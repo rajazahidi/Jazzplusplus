@@ -1,5 +1,10 @@
 ChangeLog for Development Version
 
+03-23-04
+-Added the XRC library and make a Makefile.am for it.
+-Removed the configure and Makefile.in entries from the CVS.  They keep
+ changing, and it's annoying to keep them current in the CVS.
+
 03-21-04 Patrick Earl
 -I forget to make log entries, so this is one huge entry to describe the
  changes I've made over time.  I'm no doubt missing many smaller changes.

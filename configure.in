@@ -5,6 +5,7 @@ AM_CONFIG_HEADER(src/config.h)
 
 AC_PROG_CC
 AC_PROG_CXX
+AC_PROG_LIBTOOL
 
 dnl Make autoconf use C++ for its tests.
 AC_LANG(C++)
@@ -136,13 +137,9 @@ dnl im not exactly shure which is the minimal wxwin version required for jazz, b
      
      LDFLAGS="$LDFLAGS $WX_LIBS"
 
-# Add our self-compiled XRC flags
-
-CXXFLAGS="$CXXFLAGS -I../xrc/include"
-LIBS="$LIBS -L../xrc -lwx_xrc-2.4"
-
 AC_OUTPUT( 
-  Makefile  
+  Makefile
+  xrc/Makefile
   src/Makefile 
   conf/Makefile 
 )

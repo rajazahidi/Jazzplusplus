@@ -10,4 +10,4 @@ EXTRA_DIST = bootstrap wxwin2_port.txt song  scripts midinetd mswin contrib bitm
 
 really-clean: maintainer-clean
 	cd bitmaps; make clean
-	rm -f configure Makefile.in aclocal.m4
+	rm -f configure Makefile.in xrc/Makefile.in src/Makefile.in conf/Makefile.in aclocal.m4

@@ -50,7 +50,8 @@ jazz_SOURCES = \
                 dialogs/synthSettings.cpp \
                 commands/copyCommand.cpp
 
-
+jazz_LDADD=-L../xrc -lwx_xrc
+jazz_CXXFLAGS=-I../xrc/include
 
 #the following files arent compilable yet(under wx2)
 
@@ -75,4 +76,3 @@ audio.h     events.h    guitar.h    mascfile.h  random.h       sig2.h      track
 #also, the automake info file suggests using INCLUDES for this purpose
 # and i cant even get it to expand the pkgdatadir, aargh
 INCLUDES= -DJAZZ_DATADIR=\"@datadir@/@PACKAGE@\"
-

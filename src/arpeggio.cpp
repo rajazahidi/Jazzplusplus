@@ -218,12 +218,12 @@ static tToolDef tdefs[] = {
 #else
 
 static tToolDef tdefs[] = {
-  { MEN_LOAD,  	FALSE,  0, "open_xpm", "load settings" },
-  { MEN_SAVE,  	FALSE,  1, "save_xpm", "save settings" },
-  { MEN_GEN,  	FALSE,  0, "rrggen_xpm", "generate" },
-  { MEN_RANDOM,	FALSE,  0, "alea_xpm", "random arpeggio" },
-  { MEN_PLAY,	FALSE,  1, "play_xpm",   "play" },
-  { MEN_HELP,  	FALSE,  0, "help_xpm", "help" }
+  { MEN_LOAD,  	FALSE,  0, "tb_open", "load settings" },
+  { MEN_SAVE,  	FALSE,  1, "tb_save", "save settings" },
+  { MEN_GEN,  	FALSE,  0, "tb_rrggen", "generate" },
+  { MEN_RANDOM,	FALSE,  0, "tb_alea", "random arpeggio" },
+  { MEN_PLAY,	FALSE,  1, "tb_play",   "play" },
+  { MEN_HELP,  	FALSE,  0, "tb_help", "help" }
 };
 
 #endif

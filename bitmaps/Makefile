@@ -6,7 +6,7 @@ all: panic.xpm
 
 # if one is there, all should be there
 panic.xpm : panic.bmp
-	for i in *.bmp; do n=`basename $$i .bmp`; echo $$i; bmptoppm $$i | pnmmargin -color rgb:c3/c3/c3 2 | ppmtoxpm -name tb_$$n > $$n.xpm; done
+	for i in *.bmp; do n=`basename $$i .bmp`; echo $$i; bmptoppm $$i | pnmmargin -color rgb:c3/c3/c3 2 | ppmtoxpm -name $$n\_xpm > $$n.xpm; done
 
 
 bmp2ppm:

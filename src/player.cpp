@@ -1223,6 +1223,7 @@ void tOSSThru::Notify()
     {
       if (buf[i] == EV_CHN_COMMON || buf[i] == EV_CHN_VOICE)
       {
+        buf[i+1] = mididev;
         if (ioctl(seqfd, SNDCTL_SEQ_OUTOFBAND, &buf[i]) < 0)
            perror("ioctl outofband");
       }
@@ -1693,9 +1694,11 @@ long tSeq2Player::GetRealTimeClock()
 		break;
 	    }
 
-            // midi throu
-            if (Config(C_SoftThru))
+            // midi thru
+            if (Config(C_SoftThru)) {
+              buf[i+1] = mididev;
               ioctl(seqfd, SNDCTL_SEQ_OUTOFBAND, &buf[i]);
+            }
 	  }
           i += 8;
           break;
@@ -1720,9 +1723,11 @@ long tSeq2Player::GetRealTimeClock()
 		 break;
 	    }
 
-            // midi throu
-            if (Config(C_SoftThru))
+            // midi thru
+            if (Config(C_SoftThru)) {
+              buf[i+1] = mididev;
               ioctl(seqfd, SNDCTL_SEQ_OUTOFBAND, &buf[i]);
+            }
 	  }
 	  i += 8;
 	  break;

@@ -155,7 +155,7 @@ static tToolDef tdefs[] = {
   { MEN_SHIFTR, 	FALSE, 0, shiftr_xpm  , "shift selection right"},
   { MEN_VIS_ALL_TRK, 	TRUE,  1, evnts_xpm  , "show events from all tracks"},
 
-  { MEN_ZOOMIN,		FALSE, 0, tb_zoomin  , "zoom in"}, //havent changed this yet
+  { MEN_ZOOMIN,		FALSE, 0, zoomin_xpm  , "zoom in"}, //havent changed this yet
   { MEN_ZOOMOUT,	FALSE, 0, zoomout_xpm  , "zoom out"},
   { MEN_UNDO,		FALSE, 0, undo_xpm  , "undo"},
   { MEN_REDO,		FALSE, 0, redo_xpm , "redo"},
@@ -166,29 +166,29 @@ static tToolDef tdefs[] = {
 #else
 
 static tToolDef tdefs[] = {
-  { MEN_MSELECT,  	TRUE,  0, "select_xpm", "select events" },
-  { MEN_MLENGTH,  	TRUE,  0, "length_xpm", "change length" },
-  { MEN_MDIALOG,  	TRUE,  0, "dialog_xpm", "event dialog" },
-  { MEN_MCUTPASTE,  	TRUE,  1, "cutpaste_xpm", "cut/paste events" },
+  { MEN_MSELECT,  	TRUE,  0, "tb_select", "select events" },
+  { MEN_MLENGTH,  	TRUE,  0, "tb_length", "change length" },
+  { MEN_MDIALOG,  	TRUE,  0, "tb_dialog", "event dialog" },
+  { MEN_MCUTPASTE,  	TRUE,  1, "tb_cutpaste", "cut/paste events" },
 
-  { MEN_SNAP_8,  	TRUE,  0, "note8_xpm", "snap 1/8" },
-  { MEN_SNAP_8D,  	TRUE,  0, "note83_xpm", "snap 1/12" },
-  { MEN_SNAP_16,  	TRUE,  0, "note16_xpm", "snap 1/16"},
-  { MEN_SNAP_16D,  	TRUE,  1, "note163_xpm", "snap 1/24"},
+  { MEN_SNAP_8,  	TRUE,  0, "tb_note8", "snap 1/8" },
+  { MEN_SNAP_8D,  	TRUE,  0, "tb_note83", "snap 1/12" },
+  { MEN_SNAP_16,  	TRUE,  0, "tb_note16", "snap 1/16"},
+  { MEN_SNAP_16D,  	TRUE,  1, "tb_note163", "snap 1/24"},
 
-  { MEN_CUT,   		FALSE, 0, "cut_xpm", "cut selection"  },
-  { MEN_ERASE, 		FALSE, 0, "delete_xpm", "delete selection" },
-  { MEN_QUANTIZE, 	FALSE, 0, "quantize_xpm", "quantize selection"  },
-  { MEN_SHIFTL, 	FALSE, 0, "shiftl_xpm", "shift selection left" },
-  { MEN_SHIFTR, 	FALSE, 0, "shiftr_xpm", "shift selection right"  },
-  { MEN_VIS_ALL_TRK, 	TRUE,  1, "evnts_xpm", "show events from all tracks"  },
+  { MEN_CUT,   		FALSE, 0, "tb_cut", "cut selection"  },
+  { MEN_ERASE, 		FALSE, 0, "tb_delete", "delete selection" },
+  { MEN_QUANTIZE, 	FALSE, 0, "tb_quantize", "quantize selection"  },
+  { MEN_SHIFTL, 	FALSE, 0, "tb_shiftl", "shift selection left" },
+  { MEN_SHIFTR, 	FALSE, 0, "tb_shiftr", "shift selection right"  },
+  { MEN_VIS_ALL_TRK, 	TRUE,  1, "tb_evnts", "show events from all tracks"  },
 
-  { MEN_ZOOMIN,		FALSE, 0, "zoomin_xpm", "zoom in"  },
-  { MEN_ZOOMOUT,	FALSE, 0, "zoomout_xpm", "zoom out" },
-  { MEN_UNDO,		FALSE, 0, "undo_xpm", "undo"  },
-  { MEN_REDO,		FALSE, 0, "redo_xpm" , "redo" },
-  { MEN_RESET, 		FALSE, 0, "panic_xpm", "all notes off" },
-  { MEN_HELP_PWIN, 	FALSE, 0, "help_xpm", "help" }
+  { MEN_ZOOMIN,		FALSE, 0, "tb_zoomin", "zoom in"  },
+  { MEN_ZOOMOUT,	FALSE, 0, "tb_zoomout", "zoom out" },
+  { MEN_UNDO,		FALSE, 0, "tb_undo", "undo"  },
+  { MEN_REDO,		FALSE, 0, "tb_redo" , "redo" },
+  { MEN_RESET, 		FALSE, 0, "tb_panic", "all notes off" },
+  { MEN_HELP_PWIN, 	FALSE, 0, "tb_help", "help" }
 };
 
 #endif

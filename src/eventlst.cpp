@@ -550,9 +550,9 @@ static tToolDef tdefs[] = {
 #else
 
 static tToolDef tdefs[] = {
-  { MEN_ACCEPT,	FALSE,  0, "accept_xpm", "accept changes" },
-  { MEN_CANCEL,	FALSE,  1, "cancel_xpm", "discard changes" },
-  { MEN_HELP,  	FALSE,  0, "help_xpm", "help" }
+  { MEN_ACCEPT,	FALSE,  0, "tb_accept", "accept changes" },
+  { MEN_CANCEL,	FALSE,  1, "tb_cancel", "discard changes" },
+  { MEN_HELP,  	FALSE,  0, "tb_help", "help" }
 };
 
 #endif

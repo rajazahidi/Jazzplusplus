@@ -628,7 +628,6 @@ bool tEventList::Accept()
     se.add((string)buf);
   }
   se.end();
-  delete[] buf;
 
   return se;
 }

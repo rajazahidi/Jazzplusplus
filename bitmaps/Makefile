@@ -1,20 +1,23 @@
+# The .xpm files are created automatically from the .bmp files.  A 2 pixel
+# transparent border is added around each image.  Any pixels with the #c0c0c0
+# color will be converted to transparent pixels in the finished image.
 
-# .xpm are 2x2 pixel larger than .bmp files. .xpm are derived from .bmp, .bmp may be edited in ppm format
+BITMAPS=$(shell ls *.bmp)
+XPMS=$(patsubst %.bmp,%.xpm,$(BITMAPS))
 
-all: panic.xpm
+all: $(XPMS)
 
+%.xpm: %.ppm
+	pnmmargin -color rgb:c0/c0/c0 2 $< > border_$<
+	ppmcolormask rgb:c0/c0/c0 border_$< > trans_$<
+	ppmtoxpm -alphamask=trans_$< -name=$(subst .,_,$@) border_$< > $@
+	rm -f border_$< trans_$<
 
-# if one is there, all should be there
-panic.xpm : panic.bmp
-	for i in *.bmp; do n=`basename $$i .bmp`; echo $$i; bmptoppm $$i | pnmmargin -color rgb:c3/c3/c3 2 | ppmtoxpm -name $$n\_xpm > $$n.xpm; done
+%.ppm: %.bmp
+	bmptoppm $< > $@
 
-
-bmp2ppm:
-	for i in *.bmp; do n=`basename $$i .bmp`; echo $$i; bmptoppm < $$i > $$n.ppm ; done
-
-ppm2bmp:
-	for i in *.ppm; do n=`basename $$i .ppm`; echo $$i; ppmtobmp < $$i > $$n.bmp; done
+#%.bmp: %.ppm
+#	ppmtobmp -bpp=4 $< > $@
 
 clean:
-	rm -f *.xpm *.ppm
-
+	rm -f *.xpm *.ppm border_* trans_*

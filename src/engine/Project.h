@@ -110,7 +110,7 @@ class jppProject  : public tSong
         /// Open the Song
         void OpenSong(wxString newsong);
 		/// Save the song
-        void Save();
+        void Save(wxString newsong);
 
         // Here is the new play interface.  For now it just acts as a layer between the Project
         // and the GUI.

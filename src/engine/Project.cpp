@@ -57,10 +57,37 @@ void jppProject::SetPattern(wxString newpattern)
 }
 
 void jppProject::Play() {
+	mIsPlaying = TRUE;
     Midi->StartPlay(mStartTime, mStopTime);
 }
 
+/**
+ *
+ *  Open a midi file.  Pass it a wxString containing the path to the file.
+ *
+ */
+void jppProject::OpenSong(wxString newsong)
+{
+    tStdRead io;
+    Clear();
+    Read(io, newsong);
+}
+
+/**
+ *
+ *  Save a midi file.  Pass it a wxString containing the path to the file.
+ *  Save will overwrite the file if it is already there!
+ *
+ */
+void jppProject::Save(wxString newsong)
+{
+    tStdWrite io;
+    Write(io, newsong);
+}
+
 void jppProject::Stop() {
+	mIsPlaying = FALSE;
+    Midi->Stop();
     // Stub
 }
 

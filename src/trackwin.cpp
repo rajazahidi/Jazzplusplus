@@ -635,6 +635,7 @@ void tTrackWin::EnableDisableMenus()
 /* PAT - This entire function doesn't seem to be called anywhere.  I commented
    it out with no effect.  It's just here for reference since a few of the
    items aren't moved elsewhere yet (ex. MEN_RHYTHM handling). */
+// DAVE - Thank you!  ;)  I tried that and it didn't work...
 /*
 void tTrackWin::OnMenuCommand(int id)
 {
@@ -764,9 +765,7 @@ void tTrackWin::OnLoad(){
     if (s!=wxEmptyString)
     {
         //load the song
-        tStdRead io;
-        Song->Clear();
-        Song->Read(io, s);
+        gProject->OpenSong(s);
         SetTitle(s);
         NextWin->NewPosition(1, 0);
         Canvas->SetScrollRanges();
@@ -782,8 +781,7 @@ void tTrackWin::OnSave(){
         OnSaveAs();
     else
     {
-        tStdWrite io;
-        Song->Write(io, defsong);
+    	gProject->Save(defsong);
         tTrack::changed = 0;
         Config.Put(C_StartUpSong, defsong);
     }
@@ -796,8 +794,7 @@ void tTrackWin::OnSaveAs()
         wxString s = file_selector(defsong, "Save File", 1, 0, "*.mid");
         if (s)
         {
-            tStdWrite io;
-            Song->Write(io, s);
+			gProject->Save(s);
             SetTitle(s);
             tTrack::changed = 0;
             Config.Put(C_StartUpSong, s);
@@ -813,7 +810,7 @@ void tTrackWin::OnNew(){
     }
     if (wxMessageBox("Clear Song?", "Sure?", wxOK | wxCANCEL) == wxOK)
     {
-        Song->Clear();
+        gProject->Clear();
         Redraw();
         delete [] defsong;
         defsong = copystring("noname.mid");
@@ -833,9 +830,7 @@ void tTrackWin::OnLoadTemplate()
 	s = file_selector(defsong, "Load Template", 0, tTrack::changed, "*.mid");
 	if (s!=wxEmptyString)
     {
-	    tStdRead io;
-	    Song->Clear();
-	    Song->Read(io, s);
+	    gProject->OpenSong(s);
 	    delete [] defsong;
 	    defsong = copystring("noname.mid");
 	    SetTitle(defsong);
@@ -908,15 +903,14 @@ bool tTrackWin::OnClose()
         if (wxMessageBox("Song has changed. Quit anyway?", "Quit ?", wxYES_NO) == wxNO)
             return FALSE;
     }
-    if (Midi->Playing)
+    if (gProject->IsPlaying())
     {
-        Midi->StopPlay();
+        gProject->Stop();
     #ifndef wx_msw
         sleep(1);
     #endif
     }
     delete the_harmony_browser;
-    delete Midi;
     delete NextWin;
     return TRUE;
 }
@@ -966,7 +960,7 @@ void tTrackWin::MenClpCopy(bool erase)
 {
     if (!EventsSelected("please select events to be copied"))
         return;
-    Song->NewUndoBuffer();
+    gProject->NewUndoBuffer();
 
     int tracknr = 0;
 
@@ -995,7 +989,7 @@ void tTrackWin::MenClpCopy(bool erase)
             src->Cleanup();
         src = Tracks.Next();
     }
-    paste_buffer->TicksPerQuarter = Song->TicksPerQuarter;
+    paste_buffer->TicksPerQuarter = gProject->TicksPerQuarter;
     if (erase)
         Redraw();
 }
@@ -1040,8 +1034,6 @@ void tTrackWin::OnShift()
 }
 
 ///////////////////////////////////////
-
-// tTrackWin::MenDelete GOES HERE!!!!!!!!!!!!
 
 /*
        All of these event macros are defined and lack handlers
@@ -1164,11 +1156,11 @@ void tTrackWin::MenMergeTracks()
     if (choice == wxOK)
     {
         int tn;
-        Song->NewUndoBuffer();
-        tTrack *dst = Song->GetTrack(0);
-        for (tn = 1; tn < Song->nTracks; tn++)
+        gProject->NewUndoBuffer();
+        tTrack *dst = gProject->GetTrack(0);
+        for (tn = 1; tn < gProject->nTracks; tn++)
         {
-            tTrack *src = Song->GetTrack(tn);
+            tTrack *src = gProject->GetTrack(tn);
             tEventIterator Iterator(src);
             tEvent *e = Iterator.First();
             while (e)
@@ -1197,8 +1189,8 @@ void tTrackWin::MenSplitTracks()
     if (choice == wxOK)
     {
         int ch;
-        Song->NewUndoBuffer();
-        tTrack *src = Song->GetTrack(0);
+        gProject->NewUndoBuffer();
+        tTrack *src = gProject->GetTrack(0);
         tEventIterator Iterator(src);
         tEvent *e = Iterator.First();
         while (e)
@@ -1207,7 +1199,7 @@ void tTrackWin::MenSplitTracks()
             if (ce)
             {
                 int cn = ce->Channel;
-                tTrack *dst = Song->GetTrack(cn + 1);
+                tTrack *dst = gProject->GetTrack(cn + 1);
                 if (dst)
                 {
                     tEvent *cp = ce->Copy();
@@ -1221,7 +1213,7 @@ void tTrackWin::MenSplitTracks()
 
         for (ch = 0; ch <= 16; ch++)
         {
-            src = Song->GetTrack(ch);
+            src = gProject->GetTrack(ch);
             if (src)
                 src->Cleanup();
         }
@@ -1409,14 +1401,14 @@ void tTrackWin::OnSaveAll(){
 
 void tTrackWin::OnUndo(){
     //    case :
-    Song->Undo();
+    gProject->Undo();
     Redraw();
     NextWin->Redraw();
 }
 
 void tTrackWin::OnRedo(){
     //    case :
-    Song->Redo();
+    gProject->Redo();
     Redraw();
     NextWin->Redraw();
 }
@@ -1677,7 +1669,7 @@ void tTrackWin::DrawCounters(wxDC* dc)
     dc->SetClippingRegion(xPatch, yEvents, xPatch + wPatch, yEvents + hEvents);
     for (i = FromLine; i < ToLine; i++)
     {
-        tTrack *t = Song->GetTrack(i);
+        tTrack *t = gProject->GetTrack(i);
         if (t)
         {
             char buf[20];
@@ -1729,7 +1721,7 @@ void tTrackWin::DrawNumbers(wxDC* dc)
     dc->SetClippingRegion(xNumber, yEvents, xNumber + wNumber, yEvents + hEvents);
     for (i = FromLine; i < ToLine; i++)
     {
-        tTrack *t = Song->GetTrack(i);
+        tTrack *t = gProject->GetTrack(i);
         if (t != 0)
         {
             if (t->GetAudioMode())
@@ -1761,7 +1753,7 @@ void tTrackWin::DrawSpeed(wxDC* dc,int Value, bool down)
     char buf[50];
 
     if (Value < 0)
-        Value = Song->GetTrack(0)->GetDefaultSpeed();
+        Value = gProject->GetTrack(0)->GetDefaultSpeed();
 
     sprintf(buf, "speed: %3d", Value);
 
@@ -1817,7 +1809,7 @@ void tTrackWin::OnPaintSub(wxDC* dc,long x, long y)
     BarInfo.SetClock(FromClock);
     StopClk = x2Clock(CanvasX + CanvasW);
     nBars = 0;
-    int intro = Song->GetIntroLength();
+    int intro = gProject->GetIntroLength();
     dc->SetPen(*wxGREY_PEN);
     while (1)
     {
@@ -1863,7 +1855,7 @@ void tTrackWin::OnPaintSub(wxDC* dc,long x, long y)
         dc->SetPen(*wxBLACK_PEN);
         dc->DrawLine(CanvasX, y, xEvents,y);
         //
-        tTrack *Track = Song->GetTrack(TrackNr);
+        tTrack *Track = gProject->GetTrack(TrackNr);
         if (Track)
         {
             // TrackName, show the button pressed when dialog is open
@@ -1903,7 +1895,7 @@ void tTrackWin::DrawEvents(wxDC* dc){
   int TrackNr = FromLine;
   for (int y = Line2y(TrackNr); y < yEvents + hEvents; y += hLine)
   {
-    tTrack *Track = Song->GetTrack(TrackNr);
+    tTrack *Track = gProject->GetTrack(TrackNr);
     if (Track)
     {
       tEventIterator Iterator(Track);
@@ -2000,7 +1992,7 @@ long tTrackWin::x2wBar(long x)
 
 tTrack *tTrackWin::y2Track(long y)
 {
-    return Song->GetTrack(y2Line(y));
+    return gProject->GetTrack(y2Line(y));
 }
 
 
@@ -2065,7 +2057,7 @@ void tTrackWin::MouseNumber(wxMouseEvent &e)
       tRect r;
       r.x = 0;
       r.y = y2yLine((long)y);
-      r.width = Clock2x( Song->MaxQuarters * Song->TicksPerQuarter );
+      r.width = Clock2x( gProject->MaxQuarters * gProject->TicksPerQuarter );
       r.height = hLine;
       SnapSel->Select(r, xEvents, yEvents, wEvents, hEvents);
       SnapSelStop(e);
@@ -2235,7 +2227,7 @@ void tTrackWin::MouseSpeed(wxMouseEvent &e)
   if (Midi->GetAudioEnabled() && Midi->Playing)
     return;
 
-  Value = Song->GetTrack(0)->GetDefaultSpeed();
+  Value = gProject->GetTrack(0)->GetDefaultSpeed();
   tSpeedCounter *SpeedCounter = new tSpeedCounter(this, &r, Value, 20, 250);
   SpeedCounter->Event(e);
   MouseAction = SpeedCounter;
@@ -2351,7 +2343,7 @@ void tTrackWin::MouseName(wxMouseEvent &e)
          tTrack *t = y2Track((long)y);
          if (t && !MixerForm) {
            to = y2Line((long)y);
-           Song->moveTrack(from,to);
+           gProject->moveTrack(from,to);
 	 }
 	 Redraw();
    }

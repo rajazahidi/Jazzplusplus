@@ -17,10 +17,13 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **
-*/                                                                              
+*/
 
 #include "wx/wx.h"
 #include <unistd.h>
+
+#include "engine/Project.h"
+
 #include "synth.h"
 
 #include "config.h"
@@ -63,6 +66,8 @@
 
 ///////////////////////////////////////////////////////////////////
 // globals
+// These all need to be removed when they're not used anymore and have been
+// replaced in jppProject
 char *StartUpSong = 0;
 tSong *TheSong;
 tSynth *Synth;
@@ -71,6 +76,8 @@ tHelp *HelpInstance = 0;
 tConfig Config; //JAVE valgrind says mismatched free()
 ///////////////////////////////////////////////////////////////////
 
+// gProject is the global jppProject instance that we should use now
+jppProject* gProject;
 
 
 // -------------------------- global config -----------------------------------
@@ -831,6 +838,9 @@ bool tApp::OnInit(void)
 	exit(0);
   }
 #endif
+
+	// Instantiate the gProject object
+    gProject = new jppProject();
 
   //  const char *fname = "/tmp/jazz.cfg";//Config.File();
   //cout<<"WARNING hardcoded jazz.cfg  path, because jazz mysteriously dont load cfg file"<<endl;

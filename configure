@@ -5048,7 +5048,13 @@ echo "$as_me: error:
 
      LDFLAGS="$LDFLAGS $WX_LIBS"
 
-LIBS="$LIBS -lwx_gtk_xrc-2.4"
+wxbasename=`wx-config --basename`
+
+if test "$wxbasename" = "wx_gtk"; then
+    LIBS="$LIBS -lwx_gtk_xrc-2.4"
+else
+    LIBS="$LIBS -lwx_gtk2_xrc-2.4"
+fi
 
                               ac_config_files="$ac_config_files Makefile src/Makefile conf/Makefile"
 cat >confcache <<\_ACEOF

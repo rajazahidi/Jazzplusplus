@@ -141,7 +141,13 @@ dnl stick it here as a quick hack.  It's too bad it's not part of the core
 dnl wxWidgets distribution yet.  On debian you need to install the contrib-dev
 dnl stuff.  In any case, the wxxrc library comes with the wxWidgets contrib
 dnl material.
-LIBS="$LIBS -lwx_gtk_xrc-2.4"
+wxbasename=`wx-config --basename`
+
+if test "$wxbasename" = "wx_gtk"; then
+    LIBS="$LIBS -lwx_gtk_xrc-2.4"
+else
+    LIBS="$LIBS -lwx_gtk2_xrc-2.4"
+fi
 
 AC_OUTPUT( 
   Makefile  

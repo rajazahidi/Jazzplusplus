@@ -48,7 +48,7 @@ class tCanvas: public wxScrolledWindow //this was wxCanvas
     //    void OnEvent(wxMouseEvent& event);
     void OnMouseEvent(wxMouseEvent& event);
     void OnChar(wxKeyEvent& event);
-    Bool OnCharHook(wxKeyEvent& event);
+    bool OnCharHook(wxKeyEvent& event);
     void SetScrollRanges();
     void SetScrollPosition(long x, long y);
     void OnDraw(wxDC& dc);
@@ -76,7 +76,7 @@ class tEventWin : public wxFrame
 {
 
   public:
-    Bool OnCharHook(wxKeyEvent& event);
+    bool OnCharHook(wxKeyEvent& event);
     void OnChar(wxKeyEvent& event);
 
     // 2-step initialization: 1) constructor
@@ -137,7 +137,7 @@ class tEventWin : public wxFrame
     long y2Line(long y, int up = 0);
     long y2yLine(long y, int up = 0);
     long Line2y(long line);
-    void LineText(wxDC *dc, long x, long y, long w, const char *str, int h = -1, Bool down = FALSE);
+    void LineText(wxDC *dc, long x, long y, long w, const char *str, int h = -1, bool down = FALSE);
     long x2Clock(long x);
     long Clock2x(long clk);
     long x2BarClock(long x, int Next = 0);

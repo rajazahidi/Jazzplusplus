@@ -22,7 +22,6 @@
 
 #ifndef COPYRIGHTDIALOG
 #define COPYRIGHTDIALOG
-#include "wxwin2port.h"
 
 #include "proplistdlg.h"
 

@@ -43,7 +43,7 @@ tMouseMapper::tMouseMapper()
   left_action = 0;
 }
 
-void tMouseMapper::SetAction(int code, Button but, Bool shift, Bool ctrl)
+void tMouseMapper::SetAction(int code, Button but, bool shift, bool ctrl)
 {
   int i = 0;
   switch (but)
@@ -442,7 +442,7 @@ void tMouseCounter::Notify()
 }
 
 
-void tMouseCounter::ShowValue(Bool down)
+void tMouseCounter::ShowValue(bool down)
 {
   char buf[20];
   sprintf(buf, "%3d", Value);

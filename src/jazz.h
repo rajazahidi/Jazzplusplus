@@ -186,13 +186,13 @@ class tConfig
       int& operator () ( char* name );
       int& operator () ( int name );
 
-      Bool Get(int entry, char *value);
-      Bool Get(int entry, long &value);
+      bool Get(int entry, char *value);
+      bool Get(int entry, long &value);
 
-      Bool Put(int entry, const char *value);
-      Bool Put(int entry, long value);
-      Bool Put(int entry );
-      Bool Put(int entry, int val);
+      bool Put(int entry, const char *value);
+      bool Put(int entry, long value);
+      bool Put(int entry );
+      bool Put(int entry, int val);
 };
 
 enum SynthTypeId {

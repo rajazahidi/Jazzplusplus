@@ -23,14 +23,9 @@
 #ifndef util_h
 #define util_h
 
-
-#include "wxwin2port.h"
-
+#include "wx/wx.h"
 #include "wx/proplist.h"
 
-#ifndef wxb_formh
-#include "wx_form.h"
-#endif
 
 #include <iostream>
 using namespace std;
@@ -53,6 +48,8 @@ public:
 };
 
 
+class wxStringListValidator;
+class wxProperty;
 class tSong;
 
 // ************************************************************************
@@ -184,7 +181,7 @@ istream & ReadString(istream &is, char *buf, int maxlen);
 ostream & WriteString(ostream &os, const char *str);
 
 
-wxString file_selector(wxString deffile, const wxString title, Bool save, Bool changed, const wxString ext);
+wxString file_selector(wxString deffile, const wxString title, bool save, bool changed, const wxString ext);
 
 // ------------------------------------------------------------
 // ---------------------------- mapper ------------------------

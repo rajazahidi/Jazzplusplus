@@ -125,12 +125,12 @@ probably never called in wx2
 
 
 
-Bool tCanvas::OnCharHook(wxKeyEvent& e) {
+bool tCanvas::OnCharHook(wxKeyEvent& e) {
   return EventWin->OnKeyEvent(e);
 }
 
 
-Bool tEventWin::OnCharHook(wxKeyEvent& e)
+bool tEventWin::OnCharHook(wxKeyEvent& e)
 {
   return OnKeyEvent(e);
 }
@@ -414,7 +414,7 @@ long tEventWin::Line2y(long Line)
   return Line * hLine + hTop;
 }
 
-void tEventWin::LineText(wxDC *dc, long x, long y, long w, const char *str, int h, Bool down)
+void tEventWin::LineText(wxDC *dc, long x, long y, long w, const char *str, int h, bool down)
 {
   if (h <= 0)
   {

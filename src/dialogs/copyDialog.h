@@ -22,7 +22,6 @@
 
 #ifndef COPYDIALOG
 #define COPYDIALOG
-#include "wxwin2port.h"
 
 #include "../commands/copyCommand.h"
 

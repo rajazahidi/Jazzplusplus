@@ -391,7 +391,7 @@ int& tConfig::operator () ( int name )
    return Names[name]->Value;
 }
 
-Bool tConfig::Get(int entry, char *value)
+bool tConfig::Get(int entry, char *value)
 {
    assert( (entry >= 0) && (entry < NumConfigNames) );
 
@@ -404,7 +404,7 @@ Bool tConfig::Get(int entry, char *value)
 
    int  len = strlen(name);
    char buf[1000];
-   Bool found = FALSE;
+   bool found = FALSE;
    while (!found && fgets(buf, sizeof(buf), fd) != NULL)
    {
       if (strncmp(buf, name, len) == 0)
@@ -422,7 +422,7 @@ Bool tConfig::Get(int entry, char *value)
    return found;
 }
 
-Bool tConfig::Get(int entry, long &value)
+bool tConfig::Get(int entry, long &value)
 {
   char buf[512];
   if (Get(entry, buf))
@@ -434,7 +434,7 @@ Bool tConfig::Get(int entry, long &value)
 }
 /** write a conf entry by making a temp file, and copying all entries to there. 
 if the name/value pair is found, replace it. otherwise write it. lastly copy temp file over the old file*/
-Bool tConfig::Put(int entry, const char *value)
+bool tConfig::Put(int entry, const char *value)
 {
    assert( (entry >= 0) && (entry < NumConfigNames) );
 
@@ -454,7 +454,7 @@ Bool tConfig::Put(int entry, const char *value)
 
    int  len = strlen(name);
    char buf[1000];
-   Bool found = FALSE;
+   bool found = FALSE;
    while (fgets(buf, sizeof(buf), inp) != NULL)
    {
       if (strncmp(buf, name, len) == 0)
@@ -475,19 +475,19 @@ Bool tConfig::Put(int entry, const char *value)
 }
 
 
-Bool tConfig::Put(int entry, long value)
+bool tConfig::Put(int entry, long value)
 {
    char buf[50];
    sprintf(buf, "%ld", value);
    return Put(entry, buf);
 }
 
-Bool tConfig::Put( int entry )
+bool tConfig::Put( int entry )
 {
    return Put( entry, (long) operator()( entry ) );
 }
 
-Bool tConfig::Put( int entry, int val )
+bool tConfig::Put( int entry, int val )
 {
    operator()( entry ) = val;
    return Put( entry );

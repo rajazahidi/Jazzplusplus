@@ -42,7 +42,7 @@
 // Menubar
 // ************************************************************************
 
-#define MEN_SETTINGS	5
+#define ACT_SETTINGS	5
 #define MEN_FILTER	6
 #define MEN_SNAP	7
 #define MEN_METERCH	8
@@ -279,12 +279,7 @@ tPianoWin::tPianoWin(wxFrame *frame, char *title, tSong *song, int x, int y, int
     MousePlay(play_actions),
     MouseEvnt(evnt_actions)
 {
-  // Start of tEventWin init.
-
-  tool_bar  = 0;
-
   Song      = song;
-
   ParentWin = frame;
 
   Filter    = new tFilter(Song);
@@ -304,8 +299,7 @@ tPianoWin::tPianoWin(wxFrame *frame, char *title, tSong *song, int x, int y, int
   hLine = 0;
   LittleBit = 1;
 
-  FontSize = 12;
-  ClocksPerPixel = 36;
+  FontSize = PianoFontSizes[1]; // Must be an entry in the array.
   UseColors = 1;
 
   PlayClock = -1;
@@ -334,10 +328,6 @@ tPianoWin::tPianoWin(wxFrame *frame, char *title, tSong *song, int x, int y, int
 
   ClocksPerPixel = 4;
 
-  // There was previously an #ifdef here to change the font size to 6 if
-  // wx_msw is set.
-  FontSize = 7;
-
   TrackNr = 0;
   Track = Song->GetTrack(TrackNr);
   SnapDenomiator = 16;
@@ -365,6 +355,18 @@ tPianoWin::tPianoWin(wxFrame *frame, char *title, tSong *song, int x, int y, int
 
   CtrlEdit  = 0;
   GuitarWin = 0;
+
+  int w, h;
+  GetClientSize(&w, &h);
+  Canvas = new tPianoCanvas(this, 0, 0, w, h);
+
+  SnapSel = new tSnapSelection(Canvas);
+
+
+  Setup();
+  Canvas->SetScrollRanges();
+  Canvas->SetScrollPosition(0,0);//this wasnt here before wx2, why?
+
 }
 
 
@@ -538,7 +540,7 @@ void tPianoWin::CreateMenu()
 
   wxMenu *setting_menu = new wxMenu("",wxMENU_TEAROFF);
   setting_menu->Append(MEN_FILTER,    "&Filter ...");
-  setting_menu->Append(MEN_SETTINGS,  "&Window ...");
+  setting_menu->Append(ACT_SETTINGS,  "&Window ...");
   setting_menu->Append(MEN_VISIBLE,   "&Events...");
   setting_menu->Append(MEN_SNAP,      "&Snap ...");
   setting_menu->Append(MEN_METERCH,   "&Meterchange ...");
@@ -650,32 +652,32 @@ BEGIN_EVENT_TABLE(tPianoWin, wxFrame)
 //  EVT_MENU    (MEN_SEQLENGTH,  	tPianoWin::MenSeqLength)
 //  EVT_MENU    (MEN_MIDIDELAY, tPianoWin::MenMidiDelay)
 //  EVT_MENU    (MEN_CONVERT_TO_MODULATION ,	tPianoWin::MenConvertToModulation)
-  EVT_MENU    (MEN_SETTINGS,tPianoWin::OnSettingsDialog)
+  EVT_MENU    (ACT_SETTINGS, tPianoWin::ActSettingsDialog)
   EVT_MENU    (MEN_FILTER,tPianoWin::OnFilter)
   EVT_MENU    (MEN_SNAP    ,tPianoWin::SnapDlg)
 END_EVENT_TABLE()
-void tPianoWin::OnFilter(){
+
+
+void tPianoWin::OnFilter()
+{
   Filter->Dialog(0);
-  
-  }
+}
 
-void tPianoWin::OnSettingsDialog(){
-  SettingsDialog();
-
-  }
 
 /**activate velocity edit*/
-void tPianoWin::OnCtrlVelocity(){
-      delete CtrlEdit;
-      int cw, ch;
-      GetClientSize(&cw, &ch);
-      CtrlEdit = new tVelocEdit(this, "Velocity", wPiano, 0, CtrlY(ch), CanvasW, CtrlH(ch));
-      CtrlEdit->ReInit(Track, FromClock, ClocksPerPixel);
-      Redraw();
-  }
+void tPianoWin::OnCtrlVelocity()
+{
+  delete CtrlEdit;
+  int cw, ch;
+  GetClientSize(&cw, &ch);
+  CtrlEdit = new tVelocEdit(this, "Velocity", wPiano, 0, CtrlY(ch), CanvasW, CtrlH(ch));
+  CtrlEdit->ReInit(Track, FromClock, ClocksPerPixel);
+  Redraw();
+}
 
 
-void tPianoWin::CtrlChannelAftertouchEdit(){
+void tPianoWin::CtrlChannelAftertouchEdit()
+{
   delete CtrlEdit;
   int cw, ch;
   GetClientSize(&cw, &ch);
@@ -683,58 +685,64 @@ void tPianoWin::CtrlChannelAftertouchEdit(){
   CtrlEdit->ReInit(Track, FromClock, ClocksPerPixel);
   Redraw();
   
-  }
-void tPianoWin::OnCtrlPolyAftertouchEdit(){
+}
+
+void tPianoWin::OnCtrlPolyAftertouchEdit()
+{
   int cw, ch;
   GetClientSize(&cw, &ch);
   delete CtrlEdit;
   CtrlEdit = new tPolyAfterEdit(this, "Key Aftertouch", wPiano, 0, CtrlY(ch), CanvasW,CtrlH(ch));
   CtrlEdit->ReInit(Track, FromClock, ClocksPerPixel);
   Redraw();  
-  }
-void tPianoWin::OnCtrlNone(){
-      delete CtrlEdit;
-      CtrlEdit = 0;
-      Redraw();  
-  }
-void tPianoWin::OnCtrlTempo(){
-      tEventIterator Iterator(Track);
-      Track->Sort();
-      tEvent *e = Iterator.Range(0, (long unsigned) Track->GetLastClock() + 1);
-      tSetTempo *t;
-      int min = 240;
-      int max = 20;
-      while (e) {
-        if ((t = e->IsSetTempo()) != 0) {
-	  min = MIN( t->GetBPM(), min );
-	  max = MAX( t->GetBPM(), max );
-        }
-        e = Iterator.Next();
-      } // while e
+}
 
+void tPianoWin::OnCtrlNone()
+{
+  delete CtrlEdit;
+  CtrlEdit = 0;
+  Redraw();  
+}
+
+void tPianoWin::OnCtrlTempo(){
+  tEventIterator Iterator(Track);
+  Track->Sort();
+  tEvent *e = Iterator.Range(0, (long unsigned) Track->GetLastClock() + 1);
+  tSetTempo *t;
+  int min = 240;
+  int max = 20;
+  while (e) {
+    if ((t = e->IsSetTempo()) != 0) {
+      min = MIN( t->GetBPM(), min );
+      max = MAX( t->GetBPM(), max );
+    }
+    e = Iterator.Next();
+  } // while e
+  
+  delete CtrlEdit;
+  int cw, ch;
+  GetClientSize(&cw, &ch);
+  CtrlEdit = new tTempoEdit( MAX(min-50, 20), MIN(max+50,240), this, "Tempo", wPiano, 0, CtrlY(ch), CanvasW, CtrlH(ch));
+  CtrlEdit->ReInit(Track, FromClock, ClocksPerPixel);
+  Redraw();  
+}
+
+void tPianoWin::OnSelectController()
+{
+  int i = SelectControllerDlg();
+  if (i > 0)
+    {
       delete CtrlEdit;
       int cw, ch;
       GetClientSize(&cw, &ch);
-      CtrlEdit = new tTempoEdit( MAX(min-50, 20), MIN(max+50,240), this, "Tempo", wPiano, 0, CtrlY(ch), CanvasW, CtrlH(ch));
+      CtrlEdit = new tCtrlEdit(i-1, this, Config.CtrlName(i).Name, wPiano, 0, CtrlY(ch), CanvasW, CtrlH(ch));
       CtrlEdit->ReInit(Track, FromClock, ClocksPerPixel);
-      Redraw();  
-  }
+      Redraw();
+    }  
+}
 
-
-void tPianoWin::OnSelectController(){
-	int i = SelectControllerDlg();
-	if (i > 0)
-	{
-	  delete CtrlEdit;
-	  int cw, ch;
-	  GetClientSize(&cw, &ch);
-	  CtrlEdit = new tCtrlEdit(i-1, this, Config.CtrlName(i).Name, wPiano, 0, CtrlY(ch), CanvasW, CtrlH(ch));
-	  CtrlEdit->ReInit(Track, FromClock, ClocksPerPixel);
-	  Redraw();
-	}  
-  }
-
-void tPianoWin::OnCtrlModulation(){
+void tPianoWin::OnCtrlModulation()
+{
   delete CtrlEdit;
   int cw, ch;
   GetClientSize(&cw, &ch);
@@ -743,7 +751,8 @@ void tPianoWin::OnCtrlModulation(){
   Redraw();  
 }
 
-void tPianoWin::OnCtrlPitch(){
+void tPianoWin::OnCtrlPitch()
+{
   int cw, ch;
   GetClientSize(&cw, &ch);
   delete CtrlEdit;
@@ -755,55 +764,62 @@ void tPianoWin::OnCtrlPitch(){
 
 /**
    redo undone actions
- */
-void tPianoWin::OnRedo(){
-      Song->Redo();
-      Redraw();
-      if (CtrlEdit && Track >= 0)
-	CtrlEdit->ReInit(Track, FromClock, ClocksPerPixel);  
-  }
+*/
+void tPianoWin::OnRedo()
+{
+  Song->Redo();
+  Redraw();
+  if (CtrlEdit && Track >= 0)
+    CtrlEdit->ReInit(Track, FromClock, ClocksPerPixel);  
+}
 
 /**
  undo actions 
 */
-void tPianoWin::OnUndo(){
-      Song->Undo();
-      Redraw();
-      if (CtrlEdit && Track >= 0)
-	CtrlEdit->ReInit(Track, FromClock, ClocksPerPixel);  
-  }
+void tPianoWin::OnUndo()
+{
+  Song->Undo();
+  Redraw();
+  if (CtrlEdit && Track >= 0)
+    CtrlEdit->ReInit(Track, FromClock, ClocksPerPixel);  
+}
 
 /** quantize selected events*/
-void tPianoWin::OnQuantize(){
-      if (EventsSelected())
-      {
-	tCmdQuantize cmd(Filter, SnapClocks(), 0, 0);
-	cmd.Execute(1);
-	Redraw();
-      }  
-  }
+void tPianoWin::OnQuantize()
+{
+  if (EventsSelected())
+    {
+      tCmdQuantize cmd(Filter, SnapClocks(), 0, 0);
+      cmd.Execute(1);
+      Redraw();
+    }  
+}
+
 /** flip events up and down*/
-void tPianoWin::OnExchangeUpDown(){
-      if (EventsSelected())
-      {
-	tCmdExchUpDown cmd(Filter);
-	cmd.Execute(1);
-	Redraw();
-      }  
-  }
+void tPianoWin::OnExchangeUpDown()
+{
+  if (EventsSelected())
+    {
+      tCmdExchUpDown cmd(Filter);
+      cmd.Execute(1);
+      Redraw();
+    }  
+}
 
 /**flip events left to righ*/
-void tPianoWin::OnExchangeLeftRight(){
-      if (EventsSelected())
-      {
-	tCmdExchLeftRight cmd(Filter);
-	cmd.Execute(1);
-	Redraw();
-      }  
-  }
+void tPianoWin::OnExchangeLeftRight()
+{
+  if (EventsSelected())
+    {
+      tCmdExchLeftRight cmd(Filter);
+      cmd.Execute(1);
+      Redraw();
+    }  
+}
 
 /**shift events snapclock clocks to left*/
-void tPianoWin::OnShiftLeft(){
+void tPianoWin::OnShiftLeft()
+{
   if (EventsSelected())
     {
       long steps =  -SnapClocks();
@@ -814,7 +830,8 @@ void tPianoWin::OnShiftLeft(){
 }
 
 /**shift events snapclock clocks to right*/
-void tPianoWin::OnShiftRight(){
+void tPianoWin::OnShiftRight()
+{
   if (EventsSelected())
     {
       long steps = SnapClocks();
@@ -824,73 +841,77 @@ void tPianoWin::OnShiftRight(){
     }
 }
 
-void tPianoWin::OnShift(){
+void tPianoWin::OnShift()
+{
   // FIXME PAT - Bring this back once Dave has figured out what's he's doing
   // with the trackwin stuff.
   //MenShift(SnapClocks());
-  }
+}
 
-void tPianoWin::OnCut(){
+void tPianoWin::OnCut()
+{
   CutOrCopy(MEN_CUT);
-  }
+}
 
-void tPianoWin::OnCopy(){
+void tPianoWin::OnCopy()
+{
   CutOrCopy(MEN_COPY);
-  }
+}
 
 /**helper for cut and copy events*/
-void tPianoWin::CutOrCopy(int id){
-      if (EventsSelected())
-      {
-	PasteBuffer.Clear();
-	tCmdCopyToBuffer cmd(Filter, &PasteBuffer);
-	Filter->OtherSelected = VisibleTempo;
-	cmd.Execute(0);	// no UNDO
-	if (id == MEN_CUT)
+void tPianoWin::CutOrCopy(int id)
+{
+  if (EventsSelected())
+    {
+      PasteBuffer.Clear();
+      tCmdCopyToBuffer cmd(Filter, &PasteBuffer);
+      Filter->OtherSelected = VisibleTempo;
+      cmd.Execute(0);	// no UNDO
+      if (id == MEN_CUT)
 	{
 	  tCmdErase cmd(Filter);
 	  cmd.Execute(1);	// with UNDO
 	  Redraw();
 	}
-	Filter->OtherSelected = 0;
-	if (GuitarWin)
-	  GuitarWin->Redraw();
-      }  
-  }
+      Filter->OtherSelected = 0;
+      if (GuitarWin)
+	GuitarWin->Redraw();
+    }  
+}
 
 
-void tPianoWin::OnErase(){
+void tPianoWin::OnErase()
+{
   if (EventsSelected())
     {
       tCmdErase cmd(Filter);
       cmd.Execute(1);	// with UNDO
-	Redraw();
+      Redraw();
     }  
 }
 
 /**togle display of events from all tracks, or just from the current track */
-void tPianoWin::OnVisibleAllTracks(){
-      VisibleAllTracks = !VisibleAllTracks;
-      //VisibleAllTracks = tool_bar->GetToolState(MEN_VIS_ALL_TRK);
-      Redraw();  
-  }
+void tPianoWin::OnVisibleAllTracks()
+{
+  VisibleAllTracks = !VisibleAllTracks;
+  //VisibleAllTracks = tool_bar->GetToolState(MEN_VIS_ALL_TRK);
+  Redraw();  
+}
 
 /**send a midi reset*/
-  void tPianoWin::OnReset(){
+void tPianoWin::OnReset(){
   Midi->AllNotesOff(1);
 }
 
-  //INSER_EVENT_HANDLER_HERE
+//INSER_EVENT_HANDLER_HERE
 
 /*
-//all the code commented out will compile nicely
 
+//these wont compile nicely
 
-      //these wont compile nicely
+case MEN_VISIBLE:   VisibleDialog(); break;
 
-  case MEN_VISIBLE:   VisibleDialog(); break;
-
-    case MEN_METERCH:	MenMeterChange(); break;
+case MEN_METERCH:	MenMeterChange(); break;
 
 
 
@@ -2108,7 +2129,7 @@ int tVelocCounter::Event(wxMouseEvent &e)
 // --------------------------------------------------------------------
 
 
-void tPianoWin::MouseCutPaste(wxMouseEvent &e, Bool cut)
+void tPianoWin::MouseCutPaste(wxMouseEvent &e, bool cut)
 {
 
   //converts physical coords to logical(scrolled) coords
@@ -2540,7 +2561,7 @@ void tPianoWin::SetSnapDenom(long value)
 
 
 
-void tPianoWin::SetVisibleAllTracks(Bool value)
+void tPianoWin::SetVisibleAllTracks(bool value)
 {
   tool_bar->ToggleTool(MEN_VIS_ALL_TRK, value);
   VisibleAllTracks = value;
@@ -2600,7 +2621,6 @@ void tPianoWin::DrawPlayPosition(wxDC* dc)
     dc->SetBrush(*wxBLACK_BRUSH);
     dc->SetPen(*wxBLACK_PEN);
     long x = Clock2x(PlayClock);
-    //cout<<"tEventWin::DrawPlayPosition play pos x "<<x<<" "<<FromClock<<" "<<ToClock<<endl;
     //dc->DrawRectangle(x, CanvasY, 2*LittleBit, hTop);
     dc->DrawLine(x,  CanvasY,x,  yEvents+hEvents); //draw a line, 2 pixwels wide
     dc->DrawLine(x+1,CanvasY,x+1,yEvents+hEvents);
@@ -2608,48 +2628,9 @@ void tPianoWin::DrawPlayPosition(wxDC* dc)
       }
 }
 
-/**
-second phase of creation. make menus, the canvas, and so on
-*/
-void tPianoWin::Create()
-{
-  CreateMenu();
-
-  CreateCanvas();
-  SnapSel = new tSnapSelection(Canvas);
-
-
-  Setup();
-  Canvas->SetScrollRanges();
-  Canvas->SetScrollPosition(0,0);//this wasnt here before wx2, why?
-}
-
-
 void tPianoWin::Redraw()
 {
-//   wxDC* dc=new wxClientDC(this);
-//   wxPaintEvent e;
-//   cout<<"FIXME tEventWin::Redraw"<<endl;
-//   Canvas->OnDraw(*dc); //this will in turn call the eventwin onpaintsub
-//   //the problem is that onpaint no longer tkes no argument, and is supposed to be called from the framework only, so it should be split
-//   delete dc;
   Canvas->Refresh();
-
-}
-
-/**
-
-create the canvas component(used for differently dependingon the subclass)
-size it to the client area of the frame(frame size minus toolbar and menus )
-*/
-void tPianoWin::CreateCanvas()
-{
-  cout << "createcanvas\n"; 
- int w, h;
-  GetClientSize(&w, &h);
-  Canvas = new tPianoCanvas(this, 0, 0, w, h);
-  //dc = Canvas->GetDC();
-  //dc = new wxClientDC(Canvas);
 }
 
 long tPianoWin::Clock2x(long clk)
@@ -2662,28 +2643,11 @@ long tPianoWin::Line2y(long Line)
   return Line * hLine + hTop;
 }
 
-// FIXME PAT - Quick hack to get tEventWinDlg from eventwin.cpp.
-
-class tEventWinDlg : public tPropertyListDlg
-{
-  tPianoWin *EventWin;
-  //tNamedChoice xSize, ySize;
-  tNamedValue* xSizes;
-  tNamedValue* ySizes;
- public:
-  tEventWinDlg(tPianoWin *w, tNamedValue *xSizes, tNamedValue *ySizes);
-  void AddProperties();
-  virtual bool OnClose();
-  virtual void OnCancel();
-  virtual void OnHelp();
-};
-
-void tPianoWin::SettingsDialog()
+void tPianoWin::ActSettingsDialog()
 {
   tResourceDialog dialog(this, "windowSettings");
   
   dialog.Attach("use_colours", &UseColors);
-  dialog.Attach("event_size", &ClocksPerPixel, PianoEventSizes);
   dialog.Attach("font_size", &FontSize, PianoFontSizes);
 
   if(dialog.ShowModal() == wxID_OK) {
@@ -2742,7 +2706,7 @@ long tPianoWin::x2Clock(long x)
   return (x - xEvents) * ClocksPerPixel + FromClock;
 }
 
-void tPianoWin::LineText(wxDC *dc, long x, long y, long w, const char *str, int h, Bool down)
+void tPianoWin::LineText(wxDC *dc, long x, long y, long w, const char *str, int h, bool down)
 {
   if (h <= 0)
   {
@@ -2911,7 +2875,7 @@ void tPianoWin::GetVirtSize(long *w, long *h)
   *w = 5000L;
 }
 
-Bool tPianoWin::OnCharHook(wxKeyEvent& e)
+bool tPianoWin::OnCharHook(wxKeyEvent& e)
 {
   return OnKeyEvent(e);
 }
@@ -2971,32 +2935,7 @@ void tPianoCanvas::OnMouseEvent(wxMouseEvent &e)
   PianoWin->OnMouseEvent(e);
 }
 
-/**
-probably never called in wx2
-*/
-// void tPianoCanvas::OnEvent(wxMouseEvent &e)
-// {
-//   PianoWin->OnMouseEvent(e);
-// }
-
-//JAVE the OnChar method seems to be gone in wxwin232, but its documented, so i dont know whats happened
-//the OnCharHook should do the same thing basically(it was there from the start. OnChar seemd redundant)
-
-// void tPianoCanvas::OnChar(wxKeyEvent &e)
-// {
-//   if (!PianoWin->OnKeyEvent(e))
-//     wxWindow::OnChar(e);
-// }
-
-// void tPianoWin::OnChar(wxKeyEvent& e)
-// {
-//   if (!OnKeyEvent(e))
-//     wxFrame::OnChar(e);
-// }
-
-
-
-Bool tPianoCanvas::OnCharHook(wxKeyEvent& e) {
+bool tPianoCanvas::OnCharHook(wxKeyEvent& e) {
   return PianoWin->OnKeyEvent(e);
 }
 
@@ -3006,11 +2945,7 @@ void tPianoCanvas::SetScrollRanges()
   long w, h;
   PianoWin->GetVirtSize(&w, &h);
   SetScrollbars(ScLine, ScLine, w/ScLine, h/ScLine, ScPage, ScPage);
-#ifdef wx_xt
-  EnableScrolling(TRUE, TRUE);
-#else
   EnableScrolling(FALSE, FALSE);
-#endif
 }
 
 void tPianoCanvas::SetScrollPosition(long x, long y)
@@ -3037,7 +2972,7 @@ void tPianoWin::LogicalMousePosition(wxMouseEvent &e, long *x, long *y) {
 }
 
 
-void tPianoWin::ButtonLabelDisplay(wxString text, Bool down) {
+void tPianoWin::ButtonLabelDisplay(wxString text, bool down) {
   wxClientDC dc(Canvas);
 
   LineText(&dc, 0, 0, wPiano, text.GetData(), hTop, down);
@@ -3049,7 +2984,7 @@ void tPianoWin::ButtonLabelDisplay(wxString text, Bool down) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// The rest of this file is "Patrick Approved."  Take that how you want. :)
+// The rest of this file is "Patrick Approved."  Take that how you want. :)  //
 ///////////////////////////////////////////////////////////////////////////////
 
 void tPianoWin::InitColors()

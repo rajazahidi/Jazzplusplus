@@ -131,7 +131,7 @@ class tPlayer : public wxTimer
     void SetRecordInfo(tRecordInfo *inf) {
       rec_info = inf;
     }
-    Bool IsPlaying() const { return Playing; }
+    bool IsPlaying() const { return Playing; }
     virtual int FindMidiDevice() { return -1; }
 
     virtual int SupportsMultipleDevices() { return 0; }
@@ -147,7 +147,7 @@ class tPlayer : public wxTimer
     virtual void SetAudioEnabled(int) { }
     virtual void ListenAudio(int key, int start_stop_mode = 1) {}
     virtual void ListenAudio(tSample &spl, long fr_smpl, long to_smpl) {}
-    virtual Bool IsListening() const { return 0; }
+    virtual bool IsListening() const { return 0; }
 
     virtual int OnMenuCommand(int id) {
       if (Playing)

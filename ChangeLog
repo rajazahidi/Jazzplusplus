@@ -21,6 +21,7 @@ ChangeLog for Development Version
 -Integrated patch to support midi devices other than 0.
 -Removed all the misused #pragma hdrstop directives.
 -Created new XRC Window Settings dialog for the piano and track windows.
+-Removed the wxwin2port.h file and properly dealt with any issues that caused.
 
 03-15-04 Patrick Earl
 -Rewrote toolbar.cpp and toolbar.h

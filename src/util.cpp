@@ -19,8 +19,6 @@
 **
 */                                                                              
 
-#include "wxwin2port.h"
-
 #include "wx/wx.h"
 
 #include "util.h"
@@ -499,8 +497,8 @@ wxStrings have refernce counting, so should be less error prone.
 */
 wxString file_selector(wxString deffile, 
 		    const wxString title, 
-		    Bool save, 
-		    Bool changed, 
+		    bool save, 
+		    bool changed, 
 		    const wxString ext)
 {
    wxString s;

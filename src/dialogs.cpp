@@ -93,7 +93,7 @@ void tShiftDlg::AddProperties()
 // *************************************************************************
 
 long tCleanupDlg::lowLimit = 48;
-Bool tCleanupDlg::shortenOverlaps = 1;
+bool tCleanupDlg::shortenOverlaps = 1;
 
 
 
@@ -517,7 +517,7 @@ void tMidiDelayDlg::AddProperties()
 // Delete
 // *************************************************************************
 
-Bool tDeleteDlg::LeaveSpace = 1;
+bool tDeleteDlg::LeaveSpace = 1;
 
 tDeleteDlg::tDeleteDlg(tEventWin *w, tFilter *f)
 : tPropertyListDlg("Delete" )

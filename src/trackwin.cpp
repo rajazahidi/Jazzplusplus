@@ -20,7 +20,6 @@
 */
 
 #include "config.h"
-#include "wxwin2port.h"
 #include "wx/wx.h"
 
 #ifndef __PORTING
@@ -370,7 +369,6 @@ tTrackWin::tTrackWin(wxFrame *frame, char *title, tSong *song, int x, int y, int
     }
 
     NextWin = new tPianoWin(frame, "Piano Roll", Song, Config(C_PianoWinXpos), Config(C_PianoWinYpos), Config(C_PianoWinWidth), Config(C_PianoWinHeight) );
-    NextWin->Create();
 
     RecInfo.Track = 0;
     nBars = 0;
@@ -954,7 +952,7 @@ void tTrackWin::MenClpCopyLeaveSrc()
 }
 
 // Called from Cut/Copy event handlers
-void tTrackWin::MenClpCopy(Bool erase)
+void tTrackWin::MenClpCopy(bool erase)
 {
     if (!EventsSelected("please select events to be copied"))
         return;
@@ -1331,7 +1329,6 @@ void tTrackWin::OnSettingsDialog()
   tResourceDialog dialog(this, "windowSettings");
   
   dialog.Attach("use_colours", &UseColors);
-  dialog.Attach("event_size", &ClocksPerPixel, TrackEventSizes);
   dialog.Attach("font_size", &FontSize, TrackFontSizes);
 
   if(dialog.ShowModal() == wxID_OK) {
@@ -1606,7 +1603,7 @@ char *wxPathOnly (char *path)
       strcpy (buf, path);
 
       int l = strlen(path);
-      Bool done = FALSE;
+      bool done = FALSE;
 
       int i = l - 1;
 
@@ -1759,7 +1756,7 @@ void tTrackWin::DrawNumbers(wxDC* dc)
 draws the "speed" tempo indicator
 in the top left part of the canvas
 */
-void tTrackWin::DrawSpeed(wxDC* dc,int Value, Bool down)
+void tTrackWin::DrawSpeed(wxDC* dc,int Value, bool down)
 {
     char buf[50];
 
@@ -2202,7 +2199,7 @@ class tSpeedCounter : public tMouseCounter
     {
       tw = t;
     }
-    virtual void ShowValue(Bool down);
+    virtual void ShowValue(bool down);
 };
 
 int tSpeedCounter::Event(wxMouseEvent &e)
@@ -2220,7 +2217,7 @@ int tSpeedCounter::Event(wxMouseEvent &e)
   return 0;
 }
 
-void tSpeedCounter::ShowValue(Bool down)
+void tSpeedCounter::ShowValue(bool down)
 {
   wxDC* dc=new wxClientDC(tw);
   tw->DrawSpeed(dc,Value, down);
@@ -2476,9 +2473,9 @@ void tTrackWin::MousePlay(wxMouseEvent *e, MousePlayMode mode)
         break;
     }
 
-    Bool loop   = prev_loop;
-    Bool muted  = prev_muted;
-    Bool record = prev_record;
+    bool loop   = prev_loop;
+    bool muted  = prev_muted;
+    bool record = prev_record;
 
     // possible to record?
     if (record && SnapSel->Selected)
@@ -2699,5 +2696,5 @@ int tTrackWin::OnMouseEvent(wxMouseEvent &e)
 }
 
 
-void tTrackWin::ButtonLabelDisplay(wxString text, Bool down) {
+void tTrackWin::ButtonLabelDisplay(wxString text, bool down) {
 }

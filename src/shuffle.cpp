@@ -273,8 +273,8 @@ class tRndShuffle {
     enum TrackMode { Sync, Rand, Excl };
     tRndShuffle(tFilter *f);
     void SetTrackMode(TrackMode x) { track_mode = x; }
-    void SetSkipSilence(Bool x) { skip_silence = x; }
-    void SetRandomOrder(Bool x) { random_order = x; }
+    void SetSkipSilence(bool x) { skip_silence = x; }
+    void SetRandomOrder(bool x) { random_order = x; }
     void SetClocksPerSegment(long x) { clocks_per_segm = x; }
     void RunOther();
     void RunExcl();

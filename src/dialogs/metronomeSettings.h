@@ -23,7 +23,6 @@
 #ifndef METRONOMESETTINGS
 #define METRONOMESETTINGS
 
-#include "wxwin2port.h"
 #include "../eventwin.h"
 #include "../trackwin.h"
 

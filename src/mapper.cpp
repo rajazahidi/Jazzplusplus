@@ -365,9 +365,9 @@ void tMapperWin::ItemChanged()
   else
     mode->Enable(TRUE);
 
-  Bool add = mode->GetValue();
-  Bool rnd = source->GetSelection() ==  SRND;
-  Bool rhy = source->GetSelection() ==  SRHY;
+  bool add = mode->GetValue();
+  bool rnd = source->GetSelection() ==  SRND;
+  bool rhy = source->GetSelection() ==  SRHY;
 
   int ymin = 1;
   int ymax = 127;

@@ -22,7 +22,6 @@
 
 #ifndef SONGSETTINGS
 #define SONGSETTINGS
-#include "wxwin2port.h"
 #include "proplistdlg.h"
 #include "../eventwin.h"
 #include "../trackwin.h"

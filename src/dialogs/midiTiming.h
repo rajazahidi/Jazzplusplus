@@ -22,7 +22,6 @@
 
 #ifndef MIDITIMING
 #define MIDITIMING
-#include "wxwin2port.h"
 #include "../eventwin.h"
 #include "../trackwin.h"
 

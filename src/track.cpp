@@ -592,7 +592,7 @@ void tSimpleEventArray::Sort()
 
 
 
-void tEventArray::Cleanup(Bool dont_delete_killed_events)
+void tEventArray::Cleanup(bool dont_delete_killed_events)
 {
   tEvent *e;
   tControl *c;
@@ -1538,9 +1538,9 @@ void tTrack::Dialog(tTrackWin *parent)
     return;
   }
   #ifdef wx_msw
-  Bool modal = TRUE;  // keep button down
+  bool modal = TRUE;  // keep button down
   #else
-  Bool modal = FALSE;
+  bool modal = FALSE;
   #endif
   DialogBox = new wxDialogBox(parent, "Track Settings", modal, Config(C_TrackDlgXpos), Config(C_TrackDlgYpos) );
   dlg = new tTrackDlg( (tTrackWin*) parent, this);
@@ -1571,7 +1571,7 @@ tTrack::tTrack()
 }
 
 
-Bool tTrack::IsDrumTrack()
+bool tTrack::IsDrumTrack()
 {
   return Channel == Config(C_DrumChannel);
 }

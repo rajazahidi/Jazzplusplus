@@ -74,17 +74,40 @@ WX_DECLARE_LIST(tResourceElement, tResourceElementList);
 
 class tResourceDialog {
  public:
+  /* Use this function to load the resource files when the program starts. */
   static void LoadResource(const wxString& xrcfile);
 
+  /* Create a dialog with the given parent and resource name. */
   tResourceDialog(wxWindow* parent, const wxString& name);
   ~tResourceDialog();
 
+  /* Show the dialog, setting any Attached data values if the dialog is
+     accepted.  Note that the dialogs must return wxID_OK to indicate
+     acceptance. */
+  int ShowModal();
+
+
+  /* The Attach functions link named widgets within dialogs to data structures
+     within the source.  The first parameter to all of the Attach functions is
+     the name of the individual widget representing the data. */
+
+  /* For attaching to a string.  Currently supports wxTextCtrl widgets. */
   void Attach(const wxString& name, wxString *data);
+
+  /* For attaching to a bool.  Currently supports wxCheckBox widgets. */
   void Attach(const wxString& name, bool *data);
-  void Attach(const wxString& name, long *data, wxArrayLong a);
+
+  /* For attaching a list of items to a long.  The actual text displayed in
+     the GUI is defined by the XRC file.  The indices in the GUI correspond
+     to the indicies in the passed in array.  If the user selects the item
+     with index 2, the long data will be set to the value at index 2 of the
+     given array.  Currently supports wxChoice widgets. */
+  void Attach(const wxString& name, long *data, wxArrayLong array);
+
+  /* Similar to the above function only it accepts a -1 terminated array of
+     longs for convenience. */
   void Attach(const wxString& name, long *data, long *a);
 
-  int ShowModal();
 
  private:
   bool LoadData(tResourceElement *elem, wxWindow *win);

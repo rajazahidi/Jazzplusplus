@@ -22,7 +22,6 @@
 
 #ifndef SYNTHSETTINGS
 #define SYNTHSETTINGS
-#include "wxwin2port.h"
 #include "../eventwin.h"
 #include "../trackwin.h"
 

@@ -23,21 +23,16 @@
 #ifndef pianowin_h
 #define pianowin_h
 
-#ifndef eventwin_h
-#include "eventwin.h"
-#endif
-
-#ifndef track_h
 #include "track.h"
-#endif
-
-#ifndef song_h
 #include "song.h"
-#endif
+#include "maction.h"
+#include "toolbar.h"
+#include "filter.h"
 
 #define MaxSnaps 500
 
 class tCtrlEditBase;
+class tPianoWin;
 
 class tPianoCanvas: public wxScrolledWindow //this was wxCanvas
 {
@@ -48,7 +43,7 @@ class tPianoCanvas: public wxScrolledWindow //this was wxCanvas
     //    void OnEvent(wxMouseEvent& event);
     void OnMouseEvent(wxMouseEvent& event);
     void OnChar(wxKeyEvent& event);
-    Bool OnCharHook(wxKeyEvent& event);
+    bool OnCharHook(wxKeyEvent& event);
     void SetScrollRanges();
     void SetScrollPosition(long x, long y);
     void OnDraw(wxDC& dc);
@@ -64,7 +59,7 @@ class tPianoWin : public wxFrame,
   virtual ~tPianoWin();
     
   // Method in tButtonLabelInterface
-  void ButtonLabelDisplay(wxString text, Bool down);
+  void ButtonLabelDisplay(wxString text, bool down);
 
     void OnMSelect();
     void OnMLength();
@@ -90,18 +85,17 @@ class tPianoWin : public wxFrame,
     int  IsVisible(tEvent *e);
     int  IsVisible(tTrack *t);
     void VisibleDialog();
-    Bool VisibleKeyOn;
-    Bool VisiblePitch;
-    Bool VisibleController;
-    Bool VisibleProgram;
-    Bool VisibleTempo;
-    Bool VisibleSysex;
-    Bool VisiblePlayTrack;
-    Bool VisibleDrumNames;
-    Bool VisibleAllTracks;
-    Bool VisibleHBChord;
-    // SN++
-    Bool VisibleMono;
+    bool VisibleKeyOn;
+    bool VisiblePitch;
+    bool VisibleController;
+    bool VisibleProgram;
+    bool VisibleTempo;
+    bool VisibleSysex;
+    bool VisiblePlayTrack;
+    bool VisibleDrumNames;
+    bool VisibleAllTracks;
+    bool VisibleHBChord;
+    bool VisibleMono;
 
     long MouseLine;
 
@@ -136,7 +130,7 @@ class tPianoWin : public wxFrame,
     int OnKeyEvent(wxKeyEvent &e);
     void MouseEvents(wxMouseEvent &e);
     void MousePiano(wxMouseEvent &e);
-    void MouseCutPaste(wxMouseEvent &e, Bool cut);
+    void MouseCutPaste(wxMouseEvent &e, bool cut);
 
     void OnGuitar();
 
@@ -161,14 +155,14 @@ class tPianoWin : public wxFrame,
 
     void SetSnapDenom(long value);
     void PressRadio(int id = 0);
-    void SetVisibleAllTracks(Bool value);
+    void SetVisibleAllTracks(bool value);
 // SN++ made public for mouse keylength dragger
    tCtrlEditBase *CtrlEdit;
   void CutOrCopy(int id);
   DECLARE_EVENT_TABLE()
-void OnFilter();
-  void OnSettingsDialog();
-void CtrlChannelAftertouchEdit();
+  void OnFilter();
+  void ActSettingsDialog();
+  void CtrlChannelAftertouchEdit();
   void OnCtrlPolyAftertouchEdit();
   void OnCtrlNone();
   void OnCtrlTempo();
@@ -195,23 +189,21 @@ void CtrlChannelAftertouchEdit();
   void NewPlayPosition(long Clock);
   void DrawPlayPosition(wxDC* dc);
   void Redraw();
-  void Create();
   void CreateCanvas();
   long Clock2x(long clk);
   long x2Clock(long x);
   long Line2y(long Line);
   long y2Line(long y, int up = 0);
-  void SettingsDialog();
   int EventsSelected(const char *msg = 0);
   void ZoomIn();
   void ZoomOut();
-  void LineText(wxDC *dc, long x, long y, long w, const char *str, int h = -1, Bool down = FALSE);
+  void LineText(wxDC *dc, long x, long y, long w, const char *str, int h = -1, bool down = FALSE);
   long x2BarClock(long x, int next);
   int OnEventWinMouseEvent(wxMouseEvent &e);
   void OnEventWinPaintSub(long x, long y);
   long y2yLine(long y, int up = 0);
   void GetVirtSize(long *w, long *h);
-  Bool OnCharHook(wxKeyEvent& e);
+  bool OnCharHook(wxKeyEvent& e);
 
   tPianoCanvas *Canvas;
   tToolBar *tool_bar;

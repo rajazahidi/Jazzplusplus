@@ -58,7 +58,7 @@ class tCleanupDlg : public tPropertyListDlg
   public:
 
     static long lowLimit;	// 1/32
-    static Bool shortenOverlaps;
+    static bool shortenOverlaps;
 
     tFilter *Filter;
     tSong   *Song;
@@ -226,7 +226,7 @@ class tDeleteDlg : public tPropertyListDlg
   tEventWin *EventWin;
 
  public:
-  static Bool LeaveSpace;	// 1
+  static bool LeaveSpace;	// 1
 
   tDeleteDlg(tEventWin *w, tFilter *f);
   void AddProperties();

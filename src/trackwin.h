@@ -70,7 +70,7 @@ class tTrackWin : public tEventWin,
                   public tButtonLabelInterface
 {
     // Method in tButtonLabelInterface
-    virtual void ButtonLabelDisplay(wxString text, Bool down);
+    virtual void ButtonLabelDisplay(wxString text, bool down);
 
     int xNumber, wNumber;
     int xName,   wName;
@@ -82,9 +82,9 @@ class tTrackWin : public tEventWin,
 
     // restart play here if space bar hit
     long prev_clock;
-    Bool prev_loop;
-    Bool prev_muted;
-    Bool prev_record;
+    bool prev_loop;
+    bool prev_muted;
+    bool prev_record;
 
     tSong *paste_buffer;
     tGenMelody *meldy_win;
@@ -114,7 +114,7 @@ class tTrackWin : public tEventWin,
 
     tPianoWin *GetPianoWin()	{ return (tPianoWin *)NextWin; }
     void DrawNumbers(wxDC* dc);
-    void DrawSpeed(wxDC* dc, int Value = -1, Bool down = FALSE);
+    void DrawSpeed(wxDC* dc, int Value = -1, bool down = FALSE);
     void DrawCounters(wxDC* dc);
     void DrawEvents(wxDC* dc);
     const char *CounterStr();
@@ -190,7 +190,7 @@ class tTrackWin : public tEventWin,
     void MenMidiThru();
     void MenSynthSettings();
     void MenDrumParam();
-    void MenClpCopy(Bool);
+    void MenClpCopy(bool);
     void MenClpPaste();
 
     void SaveMidiDeviceSettings( int dev );

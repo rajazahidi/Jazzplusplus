@@ -12,9 +12,9 @@ in the future this class might be used to implement wxPropertyForms, who can be 
 #ifndef PROPLISTDLG_H
 #define PROPLISTDLG_H
 
-#include "wx/propform.h"
-#include "wx/proplist.h"
 #include "util.h"
+#include "wx/proplist.h"
+#include "wx/propform.h"
 
 
 class tNamedValueListValue : public wxPropertyValue

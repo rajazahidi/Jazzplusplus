@@ -8,26 +8,8 @@
         <object class="wxBoxSizer">
           <orient>wxVERTICAL</orient>
           <object class="sizeritem">
-            <object class="wxFlexGridSizer">
-              <cols>2</cols>
-              <rows>2</rows>
-              <object class="sizeritem">
-                <object class="wxStaticText" name="">
-                  <label>Event Size</label>
-                </object>
-                <flag>wxALIGN_CENTRE_VERTICAL</flag>
-              </object>
-              <object class="sizeritem">
-                <object class="wxChoice" name="event_size">
-                  <content>
-                    <item>Tiny</item>
-                    <item>Small</item>
-                    <item>Medium</item>
-                    <item>Large</item>
-                    <item>Huge</item>
-                  </content>
-                </object>
-              </object>
+            <object class="wxBoxSizer">
+              <orient>wxHORIZONTAL</orient>
               <object class="sizeritem">
                 <object class="wxStaticText" name="">
                   <label>Font Size</label>
@@ -44,9 +26,9 @@
                     <item>Huge</item>
                   </content>
                 </object>
+                <flag>wxLEFT</flag>
+                <border>10</border>
               </object>
-              <vgap>10</vgap>
-              <hgap>10</hgap>
             </object>
           </object>
           <object class="sizeritem">

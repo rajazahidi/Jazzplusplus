@@ -53,8 +53,8 @@ class tGuitarCanvas : public wxScrolledWindow
 
     void SettingsDialog();
     int  xy2Pitch(int x, int y);
-    void DrawPitch(wxDC *dc,int pitch, int string, Bool show);
-    void DrawPitch(wxDC *dc,int pitch, Bool show);
+    void DrawPitch(wxDC *dc,int pitch, int string, bool show);
+    void DrawPitch(wxDC *dc,int pitch, bool show);
 
     int y2String(int y)
     {
@@ -70,15 +70,15 @@ class tGuitarCanvas : public wxScrolledWindow
 
   private:
     void DrawBoard(wxDC *dc);
-    void DrawBuffer(wxDC* dc, tEventArray &arr, Bool show);
+    void DrawBuffer(wxDC* dc, tEventArray &arr, bool show);
 
     tGuitarWin *guitar;
     tPianoWin  *piano;
 
 
-    static Bool chord_mode;
-    static Bool bass_guitar;
-    static Bool show_octaves;
+    static bool chord_mode;
+    static bool bass_guitar;
+    static bool show_octaves;
     static int  n_frets;
 
     int    n_strings;
@@ -96,9 +96,9 @@ class tGuitarCanvas : public wxScrolledWindow
     wxFont *font;
 };
 
-Bool tGuitarCanvas::chord_mode = FALSE;
-Bool tGuitarCanvas::bass_guitar = FALSE;
-Bool tGuitarCanvas::show_octaves = TRUE;
+bool tGuitarCanvas::chord_mode = FALSE;
+bool tGuitarCanvas::bass_guitar = FALSE;
+bool tGuitarCanvas::show_octaves = TRUE;
 int  tGuitarCanvas::n_frets = 17;
 
 const int tGuitarCanvas::bass_pitches[4] = {28+15, 28+10, 28+5, 28};
@@ -210,7 +210,7 @@ void tGuitarCanvas::OnDraw(wxDC& indc)
   DrawBuffer(dc, piano->PasteBuffer, TRUE);
 }
 
-void tGuitarCanvas::DrawBuffer(wxDC* dc, tEventArray &arr, Bool show)
+void tGuitarCanvas::DrawBuffer(wxDC* dc, tEventArray &arr, bool show)
 {
   int i;
   for (i = 0; i < arr.nEvents; i++)
@@ -285,7 +285,7 @@ int tGuitarCanvas::xy2Pitch(int x, int y)
 }
 
 
-void tGuitarCanvas::DrawPitch(  wxDC *dc, int pitch, int string, Bool show)
+void tGuitarCanvas::DrawPitch(  wxDC *dc, int pitch, int string, bool show)
 {
   static const char *key_names[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
   int x = (pitch - pitches[string] - 1) * ww / n_frets + wfret/3;
@@ -309,7 +309,7 @@ void tGuitarCanvas::DrawPitch(  wxDC *dc, int pitch, int string, Bool show)
 }
 
 
-void tGuitarCanvas::DrawPitch(wxDC* dc,int pitch, Bool show)
+void tGuitarCanvas::DrawPitch(wxDC* dc,int pitch, bool show)
 {
   if (pitch <= 0)
     return;
@@ -494,7 +494,7 @@ void tGuitarWin::OnSize(int w, int h)
 }
 
 #ifndef __PORTING
-Bool tGuitarWin::OnClose()
+bool tGuitarWin::OnClose()
 {
   return TRUE;
 }

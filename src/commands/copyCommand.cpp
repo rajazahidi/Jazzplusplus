@@ -23,10 +23,10 @@
 #include "copyCommand.h"
 #include "command.h"
 
-Bool tCopyCommand::EraseDestin = 1;
-Bool tCopyCommand::RepeatCopy = 0;
-Bool tCopyCommand::EraseSource = 0;
-Bool tCopyCommand::InsertSpace = 0;
+bool tCopyCommand::EraseDestin = 1;
+bool tCopyCommand::RepeatCopy = 0;
+bool tCopyCommand::EraseSource = 0;
+bool tCopyCommand::InsertSpace = 0;
 
 tCopyCommand::tCopyCommand(tTrackWin *t)
 {

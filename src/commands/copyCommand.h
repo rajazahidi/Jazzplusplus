@@ -42,10 +42,10 @@ class tCopyCommand : public wxObject, public tMouseAction
     tCopyDlg *CopyDlg;
 
   public:
-    static Bool RepeatCopy;
-    static Bool EraseSource;
-    static Bool EraseDestin;
-    static Bool InsertSpace;
+    static bool RepeatCopy;
+    static bool EraseSource;
+    static bool EraseDestin;
+    static bool InsertSpace;
 
     int Event(wxMouseEvent &e);
     tCopyCommand(tTrackWin *t);

@@ -23,7 +23,6 @@
 #ifndef MIDITHRUDIALOG
 #define MIDITHRUDIALOG
 
-#include "wxwin2port.h"
 #include "proplistdlg.h"
 #include "../eventwin.h"
 #include "../trackwin.h"

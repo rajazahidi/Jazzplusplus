@@ -320,7 +320,7 @@ class tEventArray : public tSimpleEventArray
     int ForceChannel;
 
     virtual void Clear();
-    void Cleanup(Bool dont_delete_killed_events = 0);
+    void Cleanup(bool dont_delete_killed_events = 0);
 
     void Keyoff2Length();
     void Length2Keyoff();
@@ -356,7 +356,7 @@ class tTrack : public tEventArray
     tTrack();
     ~tTrack() { Clear(); }
 
-    Bool IsDrumTrack();
+    bool IsDrumTrack();
 
     int iUndo;  // index to actual undo buffer
     int nRedo;  // current number of possible redo's

@@ -50,7 +50,7 @@ class tMouseMapper
     tMouseMapper();
 
     enum Button { Left, Middle, Right };
-    void SetAction(int code, Button but = Left, Bool shift = FALSE, Bool ctrl = FALSE);
+    void SetAction(int code, Button but = Left, bool shift = FALSE, bool ctrl = FALSE);
     int Action(wxMouseEvent &);
     void SetLeftAction(int id = 0) { left_action = id; }
 
@@ -154,7 +154,7 @@ class tEventWin;
 */
 class tButtonLabelInterface {
  public:
-  virtual void ButtonLabelDisplay(wxString text, Bool down) = 0;
+  virtual void ButtonLabelDisplay(wxString text, bool down) = 0;
 };
 
 
@@ -174,7 +174,7 @@ class tMouseCounter : public wxTimer, public tMouseAction
     virtual int RightDown(wxMouseEvent &);
     virtual int RightUp(wxMouseEvent &);
     virtual void Notify();
-    virtual void ShowValue(Bool down);
+    virtual void ShowValue(bool down);
   public:
     tRect r;
     int Value;

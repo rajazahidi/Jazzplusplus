@@ -52,7 +52,7 @@ class tFltEvent
   public:
     int  Stat;
     char *Name;
-    Bool Selected;
+    bool Selected;
     int MinValue, MaxValue;
     int FromValue, ToValue;
 };
@@ -68,7 +68,7 @@ class tFilter : public wxObject
   public:
 
     tFltEvent *FltEvents;
-    Bool      OtherSelected;
+    bool      OtherSelected;
 
     tSong *Song;
     long FromClock, ToClock;	// einschl .. ausschl

@@ -153,7 +153,7 @@ class HBPlayer : public wxTimer
     static int bass_channel, bass_veloc;
     static int chord_channel, chord_veloc;
     static int meldy_channel, meldy_veloc;
-    static Bool bass_enabled, chord_enabled, meldy_enabled;
+    static bool bass_enabled, chord_enabled, meldy_enabled;
     static int bass_pitch, chord_pitch, meldy_pitch;
     static int meldy_speed;
 
@@ -164,17 +164,17 @@ class HBPlayer : public wxTimer
     int device;
 };
 
-int HBPlayer::bass_enabled  = 1;
+bool HBPlayer::bass_enabled  = 1;
 int HBPlayer::bass_channel  = 1;
 int HBPlayer::bass_veloc    = 90;
 int HBPlayer::bass_pitch    = 40;
 
-int HBPlayer::chord_enabled = 1;
+bool HBPlayer::chord_enabled = 1;
 int HBPlayer::chord_channel = 2;
 int HBPlayer::chord_veloc   = 90;
 int HBPlayer::chord_pitch   = 60;
 
-int HBPlayer::meldy_enabled = 0;
+bool HBPlayer::meldy_enabled = 0;
 int HBPlayer::meldy_channel = 3;
 int HBPlayer::meldy_veloc   = 90;
 int HBPlayer::meldy_pitch   = 70;
@@ -441,7 +441,7 @@ class HBCanvas : public wxScrolledWindow
     void ChordRect(tRect &r, const HBContext &ct);
     void DrawChord(const HBContext &ct);
     void UnDrawChord(const HBContext &ct);
-    Bool Find(float x, float y, HBContext &out);
+    bool Find(float x, float y, HBContext &out);
 
   private:
 
@@ -457,17 +457,17 @@ class HBCanvas : public wxScrolledWindow
 
     HBContext mouse_context;
 
-    Bool haunschild_layout;
-    Bool mark_4_common;
-    Bool mark_3_common;
-    Bool mark_2_common;
-    Bool mark_1_common;
-    Bool mark_b_common;
-    Bool mark_0_common;
-    Bool mark_1_semi;
-    Bool mark_251;
-    Bool mark_tritone;
-    Bool mark_piano;
+    bool haunschild_layout;
+    bool mark_4_common;
+    bool mark_3_common;
+    bool mark_2_common;
+    bool mark_1_common;
+    bool mark_b_common;
+    bool mark_0_common;
+    bool mark_1_semi;
+    bool mark_251;
+    bool mark_tritone;
+    bool mark_piano;
     void SetMarker(int id, wxToolBar *tool_bar);
     int  active_marker;
 
@@ -936,7 +936,7 @@ void HBCanvas::DrawMarkers(const HBContext &ct, wxDC* dc)
   dc->SetBrush(*wxWHITE_BRUSH);
 }
 
-Bool HBCanvas::Find(float x, float y, HBContext &out)
+bool HBCanvas::Find(float x, float y, HBContext &out)
 {
   HBContextIterator iter;
   iter.SetSequence(seq, n_seq);

@@ -824,36 +824,6 @@ void tEventWin::MenLength()
 
 }
 
-// ********************************************************************************
-// Sequence Length
-// ********************************************************************************
-
-
-void tEventWin::MenSeqLength()
-{
-
-  if (!EventsSelected())
-    return;
-  tSeqLengthDlg* dlg = new tSeqLengthDlg(this, Filter);
-  dlg->Create();
-
-
-}
-
-// ********************************************************************************
-// Midi delay
-// ********************************************************************************
-
-
-void tEventWin::MenMidiDelay()
-{
-
-  if (!EventsSelected())
-    return;
-  tMidiDelayDlg* dlg = new tMidiDelayDlg(this, Filter);
-  dlg->Create();
-}
-
 
 // ********************************************************************************
 // convert to modulation

@@ -169,6 +169,7 @@ class tPianoWin : public wxFrame,
   void ActSettingsDialog();
   void ActMidiDelayDialog();
   void ActSequenceLengthDialog();
+  void ActVelocityDialog();
 
   void CtrlChannelAftertouchEdit();
   void OnCtrlPolyAftertouchEdit();

@@ -602,9 +602,8 @@ BEGIN_EVENT_TABLE(tPianoWin, wxFrame)
 //  EVT_MENU    (MEN_SEARCHREP,  tPianoWin::MenSearchReplace)
 //  EVT_MENU    (MEN_TRANSP, 	tPianoWin::MenTranspose)
 //  EVT_MENU    (MEN_SETCHAN,	tPianoWin::MenSetChannel)
-//  EVT_MENU    (MEN_VELOC ,	tPianoWin::MenVelocity)
+  EVT_MENU    (MEN_VELOC ,	tPianoWin::ActVelocityDialog)
 //  EVT_MENU    (MEN_LENGTH, tPianoWin::MenLength)
-//  EVT_MENU    (MEN_SEQLENGTH,  	tPianoWin::MenSeqLength)
   EVT_MENU    (MEN_SEQLENGTH,  	tPianoWin::ActSequenceLengthDialog)
   EVT_MENU    (MEN_MIDIDELAY, tPianoWin::ActMidiDelayDialog)
 
@@ -2618,6 +2617,8 @@ void tPianoWin::ActSettingsDialog()
 */
 void tPianoWin::ActMidiDelayDialog()
 {
+  if (!EventsSelected())
+    return;
   long scale = 50; //in percent
   long clockDelay = 10;
   int repeat = 6;
@@ -2632,8 +2633,6 @@ void tPianoWin::ActMidiDelayDialog()
     //execute the command
     tCmdMidiDelay cmd(Filter, (1.0*scale)/100.0,clockDelay,repeat);
      cmd.Execute();
-
-    Setup();//??
     Canvas->SetScrollRanges();
     Redraw();
   }
@@ -2643,18 +2642,18 @@ void tPianoWin::ActMidiDelayDialog()
 /**call the sequence lenght command */
 void tPianoWin::ActSequenceLengthDialog()
 {
-  long scale = 100; //in percent
+ if (!EventsSelected())
+    return;
+   long scale = 100; //in percent
 
   jppResourceDialog dialog(this, "sequenceLength");
   
-  //  dialog.Attach("scale", &scale);
+   dialog.Attach("scale", &scale);
 
   if(dialog.ShowModal() == wxID_OK) {
     //execute the command
     tCmdSeqLength cmd(Filter, (1.0*scale)/100.0);
     cmd.Execute();
-
-    Setup();//??
     Canvas->SetScrollRanges();
     Redraw();
   }
@@ -2662,6 +2661,30 @@ void tPianoWin::ActSequenceLengthDialog()
 ////////////////
 
 
+void tPianoWin::ActVelocityDialog()
+{
+  int FromValue = 64;
+  int ToValue = 0;
+  int Mode = 0;
+
+  if (!EventsSelected())
+    return;
+  jppResourceDialog dialog(this, "velocity");
+  dialog.Attach("start",&FromValue);
+  dialog.Attach("stop",&ToValue);
+  dialog.Attach("mode",&Mode);
+
+  if(dialog.ShowModal() == wxID_OK) {
+    //execute the command
+    tCmdVelocity cmd(Filter, FromValue, ToValue, Mode);
+    cmd.Execute();
+    Canvas->SetScrollRanges();
+    Redraw();
+  }
+
+
+
+}
 
 
 

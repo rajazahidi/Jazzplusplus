@@ -187,6 +187,10 @@ void tFilterDlg::OnHelp()
 }
 
 
+
+
+
+
 void tFilter::Dialog(wxFrame *parent, int ShowEventStats)
 {
   tFilterDlg *dlg;
@@ -199,18 +203,6 @@ void tFilter::Dialog(wxFrame *parent, int ShowEventStats)
 }
 
 
-
-#if 0
-void GlobalFilterDlg(wxButton& but, wxMouseEvent& event)
-{
-  GlobalFilter->Dialog(0, 1);
-}
-
-void GlobalFilterDlgNoStats(wxButton& but, wxMouseEvent& event)
-{
-  GlobalFilter->Dialog(0, 0);
-}
-#endif
 
 
 // --------------------------------------------------------------------------

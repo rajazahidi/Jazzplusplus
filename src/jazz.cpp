@@ -890,6 +890,7 @@ bool tApp::OnInit(void)
   jppResourceDialog::LoadResource(FindDialog("windowSettings.xrc"));
   jppResourceDialog::LoadResource(FindDialog("midiDelay.xrc"));//JAVE
   jppResourceDialog::LoadResource(FindDialog("sequenceLength.xrc"));//JAVE
+  jppResourceDialog::LoadResource(FindDialog("velocity.xrc"));//JAVE
 
 
 

@@ -7,8 +7,6 @@
 #     ./bootstrap
 #     cd bitmaps; make
 
-rm -f config.cache Makefile src/Makefile configure 
 ./bootstrap
 ./configure --enable-alsa=yes --enable-sequencer2=yes
-cd bitmaps; make; cd ..
 make

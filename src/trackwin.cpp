@@ -2415,6 +2415,7 @@ void tTrackWin::MouseEvents(wxMouseEvent &e)
 
 void tTrackWin::MousePlay(wxMouseEvent *e, MousePlayMode mode)
 {
+        cout<<"tTrackWin::MousePlay"<<endl;
 #ifndef __PORTING
   /// \todo
   /* { does this ever get deleted? Do todo lists in doxygen work? }
@@ -2448,6 +2449,7 @@ void tTrackWin::MousePlay(wxMouseEvent *e, MousePlayMode mode)
                 break;
 
             case PlayButton:
+            	cout << "tTrackwin::PlayButton" << endl;
                 gProject->SetLoop(FALSE);
                 gProject->SetRecord(FALSE);
                 break;
@@ -2462,7 +2464,7 @@ void tTrackWin::MousePlay(wxMouseEvent *e, MousePlayMode mode)
             case RecordButton:
                 if (!EventsSelected("please select record track/bar first"))
                     return;
-                tBarInfo bi(gProject->Song);
+                tBarInfo bi(gProject);
 
                 bi.SetClock(Filter->FromClock);
 
@@ -2487,7 +2489,7 @@ void tTrackWin::MousePlay(wxMouseEvent *e, MousePlayMode mode)
         {
             RecInfo->TrackNr   = Filter->FromTrack;
 
-            RecInfo->Track     = gProject->Song->GetTrack(RecInfo->TrackNr);
+            RecInfo->Track     = gProject->GetTrack(RecInfo->TrackNr);
 
             RecInfo->FromClock = Filter->FromClock;
             RecInfo->ToClock   = Filter->ToClock;
@@ -2515,10 +2517,11 @@ void tTrackWin::MousePlay(wxMouseEvent *e, MousePlayMode mode)
         }
 
         // GO!
-        if (RecInfo->Track)  // recording?
-            gProject->Midi->SetRecordInfo(RecInfo);
-        else
-            gProject->Midi->SetRecordInfo(0);
+		cout << "Go!" << endl;
+        //if (RecInfo->Track)  // recording?
+            //gProject->Midi->SetRecordInfo(RecInfo);
+        //else
+            //gProject->Midi->SetRecordInfo(0);
         cout<<"Midi->StartPlay"<<endl;
 
         gProject->mStartTime = prev_clock;
@@ -2544,7 +2547,7 @@ void tTrackWin::MousePlay(wxMouseEvent *e, MousePlayMode mode)
                 //if (choice == wxOK)
                 {
                     wxBeginBusyCursor();
-                    gProject->Song->NewUndoBuffer();
+                    gProject->NewUndoBuffer();
                     RecInfo->Track->MergeRange(&gProject->Midi->RecdBuffer, RecInfo->FromClock, RecInfo->ToClock, RecInfo->Muted);
                     wxEndBusyCursor();
                     Redraw();

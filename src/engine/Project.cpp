@@ -29,20 +29,13 @@
 #include "../mstdfile.h"
 
 jppProject::jppProject() {
-    mRecInfo->Track = 0;
-    mRecInfo->Muted = 0;
+//    mRecInfo->Track = 0;
+//    mRecInfo->Muted = 0;
     mNumBars = 0;
     mMetronomeInfo.IsAccented = Config(C_MetroIsAccented);
     mMetronomeInfo.Veloc = Config(C_MetroVelocity);
     mMetronomeInfo.KeyNorm = Config(C_MetroNormalClick);
     mMetronomeInfo.KeyAcc = Config(C_MetroAccentedClick);
-}
-
-void jppProject::Save() {
-    tStdWrite io;
-    Song->Write(io, mSongFileName);
-    mChanged = 0;
-    Config.Put(C_StartUpSong, mSongFileName);
 }
 
 bool jppProject::IsPlaying() {
@@ -61,12 +54,6 @@ void jppProject::SetSong(wxString newsong)
 void jppProject::SetPattern(wxString newpattern)
 {
     mPatternFileName = newpattern;
-}
-
-void jppProject::OpenSong(wxString newsong) {
-    tStdRead io;
-    Song->Clear();
-    Song->Read(io, newsong);
 }
 
 void jppProject::Play() {

@@ -988,7 +988,7 @@ bool tApp::OnInit(void)
 
   // ---------------------- end drivers ----------------------
 
-
+	gProject->Midi = Midi;
 
   int i;
   int opt;

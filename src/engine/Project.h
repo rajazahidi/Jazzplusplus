@@ -24,12 +24,12 @@
 #include "wx/wx.h"
 
 class tPlayer;
-class tSong;
 class tSynth;
 class tFilter;
 
 // needed until tRecordInfo gets moved to its own file
-#include "../trackwin.h"
+//#include "../trackwin.h"
+#include "../song.h"
 
 #ifndef JPPPROJECT
 #define JPPPROJECT
@@ -45,12 +45,20 @@ public:
   int    Muted;		// recording track is muted
 };
 
-class jppProject {
+/**
+ *
+ *  jppProject derives from tSong solely as a shortcut to having a track interface in the Project
+ *  object.  As the backend storage stuff gets rewritten, we'll be overloading the tSong members
+ *  accordingly, until tSong itself will be gone.  tSong is deprecated right now, and anything that
+ *  still uses it needs to switch to using jppProject instead through its global instance.
+ *
+ */
+class jppProject  : public tSong
+{
     public:
         // These should probably become private members at some point.  I'm not sure about that
         // though.  They are currently used as a holding pen for loose global variables while
         // the globals are brought under control, again.
-        tSong* Song;
         tPlayer* Midi;
         tSynth *Synth;
 

@@ -1,0 +1,14 @@
+This directory contains all of the source and headers from the contrib/src/xrc
+and contrib/include/wx/xrc from the wxWidgets distribution.  The current
+version comes from:
+
+  wxGTK-2.4.2
+
+Note that the expat files have been moved to this directory to simplify the
+make system.  They can be identified as *.c and *.h.  The XRC files are the
+*.cpp files.  We only need the following files from expat:
+
+    xmltok.c xmlrole.c xmlparse.c xmltok_impl.c xmltok_ns.c
+
+The license of XRC is the same as the license for the wxWidgets library
+that we link to elsewhere.

@@ -1,3 +1,7 @@
+Note from Patrick (March 23, 2004):  Most of the issues within this file have
+been dealt with, but I left it here for informational purposes.
+
+
 *Porting jazz++ to wxwin2
 
 **Overview
@@ -75,14 +79,6 @@ be able to automate some of these changes for the rest of jazz
 code. It would also be a good idea to write detailed instructions
 about how to make other needed changes, so more people can help ( Hi,
 Josh!  [:)] .
-
-There is also a compatibility ifdef in setup.h that defines a number of
-wx168 constructs in wx2. We recommend having this set to true initially,
-and when porting is finished, switch it to off. The reason for this
-is because these functions are bound to be removed from wxwin at some point, 
-but we need to get to compiling status as soon as possible.
-
-WXWIN_COMPATIBILITY set to 1 in setup.h. (from wxwin487.htm#portingcompat, wxwin doc tree)
 
 
 ***Semantic changes from wx1 to wx2.

@@ -1108,12 +1108,12 @@ void tEventArray::Write(tWriteBase &io)
   if (Patch) Patch->Write(io);
 
   // write jazz track info
-  tJazzMeta jazz;
-  jazz.SetAudioMode(audio_mode);
-  jazz.SetTrackState(State);
-  jazz.SetTrackDevice(Device);
-  jazz.SetIntroLength(TheSong->GetIntroLength());
-  jazz.Write(io);
+  tJazzMeta *jazz = new tJazzMeta;
+  jazz->SetAudioMode(audio_mode);
+  jazz->SetTrackState(State);
+  jazz->SetTrackDevice(Device);
+  jazz->SetIntroLength(TheSong->GetIntroLength());
+  jazz->Write(io);
 
   for (int i = 0; i < nEvents; i++) {
 	e = Events[i];

@@ -56,6 +56,7 @@ void jppResourceDialog::LoadResource(const wxString& xrcfile) {
   wxXmlResource::Get()->Load(xrcfile);
 }
 
+
 // Instance Methods
 
 jppResourceDialog::jppResourceDialog(wxWindow* parent, const wxString& name) {

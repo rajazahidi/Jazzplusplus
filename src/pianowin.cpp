@@ -1464,7 +1464,6 @@ void tPianoWin::DrawEvents(wxDC* dc, tTrack *t, int Stat, wxBrush *Brush, int fo
         dc->DrawRectangle(x1, y1 + LittleBit, DrawLength, hLine - 2 * LittleBit);
 	//shouldnt it be in drawevent? odd. 
 
-	//printf("isplaytrack:%x",e->IsPlayTrack());
 	if (e->IsPlayTrack()) {
 	  dc->SetPen(*wxBLACK_PEN);
 	  sprintf(buf, "Track:%l", e->IsPlayTrack()->track); 
@@ -1483,7 +1482,6 @@ void tPianoWin::DrawEvents(wxDC* dc, tTrack *t, int Stat, wxBrush *Brush, int fo
 	}
 	
 	if (e->IsText()) {
-	  //fprintf(stderr,"text:%s",e->IsText()->GetText());
 	  dc->SetPen(*wxGREEN_PEN);
 	  dc->VLine(x1); //draw a vertical bar
 	  dc->SetPen(*wxBLACK_PEN);
@@ -2633,8 +2631,8 @@ void tPianoWin::ActMidiDelayDialog()
 
   if(dialog.ShowModal() == wxID_OK) {
     //execute the command
-    tCmdMidiDelay cmd(Filter, (1.0*scale)/100.0,clockDelay,repeat);
-     cmd.Execute();
+    tCmdMidiDelay cmd(Filter, scale/100.0,clockDelay,repeat);
+    cmd.Execute();
     Canvas->SetScrollRanges();
     Redraw();
   }
@@ -2644,14 +2642,14 @@ void tPianoWin::ActMidiDelayDialog()
 /**call the sequence lenght command */
 void tPianoWin::ActSequenceLengthDialog()
 {
- if (!EventsSelected())
+  if (!EventsSelected())
     return;
-   long scale = 100; //in percent
+  long scale = 100; //in percent
 
   jppResourceDialog dialog(this, "sequenceLength");
   
-   dialog.Attach("scale", &scale);
-
+  dialog.Attach("scale", &scale);
+  
   if(dialog.ShowModal() == wxID_OK) {
     //execute the command
     tCmdSeqLength cmd(Filter, (1.0*scale)/100.0);
@@ -2891,7 +2889,6 @@ onpaint seems never to get called
   int x=0, y=0;
   GetViewStart(&x, &y);
   PianoWin->OnPaintSub(&dc, (long)x * ScLine, (long)y * ScLine);  
-  cout << "tPianoCanvas::OnDraw\n";
 }
 
 BEGIN_EVENT_TABLE(tPianoCanvas, wxScrolledWindow)

@@ -31,6 +31,7 @@
 jppProject::jppProject() {
 //    mRecInfo->Track = 0;
 //    mRecInfo->Muted = 0;
+    mRecInfo = 0;
     mNumBars = 0;
     mMetronomeInfo.IsAccented = Config(C_MetroIsAccented);
     mMetronomeInfo.Veloc = Config(C_MetroVelocity);

@@ -25,20 +25,14 @@
 /* #define DEBUG(x) x */
 #define DEBUG(x)
 
-#ifndef util_h
 #include "util.h"
-#endif
-
-
 #include "synth.h"
 
-
 #include "wx/help.h"
-#include "wx/cshelp.h"
-
 
 #include <time.h>
 #include <assert.h>
+
 
 // values for C_MidiDriver
 #define C_DRV_JAZZ  0
@@ -216,7 +210,7 @@ public:
   void DisplayContents();
 private:
   // PAT - Changed this from wxHelpControllerHtml.
-  wxHtmlHelpController *help;
+  wxHelpController *help;
   const char *helpfile;
 };
 

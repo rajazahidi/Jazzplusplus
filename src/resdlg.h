@@ -118,19 +118,24 @@ class jppResourceDialog {
 
   static void LoadResource(const wxString& xrcfile);
 
+
   /// Create a dialog with the given parent and resource name.
 
   jppResourceDialog(wxWindow* parent, const wxString& name);
+
 
   /// Calls Destroy() on the previously created dialog.
 
   ~jppResourceDialog();
 
+
   /// Show the dialog.
   /** Shows the dialog and also sets any "Attached" data values if the dialog
       contents have been accepted.  The dialog must return wxID_OK to indicate
       acceptance. */
+
   int ShowModal();
+
 
   /// For attaching to a wxString.
   /** Connects a wxString variable to a named resource.  Currently supports
@@ -138,17 +143,22 @@ class jppResourceDialog {
 
   void Attach(const wxString& name, wxString *data);
 
+
   /// For attaching to a bool.
   /** Connects a bool variable to a named resource.  Currently supports
       wxCheckBox widgets. */
+
   void Attach(const wxString& name, bool *data);
+
 
   /// For attaching to a long.
   /** Connects a long variable to a named resource.  Currently supports
       wxSlider widgets. */
+
   void Attach(const wxString& name, long *data);
 
   /// Duplicate of long version, but with int restrictions.
+
   void Attach(const wxString& name, int *data);
 
   /// For attaching a list of items to a long.
@@ -168,9 +178,11 @@ class jppResourceDialog {
 
 
   /// Duplicate of long version, but with int restrictions.
+
   void Attach(const wxString& name, int *data, int *a);
 
   /// Duplicate of long version, but with int restrictions.
+
   void Attach(const wxString& name, int *data, wxArrayInt array);
 
 
@@ -178,16 +190,19 @@ class jppResourceDialog {
   /** Called when a dialog produced by Show() has caused a wxID_OK event.
       If the function returns true, the Attached data will be set and the
       dialog will be hidden. */
+
   virtual bool OnOk() { return true; }
 
   /// Cancel event handler
   /** Called when a dialog produced by Show() has caused a wxID_CANCEL event.
       If the function returns true, the dialog will be hidden. */
+
   virtual bool OnCancel() { return true; }
 
   /// Apply event handler
   /** Called when a dialog produced by Show() has caused a wxID_APPLY event.
       If the function returns true, the Attached data will be set. */
+
   virtual bool OnApply() { return true; }
 
 

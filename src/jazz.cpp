@@ -894,7 +894,6 @@ bool tApp::OnInit(void)
 
 
 
-
   // --------------------- Linux drivers ------------------------
 #ifndef wx_msw
   if (Config(C_MidiDriver) == C_DRV_OSS)

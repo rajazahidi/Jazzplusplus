@@ -598,7 +598,9 @@ BEGIN_EVENT_TABLE(tPianoWin, wxFrame)
 //  EVT_MENU    (MEN_VELOC ,	tPianoWin::MenVelocity)
 //  EVT_MENU    (MEN_LENGTH, tPianoWin::MenLength)
 //  EVT_MENU    (MEN_SEQLENGTH,  	tPianoWin::MenSeqLength)
+  EVT_MENU    (MEN_SEQLENGTH,  	tPianoWin::ActSequenceLengthDialog)
   EVT_MENU    (MEN_MIDIDELAY, tPianoWin::ActMidiDelayDialog)
+
 //  EVT_MENU    (MEN_CONVERT_TO_MODULATION ,	tPianoWin::MenConvertToModulation)
   EVT_MENU    (ACT_SETTINGS, tPianoWin::ActSettingsDialog)
   EVT_MENU    (MEN_FILTER,tPianoWin::OnFilter)
@@ -2604,8 +2606,9 @@ void tPianoWin::ActSettingsDialog()
 }
 
 /////JAVE 
-/// this is a test to see how to implement a dialog with patricks system
-/// it replaces tMidiDelayDlg, which isnt necesarily a good idea
+/** this is a test to see how to implement a dialog with patricks system
+ it replaces tMidiDelayDlg, which isnt necesarily a good idea
+*/
 void tPianoWin::ActMidiDelayDialog()
 {
   long scale = 50; //in percent
@@ -2629,6 +2632,28 @@ void tPianoWin::ActMidiDelayDialog()
   }
 }
 ////////////
+/////JAVE 
+/**call the sequence lenght command */
+void tPianoWin::ActSequenceLengthDialog()
+{
+  long scale = 100; //in percent
+
+  jppResourceDialog dialog(this, "sequenceLength");
+  
+  //  dialog.Attach("scale", &scale);
+
+  if(dialog.ShowModal() == wxID_OK) {
+    //execute the command
+    tCmdSeqLength cmd(Filter, (1.0*scale)/100.0);
+    cmd.Execute();
+
+    Setup();//??
+    Canvas->SetScrollRanges();
+    Redraw();
+  }
+}
+////////////////
+
 
 
 

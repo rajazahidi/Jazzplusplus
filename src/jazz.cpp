@@ -887,6 +887,8 @@ bool tApp::OnInit(void)
   // ---------------------- XML Dialogs -------------------------
   jppResourceDialog::LoadResource(FindDialog("windowSettings.xrc"));
   jppResourceDialog::LoadResource(FindDialog("midiDelay.xrc"));//JAVE
+  jppResourceDialog::LoadResource(FindDialog("sequenceLength.xrc"));//JAVE
+
 
 
 

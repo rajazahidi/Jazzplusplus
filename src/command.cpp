@@ -488,15 +488,20 @@ tCmdSeqLength::tCmdSeqLength(tFilter *f, double scale)
   this->startClock=-1000;
 }
 
+/** move an event according to startclock and scale
+ */
 void tCmdSeqLength::ExecuteEvent(tTrack *t, tEvent *e)
 {
+  //make a copy of the current event 
   tEvent *k;
   k = (tKeyOn *)e->Copy();
 
-
+  //little hack, if clock is -1000 it means set startclock from the first event.
   if(startClock==-1000){
     startClock=k->GetClock();
   }
+
+  //calculate the new start clock, move the new event and kill the old one
   k->SetClock((long int)(((k->GetClock()-startClock)*scale) + startClock ) );
   t->Kill(e);
   t->Put(k);

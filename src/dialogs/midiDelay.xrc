@@ -43,7 +43,7 @@ and to generate weird effects
                 <flag>wxALIGN_CENTRE_VERTICAL</flag>
               </object>
               <object class="sizeritem">
-                <object class="wxSlider" name="repeats">
+                <object class="wxSlider" name="repeat">
                   <value></value>
                   <min></min>
                   <max>100</max>

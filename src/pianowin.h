@@ -168,7 +168,7 @@ class tPianoWin : public wxFrame,
   void ActHelpMouse();
   void ActSettingsDialog();
   void ActMidiDelayDialog();
-
+  void ActSequenceLengthDialog();
 
   void CtrlChannelAftertouchEdit();
   void OnCtrlPolyAftertouchEdit();

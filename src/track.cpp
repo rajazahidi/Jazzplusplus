@@ -20,16 +20,15 @@
 */                                                                              
 
 #include "wx/wx.h"
-#pragma hdrstop
 
 #include "synth.h"
-
 #include "track.h"
 #include "util.h"
 #include "player.h"
 #include "jazz.h"
 #include "eventwin.h"
 #include "trackwin.h"
+
 #include <stdlib.h>
 
 //for sleep

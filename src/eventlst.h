@@ -23,8 +23,6 @@
 #define eventlst_h
 
 #include "wx/wx.h"
-#pragma hdrstop
-
 
 #include "random.h"
 #include "slidrwin.h"

@@ -21,7 +21,6 @@
 
 #include "config.h"
 #include "wx/wx.h"
-#pragma hdrstop
 
 #include "maction.h"
 #include "eventwin.h"
@@ -376,7 +375,7 @@ void tSnapSelection::SetYSnap(long ymin, long ymax, long ystep)
 // tMouseCounter
 // *************************************************************************
 
-tMouseCounter::tMouseCounter(tEventWin *wwin, tRect *rr, int val, int min, int max, int wait)
+tMouseCounter::tMouseCounter(tButtonLabelInterface *wwin, tRect *rr, int val, int min, int max, int wait)
 {
   win = wwin;
   r  = *rr;
@@ -445,21 +444,9 @@ void tMouseCounter::Notify()
 
 void tMouseCounter::ShowValue(Bool down)
 {
-#if 0
-  char buf[20];
-  dc->SetBrush(wxWHITE_BRUSH);
-  dc->SetPen(wxTRANSPARENT_PEN);
-  if (r.w && r.h)
-    dc->DrawRectangle((int)r.x, (int)r.y, (int)r.w, (int)r.h);
-  dc->SetPen(wxBLACK_PEN);
-  sprintf(buf, "%3d", Value);
-  dc->DrawText(buf, (int)r.x, (int)r.y);
-#else
   char buf[20];
   sprintf(buf, "%3d", Value);
-  wxDC* dc=new wxClientDC(win);
-  win->LineText(dc, (long)r.x, (long)r.y, (long)r.width, buf, (long)r.height, down);
-#endif
+  win->ButtonLabelDisplay(buf, down);
 }
 
 // -------------------------------------------------------------------------

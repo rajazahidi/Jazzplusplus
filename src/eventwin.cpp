@@ -22,7 +22,6 @@
 #include "wx/wx.h"
 
 #include "proplistdlg.h"
-#pragma hdrstop
 
 #include "eventwin.h"
 #include "util.h"
@@ -268,7 +267,6 @@ void tEventWin::Create()
 {
   cout <<"tEventWin::Create\n";
   CreateMenu();
-
 
   CreateCanvas();
   SnapSel = new tSnapSelection(Canvas);
@@ -746,7 +744,7 @@ void tEventWin::GetVirtSize(long *w, long *h)
   *h = 127 * hLine + hTop;
 
 
-  *w = 5000L; *h = 1000;
+  *w = 5000L;
 }
 
 // ------------------------------------------------------------------------------------

@@ -1,6 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 bin_PROGRAMS = jazz
-jazz_SOURCES = maction.cpp \
+jazz_SOURCES = \
+                pianowin.cpp \
+                maction.cpp \
                 eventwin.cpp \
                 trackwin.cpp \
                 toolbar.cpp \
@@ -16,7 +18,6 @@ jazz_SOURCES = maction.cpp \
                 audio.cpp \
                 sample.cpp \
                 freqtab.cpp \
-                pianowin.cpp \
                 harmonyp.cpp \
                 slidrwin.cpp \
                 eventlst.cpp \

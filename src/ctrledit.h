@@ -29,7 +29,7 @@
 #endif
 #include "random.h"
 
-class tEventWin;
+class tPianoWin;
 class tTrack;
 class tEvent;
 
@@ -55,7 +55,7 @@ class tCtrlPanel : public wxPanel
 class tCtrlEditBase : public tArrayEditDrawBars
 {
   public:
-    tCtrlEditBase(int min, int max, tEventWin *parent, char const *label, int xoff, int x, int y, int w, int h, int mode=0);
+    tCtrlEditBase(int min, int max, tPianoWin *parent, char const *label, int xoff, int x, int y, int w, int h, int mode=0);
     virtual ~tCtrlEditBase();
     void SetSize(int xoff, int x, int y, int w, int h);
     void ReInit(tTrack *track, long FromClock, long ClocksPerPixel);
@@ -93,12 +93,12 @@ class tCtrlEditBase : public tArrayEditDrawBars
     tRndArray  array;
 
     tArrayEdit *edit;
-    tEventWin  *parent;
+    tPianoWin  *parent;
     tCtrlPanel *panel;
 
   private:
 
-    void Create(tEventWin *p, char const *label, int dx, int x, int y, int w, int h);
+    void Create(tPianoWin *p, char const *label, int dx, int x, int y, int w, int h);
 
     static void Apply(wxButton &but, wxCommandEvent& event);
     static void Revert(wxButton &but, wxCommandEvent& event);
@@ -111,7 +111,7 @@ class tCtrlEditBase : public tArrayEditDrawBars
 class tPitchEdit : public tCtrlEditBase
 {
   public:
-    tPitchEdit(tEventWin *parent, char const *label, int xoff, int x, int y, int w, int h);
+    tPitchEdit(tPianoWin *parent, char const *label, int xoff, int x, int y, int w, int h);
   protected:
     virtual int Missing();
     virtual int IsCtrlEdit(tEvent *e);
@@ -123,7 +123,7 @@ class tPitchEdit : public tCtrlEditBase
 class tPolyAfterEdit : public tCtrlEditBase
 {
   public:
-    tPolyAfterEdit(tEventWin *parent, char const *label, int xoff, int x, int y, int w, int h);
+    tPolyAfterEdit(tPianoWin *parent, char const *label, int xoff, int x, int y, int w, int h);
   protected:
     virtual int Missing();
     virtual int IsCtrlEdit(tEvent *e);
@@ -135,7 +135,7 @@ class tPolyAfterEdit : public tCtrlEditBase
 class tChannelAfterEdit : public tCtrlEditBase
 {
   public:
-    tChannelAfterEdit(tEventWin *parent, char const *label, int xoff, int x, int y, int w, int h);
+    tChannelAfterEdit(tPianoWin *parent, char const *label, int xoff, int x, int y, int w, int h);
   protected:
     virtual int Missing();
     virtual int IsCtrlEdit(tEvent *e);
@@ -148,7 +148,7 @@ class tChannelAfterEdit : public tCtrlEditBase
 class tCtrlEdit : public tCtrlEditBase
 {
   public:
-    tCtrlEdit(int CtrlNum, tEventWin *parent, char const *label, int xoff, int x, int y, int w, int h);
+    tCtrlEdit(int CtrlNum, tPianoWin *parent, char const *label, int xoff, int x, int y, int w, int h);
   protected:
     virtual int Missing();
     virtual int IsCtrlEdit(tEvent *e);
@@ -161,7 +161,7 @@ class tCtrlEdit : public tCtrlEditBase
 class tVelocEdit : public tCtrlEditBase
 {
   public:
-    tVelocEdit(tEventWin *parent, char const *label, int xoff, int x, int y, int w, int h);
+    tVelocEdit(tPianoWin *parent, char const *label, int xoff, int x, int y, int w, int h);
   protected:
     virtual int Missing();
     virtual int IsCtrlEdit(tEvent *e);
@@ -172,7 +172,7 @@ class tVelocEdit : public tCtrlEditBase
 class tTempoEdit : public tCtrlEditBase
 {
   public:
-    tTempoEdit(int min, int max, tEventWin *parent, char const *label, int xoff, int x, int y, int w, int h);
+    tTempoEdit(int min, int max, tPianoWin *parent, char const *label, int xoff, int x, int y, int w, int h);
   protected:
     virtual int Missing();
     virtual int IsCtrlEdit(tEvent *e);

@@ -23,12 +23,6 @@
 #include "wxwin2port.h"
 #include "wx/wx.h"
 
-// Not sure what this is for, so I'm leaving it
-#ifdef wx_xt
-#define wxbMessageBox wxMessageBox
-#endif
-
-#pragma hdrstop
 #ifndef __PORTING
 #include "rhythm.h"
 #include "dialogs.h"
@@ -2679,3 +2673,6 @@ int tTrackWin::OnMouseEvent(wxMouseEvent &e)
   return 0;
 }
 
+
+void tTrackWin::ButtonLabelDisplay(wxString text, Bool down) {
+}

@@ -23,8 +23,6 @@
 #include <unistd.h>
 #include "synth.h"
 
-#pragma hdrstop
-
 #include "config.h"
 #include "song.h"
 

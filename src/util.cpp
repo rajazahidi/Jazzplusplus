@@ -21,13 +21,10 @@
 
 #include "wxwin2port.h"
 
-#pragma hdrstop
-
 #include "wx/wx.h"
+
 #include "util.h"
-
 #include "song.h"
-
 #include "jazz.h"
 
 #include <ctype.h>

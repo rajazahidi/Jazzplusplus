@@ -20,7 +20,6 @@
 */                                                                              
 
 #include "wx/wx.h"
-#pragma hdrstop
 
 #include "mstdfile.h"
 #include <stdio.h>

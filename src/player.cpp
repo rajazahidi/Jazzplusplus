@@ -21,7 +21,6 @@
 
 
 #include "wx/wx.h"
-#pragma hdrstop
 
 #include "player.h"
 #include "trackwin.h"

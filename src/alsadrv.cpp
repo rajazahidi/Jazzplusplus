@@ -28,7 +28,6 @@
 */                                                                              
 
 #include "wx.h"
-#pragma hdrstop
 
 #include "config.h"
 #include "alsadrv.h"

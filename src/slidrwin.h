@@ -25,7 +25,6 @@
 #include "toolbar.h"
 
 #include "wx/wx.h"
-#pragma hdrstop
 
 class wxToolBar;
 struct tToolDef;

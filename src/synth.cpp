@@ -20,7 +20,6 @@
 */                                                                              
 
 #include "wx/wx.h"
-#pragma hdrstop
 
 #include "track.h"
 #include "util.h"

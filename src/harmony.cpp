@@ -23,8 +23,6 @@
 #include "wx/wx.h"
 #include "util.h"
 
-#pragma hdrstop
-
 #include "harmony.h"
 #include "harmonyp.h"
 #include "player.h"

@@ -142,6 +142,22 @@ public:
 
 class tEventWin;
 
+
+/**
+  tButtonLabelInterface
+
+  Specifies an interface for displaying a text string within another widget.
+  The other widget would inherit from this interface and implement the Display
+  method to print the string somewhere appropriate.  The down argument
+  indicates if the text should be displayed in a depressed button or a normal
+  button.
+*/
+class tButtonLabelInterface {
+ public:
+  virtual void ButtonLabelDisplay(wxString text, Bool down) = 0;
+};
+
+
 /**
   MouseCounter - let you enter numbers with left/right mouse button
 
@@ -151,7 +167,7 @@ class tMouseCounter : public wxTimer, public tMouseAction
     int Min, Max, Delta;
     int Timeout;
     int Wait;	// don't inc/dec at Init
-    tEventWin *win;
+    tButtonLabelInterface *win;
 
     virtual int LeftDown(wxMouseEvent &);
     virtual int LeftUp(wxMouseEvent &);
@@ -162,7 +178,7 @@ class tMouseCounter : public wxTimer, public tMouseAction
   public:
     tRect r;
     int Value;
-    tMouseCounter(tEventWin *win, tRect *rec, int val, int min, int max, int wait = 0);
+    tMouseCounter(tButtonLabelInterface *win, tRect *rec, int val, int min, int max, int wait = 0);
 };
 
 

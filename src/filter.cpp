@@ -23,8 +23,6 @@
 
 #include "proplistdlg.h"
 
-#pragma hdrstop
-
 #include "filter.h"
 #include "events.h"
 #include "util.h"

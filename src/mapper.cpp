@@ -20,7 +20,6 @@
 */                                                                              
 #include "config.h"
 #include "wx/wx.h"
-#pragma hdrstop
 
 #include "mapper.h"
 #include "jazz.h"

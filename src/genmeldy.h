@@ -23,8 +23,6 @@
 #define genmeldy_h
 
 #include "wx/wx.h"
-#pragma hdrstop
-//#include "wx_form.h"
 
 #include "random.h"
 #include "slidrwin.h"

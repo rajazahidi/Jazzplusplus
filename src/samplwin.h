@@ -23,7 +23,6 @@
 #define samplwin_h
 
 #include "wx/wx.h"
-#pragma hdrstop
 //#include "wx_scrol.h"
 
 class tSample;

@@ -20,7 +20,6 @@
 */                                                                              
 
 #include "wx/wx.h"
-#pragma hdrstop
 
 #include "ctrledit.h"
 #include "eventwin.h"
@@ -31,7 +30,7 @@
 static const long wbar = 2;
 static int bars_state = 2;  // from ArrayEdit
 
-tCtrlEditBase::tCtrlEditBase(int min, int max, tEventWin *p, char const *label, int dx, int x, int y, int w, int h, int ctrledit)
+tCtrlEditBase::tCtrlEditBase(int min, int max, tPianoWin *p, char const *label, int dx, int x, int y, int w, int h, int ctrledit)
     : array((w-dx)/wbar, min, max)
 {
   ctrlmode = ctrledit;
@@ -39,7 +38,7 @@ tCtrlEditBase::tCtrlEditBase(int min, int max, tEventWin *p, char const *label, 
   Create(p, label, dx, x, y, w, h);
 }
 
-void tCtrlEditBase::Create(tEventWin *p, char const *label, int dx, int x, int y, int w, int h)
+void tCtrlEditBase::Create(tPianoWin *p, char const *label, int dx, int x, int y, int w, int h)
 {
   x_off = dx;
   parent = p;
@@ -348,7 +347,7 @@ void tCtrlEditBase::DrawBars(wxDC* dc)
 
 // ------------------------------------------------------------------
 
-tPitchEdit::tPitchEdit(tEventWin *parent, char const *label, int xoff, int x, int y, int w, int h)
+tPitchEdit::tPitchEdit(tPianoWin *parent, char const *label, int xoff, int x, int y, int w, int h)
   : tCtrlEditBase(-8191, 8191, parent, label, xoff, x, y, w, h)
 {
 }
@@ -375,7 +374,7 @@ tEvent * tPitchEdit::NewEvent(long clock, int val)
 
 // ------------------------------------------------------------------
 
-tCtrlEdit::tCtrlEdit(int CtrlNum, tEventWin *parent, char const *label, int xoff, int x, int y, int w, int h)
+tCtrlEdit::tCtrlEdit(int CtrlNum, tPianoWin *parent, char const *label, int xoff, int x, int y, int w, int h)
   : tCtrlEditBase(0, 127, parent, label, xoff, x, y, w, h, 1)
 {
   ctrl_num = CtrlNum;
@@ -409,7 +408,7 @@ tEvent * tCtrlEdit::NewEvent(long clock, int val)
 
 // ------------------------------------------------------------------
 
-tVelocEdit::tVelocEdit(tEventWin *parent, char const *label, int xoff, int x, int y, int w, int h)
+tVelocEdit::tVelocEdit(tPianoWin *parent, char const *label, int xoff, int x, int y, int w, int h)
   : tCtrlEditBase(1, 127, parent, label, xoff, x, y, w, h)
 {
   sticky = 0;
@@ -487,7 +486,7 @@ void tVelocEdit::OnApply()
 
 // ------------------------------------------------------------------
 
-tPolyAfterEdit::tPolyAfterEdit(tEventWin *parent, char const *label, int xoff, int x, int y, int w, int h)
+tPolyAfterEdit::tPolyAfterEdit(tPianoWin *parent, char const *label, int xoff, int x, int y, int w, int h)
   : tCtrlEditBase(0, 127, parent, label, xoff, x, y, w, h, 1)
 {
   sticky = 0;  // SN must be set for proper editing!
@@ -624,7 +623,7 @@ void tPolyAfterEdit::OnApply()
 
 // ----------------------------------------------------------------------
 
-tChannelAfterEdit::tChannelAfterEdit(tEventWin *parent, char const *label, int xoff, int x, int y, int w, int h)
+tChannelAfterEdit::tChannelAfterEdit(tPianoWin *parent, char const *label, int xoff, int x, int y, int w, int h)
   : tCtrlEditBase(0, 127, parent, label, xoff, x, y, w, h, 1)
 {
 }
@@ -730,7 +729,7 @@ void tChannelAfterEdit::OnApply()
 
 // ------------------------------------------------------------------
 
-tTempoEdit::tTempoEdit( int min, int max, tEventWin *parent, char const *label, int xoff, int x, int y, int w, int h)
+tTempoEdit::tTempoEdit( int min, int max, tPianoWin *parent, char const *label, int xoff, int x, int y, int w, int h)
   : tCtrlEditBase(min, max, parent, label, xoff, x, y, w, h)
 {
 }

@@ -39,14 +39,32 @@
 
 class tCtrlEditBase;
 
-class tPianoWin : public tEventWin
+class tPianoCanvas: public wxScrolledWindow //this was wxCanvas
+{
+  public:
+    tPianoWin *PianoWin;
+    tPianoCanvas(tPianoWin *frame, int x, int y, int w, int h, int style = 0);
+    void OnPaint(wxPaintEvent& event);
+    //    void OnEvent(wxMouseEvent& event);
+    void OnMouseEvent(wxMouseEvent& event);
+    void OnChar(wxKeyEvent& event);
+    Bool OnCharHook(wxKeyEvent& event);
+    void SetScrollRanges();
+    void SetScrollPosition(long x, long y);
+    void OnDraw(wxDC& dc);
+    DECLARE_EVENT_TABLE()
+};
+
+class tPianoWin : public wxFrame,
+                  public tButtonLabelInterface
 {
   friend class tGuitarWin;
  public:
   tPianoWin(wxFrame *frame, char *title, tSong *song, int x, int y, int width, int height);
   virtual ~tPianoWin();
     
-
+  // Method in tButtonLabelInterface
+  void ButtonLabelDisplay(wxString text, Bool down);
 
     void OnMSelect();
     void OnMLength();
@@ -132,7 +150,7 @@ class tPianoWin : public tEventWin
     void paste_keys_aftertouch(tTrack *t, tEvent *e);
     void kill_keys_aftertouch(tTrack *t, tEvent *e);
     int  nKeyOnEvents();
-    //
+    void LogicalMousePosition(wxMouseEvent &e, long *x, long *y);
 
 #ifndef __PORTING
 
@@ -171,6 +189,55 @@ void CtrlChannelAftertouchEdit();
   void OnErase();
   void OnVisibleAllTracks();
   void OnReset();
+
+  // Functions slurped from tEventWin
+ public:
+  void NewPlayPosition(long Clock);
+  void DrawPlayPosition(wxDC* dc);
+  void Redraw();
+  void Create();
+  void CreateCanvas();
+  long Clock2x(long clk);
+  long x2Clock(long x);
+  long Line2y(long Line);
+  long y2Line(long y, int up = 0);
+  void SettingsDialog();
+  int EventsSelected(const char *msg = 0);
+  void ZoomIn();
+  void ZoomOut();
+  void LineText(wxDC *dc, long x, long y, long w, const char *str, int h = -1, Bool down = FALSE);
+  long x2BarClock(long x, int next);
+  int OnEventWinMouseEvent(wxMouseEvent &e);
+  void OnEventWinPaintSub(wxDC *dc, long x, long y);
+  long y2yLine(long y, int up = 0);
+  void GetVirtSize(long *w, long *h);
+  Bool OnCharHook(wxKeyEvent& e);
+
+  tPianoCanvas *Canvas;
+  tToolBar *tool_bar;
+  long   FontSize;
+  long   ClocksPerPixel;
+  tSong   *Song;
+  wxFont *Font;
+  wxFont *FixedFont;	//remains with 12pt/ bleibt bei 12pt
+  int    hFixedFont;	//Height letters/ Hoehe eines Buchstaben
+  long   hTop;
+  long   wLeft;
+  long   LittleBit;
+  long FromLine, ToLine;
+  tFilter *Filter;
+  long   hLine;
+  long xEvents, yEvents, wEvents, hEvents;
+  long CanvasX, CanvasY, CanvasW, CanvasH;	// canvas coords
+  long FromClock, ToClock;
+  tSnapSelection *SnapSel;
+  Bool   UseColors;
+  tMouseAction *MouseAction;
+  long    PlayClock;
+  wxFrame *ParentWin;
+  wxDialog *DialogBox;
+  wxDialog *MixerForm;
+  wxTextCtrl         *m_textWindow;
 
 
   private:

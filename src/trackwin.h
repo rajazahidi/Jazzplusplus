@@ -23,13 +23,9 @@
 #ifndef trackwin_h
 #define trackwin_h
 
-#ifndef eventwin_h
 #include "eventwin.h"
-#endif
-
-#ifndef song_h
 #include "song.h"
-#endif
+
 
 #define MaxBars 200
 
@@ -70,8 +66,12 @@ class tArpeggioWin;
 /**
 the main window in jazz
 */
-class tTrackWin : public tEventWin
+class tTrackWin : public tEventWin,
+                  public tButtonLabelInterface
 {
+    // Method in tButtonLabelInterface
+    virtual void ButtonLabelDisplay(wxString text, Bool down);
+
     int xNumber, wNumber;
     int xName,   wName;
     int xState,  wState;

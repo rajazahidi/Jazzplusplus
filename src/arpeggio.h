@@ -23,8 +23,6 @@
 #define arpeggio_h
 
 #include "wx/wx.h"
-#pragma hdrstop
-//#include "wx_form.h"
 
 #include "slidrwin.h"
 

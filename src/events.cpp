@@ -20,10 +20,8 @@
 */                                                                              
 
 #include "wx/wx.h"
-#pragma hdrstop
 
 #include "events.h"
-#include "wx/wx.h"
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -21,7 +21,6 @@
 */
 
 #include "wx/wx.h"
-#pragma hdrstop
 
 #include "toolbar.h"
 

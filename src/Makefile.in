@@ -51,13 +51,13 @@ CONFIG_CLEAN_FILES =
 am__installdirs = $(DESTDIR)$(bindir)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_jazz_OBJECTS = maction.$(OBJEXT) eventwin.$(OBJEXT) \
-	trackwin.$(OBJEXT) toolbar.$(OBJEXT) jazz.$(OBJEXT) \
-	track.$(OBJEXT) synth.$(OBJEXT) events.$(OBJEXT) \
-	song.$(OBJEXT) mstdfile.$(OBJEXT) util.$(OBJEXT) \
-	player.$(OBJEXT) dynarray.$(OBJEXT) about.$(OBJEXT) \
-	audio.$(OBJEXT) sample.$(OBJEXT) freqtab.$(OBJEXT) \
-	pianowin.$(OBJEXT) harmonyp.$(OBJEXT) slidrwin.$(OBJEXT) \
+am_jazz_OBJECTS = pianowin.$(OBJEXT) maction.$(OBJEXT) \
+	eventwin.$(OBJEXT) trackwin.$(OBJEXT) toolbar.$(OBJEXT) \
+	jazz.$(OBJEXT) track.$(OBJEXT) synth.$(OBJEXT) \
+	events.$(OBJEXT) song.$(OBJEXT) mstdfile.$(OBJEXT) \
+	util.$(OBJEXT) player.$(OBJEXT) dynarray.$(OBJEXT) \
+	about.$(OBJEXT) audio.$(OBJEXT) sample.$(OBJEXT) \
+	freqtab.$(OBJEXT) harmonyp.$(OBJEXT) slidrwin.$(OBJEXT) \
 	eventlst.$(OBJEXT) command.$(OBJEXT) filter.$(OBJEXT) \
 	random.$(OBJEXT) arpeggio.$(OBJEXT) genmeldp.$(OBJEXT) \
 	genmeldy.$(OBJEXT) mapper.$(OBJEXT) audiodrv.$(OBJEXT) \
@@ -198,7 +198,9 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-jazz_SOURCES = maction.cpp \
+jazz_SOURCES = \
+                pianowin.cpp \
+                maction.cpp \
                 eventwin.cpp \
                 trackwin.cpp \
                 toolbar.cpp \
@@ -214,7 +216,6 @@ jazz_SOURCES = maction.cpp \
                 audio.cpp \
                 sample.cpp \
                 freqtab.cpp \
-                pianowin.cpp \
                 harmonyp.cpp \
                 slidrwin.cpp \
                 eventlst.cpp \

@@ -21,10 +21,7 @@
 
 #include "config.h" 
 #include "wx/wx.h"
-#pragma hdrstop
 
-
-#include "wx/wx.h"
 #include "guitar.h"
 #include "pianowin.h"
 #include "player.h"

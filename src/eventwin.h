@@ -24,34 +24,16 @@
 #define eventwin_h
 
 
-#ifndef wx_wxh
 #include "wx/wx.h"
-#endif
 
-
-
-#ifndef filter_h
 #include "filter.h"
-#endif
-
-#ifndef __PORTING
-#ifndef wx_bbarh
-#include "wx_bbar.h"
-#endif
-
-#endif //__PORTING
-
-
-
-#ifndef maction_h
 #include "maction.h"
-#endif
 
 
 class tEventWin;
 class tSong;
 class tToolBar;
-
+class tPianoWin;
 
 /**
 JAVE i dont get the meaning of this class
@@ -73,6 +55,8 @@ class tCanvas: public wxScrolledWindow //this was wxCanvas
     DECLARE_EVENT_TABLE()
 };
 
+
+#include "pianowin.h"
 
 
 /**
@@ -109,7 +93,7 @@ class tEventWin : public wxFrame
 
 
     wxFrame *ParentWin;
-    tEventWin *NextWin;
+    tPianoWin *NextWin;
 
 
     // 2) Create():

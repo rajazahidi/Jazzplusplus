@@ -23,7 +23,6 @@
 #define sampldlg_h
 
 #include "wx/wx.h"
-#pragma hdrstop
 
 
 #include "random.h"

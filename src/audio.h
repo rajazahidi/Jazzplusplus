@@ -17,7 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **
-*/                                                                              
+*/
 
 #ifndef audio_h
 #define audio_h
@@ -28,13 +28,13 @@
 #include <iostream>
 using namespace std;
 #include "dynarray.h"
+#include "engine/Project.h"
 
 class tEventArray;
 class tTrack;
 struct tAudioBuffer;
 class tAudioBufferQueue;
 class tAudioRecordBuffer;
-class tRecordInfo;
 class tSampleWin;
 
 // these should be variables and queried from the driver!

@@ -67,7 +67,9 @@
 #include "audiodrv.h"
 #endif
 
+extern jppProject* gProject;
 
+// \todo: get rid of all this stuff, it's moving to jppProject
 tTrackWin *TrackWin = 0;
 static char *defsong = 0;
 static char *defpattern = 0;
@@ -356,7 +358,7 @@ tTrackWin::tTrackWin(wxFrame *frame, char *title, tSong *song, int x, int y, int
 
     // Give the frame a status line for no reason currently
     CreateStatusBar();
-    SetStatusText("Welcome to Alacrity");
+    SetStatusText("Welcome to JazzPlusPlus");
 
     int i;
     int opt;
@@ -371,9 +373,16 @@ tTrackWin::tTrackWin(wxFrame *frame, char *title, tSong *song, int x, int y, int
 
     NextWin = new tPianoWin(frame, "Piano Roll", Song, Config(C_PianoWinXpos), Config(C_PianoWinYpos), Config(C_PianoWinWidth), Config(C_PianoWinHeight) );
 
-    RecInfo.Track = 0;
+    tRecordInfo *RecInfo;
+
+    RecInfo = new tRecordInfo();
+
+    RecInfo->Track = 0;
+    RecInfo->Muted = 0;
+
+    gProject->SetRecInfo(RecInfo); // gProject will take ownership of this thing
+
     nBars = 0;
-    RecInfo.Muted = 0;
 
     CounterMode = CmProgram;
     NumberMode = NmMidiChannel;
@@ -2407,138 +2416,143 @@ void tTrackWin::MouseEvents(wxMouseEvent &e)
 void tTrackWin::MousePlay(wxMouseEvent *e, MousePlayMode mode)
 {
 #ifndef __PORTING
-  //
+  /// \todo
+  /* { does this ever get deleted? Do todo lists in doxygen work? }
+  */
   wxDC* dc=new wxClientDC(Canvas);
 #endif // __PORTING
 
-  if (mode == Mouse && !e->ButtonDown())
-    return;
+    if (mode == Mouse && !e->ButtonDown())
+        return;
 
-  if (!Midi->Playing)
-  {
-    switch (mode) {
-      case Mouse:
-	{
-	  int x, y;
-	  e->GetPosition(&x, &y);
-	  prev_clock = x2BarClock((long)x);
-	  prev_muted = (e->RightDown() != 0);
-	  if (SnapSel->Selected && (e->ShiftDown() || e->MiddleDown()))
-	    prev_loop = TRUE;
-	  else
-	    prev_loop = FALSE;
-          prev_record = SnapSel->Selected;
-	}
-	break;
+    // This is a little hack to keep it working for now.  All this stuff needs to be moved.
+    tRecordInfo* RecInfo = gProject->GetRecInfo();
 
-      case SpaceBar:
-        // do it again, sam
-        break;
+    if (!gProject->IsPlaying())
+    {
+        switch (mode) {
+            case Mouse:
+                int x, y;
+                e->GetPosition(&x, &y);
+                gProject->SetPlayPosition(x2BarClock((long)x));
+                gProject->Mute((e->RightDown() != 0));
+                if (SnapSel->Selected && (e->ShiftDown() || e->MiddleDown()))
+                    gProject->SetLoop(TRUE);
+                else
+                    gProject->SetLoop(FALSE);
+                    prev_record = SnapSel->Selected;
+                break;
 
-      case PlayButton:
-        prev_loop = FALSE;
-	prev_record = FALSE;
-        break;
+            case SpaceBar:
+                // do it again, sam
+                break;
 
-      case PlayLoopButton:
-        if (!EventsSelected("please select loop range first"))
-	  return;
-        prev_loop   = TRUE;
-	prev_record = FALSE;
-	break;
+            case PlayButton:
+                gProject->SetLoop(FALSE);
+                gProject->SetRecord(FALSE);
+                break;
 
-      case RecordButton:
+            case PlayLoopButton:
+                if (!EventsSelected("please select loop range first"))
+                    return;
+                gProject->SetLoop(TRUE);
+                gProject->SetRecord(FALSE);
+                break;
+
+            case RecordButton:
+                if (!EventsSelected("please select record track/bar first"))
+                    return;
+                tBarInfo bi(gProject->Song);
+
+                bi.SetClock(Filter->FromClock);
+
+                if (bi.BarNr > 0)
+                    bi.SetBar(bi.BarNr - 1);
+                gProject->SetPlayPosition(bi.Clock);
+                gProject->SetRecord(TRUE);
+                gProject->SetLoop(FALSE);
+                break;
+        }
+
+        // todo: figure out if we should have getters for these instead and make them private
+        // jppProject members
+        bool loop   = gProject->mLoop;
+        bool muted  = gProject->mMuted;
+        bool record = gProject->mRecord;
+
+        // possible to record?
+
+
+        if (record && SnapSel->Selected)
         {
-	  if (!EventsSelected("please select record track/bar first"))
-	    return;
-	  tBarInfo bi(Song);
+            RecInfo->TrackNr   = Filter->FromTrack;
 
-	  bi.SetClock(Filter->FromClock);
+            RecInfo->Track     = gProject->Song->GetTrack(RecInfo->TrackNr);
 
-	  if (bi.BarNr > 0)
-	    bi.SetBar(bi.BarNr - 1);
-	  prev_clock  = bi.Clock;
-	  prev_record = TRUE;
-	  prev_loop   = FALSE;
-	}
-        break;
-    }
+            RecInfo->FromClock = Filter->FromClock;
+            RecInfo->ToClock   = Filter->ToClock;
 
-    bool loop   = prev_loop;
-    bool muted  = prev_muted;
-    bool record = prev_record;
+            if (muted)
+            {
+                RecInfo->Muted = 1;
+                RecInfo->Track->SetState(tsMute);
+            #ifndef __PORTING
+                LineText(dc,xState, Line2y(RecInfo.TrackNr), wState, RecInfo.Track->GetStateChar());
+            #endif // __PORTING
+            }
+            else
+                RecInfo->Muted = 0;
+        }
+        else
+            RecInfo->Track = 0;
 
-    // possible to record?
-    if (record && SnapSel->Selected)
-    {
+        // possible to loop?
+        long loop_clock = 0;
+        if (loop && SnapSel->Selected)
+        {
+            prev_clock = Filter->FromClock;
+            loop_clock = Filter->ToClock;
+        }
 
-      RecInfo.TrackNr   = Filter->FromTrack;
+        // GO!
+        if (RecInfo->Track)  // recording?
+            gProject->Midi->SetRecordInfo(RecInfo);
+        else
+            gProject->Midi->SetRecordInfo(0);
+        cout<<"Midi->StartPlay"<<endl;
 
-      RecInfo.Track     = Song->GetTrack(RecInfo.TrackNr);
+        gProject->mStartTime = prev_clock;
+        gProject->mStopTime = loop_clock;
+        gProject->Play();
 
-      RecInfo.FromClock = Filter->FromClock;
-      RecInfo.ToClock   = Filter->ToClock;
-
-      if (muted)
-      {
-	RecInfo.Muted = 1;
-	RecInfo.Track->SetState(tsMute);
-#ifndef __PORTING
-	LineText(dc,xState, Line2y(RecInfo.TrackNr), wState, RecInfo.Track->GetStateChar());
-#endif // __PORTING
-      }
-      else
-	RecInfo.Muted = 0;
-    }
+    }//if(!Midi->Playing)
     else
-      RecInfo.Track = 0;
-
-    // possible to loop?
-    long loop_clock = 0;
-    if (loop && SnapSel->Selected)
     {
-
-      prev_clock = Filter->FromClock;
-      loop_clock = Filter->ToClock;
-
+        gProject->Stop();
+        if (RecInfo->Track)
+        {
+            if (RecInfo->Muted)
+            {
+                RecInfo->Track->SetState(tsPlay);
+            #ifndef __PORTING
+                LineText(dc,xState, Line2y(RecInfo->TrackNr), wState, RecInfo->Track->GetStateChar());
+            #endif // __PORTING
+            }
+            if (!RecInfo->Track->GetAudioMode() && !gProject->Midi->RecdBuffer.IsEmpty())
+            {
+                //int choice = wxMessageBox("Keep recorded events?", "You played", wxOK | wxCANCEL);
+                //if (choice == wxOK)
+                {
+                    wxBeginBusyCursor();
+                    gProject->Song->NewUndoBuffer();
+                    RecInfo->Track->MergeRange(&gProject->Midi->RecdBuffer, RecInfo->FromClock, RecInfo->ToClock, RecInfo->Muted);
+                    wxEndBusyCursor();
+                    Redraw();
+                    NextWin->Redraw();
+                }
+            }
+        }
     }
-
-    // GO!
-    if (RecInfo.Track)  // recording?
-      Midi->SetRecordInfo(&RecInfo);
-    else
-      Midi->SetRecordInfo(0);
-    cout<<"Midi->StartPlay"<<endl;
-    Midi->StartPlay(prev_clock, loop_clock);
-
-  }//if(!Midi->Playing)
-  else
-  {
-    Midi->StopPlay();
-    if (RecInfo.Track)
-    {
-      if (RecInfo.Muted)
-      {
-	RecInfo.Track->SetState(tsPlay);
-#ifndef __PORTING
-	LineText(dc,xState, Line2y(RecInfo.TrackNr), wState, RecInfo.Track->GetStateChar());
-#endif // __PORTING
-      }
-      if (!RecInfo.Track->GetAudioMode() && !Midi->RecdBuffer.IsEmpty())
-	{
-	//int choice = wxMessageBox("Keep recorded events?", "You played", wxOK | wxCANCEL);
-	//if (choice == wxOK)
-	{
-	  wxBeginBusyCursor();
-	  Song->NewUndoBuffer();
-	  RecInfo.Track->MergeRange(&Midi->RecdBuffer, RecInfo.FromClock, RecInfo.ToClock, RecInfo.Muted);
-	  wxEndBusyCursor();
-	  Redraw();
-	  NextWin->Redraw();
-	}
-      }
-    }
-  }
 }
 
 int tTrackWin::OnKeyEvent(wxKeyEvent &e)

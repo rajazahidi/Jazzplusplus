@@ -47,6 +47,8 @@ using namespace std;
 
 #define db(a) cout << #a << " = " << a << endl
 
+extern jppProject* gProject;
+
 // -----------------------------------------------------------
 
 
@@ -766,9 +768,9 @@ void tSampleSet::AddNote(const char *fname, long frc, long toc)
 
   // delete selection
 #ifndef __PORTING
-  tSong       *song = TrackWin->Song;
+  tSong       *song = gProject->Song;
 #endif // __PORTING
-  tRecordInfo *info = &TrackWin->RecInfo;
+  tRecordInfo *info = gProject->GetRecInfo();
   tTrack      *track = info->Track;
 #ifndef __PORTING
   song->NewUndoBuffer();

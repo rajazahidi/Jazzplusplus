@@ -29,8 +29,8 @@
 #include "../mstdfile.h"
 
 jppProject::jppProject() {
-    mRecInfo.Track = 0;
-    mRecInfo.Muted = 0;
+    mRecInfo->Track = 0;
+    mRecInfo->Muted = 0;
     mNumBars = 0;
     mMetronomeInfo.IsAccented = Config(C_MetroIsAccented);
     mMetronomeInfo.Veloc = Config(C_MetroVelocity);
@@ -101,8 +101,22 @@ tMetronomeInfo jppProject::GetMetronome() {
     return mMetronomeInfo;
 }
 
-tRecordInfo jppProject::GetRecInfo() {
+/**
+ *  Returns a const pointer to the internal RecInfo member.
+ */
+tRecordInfo* jppProject::GetRecInfo() {
     return mRecInfo;
+}
+
+/**
+ *
+ * Sets the internal mRecInfo, used for recording apparently.  jppProject will take ownership
+ * of this pointer, so don't destroy it after you've made it!
+ *
+ */
+void jppProject::SetRecInfo(tRecordInfo* newRecInfo) {
+	if(mRecInfo) delete mRecInfo; // delete the one that's there already, if there is one
+	mRecInfo = newRecInfo;
 }
 
 

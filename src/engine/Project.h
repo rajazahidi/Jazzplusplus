@@ -34,6 +34,17 @@ class tFilter;
 #ifndef JPPPROJECT
 #define JPPPROJECT
 
+class tRecordInfo
+{
+public:
+  tTrack *Track;	// 0 == not recording
+
+  long   FromClock;     // recording from clock
+  long   ToClock;	// recording to clock
+  long   TrackNr;	// recording on this track
+  int    Muted;		// recording track is muted
+};
+
 class jppProject {
     public:
         // These should probably become private members at some point.  I'm not sure about that
@@ -45,52 +56,81 @@ class jppProject {
 
         jppProject();
 
-        // restart play here if space bar hit
+        /// restart play here if space bar hit
         long mStartTime;
+
+        /// Not yet sure what this does
         long mStopTime;
+
+        /// Loop flag, loops play if true
         bool mLoop;
+
+        /// If true, mutes output
         bool mMuted;
+
+        /// If true, records from midi in
         bool mRecord;
 
+        /// Not yet sure what this does
         tFilter *Filter;
+
+        /// Stores metrome information
         tMetronomeInfo mMetronomeInfo;
 
+        /// Returns the internal pointer to the metronome
         tMetronomeInfo GetMetronome();
 
         /// Number of bars
         int mNumBars;
 
+        /// Returns whether or not the project has changed since last save
         bool HasChanged();
 
+        /// Name of the song file currently loaded
         wxString mSongFileName;
+
+        /// Name of the pattern file currently loaded
         wxString mPatternFileName;
 
         // These provide access to the Project
 
         /// Sets the song name
         void SetSong(wxString newsong);
+        /// Sets the pattern name
         void SetPattern(wxString newpattern);
 
         /// Open the Song
         void OpenSong(wxString newsong);
+		/// Save the song
         void Save();
 
         // Here is the new play interface.  For now it just acts as a layer between the Project
         // and the GUI.
+        /// Returns true during playback
         bool IsPlaying();
+        /// Starts playback
         void Play();
+        /// Stops playback
         void Stop();
+        /// Sets the playback cursor to a specific position
         void SetPlayPosition(long newposition);
+        /// Mutes playback
         void Mute(bool newmute);
+		/// Set loop, true to loop, false not to loop
         void SetLoop(bool newloop);
+        /// Set record, true to record, false not to record
         void SetRecord(bool newrecord);
+        /// Beats me what this does.
         void SetLoopClock(long newclock);
 
-        tRecordInfo GetRecInfo();
+		/// Beats me what this does.
+        tRecordInfo *GetRecInfo();
+        /// Sets RecInfo, jppProject takes ownership of this object
+        void SetRecInfo(tRecordInfo* newRecInfo);
     private:
         bool mChanged;
         bool mIsPlaying;
-        tRecordInfo mRecInfo;
+        tRecordInfo *mRecInfo;
 };
 
 #endif // JPPPROJECT

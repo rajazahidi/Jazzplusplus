@@ -29,17 +29,6 @@
 
 #define MaxBars 200
 
-class tRecordInfo
-{
-public:
-  tTrack *Track;	// 0 == not recording
-
-  long   FromClock;     // recording from clock
-  long   ToClock;	// recording to clock
-  long   TrackNr;	// recording on this track
-  int    Muted;		// recording track is muted
-};
-
 enum tCounterModes
 {
   CmProgram,
@@ -151,8 +140,6 @@ class tTrackWin : public tEventWin,
     enum MousePlayMode {Mouse, SpaceBar, PlayButton, PlayLoopButton, RecordButton };
     void MousePlay(wxMouseEvent *e, MousePlayMode mode = SpaceBar);
     void MouseSpeed(wxMouseEvent &e);
-
-    tRecordInfo RecInfo;
 
     void MenCopy();
     void MenSongSettings();

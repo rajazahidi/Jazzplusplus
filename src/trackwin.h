@@ -58,6 +58,9 @@ the main window in jazz
 class tTrackWin : public tEventWin,
                   public tButtonLabelInterface
 {
+  wxFrame *frame; //JAVE experiment
+
+
     // Method in tButtonLabelInterface
     virtual void ButtonLabelDisplay(wxString text, bool down);
 
@@ -200,6 +203,7 @@ class tTrackWin : public tEventWin,
     void OnLoad();
     void OnPlay();
     void OnPianowin();
+    void OnPianowin2();
     void OnEventList();
     void OnMapper();
     void OnSaveAs();

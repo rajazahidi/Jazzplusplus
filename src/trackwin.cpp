@@ -236,6 +236,7 @@ BEGIN_EVENT_TABLE(tTrackWin, wxFrame)
     // Settings Menu
     EVT_MENU    (MEN_FILTER,tTrackWin::OnFilter)
     EVT_MENU    (MEN_PIANOWIN, tTrackWin::OnPianowin)
+    EVT_MENU    (MEN_PIANOWIN2, tTrackWin::OnPianowin2)
     EVT_MENU    (MEN_SONG, tTrackWin::MenSongSettings)
     #ifndef __PORTING
     EVT_MENU    (MEN_METRONOME ,tTrackWin::MenMetronomeSettings)
@@ -318,6 +319,7 @@ static tToolDef tdefs[] = {
     { MEN_QUANTIZE,  FALSE, quantize_xpm, "quantize selection" },
     { MEN_MIXER,     FALSE, mixer_xpm,    "mixer" },
     { MEN_PIANOWIN,  FALSE, pianowin_xpm, "show piano window"    },
+    { MEN_PIANOWIN2,  FALSE, pianowin_xpm, "show piano window2"    },
     TOOLDEF_SEPARATOR,
     { MEN_PLAY,      FALSE, play_xpm,     "start play"},
     { MEN_PLAYLOOP,  FALSE, playloop_xpm, "loop play"},
@@ -335,9 +337,11 @@ static tToolDef tdefs[] = {
 };
 
 
+
 tTrackWin::tTrackWin(wxFrame *frame, char *title, tSong *song, int x, int y, int width, int height)
   : tEventWin(frame, title, song, x, y, width, height)
 {
+  this->frame=frame;
     #ifndef __PORTING
         rhythm_win  = 0;
     #endif // __PORTING
@@ -1456,6 +1460,16 @@ void tTrackWin::OnZoomOut(){
 void tTrackWin::OnPianowin(){
     NextWin->Show(TRUE);
 }
+
+
+void tTrackWin::OnPianowin2(){
+  //    NextWin->Show(TRUE);
+  tPianoWin*  pianowin = new tPianoWin(frame, "Piano Roll", Song, Config(C_PianoWinXpos), Config(C_PianoWinYpos), Config(C_PianoWinWidth), Config(C_PianoWinHeight) );
+  pianowin->Show(TRUE);
+  //yes yes, the pointer will be lost now, but that shouldn be a problem right now, only later when we actually want to do something JAVE
+  
+}
+
 
 void tTrackWin::OnPlay(){
     cout<<"tTrackWin::OnPlay\n";

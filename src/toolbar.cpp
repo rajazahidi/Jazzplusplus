@@ -2,6 +2,7 @@
 **  The JAZZ++ Midi Sequencer
 **
 ** Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
+** Modifications Copyright (C) 2004 Patrick Earl
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,7 +18,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **
-*/                                                                              
+*/
 
 #include "wx/wx.h"
 #pragma hdrstop
@@ -25,55 +26,45 @@
 #include "toolbar.h"
 
 
-
-
-tToolBar::tToolBar(wxFrame *frame, tToolDef *td, int n)
-  //  : wxToolBar(frame, -1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxTB_3DBUTTONS|wxTB_DOCKABLE)//, 0, 0, -1, -1, wxTB_3DBUTTONS, wxHORIZONTAL, n)
+tToolBar::tToolBar(wxFrame *frame, tToolDef *td)
 {
-  win = frame;
-  toolbar=win->CreateToolBar(wxNO_BORDER | wxTB_FLAT|wxTB_HORIZONTAL|wxTB_DOCKABLE);//|wxTB_3DBUTTONS
-  //if  you want to go back to subclassing rather than delegating, just set toolbar=this
-  
-  int i;
+  toolbar=frame->CreateToolBar(wxTB_FLAT | wxTB_HORIZONTAL | wxTB_DOCKABLE);
 
   toolbar->SetMargins(5, 5);
 
-  int width = 24;
-  int currentX = 5;
-  for (i = 0; i < n; i++)
+  while(td->id != TOOLDEF_END_ID)
   {
-    wxBitmap bitmap =  wxBitmap((char **)td->resid);//, NULL);
-    //AddTool(td->id, bitmap, NULL, td->sticky, (float)currentX, -1, NULL);
-    //                              
-    toolbar->AddTool(td->id, bitmap, wxNullBitmap, td->sticky, currentX, -1, (wxObject *) NULL, td->tooltip);
-    //printf(">>%s\n",td->tooltip);
-    if (td->sep)
-      currentX += 12;
-    currentX += width;
-    td ++;
+    if(td->id == TOOLDEF_SEPARATOR_ID) {
+      toolbar->AddSeparator();
+    } else {
+      wxBitmap bitmap =  wxBitmap((char **)td->resid);
+
+      if(td->sticky)
+	toolbar->AddCheckTool(td->id, "", bitmap, wxNullBitmap, td->tooltip);
+      else
+	toolbar->AddTool(td->id, bitmap, td->tooltip);
+    }
+
+    td++;
   }
+
   toolbar->Realize();
 }
 
-wxToolBar* tToolBar::GetToolBar(){
+wxToolBar *tToolBar::GetDelegateToolBar() {
   return toolbar;
 }
 
+// Delegated Methods
 
-
-
-//the methods below are redundant when delegating
-
-//this (win->OnMenuCommand(toolIndex))  isnt supposed to be necessary if we do the event macro setup correctly
-//i get a mysterious linker error if this function isnt defined
-  bool tToolBar::OnLeftClick(int toolIndex, bool toggled)
-  {
-//    // win->OnMenuCommand(toolIndex);
-// //   printf("tToolBar::OnLeftClick FIXME supposed to call the windows event handler somehow");
-    return TRUE;
-  }
-
-void tToolBar::OnMouseEnter(int toolIndex)
-{
+wxSize tToolBar::GetSize() const {
+  return toolbar->GetSize();
 }
 
+bool tToolBar::GetToolState(int toolId) const {
+  return toolbar->GetToolState(toolId);
+}
+
+void tToolBar::ToggleTool(int toolId, const bool toggle) {
+  toolbar->ToggleTool(toolId, toggle);
+}

@@ -29,15 +29,6 @@
 #include "song.h"   // Speed()
 #include "toolbar.h"
 
-// all the toolbar icons
-#ifdef wx_x
-#include "../bitmaps/open.xpm"
-#include "../bitmaps/save.xpm"
-#include "../bitmaps/rrggen.xpm"
-#include "../bitmaps/help.xpm"
-#include "../bitmaps/play.xpm"
-#endif
-
 
 tCommandPainter::tCommandPainter(tSampleWin &w, tPaintableCommand &c)
   : win(w), cmd(c)
@@ -405,27 +396,24 @@ static const int SYN_GEN  = 4;
 static const int SYN_HELP = 5;
 static const int SYN_PLAY = 6;
 
-#ifdef wx_x
+
+#include "../bitmaps/open.xpm"
+#include "../bitmaps/save.xpm"
+#include "../bitmaps/rrggen.xpm"
+#include "../bitmaps/help.xpm"
+#include "../bitmaps/play.xpm"
 
 static tToolDef syn_tdefs[] = {
-  { SYN_LOAD,  	FALSE,  0, open_xpm },
-  { SYN_SAVE,  	FALSE,  1, save_xpm },
-  { SYN_GEN,  	FALSE,  0, rrggen_xpm },
-  { SYN_PLAY,	FALSE,  1, play_xpm },
-  { SYN_HELP,  	FALSE,  0, help_xpm }
+  { SYN_LOAD, FALSE, open_xpm,   "open synth settings" },
+  { SYN_SAVE, FALSE, save_xpm,   "save synth settings" },
+  TOOLDEF_SEPARATOR,
+  { SYN_GEN,  FALSE, rrggen_xpm, "generate sound" },
+  { SYN_PLAY, FALSE, play_xpm,   "play sound" },
+  TOOLDEF_SEPARATOR,
+  { SYN_HELP, FALSE, help_xpm,   "help" },
+  TOOLDEF_END
 };
 
-#else
-
-static tToolDef syn_tdefs[] = {
-  { SYN_LOAD,  	FALSE,  0, "tb_open", "open synth settings" },
-  { SYN_SAVE,  	FALSE,  1, "tb_save", "save synth settings" },
-  { SYN_GEN,  	FALSE,  0, "tb_rrggen", "generate sound" },
-  { SYN_PLAY,	FALSE,  1, "tb_play",   "play sound" },
-  { SYN_HELP,  	FALSE,  0, "tb_help", "help" }
-};
-
-#endif
 
 tSynthDlg::tSynthDlg(tSampleWin &w, wxFrame **ref)
 : tSliderWin(&w, ref, "Additive Synthesis", geo, syn_tdefs, 5),

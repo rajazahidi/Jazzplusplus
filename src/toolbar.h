@@ -2,6 +2,7 @@
 **  The JAZZ++ Midi Sequencer
 **
 ** Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
+** Modifications Copyright (C) 2004 Patrick Earl
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,50 +20,47 @@
 **
 */                                                                              
 
-
 #ifndef toolbar_h
 #define toolbar_h
 
-
-#ifndef wx_wxh
 #include "wx/wx.h"
-#endif
 
-#ifndef wx_bbarh
-//#include "wx_bbar.h"
-#endif
-
-/**
-this struct is used to initialize the tToolBar class, which is a wxToolBar wrapper
-*/
+/* This struct is used to initialize the tToolBar class, which is a wxToolBar
+   wrapper.  An array of tToolDef items must be created, and the ID of the
+   last entry in the array must be set to TOOLDEF_END. */
 struct tToolDef
 {
   int  id;
   bool sticky;
-  int  sep;
   const void *resid;
   const char *tooltip;
 };
 
+#define TOOLDEF_END_ID -1        // The id of the last tToolDef entry.
+#define TOOLDEF_SEPARATOR_ID -2  // The id representing a separator.
 
-//porting note:  wxToolBar should be sufficient in wxwin 2
-//also: i no longer subclass, because to test if it works better with letting the frame construct the bar
+// Use these entries in the tToolDef list.
+#define TOOLDEF_END { TOOLDEF_END_ID }
+#define TOOLDEF_SEPARATOR { TOOLDEF_SEPARATOR_ID }
 
-#ifdef wx_msw
-class tToolBar : public wxButtonBar
-#else
-class tToolBar //: public wxToolBar
-#endif
+
+class tToolBar
 {
   public:
-    tToolBar(wxFrame *frame, tToolDef *tdef, int ndefs);
-    bool OnLeftClick(int toolIndex, bool toggled);
-    void OnMouseEnter(int toolIndex);
-    wxToolBar* GetToolBar();
+    // Pass in the frame on which the toolbar is to be created.  Also pass in
+    // the list of toolbar definitions terminated by TOOLDEF_END.
+    tToolBar(wxFrame *frame, tToolDef *tdef);
+
+    // To retrieve the wxToolBar we're delegating to
+    wxToolBar *GetDelegateToolBar();
+
+    // Delegated functions from wxToolBar
+    void ToggleTool(int toolId, const bool toggle);
+    wxSize GetSize() const;
+    bool GetToolState(int toolId) const;
+
   private:
-    wxFrame *win;
     wxToolBar* toolbar;
 };
 
 #endif
-

@@ -535,33 +535,25 @@ void tString2Event::end() {
 #define MEN_CANCEL 2
 #define MEN_HELP 3
 
-#ifdef wx_x
 
 #include "../bitmaps/accept.xpm"
 #include "../bitmaps/cancel.xpm"
 #include "../bitmaps/help.xpm"
 
 static tToolDef tdefs[] = {
-  { MEN_ACCEPT,	FALSE,  0, accept_xpm },
-  { MEN_CANCEL,	FALSE,  1, cancel_xpm },
-  { MEN_HELP,  	FALSE,  0, help_xpm }
+  { MEN_ACCEPT,	FALSE, accept_xpm, "accept changes" },
+  { MEN_CANCEL,	FALSE, cancel_xpm, "discard changes" },
+  TOOLDEF_SEPARATOR,
+  { MEN_HELP,  	FALSE, help_xpm, "help" },
+  TOOLDEF_END
 };
 
-#else
-
-static tToolDef tdefs[] = {
-  { MEN_ACCEPT,	FALSE,  0, "tb_accept", "accept changes" },
-  { MEN_CANCEL,	FALSE,  1, "tb_cancel", "discard changes" },
-  { MEN_HELP,  	FALSE,  0, "tb_help", "help" }
-};
-
-#endif
 
 int tEventList::geo[4] = { 50, 80, 400, 400 };
 
 
 tEventList::tEventList(tTrackWin *w, wxFrame **ref)
-: tSliderWin(w, ref, "Event List", geo, tdefs, 3),
+: tSliderWin(w, ref, "Event List", geo, tdefs),
   tw(w),
   filter(tw->Song)
 {

@@ -446,7 +446,7 @@ void tRhythm::Generate(tTrack *track, tBarInfo &bi, tRhythm *rhy[], int n_rhy)
 #define MEN_UP    8
 #define MEN_DOWN  9
 
-#ifdef wx_x
+
 #include "../bitmaps/open.xpm"
 #include "../bitmaps/save.xpm"
 #include "../bitmaps/rrgadd.xpm"
@@ -455,35 +455,20 @@ void tRhythm::Generate(tTrack *track, tBarInfo &bi, tRhythm *rhy[], int n_rhy)
 #include "../bitmaps/rrgdown.xpm"
 #include "../bitmaps/rrggen.xpm"
 #include "../bitmaps/help.xpm"
-static tToolDef tdefs[] = {
-  { MEN_LOAD,  	FALSE,  0, open_xpm },
-  { MEN_SAVE,  	FALSE,  1, save_xpm },
-
-  { MEN_ADD,  	FALSE,  0, rrgadd_xpm },
-  { MEN_DEL,  	FALSE,  0, rrgdel_xpm },
-  { MEN_UP,  	FALSE,  0, rrgup_xpm },
-  { MEN_DOWN,  	FALSE,  0, rrgdown_xpm },
-  { MEN_GEN,  	FALSE,  1, rrggen_xpm },
-
-  { MEN_HELP,  	FALSE,  0, help_xpm }
-};
-
-#else
 
 static tToolDef tdefs[] = {
-  { MEN_LOAD,  	FALSE,  0, "tb_open", "open rhythm file" },
-  { MEN_SAVE,  	FALSE,  1, "tb_save", "save into rhythm file" },
-
-  { MEN_ADD,  	FALSE,  0, "tb_rrgadd", "add instrumten" },
-  { MEN_DEL,  	FALSE,  0, "tb_rrgdel", "remove instrument" },
-  { MEN_UP,  	FALSE,  0, "tb_rrgup",  "move instrument up" },
-  { MEN_DOWN,  	FALSE,  0, "tb_rrgdown", "move instrument down" },
-  { MEN_GEN,  	FALSE,  1, "tb_rrggen", "generate events into trackwin selection" },
-
-  { MEN_HELP,  	FALSE,  0, "tb_help", "help" }
+  { MEN_LOAD, FALSE, open_xpm,    "open rhythm file" },
+  { MEN_SAVE, FALSE, save_xpm,    "save into rhythm file" },
+  TOOLDEF_SEPARATOR,
+  { MEN_ADD,  FALSE, rrgadd_xpm,  "add instrument" },
+  { MEN_DEL,  FALSE, rrgdel_xpm,  "remove instrument" },
+  { MEN_UP,   FALSE, rrgup_xpm,   "move instrument up" },
+  { MEN_DOWN, FALSE, rrgdown_xpm, "move instrument down" },
+  { MEN_GEN,  FALSE, rrggen_xpm,  "generate events into trackwin selection" },
+  TOOLDEF_SEPARATOR,
+  { MEN_HELP, FALSE, help_xpm,    "help" },
+  TOOLDEF_END
 };
-
-#endif
 
 
 tRhythmWin::tRhythmWin(tEventWin *e, tSong *s)

@@ -606,7 +606,6 @@ void tSampleCnvs::Play()
 // ----------------------------------------------------------------
 
 
-#ifdef wx_x
 #include "../bitmaps/open.xpm"
 #include "../bitmaps/save.xpm"
 #include "../bitmaps/play.xpm"
@@ -615,36 +614,21 @@ void tSampleCnvs::Play()
 #include "../bitmaps/cancel.xpm"
 #include "../bitmaps/zoomin.xpm"
 #include "../bitmaps/zoomout.xpm"
-static tToolDef tdefs[] = {
-  { MEN_LOAD,  		FALSE,  0, open_xpm, "open wave file"},
-  { MEN_SAVE,  		FALSE,  1, save_xpm, "save wave file" },
-
-  { MEN_ZOOM_IN,	FALSE,  0, zoomin_xpm, "zoom to selection" },
-  { MEN_ZOOM_OUT,	FALSE,  0, zoomout_xpm, "zoom out" },
-  { MEN_ACCEPT,		FALSE,  0, accept_xpm, "accept painting"},
-  { MEN_CANCEL,		FALSE,  1, cancel_xpm, "cancel painting" },
-
-  { MEN_PLAY,		FALSE,  0, play_xpm, "play sample" },
-  { MEN_HELP,		FALSE,  0, help_xpm, "help" }
-};
-
-#else
 
 static tToolDef tdefs[] = {
-  { MEN_LOAD,  		FALSE, 0, "tb_open", "open wave file" },
-  { MEN_SAVE,  		FALSE, 1, "tb_save", "save wave file" },
-
-  { MEN_ZOOM_IN,	FALSE, 0, "tb_zoomin", "zoom to selection" },
-  { MEN_ZOOM_OUT,	FALSE, 0, "tb_zoomout", "zoom out" },
-  { MEN_ACCEPT,		FALSE, 0, "tb_accept", "accept painting" },
-  { MEN_CANCEL,		FALSE, 1, "tb_cancel", "cancel painting" },
-
-
-  { MEN_PLAY,	FALSE,  0, "tb_play", "play sample" },
-  { MEN_HELP,	FALSE,  0, "tb_help", "help" }
+  { MEN_LOAD,     FALSE, open_xpm,    "open wave file" },
+  { MEN_SAVE,     FALSE, save_xpm,    "save wave file" },
+  TOOLDEF_SEPARATOR,
+  { MEN_ZOOM_IN,  FALSE, zoomin_xpm,  "zoom to selection" },
+  { MEN_ZOOM_OUT, FALSE, zoomout_xpm, "zoom out" },
+  { MEN_ACCEPT,   FALSE, accept_xpm,  "accept painting" },
+  { MEN_CANCEL,   FALSE, cancel_xpm,  "cancel painting" },
+  TOOLDEF_SEPARATOR,
+  { MEN_PLAY,     FALSE, play_xpm,    "play sample" },
+  { MEN_HELP,     FALSE, help_xpm,    "help" },
+  TOOLDEF_END
 };
 
-#endif
 
 int tSampleWin::geo[4] = { 30, 30, 600, 300 };
 

@@ -67,7 +67,7 @@ virtual bool OnClose();
   private:
     HBCanvas *cnvs;
     int SeqSelected();
-    wxToolBar *tool_bar;
+    tToolBar *tool_bar;
     tGenMelody *genmeldy;
     DECLARE_EVENT_TABLE()
 };

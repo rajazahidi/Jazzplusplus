@@ -226,7 +226,7 @@ tEventWin::~tEventWin()
   delete Filter;
 #endif // __PORTING
 
-  delete tool_bar;  //JAVE valgrind complains here
+  delete tool_bar;
 
   if (MixerForm)
     delete MixerForm;
@@ -660,7 +660,7 @@ void tEventWin::OnPaintSub(wxDC *dc, long x, long y)
   hEvents = CanvasH - hTop;
   //printf("EventWin::OnPaint: xe %ld, ye %ld, we %ld, he %ld\n", xEvents, yEvents, wEvents, hEvents);
 
-  FromLine = CanvasY / hLine;
+  FromLine = CanvasY / hLine; 
   ToLine   = (CanvasY + CanvasH - hTop) / hLine;
   FromClock = CanvasX * ClocksPerPixel;
   ToClock = x2Clock(CanvasX + CanvasW);

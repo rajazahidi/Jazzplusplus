@@ -213,7 +213,7 @@ class tEventWin : public wxFrame
     wxTextCtrl         *m_textWindow;
   protected:
 
-    wxToolBar *tool_bar;
+    tToolBar *tool_bar;
     wxColor *grey_color;
     wxBrush *grey_brush;
 

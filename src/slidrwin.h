@@ -22,6 +22,8 @@
 #ifndef slidrwin_h
 #define slidrwin_h
 
+#include "toolbar.h"
+
 #include "wx/wx.h"
 #pragma hdrstop
 
@@ -38,7 +40,7 @@ class tSliderWin : public wxFrame
 {
   public:
     DECLARE_EVENT_TABLE()
-    tSliderWin(wxFrame *parent, wxFrame **ref, const char *title, int geo[4], tToolDef *tdefs = 0, int ntools = 0);
+    tSliderWin(wxFrame *parent, wxFrame **ref, const char *title, int geo[4], tToolDef *tdefs = NULL);
     ~tSliderWin();
     void Initialize();
     virtual void OnSize(wxSizeEvent& event);
@@ -65,7 +67,7 @@ class tSliderWin : public wxFrame
     int           sliders_per_row;
     int           *geo;
 
-    wxToolBar *tool_bar;
+    tToolBar *tool_bar;
 
 };
 

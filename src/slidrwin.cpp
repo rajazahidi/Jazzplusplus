@@ -24,12 +24,12 @@
 #include "random.h"
 #include "toolbar.h"
 
-/* PAT - Added the iostream and namespace lines to handle cout usage. */
+/* These two lines are just here to handle the cout usage. */
 #include <iostream>
 using namespace std;
 
 
-tSliderWin::tSliderWin(wxFrame *parent, wxFrame **ref, const char *title, int geo[4], tToolDef *tdefs, int ntools)
+tSliderWin::tSliderWin(wxFrame *parent, wxFrame **ref, const char *title, int geo[4], tToolDef *tdefs)
   : wxFrame(0, -1, (char *)title, wxPoint(geo[0], geo[1]), wxSize(geo[2], geo[3]))
 {
   this->geo = geo;
@@ -39,10 +39,8 @@ tSliderWin::tSliderWin(wxFrame *parent, wxFrame **ref, const char *title, int ge
   sliders_per_row = 1;
   panel = new wxPanel(this, 0, 0, 1000, 1000);
 
-  if (ntools > 0){
-    tToolBar* hack=new tToolBar(this, tdefs, ntools);
-    tool_bar = hack->GetToolBar();
-  }
+  if (tdefs != NULL)
+    tool_bar=new tToolBar(this, tdefs);
   else
     tool_bar = 0;
 }

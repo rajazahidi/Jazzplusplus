@@ -174,8 +174,10 @@ void CtrlChannelAftertouchEdit();
 
 
   private:
-    enum { NUM_COLORS = 24 }; // must be even!
-    wxBrush *color_brush[NUM_COLORS];
+    // Next 3 statements are "Patrick Approved."
+    enum { NUM_COLORS = 24 }; // Number of colors to use for velocity
+                              // representation.
+    wxBrush color_brush[NUM_COLORS];
     void InitColors();
 
 //    tCtrlEditBase *CtrlEdit;

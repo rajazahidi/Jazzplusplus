@@ -36,7 +36,6 @@
 #define MEN_CLOSE 6
 #define MEN_TRANSP 7
 
-#ifdef wx_x
 
 #include "../bitmaps/open.xpm"
 #include "../bitmaps/save.xpm"
@@ -46,26 +45,17 @@
 #include "../bitmaps/help.xpm"
 
 static tToolDef tdefs[] = {
-  { MEN_LOAD,  	FALSE,  0, open_xpm },
-  { MEN_SAVE,  	FALSE,  1, save_xpm },
-  { MEN_GEN,  	FALSE,  0, rrggen_xpm },
-  { MEN_TRANSP,	FALSE,  0, transpos_xpm },
-  { MEN_PLAY,	FALSE,  1, play_xpm },
-  { MEN_HELP,  	FALSE,  0, help_xpm }
+  { MEN_LOAD,   FALSE, open_xpm,     "load settings" },
+  { MEN_SAVE,   FALSE, save_xpm,     "save settings" },
+  TOOLDEF_SEPARATOR,
+  { MEN_GEN,    FALSE, rrggen_xpm,   "generate" },
+  { MEN_TRANSP, FALSE, transpos_xpm, "transpose trackwin selection" },
+  { MEN_PLAY,   FALSE, play_xpm,     "play" },
+  TOOLDEF_SEPARATOR,
+  { MEN_HELP,   FALSE, help_xpm,     "help" },
+  TOOLDEF_END
 };
 
-#else
-
-static tToolDef tdefs[] = {
-  { MEN_LOAD,  	FALSE,  0, "tb_open", "load settings" },
-  { MEN_SAVE,  	FALSE,  1, "tb_save", "save settings" },
-  { MEN_GEN,  	FALSE,  0, "tb_rrggen", "generate" },
-  { MEN_TRANSP,	FALSE,  0, "tb_transpos", "transpose trackwin selection" },
-  { MEN_PLAY,	FALSE,  1, "tb_play",   "play" },
-  { MEN_HELP,  	FALSE,  0, "tb_help", "help" }
-};
-
-#endif
 
 int tGenMelody::geo[4] = { 50, 80, 800, 600 };
 
@@ -77,7 +67,7 @@ int tGenMelody::rhythm_intv = 0;
 
 
 tGenMelody::tGenMelody(tTrackWin *w, wxFrame **ref)
-: tSliderWin(w, ref, "Random Melody", geo, tdefs, 5),
+: tSliderWin(w, ref, "Random Melody", geo, tdefs),
   tw(w)
 {
 

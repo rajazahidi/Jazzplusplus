@@ -72,28 +72,6 @@
 #include "audiodrv.h"
 #endif
 
-#ifdef wx_x
-
-#include "../bitmaps/open.xpm"
-#include "../bitmaps/save.xpm"
-#include "../bitmaps/new.xpm"
-#include "../bitmaps/repl.xpm"
-#include "../bitmaps/delete.xpm"
-#include "../bitmaps/quantize.xpm"
-#include "../bitmaps/mixer.xpm"
-#include "../bitmaps/play.xpm"
-#include "../bitmaps/undo.xpm"
-#include "../bitmaps/redo.xpm"
-#include "../bitmaps/zoomin.xpm"
-#include "../bitmaps/zoomout.xpm"
-#include "../bitmaps/panic.xpm"
-#include "../bitmaps/help.xpm"
-#include "../bitmaps/pianowin.xpm"
-#include "../bitmaps/metro.xpm"
-#include "../bitmaps/playloop.xpm"
-#include "../bitmaps/record.xpm"
-
-#endif
 
 tTrackWin *TrackWin = 0;
 static char *defsong = 0;
@@ -313,60 +291,52 @@ BEGIN_EVENT_TABLE(tTrackWin, wxFrame)
     EVT_MENU    (MEN_METRO_ON, tTrackWin::OnMetroOn)
 END_EVENT_TABLE()
 
-#ifdef wx_x
+
+#include "../bitmaps/open.xpm"
+#include "../bitmaps/save.xpm"
+#include "../bitmaps/new.xpm"
+#include "../bitmaps/repl.xpm"
+#include "../bitmaps/delete.xpm"
+#include "../bitmaps/quantize.xpm"
+#include "../bitmaps/mixer.xpm"
+#include "../bitmaps/play.xpm"
+#include "../bitmaps/undo.xpm"
+#include "../bitmaps/redo.xpm"
+#include "../bitmaps/zoomin.xpm"
+#include "../bitmaps/zoomout.xpm"
+#include "../bitmaps/panic.xpm"
+#include "../bitmaps/help.xpm"
+#include "../bitmaps/pianowin.xpm"
+#include "../bitmaps/metro.xpm"
+#include "../bitmaps/playloop.xpm"
+#include "../bitmaps/record.xpm"
 
 static tToolDef tdefs[] = {
-    { MEN_LOAD,  		FALSE, 0, open_xpm, "load song" },
-    { MEN_SAVE,  		FALSE, 0, save_xpm, "save song" },
-    { MEN_NEW,   		FALSE, 1, new_xpm , "new song" },
-
-    { MEN_REPLICATE,  	FALSE, 0, repl_xpm , "replicate selection" },
-    { MEN_DELETE, 	FALSE, 0, delete_xpm , "delete selection"  },
-    { MEN_QUANTIZE, 	FALSE, 0, quantize_xpm  , "quantize selection" },
-    { MEN_MIXER, 		FALSE, 0,  mixer_xpm , "mixer" },
-    { MEN_PIANOWIN,	FALSE, 1, pianowin_xpm, "show piano window"    },
-
-    { MEN_PLAY, 		FALSE, 0, play_xpm , "start play"},
-    { MEN_PLAYLOOP, 	FALSE, 0, playloop_xpm , "loop play"},
-    { MEN_RECORD, 	FALSE, 0, record_xpm , "record"},
-    { MEN_METRO_ON,	TRUE,  1, metro_xpm , "metronome" },
-
-    { MEN_ZOOMIN, 	FALSE, 0, zoomin_xpm, "zoom in" },
-    { MEN_ZOOMOUT,	FALSE, 0, zoomout_xpm , "zoom out"},
-    { MEN_UNDO, 		FALSE, 0, undo_xpm , "undo"},
-    { MEN_REDO, 		FALSE, 0, redo_xpm , "redo"},
-    { MEN_RESET, 		FALSE, 0, panic_xpm , "all notes off"},
-    { MEN_HELP_JAZZ, 	FALSE, 0, help_xpm, "help" },
-    { MEN_ABOUT, 	        FALSE, 0, help_xpm, "about" }
+    { MEN_LOAD,      FALSE, open_xpm,     "load song" },
+    { MEN_SAVE,      FALSE, save_xpm,     "save song" },
+    { MEN_NEW,       FALSE, new_xpm,      "new song" },
+    TOOLDEF_SEPARATOR,
+    { MEN_REPLICATE, FALSE, repl_xpm,     "replicate selection" },
+    { MEN_DELETE,    FALSE, delete_xpm,   "delete selection"  },
+    { MEN_QUANTIZE,  FALSE, quantize_xpm, "quantize selection" },
+    { MEN_MIXER,     FALSE, mixer_xpm,    "mixer" },
+    { MEN_PIANOWIN,  FALSE, pianowin_xpm, "show piano window"    },
+    TOOLDEF_SEPARATOR,
+    { MEN_PLAY,      FALSE, play_xpm,     "start play"},
+    { MEN_PLAYLOOP,  FALSE, playloop_xpm, "loop play"},
+    { MEN_RECORD,    FALSE, record_xpm,   "record"},
+    { MEN_METRO_ON,  TRUE,  metro_xpm,    "metronome" },
+    TOOLDEF_SEPARATOR,
+    { MEN_ZOOMIN,    FALSE, zoomin_xpm,   "zoom in" },
+    { MEN_ZOOMOUT,   FALSE, zoomout_xpm,  "zoom out"},
+    { MEN_UNDO,      FALSE, undo_xpm,     "undo"},
+    { MEN_REDO,      FALSE, redo_xpm,     "redo"},
+    { MEN_RESET,     FALSE, panic_xpm,    "all notes off"},
+    { MEN_HELP_JAZZ, FALSE, help_xpm,     "help" },
+    { MEN_ABOUT,     FALSE, help_xpm,     "about" },
+    TOOLDEF_END
 };
 
-#else
-
-static tToolDef tdefs[] = {
-    { MEN_LOAD,  		FALSE, 0, "tb_open", "load song" },
-    { MEN_SAVE,  		FALSE, 0, "tb_save", "save song" },
-    { MEN_NEW,   		FALSE, 1, "tb_new" , "new song" },
-
-    { MEN_REPLICATE,  	FALSE, 0, "tb_repl", "replicate selection" },
-    { MEN_DELETE, 	FALSE, 0, "tb_delete", "delete selection"  },
-    { MEN_QUANTIZE, 	FALSE, 0, "tb_quantize", "quantize selection"  },
-    { MEN_MIXER, 		FALSE, 0, "tb_mixer", "mixer"  },
-    { MEN_PIANOWIN,	FALSE, 1, "tb_pianowin", "show piano window"  },
-
-    { MEN_PLAY, 		FALSE, 0, "tb_play", "start play" },
-    { MEN_PLAYLOOP, 	FALSE, 0, "tb_playloop", "loop play" },
-    { MEN_RECORD, 	FALSE, 0, "tb_record", "record" },
-    { MEN_METRO_ON, 	TRUE,  1, "tb_metro", "metronome" },
-
-    { MEN_ZOOMIN, 	FALSE, 0, "tb_zoomin", "zoom in" },
-    { MEN_ZOOMOUT,	FALSE, 0, "tb_zoomout", "zoom out" },
-    { MEN_UNDO, 		FALSE, 0, "tb_undo", "undo" },
-
-    { MEN_REDO, 		FALSE, 0, "tb_redo", "redo" },
-    { MEN_RESET, 		FALSE, 0, "tb_panic", "all notes off" },
-    { MEN_HELP_JAZZ, 	FALSE, 0, "tb_help", "help" }
-};
-#endif // wx_x
 
 tTrackWin::tTrackWin(wxFrame *frame, char *title, tSong *song, int x, int y, int width, int height)
   : tEventWin(frame, title, song, x, y, width, height)
@@ -387,8 +357,7 @@ tTrackWin::tTrackWin(wxFrame *frame, char *title, tSong *song, int x, int y, int
     defsong = copystring(lasts);
     defpattern = copystring("noname.mid");
 
-    tToolBar* t=new tToolBar(this, tdefs, 19);
-    tool_bar = t->GetToolBar();
+    tool_bar=new tToolBar(this, tdefs);
 
     // Give the frame a status line for no reason currently
     CreateStatusBar();

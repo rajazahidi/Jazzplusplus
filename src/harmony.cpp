@@ -78,7 +78,6 @@ tHBInterface *the_harmony_browser = 0;
 #define MEN_SAVE	28
 
 
-#ifdef wx_x
 #include "../bitmaps/open.xpm"
 #include "../bitmaps/save.xpm"
 #include "../bitmaps/majscale.xpm"
@@ -100,64 +99,34 @@ tHBInterface *the_harmony_browser = 0;
 #include "../bitmaps/analyze.xpm"
 #include "../bitmaps/rrggen.xpm"
 #include "../bitmaps/delchord.xpm"
-static tToolDef tdefs[] = {
-  { MEN_LOAD,  		FALSE,  0,open_xpm, "open harmony file" },
-  { MEN_SAVE,  		FALSE,  1,save_xpm, "save harmony file" },
-
-  { MEN_MAJSCALE,  	TRUE,  0, majscale_xpm, "major scale" },
-  { MEN_HARSCALE,  	TRUE,  0, harscale_xpm, "harmonic scale" },
-  { MEN_MELSCALE,  	TRUE,  0, melscale_xpm, "melodic scale" },
-  { MEN_IONSCALE,  	TRUE,  1, ionscale_xpm, "ionic b13 scale" },
-
-  { MEN_EQ4,  		TRUE,  0, same4_xpm, "4 common notes" },
-  { MEN_EQ3,  		TRUE,  0, same3_xpm, "3 common notes" },
-  { MEN_EQ2,  		TRUE,  0, same2_xpm, "2 common notes" },
-  { MEN_EQ1,  		TRUE,  0, same1_xpm, "1 common note" },
-  { MEN_EQ0,  		TRUE,  0, same0_xpm, "0 common notes" },
-  { MEN_EQH,  		TRUE,  0, sameh_xpm, "one half note difference" },
-  { MEN_251,  		TRUE,  0, std251_xpm, "next in 2-5-1 move" },
-  { MEN_EQB,  		TRUE,  0, sameb_xpm, "same base note" },
-  { MEN_TRITONE,  	TRUE,  0, tritone_xpm, "tritone substitute" },
-  { MEN_PIANO, 		TRUE,  1, piano_xpm, "pianowin copy buffer" },
-  { MEN_HAUNSCH,  	TRUE,  1, haunsch_xpm, "haunschild layout" },
-
-  { MEN_TRANSPOSE,	FALSE,  0, transpos_xpm, "transpose trackwin selection" },
-  { MEN_ANALYZE,	FALSE,  0, analyze_xpm,  "analyze trackwin selection" },
-
-  { MEN_CLEARSEQ,	FALSE,  0, delchord_xpm, "clear harmonies" }
-};
-
-#else
 
 static tToolDef tdefs[] = {
-  { MEN_LOAD,  		FALSE, 0, "tb_open", "open harmony file" },
-  { MEN_SAVE,  		FALSE, 1, "tb_save", "save harmony file"},
-
-  { MEN_MAJSCALE,  	TRUE,  0, "tb_majscale", "major scale" },
-  { MEN_HARSCALE,  	TRUE,  0, "tb_harscale", "harmonic scale" },
-  { MEN_MELSCALE,  	TRUE,  0, "tb_melscale", "melodic scale" },
-  { MEN_IONSCALE,  	TRUE,  1, "tb_ionscale", "ionic b13 scale" },
-
-  { MEN_EQ4,  		TRUE,  0, "tb_same4", "4 common notes"},
-  { MEN_EQ3,  		TRUE,  0, "tb_same3", "3 common notes" },
-  { MEN_EQ2,  		TRUE,  0, "tb_same2", "2 common notes" },
-  { MEN_EQ1,  		TRUE,  0, "tb_same1", "1 common note" },
-  { MEN_EQ0,  		TRUE,  0, "tb_same0", "0 common notes" },
-  { MEN_EQH,  		TRUE,  0, "tb_sameh", "one half note difference" },
-  { MEN_251,  		TRUE,  0, "tb_std251", "next in 2-5-1 move" },
-  { MEN_EQB,  		TRUE,  0, "tb_sameb", "same base note" },
-  { MEN_TRITONE,  	TRUE,  0, "tb_tritone", "tritone substitute" },
-  { MEN_PIANO, 		TRUE,  1, "tb_piano", "pianowin copy buffer" },
-  { MEN_HAUNSCH,  	TRUE,  1, "tb_haunsch", "Haunschild layout" },
-
-  { MEN_TRANSPOSE,	FALSE,  0, "tb_transpos", "transpose trackwin selection" },
-  { MEN_ANALYZE,	FALSE,  0, "tb_analyze", "analyze trackwin selection" },
-
-  { MEN_CLEARSEQ,	FALSE,  0, "tb_delchord", "clear harmonies" }
+  { MEN_LOAD,      FALSE, open_xpm,     "open harmony file" },
+  { MEN_SAVE,      FALSE, save_xpm,     "save harmony file" },
+  TOOLDEF_SEPARATOR,
+  { MEN_MAJSCALE,  TRUE,  majscale_xpm, "major scale" },
+  { MEN_HARSCALE,  TRUE,  harscale_xpm, "harmonic scale" },
+  { MEN_MELSCALE,  TRUE,  melscale_xpm, "melodic scale" },
+  { MEN_IONSCALE,  TRUE,  ionscale_xpm, "ionic b13 scale" },
+  TOOLDEF_SEPARATOR,
+  { MEN_EQ4,       TRUE,  same4_xpm,    "4 common notes" },
+  { MEN_EQ3,       TRUE,  same3_xpm,    "3 common notes" },
+  { MEN_EQ2,       TRUE,  same2_xpm,    "2 common notes" },
+  { MEN_EQ1,       TRUE,  same1_xpm,    "1 common note" },
+  { MEN_EQ0,       TRUE,  same0_xpm,    "0 common notes" },
+  { MEN_EQH,       TRUE,  sameh_xpm,    "one half note difference" },
+  { MEN_251,       TRUE,  std251_xpm,   "next in 2-5-1 move" },
+  { MEN_EQB,       TRUE,  sameb_xpm,    "same base note" },
+  { MEN_TRITONE,   TRUE,  tritone_xpm,  "tritone substitute" },
+  { MEN_PIANO,     TRUE,  piano_xpm,    "pianowin copy buffer" },
+  TOOLDEF_SEPARATOR,
+  { MEN_HAUNSCH,   TRUE,  haunsch_xpm,  "haunschild layout" },
+  TOOLDEF_SEPARATOR,
+  { MEN_TRANSPOSE, FALSE, transpos_xpm, "transpose trackwin selection" },
+  { MEN_ANALYZE,   FALSE, analyze_xpm,  "analyze trackwin selection" },
+  { MEN_CLEARSEQ,  FALSE, delchord_xpm, "clear harmonies" },
+  TOOLDEF_END
 };
-
-#endif
-
 
 
 // ------------------------ HBPlayer ------------------------
@@ -1669,7 +1638,7 @@ void HBFrame::OnMenuCommand(int id)
       break;
 
     default:
-      cnvs->OnMenuCommand(id, tool_bar);
+      cnvs->OnMenuCommand(id, tool_bar->GetDelegateToolBar());
       break;
   }
 }
@@ -1682,11 +1651,7 @@ HBFrame::HBFrame(wxFrame *parent)
   cnvs = 0;
   genmeldy = 0;
 
-  //  tool_bar = new tToolBar(this, tdefs, 20);
-
-  tToolBar* t=new tToolBar(this, tdefs, 20);
-  tool_bar = t->GetToolBar();
-
+  tool_bar = new tToolBar(this, tdefs);
 
   wxMenuBar *menu_bar = new wxMenuBar;
   wxMenu    *menu;

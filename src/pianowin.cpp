@@ -114,8 +114,6 @@
 #define MEN_CONVERT_TO_MODULATION	54
 
 // Toolbar Icons
-
-#ifdef wx_x
 #include "../bitmaps/note8.xpm"
 #include "../bitmaps/note83.xpm"
 #include "../bitmaps/note16.xpm"
@@ -138,60 +136,31 @@
 #include "../bitmaps/cutpaste.xpm"
 
 static tToolDef tdefs[] = {
-  { MEN_MSELECT,  	TRUE,  0, select_xpm , "select events"},
-  { MEN_MLENGTH,  	TRUE,  0, length_xpm , "change length"},
-  { MEN_MDIALOG,  	TRUE,  0, dialog_xpm , "event dialog"},
-  { MEN_MCUTPASTE,  	TRUE,  1, cutpaste_xpm , "cut/paste events"},
-
-  { MEN_SNAP_8,  	TRUE,  0, note8_xpm , "snap 1/8"},
-  { MEN_SNAP_8D,  	TRUE,  0, note83_xpm , "snap 1/12"},
-  { MEN_SNAP_16,  	TRUE,  0, note16_xpm , "snap 1/16"},
-  { MEN_SNAP_16D,  	TRUE,  1, note163_xpm , "snap 1/24"},
-
-  { MEN_CUT,   		FALSE, 0, cut_xpm  , "cut selection"},
-  { MEN_ERASE, 		FALSE, 0, delete_xpm  , "delete selection"},
-  { MEN_QUANTIZE, 	FALSE, 0, quantize_xpm  , "quantize selection"},
-  { MEN_SHIFTL, 	FALSE, 0, shiftl_xpm  , "shift selection left"},
-  { MEN_SHIFTR, 	FALSE, 0, shiftr_xpm  , "shift selection right"},
-  { MEN_VIS_ALL_TRK, 	TRUE,  1, evnts_xpm  , "show events from all tracks"},
-
-  { MEN_ZOOMIN,		FALSE, 0, zoomin_xpm  , "zoom in"}, //havent changed this yet
-  { MEN_ZOOMOUT,	FALSE, 0, zoomout_xpm  , "zoom out"},
-  { MEN_UNDO,		FALSE, 0, undo_xpm  , "undo"},
-  { MEN_REDO,		FALSE, 0, redo_xpm , "redo"},
-  { MEN_RESET, 		FALSE, 0, panic_xpm , "all notes off"},
-  { MEN_HELP_PWIN, 	FALSE, 0, help_xpm , "help"}
+  { MEN_MSELECT,     TRUE, select_xpm,    "select events"},
+  { MEN_MLENGTH,     TRUE, length_xpm,    "change length"},
+  { MEN_MDIALOG,     TRUE, dialog_xpm,    "event dialog"},
+  { MEN_MCUTPASTE,   TRUE, cutpaste_xpm,  "cut/paste events"},
+  TOOLDEF_SEPARATOR,
+  { MEN_SNAP_8,      TRUE, note8_xpm,     "snap 1/8"},
+  { MEN_SNAP_8D,     TRUE, note83_xpm,    "snap 1/12"},
+  { MEN_SNAP_16,     TRUE, note16_xpm,    "snap 1/16"},
+  { MEN_SNAP_16D,    TRUE, note163_xpm,   "snap 1/24"},
+  TOOLDEF_SEPARATOR,
+  { MEN_CUT,         FALSE, cut_xpm,      "cut selection"},
+  { MEN_ERASE,       FALSE, delete_xpm,   "delete selection"},
+  { MEN_QUANTIZE,    FALSE, quantize_xpm, "quantize selection"},
+  { MEN_SHIFTL,      FALSE, shiftl_xpm,   "shift selection left"},
+  { MEN_SHIFTR,      FALSE, shiftr_xpm,   "shift selection right"},
+  { MEN_VIS_ALL_TRK, TRUE,  evnts_xpm,    "show events from all tracks"},
+  TOOLDEF_SEPARATOR,
+  { MEN_ZOOMIN,      FALSE, zoomin_xpm,   "zoom in"}, //havent changed this yet
+  { MEN_ZOOMOUT,     FALSE, zoomout_xpm,  "zoom out"},
+  { MEN_UNDO,        FALSE, undo_xpm,     "undo"},
+  { MEN_REDO,        FALSE, redo_xpm,     "redo"},
+  { MEN_RESET,       FALSE, panic_xpm,    "all notes off"},
+  { MEN_HELP_PWIN,   FALSE, help_xpm,     "help"},
+  TOOLDEF_END
 };
-
-#else
-
-static tToolDef tdefs[] = {
-  { MEN_MSELECT,  	TRUE,  0, "tb_select", "select events" },
-  { MEN_MLENGTH,  	TRUE,  0, "tb_length", "change length" },
-  { MEN_MDIALOG,  	TRUE,  0, "tb_dialog", "event dialog" },
-  { MEN_MCUTPASTE,  	TRUE,  1, "tb_cutpaste", "cut/paste events" },
-
-  { MEN_SNAP_8,  	TRUE,  0, "tb_note8", "snap 1/8" },
-  { MEN_SNAP_8D,  	TRUE,  0, "tb_note83", "snap 1/12" },
-  { MEN_SNAP_16,  	TRUE,  0, "tb_note16", "snap 1/16"},
-  { MEN_SNAP_16D,  	TRUE,  1, "tb_note163", "snap 1/24"},
-
-  { MEN_CUT,   		FALSE, 0, "tb_cut", "cut selection"  },
-  { MEN_ERASE, 		FALSE, 0, "tb_delete", "delete selection" },
-  { MEN_QUANTIZE, 	FALSE, 0, "tb_quantize", "quantize selection"  },
-  { MEN_SHIFTL, 	FALSE, 0, "tb_shiftl", "shift selection left" },
-  { MEN_SHIFTR, 	FALSE, 0, "tb_shiftr", "shift selection right"  },
-  { MEN_VIS_ALL_TRK, 	TRUE,  1, "tb_evnts", "show events from all tracks"  },
-
-  { MEN_ZOOMIN,		FALSE, 0, "tb_zoomin", "zoom in"  },
-  { MEN_ZOOMOUT,	FALSE, 0, "tb_zoomout", "zoom out" },
-  { MEN_UNDO,		FALSE, 0, "tb_undo", "undo"  },
-  { MEN_REDO,		FALSE, 0, "tb_redo" , "redo" },
-  { MEN_RESET, 		FALSE, 0, "tb_panic", "all notes off" },
-  { MEN_HELP_PWIN, 	FALSE, 0, "tb_help", "help" }
-};
-
-#endif
 
 
 // positions for controller editor
@@ -323,11 +292,10 @@ tPianoWin::tPianoWin(wxFrame *frame, char *title, tSong *song, int x, int y, int
     MouseEvnt(evnt_3_actions)
 {
   int i;
+
   InitColors();
   
-  tToolBar *hack= new tToolBar(this, tdefs, 20);
-
-  tool_bar = hack->GetToolBar();
+  tool_bar= new tToolBar(this, tdefs);
 
   tool_bar->ToggleTool(MEN_MSELECT, TRUE);
   MouseEvnt.SetLeftAction(MA_SELECT);
@@ -375,28 +343,6 @@ tPianoWin::~tPianoWin()
   int i;
   delete CtrlEdit;
   delete GuitarWin;
-  for (i = 0; i < NUM_COLORS; i++)
-    delete color_brush[i];
-}
-
-// SN+ Colors
-void tPianoWin::InitColors()
-{
-  int i, n = NUM_COLORS/2;
-  for (i = 0; i < NUM_COLORS; i++)
-    color_brush[i]  = new wxBrush("BLACK", wxSOLID);
-#if 0
-  for (i = 0; i < n; i++) {
-    int c = 255 * i / n;
-    color_brush[i]->SetColour  (c,   255,   0);
-    color_brush[i+n]->SetColour(255, 255-c, 0);
-  }
-#else
-  for (i = 0; i < NUM_COLORS; i++) {
-    int c = 255 * i / NUM_COLORS;
-    color_brush[i]->SetColour  (c, 255-c, 16);
-  }
-#endif
 }
 
 #ifndef __PORTING
@@ -1397,14 +1343,12 @@ void tPianoWin::DrawEvent(wxDC* dc, tEvent *e, wxBrush *Brush, int xoor, int for
     dc->DrawRectangle(x, y + LittleBit, length, hLine - 2 * LittleBit);
   }
 
-// SN++
   // show velocity as colors
-  if (force_color !=0 && UseColors && e->IsKeyOn()) {
+  if (force_color != 0 && UseColors && e->IsKeyOn()) {
     int vel = e->IsKeyOn()->Veloc;
-    int i = vel * NUM_COLORS / 127;
-    if (i > NUM_COLORS-1)
-      i = NUM_COLORS-1;
-    dc->SetBrush(*(color_brush[i]));
+
+    // Next line is "Patrick Approved."
+    dc->SetBrush(color_brush[ vel * NUM_COLORS / 128 ]);
   }
   else
     dc->SetBrush(*Brush);
@@ -1472,10 +1416,7 @@ void tPianoWin::DrawEvents(wxDC* dc, tTrack *t, int Stat, wxBrush *Brush, int fo
 	// show velocity as colors
 	if (!force_color && UseColors && e->IsKeyOn()) {
 	  int vel = e->IsKeyOn()->Veloc;
-	  int i = vel * NUM_COLORS / 127;
-	  if (i > NUM_COLORS-1)
-	    i = NUM_COLORS-1;
-	  dc->SetBrush(*(color_brush[i]));
+	  dc->SetBrush(color_brush[ vel * NUM_COLORS / 128 ]);
 	}
 	else
 	  dc->SetBrush(*Brush);
@@ -2565,3 +2506,19 @@ void tPianoWin::SetVisibleAllTracks(Bool value)
   Redraw();
 }
 
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// The rest of this file is "Patrick Approved."  Take that how you want. :)
+///////////////////////////////////////////////////////////////////////////////
+
+void tPianoWin::InitColors()
+{
+  int i, c;
+  for (i = 0; i < NUM_COLORS; i++) {
+    c = 256 * i / NUM_COLORS;
+    color_brush[i].SetColour(c, 255-c, 16);
+    color_brush[i].SetStyle(wxSOLID);
+  }
+}

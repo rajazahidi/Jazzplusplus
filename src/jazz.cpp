@@ -98,7 +98,8 @@ tConfigEntry::tConfigEntry( char* name, char* sval )
 
 tConfigEntry::~tConfigEntry()
 {
-  delete StrValue; 
+  if (StrValue)
+     delete [] StrValue; 
 }
 
 tConfig::tConfig()
@@ -271,7 +272,8 @@ tConfig::~tConfig()
    int i;
    for (i = 0; i < NumConfigNames; i++)
    {
-      delete [] Names[i];
+      if (Names[i])
+          delete  Names[i];
    }
 }
 

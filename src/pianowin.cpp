@@ -354,18 +354,25 @@ tPianoWin::tPianoWin(wxFrame *frame, char *title, tSong *song, int x, int y, int
 
 tPianoWin::~tPianoWin()
 {
-  delete CtrlEdit;
-  delete GuitarWin;
-  delete Canvas;
-  delete SnapSel;
+  if (CtrlEdit)
+      delete CtrlEdit;
+  if (GuitarWin)
+      delete GuitarWin;
+  if (Canvas)
+      delete Canvas;
+  if (SnapSel)
+      delete SnapSel;
 
 #ifndef __PORTING
-  delete Filter;
+  if (Filter)
+      delete Filter;
 #endif // __PORTING
 
-  delete tool_bar;
+  if (tool_bar)
+      delete tool_bar;
 
-  delete MixerForm;
+  if (MixerForm)
+      delete MixerForm;
 }
 
 void tPianoWin::OnSize(wxSizeEvent& event)

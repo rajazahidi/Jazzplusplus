@@ -2667,9 +2667,7 @@ void tPianoWin::ActVelocityDialog()
 {
   int FromValue = 64;
   int ToValue = 0;
-  long Mode = 8;
-
- long modes[] =
+  long modes[] =
 {
   8,  // set
   12,  // add
@@ -2677,12 +2675,15 @@ void tPianoWin::ActVelocityDialog()
   -1, // End of list
 };
 
+  long Mode = modes[0];
+
+
   if (!EventsSelected())
     return;
   jppResourceDialog dialog(this, "velocity");
-  dialog.Attach("start",&FromValue);
-  dialog.Attach("stop",&ToValue);
-  dialog.Attach("mode",&Mode,modes);
+   dialog.Attach("start",&FromValue);
+   dialog.Attach("stop",&ToValue);
+   dialog.Attach("mode",&Mode,modes);
 
   if(dialog.ShowModal() == wxID_OK) {
     //execute the command

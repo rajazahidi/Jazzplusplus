@@ -99,6 +99,8 @@ static long PianoFontSizes[] =
 };
 
 
+
+
 // ************************************************************************
 // Menubar
 // ************************************************************************
@@ -2665,14 +2667,22 @@ void tPianoWin::ActVelocityDialog()
 {
   int FromValue = 64;
   int ToValue = 0;
-  int Mode = 0;
+  long Mode = 8;
+
+ long modes[] =
+{
+  8,  // set
+  12,  // add
+  16,  // subtract
+  -1, // End of list
+};
 
   if (!EventsSelected())
     return;
   jppResourceDialog dialog(this, "velocity");
   dialog.Attach("start",&FromValue);
   dialog.Attach("stop",&ToValue);
-  dialog.Attach("mode",&Mode);
+  dialog.Attach("mode",&Mode,modes);
 
   if(dialog.ShowModal() == wxID_OK) {
     //execute the command

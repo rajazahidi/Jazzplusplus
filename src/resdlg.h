@@ -41,6 +41,8 @@ class jppResourceElement {
   bool *boolptr;
   /// Reference to long data.
   long *longptr;
+  /// Reference to int data.
+  int *intptr;
 
   /// List of longs for mapping selection indices.
   wxArrayLong longarr;
@@ -83,7 +85,7 @@ WX_DECLARE_LIST(jppResourceElement, jppResourceElementList);
 
     Here is an example:
 
-    \verbatim
+    \code
     // At application init time:
     tResourceDialog::LoadResource("mydialog.xrc");
 
@@ -92,7 +94,7 @@ WX_DECLARE_LIST(jppResourceElement, jppResourceElementList);
     dialog.Attach("myTextWidget",&someWxString);
     dialog.Attach("myCheckWidget",&someBool);
     dialog.ShowModal();
-    \endverbatim
+    \endcode
 
     The XRC file itself would contain a dialog with an ID of "myDialog".  That
     dialog would contain a wxTextCtrl with an ID of "myTextWidget" and a
@@ -100,8 +102,12 @@ WX_DECLARE_LIST(jppResourceElement, jppResourceElementList);
     the values will automatically be transferred into the variables and
     ShowModal() will return wxID_OK;
 
+    FIXME - Add notes about which widgets support which exact types.  Note that
+            some type conversions are performed automatically, though effects
+            like wraparound, truncation, and rounding, are not checked for.
+
     FIXME - The non-modal code has not yet been implemented.  Perhaps we should
-    use the event table system instead of plain subclassing.
+            use the event table system instead of plain subclassing.
 */
 
 class jppResourceDialog {
@@ -135,8 +141,15 @@ class jppResourceDialog {
   /// For attaching to a bool.
   /** Connects a bool variable to a named resource.  Currently supports
       wxCheckBox widgets. */
-
   void Attach(const wxString& name, bool *data);
+
+  /// For attaching to a long.
+  /** Connects a long variable to a named resource.  Currently supports
+      wxSlider widgets. */
+  void Attach(const wxString& name, long *data);
+
+  /// Duplicate of long version, but with int restrictions.
+  void Attach(const wxString& name, int *data);
 
   /// For attaching a list of items to a long.
   /** Connects a long variable to some list of items.  Currently supports
@@ -152,6 +165,14 @@ class jppResourceDialog {
      longs for convenience. */
 
   void Attach(const wxString& name, long *data, long *a);
+
+
+  /// Duplicate of long version, but with int restrictions.
+  void Attach(const wxString& name, int *data, int *a);
+
+  /// Duplicate of long version, but with int restrictions.
+  void Attach(const wxString& name, int *data, wxArrayInt array);
+
 
   /// Ok event handler
   /** Called when a dialog produced by Show() has caused a wxID_OK event.

@@ -32,6 +32,7 @@ WX_DEFINE_LIST(jppResourceElementList);
 jppResourceElement::jppResourceElement() {
   // Set all pointer fields to zero.
   string = 0;
+  intptr = 0;
   longptr = 0;
   boolptr = 0;
 }
@@ -86,6 +87,20 @@ void jppResourceDialog::Attach(const wxString& name, bool *data) {
   links.Append(elem);
 }
 
+void jppResourceDialog::Attach(const wxString& name, long *data) {
+  jppResourceElement *elem = new jppResourceElement;
+  elem->resource = name;
+  elem->longptr = data;
+  links.Append(elem);
+}
+
+void jppResourceDialog::Attach(const wxString& name, int *data) {
+  jppResourceElement *elem = new jppResourceElement;
+  elem->resource = name;
+  elem->intptr = data;
+  links.Append(elem);
+}
+
 void jppResourceDialog::Attach(const wxString& name, long *data, wxArrayLong a) {
   jppResourceElement *elem = new jppResourceElement;
   elem->resource = name;
@@ -102,6 +117,28 @@ void jppResourceDialog::Attach(const wxString& name, long *data, long *a) {
   }
   Attach(name, data, arr);
 }
+
+void jppResourceDialog::Attach(const wxString& name, int *data, wxArrayInt a) {
+  jppResourceElement *elem = new jppResourceElement;
+  elem->resource = name;
+  elem->intptr = data;
+
+  for(int i=0; i<a.GetCount(); i++) {
+    elem->longarr.Add(a[i]);
+  }
+
+  links.Append(elem);
+}
+
+void jppResourceDialog::Attach(const wxString& name, int *data, int *a) {
+  wxArrayInt arr;
+  while(*a != -1) {
+    arr.Add(*a);
+    a++;
+  }
+  Attach(name, data, arr);
+}
+
 
 int jppResourceDialog::ShowModal() {
 
@@ -173,7 +210,11 @@ bool jppResourceDialog::LoadData(jppResourceElement *elem, wxWindow *win) {
       used = 1;
       ((wxCheckBox*)win)->SetValue(*elem->boolptr);
     }
-  } else if(elem->longptr) {
+  } else if(elem->longptr || elem->intptr) {
+    long value;
+    if(elem->longptr) value = *elem->longptr;
+    if(elem->intptr) value = *elem->intptr;
+
     if(win->IsKindOf(CLASSINFO(wxChoice))) {
       wxChoice *choice = (wxChoice*)win;
       if(choice->GetCount() != elem->longarr.GetCount()) {
@@ -186,7 +227,7 @@ bool jppResourceDialog::LoadData(jppResourceElement *elem, wxWindow *win) {
       } else {
 	int i;
 	for(i=0; i<elem->longarr.GetCount(); i++) {
-	  if(*elem->longptr == elem->longarr[i]) break;
+	  if(value == elem->longarr[i]) break;
 	}
 	
 	if(i == elem->longarr.GetCount()) {
@@ -203,6 +244,9 @@ bool jppResourceDialog::LoadData(jppResourceElement *elem, wxWindow *win) {
 	choice->SetSelection(i);
 	used = 1;
       }
+    } else if(win->IsKindOf(CLASSINFO(wxSlider))) {
+      used = 1;
+      ((wxSlider*)win)->SetValue((int)value);
     }
   }
   
@@ -230,7 +274,7 @@ bool jppResourceDialog::StoreData(jppResourceElement *elem, wxWindow *win) {
     if(win->IsKindOf(CLASSINFO(wxCheckBox))) {
       *(elem->boolptr) = ((wxCheckBox*)win)->GetValue();
     }
-  } else if(elem->longptr) {
+  } else if(elem->longptr || elem->intptr) {
     if(win->IsKindOf(CLASSINFO(wxChoice))) {
       int sel = ((wxChoice*)win)->GetSelection();
 
@@ -244,7 +288,19 @@ bool jppResourceDialog::StoreData(jppResourceElement *elem, wxWindow *win) {
 	return false;
       }
 
-      *(elem->longptr) = elem->longarr[sel];
+      if(elem->longptr)
+	*(elem->longptr) = elem->longarr[sel];
+      if(elem->intptr)
+	*(elem->intptr) = (int)elem->longarr[sel];
+
+    } else if(win->IsKindOf(CLASSINFO(wxSlider))) {
+
+      int value = ((wxSlider*)win)->GetValue();
+
+      if(elem->longptr)
+	*(elem->longptr) = value;
+      if(elem->intptr)
+	*(elem->intptr) = value;
     }
   }
 

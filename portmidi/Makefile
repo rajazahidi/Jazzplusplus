@@ -44,8 +44,8 @@ pm_test/sysex: Makefile pm_test/sysex.o $(pmlib) $(ptlib)
 pm_test/midithread: Makefile pm_test/midithread.o $(pmlib) $(ptlib)
 	$(CC) pm_test/midithread.c -o pm_test/midithread $(pmlib) $(ptlib) $(ALSALIB)
 
-pm_test/latency: Makefile $(ptlib) pm_test/latency.o 
-	$(CC) pm_test/latency.c -o pm_test/latency $(ptlib) -lpthread -lm
+pm_test/latency: Makefile $(ptlib) $(pmlib) pm_test/latency.o 
+	$(CC) pm_test/latency.c -o pm_test/latency $(ptlib) $(pmlib) $(ALSALIB) -lpthread -lm
 
 porttime/ptlinux.o: Makefile porttime/ptlinux.c
 	$(CC) -c porttime/ptlinux.c -o porttime/ptlinux.o

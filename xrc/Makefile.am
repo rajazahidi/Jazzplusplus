@@ -17,7 +17,7 @@ libwx_xrc_la_SOURCES = xmlparse.c xmlrole.c xmltok.c \
 noinst_HEADERS = ascii.h asciitab.h iasciitab.h latin1tab.h nametab.h \
                  utf8tab.h xmldef.h xmlparse.h xmlrole.h xmltok.h \
                  xmltok_impl.h \
-                 xmltok_impl.c xmltk_ns.c \
+                 xmltok_impl.c xmltok_ns.c \
                  include/wx/xrc/xh_all.h include/wx/xrc/xh_bmpbt.h \
                  include/wx/xrc/xh_bmp.h include/wx/xrc/xh_bttn.h \
                  include/wx/xrc/xh_cald.h include/wx/xrc/xh_chckb.h \

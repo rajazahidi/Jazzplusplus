@@ -21,7 +21,7 @@
 **
 */
 
-#include "wx.h"
+#include "wx/wx.h"
 
 class tPlayer;
 class tSong;
@@ -47,12 +47,13 @@ class jppProject {
 
         // restart play here if space bar hit
         long mStartTime;
+        long mStopTime;
         bool mLoop;
         bool mMuted;
         bool mRecord;
 
         tFilter *Filter;
-        tMetronomeInfo MetronomeInfo;
+        tMetronomeInfo mMetronomeInfo;
 
         tMetronomeInfo GetMetronome();
 

@@ -26,6 +26,7 @@
 #include "../song.h"
 #include "../filter.h"
 #include "../player.h"
+#include "../mstdfile.h"
 
 jppProject::jppProject() {
     mRecInfo.Track = 0;
@@ -41,7 +42,7 @@ void jppProject::Save() {
     tStdWrite io;
     Song->Write(io, mSongFileName);
     mChanged = 0;
-    Config.Put(C_StartUpSong, defsong);
+    Config.Put(C_StartUpSong, mSongFileName);
 }
 
 bool jppProject::IsPlaying() {
@@ -65,7 +66,7 @@ void jppProject::SetPattern(wxString newpattern)
 void jppProject::OpenSong(wxString newsong) {
     tStdRead io;
     Song->Clear();
-    Song->Read(io, s);
+    Song->Read(io, newsong);
 }
 
 void jppProject::Play() {
@@ -97,7 +98,7 @@ void jppProject::SetLoopClock(long newclock) {
 }
 
 tMetronomeInfo jppProject::GetMetronome() {
-    return MetronomeInfo;
+    return mMetronomeInfo;
 }
 
 tRecordInfo jppProject::GetRecInfo() {

@@ -50,6 +50,7 @@
 #include "dialogs/copyDialog.h"
 #include "commands/copyCommand.h"
 #include "gui/trackwinEnum.h"
+#include "engine/Project.h"
 #include "shuffle.h"
 #include "about.h"
 #include "resdlg.h"

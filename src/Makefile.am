@@ -65,7 +65,7 @@ EXTRA_DIST=	rhythm.cpp \
 noinst_HEADERS=about.h     command.h   eventwin.h  harmony.h   midinet.h      rhythm.h    signali.h   trackwin.h \
 alsadrv.h   config.h    filter.h    harmonyp.h  midi_p.h       samplcmd.h  slidrwin.h  util.h \
 alsaplay.h  ctrledit.h  freqtab.h   hbanalyz.h  mstdfile.h     sampldlg.h  song.h      winaudio.h \
-alsathru.h  dialogs.h   genmeldp.h  jazz.h      pianowin.h     sample.h    splcmplx.h  wxwin2port.h \
+alsathru.h  dialogs.h   genmeldp.h  jazz.h      pianowin.h     sample.h    splcmplx.h \
 arpeggio.h  dynarray.h  genmeldy.h  maction.h   player.h       samplwin.h  synth.h \
 audiodrv.h  eventlst.h  gs_dlgs.h   mapper.h    proplistdlg.h  shuffle.h   toolbar.h \
 audio.h     events.h    guitar.h    mascfile.h  random.h       sig2.h      track.h

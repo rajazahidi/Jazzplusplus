@@ -1314,16 +1314,6 @@ static long TrackFontSizes[] =
   -1, // End of List
 };
 
-static long TrackEventSizes[] =
-{
-  60, // Tiny
-  48, // Small
-  36, // Medium
-  24, // Large
-  12, // Huge
-  -1, // End of List
-};
-
 void tTrackWin::OnSettingsDialog()
 {
   tResourceDialog dialog(this, "windowSettings");

@@ -161,7 +161,13 @@ class tPianoWin : public wxFrame,
   void CutOrCopy(int id);
   DECLARE_EVENT_TABLE()
   void OnFilter();
+
+  // Actions (Called from menu items, toolbar buttons, and wx events)
+  bool ActCloseEvent(wxCloseEvent &e);
+  void ActClose();
+  void ActHelpMouse();
   void ActSettingsDialog();
+
   void CtrlChannelAftertouchEdit();
   void OnCtrlPolyAftertouchEdit();
   void OnCtrlNone();
@@ -197,7 +203,7 @@ class tPianoWin : public wxFrame,
   int EventsSelected(const char *msg = 0);
   void ZoomIn();
   void ZoomOut();
-  void LineText(wxDC *dc, long x, long y, long w, const char *str, int h = -1, bool down = FALSE);
+  void LineText(wxDC *dc, const char *str, bool down = FALSE);
   long x2BarClock(long x, int next);
   int OnEventWinMouseEvent(wxMouseEvent &e);
   void OnEventWinPaintSub(long x, long y);
@@ -229,7 +235,6 @@ class tPianoWin : public wxFrame,
   wxFrame *ParentWin;
   wxDialog *DialogBox;
   wxDialog *MixerForm;
-  wxTextCtrl         *m_textWindow;
 
 
   private:

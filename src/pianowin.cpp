@@ -38,6 +38,67 @@
 #include "resdlg.h"
 
 
+// Mouse Actions Mapping
+
+enum {
+  MA_PLAY = 1, // 0 represents no action.
+  MA_CYCLE,
+  MA_SELECT,
+  MA_CONTSEL,
+  MA_CUTPASTE,
+  MA_LENGTH,
+  MA_DIALOG,
+  MA_LISTEN,
+  MA_COPY,
+  MA_VELOCITY
+};
+
+const int play_actions[12] = {
+  // left	middle		right
+  MA_PLAY,	MA_CYCLE,	0,		// plain
+  MA_CYCLE,	0,		0,		// shift
+  0,		0,		0,		// ctrl
+  0,		0,		0		// shift+ctrl
+};
+
+const int evnt_actions[12] = {
+  // left	middle		right
+  MA_SELECT,	MA_CUTPASTE,	MA_LENGTH,	// plain
+  MA_CONTSEL,	MA_COPY,	MA_LISTEN,	// shift
+  MA_VELOCITY,	MA_DIALOG,	MA_VELOCITY,	// ctrl
+  MA_CUTPASTE,	0,		MA_COPY		// shift+ctrl
+};
+
+const char mouse_help[] =
+  "On Top Line:\n"
+  "    Left Click:  Start/stop play\n"
+  "        +Shift:  Start/stop cycle play\n"
+  "    Middle Click:  Start/stop cycle play\n"
+  "On Event Area:\n"
+  "    Left Click:  Depends on mode\n"
+  "        +Shift:  Continue selection\n"
+  "        +Ctrl:  Increase velocity\n"
+  "        +Ctrl+Shift:  Cut/paste event\n"
+  "    Middle Click:  Cut/paste event\n"
+  "        +Shift:  Copy event\n"
+  "        +Ctrl:  Event dialog\n"
+  "    Right Click:  Edit note length / change track\n"
+  "        +Shift:  Play pitch\n"
+  "        +Ctrl:  Decrease velocity\n"
+  "        +Ctrl+Shift:  Copy event\n";
+
+
+static long PianoFontSizes[] =
+{
+  6,  // Tiny
+  7,  // Small
+  8,  // Medium
+  10, // Large
+  12, // Huge
+  -1, // End of list
+};
+
+
 // ************************************************************************
 // Menubar
 // ************************************************************************
@@ -46,7 +107,7 @@
 #define MEN_FILTER	6
 #define MEN_SNAP	7
 #define MEN_METERCH	8
-#define MEN_HELP_MOUSE	9
+#define ACT_HELP_MOUSE	9
 
 #define MEN_COPY	10
 #define MEN_SHIFT	11
@@ -85,7 +146,7 @@
 #define MEN_SHIFTL      39
 #define MEN_SHIFTR      40
 
-#define MEN_CLOSE	41
+#define ACT_CLOSE	41
 #define MEN_CTRL_TEMPO  42
 
 #define MEN_MSELECT     43
@@ -157,79 +218,6 @@ static tToolDef tdefs[] = {
 #define CtrlH(h)	((h)/4)
 #define CtrlY(h)	(h - CtrlH(h))
 
-// mouse actions mapping
-
-#define MA_PLAY		1
-#define MA_CYCLE	2
-
-#define MA_SELECT	3
-#define MA_CONTSEL	4
-
-#define MA_CUTPASTE	5
-#define MA_LENGTH	6
-#define MA_DIALOG	7
-#define MA_LISTEN	8
-#define MA_COPY		9
-#define MA_VELOCITY    10
-
-
-const int play_actions[12] = {
-  // left	middle		right
-  MA_PLAY,	MA_CYCLE,	0,		// plain
-  MA_CYCLE,	0,		0,		// shift
-  0,		0,		0,		// ctrl
-  0,		0,		0		// shift+ctrl
-};
-
-const int evnt_actions[12] = {
-  // left	middle		right
-  MA_SELECT,	MA_CUTPASTE,	MA_LENGTH,	// plain
-  MA_CONTSEL,	MA_COPY,	MA_LISTEN,	// shift
-  MA_VELOCITY,	MA_DIALOG,	MA_VELOCITY,	// ctrl
-  MA_CUTPASTE,	0,		MA_COPY		// shift+ctrl
-};
-
-const char mouse_help[] =
-	"on topline:\n"
-	"  left: start/stop play\n"
-	"    +shift: start/stop cycle play\n"
-	"  middle: same as left+shift\n"
-	"on events:\n"
-        "  left: depends on mode\n"
-        "    +shift: continue selection\n"
-        "    +ctrl: increase velocity\n"
-        "    +ctrl+shift: cut/paste event\n"
-        "  middle: cut/paste event\n"
-        "    +shift: copy event\n"
-        "    +ctrl: event dialog\n"
-        "  right: edit note length / change track\n"
-        "    +shift: play pitch\n"
-        "    +ctrl: decrease velocity\n"
-        "    +ctrl+shift: copy\n";
-
-
-static long PianoFontSizes[] =
-{
-  6,  // Tiny
-  7,  // Small
-  8,  // Medium
-  10, // Large
-  12, // Huge
-  -1, // End of list
-};
-
-static long PianoEventSizes[] =
-{
-  16, // Tiny
-  8,  // Small
-  4,  // Medium
-  2,  // Large
-  1,  // Huge
-  -1, // End of list
-};
-
-
-
 // -------------------------------------------------------------------------
 // MousePiano
 // -------------------------------------------------------------------------
@@ -275,7 +263,7 @@ static tListen Listen;
 // **************************************************************************
 
 tPianoWin::tPianoWin(wxFrame *frame, char *title, tSong *song, int x, int y, int width, int height)
-  : wxFrame(frame, -1, title, wxPoint(x, y), wxSize(width, height)), // default is 640x442
+  : wxFrame(frame, -1, title, wxPoint(x, y), wxSize(width, height)),
     MousePlay(play_actions),
     MouseEvnt(evnt_actions)
 {
@@ -284,10 +272,7 @@ tPianoWin::tPianoWin(wxFrame *frame, char *title, tSong *song, int x, int y, int
 
   Filter    = new tFilter(Song);
 
-
-  Canvas = 0;
   MouseAction = 0;
-  SnapSel = 0;
   DialogBox = 0;
   MixerForm = 0;
 
@@ -312,9 +297,6 @@ tPianoWin::tPianoWin(wxFrame *frame, char *title, tSong *song, int x, int y, int
   FromClock = ToClock = 0;
   FromLine = ToLine = 0;
 
-    m_textWindow = new wxTextCtrl(this, -1, "", wxPoint(0, 0), wxSize(-1, -1), wxTE_MULTILINE);
-
-  // Done EventWin init.
 
 
   InitColors();
@@ -383,19 +365,8 @@ tPianoWin::~tPianoWin()
 
   delete tool_bar;
 
-  if (MixerForm)
-    delete MixerForm;
+  delete MixerForm;
 }
-
-#ifndef __PORTING
-
-bool tPianoWin::OnClose()
-{
-  Show(FALSE);
-  return FALSE;
-}
-#endif // __PORTING
-
 
 void tPianoWin::OnSize(wxSizeEvent& event)
 {
@@ -516,7 +487,7 @@ void tPianoWin::NewPosition(int track, long clock)
 void tPianoWin::CreateMenu()
 {
   wxMenu *win_menu = new wxMenu;
-  win_menu->Append(MEN_CLOSE, "&Close");
+  win_menu->Append(ACT_CLOSE, "&Close");
 
   wxMenu *edit_menu = new wxMenu("",wxMENU_TEAROFF);
   edit_menu->Append(MEN_ERASE, "&Delete");
@@ -562,7 +533,7 @@ void tPianoWin::CreateMenu()
 
   wxMenu *help_menu = new wxMenu("",wxMENU_TEAROFF);
   help_menu->Append(MEN_HELP_PWIN, "&Pianowin");
-  help_menu->Append(MEN_HELP_MOUSE, "&Mouse");
+  help_menu->Append(ACT_HELP_MOUSE, "&Mouse");
 
   wxMenuBar *menu_bar = new wxMenuBar;
   menu_bar->Append(win_menu,    "&Window");
@@ -588,12 +559,6 @@ void tPianoWin::OnMenuCommand(int id)
 
 
  #ifndef __PORTING
-
-
-
-    case MEN_HELP_MOUSE:
-      wxMessageBox((char *)mouse_help, "Help", wxOK);
-      break;
 
     case MEN_HELP_PWIN:
       HelpInstance->ShowTopic("Piano Window");
@@ -655,6 +620,11 @@ BEGIN_EVENT_TABLE(tPianoWin, wxFrame)
   EVT_MENU    (ACT_SETTINGS, tPianoWin::ActSettingsDialog)
   EVT_MENU    (MEN_FILTER,tPianoWin::OnFilter)
   EVT_MENU    (MEN_SNAP    ,tPianoWin::SnapDlg)
+
+  // These are all "Patrick Approved"
+  EVT_CLOSE (tPianoWin::ActCloseEvent)
+  EVT_MENU  (ACT_CLOSE, tPianoWin::ActClose)
+  EVT_MENU  (ACT_HELP_MOUSE, tPianoWin::ActHelpMouse)
 END_EVENT_TABLE()
 
 
@@ -913,10 +883,6 @@ case MEN_VISIBLE:   VisibleDialog(); break;
 
 case MEN_METERCH:	MenMeterChange(); break;
 
-
-
-case MEN_CLOSE:     Show(FALSE); break;
-
 */
 
 /**show the guitar edit  window*/
@@ -1070,8 +1036,6 @@ const int isBlack[12] = {0,1,0,1,0,0,1,0,1,0,1,0};
 
 void tPianoWin::OnPaintSub(wxDC* dc, long x, long y)
 {
-  cout << "tPianoWin::OnPaintSub" << endl;
-
   long OldFromClock = FromClock;
 
   OnEventWinPaintSub(x, y);
@@ -1190,11 +1154,12 @@ void tPianoWin::OnPaintSub(wxDC* dc, long x, long y)
     BarInfo.Next();
   }
 
+  LineText(dc, "");
+
+
 
   dc->SetPen(*wxBLACK_PEN);
   DrawPianoRoll(dc);
-  LineText(dc,xPiano, CanvasY-1, wPiano, "", hTop);
-
 
 
   // draw chords from harmony-browser
@@ -1318,7 +1283,7 @@ void tPianoWin::DrawPianoRoll(wxDC* dc)
   dc->DrawRectangle(xPiano, yEvents, wPiano, hEvents); //draw grey bg for keyboard
   dc->SetBrush(*wxBLACK_BRUSH);
 
-  dc->SetTextBackground(*wxLIGHT_GREY);
+  //dc->SetTextBackground(*wxLIGHT_GREY);
 
   long wBlack = wPiano * 2 / 3;
   int Pitch = 127 - FromLine;
@@ -1401,7 +1366,7 @@ void tPianoWin::DrawPianoRoll(wxDC* dc)
   }
 
   //dc->DestroyClippingRegion();
-  dc->SetTextBackground(*wxWHITE);
+  //dc->SetTextBackground(*wxWHITE);
   dc->SetFont(*Font);
 }
 
@@ -2706,65 +2671,44 @@ long tPianoWin::x2Clock(long x)
   return (x - xEvents) * ClocksPerPixel + FromClock;
 }
 
-void tPianoWin::LineText(wxDC *dc, long x, long y, long w, const char *str, int h, bool down)
+/* Draws the little rectangle in the top left corner of the piano window. */
+
+void tPianoWin::LineText(wxDC *dc, const char *str, bool down)
 {
-  if (h <= 0)
-  {
-    h = hLine;
-    y = y2yLine(y);
-  }
-  if (w && h)
-  {
-    //dc->SetBrush(wxGREY_BRUSH);
-    dc->SetBrush(*wxLIGHT_GREY_BRUSH);
-    dc->SetPen(*wxGREY_PEN);
-    #ifdef wx_msw
-    dc->DrawRectangle(x, y, w+1, h+1);
-    #else
-    dc->DrawRectangle(x, y, w, h);
-    #endif
-    x += 1;
-    y += 1;
-    w -= 2;
-    h -= 2;
-    if (down) {
-      dc->SetPen(*wxBLACK_PEN);
-      dc->DrawLine(x, y, x+w, y);
-      dc->DrawLine(x, y, x, y+h);
-      dc->SetPen(*wxWHITE_PEN);
-      dc->DrawLine(x+w, y, x+w, y+h);
-      dc->DrawLine(x, y+h, x+w, y+h);
-    }
-    else {
-      dc->SetPen(*wxWHITE_PEN);
-      dc->DrawLine(x, y, x+w, y);
-      dc->DrawLine(x, y, x, y+h);
-      dc->SetPen(*wxBLACK_PEN);
-      dc->DrawLine(x+w, y, x+w, y+h);
-      dc->DrawLine(x, y+h, x+w, y+h);
-    }
+  int x = 0;
+  int y = 0;
+  int w = wPiano;
+  int h = hTop;
+
+  dc->SetBrush(*wxLIGHT_GREY_BRUSH); // Fill
+  dc->SetPen(*wxLIGHT_GREY_PEN);     // Outline
+  dc->DrawRectangle(x, y, w, h);
+
+  x += 1;
+  y += 1;
+  w -= 2;
+  h -= 2;
+
+  // Draw the top and left lines of the 3D button.
+  if (down)
     dc->SetPen(*wxBLACK_PEN);
-    x -= 2;
-    y -= 2;
-  }
-  wxColor &bg = dc->GetTextBackground();
-  //dc->SetTextForeground(*wxBLUE);
-  dc->SetTextBackground(*wxLIGHT_GREY);
+  else
+    dc->SetPen(*wxWHITE_PEN);
 
+  dc->DrawLine(x, y, x+w, y);
+  dc->DrawLine(x, y, x, y+h);
 
-  dc->SetPen(*wxBLACK_PEN);
-  dc->SetBrush(*wxBLACK_BRUSH);
-  dc->SetTextForeground(*wxBLACK);
+  // Draw the bottom and right lines of the 3D button.
+  if (down)
+    dc->SetPen(*wxWHITE_PEN);
+  else
+    dc->SetPen(*wxBLACK_PEN);
 
-  wxString mystr = str;
-  dc->DrawText(mystr, x + LittleBit, y + LittleBit);
-  //Canvas->Refresh();
+  dc->DrawLine(x+w, y, x+w, y+h);
+  dc->DrawLine(x, y+h, x+w, y+h);
 
-  dc->SetTextBackground(*wxWHITE);
-
-  //cout << x << " " << y << " " << w << " " << h << endl;
-  //wxRect rect(0,0,200,200);
-  //RefreshRect(rect);
+  // Print the message in the button.
+  dc->DrawText(str, x + LittleBit, y + LittleBit);
 }
 
 long tPianoWin::y2Line(long y, int up)
@@ -2865,14 +2809,9 @@ long tPianoWin::y2yLine(long y, int up)
 
 void tPianoWin::GetVirtSize(long *w, long *h)
 {
-
-
   long clk = Song->MaxQuarters * Song->TicksPerQuarter;
   *w = clk / ClocksPerPixel + wLeft;
   *h = 127 * hLine + hTop;
-
-
-  *w = 5000L;
 }
 
 bool tPianoWin::OnCharHook(wxKeyEvent& e)
@@ -2918,13 +2857,8 @@ onpaint seems never to get called
   cout << "tPianoCanvas::OnDraw\n";
 }
 
-//the canvas sends events to the subclassed window, i (might)filter the events a bit so as not get all mouse move events
 BEGIN_EVENT_TABLE(tPianoCanvas, wxScrolledWindow)
    EVT_MOUSE_EVENTS(tPianoCanvas::OnMouseEvent)
-//   EVT_LEFT_DOWN(tPianoCanvas::OnMouseEvent)
-//   EVT_LEFT_UP(tPianoCanvas::OnMouseEvent)
-//   EVT_RIGHT_DOWN(tPianoCanvas::OnMouseEvent)
-//   EVT_RIGHT_UP(tPianoCanvas::OnMouseEvent)
 END_EVENT_TABLE()
 
   /**
@@ -2955,16 +2889,6 @@ void tPianoCanvas::SetScrollPosition(long x, long y)
   Scroll(x, y);
 }
 
-
-
-
-
-
-
-
-
-
-
 void tPianoWin::LogicalMousePosition(wxMouseEvent &e, long *x, long *y) {
   e.GetPosition(x, y);
   *x += CanvasX;
@@ -2972,21 +2896,12 @@ void tPianoWin::LogicalMousePosition(wxMouseEvent &e, long *x, long *y) {
 }
 
 
-void tPianoWin::ButtonLabelDisplay(wxString text, bool down) {
-  wxClientDC dc(Canvas);
-
-  LineText(&dc, 0, 0, wPiano, text.GetData(), hTop, down);
-}
-
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // The rest of this file is "Patrick Approved."  Take that how you want. :)  //
 ///////////////////////////////////////////////////////////////////////////////
 
+/* Generate some colours to represent note velocity.  The current settings use
+   dark blue for quiet and bright red for loud. */
 void tPianoWin::InitColors()
 {
   int i, c;
@@ -2995,4 +2910,37 @@ void tPianoWin::InitColors()
     color_brush[i].SetColour(c, 0, 127-c/2);
     color_brush[i].SetStyle(wxSOLID);
   }
+}
+
+/* This is an an event handler for tMouseCounter. */
+void tPianoWin::ButtonLabelDisplay(wxString text, bool down) {
+  wxClientDC dc(Canvas);
+  LineText(&dc, text.GetData(), down);
+}
+
+
+/* This section of the file consists of various action handlers in alphabetical
+   order.  Most of these are called from menus or toolbar buttons.  If they
+   are called in a different way, that will be noted. */
+
+void tPianoWin::ActClose() {
+  Show(FALSE);
+}
+
+/* This event is generated when the window's close button is pressed. */
+bool tPianoWin::ActCloseEvent(wxCloseEvent &e)
+{
+  // This strange code brought to you by the documentation for wxCloseEvent.
+  if(e.CanVeto()) {
+    Show(FALSE);
+    e.Veto();
+    return FALSE;
+  } else {
+    Destroy();
+    return TRUE;
+  }
+}
+
+void tPianoWin::ActHelpMouse() {
+  wxMessageBox((char *)mouse_help, "Mouse Help");
 }

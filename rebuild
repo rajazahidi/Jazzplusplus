@@ -1,0 +1,6 @@
+#!/bin/sh
+
+rm -f config.cache Makefile src/Makefile configure 
+./bootstrap
+./configure --enable-audio=yes --enable-alsa=yes --enable-sequencer2=yes
+make -k

@@ -1,0 +1,8 @@
+4.1.3: 
+  - diff for easier compiling of wxwin 168e and updated COMPILE document
+  - applied patch for scan_clients problem (slow startup)
+  - jazz/wxwin now compile with gnu 2.95.2
+
+4.1.1: 
+  - Upgrade the ALSA driver to support version 0.57 and up. 
+    Thanks very much to Takashi Iwai <iwai@ww.uni-erlangen.de>

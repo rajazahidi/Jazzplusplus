@@ -1,0 +1,2 @@
+#recode latin1:ibmpc $*
+perl -p -i -e 's!\s+$!\r\n!;' $*

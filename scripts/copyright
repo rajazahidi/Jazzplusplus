@@ -1,0 +1,6 @@
+
+for i in ../src/*.cpp ../src/*.h
+do
+  perl -i.bak copyright.pl $i;
+done
+

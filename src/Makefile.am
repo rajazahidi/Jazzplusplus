@@ -2,6 +2,7 @@
 bin_PROGRAMS = jazz
 jazz_SOURCES = \
                 pianowin.cpp \
+                resdlg.cpp \
                 maction.cpp \
                 eventwin.cpp \
                 trackwin.cpp \

@@ -51,24 +51,24 @@ CONFIG_CLEAN_FILES =
 am__installdirs = $(DESTDIR)$(bindir)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_jazz_OBJECTS = pianowin.$(OBJEXT) maction.$(OBJEXT) \
-	eventwin.$(OBJEXT) trackwin.$(OBJEXT) toolbar.$(OBJEXT) \
-	jazz.$(OBJEXT) track.$(OBJEXT) synth.$(OBJEXT) \
-	events.$(OBJEXT) song.$(OBJEXT) mstdfile.$(OBJEXT) \
-	util.$(OBJEXT) player.$(OBJEXT) dynarray.$(OBJEXT) \
-	about.$(OBJEXT) audio.$(OBJEXT) sample.$(OBJEXT) \
-	freqtab.$(OBJEXT) harmonyp.$(OBJEXT) slidrwin.$(OBJEXT) \
-	eventlst.$(OBJEXT) command.$(OBJEXT) filter.$(OBJEXT) \
-	random.$(OBJEXT) arpeggio.$(OBJEXT) genmeldp.$(OBJEXT) \
-	genmeldy.$(OBJEXT) mapper.$(OBJEXT) audiodrv.$(OBJEXT) \
-	proplistdlg.$(OBJEXT) alsaplay.$(OBJEXT) alsathru.$(OBJEXT) \
-	harmony.$(OBJEXT) hbanalyz.$(OBJEXT) ctrledit.$(OBJEXT) \
-	sig2.$(OBJEXT) samplcmd.$(OBJEXT) guitar.$(OBJEXT) \
-	dialogs.$(OBJEXT) shuffle.$(OBJEXT) copyDialog.$(OBJEXT) \
-	copyright.$(OBJEXT) metronomeSettings.$(OBJEXT) \
-	midiThruDialog.$(OBJEXT) midiTiming.$(OBJEXT) \
-	songSettings.$(OBJEXT) synthSettings.$(OBJEXT) \
-	copyCommand.$(OBJEXT)
+am_jazz_OBJECTS = pianowin.$(OBJEXT) resdlg.$(OBJEXT) \
+	maction.$(OBJEXT) eventwin.$(OBJEXT) trackwin.$(OBJEXT) \
+	toolbar.$(OBJEXT) jazz.$(OBJEXT) track.$(OBJEXT) \
+	synth.$(OBJEXT) events.$(OBJEXT) song.$(OBJEXT) \
+	mstdfile.$(OBJEXT) util.$(OBJEXT) player.$(OBJEXT) \
+	dynarray.$(OBJEXT) about.$(OBJEXT) audio.$(OBJEXT) \
+	sample.$(OBJEXT) freqtab.$(OBJEXT) harmonyp.$(OBJEXT) \
+	slidrwin.$(OBJEXT) eventlst.$(OBJEXT) command.$(OBJEXT) \
+	filter.$(OBJEXT) random.$(OBJEXT) arpeggio.$(OBJEXT) \
+	genmeldp.$(OBJEXT) genmeldy.$(OBJEXT) mapper.$(OBJEXT) \
+	audiodrv.$(OBJEXT) proplistdlg.$(OBJEXT) alsaplay.$(OBJEXT) \
+	alsathru.$(OBJEXT) harmony.$(OBJEXT) hbanalyz.$(OBJEXT) \
+	ctrledit.$(OBJEXT) sig2.$(OBJEXT) samplcmd.$(OBJEXT) \
+	guitar.$(OBJEXT) dialogs.$(OBJEXT) shuffle.$(OBJEXT) \
+	copyDialog.$(OBJEXT) copyright.$(OBJEXT) \
+	metronomeSettings.$(OBJEXT) midiThruDialog.$(OBJEXT) \
+	midiTiming.$(OBJEXT) songSettings.$(OBJEXT) \
+	synthSettings.$(OBJEXT) copyCommand.$(OBJEXT)
 jazz_OBJECTS = $(am_jazz_OBJECTS)
 jazz_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
@@ -93,11 +93,11 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/midiTiming.Po ./$(DEPDIR)/mstdfile.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/pianowin.Po ./$(DEPDIR)/player.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/proplistdlg.Po ./$(DEPDIR)/random.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/samplcmd.Po ./$(DEPDIR)/sample.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/shuffle.Po ./$(DEPDIR)/sig2.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/slidrwin.Po ./$(DEPDIR)/song.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/songSettings.Po ./$(DEPDIR)/synth.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/synthSettings.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/resdlg.Po ./$(DEPDIR)/samplcmd.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/sample.Po ./$(DEPDIR)/shuffle.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/sig2.Po ./$(DEPDIR)/slidrwin.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/song.Po ./$(DEPDIR)/songSettings.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/synth.Po ./$(DEPDIR)/synthSettings.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/toolbar.Po ./$(DEPDIR)/track.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/trackwin.Po ./$(DEPDIR)/util.Po
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -200,6 +200,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 jazz_SOURCES = \
                 pianowin.cpp \
+                resdlg.cpp \
                 maction.cpp \
                 eventwin.cpp \
                 trackwin.cpp \
@@ -388,6 +389,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/player.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/proplistdlg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/random.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/resdlg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/samplcmd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sample.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shuffle.Po@am__quote@

@@ -412,11 +412,15 @@ void tPianoWin::Setup()
 
   long lx,ly;
 
-  wxDC* dc=new wxClientDC(Canvas);
-  //dc is from Canvas
+  wxDC *dc = new wxClientDC(Canvas);
+
+  cout << "NAAAAAAAAAAAAAAAAAAAAAME " << typeid(*dc).name() << endl;
+  cout << "NAAAAAAAAAAAAAAAAAAAAAME " << typeid(this).name() << endl;
+
   dc->SetFont(wxNullFont);
   delete FixedFont;
   FixedFont = new wxFont(12, wxSWISS, wxNORMAL, wxNORMAL);
+
   dc->SetFont(*FixedFont);
   dc->GetTextExtent("M", &lx, &ly);
   hFixedFont = (int)ly;

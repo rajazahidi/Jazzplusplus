@@ -543,7 +543,7 @@ class tMetaEvent : public tEvent
 
     virtual ~tMetaEvent()
     {
-      delete Data;
+      delete [] Data;
     }
 
     virtual int Write(tWriteBase &io)

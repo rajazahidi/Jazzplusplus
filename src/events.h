@@ -769,17 +769,18 @@ class tPlayTrack : public tMetaEvent
 
   virtual int   GetLength()		{ edb(); return eventlength; }
   
-  tPlayTrack(long clk, uchar *dat, ushort len)
-    : tMetaEvent(clk, StatPlayTrack, dat, len)
+  tPlayTrack(long clk, uchar *chardat, ushort len)
+    : tMetaEvent(clk, StatPlayTrack, chardat, len)
     {
+      int *dat = (int *)chardat;
       //fill in the fields from the data 
       track=0;
       transpose=0;
       eventlength=0;
       if(dat!=0){
-	track=*(((int*)dat)++);
-	transpose=*(((int*)dat)++);
-	eventlength=*(((int*)dat)++);
+	track=dat[0];
+	transpose=dat[1];
+	eventlength=dat[2];
       }
     }
   
@@ -795,10 +796,10 @@ class tPlayTrack : public tMetaEvent
 
     {
       Data = new uchar [Length + 1];
-      uchar* dat=Data;
-      *(((int*)dat)++)=track;
-      *(((int*)dat)++)=transpose;
-      *(((int*)dat)++)=eventlength;
+      int *dat= (int *)Data;
+      dat[0]=track;
+      dat[1]=transpose;
+      dat[2]=eventlength;
       Length=sizeof(int)*3;
       edb(); 
 

@@ -1317,7 +1317,7 @@ static long TrackFontSizes[] =
 
 void tTrackWin::OnSettingsDialog()
 {
-  tResourceDialog dialog(this, "windowSettings");
+  jppResourceDialog dialog(this, "windowSettings");
   
   dialog.Attach("use_colours", &UseColors);
   dialog.Attach("font_size", &FontSize, TrackFontSizes);

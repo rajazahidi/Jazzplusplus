@@ -22,31 +22,30 @@
 #include "resdlg.h"
 
 #include <wx/listimpl.cpp>
-WX_DEFINE_LIST(tResourceElementList);
+WX_DEFINE_LIST(jppResourceElementList);
 
 
 /******************************************************************************
- * tResourceElement
+ * jppResourceElement
  *****************************************************************************/
 
-tResourceElement::tResourceElement() {
+jppResourceElement::jppResourceElement() {
   // Set all pointer fields to zero.
   string = 0;
   longptr = 0;
   boolptr = 0;
-  wxArrayLong longarr;
 }
 
 
 /******************************************************************************
- * tResourceDialog
+ * jppResourceDialog
  *****************************************************************************/
 
 // Static Members
 
-bool tResourceDialog::initialized;
+bool jppResourceDialog::initialized;
 
-void tResourceDialog::LoadResource(const wxString& xrcfile) {
+void jppResourceDialog::LoadResource(const wxString& xrcfile) {
   if(!initialized) {
     wxFileSystem::AddHandler(new wxZipFSHandler);
     wxXmlResource::Get()->InitAllHandlers();
@@ -58,44 +57,44 @@ void tResourceDialog::LoadResource(const wxString& xrcfile) {
 
 // Instance Methods
 
-tResourceDialog::tResourceDialog(wxWindow* parent, const wxString& name) {
+jppResourceDialog::jppResourceDialog(wxWindow* parent, const wxString& name) {
   dialogName = name;
 
   // The system will report any errors in loading, assuming we don't crash
   // ourselves first.
   dialog = wxXmlResource::Get()->LoadDialog(parent, name);
 
-  // Make the list delete its data items when the tResourceDialog is deleted.
+  // Make the list delete its data items when the jppResourceDialog is deleted.
   links.DeleteContents(true);
 }
 
-tResourceDialog::~tResourceDialog() {
+jppResourceDialog::~jppResourceDialog() {
   dialog->Destroy();
 }
 
-void tResourceDialog::Attach(const wxString& name, wxString *data) {
-  tResourceElement *elem = new tResourceElement;
+void jppResourceDialog::Attach(const wxString& name, wxString *data) {
+  jppResourceElement *elem = new jppResourceElement;
   elem->resource = name;
   elem->string = data;
   links.Append(elem);
 }
 
-void tResourceDialog::Attach(const wxString& name, bool *data) {
-  tResourceElement *elem = new tResourceElement;
+void jppResourceDialog::Attach(const wxString& name, bool *data) {
+  jppResourceElement *elem = new jppResourceElement;
   elem->resource = name;
   elem->boolptr = data;
   links.Append(elem);
 }
 
-void tResourceDialog::Attach(const wxString& name, long *data, wxArrayLong a) {
-  tResourceElement *elem = new tResourceElement;
+void jppResourceDialog::Attach(const wxString& name, long *data, wxArrayLong a) {
+  jppResourceElement *elem = new jppResourceElement;
   elem->resource = name;
   elem->longptr = data;
   elem->longarr = a;
   links.Append(elem);
 }
 
-void tResourceDialog::Attach(const wxString& name, long *data, long *a) {
+void jppResourceDialog::Attach(const wxString& name, long *data, long *a) {
   wxArrayLong arr;
   while(*a != -1) {
     arr.Add(*a);
@@ -104,7 +103,7 @@ void tResourceDialog::Attach(const wxString& name, long *data, long *a) {
   Attach(name, data, arr);
 }
 
-int tResourceDialog::ShowModal() {
+int jppResourceDialog::ShowModal() {
 
   // Don't bother with dialogs that don't exist.  An error message will be
   // produced by the system at some point.
@@ -115,8 +114,8 @@ int tResourceDialog::ShowModal() {
   // let the user know.  Upon finding the resource, attempt to load the
   // current value(s) into it.
 
-  wxtResourceElementListNode *node = links.GetFirst();
-  tResourceElement *elem;
+  wxjppResourceElementListNode *node = links.GetFirst();
+  jppResourceElement *elem;
   
   while(node) {
     elem = node->GetData();
@@ -141,8 +140,8 @@ int tResourceDialog::ShowModal() {
   int res = dialog->ShowModal();
 
   if(res == wxID_OK) {
-    wxtResourceElementListNode *node = links.GetFirst();
-    tResourceElement *elem;
+    wxjppResourceElementListNode *node = links.GetFirst();
+    jppResourceElement *elem;
 
     // Iterate through list of attached links.  For each link, try and move
     // the data from the wxWidget to the location of the relevant pointer.
@@ -161,7 +160,7 @@ int tResourceDialog::ShowModal() {
   return res;
 }
 
-bool tResourceDialog::LoadData(tResourceElement *elem, wxWindow *win) {
+bool jppResourceDialog::LoadData(jppResourceElement *elem, wxWindow *win) {
   bool used = 0;
 
   if(elem->string) {
@@ -218,7 +217,7 @@ bool tResourceDialog::LoadData(tResourceElement *elem, wxWindow *win) {
   return used;
 }
 
-bool tResourceDialog::StoreData(tResourceElement *elem, wxWindow *win) {
+bool jppResourceDialog::StoreData(jppResourceElement *elem, wxWindow *win) {
   // We don't need to do as much error checking here.  Most of that will have
   // been done in LoadData before things have had opportunity to modify
   // themselves.

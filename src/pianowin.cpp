@@ -2591,7 +2591,7 @@ long tPianoWin::Line2y(long Line)
 
 void tPianoWin::ActSettingsDialog()
 {
-  tResourceDialog dialog(this, "windowSettings");
+  jppResourceDialog dialog(this, "windowSettings");
   
   dialog.Attach("use_colours", &UseColors);
   dialog.Attach("font_size", &FontSize, PianoFontSizes);

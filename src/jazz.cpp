@@ -874,7 +874,7 @@ bool tApp::OnInit(void)
 
 
   // ---------------------- XML Dialogs -------------------------
-  tResourceDialog::LoadResource(FindDialog("windowSettings.xrc"));
+  jppResourceDialog::LoadResource(FindDialog("windowSettings.xrc"));
 
 
 

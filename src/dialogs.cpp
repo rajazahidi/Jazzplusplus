@@ -674,12 +674,12 @@ class tEventDlg : public tPropertyListDlg
 
     tTrack    *Track;
     tClockDlg ClockDlg;
-    tEventWin *Win;
+    tPianoWin *Win;
 
     tEvent    *Event;
     tEvent    *Copy;
 
-    tEventDlg(tEvent *e, tEventWin *w, tTrack *t);
+    tEventDlg(tEvent *e, tPianoWin *w, tTrack *t);
     virtual void AddProperties();
     virtual bool OnClose();
     virtual void OnHelp();
@@ -687,7 +687,7 @@ class tEventDlg : public tPropertyListDlg
 };
 
 
-tEventDlg::tEventDlg(tEvent *e, tEventWin *w, tTrack *t)
+tEventDlg::tEventDlg(tEvent *e, tPianoWin *w, tTrack *t)
   : tPropertyListDlg( "Event" ), ClockDlg(w->Song, "Time ", e->Clock)
 {
   Win   = w;
@@ -714,8 +714,6 @@ bool tEventDlg::OnClose()
   Track->Put(Copy);
   Track->Cleanup();
   Win->Redraw();
-  if (Win->NextWin)
-  	Win->NextWin->Redraw();
   tPropertyListDlg::OnClose();
 }
 
@@ -733,7 +731,7 @@ class tChEventDlg : public tEventDlg
 
     int Channel;
 
-    tChEventDlg(tChannelEvent *e, tEventWin *w, tTrack *t)
+    tChEventDlg(tChannelEvent *e, tPianoWin *w, tTrack *t)
       : tEventDlg(e, w, t)
     {
       Channel = e->Channel + 1;		// 1..16
@@ -769,14 +767,14 @@ class tKeyOnDlg : public tChEventDlg
   // SN++
   int OffVeloc;
 
-  tKeyOnDlg(tKeyOn *e, tEventWin *w, tTrack *t);
+  tKeyOnDlg(tKeyOn *e, tPianoWin *w, tTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tKeyOnDlg::tKeyOnDlg(tKeyOn *e, tEventWin *w, tTrack *t)
+tKeyOnDlg::tKeyOnDlg(tKeyOn *e, tPianoWin *w, tTrack *t)
   : tChEventDlg(e, w, t),
     PitchDlg("Pitch", e->Key)
 {
@@ -825,14 +823,14 @@ class tPitchDlg : public tChEventDlg
 
   int Value;
 
-  tPitchDlg(tPitch *e, tEventWin *w, tTrack *t);
+  tPitchDlg(tPitch *e, tPianoWin *w, tTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tPitchDlg::tPitchDlg(tPitch *e, tEventWin *w, tTrack *t)
+tPitchDlg::tPitchDlg(tPitch *e, tPianoWin *w, tTrack *t)
   : tChEventDlg(e, w, t)
 {
   Event = e;
@@ -864,14 +862,14 @@ class tControlDlg : public tChEventDlg
   long Control;
   //tNamedChoice Choice;
 
-  tControlDlg(tControl *e, tEventWin *w, tTrack *t);
+  tControlDlg(tControl *e, tPianoWin *w, tTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tControlDlg::tControlDlg(tControl *e, tEventWin *w, tTrack *t)
+tControlDlg::tControlDlg(tControl *e, tPianoWin *w, tTrack *t)
   : tChEventDlg(e, w, t)
   //,    Choice("Controller", &Config.CtrlName(0), &Control)
 {
@@ -912,14 +910,14 @@ class tPlayTrackDlg : public tEventDlg
 
   tNamedChoice Choice;
 
-  tPlayTrackDlg(tPlayTrack *e, tEventWin *w, tTrack *t);
+  tPlayTrackDlg(tPlayTrack *e, tPianoWin *w, tTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tPlayTrackDlg::tPlayTrackDlg(tPlayTrack *e, tEventWin *w, tTrack *t)
+tPlayTrackDlg::tPlayTrackDlg(tPlayTrack *e, tPianoWin *w, tTrack *t)
   : tEventDlg(e, w, t),
     Choice("playtrack", &Config.CtrlName(0), &track)
 {
@@ -959,14 +957,14 @@ class tTextDlg : public tEventDlg
   long track;
   tNamedChoice Choice;
 
-  tTextDlg(tText *e, tEventWin *w, tTrack *t);
+  tTextDlg(tText *e, tPianoWin *w, tTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tTextDlg::tTextDlg(tText *e, tEventWin *w, tTrack *t)
+tTextDlg::tTextDlg(tText *e, tPianoWin *w, tTrack *t)
   : tEventDlg(e, w, t),
     Choice("text", &Config.CtrlName(0), &track)
 {
@@ -1006,14 +1004,14 @@ class tEndOfTrackDlg : public tEventDlg
 
   tNamedChoice Choice;
 
-  tEndOfTrackDlg(tEndOfTrack *e, tEventWin *w, tTrack *t);
+  tEndOfTrackDlg(tEndOfTrack *e, tPianoWin *w, tTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tEndOfTrackDlg::tEndOfTrackDlg(tEndOfTrack *e, tEventWin *w, tTrack *t)
+tEndOfTrackDlg::tEndOfTrackDlg(tEndOfTrack *e, tPianoWin *w, tTrack *t)
   : tEventDlg(e, w, t),
     Choice("End Of Track", &Config.CtrlName(0), &track)
 {
@@ -1043,14 +1041,14 @@ class tProgramDlg : public tEventDlg
   long Program;
   //  tNamedChoice Choice;
 
-  tProgramDlg(tProgram *e, tEventWin *w, tTrack *t);
+  tProgramDlg(tProgram *e, tPianoWin *w, tTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tProgramDlg::tProgramDlg(tProgram *e, tEventWin *w, tTrack *t)
+tProgramDlg::tProgramDlg(tProgram *e, tPianoWin *w, tTrack *t)
   : tEventDlg(e, w, t),
     Program(e->Program + 1)
   //,    Choice("Program", &Config.VoiceName(0), &Program)
@@ -1085,14 +1083,14 @@ class tSetTempoDlg : public tEventDlg
 
   int Value;
 
-  tSetTempoDlg(tSetTempo *e, tEventWin *w, tTrack *t);
+  tSetTempoDlg(tSetTempo *e, tPianoWin *w, tTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tSetTempoDlg::tSetTempoDlg(tSetTempo *e, tEventWin *w, tTrack *t)
+tSetTempoDlg::tSetTempoDlg(tSetTempo *e, tPianoWin *w, tTrack *t)
   : tEventDlg(e, w, t)
 {
   Event = e;
@@ -1121,14 +1119,14 @@ class tSysexDlg : public tEventDlg
 
   char *str;
 
-  tSysexDlg(tSysEx *s, tEventWin *w, tTrack *t);
+  tSysexDlg(tSysEx *s, tPianoWin *w, tTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tSysexDlg::tSysexDlg(tSysEx *s, tEventWin *w, tTrack *t)
+tSysexDlg::tSysexDlg(tSysEx *s, tPianoWin *w, tTrack *t)
   : tEventDlg(s, w, t)
 {
   Event = s;
@@ -1303,7 +1301,7 @@ static tEvent *CreateEventDialog(long Clock, int Channel, int Pitch)
 
 
 
-void EventDialog(tEvent *e, tEventWin *w, tTrack *t, long Clock, int Channel, int Pitch)
+void EventDialog(tEvent *e, tPianoWin *w, tTrack *t, long Clock, int Channel, int Pitch)
 {
   if (!e)
     e = CreateEventDialog(Clock, Channel, Pitch);

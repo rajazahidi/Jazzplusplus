@@ -374,20 +374,6 @@ static tNamedValue TrackFontSizes[] =
   tNamedValue(0,        12 )
 };
 
-static tNamedValue PianoFontSizes[] =
-{
-  tNamedValue("Tiny",    6 ),
-#ifndef wx_msw
-  tNamedValue("Small",   7 ), // msw does not have this??
-#endif
-  tNamedValue("Medium",  8 ),
-  tNamedValue("Large",  10 ),
-  tNamedValue("Huge",   12 ),
-
-  tNamedValue(0,         8 )
-};
-
-
 static tNamedValue TrackEventSizes[] =
 {
   tNamedValue("Tiny",   60 ),
@@ -398,27 +384,15 @@ static tNamedValue TrackEventSizes[] =
   tNamedValue(0,        36 )
 };
 
-static tNamedValue PianoEventSizes[] =
-{
-  tNamedValue("Tiny",   16 ),
-  tNamedValue("Small",  8 ),
-  tNamedValue("Medium", 4 ),
-  tNamedValue("Large",  2 ),
-  tNamedValue("Huge",   1 ),
-  tNamedValue(0,        6 )
-};
-
-
-
 
 class tEventWinDlg : public tPropertyListDlg
 {
-  tEventWin *EventWin;
+  tPianoWin *EventWin;
   //tNamedChoice xSize, ySize;
   tNamedValue* xSizes;
   tNamedValue* ySizes;
  public:
-  tEventWinDlg(tEventWin *w, tNamedValue *xSizes, tNamedValue *ySizes);
+  tEventWinDlg(tPianoWin *w, tNamedValue *xSizes, tNamedValue *ySizes);
   void AddProperties();
   virtual bool OnClose();
   virtual void OnCancel();
@@ -427,7 +401,7 @@ class tEventWinDlg : public tPropertyListDlg
 
 
 
-tEventWinDlg::tEventWinDlg(tEventWin *w, tNamedValue *xSizes, tNamedValue *ySizes)
+tEventWinDlg::tEventWinDlg(tPianoWin *w, tNamedValue *xSizes, tNamedValue *ySizes)
   : tPropertyListDlg( "Settings" )
   //    xSize("Event Size", xSizes, &w->ClocksPerPixel),
   // ySize("Font Size",  ySizes, &w->FontSize)
@@ -497,12 +471,16 @@ void tEventWin::SettingsDialog(int piano)
   //  DialogBox = new wxDialogBox(this, "Window Settings", FALSE );
 
   //JAVE this is hardly very elegant, should be handled with polymorphism instead FIXME
+  /* FIXME PAT - I stole tEventWinDlg for my own uses with tPianoWin.  As far
+     as I know, Dave will have made a copy or something in his changes.
+     Right now, the settings dialog won't work for the track win due to these
+     changes.
   if (piano)
     dlg = new tEventWinDlg(this, PianoEventSizes, PianoFontSizes);
   else
     dlg = new tEventWinDlg(this, TrackEventSizes, TrackFontSizes);
   dlg->Create();
-
+  */
 }
 
 

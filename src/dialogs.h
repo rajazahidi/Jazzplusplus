@@ -276,10 +276,10 @@ class tQuantizeDlg : public tPropertyListDlg
 // **************************************************************************
 
 class tEvent;
-class tEventWin;
+class tPianoWin;
 class tEventArray;
 
-void EventDialog(tEvent *, tEventWin *, tTrack *, long Clock, int Channel, int Pitch);
+void EventDialog(tEvent *, tPianoWin *, tTrack *, long Clock, int Channel, int Pitch);
 
 #endif
 

@@ -208,7 +208,7 @@ void CtrlChannelAftertouchEdit();
   void LineText(wxDC *dc, long x, long y, long w, const char *str, int h = -1, Bool down = FALSE);
   long x2BarClock(long x, int next);
   int OnEventWinMouseEvent(wxMouseEvent &e);
-  void OnEventWinPaintSub(wxDC *dc, long x, long y);
+  void OnEventWinPaintSub(long x, long y);
   long y2yLine(long y, int up = 0);
   void GetVirtSize(long *w, long *h);
   Bool OnCharHook(wxKeyEvent& e);

@@ -31,7 +31,11 @@
 class tResourceElement {
  public:
   wxString *string;
+  bool *boolptr;
+  long *longptr;
+
   wxString resource;
+  wxArrayLong longarr;
 
   tResourceElement();
 };
@@ -80,6 +84,9 @@ class tResourceDialog {
   int ShowModal();
 
  private:
+  bool LoadData(tResourceElement *elem, wxWindow *win);
+  bool StoreData(tResourceElement *elem, wxWindow *win);
+
   static bool initialized;    // If the resource system has been initialized.
 
   tResourceElementList links; // List of associations created by Attach.

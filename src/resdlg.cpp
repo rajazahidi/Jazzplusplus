@@ -29,6 +29,9 @@
 tResourceElement::tResourceElement() {
   // Set all pointer fields to zero.
   string = 0;
+  longptr = 0;
+  boolptr = 0;
+  wxArrayLong longarr;
 }
 
 
@@ -80,54 +83,141 @@ int tResourceDialog::ShowModal() {
   // produced by the system at some point.
   if(!dialog) return wxID_CANCEL;
 
+
+  // Iterate through the list of attachments.  If we can't find the resource,
+  // let the user know.  Upon finding the resource, attempt to load the
+  // current value(s) into it.
+
+  wxtResourceElementListNode *node = links.GetFirst();
+  tResourceElement *elem;
+  
+  while(node) {
+    elem = node->GetData();
+
+    wxWindow *win = wxWindow::FindWindowByName(elem->resource, dialog);
+
+    if(!win) {
+      wxMessageBox("Unable to locate widget named:\n"
+		   "    " + elem->resource + "\n"
+		   "Tried to find it in the dialog named:\n"
+		   "    " + dialogName,
+		   "Error Finding Resource",
+		   wxOK | wxICON_ERROR);
+      return wxID_CANCEL;
+    }
+
+    if(!LoadData(elem, win)) return wxID_CANCEL;
+
+    node = node->GetNext();
+  }
+
   int res = dialog->ShowModal();
 
   if(res == wxID_OK) {
     wxtResourceElementListNode *node = links.GetFirst();
-
     tResourceElement *elem;
-    bool used;
 
     // Iterate through list of attached links.  For each link, try and move
     // the data from the wxWidget to the location of the relevant pointer.
-    // If no transfer succeeds, print an error message.
 
     while(node) {
       elem = node->GetData();
-      used = 0;
 
       wxWindow *win = wxWindow::FindWindowByName(elem->resource, dialog);
 
-      if(!win) {
-	wxMessageBox("Unable to locate widget named:\n"
-		     "    " + elem->resource + "\n"
-		     "Tried to find it in the dialog named:\n"
-                     "    " + dialogName,
-		     "Error Finding Resource",
-		     wxOK | wxICON_ERROR);
-	return wxID_CANCEL;
-      }
-
-      if(elem->string) {
-        if(typeid(*win) == typeid(wxTextCtrl)) {
-          used = 1;
-          *(elem->string) = ((wxTextCtrl*)win)->GetValue();
-        }
-      }
-
-      if(!used) {
-	wxMessageBox("Unable to locate mapping for resource dialog:\n"
-		     "    " + dialogName + "\n"
-		     "No known association for the control named:\n"
-                     "    " + elem->resource,
-		     "Error Storing Data",
-		     wxOK | wxICON_ERROR);
-	return wxID_CANCEL;
-      }
+      if(!StoreData(elem, win)) return wxID_CANCEL;
 
       node = node->GetNext();
     }
   }
 
   return res;
+}
+
+bool tResourceDialog::LoadData(tResourceElement *elem, wxWindow *win) {
+  bool used = 0;
+
+  if(elem->string) {
+    if(win->IsKindOf(CLASSINFO(wxTextCtrl))) {
+      used = 1;
+      ((wxTextCtrl*)win)->SetValue(*(elem->string));
+    }
+  } else if(elem->boolptr) {
+    /*
+    if(win->IsKindOf(CLASSINFO(wxCheckBox))) {
+      used = 1;
+      *(elem->bool) = ((wxCheckBox*)win)->GetValue();
+    }
+    */
+  } else if(elem->longptr) {
+    /*
+    if(win->IsKindOf(CLASSINFO(wxChoice))) {
+      wxChoice *choice = win;
+      if(choice->GetCount() != longarr.GetCount()) {
+	wxMessageBox("Error handling data for the control named:\n"
+		     "    " + elem->resource + "\n"
+		     "Length mismatch with designated translation array.",
+		     "Error Storing Data",
+		     wxOK | wxICON_ERROR);
+      } else {
+	int sel = choice->GetSelection();
+	
+	*(elem->longptr) = longarr[choice->GetSelection()];
+	used = 1;
+      }
+    }
+    */
+  }
+  
+  if(!used) {
+    wxMessageBox("Unable to locate a mapping for resource dialog:\n"
+		 "    " + dialogName + "\n"
+		 "No valid association for the control named:\n"
+		 "    " + elem->resource,
+		 "Error Storing Data",
+		 wxOK | wxICON_ERROR);
+  }
+}
+
+bool tResourceDialog::StoreData(tResourceElement *elem, wxWindow *win) {
+  // We don't need to do as much error checking here.  Most of that will have
+  // been done in LoadData.
+  bool used;
+
+  if(elem->string) {
+    if(win->IsKindOf(CLASSINFO(wxTextCtrl))) {
+      used = 1;
+      *(elem->string) = ((wxTextCtrl*)win)->GetValue();
+    }
+  } else if(elem->boolptr) {
+    if(win->IsKindOf(CLASSINFO(wxCheckBox))) {
+      used = 1;
+      *(elem->boolptr) = ((wxCheckBox*)win)->GetValue();
+    }
+  } else if(elem->longptr) {
+    if(win->IsKindOf(CLASSINFO(wxChoice))) {
+      wxChoice *choice = (wxChoice*)win;
+      if(choice->GetCount() != elem->longarr.GetCount()) {
+	wxMessageBox("Error handling data for the control named:\n"
+		     "    " + elem->resource + "\n"
+		     "Length mismatch with designated translation array.",
+		     "Error Storing Data",
+		     wxOK | wxICON_ERROR);
+      } else {
+	int sel = choice->GetSelection();
+	
+	*(elem->longptr) = elem->longarr[choice->GetSelection()];
+	used = 1;
+      }
+    }
+  }
+  
+  if(!used) {
+    wxMessageBox("Unable to locate a mapping for resource dialog:\n"
+		 "    " + dialogName + "\n"
+		 "No valid association for the control named:\n"
+		 "    " + elem->resource,
+		 "Error Storing Data",
+		 wxOK | wxICON_ERROR);
+  }
 }

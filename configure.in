@@ -95,6 +95,8 @@ dnl   fi
     
     AM_PATH_ALSA(0.9.0)
 
+    LIBS="$LIBS $ALSA_LIBS"
+
 fi
 
 dnl ---------------------------------------
@@ -146,8 +148,12 @@ dnl im not exactly shure which is the minimal wxwin version required for jazz, b
      
      LDFLAGS="$LDFLAGS $WX_LIBS"
 
-LIBS="$LIBS $ALSA_LIBS"
-echo libs: $LIBS  cxxflags: $CXXFLAGS
+dnl We don't yet have an automatic check for the wxxrc library, so we just
+dnl stick it here as a quick hack.  It's too bad it's not part of the core
+dnl wxWidgets distribution yet.  On debian you need to install the contrib-dev
+dnl stuff.  In any case, the wxxrc library comes with the wxWidgets contrib
+dnl material.
+LIBS="$LIBS -lwx_gtk_xrc-2.4"
 
 AC_OUTPUT( 
   Makefile  

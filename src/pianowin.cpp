@@ -206,6 +206,33 @@ const char mouse_help[] =
         "    +ctrl: decrease velocity\n"
         "    +ctrl+shift: copy\n";
 
+
+static tNamedValue PianoFontSizes[] =
+{
+  tNamedValue("Tiny",    6 ),
+#ifndef wx_msw
+  tNamedValue("Small",   7 ), // msw does not have this??
+#endif
+  tNamedValue("Medium",  8 ),
+  tNamedValue("Large",  10 ),
+  tNamedValue("Huge",   12 ),
+
+  tNamedValue(0,         8 )
+};
+
+
+static tNamedValue PianoEventSizes[] =
+{
+  tNamedValue("Tiny",   16 ),
+  tNamedValue("Small",  8 ),
+  tNamedValue("Medium", 4 ),
+  tNamedValue("Large",  2 ),
+  tNamedValue("Huge",   1 ),
+  tNamedValue(0,        6 )
+};
+
+
+
 // -------------------------------------------------------------------------
 // MousePiano
 // -------------------------------------------------------------------------
@@ -413,9 +440,6 @@ void tPianoWin::Setup()
   long lx,ly;
 
   wxDC *dc = new wxClientDC(Canvas);
-
-  cout << "NAAAAAAAAAAAAAAAAAAAAAME " << typeid(*dc).name() << endl;
-  cout << "NAAAAAAAAAAAAAAAAAAAAAME " << typeid(this).name() << endl;
 
   dc->SetFont(wxNullFont);
   delete FixedFont;
@@ -1032,7 +1056,7 @@ void tPianoWin::OnPaintSub(wxDC* dc, long x, long y)
 
   long OldFromClock = FromClock;
 
-  OnEventWinPaintSub(dc, x, y);
+  OnEventWinPaintSub(x, y);
 
 // SN++ Da Jazz nun eine ReDo Funktion hat. Behebt gleichzeitig ein kleines
 //		Update Problem beim mehrfachen ZoomOut.
@@ -1653,8 +1677,9 @@ void tPianoWin::Copy(tTrack *t, tEvent *e, int Kill)
 #endif
     }
 
-  wxDC* dc=new wxClientDC(this);
-    DrawEvent(dc, e, wxWHITE_BRUSH, 0);
+    wxClientDC dc(Canvas);
+    Canvas->PrepareDC(dc);
+    DrawEvent(&dc, e, wxWHITE_BRUSH, 0);
     t->Kill(e);
     t->Cleanup();
   }
@@ -1722,8 +1747,9 @@ void tPianoWin::Paste(tTrack *t, long Clock, int Pitch)
       if (k)
 	Listen.KeyOn(Track, k->Key, k->Channel, k->Veloc, k->Length);
 #endif
-      wxDC* dc=new wxClientDC(this);
-      DrawEvent(dc, c, c->GetBrush(), 0, 1);
+      wxClientDC dc(Canvas);
+      Canvas->PrepareDC(dc);
+      DrawEvent(&dc, c, c->GetBrush(), 0, 1);
       t->Put(c);
       e = Iterator.Next();
     }
@@ -1886,7 +1912,8 @@ tKeyLengthDragger::tKeyLengthDragger(tKeyOn *k, tPianoWin *w)
   // SN++ BUG FIX: undo/redo
   Win->Song->NewUndoBuffer();
   //
-  wxClientDC dc(w->Canvas);
+  wxClientDC dc(Win->Canvas);
+  Win->Canvas->PrepareDC(dc); //to translate scrolled coordinates
   Win->DrawEvent(&dc, Copy, wxWHITE_BRUSH, 0);
   Win->DrawEvent(&dc, Copy, Copy->GetBrush(), 1, 1);
 }
@@ -1903,6 +1930,7 @@ int tKeyLengthDragger::Dragging(wxMouseEvent &e)
   long fx, fy;
 
   wxClientDC dc(Win->Canvas);
+  Win->Canvas->PrepareDC(dc); //to translate scrolled coordinates
   Win->DrawEvent(&dc, Copy, Copy->GetBrush(), 1, 1);
   Win->LogicalMousePosition(e, &fx, &fy);
   long Clock = Win->x2Clock(fx);
@@ -1917,9 +1945,11 @@ int tKeyLengthDragger::Dragging(wxMouseEvent &e)
 
 int tKeyLengthDragger::ButtonUp(wxMouseEvent &e)
 {
-  wxDC* dc=new wxClientDC(Win);
-  Win->DrawEvent(dc, Copy, Copy->GetBrush(), 1, 1);
-  Win->DrawEvent(dc, Copy, Copy->GetBrush(), 0, 1);
+  // PAT - Since we repaint below, these calls are basically redundant.
+  //wxClientDC dc(Win->Canvas);
+  //Win->Canvas->PrepareDC(dc);
+  //Win->DrawEvent(&dc, Copy, Copy->GetBrush(), 1, 1);
+  //Win->DrawEvent(&dc, Copy, Copy->GetBrush(), 0, 1);
 
   // SN++ Key_Aftertouch
   if (Copy->Length < KeyOn->Length) {
@@ -1984,9 +2014,10 @@ tPlayTrackLengthDragger::tPlayTrackLengthDragger(tPlayTrack *k, tPianoWin *w)
   // SN++ BUG FIX: undo/redo
   Win->Song->NewUndoBuffer();
   //
-  wxDC* dc=new wxClientDC(Win);
-  Win->DrawEvent(dc, Copy, wxWHITE_BRUSH, 0);
-  Win->DrawEvent(dc, Copy, Copy->GetBrush(), 1, 1);
+  wxClientDC dc(Win->Canvas);
+  Win->Canvas->PrepareDC(dc);
+  Win->DrawEvent(&dc, Copy, wxWHITE_BRUSH, 0);
+  Win->DrawEvent(&dc, Copy, Copy->GetBrush(), 1, 1);
 }
 
 int tPlayTrackLengthDragger::Event(wxMouseEvent &e)
@@ -1999,8 +2030,9 @@ int tPlayTrackLengthDragger::Event(wxMouseEvent &e)
 int tPlayTrackLengthDragger::Dragging(wxMouseEvent &e)
 {
   long fx, fy;
-  wxDC* dc=new wxClientDC(Win);
-  Win->DrawEvent(dc, Copy, Copy->GetBrush(), 1, 1);
+  wxClientDC dc(Win->Canvas);
+  Win->Canvas->PrepareDC(dc);
+  Win->DrawEvent(&dc, Copy, Copy->GetBrush(), 1, 1);
   Win->LogicalMousePosition(e, &fx, &fy);
   long Clock = Win->x2Clock(fx);
   int  Length = Clock - Copy->Clock;
@@ -2008,15 +2040,16 @@ int tPlayTrackLengthDragger::Dragging(wxMouseEvent &e)
     Length = 1;
   Copy->eventlength = Length; 
 
-  Win->DrawEvent(dc, Copy, Copy->GetBrush(), 1, 1);
+  Win->DrawEvent(&dc, Copy, Copy->GetBrush(), 1, 1);
   return 0;
 }
 
 int tPlayTrackLengthDragger::ButtonUp(wxMouseEvent &e)
 {
-  wxDC* dc=new wxClientDC(Win);
-  Win->DrawEvent(dc, Copy, Copy->GetBrush(), 1, 1);
-  Win->DrawEvent(dc, Copy, Copy->GetBrush(), 0, 1);
+  wxClientDC dc(Win->Canvas);
+  Win->Canvas->PrepareDC(dc);
+  Win->DrawEvent(&dc, Copy, Copy->GetBrush(), 1, 1);
+  Win->DrawEvent(&dc, Copy, Copy->GetBrush(), 0, 1);
 
   Win->Track->Kill(KeyOn);
   Win->Track->Put(Copy);
@@ -2055,8 +2088,8 @@ class tVelocCounter : public tMouseCounter
       // SN++ BUG FIX: undo/redo
       Win->Song->NewUndoBuffer();
       //
-      wxDC* dc=new wxClientDC(Win);
-      dc->SetFont(*(Win->FixedFont));
+      wxClientDC dc(Win->Canvas);
+      dc.SetFont(*(Win->FixedFont));
     }
 };
 
@@ -2073,6 +2106,7 @@ int tVelocCounter::Event(wxMouseEvent &e)
     Win->Track->Cleanup();
 
     wxClientDC dc(Win->Canvas);
+    Win->Canvas->PrepareDC(dc);
     Win->DrawEvent(&dc, Copy, Copy->GetBrush(), 0, 1);
 
     if (Win->CtrlEdit)
@@ -2096,10 +2130,9 @@ void tPianoWin::MouseCutPaste(wxMouseEvent &e, Bool cut)
 {
 
   //converts physical coords to logical(scrolled) coords
-  wxClientDC* scrolledDC=new wxClientDC(Canvas);
-  Canvas->PrepareDC(*scrolledDC);
-  wxPoint point=e.GetLogicalPosition(*scrolledDC);
-  delete scrolledDC;
+  wxClientDC dc(Canvas);
+  Canvas->PrepareDC(dc);
+  wxPoint point=e.GetLogicalPosition(dc);
 
   long   x=point.x;
   long   y=point.y;
@@ -2175,8 +2208,7 @@ void tPianoWin::MouseEvents(wxMouseEvent &e)
 
 
       case MA_DIALOG	:
-	// FIXME PAT - Commented out due to "this" previously being tEventWin.
-	//EventDialog(m, this, Track, Clock, Track->Channel - 1, Pitch);
+	EventDialog(m, this, Track, Clock, Track->Channel - 1, Pitch);
         break;
 
 
@@ -2223,17 +2255,16 @@ void tPianoWin::ShowPitch(int pitch)
   long line = y2Line(Pitch2y(pitch)); //this is the current position of the mouse, MouseLine is the last position
   if (line >= FromLine && line != MouseLine)
   {
-    wxDC* dc=new wxClientDC(Canvas);
-    Canvas->PrepareDC(*dc); //to translate scrolled coordinates (doesnt work?!?)
-    dc->SetLogicalFunction(wxXOR);
-    //dc->SetBrush(wxBLACK_BRUSH);
-    dc->SetBrush(*wxBLUE_BRUSH);
+    wxClientDC dc(Canvas);
+    Canvas->PrepareDC(dc); //to translate scrolled coordinates
+    dc.SetLogicalFunction(wxXOR);
+    //dc.SetBrush(wxBLACK_BRUSH);
+    dc.SetBrush(*wxBLUE_BRUSH);
     if (MouseLine >= 0) 
-      dc->DrawRectangle(xPiano, Line2y(MouseLine) + LittleBit, wPiano, hLine - 2*LittleBit); //erase the previous highlight
+      dc.DrawRectangle(xPiano, Line2y(MouseLine) + LittleBit, wPiano, hLine - 2*LittleBit); //erase the previous highlight
     MouseLine = line;
-    dc->DrawRectangle(xPiano, Line2y(MouseLine) + LittleBit, wPiano, hLine - 2*LittleBit); //draw the new position
-    dc->SetLogicalFunction(wxCOPY);
-    delete dc;
+    dc.DrawRectangle(xPiano, Line2y(MouseLine) + LittleBit, wPiano, hLine - 2*LittleBit); //draw the new position
+    dc.SetLogicalFunction(wxCOPY);
   }
 }
 
@@ -2651,10 +2682,24 @@ long tPianoWin::Line2y(long Line)
   return Line * hLine + hTop;
 }
 
+// FIXME PAT - Quick hack to get tEventWinDlg from eventwin.cpp.
+
+class tEventWinDlg : public tPropertyListDlg
+{
+  tPianoWin *EventWin;
+  //tNamedChoice xSize, ySize;
+  tNamedValue* xSizes;
+  tNamedValue* ySizes;
+ public:
+  tEventWinDlg(tPianoWin *w, tNamedValue *xSizes, tNamedValue *ySizes);
+  void AddProperties();
+  virtual bool OnClose();
+  virtual void OnCancel();
+  virtual void OnHelp();
+};
+
 void tPianoWin::SettingsDialog()
 {
-  /* FIXME PAT - Commented out due to "this" no longer being tEventWin.
-
   tEventWinDlg *dlg;
   if (DialogBox)
   {
@@ -2666,7 +2711,6 @@ void tPianoWin::SettingsDialog()
 
   dlg = new tEventWinDlg(this, PianoEventSizes, PianoFontSizes);
   dlg->Create();
-  */
 }
 
 int tPianoWin::EventsSelected(const char *msg)
@@ -2689,8 +2733,7 @@ void tPianoWin::ZoomIn()
     long x = CanvasX * 2;
     long y = CanvasY;
 
-    wxDC* dc=new wxClientDC(Canvas);
-    OnEventWinPaintSub(dc, x, y);
+    OnEventWinPaintSub(x, y);
     Canvas->SetScrollRanges();
     Canvas->SetScrollPosition(x, y);
     if (x == 0)
@@ -2706,8 +2749,7 @@ void tPianoWin::ZoomOut()
     long x = CanvasX / 2;
     long y = CanvasY;
 
-    wxDC* dc=new wxClientDC(Canvas);
-    OnEventWinPaintSub(dc, x, y);
+    OnEventWinPaintSub(x, y);
     Canvas->SetScrollRanges();
     Canvas->SetScrollPosition(x, y);
     if (x == 0)
@@ -2847,12 +2889,10 @@ int tPianoWin::OnEventWinMouseEvent(wxMouseEvent &e)
   return 0;
 }
 
-void tPianoWin::OnEventWinPaintSub(wxDC *dc, long x, long y)
+void tPianoWin::OnEventWinPaintSub(long x, long y)
 {
-  //printf("OnEventWinPaintSub: x %ld, y %ld, w %ld, h %ld\n", x, y, w, h);
   CanvasX = x;
   CanvasY = y;
-// wxCanvas::GetClientSize returns huge values, at least in wx_xt
   int xc, yc;
   GetClientSize(&xc, &yc);
   CanvasW = xc;
@@ -2862,7 +2902,6 @@ void tPianoWin::OnEventWinPaintSub(wxDC *dc, long x, long y)
   yEvents = CanvasY + hTop;
   wEvents = CanvasW - wLeft;
   hEvents = CanvasH - hTop;
-  //printf("EventWin::OnPaint: xe %ld, ye %ld, we %ld, he %ld\n", xEvents, yEvents, wEvents, hEvents);
 
   FromLine = CanvasY / hLine; 
   ToLine   = (CanvasY + CanvasH - hTop) / hLine;
@@ -3038,7 +3077,7 @@ void tPianoWin::InitColors()
   int i, c;
   for (i = 0; i < NUM_COLORS; i++) {
     c = 256 * i / NUM_COLORS; 
-    color_brush[i].SetColour(0, c, 127-c/2);
+    color_brush[i].SetColour(c, 0, 127-c/2);
     color_brush[i].SetStyle(wxSOLID);
   }
 }

@@ -2919,5 +2919,5 @@ bool tPianoWin::ActCloseEvent(wxCloseEvent &e)
 }
 
 void tPianoWin::ActHelpMouse() {
-  wxMessageBox((char *)mouse_help, "Mouse Help");
+  wxMessageBox(mouse_help, "Mouse Help");
 }

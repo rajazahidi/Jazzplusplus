@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-SUBDIRS = src conf
+SUBDIRS = xrc src conf
 
 #some extra things to distribute
 # things to fix:

@@ -598,7 +598,7 @@ BEGIN_EVENT_TABLE(tPianoWin, wxFrame)
 //  EVT_MENU    (MEN_VELOC ,	tPianoWin::MenVelocity)
 //  EVT_MENU    (MEN_LENGTH, tPianoWin::MenLength)
 //  EVT_MENU    (MEN_SEQLENGTH,  	tPianoWin::MenSeqLength)
-//  EVT_MENU    (MEN_MIDIDELAY, tPianoWin::MenMidiDelay)
+  EVT_MENU    (MEN_MIDIDELAY, tPianoWin::ActMidiDelayDialog)
 //  EVT_MENU    (MEN_CONVERT_TO_MODULATION ,	tPianoWin::MenConvertToModulation)
   EVT_MENU    (ACT_SETTINGS, tPianoWin::ActSettingsDialog)
   EVT_MENU    (MEN_FILTER,tPianoWin::OnFilter)
@@ -2602,6 +2602,36 @@ void tPianoWin::ActSettingsDialog()
     Redraw();
   }
 }
+
+/////JAVE 
+/// this is a test to see how to implement a dialog with patricks system
+/// it replaces tMidiDelayDlg
+void tPianoWin::ActMidiDelayDialog()
+{
+  double scale = 0.5;
+  long clockDelay = 10;
+  int repeat = 6;
+
+  jppResourceDialog dialog(this, "midiDelay");
+  
+ //  dialog.Attach("scale", &scale);
+//   dialog.Attach("clockDelay", &clockDelay);
+//   dialog.Attach("repeat", &repeat);
+
+  if(dialog.ShowModal() == wxID_OK) {
+    //execute the command
+     tCmdMidiDelay cmd(Filter, scale,clockDelay,repeat);
+     cmd.Execute();
+
+    Setup();//??
+    Canvas->SetScrollRanges();
+    Redraw();
+  }
+}
+////////////
+
+
+
 
 int tPianoWin::EventsSelected(const char *msg)
 {

@@ -492,22 +492,29 @@ void tMidiDelayDlg::OnHelp()
 void tMidiDelayDlg::AddProperties()
 {
 
-//   Add(wxMakeFormMessage("MIDI delay line"));
-//   Add(wxMakeFormNewLine());
-//   Add(wxMakeFormDouble("Scale", &scale, wxFORM_DEFAULT,
-//                        new wxList(wxMakeConstraintRange(0.0, 4.0), 0)));
-//   Add(wxMakeFormNewLine());
-//   Add(wxMakeFormLong("Delay in clocks ", &clockDelay, wxFORM_DEFAULT,
-//                        new wxList(wxMakeConstraintRange(-100.0, 1000.0), 0)));
-//   Add(wxMakeFormNewLine());
-//   Add(wxMakeFormShort("Repeats ", &repeat, wxFORM_DEFAULT,
-//                        new wxList(wxMakeConstraintRange(0.0, 100.0), 0)));
-//   Add(wxMakeFormNewLine());
+  // Old system:
+  //   Add(wxMakeFormMessage("MIDI delay line"));
+  //   Add(wxMakeFormNewLine());
+  //   Add(wxMakeFormDouble("Scale", &scale, wxFORM_DEFAULT,
+  //                        new wxList(wxMakeConstraintRange(0.0, 4.0), 0)));
+  //   Add(wxMakeFormNewLine());
+  //   Add(wxMakeFormLong("Delay in clocks ", &clockDelay, wxFORM_DEFAULT,
+  //                        new wxList(wxMakeConstraintRange(-100.0, 1000.0), 0)));
+  //   Add(wxMakeFormNewLine());
+  //   Add(wxMakeFormShort("Repeats ", &repeat, wxFORM_DEFAULT,
+  //                        new wxList(wxMakeConstraintRange(0.0, 100.0), 0)));
+  //   Add(wxMakeFormNewLine());
+  
+  //   AssociatePanel(panel);
 
-//   AssociatePanel(panel);
-  sheet->AddProperty(new wxProperty("Scale",  wxPropertyValue((double*)&scale), "real", new wxRealListValidator(0.0001, 4.0)));
-  sheet->AddProperty(new wxProperty("Delay in clocks",  wxPropertyValue((long*)&clockDelay), "integer", new wxIntegerListValidator(-1000, 1000)));
-  sheet->AddProperty(new wxProperty("Repeats",  wxPropertyValue((long*)&repeat), "integer", new wxIntegerListValidator(0, 100)));
+  //System 2:
+  //   sheet->AddProperty(new wxProperty("Scale",  wxPropertyValue((double*)&scale), "real", new wxRealListValidator(0.0001, 4.0)));
+  //   sheet->AddProperty(new wxProperty("Delay in clocks",  wxPropertyValue((long*)&clockDelay), "integer", new wxIntegerListValidator(-1000, 1000)));
+  //   sheet->AddProperty(new wxProperty("Repeats",  wxPropertyValue((long*)&repeat), "integer", new wxIntegerListValidator(0, 100)));
+
+  //System 3:
+
+
 
 }
 

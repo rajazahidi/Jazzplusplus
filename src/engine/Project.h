@@ -131,6 +131,9 @@ class jppProject  : public tSong
         /// Beats me what this does.
         void SetLoopClock(long newclock);
 
+		/// Sets selection
+//        void SetSelection();
+
 		/// Beats me what this does.
         tRecordInfo *GetRecInfo();
         /// Sets RecInfo, jppProject takes ownership of this object

@@ -1330,14 +1330,14 @@ tSeq2Player::~tSeq2Player()
      int k = dialog->GetSelection();
      dialog->Destroy();
 
-     delete devs;
+     delete [] devs;
 
      if(res == wxCANCEL) k = -1;
 
      return k;
 
    } else {
-     delete devs;
+     delete [] devs;
      cerr << "no midi device found!\n";
      return -1;
    }

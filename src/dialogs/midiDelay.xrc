@@ -20,6 +20,19 @@
             </object>
           </object>
           <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>The Midi Delay allows you to simulate an echo
+by copying a set of events repeatedly and 
+scale the velocity for each repeat.
+
+The delay can also be used unorthodoxly to just
+generate a number of copies(with scale=100),
+and to generate weird effects
+(with negative clock values, or scale &gt; 100)
+</label>
+            </object>
+          </object>
+          <object class="sizeritem">
             <object class="wxFlexGridSizer">
               <cols>2</cols>
               <rows>3</rows>
@@ -30,7 +43,7 @@
                 <flag>wxALIGN_CENTRE_VERTICAL</flag>
               </object>
               <object class="sizeritem">
-                <object class="wxSlider" name="repeat">
+                <object class="wxSlider" name="repeats">
                   <value></value>
                   <min></min>
                   <max>100</max>

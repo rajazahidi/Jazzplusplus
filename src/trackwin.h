@@ -105,9 +105,7 @@ class tTrackWin : public tEventWin,
     wxMenu *save_settings_menu;
     wxMenu *misc_menu;
     wxMenu *help_menu;
-    #ifdef AUDIO
     wxMenu *audio_menu;
-    #endif
 
     void EnableDisableMenus();
 
@@ -137,7 +135,7 @@ class tTrackWin : public tEventWin,
     virtual ~tTrackWin();
 
     void CreateMenu();
-    void OnMenuCommand(int Id);
+    //void OnMenuCommand(int Id);
     void OnPaintSub(wxDC* dc,long x, long y);
     void SnapSelStart(wxMouseEvent &e);
     void SnapSelStop(wxMouseEvent &e);

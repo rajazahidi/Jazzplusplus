@@ -572,14 +572,12 @@ class tJazzMeta : public tMetaEvent
       memcpy(Data, "JAZ2", 4);
       Data[4] = 1; // version or so
     }
-#ifdef AUDIO
     char GetAudioMode() const {
       return Data[5];
     }
     void SetAudioMode(char c) {
       Data[5] = c;
     }
-#endif
     char GetTrackState() const {
       return Data[6];
     }

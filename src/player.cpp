@@ -40,9 +40,7 @@
 #include <sys/ioctl.h>
 #endif
 
-#ifdef AUDIO
 #include "audio.h"
-#endif
 
 #define dprintf(a)  printf a
 #define ddprintf(a)  printf a
@@ -177,9 +175,7 @@ void tPlayLoop::PrepareOutput(
 
 
 tPlayer::tPlayer(tSong *song)
-#ifdef AUDIO
   : samples( song->TicksPerQuarter * song->Speed() )
-#endif
 {
   DummyDeviceList.add("default");
   poll_millisec = 200;  // default
@@ -187,9 +183,7 @@ tPlayer::tPlayer(tSong *song)
   OutClock = 0;
   Playing = 0;
   PlayLoop = new tPlayLoop();
-#ifdef AUDIO
   AudioBuffer = 0;
-#endif
   rec_info = 0;
 }
 
@@ -218,10 +212,8 @@ void tPlayer::StartPlay(long Clock, long LoopClock, int Continue)
   Clock = PlayLoop->Int2ExtClock(Clock);
   PlayBuffer.Clear();
   RecdBuffer.Clear();
-#ifdef AUDIO
   if (AudioBuffer)
     AudioBuffer->Clear();
-#endif
 
   tTrack *t;
 
@@ -367,10 +359,8 @@ void tPlayer::StartPlay(long Clock, long LoopClock, int Continue)
   OutClock = Clock + FIRST_DELTACLOCK;
   TrackWin->NewPlayPosition(PlayLoop->Ext2IntClock(Clock));
   PlayLoop->PrepareOutput(&PlayBuffer, Song, Clock, Clock + FIRST_DELTACLOCK, 0);
-#ifdef AUDIO
   if (AudioBuffer)
      PlayLoop->PrepareOutput(AudioBuffer, Song, Clock, Clock + FIRST_DELTACLOCK, 1);
-#endif
   PlayBuffer.Length2Keyoff();
 
   // Notify() has to be called very often because voxware
@@ -428,10 +418,8 @@ void tPlayer::Notify()
   {
     dprintf(("*** Notify: more events to playbuffer\n"));
     PlayLoop->PrepareOutput(&PlayBuffer, Song, OutClock, Now + DELTACLOCK, 0);
-#ifdef AUDIO
     if (AudioBuffer)
       PlayLoop->PrepareOutput(AudioBuffer, Song, OutClock, Now + DELTACLOCK, 1);
-#endif
     OutClock = Now + DELTACLOCK;
     PlayBuffer.Length2Keyoff();
   }
@@ -1455,11 +1443,9 @@ int tSeq2Player::OutEvent(tEvent *e, int now)
 	}
 	else
 	{
-#ifdef AUDIO
-	   if (!GetAudioEnabled())
-#endif
-	      if (e->Clock > 0)
-		 SEQ_SET_TEMPO(bpm);
+	  if (!GetAudioEnabled())
+	    if (e->Clock > 0)
+	      SEQ_SET_TEMPO(bpm);
 	}
       }
       break;
@@ -1595,9 +1581,7 @@ void tSeq2Player::StartPlay(long Clock, long LoopClock, int Continue)
 
   // start play
   SEQ_START_TIMER();
-#ifdef AUDIO
   StartAudio();
-#endif
   tPlayer::Notify();
   seqbuf_dump();
 }

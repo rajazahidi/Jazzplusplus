@@ -114,7 +114,7 @@ class tEventWin : public wxFrame
     long   wLeft;
     long   FontSize;
     long   ClocksPerPixel;
-    Bool   UseColors;
+    bool   UseColors;
 
     // Parameters changed, e.g. Song loaded
     virtual void Setup();

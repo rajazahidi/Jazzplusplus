@@ -482,9 +482,7 @@ tEventArray::tEventArray()
   Device = 0;
   ForceChannel = 0;
   State = tsPlay;
-#ifdef AUDIO
   audio_mode = 0;
-#endif
 
   Clear();
 }
@@ -566,9 +564,7 @@ void tEventArray::Clear()
   MaxEvents = 0;
 
   State = tsPlay;
-#ifdef AUDIO
   audio_mode = 0;
-#endif
 }
 
 
@@ -1113,9 +1109,7 @@ void tEventArray::Write(tWriteBase &io)
 
   // write jazz track info
   tJazzMeta jazz;
-#ifdef AUDIO
   jazz.SetAudioMode(audio_mode);
-#endif
   jazz.SetTrackState(State);
   jazz.SetTrackDevice(Device);
   jazz.SetIntroLength(TheSong->GetIntroLength());
@@ -1375,9 +1369,7 @@ class tTrackDlg : public wxForm
   long Device;
   long BankNr;
   int ClearTrack;
-#ifdef AUDIO
   int AudioMode;
-#endif
 
  public:
   tTrackDlg::tTrackDlg(tTrackWin *w, tTrack *t);
@@ -1415,9 +1407,8 @@ void tTrackDlg::OnOk()
 {
   trk->DialogBox->GetPosition( &Config(C_TrackDlgXpos), &Config(C_TrackDlgYpos) );
   trk->DialogBox = 0;
-#ifdef AUDIO
   trk->SetAudioMode(AudioMode);
-#endif
+
   if (ClearTrack) {
 	trk->Clear();
   	delete TrackName;
@@ -1519,11 +1510,9 @@ void tTrackDlg::EditForm(wxPanel *panel)
   }
   Add(wxMakeFormShort("Channel", &trk->Channel, wxFORM_DEFAULT,
                        new wxList(wxMakeConstraintRange(1.0, 16.0), 0)));
-#ifdef AUDIO
   AudioMode = trk->GetAudioMode();
   Add(wxMakeFormNewLine());
   Add(wxMakeFormBool("Audio Track", &AudioMode));
-#endif
   Add(wxMakeFormNewLine());
   Add(wxMakeFormBool("Force channel number onto all events on track", &trk->ForceChannel));
   ClearTrack = 0;
@@ -1630,11 +1619,9 @@ void tTrack::MergeRange(tEventArray *other, long FromClock, long ToClock, int Re
 
 void tTrack::Cleanup()
 {
-#ifdef AUDIO
   // on audio tracks, adjust length of keyon events to
   // actual sample length
   Midi->AdjustAudioLength(this);
-#endif
   tEventArray::Cleanup(TRUE);
 }
 

@@ -72,9 +72,7 @@ tWinPlayer::tWinPlayer(tSong *song)
   state->playing = FALSE;
   state->soft_thru = Config(C_SoftThru);
   state->doing_mtc_rec = FALSE;
-#ifdef AUDIO
   state->audio_player = 0;
-#endif
 
   long ilong = -1, olong = -1;
   if (!Config.Get(C_WinInputDevice, ilong) || !Config.Get(C_WinOutputDevice, olong))
@@ -622,10 +620,8 @@ void tWinPlayer::StartPlay(long Clock, long LoopClock, int Continue)
   state->play_time   = state->start_time;
   midiClockOut = Clock;
 
-#ifdef AUDIO
   if (GetAudioEnabled())
     state->play_buffer.put(START_AUDIO, state->start_time);
-#endif
 
   OutOfBandEvents.Clear();
   TrackWin->NewPlayPosition(PlayLoop->Ext2IntClock(Clock));

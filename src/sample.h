@@ -22,7 +22,6 @@
 #ifndef sample_h
 #define sample_h
 #include "config.h"
-#ifdef AUDIO
 
 class tSampleSet;
 #include <iostream>
@@ -405,6 +404,5 @@ class tSample {
 
 };
 
-#endif
 #endif
 

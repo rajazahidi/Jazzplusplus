@@ -1313,13 +1313,11 @@ void EventDialog(tEvent *e, tPianoWin *w, tTrack *t, long Clock, int Channel, in
   switch (e->Stat)
   {
     case StatKeyOn:
-#ifdef AUDIO
       if (t->GetAudioMode()) {
         if (!Midi->IsPlaying())
 	  Midi->EditSample(e->IsKeyOn()->Key);
 	break;
       }
-#endif
       str = "Key On";
       dlg = new tKeyOnDlg(e->IsKeyOn(), w, t);
       break;

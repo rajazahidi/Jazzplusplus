@@ -24,9 +24,7 @@
 #include "config.h"
 #include "song.h"
 #include "command.h"
-#ifdef AUDIO
 #include "audio.h"
-#endif
 
 
 
@@ -189,10 +187,9 @@ void tSong::MergeTracks(
     tTrack *t = Tracks[i];
     if (t->State == tsSolo || (!solo && t->State == tsPlay))
     {
-#ifdef AUDIO
       if (t->GetAudioMode() != mode)
         continue;
-#endif
+
       tEventIterator Iterator(Tracks[i]);
       tEvent *e = Iterator.Range(FrClock, ToClock);
       while (e)

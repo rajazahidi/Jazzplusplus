@@ -35,6 +35,7 @@
 #include "harmonyp.h"
 #include "hbanalyz.h"
 #include "toolbar.h"
+#include "resdlg.h"
 
 
 // ************************************************************************
@@ -207,28 +208,24 @@ const char mouse_help[] =
         "    +ctrl+shift: copy\n";
 
 
-static tNamedValue PianoFontSizes[] =
+static long PianoFontSizes[] =
 {
-  tNamedValue("Tiny",    6 ),
-#ifndef wx_msw
-  tNamedValue("Small",   7 ), // msw does not have this??
-#endif
-  tNamedValue("Medium",  8 ),
-  tNamedValue("Large",  10 ),
-  tNamedValue("Huge",   12 ),
-
-  tNamedValue(0,         8 )
+  6,  // Tiny
+  7,  // Small
+  8,  // Medium
+  10, // Large
+  12, // Huge
+  -1, // End of list
 };
 
-
-static tNamedValue PianoEventSizes[] =
+static long PianoEventSizes[] =
 {
-  tNamedValue("Tiny",   16 ),
-  tNamedValue("Small",  8 ),
-  tNamedValue("Medium", 4 ),
-  tNamedValue("Large",  2 ),
-  tNamedValue("Huge",   1 ),
-  tNamedValue(0,        6 )
+  16, // Tiny
+  8,  // Small
+  4,  // Medium
+  2,  // Large
+  1,  // Huge
+  -1, // End of list
 };
 
 
@@ -1307,9 +1304,7 @@ void tPianoWin::DrawPianoRoll(wxDC* dc)
   long y = Line2y(FromLine);
 
   if (VisibleKeyOn
-#ifdef AUDIO
       && !Track->GetAudioMode()
-#endif
       && (!Track->IsDrumTrack() || !VisibleDrumNames))
   {
     dc->SetFont(*FixedFont);
@@ -1347,7 +1342,6 @@ void tPianoWin::DrawPianoRoll(wxDC* dc)
     }
   }
 
-#ifdef AUDIO
   else if (Track->GetAudioMode())
   {
     dc->SetFont(*DrumFont);
@@ -1358,7 +1352,6 @@ void tPianoWin::DrawPianoRoll(wxDC* dc)
       --Pitch;
     }
   }
-#endif
 
   else
   {
@@ -1667,14 +1660,10 @@ void tPianoWin::Copy(tTrack *t, tEvent *e, int Kill)
     if (k)
     {
       kill_keys_aftertouch(t,e);
-#ifdef AUDIO
       if (Track->GetAudioMode())
 	Midi->ListenAudio(k->Key, 0);
       else
 	Listen.KeyOn(Track, k->Key, k->Channel, k->Veloc, k->Length);
-#else
-      Listen.KeyOn(Track, k->Key, k->Channel, k->Veloc, k->Length);
-#endif
     }
 
     wxClientDC dc(Canvas);
@@ -1735,7 +1724,6 @@ void tPianoWin::Paste(tTrack *t, long Clock, int Pitch)
       if (t->ForceChannel && c->IsChannelEvent())
         c->IsChannelEvent()->Channel = t->Channel - 1;
       tKeyOn *k = c->IsKeyOn();
-#ifdef AUDIO
       if (k)
       {
 	if (Track->GetAudioMode())
@@ -1743,10 +1731,6 @@ void tPianoWin::Paste(tTrack *t, long Clock, int Pitch)
 	else
 	  Listen.KeyOn(Track, k->Key, k->Channel, k->Veloc, k->Length);
       }
-#else
-      if (k)
-	Listen.KeyOn(Track, k->Key, k->Channel, k->Veloc, k->Length);
-#endif
       wxClientDC dc(Canvas);
       Canvas->PrepareDC(dc);
       DrawEvent(&dc, c, c->GetBrush(), 0, 1);
@@ -1836,14 +1820,12 @@ int tMousePlay::Event(wxMouseEvent &e)
   else
     return 0;
 
-#ifdef AUDIO
   if (Win->Track->GetAudioMode())
   {
     if (Pitch && Pitch != OldPitch)
       Midi->ListenAudio(Pitch, 0);
   }
   else
-#endif
 
   {
     if (OldPitch && OldPitch != Pitch)
@@ -2180,9 +2162,7 @@ void tPianoWin::MouseEvents(wxMouseEvent &e)
 
       case MA_LENGTH	:
         if (k) {
-#ifdef AUDIO
 	  if (!Track->GetAudioMode())
-#endif
 	    MouseAction = new tKeyLengthDragger(k, this);
 	}
 	else 
@@ -2700,17 +2680,17 @@ class tEventWinDlg : public tPropertyListDlg
 
 void tPianoWin::SettingsDialog()
 {
-  tEventWinDlg *dlg;
-  if (DialogBox)
-  {
-    DialogBox->Show(TRUE);
-    return;
+  tResourceDialog dialog(this, "windowSettings");
+  
+  dialog.Attach("use_colours", &UseColors);
+  dialog.Attach("event_size", &ClocksPerPixel, PianoEventSizes);
+  dialog.Attach("font_size", &FontSize, PianoFontSizes);
+
+  if(dialog.ShowModal() == wxID_OK) {
+    Setup();
+    Canvas->SetScrollRanges();
+    Redraw();
   }
-
-  //  DialogBox = new wxDialogBox(this, "Window Settings", FALSE );
-
-  dlg = new tEventWinDlg(this, PianoEventSizes, PianoFontSizes);
-  dlg->Create();
 }
 
 int tPianoWin::EventsSelected(const char *msg)

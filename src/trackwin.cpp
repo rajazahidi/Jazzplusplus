@@ -53,6 +53,7 @@
 #include "gui/trackwinEnum.h"
 #include "shuffle.h"
 #include "about.h"
+#include "resdlg.h"
 #include <stdlib.h>
 #include <unistd.h>
 #include <ctype.h>
@@ -558,16 +559,14 @@ void tTrackWin::CreateMenu()
     menu_bar->Append(parts_menu,   "&Parts");
     menu_bar->Append(setting_menu, "&Settings");
 
-    #ifdef AUDIO
-        audio_menu = new wxMenu();
-        audio_menu->Append(MEN_AUDIO_GLOBAL,        "&Global Settings ...");
-        audio_menu->Append(MEN_AUDIO_SAMPLES,       "Sample Se&ttings ... ");
-        audio_menu->Append(MEN_AUDIO_LOAD,          "&Load Set ...");
-        audio_menu->Append(MEN_AUDIO_SAVE,          "&Save Set");
-        audio_menu->Append(MEN_AUDIO_SAVE_AS,       "Save Set &As");
-        audio_menu->Append(MEN_AUDIO_NEW,           "&New Set");
-        menu_bar->Append(audio_menu, "&Audio");
-    #endif
+    audio_menu = new wxMenu();
+    audio_menu->Append(MEN_AUDIO_GLOBAL,        "&Global Settings ...");
+    audio_menu->Append(MEN_AUDIO_SAMPLES,       "Sample Se&ttings ... ");
+    audio_menu->Append(MEN_AUDIO_LOAD,          "&Load Set ...");
+    audio_menu->Append(MEN_AUDIO_SAVE,          "&Save Set");
+    audio_menu->Append(MEN_AUDIO_SAVE_AS,       "Save Set &As");
+    audio_menu->Append(MEN_AUDIO_NEW,           "&New Set");
+    menu_bar->Append(audio_menu, "&Audio");
 
     menu_bar->Append(help_menu,    "&Help");
 
@@ -625,6 +624,10 @@ void tTrackWin::EnableDisableMenus()
 
 
 // Old Event Loop.  Replace this as soon as possible and remove it from the code.
+/* PAT - This entire function doesn't seem to be called anywhere.  I commented
+   it out with no effect.  It's just here for reference since a few of the
+   items aren't moved elsewhere yet (ex. MEN_RHYTHM handling). */
+/*
 void tTrackWin::OnMenuCommand(int id)
 {
   char *s;
@@ -739,6 +742,7 @@ void tTrackWin::OnMenuCommand(int id)
 #endif // __PORTING
   }
 }
+*/
 
 // Has Event Macro
 void tTrackWin::OnLoad(){
@@ -1301,10 +1305,42 @@ void tTrackWin::OnFilter()
     Filter->Dialog(0);
 }
 
+
+static long TrackFontSizes[] =
+{
+  8,  // Tiny
+  10, // Small
+  12, // Medium
+  14, // Large
+  17, // Huge
+  -1, // End of List
+};
+
+static long TrackEventSizes[] =
+{
+  60, // Tiny
+  48, // Small
+  36, // Medium
+  24, // Large
+  12, // Huge
+  -1, // End of List
+};
+
 void tTrackWin::OnSettingsDialog()
 {
-    SettingsDialog(0);
+  tResourceDialog dialog(this, "windowSettings");
+  
+  dialog.Attach("use_colours", &UseColors);
+  dialog.Attach("event_size", &ClocksPerPixel, TrackEventSizes);
+  dialog.Attach("font_size", &FontSize, TrackFontSizes);
+
+  if(dialog.ShowModal() == wxID_OK) {
+    Setup();
+    Canvas->SetScrollRanges();
+    Redraw();
+  }
 }
+
 
 void tTrackWin::OnDevice()
 {
@@ -1699,11 +1735,9 @@ void tTrackWin::DrawNumbers(wxDC* dc)
         tTrack *t = Song->GetTrack(i);
         if (t != 0)
         {
-        #ifdef AUDIO
             if (t->GetAudioMode())
                 LineText(dc,xNumber, Line2y(i), wNumber, "Au");
             else
-        #endif
             {
                 char buf[20];
                 int  val;
@@ -2177,11 +2211,9 @@ int tSpeedCounter::Event(wxMouseEvent &e)
   {
     tTrack *t = tw->Song->GetTrack(0);
     t->SetDefaultSpeed(Value);
-#ifdef AUDIO
     for (int i = 0; i < tw->Song->nTracks; i++)
       Midi->AdjustAudioLength(tw->Song->GetTrack(i));
     tw->NextWin->Redraw();
-#endif
     tw->MouseAction = 0;
     delete this;
   }
@@ -2203,10 +2235,8 @@ void tTrackWin::MouseSpeed(wxMouseEvent &e)
   if (!e.LeftDown() && !e.RightDown())
     return;
 
-#ifdef AUDIO
   if (Midi->GetAudioEnabled() && Midi->Playing)
     return;
-#endif
 
   Value = Song->GetTrack(0)->GetDefaultSpeed();
   tSpeedCounter *SpeedCounter = new tSpeedCounter(this, &r, Value, 20, 250);
@@ -2506,13 +2536,8 @@ void tTrackWin::MousePlay(wxMouseEvent *e, MousePlayMode mode)
 	LineText(dc,xState, Line2y(RecInfo.TrackNr), wState, RecInfo.Track->GetStateChar());
 #endif // __PORTING
       }
-#ifdef AUDIO
-      if (RecInfo.Track->GetAudioMode())
-	;
-      else
-#endif
-      if (!Midi->RecdBuffer.IsEmpty())
-      {
+      if (!RecInfo.Track->GetAudioMode() && !Midi->RecdBuffer.IsEmpty())
+	{
 	//int choice = wxMessageBox("Keep recorded events?", "You played", wxOK | wxCANCEL);
 	//if (choice == wxOK)
 	{

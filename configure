@@ -855,7 +855,6 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-dependency-tracking Speeds up one-time builds
   --enable-dependency-tracking  Do not reject slow dependency extractors
---enable-audio    Support audio
 --enable-alsa     Support ALSA
   --disable-alsatest      Do not try to compile and run a test Alsa program
 --enable-sequencer2      Support sequencer2
@@ -4462,23 +4461,6 @@ echo "${ECHO_T}$result" >&6
 
 
 
-
-
-# Check whether --enable-audio or --disable-audio was given.
-if test "${enable_audio+set}" = set; then
-  enableval="$enable_audio"
-
-fi;
-
-if test x$enable_audio = xyes ; then
-   echo "$as_me:$LINENO: result: " >&5
-echo "${ECHO_T}" >&6 Audio is enabled
-
-cat >>confdefs.h <<\_ACEOF
-#define AUDIO 1
-_ACEOF
-
-   fi
 
 
 # Check whether --enable-alsa or --disable-alsa was given.

@@ -1,9 +1,5 @@
 /* src/config.h.in.  Generated from configure.in by autoheader.  */
 
-/* support DSP audio (needs DEV_SEQUENCER too). If audio isnt defined, it will
-   complain on tPlayer::LoadDefaultSettings, so it needs to be improved. */
-#undef AUDIO
-
 /* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
    systems. This function is required for `alloca.c' support on those systems.
    */

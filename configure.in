@@ -58,19 +58,7 @@ AC_MSG_RESULT($result)
 
 
 
-dnl optional stuff, like audio, alsa oss...
-
-
-dnl ---------------------------------------
-dnl check if we are to enable audio support
-dnl ---------------------------------------
-AC_ARG_ENABLE(audio, --enable-audio    Support audio)
-
-if test x$enable_audio = xyes ; then
-   AC_MSG_RESULT Audio is enabled
-   AC_DEFINE(AUDIO,1,[support DSP audio (needs DEV_SEQUENCER too).  If audio isnt defined, it will complain on tPlayer::LoadDefaultSettings, so it needs to be improved.])
-   dnl dont do AC_DEFINE(X,0) if using ifdef constucts(autoconf will define X as 0)
-fi
+dnl optional stuff, like alsa oss...
 
 
 dnl ---------------------------------------

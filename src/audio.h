@@ -23,7 +23,6 @@
 #define audio_h
 
 #include "config.h"
-#ifdef AUDIO
 
 #include "wx/wx.h"
 #include <iostream>
@@ -345,7 +344,5 @@ class tSampleSet {
 };
 
 
-
-#endif // AUDIO
 #endif
 

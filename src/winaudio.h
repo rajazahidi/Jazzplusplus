@@ -22,7 +22,6 @@
 #ifndef winaudio_h
 #define winaudio_h
 #include "config.h"
-#ifdef AUDIO
 
 #include <mmsystem.h>
 #include "winplay.h"
@@ -109,5 +108,4 @@ class tWinAudioPlayer : public tWinIntPlayer
 };
 
 
-#endif
 #endif

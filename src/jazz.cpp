@@ -25,18 +25,13 @@
 
 #include "config.h"
 #include "song.h"
-
 #include "trackwin.h"
-
-
 #include "filter.h"
-
 #include "mstdfile.h"
-
 #include "player.h"
-
-
 #include "jazz.h"
+#include "resdlg.h"
+
 #include <stdlib.h>
 #include <ctype.h>
 #include <assert.h>
@@ -51,19 +46,18 @@
 #include "alsaplay.h"
 #endif
 
-
-
-#ifdef AUDIO
 #include "audio.h"
-  #ifdef DEV_ALSA
-    #include "alsadrv.h"
-  #endif
-  #ifdef DEV_SEQUENCER2
-    #include "audiodrv.h"
-  #endif
-  #ifdef wx_msw
-    #include "winaudio.h"
-  #endif
+
+#ifdef DEV_ALSA
+#include "alsadrv.h"
+#endif
+
+#ifdef DEV_SEQUENCER2
+#include "audiodrv.h"
+#endif
+
+#ifdef wx_msw
+#include "winaudio.h"
 #endif
 
 
@@ -747,6 +741,10 @@ wxString FindFile(const char *fname)
   return wxEmptyString;
 }
 
+wxString FindDialog(wxString name) {
+  return FindFile("dialogs/" + name);
+}
+
 tNamedValue SynthTypes[] =
 {
    tNamedValue("GM", SynthTypeGM),
@@ -875,22 +873,22 @@ bool tApp::OnInit(void)
   Midi = new tNullPlayer(TheSong);
 
 
+  // ---------------------- XML Dialogs -------------------------
+  tResourceDialog::LoadResource(FindDialog("windowSettings.xrc"));
+
+
 
   // --------------------- Linux drivers ------------------------
 #ifndef wx_msw
   if (Config(C_MidiDriver) == C_DRV_OSS)
   {
 #ifdef DEV_SEQUENCER2
-#ifdef AUDIO
     Midi = new tAudioPlayer(TheSong);
     if (!Midi->Installed())
     {
       delete Midi;
-#endif //AUDIO
       Midi = new tSeq2Player(TheSong);
-#ifdef AUDIO
     }
-#endif //AUDIO
     if (!Midi->Installed())
     {
       perror("/dev/music");
@@ -915,7 +913,7 @@ bool tApp::OnInit(void)
       Midi = new tAlsaPlayer(TheSong);
 #ifndef __PORTING
     }
-#endif //AUDIO
+#endif //__PORTING
     if (!Midi->Installed())
     {
       fprintf(stderr, "Could not install alsa driver.\nJazz will start with no play/record ability\n");
@@ -961,7 +959,6 @@ bool tApp::OnInit(void)
     case CsFsk:
     case CsInt:
     default:
-#ifdef AUDIO
       Midi = new tWinAudioPlayer(TheSong);
       if (!Midi->Installed())
       {
@@ -969,9 +966,6 @@ bool tApp::OnInit(void)
         delete Midi;
 	Midi = new tWinIntPlayer(TheSong);
       }
-#else
-      Midi = new tWinIntPlayer(TheSong);
-#endif
       break;
   }
   if (!Midi->Installed())
@@ -1044,7 +1038,6 @@ bool tApp::OnInit(void)
   if (Config(C_SynthDialog))
     TrackWin->MenSynthSettings();
 #endif // __PORTING
-
 
 
   return 1;//TrackWin;

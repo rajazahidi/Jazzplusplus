@@ -44,8 +44,6 @@ class tResourceElement {
 /* Create a list that can contain tResourceElements. */
 
 WX_DECLARE_LIST(tResourceElement, tResourceElementList);
-#include <wx/listimpl.cpp>
-WX_DEFINE_LIST(tResourceElementList);
 
 
 /* This class is used to create a dialog from a WRC XML file.  The dialog
@@ -80,7 +78,12 @@ class tResourceDialog {
 
   tResourceDialog(wxWindow* parent, const wxString& name);
   ~tResourceDialog();
-  void Attach(wxString *data, const wxString& name);
+
+  void Attach(const wxString& name, wxString *data);
+  void Attach(const wxString& name, bool *data);
+  void Attach(const wxString& name, long *data, wxArrayLong a);
+  void Attach(const wxString& name, long *data, long *a);
+
   int ShowModal();
 
  private:

@@ -144,11 +144,7 @@ void tTimingDlg::OnOk()
       case CsFsk:
       case CsInt:
       default:
-#ifdef AUDIO
 	Midi = new tWinAudioPlayer(EventWin->Song);
-#else
-	Midi = new tWinIntPlayer(EventWin->Song);
-#endif
         break;
     }
     if (!Midi->Installed())

@@ -21,6 +21,11 @@
 
 #include "resdlg.h"
 
+#include <wx/listimpl.cpp>
+WX_DEFINE_LIST(tResourceElementList);
+
+#include <iostream>
+using namespace::std;
 
 /******************************************************************************
  * tResourceElement
@@ -70,11 +75,35 @@ tResourceDialog::~tResourceDialog() {
   dialog->Destroy();
 }
 
-void tResourceDialog::Attach(wxString *data, const wxString& name) {
+void tResourceDialog::Attach(const wxString& name, wxString *data) {
   tResourceElement *elem = new tResourceElement;
-  elem->string = data;
   elem->resource = name;
+  elem->string = data;
   links.Append(elem);
+}
+
+void tResourceDialog::Attach(const wxString& name, bool *data) {
+  tResourceElement *elem = new tResourceElement;
+  elem->resource = name;
+  elem->boolptr = data;
+  links.Append(elem);
+}
+
+void tResourceDialog::Attach(const wxString& name, long *data, wxArrayLong a) {
+  tResourceElement *elem = new tResourceElement;
+  elem->resource = name;
+  elem->longptr = data;
+  elem->longarr = a;
+  links.Append(elem);
+}
+
+void tResourceDialog::Attach(const wxString& name, long *data, long *a) {
+  wxArrayLong arr;
+  while(*a != -1) {
+    arr.Add(*a);
+    a++;
+  }
+  Attach(name, data, arr);
 }
 
 int tResourceDialog::ShowModal() {
@@ -140,84 +169,87 @@ bool tResourceDialog::LoadData(tResourceElement *elem, wxWindow *win) {
   if(elem->string) {
     if(win->IsKindOf(CLASSINFO(wxTextCtrl))) {
       used = 1;
-      ((wxTextCtrl*)win)->SetValue(*(elem->string));
-    }
-  } else if(elem->boolptr) {
-    /*
-    if(win->IsKindOf(CLASSINFO(wxCheckBox))) {
-      used = 1;
-      *(elem->bool) = ((wxCheckBox*)win)->GetValue();
-    }
-    */
-  } else if(elem->longptr) {
-    /*
-    if(win->IsKindOf(CLASSINFO(wxChoice))) {
-      wxChoice *choice = win;
-      if(choice->GetCount() != longarr.GetCount()) {
-	wxMessageBox("Error handling data for the control named:\n"
-		     "    " + elem->resource + "\n"
-		     "Length mismatch with designated translation array.",
-		     "Error Storing Data",
-		     wxOK | wxICON_ERROR);
-      } else {
-	int sel = choice->GetSelection();
-	
-	*(elem->longptr) = longarr[choice->GetSelection()];
-	used = 1;
-      }
-    }
-    */
-  }
-  
-  if(!used) {
-    wxMessageBox("Unable to locate a mapping for resource dialog:\n"
-		 "    " + dialogName + "\n"
-		 "No valid association for the control named:\n"
-		 "    " + elem->resource,
-		 "Error Storing Data",
-		 wxOK | wxICON_ERROR);
-  }
-}
-
-bool tResourceDialog::StoreData(tResourceElement *elem, wxWindow *win) {
-  // We don't need to do as much error checking here.  Most of that will have
-  // been done in LoadData.
-  bool used;
-
-  if(elem->string) {
-    if(win->IsKindOf(CLASSINFO(wxTextCtrl))) {
-      used = 1;
-      *(elem->string) = ((wxTextCtrl*)win)->GetValue();
+      ((wxTextCtrl*)win)->SetValue(*elem->string);
     }
   } else if(elem->boolptr) {
     if(win->IsKindOf(CLASSINFO(wxCheckBox))) {
       used = 1;
-      *(elem->boolptr) = ((wxCheckBox*)win)->GetValue();
+      ((wxCheckBox*)win)->SetValue(*elem->boolptr);
     }
   } else if(elem->longptr) {
     if(win->IsKindOf(CLASSINFO(wxChoice))) {
       wxChoice *choice = (wxChoice*)win;
       if(choice->GetCount() != elem->longarr.GetCount()) {
-	wxMessageBox("Error handling data for the control named:\n"
-		     "    " + elem->resource + "\n"
-		     "Length mismatch with designated translation array.",
-		     "Error Storing Data",
+	wxMessageBox("Error handling data for this widget:\n"
+                     "    dialog = " + dialogName + "\n"
+                     "    control = " + elem->resource + "\n"
+		     "Length mismatch with translation array.",
+		     "Error Loading Data",
 		     wxOK | wxICON_ERROR);
       } else {
-	int sel = choice->GetSelection();
+	int i;
+	for(i=0; i<elem->longarr.GetCount(); i++) {
+	  if(*elem->longptr == elem->longarr[i]) break;
+	}
 	
-	*(elem->longptr) = elem->longarr[choice->GetSelection()];
+	if(i == elem->longarr.GetCount()) {
+	  // We couldn't find the value in the list.
+	  wxMessageBox("Error handling data for this widget:\n"
+		       "    dialog = " + dialogName + "\n"
+		       "    control = " + elem->resource + "\n"
+		       "Initial value not found in translation array.",
+		       "Error Loading Data",
+		       wxOK | wxICON_ERROR);
+	  return false;
+	}
+
+	choice->SetSelection(i);
 	used = 1;
       }
     }
   }
   
   if(!used) {
-    wxMessageBox("Unable to locate a mapping for resource dialog:\n"
-		 "    " + dialogName + "\n"
-		 "No valid association for the control named:\n"
-		 "    " + elem->resource,
-		 "Error Storing Data",
+    wxMessageBox("Unable to locate a mapping for this widget:\n"
+		 "    dialog = " + dialogName + "\n"
+		 "    widget = " + elem->resource,
+		 "Error Loading Data",
 		 wxOK | wxICON_ERROR);
   }
+
+  return used;
+}
+
+bool tResourceDialog::StoreData(tResourceElement *elem, wxWindow *win) {
+  // We don't need to do as much error checking here.  Most of that will have
+  // been done in LoadData before things have had opportunity to modify
+  // themselves.
+
+  if(elem->string) {
+    if(win->IsKindOf(CLASSINFO(wxTextCtrl))) {
+      *(elem->string) = ((wxTextCtrl*)win)->GetValue();
+    }
+  } else if(elem->boolptr) {
+    if(win->IsKindOf(CLASSINFO(wxCheckBox))) {
+      *(elem->boolptr) = ((wxCheckBox*)win)->GetValue();
+    }
+  } else if(elem->longptr) {
+    if(win->IsKindOf(CLASSINFO(wxChoice))) {
+      int sel = ((wxChoice*)win)->GetSelection();
+
+      if(sel < 0 || sel >= elem->longarr.GetCount()) {
+	wxMessageBox("Error handling data for this widget:\n"
+		     "    dialog = " + dialogName + "\n"
+		     "    control = " + elem->resource + "\n"
+		     "Selection value out of range.",
+		     "Error Loading Data",
+		     wxOK | wxICON_ERROR);
+	return false;
+      }
+
+      *(elem->longptr) = elem->longarr[sel];
+    }
+  }
+
+  return true;
 }

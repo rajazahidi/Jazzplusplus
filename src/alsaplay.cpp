@@ -426,21 +426,17 @@ void tAlsaPlayer::Notify()
     PlayBuffer.Clear();
     OutClock = Now + FIRST_DELTACLOCK;
     PlayLoop->PrepareOutput(&PlayBuffer, Song, Now, OutClock, 0);
-#ifdef AUDIO
     if (AudioBuffer) {
       AudioBuffer->Clear();
       PlayLoop->PrepareOutput(AudioBuffer, Song, Now, OutClock, 1);
     }
-#endif
     PlayBuffer.Length2Keyoff();
   } else {
     // time to put more events
     if ( Now >= (OutClock - ADVANCE_PLAY) ) {
       PlayLoop->PrepareOutput(&PlayBuffer, Song, OutClock, Now + DELTACLOCK, 0);
-#ifdef AUDIO
       if (AudioBuffer)
 	PlayLoop->PrepareOutput(AudioBuffer, Song, OutClock, Now + DELTACLOCK, 1);
-#endif
       OutClock = Now + DELTACLOCK;
       PlayBuffer.Length2Keyoff();
     }

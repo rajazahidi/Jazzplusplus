@@ -28,7 +28,6 @@
 #ifndef alsadrv_h
 #define alsadrv_h
 #include "config.h"
-#ifdef AUDIO
 
 #include <sys/time.h>
 #include "events.h"
@@ -105,7 +104,5 @@ class tAlsaAudioPlayer : public tAlsaPlayer
     tAudioRecordBuffer recbuffers;
 };
 
-
-#endif // AUDIO
 
 #endif

@@ -336,13 +336,11 @@ class tEventArray : public tSimpleEventArray
     long GetFirstClock();
 
     int State;		// tsXXX
-#ifdef AUDIO
   public:
     int GetAudioMode() const { return audio_mode; }
     void SetAudioMode(int x) { audio_mode = x; }
   protected:
     int audio_mode;
-#endif
 };
 
 

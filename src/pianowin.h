@@ -231,7 +231,7 @@ void CtrlChannelAftertouchEdit();
   long CanvasX, CanvasY, CanvasW, CanvasH;	// canvas coords
   long FromClock, ToClock;
   tSnapSelection *SnapSel;
-  Bool   UseColors;
+  bool   UseColors;
   tMouseAction *MouseAction;
   long    PlayClock;
   wxFrame *ParentWin;

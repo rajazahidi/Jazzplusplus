@@ -30,9 +30,7 @@
 #include <memory.h>
 #include "jazzdll.h"
 #include "config.h"
-#ifdef AUDIO
 #include "winaudio.h"
-#endif
 
 extern "C" {
 
@@ -229,11 +227,9 @@ void FAR PASCAL midiIntTimerHandler(UINT wTimerId, UINT wMsg, DWORD dwUser, DWOR
     if (m->data)
     {
 
-#ifdef AUDIO
       if (m->data == START_AUDIO)
         state->audio_player->StartAudio();
       else
-#endif
 
       if (m->data == SYSEX_EVENT)
         outsysex(state);

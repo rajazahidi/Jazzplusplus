@@ -22,7 +22,6 @@
 #ifndef audiodrv_h
 #define audiodrv_h
 #include "config.h"
-#ifdef AUDIO
 
 #include <sys/soundcard.h>
 // in oss/free (from kernel 2.0.29) the following is not implemented
@@ -89,8 +88,5 @@ class tAudioPlayer : public tSeq2Player
 
     int force_read;	// needed by buggy audio driver ...
 };
-
-
-#endif // AUDIO
 
 #endif

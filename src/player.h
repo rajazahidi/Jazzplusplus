@@ -23,37 +23,18 @@
 #ifndef player_h
 #define player_h
 
-#ifndef config_h
-#include "config.h"
-#endif
-
-#ifndef wx_timerh
 #include <sys/types.h>
 #include <time.h>
+
 #include <wx/timer.h>
-#endif
 
-#ifndef events_h
+#include "config.h"
 #include "events.h"
-#endif
-
-#ifndef track_h
 #include "track.h"
-#endif
-
-#ifndef song_h
 #include "song.h"
-#endif
-
-
-#ifndef midinet_h
 #include "midinet.h"
-#endif
-
-
-#ifdef AUDIO
-
 #include "audio.h"
+
 
 // audio-menu
 #define MEN_AUDIO_LOAD     200
@@ -62,8 +43,6 @@
 #define MEN_AUDIO_SAMPLES  203
 #define MEN_AUDIO_NEW      204
 #define MEN_AUDIO_SAVE_AS  205
-
-#endif
 
 
 class tPlayLoop
@@ -161,7 +140,6 @@ class tPlayer : public wxTimer
     virtual int GetThruInputDevice() { return 0; }
     virtual int GetThruOutputDevice() { return 0; }
 
-#ifdef AUDIO
     // Audio stuff
     virtual void StartAudio() {}
     tEventArray *AudioBuffer;
@@ -196,8 +174,6 @@ class tPlayer : public wxTimer
     tSampleSet samples;
 
   public:
-#endif
-
     tPlayer(tSong *song);
     virtual ~tPlayer();
 

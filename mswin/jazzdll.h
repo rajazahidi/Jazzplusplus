@@ -325,9 +325,7 @@ struct tWinPlayerState
     tMidiQueue play_buffer;
     tMidiQueue thru_buffer;
 
-#ifdef AUDIO
     tWinAudioPlayer *audio_player;
-#endif
     long       time_correction;
 
     tWinSysexBufferArray *isx_buffers;

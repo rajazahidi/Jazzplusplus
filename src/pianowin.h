@@ -203,7 +203,7 @@ class tPianoWin : public wxFrame,
   int EventsSelected(const char *msg = 0);
   void ZoomIn();
   void ZoomOut();
-  void LineText(wxDC *dc, const char *str, bool down = FALSE);
+  void LineText(wxDC *dc, long x, long y, long w, long h, wxString str = "", bool down = FALSE);
   long x2BarClock(long x, int next);
   int OnEventWinMouseEvent(wxMouseEvent &e);
   void OnEventWinPaintSub(long x, long y);

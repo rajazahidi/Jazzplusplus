@@ -370,36 +370,19 @@ tPianoWin::~tPianoWin()
 
 void tPianoWin::OnSize(wxSizeEvent& event)
 {
-
-  //have a look at trackwin::onsize, which works somewhat
-
-
-
   int cw, ch;
   GetClientSize(&cw, &ch);
-  int tw = 0;
-  int th = 0;
-#ifndef __PORTING
-  if (tool_bar)
-    tool_bar->GetMaxSize(&tw, &th);
-#endif // __PORTING
 
-  if (Canvas && CtrlEdit) //CtrlEdit is the optional edit area for controller values, below the piano roll
-  {
+  // CtrlEdit is the optional edit area for controller values, below the
+  // piano roll
+  if(CtrlEdit) {
     int ctrl_w, ctrl_h;
-    Canvas->SetSize(0, (int)th, cw, CtrlY(ch) - (int)th);
+    Canvas->SetSize(0, 0, cw, CtrlY(ch));
     Canvas->GetClientSize(&ctrl_w, &ctrl_h); // dont count Scrollbar??
     CtrlEdit->SetSize(wPiano, 0, CtrlY(ch), ctrl_w, CtrlH(ch));
+  } else {
+    Canvas->SetSize(0, 0, cw, ch);
   }
-  else if (Canvas)
-    Canvas->SetSize(0, (int)th, cw, ch - (int)th);
-#ifndef __PORTING
-  if (tool_bar)
-    tool_bar->SetSize(0, 0, (int)cw, (int)th);
-#endif // __PORTING
-
-
-
 }
 
 
@@ -1154,9 +1137,7 @@ void tPianoWin::OnPaintSub(wxDC* dc, long x, long y)
     BarInfo.Next();
   }
 
-  LineText(dc, "");
-
-
+  LineText(dc, CanvasX, CanvasY, wPiano, hTop);
 
   dc->SetPen(*wxBLACK_PEN);
   DrawPianoRoll(dc);
@@ -2671,46 +2652,6 @@ long tPianoWin::x2Clock(long x)
   return (x - xEvents) * ClocksPerPixel + FromClock;
 }
 
-/* Draws the little rectangle in the top left corner of the piano window. */
-
-void tPianoWin::LineText(wxDC *dc, const char *str, bool down)
-{
-  int x = 0;
-  int y = 0;
-  int w = wPiano;
-  int h = hTop;
-
-  dc->SetBrush(*wxLIGHT_GREY_BRUSH); // Fill
-  dc->SetPen(*wxLIGHT_GREY_PEN);     // Outline
-  dc->DrawRectangle(x, y, w, h);
-
-  x += 1;
-  y += 1;
-  w -= 2;
-  h -= 2;
-
-  // Draw the top and left lines of the 3D button.
-  if (down)
-    dc->SetPen(*wxBLACK_PEN);
-  else
-    dc->SetPen(*wxWHITE_PEN);
-
-  dc->DrawLine(x, y, x+w, y);
-  dc->DrawLine(x, y, x, y+h);
-
-  // Draw the bottom and right lines of the 3D button.
-  if (down)
-    dc->SetPen(*wxWHITE_PEN);
-  else
-    dc->SetPen(*wxBLACK_PEN);
-
-  dc->DrawLine(x+w, y, x+w, y+h);
-  dc->DrawLine(x, y+h, x+w, y+h);
-
-  // Print the message in the button.
-  dc->DrawText(str, x + LittleBit, y + LittleBit);
-}
-
 long tPianoWin::y2Line(long y, int up)
 {
   if (up)
@@ -2912,10 +2853,46 @@ void tPianoWin::InitColors()
   }
 }
 
+/* Draws the a 3D button with text in it.  Used to draw the little area in the
+   top left of the window. */
+void tPianoWin::LineText(wxDC *dc, long x, long y, long w, long h,
+			 wxString str, bool down)
+{
+  dc->SetBrush(*wxLIGHT_GREY_BRUSH); // Fill
+  dc->SetPen(*wxLIGHT_GREY_PEN);     // Outline
+  dc->DrawRectangle(x, y, w, h);
+
+  x += 1;
+  y += 1;
+  w -= 2;
+  h -= 2;
+
+  // Draw the top and left lines of the 3D button.
+  if (down)
+    dc->SetPen(*wxBLACK_PEN);
+  else
+    dc->SetPen(*wxWHITE_PEN);
+
+  dc->DrawLine(x, y, x+w, y);
+  dc->DrawLine(x, y, x, y+h);
+
+  // Draw the bottom and right lines of the 3D button.
+  if (down)
+    dc->SetPen(*wxWHITE_PEN);
+  else
+    dc->SetPen(*wxBLACK_PEN);
+
+  dc->DrawLine(x+w, y, x+w, y+h);
+  dc->DrawLine(x, y+h, x+w, y+h);
+
+  // Print the message in the button.
+  dc->DrawText(str, x + LittleBit, y + LittleBit);
+}
+
 /* This is an an event handler for tMouseCounter. */
 void tPianoWin::ButtonLabelDisplay(wxString text, bool down) {
   wxClientDC dc(Canvas);
-  LineText(&dc, text.GetData(), down);
+  LineText(&dc, 0, 0, wPiano, hTop, text, down);
 }
 
 

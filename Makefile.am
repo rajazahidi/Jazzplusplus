@@ -13,7 +13,7 @@ really-clean: maintainer-clean
 	rm -f configure Makefile.in xrc/Makefile.in src/Makefile.in conf/Makefile.in aclocal.m4
 
 htmldocs:
-	doxygen -g jazz.doxy
+	doxygen jazz.doxy
 
 
 #

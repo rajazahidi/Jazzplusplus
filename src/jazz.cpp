@@ -802,6 +802,7 @@ class tApp: public wxApp
 {
   public:
     bool OnInit(void);
+    int OnExit(void);
 };
 
 
@@ -1053,6 +1054,9 @@ bool tApp::OnInit(void)
   return 1;//TrackWin;
 }
 
+int tApp::OnExit(void) {
+	delete gProject;
+}
 
 
 // end jazz.cpp

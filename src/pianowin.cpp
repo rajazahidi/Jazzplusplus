@@ -2605,22 +2605,22 @@ void tPianoWin::ActSettingsDialog()
 
 /////JAVE 
 /// this is a test to see how to implement a dialog with patricks system
-/// it replaces tMidiDelayDlg
+/// it replaces tMidiDelayDlg, which isnt necesarily a good idea
 void tPianoWin::ActMidiDelayDialog()
 {
-  double scale = 0.5;
+  long scale = 50; //in percent
   long clockDelay = 10;
   int repeat = 6;
 
   jppResourceDialog dialog(this, "midiDelay");
   
- //  dialog.Attach("scale", &scale);
-//   dialog.Attach("clockDelay", &clockDelay);
-//   dialog.Attach("repeat", &repeat);
+  dialog.Attach("scale", &scale);
+  dialog.Attach("clockDelay", &clockDelay);
+  dialog.Attach("repeat", &repeat);
 
   if(dialog.ShowModal() == wxID_OK) {
     //execute the command
-     tCmdMidiDelay cmd(Filter, scale,clockDelay,repeat);
+    tCmdMidiDelay cmd(Filter, (1.0*scale)/100.0,clockDelay,repeat);
      cmd.Execute();
 
     Setup();//??

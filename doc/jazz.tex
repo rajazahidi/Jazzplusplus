@@ -1,0 +1,2715 @@
+\documentstyle[a4,makeidx,verbatim,texhelp,fancyhea]{report}%
+\input{psbox.tex}
+\parskip=10pt%
+\parindent=0pt%
+\title{the JAZZ++ midi sequencer\\
+version 3.2}%
+\author{Andreas Voss $<$Andreas.Voss@jazzware.com$>$\\
+Per Sigmond $<$Per.Sigmond@jazzware.com$>$}%
+\date{February 2000}%
+\makeindex%
+\begin{document}%
+\maketitle%
+\pagestyle{fancyplain}%
+\tableofcontents%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Introduction}\label{introduction}
+
+JAZZ++ is a full size MIDI sequencer with audio support. In addition to basic
+sequencer functions like record and play, JAZZ++ provides many edit features
+like quantize, copy, transpose, graphical pitch editing, multiple
+undo/redo etc.
+
+JAZZ++ has two main windows; one
+operating on the song as a whole, and one operating on single tracks and
+single events. Among the other windows and dialogs are mixer windows for easy
+adjusting of default track parameters, and all settings are saved into the
+MIDI file for later use.
+
+JAZZ++ has support for {\em GM} (General MIDI) equipment with both {\em GS}
+and {\em XG} extensions.
+
+JAZZ++ offers special functions like GS/XG sound editing, setting of effect
+types, a {\em random rhythm generator} and a {\em harmony browser}. Windows versions of
+JAZZ++ can be synchronized to other sound equipment (e.g. a tape recorder)
+using Midi Time Code (MTC) or SongPointer synchronization techniques.
+
+As an extension to normal MIDI sequencing, JAZZ++ provides audio play
+(*.wav files), audio recording and audio/midi integration. A multi function
+{\em audio editor} is also included.
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{jzwins.ps}}%
+\htmlonly{\image{0cm;0cm}{jzwins.gif}}%
+\winhelponly{\image{0cm;0cm}{jzwins.bmp}}%
+\caption{Main windows of JAZZ++}%
+\end{figure}}
+
+\section{System requirements}\label{requirements}
+
+\subsection{MIDI and audio equipment}
+To play midi music your PC must be attached to a midi synthesizer device. The
+synthesizer can either be an integrated part of a sound-card, or an
+external device attached to the PC with a cable. To record midi music you
+will need a midi-capable piano-keyboard attached to the PC (as an alternative
+you can enter notes using the mouse).
+
+For audio you need an audio capable sound card.
+
+\subsection{Unix operating systems}
+
+The device-independent part of JAZZ++ (the sequencer / editor part) is known
+to run on Linux, Sun-OS4 and Solaris2 systems, but should compile and run
+(with some minor hacking) on any system supporting Unix/X11. To compile
+you will need the "wxwin" GUI package (free) together with either XView
+(free) or Motif.
+
+The device-dependant part (midi-driver) currently supports:
+\begin{itemize}
+\item OSS/Free (OSS/Linux) midi driver API (formerly known as USS/Lite and
+VoxWare). This API is included in later Linux kernels. The JAZZ++ code
+interfacing OSS has only been tested on Linux platforms.
+\item JAZZ++'s native MPU-401 midi driver (requires an intelligent-mode MPU-401
+interface-card). The driver is implemented as a Linux kernel
+load-module. In this mode JAZZ++ works as a TCP/IP-based client/server
+application allowing the sequencer/editor and the midi-driver to run on
+separate computers. The native driver has better support for the MPU-401
+than the JAZZ++/OSS solution (e.g. support for external timing source).
+\end{itemize}
+
+\subsection{Windows operating systems}
+
+JAZZ++ supports the windows midi / audio driver interface. A driver for your
+midi interface card or sound card must be installed before JAZZ++ can play /
+record midi or audio.
+
+Provided such a midi driver is installed in your system, JAZZ++ currently
+supports 32-bit platforms (e.g. win95).
+
+\subsection{CPU and memory}
+For midi-only operation a 486 CPU (or equivalent) is sufficient in most
+cases. For satisfactory audio operation a Pentium CPU with 32 MBytes
+RAM is recommended.
+
+
+\section{Where to get it}\label{wheretoget}
+
+For latest updates on software from {\em JazzWare}, please look at the
+JAZZ++ homepage at
+
+\begin{indented}{2cm}
+{\tt http://www.jazzware.com}
+\end{indented}
+
+You are welcome to join the JAZZ++ mailing list by sending mail to
+
+\begin{indented}{2cm}
+{\tt jazz-users-request@hia.no}
+\end{indented}
+
+with subject-field containing {\tt subscribe}.
+
+We'd be happy to receive your bug reports (well, somehow) or success
+stories. And - of course - you are welcome to contribute to the JAZZ++
+project by sending code, suggestions, ..., or corrections for this
+manual.
+
+
+
+\section{Copyright}\label{copyright}
+
+The JAZZ++ Midi Sequencer is copyright (C) 1994-2000 Andreas Voss and 
+Per Sigmond, all rights reserved.
+
+JAZZ++ program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
+
+
+\section{Installation and Startup}\label{installation}
+
+For Windows there is an install utility (run {\tt setup.exe}) which
+mostly automates the installation process.
+
+For Linux there is a shell script {\tt install-jazz} in the
+distribution. You must be logged in as root when running the installation
+script. As a default JAZZ++ will be installed to {\tt /usr/local/jazz},
+this may be changed by editing {\tt install-jazz}. Also you
+must set the environment variable JAZZ to point the jazz directory by
+adding the line:
+
+{\tt export JAZZ=/usr/local/home}
+
+to your .profile or .bashrc. Please refer to the file
+{\tt install.txt} which contains up-to-date instructions.
+
+On startup JAZZ++ looks for its configuration files
+\begin{enumerate}
+\item in the current directory
+\item in the home directory (where the environment variable HOME points to)
+\item in the directory where the environment variable JAZZ points to
+\item in the directory from where JAZZ++ itself was started.
+\end{enumerate}
+The main configuration file is named {\tt jazz.cfg}.
+This file also contains pointers to other configuration files {\tt (*.jzi)}
+present in the same directory.
+Then JAZZ++ searches for a song named {\tt jazz.mid} in the current directory
+and loads it - if found. This song may contain default settings for your
+midi equipment.
+
+
+\subsection{Command line options (Unix only)}
+
+Command line options (in any order):
+
+\begin{itemize}
+\item {\tt jazz -h}                                   -- Print help text
+\item {\tt jazz -v}                                   -- Print help text
+\item {\tt jazz -f filename}                          -- Input midi file
+\item {\tt jazz -trackwin xpos ypos [width height]}   -- Position/size of main window
+\item {\tt jazz -pianowin xpos ypos [width height]}   -- Position/size of piano roll window
+\end{itemize}
+
+
+\section{Acknowledgements}
+
+JAZZ++ is based on the work of countless other people who have have made
+their software freely available. Beside all the people who made Linux,
+GNU and X11 possible, we'd like to mention
+
+\begin{itemize}
+\item {\em Hannu Savolainen} for writing all these excellent midi drivers, so
+JAZZ++ can talk to nearly every midi card on Linux.
+\item {\em Julian Smart} who wrote the free, portable GUI library
+wxwin, so JAZZ++ runs with XView, Motif and MS-Windows.
+\end{itemize}
+
+We would also like to thank Henrik Seidel and Stefan Nitschke for code
+contributions.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Track window}\label{trackwin}
+
+The trackwindow shows bars and tracks of your song while the
+\helpref{pianowin}{pianowin} shows single events of one track. Events are shown like
+bar codes, i.e. every event is shown as a short vertical line.
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{trackwin.ps}}%
+\htmlonly{\image{0cm;0cm}{trackwin.gif}}%
+\winhelponly{\image{0cm;0cm}{trackwin.bmp}}%
+\caption{Track window}%
+\end{figure}}
+
+
+\section{Toolbar}\label{twtoolbar}
+
+From left to right there are the following buttons:
+\begin{enumerate}
+\item \helpref{Open a file}{file}
+\item \helpref{Save actual song to file}{file}
+\item Clear song (start a new one)
+\item \helpref{Replicate}{replicate}
+\item \helpref{Delete}{delete}
+\item \helpref{Quantize}{quantize}
+\item \helpref{Mixer}{mixer}
+\item \helpref{Piano Window}{pianowin}
+\item \helpref{Play}{recplay}
+\item \helpref{Loop play}{recplay}
+\item \helpref{Record}{recplay}
+\item \helpref{Metronome}{metro}
+\item Zoom in
+\item Zoom out
+\item \helpref{Undo}{undo}
+\item \helpref{Redo}{undo}
+\item \helpref{Panic (MIDI reset)}{panic}
+\item \helpref{Help}{twhelp}
+\end{enumerate}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{twtoolb.ps}}%
+\htmlonly{\image{0cm;0cm}{twtoolb.gif}}%
+\winhelponly{\image{0cm;0cm}{twtoolb.bmp}}%
+\caption{Trackwin toolbar}%
+\end{figure}}
+
+\section{Selecting events}\label{select}
+
+Many functions (e.g 'Delete' from the edit menu) require that you have
+selected some range of bars and tracks that will be affected by the
+selected operation. You can drag a rectangle to select a range. Holding
+the shift-key down while pressing the left mouse button will continue a
+selection. This way, you can select a range bigger than the window by
+continuing a selection after scrolling. Alternatively, you can click
+into the leftmost column to select a whole track.
+
+The selection indicates a range of tracks (y-axis) and a range of bars (x-axis).
+These values are copied to the Event filter from Settings-Menu. In the event filter
+you can specify more precise, which events shall be worked with.
+
+Example: To delete all events but program changes from bar 5 to 15 on track 1 to 3,
+mark bars and tracks by dragging a rectangle. Then select the event filter and
+disable program-changes (patch). Finally select Delete from Edit-Menu.
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{twselect.ps}}%
+\htmlonly{\image{0cm;0cm}{twselect.gif}}%
+\winhelponly{\image{0cm;0cm}{twselect.bmp}}%
+\caption{Selecting events}%
+\end{figure}}
+
+\section{Record and play}\label{recplay}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{recplay.ps}}%
+\htmlonly{\image{0cm;0cm}{recplay.gif}}%
+\winhelponly{\image{0cm;0cm}{recplay.bmp}}%
+\caption{Record and play}%
+\end{figure}}
+
+There are 2 play modes
+\begin{itemize}
+\item {\em play} - normal linear play
+\item {\em loop play} - requires that a loop-play range is selected (some bars in a track)
+\end{itemize}
+
+Each of the play modes has its own toolbar button. The buttons act both
+as start-play and stop-play. After using JAZZ++ for a while you will
+probably find it more convenient to start/stop play by clicking in the
+top line of the Trackwindow. Play will then start at the bar where you click.
+Loop play can also be done from the top-line by pressing shift-click.
+
+Recording is done by pressing the record button after selecting
+some bars in a track. The recorded events will be merged into the selection.
+You can also start recording by clicking in the top-line of the Trackwindow
+(some bars must be selected). If you start record with the right mouse button,
+the track will be muted before play starts and existing events in the
+selection will be replaced by the recorded events.
+
+For a step-by-step tutorial on how to make a midi song from scratch, look at
+\helpref{How to build a new midi song}{exmidisong}.
+
+\section{Metronome}\label{metro}
+
+The metronome button can be toggled on and off.
+See also \helpref{Metronome settings}{metroset}.
+
+\section{Speed adjustment}\label{speed}
+
+A single click with left/right mouse button into the speed field will
+increase / decrease the speed by one beat / minute. Keep the mouse button
+down to make bigger changes. Hold down the shift key to change
+values in steps of 10 bpm.
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{speed.ps}}%
+\htmlonly{\image{0cm;0cm}{speed.gif}}%
+\winhelponly{\image{0cm;0cm}{speed.bmp}}%
+\caption{Speed adjustment}%
+\end{figure}}
+
+
+\section{Track Defaults (program, volume etc)}\label{trackdefs}
+
+Clicking at the top of the column named Prg cycles through the available
+defaults (Prg = program change, Bnk = program bank (used in combination
+with Prg for GS and XG sounds), Vol = volume, Pan = pan, Rev = reverb,
+Cho = chorus). These events are sent before play starts. To adjust a
+value, click left or right mouse button to increase or decrease the
+value (use the shift key for quick increase or decrease). A value of 0
+means there is no event to be sent. Please note that the defaults can also be
+edited (graphically) in the \helpref{Mixer dialog}{mixer} selected from the
+\helpref{mixer toolbar button}{twtoolbar} or the {\em Parts} menu.
+
+Clicking the unnamed column containing P's toggles the Trackstatus:
+P=play, S=solo, M=mute.
+
+Clicking into the top of the leftmost column (labeled 'M') toggles
+display of midi channel and track number.
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{trackdef.ps}}%
+\htmlonly{\image{0cm;0cm}{trackdef.gif}}%
+\winhelponly{\image{0cm;0cm}{trackdef.bmp}}%
+\caption{Track defaults}%
+\end{figure}}
+
+\section{Trackname, midi channel etc}\label{trackdlg}
+
+Click on the name-field will open a Dialog. You can enter a new name for
+the track, select the instrument to be played and define default midi channel.
+If 'force all events to midi channel' is selected, all existing events on
+the track will be set to the default midi channel when pressing 'Ok'.
+Otherwise the midi channel will not affect events
+already on the track.
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{tracknam.ps}}%
+\htmlonly{\image{0cm;0cm}{tracknam.gif}}%
+\winhelponly{\image{0cm;0cm}{tracknam.bmp}}%
+\caption{Track name, midi channel etc.}%
+\end{figure}}
+
+
+\section{Moving a whole track}
+
+A whole track can be moved by clicking the right mouse button into the
+track-name field, drag down/up to the destination and then release the
+mouse button (drag and drop).
+
+
+\section{File menu}\label{file}
+
+\begin{itemize}
+\item {\em Load, Save, Save As} - Load/Save MIDI-Standard files.
+JAZZ++ will load both Format 0 and Format 1 midi files. Jazz always
+saves Format 1 files.
+
+\item {\em New} - Start editing a new song (clears the presently loaded
+song). You will be asked for a file name when saving the new song.
+
+\item {\em Load Template} is like normal load except that JAZZ++ will
+treat the song as if it was a new song (you will be asked for a file
+name when saved).
+
+\item {\em Load Pattern} merges a midi standard file into the song. After
+selecting the file, click with the left button to the destination position.
+To abort loading after selecting the file click with the right mouse button
+somewhere.
+
+\item {\em Save Pattern} saves the selected events into a midi standard
+file (Format 1).
+
+\item {\em Quit} - exit JAZZ++.
+
+\end{itemize}
+
+
+\section{Edit menu}\label{twedit}
+
+
+\subsection{Cut, Copy and Paste}\label{twclip}
+
+This enables you to cut or copy some part of a song into an internal buffer
+and paste it to another position of the song again. This can be used to
+copy events from one song to another.
+
+Do do this, \helpref{select}{select} some events and then select Cut or
+Copy from the edit menu. To paste the events select paste from the edit menu
+and click to the destination track/bar. To abort a paste operation click with
+the right mouse button somewhere. Pasted events are merged with existing
+events, so you may want to erase the destination tracks before pasting.
+
+
+
+\subsection{Replicate}\label{replicate}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{replic.ps}}%
+\htmlonly{\image{0cm;0cm}{replic.gif}}%
+\winhelponly{\image{0cm;0cm}{replic.bmp}}%
+\caption{Replicate dialog}%
+\end{figure}}
+
+To replicate (copy) some events, you must first \helpref{select}{select}
+an area. Then, after you have invoked {\em Edit$->$Replicate} (or
+pressed the \helpref{replicate button}{twtoolbar}), your cursor will change to
+a '$=>$', meaning that you should mark a
+destination for the selected area (clicking with the right mouse button will
+abort replication). After clicking destination position, you get a dialog
+box. The meanings of the different check boxes are:
+
+\begin{itemize}
+\item {\em Erase Destin}
+
+\begin{itemize}
+\item {\em Checked} - destination will be replaced by source
+\item {\em Unchecked} - events will be merged
+\end{itemize}
+
+\item {\em Erase Source}. Source will be moved to destination
+
+\item {\em Repeat Copy}. After clicking Ok, you can click at the end of the
+destination range. Repeated copies of source will fill the destination range.
+
+\item {\em Insert Space}. All Events right from the destination point will
+be moved to the right to make room for the copied events.
+
+\end{itemize}
+
+Source and Destin may overlap.
+
+
+
+\subsection{Delete}\label{delete}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{6cm;0cm}{delete.ps}}%
+\htmlonly{\image{0cm;0cm}{delete.gif}}%
+\winhelponly{\image{0cm;0cm}{delete.bmp}}%
+\caption{Delete dialog}%
+\end{figure}}
+
+To delete some events, you must first \helpref{select}{select} an area.
+Then, after you have invoked {\em Edit$->Delete$} (or pressed the
+\helpref{delete button}{twtoolbar}), you get a
+dialog box. The check box 'Leave space' has the following meaning:
+
+\begin{itemize}
+\item {\em checked} - the deleted events leave a hole
+\item {\em unchecked} - the events from right are moved to the left to
+fill up the hole
+\end{itemize}
+
+
+\subsection{Quantize}\label{quantize}
+
+Quantize will put Note-On events in the selected area 'in time' (moved to the
+nearest step-timing value). Only Note-On events are changed.
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{8cm;0cm}{quantize.ps}}%
+\htmlonly{\image{0cm;0cm}{quantize.gif}}%
+\winhelponly{\image{0cm;0cm}{quantize.bmp}}%
+\caption{Quantize dialog}%
+\end{figure}}
+
+To quantize some events, you must first \helpref{select}{select} an area.
+Then, after you have invoked {\em Edit$->$Quantize} (or pressed the
+\helpref{Quantize button}{twtoolbar}), you get a
+dialog box. The 'steps' listbox represent the 'granularity' of the
+quantization, and should normally correspond to the smallest note-timing
+value of the music to be quantized. The checkboxes control whether the
+start of the note or the end of the note (or both) should be quantized.
+
+There is also a slider named 'Groove' that can be used for quantizing notes
+'off beat'. A value of e.g. +20 means that the notes are moved to the nearest
+step-timing plus 20 percent of a step-value (notes will sound a bit 'late'). A
+negative value will make notes sound a bit 'early'. For normal quantization
+the value should be 0.
+
+
+\subsection{Set MIDI Channel}\label{setchan}
+
+The selected events will be set to the selected MIDI Channel.
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{8cm;0cm}{setchan.ps}}%
+\htmlonly{\image{0cm;0cm}{setchan.gif}}%
+\winhelponly{\image{0cm;0cm}{setchan.bmp}}%
+\caption{Set MIDI channel dialog}%
+\end{figure}}
+
+
+\subsection{Transpose}\label{transpose}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{8cm;0cm}{transpos.ps}}%
+\htmlonly{\image{0cm;0cm}{transpos.gif}}%
+\winhelponly{\image{0cm;0cm}{transpos.bmp}}%
+\caption{Transpose dialog}%
+\end{figure}}
+
+If no scale is selected, Amount is the number of semitones to transpose, e.g. an
+Amount of 1 will change C to C\#, C\# to D etc. If the scale C is selected, C
+will become D, D will become E, E will become F etc. JAZZ++ tries to analyze
+the key of the selection and displays it in the dialog.
+
+The scale 'selected' is the set of notes in the selection. If eg the selection
+contains the notes C, D, E an amount of 1 will change C's to D's, D's to E's and
+E's to C's. Its useful in the piano window create inversions of chords.
+
+Fit into scale with an amount of 0 will change all notes to the nearest one
+contained in the selected scale. If eg the selection contains some C\# and you
+select C scale, all C\#'s will become C's (D would be possible too, but transpose
+down is preferred in this case). If amount is not 0, the selection is transposed
+in semitones first and 'Fit into scale' afterwards.
+
+Only Note-On events are changed.
+
+
+\subsection{Velocity}\label{veloc}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{8cm;0cm}{veloc.ps}}%
+\htmlonly{\image{0cm;0cm}{veloc.gif}}%
+\winhelponly{\image{0cm;0cm}{veloc.bmp}}%
+\caption{Set velocity dialog}%
+\end{figure}}
+
+Changes the velocity of Note-On events. If Stop is 0, all Note-On events will get
+the Start velocity. If Stop is greater 0, events at the beginning of the selection
+will get the Start velocity, those at the end will get the Stop velocity
+(e.g. crescendo). The choice Add/Sub/Set determines, how the value is applied.
+
+
+\subsection{Length}\label{length}
+
+Adjust length of Note-On events. see \helpref{Velocity}{veloc}.
+
+
+\subsection{Shift}\label{shift}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{8cm;0cm}{shift.ps}}%
+\htmlonly{\image{0cm;0cm}{shift.gif}}%
+\winhelponly{\image{0cm;0cm}{shift.bmp}}%
+\caption{Shift dialog}%
+\end{figure}}
+
+Moves events left or right in amounts smaller than a bar. The snap value is
+adjusted in the pianowin.
+
+\subsection{Cleanup}\label{cleanup}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{6cm;0cm}{cleanup.ps}}%
+\htmlonly{\image{0cm;0cm}{cleanup.gif}}%
+\winhelponly{\image{0cm;0cm}{cleanup.bmp}}%
+\caption{Cleanup dialog}%
+\end{figure}}
+
+Deletes note-on events that are shorter than a selected length. Optionally
+shorten notes to insure that notes of the same pitch does not overlap.
+
+Accidental keyboard hits often leave very short notes on the track that
+distorts the music. Another problem is that two overlapping notes of the
+same pitch causes the second note to stop sounding (because of the note-off
+event from the first note). This cleanup function effectively solve such
+problems.
+
+\subsection{Search Replace}\label{search}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{search.ps}}%
+\htmlonly{\image{0cm;0cm}{search.gif}}%
+\winhelponly{\image{0cm;0cm}{search.bmp}}%
+\caption{Search Replace dialog}%
+\end{figure}}
+
+Searches for controller events and changes the controller number, eg
+transforms modulation wheel to volume.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Parts menu}\label{partsmenu}
+
+This menu deals with all kinds of instrument settings, or {\em parts} settings.
+Some of the parameters will work with
+almost any General Midi (GM) equipment (like Volume settings) while
+others only work with GS- or XG-compatible synthesizers. The number of
+selectable menu entries will vary depending on the
+\helpref{synthesizer type}{synthtype} settings.
+
+Please note that some
+menu entries may have no effect on your equipment even if selectable. In some
+cases special {\em system exclusive} message needs to be sent
+first in order to enable the specific feature
+(see \helpref{Edit/create single events}{pweventedit} on how to create a
+system exclusive event).
+In other cases the equipment just doesn't support the feature.
+Please consult the owner's manual of your sound generator for more info.
+
+All parameters are operated with sliders per track (part). Note that for some
+platforms the number of adjustable parameters are restricted because of
+the size of the dialogs.
+
+Please note that only one {\em parts} dialog can be opened at a time.
+
+\subsection{Mixer and Master}\label{mixer}
+
+Setting of default {\em Volume}, {\em Pan}, {\em Reverb} and {\em Chorus}.
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{mixer.ps}}%
+\htmlonly{\image{0cm;0cm}{mixer.gif}}%
+\winhelponly{\image{0cm;0cm}{mixer.bmp}}%
+\caption{Mixer window}%
+\end{figure}}
+
+\subsection{Sound, Vibrato and Envelope}
+
+Sound dialog - change sound color:
+
+\begin{itemize}
+\item {\em Cutoff frequency} - filter high frequencies
+\item {\em Resonance} - make the sound more 'synthetic' (wha-wha sound)
+\end{itemize}
+
+Vibrato dialog - change the way the tone's vibrato develops in time:
+
+\begin{itemize}
+\item {\em Vibrato Rate} - controls how fast the vibrato will be
+\item {\em Vibrato Depth} - controls how much vibrato you get
+\item {\em Vibrato Delay} - controls at what time after note start the
+vibrato begins
+\end{itemize}
+
+Envelope dialog - change the way the tone envelope (amplitude) develops in
+time:
+
+\begin{itemize}
+\item {\em Envelope Attack} - controls how fast the tone increases in volume
+when it starts
+\item {\em Envelope Decay} - controls how fast the tone will
+decrease in volume after it has started (also called {\em sustain})
+\item {\em Envelope Release} - controls how fast the tone decreases in volume
+after it is has ended (how fast the tone stops)
+\end{itemize}
+
+\subsection{Controller dialogs}
+These dialogs change the way the different controllers affect the sound.
+
+Controllers are:
+
+\begin{itemize}
+\item {\em Pitch Bender} - used to control continuous tone-pitch in real time
+\item {\em Modulation Wheel} - used to control 'tone expression'
+(e.g. vibrato) in real time
+\item {\em Channel Aftertouch (CAf)} - some keyboards senses how hard you
+press down the key after the attack, used for 'tone expression' in real
+time. Affects all tones of the part (midi channel).
+\item {\em Polyphonic Aftertouch (PAf)} - same as above, but only affects
+one key pitch of a part (channel).
+\item {\em Continuous Controller 1 (CC1)} - used for misc. 'tone expression'
+\item {\em Continuous Controller 2 (CC1)} - used for misc. 'tone expression'
+\end{itemize}
+
+All the controllers have three associated types dialogs with sliders;
+{\em Basic}, {\em LFO1} and {\em LFO2}.
+The settings tell how much the controller will trigger the
+sound-change described by each parameter. Parameters are:
+
+\begin{itemize}
+\item {\em Pitch Control / Sense} - pitch in half-tone steps
+\item {\em TVF Cutoff} - controls high frequency cutoff (TVF =
+Time Variant Filter)
+\item {\em Amplitude} - controls amplitude (dynamic volume)
+\item {\em LFO1 Rate, Pitch, TVF and TVA} - controls the rate of the Low
+Frequency Oscillator 1 (LFO1) and how it affects pitch, TVF and TVA (TVA =
+Time Variant Amplitude)
+\item {\em LFO2 Rate, Pitch, TVF and TVA} - controls the rate of the Low
+Frequency Oscillator 2 (LFO2) and how it affects pitch, TVF and TVA (TVA =
+Time Variant Amplitude)
+\end{itemize}
+
+The {\em Basic} dialogs of the {\em Continuous Controller} entries also has
+a {\em Controller Nr} dialog to set what continuous controller the part
+will respond to.
+
+
+\subsection{Drum Instrument Parameters}
+
+This is a dialog for controlling different parameters of the individual drum
+instruments of the primary drum part. The track selected is the first track
+with channel equal to the {\em .drumchannel} setting (in the configuration
+file ). Note that the name of the track also has to be set.
+
+Drum instruments are listed in a list box. The sliders are valid for the
+instrument currently selected from the list. Listed instruments to be
+controlled are added/deleted by using the {\em Add} and {\em Del} buttons.
+
+The controllable parameters are:
+
+\begin{itemize}
+\item Drum instrument {\em pitch coarse}
+\item Drum instrument {\em TVA} (volume)
+\item Drum instrument {\em panpot} (checkbox gives random pan)
+\item Drum instrument {\em reverb send}
+\item Drum instrument {\em chorus send}
+\end{itemize}
+
+
+\subsection{Partial Reserve}
+
+Sound generators have a limited amount of tones that can be played
+simultaneously. This is sometimes referred to as 'maximum polyphony'.
+When the maximum polyphony is exceeded the synthesizer will start
+cutting tones, which can cause audible 'distortion' to the music.
+
+In some GS equipment you can assign the number of tones (oscillators)
+that is assigned to each part (channel) and thereby control which instruments
+are 'more important'. This is what this dialog is for.
+
+\subsection{Part Mode}
+
+Here you can set two things:
+
+\begin{itemize}
+\item {\em Rx Channel} - the channel to be received by the part
+\item {\em Use for rhythm} - sets the part to normal mode (value 0)
+or drum modes (value > 1). Part 10 (channel 10) has default value 1,
+all others have default value 0. On GS and XG synths you can get another drum
+part by setting that part to value > 1.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Settings menu}\label{twsettings}
+
+\subsection{Filter}\label{midifilter}
+
+Using the 'event filter dialog', you can specify what types and ranges of
+events that will be affected by \helpref{selection}{select} operations like
+e.g. 'Delete' and 'Replicate'.
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{filter.ps}}%
+\htmlonly{\image{0cm;0cm}{filter.gif}}%
+\winhelponly{\image{0cm;0cm}{filter.bmp}}%
+\caption{Event filter dialog}%
+\end{figure}}
+
+The entries {\em From Time}, {\em To Time}, {\em From Track} and
+{\em To Track} are automatically set by selecting a range with the mouse.
+
+The checkboxes {\em Note}, {\em Controller}, {\em Patch} (Program Change),
+{\em Pitch}, {\em Meter} and {\em Other} decide whether these event types
+should be included in the selection. For the first four event types you can
+also specify more closely which values will be included.
+
+By default, all 'boxes' except {\em Other} are checked, leaving e.g.
+{\em Tempo} events unchanged by selection operations.
+
+\subsection{Window}
+adjust size of fonts (y-axis) and events (x-axis).
+
+
+
+\subsection{Song}\label{songset}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{10cm;0cm}{songset.ps}}%
+\htmlonly{\image{0cm;0cm}{songset.gif}}%
+\winhelponly{\image{0cm;0cm}{songset.bmp}}%
+\caption{Song settings dialog}%
+\end{figure}}
+
+Here you can adjust the overall resolution of the song in ticks per quarter.
+The native JAZZ++ driver (MPU-401) supports distinct values only. With OSS
+and on MS-Windows you can use any value here. If you change this value,
+all event timings are recomputed.
+
+A big value of 'ticks per quarter' means that the time resolution of the
+notes in the song will be better, but the strain on the sequencer system
+will also increase. Many people think it is important to have a big value here,
+while others say you won't hear the difference. We recommend you to use
+the default value (120 ticks per quarter) which gives sufficient resolution
+for any 'normal' midi song.
+
+In this dialog you may also set the maximum length of the song in bars.
+This value is used to set the scrollbars in the track and piano windows.
+
+
+\subsection{Metronome Settings}\label{metroset}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{10cm;0cm}{metroset.ps}}%
+\htmlonly{\image{0cm;0cm}{metroset.gif}}%
+\winhelponly{\image{0cm;0cm}{metroset.bmp}}%
+\caption{Metronome settings dialog}%
+\end{figure}}
+
+Adjust metronome instruments and velocity.
+
+An ``accented'' metronome means that the first count of a bar sounds different
+than the other counts.
+
+\subsection{Effects}
+
+Adjust GS or XG effect settings. In XG mode, also equalizer settings can be
+chosen.
+
+In GS mode, effects can be adjusted in two modes dependant on the settings
+of the 'Use effect macro' and 'Use chorus macro' checkboxes:
+\begin{itemize}
+\item {\em macro mode} - the choices in the macro listboxes are valid
+\item {\em individual parameter mode} - the values of the parameter
+sliders are valid
+\end{itemize}
+
+Macro mode will be sufficient in most practical cases. Setting of individual
+parameters is more difficult, but can give very good results when done right.
+
+The mode settings (position of the checkboxes) can be saved with the
+"Save settings" menu entry. The current values of the listboxes or parameter
+sliders are stored in the midi file.
+
+\subsection{Timing}
+
+Controls clock source and real-time output.
+
+The available choices of {\em clock source} will vary depending on system
+platform:
+
+\begin{itemize}
+
+\item {\em Internal}. The sequencer is itself the source of the clock timing
+(available on all system platforms).
+
+\item {\em Song Pointer}. The sequencer clock locks to midi real-time messages
+received from midi input. The source of these messages is typically a
+tape-machine with an external sync-box or just another sequencer. Song
+pointer sync is available on Unix with JAZZ++-native MPU-401 driver and on
+MS-Windows.
+
+\item {\em Midi Time Code}. The sequencer clock locks to Midi Time Code
+(MTC) messages received from midi input. The source is typically a
+tape-machine with an external sync-box doing SMPTE-to-MTC conversion or
+a MTC-capable recording machine. MTC sync is available on MS-Windows platform.
+
+\item {\em FSK}. The sequencer clock locks to FSK information received from
+tape. This is available on Unix with an MPU-401 card supporting FSK
+sync.
+
+\end{itemize}
+
+How to sync?
+
+\begin{itemize}
+
+\item {\em Internal}.
+Just play; JAZZ++ is the master and decides all timing
+using internal clocks in the computer.
+
+\item {\em Song Pointer}.
+Make sure the device (here called "tape") you are syncing
+to sends midi real-time messages (songpointer, midi clock etc.) This could
+involve recording a "songpointer stripe" to a tape track by means of
+a sync box. To do this you must play the song with the sequencer in
+"Internal" sync mode and with "Realtime to MIDI Out" enabled. (For more info
+refer to the instructions of the sync box.)
+
+To play, enable "Song pointer" sync mode in sequencer (JAZZ++), start play on
+sequencer
+first, then start tape at any point in the song. The sequencer is now locked
+to the movements of the tape. (Note that some sync boxes don't send
+song-pointer at beginning of the song. In this situation you must manually
+start sequencer at song-start before running tape.)
+
+\item {\em Midi Time Code}.
+Make sure the device (tape) you are syncing to sends
+MTC messages (could involve recording an SMPTE stripe). Set the MTC offset
+and the MTC type either manually or by recording it while listening to the
+tape. (The MTC offset is the point in time when the sequencer is supposed
+to start playing the song.) When recording MTC offset the sequencer will
+automatically be set into MTC sync mode.
+
+To play, set sequencer to MTC sync mode, start play on sequencer, then start
+tape at any point in the song. The sequencer is now locked to the movements
+of the external device.
+
+\item {\em FSK}.
+An "FSK stripe" must first be recorded to a tape track. To do
+this you must play the song with the sequencer in "Internal" sync mode. Be
+sure to start FSK stripe recording some time before sequencer is started
+(must record the pilot tone).
+
+To play, set sequencer to FSK sync mode, start tape in the pilot-tone area,
+then start sequencer before pilot tone ends. (Note that with FSK play must
+always start at beginning of the song.)
+
+\end{itemize}
+
+The "Realtime to Midi Out" choice is useful for syncing another sequencer
+to this one or to record a "songpointer stripe" to tape via a sync box.
+Note that "Realtime to Midi Out" will only work properly for a
+ticks-per-quarter resolution dividable by 24
+(see \helpref{Song settings}{songset}).
+
+
+\subsection{Midi Thru}
+Enable/disable midi thru. Should normally be enabled.
+
+When enabled, the sequencer will send all notes received on
+the MIDI IN port to the MIDI OUT port. This basically means that you will hear
+what you play on the keyboard.
+
+\subsection{Synthesizer Type Settings}\label{synthtype}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{syntype.ps}}%
+\htmlonly{\image{0cm;0cm}{syntype.gif}}%
+\winhelponly{\image{0cm;0cm}{syntype.bmp}}%
+\caption{Setting of synthesizer type}%
+\end{figure}}
+
+Many MIDI sound generators (a synthesizer, soundmodule or soundcard) offer
+possibilities to choose an extended number of instruments (more than
+the 128 General MIDI instruments), or to control things like sound colour,
+reverb/chorus settings or time-variant filters. This is done by sending
+specific MIDI commands from the sequencer
+(bank-, NRPN- and SYSEX-events). However, the parameters of
+these commands are different depending on which standard your sound
+generator supports.
+
+To allow JAZZ++ to get the most out of your MIDI sound generator, you should
+choose the synthesizer type option that corresponds most closely to your
+equipment.
+
+Options are:
+
+\begin{itemize}
+
+\item{\em GM}
+- Choose this if your sound generator is a standard General MIDI device.
+This option is safe and will work for almost any sound generator.
+
+\item{\em GS}
+- GS is an extension to the GM specification that allows for 317 different
+instruments, effect type control and a lot more. Look for the GS logo on
+your equipment. GS was originally defined by Roland (R).
+
+\item{\em XG}
+- XG is another extension to GM. A lot of extra instruments
+are defined as well as a number of extended control possibilities. Look
+for the XG logo on your equipment. XG was originally defined by
+Yamaha (R).
+
+\item{\em Other}
+- This option is for sound generators that do not follow any of the standards
+mentioned above. JAZZ++ allows user customization of parameters like
+instrument lists (patches), controllers and drum instrument names. Look
+into the JAZZ++ \helpref{configuration files}{installation} for more info.
+
+\end{itemize}
+
+The 'Auto send MIDI reset' options control the conditions for when JAZZ++
+should send a MIDI reset command (corresponding to the synthesizer type) to the
+synthesizer device.
+
+\begin{itemize}
+\item {\em Never} - MIDI reset is never automatically sent to the device
+(only when you press the \helpref{panic putton}{twtoolbar})
+\item {\em Song start} - MIDI reset is sent whenever play starts from the
+beginning of the song (default)
+\item {\em Start play} - MIDI reset is always sent when play starts
+\end{itemize}
+
+Files saved from JAZZ++ will always contain a MIDI reset near the beginning
+of track 0.
+
+\subsection{Midi Device}
+
+You may select the input and output devices from the list of installed
+drivers.
+
+\subsection{Save Settings}
+Save settings to config file.
+Affected settings: midi thru, clock source, realtime out, effect macro modes,
+display welcome message and window geometry.
+
+
+\section{Misc menu}
+
+\subsection{Undo and redo}\label{undo}
+
+Undo or redo the last operation. The last 20 operations can be undone/redone.
+
+
+\subsection{Merge / Split Tracks}
+
+{\em Split tracks} places all events from track 0 to track 1..16 depending on
+the midi channel (useful for 'decoding' a format 0 midi file).
+
+{\em Merge tracks} moves all events to track 0 (not so useful as JAZZ++ only
+saves file format 1).
+
+\subsection{Meterchange}\label{meterchange}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{6cm;0cm}{meter.ps}}%
+\htmlonly{\image{0cm;0cm}{meter.gif}}%
+\winhelponly{\image{0cm;0cm}{meter.bmp}}%
+\caption{Meter change dialog}%
+\end{figure}}
+
+Changes the meter (counts per bar and note-value of each count) starting
+from specified bar to the end of song or to the
+next meterchange. {\em Numinator} is the 'counts per bar', while
+{\em Denominator} is the 'note-value of a count'.
+
+Meterchange events are placed on track 0 always.
+
+\subsection{Midi reset}\label{panic}
+
+Sends an initialize message (either 'GM ON', 'GS ON' or 'XG ON') to the midi
+port. If \helpref{synthesizer type}{synthtype} is correctly set, most sound
+generators will initialize to default values when such a message is
+sent.
+
+\subsection{Harmony browser}\label{hbrowser}
+
+\latexonly{\begin{figure}%
+\image{13cm;0cm}{hb.ps}%
+\caption{Harmony browser}%
+\end{figure}}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{hbtoolb.ps}}%
+\htmlonly{\image{0cm;0cm}{hbtoolb.gif}}%
+\winhelponly{\image{0cm;0cm}{hbtoolb.bmp}}%
+\caption{Harmony browser toolbar}%
+\end{figure}}
+
+The harmony browser shows the 4-tuned JAZZ++ harmonies of the four scales
+types major, harmonic minor, melodic minor and harmonic major.
+
+The first thing you can do is to click on chords and listen how they sound (eg
+examples from a song book or a book about harmony theory). The selected
+chord is placed into the pianowin copy buffer and can be pasted into
+your song (see \helpref{mouse actions}{mouseact}.
+
+The harmony browser is also able to analyze a section of your song and
+to transpose parts of your song into new scales and chords. Also you may generate
+chords thru the random rhythm generator into your song.
+
+What you can do with the mouse:
+\begin{itemize}
+\item {\em left click on a chord} selects the chord and marks related chords (see below).
+\item {\em shift + left} click selects the chord and appends it to the chord sequence
+you need to transpose parts of your song
+\item {\em right click} just listen to the chord, don't select it
+\item {\em right click on the last chord} of the chord sequence removes this
+chord from the sequence.
+\end{itemize}
+
+There is a toolbar with the following icons (from left to right):
+
+\begin{itemize}
+
+\item {\em The left four buttons} switch the scale type for which the standard
+chords are displayed: major, harmonic minor, melodic minor and harmonic
+major which is also known as ionic b13.
+
+\end{itemize}
+
+The following five Icons (with the cyan right arrow and the piano)
+specify what related chords are marked when you select a chord:
+
+\begin{itemize}
+
+\item {\em 4,3,2,1,0} marks all chords that have 4,3,2,1,0 common notes with the
+actual chord
+
+\item {\em 1/2} marks all chords, that differ from the selected chord by exactly
+one half note
+
+\item {\em 251} marks all chords, that would come next in the 2-5-1 move
+
+\item {\em =B} marks all chords, that share the same bass note with the selected chord
+
+\item {\em Tri} marks all chords, that could be tritone substitutes (their bass note
+is at a tritone interval from the selected chord).
+
+\item {\em (piano)} mark all chords, that contain all of the keys in the pianowin
+copy buffer. So you could select a few notes (max 4) in the pianowin and select
+copy from the edit menu. Now the harmony browser will mark all chords that contain
+those notes.
+
+If the piano button is not selected, the harmony browser works the other way round.
+Whenever you select a chord, the chord is placed into the pianowin buffer so you
+can paste it into your song. The parameters (midi channel, length etc) can be set
+in the midi-entry of the harmony browser menu.
+
+\end{itemize}
+
+The last four buttons do different things:
+
+{\bf Haunschild layout} shows harmonies and scales in an order proposed
+in a book about harmony theory by the German author Haunschild. If selected,
+chords are shown in a way that 'valid moves' are
+
+\begin{itemize}
+\item {\em from left to right}, e.g the 2-5-1 move is displayed as three neighbored
+chords. In general, all horizontal moves are allowed.
+\item {\em vertical moves} are allowed, they change one semitone of a chord (at most).
+\item {\em diagonal} from top-left to bottom right. I don't know why, but it sounds
+nice.
+\end{itemize}
+
+{\bf Transpose} lets you change parts of your song to the harmonies and chords
+of the chord sequence. When you select some bars in the trackwin and
+click on transpose, then the selection is mapped to the chord sequence.
+The default is, that on chord lasts one bar, but you may change this in the
+settings menu in the harmony browser. If the results are not satisfying, you
+should try to transpose track by track, this often works better. All in all,
+transposing works better, when the selected material is not too complicated.
+
+I had nice results with the following procedure: I recorded (very slow, as I am
+not a good piano player) cj7 chords on one track, some monphone bass line on the
+second track and a solo on the third track. Everything was in c major (white keys
+only). Then I selected some chords and transposed each track on its own.
+
+{\bf Analyze} Tries to find the chords and scales from the selection in the
+trackwin. Again, the default is one harmony per bar which can be changed in the
+settings menu. The algorithm looks at the length of the notes and chooses the
+longest notes to be the notes of the chord.
+
+{\bf Clear chord sequence} removes all chords from the chord sequence.
+
+
+{\bf Menu entries}
+
+\begin{itemize}
+\item {\em edit chord} - often you may want to have chords/scales that are not displayed
+in the harmony browser. You can select a chord from the chord sequence and change
+it in this dialog.
+
+\item {\em settings} - adjust parameters for transpose and analyze as explained above.
+A value of 0 quarters per chord when transposing will map the chords to the length
+of the selection, e.g if you have selected 16 Bars and your sequence has 4 chords,
+every chord will last 4 bars. If you had chosen 4 quarters instead, the chord
+sequence would have been repeated 4 times to fill the 16 bars of the trackwin selection.
+
+\item {\em midi} - these settings affect what you hear, when clicking on a chord and what
+is put into the pianowin buffer.
+
+\end{itemize}
+
+{\bf Generating chords with the random rhythm generator}
+
+After defining a chord sequence, you may open the random rhythm
+generator. When adding an instrument, it will show (beside drums) the
+instrument 'chords from harmony browser'. You select it and define a more or
+less randomized rhythm and proceed as described \helpref{here}{randrhy}.
+
+\subsubsection{Transpose Algorithm}
+
+This one is somewhat difficult to explain, but its probably the most
+interesting feature of the Harmony Browser.  Lets assume, you have a
+sequence of 4 chords. Then you select 4 bars in the track window (all
+tracks) and you press the transpose button.  Now, the Harmony Browser
+tries to change the harmonies and scales from the trackwindow selection
+into the selected chords.
+
+The algorithm looks at the first bar from the trackwin selection and
+sums up the length of all different notes. It assumes, that the 4 notes with the
+largest sum of length are the chords present in the song and changes them
+to the 4 notes from the first chord of your chord selection. Afterwards,
+the remaining notes from the trackwin selection are mapped to the remaining
+notes of the scale the chord was taken from.
+
+
+
+\subsection{Random rhythm generator}\label{randrhy}
+
+\latexonly{\begin{figure}%
+\image{13cm;0cm}{rrg.ps}%
+\caption{Random rhythm generator}%
+\end{figure}}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{rrgtoolb.ps}}%
+\htmlonly{\image{0cm;0cm}{rrgtoolb.gif}}%
+\winhelponly{\image{0cm;0cm}{rrgtoolb.bmp}}%
+\caption{Random rhythm generator toolbar}%
+\end{figure}}
+
+This dialog generates rhythms from some kind of statistical specification.
+You define probabilities for timing, velocity and note-length and from these
+the rhythm is generated.
+
+With the three sliders you specify the meter and (with \# Bars) how many
+probabilities you want to define. Next, you can add or remove instruments
+to the listbox. Then you specify the probabilities for rhythm, velocity
+and length for each instrument.
+
+Probabilities are set with the mouse where
+
+\begin{itemize}
+\item {\em left button} - draw some kind of curve
+\item {\em right button} - clear values to zero
+\item {\em + shift} - adjust all values simultaneously
+\item {\em + ctrl} - adjust exactly one value
+\end{itemize}
+
+In the rhythm field you specify the probabilities for every time
+position. A high value means a high probability that the instrument is
+played definitely at that time. A low value means, that the instrument
+{\em may} be played at that time. By adjusting high values only, you
+can specify a definite rhythm without any randomization.
+
+The velocity (and length) values are looked up by the generator, whenever
+it decides to play a beat.  It chooses one value from 1..127 (x-axis,
+1..8 for length) where positions with high probabilities are chosen more
+often.
+
+If the chosen length is greater than 1 step, there are no more events
+generated until the note quits, even if there are high probabilities in the
+rhythm field. You can abuse this, to make sure that there are not too many
+events generated (example: you have rhythm probabilities at step 4 and 5,
+but you want exactly {\em one} beat to be played at either of these.
+Specifying a length of 2 will do this,  if step 4 is chosen, there cannot
+be an event on step 5). The length may also be used for rhythms where you
+want to have random intervals between the beats but you are not interested
+in the absolute timing positions of the beats. Look at the cowbell definition
+in the rrg1.rhy example for this.
+
+We had the best results with the following: define every instrument
+twice. In the first definition, select high probabilities on a few
+timing positions together with high velocities, this makes the base
+groove - it is loud and does not change very much. In the second
+definition, have little probabilities on many timing positions with
+a low velocity, this makes randomized background fills, which make the
+whole thing more interesting and that do not override the base groove
+because of the low velocity.
+
+Aside from drums there are some special 'Instruments' you can select:
+
+\begin{itemize}
+\item {\em Controller} - opens another dialog to select a controller.
+Randomizing works the same like with drum keys except that instead of
+velocity the controller value is generated. With this, you may generate for
+example random panpot events that move the sound between left and
+right speaker or, in conjunction with the \helpref{Parts Menu}{partsmenu},
+you can generate many different randomized sound effects.
+\item {\em Pianowin all} - places the events currently selected in the piano
+window. You could eg select a chord an then replicate it on random timing
+positions.
+\item {\em Pianowin one} - like pianowin all, but on every timing position
+there is chosen one of all the selected events.
+%\item[Harmony: chord, harmony: bass] only available, if the
+%\helpref{harmony browser}{hbrowser} is opened and a chord sequence is defined. Places
+%the selected chords or bass note randomly.
+\end{itemize}
+
+The events selected in pianowin are copied to an internal rhythm buffer, so
+you may define multiple rhythms with different pianowin selections.
+
+To generate, you select some bars on one track in the trackwin and press the
+gen button.
+
+
+
+\subsubsection{Instruments without randomizing}
+
+If the checkbox 'randomize' is not selected, the velocity and length
+fields are disabled. The rhythm is generated from the rhythm field only.
+Every position with a bar height greater 0 gives a beat, the height of
+the bar is the velocity.
+
+
+\subsubsection{Instrument Groups}
+
+Up to now every instrument has its own probability definition and plays
+on its own without listening to the other instruments. By defining groups,
+instruments can play a little more 'together'. Some instruments contribute
+their rhythm to a group and others listen to the group and play
+accordingly.
+
+The contributors contribute their actual rhythm to the group, so the group
+maintains its own rhythm that is something like the sum of the rhythms of
+all contributing instruments.
+
+The listening instruments modify their probabilities according to the
+rhythm of the group. If the listen value is greater 0, then the instrument
+will play at the same timing positions as the group rhythm. If the value
+is negative, the instrument will play at the timing positions where the
+contributors do not play.
+
+The algorithm evaluates the instruments in the order they appear in the
+list. So contributors should be defined before listeners so its actual rhythm
+will be known to the listener. If a contributor is
+defined after a listener, the listener will listen to what the contributor
+played in the previous bar. An instrument may be listener and contributor
+at once.
+
+Example 1: There are three different conga instruments: muted,  high and low
+and you want them to play exclusively (only one instrument at a time). The
+first in the instrument list (eg the muted conga) will play its rhythm and
+contribute it to a group. The next instrument (e.g. high conga) will listen
+to the group with a value of -100, so it will play on those positions only
+where the muted conga does not play. It will also contribute its
+rhythm to the group. The third instrument (e.g. low conga) will also listen
+with a value of -100 so it will play only on positions, where none of the
+others play. See rrg2.rhy for an example of this.
+
+Example 2: The open hi-hat shall go on some of the positions where the
+bass drum plays, it shall not play alone (without bass drum). In this
+situation the bass drum will contribute its rhythm to a group and the
+open hi-hat will listen to the group with a value of +100.
+
+
+
+\subsection{Mapper}\label{mapper}
+
+This dialog allows to modify velocity, note length, note pitch and note start.
+We'll explain this dialog by an example: Select length as 'Source' and velocity
+as 'Destin' and select some tracks in the trackwin. In the lower part of the
+dialog you can paint some kind of curve now, see section \helpref{Random
+Rhythm}{randrhy} for details.
+
+When you press the Apply-Button
+the following happens: for every note on event, JAZZ++ looks at its length and
+looks up the length on the x axis of the curve. Now it looks at the curve and
+finds the corresponding value at the y-axis. This value is assigned to the
+velocity of the note on event. So, if you draw a diagonal line from bottom
+left to top right, short notes will get a low velocity and long note will get
+a high velocity.
+
+For rhythm this is analogous: the mapper looks up the start time in the x axis
+and takes the value from the height of the corresponding bar.
+
+When using random as 'Source' things are a bit different. The y-axis shows
+probability values now and the x-axis shows possible Destin values.
+JAZZ++ chooses for every note-on a new destin value - one of all the values
+shown on the x-axis. But those values, with a high probability are chosen
+more often, values with probability 0 will never be chosen.
+
+The switch 'Add value' means, that the Destin value is added to the existing
+value and the value is not replaced. You can subtract values too by adding
+negative Destin values.
+
+The rhythm and random features are probably the most interesting. The rhythm
+allows, to adjust velocity to a certain groove and random allows to 'humanize'
+midi events, add some very small timing inaccuracy or velocity changes.
+
+
+
+\subsection{Random Shuffle}\label{shuffle}
+
+
+With this dialog you can rearrange parts of your song based on random. The
+selected bars are divided into small segments (default length is 1/4 note).
+When pressing OK, jazz rearranges these segments in random order. Also,
+some of the segments may be choosen more than once while other segments do
+not appear at all. Options are:
+
+\begin{itemize}
+
+\item {\em Segment:} You can choose the length of the segments here. You may
+choose very small segments (e.g. 1/16) to create new drum rhythms or large
+segments (e.g 4/1) to rearrange large parts of the song.
+
+\item {\em skip silence:} when checked, segments that contain silence (no notes)
+are ignored. So you could place just a few events on some tracks in the piano
+window and then replicate them in random order.
+
+\item {\em random order:} when checked, jazz chooses the segments by random. If
+not checked, jazz chooses the segments one after the other from left to right
+and starts over on the left again when it reaches the right end. This makes
+sense when skip silence is enabled and/or track mode is set to
+'One track at a time'.
+
+\item {\em track mode:} When you have selected more than one track, this
+option applies. There are three choices:
+
+\begin{itemize}
+
+\item {\em All tracks in sync} means, that whenever jazz chooses a segment,
+it will take the same segment from all tracks. For example if jazz chooses
+the 7-th segment on the first selected track, it will place the 7-th segment
+of all tracks.
+
+\item {\em All tracks independently} means, that jazz chooses the segments
+independently on every track. In the example, jazz may choose the 7-th
+segment on the first track, the 3-rd segment on the second track and so on
+and all these segments will sound together in the result.
+
+\item {\em one track at a time} means, jazz will choose only one
+segment from one track per step. If you have selected a drum track and
+a percussion track, in the result there will be playing either drums or
+percussion but not both together.
+
+\end{itemize}
+
+\end{itemize}
+
+
+See the song/shuffle directory for an example. Load shuffle0.mid, then mark
+from 5 to 24 on tracks 5 to 8 (chords, ..., muted gt). Select Shuffle from
+the misc menu. Set the segment size to 1/4 note and set the trackmode to 'one
+track at a time'. Then press ok. This should give you something similar to
+shuffle1.mid. The song shuffle2.mid was generated from shuffle0.mid by deleting
+the tracks 5 and 7 (marimba and brass). To delete a track, click on its
+name and check the field 'Clear track' at the bottom of the track dialog.
+After clicking OK, you can drag the empty track to a new position with
+the right mouse button. To get shuffle2.mid set the segments size 1/8 note.
+
+
+\subsection{Random Melody Generator}\label{shuffle}
+
+With this dialog you can generate melodies, bass lines or chords.
+In general it works as follows: first it generates a small piece of melody,
+the seed. Then this seed is repeated several times and each time some variations are
+applied to the seed. Finally the melody is mapped to the harmonies using the Harmony
+Browser. See the description of the \helpref{Random Rhythm Generator}{randrhy}
+for additional information. Adjustables:
+
+\begin{itemize}
+
+\item {\em steps/count, count/bar, \#bars} the maximum length of a seed
+
+\item{\em pitch center, pitch range} defines the range of midi keys for the
+generated melody.
+
+\item{\em \#notes} one for melody and bass, two or three for chords
+
+\item{\em random seed length} if checked, the length of the seed is
+determined by random. If not, the seed length equals the length of
+the rhythm field (see below) and produces more steady results for bass
+and chords.
+
+\item{\em rhythm as intervals} if checked, the rhythm field is interpreted as
+intervals, if not, its interpreted absolute. Example: lets assume there is one bar
+at 1 and one bar at 2. Interpreted absolute means, that notes may occur on the first
+beat and/or on the second beat, but no notes will be generated at the third and fourth
+beat. Interpreted as intervals means, that the time distance between two notes
+may be either 1/16 or 4/16.
+
+\item{\em note length} the length of a generated note. Like the Random Rhythm
+Generator, a new note may start only after the old one has finished, so the
+note length overrides the rhythm setting in concurrent situation.
+
+\item{\em velocity} velocity setting, same as in Random Rhythm generation
+
+\item{\em pitch interval} When the RMG generates the seed, it starts with a random
+choosen pitch. Then for every next note, it adds an interval to its previous note.
+The interval is choosen from the probabilties you define here. If, for example, there
+is only one bar at 1, then every note will have an interval of 1 to its previous
+note.
+
+\item {\em seed length} Here you define the probabilities for the length of the seed.
+
+\item {\em seed repeat} defines the probabilities for how often a sees will be
+repeated
+
+\item {\em seed variations} defines the variations that may be applied:
+\begin{itemize}
+\item {\bf 1} plain repeat with no variation
+\item {\bf 2} multiplies the intervals by -1
+\item {\bf 3} appends a new pattern to the beginning and to the end of the seed
+\item {\bf 4} multiplies the intervals by 2 or 1/2
+\end{itemize}
+
+\item {\em rhythm} defines the probabilities for the rhythm.
+
+\end{itemize}
+
+Please take a look at the examples in the song/rmg directory. To generate a new
+melody for example 1, do the following:
+\begin{itemize}
+\item load the midi file rmg1.mid in the track window
+\item load the harmonies rmg1.har in the harmony browser. You may minimize the
+harmony browser but not close it - it is needed to transpose the generated melody.
+\item load the melody generator settings rmg1solo.mel into the Random Melody Generator
+\item next, mark the range where the events should be generated. This is
+bar 5 to bar 45 in the track window.
+\item In the Random Melody Generator window press the generate button,
+then the transpose button and finally the play button (the three rightmost
+buttons in the toolbar).
+\end{itemize}
+
+
+
+\subsection{Event List Editor}\label{evtlst}
+
+In this window, you can edit events like text. When the window is opened,
+JAZZ++ translates the selected events into a text form. You can edit this
+text in the Event List Editor and finally convert it back to midi events.
+
+The Event List Editor allows to filter events. The Editor will show only those
+events that are currently enabled in the \helpref{Filter Dialog}{midifilter} 
+in the Settings menu. As we already know, changing the filter settings 
+affects most of the other edit functions too, e.g erase will erase only
+those events, that are enabled in the Filter Dialog.
+
+The Event List Editor recognizes the following events:
+
+\begin{itemize}
+\item {\tt 1:2:030 key 1 4C 90 200}\\
+      A note event. 1:2:030 is the timing information, it means bar 1, 
+      beat 2 plus 30 ticks. The string key indicates that this line
+      corresponds to a note on event. The following 1 is the midi channel
+      (numbered from 1 to 16), 4C is the octave and pitch, 90
+      the velocity and 200 the length of the note.
+
+\item {\tt 1:2:030 kpr 1 4C 90}\\
+      A keypressure event. It defines a pressure on channel 1, value 90 for the note 4C.
+
+\item {\tt 1:2:030 ctl 1 10 40}\\
+	A controller event. 1 is the midi channel, 10 the controller number (pan) and
+	40 the value.
+
+\item {\tt 1:2:030 prg 1 5}\\
+	A program change event, here program 5 on channel 1)
+
+\item {\tt 1:2:030 cpr 1 50}\\
+	A channel pressure event, here value 50 on channel 1
+
+\item {\tt 1:2:030 pit 1 -4074}\\
+	A pitchbend event, valid values are in -8191 .. 8191
+
+\item {\tt 1:2:030 sys f0 11 22 33 44 f7}\\
+	A system exclusive message, hex values including the start- 
+	(f0) and stop- (f7) byte.
+
+\item {\tt 1:2:030 txt here is some text}\\
+	A text event. All text up to the end of the line is text.
+
+\item {\tt 1:2:030 cpy copyright text}\\
+	A copyright event. All text up to the end of the line is text.
+
+\item {\tt 1:2:030 trn copyright text}\\
+	A trackname event. All text up to the end of the line is text.
+
+\item {\tt 1:2:030 spd 120}\\
+	A set tempo event. The value is in beats per minute.
+
+\item {\tt 1:2:030 tsi 7/8}\\
+	A time signature event. The denomiator must be a power of 2, e.g one
+	of 2,4,8,16,32.
+
+\item {\tt 1:2:030 ksi maj 3}\\
+	A key signature event. The string 'maj' indicates a major scale,
+	'min' would mean a minor scale. The number is the number of
+	sharps in the scale.
+
+\end{itemize}
+
+
+
+\subsection{Arpeggio Generator}\label{arpeg}
+
+This dialog generates arpeggios from chords that are already recorded.
+The generator scans the selected track(s) in the trackwindow. Whenever
+3 or more notes sound simultanously, they are replaced by an arpeggio that
+consists of the chord notes and their octaves.
+
+You can paint the kind of arpeggio: the x axis represents the time in steps,
+the y axis the note of the chord. A value of 5 on the y axis means: 'take
+the 5-th note of the chord'. If the chord does not contain 5 notes, the
+generator transposes the chord by one octave.
+
+If you check the controller box, you can choose a controller (e.g. panpot).
+In this mode, the generator does not scan the selection but generates controller
+events.
+
+Take a look at the examples in the song/arpeggio directory.
+
+
+\subsection{Set Music Copyright}\label{muscopyr}
+The copyright notice is put into the midi file as a 'copyright' meta event.
+It is intended to be used for copyrighting the music.
+
+\section{Help menu}\label{twhelp}
+
+\begin{itemize}
+
+\item {\em Jazz} loads top-level 'table of contents' of the help-file.
+
+\item {\em Trackwin} loads trackwin chapter.
+
+\item {\em Mouse} shows a dialog that describes mouse actions (what the buttons do
+etc.).
+
+\item {\em About} shows a dialog with info about Jazz.
+
+\item {\em Welcome} shows a dialog containing the Jazz 'welcome-message'.
+
+\end{itemize}
+
+\section{Help system}\label{help}
+Context specific help is available via the ``help'' button in most dialogs.
+
+There is also a help menu in both main windows.
+
+The help buttons and some of the help-submenus requires access to
+the wxWin help system. The help system acts a little different dependant
+on the system platform:
+
+\begin{itemize}
+\item {\em Unix}. A copy of the {\em wxhelp} utility program as well as
+the file {\em jazz.xlp} has to be present in a directory listed by the
+shell's binary search path (e.g. /usr/local/bin). If the wxhelp program
+cannot be found there will be a timeout message
+after a while (repeated two times).
+
+Please observe that the jazz.xlp file does not support graphics.
+In order to view the help-file images on Unix (can be useful)
+please use the html- or postscript-versions of the documentation. The html
+files can be viewed using a standard web browser (like 'netscape'). The
+postscript file can be viewed using 'ghostview' or it can be produced on paper
+using a postcript-capable printer.
+
+\item {\em Windows}. The native help system is used, which requires that the
+help file is present in 'Windows help' format ({\em jazz.hlp}). This file is
+installed automatically by the jazz install-utility.
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Piano window}\label{pianowin}
+
+The pianowindow shows Note-On events of a single Track.
+Displayed track and bar is selected by clicking with the right
+mouse button into the trackwindow.
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{pianowin.ps}}%
+\htmlonly{\image{0cm;0cm}{pianowin.gif}}%
+\winhelponly{\image{0cm;0cm}{pianowin.bmp}}%
+\caption{Piano Window}%
+\end{figure}}
+
+
+
+\section{Toolbar}\label{pwtoolbar}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{pwtoolb.ps}}%
+\htmlonly{\image{0cm;0cm}{pwtoolb.gif}}%
+\winhelponly{\image{0cm;0cm}{pwtoolb.bmp}}%
+\caption{Pianowin toolbar}%
+\end{figure}}
+
+Buttons to set the mode of the left mouse-button:
+\begin{itemize}
+\item {\em select area} (by dragging a rectangle)
+\item {\em change length} (by dragging the 'tail' of an event)
+\item {\em show dialog} (\helpref{edit existing event or create a new one}{pweventedit})
+\item {\em cut/paste} (great for fast note-by-note editing)
+\end{itemize}
+
+Note that these actions can also be done by using other mouse buttons or
+by combining shift- and ctrl-keys with mouse buttons
+(see \helpref{Mouse actions}{mouseact}).
+
+
+Buttons to set the most common \helpref{snap}{snap} values (pasted events
+will be placed at nearest 'snap' value, similar to a 'grid' in a graphics
+paint system):
+\begin{itemize}
+\item set snap to 1/8 note
+\item set snap to 1/12 note
+\item set snap to 1/16 note
+\item set snap to 1/24 note
+\end{itemize}
+
+Buttons to manipulate events:
+\begin{itemize}
+\item \helpref{Cut}{pwcutpaste}
+\item \helpref{Delete}{pwcutpaste}
+\item \helpref{Quantize}{quantize}
+\item \helpref{Shift left}{pwshift}
+\item \helpref{Shift right}{pwshift}
+\item Enable {\em multi track mode} as described \helpref{here}{pwevents}
+\end{itemize}
+
+Buttons for other operations:
+\begin{itemize}
+\item \helpref{Undo}{undo}
+\item \helpref{Redo}{undo}
+\item \helpref{Panic (MIDI reset)}{panic}
+\item \helpref{Help}{help}
+\end{itemize}
+
+
+
+\section{Mouse actions}\label{mouseact}
+
+For a fast reference to mouse-actions, please invoke the {\em Help-$>$Mouse}
+menu entry.
+
+{\bf Mouse actions in the event area}
+
+\begin{itemize}
+
+\item {\em Select events}. When in 'select area' mode
+(see \helpref{toolbar}{pwtoolbar}), events can
+be selected by dragging a rectangle with the left mouse button.
+A selection is continued by dragging while holding the shiftkey down. (To
+continue a selection outside the current view, you need to scroll using the
+window scrollbars before doing shiftkey + left-button again.)
+
+\item {\em Adjust note length by dragging}. Click on the event and drag
+the 'tail' while holding mouse button down. This can be done with the
+left mouse button when in 'change length' mode
+(see \helpref{toolbar}{pwtoolbar}), or by using the right mouse button.
+
+\item {\em Show event dialog}. Opens a dialog box to
+modify the values of the event
+or to create a new event. This can be done with the left mouse button when in
+'show dialog' mode
+(see \helpref{toolbar}{pwtoolbar}), or by using ctrl+middle (if
+available).
+
+\item {\em Cut / paste events}. Clicking on an event cuts the event to the
+internal cut/paste buffer, clicking on an empty position pastes the
+buffer contents into the pianowin. This can be done with the left mouse
+button when in 'cut/paste' mode
+(see \helpref{toolbar}{pwtoolbar}), with the middle mouse button (if
+available) or with shift+ctrl+left.
+
+\item {\em Copy events}. Copy an event into the internal cut/paste buffer. Do
+this by pressing shift+ctrl+right or shift+middle (if available).
+
+\item {\em Change velocity of event}. Holding the controlkey while pressing the
+left or right button on an event increments/decrements the velocity. The
+velocity value is displayed in the left end of the top line (just
+above the piano keyboard).
+
+\item {\em Change track in 'single track mode'}. You may change the track by pressing
+shift + cursor keys.
+
+\item {\em Change track in 'multiple track mode'}. In this mode you can change track
+by pressing the right mouse button on an event from another track
+(painted with grey color).
+
+\item {\em Listen to pitch}. Do this by pressing shift+right.
+
+\end{itemize}
+
+
+
+{\bf Mouse actions in the top line}
+
+\begin{itemize}
+\item {\em Start/stop play}. Click the left mouse button on the top line to
+start/stop playing (record is not available in the pianowin).
+\item {\em Start cycle play}. Select some events (some bars) and press
+shift+left-button. If there is no selection active, 4 bars are cycled.
+\end{itemize}
+
+
+\section{Edit/create single events}\label{pweventedit}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{eventdlg.ps}}%
+\htmlonly{\image{0cm;0cm}{eventdlg.gif}}%
+\winhelponly{\image{0cm;0cm}{eventdlg.bmp}}%
+\caption{Example of event editing dialog}%
+\end{figure}}
+
+There are a number of dialogs that allow for detailed editing of single events.
+The dialogs are invoked by clicking left mouse button in the pianowin when
+in {\em show dialog} mode (see \helpref{toolbar}{pwtoolbar}). Events that
+can be created or edited are {\em Note On}, {\em Controller},
+{\em Program Change}, {\em Set Tempo} and {\em System Exclusive}.
+
+
+\section{Edit menu}
+
+Some entries work the same way as discussed in the \helpref{edit menu}{twedit}
+of the trackwindow. Only the entries that is special for the pianowindow is
+described here.
+
+\subsection{Cut, Copy, Paste}\label{pwcutpaste}
+Copies selected events into an internal buffer. Events can be pasted to an
+empty space.
+
+Cut is like Copy + delete.
+
+\subsection{Shift}\label{pwshift}
+
+Moves selected events to the left or right. The amount is snaps, which can be
+adjusted in the settings-menu.
+
+\subsection{Quantize}
+Quantizes selected events to the current snap-setting.
+
+\subsection{Left - Right, Up - Down}
+
+Exchanges the position of selected events. Try it.
+
+\section{Settings menu}
+
+Some entries work the same way as discussed in the
+\helpref{settings menu}{twsettings} of the trackwindow.
+
+\subsection{Events}\label{pwevents}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{pwevents.ps}}%
+\htmlonly{\image{0cm;0cm}{pwevents.gif}}%
+\winhelponly{\image{0cm;0cm}{pwevents.bmp}}%
+\caption{Pianowin show-events dialog}%
+\end{figure}}
+
+You can specify what events are to be shown in the pianowin.
+
+\begin{itemize}
+\item {\em NoteOn, Controller, Program, Tempo, SysEx}. These events can be
+shown and
+edited in the pianowin. If you select exactly one, the piano at the left
+hand side will be replaced by a list of controller- or program names.
+\item {\em Show drumnames}. Switch it off if you prefer to see the piano
+keyboard instead of drumnames.
+\item {\em Show events from all tracks}. Displays all events
+('multi track mode'). Events from active track are shown
+red, the others grey. Clicking with the right mouse button on a grey event
+changes the actual track.
+\item {\em Show harmonies from harmonybrowser}. Displays the chords and
+scales from the harmony browser. To see the chords, you must first open the
+harmonybrowser and define a chord sequence. Then you have to mark some bars
+in the trackwin to show, where the chords should go. Now the pianowin shows
+notes from chords in light blue and notes from the scale in light green.
+
+\end{itemize}
+
+\subsection{Snap}\label{snap}
+
+The start time of pasted events will be quantized to this value. This value is also
+used in the quantize- and shift dialogs in pianowin and trackwin.
+
+
+\section{Misc menu}
+
+\subsection{Edit Pitch and others}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{pitched.ps}}%
+\htmlonly{\image{0cm;0cm}{pitched.gif}}%
+\winhelponly{\image{0cm;0cm}{pitched.bmp}}%
+\caption{Graphical editing in Pianowin}%
+\end{figure}}
+
+
+Opens a painting area where you can paint values of the specified type (pitch, controller, ...).
+Painting with mouse is done analogous to the \helpref{random rhythm generator}{randrhy}, make sure
+you use the right button to set values to zero because you can't paint an exact zero because
+of limited screen resolution. Use the Apply button to make your changes take effect.
+
+Also 'tempo' change events can be painted. Please note that tempo changes
+in the middle of the song may not work if audio/midi synchronization is
+enabled (see \helpref{Global Audio dialog}{globalsettings}).
+
+\subsection{Guitar board}
+
+Opens a window displaying the frets of a guitar. Moving the mouse over the guitar board shows
+the names of the notes and moves the black bar in the pianowin. Same works the other way around,
+moving the mouse in the pianowin shows the notes on the guitar board.
+
+Also, the actual contents of the pianowin cut / paste buffer is shown (this may be set from the
+harmony browser too, so you can see how chords could be played).
+
+Clicking with the left button adds events to the pianowin buffer so you can paste them into
+your song. In chord mode (settings dialog), if you add several events to the buffer, they all
+start at the same time, otherwise they are generated one after the other (length is the
+current snap setting).
+
+
+\section{Help menu}
+
+\begin{itemize}
+
+\item {\em Pianowin} - loads the pianowin chapter of the help file.
+
+\item {\em Mouse} - displays a dialog that describes mouse actions (what the buttons
+do etc.).
+
+\end{itemize}
+
+For more info about help see \helpref{'Help System'}{help} in the {\em Track Window} chapter.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Audio}\label{audio}
+
+\section{Audio Overview}\label{audiointro}
+
+Audio signal processing is a very CPU and memory intensive task. For
+satisfying results we recommend a pentium processor with 32 MB RAM or
+up.
+
+The audio part of JAZZ++ is organized similar to a sampler or a
+drum machine. That is, you can assign a sound sample to every midi key.
+This is different to a usual synthesizer where you assign a sound
+to a midi channel and the note only changes the pitch. So an audio track
+in JAZZ++ is very much like a drum track. On a drum track, every
+note plays another instrument, on an audio track every note plays
+another sample.
+
+You assign samples to midi keys using the \helpref{Sample Settings
+Dialog}{samplesettings}. JAZZ++ then loads the samples into memory. You
+may use samples with different sampling rates and channels (mono,
+stereo) in one song, JAZZ++ converts all samples into the format you
+specify in the \helpref{Global Settings Dialog}{globalsettings}.
+The collection of samples you define in the Sample Settings Dialog
+is called a {\em Sample Set} in JAZZ++.
+
+After defining a sample set, you should define an audio track. You do
+this in the track window by opening the \helpref{Track Dialog}{trackdlg}
+and check the entry called Audio Track. Audio tracks behave the same
+way like drum tracks or other midi tracks. E.g you can place individual
+notes on the track, copy, delete or replicate bars etc. Every note
+on the audio track corresponds to a sample you just defined.
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{audiotrk.ps}}%
+\htmlonly{\image{0cm;0cm}{audiotrk.gif}}%
+\winhelponly{\image{0cm;0cm}{audiotrk.bmp}}%
+\caption{Audio track in pianowin}%
+\end{figure}}
+
+Next open the piano window on that track by clicking with the right
+mouse button on the audio track you just created. When you scroll up
+and down you should see the labels of the samples on the left hand side
+of the window (the labels are assigned in the Sample Settings Dialog).
+When you click on one of the labels, you should hear the sound of
+that sample.
+
+Next select the 1/16 note in the toolbar to be able to place some notes
+on the track. Then set a few notes. When placing a note, you will hear
+the sample too. Also you may notice, that the length of the note is
+not 1/16 but is as long as the sample is according to the current midi
+speed. When you change the midi speed in the trackwin, you will see that
+the note length is adjusted to the new speed (by the way: this way you
+can easily adjust the midi speed to a drum loop sample).
+
+Now you are ready to listen to your new song. Go back to the track
+window and click on the start play toolbar button. And voila, you will
+hear your new audio enabled song.
+
+
+\section{Audio Recording}
+
+Audio record works much the same way like midi record. Select some bars
+on an audio track where you want to record an audio signal. Then press
+the record button. More on record / play you can read
+\helpref{here}{recplay}.  While recording you may not hear other samples
+depending on the capabilities of your sound card. Most sound cards do not
+support simultaneous record and playback.
+
+When you have finished recording, stop the operation by clicking on the
+play or record
+button again. JAZZ++ will then ask you, if you want to keep the recording.
+When you answer yes, you will get the file selector dialog to specify
+the audio file for your recording. The recording will be saved in the
+Microsoft .wav format. Also JAZZ++ automatically assigns a midi note to
+your new sample and places a note on the recorded audio track. If you
+don't like your recording and you do it again, you should save it under
+the same file name as the old recording. Then JAZZ++ will reuse the same
+midi note and not assign a new one.
+
+Please note: when you do audio recording, JAZZ++ needs much memory for the
+playback too. So you should start playback a few bars before the
+selection and stop playback a few bars after it. Please do not playback
+the whole song, when you only want to record a few bars.
+
+
+\section{Audio Menu}
+
+\subsection{Global Settings}\label{globalsettings}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{5cm;0cm}{audioset.ps}}%
+\htmlonly{\image{0cm;0cm}{audioset.gif}}%
+\winhelponly{\image{0cm;0cm}{audioset.bmp}}%
+\caption{Global audio settings dialog}%
+\end{figure}}
+
+Here you specify the internal resolution for the audio processing of
+JAZZ++.  This means, that all samples are internally converted to the
+parameters you specify here. If you set the sampling rate to 22050 here
+and load a sample that was sampled with 11025 samples per second, JAZZ++
+will convert it to 22050 samples per second on loading. Specifying
+low quality here (low sampling rate and mono) will dramatically reduce
+the CPU and memory requirements needed for processing. Of course this
+will reduce sound quality too.
+
+\begin{itemize}
+
+\item {\em Enable Audio}. If you leave this unchecked, the whole audio system
+will be disabled. This is useful, if you do not use audio in a midi-only
+song and want to save CPU and memory.
+
+\item {\em Sample Freq (or Sampling Rate)}. The number of samples per second and
+per channel (if stereo). 44100 is CD quality, 8000 is telephone sound.
+
+\item {\em Stereo}. Switch this off if all your samples are mono anyway or to
+save memory.
+
+\item {\em Software Midi/Audio Sync}. You may try to switch this off. If midi
+and audio keep in time, then your sound card synchronizes midi and audio
+itself and you should leave this unchecked, because midi-audio synchronization
+is CPU intensive too. Most cards do not synchronize midi and audio, so
+in most cases this should be checked. Please note that midi tempo changes
+in the middle of a song will not work if Midi/Audio Sync is enabled.
+
+\end{itemize}
+
+
+
+\subsection{Sample Settings}\label{samplesettings}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{7cm;0cm}{sampset.ps}}%
+\htmlonly{\image{0cm;0cm}{sampset.gif}}%
+\winhelponly{\image{0cm;0cm}{sampset.bmp}}%
+\caption{Sample settings dialog}%
+\end{figure}}
+
+In this dialog you define the midi keys for your samples. Please read
+the \helpref{Introduction}{audiointro} for more information on midi
+keys for samples.
+
+You add a new sample to the list by selecting an list entry first
+and then press the add button. In the file selector you choose the
+sample file you want to play in your song. The only file format supported
+currently is the Microsoft .wav format. After loading the file you should
+enter a label (a name for the sample) in the label text entry near the
+bottom. This label will be shown in the piano window when editing an
+audio track.
+
+The list shows the available midi keys at the left. Low numbers at the
+top of the list stand for very low midi keys and high numbers for high
+midi keys. To avoid scrolling in the piano window you probably want to
+load the samples somewhere in the middle of the list.
+
+To remove a sample from the list select that entry and press the Clear
+button. To listen to a sample press the Play button, to interrupt
+listening press it again. The Edit button invokes the \helpref{Sample
+Editor}{samplewin}.
+
+The Sample Settings dialogs also allows to adjust volume, pan and pitch
+of a sample. In opposite to the Sample Editor, these changes are not
+permanent, e.g if you reduce the volume you can increase it later again
+with no loss of quality. JAZZ++ applies these settings every time a sample
+is loaded.
+
+After you have defined a set of samples you want to use, you may
+save these settings into a .spl file. Close the dialog and select Save Set from the
+Audio menu in the track window. Please notice, that these files contain all
+your settings from the Sample Settings Dialog, but they do not contain
+the samples themselves. The .spl files only contains the filenames of
+the samples, so if you rename or delete samples, JAZZ++ will not be able
+to find those samples again.
+
+\section{Sample Editor}\label{samplewin}
+
+\xlpignore{\begin{figure}%
+\latexonly{\image{13cm;0cm}{sampedit.ps}}%
+\htmlonly{\image{0cm;0cm}{sampedit.gif}}%
+\winhelponly{\image{0cm;0cm}{sampedit.bmp}}%
+\caption{Sample editor}%
+\end{figure}}
+
+The sample editor may be invoked from the
+\helpref{Sample Settings Dialog}{samplesettings} or from the piano window.
+In the piano window, the editor is invoked when you select the dialog
+toolbar button on an audio track and click on a note.
+
+The sample editor shows the waveform of the audio signal and allows
+you to modify it. There are two scrollbars, the upper one controls the
+zoom and the lower one the view position.
+
+For some operations (like cut) you must select a range of samples, you
+can do this by dragging the mouse. Similar to the track window or piano
+window you may continue a selection by dragging with the shift key down.
+Clicking again clears the selection. Other operations (like paste) need
+an insertion point. This is set by clicking into the sample area when
+there is no selection. The insertion point is displayed as a vertical
+red line.
+
+A more convenient way to zoom into a part of a sample is to select
+the range of interest and then click the magnify glass button.
+
+Pressing the play button will play the whole sample by default. If there
+is a selection, only the selected samples will played. If there is
+an insertion point, play will start at that point.
+
+
+
+\subsection{Loading and Saving Samples}
+
+After you have modified your sample you may save it. Please note that
+saving will make the settings in the \helpref{Sample Settings
+Dialog}{samplesettings} permanent. That is, if you have set the volume
+e.g. to a value of 50 in the sample settings dialog, the sample will be
+saved with this volume and you cannot make it louder again without loss
+of quality. To avoid this, you can set the volume to maximum in the
+sample settings dialog and leave the pan and pitch sliders neutral before
+starting to edit. After saving your sample you can change volume etc again.
+
+You may think of the sample settings dialog as some kind of mixer
+whereas the sample editor really changes the sound source itself.
+
+\subsection{Cut/Copy/Paste}
+
+\begin{itemize}
+
+\item {\em Cut}. Cuts out a piece of the sample into an internal buffer. Needs
+some samples to be selected.
+
+\item {\em Copy}. Copies some samples into the internal buffer. If no range is
+selected, the whole sample is copied.
+
+\item {\em Paste}. Inserts the samples from the internal buffer to the sample.
+If there is a selection, the selection is replaced by the buffer. If there
+is an insertion point, the buffer is inserted at that position.
+
+\item {\em Paste Merge}. Adds the buffer at the insertion point. The samples
+from the buffer are mixed with the original.
+
+\end{itemize}
+
+
+
+\subsection{Silence}
+
+You have to select a range before using this function.
+\begin{itemize}
+\item {\em Replace} - the selection will be replaced with silence.
+\item {\em Insert} - will insert silence at the beginning of the selection,
+the length of the inserted silence is equal to the length of the selection.
+\item {\em Append} - will append silence at the end of the selection. The
+length is equal to the length of the selection.
+\end{itemize}
+
+
+\subsection{Invert Phase}
+Inverts the phase of the left or right channel
+
+
+\subsection{Maximize Volume}
+This maximizes the volume of the whole sample. It is made as loud as possible
+without distortion.
+
+
+\subsection{Painters}\label{audiopainters}
+
+After selecting a painter command in the menu bar, a paintable area is
+displayed at the bottom of the window. In this area you may paint some
+kind of curve. Painting works the same way as in the \helpref{Random
+Rhythm Generator}{randrhy} and is described there in more detail. After
+painting you can press the green accept-button in the toolbar or the red
+crossed cancel button. The operation is applied for the visible range
+of samples. So if you don't want to modify the whole sample, zoom to
+the range of interest before invoking the painter.
+
+\begin{itemize}
+\item {\em Volume} - lets you paint some kind of envelope. The painter lets you
+paint the relative volume, that means no painting will not change the
+volume, painting above the zero line will increase the volume, painting
+below the zero line will decrease it.
+\item {\em Panpot} - changes volume between left and right channel
+\item {\em Pitch} - changes the pitch of the sample. This can operate on the
+whole sample only. The range of transposing can be adjusted in the
+Settings menu.
+\item {\em Filter} - a dynamic filter, e.g you can paint the cut off frequency.
+The filter settings can be adjusted in the settings menu.
+\end{itemize}
+
+% how to use, Pitch Painter Settings
+% volume pan pitch filter
+
+
+\subsection{Distortion}
+
+This adds a distortion effect to your sample. In the dialog you can paint
+a distortion curve. When pressing Ok, every sample is mapped to a new
+value according to the curve. JAZZ++ looks up the original sample value at the
+horizontal axis and replaces the sample value with the height value of
+the curve at that point. Because painting smooth curves is difficult, there
+are some presets, try them out!
+
+
+
+\subsection{Reverb}
+
+The reverb algorithm of JAZZ++ is produces a high quality reverb effect.
+Parameters of the Reverb Dialog:
+
+\begin{itemize}
+\item {\em Room Size} - a value corresponding to the time until the first
+echo of the reverb can be heard. If you think of a big room producing
+the reverb, this corresponds to the size of the room.
+\item {\em Brightness} - controls the frequencies that are echoed from
+the rooms walls.
+\item {\em Length} - controls how many echos are computed. This controls the
+depth of the reverb.
+\item {\em Effect Volume} - the final output mixer, you set the volume of the
+reverb-only signal here which is mixed to the original then.
+\end{itemize}
+
+
+
+\subsection{Echo}
+
+In this dialog you can add one or more echos to your sample.
+\begin{itemize}
+\item {\em Number of echos} - controls how many echos are generated
+\item {\em Delay} - the time in milli seconds between the echos
+\item {\em Amplitude} - the relative Amplitude in \%. A value of e.g. 20 means,
+that the first echo has a volume of 20\% of the original, the second
+echo has a volume of 20\% of the first echo and so on.
+\item {\em Random delay}. If this is checked, the time between the echos is
+chosen randomly. The Delay-Value (see above) is taken as a basis
+for the random generator.
+\end{itemize}
+
+
+
+
+\subsection{Chorus}
+
+This is some kind of universal effect which can produce chorus-like effects.
+The operation is quite simple: JAZZ++ takes a copy of the original sample,
+then modifies it according to the settings in the dialog and finally
+mixes the modified copy back to the original.
+
+\begin{itemize}
+
+\item {\em Delay} - delays the signal for the number of seconds/100 specified
+here (e.g. a value of 20 means 200 millisec delay).
+
+\item {\em Pitch Modulation Frequency} - changes the pitch of the signal up
+and down controlled by a sine wave LFO (Low Frequency Oscillator), this is
+the heart of most chorus effects.
+The modulation frequency is set in Hertz/10 (that is, a value of 20 means 2
+turnarounds per second). The modulation frequency corresponds to the speed
+regulator of a chorus effect.
+
+\item {\em Pitch Intensity} - the depth of pitch change.
+
+\item {\em Pan Freq} - changes the pan of the signal to the left and right
+controlled by a sine LFO.
+
+\item {\em Stereo Spread} - enhances the stereo effect of the output. You
+may even try to convert a mono signal to a stereo signal by setting Delay
+to 20 or so, turn pitch intensity and pan spread off and set stereo spread
+to maximum.
+
+\item {\em Effect Volume} - the volume of the modified signal in \% of the
+original.
+
+\end{itemize}
+
+
+
+\subsection{Pitch shifter}\label{pitchshifter}
+
+This operation lets you change the pitch of a sample. Pitch changing
+normally changes the length of the sample too (you can think of a tape
+machine, where the speed is altered). JAZZ++ however provides algorithms
+to change the speed without changing the length of the sample.
+
+With the sliders you specify the amount of transposition in semitones.
+If the box {\em Keep Length} is checked, the transposed sample will have the
+same length as the original. In this case, JAZZ++ divides the sample
+into small pieces and plays these pieces with the new speed as often as
+necessary to match the original length. This may lead to an undesired
+tremolo effect if the size of the pieces is too big or too small. The
+slider named window size lets you adjust the size of the pieces.
+
+
+\subsection{Time Stretcher}
+
+This is similar to the \helpref{Pitch shifter}{pitchshifter}. You can
+change the length of the sample here. Changing the length normally
+changes the pitch of the sample too, but if you check the box labeled
+{\em Keep Pitch} JAZZ++ will change the length without changing the pitch.
+
+You may specify the new length in seconds (upper sliders) or in terms
+of midi speed (lower sliders). With the upper sliders you specify the
+delta length, that is how much time you like to add or subtract from
+the original length. Eg to make the sample one second shorter, you
+would set the first slider to -1.
+
+The midi speed sliders are best explained using an example: Lets assume
+you have a drum loop recorded at a speed of 120 beats per minute. To
+change the speed (and thus the length) of the sample, to 130 beats per
+minute, you set the slider {\em old speed} to 120 and the slider {\em new speed}
+to 130.
+
+The meaning of the window slider is described in the \helpref{Pitch
+Shifter Dialog}{pitchshifter}.
+
+
+
+\subsection{Reverse}
+
+This reverses the output (think of a tape playing backwards). If there
+is no selection, the whole sample is reversed.
+
+
+
+\subsection{Additive Synthesis}
+
+In this window you can generate new sounds using a noise generator
+together with additive sound synthesis generators. You may up to 6
+generators to build your sound. For each generator you can paint curves
+for envelope, panpot and pitch. The output of all generators is mixed
+together to make the final sound.
+
+The toolbar buttons have the following meaning (from left to right):
+\begin{itemize}
+\item load synth settings. In the song subdirectory you find an
+example for a simple drum which maybe a starting point for you.
+\item save a synth settings.
+\item generate a wave
+\item listen to the generated wave (you have to generate first). If you
+dont hear anything make sure that you have painted some envelope. Also
+you have to enable audio in the audio menu of the track window of course.
+\end{itemize}
+
+Near the top of the window you find some checkboxes. The first
+4 (Harmonics, Envelope, Panpot and Pitch) switch on and off the
+corresponding paint areas.  This is useful for painting on a small screen.
+The last one labeld {\it Noise} turns the first generator into a noise
+generator when checked.
+
+{\bf Noise generator}
+
+In the left paint area labeled {\it noise filter}  you can paint the
+cut off frequency of the noise generator. The slider labeled {\it Midi Key}
+is ignored in the noise mode.
+
+
+{\bf Sound generator}
+
+In sound generator mode the left paint area is labeled {\it harmonics}. You can
+paint the volumes for each harmonic. Note that the 10 leftmost harmonics
+determine much of the final sound (you have to make the window big to
+paint these). Harmonics with even numbers sound warmer than harmonics
+with odd numbers. Most sounds will only have a few harmonics with
+high volume and especially harmonics with high numbers will have low
+volume. In this mode the midi key is the base frequency from which the
+harmonics are calculated.
+
+{\bf working with multiple generators}
+
+With the slider labeled {\it Number of Synths} you can use up to 6 generators
+simultanously. Only the first one may be a noise generator, all others will
+be in additive synthesis mode. There is much room for experimenting with
+multiple generators, e.g you can do some kind of morphing / crossfading with
+the envelope painters, or get some chorus like effects when detuning the
+oscillators a little bit in the pitch painter.
+
+After you have made some sound make sure to add some reverb or chorus.
+
+
+
+\subsection{Filter}
+
+This adds high quality filters to your effects gallery. You may choose
+one of the following filter types:
+
+\begin{itemize}
+\item {\em Low Pass} - lets pass low frequencies, the volume of high
+frequencies is reduced (some kind of bass booster).
+Frequencies below the corner frequency will become louder, frequencies above
+will become more quiet. The bandwidth value is ignored.
+
+\item {\em High Pass} - the other way round, the volume of low frequencies is
+reduced and high frequencies can pass the filter (some kind of treble booster).
+Frequencies above the corner frequency will become louder, frequencies below
+will become more quiet. The bandwidth value is ignored.
+
+\item {\em Band Pass} - increases the volume of middle frequencies. The corner
+frequency is the frequency with maximum volume. The bandwidth is a value
+in \% of the corner frequency and specifies, what frequencies above
+and below the corner frequency may pass the filter.
+
+\item {\em Band Stop} - decreases the volume of middle frequencies.
+\end{itemize}
+
+The feedback value controls the gradient of the filter. In case of a low
+pass filter for example, it controls how much the volume above the
+corner frequency is reduced. A value of 1 or 2 is sufficient in most
+cases.
+
+\subsection{Settings}
+
+\begin{itemize}
+
+\item {\em Pitch Painter} opens a dialog to control the range of the
+pitch paint area (see \helpref{Painters}{audiopainters}).
+
+\item {\em Filter Painter} opens a dialog to control the type of filter that
+is applied to the filter painter area (see \helpref{Painters}{audiopainters}).
+
+\item {\em View Settings} opens a dialog to control view parameters of the
+sample editor window. The 'show midi time' checkbox toggles between
+showing time as counts or real time.
+
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Examples}\label{examples}
+
+\section{How to build a new midi song}\label{exmidisong}
+
+Supposing you start with a blank song in the trackwin, these are the steps
+you need to do in order to record some midi tracks and make your own midi song.
+
+\begin{enumerate}
+
+\item {\em Turn on the metronome}. Push the \helpref{metronome button}{twtoolbar}.
+This will help you keep in time when playing.
+Later, when you have recorded some tracks, you may want to turn the metronome
+off again because the other recorded tracks will support you with the necessary
+beat information.
+
+\item {\em Select counts per bar etc.}. By default, a blank song will have
+4 counts per bar with each count corresponding to a quarter note. To change
+this you need to invoke the \helpref{Misc-$>$Meterchange}{meterchange}
+menu entry.
+
+\item {\em Select song speed}. You probably have a feeling about how fast
+your song should be. You can try this right away by just pressing the
+\helpref{play button}{twtoolbar}. You will then hear the beats of the
+metronome. Change the speed to your preference by clicking into the
+\helpref{speed field}{speed}.
+
+\item {\em Define track defaults}\label{rectrackdef}. Before you can enter music
+(events) into
+a track, you need to define {\em track name}, {\em instrument to be played}
+and {\em midi channel number} for that track. Do this by clicking on the
+\helpref{track name field}{trackdlg}, starting on the {\em second} track (will
+invoke the Track Settings dialog). {\em Never use the first track for
+recording}, as this is defined to be the {\em master track} (holding events
+controlling the whole song like speed, meter change etc.).
+
+\begin{itemize}
+
+\item {\em Track name}. Enter a track-name that describes what you play on the
+track, not just the instrument
+name (you may want to play some other voice using the same instrument into
+another track at a later stage).
+
+\item {\em Instrument}. Select an instrument from the instrument list. The instruments with
+one number in front of the name (e.g. '5 Rhodes Piano') are the 'General MIDI' (GM)
+instruments, the others are extensions to the GM standard and may not be
+supported by your synth/sound-card.
+
+If this track is to play the same
+channel and the same instrument as a previously defined track, set the
+instrument to 'None' (default).
+
+If your track is a drum track, the instrument names are a bit misleading.
+To get started we recommend that you select instrument number 1
+(labelled '1 Piano 1'). This will give you the 'standard drum kit' on a
+GM compatible synth/sound-card. You must study the instrument list in your
+synth documentation to see what other drumkits are available.
+
+\item {\em MIDI channel}. If the track is to play a new instrument, choose a
+midi channel that
+has not been used by another track. Start at channel 1 and increment by one
+for each new instrument (track). If your track is to play {\em drums}, select
+channel 10 (predefined by GM to be the drum channel).
+
+\end{itemize}
+
+\item {\em Set output midi channel on your keyboard}\label{recsetkbchan}.
+If your keyboard is
+capable of sending on different midi channels, you should now set the
+keyboard output channel according to the midi channel of the track you are
+about to record. If your keyboard can only send on one midi channel
+(e.g. channel 1), you must use a slightly different algorithm
+(described \helpref{below}{onechannel}).
+
+Note that you can also 'record' without a keyboard by manually entering
+events into the \helpref{pianowin}{pianowin} using the mouse.
+
+\item {\em Select some bars}. \helpref{Select}{select} the area of your track
+where you want to record. You can also select the whole track by
+clicking in the leftmost field of the track in trackwin (the
+\helpref{track/channel display column}{trackdefs}).
+
+\item {\em Start recording}. Start recording by clicking at the
+\helpref{record button}{twtoolbar}. JAZZ++ will then start to play one bar
+ahead of the selected area to give you a count-in. You can also start
+recording by clicking directly at a bar in the top-line of the event area
+(see section \helpref{Record and play}{recplay}). While recording you will
+hear the metronome (if enabled), any previously recorded tracks plus your own
+keyboard playing.
+
+\item {\em Stop recording}. Stop recording by clicking the
+\helpref{record button}{twtoolbar} again (or use one of the other 'stop-play'
+methods). If you played any notes, you will be asked if you want
+to keep the recorded events. If you decide to keep them, press 'Ok'. You can
+then listen to the recording. If you are not satisfied you can press the
+\helpref{Undo button}{twtoolbar} to take it away and then do a new recording
+(go back to previous item).
+You can also do a new recording by pressing right-button on the top-line.
+The old recording will then be silent, and any new recording will replace the
+old one.
+
+\item {\em Post process the recording}. You may want to fix something in your
+recording afterwards. You may want to \helpref{quantize}{quantize} or
+\helpref{transpose}{transpose} the recording (menu entry {\em Edit-$>$Transpose}),
+or you may want to fix notes that are wrong using the mouse in the
+\helpref{pianowin}{pianowin}.
+
+\end{enumerate}
+
+You can record a new track by going back to the item
+{\em 'Define track defaults'}. You can also record more
+music into an existing track by going back to item
+{\em 'Set output midi channel on your keyboard'}.
+
+At some point you will probably also want to edit other track defaults like
+volume, pan, reverb and chorus. You can do this by invoking the
+\helpref{Mixer}{mixer} dialog (press the \helpref{mixer button}{twtoolbar}).
+
+If your synth is {\em GS} or {\em XG} compatible, you may also want to do other kinds of
+part editing like adjusting {\em sound-color}, {\em vibrato} or {\em envelope},
+or change the behavior of controllers like {\em pitch bender} and
+{\em modulation wheel}. These things and a lot more are accessible through the
+\helpref{Parts menu}{partsmenu}.
+
+\subsection{Recording with a one-channel keyboard}\label{onechannel}
+
+If your keyboard can only send on one midi channel (e.g. channel 1) you must
+change the above procedure according to the following:
+
+\begin{itemize}
+
+\item Always record in a track having the default channel set to 1.
+
+\item When finished recording on that track, change the default track number
+to something else (a free channel number) by clicking the track-name-field
+and adjusting the slider in the "Track Settings" dialog. When you click
+'Ok', the default channel and all events on the track will be converted to
+the new channel number (this is true if the entry
+{\em 'Force channel number onto all events on track'} is checked).
+
+\item If you want to do more recording on a previously recorded track, change
+that track back to channel 1 first using the same method.
+
+\end{itemize}
+
+Pressing the \helpref{Panic}{twtoolbar} button between operations will
+prevent the synth/sound-card from being confused (sends a 'reset' command
+to the synth/sound-card).
+
+
+\section{Random rhythm and harmonizer example}
+
+This section documents the demo example.
+
+\begin{enumerate}
+
+\item I prepared the tracks for the song and assigned names and channels for
+drums, bass, piano and melody. Then I generated the drums with the
+random rhythm generator.
+
+\item open the random rhythm generator and load the file demo.rhy. Lets take a
+look at the adjustments for the instruments:
+
+The first kick drum defines high probabilities at beat 1/4 and 3/4 -
+this makes the basic groove. The probabilities at 3/16 and 9/16 are a
+little lower, so the kick drum will not play these beats always. The
+velocity ranges from about 70 to 100, so the loudness of the beats varies.
+
+The snare drum plays at 2/4 and 4/4 but probabilities are less than 100\%, so
+it will play most of the time but not always. The velocity is about 80 .. 100, so
+the snare is loud always, there is not much dynamic.
+
+The third entry, closed hi-hat, plays at 2/8, 4/8, 6/8 and 8/8 - the probabilities
+are 100\% and velocity is high - these beats are played always and all of them are
+loud.
+
+The ride cymbal plays most of 1/4, 2/4, 3/4 and 4/4 and sometimes on 16/16. Also
+it plays at 9/16 - just to make things more interesting.
+
+The next entry, snare drum again, plays with low probability on all 1/16 timings -
+so not all of them are played - the probabilities would lead to about every 2nd
+1/16 would be played. For every beat that is played, the generator selects a
+length from the length field. Valid length values are 1/16, 2/16 and 3/16 where
+1/16 is chosen most often because it has the highest probability. When a length
+greater 1 is selected, then the generator will not produce a beat on the following
+1/16 step, because the previous note has not finished. Anyway, the velocity is
+very low compared to the other snare drum entry. Together both snare drum entries
+produce a loud and steady beat from the first entry and a lot of low-velocity
+fillings from the second entry.
+
+The last entry, closed hi-hat again, is similar. It does not play on the timing positions
+where the first closed hi-hat plays its loud and steady beats. It plays at the other
+timing position in between with a very wide range of velocity - so some of these
+in between beats will be dominant while others will sound like background.
+
+
+\item To produce the rhythm I selected bar 5 to 20 on the drum track and then
+clicked on the 'gen' button. This gives demo1.mid
+
+\item next I recorded 2 bars of a bass line and some chords. I quantized
+this and set the velocity to 90. Last I choose repeat copy to duplicate
+the material to the full length of 16 bars. This is demo2.mid.
+
+\item next I recorded a melody and did some corrections in the pianowin editor.
+This is demo3.mid.
+
+\item last I wanted some more interesting harmonies. To reproduce this step
+you may open the harmony browser and load the file demo.har.
+
+The first 4 chords
+are from the original recording Am7 and D7. These are step II and V from G major.
+So I chose Gj7 as the next 2 chords to establish that scale.
+
+The next 6 chords are a minor II-V-I move, which leads to Bbm7 in the
+scale of Ab major - notice, that the V was taken from the harmonic scale.
+The last chords are a V-I move in Ab major.
+
+
+\item to perform the transposition, transpose every track on its own. Mark the
+bass track in the trackwin and select transpose in the harmony browser (the button
+where the arrow points from the rectangle to the note). Then do the same for
+piano and melody. This should result in demo4.mid.
+
+demo4.mid is not perfectly transposed, but it could serve as a starting point and
+you could correct some notes in the pianowin editor. The pianowin editor can
+show the chords and scales in colors, look at \helpref{Pianowin Menu Events}{pwevents}
+for details.
+
+\end{enumerate}
+
+
+\section{Audio example}\label{exaudio}
+
+This is how you run the supplied audio demo:
+
+\begin{enumerate}
+
+\item Load the midi file named 'audiodem.mid'. You will see there are 3 tracks
+defined; drums, bass and an audio track named 'guitar'.
+
+\item Invoke menu entry {\em Audio$->$Load Set} and load file 'audiodem.spl'.
+This is the 'sample set definition file' that binds audio sample files to
+the different key pitches (see \helpref{Audio Overview}{audiointro}).
+
+\item Check that audio is enabled (invoke menu entry
+{\em Audio$->$Global Settings}, see \helpref{Global Settings}{globalsettings}).
+
+\item Now you can play the song (with audio) (see
+\helpref{Record and Play}{recplay}).
+
+\end{enumerate}
+
+You may also want to look at how the samples are bound to the key pitches by
+invoking
+\helpref{Sample Settings dialog}{samplesettings} and scroll the listbox down to
+position 50. There are two samples defined (funkguit1.wav and funkguit2.wav).
+Play the samples by selecting in the listbox and press the {\em Play} button.
+Look at how you can edit the samples in the
+\helpref{Sample Editor}{samplewin} by pressing the {\em Edit} button.
+
+At last you should look at the 'guitar' audio track in the
+\helpref{Piano Window}{pianowin}. Scroll
+up and down until you find the defined samples.
+
+
+\end{document}
+

@@ -6,10 +6,10 @@ ps: ../trackwin.ps
 ../trackwin.ps: trackwin.ppm
 	for i in *.ppm; do n=`basename $$i .ppm`; echo $$i; ppmtogif $$i | giftopnm | pnmtops -noturn > ../$$n.ps; done
 
-gif: ../html/trackwin.gif
+png: ../html/trackwin.png
 
-../html/trackwin.gif: trackwin.ppm
-	for i in *.ppm; do n=`basename $$i .ppm`; echo $$i; ppmtogif $$i > ../html/$$n.gif; done
+../html/trackwin.png: trackwin.ppm
+	for i in *.ppm; do n=`basename $$i .ppm`; echo $$i; pnmtopng $$i > ../html/$$n.png; done
 
 bmp: ../trackwin.bmp
 

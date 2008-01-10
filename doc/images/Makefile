@@ -4,7 +4,7 @@
 ps: ../trackwin.ps
 
 ../trackwin.ps: trackwin.ppm
-	for i in *.ppm; do n=`basename $$i .ppm`; echo $$i; ppmtogif $$i | giftopnm | pnmtops -noturn > ../$$n.ps; done
+	for i in *.ppm; do n=`basename $$i .ppm`; echo $$i; pnmtops -noturn $$i > ../$$n.ps; done
 
 png: ../html/trackwin.png
 

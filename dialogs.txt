@@ -2,7 +2,8 @@ How To Work on Dialogs
 
 Feel free to add to this file as you learn things while porting dialogs.
 
-1.  Find an existing dialog that hasn't been ported.  This is pretty easy to do,    since most of the dialogs have not yet been ported.  Any dialogs based on
+1.  Find an existing dialog that hasn't been ported.  This is pretty easy to do,
+    since most of the dialogs have not yet been ported.  Any dialogs based on
     wxForm or wxPropertyList should be ported to the new XML system.
 
 2.  Create an .xrc file that has the appropriate widgets.  The IDs of the

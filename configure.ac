@@ -1,8 +1,16 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(src/jazz.cpp)
-AM_INIT_AUTOMAKE(jazz, wx2alpha)
-AM_CONFIG_HEADER(src/config.h)
+AC_INIT([Jazz++], [5.0.0], pstieber@verizon.net)
 
+dnl Change the location of the auxiliary configure files to config.
+AC_CONFIG_AUX_DIR([config])
+
+AC_CONFIG_SRCDIR([src/JazzPlusPlusApplication.cpp])
+
+AM_INIT_AUTOMAKE
+
+AC_CONFIG_HEADERS(src/config.h)
+
+# Checks for programs.
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_LIBTOOL
@@ -26,20 +34,11 @@ AC_ST_BLKSIZE
 dnl These were taken from acconfig.h when it was removed.  They do not yet have
 dnl equivalents in this file.
 
-dnl // define this, if your computer is a 386 or so. It will reduce
-dnl // screenpaints
-dnl // #define SLOW_MACHINE
-
 dnl // in ms-windows, we have nothing
 dnl #ifdef wx_msw
 dnl #undef DEV_SEQUENCER2
 dnl #undef DEV_MPU401
 dnl #endif
-
-
-dnl a special porting define
-AC_DEFINE(__PORTING,1,
-[this symbol is used during the port from wx168 to wx2, so leave it defined if you're not doing porting work])
 
 
 dnl Check to see if we are using _Ios_Openmode.  gcc 3.2 doesn't like using
@@ -53,7 +52,7 @@ std::_Ios_Openmode test;],
 result=yes,
 result=no)
 if test $result = yes; then
-    AC_DEFINE(HAVE_IOS_OPENMODE,1,[This symbol should be defined for gcc 3.2 so that we use std::_Ios_Openmode instead of int])
+  AC_DEFINE(HAVE_IOS_OPENMODE,1,[This symbol should be defined for gcc 3.2 so that we use std::_Ios_Openmode instead of int])
 fi
 AC_MSG_RESULT($result)
 
@@ -68,78 +67,90 @@ dnl ---------------------------------------
 AC_ARG_ENABLE(alsa,  --enable-alsa     Support ALSA)
 
 if test x$enable_alsa = xyes ; then
-   AC_MSG_RESULT(alsa is enabled)
-   AC_DEFINE(DEV_ALSA,1,[use alsa drivers])
+  AC_MSG_RESULT(alsa is enabled)
+  AC_DEFINE(DEV_ALSA,1,[use alsa drivers])
 
-   dnl for alsa to work it must be installed(logical no?)
-   dnl this test is just preliminary
-dnl   if test -f /proc/asound/version; then
-dnl     AC_MSG_RESULT(alsa seems to be running...very good!)
-dnl     LIBS="$LIBS -lasound"
-dnl   else
-dnl     AC_MSG_ERROR(no alsa i can use! check if its at least 090 and running)
-dnl   fi
+  dnl for alsa to work it must be installed(logical no?)
+  dnl this test is just preliminary
+dnl  if test -f /proc/asound/version; then
+dnl    AC_MSG_RESULT(alsa seems to be running...very good!)
+dnl    LIBS="$LIBS -lasound"
+dnl  else
+dnl    AC_MSG_ERROR(no alsa i can use! check if its at least 090 and running)
+dnl  fi
 
-    dnl this test comes with the alsa distribution!
+  dnl This test comes with the alsa distribution!
     
-    AM_PATH_ALSA(0.9.0)
+  AM_PATH_ALSA(0.9.0)
 
-    LIBS="$LIBS $ALSA_LIBS"
-
+  LIBS="$LIBS $ALSA_LIBS"
 fi
 
-dnl ---------------------------------------
+dnl --------------------------------------------
 dnl check if we are to enable sequencer2 support
-dnl ---------------------------------------
-AC_ARG_ENABLE(sequencer2,   --enable-sequencer2      Support sequencer2)
+dnl --------------------------------------------
+AC_MSG_CHECKING([whether to enable sequencer2])
+AC_ARG_ENABLE(
+  sequencer2,
+  AC_HELP_STRING(
+    [--enable-sequencer2],
+    [enable sequencer2 support (off by default)]),
+  ac_arg_profile="yes",
+  ac_arg_profile="no")
+AC_MSG_RESULT(${enable_sequencer2-no})
 
 if test x$enable_sequencer2 = xyes ; then
    AC_MSG_RESULT(sequencer2 is enabled)
-   AC_DEFINE(DEV_SEQUENCER2,1,[support /dev/sequencer2])
+   AC_DEFINE(DEV_SEQUENCER2, 1, [support /dev/sequencer2])
 fi
 
 
 
-dnl ---------------------------------------
+dnl ----------------------------------------
 dnl check if we are to enable mpu401 support
-dnl ---------------------------------------
+dnl ----------------------------------------
 AC_ARG_ENABLE(mpu401, --enable-mpu401   Support jazz mpu401 driver)
 
 if test x$enable_mpu401 = xyes ; then
-   AC_MSG_RESULT(Mpu401 is enabled)
-   AC_DEFINE(DEV_MPU401,1,[support jazz's own driver over tcp/ip])
+  AC_MSG_RESULT(Mpu401 is enabled)
+  AC_DEFINE(DEV_MPU401,1,[support jazz's own driver over tcp/ip])
 fi
 
 
-dnl this stuff copied from /usr/share/aclocal/wxwin.m4
-dnl Macros for wxWindows detection. Typically used in configure.in as:
-dnl     AC_ARG_ENABLE(...)
-dnl     AC_ARG_WITH(...)
+dnl Check for wxWidgets
 
-     AM_OPTIONS_WXCONFIG
+AM_OPTIONS_WXCONFIG
 
-dnl im not exactly shure which is the minimal wxwin version required for jazz, but at least 2.0.0
-     AM_PATH_WXCONFIG(2.0.0, wxWin=1)
-     if test "$wxWin" != 1; then
-        AC_MSG_ERROR([
-                wxWindows must be installed on your system
-                but wx-config script couldn't be found.
+AM_PATH_WXCONFIG(2.8.7, wxWin=1)
+
+if test "$wxWin" != 1; then
+  AC_MSG_ERROR([
+    wxWidgets must be installed on your system, but the
+    wx-config script couldn't be found.
      
-                Please check that wx-config is in path, the directory
-                where wxWindows libraries are installed (returned by
-                'wx-config --libs' command) is in LD_LIBRARY_PATH or
-                equivalent variable and wxWindows version is 2.0.0 or above.
-        ])
-     fi
-     CPPFLAGS="$CPPFLAGS $WX_CPPFLAGS"
-     CXXFLAGS="$CXXFLAGS $WX_CXXFLAGS_ONLY"
-     CFLAGS="$CFLAGS $WX_CFLAGS_ONLY"
-     
-     LDFLAGS="$LDFLAGS $WX_LIBS"
+    Please check that wx-config is in your PATH, the
+    directory where wxWidgets libraries are installed
+    (returned by 'wx-config --libs' command) is in
+    LD_LIBRARY_PATH or equivalent variable, and the
+    wxWidgets version is 2.8.7 or above.
+  ])
+fi
 
-AC_OUTPUT( 
-  Makefile
-  xrc/Makefile
-  src/Makefile 
-  conf/Makefile 
-)
+JAZZ_PATH=\${top_srcdir}
+AC_SUBST(JAZZ_PATH)
+
+BITMAPS_PATH="$JAZZ_PATH/Bitmaps"
+AC_SUBST(BITMAPS_PATH)
+BITMAPS_FLAGS="-I$BITMAPS_PATH"
+
+# CPPFLAGS="$CPPFLAGS $WX_CPPFLAGS"
+CPPFLAGS=`echo -Wall -Wno-unknown-pragmas $BITMAPS_FLAGS $WX_CPPFLAGS | sed 's/ \+/ /g'`
+
+CFLAGS="$CFLAGS $WX_CFLAGS_ONLY"
+
+CXXFLAGS="$CXXFLAGS $WX_CXXFLAGS_ONLY"
+     
+LDFLAGS="$LDFLAGS $WX_LIBS"
+
+AC_CONFIG_FILES([Makefile src/Makefile conf/Makefile])
+AC_OUTPUT 

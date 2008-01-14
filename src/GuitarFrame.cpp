@@ -65,7 +65,7 @@ JZGuitarFrame::JZGuitarFrame()
       wxDEFAULT_FRAME_STYLE | wxNO_FULL_REPAINT_ON_RESIZE)
 {
   // set the frame icon
-  SetIcon(wxICON(mondrian));
+//  SetIcon(wxICON(mondrian));
 
   wxMenu* pMenu = new wxMenu;
   pMenu->Append(MEN_CLEAR,    "C&lear");

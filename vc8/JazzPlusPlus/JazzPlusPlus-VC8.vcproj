@@ -277,6 +277,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\Rectangle.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Rectangle.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\Resources.h"
 				>
 			</File>

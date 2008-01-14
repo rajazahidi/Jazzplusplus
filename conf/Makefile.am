@@ -1,8 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
-
-#jazz data files to install, for example in /usr/local/share/jazz, which is the gnu dictated place for such files
-#jazz.cfg could be tailored after the configure options(make a jazz.cfg.in and use var substitution1111)
+# This files specifies Jazz++ data files to install.  The default locations is
+# /usr/local/share/jazz, which is the gnu dictated place for such files.
+# jazz.cfg could be tailored after the configure options (make a jazz.cfg.in
+# and use var substitution1111)
 pkgdata_DATA = jazz.mid \
 jazz.cfg \
 ctrlnam.jzi \

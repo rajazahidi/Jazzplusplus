@@ -25,6 +25,10 @@
 #include "TrackWindow.h"
 #include "TrackFrame.h"
 
+#include <iostream>
+
+using namespace std;
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZTrackWindow::JZTrackWindow(
@@ -54,6 +58,7 @@ JZTrackWindow::JZTrackWindow(
     mToLine(0),
     xPatch(0),
     wPatch(0),
+    nBars(0),
     mCounterMode(eCmProgram),
     mpFixedFont(0),
     mFixedFontHeight(0),
@@ -104,7 +109,55 @@ void JZTrackWindow::Create()
 
   pDc->GetTextExtent("HXWjgi", &x, &y);
   hLine = y + mLittleBit;
+
+  hTop = mFixedFontHeight + 2 * mLittleBit;
+
+  pDc->GetTextExtent("99", &x, &y);
+  wNumber = x + mLittleBit;
+
+  pDc->GetTextExtent("Normal Trackname", &x, &y);
+  wName = x + mLittleBit;
+
+  pDc->GetTextExtent("m", &x, &y);
+  wState = x + mLittleBit;
+
+  pDc->GetTextExtent("999", &x, &y);
+  wPatch = x + 2 * mLittleBit;
+
+  wLeft = wNumber + wName + wState + wPatch + 1;
+
+  cout
+    << " " << wNumber
+    << " " << wName
+    << " " << wState
+    << " " << wPatch
+    << " " << wLeft
+    << endl;
+
+  UnMark();
+
   delete pDc;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::Mark(int x, int y)
+{
+  Marked.SetX(x2xBar(x));
+  Marked.SetY(y2yLine(y));
+  Marked.SetWidth(x2wBar(x));
+  Marked.SetHeight(hLine);
+
+  wxDC* pDc = new wxClientDC(this);
+  LineText(*pDc, Marked.GetX(), Marked.GetY(), Marked.GetWidth(), ">");
+  delete pDc;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::UnMark()
+{
+  Marked.SetX(-1);
 }
 
 //-----------------------------------------------------------------------------
@@ -127,7 +180,52 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
   mFromClock = mCanvasX * mClocksPerPixel;
   mToClock = x2Clock(mCanvasX + mCanvasWidth);
 
+  xNumber = mCanvasX;
+  xName   = xNumber + wNumber;
+  xState  = xName   + wName;
+  xPatch  = xState  + wState;
+
+//  int StopClk;
+
+//  Dc.BeginDrawing();
+//  Dc.DestroyClippingRegion();
+
+  DrawPlayPosition(Dc);
+
+  Dc.SetBackground(*wxWHITE_BRUSH);
+  Dc.Clear();
+
   DrawCounters(Dc);
+}
+
+//-----------------------------------------------------------------------------
+// Description:
+//   Draw the "play position", by placing a vertical line where the
+// "play clock" is.
+//-----------------------------------------------------------------------------
+void JZTrackWindow::DrawPlayPosition(wxDC& Dc)
+{
+#if 0
+  if (!SnapSel->Active && PlayClock >= FromClock && PlayClock < ToClock)
+  {
+    Dc.SetBrush(*wxBLACK_BRUSH);
+    Dc.SetPen(*wxBLACK_PEN);
+
+//    Dc.SetLogicalFunction(wxXOR);
+
+    int x = Clock2x(PlayClock);
+
+    // Draw a line, 2 pixwels wide.
+    Dc.DrawLine(x,     mCanvasY, x,     yEvents + hEvents);
+    Dc.DrawLine(x + 1, mCanvasY, x + 1, yEvents + hEvents);
+
+//    Dc.SetLogicalFunction(wxCOPY);
+  }
+//  if (mpNextWin)
+//  {
+//    mpNextWin->DrawPlayPosition(Dc);
+//  }
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -270,6 +368,51 @@ const char* JZTrackWindow::CounterStr()
       break;
   }
   return pString;
+}
+
+//-----------------------------------------------------------------------------
+// Was the VLine macro
+//-----------------------------------------------------------------------------
+void JZTrackWindow::DrawVerticalLine(wxDC& Dc, int XPosition) const
+{
+  Dc.DrawLine(XPosition, mCanvasY, XPosition, yEvents + hEvents);
+}
+
+//-----------------------------------------------------------------------------
+// Was the HLine macro
+//-----------------------------------------------------------------------------
+void JZTrackWindow::DrawHorizontalLine(wxDC& Dc, int YPosition) const
+{
+  Dc.DrawLine(mCanvasX, YPosition, mCanvasX + mCanvasWidth, YPosition);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZTrackWindow::x2xBar(int x)
+{
+  for (int i = 1; i < nBars; i++)
+  {
+    if (x < xBars[i])
+    {
+      return xBars[i - 1];
+    }
+  }
+  return -1;
+}
+
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZTrackWindow::x2wBar(int x)
+{
+  for (int i = 1; i < nBars; i++)
+  {
+    if (x < xBars[i])
+    {
+      return xBars[i] - xBars[i - 1];
+    }
+  }
+  return 0;
 }
 
 //-----------------------------------------------------------------------------

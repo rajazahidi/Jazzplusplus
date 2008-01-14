@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
+
 bin_PROGRAMS = jazz
+
 jazz_SOURCES = \
 AboutDialog.cpp \
 GuitarFrame.cpp \
@@ -8,22 +10,13 @@ GuitarSettingsDialog.cpp \
 GuitarWindow.cpp \
 JazzPlusPlusApplication.cpp \
 PianoFrame.cpp \
+Rectangle.cpp \
 ToolBar.cpp \
 TrackFrame.cpp \
 TrackWindow.cpp
 
 #jazz_LDADD=-L../xrc -lwx_xrc
 #jazz_CXXFLAGS=-I../xrc/include
-
-# The following files aren't compilable under wx2
-#EXTRA_DIST = \
-#rhythm.cpp \
-#gs_dlg1.cpp \
-#gs_dlg2.cpp \
-#sampldlg.cpp \
-#samplwin.cpp \
-#alsadrv.cpp
-
 
 noinst_HEADERS = \
 AboutDialog.h \
@@ -33,6 +26,7 @@ GuitarSettings.h \
 GuitarWindow.h \
 JazzPlusPlusApplication.h \
 PianoFrame.h \
+Rectangle.h \
 Resources.h \
 ToolBar.h \
 TrackFrame.h \

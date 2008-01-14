@@ -23,6 +23,8 @@
 #ifndef JZ_TRACKWINDOW_H
 #define JZ_TRACKWINDOW_H
 
+#include "Rectangle.h"
+
 class JZTrackFrame;
 class wxFont;
 
@@ -41,6 +43,11 @@ class JZTrackWindow : public wxScrolledWindow
 {
   public:
 
+    enum TELitits
+    {
+      eMaxBars = 200
+    };
+
     JZTrackWindow(
       JZTrackFrame* pParent,
       const wxPoint& Position,
@@ -54,6 +61,8 @@ class JZTrackWindow : public wxScrolledWindow
 
     virtual void OnDraw(wxDC& Dc);
 
+    void DrawPlayPosition(wxDC& Dc);
+
     void DrawCounters(wxDC& Dc);
 
     void LineText(
@@ -65,7 +74,21 @@ class JZTrackWindow : public wxScrolledWindow
       int h = -1,
       bool Down = false);
 
+    void Mark(int x, int y);
+
+    void UnMark();
+
     const char* CounterStr();
+
+    // Was the VLine macro
+    void DrawVerticalLine(wxDC& Dc, int XPosition) const;
+
+    // Was the HLine macro
+    void DrawHorizontalLine(wxDC& Dc, int YPosition) const;
+
+    int x2xBar(int x);
+
+    int x2wBar(int x);
 
     int Line2y(int Line);
 
@@ -90,7 +113,13 @@ class JZTrackWindow : public wxScrolledWindow
     int mFromClock, mToClock;
     int mFromLine, mToLine;
 
-    int xPatch, wPatch;
+    int xNumber, wNumber;
+    int xName,   wName;
+    int xState,  wState;
+    int xPatch,  wPatch;
+
+    int nBars;
+    long xBars[eMaxBars];
 
     TECounterModes mCounterMode;
 
@@ -99,6 +128,8 @@ class JZTrackWindow : public wxScrolledWindow
 
     int mFontSize;
     wxFont* mpFont;
+
+    JZRectangle Marked;
 };
 
 #endif // !defined(JZ_TRACKWINDOW_H)

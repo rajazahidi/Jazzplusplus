@@ -30,7 +30,7 @@
 #include "AboutDialog.h"
 #include "JazzPlusPlusApplication.h"
 
-#include "../Bitmaps/JazzLogo.xpm"
+#include "Bitmaps/JazzLogo.xpm"
 
 #include <sstream>
 

@@ -1,4 +1,7 @@
 ## Process this file with automake to produce Makefile.in
+
+ACLOCAL_FLAGS=-I config
+
 SUBDIRS = src conf
 
 # Here are some extra things to distribute.

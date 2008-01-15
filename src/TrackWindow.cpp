@@ -68,8 +68,9 @@ JZTrackWindow::JZTrackWindow(
     mFontSize(12),
     mpFont(0)
 {
-#ifdef WX_MSW
-  mpGreyColor = new wxColor(192, 192, 192);
+#ifdef __WXMSW__
+//  mpGreyColor = new wxColor(*wxLIGHT_GREY);
+  mpGreyColor = new wxColor(240, 240, 240);
 #else
   mpGreyColor = new wxColor(220, 220, 220);
 #endif
@@ -255,46 +256,50 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
     BarInfo.Next();
   }
   Dc.SetPen(*wxBLACK_PEN);
+*/
 
-  // for each track show num, name, state, prg
-
-  Dc.SetClippingRegion(mCanvasX, yEvents, mCanvasX + mCanvasW, yEvents + hEvents);
+  // For each track show the num, name, state, prg.
+  Dc.SetClippingRegion(
+    mCanvasX,
+    yEvents,
+    mCanvasX + mCanvasWidth,
+    yEvents + hEvents);
   int TrackNr = mFromLine;
-  for (y = Line2y(TrackNr); y < yEvents + hEvents; y += hLine)
+  for (int y = Line2y(TrackNr); y < yEvents + hEvents; y += hLine)
   {
     // SN+    Dc.HLine(y);
     Dc.SetPen(*wxGREY_PEN);
-    Dc.DrawLine(xEvents + 1, y, mCanvasX + mCanvasW, y);
+    Dc.DrawLine(xEvents + 1, y, mCanvasX + mCanvasWidth, y);
     Dc.SetPen(*wxBLACK_PEN);
     Dc.DrawLine(mCanvasX, y, xEvents,y);
 
-    //
-    tTrack *Track = gProject->GetTrack(TrackNr);
-    if (Track)
-    {
-      // TrackName, show the button pressed when dialog is open
-      //Dc.DrawText(Track->GetName(), xName + mLittleBit, y + mLittleBit);
-      if (Track->DialogBox)
-      {
-        LineText(Dc, xName, y, wName, Track->GetName(), -1, true);
-      }
-      else
-      {
-        LineText(Dc, xName, y, wName, Track->GetName(), -1, false);
-      }
-
-      // TrackStatus
-      //Dc.DrawText(Track->GetStateChar(), xState + mLittleBit, y + mLittleBit);
-      LineText(Dc, xState, y, wState, Track->GetStateChar());
-    }
+//    JZTrack* pTrack = gProject->GetTrack(TrackNr);
+//    if (pTrack)
+//    {
+//      // TrackName, show the button pressed when dialog is open
+//      //Dc.DrawText(pTrack->GetName(), xName + mLittleBit, y + mLittleBit);
+//      if (pTrack->DialogBox)
+//      {
+//        LineText(Dc, xName, y, wName, pTrack->GetName(), -1, true);
+//      }
+//      else
+//      {
+//        LineText(Dc, xName, y, wName, pTrack->GetName(), -1, false);
+//      }
+//
+//      // TrackStatus
+//      //Dc.DrawText(pTrack->GetStateChar(), xState + mLittleBit, y + mLittleBit);
+//      LineText(Dc, xState, y, wState, pTrack->GetStateChar());
+//    }
     ++TrackNr;
   }
   Dc.DestroyClippingRegion();
-*/
 
   DrawNumbers(Dc);
   DrawSpeed(Dc);
   DrawCounters(Dc);
+
+  LineText(Dc, xState, mCanvasY - 1, wState, "", hTop);
 }
 
 //-----------------------------------------------------------------------------
@@ -413,7 +418,7 @@ void JZTrackWindow::LineText(
   {
     Dc.SetBrush(*wxGREY_BRUSH);
     Dc.SetPen(*wxGREY_PEN);
-#ifdef wx_msw
+#ifdef __WXMSW__
     Dc.DrawRectangle(x, y, Width + 1, Height + 1);
 #else
     Dc.DrawRectangle(x, y, Width, Height);

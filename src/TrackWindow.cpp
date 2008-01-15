@@ -26,6 +26,8 @@
 #include "TrackFrame.h"
 
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -60,6 +62,7 @@ JZTrackWindow::JZTrackWindow(
     wPatch(0),
     nBars(0),
     mCounterMode(eCmProgram),
+    mNumberMode(eNmMidiChannel),
     mpFixedFont(0),
     mFixedFontHeight(0),
     mFontSize(12),
@@ -195,7 +198,169 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
   Dc.SetBackground(*wxWHITE_BRUSH);
   Dc.Clear();
 
+  Dc.SetPen(*wxBLACK_PEN);
+
+  // Draw the vertical lines.
+  DrawVerticalLine(Dc, xNumber);
+  DrawVerticalLine(Dc, xName);
+  DrawVerticalLine(Dc, xState);
+  DrawVerticalLine(Dc, xPatch);
+
+  // SN+ Dc.VLine(xEvents);
+  DrawVerticalLine(Dc, xEvents - 1);
+
+  DrawHorizontalLine(Dc, yEvents);
+  DrawHorizontalLine(Dc, yEvents - 1);
+
+
+/*
+  while (1)
+  {
+    int x = Clock2x(BarInfo.Clock);
+    if (x > mCanvasX + mCanvasWidth)
+    {
+      break;
+    }
+    if (x >= xEvents)   // so ne Art clipping
+    {
+      // SN+-      if ((BarInfo.BarNr % 4) == 0)
+      int c;
+      if (ClocksPerPixel > 48)
+      {
+        c = 8;
+      }
+      else
+      {
+        c = 4;
+      }
+      if (((BarInfo.BarNr - intro + 96) % c) == 0)
+      {
+        Dc.SetPen(*wxBLACK_PEN);
+        sprintf(buf, "%d", BarInfo.BarNr + 1 - intro);
+        Dc.DrawText(buf, x + mLittleBit, yEvents - hLine);
+        Dc.SetPen(*wxGREY_PEN);
+        Dc.DrawLine(x, yEvents + 1 - hLine, x, yEvents + hEvents);
+      }
+      else
+      {
+        Dc.SetPen(*wxLIGHT_GREY_PEN);
+        Dc.DrawLine(x, yEvents + 1, x, yEvents + hEvents);
+      }
+
+      if (nBars < MaxBars)      // x-Koordinate fuer MouseAction->Snap()
+      {
+        xBars[nBars++] = x;
+      }
+    }
+    BarInfo.Next();
+  }
+  Dc.SetPen(*wxBLACK_PEN);
+
+  // for each track show num, name, state, prg
+
+  Dc.SetClippingRegion(mCanvasX, yEvents, mCanvasX + mCanvasW, yEvents + hEvents);
+  int TrackNr = mFromLine;
+  for (y = Line2y(TrackNr); y < yEvents + hEvents; y += hLine)
+  {
+    // SN+    Dc.HLine(y);
+    Dc.SetPen(*wxGREY_PEN);
+    Dc.DrawLine(xEvents + 1, y, mCanvasX + mCanvasW, y);
+    Dc.SetPen(*wxBLACK_PEN);
+    Dc.DrawLine(mCanvasX, y, xEvents,y);
+
+    //
+    tTrack *Track = gProject->GetTrack(TrackNr);
+    if (Track)
+    {
+      // TrackName, show the button pressed when dialog is open
+      //Dc.DrawText(Track->GetName(), xName + mLittleBit, y + mLittleBit);
+      if (Track->DialogBox)
+      {
+        LineText(Dc, xName, y, wName, Track->GetName(), -1, true);
+      }
+      else
+      {
+        LineText(Dc, xName, y, wName, Track->GetName(), -1, false);
+      }
+
+      // TrackStatus
+      //Dc.DrawText(Track->GetStateChar(), xState + mLittleBit, y + mLittleBit);
+      LineText(Dc, xState, y, wState, Track->GetStateChar());
+    }
+    ++TrackNr;
+  }
+  Dc.DestroyClippingRegion();
+*/
+
+  DrawNumbers(Dc);
+  DrawSpeed(Dc);
   DrawCounters(Dc);
+}
+
+//-----------------------------------------------------------------------------
+// Description:
+//   This function draws the "numbers" column (leftmost one), which either
+// represents track numbers or midi channel depending on mode.
+//-----------------------------------------------------------------------------
+void JZTrackWindow::DrawNumbers(wxDC& Dc)
+{
+  const char* pString = NumberStr();
+  LineText(Dc, xNumber, mCanvasY - 1, wNumber, pString, hTop);
+
+  Dc.SetClippingRegion(xNumber, yEvents, xNumber + wNumber, yEvents + hEvents);
+  for (int i = mFromLine; i < mToLine; ++i)
+  {
+//    JZTrack* pTrack = gProject->GetTrack(i);
+//    if (pTrack != 0)
+    {
+//      if (pTrack->GetAudioMode())
+      {
+        LineText(Dc, xNumber, Line2y(i), wNumber, "Au");
+      }
+//      else
+//      {
+//        int Value;
+//        switch (NumberMode)
+//        {
+//          case NmTrackNr:
+//            Value = i;
+//            break;
+//          case NmMidiChannel:
+//            Value = pTrack->Channel;
+//            break;
+//          default:
+//            Value = 0;
+//            break;
+//        }
+  //        char buf[20];
+  //        sprintf(buf, "%02d", Value);
+//        ostringstream Oss;
+//        Oss << setw(2) << Value;
+//        LineText(Dc, xNumber, Line2y(i), wNumber, Oss.str().c_str());
+//      }
+    }
+  }
+  Dc.DestroyClippingRegion();
+}
+
+//-----------------------------------------------------------------------------
+// Description:
+//   This function draws the "speed" tempo indicator in the top left part of
+// the canvas.
+//-----------------------------------------------------------------------------
+void JZTrackWindow::DrawSpeed(wxDC& Dc, int Value, bool Down)
+{
+//  if (Value < 0)
+//  {
+//    Value = gProject->GetTrack(0)->GetDefaultSpeed();
+//  }
+
+//  char buf[50];
+//  sprintf(buf, "speed: %3d", Value);
+  ostringstream Oss;
+  Oss << "speed: " << setw(3) << Value;
+
+  LineText(Dc, xName, mCanvasY - 1, wName, Oss.str().c_str(), hTop, Down);
 }
 
 //-----------------------------------------------------------------------------
@@ -449,3 +614,27 @@ int JZTrackWindow::y2yLine(int y, int Up)
   y += hTop;
   return y;
 }
+
+//-----------------------------------------------------------------------------
+//   Returns a string indicating the current use of the "numbers" column,
+// which is the leftmost one.
+// T means track number, M means midi channel
+//-----------------------------------------------------------------------------
+const char* JZTrackWindow::NumberStr() const
+{
+  const char* pString;
+  switch (mNumberMode)
+  {
+    case eNmTrackNr:
+      pString = "T";
+      break;
+    case eNmMidiChannel:
+      pString = "M";
+      break;
+    default:
+      pString = "?";
+      break;
+  }
+  return pString;
+}
+

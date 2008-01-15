@@ -39,6 +39,14 @@ enum TECounterModes
   eCmModes
 };
 
+enum TENumberModes
+{
+  eNmTrackNr,
+  eNmMidiChannel,
+  eNmModes
+};
+
+
 class JZTrackWindow : public wxScrolledWindow
 {
   public:
@@ -62,6 +70,10 @@ class JZTrackWindow : public wxScrolledWindow
     virtual void OnDraw(wxDC& Dc);
 
     void DrawPlayPosition(wxDC& Dc);
+
+    void DrawNumbers(wxDC& Dc);
+
+    void DrawSpeed(wxDC& Dc, int Value = -1, bool Down = false);
 
     void DrawCounters(wxDC& Dc);
 
@@ -98,6 +110,8 @@ class JZTrackWindow : public wxScrolledWindow
 
     int y2yLine(int y, int Up = 0);
 
+    const char* NumberStr() const;
+
   private:
 
     wxColor* mpGreyColor;
@@ -122,6 +136,7 @@ class JZTrackWindow : public wxScrolledWindow
     long xBars[eMaxBars];
 
     TECounterModes mCounterMode;
+    TENumberModes mNumberMode;
 
     wxFont* mpFixedFont;
     int mFixedFontHeight;

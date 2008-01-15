@@ -43,9 +43,13 @@ class JZTrackFrame : public wxFrame
 
   private:
 
+    bool OnClose();
+
     void CreateToolBar();
 
     void CreateMenu();
+
+    void OnFileExit(wxCommandEvent& Event);
 
     void OnPianoWindow(wxCommandEvent& Event);
 

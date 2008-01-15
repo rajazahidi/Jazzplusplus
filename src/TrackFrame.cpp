@@ -59,9 +59,9 @@
 //-----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(JZTrackFrame, wxFrame)
 
-  EVT_MENU(ID_PIANOWIN, JZTrackFrame::OnPianoWindow)
+  EVT_MENU(wxID_EXIT, JZTrackFrame::OnFileExit)
 
-//  EVT_MENU(wxID_EXIT, JZTrackFrame::OnFileExit)
+  EVT_MENU(ID_PIANOWIN, JZTrackFrame::OnPianoWindow)
 
   EVT_MENU(wxID_HELP_CONTENTS, JZTrackFrame::OnHelpContents)
 
@@ -338,6 +338,44 @@ void JZTrackFrame::CreateMenu()
   SetMenuBar(pMenuBar);
 
 //  EnableDisableMenus();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZTrackFrame::OnClose()
+{
+//  if (JZTrack::changed)
+//  {
+//    if (
+//      ::wxMessageBox(
+//        "Song has changed. Quit anyway?",
+//        "Quit ?",
+//        wxYES_NO) == wxNO)
+//    {
+//      return false;
+//    }
+//  }
+//  if (gProject->IsPlaying())
+//  {
+//    gProject->Stop();
+//#ifndef WX_MSW
+//    sleep(1);
+//#endif
+//  }
+
+//OLD  delete the_harmony_browser;
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnFileExit(wxCommandEvent& Event)
+{
+  if (OnClose() == false)
+  {
+    return;
+  }
+  Close();
 }
 
 //-----------------------------------------------------------------------------

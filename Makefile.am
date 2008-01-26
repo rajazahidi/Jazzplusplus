@@ -5,8 +5,9 @@ ACLOCAL_FLAGS=-I config
 SUBDIRS = src conf
 
 # Here are some extra things to distribute.
-# things to fix:
-# docs are mising(because they are so large)
+# Things to fix:
+#   The docs are missing because they are so large.
+#   Subversion directories are included.
 EXTRA_DIST = bootstrap wxwin2_port.txt song scripts midinetd mswin contrib bitmaps rebuild
 
 really-clean: maintainer-clean

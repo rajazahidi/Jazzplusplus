@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT([Jazz++], [5.0.0], pstieber@verizon.net)
+AC_INIT([jazzplusplus], [5.0.0], pstieber@verizon.net, [Jazz++])
 
 dnl Change the location of the auxiliary configure files to config.
 AC_CONFIG_AUX_DIR([config])
@@ -149,8 +149,8 @@ CPPFLAGS=`echo -Wall -Wno-unknown-pragmas $BITMAPS_FLAGS $WX_CPPFLAGS | sed 's/ 
 CFLAGS="$CFLAGS $WX_CFLAGS_ONLY"
 
 CXXFLAGS="$CXXFLAGS $WX_CXXFLAGS_ONLY"
-     
+
 LDFLAGS="$LDFLAGS $WX_LIBS"
 
 AC_CONFIG_FILES([Makefile src/Makefile conf/Makefile])
-AC_OUTPUT 
+AC_OUTPUT

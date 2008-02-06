@@ -3,7 +3,7 @@
 # This files specifies Jazz++ data files to install.  The default location on
 # a Linux box is /usr/local/share/jazz, which is the gnu dictated place for
 # such files.  jazz.cfg could be tailored after the configure options (make a
-# jazz.cfg.in and use var substitution1111)
+# jazz.cfg.in and use var substitution).
 pkgdata_DATA = jazz.mid \
 jazz.cfg \
 ctrlnam.jzi \

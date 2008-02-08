@@ -35,6 +35,7 @@ class JZPianoFrame;
 JAVE i dont get the meaning of this class
 it seems to just fork out the method calls to its delegate, EventWin
 */
+/*
 class tCanvas: public wxScrolledWindow
 {
   public:
@@ -50,7 +51,7 @@ class tCanvas: public wxScrolledWindow
     void OnDraw(wxDC& dc);
     DECLARE_EVENT_TABLE()
 };
-
+*/
 
 
 /**
@@ -95,7 +96,7 @@ class JZEventFrame : public wxFrame
     virtual void Create();
     virtual void CreateMenu();
     void CreateCanvas();
-    tCanvas* Canvas;
+//    tCanvas* Canvas;
 
     // Setup()
     wxFont* mpFont;

@@ -25,7 +25,7 @@
 
 #include <wx/html/helpctrl.h>
 
-class JZSynth;
+class JZProject;
 
 //*****************************************************************************
 // Description:
@@ -78,11 +78,9 @@ class JZJazzPlusPlusApplication : public wxApp
     //     The application's build number.
     int GetBuildNumber() const;
 
-    const JZSynth& GetSynthesizer() const;
-
   private:
 
-    JZSynth* mpSynth;
+    JZProject* mpProject;
 
     mutable wxHtmlHelpController mHelp;
 

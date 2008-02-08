@@ -27,21 +27,10 @@ class tPlayer;
 class JZSynth;
 class tFilter;
 
-// needed until tRecordInfo gets moved to its own file
-//#include "TrackFrame.h"
 #include "Song.h"
 #include "Metronome.h"
 
-class tRecordInfo
-{
-public:
-  tTrack *Track;	// 0 == not recording
-
-  long   FromClock;     // recording from clock
-  long   ToClock;	// recording to clock
-  long   TrackNr;	// recording on this track
-  int    Muted;		// recording track is muted
-};
+class JZRecordingInfo;
 
 //*****************************************************************************
 // Description:
@@ -50,22 +39,15 @@ public:
 // object.  As the backend storage stuff gets rewritten, we'll be overloading
 // the JZSong members accordingly, until JZSong itself will be gone.  JZSong is
 // deprecated right now, and anything that still uses it needs to switch to
-// using jppProject instead through its global instance.
+// using JZProject instead through its global instance.
 //*****************************************************************************
-class jppProject : public JZSong
+class JZProject : public JZSong
 {
   public:
 
-    // These should probably become private members at some point.  I'm not
-    // sure about that though.  They are currently used as a holding pen for
-    // loose global variables while the globals are brought under control,
-    // again.
-    tPlayer* Midi;
-    JZSynth *Synth;
+    JZProject();
 
-    jppProject();
-
-    ~jppProject();
+    ~JZProject();
 
     // restart play here if space bar hit
     long mStartTime;
@@ -105,14 +87,16 @@ class jppProject : public JZSong
 
     // These provide access to the Project
 
-    // Sets the song name
-    void SetSong(wxString newsong);
+    // Description:
+    //   Set the song file name.
+    void SetSong(const wxString& SongFileName);
 
-    // Sets the pattern name
-    void SetPattern(wxString newpattern);
+    // Description:
+    //   Set the pattern file name.
+    void SetPattern(const wxString& PatternFileName);
 
     // Open the Song
-    void OpenSong(wxString newsong);
+    void OpenSong(const wxString& SongFileName);
 
     // Save the song
     void Save(wxString newsong);
@@ -146,19 +130,28 @@ class jppProject : public JZSong
     // Sets selection
 //    void SetSelection();
 
-    // Beats me what this does.
-    tRecordInfo *GetRecInfo();
+    const JZRecordingInfo* GetRecInfo();
 
-    // Sets RecInfo, jppProject takes ownership of this object
-    void SetRecInfo(tRecordInfo* newRecInfo);
+    // Sets RecInfo, JZProject takes ownership of this object
+    void SetRecInfo(JZRecordingInfo* pRecInfo);
 
   private:
+
+    // They are currently used as a holding pen for
+    // loose global variables while the globals are brought under control,
+    // again.
+    tPlayer* mpMidiPlayer;
+
+    JZSynth* mpSynth;
+
+    JZRecordingInfo* mpRecInfo;
+
+    JZSong* mpSong;
 
     bool mChanged;
 
     bool mIsPlaying;
 
-    tRecordInfo* mRecInfo;
 };
 
 #endif // !defined(JZ_PROJECT_H)

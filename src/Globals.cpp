@@ -28,9 +28,9 @@
 #include "NamedValue.h"
 #include "Project.h"
 
-char* pgStartUpSong = 0;
+char* gpStartUpSong = 0;
 
-JZSong* TheSong = 0;
+JZSong* gpSong = 0;
 
 JZSynth* Synth = 0;
 
@@ -49,4 +49,4 @@ tNamedValue limitSteps[] =
   tNamedValue(   0,      1  )
 };
 
-jppProject* gProject = 0;
+JZProject* gpProject = 0;

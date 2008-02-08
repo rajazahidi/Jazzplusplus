@@ -191,7 +191,7 @@ HBPlayer::HBPlayer()
   bass_key = n_chord_keys = n_meldy_keys = 0;
   note_length = 60;
   meldy_index = 0;
-  device = TheSong->GetTrack(0)->GetDevice();
+  device = gpSong->GetTrack(0)->GetDevice();
 }
 
 
@@ -259,7 +259,7 @@ void HBPlayer::StartPlay(const HBContext &ct)
 {
   int i;
 
-  device = TheSong->GetTrack(0)->GetDevice();
+  device = gpSong->GetTrack(0)->GetDevice();
 
   if (playing)
     StopPlay();
@@ -1547,13 +1547,10 @@ HBFrame::~HBFrame()
   the_harmony_browser = 0;
 }
 
-#ifndef __PORTING
-
 bool HBFrame::OnClose()
 {
-  return TRUE;
+  return true;
 }
-#endif // __PORTING
 
 int HBFrame::SeqDefined()
 {
@@ -1601,14 +1598,12 @@ void HBFrame::OnMenuCommand(int id)
         gpHelpInstance->ShowTopic("Harmony browser");
 	break;
 
-#ifndef __PORTING
     case MEN_MOUSE:
 	wxMessageBox("left: select chord\n"
 	              "  +shift: put chord into sequence\n"
 	              "middle: same as left+shift\n"
 	              "right: play chord\n", "Mousebuttons", wxOK);
 	break;
-#endif // __PORTING
 
     case MEN_MIDI:
       cnvs->player.SettingsDialog(this);

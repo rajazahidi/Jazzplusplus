@@ -186,9 +186,7 @@ class tRhythmWin : public wxFrame
     virtual ~tRhythmWin();
     void OnPaint();
     void GenRhythm();
-#ifndef __PORTING
     bool OnClose();
-#endif // __PORTING
 };
 
 extern tRhythmWin *rhythm_win;

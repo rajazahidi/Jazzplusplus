@@ -72,7 +72,7 @@ void tCtrlEditBase::Create(
   //(void) new wxMessage(panel, (char *)label);
   //panel->NewLine();
 
-  //__PORTING: changed the calls a bit so it would compile, need to remake the layout and do the event bindings
+  // PORTING: changed the calls a bit so it would compile, need to remake the layout and do the event bindings
 
   ctrlmode = 0;  // edit seems stupid to me ...
 
@@ -543,7 +543,7 @@ void tVelocEdit::OnApply()
   track->Cleanup();
   wxEndBusyCursor();
   OnRevert();
-  // SN+ fuer Color Darstellung
+  // SN+ for Color Darstellung
   parent->Redraw();
 }
 
@@ -682,7 +682,7 @@ void tPolyAfterEdit::OnApply()
   track->Cleanup();
   wxEndBusyCursor();
   OnRevert();
-  // SN+ fuer Color Darstellung
+  // SN+ for Color Darstellung
   parent->Redraw();
 }
 

@@ -369,6 +369,7 @@ JZPianoFrame::JZPianoFrame(
       wxDEFAULT_FRAME_STYLE | wxNO_FULL_REPAINT_ON_RESIZE),
     mpToolBar(0),
     mpGuitarFrame(0),
+    Canvas(0),
     mpFilter(0),
 //    mpFileMenu(0),
 //    mpEditMenu(0)
@@ -565,6 +566,8 @@ void JZPianoFrame::Setup()
 
 void JZPianoFrame::OnSize(wxSizeEvent& Event)
 {
+  if (Canvas)
+  {
   int cw, ch;
   GetClientSize(&cw, &ch);
 
@@ -580,6 +583,7 @@ void JZPianoFrame::OnSize(wxSizeEvent& Event)
   else
   {
     Canvas->SetSize(0, 0, cw, ch);
+  }
   }
 }
 
@@ -1216,7 +1220,7 @@ void JZPianoFrame::OnPaintSub(wxDC* dc, long x, long y)
   dc->DestroyClippingRegion();
   dc->SetBackground(*wxWHITE_BRUSH);
   DrawPlayPosition(dc);
-  SnapSel->Draw(dc,xEvents, yEvents, wEvents, hEvents);
+  SnapSel->Draw(*dc, xEvents, yEvents, wEvents, hEvents);
   dc->Clear();
 
 
@@ -1419,7 +1423,7 @@ void JZPianoFrame::OnPaintSub(wxDC* dc, long x, long y)
   dc->SetBrush(*wxBLACK_BRUSH);
   dc->SetBackground(*wxWHITE_BRUSH);        // xor-bug
 
-  SnapSel->Draw(dc, xEvents, yEvents, wEvents, hEvents);
+  SnapSel->Draw(*dc, xEvents, yEvents, wEvents, hEvents);
 
   DrawPlayPosition(dc);
 //OBSOLETE  dc->EndDrawing();
@@ -1610,7 +1614,7 @@ void JZPianoFrame::DrawEvents(wxDC* dc, tTrack *t, int Stat, const wxBrush* Brus
   int FromPitch = 127 - ToLine;
   int ToPitch   = 127 - FromLine;
 
-  // Koordinate fuer Linien
+  // Coordinate for Linien
 
   long x0 = Clock2x(0);
   long y0 = Line2y(64);
@@ -1954,7 +1958,7 @@ void JZPianoFrame::Paste(tTrack *t, long Clock, int Pitch)
 // ********************************************************************
 
 /*
- * left drag: Events markieren fuer Menu
+ * left drag: Events markieren for Menu
  * left click:
  *   mit shift: copy
  *   ohne shift: cut

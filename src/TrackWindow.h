@@ -26,6 +26,8 @@
 #include "Rectangle.h"
 
 class JZTrackFrame;
+class JZSong;
+class tSnapSelection;
 class wxFont;
 
 enum TECounterModes
@@ -57,6 +59,7 @@ class JZTrackWindow : public wxScrolledWindow
 
     JZTrackWindow(
       JZTrackFrame* pParent,
+      JZSong* pSong,
       const wxPoint& Position,
       const wxSize& Size);
 
@@ -75,6 +78,8 @@ class JZTrackWindow : public wxScrolledWindow
     void DrawSpeed(wxDC& Dc, int Value = -1, bool Down = false);
 
     void DrawCounters(wxDC& Dc);
+
+    void DrawEvents(wxDC& Dc);
 
     void LineText(
       wxDC& Dc,
@@ -113,6 +118,8 @@ class JZTrackWindow : public wxScrolledWindow
 
   private:
 
+    JZSong* mpSong;
+
     wxColor* mpGreyColor;
     wxBrush* mpGreyBrush;
 
@@ -120,11 +127,14 @@ class JZTrackWindow : public wxScrolledWindow
     int hTop;
     int wLeft;
     int mClocksPerPixel;
+    bool mUseColors;
     int mLittleBit;
     int xEvents, yEvents, wEvents, hEvents;
     int mCanvasX, mCanvasY, mCanvasWidth, mCanvasHeight;
     int mFromClock, mToClock;
     int mFromLine, mToLine;
+
+    tSnapSelection* mpSnapSel;
 
     int xNumber, wNumber;
     int xName,   wName;

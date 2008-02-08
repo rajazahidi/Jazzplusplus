@@ -23,56 +23,78 @@
 #include "WxWidgets.h"
 
 #include "Project.h"
+#include "RecordingInfo.h"
 #include "Synth.h"
 #include "Song.h"
+#include "Globals.h"
 #include "Filter.h"
 #include "Player.h"
 #include "StandardFile.h"
 
-jppProject::jppProject()
-  : Midi(0),
-    Synth(0),
-    mRecInfo(0)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZProject::JZProject()
+  : mpMidiPlayer(0),
+    mpSynth(0),
+    mpSong(0),
+    mpRecInfo(0),
+    mChanged(false),
+    mIsPlaying(false)
 {
-//  mRecInfo->Track = 0;
-//  mRecInfo->Muted = 0;
   mNumBars = 0;
+
   mMetronomeInfo.IsAccented = Config(C_MetroIsAccented);
   mMetronomeInfo.Veloc = Config(C_MetroVelocity);
   mMetronomeInfo.KeyNorm = Config(C_MetroNormalClick);
   mMetronomeInfo.KeyAcc = Config(C_MetroAccentedClick);
+
+  mpSong = new JZSong;
+  mpRecInfo = new JZRecordingInfo;
+  gpSong = mpSong;
+  mpSynth = NewSynth("GS");
+  Synth = mpSynth;
 }
 
-jppProject::~jppProject()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZProject::~JZProject()
 {
-  delete Midi; 
-  delete mRecInfo;
+  delete mpMidiPlayer; 
+  delete mpSynth;
+  delete mpRecInfo;
+  delete mpSong;
 }
 
-bool jppProject::IsPlaying()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZProject::IsPlaying()
 {
   return mIsPlaying;
 }
 
-bool jppProject::HasChanged()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZProject::HasChanged()
 {
   return mChanged;
 }
 
-void jppProject::SetSong(wxString newsong)
+//-----------------------------------------------------------------------------
+// Description:
+//   Set the song file name.
+//-----------------------------------------------------------------------------
+void JZProject::SetSong(const wxString& SongFileName)
 {
-  mSongFileName = newsong;
+  mSongFileName = SongFileName;
 }
 
-void jppProject::SetPattern(wxString newpattern)
+//-----------------------------------------------------------------------------
+// Description:
+//   Set the pattern file name.
+//-----------------------------------------------------------------------------
+void JZProject::SetPattern(const wxString& PatternFileName)
 {
-  mPatternFileName = newpattern;
-}
-
-void jppProject::Play()
-{
-  mIsPlaying = true;
-  Midi->StartPlay(mStartTime, mStopTime);
+  mPatternFileName = PatternFileName;
 }
 
 /**
@@ -80,11 +102,11 @@ void jppProject::Play()
  *  Open a midi file.  Pass it a wxString containing the path to the file.
  *
  */
-void jppProject::OpenSong(wxString newsong)
+void JZProject::OpenSong(const wxString& SongFileName)
 {
   tStdRead io;
   Clear();
-  Read(io, newsong);
+  Read(io, SongFileName);
 }
 
 /**
@@ -93,65 +115,88 @@ void jppProject::OpenSong(wxString newsong)
  *  Save will overwrite the file if it is already there!
  *
  */
-void jppProject::Save(wxString newsong)
+void JZProject::Save(wxString newsong)
 {
     tStdWrite io;
     Write(io, newsong);
 }
 
-void jppProject::Stop()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZProject::Play()
+{
+  mIsPlaying = true;
+  mpMidiPlayer->StartPlay(mStartTime, mStopTime);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZProject::Stop()
 {
   mIsPlaying = false;
-  Midi->Stop();
+  mpMidiPlayer->Stop();
   // Stub
 }
 
-void jppProject::SetPlayPosition(long newposition)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZProject::SetPlayPosition(long newposition)
 {
   mStartTime = newposition;
 }
 
-void jppProject::Mute(bool newmute)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZProject::Mute(bool newmute)
 {
   mMuted = newmute;
 }
 
-void jppProject::SetLoop(bool newloop)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZProject::SetLoop(bool newloop)
 {
   mLoop = newloop;
 }
 
-void jppProject::SetRecord(bool newrecord)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZProject::SetRecord(bool newrecord)
 {
   mRecord = newrecord;
 }
 
-void jppProject::SetLoopClock(long newclock)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZProject::SetLoopClock(long newclock)
 {
   mStopTime = newclock;
 }
 
-tMetronomeInfo jppProject::GetMetronome()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+tMetronomeInfo JZProject::GetMetronome()
 {
   return mMetronomeInfo;
 }
 
-/**
- *  Returns a const pointer to the internal RecInfo member.
- */
-tRecordInfo* jppProject::GetRecInfo()
+//-----------------------------------------------------------------------------
+// Description:
+//   Returns a constant pointer to the internal RecInfo member.
+//-----------------------------------------------------------------------------
+const JZRecordingInfo* JZProject::GetRecInfo()
 {
-  return mRecInfo;
+  return mpRecInfo;
 }
 
-/**
- *
- * Sets the internal mRecInfo, used for recording apparently.  jppProject will take ownership
- * of this pointer, so don't destroy it after you've made it!
- *
- */
-void jppProject::SetRecInfo(tRecordInfo* newRecInfo)
+//-----------------------------------------------------------------------------
+// Description:
+//   Sets the internal mpRecInfo, used for recording apparently.
+// JZProject will take ownership of this pointer, so don't delete it after
+// you've made it!
+//-----------------------------------------------------------------------------
+void JZProject::SetRecInfo(JZRecordingInfo* pRecInfo)
 {
-  delete mRecInfo;
-  mRecInfo = newRecInfo;
+  delete mpRecInfo;
+  mpRecInfo = pRecInfo;
 }

@@ -59,9 +59,7 @@ class HBFrame : public wxFrame, public tHBInterface
     int GetBassKeys(int *out, int step, int n_steps);
     virtual void OnSize(wxSizeEvent& Event);
     HBAnalyzer * getAnalyzer();
-#ifndef __PORTING
     virtual bool OnClose();
-#endif // __PORTING
     void TransposeSelection();
   protected:
     virtual void OnMenuCommand(int id);

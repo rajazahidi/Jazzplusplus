@@ -25,6 +25,7 @@
 #include "Sample.h"
 #include "Audio.h"
 #include "Events.h"
+#include "RecordingInfo.h"
 #include "Track.h"
 #include "Globals.h"
 #include "Player.h"
@@ -209,7 +210,6 @@ tSampleSet::~tSampleSet()
 
 void tSampleSet::Edit(int key)
 {
-#ifndef __PORTING
   if (samplewin[key] == 0)
   {
     tSample* spl = samples[key];
@@ -218,7 +218,6 @@ void tSampleSet::Edit(int key)
   }
   samplewin[key]->Show(TRUE);
   samplewin[key]->Redraw();
-#endif // __PORTING
 }
 
 
@@ -289,13 +288,15 @@ int tSampleSet::Load(const wxString& FileName)
 	sprintf(buf, "could not load \"%s\"", samples[key]->GetFilename());
 	wxMessageBox(buf, "Error", wxOK);
       }
-#ifndef __PORTING
       if (samplewin[key])
+      {
         samplewin[key]->Redraw();
-#endif // __PORTING
+      }
     }
     else
+    {
       break;
+    }
   }
   wxEndBusyCursor();
   dirty = 0;
@@ -553,7 +554,7 @@ class tSamplesDlg : public wxDialog
     static void ClrButton(wxItem &item, wxCommandEvent& event);
     static void HelpButton(wxItem &item, wxCommandEvent& event);
     static void ListClick(wxItem &item, wxCommandEvent& event);
-#endif // __PORTING
+#endif // OBSOLETE
     void OnCloseButton();
     void OnPlayButton();
     void OnEditButton();
@@ -573,7 +574,7 @@ class tSamplesDlg : public wxDialog
 #ifdef OBSOLETE
     wxText    *label;
     wxText    *file;
-#endif // __PORTING
+#endif // OBSOLETE
 
     static char *path;
     static int  current;
@@ -697,7 +698,7 @@ class tAudioGloblForm : public wxForm
     bool duplex_audio;
 };
 
-#endif // __PORTING
+#endif // OBSOLETE
 
 void tSampleSet::GlobalSettingsDlg()
 {
@@ -713,7 +714,7 @@ void tSampleSet::GlobalSettingsDlg()
     tAudioGloblForm *form  = new tAudioGloblForm(*this);
     form->AssociatePanel(glb_dialog);
     glb_dialog->Fit();
-#endif // __PORTING
+#endif // OBSOLETE
   }
   glb_dialog->Show(TRUE);
 }
@@ -788,14 +789,14 @@ void tSampleSet::AddNote(const char *fname, long frc, long toc)
 
   // delete selection
 #ifdef OBSOLETE
-  JZSong       *song = gProject->Song;
+  JZSong       *song = gpProject->Song;
 #endif
-  tRecordInfo *info = gProject->GetRecInfo();
-  tTrack      *track = info->Track;
+  const JZRecordingInfo* info = gpProject->GetRecInfo();
+  tTrack* track = info->mpTrack;
 #ifdef OBSOLETE
   song->NewUndoBuffer();
 #endif
-  tEventIterator iter(info->Track);
+  tEventIterator iter(info->mpTrack);
   JZEvent *e = iter.Range(frc, toc);
   while (e != 0) {
     track->Kill(e);
@@ -838,6 +839,7 @@ void tSampleSet::SaveWave(const char *fname, long frc, long toc, tAudioRecordBuf
   long end_index   = Ticks2Samples(toc - start_clock);
 
   unsigned int bufsize = buf.bufbytes / 2;
+
   // recording aborted?
   if (end_index > buf.num_buffers * bufsize)
   {
@@ -956,7 +958,7 @@ tSamplesDlg::tSamplesDlg(wxFrame *parent, tSampleSet &s)
   NewLine();
   file = new wxText(this, (wxFunction)0, "File", "", -1, -1, 300);
   NewLine();
-#endif // __PORTING
+#endif // OBSOLETE
   Fit();
   Sample2Win(current);
   list->SetSelection(current, TRUE);
@@ -1123,7 +1125,7 @@ void tSamplesDlg::ListClick(wxItem &itm, wxCommandEvent& event)
 {
   ((tSamplesDlg *)itm.GetParent())->OnListClick();
 }
-#endif // __PORTING
+#endif // OBSOLETE
 
 void tSampleSet::SamplesDlg()
 {

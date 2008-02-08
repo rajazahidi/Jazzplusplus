@@ -128,15 +128,15 @@ int tSelection::ButtonDown(wxMouseEvent &e)
 #endif
     Active = 1;
 //     wxDC *dc = new wxPaintDC(win);//Canvas->GetDC();
-//     dc->SetBrush(*mpBackgroundBrush);
-//     dc->SetLogicalFunction(wxXOR);
+//     Dc.SetBrush(*mpBackgroundBrush);
+//     Dc.SetLogicalFunction(wxXOR);
     if (Selected && e.ShiftDown())
     {
       // Continue selection
       JZRectangle rr = r;
       rr.SetNormal();
 //       if (rr.width && rr.height)
-// 	dc->DrawRectangle(rr.x, rr.y, rr.width, rr.height);
+// 	Dc.DrawRectangle(rr.x, rr.y, rr.width, rr.height);
       Dragging(e);
     }
     else
@@ -153,10 +153,10 @@ int tSelection::ButtonDown(wxMouseEvent &e)
       r.y = y;
       r.width = 1;
       r.height = 1;
-//       dc->DrawRectangle(r.x, r.y, r.width, r.height);
+//       Dc.DrawRectangle(r.x, r.y, r.width, r.height);
       //Dragging(e);
     }
-//     dc->SetLogicalFunction(wxCOPY);
+//     Dc.SetLogicalFunction(wxCOPY);
   }
   win->Refresh(); //invalidate
   return 0;
@@ -214,10 +214,10 @@ int tSelection::ButtonUp(wxMouseEvent &e)
     r.SetNormal();
 //     wxDC *dc = new wxPaintDC(win);//Canvas->GetDC();
 
-//     dc->SetLogicalFunction(wxXOR);
+//     Dc.SetLogicalFunction(wxXOR);
 //     if (r.width && r.height)
-//       dc->DrawRectangle(r.x, r.y, r.width, r.height);
-//     dc->SetLogicalFunction(wxCOPY);
+//       Dc.DrawRectangle(r.x, r.y, r.width, r.height);
+//     Dc.SetLogicalFunction(wxCOPY);
     Selected = (r.width > 3 && r.height > 3); //its selected only if larger than 3x3 pixels
     return 1;
   }
@@ -226,37 +226,37 @@ int tSelection::ButtonUp(wxMouseEvent &e)
 }
 
 /** draw the selected rectangle, normally called from OnDraw in the parent window*/
-void tSelection::Draw(wxDC* dc)
+void tSelection::Draw(wxDC& Dc)
 {
   cout
     << "tSelection::Draw -----------------------------------------------------------------------------"
     << endl;
-  //    dc->DrawRectangle(100,100,100,100);
+  //    Dc.DrawRectangle(100,100,100,100);
 //   if (Selected) //we cant check for "selected" here, because...
 //   {
 
     JZRectangle rr = r;
 
-    dc->DestroyClippingRegion();
+    Dc.DestroyClippingRegion();
 
-    dc->SetLogicalFunction(wxXOR);
-    dc->SetBrush(*mpBackgroundBrush);
+    Dc.SetLogicalFunction(wxXOR);
+    Dc.SetBrush(*mpBackgroundBrush);
     
     rr.SetNormal();
     if (rr.width && rr.height)
-      dc->DrawRectangle(rr.x, rr.y, rr.width, rr.height);
-    dc->SetLogicalFunction(wxCOPY);
+      Dc.DrawRectangle(rr.x, rr.y, rr.width, rr.height);
+    Dc.SetLogicalFunction(wxCOPY);
 //  }
 }
 
 /** draw, but use clipping to redruce drawing*/
-void tSelection::Draw(wxDC* dc, long x, long y, long w, long h)
+void tSelection::Draw(wxDC& Dc, long x, long y, long w, long h)
 {
 //   if (Selected)
 //   {
-    dc->SetClippingRegion(x, y, x+w, y+h);
-    Draw(dc);
-    dc->DestroyClippingRegion();
+    Dc.SetClippingRegion(x, y, x+w, y+h);
+    Draw(Dc);
+    Dc.DestroyClippingRegion();
     //  }
 }
 

@@ -133,11 +133,8 @@ void tSliderWin::OnSize(wxSizeEvent& Event)//int w, int h)
       int k = row * sliders_per_row + col;
       float x0 = col * (float)cw / n_cols;
       float x1 = x0 + (float)cw / n_cols;
-#ifndef __PORTING
       sliders[k]->SetSize((int)x0, (int)y0, (int)(x1 - x0), (int)(y1 - y0));
-#else
-      sliders[k]->SetSize((int)x0, 0, (int)(x1 - x0), (int)(y0-y1));
-#endif// __PORTING
+//      sliders[k]->SetSize((int)x0, 0, (int)(x1 - x0), (int)(y0-y1));
       cout<<"slider "<<k<<" size:"<<(int)x0<<" "<< (int)y0<<" "<< (int)(x1 - x0)<<" "<< (int)(y1 - y0)<<endl;
     }
   }

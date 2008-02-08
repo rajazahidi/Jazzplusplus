@@ -1089,12 +1089,10 @@ tRhythmWin::~tRhythmWin()
   rhythm_win = 0;
 }
 
-#ifndef __PORTING
 bool tRhythmWin::OnClose()
 {
-  return TRUE;
+  return true;
 }
-#endif // __PORTING
 
 
 void tRhythmWin::OnPaint()

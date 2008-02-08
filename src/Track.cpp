@@ -1134,7 +1134,7 @@ void tEventArray::Write(tWriteBase &io)
   jazz->SetAudioMode(audio_mode);
   jazz->SetTrackState(State);
   jazz->SetTrackDevice(Device);
-  jazz->SetIntroLength(TheSong->GetIntroLength());
+  jazz->SetIntroLength(gpSong->GetIntroLength());
   jazz->Write(io);
 
   for (int i = 0; i < nEvents; i++) {
@@ -1197,7 +1197,7 @@ void tEventArray::Read(tReadBase &io)
       audio_mode = (int)j->GetAudioMode();
       State      = (int)j->GetTrackState();
       Device     = (int)j->GetTrackDevice();
-      TheSong->SetIntroLength((int)j->GetIntroLength());
+      gpSong->SetIntroLength((int)j->GetIntroLength());
       delete j;
       continue;
     }

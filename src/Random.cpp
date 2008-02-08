@@ -635,7 +635,7 @@ int tArrayEdit::Dragging(wxMouseEvent &e)
     dc->DrawText(buf, 50, 50);
   }
 #endif
-      wxDC *dc = new wxClientDC(this);//__PORTING this is evil and shoud go
+  wxDC *dc = new wxClientDC(this); // PORTING this is evil and shoud go
   if (e.ShiftDown())
   {
     int k;
@@ -696,7 +696,7 @@ int tArrayEdit::ButtonUp(wxMouseEvent &e)
 #endif
   dragging = 0;
   index    = -1;
-//       wxDC *dc = new wxClientDC(this);//__PORTING this is evil and shoud go
+//       wxDC *dc = new wxClientDC(this); // PORTING this is evil and shoud go
 //   DrawLabel(dc);
 //   DrawNull(dc);
 //   delete dc;

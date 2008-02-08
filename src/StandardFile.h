@@ -31,7 +31,7 @@ class tStdChunk
 {
   long Size;		// Groesse von Base
   long nRead;		// soviele Bytes aus Datei gelesen
-  unsigned char *Base;  // Puffer fuer Daten
+  unsigned char *Base;  // Puffer for Daten
   unsigned char *cp;	// Aktueller Schreib/Lese Pointer
   long Clock;		// Absolute Clock
   int  EofSeen;  	// endoftrack meta-event gelesen

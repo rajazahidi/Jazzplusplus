@@ -59,7 +59,7 @@ class tCtrlEditBase : public tArrayEditDrawBars
 
 // SN++ Default = 0, 1 bedeutet der Editor arbeitet auch auf Selektionen.
 //      Dieser Patch zusammen mit dem "selectable Patch" im PianoWin
-//      ist fuer VelocEdit und AftertouchEdit Updates.
+//      ist for VelocEdit und AftertouchEdit Updates.
     int selectable;
     virtual void UpDate();
 //

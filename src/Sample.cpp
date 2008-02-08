@@ -629,7 +629,6 @@ float tSample::Samples2Seconds(long samples)
 
 void tFloatSample::Filter(long fr, long to, tSplFilter::Type type, int order, double freq, double bw)
 {
-#ifndef __PORTING
   long i;
   if (fr < 0) fr = 0;
   if (to < 0) to = length;
@@ -643,7 +642,6 @@ void tFloatSample::Filter(long fr, long to, tSplFilter::Type type, int order, do
       data[i + c] = filters[c].Loop(data[i + c]);
   }
   delete [] filters;
-#endif // __PORTING
 }
 
 int tSample::Save()
@@ -1041,11 +1039,9 @@ void tFloatSample::RndEcho(int num_echos, long delay, float ampl)
   for (i = 0; i < num_echos; i++)
   {
     // compute random delays in the range 0.5 * delay ... 1.5 * delay
-#ifndef __PORTING
     long d = (long) ((rnd.asDouble() + 0.5) * (double)delay);
     d &= -channels;
     delays[i] = d;
-#endif // __PORTING
   }
 
   AssureLength(length + (long)num_echos * delay);
@@ -1075,13 +1071,11 @@ void tFloatSample::RndEchoStereo(int num_echos, long delay, float ampl)
   for (i = 0; i < num_echos; i++)
   {
     // compute random delays in the range 0.5 * delay ... 1.5 * delay
-#ifndef __PORTING
     long d = (long) ((rnd.asDouble() + 0.5) * (double)delay);
     d &= -channels;
     delays[i] = d;
     ipans[i] = (float)rnd.asDouble();
     opans[i] = (float)rnd.asDouble();
-#endif // __PORTING
   }
 
   AssureLength(length + (long)num_echos * delay);

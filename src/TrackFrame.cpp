@@ -53,7 +53,7 @@
 #include "Bitmaps/playloop.xpm"
 #include "Bitmaps/record.xpm"
 
-// \todo: get rid of all this stuff, it's moving to jppProject
+// \todo: get rid of all this stuff, it's moving to JZProject
 JZTrackFrame* TrackWin = 0;
 
 //*****************************************************************************
@@ -90,7 +90,6 @@ JZTrackFrame::JZTrackFrame(
       pSong,
       Position,
       Size),
-//      wxDEFAULT_FRAME_STYLE | wxNO_FULL_REPAINT_ON_RESIZE),
     mpToolBar(0),
     mpFileMenu(0),
     mpEditMenu(0)//,
@@ -100,7 +99,7 @@ JZTrackFrame::JZTrackFrame(
 
   CreateMenu();
 
-  mpTrackWindow = new JZTrackWindow(this, wxPoint(0, 0), wxSize(600, 120));
+  mpTrackWindow = new JZTrackWindow(this, pSong, wxPoint(0, 0), wxSize(600, 120));
   mpTrackWindow->Create();
 
 //  mpPianoFrame = new JZPianoFrame(
@@ -368,9 +367,9 @@ bool JZTrackFrame::OnClose()
 //      return false;
 //    }
 //  }
-//  if (gProject->IsPlaying())
+//  if (gpProject->IsPlaying())
 //  {
-//    gProject->Stop();
+//    gpProject->Stop();
 //#ifndef WX_MSW
 //    sleep(1);
 //#endif
@@ -398,7 +397,7 @@ void JZTrackFrame::OnPianoWindow(wxCommandEvent& Event)
   JZPianoFrame* pPianoFrame = new JZPianoFrame(
     this,
     "Piano",
-    TheSong,
+    gpSong,
     wxDefaultPosition,
     wxSize(640, 480));
 

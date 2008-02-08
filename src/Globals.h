@@ -30,13 +30,13 @@ class JZSong;
 class JZSynth;
 class tHelp;
 class tNamedValue;
-class jppProject;
+class JZProject;
 
-extern char* pgStartUpSong;
-extern JZSong* TheSong;
+extern char* gpStartUpSong;
+extern JZSong* gpSong;
 extern JZSynth* Synth;
 extern tHelp* HelpInstance;
 extern tNamedValue limitSteps[];
-extern jppProject* gProject;
+extern JZProject* gpProject;
 
 #endif // !defined(JZ_GLOBALS_H)

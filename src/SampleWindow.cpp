@@ -328,7 +328,7 @@ void tSampleCnvs::OnEvent(wxMouseEvent &e)
     mouse_down = TRUE;
     if (snapsel.Selected)
     {
-      snapsel.Draw(pDc);
+      snapsel.Draw(*pDc);
       snapsel.Selected = 0;
     }
     else if (inspt.IsVisible())
@@ -343,7 +343,7 @@ void tSampleCnvs::OnEvent(wxMouseEvent &e)
     snapsel.Event(e);
     if (snapsel.Selected)
     {
-      snapsel.Draw(pDc);
+      snapsel.Draw(*pDc);
       sel_fr = Pixel2Sample(snapsel.r.x);
       sel_to = Pixel2Sample(snapsel.r.x + snapsel.r.width);
     }
@@ -366,7 +366,7 @@ void tSampleCnvs::ClearSelection()
   if (snapsel.Selected)
   {
     wxDC* pDc = new wxClientDC(this);
-    snapsel.Draw(pDc);
+    snapsel.Draw(*pDc);
     snapsel.Selected = 0;
   }
   else if (inspt.IsVisible())
@@ -401,7 +401,7 @@ void tSampleCnvs::SetSelection(long fr, long to)
   snapsel.r = r;
   snapsel.Selected = TRUE;
   wxDC* pDc = new wxClientDC(this);
-  snapsel.Draw(pDc);
+  snapsel.Draw(*pDc);
 }
 
 
@@ -464,7 +464,7 @@ void tSampleCnvs::OnPaint()
     r.SetHeight(ch);
     snapsel.r = r;
     wxDC* pDc = new wxClientDC(this);
-    snapsel.Draw(pDc);
+    snapsel.Draw(*pDc);
   }
   else if (sel_fr > 0)
   {
@@ -510,7 +510,7 @@ void tSampleCnvs::DrawTicks(int x, int y, int w)
     long cfr = (long)spl->Samples2Ticks(sfr);
     long cto = (long)spl->Samples2Ticks(sto);
     JZMapper Map(cfr, cto, x, x+w);
-    JZBarInfo bi(TheSong);
+    JZBarInfo bi(gpSong);
     bi.SetClock(cfr);
     bi.SetBar(bi.BarNr);
     while (bi.Clock < cto) {

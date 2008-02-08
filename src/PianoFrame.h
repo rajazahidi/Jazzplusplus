@@ -99,7 +99,7 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
     wxFont *DrumFont;
 
     long SnapClocks();
-    long SnapDenomiator;	// 16 fuer 16-tel
+    long SnapDenomiator;	// 16 for 16-tel
     long SnapClock(long Clock, int up = 0);
 
 

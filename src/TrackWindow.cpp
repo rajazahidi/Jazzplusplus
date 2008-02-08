@@ -24,6 +24,8 @@
 
 #include "TrackWindow.h"
 #include "TrackFrame.h"
+#include "Project.h"
+#include "Globals.h"
 
 #include <iostream>
 #include <sstream>
@@ -35,6 +37,7 @@ using namespace std;
 //-----------------------------------------------------------------------------
 JZTrackWindow::JZTrackWindow(
   JZTrackFrame* pParent,
+  JZSong* pSong,
   const wxPoint& Position,
   const wxSize& Size)
   : wxScrolledWindow(
@@ -43,12 +46,14 @@ JZTrackWindow::JZTrackWindow(
       Position,
       Size,
       wxHSCROLL | wxVSCROLL | wxNO_FULL_REPAINT_ON_RESIZE),
+    mpSong(pSong),
     mpGreyColor(0),
     mpGreyBrush(0),
     hLine(0),
     hTop(40),
     wLeft(100),
     mClocksPerPixel(36),
+    mUseColors(true),
     mLittleBit(0),
     mCanvasX(0),
     mCanvasY(0),
@@ -58,6 +63,7 @@ JZTrackWindow::JZTrackWindow(
     mToClock(0),
     mFromLine(0),
     mToLine(0),
+    mpSnapSel(0),
     xPatch(0),
     wPatch(0),
     nBars(0),
@@ -69,13 +75,14 @@ JZTrackWindow::JZTrackWindow(
     mpFont(0)
 {
 #ifdef __WXMSW__
-//  mpGreyColor = new wxColor(*wxLIGHT_GREY);
-  mpGreyColor = new wxColor(240, 240, 240);
+  mpGreyColor = new wxColor(192, 192, 192);
 #else
   mpGreyColor = new wxColor(220, 220, 220);
 #endif
 
   mpGreyBrush = new wxBrush(*mpGreyColor, wxSOLID);
+
+  mpSnapSel = new tSnapSelection(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -86,6 +93,7 @@ JZTrackWindow::~JZTrackWindow()
   delete mpGreyBrush;
   delete mpFixedFont;
   delete mpFont;
+  delete mpSnapSel;
 }
 
 //-----------------------------------------------------------------------------
@@ -191,8 +199,7 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
 
 //  int StopClk;
 
-//  Dc.BeginDrawing();
-//  Dc.DestroyClippingRegion();
+  Dc.DestroyClippingRegion();
 
   DrawPlayPosition(Dc);
 
@@ -209,54 +216,61 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
 
   // SN+ Dc.VLine(xEvents);
   DrawVerticalLine(Dc, xEvents - 1);
-
   DrawHorizontalLine(Dc, yEvents);
   DrawHorizontalLine(Dc, yEvents - 1);
 
-
-/*
-  while (1)
+  if (mpSong)
   {
-    int x = Clock2x(BarInfo.Clock);
-    if (x > mCanvasX + mCanvasWidth)
+    JZBarInfo BarInfo(mpSong);
+    BarInfo.SetClock(mFromClock);
+//    StopClk = x2Clock(mCanvasX + mCanvasWidth);
+    nBars = 0;
+    int intro = gpProject->GetIntroLength();
+    Dc.SetPen(*wxGREY_PEN);
+    while (1)
     {
-      break;
-    }
-    if (x >= xEvents)   // so ne Art clipping
-    {
-      // SN+-      if ((BarInfo.BarNr % 4) == 0)
-      int c;
-      if (ClocksPerPixel > 48)
+      int x = Clock2x(BarInfo.Clock);
+      if (x > mCanvasX + mCanvasWidth)
       {
-        c = 8;
+        break;
       }
-      else
+      if (x >= xEvents)   // so ne Art clipping
       {
-        c = 4;
-      }
-      if (((BarInfo.BarNr - intro + 96) % c) == 0)
-      {
-        Dc.SetPen(*wxBLACK_PEN);
-        sprintf(buf, "%d", BarInfo.BarNr + 1 - intro);
-        Dc.DrawText(buf, x + mLittleBit, yEvents - hLine);
-        Dc.SetPen(*wxGREY_PEN);
-        Dc.DrawLine(x, yEvents + 1 - hLine, x, yEvents + hEvents);
-      }
-      else
-      {
-        Dc.SetPen(*wxLIGHT_GREY_PEN);
-        Dc.DrawLine(x, yEvents + 1, x, yEvents + hEvents);
-      }
+        // SN+-      if ((BarInfo.BarNr % 4) == 0)
+        int c;
+        if (mClocksPerPixel > 48)
+        {
+          c = 8;
+        }
+        else
+        {
+          c = 4;
+        }
+        if (((BarInfo.BarNr - intro + 96) % c) == 0)
+        {
+          Dc.SetPen(*wxBLACK_PEN);
+          ostringstream Oss;
+          Oss << BarInfo.BarNr + 1 - intro;
+          Dc.DrawText(Oss.str().c_str(), x + mLittleBit, yEvents - hLine);
+          Dc.SetPen(*wxGREY_PEN);
+          Dc.DrawLine(x, yEvents + 1 - hLine, x, yEvents + hEvents);
+        }
+        else
+        {
+          Dc.SetPen(*wxLIGHT_GREY_PEN);
+          Dc.DrawLine(x, yEvents + 1, x, yEvents + hEvents);
+        }
 
-      if (nBars < MaxBars)      // x-Koordinate fuer MouseAction->Snap()
-      {
-        xBars[nBars++] = x;
+        // x-coordinate for MouseAction->Snap()
+        if (nBars < eMaxBars)
+        {
+          xBars[nBars++] = x;
+        }
       }
+      BarInfo.Next();
     }
-    BarInfo.Next();
+    Dc.SetPen(*wxBLACK_PEN);
   }
-  Dc.SetPen(*wxBLACK_PEN);
-*/
 
   // For each track show the num, name, state, prg.
   Dc.SetClippingRegion(
@@ -264,34 +278,34 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
     yEvents,
     mCanvasX + mCanvasWidth,
     yEvents + hEvents);
-  int TrackNr = mFromLine;
-  for (int y = Line2y(TrackNr); y < yEvents + hEvents; y += hLine)
+  int TrackNumber = mFromLine;
+  for (int y = Line2y(TrackNumber); y < yEvents + hEvents; y += hLine)
   {
     // SN+    Dc.HLine(y);
     Dc.SetPen(*wxGREY_PEN);
     Dc.DrawLine(xEvents + 1, y, mCanvasX + mCanvasWidth, y);
     Dc.SetPen(*wxBLACK_PEN);
-    Dc.DrawLine(mCanvasX, y, xEvents,y);
+    Dc.DrawLine(mCanvasX, y, xEvents, y);
 
-//    tTrack* pTrack = gProject->GetTrack(TrackNr);
-//    if (pTrack)
-//    {
-//      // TrackName, show the button pressed when dialog is open
-//      //Dc.DrawText(pTrack->GetName(), xName + mLittleBit, y + mLittleBit);
-//      if (pTrack->DialogBox)
-//      {
-//        LineText(Dc, xName, y, wName, pTrack->GetName(), -1, true);
-//      }
-//      else
-//      {
-//        LineText(Dc, xName, y, wName, pTrack->GetName(), -1, false);
-//      }
-//
-//      // TrackStatus
-//      //Dc.DrawText(pTrack->GetStateChar(), xState + mLittleBit, y + mLittleBit);
-//      LineText(Dc, xState, y, wState, pTrack->GetStateChar());
-//    }
-    ++TrackNr;
+    tTrack* pTrack = gpProject->GetTrack(TrackNumber);
+    if (pTrack)
+    {
+      // TrackName, show the button pressed when dialog is open
+      //Dc.DrawText(pTrack->GetName(), xName + mLittleBit, y + mLittleBit);
+      if (pTrack->DialogBox)
+      {
+        LineText(Dc, xName, y, wName, pTrack->GetName(), -1, true);
+      }
+      else
+      {
+        LineText(Dc, xName, y, wName, pTrack->GetName(), -1, false);
+      }
+
+      // TrackStatus
+      //Dc.DrawText(pTrack->GetStateChar(), xState + mLittleBit, y + mLittleBit);
+      LineText(Dc, xState, y, wState, pTrack->GetStateChar());
+    }
+    ++TrackNumber;
   }
   Dc.DestroyClippingRegion();
 
@@ -300,6 +314,18 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
   DrawCounters(Dc);
 
   LineText(Dc, xState, mCanvasY - 1, wState, "", hTop);
+
+  DrawEvents(Dc);
+
+  if (Marked.x > 0)
+  {
+    LineText(Dc, (long)Marked.x, (long)Marked.y, (long)Marked.width, ">");
+  }
+  Dc.DestroyClippingRegion();
+  DrawPlayPosition(Dc);
+
+  // Draw the selection box.
+  mpSnapSel->Draw(Dc, xEvents, yEvents, wEvents, hEvents);
 }
 
 //-----------------------------------------------------------------------------
@@ -315,34 +341,32 @@ void JZTrackWindow::DrawNumbers(wxDC& Dc)
   Dc.SetClippingRegion(xNumber, yEvents, xNumber + wNumber, yEvents + hEvents);
   for (int i = mFromLine; i < mToLine; ++i)
   {
-//    tTrack* pTrack = gProject->GetTrack(i);
-//    if (pTrack != 0)
+    tTrack* pTrack = gpProject->GetTrack(i);
+    if (pTrack != 0)
     {
-//      if (pTrack->GetAudioMode())
+      if (pTrack->GetAudioMode())
       {
         LineText(Dc, xNumber, Line2y(i), wNumber, "Au");
       }
-//      else
-//      {
-//        int Value;
-//        switch (NumberMode)
-//        {
-//          case NmTrackNr:
-//            Value = i;
-//            break;
-//          case NmMidiChannel:
-//            Value = pTrack->Channel;
-//            break;
-//          default:
-//            Value = 0;
-//            break;
-//        }
-  //        char buf[20];
-  //        sprintf(buf, "%02d", Value);
-//        ostringstream Oss;
-//        Oss << setw(2) << Value;
-//        LineText(Dc, xNumber, Line2y(i), wNumber, Oss.str().c_str());
-//      }
+      else
+      {
+        int Value;
+        switch (mNumberMode)
+        {
+          case eNmTrackNr:
+            Value = i;
+            break;
+          case eNmMidiChannel:
+            Value = pTrack->Channel;
+            break;
+          default:
+            Value = 0;
+            break;
+        }
+        ostringstream Oss;
+        Oss << setw(2) << Value;
+        LineText(Dc, xNumber, Line2y(i), wNumber, Oss.str().c_str());
+      }
     }
   }
   Dc.DestroyClippingRegion();
@@ -357,7 +381,7 @@ void JZTrackWindow::DrawSpeed(wxDC& Dc, int Value, bool Down)
 {
 //  if (Value < 0)
 //  {
-//    Value = gProject->GetTrack(0)->GetDefaultSpeed();
+//    Value = gpProject->GetTrack(0)->GetDefaultSpeed();
 //  }
 
 //  char buf[50];
@@ -376,7 +400,7 @@ void JZTrackWindow::DrawSpeed(wxDC& Dc, int Value, bool Down)
 void JZTrackWindow::DrawPlayPosition(wxDC& Dc)
 {
 #if 0
-  if (!SnapSel->Active && PlayClock >= FromClock && PlayClock < ToClock)
+  if (!mpSnapSel->Active && PlayClock >= FromClock && PlayClock < ToClock)
   {
     Dc.SetBrush(*wxBLACK_BRUSH);
     Dc.SetPen(*wxBLACK_PEN);
@@ -416,7 +440,7 @@ void JZTrackWindow::LineText(
   }
   if (Width && Height)
   {
-    Dc.SetBrush(*wxGREY_BRUSH);
+    Dc.SetBrush(*mpGreyBrush);
     Dc.SetPen(*wxGREY_PEN);
 #ifdef __WXMSW__
     Dc.DrawRectangle(x, y, Width + 1, Height + 1);
@@ -466,13 +490,12 @@ void JZTrackWindow::DrawCounters(wxDC& Dc)
   Dc.SetClippingRegion(xPatch, yEvents, xPatch + wPatch, yEvents + hEvents);
   for (i = mFromLine; i < mToLine; i++)
   {
-#if 0
-    tTrack* pTrack = gProject->GetTrack(i);
+    tTrack* pTrack = gpProject->GetTrack(i);
     if (pTrack)
     {
       char buf[20];
       int Value;
-      switch (CounterMode)
+      switch (mCounterMode)
       {
         case eCmProgram:
           Value = pTrack->GetPatch();
@@ -500,12 +523,98 @@ void JZTrackWindow::DrawCounters(wxDC& Dc)
       LineText(Dc, xPatch, Line2y(i), wPatch, buf);
     }
     else
-#endif
     {
       LineText(Dc, xPatch, Line2y(i), wPatch, "?");
     }
   }
   Dc.DestroyClippingRegion();
+}
+
+//-----------------------------------------------------------------------------
+// Description:
+//   Draw the MIDI events.
+//-----------------------------------------------------------------------------
+void JZTrackWindow::DrawEvents(wxDC& Dc)
+{
+  if (!mpSong)
+  {
+    return;
+  }
+
+  JZBarInfo BarInfo(mpSong);
+
+  Dc.SetClippingRegion(xEvents, yEvents, wEvents, hEvents);
+
+  int TrackNumber = mFromLine;
+  for (int y = Line2y(TrackNumber); y < yEvents + hEvents; y += hLine)
+  {
+    tTrack *Track = gpProject->GetTrack(TrackNumber);
+    if (Track)
+    {
+      tEventIterator Iterator(Track);
+      long StopClk = x2Clock(mCanvasX + mCanvasWidth);
+      JZEvent *e = Iterator.Range(mFromClock, StopClk);
+      int y0 = y + mLittleBit;
+      int y1 = y + hLine - mLittleBit;
+
+      if (mUseColors)
+      {
+#if 0
+	while (e)       // slow!
+	{
+	  float x = Clock2x(e->Clock);
+	  Dc.SetPen(e->GetPen());
+	  Dc.DrawLine(x, y0, x, y1);
+	  e = Iterator.Next();
+	}
+#else
+	int xdone = -1;
+	int h = y1 - y0;
+	while (e)       // very slow!
+	{
+	  int x1 = Clock2x(e->Clock + e->GetLength());
+	  if (x1 > xdone) {
+	    int x0 = Clock2x(e->Clock);
+	    if (x0 < xdone)
+	      x0 = xdone;
+	    int w = x1 - x0;
+	    if (w < 2)
+	      w = 2;
+	    xdone = x0 + w;
+	    Dc.SetPen(*e->GetPen());
+	    Dc.SetBrush(*e->GetBrush());
+	    Dc.DrawRectangle(x0, y0, w, h);
+	  }
+	  e = Iterator.Next();
+	}
+#endif
+	Dc.SetPen(*wxBLACK_PEN);
+      }
+      else
+      {
+	float xblack = -1.0;
+	while (e)
+	{
+	  int x = Clock2x(e->Clock);
+
+	  // Avoid painting events ON the bar
+	  if ( !(e->Clock % BarInfo.TicksPerBar) ) x = x + 1;
+
+	  if (x > xblack)
+	  {
+	    Dc.DrawLine(x, y0, x, y1);
+#ifndef SLOW_MACHINE
+	    xblack = x;
+#else
+	    xblack = x + 4;
+#endif
+	  }
+	  e = Iterator.Next();
+	}
+      }
+    }
+    ++TrackNumber;
+  }
 }
 
 //-----------------------------------------------------------------------------

@@ -73,7 +73,7 @@ public:
 
 enum tClockSource { CsInt = 0, CsFsk, CsMidi, CsMtc };
 
-class tRecordInfo;
+class JZRecordingInfo;
 
 
 class tDeviceList {
@@ -115,7 +115,7 @@ class tPlayer : public wxTimer
     tPlayLoop *PlayLoop;
     // timer value for polling the record queue
     int poll_millisec;
-    tRecordInfo *rec_info;   // 0 == not recording
+    JZRecordingInfo* rec_info;   // 0 == not recording
 
 
   public:
@@ -129,7 +129,8 @@ class tPlayer : public wxTimer
     JZSong *Song;
     tEventArray PlayBuffer;
     tEventArray RecdBuffer;
-    void SetRecordInfo(tRecordInfo *inf) {
+    void SetRecordInfo(JZRecordingInfo* inf)
+    {
       rec_info = inf;
     }
     bool IsPlaying() const { return Playing; }

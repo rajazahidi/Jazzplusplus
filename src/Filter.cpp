@@ -135,8 +135,6 @@ tFilterDlg::tFilterDlg(tFilter *f, JZSong *Song, int ShowEventStats)
 
 void tFilterDlg::AddProperties()
 {
-#ifndef __PORTING
-
 //   Add(FromClockDlg.mkFormItem(150));
 //   Add(ToClockDlg.mkFormItem(150));
 //   Add(wxMakeFormNewLine());
@@ -168,8 +166,6 @@ void tFilterDlg::AddProperties()
 //     Add(wxMakeFormBool("Other", &Filter->OtherSelected));
 //   }
 //   AssociatePanel(panel);
-#endif // __PORTING
-
 }
 
 

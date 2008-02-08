@@ -107,8 +107,8 @@ class tSelection : public tMouseAction
     virtual int Event(wxMouseEvent &e);
     virtual int ButtonDown(wxMouseEvent &);
     virtual int ButtonUp(wxMouseEvent &);
-    virtual void Draw(wxDC* dc);
-    virtual void Draw(wxDC* dc, long x, long y, long w, long h); // clipping
+    virtual void Draw(wxDC& Dc);
+    virtual void Draw(wxDC& Dc, long x, long y, long w, long h); // clipping
     // may not be called while dragging
     void Select(JZRectangle &rr, long x, long y, long w, long h);
     void Select(JZRectangle &rr);

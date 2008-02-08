@@ -1406,7 +1406,7 @@ void tStretcherForm::EditForm(wxPanel *panel)
   Add(wxMakeFormMessage("Seconds/100"));
   Add(wxMakeFormNewLine());
 
-  oldspeed = newspeed = TheSong->Speed();
+  oldspeed = newspeed = gpSong->Speed();
   sprintf(buf, "current midi speed is %d", oldspeed);
   Add(wxMakeFormMessage(buf));
   Add(wxMakeFormNewLine());

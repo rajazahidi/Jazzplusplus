@@ -1,38 +1,37 @@
+//*****************************************************************************
+// The JAZZ++ Midi Sequencer
+//
+// Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
+// Modifications Copyright (C) 2004 Patrick Earl
+// Modifications Copyright (C) 2008 Peter J. Stieber
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+//*****************************************************************************
 
-/*
-** Copyright (C) 1994-1997 Andreas Voss and Per Sigmond, all rights reserved.
-**
-** License is granted to copy and distribute this software for any purpose,
-** provided that the copyright notice and this license notice is included in
-** all copies and in all related documentation.
-** License is granted to use this software for non-commercial purposes only.
-** The copyright holders grant no other licenses expressed or implied and
-** the licensee acknowleges that the copyright holders have no liability for
-** licensee's use.
-**
-** This software is provided AS IS.
-**
-** THE COPYRIGHT HOLDERS DISCLAIM AND LICENSEE AGREES THAT ALL WARRANTIES,
-** EXPRESSED OR IMPLIED, INCLUDING WITHOUT LIMITATION THE IMPLIED WARRANTIES
-** OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. NOTWITHSTANDING
-** ANY OTHER PROVISION CONTAINED HEREIN, ANY LIABILITY FOR DAMAGES RESULTING
-** FROM THE SOFTWARE OR ITS USE IS EXPRESSLY DISCLAIMED, INCLUDING
-** CONSEQUENTIAL OR ANY OTHER INDIRECT DAMAGES, WHETHER ARISING IN CONTRACT,
-** TORT (INCLUDING NEGLIGENCE) OR STRICT LIABILITY, EVEN IF THE COPYRIGHT
-** HOLDERS ARE ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-*/
-
-#include "config.h"
+//#include "config.h"
 #include "winplay.h"
 #include "jazzdll.h"
 #include "trackwin.h"
 #include "jazz.h"
 #include "dialogs.h"
+#include "MidiDeviceDialog.h"
 
 #include <dos.h>
 
 // for msvc uncomment these
-#ifdef MSVC
+#ifdef _MSC_VER
 #define enable()
 #define disable()
 #endif
@@ -54,11 +53,16 @@ int  PROIO_yywrap(void)
 void *alloca(size_t size) { return malloc(size); }
 }
 #endif
+
 char wxDummyChar = 0;
 
 
-tWinPlayer::tWinPlayer(tSong *song)
-  : tPlayer(song)
+//*****************************************************************************
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+tWinPlayer::tWinPlayer(JZSong* pSong)
+  : tPlayer(pSong)
 {
   poll_millisec = 25;
   timer_installed = FALSE;
@@ -75,12 +79,17 @@ tWinPlayer::tWinPlayer(tSong *song)
   state->audio_player = 0;
 
   long ilong = -1, olong = -1;
-  if (!Config.Get(C_WinInputDevice, ilong) || !Config.Get(C_WinOutputDevice, olong))
+  if (
+    !Config.Get(C_WinInputDevice, ilong) ||
+    !Config.Get(C_WinOutputDevice, olong))
+  {
     SettingsDlg(ilong, olong);
-  //else if (ilong < 0 || olong < 0)
+  }
   // only output device MUST be there
   else if (olong < 0)
+  {
     SettingsDlg(ilong, olong);
+  }
 
   // select input device
   if (ilong >= 0)
@@ -90,15 +99,30 @@ tWinPlayer::tWinPlayer(tSong *song)
     switch (Config(C_ClockSource))
     {
       case CsMidi:
-        rc = midiInOpen(&state->hinp, dev, (DWORD)midiMidiInputHandler, (DWORD)state, CALLBACK_FUNCTION);
+        rc = midiInOpen(
+          &state->hinp,
+          dev,
+          (DWORD)midiMidiInputHandler,
+          (DWORD)state,
+          CALLBACK_FUNCTION);
         break;
       case CsMtc:
-        rc = midiInOpen(&state->hinp, dev, (DWORD)midiMtcInputHandler, (DWORD)state, CALLBACK_FUNCTION);
+        rc = midiInOpen(
+          &state->hinp,
+          dev,
+          (DWORD)midiMtcInputHandler,
+          (DWORD)state,
+          CALLBACK_FUNCTION);
         break;
       case CsInt:
       case CsFsk:
       default:
-        rc = midiInOpen(&state->hinp, dev, (DWORD)midiIntInputHandler, (DWORD)state, CALLBACK_FUNCTION);
+        rc = midiInOpen(
+          &state->hinp,
+          dev,
+          (DWORD)midiIntInputHandler,
+          (DWORD)state,
+          CALLBACK_FUNCTION);
         break;
     }
     if (rc)
@@ -151,13 +175,15 @@ tWinPlayer::tWinPlayer(tSong *song)
     midiInStart(state->hinp);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tWinPlayer::Installed()
 {
   return timer_installed && state->hout;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tWinPlayer::~tWinPlayer()
 {
   if (state->hinp)
@@ -181,17 +207,16 @@ tWinPlayer::~tWinPlayer()
   DeleteWinPlayerState(state);
 }
 
-
-
-
-void tWinPlayer::SettingsDlg(long &idev, long &odev)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void tWinPlayer::SettingsDlg(long& InputDevice, long& OutputDevice)
 {
   tNamedValue Devs[MAX_MIDI_DEVS];
   UINT i;
 
   // select input device
-  UINT ninp = midiInGetNumDevs();
-  for (i = 0; i < ninp; i++)
+  UINT InputMidiDeviceCount = midiInGetNumDevs();
+  for (i = 0; i < InputMidiDeviceCount; ++i)
   {
     MIDIINCAPS caps;
     midiInGetDevCaps(i, &caps, sizeof(caps));
@@ -201,17 +226,24 @@ void tWinPlayer::SettingsDlg(long &idev, long &odev)
   Devs[i].Name = 0;
   Devs[i].Value = 0;
 
-  wxDialogBox *panel = new wxDialogBox(TrackWin, "Input MIDI device", TRUE);
-  tMidiDeviceDlg *dlg = new tMidiDeviceDlg(TrackWin, Devs, &idev );
-  dlg->EditForm(panel);
-  panel->Fit();
-  panel->Show(TRUE);
-  for (i = 0; i < ninp; i++)
+  if (InputMidiDeviceCount > 0)
+  {
+    JZMidiDeviceDialog MidiInputDeviceDialog(
+      Devs,
+      InputDevice,
+      TrackWin,
+      "Input MIDI device");
+    MidiInputDeviceDialog.ShowModal();
+  }
+
+  for (i = 0; i < InputMidiDeviceCount; ++i)
+  {
     delete [] Devs[i].Name;
+  }
 
   // select output device
-  UINT nout = midiOutGetNumDevs();
-  for (i = 0; i < nout; i++)
+  UINT OutputMidiDeviceCount = midiOutGetNumDevs();
+  for (i = 0; i < OutputMidiDeviceCount; ++i)
   {
     MIDIOUTCAPS caps;
     midiOutGetDevCaps(i, &caps, sizeof(caps));
@@ -220,34 +252,51 @@ void tWinPlayer::SettingsDlg(long &idev, long &odev)
   }
   Devs[i].Name = copystring("Midi Mapper");
   Devs[i].Value = MAX_MIDI_DEVS;
-  i++;
+  ++i;
   Devs[i].Name = 0;
   Devs[i].Value = 0;
 
-  panel = new wxDialogBox(TrackWin, "Output MIDI device", TRUE);
-  dlg = new tMidiDeviceDlg(TrackWin, Devs, &odev );
-  dlg->EditForm(panel);
-  panel->Fit();
-  panel->Show(TRUE);
-  for (i = 0; i < nout+1; i++)
-    delete [] Devs[i].Name;
+  JZMidiDeviceDialog MidiOutputDeviceDialog(
+    Devs,
+    OutputDevice,
+    TrackWin,
+    "Output MIDI device");
+  MidiOutputDeviceDialog.ShowModal();
 
-  if (idev >= 0)
-    Config.Put(C_WinInputDevice, idev);
+  for (i = 0; i < OutputMidiDeviceCount + 1; ++i)
+  {
+    delete [] Devs[i].Name;
+  }
+
+  if (InputDevice >= 0)
+  {
+    Config.Put(C_WinInputDevice, InputDevice);
+  }
   else
-    Config.Get(C_WinInputDevice, idev);
-  if (odev >= 0)
-    Config.Put(C_WinOutputDevice, odev);
+  {
+    Config.Get(C_WinInputDevice, InputDevice);
+  }
+
+  if (OutputDevice >= 0)
+  {
+    Config.Put(C_WinOutputDevice, OutputDevice);
+  }
   else
-    Config.Get(C_WinOutputDevice, odev);
+  {
+    Config.Get(C_WinOutputDevice, OutputDevice);
+  }
 }
 
-void tWinPlayer::SetSoftThru(int on, int idev, int odev)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void tWinPlayer::SetSoftThru(int on, int InputDevice, int OutputDevice)
 {
   state->soft_thru = on;
 }
 
-tEvent *tWinPlayer::Dword2Event(DWORD dw)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZEvent *tWinPlayer::Dword2Event(DWORD dw)
 {
   union {
     DWORD w;
@@ -255,7 +304,7 @@ tEvent *tWinPlayer::Dword2Event(DWORD dw)
   } u;
   u.w = dw;
 
-  tEvent *e = 0;
+  JZEvent *e = 0;
 
   switch(u.c[0] & 0xf0)
   {
@@ -294,8 +343,9 @@ tEvent *tWinPlayer::Dword2Event(DWORD dw)
   return e;
 }
 
-
-DWORD tWinPlayer::Event2Dword(tEvent *e)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+DWORD tWinPlayer::Event2Dword(JZEvent *e)
 {
   union {
     DWORD w;
@@ -397,21 +447,29 @@ DWORD tWinPlayer::Event2Dword(tEvent *e)
   return u.w;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 long tWinPlayer::Clock2Time(long clock)
 {
   if (clock < state->start_clock)
     return state->start_time;
-  return (long)( (double)(clock - state->start_clock) * 60000.0 / (double)state->ticks_per_minute + state->start_time);
+  return (long)( (double)(clock - state->start_clock) * 60000.0 /
+    (double)state->ticks_per_minute + state->start_time);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 long tWinPlayer::Time2Clock(long time)
 {
   if (time < state->start_time)
     return state->start_clock;
-  return (long)((double)(time - state->start_time) * (double)state->ticks_per_minute / 60000.0 + state->start_clock);
+  return (long)(
+    (double)(time - state->start_time) * (double)state->ticks_per_minute / 60000.0 +
+    state->start_clock);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tWinPlayer::SetTempo(long bpm, long clock)
 {
   long t1 = Clock2Time(clock);
@@ -420,6 +478,8 @@ void tWinPlayer::SetTempo(long bpm, long clock)
   state->start_time += (t1 - t2);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 long tWinPlayer::RealTimeClock2Time(long clock)
 {
   if (clock < state->start_clock)
@@ -427,6 +487,8 @@ long tWinPlayer::RealTimeClock2Time(long clock)
   return (long)( (double)(clock - state->start_clock) * 60000.0 / (double)real_ticks_per_minute + real_start_time);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 long tWinPlayer::Time2RealTimeClock(long time)
 {
   if (time < real_start_time)
@@ -434,6 +496,8 @@ long tWinPlayer::Time2RealTimeClock(long time)
   return (long)((double)(time - real_start_time) * (double)real_ticks_per_minute / 60000.0 + state->start_clock);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tWinPlayer::SetRealTimeTempo(long bpm, long clock)
 {
   long t1 = RealTimeClock2Time(clock);
@@ -442,8 +506,9 @@ void tWinPlayer::SetRealTimeTempo(long bpm, long clock)
   real_start_time += (t1 - t2);
 }
 
-
-int tWinPlayer::OutSysex(tEvent *e, DWORD time)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int tWinPlayer::OutSysex(JZEvent *e, DWORD time)
 {
   tSysEx *sx = e->IsSysEx();
   if (sx == 0)
@@ -460,8 +525,9 @@ int tWinPlayer::OutSysex(tEvent *e, DWORD time)
   return 0;
 }
 
-
-int tWinPlayer::OutEvent(tEvent *e)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int tWinPlayer::OutEvent(JZEvent *e)
 {
   DWORD d = Event2Dword(e);
   if (d)
@@ -471,7 +537,9 @@ int tWinPlayer::OutEvent(tEvent *e)
   return 0;
 }
 
-int tWinMidiPlayer::OutEvent(tEvent *e)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int tWinMidiPlayer::OutEvent(JZEvent *e)
 {
   DWORD d = Event2Dword(e);
   if (d)
@@ -482,15 +550,21 @@ int tWinMidiPlayer::OutEvent(tEvent *e)
 }
 
 
-void tWinPlayer::OutNow(tEvent *e)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void tWinPlayer::OutNow(JZEvent *e)
 {
   DWORD d = Event2Dword(e);
   if (d)
+  {
     midiOutShortMsg(state->hout, d);
+  }
   else if (e->Stat == StatSetTempo)
   {
     if (state->playing)
+    {
       SetTempo(e->IsSetTempo()->GetBPM(), OutClock);
+    }
   }
   else if (e->Stat == StatSysEx)
   {
@@ -513,7 +587,8 @@ void tWinPlayer::OutNow(tEvent *e)
   }
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tWinPlayer::OutNow(tParam *r)
 {
   OutNow(&r->Msb);
@@ -534,6 +609,8 @@ void tWinPlayer::FillMidiClocks( long to )
   PlayBuffer.Sort();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tWinPlayer::OutBreak(long clock)
 {
   if (Config(C_RealTimeOut))
@@ -547,6 +624,8 @@ void tWinPlayer::OutBreak(long clock)
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tWinMidiPlayer::OutBreak(long clock)
 {
   if (Config(C_RealTimeOut))
@@ -560,11 +639,15 @@ void tWinMidiPlayer::OutBreak(long clock)
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tWinPlayer::OutBreak()
 {
   OutBreak(OutClock);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 static DWORD GetMtcTime( tWinPlayerState *state )
 {
   DWORD frames = state->mtc_frames;
@@ -582,6 +665,8 @@ static DWORD GetMtcTime( tWinPlayerState *state )
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tWinPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 {
   state->play_buffer.clear();
@@ -683,7 +768,8 @@ void tWinPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tWinPlayer::StopPlay()
 {
   wxBeginBusyCursor();
@@ -703,34 +789,41 @@ void tWinPlayer::StopPlay()
     if (state->sysex_found)
       midiOutReset(state->hout);
     int n = state->osx_buffers->Size();
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; ++i)
+    {
       tWinSysexBuffer *buf = state->osx_buffers->At(i);
       if (buf->IsPrepared())
+      {
         buf->UnprepareOut(state->hout);
+      }
     }
     state->osx_buffers->ReleaseAllBuffers();
   }
 
 
-  /**
+/*
   // sysex recording not finished yet.
   if (state->hinp)
   {
     midiInReset(state->hinp);
     int n = state->isx_buffers->Size();
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; ++i)
+    {
       tWinSysexBuffer *buf = state->isx_buffers->At(i);
       if (buf->IsPrepared())
+      {
         buf->UnprepareIn(state->hinp);
+      }
       state->isx_buffers->ReleaseAllBuffers();
     }
   }
-  **/
+*/
 
   wxEndBusyCursor();
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tWinPlayer::FlushToDevice()
 // try to send all events up to OutClock to device
 {
@@ -742,10 +835,12 @@ void tWinPlayer::FlushToDevice()
   OutBreak(OutClock);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tWinPlayer::FlushToDevice( long clock )
 {
   tEventIterator Iterator(&PlayBuffer);
-  tEvent *e = Iterator.Range(0, clock);
+  JZEvent *e = Iterator.Range(0, clock);
   if (e) {
     do {
       OutEvent(e);
@@ -757,6 +852,8 @@ void tWinPlayer::FlushToDevice( long clock )
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 long tWinIntPlayer::GetRealTimeClock()
 {
   while (!state->recd_buffer.empty())
@@ -764,7 +861,7 @@ long tWinIntPlayer::GetRealTimeClock()
     midi_event *m = state->recd_buffer.get();
 
     // Event?
-    tEvent     *e = Dword2Event(m->data);
+    JZEvent     *e = Dword2Event(m->data);
     if (e)
     {
       e->Clock = PlayLoop->Ext2IntClock(Time2RealTimeClock(m->ref));
@@ -779,7 +876,7 @@ long tWinIntPlayer::GetRealTimeClock()
   if ( !OutOfBandEvents.IsEmpty() )
   {
     tEventIterator Iterator(&OutOfBandEvents);
-    tEvent *e = Iterator.Range(0, clock);
+    JZEvent *e = Iterator.Range(0, clock);
     while (e)
     {
       switch (e->Stat)
@@ -799,9 +896,10 @@ long tWinIntPlayer::GetRealTimeClock()
   return clock;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 long tWinMidiPlayer::GetRealTimeClock()
 {
-
   long clock;
 
   while (!state->recd_buffer.empty())
@@ -828,7 +926,7 @@ long tWinMidiPlayer::GetRealTimeClock()
     }
 
     // Event?
-    tEvent     *e = Dword2Event(m->data);
+    JZEvent     *e = Dword2Event(m->data);
     if (e)
     {
       e->Clock = PlayLoop->Ext2IntClock( m->ref );
@@ -851,9 +949,10 @@ long tWinMidiPlayer::GetRealTimeClock()
   return clock;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 long tWinMtcPlayer::GetRealTimeClock()
 {
-
   long clock;
 
   while (!state->recd_buffer.empty())
@@ -870,7 +969,7 @@ long tWinMtcPlayer::GetRealTimeClock()
     }
 
     // Event?
-    tEvent     *e = Dword2Event(m->data);
+    JZEvent     *e = Dword2Event(m->data);
     if (e)
     {
       e->Clock = PlayLoop->Ext2IntClock(Time2Clock(m->ref));
@@ -910,7 +1009,7 @@ long tWinMtcPlayer::GetRealTimeClock()
   if ( !OutOfBandEvents.IsEmpty() )
   {
     tEventIterator Iterator(&OutOfBandEvents);
-    tEvent *e = Iterator.Range(0, clock);
+    JZEvent *e = Iterator.Range(0, clock);
     while (e)
     {
       switch (e->Stat)
@@ -930,16 +1029,19 @@ long tWinMtcPlayer::GetRealTimeClock()
   return clock;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tWinMtcPlayer::InitMtcRec()
 {
   state->doing_mtc_rec = TRUE;
   StartPlay( 0, 0, 0 );
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tMtcTime* tWinMtcPlayer::FreezeMtcRec()
 {
   StopPlay();
   state->doing_mtc_rec = FALSE;
   return( new tMtcTime( (long) GetMtcTime( state ), (tMtcType) state->mtc_start.type ) );
 }
-

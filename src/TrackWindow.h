@@ -46,7 +46,6 @@ enum TENumberModes
   eNmModes
 };
 
-
 class JZTrackWindow : public wxScrolledWindow
 {
   public:

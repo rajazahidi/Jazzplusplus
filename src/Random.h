@@ -1,0 +1,210 @@
+//*****************************************************************************
+// The JAZZ++ Midi Sequencer
+//
+// Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
+// Modifications Copyright (C) 2004 Patrick Earl
+// Modifications Copyright (C) 2008 Peter J. Stieber
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+//*****************************************************************************
+
+#ifndef JZ_RANDOM_H
+#define JZ_RANDOM_H
+
+#include <iostream>
+
+#include "DynamicArray.h"
+
+
+class JZRandomGenerator
+{
+  public:
+
+    double asDouble();
+};
+
+extern JZRandomGenerator rnd;
+
+#undef min
+#undef max
+
+
+// array of probabilities
+
+class JZRndArray
+{
+  friend class tArrayEdit;
+
+  protected:
+
+    JZIntArray mArray;
+    int n;	// number of elements in array
+    int nul, min, max;
+
+  public:
+
+    int Null()				{ return nul; }
+    void SetNull(int n)			{ nul = n; }
+    JZRndArray(int n, int min, int max);
+    JZRndArray & operator = (const JZRndArray &);
+    JZRndArray(JZRndArray const &);
+
+    virtual ~JZRndArray();
+    int &operator[] (int i) 		{ return mArray[i]; }
+    int  operator[] (int i) const 	{ return mArray[i]; }
+    /* PAT - The following ifdef was removed due to changes in gcc 3.x.  If it
+       needs to be put back for compatibility purposes, it will need to return
+       in an alternate form. */
+    /*#ifdef FOR_MSW*/
+    double operator[](double f);
+    float operator[](float f) {
+      /*#else
+    double operator[](double f) const;
+    float operator[](float f) const {
+    #endif*/
+      return (float)operator[]((double)f);
+    }
+    int Size() const 			{ return n; }
+    int Min() const			{ return min; }
+    int Max() const			{ return max; }
+    void SetMinMax(int min, int max);
+    void Resize(int nn) 		{ n = nn; }
+
+    friend std::ostream & operator << (std::ostream &, JZRndArray const &);
+    friend std::istream & operator >> (std::istream &, JZRndArray &);
+
+    int Random();	// returns index 0..n-1 (arrayvalues -> empiric distribution)
+    int Random(double rndval);	// returns index 0..n-1 (arrayvalues -> empiric distribution)
+    int Random(int i);  // return 0/1
+    int Interval(int seed);
+
+    void SetUnion(JZRndArray &o, int fuzz);
+    void SetDifference(JZRndArray &o, int fuzz);
+    void SetIntersection(JZRndArray &o, int fuzz);
+    void SetInverse(int fuzz);
+    int Fuzz(int fuzz, int v1, int v2) const;
+    void Clear();
+};
+
+
+#define ARED_GAP	1
+#define ARED_XTICKS 	2
+#define ARED_YTICKS	4
+#define ARED_MINMAX	8
+#define ARED_RHYTHM	16
+#define ARED_BLOCKS     32
+#define ARED_LINES      64
+
+
+class tArrayEditDrawBars {
+  public:
+    virtual void DrawBars(wxDC* dc) = 0;
+};
+
+
+class tArrayEdit : public wxScrolledWindow
+{
+  protected:
+
+    // paint position
+    long x, y, w, h, ynul;
+    void DrawBar(wxDC *dc, int i, int black);
+
+    int dragging;		// Dragging-Event valid
+    int index;		// ctrl down: drag this one
+
+    JZRndArray& mArray;
+    int &n, &min, &max, &nul;	// shorthand for mArray.n, mArray.min, ...
+    wxString mLabel;
+    tArrayEditDrawBars *draw_bars;
+
+    // array size is mapped to this range for x-tick marks
+    int xmin, xmax;
+
+    virtual void DrawXTicks(wxDC* dc);
+    virtual void DrawYTicks(wxDC* dc);
+    virtual void DrawLabel(wxDC* dc);
+    virtual void DrawNull(wxDC* dc);
+    int  Index(wxMouseEvent &e);
+
+    int  enabled;
+    int  style_bits;
+
+    virtual const char *GetXText(int xval);  // Text for x-tickmarks
+    virtual const char *GetYText(int yval);  // Text for y-tickmarks
+
+  public:
+
+    tArrayEdit(
+      wxFrame* pParent,
+      JZRndArray& Array,
+      long xx,
+      long yy,
+      long ww,
+      long hh,
+      int style_bits = (ARED_GAP | ARED_XTICKS));
+
+    virtual ~tArrayEdit();
+
+    virtual void OnDraw(wxDC& indc);
+    virtual void OnSize(wxSizeEvent& event);
+    virtual void OnMouseEvent(wxMouseEvent &e);
+    virtual int Dragging(wxMouseEvent &);
+    virtual int ButtonDown(wxMouseEvent &);
+    virtual int ButtonUp(wxMouseEvent &);
+
+    virtual void SetLabel(char const *llabel);
+    void Enable(int enable = 1);
+    void SetStyle(int style) { style_bits = style; }
+    // min and max value in array (both values inclusive)
+    void SetYMinMax(int min, int max);
+    // for display x-axis only, does not resize the array (both values inclusive)
+    void SetXMinMax(int xmin, int xmax);
+    void DrawBarLine (wxDC *dc, long xx);
+    void SetDrawBars(tArrayEditDrawBars *x) { draw_bars = x; }
+    void Init() {}
+
+  DECLARE_EVENT_TABLE()
+};
+
+
+
+class tRhyArrayEdit : public tArrayEdit
+{
+  public:
+
+    tRhyArrayEdit(
+      wxFrame *parent,
+      JZRndArray& Array,
+      long xx,
+      long yy,
+      long ww,
+      long hh,
+      int style_bits = (ARED_GAP | ARED_XTICKS | ARED_RHYTHM));
+
+    void SetMeter(int steps_per_count, int count_per_bar, int n_bars);
+
+  protected:
+
+    virtual void DrawXTicks(wxDC* dc);
+
+  private:
+
+    int steps_per_count;
+    int count_per_bar;
+    int n_bars;
+};
+
+#endif // !defined(JZ_RANDOM_H)

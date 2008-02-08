@@ -44,4 +44,4 @@ class JZRectangle : public wxRect
     bool IsInside(int XPosition, int YPosition) const;
 };
 
-#endif // !define(JZ_RECTANGLE_H)
+#endif // !defined(JZ_RECTANGLE_H)

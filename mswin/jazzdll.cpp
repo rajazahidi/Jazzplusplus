@@ -1,35 +1,32 @@
+//*****************************************************************************
+// The JAZZ++ Midi Sequencer
+//
+// Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
+// Modifications Copyright (C) 2004 Patrick Earl
+// Modifications Copyright (C) 2008 Peter J. Stieber
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+//*****************************************************************************
 
-/*
-** Copyright (C) 1994-1997 Andreas Voss and Per Sigmond, all rights reserved.
-**
-** License is granted to copy and distribute this software for any purpose,
-** provided that the copyright notice and this license notice is included in
-** all copies and in all related documentation.
-** License is granted to use this software for non-commercial purposes only.
-** The copyright holders grant no other licenses expressed or implied and
-** the licensee acknowleges that the copyright holders have no liability for
-** licensee's use.
-**
-** This software is provided AS IS.
-**
-** THE COPYRIGHT HOLDERS DISCLAIM AND LICENSEE AGREES THAT ALL WARRANTIES,
-** EXPRESSED OR IMPLIED, INCLUDING WITHOUT LIMITATION THE IMPLIED WARRANTIES
-** OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. NOTWITHSTANDING
-** ANY OTHER PROVISION CONTAINED HEREIN, ANY LIABILITY FOR DAMAGES RESULTING
-** FROM THE SOFTWARE OR ITS USE IS EXPRESSLY DISCLAIMED, INCLUDING
-** CONSEQUENTIAL OR ANY OTHER INDIRECT DAMAGES, WHETHER ARISING IN CONTRACT,
-** TORT (INCLUDING NEGLIGENCE) OR STRICT LIABILITY, EVEN IF THE COPYRIGHT
-** HOLDERS ARE ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-*/
-
-// necessary, otherwise msvc 5.0 runs into an endless include loop, but why???
-#include "wx.h"
+#include "WxWidgets.h"
 
 #include <windows.h>
 #include <mmsystem.h>
 #include <memory.h>
 #include "jazzdll.h"
-#include "config.h"
+//#include "config.h"
 #include "winaudio.h"
 
 extern "C" {
@@ -61,8 +58,6 @@ void FAR PASCAL _WEP(WORD wParam)
 // in interrupt.
 tWinPlayerState FAR * FAR PASCAL NewWinPlayerState()
 {
-  int i;
-
   tWinPlayerState FAR *state = 0;
   // Allocate Fixed Memory for interrupt handler
   HANDLE hMem = GlobalAlloc(GMEM_SHARE | GMEM_FIXED | GMEM_ZEROINIT, (DWORD)sizeof(tWinPlayerState));
@@ -84,8 +79,6 @@ tWinPlayerState FAR * FAR PASCAL NewWinPlayerState()
 // free interrupt data
 void FAR PASCAL DeleteWinPlayerState(tWinPlayerState FAR * state)
 {
-  int i, n;
-
   delete state->isx_buffers;
   state->isx_buffers = 0;
   delete state->osx_buffers;
@@ -222,7 +215,9 @@ void FAR PASCAL midiIntTimerHandler(UINT wTimerId, UINT wMsg, DWORD dwUser, DWOR
   while (m)
   {
     if (m->ref > state->play_time)
+    {
       break;
+    }
 
     if (m->data)
     {
@@ -539,8 +534,9 @@ void FAR PASCAL midiMtcTimerHandler(UINT wTimerId, UINT wMsg, DWORD dwUser, DWOR
   while (m)
   {
     if (m->ref > state->play_time)
-        break;
-
+    {
+      break;
+    }
 
     if (m->data)
     {

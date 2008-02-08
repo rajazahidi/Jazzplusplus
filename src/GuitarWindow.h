@@ -47,6 +47,8 @@ class JZGuitarWindow : public wxScrolledWindow
       Refresh();
     }
 
+    void ShowPitch(int Pitch);
+
   private:
 
     void DrawBoard(wxDC& Dc);
@@ -72,7 +74,7 @@ class JZGuitarWindow : public wxScrolledWindow
   private:
 
 //    JZGuitarFrame* mpGuitarFrame;
-//    tPianoWin* mpPianoWindow;
+//    JZPianoFrame* mpPianoWindow;
 
     static bool mChordMode;
     static bool mBassGuitar;

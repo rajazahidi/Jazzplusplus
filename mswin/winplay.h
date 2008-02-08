@@ -1,47 +1,50 @@
-
-/*
-** Copyright (C) 1994-1997 Andreas Voss and Per Sigmond, all rights reserved.
-**
-** License is granted to copy and distribute this software for any purpose,
-** provided that the copyright notice and this license notice is included in
-** all copies and in all related documentation.
-** License is granted to use this software for non-commercial purposes only.
-** The copyright holders grant no other licenses expressed or implied and
-** the licensee acknowleges that the copyright holders have no liability for
-** licensee's use.
-**
-** This software is provided AS IS.
-**
-** THE COPYRIGHT HOLDERS DISCLAIM AND LICENSEE AGREES THAT ALL WARRANTIES,
-** EXPRESSED OR IMPLIED, INCLUDING WITHOUT LIMITATION THE IMPLIED WARRANTIES
-** OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. NOTWITHSTANDING
-** ANY OTHER PROVISION CONTAINED HEREIN, ANY LIABILITY FOR DAMAGES RESULTING
-** FROM THE SOFTWARE OR ITS USE IS EXPRESSLY DISCLAIMED, INCLUDING
-** CONSEQUENTIAL OR ANY OTHER INDIRECT DAMAGES, WHETHER ARISING IN CONTRACT,
-** TORT (INCLUDING NEGLIGENCE) OR STRICT LIABILITY, EVEN IF THE COPYRIGHT
-** HOLDERS ARE ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-*/
+//*****************************************************************************
+// The JAZZ++ Midi Sequencer
+//
+// Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
+// Modifications Copyright (C) 2004 Patrick Earl
+// Modifications Copyright (C) 2008 Peter J. Stieber
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+//*****************************************************************************
 
 #ifndef winplay_h
 #define winplay_h
 
-#include "player.h"
-extern "C" {
+#include "Player.h"
+
+extern "C"
+{
 #include <mmsystem.h>
 }
+
 #include "jazzdll.h"
 
-
-
+//*****************************************************************************
+//*****************************************************************************
 class tWinPlayer : public tPlayer
 {
   public:
-    tWinPlayer(tSong *song);
+
+    tWinPlayer(JZSong* pSong);
+
     int Installed();
     virtual ~tWinPlayer();
-    virtual int OutEvent(tEvent *e);
-    virtual int OutSysex(tEvent *e, DWORD time);
-    void OutNow(tEvent *e);
+    virtual int OutEvent(JZEvent *e);
+    virtual int OutSysex(JZEvent *e, DWORD time);
+    void OutNow(JZEvent *e);
     void OutNow(tParam *r);
     void OutBreak();
     virtual void OutBreak(long BreakOver);
@@ -49,19 +52,26 @@ class tWinPlayer : public tPlayer
     void StopPlay();
     virtual long GetRealTimeClock() = 0;
     virtual void FlushToDevice();
-    void SetSoftThru(int on, int idev, int odev);
-    virtual void InitMtcRec() { }
-    virtual tMtcTime* FreezeMtcRec() { return(0); }
+    void SetSoftThru(int on, int InputDevice, int OutputDevice);
 
-    static void SettingsDlg(long &idev, long &odev);
+    virtual void InitMtcRec()
+    {
+    }
+
+    virtual tMtcTime* FreezeMtcRec()
+    {
+      return 0;
+    }
+
+    static void SettingsDlg(long& InputDevice, long& OutputDevice);
 
     enum { MAX_MIDI_DEVS = 10 };
 
   protected:
 
     tWinPlayerState *state;
-    DWORD Event2Dword(tEvent *e);
-    tEvent *Dword2Event(DWORD dw);
+    DWORD Event2Dword(JZEvent *e);
+    JZEvent *Dword2Event(DWORD dw);
     long  Clock2Time(long clock);
     long  Time2Clock(long time);
     void  SetTempo(long bpm, long clock);
@@ -83,29 +93,49 @@ class tWinPlayer : public tPlayer
     MIDIHDR *pSysHdr;
     HANDLE hSysBuf;
     unsigned char *pSysBuf;
-    unsigned  int maxSysLen;
+    unsigned short maxSysLen;
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tWinIntPlayer : public tWinPlayer
 {
   public:
-    tWinIntPlayer(tSong *song) : tWinPlayer( song ) { }
+
+    tWinIntPlayer(JZSong* pSong)
+      : tWinPlayer(pSong)
+    {
+    }
+
     virtual long GetRealTimeClock();
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tWinMidiPlayer : public tWinPlayer
 {
   public:
-    tWinMidiPlayer(tSong *song) : tWinPlayer( song ) { }
+
+    tWinMidiPlayer(JZSong* pSong)
+      : tWinPlayer(pSong)
+    {
+    }
+
     virtual long GetRealTimeClock();
-    virtual int OutEvent(tEvent *e);
+    virtual int OutEvent(JZEvent *e);
     virtual void OutBreak(long clock);
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tWinMtcPlayer : public tWinPlayer
 {
   public:
-    tWinMtcPlayer(tSong *song) : tWinPlayer( song ) { }
+    tWinMtcPlayer(JZSong* pSong)
+      : tWinPlayer(pSong)
+    {
+    }
+
     virtual long GetRealTimeClock();
     virtual void InitMtcRec();
     virtual tMtcTime* FreezeMtcRec();

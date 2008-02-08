@@ -25,6 +25,8 @@
 
 #include <wx/html/helpctrl.h>
 
+class JZSynth;
+
 //*****************************************************************************
 // Description:
 //   This is the JazzPlusPlus application class declaration.
@@ -34,6 +36,8 @@ class JZJazzPlusPlusApplication : public wxApp
   public:
 
     JZJazzPlusPlusApplication();
+
+    ~JZJazzPlusPlusApplication();
 
     // Override the base class virtual functions.
 
@@ -56,7 +60,7 @@ class JZJazzPlusPlusApplication : public wxApp
     // Returns:
     //   int:
     //     The application's major version number.
-    virtual int GetMajorVersion() const;
+    int GetMajorVersion() const;
 
     // Description:
     //   This function returns the application's minor version number.
@@ -64,7 +68,7 @@ class JZJazzPlusPlusApplication : public wxApp
     // Returns:
     //   int:
     //     The application's minor version number.
-    virtual int GetMinorVersion() const;
+    int GetMinorVersion() const;
 
     // Description:
     //   This function returns the application's build number.
@@ -72,9 +76,13 @@ class JZJazzPlusPlusApplication : public wxApp
     // Returns:
     //   int:
     //     The application's build number.
-    virtual int GetBuildNumber() const;
+    int GetBuildNumber() const;
+
+    const JZSynth& GetSynthesizer() const;
 
   private:
+
+    JZSynth* mpSynth;
 
     mutable wxHtmlHelpController mHelp;
 
@@ -109,6 +117,7 @@ const JZJazzPlusPlusApplication& GetJazzApplication();
 // Ver Date       Description
 //  4  ?          Unknown for all prior versions.  Might be filled in by
 //                looking at old commit messages.
+//  5  1/21/2008  Start of the Jazz++ development revizal.
 //
 // Returns:
 //   int:
@@ -117,7 +126,7 @@ const JZJazzPlusPlusApplication& GetJazzApplication();
 inline
 int JZJazzPlusPlusApplication::GetMajorVersion() const
 {
-  return 4;
+  return 5;
 }
 
 //-----------------------------------------------------------------------------
@@ -127,7 +136,7 @@ int JZJazzPlusPlusApplication::GetMajorVersion() const
 // Ver Date       Description
 //  ?  ?          Unknown for all prior versions.  Might be filled in by
 //                looking at old commit messages.
-//  2  1/11/2008  Major refactoring here to get the code compiling with
+//  3  1/21/2008  Major refactoring here to get the code compiling with
 //                wxWidgets 2.8.7 and recent compilers including Visual Studio
 //                .NET 2005 and GCC 4.
 // Returns:
@@ -137,7 +146,7 @@ int JZJazzPlusPlusApplication::GetMajorVersion() const
 inline
 int JZJazzPlusPlusApplication::GetMinorVersion() const
 {
-  return 2;
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -147,7 +156,7 @@ int JZJazzPlusPlusApplication::GetMinorVersion() const
 // Ver Date       Description
 //  ?  ?          Unknown for all prior versions.  Might be filled in by
 //                looking at old commit messages.
-//  11 1/11/2008  See minor version 2.
+//  11 1/21/2008  See minor version 3.
 //-----------------------------------------------------------------------------
 inline
 int JZJazzPlusPlusApplication::GetBuildNumber() const

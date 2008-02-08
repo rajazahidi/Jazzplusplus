@@ -30,9 +30,11 @@ class JZGuitarFrame : public wxFrame
 {
   public:
 
-    JZGuitarFrame();
+    JZGuitarFrame(wxWindow* pParent = 0);
 
     void PrepareDC(wxDC& Dc);
+
+    void ShowPitch(int Pitch);
 
   private:
 

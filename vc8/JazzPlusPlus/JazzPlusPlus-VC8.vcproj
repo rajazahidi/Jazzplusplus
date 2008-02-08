@@ -46,7 +46,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(EXT_PKGS)\wxMSW-2.8.7-VC8\lib\vc_lib\mswd,$(EXT_PKGS)\wxMSW-2.8.7-VC8\include"
+				AdditionalIncludeDirectories="&quot;$(EXT_PKGS)\wxMSW-2.8.7-VC8\lib\vc_lib\mswd&quot;;&quot;$(EXT_PKGS)\wxMSW-2.8.7-VC8\include&quot;;../../mswin"
 				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;WINVER=0x0400;STRICT;NOMINMAX;__WXDEBUG__;WXDEBUG=1"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -76,12 +76,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxmsw28d_core.lib wxmsw28d_adv.lib wxmsw28d_html.lib wxbase28d.lib wxpngd.lib wxzlibd.lib wxjpegd.lib wxtiffd.lib odbc32.lib odbccp32.lib comctl32.lib rpcrt4.lib wsock32.lib winmm.lib opengl32.lib glu32.lib"
+				AdditionalDependencies="wxmsw28d_xrc.lib wxbase28d_xml.lib wxexpatd.lib wxmsw28d_core.lib wxmsw28d_adv.lib wxmsw28d_html.lib wxbase28d.lib wxpngd.lib wxzlibd.lib wxjpegd.lib wxtiffd.lib odbc32.lib odbccp32.lib comctl32.lib rpcrt4.lib wsock32.lib winmm.lib opengl32.lib glu32.lib"
 				OutputFile=".\$(OutDir)\JazzPlusPlus.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;$(EXT_PKGS)\wxMSW-2.8.7-VC8\lib\vc_lib&quot;"
-				IgnoreDefaultLibraryNames="libcd.lib,libcid.lib,msvcrt.lib"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\$(OutDir)\JazzPlusPlus.pdb"
 				SubSystem="2"
@@ -177,12 +177,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxmsw28_core.lib wxmsw28_adv.lib wxmsw28_html.lib wxbase28.lib wxpng.lib wxzlib.lib wxjpeg.lib wxtiff.lib odbc32.lib odbccp32.lib comctl32.lib rpcrt4.lib wsock32.lib winmm.lib opengl32.lib glu32.lib"
+				AdditionalDependencies="wxmsw28_xrc.lib wxbase28_xml.lib wxexpat.lib wxmsw28_core.lib wxmsw28_adv.lib wxmsw28_html.lib wxbase28.lib wxpng.lib wxzlib.lib wxjpeg.lib wxtiff.lib odbc32.lib odbccp32.lib comctl32.lib rpcrt4.lib wsock32.lib winmm.lib opengl32.lib glu32.lib"
 				OutputFile=".\$(OutDir)\JazzPlusPlus.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;$(EXT_PKGS)\wxMSW-2.8.6-VC8\lib\vc_lib&quot;"
-				IgnoreDefaultLibraryNames="libc.lib,libci.lib,msvcrtd.lib"
+				IgnoreDefaultLibraryNames=""
 				ProgramDatabaseFile=".\$(OutDir)\JazzPlusPlus.pdb"
 				SubSystem="2"
 				TargetMachine="1"
@@ -229,6 +229,134 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\Audio.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Audio.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ClockDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ClockDialog.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Command.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Command.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Configuration.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Configuration.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ControlEdit.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ControlEdit.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\DeprecatedStringUtils.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\DeprecatedStringUtils.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Dialogs.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Dialogs.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\DynamicArray.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\DynamicArray.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ErrorMessage.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ErrorMessage.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Events.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Events.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\EventWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\EventWindow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\FileSelector.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\FileSelector.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Filter.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Filter.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\FindFile.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\FindFile.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\FrequencyTable.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\FrequencyTable.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Globals.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Globals.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\GuitarFrame.cpp"
 				>
 			</File>
@@ -261,11 +389,91 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\Harmony.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Harmony.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\HarmonyBrowserAnalyzer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\HarmonyBrowserAnalyzer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\HarmonyP.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\HarmonyP.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Help.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Help.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\JazzPlusPlusApplication.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\src\JazzPlusPlusApplication.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\KeyDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\KeyDialog.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\KeyStringConverters.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\KeyStringConverters.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Mapper.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Mapper.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Metronome.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Metronome.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\MouseAction.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\MouseAction.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\NamedValue.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\NamedValue.h"
 				>
 			</File>
 			<File
@@ -277,6 +485,70 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\PianoWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\PianoWindow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Player.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Player.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Project.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Project.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\DeprecatedWx\prop.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\DeprecatedWx\prop.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\PropertyListDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\PropertyListDialog.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\DeprecatedWx\propform.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\DeprecatedWx\propform.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\DeprecatedWx\proplist.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\DeprecatedWx\proplist.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Random.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Random.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\Rectangle.cpp"
 				>
 			</File>
@@ -285,7 +557,115 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\ResourceDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ResourceDialog.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\Resources.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Rhythm.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Rhythm.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Sample.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Sample.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\SampleCommand.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\SampleCommand.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\SampleDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\SampleDialog.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\SampleWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\SampleWindow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\SelectControllerDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\SelectControllerDialog.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\DeprecatedWx\setup.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Signal2.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Signal2.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\SliderWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\SliderWindow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Song.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Song.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\StandardFile.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\StandardFile.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\StringReadWrite.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\StringReadWrite.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Synth.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Synth.h"
 				>
 			</File>
 			<File
@@ -294,6 +674,14 @@
 			</File>
 			<File
 				RelativePath="..\..\src\ToolBar.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Track.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Track.h"
 				>
 			</File>
 			<File
@@ -310,6 +698,10 @@
 			</File>
 			<File
 				RelativePath="..\..\src\TrackWindow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\WxWidgets.h"
 				>
 			</File>
 		</Filter>

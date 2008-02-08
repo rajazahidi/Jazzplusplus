@@ -31,10 +31,10 @@
 //*****************************************************************************
 struct JZToolDef
 {
-  int  mId;
+  int mId;
   bool mSticky;
   const void* mpResourceId;
-  const char* pToolTip;
+  const char* mpToolTip;
 };
 
 //*****************************************************************************
@@ -53,7 +53,7 @@ class JZToolBar
 
     // Description:
     //   Pass the frame on which the toolbar is to be created.  Also pass in
-    // the list of toolbar definitions terminated by TOOLDEF_END.
+    // the list of toolbar definitions terminated by eToolBarEnd.
     JZToolBar(wxFrame* pFrame, JZToolDef* pToolDef);
 
     // To retrieve the wxToolBar we're delegating to
@@ -67,7 +67,6 @@ class JZToolBar
   private:
 
     wxToolBar* mpToolBar;
-
 };
 
 #endif // !defined(JZ_TOOLBAR_H)

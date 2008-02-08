@@ -140,6 +140,16 @@ void JZGuitarWindow::OnSize(wxSizeEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void JZGuitarWindow::ShowPitch(int Pitch)
+{
+  wxClientDC Dc(this);
+  PrepareDC(Dc);
+
+  ShowPitch(Dc, Pitch);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZGuitarWindow::OnPaint(wxPaintEvent& Event)
 {
   wxPaintDC Dc(this);

@@ -4,6 +4,13 @@ bin_PROGRAMS = jazz
 
 jazz_SOURCES = \
 AboutDialog.cpp \
+AlsaDriver.cpp \
+AlsaPlay.cpp \
+AlsaThru.cpp \
+Audio.cpp \
+ClockDialog.cpp \
+Command.cpp \
+Configuration.cpp \
 GuitarFrame.cpp \
 GuitarSettings.cpp \
 GuitarSettingsDialog.cpp \
@@ -14,9 +21,6 @@ Rectangle.cpp \
 ToolBar.cpp \
 TrackFrame.cpp \
 TrackWindow.cpp
-
-#jazz_LDADD=-L../xrc -lwx_xrc
-#jazz_CXXFLAGS=-I../xrc/include
 
 noinst_HEADERS = \
 AboutDialog.h \

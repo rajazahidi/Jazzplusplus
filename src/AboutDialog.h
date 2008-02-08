@@ -20,8 +20,8 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef TRC_ABOUTDIALOG_H
-#define TRC_ABOUTDIALOG_H
+#ifndef JZ_ABOUTDIALOG_H
+#define JZ_ABOUTDIALOG_H
 
 //*****************************************************************************
 // Description:
@@ -48,4 +48,4 @@ class JZAboutDialog : public wxDialog
   DECLARE_EVENT_TABLE()
 };
 
-#endif // !defined(TRC_ABOUTDIALOG_H)
+#endif // !defined(JZ_ABOUTDIALOG_H)

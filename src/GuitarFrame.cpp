@@ -55,9 +55,9 @@ END_EVENT_TABLE()
 // Description:
 //   This is the guitar frame constructor.
 //-----------------------------------------------------------------------------
-JZGuitarFrame::JZGuitarFrame()
+JZGuitarFrame::JZGuitarFrame(wxWindow* pParent)
   : wxFrame(
-      0,
+      pParent,
       wxID_ANY,
       "Guitar board",
       wxPoint(20, 20),
@@ -123,3 +123,11 @@ void JZGuitarFrame::OnClose(wxCommandEvent& Event)
   // true is to force the frame to close
   Close(true);
 }
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZGuitarFrame::ShowPitch(int Pitch)
+{
+  mpFretBoardWindow->ShowPitch(Pitch);
+}
+

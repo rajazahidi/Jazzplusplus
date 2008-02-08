@@ -29,6 +29,8 @@
 #include "JazzPlusPlusApplication.h"
 #include "ToolBar.h"
 #include "PianoFrame.h"
+#include "Globals.h"
+#include "Configuration.h"
 #include "AboutDialog.h"
 
 // These are the tool bar icons.
@@ -51,6 +53,9 @@
 #include "Bitmaps/playloop.xpm"
 #include "Bitmaps/record.xpm"
 
+// \todo: get rid of all this stuff, it's moving to jppProject
+JZTrackFrame* TrackWin = 0;
+
 //*****************************************************************************
 // Description:
 //   This is the track frame class definition.
@@ -63,6 +68,8 @@ BEGIN_EVENT_TABLE(JZTrackFrame, wxFrame)
 
   EVT_MENU(ID_PIANOWIN, JZTrackFrame::OnPianoWindow)
 
+  EVT_MENU(ID_METRONOME_ON, JZTrackFrame::OnMetroOn)
+
   EVT_MENU(wxID_HELP_CONTENTS, JZTrackFrame::OnHelpContents)
 
   EVT_MENU(wxID_ABOUT, JZTrackFrame::OnHelpAbout)
@@ -74,15 +81,16 @@ END_EVENT_TABLE()
 JZTrackFrame::JZTrackFrame(
   wxWindow* pParent,
   const wxString& Title,
+  JZSong* pSong,
   const wxPoint& Position,
   const wxSize& Size)
-  : wxFrame(
+  : JZEventFrame(
       pParent,
-      wxID_ANY,
       Title,
+      pSong,
       Position,
-      Size,
-      wxDEFAULT_FRAME_STYLE | wxNO_FULL_REPAINT_ON_RESIZE),
+      Size),
+//      wxDEFAULT_FRAME_STYLE | wxNO_FULL_REPAINT_ON_RESIZE),
     mpToolBar(0),
     mpFileMenu(0),
     mpEditMenu(0)//,
@@ -100,6 +108,11 @@ JZTrackFrame::JZTrackFrame(
 //    "Piano",
 //    wxDefaultPosition,
 //    wxSize(640, 480));
+
+  MetronomeInfo.IsAccented = Config(C_MetroIsAccented);
+  MetronomeInfo.Veloc = Config(C_MetroVelocity);
+  MetronomeInfo.KeyNorm = Config(C_MetroNormalClick);
+  MetronomeInfo.KeyAcc = Config(C_MetroAccentedClick);
 }
 
 //-----------------------------------------------------------------------------
@@ -344,7 +357,7 @@ void JZTrackFrame::CreateMenu()
 //-----------------------------------------------------------------------------
 bool JZTrackFrame::OnClose()
 {
-//  if (JZTrack::changed)
+//  if (tTrack::changed)
 //  {
 //    if (
 //      ::wxMessageBox(
@@ -385,10 +398,18 @@ void JZTrackFrame::OnPianoWindow(wxCommandEvent& Event)
   JZPianoFrame* pPianoFrame = new JZPianoFrame(
     this,
     "Piano",
+    TheSong,
     wxDefaultPosition,
     wxSize(640, 480));
 
   pPianoFrame->Show(true);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnMetroOn(wxCommandEvent& Event)
+{
+  MetronomeInfo.IsOn = !MetronomeInfo.IsOn;
 }
 
 //-----------------------------------------------------------------------------

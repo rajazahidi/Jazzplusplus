@@ -25,6 +25,8 @@
 #include "JazzPlusPlusApplication.h"
 #include "TrackFrame.h"
 //#include "GuitarFrame.h"
+#include "Synth.h"
+#include "Globals.h"
 
 #ifdef _MSC_VER
 // This include allows Microsoft leak detection calls like _CrtSetBreakAlloc.
@@ -73,6 +75,7 @@ END_EVENT_TABLE()
 //-----------------------------------------------------------------------------
 JZJazzPlusPlusApplication::JZJazzPlusPlusApplication()
   : wxApp(),
+    mpSynth(0),
     mHelp(wxHF_DEFAULT_STYLE | wxHF_OPEN_FILES)
 {
   // Set the global application pointer to this instance.
@@ -93,6 +96,13 @@ JZJazzPlusPlusApplication::JZJazzPlusPlusApplication()
   //
   // _CrtSetBreakAlloc(1494);
 #endif // _MSC_VER
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZJazzPlusPlusApplication::~JZJazzPlusPlusApplication()
+{
+  delete mpSynth;
 }
 
 //-----------------------------------------------------------------------------
@@ -119,7 +129,7 @@ bool JZJazzPlusPlusApplication::OnInit()
   JZTrackFrame* pFrame = new JZTrackFrame(
     0,
     "Jazz++",
-//    TheSong,
+    TheSong,
     wxPoint(10, 10),
     wxSize(600, 400));
 //  JZGuitarFrame* pFrame = new JZGuitarFrame();
@@ -127,6 +137,8 @@ bool JZJazzPlusPlusApplication::OnInit()
   // Show it and tell the application that it's our main window
   pFrame->Show(true);
   SetTopWindow(pFrame);
+
+  mpSynth = NewSynth("GS");
 
   return true;
 }
@@ -164,4 +176,11 @@ void JZJazzPlusPlusApplication::DisplayHelpContents() const
 void JZJazzPlusPlusApplication::GetHelp(const wxString& TopicString) const
 {
   mHelp.DisplaySection(TopicString);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+const JZSynth& JZJazzPlusPlusApplication::GetSynthesizer() const
+{
+  return *mpSynth;
 }

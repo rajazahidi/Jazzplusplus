@@ -71,11 +71,11 @@ JZToolBar::JZToolBar(wxFrame* pFrame, JZToolDef* pToolDef)
           "",
           Bitmap,
           wxNullBitmap,
-          pToolDef->pToolTip);
+          pToolDef->mpToolTip);
       }
       else
       {
-	mpToolBar->AddTool(pToolDef->mId, Bitmap, pToolDef->pToolTip);
+	mpToolBar->AddTool(pToolDef->mId, Bitmap, pToolDef->mpToolTip);
       }
     }
 
@@ -87,7 +87,7 @@ JZToolBar::JZToolBar(wxFrame* pFrame, JZToolDef* pToolDef)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-wxToolBar *JZToolBar::GetDelegateToolBar()
+wxToolBar* JZToolBar::GetDelegateToolBar()
 {
   return mpToolBar;
 }

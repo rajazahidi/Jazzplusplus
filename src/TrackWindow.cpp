@@ -273,7 +273,7 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
     Dc.SetPen(*wxBLACK_PEN);
     Dc.DrawLine(mCanvasX, y, xEvents,y);
 
-//    JZTrack* pTrack = gProject->GetTrack(TrackNr);
+//    tTrack* pTrack = gProject->GetTrack(TrackNr);
 //    if (pTrack)
 //    {
 //      // TrackName, show the button pressed when dialog is open
@@ -315,7 +315,7 @@ void JZTrackWindow::DrawNumbers(wxDC& Dc)
   Dc.SetClippingRegion(xNumber, yEvents, xNumber + wNumber, yEvents + hEvents);
   for (int i = mFromLine; i < mToLine; ++i)
   {
-//    JZTrack* pTrack = gProject->GetTrack(i);
+//    tTrack* pTrack = gProject->GetTrack(i);
 //    if (pTrack != 0)
     {
 //      if (pTrack->GetAudioMode())
@@ -467,7 +467,7 @@ void JZTrackWindow::DrawCounters(wxDC& Dc)
   for (i = mFromLine; i < mToLine; i++)
   {
 #if 0
-    JZTrack* pTrack = gProject->GetTrack(i);
+    tTrack* pTrack = gProject->GetTrack(i);
     if (pTrack)
     {
       char buf[20];

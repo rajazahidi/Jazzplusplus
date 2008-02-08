@@ -23,6 +23,10 @@
 #ifndef JZ_SONG_H
 #define JZ_SONG_H
 
+#include "Track.h"
+#include "Configuration.h"
+
+class tMetronomeInfo;
 class JZSong;
 
 class JZBarInfo
@@ -46,55 +50,23 @@ class JZBarInfo
 
     tEventIterator Iterator;
 
-    tEvent *e;
+    JZEvent *e;
 
     int TicksPerQuarter;
 };
-
-
-class tMetronomeInfo
-{
-  public:
-
-    uchar KeyAcc;
-    uchar KeyNorm;
-    uchar Veloc;
-    int IsOn;
-    int IsAccented;
-
-    tMetronomeInfo()
-      : KeyAcc(36),
-        KeyNorm(37),
-        Veloc(127),
-        IsAccented(1),
-        IsOn(0)
-    {
-    }
-
-    tKeyOn *Normal(long clock)
-    {
-      return new tKeyOn(clock, Config(C_DrumChannel)-1, KeyNorm, Veloc, 15);
-    }
-
-    tKeyOn *Accented(long clock)
-    {
-      return new tKeyOn(clock, Config(C_DrumChannel)-1, KeyAcc, Veloc, 15);
-    }
-};
-
 
 // same as keys in pianowin
 #define MaxTracks 127
 
 class JZSong
 {
-  friend class tBarInfo;
+  friend class JZBarInfo;
 
   void MakeMetronome(
     long FrClock,
     long ToClock,
     tEventArray *Destin,
-    tMetronomeInfo *MetronomeInfo,
+    tMetronomeInfo* MetronomeInfo,
     long delta = 0);
 
   public:
@@ -132,7 +104,7 @@ class JZSong
       long FrClock,
       long ToClock,
       tEventArray *Destin,
-      tMetronomeInfo *MetronomeInfo,
+      tMetronomeInfo* MetronomeInfo,
       long DeltaClock = 0,
       int mode = 0);
 
@@ -162,6 +134,5 @@ class JZSong
 
     int intro_length;
 };
-
 
 #endif // !defined(JZ_SONG_H)

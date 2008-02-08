@@ -1,30 +1,29 @@
-
-/*
-** Copyright (C) 1994-1997 Andreas Voss and Per Sigmond, all rights reserved.
-**
-** License is granted to copy and distribute this software for any purpose,
-** provided that the copyright notice and this license notice is included in
-** all copies and in all related documentation.
-** License is granted to use this software for non-commercial purposes only.
-** The copyright holders grant no other licenses expressed or implied and
-** the licensee acknowleges that the copyright holders have no liability for
-** licensee's use.
-**
-** This software is provided AS IS.
-**
-** THE COPYRIGHT HOLDERS DISCLAIM AND LICENSEE AGREES THAT ALL WARRANTIES,
-** EXPRESSED OR IMPLIED, INCLUDING WITHOUT LIMITATION THE IMPLIED WARRANTIES
-** OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. NOTWITHSTANDING
-** ANY OTHER PROVISION CONTAINED HEREIN, ANY LIABILITY FOR DAMAGES RESULTING
-** FROM THE SOFTWARE OR ITS USE IS EXPRESSLY DISCLAIMED, INCLUDING
-** CONSEQUENTIAL OR ANY OTHER INDIRECT DAMAGES, WHETHER ARISING IN CONTRACT,
-** TORT (INCLUDING NEGLIGENCE) OR STRICT LIABILITY, EVEN IF THE COPYRIGHT
-** HOLDERS ARE ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-*/
+//*****************************************************************************
+// The JAZZ++ Midi Sequencer
+//
+// Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
+// Modifications Copyright (C) 2004 Patrick Earl
+// Modifications Copyright (C) 2008 Peter J. Stieber
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+//*****************************************************************************
 
 #ifndef jazzdll_h
 #define jazzdll_h
-#include "config.h"
+
+//#include "config.h"
 #include "dynarray.h"
 
 struct tWinPlayerState;
@@ -198,7 +197,7 @@ class tWinSysexBufferArray {
     }
 
   private:
-    tVoidPtrArray array;
+    JZVoidPtrArray array;
     int size;
     tWinSysexBuffer *next_free;
 };
@@ -214,8 +213,8 @@ inline void tWinSysexBuffer::Release() {
 
 struct midi_event
 {
-  DWORD ref; /* Means time or clock depending on sync mode */
-  DWORD data; // midi event or pseudo data
+  DWORD ref;  // Means time or clock depending on sync mode.
+  DWORD data; // midi event or pseudo data.
 };
 
 

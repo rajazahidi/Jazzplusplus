@@ -23,23 +23,43 @@
 #ifndef JZ_TRACKFRAME_H
 #define JZ_TRACKFRAME_H
 
+#include "EventWindow.h"
+#include "MouseAction.h"
+#include "Metronome.h"
+
+class JZSong;
 class JZToolBar;
 class JZTrackWindow;
 class JZPianoFrame;
 
 //*****************************************************************************
 //*****************************************************************************
-class JZTrackFrame : public wxFrame
+class JZTrackFrame : public JZEventFrame, public tButtonLabelInterface
 {
   public:
 
     JZTrackFrame(
       wxWindow* pParent,
       const wxString& Title,
+      JZSong* pSong,
       const wxPoint& Position = wxDefaultPosition,
       const wxSize& Size = wxDefaultSize);
 
     virtual ~JZTrackFrame();
+
+    JZPianoFrame* GetPianoWindow()
+    {
+      return 0;
+    }
+
+    // Overridden tButtonLabelInterface finction.
+    virtual void ButtonLabelDisplay(const wxString& Text, bool IsButtonDown);
+
+    tMetronomeInfo MetronomeInfo;
+
+  private:
+
+    void OnMetroOn(wxCommandEvent& Event);
 
   private:
 
@@ -71,5 +91,12 @@ class JZTrackFrame : public wxFrame
 
   DECLARE_EVENT_TABLE()
 };
+
+inline
+void JZTrackFrame::ButtonLabelDisplay(const wxString& Text, bool IsButtonDown)
+{
+}
+
+extern JZTrackFrame* TrackWin;
 
 #endif // !defined(JZ_TRACKFRAME_H)

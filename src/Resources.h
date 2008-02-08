@@ -43,6 +43,7 @@
 #define ID_SNAP_16D                          wxID_HIGHEST + 10
 #define ID_MIXER                             wxID_HIGHEST + 11
 #define ID_PIANOWIN                          wxID_HIGHEST + 12
+#define ID_METRONOME_ON                      wxID_HIGHEST + 13
 
 #define ID_PLAY                              wxID_HIGHEST + 14
 #define ID_PLAY_LOOP                         wxID_HIGHEST + 15

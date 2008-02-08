@@ -549,6 +549,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\RecordingInfo.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\RecordingInfo.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\Rectangle.cpp"
 				>
 			</File>

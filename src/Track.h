@@ -47,11 +47,7 @@ enum { NrpnEnvAttack = 0, NrpnEnvDecay, NrpnEnvRelease, NrpnEnvParams };
 class tParam
 {
   public:
-    tControl Msb;
-    tControl Lsb;
-    tControl DataMsb;
-    tControl ResetMsb;
-    tControl ResetLsb;
+
     tParam(
       long clk,
       int cha,
@@ -64,18 +60,32 @@ class tParam
         Lsb( clk, cha, id2, lsb ),
         DataMsb( clk, cha, 0x06, msbval ),
         ResetMsb( clk, cha, id1, 0x7f ),
-        ResetLsb( clk, cha, id2, 0x7f ) {}
+        ResetLsb( clk, cha, id2, 0x7f )
+    {
+    }
+
+    virtual ~tParam()
+    {
+    }
+
     virtual int Write(tWriteBase &io);
     virtual void SetCha( unsigned char cha );
     virtual int GetVal()
     {
       return( DataMsb.Value );
     }
+
+    tControl Msb;
+    tControl Lsb;
+    tControl DataMsb;
+    tControl ResetMsb;
+    tControl ResetLsb;
 };
 
 class tNrpn : public tParam
 {
   public:
+
     tNrpn(
       long clk,
       int cha,
@@ -90,6 +100,7 @@ class tNrpn : public tParam
 class tRpn : public tParam
 {
   public:
+
     tRpn(
       long clk,
       int cha,
@@ -101,8 +112,14 @@ class tRpn : public tParam
     }
 };
 
-unsigned char *SysExDT1( unsigned char aa, unsigned char bb, unsigned char cc, int length, unsigned char* dd );
-int sysex_channel( int Channel );
+unsigned char *SysExDT1(
+  unsigned char aa,
+  unsigned char bb,
+  unsigned char cc,
+  int length,
+  unsigned char* dd);
+
+int sysex_channel(int Channel);
 
 enum ModulationSysexParameter
 {

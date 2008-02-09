@@ -20,15 +20,18 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
+#include "WxWidgets.h"
+
 #include "copyCommand.h"
-#include "command.h"
+#include "TrackFrame.h"
+#include "Command.h"
 
 bool tCopyCommand::EraseDestin = 1;
 bool tCopyCommand::RepeatCopy = 0;
 bool tCopyCommand::EraseSource = 0;
 bool tCopyCommand::InsertSpace = 0;
 
-tCopyCommand::tCopyCommand(tTrackWin *t)
+tCopyCommand::tCopyCommand(JZTrackFrame *t)
 {
   tw = t;
   MarkRepeat = 0;

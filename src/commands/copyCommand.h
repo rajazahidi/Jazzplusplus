@@ -23,33 +23,37 @@
 #ifndef COPYCOMMAND
 #define COPYCOMMAND
 
-#include "../eventwin.h"
-#include "../trackwin.h"
+#include "MouseAction.h"
 
+class JZTrackFrame;
+class tMarkDestin;
 class tCopyDlg;
 
-/** this class handles the gui copy operation*/
+// this class handles the gui copy operation
 class tCopyCommand : public wxObject, public tMouseAction
 {
-    tTrackWin *tw;
-    int MarkRepeat;
-    float StartX, StartY, StopX, StopY;
-
-    tMarkDestin *Mouse;
-    tCopyDlg *CopyDlg;
-
   public:
+
     static bool RepeatCopy;
     static bool EraseSource;
     static bool EraseDestin;
     static bool InsertSpace;
 
-    int Event(wxMouseEvent &e);
-    tCopyCommand(tTrackWin *t);
-    void EditForm(wxPanel *panel);
+    int Event(wxMouseEvent& e);
+    tCopyCommand(JZTrackFrame* t);
+    void EditForm(wxPanel* panel);
     void OnOk();
     void OnCancel();
     void Execute(int doit);
+
+  private:
+
+    JZTrackFrame* tw;
+    int MarkRepeat;
+    float StartX, StartY, StopX, StopY;
+
+    tMarkDestin* Mouse;
+    tCopyDlg* CopyDlg;
 };
 
 #endif // Copycommand

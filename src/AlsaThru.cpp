@@ -35,6 +35,9 @@
 //   or a thread.
 //*****************************************************************************
 
+
+#include "WxWidgets.h"
+
 #include <stdlib.h>
 #include <errno.h>
 #include <stdio.h>

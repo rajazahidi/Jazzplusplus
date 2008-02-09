@@ -20,7 +20,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "harmonyp.h"
+#include "HarmonyP.h"
 
 #include <assert.h>
 #include <string.h>
@@ -31,7 +31,8 @@ using namespace std;
 // HBChord
 // ========================================================================
 
-const char *const HBChord::scale_names[2][12] = {
+const char *const HBChord::scale_names[2][12] =
+{
   { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" },
   { "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B" }
 };

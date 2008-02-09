@@ -35,6 +35,12 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+BEGIN_EVENT_TABLE(JZTrackWindow, wxScrolledWindow)
+  EVT_SIZE(JZTrackWindow::OnSize)
+END_EVENT_TABLE()
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZTrackWindow::JZTrackWindow(
   JZTrackFrame* pParent,
   JZSong* pSong,
@@ -170,6 +176,17 @@ void JZTrackWindow::Mark(int x, int y)
 void JZTrackWindow::UnMark()
 {
   Marked.SetX(-1);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::OnSize(wxSizeEvent& Event)
+{
+  GetClientSize(&mCanvasWidth, &mCanvasHeight);
+  if (mCanvasWidth && mCanvasHeight)
+  {
+    Refresh();
+  }
 }
 
 //-----------------------------------------------------------------------------

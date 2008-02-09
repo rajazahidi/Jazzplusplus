@@ -69,6 +69,8 @@ class JZTrackWindow : public wxScrolledWindow
 
   private:
 
+    void OnSize(wxSizeEvent& Event);
+
     virtual void OnDraw(wxDC& Dc);
 
     void DrawPlayPosition(wxDC& Dc);
@@ -154,6 +156,8 @@ class JZTrackWindow : public wxScrolledWindow
     wxFont* mpFont;
 
     JZRectangle Marked;
+
+  DECLARE_EVENT_TABLE()
 };
 
 #endif // !defined(JZ_TRACKWINDOW_H)

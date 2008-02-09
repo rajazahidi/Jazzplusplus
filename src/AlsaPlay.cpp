@@ -43,7 +43,6 @@
 
 using namespace std;
 
-/** construct a alsa player, take song as arg*/
 tAlsaPlayer::tAlsaPlayer(JZSong *song)
   : tPlayer(song)
 {
@@ -77,7 +76,8 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
   memset(&self, 0, sizeof(self));
   self.client  = client;
   self.port    = create_port(handle, "Input/Output");
-  fprintf(stderr, "created client:port = %d:%d\n", self.client, self.port);
+
+  cerr << "created client:port = " << self.client << ':' << self.port << endl;
 
   // allocate a queue
   queue = snd_seq_alloc_named_queue(handle, "Jazz++");
@@ -422,13 +422,19 @@ void tAlsaPlayer::Notify()
 {
   // called by timer
   long Now = GetRealTimeClock();
-  printf("tAlsaPlayer::Notify %d %d\n",Now,play_clock);
-  if (Now < 0) return;
 
-  if (Now < play_clock) {
+  cout << "tAlsaPlayer::Notify " << Now << ' ' << play_clock << endl;
+
+  if (Now < 0)
+  {
+    return;
+  }
+
+  if (Now < play_clock)
+  {
     // rewind..
     // clear and rebuild
-    printf("tAlsaPlayer::Notify rewind");
+    cout << "tAlsaPlayer::Notify rewind" << endl;
     ResetPlay(Now);
     PlayBuffer.Clear();
     OutClock = Now + FIRST_DELTACLOCK;
@@ -668,14 +674,17 @@ void tAlsaPlayer::scan_clients(tAlsaDeviceList &list, int cap)
   list.Clear();
 
   snd_seq_client_info_set_client(cinfo, 0);
-  while (snd_seq_query_next_client(handle, cinfo) >= 0) {
+  while (snd_seq_query_next_client(handle, cinfo) >= 0)
+  {
     int c = snd_seq_client_info_get_client(cinfo);
     if (c == self.client)
       continue;
     snd_seq_port_info_set_client(pinfo, c);
     snd_seq_port_info_set_port(pinfo, -1);
-    while (snd_seq_query_next_port(handle, pinfo) >= 0) {
-      if ((snd_seq_port_info_get_capability(pinfo) & cap) == cap) {
+    while (snd_seq_query_next_port(handle, pinfo) >= 0)
+    {
+      if ((snd_seq_port_info_get_capability(pinfo) & cap) == cap)
+      {
         snd_seq_addr_t a = *snd_seq_port_info_get_addr(pinfo);
         char buf[500];
         strcpy(buf, snd_seq_client_info_get_name(cinfo));
@@ -746,21 +755,25 @@ int tAlsaPlayer::select_list(tAlsaDeviceList &list, char *title, int def_device)
 }
 
 
-void tAlsaDeviceList::print(const char *msg) {
+void tAlsaDeviceList::print(const char *msg)
+{
   cout << msg << endl;
-  for (int i = 0; i < count; i++) {
+  for (int i = 0; i < count; ++i)
+  {
     snd_seq_addr_t &a = operator[](i);
     cout << GetName(i) << " = " << (int)a.client << ":" << (int)a.port << endl;
   }
 }
 
-int tAlsaDeviceList::add(const char *name, const snd_seq_addr_t &a) {
+int tAlsaDeviceList::add(const char *name, const snd_seq_addr_t &a)
+{
   addr[count] = a;
   names[count] = copystring(name);
   return count++;
 }
 
-snd_seq_addr_t& tAlsaDeviceList::operator[](int i) {
+snd_seq_addr_t& tAlsaDeviceList::operator[](int i)
+{
   if (i >= count)
     return addr[0];
   return addr[i];

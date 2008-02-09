@@ -152,7 +152,14 @@ class JZEventFrame;
 class tButtonLabelInterface
 {
   public:
-    virtual void ButtonLabelDisplay(const wxString& Text, bool IsButtonDown) = 0;
+
+    virtual ~tButtonLabelInterface()
+    {
+    }
+
+    virtual void ButtonLabelDisplay(
+      const wxString& Text,
+      bool IsButtonDown) = 0;
 };
 
 

@@ -34,6 +34,7 @@
 #include "AlsaDriver.h"
 
 #include "TrackFrame.h"
+#include "RecordingInfo.h"
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -160,41 +161,49 @@ int tAlsaAudioPlayer::PlayBackMode() const
 
 void tAlsaAudioPlayer::StartPlay(long clock, long loopClock, int cont)
 {
-	delete listener;
-	samples.StartPlay(clock);
+  delete listener;
+  samples.StartPlay(clock);
 
-	tAlsaPlayer::StartPlay(clock, loopClock, cont);
-	if (!audio_enabled)
-		return;
+  tAlsaPlayer::StartPlay(clock, loopClock, cont);
+  if (!audio_enabled)
+  {
+    return;
+  }
 
-	long ticks_per_minute = Song->TicksPerQuarter * Song->Speed();
-	samples.ResetBuffers(AudioBuffer, clock, ticks_per_minute);
-	last_scount = 0;
-	cur_pos = 0;
-	audio_clock_offset = clock;
-	midi_speed  = Song->Speed();
-	curr_speed  = midi_speed;
+  long ticks_per_minute = Song->TicksPerQuarter * Song->Speed();
+  samples.ResetBuffers(AudioBuffer, clock, ticks_per_minute);
+  last_scount = 0;
+  cur_pos = 0;
+  audio_clock_offset = clock;
+  midi_speed  = Song->Speed();
+  curr_speed  = midi_speed;
 
-	running_mode = 0;
-	if (rec_info && rec_info->Track->GetAudioMode()) {
-		OpenDsp(CAPTURE, 1);
-		recbuffers.ResetBufferSize(frag_byte_size[CAPTURE]);
-	}
-	if (dev[CAPTURE] != dev[PLAYBACK]
-	    || can_duplex || running_mode == 0) {
-		OpenDsp(PLAYBACK, 1);
-		samples.ResetBufferSize(frag_byte_size[PLAYBACK]);
-		samples.FillBuffers(OutClock);
-	}
-	if (running_mode == 0) {
-		audio_enabled = 0;
-		return;
-	}
-	
-	// ok, suspend the device until midi starts
-	if (PlayBackMode())
-		WriteSamples();
-	compose_echo(clock, 1); // trigger echo
+  running_mode = 0;
+  if (rec_info && rec_info->mpTrack->GetAudioMode())
+  {
+    OpenDsp(CAPTURE, 1);
+    recbuffers.ResetBufferSize(frag_byte_size[CAPTURE]);
+  }
+
+  if (dev[CAPTURE] != dev[PLAYBACK] || can_duplex || running_mode == 0)
+  {
+    OpenDsp(PLAYBACK, 1);
+    samples.ResetBufferSize(frag_byte_size[PLAYBACK]);
+    samples.FillBuffers(OutClock);
+  }
+
+  if (running_mode == 0)
+  {
+    audio_enabled = 0;
+    return;
+  }
+
+  // ok, suspend the device until midi starts
+  if (PlayBackMode())
+  {
+    WriteSamples();
+  }
+  compose_echo(clock, 1); // trigger echo
 }
 
 
@@ -209,8 +218,6 @@ void tAlsaAudioPlayer::StartAudio()
 
 void tAlsaAudioPlayer::OpenDsp(int mode, int sync_mode)
 {
-	int tmp;
-
 	if (!audio_enabled)
 		return;
 
@@ -415,14 +422,15 @@ void tAlsaAudioPlayer::ReadSamples()
 
 void tAlsaAudioPlayer::ResetPlay(long clock)
 {
-	tAlsaPlayer::ResetPlay(clock);
-	if (pcm[PLAYBACK]) {
-		snd_pcm_drop(pcm[PLAYBACK]);
-		long ticks_per_minute = Song->TicksPerQuarter * Song->Speed();
-		//samples.ResetBuffers(AudioBuffer, clock, ticks_per_minute);
-	}
-	audio_clock_offset = clock;
-	cur_pos = 0;
+  tAlsaPlayer::ResetPlay(clock);
+  if (pcm[PLAYBACK])
+  {
+    snd_pcm_drop(pcm[PLAYBACK]);
+    //long ticks_per_minute = Song->TicksPerQuarter * Song->Speed();
+    //samples.ResetBuffers(AudioBuffer, clock, ticks_per_minute);
+  }
+  audio_clock_offset = clock;
+  cur_pos = 0;
 }
 
 long tAlsaAudioPlayer::GetCurrentPosition(int mode)
@@ -496,24 +504,31 @@ void tAlsaAudioPlayer::MidiSync()
 
 void tAlsaAudioPlayer::StopPlay()
 {
-	samples.StopPlay();
-	tAlsaPlayer::StopPlay();
-	if (!audio_enabled)
-		return;
+  samples.StopPlay();
+  tAlsaPlayer::StopPlay();
+  if (!audio_enabled)
+  {
+    return;
+  }
 
-	CloseDsp(TRUE);
-	if (RecordMode()) {
-		long frc = rec_info->FromClock;
-		if (frc < audio_clock_offset)
-			frc = audio_clock_offset;
-		long toc = rec_info->ToClock;
-		if (toc > recd_clock)
-			toc = recd_clock;
-		samples.SaveRecordingDlg(frc, toc, recbuffers);
-	}
-	recbuffers.Clear();
-	// xview has reentrancy problems!!
-	// TrackWin->DrawSpeed(midi_speed);
+  CloseDsp(TRUE);
+  if (RecordMode())
+  {
+    long frc = rec_info->mFromClock;
+    if (frc < audio_clock_offset)
+    {
+      frc = audio_clock_offset;
+    }
+    long toc = rec_info->mToClock;
+    if (toc > recd_clock)
+    {
+      toc = recd_clock;
+    }
+    samples.SaveRecordingDlg(frc, toc, recbuffers);
+  }
+  recbuffers.Clear();
+  // xview has reentrancy problems!!
+  // TrackWin->DrawSpeed(midi_speed);
 }
 
 

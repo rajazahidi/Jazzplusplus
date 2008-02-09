@@ -225,15 +225,17 @@ int tSelection::ButtonUp(wxMouseEvent &e)
   return 0;
 }
 
-/** draw the selected rectangle, normally called from OnDraw in the parent window*/
+// Description:
+//   Draw the selected rectangle, normally called from OnDraw
+// in the parent window.
 void tSelection::Draw(wxDC& Dc)
 {
   cout
-    << "tSelection::Draw -----------------------------------------------------------------------------"
+    << "tSelection::Draw ---------------------------------------------------"
     << endl;
   //    Dc.DrawRectangle(100,100,100,100);
-//   if (Selected) //we cant check for "selected" here, because...
-//   {
+// if (Selected) //we cant check for "selected" here, because...
+// {
 
     JZRectangle rr = r;
 
@@ -244,7 +246,9 @@ void tSelection::Draw(wxDC& Dc)
     
     rr.SetNormal();
     if (rr.width && rr.height)
+    {
       Dc.DrawRectangle(rr.x, rr.y, rr.width, rr.height);
+    }
     Dc.SetLogicalFunction(wxCOPY);
 //  }
 }

@@ -38,10 +38,10 @@ class JZRecordingInfo
     tTrack* mpTrack;
 
     // This is the recording from clock.
-//    long mFromClock;
+    long mFromClock;
 
     // This is the recording to clock.
-//    long mToClock;
+    long mToClock;
 
     // This is the recording track index.
 //    long mTrackIndex;

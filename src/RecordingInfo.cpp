@@ -22,10 +22,12 @@
 
 #include "RecordingInfo.h"
 
+//*****************************************************************************
+//*****************************************************************************
 JZRecordingInfo::JZRecordingInfo()
   : mpTrack(0),
-//    mFromClock(0),
-//    mToClock(0),
+    mFromClock(0),
+    mToClock(0),
 //    mTrackIndex(0),
     mIsMuted(false)
 {

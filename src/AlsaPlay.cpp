@@ -29,6 +29,8 @@
 //   like OSS driver mode.
 //*****************************************************************************
 
+#include "WxWidgets.h"
+
 #include "AlsaPlay.h"
 #include "TrackFrame.h"
 #include "Dialogs.h"
@@ -45,7 +47,6 @@ using namespace std;
 tAlsaPlayer::tAlsaPlayer(JZSong *song)
   : tPlayer(song)
 {
-  int i;
   ithru = othru = 0;
 
   installed = 1;
@@ -67,10 +68,10 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
   client = snd_seq_client_id(handle);
   struct pollfd pfds;
   snd_seq_poll_descriptors(handle, &pfds, 1, POLLIN|POLLOUT);
-  seqfd = pfds.fd;
 
   //JAVE seqfd doesnt seem to be used for anything, not here nor in the base
   // class tPlayer(but heavily in tSeq2Player)
+//  seqfd = pfds.fd;
 
   // create my input/output port
   memset(&self, 0, sizeof(self));
@@ -560,7 +561,6 @@ int tAlsaPlayer::set_blocking_mode(int enable) {
 
 void tAlsaPlayer::StopPlay()
 {
-  snd_seq_event_t *ep;
   tPlayer::StopPlay();
   ResetPlay(0);
   flush_output();
@@ -709,29 +709,38 @@ int tAlsaPlayer::FindMidiDevice()
 
 int tAlsaPlayer::select_list(tAlsaDeviceList &list, char *title, int def_device)
 {
-  int k;
 
-  if (list.GetCount() > 0) {
+  if (list.GetCount() > 0)
+  {
     int ndevs = list.GetCount();
     wxString devs[ndevs];
 
-    for (int i = 0; i < ndevs; i++) {
+    for (int i = 0; i < ndevs; i++)
+    {
       devs[i] = list.GetName(i);
     }    
 
     wxSingleChoiceDialog dialog(TrackWin, title, title, ndevs, devs);
 
-    if(def_device != -1) dialog.SetSelection(def_device);
+    if (def_device != -1)
+    {
+      dialog.SetSelection(def_device);
+    }
 
     int res = dialog.ShowModal();
     int k = dialog.GetSelection();
 
-    if(res == wxCANCEL) k = -1;
+    if (res == wxCANCEL)
+    {
+      k = -1;
+    }
 
     return k;
 
-  } else {
-    cerr << "no device found!\n";
+  }
+  else
+  {
+    cerr << "no device found!" << endl;
     return -1;
   }
 }

@@ -40,7 +40,7 @@ tCopyCommand::tCopyCommand(JZTrackFrame *t)
 }
 
 
-int tCopyCommand::Event(wxMouseEvent &e)
+int tCopyCommand::Event(wxMouseEvent& e)
 {
 #ifdef OBSOLETE
   if (!CopyDlg && Mouse && Mouse->Event(e))

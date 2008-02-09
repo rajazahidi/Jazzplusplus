@@ -13,6 +13,9 @@ Command.cpp \
 Configuration.cpp \
 ControlEdit.cpp \
 DeprecatedStringUtils.cpp \
+DeprecatedWx/prop.cpp \
+DeprecatedWx/propform.cpp \
+DeprecatedWx/proplist.cpp \
 Dialogs.cpp \
 DynamicArray.cpp \
 ErrorMessage.cpp \
@@ -74,6 +77,9 @@ ClockDialog.h \
 Command.h \
 Configuration.h \
 ControlEdit.h \
+DeprecatedWx/prop.h \
+DeprecatedWx/propform.h \
+DeprecatedWx/proplist.h \
 DeprecatedStringUtils.h \
 Dialogs.h \
 DynamicArray.h \

@@ -28,9 +28,24 @@
 #include "Globals.h"
 
 #ifdef _MSC_VER
+
+#ifdef _DEBUG
+// This code provides a console window for a GUI windows application.  This
+// allows the use of cout for debug or informational messages.
+#include "mswin/WindowsConsole.h"
+#endif
+
 // This include allows Microsoft leak detection calls like _CrtSetBreakAlloc.
 #include <crtdbg.h>
+
 #endif // _MSC_VER
+
+#ifdef __LINUX__
+
+// The following include is required to call feenableexcept on Linux.
+#include <fenv.h>
+
+#endif
 
 //*****************************************************************************
 // Description:
@@ -96,6 +111,15 @@ JZJazzPlusPlusApplication::JZJazzPlusPlusApplication()
   // _CrtSetBreakAlloc(1494);
 #endif // _MSC_VER
 
+#ifdef __LINUX__
+  // This code enables floating point exceptions for
+  // 1. Division by zero.
+  // 2. Invalid arguments (for example sqrt of a negative number).
+  // 3. Overflow.
+  // on a Linux box.
+  feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+#endif // __LINUX__
+
   mpProject = new JZProject;
   gpProject = mpProject;
 }
@@ -116,6 +140,10 @@ JZJazzPlusPlusApplication::~JZJazzPlusPlusApplication()
 //-----------------------------------------------------------------------------
 bool JZJazzPlusPlusApplication::OnInit()
 {
+#if defined(_MSC_VER) && defined(_DEBUG)
+  RedirectIoToConsole();
+#endif // _MSC_VER
+
   SetVendorName("Jazz");
   SetAppName("Jazz");
 
@@ -134,7 +162,6 @@ bool JZJazzPlusPlusApplication::OnInit()
     gpSong,
     wxPoint(10, 10),
     wxSize(600, 400));
-//  JZGuitarFrame* pFrame = new JZGuitarFrame();
 
   // Show it and tell the application that it's our main window
   pFrame->Show(true);

@@ -288,7 +288,6 @@ static tListen Listen;
 //*****************************************************************************
 BEGIN_EVENT_TABLE(JZPianoFrame, wxFrame)
 
-  EVT_SIZE(JZPianoFrame::OnSize) 
   EVT_MENU(MEN_ZOOMIN, JZPianoFrame::OnZoomIn)
   EVT_MENU(MEN_ZOOMOUT, JZPianoFrame::OnZoomOut)
   EVT_MENU(MEN_SNAP_8, JZPianoFrame::OnSnap8)
@@ -562,29 +561,6 @@ void JZPianoFrame::Setup()
 
   wLeft = wPiano;
   delete dc;
-}
-
-void JZPianoFrame::OnSize(wxSizeEvent& Event)
-{
-  if (Canvas)
-  {
-  int cw, ch;
-  GetClientSize(&cw, &ch);
-
-  // CtrlEdit is the optional edit area for controller values, below the
-  // piano roll
-  if (CtrlEdit)
-  {
-    int ctrl_w, ctrl_h;
-    Canvas->SetSize(0, 0, cw, CtrlY(ch));
-    Canvas->GetClientSize(&ctrl_w, &ctrl_h); // dont count Scrollbar??
-    CtrlEdit->SetSize(wPiano, 0, CtrlY(ch), ctrl_w, CtrlH(ch));
-  }
-  else
-  {
-    Canvas->SetSize(0, 0, cw, ch);
-  }
-  }
 }
 
 // show the guitar edit window.

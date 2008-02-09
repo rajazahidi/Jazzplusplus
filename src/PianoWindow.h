@@ -45,6 +45,8 @@ class JZPianoWindow : public wxScrolledWindow
 
   private:
 
+    void OnSize(wxSizeEvent& Event);
+
     void OnDraw(wxDC& Dc);
 
     void OnMouseEvent(wxMouseEvent& Event);
@@ -54,6 +56,10 @@ class JZPianoWindow : public wxScrolledWindow
     void OnPaint(wxPaintEvent& Event);
 
     void OnChar(wxKeyEvent& Event);
+
+  private:
+
+    int mCanvasX, mCanvasY, mCanvasWidth, mCanvasHeight;
 
   DECLARE_EVENT_TABLE()
 };

@@ -149,8 +149,6 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
 
     bool OnClose();
 
-    virtual void OnSize(wxSizeEvent& Event);
-
     void SetSnapDenom(long value);
     void PressRadio(int id = 0);
     void SetVisibleAllTracks(bool value);

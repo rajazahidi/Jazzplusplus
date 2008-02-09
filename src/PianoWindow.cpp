@@ -38,7 +38,11 @@
 //   This is the piano window definition.
 //*****************************************************************************
 BEGIN_EVENT_TABLE(JZPianoWindow, wxScrolledWindow)
+
+  EVT_SIZE(JZPianoWindow::OnSize) 
+
   EVT_MOUSE_EVENTS(JZPianoWindow::OnMouseEvent)
+
 END_EVENT_TABLE()
 
 JZPianoWindow::JZPianoWindow(
@@ -47,7 +51,11 @@ JZPianoWindow::JZPianoWindow(
   const wxSize& Size,
   long WindowStyle)
   : wxScrolledWindow(pPianoFrame, wxID_ANY, Position, Size, WindowStyle),
-    mpPianoFrame(pPianoFrame)
+    mpPianoFrame(pPianoFrame),
+    mCanvasX(0),
+    mCanvasY(0),
+    mCanvasWidth(0),
+    mCanvasHeight(0)
 {
 }
 
@@ -64,6 +72,16 @@ void JZPianoWindow::OnDraw(wxDC& Dc)
   int x = 0, y = 0;
   GetViewStart(&x, &y);
   mpPianoFrame->OnPaintSub(&Dc, (long)x * ScLine, (long)y * ScLine);  
+}
+
+
+void JZPianoWindow::OnSize(wxSizeEvent& Event)
+{
+  GetClientSize(&mCanvasWidth, &mCanvasHeight);
+  if (mCanvasWidth && mCanvasHeight)
+  {
+    Refresh();
+  }
 }
 
 /**

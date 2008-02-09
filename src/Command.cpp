@@ -968,7 +968,7 @@ void tCmdMapper::ExecuteEvent(tTrack *t, JZEvent *e)
 
       case rhythm: {
         binfo->SetClock(k->Clock);
-        long sng_tpb = binfo->TicksPerBar;
+//        long sng_tpb = binfo->TicksPerBar;
         long arr_tpb = array.Size() / n_bars;
         long arr_bar = (binfo->BarNr - start_bar) % n_bars;
         long i = arr_tpb * arr_bar + arr_tpb * (k->Clock - binfo->Clock) / binfo->TicksPerBar;

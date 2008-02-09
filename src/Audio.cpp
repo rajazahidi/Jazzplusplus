@@ -475,7 +475,6 @@ int tSampleSet::PrepareListen(int key, long fr_smpl, long to_smpl)
 
 int tSampleSet::ContinueListen()
 {
-  tSample *spl = listen_sample;
   int nfree = free_buffers.Count();
   int sound_buffers = 0;
 
@@ -935,9 +934,9 @@ tSamplesDlg::tSamplesDlg(wxFrame *parent, tSampleSet &s)
   NewLine();
 #endif
 
+#ifdef OBSOLETE
   // list box
   int y = 80;
-#ifdef OBSOLETE
   SetLabelPosition(wxVERTICAL);
   list = new wxListBox(this, (wxFunction)ListClick, "Samples", wxLB_SINGLE, 10, y, 300, 200, tSampleSet::MAXSMPL, names, wxNEEDED_SB);
 

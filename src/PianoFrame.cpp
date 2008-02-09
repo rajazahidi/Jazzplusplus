@@ -1195,7 +1195,7 @@ const int isBlack[12] = {0,1,0,1,0,0,1,0,1,0,1,0};
 
 void JZPianoFrame::OnPaintSub(wxDC* dc, long x, long y)
 {
-  long OldFromClock = FromClock;
+//  long OldFromClock = FromClock;
 
   OnEventWinPaintSub(x, y);
 
@@ -1234,7 +1234,6 @@ void JZPianoFrame::OnPaintSub(wxDC* dc, long x, long y)
   dc->SetPen(*wxGREY_PEN);
   wxBrush blackKeysBrush=wxBrush(wxColor(250,240,240),wxSOLID);
   int Pitch = 127 - FromLine;
-  long wBlack = wPiano * 2 / 3;
   y = Line2y(FromLine);
     while (Pitch >= 0 && y < yEvents + hEvents)
     {
@@ -2809,8 +2808,8 @@ void JZPianoFrame::NewPlayPosition(long Clock)
   if (!SnapSel->Active)        // sets clipping
   {
     if (PlayClock != Clock) {
-      long oldplayclock=PlayClock;
-      PlayClock = Clock;
+ //     long oldplayclock=PlayClock;
+//      PlayClock = Clock;
 //        wxRect invalidateRect;
 //        invalidateRect.x=Clock2x(oldplayclock)-1;
 //        invalidateRect.y=CanvasY;

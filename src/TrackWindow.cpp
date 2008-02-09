@@ -110,7 +110,6 @@ void JZTrackWindow::Create()
 
   wxDC* pDc = new wxClientDC(this);
 
-  // dc is from Canvas
   pDc->SetFont(wxNullFont);
 
   delete mpFixedFont;
@@ -193,9 +192,6 @@ void JZTrackWindow::OnSize(wxSizeEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackWindow::OnDraw(wxDC& Dc)
 {
-  Dc.SetBackground(*wxWHITE_BRUSH);
-  Dc.Clear();
-
   GetViewStart(&mCanvasX, &mCanvasY);
   GetClientSize(&mCanvasWidth, &mCanvasHeight);
 
@@ -205,7 +201,7 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
   hEvents = mCanvasHeight - hTop;
 
   mFromLine = mCanvasY / hLine; 
-  mToLine   = (mCanvasY + mCanvasHeight - hTop) / hLine;
+  mToLine = 1 + (mCanvasY + mCanvasHeight - hTop) / hLine;
   mFromClock = mCanvasX * mClocksPerPixel;
   mToClock = x2Clock(mCanvasX + mCanvasWidth);
 
@@ -217,8 +213,6 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
 //  int StopClk;
 
   Dc.DestroyClippingRegion();
-
-  DrawPlayPosition(Dc);
 
   Dc.SetBackground(*wxWHITE_BRUSH);
   Dc.Clear();
@@ -632,6 +626,8 @@ void JZTrackWindow::DrawEvents(wxDC& Dc)
     }
     ++TrackNumber;
   }
+
+  Dc.DestroyClippingRegion();
 }
 
 //-----------------------------------------------------------------------------

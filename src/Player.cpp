@@ -409,9 +409,11 @@ void tPlayer::Notify()
 {
   // called by timer
   long Now = GetRealTimeClock();
-  printf("tPlayer::Notify %d\n",Now);
-  if (Now < 0) return;
-
+  cout << "tPlayer::Notify " << Now << endl;
+  if (Now < 0)
+  {
+    return;
+  }
 
   // time to put more events
   if ( Now >= (OutClock - ADVANCE_PLAY) )
@@ -1252,7 +1254,7 @@ tSeq2Player::tSeq2Player(JZSong *song)
       mididev = FindMidiDevice();
       Config(C_Seq2Device) = mididev;
 
-      TrackWin->SaveMidiDeviceSettings( Config(C_Seq2Device) );
+      Config.Put( C_Seq2Device, mididev );
 
       if (mididev < 0)
         return;  // Installed() == FALSE
@@ -1355,14 +1357,6 @@ void tSeq2Player::SetSoftThru(int on, int idummy, int odummy)
       delete through;
     through = 0;
   }
-}
-
-
-static void dbsys(char *buf, int n) {
-  printf("sys: ");
-  for (int i = 0; i < n; i++)
-    printf("%02x ", (unsigned char)buf[i]);
-  printf("\n");
 }
 
 

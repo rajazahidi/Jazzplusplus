@@ -108,9 +108,15 @@ class JZRndArray
 #define ARED_LINES      64
 
 
-class tArrayEditDrawBars {
+class tArrayEditDrawBars
+{
   public:
-    virtual void DrawBars(wxDC* dc) = 0;
+
+    virtual ~tArrayEditDrawBars()
+    {
+    }
+
+    virtual void DrawBars(wxDC* pDc) = 0;
 };
 
 

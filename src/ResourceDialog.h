@@ -115,7 +115,8 @@ class jppResourceElement {
             use the event table system instead of plain subclassing.
 */
 
-class jppResourceDialog {
+class jppResourceDialog
+{
  public:
   /// Load an XRC or XRS resource file.
   /** This function should be called once for each resource file in the system.
@@ -131,7 +132,7 @@ class jppResourceDialog {
 
   /// Calls Destroy() on the previously created dialog.
 
-  ~jppResourceDialog();
+  virtual ~jppResourceDialog();
 
 
   /// Show the dialog.

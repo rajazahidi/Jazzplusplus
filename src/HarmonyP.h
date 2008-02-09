@@ -306,15 +306,30 @@ class HBContext
 class HBMatch
 {
   public:
-    virtual bool operator()(const HBContext &)	{ return true; }
+
+    virtual ~HBMatch()
+    {
+    }
+
+    virtual bool operator()(const HBContext &)
+    {
+      return true;
+    }
 };
 
 class HBMatchContains : public HBMatch
 {
   public:
-    HBMatchContains(HBChord c) : chord(c) {}
+
+    HBMatchContains(HBChord c)
+      : chord(c)
+    {
+    }
+
     virtual bool operator()(const HBContext &iter);
+
   private:
+
     HBChord chord;
 };
 

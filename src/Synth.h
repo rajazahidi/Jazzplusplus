@@ -283,11 +283,11 @@ class tXG;
 
 class JZSynth
 {
-  protected:
-
-    tSynthSysex Sysex;
-
   public:
+
+    virtual ~JZSynth()
+    {
+    }
 
     virtual const tGM* IsGM() const
     {
@@ -357,6 +357,11 @@ class JZSynth
     virtual JZEvent* ChorusParamSX( int index, long clk, unsigned char val ) { return 0; }
 
     virtual JZEvent* EqualizerMacroSX( long clk, unsigned char val ) { return 0; }
+
+  protected:
+
+    tSynthSysex Sysex;
+
 };
 
 JZSynth* NewSynth(const char* pType);

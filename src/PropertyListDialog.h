@@ -67,6 +67,9 @@ class tPropertyListDlg
 {
  public:
   tPropertyListDlg(wxString title);
+  virtual ~tPropertyListDlg()
+  {
+  }
   virtual void AddProperties();
   void Create();
   void CreateModal();

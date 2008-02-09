@@ -709,6 +709,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\mswin\WindowsConsole.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\mswin\WindowsConsole.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\WxWidgets.h"
 				>
 			</File>

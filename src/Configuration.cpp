@@ -10,24 +10,22 @@ tConfig Config; //JAVE valgrind says mismatched free()
 
 // -------------------------- global config -----------------------------------
 
-tConfigEntry::tConfigEntry( char* name, char* sval )
-   : Name(name),
-     Value(0),
-     Type( ConfigEntryTypeStr )
+tConfigEntry::tConfigEntry(char* name, char* sval)
+  : Type(ConfigEntryTypeStr),
+    Name(name),
+    Value(0),
+    StrValue(0)
 {
-   if (!sval)
-      StrValue = 0;
-   else
-   {
-     StrValue = new char[strlen(sval)+1]; //JAVE these should be deleted somewhere FIXME(see destructor below)
-      strcpy(StrValue,sval);
-   }
+  if (sval)
+  {
+    StrValue = new char[strlen(sval) + 1];
+    strcpy(StrValue,sval);
+  }
 }
 
 tConfigEntry::~tConfigEntry()
 {
-  if (StrValue)
-     delete [] StrValue; 
+  delete [] StrValue; 
 }
 
 tConfig::tConfig()

@@ -115,22 +115,25 @@ class tConfigEntry
 {
   public:
 
-    tConfigEntry::~tConfigEntry();
     tConfigEntry( char* name, int ival )
-      : Name(name),
+      : Type(ConfigEntryTypeInt),
+        Name(name),
         Value(ival),
-        StrValue(0),
-        Type(ConfigEntryTypeInt)
+        StrValue(0)
     {
     }
+
     tConfigEntry(char* name, char* sval);
+
     tConfigEntry(char* name)
-      : Name(name),
+      : Type(ConfigEntryTypeEmpty),
+        Name(name),
         Value(0),
-        StrValue(0),
-        Type(ConfigEntryTypeEmpty)
+        StrValue(0)
     {
     }
+
+    ~tConfigEntry();
 
   private:
 

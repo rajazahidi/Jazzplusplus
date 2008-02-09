@@ -27,7 +27,6 @@
 #include "EventWindow.h"
 #include "Song.h"
 #include "Track.h"
-//#include "jazz.h"
 
 static const long wbar = 2;
 static int bars_state = 2;  // from ArrayEdit
@@ -624,12 +623,13 @@ void tPolyAfterEdit::OnApply()
       e = iter.Next();
     }
     // SN++ Neue Aftertouch's von KeyOn bis KeyLength einfuehgen;
-    long key_end,key_clk;
+    long key_end(-1), key_clk(-1);
     int  key_val = -1;
-    int  key_cha;
+    int  key_cha(-1);
     JZEvent *after;
     e = iter.Range(from_clk, to_clk);
-    while (e) {
+    while (e)
+    {
       if (!parent->SnapSel->Selected || parent->mpFilter->IsSelected(e) )
       {
 	keyon = e->IsKeyOn();

@@ -448,7 +448,6 @@ void JZEventFrame::LineText(wxDC *dc, long x, long y, long w, const char *str, i
     x -= 2;
     y -= 2;
   }
-  const wxColor& bg = dc->GetTextBackground();
   dc->SetTextBackground(*mpGreyColor);
   dc->DrawText((char *)str, x + LittleBit, y + LittleBit);
   dc->SetTextBackground(*wxWHITE);
@@ -610,30 +609,29 @@ void JZEventFrame::NewPlayPosition(long Clock)
     // avoid permenent redraws when end of scroll range is reached
     if (Clock > FromClock && ToClock >= Song->MaxQuarters * Song->TicksPerQuarter)
       return;
-    long x = Clock2x(Clock);
+//    long x = Clock2x(Clock);
 //    Canvas->SetScrollPosition(x - wLeft, CanvasY);
   }
 
   if (!SnapSel->Active)	// sets clipping
   {
-    if (PlayClock != Clock) {
-      long oldplayclock=PlayClock;
-      PlayClock = Clock;
-//        wxRect invalidateRect;
-//        invalidateRect.x=Clock2x(oldplayclock)-1;
-//        invalidateRect.y=CanvasY;
-//        invalidateRect.width=3;
-//        invalidateRect.height= 100000000;
-//       //       DrawPlayPosition();
-//        Canvas->Refresh(TRUE,&invalidateRect);
+    if (PlayClock != Clock)
+    {
+//      long oldplayclock=PlayClock;
+//      PlayClock = Clock;
+//      wxRect invalidateRect;
+//      invalidateRect.x=Clock2x(oldplayclock)-1;
+//      invalidateRect.y=CanvasY;
+//      invalidateRect.width=3;
+//      invalidateRect.height= 100000000;
+//      //DrawPlayPosition();
+//      Canvas->Refresh(TRUE,&invalidateRect);
 
-//              invalidateRect.x=Clock2x(PlayClock)-1;
-//       Canvas->Refresh(TRUE,&invalidateRect);
-      //       DrawPlayPosition();
+//      invalidateRect.x=Clock2x(PlayClock)-1;
+//      Canvas->Refresh(TRUE,&invalidateRect);
+        //DrawPlayPosition();
 
 //      Canvas->Refresh();
-
-
     }
   }
   if (NextWin)
@@ -939,7 +937,8 @@ void JZEventFrame::MenMeterChange()
 void JZEventFrame::ZoomIn()
 {
 
-  if (ClocksPerPixel >= 2) {
+  if (ClocksPerPixel >= 2)
+  {
     ClocksPerPixel /= 2;
     long x = CanvasX * 2;
     long y = CanvasY;

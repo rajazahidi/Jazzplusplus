@@ -34,7 +34,7 @@ class JZProject;
 
 extern char* gpStartUpSong;
 extern JZSong* gpSong;
-extern JZSynth* Synth;
+extern JZSynth* gpSynth;
 extern tHelp* HelpInstance;
 extern tNamedValue limitSteps[];
 extern JZProject* gpProject;

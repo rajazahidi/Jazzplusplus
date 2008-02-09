@@ -99,17 +99,17 @@ void JZSong::Read(tReadBase &io, const char *fname)
 
 void JZSong::Write(tWriteBase &io, const char *fname)
 {
-   // Make sure track 0 has a synth reset
-   if (!Tracks[0]->Reset)
-   {
-      Tracks[0]->Reset = Synth->Reset()->IsSysEx();
-   }
+  // Make sure track 0 has a synth reset
+  if (!Tracks[0]->Reset)
+  {
+    Tracks[0]->Reset = gpSynth->Reset()->IsSysEx();
+  }
 
-   int n = NumUsedTracks();
-   if (!io.Open(fname, n, TicksPerQuarter))
-   {
-     return;
-   }
+  int n = NumUsedTracks();
+  if (!io.Open(fname, n, TicksPerQuarter))
+  {
+    return;
+  }
 
   wxBeginBusyCursor();
   for (int i = 0; i < n; i++)

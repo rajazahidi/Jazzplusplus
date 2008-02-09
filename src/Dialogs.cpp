@@ -1236,7 +1236,7 @@ bool tSysexDlg::OnClose()
   delete Copy;
   Copy = new tSysEx( clk, d + 1, len - 1 );
 
-  Synth->FixSysexCheckSum( Copy->IsSysEx() );
+  gpSynth->FixSysexCheckSum( Copy->IsSysEx() );
 
 #if 0
   printf("Sysex:");
@@ -1263,16 +1263,16 @@ void tSysexDlg::AddProperties()
 
   if (Event->IsSysEx()->Length)
   {
-//    sprintf(label1, "Loaded sysex: %s", tSynthSysex::GetSysexName(Synth->GetSysexId(Event->IsSysEx())));
+//    sprintf(label1, "Loaded sysex: %s", tSynthSysex::GetSysexName(gpSynth->GetSysexId(Event->IsSysEx())));
 
 //    Add(wxMakeFormMessage(label1));
 
     sheet->AddProperty(new wxProperty(
       "Loaded sysex",
-      wxPropertyValue(tSynthSysex::GetSysexName(Synth->GetSysexId(Event->IsSysEx()))),
+      wxPropertyValue(tSynthSysex::GetSysexName(gpSynth->GetSysexId(Event->IsSysEx()))),
       "string"));//r/o
 
-    uptr = Synth->GetSysexValPtr(Event->IsSysEx());
+    uptr = gpSynth->GetSysexValPtr(Event->IsSysEx());
 
     if (uptr)
     {

@@ -32,7 +32,7 @@ char* gpStartUpSong = 0;
 
 JZSong* gpSong = 0;
 
-JZSynth* Synth = 0;
+JZSynth* gpSynth = 0;
 
 tHelp* HelpInstance = 0;
 

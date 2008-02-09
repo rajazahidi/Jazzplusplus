@@ -130,7 +130,7 @@ int tGetMidiBytes::Write(JZEvent *e, unsigned char *s, int len)
 int tSysEx::GetPitch()
 {
    edb();
-   int id = Synth->GetSysexId( this );
+   int id = gpSynth->GetSysexId( this );
 
    if ((id >= SX_GM_ON) && (id < SX_GS_ON))
    {

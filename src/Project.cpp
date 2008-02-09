@@ -52,7 +52,7 @@ JZProject::JZProject()
   mpRecInfo = new JZRecordingInfo;
   gpSong = mpSong;
   mpSynth = NewSynth("GS");
-  Synth = mpSynth;
+  gpSynth = mpSynth;
 }
 
 //-----------------------------------------------------------------------------

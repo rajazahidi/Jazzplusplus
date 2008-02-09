@@ -223,7 +223,7 @@ void tPlayer::StartPlay(long Clock, long LoopClock, int Continue)
      {
         // fixme: we should have different synths for each device
 	t = Song->GetTrack(0);
-	OutNow(t, Synth->Reset());
+	OutNow(t, gpSynth->Reset());
      }
 
      // Send Volume, Pan, Chorus, etc
@@ -334,7 +334,7 @@ void tPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 	   OutNow(t, t->MasterPan);
 	if (t->RxChannel)
 	   OutNow(t, t->RxChannel);
-	if (t->UseForRhythm && *Synth->GetSysexValPtr(t->UseForRhythm))
+	if (t->UseForRhythm && *gpSynth->GetSysexValPtr(t->UseForRhythm))
 	   OutNow(t, t->UseForRhythm);
      } // for
   } // if !Continue
@@ -479,8 +479,9 @@ void tPlayer::AllNotesOff(int Reset)
     }
   }
 
-  if (Reset) {
-    OutNow( Synth->Reset() );
+  if (Reset)
+  {
+    OutNow(gpSynth->Reset());
   }
 }
 

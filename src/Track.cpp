@@ -704,9 +704,9 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
     }
     if ((s = e->IsSysEx()) != 0)
     {
-       int sxid = Synth->GetSysexId( s );
+       int sxid = gpSynth->GetSysexId( s );
 
-       if (!Synth->IsGS())
+       if (!gpSynth->IsGS())
        {
          switch (sxid)
          {
@@ -719,7 +719,7 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
          }
        }
 
-       if (Synth->IsGS())
+       if (gpSynth->IsGS())
        {
     switch (sxid)
     {
@@ -864,7 +864,7 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
         break;
     }
        }
-       else if (Synth->IsXG())
+       else if (gpSynth->IsXG())
        {
     switch (sxid)
     {
@@ -1096,7 +1096,10 @@ void tEventArray::Write(tWriteBase &io)
   if (MtcOffset) MtcOffset->Write(io);
 
   // Synth reset
-  if (Reset) Reset->Write(io);
+  if (Reset)
+  {
+    Reset->Write(io);
+  }
 
   // Rpn / Nrpn:
   // All these must be written in order (three tControl's in a row)
@@ -1324,7 +1327,7 @@ void tEventArray::Read(tReadBase &io)
     else if (e->IsSysEx())
     {
       // Get hold of the Reset sysex...
-      int sxid = Synth->GetSysexId( e->IsSysEx() );
+      int sxid = gpSynth->GetSysexId( e->IsSysEx() );
 
       if ((sxid == SX_GM_ON) || (sxid == SX_GS_ON) || (sxid == SX_XG_ON))
       {
@@ -1334,9 +1337,9 @@ void tEventArray::Read(tReadBase &io)
         // Save it in the track defaults if it fits with synth
         // type settings
         if (
-          (Synth->IsGM() && (sxid == SX_GM_ON)) ||
-          (Synth->IsGS() && (sxid == SX_GS_ON)) ||
-          (Synth->IsXG() && (sxid == SX_XG_ON)))
+          (gpSynth->IsGM() && (sxid == SX_GM_ON)) ||
+          (gpSynth->IsGS() && (sxid == SX_GS_ON)) ||
+          (gpSynth->IsXG() && (sxid == SX_XG_ON)))
         {
           if (!Reset)
           {
@@ -1476,10 +1479,10 @@ void tTrackDlg::OnOk()
   }
   else if ((s = e->IsSysEx()) != 0) {
      // Check for sysex that contains channel number
-     unsigned char *chaptr = Synth->GetSysexChaPtr( s );
+     unsigned char *chaptr = gpSynth->GetSysexChaPtr( s );
      if (chaptr)
      {
-        if (Synth->IsXG())
+        if (gpSynth->IsXG())
         {
      *chaptr = trk->Channel - 1;
         }
@@ -2204,7 +2207,7 @@ void tTrack::SetBendPitchSens(int Value)
 
 int tTrack::GetModulationSysex( int msp )
 {
-   unsigned char *valp = Synth->GetSysexValPtr(ModulationSettings[ msp ]);
+   unsigned char *valp = gpSynth->GetSysexValPtr(ModulationSettings[ msp ]);
 
    if (valp)
       return *valp + 1;
@@ -2218,7 +2221,7 @@ void tTrack::SetModulationSysex(int msp, int Value)
     Kill(ModulationSettings[ msp ]);
   if (Value > 0)
   {
-    JZEvent *e = Synth->ModSX( msp, 0, Channel, Value - 1 );
+    JZEvent *e = gpSynth->ModSX( msp, 0, Channel, Value - 1 );
     if (e)
     {
        Put(e);
@@ -2232,7 +2235,7 @@ void tTrack::SetModulationSysex(int msp, int Value)
 
 int tTrack::GetBenderSysex( int bsp )
 {
-   unsigned char *valp = Synth->GetSysexValPtr(BenderSettings[ bsp ]);
+   unsigned char *valp = gpSynth->GetSysexValPtr(BenderSettings[ bsp ]);
 
    if (valp)
       return *valp + 1;
@@ -2246,7 +2249,7 @@ void tTrack::SetBenderSysex(int bsp, int Value)
     Kill(BenderSettings[ bsp ]);
   if (Value > 0)
   {
-    JZEvent *e = Synth->BendSX( bsp, 0, Channel, Value - 1 );
+    JZEvent *e = gpSynth->BendSX( bsp, 0, Channel, Value - 1 );
     if (e)
     {
        Put(e);
@@ -2260,7 +2263,7 @@ void tTrack::SetBenderSysex(int bsp, int Value)
 
 int tTrack::GetCAfSysex( int csp )
 {
-   unsigned char *valp = Synth->GetSysexValPtr(CAfSettings[ csp ]);
+   unsigned char *valp = gpSynth->GetSysexValPtr(CAfSettings[ csp ]);
 
    if (valp)
       return *valp + 1;
@@ -2274,7 +2277,7 @@ void tTrack::SetCAfSysex(int csp, int Value)
     Kill(CAfSettings[ csp ]);
   if (Value > 0)
   {
-    JZEvent *e = Synth->CafSX( csp, 0, Channel, Value - 1 );
+    JZEvent *e = gpSynth->CafSX(csp, 0, Channel, Value - 1);
     if (e)
     {
        Put(e);
@@ -2288,7 +2291,7 @@ void tTrack::SetCAfSysex(int csp, int Value)
 
 int tTrack::GetPAfSysex( int psp )
 {
-   unsigned char *valp = Synth->GetSysexValPtr(PAfSettings[ psp ]);
+   unsigned char *valp = gpSynth->GetSysexValPtr(PAfSettings[psp]);
 
    if (valp)
       return *valp + 1;
@@ -2302,7 +2305,7 @@ void tTrack::SetPAfSysex(int psp, int Value)
     Kill(PAfSettings[ psp ]);
   if (Value > 0)
   {
-    JZEvent *e = Synth->PafSX( psp, 0, Channel, Value - 1 );
+    JZEvent *e = gpSynth->PafSX(psp, 0, Channel, Value - 1);
     if (e)
     {
        Put(e);
@@ -2316,7 +2319,7 @@ void tTrack::SetPAfSysex(int psp, int Value)
 
 int tTrack::GetCC1Sysex( int csp )
 {
-   unsigned char *valp = Synth->GetSysexValPtr(CC1Settings[ csp ]);
+   unsigned char *valp = gpSynth->GetSysexValPtr(CC1Settings[ csp ]);
 
    if (valp)
       return *valp + 1;
@@ -2330,7 +2333,7 @@ void tTrack::SetCC1Sysex(int csp, int Value)
     Kill(CC1Settings[ csp ]);
   if (Value > 0)
   {
-    JZEvent *e = Synth->CC1SX( csp, 0, Channel, Value - 1 );
+    JZEvent *e = gpSynth->CC1SX(csp, 0, Channel, Value - 1);
     if (e)
     {
        Put(e);
@@ -2344,7 +2347,7 @@ void tTrack::SetCC1Sysex(int csp, int Value)
 
 int tTrack::GetCC2Sysex( int csp )
 {
-   unsigned char *valp = Synth->GetSysexValPtr(CC2Settings[ csp ]);
+   unsigned char *valp = gpSynth->GetSysexValPtr(CC2Settings[ csp ]);
 
    if (valp)
       return *valp + 1;
@@ -2358,7 +2361,7 @@ void tTrack::SetCC2Sysex(int csp, int Value)
     Kill(CC2Settings[ csp ]);
   if (Value > 0)
   {
-    JZEvent *e = Synth->CC2SX( csp, 0, Channel, Value - 1 );
+    JZEvent *e = gpSynth->CC2SX(csp, 0, Channel, Value - 1);
     if (e)
     {
        Put(e);
@@ -2372,7 +2375,7 @@ void tTrack::SetCC2Sysex(int csp, int Value)
 
 int tTrack::GetCC1ControllerNr()
 {
-   unsigned char *valp = Synth->GetSysexValPtr(CC1ControllerNr);
+   unsigned char *valp = gpSynth->GetSysexValPtr(CC1ControllerNr);
 
    if (valp)
       return *valp + 1;
@@ -2386,7 +2389,7 @@ void tTrack::SetCC1ControllerNr(int Value)
     Kill(CC1ControllerNr);
   if (Value > 0)
   {
-    JZEvent *e = Synth->ControllerNumberSX( 1, 0, Channel, Value - 1 );
+    JZEvent *e = gpSynth->ControllerNumberSX( 1, 0, Channel, Value - 1 );
     if (e)
     {
        Put(e);
@@ -2400,7 +2403,7 @@ void tTrack::SetCC1ControllerNr(int Value)
 
 int tTrack::GetCC2ControllerNr()
 {
-   unsigned char *valp = Synth->GetSysexValPtr(CC2ControllerNr);
+   unsigned char *valp = gpSynth->GetSysexValPtr(CC2ControllerNr);
 
    if (valp)
       return *valp + 1;
@@ -2414,7 +2417,7 @@ void tTrack::SetCC2ControllerNr(int Value)
     Kill(CC2ControllerNr);
   if (Value > 0)
   {
-    JZEvent *e = Synth->ControllerNumberSX( 2, 0, Channel, Value - 1 );
+    JZEvent *e = gpSynth->ControllerNumberSX(2, 0, Channel, Value - 1);
     if (e)
     {
        Put(e);
@@ -2428,7 +2431,7 @@ void tTrack::SetCC2ControllerNr(int Value)
 
 int tTrack::GetReverbType(int lsb)
 {
-   unsigned char *valp = Synth->GetSysexValPtr(ReverbType);
+   unsigned char *valp = gpSynth->GetSysexValPtr(ReverbType);
 
    if (valp)
    {
@@ -2449,7 +2452,7 @@ void tTrack::SetReverbType(int Value, int lsb)
     Kill(ReverbType);
   if (Value > 0)
   {
-    JZEvent *e = Synth->ReverbMacroSX( 0, Value - 1, lsb - 1 );
+    JZEvent *e = gpSynth->ReverbMacroSX(0, Value - 1, lsb - 1);
     if (e)
     {
        Put(e);
@@ -2464,7 +2467,7 @@ void tTrack::SetReverbType(int Value, int lsb)
 
 int tTrack::GetChorusType(int lsb)
 {
-   unsigned char *valp = Synth->GetSysexValPtr(ChorusType);
+   unsigned char *valp = gpSynth->GetSysexValPtr(ChorusType);
 
    if (valp)
    {
@@ -2486,7 +2489,7 @@ void tTrack::SetChorusType(int Value, int lsb)
 
   if (Value > 0)
   {
-    JZEvent *e = Synth->ChorusMacroSX( 0, Value - 1, lsb - 1 );
+    JZEvent *e = gpSynth->ChorusMacroSX(0, Value - 1, lsb - 1);
     if (e)
     {
        Put(e);
@@ -2501,7 +2504,7 @@ void tTrack::SetChorusType(int Value, int lsb)
 
 int tTrack::GetEqualizerType()
 {
-   unsigned char *valp = Synth->GetSysexValPtr(EqualizerType);
+   unsigned char *valp = gpSynth->GetSysexValPtr(EqualizerType);
 
    if (valp)
       return *valp + 1;
@@ -2516,7 +2519,7 @@ void tTrack::SetEqualizerType(int Value)
 
   if (Value > 0)
   {
-    JZEvent *e = Synth->EqualizerMacroSX( 0, Value - 1 );
+    JZEvent *e = gpSynth->EqualizerMacroSX(0, Value - 1);
     if (e)
     {
        Put(e);
@@ -2530,7 +2533,7 @@ void tTrack::SetEqualizerType(int Value)
 
 int tTrack::GetRevSysex( int rsp )
 {
-   unsigned char *valp = Synth->GetSysexValPtr(ReverbSettings[ rsp ]);
+   unsigned char *valp = gpSynth->GetSysexValPtr(ReverbSettings[rsp]);
 
    if (valp)
       return *valp + 1;
@@ -2545,7 +2548,7 @@ void tTrack::SetRevSysex(int rsp, int Value)
 
   if (Value > 0)
   {
-    JZEvent *e = Synth->ReverbParamSX( rsp, 0, Value - 1 );
+    JZEvent *e = gpSynth->ReverbParamSX(rsp, 0, Value - 1);
     if (e)
     {
        Put(e);
@@ -2560,7 +2563,7 @@ void tTrack::SetRevSysex(int rsp, int Value)
 
 int tTrack::GetChoSysex( int csp )
 {
-   unsigned char *valp = Synth->GetSysexValPtr(ChorusSettings[ csp ]);
+   unsigned char *valp = gpSynth->GetSysexValPtr(ChorusSettings[csp]);
 
    if (valp)
       return *valp + 1;
@@ -2575,7 +2578,7 @@ void tTrack::SetChoSysex(int csp, int Value)
 
   if (Value > 0)
   {
-    JZEvent *e = Synth->ChorusParamSX( csp, 0, Value - 1 );
+    JZEvent *e = gpSynth->ChorusParamSX(csp, 0, Value - 1);
     if (e)
     {
        Put(e);
@@ -2591,7 +2594,7 @@ void tTrack::SetChoSysex(int csp, int Value)
 
 int tTrack::GetPartRsrv( int chan )
 {
-   unsigned char *valp = Synth->GetSysexValPtr(PartialReserve);
+   unsigned char *valp = gpSynth->GetSysexValPtr(PartialReserve);
 
    if (valp)
       return *(valp + sysex_channel(chan)) + 1;
@@ -2605,7 +2608,7 @@ void tTrack::SetPartRsrv(unsigned char *rsrv)
      Kill(PartialReserve);
 
   if (rsrv) {
-     JZEvent *e = Synth->PartialReserveSX( 0, Channel, rsrv );
+     JZEvent *e = gpSynth->PartialReserveSX(0, Channel, rsrv);
     if (e)
     {
        Put(e);
@@ -2619,11 +2622,11 @@ void tTrack::SetPartRsrv(unsigned char *rsrv)
 
 int tTrack::GetMasterVol()
 {
-   unsigned char *valp = Synth->GetSysexValPtr(MasterVol);
+   unsigned char *valp = gpSynth->GetSysexValPtr(MasterVol);
 
    if (valp)
    {
-      if (Synth->GetSysexId(MasterVol) == SX_GM_MasterVol)
+      if (gpSynth->GetSysexId(MasterVol) == SX_GM_MasterVol)
       {
    // first data byte is lsb; get msb instead!
    valp++;
@@ -2641,7 +2644,7 @@ void tTrack::SetMasterVol(int Value)
     Kill(MasterVol);
   if (Value > 0)
   {
-     JZEvent *e = Synth->MasterVolSX( 0, Value - 1 );
+     JZEvent *e = gpSynth->MasterVolSX(0, Value - 1);
      if (e)
      {
   Put(e);
@@ -2656,7 +2659,7 @@ void tTrack::SetMasterVol(int Value)
 
 int tTrack::GetMasterPan()
 {
-   unsigned char *valp = Synth->GetSysexValPtr(MasterPan);
+   unsigned char *valp = gpSynth->GetSysexValPtr(MasterPan);
 
    if (valp)
       return *valp + 1;
@@ -2670,7 +2673,7 @@ void tTrack::SetMasterPan(int Value)
     Kill(MasterPan);
   if (Value > 0)
   {
-     JZEvent *e = Synth->MasterPanSX( 0, Value - 1 );
+     JZEvent *e = gpSynth->MasterPanSX(0, Value - 1);
     if (e)
     {
        Put(e);
@@ -2689,11 +2692,11 @@ int tTrack::GetModeSysex( int param )
    switch (param)
    {
      case mspRxChannel:
-       valp = Synth->GetSysexValPtr(RxChannel);
+       valp = gpSynth->GetSysexValPtr(RxChannel);
        break;
 
      case mspUseForRhythm:
-       valp = Synth->GetSysexValPtr(UseForRhythm);
+       valp = gpSynth->GetSysexValPtr(UseForRhythm);
        break;
    }
 
@@ -2727,10 +2730,10 @@ void tTrack::SetModeSysex(int param, int Value)
     switch (param)
     {
       case mspRxChannel:
-        e = Synth->RxChannelSX( 0, Channel, Value - 1 );
+        e = gpSynth->RxChannelSX(0, Channel, Value - 1);
         break;
       case mspUseForRhythm:
-        e = Synth->UseForRhythmSX( 0, Channel, Value - 1 );
+        e = gpSynth->UseForRhythmSX(0, Channel, Value - 1);
         break;
     }
 

@@ -23,7 +23,7 @@
 #ifndef JZ_HARMONY_H
 #define JZ_HARMONY_H
 
-#include "toolbar.h"
+#include "ToolBar.h"
 
 class wxObject;
 class JZEventFrame;

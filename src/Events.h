@@ -36,9 +36,11 @@ class JZEvent;
 
 class tReadBase
 {
-  protected:
-    FILE *fd;
   public:
+
+    virtual ~tReadBase()
+    {
+    }
 
     int TicksPerQuarter;	// nach Open bekannt
     int nTracks;
@@ -48,15 +50,23 @@ class tReadBase
 
     virtual JZEvent *Read() = 0;
     virtual int NextTrack() = 0;
+
+  protected:
+
+    FILE *fd;
 };
 
 
 class tWriteBase
 {
-  protected:
-    FILE *fd;
   public:
+
+    virtual ~tWriteBase()
+    {
+    }
+
     virtual int  Open(const char *fname, int nTracks, int TicksPerQuarter);
+
     virtual void Close();
 
     virtual int Write(JZEvent *e)
@@ -77,7 +87,11 @@ class tWriteBase
       return Write(e, arr, 2);
     }
 
-    virtual int Write(JZEvent *e, unsigned char c1, unsigned char c2, unsigned char c3)
+    virtual int Write(
+      JZEvent *e,
+      unsigned char c1,
+      unsigned char c2,
+      unsigned char c3)
     {
       unsigned char arr[3];
       arr[0] = c1;
@@ -86,7 +100,12 @@ class tWriteBase
       return Write(e, arr, 3);
     }
 
-    virtual int Write(JZEvent *e, unsigned char c1, unsigned char c2, unsigned char c3, unsigned char c4)
+    virtual int Write(
+      JZEvent *e,
+      unsigned char c1,
+      unsigned char c2,
+      unsigned char c3,
+      unsigned char c4)
     {
       unsigned char arr[4];
       arr[0] = c1;
@@ -98,6 +117,10 @@ class tWriteBase
 
     virtual int Write(JZEvent *e, unsigned char *s, int len) = 0;
     virtual void NextTrack() {}
+
+  protected:
+
+    FILE *fd;
 };
 
 

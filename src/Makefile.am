@@ -8,6 +8,7 @@ AlsaDriver.cpp \
 AlsaPlayer.cpp \
 AlsaThru.cpp \
 Audio.cpp \
+AudioDriver.cpp \
 ClockDialog.cpp \
 Command.cpp \
 Configuration.cpp \
@@ -78,6 +79,7 @@ AlsaDriver.h \
 AlsaPlayer.h \
 AlsaThru.h \
 Audio.h \
+AudioDriver.h \
 ClockDialog.h \
 Command.h \
 Configuration.h \

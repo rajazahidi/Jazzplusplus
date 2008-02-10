@@ -264,7 +264,7 @@ tNamedValueListValidator::~tNamedValueListValidator()
 int tNamedValueListValidator::MapName2Value(const char* Selection)
 {
   int i;
-  int Result;
+  int Result = 0;
 
   if (Selection)
   {

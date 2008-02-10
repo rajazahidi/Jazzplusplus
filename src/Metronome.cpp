@@ -28,8 +28,8 @@ tMetronomeInfo::tMetronomeInfo()
   : KeyAcc(36),
     KeyNorm(37),
     Veloc(127),
-    IsAccented(1),
-    IsOn(0)
+    IsOn(0),
+    IsAccented(1)
 {
 }
 

@@ -30,6 +30,19 @@
 #include "Filter.h"
 #include "Player.h"
 #include "StandardFile.h"
+#include "GetOptionIndex.h"
+
+#ifdef __WXMSW__
+#include "WindowsPlayer.h"
+#include "WindowsAudioInterface.h"
+#endif
+#ifdef DEV_ALSA
+#include "AlsaPlayer.h"
+#endif
+
+#include <iostream>
+
+using namespace std;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -41,6 +54,45 @@ JZProject::JZProject()
     mChanged(false),
     mIsPlaying(false)
 {
+//  const char* pConfigurationFileName = "/tmp/jazz.cfg";
+//  Config.File();
+//  cout
+//    << "WARNING: Hardcoded the jazz.cfg path, because jazz mysteriously"
+//    << " isn't loading the configuration file."
+//    <<  endl;
+  wxString ConfigurationFileName = Config.File();
+
+  cout
+    << "JZJazzPlusPlusApplication::OnInit() ConfigurationFileName:" << '\n'
+    << '"' << ConfigurationFileName << '"'
+    << endl;
+
+  if (!ConfigurationFileName.IsEmpty())
+  {
+    Config.LoadConfig(ConfigurationFileName);
+    DEBUG(
+      if (BankTable != (tDoubleCommand *) NULL)
+      {
+        for (int i = 0; BankTable[i].Command[0]>=0; i++)
+        {
+          cerr
+            << "Bank " << i << ": "
+            << BankTable[i].Command[0]
+            << ' ' << BankTable[i].Command[1]
+            << endl;
+        }
+      }
+    )
+  }
+  else
+  {
+    wxMessageBox(
+      "Could not find configuration file.\n"
+      "Please set the environment variable JAZZ to the installation directory",
+      "Warning",
+      wxOK);
+  }
+
   mNumBars = 0;
 
   mMetronomeInfo.IsAccented = Config(C_MetroIsAccented);
@@ -48,11 +100,182 @@ JZProject::JZProject()
   mMetronomeInfo.KeyNorm = Config(C_MetroNormalClick);
   mMetronomeInfo.KeyAcc = Config(C_MetroAccentedClick);
 
+  if (Config.StrValue(C_SynthType))
+  {
+    mpSynth = NewSynth(Config.StrValue(C_SynthType));
+  }
+  else
+  {
+    mpSynth = NewSynth("GM");
+  }
+  gpSynth = mpSynth;
+
   mpSong = new JZSong;
   mpRecInfo = new JZRecordingInfo;
   gpSong = mpSong;
-  mpSynth = NewSynth("GS");
-  gpSynth = mpSynth;
+
+
+  //--------------
+  // Linux drivers
+  //--------------
+#ifndef __WXMSW__
+  if (Config(C_MidiDriver) == C_DRV_OSS)
+  {
+#ifdef DEV_SEQUENCER2
+    mpMidiPlayer = new tAudioPlayer(mpSong);
+    if (!mpMidiPlayer->Installed())
+    {
+      delete mpMidiPlayer;
+      mpMidiPlayer = new tSeq2Player(mpSong);
+    }
+    if (!mpMidiPlayer->Installed())
+    {
+      perror("/dev/music");
+      cerr
+        << "(dev_sequencer2)Jazz will start with no play/record ability."
+        << endl;
+      mpMidiPlayer = new tNullPlayer(mpSong);
+    }
+#else
+    cerr << "This programm lacks OSS driver support" << endl;
+    mpMidiPlayer = new tNullPlayer(mpSong);
+#endif // DEV_SEQUENCER2
+  }
+  else if (Config(C_MidiDriver) == C_DRV_ALSA)
+  {
+#ifdef DEV_ALSA
+    mpMidiPlayer = new tAlsaAudioPlayer(mpSong);
+    if (!mpMidiPlayer->Installed())
+    {
+      delete mpMidiPlayer;
+      cout << "creating alsa player" << endl;
+      mpMidiPlayer = new tAlsaPlayer(mpSong);
+    }
+    if (!mpMidiPlayer->Installed())
+    {
+      cerr
+        << "Could not install alsa driver." << '\n'
+        << "Jazz will start with no play/record ability."
+        << endl;
+      mpMidiPlayer = new tNullPlayer(mpSong);
+    }
+#else
+    cerr << "This programm lacks ALSA driver support" << endl;
+    mpMidiPlayer = new tNullPlayer(mpSong);
+#endif
+  }
+  else if (Config(C_MidiDriver) == C_DRV_JAZZ)
+  {
+#ifdef DEV_MPU401
+    mpMidiPlayer = new tMpuPlayer(mpSong);
+    if (!mpMidiPlayer->Installed())
+    {
+      cerr
+        << "Could not connect to midinet server at host \"
+        << %midinethost << "\"\n"
+        << "Jazz will start with no play/record ability."
+        << endl;
+      mpMidiPlayer = new tNullPlayer(mpSong);
+    }
+#else
+    cerr << "This programm lacks JAZZ/MPU401 driver support" << endl;
+    mpMidiPlayer = new tNullPlayer(mpSong);
+#endif
+  }
+  else
+  {
+    cerr
+      << "No valid driver configured in config file." << '\n'
+      << "Jazz will start with no play/record ability"
+      << endl;
+  }
+#endif // !defined(__WXMSW__)
+
+
+#ifdef __WXMSW__
+  //--------------------------
+  // Microsoft Windows Drivers
+  //--------------------------
+  switch (Config(C_ClockSource))
+  {
+    case CsMidi:
+      mpMidiPlayer = new tWinMidiPlayer(mpSong);
+      break;
+    case CsMtc:
+      mpMidiPlayer = new tWinMtcPlayer(mpSong);
+      break;
+    case CsFsk:
+    case CsInt:
+    default:
+      mpMidiPlayer = new tWinAudioPlayer(mpSong);
+      if (!mpMidiPlayer->Installed())
+      {
+	mpMidiPlayer->ShowError();
+        delete mpMidiPlayer;
+	mpMidiPlayer = new tWinIntPlayer(mpSong);
+      }
+      break;
+  }
+  if (!mpMidiPlayer->Installed())
+  {
+    mpMidiPlayer->ShowError();
+    mpMidiPlayer = new tNullPlayer(mpSong);
+  }
+#endif // __WXMSW__
+
+  if (!mpMidiPlayer)
+  {
+    mpMidiPlayer = new tNullPlayer(mpSong);
+  }
+
+  //-------------------------------------
+  // This is the end of the driver setup.
+  //-------------------------------------
+
+  int i;
+  int opt;
+
+  opt = GetOptionIndex( "-trackwin" ) + 1;
+  for (i = 0; i < 4; i++, opt++)
+  {
+    if ((wxTheApp->argc > opt) && isdigit(wxTheApp->argv[opt][0]))
+    {
+      Config(i + C_TrackWinXpos) = atoi(wxTheApp->argv[opt]);
+    }
+    else
+    {
+      break;
+    }
+  }
+
+
+  // Attempt to load the song given on commandline or load "jazz.mid".
+  cout << "load song" << endl;
+  opt = GetOptionIndex( "-f" ) + 1;
+  if (opt && (wxTheApp->argc > opt))
+  {
+    gpStartUpSong = copystring(wxTheApp->argv[opt]);
+  }
+  else
+  {
+    gpStartUpSong = copystring(Config.StrValue(C_StartUpSong));
+  }
+  FILE *fd = fopen(gpStartUpSong, "r");
+  if (fd)
+  {
+    fclose(fd);
+    tStdRead io;
+    mpSong->Read(io, gpStartUpSong);
+//    if (strcmp(gpStartUpSong, "jazz.mid"))
+//    {
+//      lasts = gpStartUpSong;
+//    }
+  }
+
+
+
+
+
 }
 
 //-----------------------------------------------------------------------------

@@ -20,22 +20,42 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_NAMEDVALUE_H
-#define JZ_NAMEDVALUE_H
+#ifndef JZ_NAMEDCHOICE_H
+#define JZ_NAMEDCHOICE_H
+
+class tNamedValue;
+class wxStringListValidator;
 
 //*****************************************************************************
-// tNamedValue is a name/value pair array.
+// tNamedChoice presents a dialog with the values to choose from
 //*****************************************************************************
-class tNamedValue
+class tNamedChoice : public wxObject
 {
   public:
 
-    tNamedValue();
+    tNamedChoice(char* pTitle, tNamedValue* pValues, long* pResult);
 
-    tNamedValue(char* pName, long v);
+    virtual ~tNamedChoice();
 
-    char* Name;
-    long Value;
+//    wxFormItem *mkFormItem(int w = 100, int h = 100);
+
+    wxStringListValidator* GetStringListValidator();
+
+    void GetValue();
+
+    void SetValue();
+
+  private:
+
+    char* mpTitle;
+
+    // Terminate the values by setting the last values name pointer to 0. or
+    // mpValues[last].Name == 0.
+    tNamedValue* mpValues;
+
+    char* mpSelection;
+
+    long* mpResult;
 };
 
-#endif // !defined(JZ_NAMEDVALUE_H)
+#endif // !defined(JZ_NAMEDCHOICE_H)

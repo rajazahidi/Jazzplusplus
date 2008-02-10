@@ -26,6 +26,7 @@
 #include <wx/html/helpctrl.h>
 
 class JZProject;
+class JZTrackFrame;
 
 //*****************************************************************************
 // Description:
@@ -49,6 +50,15 @@ class JZJazzPlusPlusApplication : public wxApp
     virtual bool OnInit();
 
     virtual int OnExit();
+
+    // Description:
+    //   This virtual function returns a pointer to the application's main
+    // frame.
+    //
+    // Returns:
+    //   JZTrackFrame*:
+    //     A pointer to the application's main frame.
+    JZTrackFrame* GetMainFrame() const;
 
     void DisplayHelpContents() const;
 
@@ -82,26 +92,14 @@ class JZJazzPlusPlusApplication : public wxApp
 
     JZProject* mpProject;
 
+    JZTrackFrame* mpTrackFrame;
+
     mutable wxHtmlHelpController mHelp;
 
   DECLARE_EVENT_TABLE()
 };
 
-//*****************************************************************************
-// Description:
-//   This is a declaration of the one-and-only Jazz++ application pointer.
-//*****************************************************************************
-extern JZJazzPlusPlusApplication* gpGlobalJazzApplication;
-
-//*****************************************************************************
-// Description:
-//   This is a global function that returns the Jazz++ application.
-//
-// Returns:
-//   const JZJazzPlusPlusApplication&:
-//     A constant reference to the one-and-only Jazz++ application.
-//*****************************************************************************
-const JZJazzPlusPlusApplication& GetJazzApplication();
+DECLARE_APP(JZJazzPlusPlusApplication)
 
 //*****************************************************************************
 // Description:

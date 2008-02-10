@@ -49,25 +49,6 @@
 
 //*****************************************************************************
 // Description:
-//   This is the one-and-only Jazz++ application pointer.
-//*****************************************************************************
-JZJazzPlusPlusApplication* gpGlobalJazzApplication = 0;
-
-//*****************************************************************************
-// Description:
-//   This is a global function that returns the Jazz++ application.
-//
-// Returns:
-//   const JZJazzPlusPlusApplication&:
-//     A constant reference to the one-and-only Jazz++ application.
-//*****************************************************************************
-const JZJazzPlusPlusApplication& GetJazzApplication()
-{
-  return *gpGlobalJazzApplication;
-}
-
-//*****************************************************************************
-// Description:
 //   This is the JazzPlusPlus application class definition.
 //*****************************************************************************
 //-----------------------------------------------------------------------------
@@ -92,9 +73,6 @@ JZJazzPlusPlusApplication::JZJazzPlusPlusApplication()
     mpProject(0),
     mHelp(wxHF_DEFAULT_STYLE | wxHF_OPEN_FILES)
 {
-  // Set the global application pointer to this instance.
-  gpGlobalJazzApplication = this;
-
 #ifdef _MSC_VER
   // When using the Microsoft C++ compiler in debug mode, each heap allocation
   // (i.e. calling new) is counted. The following line will cause the code to
@@ -119,16 +97,12 @@ JZJazzPlusPlusApplication::JZJazzPlusPlusApplication()
   // on a Linux box.
   feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
 #endif // __LINUX__
-
-  mpProject = new JZProject;
-  gpProject = mpProject;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZJazzPlusPlusApplication::~JZJazzPlusPlusApplication()
 {
-  delete mpProject;
 }
 
 //-----------------------------------------------------------------------------
@@ -147,16 +121,20 @@ bool JZJazzPlusPlusApplication::OnInit()
   SetVendorName("Jazz");
   SetAppName("Jazz");
 
+  // Create the one and only top-level Jazz++ project.
+  mpProject = new JZProject;
+  gpProject = mpProject;
+
   wxConfigBase* pConfig = wxConfigBase::Get();
 
-  // Let the help system store the PHLASH help configuration info.
+  // Let the help system store the Jazz++ help configuration info.
   mHelp.UseConfig(pConfig);
 
   // Call base class function.  This is needed for command line parsing.
   wxApp::OnInit();
 
   // Create the main application window.
-  JZTrackFrame* pFrame = new JZTrackFrame(
+  mpTrackFrame = new JZTrackFrame(
     0,
     "Jazz++",
     gpSong,
@@ -164,8 +142,8 @@ bool JZJazzPlusPlusApplication::OnInit()
     wxSize(600, 400));
 
   // Show it and tell the application that it's our main window
-  pFrame->Show(true);
-  SetTopWindow(pFrame);
+  mpTrackFrame->Show(true);
+  SetTopWindow(mpTrackFrame);
 
   return true;
 }
@@ -174,6 +152,8 @@ bool JZJazzPlusPlusApplication::OnInit()
 //-----------------------------------------------------------------------------
 int JZJazzPlusPlusApplication::OnExit()
 {
+  delete mpProject;
+
   // GetFrame returns NULL if there is no help frame active.
   if (mHelp.GetFrame())
   {
@@ -185,6 +165,13 @@ int JZJazzPlusPlusApplication::OnExit()
   delete wxConfigBase::Set(0);
 
   return 0;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZTrackFrame* JZJazzPlusPlusApplication::GetMainFrame() const
+{
+  return mpTrackFrame;
 }
 
 //-----------------------------------------------------------------------------

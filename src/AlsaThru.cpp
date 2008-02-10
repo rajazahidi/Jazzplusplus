@@ -47,7 +47,7 @@
 #include <signal.h>
 
 #include "AlsaThru.h"
-#include "AlsaPlay.h"
+#include "AlsaPlayer.h"
 
 /*
 ** midi thru for alsa. it creates a new process (because threads dont work 

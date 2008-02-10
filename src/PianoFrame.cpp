@@ -45,6 +45,10 @@
 #include "Help.h"
 #include "Rectangle.h"
 
+#include <sstream>
+
+using namespace std;
+
 // Mouse Actions Mapping
 enum
 {
@@ -366,8 +370,6 @@ JZPianoFrame::JZPianoFrame(
       Position,
       Size,
       wxDEFAULT_FRAME_STYLE | wxNO_FULL_REPAINT_ON_RESIZE),
-    mpToolBar(0),
-    mpGuitarFrame(0),
     Canvas(0),
     mpFilter(0),
 //    mpFileMenu(0),
@@ -376,7 +378,9 @@ JZPianoFrame::JZPianoFrame(
     mpFont(0),
     mpFixedFont(0),
     MousePlay(play_actions),
-    MouseEvnt(evnt_actions)
+    MouseEvnt(evnt_actions),
+    mpToolBar(0),
+    mpGuitarFrame(0)
 {
   CreateToolBar();
 
@@ -1639,8 +1643,9 @@ void JZPianoFrame::DrawEvents(wxDC* dc, tTrack *t, int Stat, const wxBrush* Brus
         if (pEvent->IsPlayTrack())
         {
           dc->SetPen(*wxBLACK_PEN);
-          sprintf(buf, "Track:%l", pEvent->IsPlayTrack()->track); 
-          dc->DrawText(buf, x1, y1 + LittleBit);
+          ostringstream Oss;
+          Oss << "Track:" << pEvent->IsPlayTrack()->track; 
+          dc->DrawText(Oss.str().c_str(), x1, y1 + LittleBit);
         }
       }
       

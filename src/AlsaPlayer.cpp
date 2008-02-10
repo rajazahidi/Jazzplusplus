@@ -31,7 +31,7 @@
 
 #include "WxWidgets.h"
 
-#include "AlsaPlay.h"
+#include "AlsaPlayer.h"
 #include "TrackFrame.h"
 #include "Dialogs.h"
 

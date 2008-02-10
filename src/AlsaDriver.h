@@ -26,7 +26,7 @@
 #include "Events.h"
 #include "Player.h"
 #include "Audio.h"
-#include "AlsaPlay.h"
+#include "AlsaPlayer.h"
 
 #include <sys/time.h>
 

@@ -5,7 +5,7 @@ bin_PROGRAMS = jazz
 jazz_SOURCES = \
 AboutDialog.cpp \
 AlsaDriver.cpp \
-AlsaPlay.cpp \
+AlsaPlayer.cpp \
 AlsaThru.cpp \
 Audio.cpp \
 ClockDialog.cpp \
@@ -75,7 +75,7 @@ TrackWindow.cpp
 noinst_HEADERS = \
 AboutDialog.h \
 AlsaDriver.h \
-AlsaPlay.h \
+AlsaPlayer.h \
 AlsaThru.h \
 Audio.h \
 ClockDialog.h \

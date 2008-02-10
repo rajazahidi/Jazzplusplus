@@ -20,12 +20,13 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-//#include "config.h"
-#include "winplay.h"
-#include "jazzdll.h"
-#include "trackwin.h"
-#include "jazz.h"
-#include "dialogs.h"
+#include "WxWidgets.h"
+
+#include "WindowsPlayer.h"
+#include "WindowsMidiInterface.h"
+#include "JazzPlusPlusApplication.h"
+#include "TrackFrame.h"
+#include "Dialogs.h"
 #include "MidiDeviceDialog.h"
 
 #include <dos.h>
@@ -231,7 +232,7 @@ void tWinPlayer::SettingsDlg(long& InputDevice, long& OutputDevice)
     JZMidiDeviceDialog MidiInputDeviceDialog(
       Devs,
       InputDevice,
-      TrackWin,
+      ::wxGetApp().GetMainFrame(),
       "Input MIDI device");
     MidiInputDeviceDialog.ShowModal();
   }
@@ -298,9 +299,10 @@ void tWinPlayer::SetSoftThru(int on, int InputDevice, int OutputDevice)
 //-----------------------------------------------------------------------------
 JZEvent *tWinPlayer::Dword2Event(DWORD dw)
 {
-  union {
+  union
+  {
     DWORD w;
-    uchar c[4];
+    unsigned char c[4];
   } u;
   u.w = dw;
 
@@ -347,9 +349,10 @@ JZEvent *tWinPlayer::Dword2Event(DWORD dw)
 //-----------------------------------------------------------------------------
 DWORD tWinPlayer::Event2Dword(JZEvent *e)
 {
-  union {
+  union
+  {
     DWORD w;
-    uchar c[4];
+    unsigned char c[4];
   } u;
   u.w = 0;
 
@@ -413,8 +416,8 @@ DWORD tWinPlayer::Event2Dword(JZEvent *e)
 	tPitch *k = e->IsPitch();
 	int     v = k->Value + 8192;
 	u.c[0] = 0xE0 | k->Channel;
-	u.c[1] = (uchar)(v & 0x7F);
-	u.c[2] = (uchar)(v >> 7);
+	u.c[1] = (unsigned char)(v & 0x7F);
+	u.c[2] = (unsigned char)(v >> 7);
       }
       break;
 
@@ -914,9 +917,10 @@ long tWinMidiPlayer::GetRealTimeClock()
     else if ( (m->data & 0x000000ff) == 0xf2 )
     {
       // Song pointer received
-      union {
+      union
+      {
         DWORD w;
-        uchar c[4];
+        unsigned char c[4];
       } u;
       Midi->StopPlay();
       u.w = m->data;

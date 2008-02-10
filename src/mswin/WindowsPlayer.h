@@ -20,8 +20,8 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef winplay_h
-#define winplay_h
+#ifndef JZ_WINDOWSPLAYER_H
+#define JZ_WINDOWSPLAYER_H
 
 #include "Player.h"
 
@@ -30,7 +30,7 @@ extern "C"
 #include <mmsystem.h>
 }
 
-#include "jazzdll.h"
+#include "WindowsMidiInterface.h"
 
 //*****************************************************************************
 //*****************************************************************************
@@ -42,8 +42,8 @@ class tWinPlayer : public tPlayer
 
     int Installed();
     virtual ~tWinPlayer();
-    virtual int OutEvent(JZEvent *e);
-    virtual int OutSysex(JZEvent *e, DWORD time);
+    virtual int OutEvent(JZEvent* e);
+    virtual int OutSysex(JZEvent* e, DWORD time);
     void OutNow(JZEvent *e);
     void OutNow(tParam *r);
     void OutBreak();
@@ -71,22 +71,22 @@ class tWinPlayer : public tPlayer
 
     tWinPlayerState *state;
     DWORD Event2Dword(JZEvent *e);
-    JZEvent *Dword2Event(DWORD dw);
-    long  Clock2Time(long clock);
-    long  Time2Clock(long time);
-    void  SetTempo(long bpm, long clock);
-    BOOL  timer_installed;
-    long  midiClockOut;
-    long  lastValidMtcClock;
-    void  FillMidiClocks( long to );
-    void  FlushToDevice( long clock );
+    JZEvent* Dword2Event(DWORD dw);
+    long Clock2Time(long clock);
+    long Time2Clock(long time);
+    void SetTempo(long bpm, long clock);
+    BOOL timer_installed;
+    long midiClockOut;
+    long lastValidMtcClock;
+    void FillMidiClocks(long to);
+    void FlushToDevice(long clock);
 
     tEventArray OutOfBandEvents;
-    long  RealTimeClock2Time(long clock);
-    long  Time2RealTimeClock(long time);
-    void  SetRealTimeTempo(long bpm, long clock);
-    long  real_start_time;
-    long  real_ticks_per_minute;
+    long RealTimeClock2Time(long clock);
+    long Time2RealTimeClock(long time);
+    void SetRealTimeTempo(long bpm, long clock);
+    long real_start_time;
+    long real_ticks_per_minute;
 
     // buffer for sysexdata
     HANDLE hSysHdr;
@@ -141,4 +141,4 @@ class tWinMtcPlayer : public tWinPlayer
     virtual tMtcTime* FreezeMtcRec();
 };
 
-#endif
+#endif // !defined(JZ_WINDOWSPLAYER_H)

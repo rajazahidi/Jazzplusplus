@@ -58,9 +58,9 @@ JZRndArray::JZRndArray(int nn, int mmin, int mmax)
 JZRndArray::JZRndArray(const JZRndArray& Other)
   : mArray(Other.mArray),
     n(Other.n),
+    nul(Other.nul),
     min(Other.min),
-    max(Other.max),
-    nul(Other.nul)
+    max(Other.max)
 {
 }
 

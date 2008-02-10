@@ -25,6 +25,7 @@ FileSelector.cpp \
 Filter.cpp \
 FindFile.cpp \
 FrequencyTable.cpp \
+GetOptionIndex.cpp \
 Globals.cpp \
 GuitarFrame.cpp \
 GuitarSettings.cpp \
@@ -38,9 +39,13 @@ JazzPlusPlusApplication.cpp \
 KeyDialog.cpp \
 KeyStringConverters.cpp \
 Mapper.cpp \
+MeasureChoice.cpp \
+MidiDeviceDialog.cpp \
 Metronome.cpp \
 MouseAction.cpp \
+NamedChoice.cpp \
 NamedValue.cpp \
+NamedValueChoice.cpp \
 PianoFrame.cpp \
 PianoWindow.cpp \
 Player.cpp \
@@ -90,6 +95,7 @@ FileSelector.h \
 Filter.h \
 FindFile.h \
 FrequencyTable.h \
+GetOptionIndex.h \
 Globals.h \
 GuitarFrame.h \
 GuitarSettingsDialog.h \
@@ -103,10 +109,14 @@ JazzPlusPlusApplication.h \
 KeyDialog.h \
 KeyStringConverters.h \
 Mapper.h \
+MeasureChoice.h \
 Metronome.h \
+MidiDeviceDialog.h \
 midinet.h \
 MouseAction.h \
+NamedChoice.h \
 NamedValue.h \
+NamedValueChoice.h \
 PianoFrame.h \
 PianoWindow.h \
 Player.h \

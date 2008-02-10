@@ -462,7 +462,20 @@ void tRhythm::Generate(tTrack *track, JZBarInfo &bi, tRhythm *rhy[], int n_rhy)
 #include "Bitmaps/rrggen.xpm"
 #include "Bitmaps/help.xpm"
 
-static JZToolDef tdefs[] =
+tRhythmWin::tRhythmWin(JZEventFrame *e, JZSong *s)
+  : wxFrame(0, -1, "Random Rhythm Generator", wxPoint(Config(C_RhythmXpos), Config(C_RhythmYpos)), wxSize(640, 580)),
+    edit(0)
+{
+#ifdef OBSOLETE
+  event_win        = e;
+  song             = s;
+  in_create        = 1;
+  n_instruments    = 0;
+  act_instrument   = -1;
+  default_filename = copystring("noname.rhy");
+  has_changed      = false;
+
+JZToolDef tdefs[] =
 {
   { MEN_LOAD, FALSE, open_xpm,    "open rhythm file" },
   { MEN_SAVE, FALSE, save_xpm,    "save into rhythm file" },
@@ -478,18 +491,6 @@ static JZToolDef tdefs[] =
 };
 
 
-tRhythmWin::tRhythmWin(JZEventFrame *e, JZSong *s)
-  : wxFrame(0, -1, "Random Rhythm Generator", wxPoint(Config(C_RhythmXpos), Config(C_RhythmYpos)), wxSize(640, 580)),
-    edit(0)
-{
-#ifdef OBSOLETE
-  event_win        = e;
-  song             = s;
-  in_create        = 1;
-  n_instruments    = 0;
-  act_instrument   = -1;
-  default_filename = copystring("noname.rhy");
-  has_changed      = false;
 
   mpToolBar = new JZToolBar(this, tdefs);
   mpToolBar->GetMaxSize(&tb_width, &tb_height);
@@ -658,9 +659,9 @@ void tRhythmWin::OnSize(int w, int h)
   {
     int cw, ch;
     GetClientSize(&cw, &ch);
+#ifdef OBSOLETE
     float tw = 0.0;
     float th = 0.0;
-#ifdef OBSOLETE
     mpToolBar->GetMaxSize(&tw, &th);
     mpToolBar->SetSize(0, 0, (int)cw, (int)th);
 #endif

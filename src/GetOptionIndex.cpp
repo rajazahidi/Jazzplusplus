@@ -1,4 +1,4 @@
-#include "wxWidgets.h"
+#include "WxWidgets.h"
 
 #include "JazzPlusPlusApplication.h"
 

@@ -111,6 +111,14 @@ enum ConfigEntryType
   ConfigEntryTypeEmpty
 };
 
+// values for C_MidiDriver
+enum TEMidiDriver
+{
+  eMidiDriverJazz = 0, // C_DRV_JAZZ  0
+  eMidiDriverOss = 1,  // C_DRV_OSS   1
+  eMidiDriverAlsa = 2  // C_DRV_ALSA  2
+};
+
 class tConfigEntry
 {
   public:

@@ -303,12 +303,16 @@ void JZTrackFrame::CreateMenu()
   setting_menu->Append(MEN_MIDI_THRU, "&Midi Thru ...");
   setting_menu->Append(MEN_SYNTH_SETTINGS, "&Synth Type ...");
 
-  #ifdef WX_MSW
-      setting_menu->Append(MEN_DEVICE,    "&Midi Device...");
-  #else
-      if (Config(C_MidiDriver) == C_DRV_OSS || Config(C_MidiDriver) == C_DRV_ALSA)
-          setting_menu->Append(MEN_DEVICE,    "&Midi Device...");
-  #endif
+#ifdef __WXMSW__
+  setting_menu->Append(MEN_DEVICE, "&Midi Device...");
+#else
+  if (
+    Config(C_MidiDriver) == eMidiDriverOss ||
+    Config(C_MidiDriver) == eMidiDriverAlsa)
+  {
+    setting_menu->Append(MEN_DEVICE, "&Midi Device...");
+  }
+#endif
   save_settings_menu = new wxMenu;
   save_settings_menu->Append( MEN_SAVE_THRU, "&Midi Thru" );
   save_settings_menu->Append( MEN_SAVE_TIM, "&Timing" );

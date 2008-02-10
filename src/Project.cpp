@@ -38,6 +38,7 @@
 #endif
 #ifdef DEV_ALSA
 #include "AlsaPlayer.h"
+#include "AlsaDriver.h"
 #endif
 
 #include <iostream>
@@ -49,8 +50,8 @@ using namespace std;
 JZProject::JZProject()
   : mpMidiPlayer(0),
     mpSynth(0),
-    mpSong(0),
     mpRecInfo(0),
+    mpSong(0),
     mChanged(false),
     mIsPlaying(false)
 {

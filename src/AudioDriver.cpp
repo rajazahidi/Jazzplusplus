@@ -23,6 +23,8 @@
 #include "WxWidgets.h"
 
 #include "AudioDriver.h"
+#include "RecordingInfo.h"
+
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
@@ -30,10 +32,6 @@
 
 #include <fcntl.h>
 
-//#include "trackwin.h"
-
-
-#define db(a) cout << #a << " = " << a << endl
 
 #define AUDIO_DEVICE "/dev/dsp"
 
@@ -145,8 +143,9 @@ int tAudioPlayer::LoadSamples(const char *filename)
   return samples.Load(filename);
 }
 
-int tAudioPlayer::RecordMode() const {
-  return rec_info != 0 && rec_info->Track->GetAudioMode();
+int tAudioPlayer::RecordMode() const
+{
+  return rec_info != 0 && rec_info->mpTrack->GetAudioMode();
 }
 
 void tAudioPlayer::StartAudio()
@@ -414,10 +413,10 @@ void tAudioPlayer::StopPlay()
   CloseDsp(TRUE);
   if (RecordMode())
   {
-    long frc = rec_info->FromClock;
+    long frc = rec_info->mFromClock;
     if (frc < start_clock)
       frc = start_clock;
-    long toc = rec_info->ToClock;
+    long toc = rec_info->mToClock;
     if (toc > recd_clock)
       toc = recd_clock;
     samples.SaveRecordingDlg(frc, toc, recbuffers);

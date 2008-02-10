@@ -20,9 +20,8 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef audiodrv_h
-#define audiodrv_h
-//#include "config.h"
+#ifndef JZ_AUDIODRIVER_H
+#define JZ_AUDIODRIVER_H
 
 #include <sys/soundcard.h>
 // in oss/free (from kernel 2.0.29) the following is not implemented
@@ -32,9 +31,10 @@
 // #endif
 
 #include <sys/time.h>
-#include "events.h"
-#include "player.h"
-#include "audio.h"
+
+#include "Events.h"
+#include "Player.h"
+#include "Audio.h"
 
 
 class tSample;
@@ -91,4 +91,4 @@ class tAudioPlayer : public tSeq2Player
     int force_read;	// needed by buggy audio driver ...
 };
 
-#endif
+#endif // !define(JZ_AUDIODRIVER_H)

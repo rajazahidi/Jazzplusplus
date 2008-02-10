@@ -64,7 +64,7 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
   wxString LocaleString = wxLocale::GetSystemEncodingName();
 
   wxString VersionString;
-  const JZJazzPlusPlusApplication& JazzApplication = GetJazzApplication();
+  const JZJazzPlusPlusApplication& JazzApplication = ::wxGetApp();
 
   VersionString
     << JazzApplication.GetMajorVersion()
@@ -191,5 +191,5 @@ JZAboutDialog::~JZAboutDialog()
 //-----------------------------------------------------------------------------
 void JZAboutDialog::OnHelp(wxCommandEvent& Event)
 {
-  GetJazzApplication().DisplayHelpContents();
+  ::wxGetApp().DisplayHelpContents();
 }

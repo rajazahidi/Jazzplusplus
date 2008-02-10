@@ -415,7 +415,7 @@ void JZTrackFrame::OnMetroOn(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnHelpContents(wxCommandEvent& Event)
 {
-  GetJazzApplication().DisplayHelpContents();
+  ::wxGetApp().DisplayHelpContents();
 }
 
 //-----------------------------------------------------------------------------

@@ -98,7 +98,7 @@ tHBInterface *the_harmony_browser = 0;
 #include "Bitmaps/piano.xpm"
 #include "Bitmaps/transpos.xpm"
 #include "Bitmaps/analyze.xpm"
-#include "Bitmaps/rrggen.xpm"
+//#include "Bitmaps/rrggen.xpm"
 #include "Bitmaps/delchord.xpm"
 
 static JZToolDef tdefs[] =
@@ -1727,13 +1727,15 @@ void HBFrame::OnSize(wxSizeEvent& Event)
 
   cout << "HBFrame::OnSize"<<endl;
 
-  float tw = 0.0;
+#ifdef OBSOLETE
   float th = 0.0;
+#endif
   if (cnvs)
        cnvs->SetSize(0, (int)0, (int)frameWidth, (int)(frameHeight));
   //    cnvs->SetSize(0, (int)th, cw, ch - (int)th);
 
 #ifdef OBSOLETE
+  float tw = 0.0;
   if (mpToolBar)
     mpToolBar->GetMaxSize(&tw, &th);
   if (mpToolBar)

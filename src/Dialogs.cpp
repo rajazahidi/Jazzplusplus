@@ -35,6 +35,7 @@
 #include "KeyDialog.h"
 #include "PropertyListDialog.h"
 #include "Globals.h"
+#include "NamedChoice.h"
 #include "Help.h"
 #include "DeprecatedWx/proplist.h"
 

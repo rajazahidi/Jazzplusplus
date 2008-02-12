@@ -234,6 +234,7 @@ typedef enum {
     wxPropertyValueString,
     wxPropertyValueList,
     wxPropertyValueIntegerPtr,
+    wxPropertyValueLongPtr,
     wxPropertyValueRealPtr,
     wxPropertyValueboolPtr,
     wxPropertyValueStringPtr
@@ -247,6 +248,7 @@ class wxPropertyValue: public wxObject
   wxPropertyValue(const wxPropertyValue& copyFrom);  // Copy constructor
   wxPropertyValue(const wxChar *val);
   wxPropertyValue(const wxString& val);
+//  wxPropertyValue(int val);
   wxPropertyValue(long val);
   wxPropertyValue(bool val);
   wxPropertyValue(float val);
@@ -255,6 +257,7 @@ class wxPropertyValue: public wxObject
   wxPropertyValue(wxStringList *val);
   // Pointer versions
   wxPropertyValue(wxChar **val);
+  wxPropertyValue(int *val);
   wxPropertyValue(long *val);
   wxPropertyValue(bool *val);
   wxPropertyValue(float *val);
@@ -267,7 +270,8 @@ class wxPropertyValue: public wxObject
   virtual float RealValue(void) const;
   virtual bool BoolValue(void) const;
   virtual wxChar *StringValue(void) const;
-  virtual long *IntegerValuePtr(void) const;
+  virtual int *IntegerValuePtr(void) const;
+  virtual long *LongValuePtr(void) const;
   virtual float *RealValuePtr(void) const;
   virtual bool *BoolValuePtr(void) const;
   virtual wxChar **StringValuePtr(void) const;
@@ -325,6 +329,7 @@ class wxPropertyValue: public wxObject
   void operator=(const bool val);
   void operator=(const float val);
   void operator=(const wxChar **val);
+  void operator=(const int *val);
   void operator=(const long *val);
   void operator=(const bool *val);
   void operator=(const float *val);
@@ -338,7 +343,8 @@ class wxPropertyValue: public wxObject
     long integer; // Also doubles as bool
     wxChar *string;
     float real;
-    long *integerPtr;
+    int *integerPtr;
+    long *longPtr;
     bool *boolPtr;
     wxChar **stringPtr;
     float *realPtr;

@@ -128,11 +128,20 @@ wxPropertyValue::wxPropertyValue(wxChar **val)
   m_last = NULL;
 }
 
-wxPropertyValue::wxPropertyValue(long *val)
+wxPropertyValue::wxPropertyValue(int *val)
 {
   m_modifiedFlag = false;
   m_type = wxPropertyValueIntegerPtr;
   m_value.integerPtr = val;
+  m_clientData = NULL;
+  m_next = NULL;
+}
+
+wxPropertyValue::wxPropertyValue(long *val)
+{
+  m_modifiedFlag = false;
+  m_type = wxPropertyValueLongPtr;
+  m_value.longPtr = val;
   m_clientData = NULL;
   m_next = NULL;
 }
@@ -327,6 +336,8 @@ wxPropertyValue *wxPropertyValue::NewCopy(void) const
     }
    case wxPropertyValueIntegerPtr:
      return new wxPropertyValue(m_value.integerPtr);
+   case wxPropertyValueLongPtr:
+     return new wxPropertyValue(m_value.longPtr);
    case wxPropertyValueRealPtr:
      return new wxPropertyValue(m_value.realPtr);
    case wxPropertyValueboolPtr:
@@ -377,6 +388,9 @@ void wxPropertyValue::Copy(wxPropertyValue& copyFrom)
       return ;
     case wxPropertyValueIntegerPtr:
       (*this) = copyFrom.IntegerValuePtr();
+      return ;
+    case wxPropertyValueLongPtr:
+      (*this) = copyFrom.LongValuePtr();
       return ;
     case wxPropertyValueStringPtr:
     {
@@ -504,6 +518,12 @@ void wxPropertyValue::WritePropertyType(wxString& stream)    // Write as any oth
     case wxPropertyValueIntegerPtr:
     {
       tmp.Printf( wxT("%ld"), *m_value.integerPtr );
+      stream.Append( tmp );
+      break;
+    }
+    case wxPropertyValueLongPtr:
+    {
+      tmp.Printf( wxT("%ld"), *m_value.longPtr );
       stream.Append( tmp );
       break;
     }
@@ -649,6 +669,8 @@ void wxPropertyValue::operator=(const long val)
     m_value.integer = val;
   else if (m_type == wxPropertyValueIntegerPtr)
     *m_value.integerPtr = val;
+  else if (m_type == wxPropertyValueLongPtr)
+    *m_value.longPtr = val;
   else if (m_type == wxPropertyValueReal)
     m_value.real = (float)val;
   else if (m_type == wxPropertyValueRealPtr)
@@ -696,7 +718,9 @@ void wxPropertyValue::operator=(const float val)
   if (m_type == wxPropertyValueInteger)
     m_value.integer = (long)val;
   else if (m_type == wxPropertyValueIntegerPtr)
-    *m_value.integerPtr = (long)val;
+    *m_value.integerPtr = (int)val;
+  else if (m_type == wxPropertyValueLongPtr)
+    *m_value.longPtr = (long)val;
   else if (m_type == wxPropertyValueReal)
     m_value.real = val;
   else if (m_type == wxPropertyValueRealPtr)
@@ -728,11 +752,20 @@ void wxPropertyValue::operator=(const wxChar **val)
 
 }
 
-void wxPropertyValue::operator=(const long *val)
+void wxPropertyValue::operator=(const int *val)
 {
   m_modifiedFlag = true;
   m_type = wxPropertyValueIntegerPtr;
-  m_value.integerPtr = (long *)val;
+  m_value.integerPtr = (int*)val;
+  m_clientData = NULL;
+  m_next = NULL;
+}
+
+void wxPropertyValue::operator=(const long *val)
+{
+  m_modifiedFlag = true;
+  m_type = wxPropertyValueLongPtr;
+  m_value.longPtr = (long*)val;
   m_clientData = NULL;
   m_next = NULL;
 }
@@ -741,7 +774,7 @@ void wxPropertyValue::operator=(const bool *val)
 {
   m_modifiedFlag = true;
   m_type = wxPropertyValueboolPtr;
-  m_value.boolPtr = (bool *)val;
+  m_value.boolPtr = (bool*)val;
   m_clientData = NULL;
   m_next = NULL;
 }
@@ -750,7 +783,7 @@ void wxPropertyValue::operator=(const float *val)
 {
   m_modifiedFlag = true;
   m_type = wxPropertyValueRealPtr;
-  m_value.realPtr = (float *)val;
+  m_value.realPtr = (float*)val;
   m_clientData = NULL;
   m_next = NULL;
 }
@@ -768,22 +801,28 @@ long wxPropertyValue::IntegerValue(void) const
     else return 0;
   }
 
-long *wxPropertyValue::IntegerValuePtr(void) const
+int *wxPropertyValue::IntegerValuePtr(void) const
 {
   return m_value.integerPtr;
 }
 
-float wxPropertyValue::RealValue(void) const {
-    if (m_type == wxPropertyValueReal)
-      return m_value.real;
-    else if (m_type == wxPropertyValueRealPtr)
-      return *m_value.realPtr;
-    else if (m_type == wxPropertyValueInteger)
-      return (float)m_value.integer;
-    else if (m_type == wxPropertyValueIntegerPtr)
-      return (float)*(m_value.integerPtr);
-    else return 0.0;
-  }
+long *wxPropertyValue::LongValuePtr(void) const
+{
+  return m_value.longPtr;
+}
+
+float wxPropertyValue::RealValue(void) const
+{
+  if (m_type == wxPropertyValueReal)
+    return m_value.real;
+  else if (m_type == wxPropertyValueRealPtr)
+    return *m_value.realPtr;
+  else if (m_type == wxPropertyValueInteger)
+    return (float)m_value.integer;
+  else if (m_type == wxPropertyValueIntegerPtr)
+    return (float)*(m_value.integerPtr);
+  else return 0.0;
+}
 
 float *wxPropertyValue::RealValuePtr(void) const
 {

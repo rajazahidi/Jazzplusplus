@@ -32,10 +32,6 @@ class JZRndArray;
 class JZBarInfo;
 class tKeyOn;
 
-// 0..11 = C..B major keys
-#define ScaleChromatic 12
-#define ScaleSelected 13
-
 class tScale
 {
   public:

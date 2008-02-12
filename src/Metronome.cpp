@@ -20,8 +20,11 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
+#include "WxWidgets.h"
+
 #include "Metronome.h"
 #include "Configuration.h"
+#include "Globals.h"
 #include "Events.h"
 
 tMetronomeInfo::tMetronomeInfo()
@@ -35,10 +38,20 @@ tMetronomeInfo::tMetronomeInfo()
 
 tKeyOn* tMetronomeInfo::Normal(long clock)
 {
-  return new tKeyOn(clock, Config(C_DrumChannel)-1, KeyNorm, Veloc, 15);
+  return new tKeyOn(
+    clock,
+    gpConfig->GetValue(C_DrumChannel) - 1,
+    KeyNorm,
+    Veloc,
+    15);
 }
 
 tKeyOn* tMetronomeInfo::Accented(long clock)
 {
-  return new tKeyOn(clock, Config(C_DrumChannel)-1, KeyAcc, Veloc, 15);
+  return new tKeyOn(
+    clock,
+    gpConfig->GetValue(C_DrumChannel) - 1,
+    KeyAcc,
+    Veloc,
+    15);
 }

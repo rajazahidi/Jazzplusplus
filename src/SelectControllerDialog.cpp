@@ -23,26 +23,36 @@
 #include "WxWidgets.h"
 
 #include "Configuration.h"
+#include "Globals.h"
 
+using namespace std;
+
+//*****************************************************************************
+//*****************************************************************************
 int SelectControllerDlg()
 {
   int i, n = 0;
-  //  char *names[130];
-  // PAT - The following line used to be this:
-  //  wxArrayString names=new wxArrayString();
-  wxArrayString names;
+  wxArrayString Names;
+
+  const vector<pair<string, int> >& ControlNames =
+    gpConfig->GetControlNames();
+
   int Controllers[130];
-  for (i = 0; Config.CtrlName(i).Name; i++)
+  for (
+    vector<pair<string, int> >::const_iterator iControlName =
+      ControlNames.begin();
+    iControlName != ControlNames.end();
+    ++iControlName)
   {
-    if (Config.CtrlName(i).Name[0])
+    const string& Name = iControlName->first;
+    if (!Name.empty())
     {
-      Controllers[n] = Config.CtrlName(i).Value;
-//      names.Add(*(new wxString(Config.CtrlName(i).Name))); //JAVE leaking?
-      names.Add(Config.CtrlName(i).Name); //JAVE leaking?
+      Controllers[n] = iControlName->second;
+      Names.Add(Name);
     }
   }
 
-  i = ::wxGetSingleChoiceIndex("Controller", "Select a controller", names);
+  i = ::wxGetSingleChoiceIndex("Controller", "Select a controller", Names);
 
   if (i >= 0)
   {

@@ -37,36 +37,50 @@ class tRhyArrayEdit;
 class tSliderWin : public wxFrame
 {
   public:
-    DECLARE_EVENT_TABLE()
-    tSliderWin(wxFrame *parent, wxFrame **ref, const char *title, int geo[4], JZToolDef *tdefs = NULL);
-    ~tSliderWin();
+
+    tSliderWin(
+      wxWindow* pParent,
+      wxFrame **ref,
+      const wxString& Title,
+      int geo[4],
+      JZToolDef *tdefs = NULL);
+
+    virtual ~tSliderWin();
+
     void Initialize();
     virtual void OnSize(wxSizeEvent& event);
     virtual bool OnClose();
 
     virtual void AddItems();
     virtual void AddEdits();
+
 #ifdef OBSOLETE
     virtual void OnItem(wxItem& item, wxCommandEvent& event);
 #endif
+
     virtual void ForceRepaint();
+
   protected:
+
 #ifdef OBSOLETE
     static void ItemCallback(wxItem& item, wxCommandEvent& event);
 #endif
 
-    int         in_constructor;
-    wxFrame    **ref;
+    int in_constructor;
+    wxFrame **ref;
 
-    wxPanel       *panel;
-    //tRhyArrayEdit *edits[100];
-    wxWindow *sliders[100];
-    int           n_sliders;
-    int           sliders_per_row;
-    int           *geo;
+    wxPanel* panel;
+
+//    tRhyArrayEdit *edits[100];
+
+    wxWindow* sliders[100];
+    int n_sliders;
+    int sliders_per_row;
+    int* geo;
 
     JZToolBar* mpToolBar;
 
+  DECLARE_EVENT_TABLE()
 };
 
 #endif // !defined(JZ_SLIDERWINDOW_H)

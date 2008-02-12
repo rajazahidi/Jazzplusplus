@@ -32,15 +32,15 @@
 using namespace std;
 
 tSliderWin::tSliderWin(
-  wxFrame *parent,
+  wxWindow* pParent,
   wxFrame **ref,
-  const char *title,
+  const wxString& Title,
   int geo[4],
   JZToolDef *tdefs)
   : wxFrame(
-      0,
-      -1,
-      (char *)title,
+      pParent,
+      wxID_ANY,
+      Title,
       wxPoint(geo[0], geo[1]),
       wxSize(geo[2], geo[3]))
 {

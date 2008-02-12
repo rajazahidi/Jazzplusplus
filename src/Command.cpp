@@ -27,6 +27,7 @@
 #include "Track.h"
 #include "Filter.h"
 #include "Random.h"
+#include "Globals.h"
 
 #include <cstdlib>
 #include <limits>
@@ -74,13 +75,13 @@ void tScale::Init(int ScaleNr, tFilter *f)
   for (i = 0; i < 12; i++)
     ScaleKeys[i] = 0;
 
-  if (ScaleNr == ScaleChromatic)
+  if (ScaleNr == gScaleChromatic)
   {
     for (i = 0; i < 12; i++)
       ScaleKeys[i] = 1;
   }
 
-  else if (ScaleNr == ScaleSelected)
+  else if (ScaleNr == gScaleSelected)
   {
     int found = 0;
     tSelectedKeys cmd(f);

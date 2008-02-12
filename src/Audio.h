@@ -331,30 +331,30 @@ class tSampleSet
       return channels * (bits == 8 ? 1L : 2L) * num_samples;
     }
 
-    long speed;		// samples / second
-    int  channels;	// mono = 1, stereo = 2
-    int  bits;		// must be 16!
+    long speed;    // samples / second
+    int  channels; // mono = 1, stereo = 2
+    int  bits;     // must be 16!
     bool softsync;      // enable software midi/audio sync
     enum { MAXSMPL = 128 };
     tSample *samples[MAXSMPL];
     tSampleWin *samplewin[MAXSMPL];
 
-    long    ticks_per_minute;	// midi speed for audio/midi sync
+    long    ticks_per_minute;  // midi speed for audio/midi sync
     double  clocks_per_buffer;
-    long    start_clock;	// when did play start
+    long    start_clock;       // when did play start
 
     int   event_index;
 
 
-    unsigned int bufbytes;		// buffer size in byte
-    unsigned int bufshorts;		// buffer size in short
-    tAudioBuffer *buffers[BUFCOUNT];    // all the audio buffers
-    tAudioBufferQueue free_buffers;     // to be filled with data
-    tAudioBufferQueue full_buffers;     // to be played by driver
-    tAudioBufferQueue driv_buffers;     // actually played by driver
+    unsigned int bufbytes;           // buffer size in byte
+    unsigned int bufshorts;          // buffer size in short
+    tAudioBuffer *buffers[BUFCOUNT]; // all the audio buffers
+    tAudioBufferQueue free_buffers;  // to be filled with data
+    tAudioBufferQueue full_buffers;  // to be played by driver
+    tAudioBufferQueue driv_buffers;  // actually played by driver
 
     // return the start clock for i-th free buffer
-    long buffers_written;               // for computing buffers clock
+    long buffers_written;            // for computing buffers clock
     long BufferClock(int i) const
     {
       return (long)(start_clock + i * clocks_per_buffer);

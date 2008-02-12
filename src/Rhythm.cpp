@@ -26,6 +26,7 @@
 #include "EventWindow.h"
 #include "Song.h"
 #include "Command.h"
+#include "Globals.h"
 #include "Harmony.h"
 #include "TrackFrame.h"
 #include "PianoFrame.h"
@@ -463,7 +464,14 @@ void tRhythm::Generate(tTrack *track, JZBarInfo &bi, tRhythm *rhy[], int n_rhy)
 #include "Bitmaps/help.xpm"
 
 tRhythmWin::tRhythmWin(JZEventFrame *e, JZSong *s)
-  : wxFrame(0, -1, "Random Rhythm Generator", wxPoint(Config(C_RhythmXpos), Config(C_RhythmYpos)), wxSize(640, 580)),
+  : wxFrame(
+      0,
+      wxID_ANY,
+      "Random Rhythm Generator",
+      wxPoint(
+        gpConfig->GetValue(C_RhythmXpos),
+        gpConfig->GetValue(C_RhythmYpos)),
+      wxSize(640, 580)),
     edit(0)
 {
 #ifdef OBSOLETE
@@ -784,12 +792,17 @@ void tRhythmWin::AddInstrumentDlg()
   names[n] = "pianowin one";
   keys[n++] = MODE_ONE_OF;
 
-  for (i = 0; Config.DrumName(i).Name; i++)
+  const vector<pair<string, int> >& DrumNames = gpConfig->GetDrumNames();
+  for (
+    vector<pair<string, int> >::const_iterator iDrumName = DrumNames.begin();
+    iDrumName != DrumNames.end();
+    ++iDrumName)
   {
-    if (Config.DrumName(i).Name[0])
+    const string& Name = iDrumName->first;
+    if (!Name.empty())
     {
-      keys[n]    = Config.DrumName(i).Value - 1;
-      names[n++] = Config.DrumName(i).Name;
+      keys[n]    = iDrumName->second - 1;
+      names[n++] = Name;
     }
   }
 
@@ -823,7 +836,7 @@ void tRhythmWin::AddInstrumentDlg()
       r->parm = SelectControllerDlg();
       if (r->parm < 0)
         return;
-      r->SetLabel(Config.CtrlName(r->parm).Name);
+      r->SetLabel(gpConfig->CtrlName(r->parm).first.c_str());
       r->mode = MODE_CONTROL;
       r->n_keys = 0;
     }
@@ -1083,9 +1096,15 @@ void tRhythmWin::RndEnable()
 
 tRhythmWin::~tRhythmWin()
 {
-  GetPosition( &Config(C_RhythmXpos), &Config(C_RhythmYpos) );
+  int XPixel, YPixel;
+  GetPosition(&XPixel, &YPixel);
+  gpConfig->Put(C_RhythmXpos, XPixel);
+  gpConfig->Put(C_RhythmYpos, YPixel);
+
   for (int i = 0; i < n_instruments; i++)
+  {
     delete instruments[i];
+  }
   delete mpToolBar;
   rhythm_win = 0;
 }

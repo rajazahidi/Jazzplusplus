@@ -483,12 +483,21 @@ void tPlayer::AllNotesOff(int Reset)
   tControl CtrlRes(0, 0, 0x79, 0);
 
   tDeviceList &devs = Midi->GetOutputDevices();
-  for (int dev = 0; dev < devs.GetCount(); dev++) {
+  for (unsigned dev = 0; dev < devs.GetCount(); dev++)
+  {
     for (int c = 0; c < 16; c++)
     {
-      NoteOff.Channel = c; NoteOff.SetDevice(dev); OutNow(&NoteOff);
-      Pitch.Channel = c;   Pitch.SetDevice(dev);   OutNow(&Pitch);
-      CtrlRes.Channel = c; CtrlRes.SetDevice(dev); OutNow(&CtrlRes);
+      NoteOff.Channel = c;
+      NoteOff.SetDevice(dev);
+      OutNow(&NoteOff);
+
+      Pitch.Channel = c;
+      Pitch.SetDevice(dev);
+      OutNow(&Pitch);
+
+      CtrlRes.Channel = c;
+      CtrlRes.SetDevice(dev);
+      OutNow(&CtrlRes);
     }
   }
 

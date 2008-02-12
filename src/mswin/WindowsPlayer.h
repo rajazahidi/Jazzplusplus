@@ -69,7 +69,7 @@ class tWinPlayer : public tPlayer
 
   protected:
 
-    tWinPlayerState *state;
+    tWinPlayerState* state;
     DWORD Event2Dword(JZEvent *e);
     JZEvent* Dword2Event(DWORD dw);
     long Clock2Time(long clock);

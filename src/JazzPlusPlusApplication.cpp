@@ -71,6 +71,7 @@ END_EVENT_TABLE()
 JZJazzPlusPlusApplication::JZJazzPlusPlusApplication()
   : wxApp(),
     mpProject(0),
+    mpTrackFrame(0),
     mHelp(wxHF_DEFAULT_STYLE | wxHF_OPEN_FILES)
 {
 #ifdef _MSC_VER

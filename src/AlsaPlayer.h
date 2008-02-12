@@ -30,12 +30,12 @@
 
 class tAlsaDeviceList : public tDeviceList
 {
-public:
-  int add(const char *name, const snd_seq_addr_t &a);
-  snd_seq_addr_t& operator[](int i);
-  void print(const char *msg);
-private:
-  snd_seq_addr_t addr[MAXDEVS];
+  public:
+    unsigned add(const char* pName, const snd_seq_addr_t& a);
+    snd_seq_addr_t& operator[](unsigned i);
+    void print(const char *msg);
+  private:
+    std::vector<snd_seq_addr_t> addr;
 };
 
 

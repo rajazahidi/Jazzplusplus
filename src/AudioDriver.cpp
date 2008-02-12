@@ -24,6 +24,8 @@
 
 #include "AudioDriver.h"
 #include "RecordingInfo.h"
+#include "Configuration.h"
+#include "Globals.h"
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -99,7 +101,7 @@ tAudioPlayer::tAudioPlayer(JZSong *song)
   long dummy = 0;
   AudioBuffer   = new tEventArray();
   installed     = 0;
-  dummy = Config(C_EnableAudio);
+  dummy = gpConfig->GetValue(C_EnableAudio);
   audio_enabled = dummy;
   listener      = 0;
   can_duplex    = 0;    // no duplex yet.
@@ -165,14 +167,18 @@ void tAudioPlayer::StartAudio()
 
   OpenDsp();
 
-  if (Config(C_OssBug1))
+  if (gpConfig->GetValue(C_OssBug1))
+  {
     WriteSamples();
+  }
   else
   {
     // ok, suspend the device until midi starts
     ioctl(dev, SNDCTL_DSP_SETSYNCRO, 0);
     if (PlaybackMode())
+    {
       WriteSamples();
+    }
     SEQ_PLAYAUDIO(0xffff);  // start all available devices
   }
 
@@ -187,7 +193,7 @@ void tAudioPlayer::OpenDsp()
   if (!audio_enabled)
     return;
 
-  can_duplex = Config(C_DuplexAudio);
+  can_duplex = gpConfig->GetValue(C_DuplexAudio);
 
   // linux driver seems to need some real free memory, which sometimes
   // is not available when operating with big samples. So allocate

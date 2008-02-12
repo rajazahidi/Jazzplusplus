@@ -34,6 +34,8 @@
 #include "AlsaPlayer.h"
 #include "TrackFrame.h"
 #include "Dialogs.h"
+#include "Configuration.h"
+#include "Globals.h"
 
 #include <stdlib.h>
 #include <errno.h>
@@ -91,20 +93,19 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
   // scan output addresses
   scan_clients(oaddr, SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE);
 
-  inp_dev = Config(C_AlsaInputDevice);
-  if (inp_dev < 0) {
+  inp_dev = gpConfig->GetValue(C_AlsaInputDevice);
+  if (inp_dev < 0)
+  {
     cout<<"invalid input device, so selecting one"<<endl;
     inp_dev = select_list(iaddr, "Input Device", inp_dev);
     cout << "Input device is: " << inp_dev << endl;
-    Config(C_AlsaInputDevice) = inp_dev;
-    Config.Put(C_AlsaInputDevice, inp_dev);
+    gpConfig->Put(C_AlsaInputDevice, inp_dev);
   }
-  outp_dev = Config(C_AlsaOutputDevice);
-  if (outp_dev < 0) {
+  outp_dev = gpConfig->GetValue(C_AlsaOutputDevice);
+  if (outp_dev < 0)
+  {
     cout<<"invalid output device, so selecting one"<<endl;
     outp_dev = select_list(oaddr, "Output Device", outp_dev);
-    Config(C_AlsaOutputDevice) = outp_dev;
-    Config.Put(C_AlsaOutputDevice, outp_dev);
   }
 
   if (inp_dev >= 0)
@@ -119,7 +120,10 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
 
   if (installed) {
     thru = new tAlsaThru();
-    SetSoftThru(Config(C_SoftThru), Config(C_ThruInput), Config(C_ThruOutput));
+    SetSoftThru(
+      gpConfig->GetValue(C_SoftThru),
+      gpConfig->GetValue(C_ThruInput),
+      gpConfig->GetValue(C_ThruOutput));
   }
 
 }
@@ -701,16 +705,14 @@ int tAlsaPlayer::FindMidiDevice()
   if (inp_dev != -1)
     unsubscribe_inp(inp_dev);
   inp_dev = select_list(iaddr, "Input MIDI device", inp_dev);
-  Config(C_AlsaInputDevice) = inp_dev;
-  Config.Put(C_AlsaInputDevice, inp_dev);
+  gpConfig->Put(C_AlsaInputDevice, inp_dev);
   if (inp_dev != -1)
     subscribe_inp(inp_dev);
 
   if (outp_dev != -1)
     unsubscribe_out(outp_dev);
   outp_dev = select_list(oaddr, "Output MIDI device", outp_dev);
-  Config(C_AlsaOutputDevice) = outp_dev;
-  Config.Put(C_AlsaOutputDevice, outp_dev);
+  gpConfig->Put(C_AlsaOutputDevice, outp_dev);
   if (outp_dev != -1)
     subscribe_out(outp_dev);
   return 0;
@@ -758,23 +760,29 @@ int tAlsaPlayer::select_list(tAlsaDeviceList &list, char *title, int def_device)
 void tAlsaDeviceList::print(const char *msg)
 {
   cout << msg << endl;
-  for (int i = 0; i < count; ++i)
+  int i = 0;
+  for (
+    vector<snd_seq_addr_t>::const_iterator iSound = addr.begin();
+    iSound != addr.end();
+    ++iSound)
   {
-    snd_seq_addr_t &a = operator[](i);
-    cout << GetName(i) << " = " << (int)a.client << ":" << (int)a.port << endl;
+    const snd_seq_addr_t& a = *iSound;
+    cout << GetName(i++) << " = " << (int)a.client << ":" << (int)a.port << endl;
   }
 }
 
-int tAlsaDeviceList::add(const char *name, const snd_seq_addr_t &a)
+unsigned tAlsaDeviceList::add(const char* pName, const snd_seq_addr_t& a)
 {
-  addr[count] = a;
-  names[count] = copystring(name);
-  return count++;
+  mDeviceNames.push_back(pName);
+  addr.push_back(a);
+  return addr.size();
 }
 
-snd_seq_addr_t& tAlsaDeviceList::operator[](int i)
+snd_seq_addr_t& tAlsaDeviceList::operator[](unsigned i)
 {
-  if (i >= count)
+  if (i >= addr.size())
+  {
     return addr[0];
+  }
   return addr[i];
 }

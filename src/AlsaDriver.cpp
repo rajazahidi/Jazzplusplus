@@ -35,6 +35,8 @@
 
 #include "TrackFrame.h"
 #include "RecordingInfo.h"
+#include "Configuration.h"
+#include "Globals.h"
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -121,8 +123,8 @@ tAlsaAudioPlayer::tAlsaAudioPlayer(JZSong *song)
 	pcm[PLAYBACK] = NULL;
 	pcm[CAPTURE] = NULL;
 
-	dev[PLAYBACK] = Config.StrValue(C_AlsaAudioOutputDevice);
-	dev[CAPTURE] = Config.StrValue(C_AlsaAudioInputDevice);
+	dev[PLAYBACK] = gpConfig->StrValue(C_AlsaAudioOutputDevice);
+	dev[CAPTURE] = gpConfig->StrValue(C_AlsaAudioInputDevice);
 	can_duplex = 1; /* FIXME */
 	installed = 1;
 	audio_enabled = 1;

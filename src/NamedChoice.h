@@ -23,17 +23,23 @@
 #ifndef JZ_NAMEDCHOICE_H
 #define JZ_NAMEDCHOICE_H
 
-class tNamedValue;
+#include <vector>
+#include <string>
+
 class wxStringListValidator;
 
 //*****************************************************************************
-// tNamedChoice presents a dialog with the values to choose from
+// Description:
+//   This class presents a dialog with the values to choose from.
 //*****************************************************************************
 class tNamedChoice : public wxObject
 {
   public:
 
-    tNamedChoice(char* pTitle, tNamedValue* pValues, long* pResult);
+    tNamedChoice(
+      char* pTitle,
+      const std::vector<std::pair<std::string, int> >& Pairs,
+      int* pResult);
 
     virtual ~tNamedChoice();
 
@@ -47,15 +53,13 @@ class tNamedChoice : public wxObject
 
   private:
 
-    char* mpTitle;
+//    char* mpTitle;
 
-    // Terminate the values by setting the last values name pointer to 0. or
-    // mpValues[last].Name == 0.
-    tNamedValue* mpValues;
+    const std::vector<std::pair<std::string, int> >& mPairs;
 
-    char* mpSelection;
+    std::string mSelection;
 
-    long* mpResult;
+    int* mpResult;
 };
 
 #endif // !defined(JZ_NAMEDCHOICE_H)

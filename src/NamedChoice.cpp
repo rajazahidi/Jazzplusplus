@@ -1,3 +1,25 @@
+//*****************************************************************************
+// The JAZZ++ Midi Sequencer
+//
+// Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
+// Modifications Copyright (C) 2004 Patrick Earl
+// Modifications Copyright (C) 2008 Peter J. Stieber
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+//*****************************************************************************
+
 #include "WxWidgets.h"
 
 #include "NamedChoice.h"
@@ -5,17 +27,21 @@
 #include "DeprecatedStringUtils.h"
 #include "DeprecatedWx/proplist.h"
 
-tNamedChoice::tNamedChoice(char* pTitle, tNamedValue* pValues, long* pResult)
-  : mpTitle(pTitle),
-    mpValues(pValues),
-    mpSelection(0),
+using namespace std;
+
+tNamedChoice::tNamedChoice(
+  char* pTitle,
+  const std::vector<std::pair<std::string, int> >& Pairs,
+  int* pResult)
+  : //mpTitle(pTitle),
+    mPairs(Pairs),
+    mSelection(),
     mpResult(pResult)
 {
 }
 
 tNamedChoice::~tNamedChoice()
 {
-  delete mpSelection;
 }
 
 #ifdef OBSOLETE
@@ -35,16 +61,19 @@ wxFormItem *tNamedChoice::mkFormItem(int w, int h)
 }
 #endif
 
-//  Return a string list validator to use in the wxproplist dialogs.
+// Return a string list validator to use in the wxproplist dialogs.
 wxStringListValidator* tNamedChoice::GetStringListValidator()
 {
   wxStringList* StringList = new wxStringList();
-  for (int i = 0; mpValues[i].Name; ++i)
+  for (
+    vector<pair<string, int> >::const_iterator iPair = mPairs.begin();
+    iPair != mPairs.end();
+    ++iPair)
   {
     // Omit empty entries.
-    if (*mpValues[i].Name)
+    if (!iPair->first.empty())
     {
-      StringList->Add(wxString(mpValues[i].Name));
+      StringList->Add(wxString(iPair->first.c_str()));
     }
   }
   return new wxStringListValidator(StringList);
@@ -52,29 +81,29 @@ wxStringListValidator* tNamedChoice::GetStringListValidator()
 
 void tNamedChoice::GetValue()
 {
-  int i;
-
-  if (mpSelection)
+  for (
+    vector<pair<string, int> >::const_iterator iPair = mPairs.begin();
+    iPair != mPairs.end();
+    ++iPair)
   {
-    for (i = 0; mpValues[i].Name; ++i)
+    if (iPair->first == mSelection)
     {
-      if (!strcmp(mpSelection, mpValues[i].Name))
-      {
-	*mpResult = mpValues[i].Value;
-	break;
-      }
+      *mpResult = iPair->second;
+      break;
     }
   }
 }
 
 void tNamedChoice::SetValue()
 {
-  for (int i = 0; mpValues[i].Name; ++i)
+  for (
+    vector<pair<string, int> >::const_iterator iPair = mPairs.begin();
+    iPair != mPairs.end();
+    ++iPair)
   {
-    if (*mpResult == mpValues[i].Value)
+    if (*mpResult == iPair->second)
     {
-      delete mpSelection;
-      mpSelection = copystring(mpValues[i].Name);
+      mSelection = iPair->first;
       break;
     }
   }

@@ -96,7 +96,7 @@ void tShiftDlg::AddProperties()
 // Cleanup
 // *************************************************************************
 
-long tCleanupDlg::lowLimit = 48;
+int tCleanupDlg::lowLimit = 48;
 bool tCleanupDlg::shortenOverlaps = 1;
 
 
@@ -104,8 +104,6 @@ bool tCleanupDlg::shortenOverlaps = 1;
 tCleanupDlg::tCleanupDlg(JZEventFrame *w, tFilter *f)
   : tPropertyListDlg( "Clean up events" )
 {
-  //limitSteps lives in util.cpp
-
   Filter = f;
   Song = f->Song;
   EventWin = w;
@@ -116,7 +114,9 @@ tCleanupDlg::tCleanupDlg(JZEventFrame *w, tFilter *f)
 bool tCleanupDlg::OnClose()
 {
   int limit = Song->TicksPerQuarter * 4 / lowLimit;
-  cout<<"tCleanupDlg::OnClose "<<lowLimit<<" "<<shortenOverlaps<<endl;
+  cout
+    << "tCleanupDlg::OnClose " << lowLimit << ' ' << shortenOverlaps
+    << endl;
   tCmdCleanup cln(Filter, limit, shortenOverlaps);
   cln.Execute();
   EventWin->Redraw();
@@ -135,33 +135,46 @@ void tCleanupDlg::OnHelp()
 }
 
 
-IMPLEMENT_DYNAMIC_CLASS(tNamedValueListValue, wxPropertyValue)
+//IMPLEMENT_DYNAMIC_CLASS(tNamedValueListValue, wxPropertyValue)
 
 void tCleanupDlg::AddProperties()
 {
-  //JAVE this doesnt work
-  //  sheet->AddProperty(new wxProperty("Delete notes shorther than", wxPropertyValue("1/8") , "props", Steps.GetStringListValidator()))  ;
+  // JAVE this doesnt work
+//  sheet->AddProperty(new wxProperty(
+//    "Delete notes shorther than",
+//    wxPropertyValue("1/8"),
+//    "props",
+//    Steps.GetStringListValidator()));
 
-  //how it ought to work
-  //sheet->AddProperty(new wxProperty("Delete notes shorther than", wxPropertyValue((long*)&lowLimit) , 
-  //			    "props", new tNamedValueListValidator(limitSteps)))  ; //limitSteps is a name/value pair array in util.cpp
+  // how it ought to work
+  // gLimitSteps is a name/value pair vector
+//  sheet->AddProperty(new wxProperty(
+//    "Delete notes shorther than",
+//    wxPropertyValue(&lowLimit),
+//    "props",
+//    new tNamedValueListValidator(gLimitSteps)));
 
-  //how it really ought to work(except the validator might ask the "value" for the list of allowed values)
-  //http://sourceforge.net/tracker/?group_id=9863&atid=109863 wx bugracker
-  tNamedValueListValue val1 = tNamedValueListValue((long*)&lowLimit, limitSteps);
+  // How it really ought to work (except the validator might ask the "value"
+  // for the list of allowed values).
+  // http://sourceforge.net/tracker/?group_id=9863&atid=109863 wx bugracker
+  tNamedValueListValue val1 = tNamedValueListValue(
+    &lowLimit,
+    gLimitSteps);
+
   wxPropertyValue& val = val1;
   cout << "little test:" << val.GetStringRepresentation() << endl;
   sheet->AddProperty(new wxProperty(
     "Delete shorther than",
     (tNamedValueListValue&)val1,
     "props",
-    new tNamedValueListValidator(limitSteps))); //limitSteps is a name/value pair array in util.cpp
+    new tNamedValueListValidator(gLimitSteps)));
 
-    
-  sheet->AddProperty(new wxProperty("Shorten overlapping", wxPropertyValue((bool*)&shortenOverlaps),"bool"));
+  sheet->AddProperty(new wxProperty(
+    "Shorten overlapping",
+    wxPropertyValue((bool*)&shortenOverlaps), "bool"));
 
-  //there seems to be a padding limit in wxPropertyListView::MakeNameValueString set to 25
-
+  // There seems to be a padding limit in
+  // wxPropertyListView::MakeNameValueString set to 25.
 }
 
 
@@ -169,8 +182,8 @@ void tCleanupDlg::AddProperties()
 // SearchReplace
 // *************************************************************************
 
-long tSearchReplaceDlg::frCtrl = 1;
-long tSearchReplaceDlg::toCtrl = 1;
+int tSearchReplaceDlg::frCtrl = 1;
+int tSearchReplaceDlg::toCtrl = 1;
 
 tSearchReplaceDlg::tSearchReplaceDlg(JZEventFrame *w, tFilter *f)
    : tPropertyListDlg("Search and replace controller types" )
@@ -182,7 +195,7 @@ tSearchReplaceDlg::tSearchReplaceDlg(JZEventFrame *w, tFilter *f)
 
 bool tSearchReplaceDlg::OnClose()
 {
-  tCmdSearchReplace sr(Filter, frCtrl-1, toCtrl-1);
+  tCmdSearchReplace sr(Filter, frCtrl - 1, toCtrl-1);
   sr.Execute();
   EventWin->Redraw();
   if (EventWin->NextWin)
@@ -198,13 +211,17 @@ void tSearchReplaceDlg::OnHelp()
 
 void tSearchReplaceDlg::AddProperties()
 {
-   sheet->AddProperty(new wxProperty("Search", tNamedValueListValue((long*)&frCtrl, &Config.CtrlName(0)) , 
-  				    "props", new tNamedValueListValidator(&Config.CtrlName(0))))  ;
+  sheet->AddProperty(new wxProperty(
+    "Search",
+    tNamedValueListValue(&frCtrl, gpConfig->GetControlNames()),
+    "props",
+    new tNamedValueListValidator(gpConfig->GetControlNames())));
 
-   sheet->AddProperty(new wxProperty("Replace", tNamedValueListValue((long*)&toCtrl, &Config.CtrlName(0)) , 
-  				    "props", new tNamedValueListValidator(&Config.CtrlName(0))))  ;
-
-
+  sheet->AddProperty(new wxProperty(
+    "Replace",
+    tNamedValueListValue(&toCtrl, gpConfig->GetControlNames()),
+    "props",
+    new tNamedValueListValidator(gpConfig->GetControlNames())));
 }
 
 
@@ -214,28 +231,8 @@ void tSearchReplaceDlg::AddProperties()
 // Transpose
 // *************************************************************************
 
-static tNamedValue ScaleNames[] =
-{
-  tNamedValue("None",     ScaleChromatic),
-  tNamedValue("Selected", ScaleSelected),
-  tNamedValue("C",   0),
-  tNamedValue("C#",  1),
-  tNamedValue("D",   2),
-  tNamedValue("D#",  3),
-  tNamedValue("E",   4),
-  tNamedValue("F",   5),
-  tNamedValue("F#",  6),
-  tNamedValue("G",   7),
-  tNamedValue("G#",  8),
-  tNamedValue("A",   9),
-  tNamedValue("A#", 10),
-  tNamedValue("B",  11),
-  tNamedValue( 0,   ScaleChromatic)
-};
-
-
-int tTransposeDlg::Notes  = 0;
-long tTransposeDlg::Scale  = ScaleChromatic;
+int tTransposeDlg::Notes = 0;
+int tTransposeDlg::Scale = gScaleChromatic;
 bool tTransposeDlg::FitIntoScale = 0;
 
 tTransposeDlg::tTransposeDlg(JZEventFrame *w, tFilter *f)
@@ -271,13 +268,22 @@ void tTransposeDlg::OnHelp()
 
 void tTransposeDlg::AddProperties()
 {
-   int s = tScale::Analyze(Filter);
+  int s = tScale::Analyze(Filter);
 
-  sheet->AddProperty(new wxProperty("selection looks like", wxPropertyValue(ScaleNames[s+2].Name),"string"));
-  sheet->AddProperty(new wxProperty("Amount",wxPropertyValue((long*) &Notes), "integer",
-		     new wxIntegerListValidator(-12, 12)));
-  sheet->AddProperty(new wxProperty("Fit into Scale", wxPropertyValue((bool*)&FitIntoScale), "bool"));
-		     }
+  sheet->AddProperty(new wxProperty(
+    "selection looks like",
+    wxPropertyValue(gScaleNames[s + 2].first),
+    "string"));
+  sheet->AddProperty(new wxProperty(
+    "Amount",
+    wxPropertyValue((long*) &Notes),
+    "integer",
+    new wxIntegerListValidator(-12, 12)));
+  sheet->AddProperty(new wxProperty(
+    "Fit into Scale",
+    wxPropertyValue((bool*)&FitIntoScale),
+    "bool"));
+}
 
 // **************************************************************************
 // SetChannel
@@ -317,7 +323,7 @@ void tSetChannelDlg::AddProperties()
 //                        new wxList(wxMakeConstraintRange(1.0, 16.0), 0)));
 //   Add(wxMakeFormNewLine());
   // AssociatePanel(panel);
-  
+
   sheet->AddProperty(new wxProperty("new Channel", wxPropertyValue((long*)&NewChannel), "integer", new wxIntegerListValidator(1, 16)));
 }
 
@@ -352,21 +358,23 @@ void tVelocityDlg::OnHelp()
   gpHelpInstance->ShowTopic("Velocity");
 }
 
-static tNamedValue modes[] =
-    {
-      tNamedValue( "Set",   8 ),
-      tNamedValue( "Add", 12 ),
-      tNamedValue( "Sub", 16 ),
-      tNamedValue(   0,      1  )
-};
-
 void tVelocityDlg::AddProperties()
 {
-  
-    sheet->AddProperty(new wxProperty("Start",  wxPropertyValue((long*)&FromValue), "integer", new wxIntegerListValidator(0, 127)));
-    sheet->AddProperty(new wxProperty("Stop",  wxPropertyValue((long*)&ToValue), "integer", new wxIntegerListValidator(0, 127)));
-    sheet->AddProperty(new wxProperty("Mode",  tNamedValueListValue((long*)&Mode, modes), "props", new tNamedValueListValidator(modes)));
-
+  sheet->AddProperty(new wxProperty(
+    "Start",
+    wxPropertyValue((long*)&FromValue),
+    "integer",
+    new wxIntegerListValidator(0, 127)));
+  sheet->AddProperty(new wxProperty(
+    "Stop",
+    wxPropertyValue((long*)&ToValue),
+    "integer",
+    new wxIntegerListValidator(0, 127)));
+  sheet->AddProperty(new wxProperty(
+    "Mode",
+    tNamedValueListValue(&Mode, gModes),
+    "props",
+    new tNamedValueListValidator(gModes)));
 }
 
 
@@ -379,7 +387,7 @@ void tVelocityDlg::AddProperties()
 int tLengthDlg::FromValue = 30;
 int tLengthDlg::ToValue = 0;
 
- int  tLengthDlg::Mode;
+int tLengthDlg::Mode;
 
 tLengthDlg::tLengthDlg(JZEventFrame *w, tFilter *f)
 : tPropertyListDlg("Length")
@@ -413,7 +421,11 @@ void tLengthDlg::OnHelp()
 
 void tLengthDlg::AddProperties()
 {
-  sheet->AddProperty(new wxProperty("Ticks/Quarter",  wxPropertyValue((long)Song->TicksPerQuarter), "integer", new wxIntegerListValidator(-16, 16)));  //r/o
+  sheet->AddProperty(new wxProperty(
+    "Ticks/Quarter",
+    wxPropertyValue((long)Song->TicksPerQuarter),
+    "integer",
+    new wxIntegerListValidator(-16, 16)));  //r/o
 
   sheet->AddProperty(new wxProperty(
     "Start",
@@ -427,9 +439,9 @@ void tLengthDlg::AddProperties()
     new wxIntegerListValidator(0, Song->TicksPerQuarter * 4)));
   sheet->AddProperty(new wxProperty(
     "Mode",
-    tNamedValueListValue((long*)&Mode, modes),
+    tNamedValueListValue(&Mode, gModes),
     "props",
-    new tNamedValueListValidator(modes)));
+    new tNamedValueListValidator(gModes)));
 }
 
 
@@ -530,7 +542,7 @@ void tMidiDelayDlg::AddProperties()
   //   Add(wxMakeFormShort("Repeats ", &repeat, wxFORM_DEFAULT,
   //                        new wxList(wxMakeConstraintRange(0.0, 100.0), 0)));
   //   Add(wxMakeFormNewLine());
-  
+
   //   AssociatePanel(panel);
 
   //System 2:
@@ -539,9 +551,6 @@ void tMidiDelayDlg::AddProperties()
   //   sheet->AddProperty(new wxProperty("Repeats",  wxPropertyValue((long*)&repeat), "integer", new wxIntegerListValidator(0, 100)));
 
   //System 3:
-
-
-
 }
 
 
@@ -593,7 +602,7 @@ void tDeleteDlg::AddProperties()
 // Snap
 // *************************************************************************
 
-tSnapDlg::tSnapDlg(JZPianoFrame* w, long *snapptr)
+tSnapDlg::tSnapDlg(JZPianoFrame* w, int* snapptr)
   : tPropertyListDlg("Snap:quantize cut/paste events")
 {
 //, Steps("Snap value", limitSteps, snapptr)
@@ -626,9 +635,12 @@ void tSnapDlg::AddProperties()
 //   Add(Steps.mkFormItem(100));
 //   Add(wxMakeFormNewLine());
 //   AssociatePanel(panel);
-   sheet->AddProperty(new wxProperty("Steps", tNamedValueListValue((long*)ptr, limitSteps) , 
-  				    "props", new tNamedValueListValidator(limitSteps)))  ; //limitSteps is a name/value pair array in util.cpp
 
+   sheet->AddProperty(new wxProperty(
+     "Steps",
+     tNamedValueListValue(ptr, gLimitSteps),
+     "props",
+     new tNamedValueListValidator(gLimitSteps)));
 }
 
 
@@ -638,26 +650,13 @@ void tSnapDlg::AddProperties()
 
 bool tQuantizeDlg::NoteStart = 1;
 bool tQuantizeDlg::NoteLength = 0;
-long tQuantizeDlg::QntStep = 16;
-int  tQuantizeDlg::Delay = 0;
-int  tQuantizeDlg::Groove = 0;
-
-static tNamedValue QntSteps[] =
-{
-  tNamedValue( "1/8",   8 ),
-  tNamedValue( "1/12", 12 ),
-  tNamedValue( "1/16", 16 ),
-  tNamedValue( "1/24", 24 ),
-  tNamedValue( "1/32", 32 ),
-  tNamedValue( "1/48", 48 ),
-  tNamedValue( "1/96", 96 ),
-  tNamedValue(  0,      1  )
-};
-
+int tQuantizeDlg::QntStep = 16;
+int tQuantizeDlg::Delay = 0;
+int tQuantizeDlg::Groove = 0;
 
 tQuantizeDlg::tQuantizeDlg(JZEventFrame *w, tFilter *f)
    : tPropertyListDlg("Quantize" )
-  //, Steps("steps", QntSteps, &QntStep)
+  //, Steps("steps", gQntSteps, &gQntStep)
 {
   Filter = f;
   Song = f->Song;
@@ -911,7 +910,7 @@ class tControlDlg : public tChEventDlg
  public:
 
   int Value;
-  long Control;
+  int Control;
   //tNamedChoice Choice;
 
   tControlDlg(tControl *e, JZPianoFrame* w, tTrack *t);
@@ -923,7 +922,7 @@ class tControlDlg : public tChEventDlg
 
 tControlDlg::tControlDlg(tControl *e, JZPianoFrame* w, tTrack *t)
   : tChEventDlg(e, w, t)
-  //,    Choice("Controller", &Config.CtrlName(0), &Control)
+  //,    Choice("Controller", &gpConfig->CtrlName(0), &Control)
 {
   Event = e;
   Value = e->Value;
@@ -942,14 +941,27 @@ bool tControlDlg::OnClose()
 void tControlDlg::AddProperties()
 {
   //  Add(Choice.mkFormItem(300, 300));
- //,    Choice("Controller", &Config.CtrlName(0), &Control)
-     sheet->AddProperty(new wxProperty("Controller", tNamedValueListValue((long*)Control, &Config.CtrlName(0)) , 
-				       "props", new tNamedValueListValidator(&Config.CtrlName(0))))  ;
+ //,    Choice("Controller", &gpConfig->CtrlName(0), &Control)
+  sheet->AddProperty(new wxProperty(
+    "Controller",
+    tNamedValueListValue(&Control, gpConfig->GetControlNames()),
+    "props",
+    new tNamedValueListValidator(gpConfig->GetControlNames())));
 
-  sheet->AddProperty(new wxProperty("Value", wxPropertyValue((long*)&Value), "integer", new wxIntegerListValidator(0,127)));
-  //  Add(wxMakeFormShort("Value:", &Value, wxFORM_DEFAULT, new wxList(wxMakeConstraintRange(0.0, 127.0), 0)));
+  sheet->AddProperty(new wxProperty(
+    "Value",
+    wxPropertyValue((long*)&Value),
+    "integer", new wxIntegerListValidator(0,127)));
+
+//  Add(wxMakeFormShort(
+//    "Value:",
+//    &Value,
+//    wxFORM_DEFAULT,
+//    new wxList(wxMakeConstraintRange(0.0, 127.0), 0)));
+
   tChEventDlg::AddProperties();
 }
+
 // -------------------------------- Play track ---------------------------
 
 class tPlayTrackDlg : public tEventDlg
@@ -957,7 +969,7 @@ class tPlayTrackDlg : public tEventDlg
  public:
 
   long transpose;
-  long track;
+  int track;
   int eventlength;
 
   tNamedChoice Choice;
@@ -971,7 +983,7 @@ class tPlayTrackDlg : public tEventDlg
 
 tPlayTrackDlg::tPlayTrackDlg(tPlayTrack *e, JZPianoFrame* w, tTrack *t)
   : tEventDlg(e, w, t),
-    Choice("playtrack", &Config.CtrlName(0), &track)
+    Choice("playtrack", gpConfig->GetControlNames(), &track)
 {
   Event = e;
   track = e->track;
@@ -1006,7 +1018,7 @@ class tTextDlg : public tEventDlg
  public:
 
   char* text;
-  long track;
+  int track;
   tNamedChoice Choice;
 
   tTextDlg(tText *e, JZPianoFrame* w, tTrack *t);
@@ -1018,7 +1030,7 @@ class tTextDlg : public tEventDlg
 
 tTextDlg::tTextDlg(tText *e, JZPianoFrame* w, tTrack *t)
   : tEventDlg(e, w, t),
-    Choice("text", &Config.CtrlName(0), &track)
+    Choice("text", gpConfig->GetControlNames(), &track)
 {
   Event = e;
   text=new char[2048];
@@ -1052,7 +1064,7 @@ void tTextDlg::AddProperties()
 class tEndOfTrackDlg : public tEventDlg
 {
  public:
-  long track;
+  int track;
 
   tNamedChoice Choice;
 
@@ -1065,7 +1077,7 @@ class tEndOfTrackDlg : public tEventDlg
 
 tEndOfTrackDlg::tEndOfTrackDlg(tEndOfTrack *e, JZPianoFrame* w, tTrack *t)
   : tEventDlg(e, w, t),
-    Choice("End Of Track", &Config.CtrlName(0), &track)
+    Choice("End Of Track", gpConfig->GetControlNames(), &track)
 {
 
 }
@@ -1090,7 +1102,7 @@ class tProgramDlg : public tEventDlg
 {
  public:
 
-  long Program;
+  int Program;
   //  tNamedChoice Choice;
 
   tProgramDlg(tProgram *e, JZPianoFrame* w, tTrack *t);
@@ -1103,7 +1115,7 @@ class tProgramDlg : public tEventDlg
 tProgramDlg::tProgramDlg(tProgram *e, JZPianoFrame* w, tTrack *t)
   : tEventDlg(e, w, t),
     Program(e->Program + 1)
-  //,    Choice("Program", &Config.VoiceName(0), &Program)
+  //,    Choice("Program", &gpConfig->VoiceName(0), &Program)
 {
   Event = e;
 }
@@ -1121,8 +1133,11 @@ bool tProgramDlg::OnClose()
 void tProgramDlg::AddProperties()
 {
   //Add(Choice.mkFormItem(300, 300));
-  sheet->AddProperty(new wxProperty("Program", tNamedValueListValue((long*)Program, &Config.VoiceName(0)) , 
-				       "props", new tNamedValueListValidator(&Config.VoiceName(0))))  ;
+  sheet->AddProperty(new wxProperty(
+    "Program",
+    tNamedValueListValue(&Program, gpConfig->GetVoiceNames()),
+    "props",
+    new tNamedValueListValidator(gpConfig->GetVoiceNames())));
 }
 
 

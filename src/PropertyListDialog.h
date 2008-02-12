@@ -39,17 +39,27 @@
 #include "DeprecatedWx/proplist.h"
 #include "DeprecatedWx/propform.h"
 
+#include <vector>
+#include <string>
 
 class tNamedValueListValue : public wxPropertyValue
 {
-  DECLARE_DYNAMIC_CLASS(tNamedValueListValue)
-  tNamedValue* nval;
-public:
-  tNamedValueListValue(void):wxPropertyValue(){}
-  tNamedValueListValue(long* val, tNamedValue* nval):wxPropertyValue(val)
-  {
-    this->nval=nval;
-  }
+//  DECLARE_DYNAMIC_CLASS(tNamedValueListValue)
+
+  public:
+
+//    tNamedValueListValue()
+//      : wxPropertyValue()
+//    {
+//    }
+
+    tNamedValueListValue(
+      int* pValue,
+      const std::vector<std::pair<std::string, int> >& Pairs)
+      : wxPropertyValue(pValue),
+        mPairs(Pairs)
+    {
+    }
 
   //overriding these doesnt really work in the display area
 /*   virtual wxString GetStringRepresentation(void){ */
@@ -60,6 +70,10 @@ public:
 /*     return 42; */
 /*   } */
 
+  private:
+
+//    tNamedValue* nval;
+    const std::vector<std::pair<std::string, int> >& mPairs;
 };
 
 
@@ -74,10 +88,10 @@ class tPropertyListDlg
   void Create();
   void CreateModal();
   virtual bool OnClose();
-  virtual void OnPropertyChanged(wxProperty *property);
+  virtual void OnPropertyChanged(wxProperty* pProperty);
  protected:
-  wxPropertySheet *sheet;
-  wxPropertyListView *view;
+  wxPropertySheet* sheet;
+  wxPropertyListView* view;
   wxPropertyValidatorRegistry *myListValidatorRegistry;//cannot be a temporary! leads to a crash
   wxString title;
 
@@ -85,25 +99,76 @@ class tPropertyListDlg
 
 class tNamedValueListValidator : public wxStringListValidator
 {
-    tNamedValue *Values;
- public:
-  tNamedValueListValidator(tNamedValue *v);
-  int MapName2Value(const char* Selection);
-  wxString MapValue2Name(int value);
-  
-  ~tNamedValueListValidator(void);
-  virtual bool OnSelect(bool select, wxProperty *property, wxPropertyListView *view, wxWindow *parentWindow);
-  virtual bool OnDoubleClick(wxProperty *WXUNUSED(property), wxPropertyListView *WXUNUSED(view), wxWindow *WXUNUSED(parentWindow) );
-  virtual bool OnValueListSelect(wxProperty *property, wxPropertyListView *view, wxWindow *parentWindow);
-  virtual bool OnPrepareControls( wxProperty *WXUNUSED(property), wxPropertyListView *WXUNUSED(view), wxWindow *WXUNUSED(parentWindow) );
-  virtual bool OnClearControls(wxProperty *property, wxPropertyListView *view, wxWindow *parentWindow);
-  virtual bool OnPrepareDetailControls( wxProperty *WXUNUSED(property), wxPropertyListView *WXUNUSED(view), wxWindow *WXUNUSED(parentWindow) );
-  virtual bool OnClearDetailControls( wxProperty *WXUNUSED(property), wxPropertyListView *WXUNUSED(view), wxWindow *WXUNUSED(parentWindow) );
-  virtual void OnEdit(wxProperty *property, wxPropertyListView *view, wxWindow *parentWindow);
-  virtual bool OnCheckValue( wxProperty *WXUNUSED(property), wxPropertyListView *WXUNUSED(view), wxWindow *WXUNUSED(parentWindow) );
-  virtual bool OnRetrieveValue(wxProperty *property, wxPropertyListView *view, wxWindow *parentWindow);
-  virtual bool OnDisplayValue(wxProperty *property, wxPropertyListView *view, wxWindow *parentWindow);
+  public:
 
+    tNamedValueListValidator(
+      const std::vector<std::pair<std::string, int> >& Values);
+
+    ~tNamedValueListValidator();
+
+    int MapName2Value(const char* pSelection);
+
+    wxString MapValue2Name(int Value);
+  
+    virtual bool OnSelect(
+      bool Select,
+      wxProperty* pProperty,
+      wxPropertyListView* pView,
+      wxWindow* pParentWindow);
+
+    virtual bool OnDoubleClick(
+      wxProperty* WXUNUSED(pProperty),
+      wxPropertyListView* WXUNUSED(pView),
+      wxWindow* WXUNUSED(pParentWindow));
+
+    virtual bool OnValueListSelect(
+      wxProperty* pProperty,
+      wxPropertyListView* pView,
+      wxWindow* pParentWindow);
+
+    virtual bool OnPrepareControls(
+      wxProperty* WXUNUSED(pProperty),
+      wxPropertyListView* WXUNUSED(pView),
+      wxWindow* WXUNUSED(pParentWindow));
+
+    virtual bool OnClearControls(
+      wxProperty* pProperty,
+      wxPropertyListView* pView,
+      wxWindow* pParentWindow);
+
+    virtual bool OnPrepareDetailControls(
+      wxProperty* WXUNUSED(pProperty),
+      wxPropertyListView* WXUNUSED(pView),
+      wxWindow* WXUNUSED(pParentWindow));
+
+    virtual bool OnClearDetailControls(
+      wxProperty* WXUNUSED(pProperty),
+      wxPropertyListView* WXUNUSED(pView),
+      wxWindow* WXUNUSED(pParentWindow));
+
+    virtual void OnEdit(
+      wxProperty* pProperty,
+      wxPropertyListView* pView,
+      wxWindow* pParentWindow);
+
+    virtual bool OnCheckValue(
+      wxProperty* WXUNUSED(pProperty),
+      wxPropertyListView* WXUNUSED(pView),
+      wxWindow* WXUNUSED(pParentWindow));
+
+    virtual bool OnRetrieveValue(
+      wxProperty* pProperty,
+      wxPropertyListView* pView,
+      wxWindow* pParentWindow);
+
+    virtual bool OnDisplayValue(
+      wxProperty* pProperty,
+      wxPropertyListView* pView,
+      wxWindow *pParentWindow);
+
+  private:
+
+    const std::vector<std::pair<std::string, int> >& mValues;
 };
 
 #endif // !defined(JZ_PROPERTYLISTDIALOG_H)

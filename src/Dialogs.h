@@ -52,7 +52,7 @@ class tCleanupDlg : public tPropertyListDlg
 {
   public:
 
-    static long lowLimit;	// 1/32
+    static int lowLimit;          // 1/32
     static bool shortenOverlaps;
 
     tFilter *Filter;
@@ -70,8 +70,8 @@ class tSearchReplaceDlg : public tPropertyListDlg
 {
   public:
 
-    static long frCtrl;
-    static long toCtrl;
+    static int frCtrl;
+    static int toCtrl;
 /*     tNamedChoice frList; */
 /*     tNamedChoice toList; */
 
@@ -92,7 +92,7 @@ class tTransposeDlg : public tPropertyListDlg
 
     static int  Notes;	// 0
     static bool FitIntoScale;
-    static long Scale;
+    static int Scale;
 
     JZEventFrame *EventWin;
     tFilter *Filter;
@@ -212,7 +212,7 @@ class tSnapDlg : public tPropertyListDlg
 {
   public:
 
-    tSnapDlg(JZPianoFrame *w, long *snapptr);
+    tSnapDlg(JZPianoFrame *w, int* snapptr);
     void AddProperties();
     //tNamedChoice Steps;
     bool OnClose();
@@ -221,18 +221,18 @@ class tSnapDlg : public tPropertyListDlg
   private:
 
     JZPianoFrame* win;
-    long* ptr;
+    int* ptr;
 };
 
 class tQuantizeDlg : public tPropertyListDlg
 {
   public:
 
-    static bool NoteStart;	// 1
-    static bool NoteLength;	// 0
-    static long QntStep;	// 1/16
-    static int  Groove;		// -x .. +x
-    static int  Delay;		// -x .. +x
+    static bool NoteStart;  // 1
+    static bool NoteLength; // 0
+    static int  QntStep;    // 1/16
+    static int  Groove;     // -x .. +x
+    static int  Delay;      // -x .. +x
 
     tFilter *Filter;
     JZSong   *Song;

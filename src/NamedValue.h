@@ -23,6 +23,8 @@
 #ifndef JZ_NAMEDVALUE_H
 #define JZ_NAMEDVALUE_H
 
+#include <string>
+
 //*****************************************************************************
 // tNamedValue is a name/value pair array.
 //*****************************************************************************
@@ -32,10 +34,25 @@ class tNamedValue
 
     tNamedValue();
 
-    tNamedValue(char* pName, long v);
+    tNamedValue(const char* pName, long Value);
 
-    char* Name;
-    long Value;
+    const std::string& GetName() const
+    {
+      return mName;
+    }
+
+    long GetValue() const
+    {
+      return mValue;
+    }
+
+    void Set(const char* pName, long Value);
+
+  private:
+
+    std::string mName;
+
+    long mValue;
 };
 
 #endif // !defined(JZ_NAMEDVALUE_H)

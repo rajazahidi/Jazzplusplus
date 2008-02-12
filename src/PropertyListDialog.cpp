@@ -233,16 +233,20 @@ void tPropertyListDlg::AddProperties()
 
 // map string on integer and store it
 
-tNamedValueListValidator::tNamedValueListValidator(tNamedValue *v)
+tNamedValueListValidator::tNamedValueListValidator(
+  const vector<pair<string, int> >& Values)
+  : mValues(Values)
 {
-  Values = v;
-  wxStringList* stringlist= new wxStringList();
-  for (int i = 0; Values[i].Name; i++)
+  wxStringList* stringlist = new wxStringList();
+  for (
+    vector<pair<string, int> >::const_iterator iValue = mValues.begin();
+    iValue != mValues.end();
+    ++iValue)
   {
     // omit empty entries
-    if (*Values[i].Name)
+    if (!iValue->first.empty())
     {
-      stringlist->Add(wxString(Values[i].Name));
+      stringlist->Add(wxString(iValue->first.c_str()));
     }
   }
 
@@ -258,21 +262,22 @@ tNamedValueListValidator::tNamedValueListValidator(tNamedValue *v)
 
 tNamedValueListValidator::~tNamedValueListValidator()
 {
-  //wxStringListValidator::~wxStringListValidator(); hmm...
 }
 
 int tNamedValueListValidator::MapName2Value(const char* Selection)
 {
-  int i;
   int Result = 0;
 
   if (Selection)
   {
-    for (i = 0; Values[i].Name; i++)
+    for (
+      vector<pair<string, int> >::const_iterator iValue = mValues.begin();
+      iValue != mValues.end();
+      ++iValue)
     {
-      if (!strcmp(Selection, Values[i].Name))
+      if (!strcmp(Selection, iValue->first.c_str()))
       {
-	Result = Values[i].Value;
+	Result = iValue->second;
 	break;
       }
     }
@@ -283,13 +288,14 @@ int tNamedValueListValidator::MapName2Value(const char* Selection)
 
 wxString tNamedValueListValidator::MapValue2Name(int value)
 {
-  int i;
-
-  for (i = 0; Values[i].Name; i++)
+  for (
+    vector<pair<string, int> >::const_iterator iValue = mValues.begin();
+    iValue != mValues.end();
+    ++iValue)
   {
-    if (value == Values[i].Value)
+    if (value == iValue->second)
     {
-      return wxString(Values[i].Name);
+      return wxString(iValue->first.c_str());
     }
   }
   return ::wxEmptyString;

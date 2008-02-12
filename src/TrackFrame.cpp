@@ -99,7 +99,12 @@ JZTrackFrame::JZTrackFrame(
 
   CreateMenu();
 
-  mpTrackWindow = new JZTrackWindow(this, pSong, wxPoint(0, 0), wxSize(600, 120));
+  mpTrackWindow = new JZTrackWindow(
+    this,
+    pSong,
+    wxPoint(0, 0),
+    wxSize(600, 120));
+
   mpTrackWindow->Create();
 
 //  mpPianoFrame = new JZPianoFrame(
@@ -108,10 +113,10 @@ JZTrackFrame::JZTrackFrame(
 //    wxDefaultPosition,
 //    wxSize(640, 480));
 
-  MetronomeInfo.IsAccented = Config(C_MetroIsAccented);
-  MetronomeInfo.Veloc = Config(C_MetroVelocity);
-  MetronomeInfo.KeyNorm = Config(C_MetroNormalClick);
-  MetronomeInfo.KeyAcc = Config(C_MetroAccentedClick);
+  MetronomeInfo.IsAccented = gpConfig->GetValue(C_MetroIsAccented);
+  MetronomeInfo.Veloc = gpConfig->GetValue(C_MetroVelocity);
+  MetronomeInfo.KeyNorm = gpConfig->GetValue(C_MetroNormalClick);
+  MetronomeInfo.KeyAcc = gpConfig->GetValue(C_MetroAccentedClick);
 }
 
 //-----------------------------------------------------------------------------
@@ -307,8 +312,8 @@ void JZTrackFrame::CreateMenu()
   setting_menu->Append(MEN_DEVICE, "&Midi Device...");
 #else
   if (
-    Config(C_MidiDriver) == eMidiDriverOss ||
-    Config(C_MidiDriver) == eMidiDriverAlsa)
+    gpConfig->GetValue(C_MidiDriver) == eMidiDriverOss ||
+    gpConfig->GetValue(C_MidiDriver) == eMidiDriverAlsa)
   {
     setting_menu->Append(MEN_DEVICE, "&Midi Device...");
   }

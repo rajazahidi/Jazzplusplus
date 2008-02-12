@@ -1271,31 +1271,36 @@ tSeq2Player::tSeq2Player(JZSong *song)
     return;
   }
   // from .jazz
-  mididev = Config(C_Seq2Device);
+  mididev = gpConfig->GetValue(C_Seq2Device);
   if (mididev < 0)
+  {
+    mididev = FindMidiDevice();
+    gpConfig->Put(C_Seq2Device, mididev);
+
+    if (mididev < 0)
     {
-      mididev = FindMidiDevice();
-      Config(C_Seq2Device) = mididev;
-
-      Config.Put( C_Seq2Device, mididev );
-
-      if (mididev < 0)
-        return;  // Installed() == FALSE
+      return;  // Installed() == FALSE
     }
+  }
 
   synth_info sinfo;
 
   sinfo.device = mididev;
   if (ioctl(seqfd, SNDCTL_SYNTH_INFO, &sinfo) < 0)
+  {
     perror("sndctl_synth_info");
+  }
 
   card_id = -1;
-  if (!strncmp( "MPU-401", sinfo.name, 7)) {
+  if (!strncmp( "MPU-401", sinfo.name, 7))
+  {
     card_id = SNDCARD_MPU401;
   }
 
-  if (Config(C_SoftThru))
+  if (gpConfig->GetValue(C_SoftThru))
+  {
     through = new tOSSThru();
+  }
 }
 
 
@@ -1368,16 +1373,20 @@ tSeq2Player::~tSeq2Player()
 
 void tSeq2Player::SetSoftThru(int on, int idummy, int odummy)
 {
-  Config(C_SoftThru) = on;
+  gpConfig->Put(C_SoftThru, on);
   if (on)
   {
     if (!through)
+    {
       through = new tOSSThru();
+    }
   }
   else
   {
     if (through)
+    {
       delete through;
+    }
     through = 0;
   }
 }
@@ -1386,7 +1395,9 @@ void tSeq2Player::SetSoftThru(int on, int idummy, int odummy)
 int tSeq2Player::OutEvent(JZEvent *e, int now)
 {
   if (!now)
+  {
     OutBreak(e->Clock);
+  }
 
   int Stat = e->Stat;
   switch (Stat)
@@ -1545,23 +1556,38 @@ void tSeq2Player::StartPlay(long Clock, long LoopClock, int Continue)
   char buf[512];
   cout<<"tSeq2Player::StartPlay"<<endl;
   if (through)
+  {
     delete through;
+  }
   through = 0;
   if (ioctl(seqfd, SNDCTL_SEQ_RESET, 0) < 0)
+  {
     perror("ioctl reset");
+  }
 
-  if (card_id == SNDCARD_MPU401) {
-        int timer_mode;
-          switch (Config(C_ClockSource)) {
-                case CsInt:         timer_mode = TMR_INTERNAL; break;
-                case CsFsk:         timer_mode = TMR_EXTERNAL | TMR_MODE_FSK; break;
-                case CsMidi:         timer_mode = TMR_EXTERNAL | TMR_MODE_MIDI; break;
-                default:         timer_mode = TMR_INTERNAL; break;
-          }
+  if (card_id == SNDCARD_MPU401)
+  {
+    int timer_mode;
+    switch (gpConfig->GetValue(C_ClockSource))
+    {
+      case CsInt:
+        timer_mode = TMR_INTERNAL;
+        break;
+      case CsFsk:
+        timer_mode = TMR_EXTERNAL | TMR_MODE_FSK;
+        break;
+      case CsMidi:
+        timer_mode = TMR_EXTERNAL | TMR_MODE_MIDI;
+        break;
+      default:
+        timer_mode = TMR_INTERNAL;
+        break;
+    }
 
-        if (ioctl(seqfd, SNDCTL_TMR_SOURCE, &timer_mode) < 0)
-            perror("ioctl tmr_source");
-
+    if (ioctl(seqfd, SNDCTL_TMR_SOURCE, &timer_mode) < 0)
+    {
+      perror("ioctl tmr_source");
+    }
   }
 
   seqbuf_clear();
@@ -1617,8 +1643,10 @@ void tSeq2Player::StopPlay()
   ioctl(seqfd, SNDCTL_SEQ_SYNC);
   ioctl(seqfd, SNDCTL_SEQ_RESET, 0);
 
-  if (Config(C_SoftThru))
+  if (gpConfig->GetValue(C_SoftThru))
+  {
     through = new tOSSThru();
+  }
   TrackWin->NewPlayPosition(-1L);
   RecdBuffer.Keyoff2Length();
 }
@@ -1629,8 +1657,10 @@ void tSeq2Player::FlushToDevice()
 {
   tEventIterator Iterator(&PlayBuffer);
   JZEvent *e = Iterator.Range(0, OutClock);
-  if (e) {
-    do {
+  if (e)
+  {
+    do
+    {
       OutEvent(e);
       e->Kill();
       e = Iterator.Next();
@@ -1693,7 +1723,8 @@ long tSeq2Player::GetRealTimeClock()
             }
 
             // midi thru
-            if (Config(C_SoftThru)) {
+            if (gpConfig->GetValue(C_SoftThru))
+            {
               buf[i+1] = mididev;
               ioctl(seqfd, SNDCTL_SEQ_OUTOFBAND, &buf[i]);
             }
@@ -1722,7 +1753,8 @@ long tSeq2Player::GetRealTimeClock()
             }
 
             // midi thru
-            if (Config(C_SoftThru)) {
+            if (gpConfig->GetValue(C_SoftThru))
+            {
               buf[i+1] = mididev;
               ioctl(seqfd, SNDCTL_SEQ_OUTOFBAND, &buf[i]);
             }

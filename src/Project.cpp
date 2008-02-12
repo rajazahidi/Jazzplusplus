@@ -21,6 +21,8 @@
 //*****************************************************************************
 
 #include "WxWidgets.h"
+#include <wx/config.h>
+#include <wx/filename.h>
 
 #include "Project.h"
 #include "RecordingInfo.h"
@@ -43,69 +45,110 @@
 #include "AlsaDriver.h"
 #endif
 
+#include <fstream>
 #include <iostream>
 
 using namespace std;
 
+//*****************************************************************************
+// Description:
+//   This is the Jazz++ project class definition.  This is the top-level class
+// for Jazz++.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+wxString JZProject::mConfFileName = "jazz.cfg";
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZProject::JZProject()
-  : mpMidiPlayer(0),
+  : mpConfig(0),
+    mpMidiPlayer(0),
     mpSynth(0),
     mpRecInfo(0),
     mpSong(0),
     mChanged(false),
     mIsPlaying(false)
 {
-//  const char* pConfigurationFileName = "/tmp/jazz.cfg";
-//  Config.File();
-//  cout
-//    << "WARNING: Hardcoded the jazz.cfg path, because jazz mysteriously"
-//    << " isn't loading the configuration file."
-//    <<  endl;
-  wxString ConfigurationFileName = Config.File();
-
-  cout
-    << "JZJazzPlusPlusApplication::OnInit() ConfigurationFileName:" << '\n'
-    << '"' << ConfigurationFileName << '"'
-    << endl;
-
-  if (!ConfigurationFileName.IsEmpty())
+  if (gLimitSteps.empty())
   {
-    Config.LoadConfig(ConfigurationFileName);
-    DEBUG(
-      if (BankTable != (tDoubleCommand *) NULL)
-      {
-        for (int i = 0; BankTable[i].Command[0]>=0; i++)
-        {
-          cerr
-            << "Bank " << i << ": "
-            << BankTable[i].Command[0]
-            << ' ' << BankTable[i].Command[1]
-            << endl;
-        }
-      }
-    )
+    gLimitSteps.push_back(make_pair( "1/8",    8));
+    gLimitSteps.push_back(make_pair( "1/12",  12));
+    gLimitSteps.push_back(make_pair( "1/16",  16));
+    gLimitSteps.push_back(make_pair( "1/24",  24));
+    gLimitSteps.push_back(make_pair( "1/32",  32));
+    gLimitSteps.push_back(make_pair( "1/48",  48));
+    gLimitSteps.push_back(make_pair( "1/96",  96));
+    gLimitSteps.push_back(make_pair("1/192", 192));
   }
-  else
+
+  if (gModes.empty())
   {
-    wxMessageBox(
-      "Could not find configuration file.\n"
-      "Please set the environment variable JAZZ to the installation directory",
-      "Warning",
-      wxOK);
+    gModes.push_back(make_pair("Set",  8));
+    gModes.push_back(make_pair("Add", 12));
+    gModes.push_back(make_pair("Sub", 16));
   }
+
+  if (gScaleNames.empty())
+  {
+    gScaleNames.push_back(make_pair("C",   0));
+    gScaleNames.push_back(make_pair("C#",  1));
+    gScaleNames.push_back(make_pair("D",   2));
+    gScaleNames.push_back(make_pair("D#",  3));
+    gScaleNames.push_back(make_pair("E",   4));
+    gScaleNames.push_back(make_pair("F",   5));
+    gScaleNames.push_back(make_pair("F#",  6));
+    gScaleNames.push_back(make_pair("G",   7));
+    gScaleNames.push_back(make_pair("G#",  8));
+    gScaleNames.push_back(make_pair("A",   9));
+    gScaleNames.push_back(make_pair("A#", 10));
+    gScaleNames.push_back(make_pair("B",  11));
+    gScaleNames.push_back(make_pair("None", gScaleChromatic));
+    gScaleNames.push_back(make_pair("Selected", gScaleSelected));
+  }
+
+  if (gQntSteps.empty())
+  {
+    gQntSteps.push_back(make_pair("1/8",   8));
+    gQntSteps.push_back(make_pair("1/12", 12));
+    gQntSteps.push_back(make_pair("1/16", 16));
+    gQntSteps.push_back(make_pair("1/24", 24));
+    gQntSteps.push_back(make_pair("1/32", 32));
+    gQntSteps.push_back(make_pair("1/48", 48));
+    gQntSteps.push_back(make_pair("1/96", 96));
+  }
+
+  if (gSynthesizerTypes.empty())
+  {
+    gSynthesizerTypes.push_back(make_pair("GM", SynthTypeGM));
+    gSynthesizerTypes.push_back(make_pair("GS", SynthTypeGS));
+    gSynthesizerTypes.push_back(make_pair("XG", SynthTypeXG));
+    gSynthesizerTypes.push_back(make_pair("Other", SynthTypeOther));
+  }
+
+  if (gSynthesierTypeFiles.empty())
+  {
+    gSynthesierTypeFiles.push_back(make_pair("gm.jzi", SynthTypeGM));
+    gSynthesierTypeFiles.push_back(make_pair("gs.jzi", SynthTypeGS));
+    gSynthesierTypeFiles.push_back(make_pair("xg.jzi", SynthTypeXG));
+    gSynthesierTypeFiles.push_back(make_pair("other.jzi", SynthTypeOther));
+  }
+
+  mpConfig = new tConfig;
+  gpConfig = mpConfig;
+
+  ReadConfiguration();
 
   mNumBars = 0;
 
-  mMetronomeInfo.IsAccented = Config(C_MetroIsAccented);
-  mMetronomeInfo.Veloc = Config(C_MetroVelocity);
-  mMetronomeInfo.KeyNorm = Config(C_MetroNormalClick);
-  mMetronomeInfo.KeyAcc = Config(C_MetroAccentedClick);
+  mMetronomeInfo.IsAccented = mpConfig->GetValue(C_MetroIsAccented);
+  mMetronomeInfo.Veloc = mpConfig->GetValue(C_MetroVelocity);
+  mMetronomeInfo.KeyNorm = mpConfig->GetValue(C_MetroNormalClick);
+  mMetronomeInfo.KeyAcc = mpConfig->GetValue(C_MetroAccentedClick);
 
-  if (Config.StrValue(C_SynthType))
+  if (mpConfig->StrValue(C_SynthType))
   {
-    mpSynth = NewSynth(Config.StrValue(C_SynthType));
+    mpSynth = NewSynth(mpConfig->StrValue(C_SynthType));
   }
   else
   {
@@ -199,7 +242,7 @@ JZProject::JZProject()
   //--------------------------
   // Microsoft Windows Drivers
   //--------------------------
-  switch (Config(C_ClockSource))
+  switch (mpConfig->GetValue(C_ClockSource))
   {
     case CsMidi:
       mpMidiPlayer = new tWinMidiPlayer(mpSong);
@@ -243,7 +286,7 @@ JZProject::JZProject()
   {
     if ((wxTheApp->argc > opt) && isdigit(wxTheApp->argv[opt][0]))
     {
-      Config(i + C_TrackWinXpos) = atoi(wxTheApp->argv[opt]);
+      mpConfig->Put(i + C_TrackWinXpos, atoi(wxTheApp->argv[opt]));
     }
     else
     {
@@ -257,19 +300,19 @@ JZProject::JZProject()
   opt = GetOptionIndex( "-f" ) + 1;
   if (opt && (wxTheApp->argc > opt))
   {
-    gpStartUpSong = copystring(wxTheApp->argv[opt]);
+    gpStartUpSong = wxTheApp->argv[opt];
   }
   else
   {
-    gpStartUpSong = copystring(Config.StrValue(C_StartUpSong));
+    gpStartUpSong = mpConfig->StrValue(C_StartUpSong);
   }
-  FILE *fd = fopen(gpStartUpSong, "r");
+  FILE *fd = fopen(gpStartUpSong.c_str(), "r");
   if (fd)
   {
     fclose(fd);
     tStdRead io;
-    mpSong->Read(io, gpStartUpSong);
-//    if (strcmp(gpStartUpSong, "jazz.mid"))
+    mpSong->Read(io, gpStartUpSong.c_str());
+//    if (gpStartUpSong == string("jazz.mid"))
 //    {
 //      lasts = gpStartUpSong;
 //    }
@@ -289,6 +332,144 @@ JZProject::~JZProject()
   delete mpSynth;
   delete mpRecInfo;
   delete mpSong;
+  delete mpConfig;
+}
+
+//-----------------------------------------------------------------------------
+// Description:
+//   This function reads the Jazz++ configuration file (jazz.cfg).
+//-----------------------------------------------------------------------------
+void JZProject::ReadConfiguration()
+{
+  wxConfigBase* pConfig = wxConfigBase::Get();
+
+  // Get the current working directory and append a directory separator.
+  wxString CurrentWorkingDirectory =
+    ::wxGetCwd() + wxFileName::GetPathSeparator();
+
+  // Jazz++ should be distributed with a conf subdirectory under the
+  // executable directory.  This will be our initial guess for the location of
+  // the Jazz++ configuration file.
+  wxString ConfFileDirectoryGuess =
+    CurrentWorkingDirectory + "conf" + wxFileName::GetPathSeparator();
+
+  // Attempt to obtain the path to the Jazz++ configuration file from the
+  // wxWidgets Jazz++ configuration file.
+  wxString ConfFilePath;
+  bool WasConfPathRead = false;
+  if (pConfig)
+  {
+    WasConfPathRead = pConfig->Read(
+      "/Paths/Conf",
+      &ConfFilePath,
+      ConfFileDirectoryGuess);
+  }
+
+  // Construct a full Jazz++ configuration path and file name.
+  wxString ConfFileNameAndPath = ConfFilePath + mConfFileName;
+
+  // Test for the existence of the Jazz++ configuration file.
+  ifstream Is;
+  Is.open(ConfFileNameAndPath.c_str());
+  if (!Is)
+  {
+    // Close and clear the stream.
+    Is.close();
+    Is.clear();
+
+    // Return a valid path to the data.
+    FindAndRegisterConfFilePath(ConfFilePath);
+    ConfFileNameAndPath = ConfFilePath + mConfFileName;
+
+    // Try one more time.
+    Is.open(ConfFileNameAndPath.c_str());
+    if (!Is)
+    {
+      Is.close();
+      Is.clear();
+    }
+    else
+    {
+      wxMessageBox(
+        "Could not find configuration file.",
+        "Warning",
+        wxOK);
+    }
+  }
+
+  cout
+    << "JZProject::ReadConfiguration() ConfFileNameAndPath:" << '\n'
+    << '"' << ConfFileNameAndPath << '"'
+    << endl;
+
+  if (!ConfFileNameAndPath.IsEmpty())
+  {
+    mpConfig->LoadConfig(ConfFileNameAndPath);
+    DEBUG(
+      if (BankTable != (tDoubleCommand *) NULL)
+      {
+        for (int i = 0; BankTable[i].Command[0] >= 0; i++)
+        {
+          cerr
+            << "Bank " << i << ": "
+            << BankTable[i].Command[0]
+            << ' ' << BankTable[i].Command[1]
+            << endl;
+        }
+      }
+    )
+  }
+  else
+  {
+    wxMessageBox(
+      "Could not find configuration file.",
+      "Warning",
+      wxOK);
+  }
+}
+
+//-----------------------------------------------------------------------------
+// Description:
+//   The configuration file was not automatically found so give the user the
+// opportunity to search for it.  If it is found, create a wxWidgets-style
+// configuration entry so the code will find the configuration file path the
+// next time it starts.
+//
+// Returns:
+//   wxString&:
+//     A user selected path to the Jazz++ configuration file.
+//-----------------------------------------------------------------------------
+void JZProject::FindAndRegisterConfFilePath(wxString& ConfFilePath)
+{
+  wxString DialogTitle;
+  DialogTitle = "Please Indicate the Location of " + mConfFileName;
+
+  // Use an open dialog to find the Jazz++ configuration file.
+  // wxFD_CHANGE_DIR - Change the current working directory to the directory
+  // where the file(s) chosen by the user are.
+  wxFileDialog OpenDialog(
+    0,
+    DialogTitle,
+    "",
+    mConfFileName,
+    "*.cfg",
+    wxFD_OPEN | wxFD_CHANGE_DIR);
+  if (OpenDialog.ShowModal() == wxID_OK)
+  {
+    // Generate a c-style string that contains a path to the help file.
+    wxString TempConfFilePath;
+    TempConfFilePath = ::wxPathOnly(OpenDialog.GetPath());
+    TempConfFilePath += ::wxFileName::GetPathSeparator();
+
+    wxConfigBase* pConfig = wxConfigBase::Get();
+    if (pConfig)
+    {
+      pConfig->Write("/Paths/Conf", TempConfFilePath);
+    }
+
+    // Return the user selected help file path.
+    ConfFilePath = TempConfFilePath;
+  }
 }
 
 //-----------------------------------------------------------------------------

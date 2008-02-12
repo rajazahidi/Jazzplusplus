@@ -137,9 +137,16 @@ class JZProject : public JZSong
 
   private:
 
-    // They are currently used as a holding pen for
-    // loose global variables while the globals are brought under control,
-    // again.
+    void ReadConfiguration();
+
+    void FindAndRegisterConfFilePath(wxString& ConfFilePath);
+
+  private:
+
+    static wxString mConfFileName;
+
+    tConfig* mpConfig;
+
     tPlayer* mpMidiPlayer;
 
     JZSynth* mpSynth;

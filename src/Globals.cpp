@@ -28,7 +28,11 @@
 #include "NamedValue.h"
 #include "Project.h"
 
-char* gpStartUpSong = 0;
+using namespace std;
+
+string gpStartUpSong;
+
+tConfig* gpConfig = 0;
 
 JZSong* gpSong = 0;
 
@@ -36,17 +40,20 @@ JZSynth* gpSynth = 0;
 
 tHelp* HelpInstance = 0;
 
-tNamedValue limitSteps[] =
-{
-  tNamedValue( "1/8",   8 ),
-  tNamedValue( "1/12", 12 ),
-  tNamedValue( "1/16", 16 ),
-  tNamedValue( "1/24", 24 ),
-  tNamedValue( "1/32", 32 ),
-  tNamedValue( "1/48", 48 ),
-  tNamedValue( "1/96", 96 ),
-  tNamedValue( "1/192", 192 ),
-  tNamedValue(   0,      1  )
-};
+vector<pair<string, int> > gLimitSteps;
+
+vector<pair<string, int> > gModes;
+
+// 0..11 are the C...B major keys.
+const int gScaleChromatic = 12;
+const int gScaleSelected  = 13;
+
+vector<pair<string, int> > gScaleNames;
+
+vector<pair<string, int> > gQntSteps;
+
+vector<pair<string, int> > gSynthesizerTypes;
+
+vector<pair<string, int> > gSynthesierTypeFiles;
 
 JZProject* gpProject = 0;

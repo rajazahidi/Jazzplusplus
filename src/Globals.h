@@ -23,20 +23,31 @@
 #ifndef JZ_GLOBALS_H
 #define JZ_GLOBALS_H
 
+#include <vector>
+#include <string>
+
 // #define DEBUG(x) x
 #define DEBUG(x)
 
+class tConfig;
 class JZSong;
 class JZSynth;
 class tHelp;
-class tNamedValue;
 class JZProject;
 
-extern char* gpStartUpSong;
+extern tConfig* gpConfig;
+extern std::string gpStartUpSong;
 extern JZSong* gpSong;
 extern JZSynth* gpSynth;
 extern tHelp* HelpInstance;
-extern tNamedValue limitSteps[];
+extern std::vector<std::pair<std::string, int> > gLimitSteps;
+extern std::vector<std::pair<std::string, int> > gModes;
+extern const int gScaleChromatic;
+extern const int gScaleSelected;
+extern std::vector<std::pair<std::string, int> > gScaleNames;
+extern std::vector<std::pair<std::string, int> > gQntSteps;
+extern std::vector<std::pair<std::string, int> > gSynthesizerTypes;
+extern std::vector<std::pair<std::string, int> > gSynthesierTypeFiles;
 extern JZProject* gpProject;
 
 #endif // !defined(JZ_GLOBALS_H)

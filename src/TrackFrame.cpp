@@ -29,6 +29,7 @@
 #include "JazzPlusPlusApplication.h"
 #include "ToolBar.h"
 #include "PianoFrame.h"
+#include "Project.h"
 #include "Globals.h"
 #include "Configuration.h"
 #include "AboutDialog.h"
@@ -63,6 +64,8 @@ JZTrackFrame* TrackWin = 0;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(JZTrackFrame, wxFrame)
+
+  EVT_MENU(wxID_OPEN, JZTrackFrame::OnFileOpen)
 
   EVT_MENU(wxID_EXIT, JZTrackFrame::OnFileExit)
 
@@ -386,6 +389,33 @@ bool JZTrackFrame::OnClose()
 
 //OLD  delete the_harmony_browser;
   return true;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnFileOpen(wxCommandEvent& Event)
+{
+  // Use an open dialog to find the Jazz++ configuration file.
+  // wxFD_CHANGE_DIR - Change the current working directory to the directory
+  // where the file(s) chosen by the user are.
+  wxFileDialog OpenDialog(
+    0,
+    "Load MIDI File",
+    "",
+    "",
+    "*.mid",
+    wxFD_OPEN | wxFD_CHANGE_DIR);
+  if (OpenDialog.ShowModal() == wxID_OK)
+  {
+    wxString FileName = OpenDialog.GetPath();
+    gpProject->OpenSong(FileName);
+    SetTitle(FileName);
+//    NextWin->NewPosition(1, 0);
+//    Canvas->SetScrollRanges();
+//    NextWin->Canvas->SetScrollRanges();
+    Refresh();
+//    tTrack::changed = false;
+  }
 }
 
 //-----------------------------------------------------------------------------

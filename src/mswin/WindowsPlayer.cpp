@@ -28,35 +28,17 @@
 #include "TrackFrame.h"
 #include "Dialogs.h"
 #include "MidiDeviceDialog.h"
+#include "Globals.h"
 
-#include <dos.h>
+//#include <dos.h>
+
+using namespace std;
 
 // for msvc uncomment these
 #ifdef _MSC_VER
 #define enable()
 #define disable()
 #endif
-
-#if 0
-FILE* logfile;
-#define OPENLOG logfile=fopen("logfile.txt","wt")
-#define CLOSELOG fclose(logfile)
-#define LOG(a,b,c) fprintf(a,b,c)
-#endif
-
-#if 0
-/* got these unresolved externals with wx166F and VC++ 5.0 */
-extern "C" {
-int  PROIO_yywrap(void)
-{
-  return 1;
-}
-void *alloca(size_t size) { return malloc(size); }
-}
-#endif
-
-char wxDummyChar = 0;
-
 
 //*****************************************************************************
 //*****************************************************************************
@@ -75,14 +57,14 @@ tWinPlayer::tWinPlayer(JZSong* pSong)
   state->play_buffer.clear();
   state->thru_buffer.clear();
   state->playing = FALSE;
-  state->soft_thru = Config(C_SoftThru);
+  state->soft_thru = gpConfig->GetValue(C_SoftThru);
   state->doing_mtc_rec = FALSE;
   state->audio_player = 0;
 
   long ilong = -1, olong = -1;
   if (
-    !Config.Get(C_WinInputDevice, ilong) ||
-    !Config.Get(C_WinOutputDevice, olong))
+    !gpConfig->Get(C_WinInputDevice, ilong) ||
+    !gpConfig->Get(C_WinOutputDevice, olong))
   {
     SettingsDlg(ilong, olong);
   }
@@ -97,7 +79,7 @@ tWinPlayer::tWinPlayer(JZSong* pSong)
   {
     UINT dev = (UINT)ilong;
     UINT rc;
-    switch (Config(C_ClockSource))
+    switch (gpConfig->GetValue(C_ClockSource))
     {
       case CsMidi:
         rc = midiInOpen(
@@ -210,86 +192,6 @@ tWinPlayer::~tWinPlayer()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinPlayer::SettingsDlg(long& InputDevice, long& OutputDevice)
-{
-  tNamedValue Devs[MAX_MIDI_DEVS];
-  UINT i;
-
-  // select input device
-  UINT InputMidiDeviceCount = midiInGetNumDevs();
-  for (i = 0; i < InputMidiDeviceCount; ++i)
-  {
-    MIDIINCAPS caps;
-    midiInGetDevCaps(i, &caps, sizeof(caps));
-    Devs[i].Name = copystring(caps.szPname);
-    Devs[i].Value = i;
-  }
-  Devs[i].Name = 0;
-  Devs[i].Value = 0;
-
-  if (InputMidiDeviceCount > 0)
-  {
-    JZMidiDeviceDialog MidiInputDeviceDialog(
-      Devs,
-      InputDevice,
-      ::wxGetApp().GetMainFrame(),
-      "Input MIDI device");
-    MidiInputDeviceDialog.ShowModal();
-  }
-
-  for (i = 0; i < InputMidiDeviceCount; ++i)
-  {
-    delete [] Devs[i].Name;
-  }
-
-  // select output device
-  UINT OutputMidiDeviceCount = midiOutGetNumDevs();
-  for (i = 0; i < OutputMidiDeviceCount; ++i)
-  {
-    MIDIOUTCAPS caps;
-    midiOutGetDevCaps(i, &caps, sizeof(caps));
-    Devs[i].Name = copystring(caps.szPname);
-    Devs[i].Value = i;
-  }
-  Devs[i].Name = copystring("Midi Mapper");
-  Devs[i].Value = MAX_MIDI_DEVS;
-  ++i;
-  Devs[i].Name = 0;
-  Devs[i].Value = 0;
-
-  JZMidiDeviceDialog MidiOutputDeviceDialog(
-    Devs,
-    OutputDevice,
-    TrackWin,
-    "Output MIDI device");
-  MidiOutputDeviceDialog.ShowModal();
-
-  for (i = 0; i < OutputMidiDeviceCount + 1; ++i)
-  {
-    delete [] Devs[i].Name;
-  }
-
-  if (InputDevice >= 0)
-  {
-    Config.Put(C_WinInputDevice, InputDevice);
-  }
-  else
-  {
-    Config.Get(C_WinInputDevice, InputDevice);
-  }
-
-  if (OutputDevice >= 0)
-  {
-    Config.Put(C_WinOutputDevice, OutputDevice);
-  }
-  else
-  {
-    Config.Get(C_WinOutputDevice, OutputDevice);
-  }
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 void tWinPlayer::SetSoftThru(int on, int InputDevice, int OutputDevice)
 {
   state->soft_thru = on;
@@ -326,7 +228,7 @@ JZEvent *tWinPlayer::Dword2Event(DWORD dw)
       break;
 
     case 0xB0:
-	if (u.c[1] != 0x7b)
+      if (u.c[1] != 0x7b)
           e = new tControl(0, u.c[0] & 0x0f, u.c[1], u.c[2]);
       break;
 
@@ -361,63 +263,63 @@ DWORD tWinPlayer::Event2Dword(JZEvent *e)
   {
     case StatKeyOn:
       {
-	tKeyOn *k = e->IsKeyOn();
-	u.c[0] = 0x90 | k->Channel;
-	u.c[1] = k->Key;
-	u.c[2] = k->Veloc;
+        tKeyOn *k = e->IsKeyOn();
+        u.c[0] = 0x90 | k->Channel;
+        u.c[1] = k->Key;
+        u.c[2] = k->Veloc;
       }
       break;
 
     case StatKeyOff:
       {
-	tKeyOff *k = e->IsKeyOff();
-	u.c[0] = 0x80 | k->Channel;
-	u.c[1] = k->Key;
-	u.c[2] = 0;
+        tKeyOff *k = e->IsKeyOff();
+        u.c[0] = 0x80 | k->Channel;
+        u.c[1] = k->Key;
+        u.c[2] = 0;
       }
       break;
 
     case StatProgram:
       {
-	tProgram *k = e->IsProgram();
-	u.c[0] = 0xC0 | k->Channel;
-	u.c[1] = k->Program;
+        tProgram *k = e->IsProgram();
+        u.c[0] = 0xC0 | k->Channel;
+        u.c[1] = k->Program;
       }
       break;
 
     case StatChnPressure:
       {
-	tChnPressure *k = e->IsChnPressure();
-	u.c[0] = 0xC0 | k->Channel;
-	u.c[1] = k->Value;
+        tChnPressure *k = e->IsChnPressure();
+        u.c[0] = 0xC0 | k->Channel;
+        u.c[1] = k->Value;
       }
       break;
 
     case StatControl:
       {
-	tControl *k = e->IsControl();
-	u.c[0] = 0xB0 | k->Channel;
-	u.c[1] = k->Control;
-	u.c[2] = k->Value;
+        tControl *k = e->IsControl();
+        u.c[0] = 0xB0 | k->Channel;
+        u.c[1] = k->Control;
+        u.c[2] = k->Value;
       }
       break;
 
     case StatKeyPressure:
       {
-	tKeyPressure *k = e->IsKeyPressure();
-	u.c[0] = 0xA0 | k->Channel;
-	u.c[1] = k->Key;
-	u.c[2] = k->Value;
+        tKeyPressure *k = e->IsKeyPressure();
+        u.c[0] = 0xA0 | k->Channel;
+        u.c[1] = k->Key;
+        u.c[2] = k->Value;
       }
       break;
 
     case StatPitch:
       {
-	tPitch *k = e->IsPitch();
-	int     v = k->Value + 8192;
-	u.c[0] = 0xE0 | k->Channel;
-	u.c[1] = (unsigned char)(v & 0x7F);
-	u.c[2] = (unsigned char)(v >> 7);
+        tPitch *k = e->IsPitch();
+        int     v = k->Value + 8192;
+        u.c[0] = 0xE0 | k->Channel;
+        u.c[1] = (unsigned char)(v & 0x7F);
+        u.c[2] = (unsigned char)(v >> 7);
       }
       break;
 
@@ -616,7 +518,7 @@ void tWinPlayer::FillMidiClocks( long to )
 //-----------------------------------------------------------------------------
 void tWinPlayer::OutBreak(long clock)
 {
-  if (Config(C_RealTimeOut))
+  if (gpConfig->GetValue(C_RealTimeOut))
   {
     FillMidiClocks( OutClock );
     FlushToDevice( OutClock );
@@ -631,7 +533,7 @@ void tWinPlayer::OutBreak(long clock)
 //-----------------------------------------------------------------------------
 void tWinMidiPlayer::OutBreak(long clock)
 {
-  if (Config(C_RealTimeOut))
+  if (gpConfig->GetValue(C_RealTimeOut))
   {
     FillMidiClocks( OutClock );
     FlushToDevice( OutClock );
@@ -682,7 +584,7 @@ void tWinPlayer::StartPlay(long Clock, long LoopClock, int Continue)
   state->time_per_tick = 60000000L / state->ticks_per_minute;
   state->time_correction   = 0;
 
-  if (Config(C_ClockSource) == CsMtc)
+  if (gpConfig->GetValue(C_ClockSource) == CsMtc)
   {
     if (state->doing_mtc_rec)
     {
@@ -716,7 +618,7 @@ void tWinPlayer::StartPlay(long Clock, long LoopClock, int Continue)
   state->playing = TRUE;  // allow for SetTempo in OutNow()
   tPlayer::StartPlay(Clock, LoopClock, Continue);
 
-  if (Config(C_RealTimeOut))
+  if (gpConfig->GetValue(C_RealTimeOut))
   {
     tMetaEvent *e;
     if (!Continue)
@@ -728,7 +630,8 @@ void tWinPlayer::StartPlay(long Clock, long LoopClock, int Continue)
   }
 
 
-  switch (Config(C_ClockSource)) {
+  switch (gpConfig->GetValue(C_ClockSource))
+  {
     case CsMidi:
       state->virtual_clock = Clock - state->ticks_per_signal;
       state->signal_time = state->start_time - 5000L;
@@ -765,7 +668,12 @@ void tWinPlayer::StartPlay(long Clock, long LoopClock, int Continue)
     case CsFsk:
     default:
       // state->playing = TRUE;
-      timeSetEvent(state->min_timer_period, state->min_timer_period, midiIntTimerHandler, (DWORD)state, TIME_ONESHOT);
+      timeSetEvent(
+        state->min_timer_period,
+        state->min_timer_period,
+        midiIntTimerHandler,
+        (DWORD)state,
+        TIME_ONESHOT);
       break;
   }
 
@@ -778,7 +686,7 @@ void tWinPlayer::StopPlay()
   wxBeginBusyCursor();
   state->playing = FALSE;
   tPlayer::StopPlay();
-  if (Config(C_RealTimeOut))
+  if (gpConfig->GetValue(C_RealTimeOut))
   {
     tStopPlay *e = new tStopPlay(0);
     OutNow( e );
@@ -830,7 +738,7 @@ void tWinPlayer::StopPlay()
 void tWinPlayer::FlushToDevice()
 // try to send all events up to OutClock to device
 {
-  if (Config(C_RealTimeOut))
+  if (gpConfig->GetValue(C_RealTimeOut))
   {
     FillMidiClocks( OutClock );
   }
@@ -1047,5 +955,71 @@ tMtcTime* tWinMtcPlayer::FreezeMtcRec()
 {
   StopPlay();
   state->doing_mtc_rec = FALSE;
-  return( new tMtcTime( (long) GetMtcTime( state ), (tMtcType) state->mtc_start.type ) );
+  return(new tMtcTime(
+    (long) GetMtcTime(state),
+    (tMtcType) state->mtc_start.type));
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void tWinPlayer::SettingsDlg(long& InputDevice, long& OutputDevice)
+{
+  vector<pair<string, int> > MidiDevices;
+
+  // select input device
+  UINT i;
+  UINT InputMidiDeviceCount = midiInGetNumDevs();
+  for (i = 0; i < InputMidiDeviceCount; ++i)
+  {
+    MIDIINCAPS caps;
+    midiInGetDevCaps(i, &caps, sizeof(caps));
+    MidiDevices.push_back(make_pair(caps.szPname, i));
+  }
+
+  if (InputMidiDeviceCount > 0)
+  {
+    JZMidiDeviceDialog MidiInputDeviceDialog(
+      MidiDevices,
+      InputDevice,
+      ::wxGetApp().GetMainFrame(),
+      "Input MIDI device");
+    MidiInputDeviceDialog.ShowModal();
+  }
+
+  MidiDevices.clear();
+
+  // select output device
+  UINT OutputMidiDeviceCount = midiOutGetNumDevs();
+  for (i = 0; i < OutputMidiDeviceCount; ++i)
+  {
+    MIDIOUTCAPS caps;
+    midiOutGetDevCaps(i, &caps, sizeof(caps));
+    MidiDevices.push_back(make_pair(caps.szPname, i));
+  }
+  MidiDevices.push_back(make_pair("Midi Mapper", MAX_MIDI_DEVS));
+
+  JZMidiDeviceDialog MidiOutputDeviceDialog(
+    MidiDevices,
+    OutputDevice,
+    TrackWin,
+    "Output MIDI device");
+  MidiOutputDeviceDialog.ShowModal();
+
+  if (InputDevice >= 0)
+  {
+    gpConfig->Put(C_WinInputDevice, InputDevice);
+  }
+  else
+  {
+    gpConfig->Get(C_WinInputDevice, InputDevice);
+  }
+
+  if (OutputDevice >= 0)
+  {
+    gpConfig->Put(C_WinOutputDevice, OutputDevice);
+  }
+  else
+  {
+    gpConfig->Get(C_WinOutputDevice, OutputDevice);
+  }
 }

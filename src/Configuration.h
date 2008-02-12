@@ -198,7 +198,6 @@ class tConfig
       return Names[entry]->GetName();
     }
 
-//    char*& StrValue(int entry)
     const char* StrValue(int entry)
     {
       assert((entry >= 0) && (entry < NumConfigNames));

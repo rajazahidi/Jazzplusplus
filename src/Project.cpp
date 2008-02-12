@@ -165,7 +165,7 @@ JZProject::JZProject()
   // Linux drivers
   //--------------
 #ifndef __WXMSW__
-  if (Config(C_MidiDriver) == eMidiDriverOss)
+  if (gpConfig->GetValue(C_MidiDriver) == eMidiDriverOss)
   {
 #ifdef DEV_SEQUENCER2
     mpMidiPlayer = new tAudioPlayer(mpSong);
@@ -187,7 +187,7 @@ JZProject::JZProject()
     mpMidiPlayer = new tNullPlayer(mpSong);
 #endif // DEV_SEQUENCER2
   }
-  else if (Config(C_MidiDriver) == eMidiDriverAlsa)
+  else if (gpConfig->GetValue(C_MidiDriver) == eMidiDriverAlsa)
   {
 #ifdef DEV_ALSA
     mpMidiPlayer = new tAlsaAudioPlayer(mpSong);
@@ -210,7 +210,7 @@ JZProject::JZProject()
     mpMidiPlayer = new tNullPlayer(mpSong);
 #endif
   }
-  else if (Config(C_MidiDriver) == eMidiDriverJazz)
+  else if (gpConfig->GetValue(C_MidiDriver) == eMidiDriverJazz)
   {
 #ifdef DEV_MPU401
     mpMidiPlayer = new tMpuPlayer(mpSong);

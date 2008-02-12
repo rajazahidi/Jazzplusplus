@@ -34,6 +34,7 @@
 #include "Dialogs.h"
 #include "Harmony.h"
 #include "Command.h"
+#include "Globals.h"
 #include "Player.h"
 #include "ControlEdit.h"
 #include "GuitarFrame.h"
@@ -814,7 +815,7 @@ void JZPianoFrame::OnSelectController(wxCommandEvent& Event)
       CtrlEdit = new tCtrlEdit(
         i - 1,
         this,
-        Config.CtrlName(i).Name,
+        gpConfig->CtrlName(i).first.c_str(),
         wPiano,
         0,
         CtrlY(ch),
@@ -1105,7 +1106,9 @@ int JZPianoFrame::IsVisible(tTrack *t)
   if (!VisibleAllTracks)
     return t == Track;
 
-  return (Track->Channel == Config(C_DrumChannel)) == (t->Channel == Config(C_DrumChannel));
+  return (
+    Track->Channel == gpConfig->GetValue(C_DrumChannel)) ==
+    (t->Channel == gpConfig->GetValue(C_DrumChannel));
 }
 
 #ifdef OBSOLETE
@@ -1477,36 +1480,45 @@ void JZPianoFrame::DrawPianoRoll(wxDC* dc)
   else
   {
     // Draw text?
-    tNamedValue* pNames = 0;
     if (VisibleKeyOn && VisibleDrumNames)
     {
-      pNames = &Config.DrumName(0);
       dc->SetFont(*DrumFont);
       while (Pitch >= 0 && y < yEvents + hEvents)
       {
-        dc->DrawText(pNames[Pitch+1].Name, CanvasX + LittleBit, y);
+        dc->DrawText(
+          gpConfig->DrumName(Pitch + 1).first.c_str(),
+          CanvasX + LittleBit,
+          y);
+
         y += hLine;
+
         --Pitch;
       }
     }
     else if (VisibleController)
     {
-      pNames = &Config.CtrlName(0);
       dc->SetFont(*DrumFont);
       while (Pitch >= 0 && y < yEvents + hEvents)
       {
-        dc->DrawText(pNames[Pitch+1].Name, CanvasX + LittleBit, y);
+        dc->DrawText(
+          gpConfig->CtrlName(Pitch + 1).first.c_str(),
+          CanvasX + LittleBit,
+          y);
+
         y += hLine;
         --Pitch;
       }
     }
     else if (VisibleProgram)
     {
-      pNames = &Config.VoiceName(0);
       dc->SetFont(*DrumFont);
       while (Pitch >= 0 && y < yEvents + hEvents)
       {
-        dc->DrawText(pNames[Pitch+1].Name, CanvasX + LittleBit, y);
+        dc->DrawText(
+          gpConfig->VoiceName(Pitch + 1).first.c_str(),
+          CanvasX + LittleBit,
+          y);
+
         y += hLine;
         --Pitch;
       }

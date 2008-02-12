@@ -27,6 +27,9 @@
 
 #include "Events.h"
 
+#include <vector>
+#include <string>
+
 enum SynthTypeId
 {
   SynthTypeGM = 0,
@@ -38,201 +41,198 @@ enum SynthTypeId
 
 enum SysexId
 {
-   SX_NONE = 0,
+  SX_NONE = 0,
 
-   // Misc:
-   SX_UNIV_NON_REALTIME,
-   SX_UNIV_REALTIME,
-   SX_ROLAND_DT1,
-   SX_ROLAND_RQ1,
-   SX_ROLAND_UNKNOWN,
-   SX_XG_NATIVE,
-   SX_MU80_NATIVE,
-   SX_YAMAHA_UNKNOWN,
+  // Misc:
+  SX_UNIV_NON_REALTIME,
+  SX_UNIV_REALTIME,
+  SX_ROLAND_DT1,
+  SX_ROLAND_RQ1,
+  SX_ROLAND_UNKNOWN,
+  SX_XG_NATIVE,
+  SX_MU80_NATIVE,
+  SX_YAMAHA_UNKNOWN,
 
-   // GM
-   SX_GM_ON,
-   SX_GM_MasterVol,
+  // GM
+  SX_GM_ON,
+  SX_GM_MasterVol,
 
-   // GS DT1
-   // 0x40 0x00 0x??:
-   SX_GS_ON,
-   SX_GS_MasterVol,
-   SX_GS_MasterPan,
+  // GS DT1
+  // 0x40 0x00 0x??:
+  SX_GS_ON,
+  SX_GS_MasterVol,
+  SX_GS_MasterPan,
 
-   // 0x40 0x2n 0x??:
-   // Must be in sequence:
-   SX_GS_ModPitch,
-   SX_GS_ModTvf,
-   SX_GS_ModAmpl,
-   SX_GS_ModLfo1Rate,
-   SX_GS_ModLfo1Pitch,
-   SX_GS_ModLfo1Tvf,
-   SX_GS_ModLfo1Tva,
-   SX_GS_ModLfo2Rate,
-   SX_GS_ModLfo2Pitch,
-   SX_GS_ModLfo2Tvf,
-   SX_GS_ModLfo2Tva,
+  // 0x40 0x2n 0x??:
+  // Must be in sequence:
+  SX_GS_ModPitch,
+  SX_GS_ModTvf,
+  SX_GS_ModAmpl,
+  SX_GS_ModLfo1Rate,
+  SX_GS_ModLfo1Pitch,
+  SX_GS_ModLfo1Tvf,
+  SX_GS_ModLfo1Tva,
+  SX_GS_ModLfo2Rate,
+  SX_GS_ModLfo2Pitch,
+  SX_GS_ModLfo2Tvf,
+  SX_GS_ModLfo2Tva,
 
-   // Must be in sequence:
-   SX_GS_BendPitch,
-   SX_GS_BendTvf,
-   SX_GS_BendAmpl,
-   SX_GS_BendLfo1Rate,
-   SX_GS_BendLfo1Pitch,
-   SX_GS_BendLfo1Tvf,
-   SX_GS_BendLfo1Tva,
-   SX_GS_BendLfo2Rate,
-   SX_GS_BendLfo2Pitch,
-   SX_GS_BendLfo2Tvf,
-   SX_GS_BendLfo2Tva,
+  // Must be in sequence:
+  SX_GS_BendPitch,
+  SX_GS_BendTvf,
+  SX_GS_BendAmpl,
+  SX_GS_BendLfo1Rate,
+  SX_GS_BendLfo1Pitch,
+  SX_GS_BendLfo1Tvf,
+  SX_GS_BendLfo1Tva,
+  SX_GS_BendLfo2Rate,
+  SX_GS_BendLfo2Pitch,
+  SX_GS_BendLfo2Tvf,
+  SX_GS_BendLfo2Tva,
 
-   // Must be in sequence:
-   SX_GS_CafPitch,
-   SX_GS_CafTvf,
-   SX_GS_CafAmpl,
-   SX_GS_CafLfo1Rate,
-   SX_GS_CafLfo1Pitch,
-   SX_GS_CafLfo1Tvf,
-   SX_GS_CafLfo1Tva,
-   SX_GS_CafLfo2Rate,
-   SX_GS_CafLfo2Pitch,
-   SX_GS_CafLfo2Tvf,
-   SX_GS_CafLfo2Tva,
+  // Must be in sequence:
+  SX_GS_CafPitch,
+  SX_GS_CafTvf,
+  SX_GS_CafAmpl,
+  SX_GS_CafLfo1Rate,
+  SX_GS_CafLfo1Pitch,
+  SX_GS_CafLfo1Tvf,
+  SX_GS_CafLfo1Tva,
+  SX_GS_CafLfo2Rate,
+  SX_GS_CafLfo2Pitch,
+  SX_GS_CafLfo2Tvf,
+  SX_GS_CafLfo2Tva,
 
-   // Must be in sequence:
-   SX_GS_PafPitch,
-   SX_GS_PafTvf,
-   SX_GS_PafAmpl,
-   SX_GS_PafLfo1Rate,
-   SX_GS_PafLfo1Pitch,
-   SX_GS_PafLfo1Tvf,
-   SX_GS_PafLfo1Tva,
-   SX_GS_PafLfo2Rate,
-   SX_GS_PafLfo2Pitch,
-   SX_GS_PafLfo2Tvf,
-   SX_GS_PafLfo2Tva,
+  // Must be in sequence:
+  SX_GS_PafPitch,
+  SX_GS_PafTvf,
+  SX_GS_PafAmpl,
+  SX_GS_PafLfo1Rate,
+  SX_GS_PafLfo1Pitch,
+  SX_GS_PafLfo1Tvf,
+  SX_GS_PafLfo1Tva,
+  SX_GS_PafLfo2Rate,
+  SX_GS_PafLfo2Pitch,
+  SX_GS_PafLfo2Tvf,
+  SX_GS_PafLfo2Tva,
 
-   // Must be in sequence:
-   SX_GS_CC1Pitch,
-   SX_GS_CC1Tvf,
-   SX_GS_CC1Ampl,
-   SX_GS_CC1Lfo1Rate,
-   SX_GS_CC1Lfo1Pitch,
-   SX_GS_CC1Lfo1Tvf,
-   SX_GS_CC1Lfo1Tva,
-   SX_GS_CC1Lfo2Rate,
-   SX_GS_CC1Lfo2Pitch,
-   SX_GS_CC1Lfo2Tvf,
-   SX_GS_CC1Lfo2Tva,
+  // Must be in sequence:
+  SX_GS_CC1Pitch,
+  SX_GS_CC1Tvf,
+  SX_GS_CC1Ampl,
+  SX_GS_CC1Lfo1Rate,
+  SX_GS_CC1Lfo1Pitch,
+  SX_GS_CC1Lfo1Tvf,
+  SX_GS_CC1Lfo1Tva,
+  SX_GS_CC1Lfo2Rate,
+  SX_GS_CC1Lfo2Pitch,
+  SX_GS_CC1Lfo2Tvf,
+  SX_GS_CC1Lfo2Tva,
 
-   // Must be in sequence:
-   SX_GS_CC2Pitch,
-   SX_GS_CC2Tvf,
-   SX_GS_CC2Ampl,
-   SX_GS_CC2Lfo1Rate,
-   SX_GS_CC2Lfo1Pitch,
-   SX_GS_CC2Lfo1Tvf,
-   SX_GS_CC2Lfo1Tva,
-   SX_GS_CC2Lfo2Rate,
-   SX_GS_CC2Lfo2Pitch,
-   SX_GS_CC2Lfo2Tvf,
-   SX_GS_CC2Lfo2Tva,
+  // Must be in sequence:
+  SX_GS_CC2Pitch,
+  SX_GS_CC2Tvf,
+  SX_GS_CC2Ampl,
+  SX_GS_CC2Lfo1Rate,
+  SX_GS_CC2Lfo1Pitch,
+  SX_GS_CC2Lfo1Tvf,
+  SX_GS_CC2Lfo1Tva,
+  SX_GS_CC2Lfo2Rate,
+  SX_GS_CC2Lfo2Pitch,
+  SX_GS_CC2Lfo2Tvf,
+  SX_GS_CC2Lfo2Tva,
 
-   // 0x40 0x01 0x??:
-   // Must be in sequence:
-   SX_GS_ReverbMacro,
-   SX_GS_RevCharacter,
-   SX_GS_RevPreLpf,
-   SX_GS_RevLevel,
-   SX_GS_RevTime,
-   SX_GS_RevDelayFeedback,
-   SX_GS_RevSendChorus,
+  // 0x40 0x01 0x??:
+  // Must be in sequence:
+  SX_GS_ReverbMacro,
+  SX_GS_RevCharacter,
+  SX_GS_RevPreLpf,
+  SX_GS_RevLevel,
+  SX_GS_RevTime,
+  SX_GS_RevDelayFeedback,
+  SX_GS_RevSendChorus,
 
-   // Must be in sequence:
-   SX_GS_ChorusMacro,
-   SX_GS_ChoPreLpf,
-   SX_GS_ChoLevel,
-   SX_GS_ChoFeedback,
-   SX_GS_ChoDelay,
-   SX_GS_ChoRate,
-   SX_GS_ChoDepth,
-   SX_GS_ChoSendReverb,
+  // Must be in sequence:
+  SX_GS_ChorusMacro,
+  SX_GS_ChoPreLpf,
+  SX_GS_ChoLevel,
+  SX_GS_ChoFeedback,
+  SX_GS_ChoDelay,
+  SX_GS_ChoRate,
+  SX_GS_ChoDepth,
+  SX_GS_ChoSendReverb,
 
-   SX_GS_PartialReserve,
+  SX_GS_PartialReserve,
 
-   // 0x40 0x1n 0x??:
-   SX_GS_RxChannel,
-   SX_GS_UseForRhythm,
-   SX_GS_CC1CtrlNo,
-   SX_GS_CC2CtrlNo,
-
-
-   // XG
-   SX_XG_ON,
-
-   // Native Multipart:
-   // Must be in sequence
-   SX_XG_ModPitch,
-   SX_XG_ModTvf,
-   SX_XG_ModAmpl,
-   SX_XG_ModLfoPitch,
-   SX_XG_ModLfoTvf,
-   SX_XG_ModLfoTva,
-   SX_XG_BendPitch,
-   SX_XG_BendTvf,
-   SX_XG_BendAmpl,
-   SX_XG_BendLfoPitch,
-   SX_XG_BendLfoTvf,
-   SX_XG_BendLfoTva,
-
-   // Must be in sequence:
-   SX_XG_CafPitch,
-   SX_XG_CafTvf,
-   SX_XG_CafAmpl,
-   SX_XG_CafLfoPitch,
-   SX_XG_CafLfoTvf,
-   SX_XG_CafLfoTva,
-   SX_XG_PafPitch,
-   SX_XG_PafTvf,
-   SX_XG_PafAmpl,
-   SX_XG_PafLfoPitch,
-   SX_XG_PafLfoTvf,
-   SX_XG_PafLfoTva,
-   SX_XG_CC1CtrlNo,
-   SX_XG_CC1Pitch,
-   SX_XG_CC1Tvf,
-   SX_XG_CC1Ampl,
-   SX_XG_CC1LfoPitch,
-   SX_XG_CC1LfoTvf,
-   SX_XG_CC1LfoTva,
-   SX_XG_CC2CtrlNo,
-   SX_XG_CC2Pitch,
-   SX_XG_CC2Tvf,
-   SX_XG_CC2Ampl,
-   SX_XG_CC2LfoPitch,
-   SX_XG_CC2LfoTvf,
-   SX_XG_CC2LfoTva,
+  // 0x40 0x1n 0x??:
+  SX_GS_RxChannel,
+  SX_GS_UseForRhythm,
+  SX_GS_CC1CtrlNo,
+  SX_GS_CC2CtrlNo,
 
 
+  // XG
+  SX_XG_ON,
 
-   SX_XG_ReverbMacro,
-   SX_XG_ChorusMacro,
-   SX_XG_EqualizerMacro,
+  // Native Multipart:
+  // Must be in sequence
+  SX_XG_ModPitch,
+  SX_XG_ModTvf,
+  SX_XG_ModAmpl,
+  SX_XG_ModLfoPitch,
+  SX_XG_ModLfoTvf,
+  SX_XG_ModLfoTva,
+  SX_XG_BendPitch,
+  SX_XG_BendTvf,
+  SX_XG_BendAmpl,
+  SX_XG_BendLfoPitch,
+  SX_XG_BendLfoTvf,
+  SX_XG_BendLfoTva,
 
-   SX_XG_RxChannel,
-   SX_XG_UseForRhythm,
+  // Must be in sequence:
+  SX_XG_CafPitch,
+  SX_XG_CafTvf,
+  SX_XG_CafAmpl,
+  SX_XG_CafLfoPitch,
+  SX_XG_CafLfoTvf,
+  SX_XG_CafLfoTva,
+  SX_XG_PafPitch,
+  SX_XG_PafTvf,
+  SX_XG_PafAmpl,
+  SX_XG_PafLfoPitch,
+  SX_XG_PafLfoTvf,
+  SX_XG_PafLfoTva,
+  SX_XG_CC1CtrlNo,
+  SX_XG_CC1Pitch,
+  SX_XG_CC1Tvf,
+  SX_XG_CC1Ampl,
+  SX_XG_CC1LfoPitch,
+  SX_XG_CC1LfoTvf,
+  SX_XG_CC1LfoTva,
+  SX_XG_CC2CtrlNo,
+  SX_XG_CC2Pitch,
+  SX_XG_CC2Tvf,
+  SX_XG_CC2Ampl,
+  SX_XG_CC2LfoPitch,
+  SX_XG_CC2LfoTvf,
+  SX_XG_CC2LfoTva,
 
-   NumSysexIds
+
+
+  SX_XG_ReverbMacro,
+  SX_XG_ChorusMacro,
+  SX_XG_EqualizerMacro,
+
+  SX_XG_RxChannel,
+  SX_XG_UseForRhythm,
+
+  NumSysexIds
 };
 
 #define SX_GROUP_UNKNOWN 64
 #define SX_GROUP_GM 65
 #define SX_GROUP_GS 66
 #define SX_GROUP_XG 67
-
-extern tNamedValue SynthTypes[];
-extern tNamedValue SynthTypeFiles[];
 
 class tSynthSysex
 {
@@ -265,13 +265,13 @@ class tSynthSysex
     tSysEx* operator()(long clk, int id, int datalen, unsigned char val[]);
     tSysEx* operator()(long clk, int id, int channel, int datalen, unsigned char val[]);
 
-    static char* GetSysexName(int i);
-    static char* GetSysexGroupName(int i);
+    static const std::string& GetSysexName(unsigned i);
+    static const std::string& GetSysexGroupName(unsigned i);
 
   private:
 
-    static tNamedValue* mpSysexNames;
-    static tNamedValue* mpSysexGroupNames;
+    static std::vector<std::string> mSysexNames;
+    static std::vector<std::string> mSysexGroupNames;
 
     unsigned char sxlen[NumSysexIds];
     unsigned char* sxdata[NumSysexIds];

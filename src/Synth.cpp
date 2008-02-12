@@ -30,10 +30,15 @@
 #include "JazzPlusPlusApplication.h"
 //#include "eventwin.h"
 #include "TrackWindow.h"
+#include "Globals.h"
 
 #include <cstdlib>
 
 #include <assert.h>
+
+#include <string>
+
+using namespace std;
 
 #define SXDECL(id,len,arr) do {\
   sxlen[id] = len; \
@@ -48,30 +53,12 @@
 #define XG_NAT 0x43,0x10,0x4c
 #define XG_NAT_LEN 8 // no command ID or checksum for XG native!
 
-tNamedValue SynthTypes[] =
-{
-  tNamedValue("GM", SynthTypeGM),
-  tNamedValue("GS", SynthTypeGS),
-  tNamedValue("XG", SynthTypeXG),
-  tNamedValue("Other", SynthTypeOther),
-  tNamedValue(0, 0)
-};
-
-tNamedValue SynthTypeFiles[] =
-{
-  tNamedValue("gm.jzi", SynthTypeGM),
-  tNamedValue("gs.jzi", SynthTypeGS),
-  tNamedValue("xg.jzi", SynthTypeXG),
-  tNamedValue("other.jzi", SynthTypeOther),
-  tNamedValue(0, 0)
-};
-
 JZSynth* NewSynth(const char* pType)
 {
   int i;
   for (i = 0; i < NumSynthTypes; i++)
   {
-    if (!strcmp(SynthTypes[i].Name, pType))
+    if (gSynthesizerTypes[i].first != string(pType))
     {
       break;
     }
@@ -90,25 +77,30 @@ JZSynth* NewSynth(const char* pType)
   }
 }
 
-tNamedValue* tSynthSysex::mpSysexNames = 0;
-tNamedValue* tSynthSysex::mpSysexGroupNames = 0;
+vector<string> tSynthSysex::mSysexNames;
 
-char* tSynthSysex::GetSysexName(int i)
+vector<string> tSynthSysex::mSysexGroupNames;
+
+const string& tSynthSysex::GetSysexName(unsigned i)
 {
-  if (mpSysexNames)
+  if (i < mSysexNames.size())
   {
-    return mpSysexNames[i].Name;
+    return mSysexNames[i];
   }
-  return "UNKNOWN";
+
+  static string Unkown("UNKNOWN");
+  return Unkown;
 }
 
-char* tSynthSysex::GetSysexGroupName(int i)
+const string& tSynthSysex::GetSysexGroupName(unsigned i)
 {
-  if (mpSysexNames)
+  if (i < mSysexGroupNames.size())
   {
-    return mpSysexGroupNames[i].Name;
+    return mSysexGroupNames[i];
   }
-  return "UNKNOWN";
+
+  static string Unkown("UNKNOWN");
+  return Unkown;
 }
 
 tSynthSysex::tSynthSysex()
@@ -121,220 +113,209 @@ tSynthSysex::tSynthSysex()
     sxdata [i] = 0;
   }
 
-  if (!mpSysexNames)
+  if (mSysexNames.empty())
   {
-    mpSysexNames = new tNamedValue[NumSysexIds + 1];
+    // Create storage.
+    mSysexNames.resize(NumSysexIds);
 
-    for (i = 0; i < (NumSysexIds+1); i++)
-    {
-      mpSysexNames[i].Value = i;
-      mpSysexNames[i].Name  = "";
-    }
-
-    mpSysexNames[SX_NONE].Name = "Unknown";
-    mpSysexNames[NumSysexIds].Name = 0;
+    // Set the names.
+    mSysexNames[SX_NONE] = "Unknown";
 
     // Misc
-    mpSysexNames[SX_UNIV_NON_REALTIME].Name = "UNIV_NON_REALTIME";
-    mpSysexNames[SX_UNIV_REALTIME].Name = "UNIV_REALTIME";
-    mpSysexNames[SX_ROLAND_DT1].Name = "ROLAND_DT1";
-    mpSysexNames[SX_ROLAND_RQ1].Name = "ROLAND_RQ1";
-    mpSysexNames[SX_ROLAND_UNKNOWN].Name = "ROLAND_UNKNOWN";
-    mpSysexNames[SX_XG_NATIVE].Name = "XG_NATIVE";
-    mpSysexNames[SX_MU80_NATIVE].Name = "MU80_NATIVE";
-    mpSysexNames[SX_YAMAHA_UNKNOWN].Name = "YAMAHA_UNKNOWN";
+    mSysexNames[SX_UNIV_NON_REALTIME] = "UNIV_NON_REALTIME";
+    mSysexNames[SX_UNIV_REALTIME] = "UNIV_REALTIME";
+    mSysexNames[SX_ROLAND_DT1] = "ROLAND_DT1";
+    mSysexNames[SX_ROLAND_RQ1] = "ROLAND_RQ1";
+    mSysexNames[SX_ROLAND_UNKNOWN] = "ROLAND_UNKNOWN";
+    mSysexNames[SX_XG_NATIVE] = "XG_NATIVE";
+    mSysexNames[SX_MU80_NATIVE] = "MU80_NATIVE";
+    mSysexNames[SX_YAMAHA_UNKNOWN] = "YAMAHA_UNKNOWN";
 
 
     // GM
-    mpSysexNames[SX_GM_ON].Name = "GM_ON";
-    mpSysexNames[SX_GM_MasterVol].Name = "GM_MasterVol";
+    mSysexNames[SX_GM_ON] = "GM_ON";
+    mSysexNames[SX_GM_MasterVol] = "GM_MasterVol";
 
     // GS DT1
     // 0x40 0x00 0x??:
-    mpSysexNames[SX_GS_ON].Name = "GS_ON";
-    mpSysexNames[SX_GS_MasterVol].Name = "GS_MasterVol";
-    mpSysexNames[SX_GS_MasterPan].Name = "GS_MasterPan";
+    mSysexNames[SX_GS_ON] = "GS_ON";
+    mSysexNames[SX_GS_MasterVol] = "GS_MasterVol";
+    mSysexNames[SX_GS_MasterPan] = "GS_MasterPan";
 
     // 0x40 0x2n 0x??:
     // Must be in sequence:
-    mpSysexNames[SX_GS_ModPitch].Name = "GS_ModPitch";
-    mpSysexNames[SX_GS_ModTvf].Name = "GS_ModTvf";
-    mpSysexNames[SX_GS_ModAmpl].Name = "GS_ModAmpl";
-    mpSysexNames[SX_GS_ModLfo1Rate].Name = "GS_ModLfo1Rate";
-    mpSysexNames[SX_GS_ModLfo1Pitch].Name = "GS_ModLfo1Pitch";
-    mpSysexNames[SX_GS_ModLfo1Tvf].Name = "GS_ModLfo1Tvf";
-    mpSysexNames[SX_GS_ModLfo1Tva].Name = "GS_ModLfo1Tva";
-    mpSysexNames[SX_GS_ModLfo2Rate].Name = "GS_ModLfo2Rate";
-    mpSysexNames[SX_GS_ModLfo2Pitch].Name = "GS_ModLfo2Pitch";
-    mpSysexNames[SX_GS_ModLfo2Tvf].Name = "GS_ModLfo2Tvf";
-    mpSysexNames[SX_GS_ModLfo2Tva].Name = "GS_ModLfo2Tva";
+    mSysexNames[SX_GS_ModPitch] = "GS_ModPitch";
+    mSysexNames[SX_GS_ModTvf] = "GS_ModTvf";
+    mSysexNames[SX_GS_ModAmpl] = "GS_ModAmpl";
+    mSysexNames[SX_GS_ModLfo1Rate] = "GS_ModLfo1Rate";
+    mSysexNames[SX_GS_ModLfo1Pitch] = "GS_ModLfo1Pitch";
+    mSysexNames[SX_GS_ModLfo1Tvf] = "GS_ModLfo1Tvf";
+    mSysexNames[SX_GS_ModLfo1Tva] = "GS_ModLfo1Tva";
+    mSysexNames[SX_GS_ModLfo2Rate] = "GS_ModLfo2Rate";
+    mSysexNames[SX_GS_ModLfo2Pitch] = "GS_ModLfo2Pitch";
+    mSysexNames[SX_GS_ModLfo2Tvf] = "GS_ModLfo2Tvf";
+    mSysexNames[SX_GS_ModLfo2Tva] = "GS_ModLfo2Tva";
 
     // Must be in sequence:
-    mpSysexNames[SX_GS_BendPitch].Name = "GS_BendPitch";
-    mpSysexNames[SX_GS_BendTvf].Name = "GS_BendTvf";
-    mpSysexNames[SX_GS_BendAmpl].Name = "GS_BendAmpl";
-    mpSysexNames[SX_GS_BendLfo1Rate].Name = "GS_BendLfo1Rate";
-    mpSysexNames[SX_GS_BendLfo1Pitch].Name = "GS_BendLfo1Pitch";
-    mpSysexNames[SX_GS_BendLfo1Tvf].Name = "GS_BendLfo1Tvf";
-    mpSysexNames[SX_GS_BendLfo1Tva].Name = "GS_BendLfo1Tva";
-    mpSysexNames[SX_GS_BendLfo2Rate].Name = "GS_BendLfo2Rate";
-    mpSysexNames[SX_GS_BendLfo2Pitch].Name = "GS_BendLfo2Pitch";
-    mpSysexNames[SX_GS_BendLfo2Tvf].Name = "GS_BendLfo2Tvf";
-    mpSysexNames[SX_GS_BendLfo2Tva].Name = "GS_BendLfo2Tva";
+    mSysexNames[SX_GS_BendPitch] = "GS_BendPitch";
+    mSysexNames[SX_GS_BendTvf] = "GS_BendTvf";
+    mSysexNames[SX_GS_BendAmpl] = "GS_BendAmpl";
+    mSysexNames[SX_GS_BendLfo1Rate] = "GS_BendLfo1Rate";
+    mSysexNames[SX_GS_BendLfo1Pitch] = "GS_BendLfo1Pitch";
+    mSysexNames[SX_GS_BendLfo1Tvf] = "GS_BendLfo1Tvf";
+    mSysexNames[SX_GS_BendLfo1Tva] = "GS_BendLfo1Tva";
+    mSysexNames[SX_GS_BendLfo2Rate] = "GS_BendLfo2Rate";
+    mSysexNames[SX_GS_BendLfo2Pitch] = "GS_BendLfo2Pitch";
+    mSysexNames[SX_GS_BendLfo2Tvf] = "GS_BendLfo2Tvf";
+    mSysexNames[SX_GS_BendLfo2Tva] = "GS_BendLfo2Tva";
 
     // Must be in sequence:
-    mpSysexNames[SX_GS_CafPitch].Name = "GS_CafPitch";
-    mpSysexNames[SX_GS_CafTvf].Name = "GS_CafTvf";
-    mpSysexNames[SX_GS_CafAmpl].Name = "GS_CafAmpl";
-    mpSysexNames[SX_GS_CafLfo1Rate].Name = "GS_CafLfo1Rate";
-    mpSysexNames[SX_GS_CafLfo1Pitch].Name = "GS_CafLfo1Pitch";
-    mpSysexNames[SX_GS_CafLfo1Tvf].Name = "GS_CafLfo1Tvf";
-    mpSysexNames[SX_GS_CafLfo1Tva].Name = "GS_CafLfo1Tva";
-    mpSysexNames[SX_GS_CafLfo2Rate].Name = "GS_CafLfo2Rate";
-    mpSysexNames[SX_GS_CafLfo2Pitch].Name = "GS_CafLfo2Pitch";
-    mpSysexNames[SX_GS_CafLfo2Tvf].Name = "GS_CafLfo2Tvf";
-    mpSysexNames[SX_GS_CafLfo2Tva].Name = "GS_CafLfo2Tva";
+    mSysexNames[SX_GS_CafPitch] = "GS_CafPitch";
+    mSysexNames[SX_GS_CafTvf] = "GS_CafTvf";
+    mSysexNames[SX_GS_CafAmpl] = "GS_CafAmpl";
+    mSysexNames[SX_GS_CafLfo1Rate] = "GS_CafLfo1Rate";
+    mSysexNames[SX_GS_CafLfo1Pitch] = "GS_CafLfo1Pitch";
+    mSysexNames[SX_GS_CafLfo1Tvf] = "GS_CafLfo1Tvf";
+    mSysexNames[SX_GS_CafLfo1Tva] = "GS_CafLfo1Tva";
+    mSysexNames[SX_GS_CafLfo2Rate] = "GS_CafLfo2Rate";
+    mSysexNames[SX_GS_CafLfo2Pitch] = "GS_CafLfo2Pitch";
+    mSysexNames[SX_GS_CafLfo2Tvf] = "GS_CafLfo2Tvf";
+    mSysexNames[SX_GS_CafLfo2Tva] = "GS_CafLfo2Tva";
 
     // Must be in sequence:
-    mpSysexNames[SX_GS_PafPitch].Name = "GS_PafPitch";
-    mpSysexNames[SX_GS_PafTvf].Name = "GS_PafTvf";
-    mpSysexNames[SX_GS_PafAmpl].Name = "GS_PafAmpl";
-    mpSysexNames[SX_GS_PafLfo1Rate].Name = "GS_PafLfo1Rate";
-    mpSysexNames[SX_GS_PafLfo1Pitch].Name = "GS_PafLfo1Pitch";
-    mpSysexNames[SX_GS_PafLfo1Tvf].Name = "GS_PafLfo1Tvf";
-    mpSysexNames[SX_GS_PafLfo1Tva].Name = "GS_PafLfo1Tva";
-    mpSysexNames[SX_GS_PafLfo2Rate].Name = "GS_PafLfo2Rate";
-    mpSysexNames[SX_GS_PafLfo2Pitch].Name = "GS_PafLfo2Pitch";
-    mpSysexNames[SX_GS_PafLfo2Tvf].Name = "GS_PafLfo2Tvf";
-    mpSysexNames[SX_GS_PafLfo2Tva].Name = "GS_PafLfo2Tva";
+    mSysexNames[SX_GS_PafPitch] = "GS_PafPitch";
+    mSysexNames[SX_GS_PafTvf] = "GS_PafTvf";
+    mSysexNames[SX_GS_PafAmpl] = "GS_PafAmpl";
+    mSysexNames[SX_GS_PafLfo1Rate] = "GS_PafLfo1Rate";
+    mSysexNames[SX_GS_PafLfo1Pitch] = "GS_PafLfo1Pitch";
+    mSysexNames[SX_GS_PafLfo1Tvf] = "GS_PafLfo1Tvf";
+    mSysexNames[SX_GS_PafLfo1Tva] = "GS_PafLfo1Tva";
+    mSysexNames[SX_GS_PafLfo2Rate] = "GS_PafLfo2Rate";
+    mSysexNames[SX_GS_PafLfo2Pitch] = "GS_PafLfo2Pitch";
+    mSysexNames[SX_GS_PafLfo2Tvf] = "GS_PafLfo2Tvf";
+    mSysexNames[SX_GS_PafLfo2Tva] = "GS_PafLfo2Tva";
 
     // Must be in sequence:
-    mpSysexNames[SX_GS_CC1Pitch].Name = "GS_CC1Pitch";
-    mpSysexNames[SX_GS_CC1Tvf].Name = "GS_CC1Tvf";
-    mpSysexNames[SX_GS_CC1Ampl].Name = "GS_CC1Ampl";
-    mpSysexNames[SX_GS_CC1Lfo1Rate].Name = "GS_CC1Lfo1Rate";
-    mpSysexNames[SX_GS_CC1Lfo1Pitch].Name = "GS_CC1Lfo1Pitch";
-    mpSysexNames[SX_GS_CC1Lfo1Tvf].Name = "GS_CC1Lfo1Tvf";
-    mpSysexNames[SX_GS_CC1Lfo1Tva].Name = "GS_CC1Lfo1Tva";
-    mpSysexNames[SX_GS_CC1Lfo2Rate].Name = "GS_CC1Lfo2Rate";
-    mpSysexNames[SX_GS_CC1Lfo2Pitch].Name = "GS_CC1Lfo2Pitch";
-    mpSysexNames[SX_GS_CC1Lfo2Tvf].Name = "GS_CC1Lfo2Tvf";
-    mpSysexNames[SX_GS_CC1Lfo2Tva].Name = "GS_CC1Lfo2Tva";
+    mSysexNames[SX_GS_CC1Pitch] = "GS_CC1Pitch";
+    mSysexNames[SX_GS_CC1Tvf] = "GS_CC1Tvf";
+    mSysexNames[SX_GS_CC1Ampl] = "GS_CC1Ampl";
+    mSysexNames[SX_GS_CC1Lfo1Rate] = "GS_CC1Lfo1Rate";
+    mSysexNames[SX_GS_CC1Lfo1Pitch] = "GS_CC1Lfo1Pitch";
+    mSysexNames[SX_GS_CC1Lfo1Tvf] = "GS_CC1Lfo1Tvf";
+    mSysexNames[SX_GS_CC1Lfo1Tva] = "GS_CC1Lfo1Tva";
+    mSysexNames[SX_GS_CC1Lfo2Rate] = "GS_CC1Lfo2Rate";
+    mSysexNames[SX_GS_CC1Lfo2Pitch] = "GS_CC1Lfo2Pitch";
+    mSysexNames[SX_GS_CC1Lfo2Tvf] = "GS_CC1Lfo2Tvf";
+    mSysexNames[SX_GS_CC1Lfo2Tva] = "GS_CC1Lfo2Tva";
 
     // Must be in sequence:
-    mpSysexNames[SX_GS_CC2Pitch].Name = "GS_CC2Pitch";
-    mpSysexNames[SX_GS_CC2Tvf].Name = "GS_CC2Tvf";
-    mpSysexNames[SX_GS_CC2Ampl].Name = "GS_CC2Ampl]";
-    mpSysexNames[SX_GS_CC2Lfo1Rate].Name = "GS_CC2Lfo1Rate";
-    mpSysexNames[SX_GS_CC2Lfo1Pitch].Name = "GS_CC2Lfo1Pitch";
-    mpSysexNames[SX_GS_CC2Lfo1Tvf].Name = "GS_CC2Lfo1Tvf";
-    mpSysexNames[SX_GS_CC2Lfo1Tva].Name = "GS_CC2Lfo1Tva";
-    mpSysexNames[SX_GS_CC2Lfo2Rate].Name = "GS_CC2Lfo2Rate";
-    mpSysexNames[SX_GS_CC2Lfo2Pitch].Name = "GS_CC2Lfo2Pitch";
-    mpSysexNames[SX_GS_CC2Lfo2Tvf].Name = "GS_CC2Lfo2Tvf";
-    mpSysexNames[SX_GS_CC2Lfo2Tva].Name = "GS_CC2Lfo2Tva";
+    mSysexNames[SX_GS_CC2Pitch] = "GS_CC2Pitch";
+    mSysexNames[SX_GS_CC2Tvf] = "GS_CC2Tvf";
+    mSysexNames[SX_GS_CC2Ampl] = "GS_CC2Ampl]";
+    mSysexNames[SX_GS_CC2Lfo1Rate] = "GS_CC2Lfo1Rate";
+    mSysexNames[SX_GS_CC2Lfo1Pitch] = "GS_CC2Lfo1Pitch";
+    mSysexNames[SX_GS_CC2Lfo1Tvf] = "GS_CC2Lfo1Tvf";
+    mSysexNames[SX_GS_CC2Lfo1Tva] = "GS_CC2Lfo1Tva";
+    mSysexNames[SX_GS_CC2Lfo2Rate] = "GS_CC2Lfo2Rate";
+    mSysexNames[SX_GS_CC2Lfo2Pitch] = "GS_CC2Lfo2Pitch";
+    mSysexNames[SX_GS_CC2Lfo2Tvf] = "GS_CC2Lfo2Tvf";
+    mSysexNames[SX_GS_CC2Lfo2Tva] = "GS_CC2Lfo2Tva";
 
     // 0x40 0x01 0x??:
     // Must be in sequence:
-    mpSysexNames[SX_GS_ReverbMacro].Name = "GS_ReverbMacro";
-    mpSysexNames[SX_GS_RevCharacter].Name = "GS_RevCharacter";
-    mpSysexNames[SX_GS_RevPreLpf].Name = "GS_RevPreLpf";
-    mpSysexNames[SX_GS_RevLevel].Name = "GS_RevLevel";
-    mpSysexNames[SX_GS_RevTime].Name = "GS_RevTime";
-    mpSysexNames[SX_GS_RevDelayFeedback].Name = "GS_RevDelayFeedback";
-    mpSysexNames[SX_GS_RevSendChorus].Name = "GS_RevSendChorus";
+    mSysexNames[SX_GS_ReverbMacro] = "GS_ReverbMacro";
+    mSysexNames[SX_GS_RevCharacter] = "GS_RevCharacter";
+    mSysexNames[SX_GS_RevPreLpf] = "GS_RevPreLpf";
+    mSysexNames[SX_GS_RevLevel] = "GS_RevLevel";
+    mSysexNames[SX_GS_RevTime] = "GS_RevTime";
+    mSysexNames[SX_GS_RevDelayFeedback] = "GS_RevDelayFeedback";
+    mSysexNames[SX_GS_RevSendChorus] = "GS_RevSendChorus";
 
     // Must be in sequence:
-    mpSysexNames[SX_GS_ChorusMacro].Name = "GS_ChorusMacro";
-    mpSysexNames[SX_GS_ChoPreLpf].Name = "GS_ChoPreLpf";
-    mpSysexNames[SX_GS_ChoLevel].Name = "GS_ChoLevel";
-    mpSysexNames[SX_GS_ChoFeedback].Name = "GS_ChoFeedback";
-    mpSysexNames[SX_GS_ChoDelay].Name = "GS_ChoDelay";
-    mpSysexNames[SX_GS_ChoRate].Name = "GS_ChoRate";
-    mpSysexNames[SX_GS_ChoDepth].Name = "GS_ChoDepth";
-    mpSysexNames[SX_GS_ChoSendReverb].Name = "GS_ChoSendReverb]";
+    mSysexNames[SX_GS_ChorusMacro] = "GS_ChorusMacro";
+    mSysexNames[SX_GS_ChoPreLpf] = "GS_ChoPreLpf";
+    mSysexNames[SX_GS_ChoLevel] = "GS_ChoLevel";
+    mSysexNames[SX_GS_ChoFeedback] = "GS_ChoFeedback";
+    mSysexNames[SX_GS_ChoDelay] = "GS_ChoDelay";
+    mSysexNames[SX_GS_ChoRate] = "GS_ChoRate";
+    mSysexNames[SX_GS_ChoDepth] = "GS_ChoDepth";
+    mSysexNames[SX_GS_ChoSendReverb] = "GS_ChoSendReverb]";
 
-    mpSysexNames[SX_GS_PartialReserve].Name = "GS_PartialReserve";
+    mSysexNames[SX_GS_PartialReserve] = "GS_PartialReserve";
 
     // 0x40 0x1n 0x??:
-    mpSysexNames[SX_GS_RxChannel].Name = "GS_RxChannel";
-    mpSysexNames[SX_GS_UseForRhythm].Name = "GS_UseForRhythm";
-    mpSysexNames[SX_GS_CC1CtrlNo].Name = "GS_CC1CtrlNo";
-    mpSysexNames[SX_GS_CC2CtrlNo].Name = "GS_CC2CtrlNo";
+    mSysexNames[SX_GS_RxChannel] = "GS_RxChannel";
+    mSysexNames[SX_GS_UseForRhythm] = "GS_UseForRhythm";
+    mSysexNames[SX_GS_CC1CtrlNo] = "GS_CC1CtrlNo";
+    mSysexNames[SX_GS_CC2CtrlNo] = "GS_CC2CtrlNo";
 
 
     // XG
-    mpSysexNames[SX_XG_ON].Name = "XG_ON";
+    mSysexNames[SX_XG_ON] = "XG_ON";
 
     // Native Multipart:
     // Must be in sequence
-    mpSysexNames[SX_XG_ModPitch].Name = "XG_ModPitch";
-    mpSysexNames[SX_XG_ModTvf].Name = "XG_ModTvf";
-    mpSysexNames[SX_XG_ModAmpl].Name = "XG_ModAmpl";
-    mpSysexNames[SX_XG_ModLfoPitch].Name = "XG_ModLfoPitch";
-    mpSysexNames[SX_XG_ModLfoTvf].Name = "XG_ModLfoTvf";
-    mpSysexNames[SX_XG_ModLfoTva].Name = "XG_ModLfoTva";
-    mpSysexNames[SX_XG_BendPitch].Name = "XG_BendPitch";
-    mpSysexNames[SX_XG_BendTvf].Name = "XG_BendTvf";
-    mpSysexNames[SX_XG_BendAmpl].Name = "XG_BendAmpl";
-    mpSysexNames[SX_XG_BendLfoPitch].Name = "XG_BendLfoPitch";
-    mpSysexNames[SX_XG_BendLfoTvf].Name = "XG_BendLfoTvf";
-    mpSysexNames[SX_XG_BendLfoTva].Name = "XG_BendLfoTva";
+    mSysexNames[SX_XG_ModPitch] = "XG_ModPitch";
+    mSysexNames[SX_XG_ModTvf] = "XG_ModTvf";
+    mSysexNames[SX_XG_ModAmpl] = "XG_ModAmpl";
+    mSysexNames[SX_XG_ModLfoPitch] = "XG_ModLfoPitch";
+    mSysexNames[SX_XG_ModLfoTvf] = "XG_ModLfoTvf";
+    mSysexNames[SX_XG_ModLfoTva] = "XG_ModLfoTva";
+    mSysexNames[SX_XG_BendPitch] = "XG_BendPitch";
+    mSysexNames[SX_XG_BendTvf] = "XG_BendTvf";
+    mSysexNames[SX_XG_BendAmpl] = "XG_BendAmpl";
+    mSysexNames[SX_XG_BendLfoPitch] = "XG_BendLfoPitch";
+    mSysexNames[SX_XG_BendLfoTvf] = "XG_BendLfoTvf";
+    mSysexNames[SX_XG_BendLfoTva] = "XG_BendLfoTva";
 
     // Must be in sequence:
-    mpSysexNames[SX_XG_CafPitch].Name = "XG_CafPitch";
-    mpSysexNames[SX_XG_CafTvf].Name = "XG_CafTvf";
-    mpSysexNames[SX_XG_CafAmpl].Name = "XG_CafAmpl]";
-    mpSysexNames[SX_XG_CafLfoPitch].Name = "XG_CafLfoPitch";
-    mpSysexNames[SX_XG_CafLfoTvf].Name = "XG_CafLfoTvf";
-    mpSysexNames[SX_XG_CafLfoTva].Name = "XG_CafLfoTva";
-    mpSysexNames[SX_XG_PafPitch].Name = "XG_PafPitch";
-    mpSysexNames[SX_XG_PafTvf].Name = "XG_PafTvf";
-    mpSysexNames[SX_XG_PafAmpl].Name = "XG_PafAmpl";
-    mpSysexNames[SX_XG_PafLfoPitch].Name = "XG_PafLfoPitch";
-    mpSysexNames[SX_XG_PafLfoTvf].Name = "XG_PafLfoTvf";
-    mpSysexNames[SX_XG_PafLfoTva].Name = "XG_PafLfoTva";
-    mpSysexNames[SX_XG_CC1CtrlNo].Name = "XG_CC1CtrlNo";
-    mpSysexNames[SX_XG_CC1Pitch].Name = "XG_CC1Pitch";
-    mpSysexNames[SX_XG_CC1Tvf].Name = "XG_CC1Tvf";
-    mpSysexNames[SX_XG_CC1Ampl].Name = "XG_CC1Ampl";
-    mpSysexNames[SX_XG_CC1LfoPitch].Name = "XG_CC1LfoPitch";
-    mpSysexNames[SX_XG_CC1LfoTvf].Name = "XG_CC1LfoTvf";
-    mpSysexNames[SX_XG_CC1LfoTva].Name = "XG_CC1LfoTva";
-    mpSysexNames[SX_XG_CC2CtrlNo].Name = "XG_CC2CtrlNo";
-    mpSysexNames[SX_XG_CC2Pitch].Name = "XG_CC2Pitch";
-    mpSysexNames[SX_XG_CC2Tvf].Name = "XG_CC2Tvf";
-    mpSysexNames[SX_XG_CC2Ampl].Name = "XG_CC2Ampl";
-    mpSysexNames[SX_XG_CC2LfoPitch].Name = "XG_CC2LfoPitch";
-    mpSysexNames[SX_XG_CC2LfoTvf].Name = "XG_CC2LfoTvf";
-    mpSysexNames[SX_XG_CC2LfoTva].Name = "XG_CC2LfoTva";
+    mSysexNames[SX_XG_CafPitch] = "XG_CafPitch";
+    mSysexNames[SX_XG_CafTvf] = "XG_CafTvf";
+    mSysexNames[SX_XG_CafAmpl] = "XG_CafAmpl]";
+    mSysexNames[SX_XG_CafLfoPitch] = "XG_CafLfoPitch";
+    mSysexNames[SX_XG_CafLfoTvf] = "XG_CafLfoTvf";
+    mSysexNames[SX_XG_CafLfoTva] = "XG_CafLfoTva";
+    mSysexNames[SX_XG_PafPitch] = "XG_PafPitch";
+    mSysexNames[SX_XG_PafTvf] = "XG_PafTvf";
+    mSysexNames[SX_XG_PafAmpl] = "XG_PafAmpl";
+    mSysexNames[SX_XG_PafLfoPitch] = "XG_PafLfoPitch";
+    mSysexNames[SX_XG_PafLfoTvf] = "XG_PafLfoTvf";
+    mSysexNames[SX_XG_PafLfoTva] = "XG_PafLfoTva";
+    mSysexNames[SX_XG_CC1CtrlNo] = "XG_CC1CtrlNo";
+    mSysexNames[SX_XG_CC1Pitch] = "XG_CC1Pitch";
+    mSysexNames[SX_XG_CC1Tvf] = "XG_CC1Tvf";
+    mSysexNames[SX_XG_CC1Ampl] = "XG_CC1Ampl";
+    mSysexNames[SX_XG_CC1LfoPitch] = "XG_CC1LfoPitch";
+    mSysexNames[SX_XG_CC1LfoTvf] = "XG_CC1LfoTvf";
+    mSysexNames[SX_XG_CC1LfoTva] = "XG_CC1LfoTva";
+    mSysexNames[SX_XG_CC2CtrlNo] = "XG_CC2CtrlNo";
+    mSysexNames[SX_XG_CC2Pitch] = "XG_CC2Pitch";
+    mSysexNames[SX_XG_CC2Tvf] = "XG_CC2Tvf";
+    mSysexNames[SX_XG_CC2Ampl] = "XG_CC2Ampl";
+    mSysexNames[SX_XG_CC2LfoPitch] = "XG_CC2LfoPitch";
+    mSysexNames[SX_XG_CC2LfoTvf] = "XG_CC2LfoTvf";
+    mSysexNames[SX_XG_CC2LfoTva] = "XG_CC2LfoTva";
 
 
 
-    mpSysexNames[SX_XG_ReverbMacro].Name = "XG_ReverbMacro";
-    mpSysexNames[SX_XG_ChorusMacro].Name = "XG_ChorusMacro";
-    mpSysexNames[SX_XG_EqualizerMacro].Name = "XG_EqualizerMacro";
+    mSysexNames[SX_XG_ReverbMacro] = "XG_ReverbMacro";
+    mSysexNames[SX_XG_ChorusMacro] = "XG_ChorusMacro";
+    mSysexNames[SX_XG_EqualizerMacro] = "XG_EqualizerMacro";
 
-    mpSysexNames[SX_XG_RxChannel].Name = "XG_RxChannel";
-    mpSysexNames[SX_XG_UseForRhythm].Name = "XG_UseForRhythm";
+    mSysexNames[SX_XG_RxChannel] = "XG_RxChannel";
+    mSysexNames[SX_XG_UseForRhythm] = "XG_UseForRhythm";
   }
 
-  if (!mpSysexGroupNames)
+  if (mSysexGroupNames.empty())
   {
-    mpSysexGroupNames = new tNamedValue [130];
+    // Create storage.
+    mSysexGroupNames.resize(130);
 
-    for (i = 0; i < 130; i++)
-    {
-      mpSysexGroupNames[i].Value = i;
-      mpSysexGroupNames[i].Name = "";
-    }
-
-    mpSysexGroupNames[129].Name = 0;
-
-    mpSysexGroupNames[SX_GROUP_UNKNOWN + 1].Name = "Other Sysex";
-    mpSysexGroupNames[SX_GROUP_GM + 1].Name = "GM Sysex";
-    mpSysexGroupNames[SX_GROUP_GS + 1].Name = "GS Sysex";
-    mpSysexGroupNames[SX_GROUP_XG + 1].Name = "XG Sysex";
+    // Set the names.
+    mSysexGroupNames[SX_GROUP_UNKNOWN + 1] = "Other Sysex";
+    mSysexGroupNames[SX_GROUP_GM + 1] = "GM Sysex";
+    mSysexGroupNames[SX_GROUP_GS + 1] = "GS Sysex";
+    mSysexGroupNames[SX_GROUP_XG + 1] = "XG Sysex";
   }
 
   // GM
@@ -478,9 +459,6 @@ tSynthSysex::tSynthSysex()
 
 tSynthSysex::~tSynthSysex()
 {
-  delete [] mpSysexNames;
-  delete [] mpSysexGroupNames;
-
   for (int i = 0; i < NumSysexIds; i++)
   {
     delete sxdata[i];
@@ -496,7 +474,7 @@ int tSynthSysex::GetId( tSysEx *s ) const
    {
     case 0x7e:
        // GM ON ?
-       if (!memcmp(sxdata[SX_GM_ON],s->Data,s->Length))
+       if (!memcmp(sxdata[SX_GM_ON], s->Data, s->Length))
        {
          return SX_GM_ON;
        }

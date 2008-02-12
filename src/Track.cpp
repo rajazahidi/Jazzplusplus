@@ -33,18 +33,11 @@
 #include "Song.h"
 
 #include <cstdlib>
-
-//for sleep
-#ifdef _MSC_VER
-#else
-#include <unistd.h>
-#endif
-
 #include <assert.h>
 
-int tParam::Write(tWriteBase &io)
+int tParam::Write(tWriteBase& io)
 {
-  return( Msb.Write( io ) + Lsb.Write( io ) + DataMsb.Write( io ) );
+  return(Msb.Write(io) + Lsb.Write(io) + DataMsb.Write(io));
 }
 
 void tParam::SetCha(unsigned char cha)
@@ -63,85 +56,120 @@ void tParam::SetCha(unsigned char cha)
 /*
 unsigned char sys_Sysex[7] = { 0x41, 0x10, 0x42, 0x12, 0x40, 0x00, 0x00 };
 
-unsigned char *SysExDT1( unsigned char aa, unsigned char bb, unsigned char cc, int datalen, unsigned char *data ) {
-
-   int length = 9 + datalen;
-   unsigned char *mess = new unsigned char[length];
-   mess[0] = 0x41;
-   mess[1] = 0x10;
-   mess[2] = 0x42;
-   mess[3] = 0x12;
-   mess[4] = aa;
-      mess[5] = bb;
-   mess[6] = cc;
-   int i;
-   for (i = 0; i < datalen; i++)
+unsigned char *SysExDT1(
+  unsigned char aa,
+  unsigned char bb,
+  unsigned char cc,
+  int datalen,
+  unsigned char *data)
+{
+  int length = 9 + datalen;
+  unsigned char *mess = new unsigned char[length];
+  mess[0] = 0x41;
+  mess[1] = 0x10;
+  mess[2] = 0x42;
+  mess[3] = 0x12;
+  mess[4] = aa;
+  mess[5] = bb;
+  mess[6] = cc;
+  int i;
+  for (i = 0; i < datalen; i++)
+  {
     mess[i+7] = data[i];
-   unsigned char sum = 0x00;
-   for (i = 4; i < (length-2); i++)
+  }
+  unsigned char sum = 0x00;
+  for (i = 4; i < (length-2); i++)
+  {
     sum += mess[i];
-      mess[length - 2] = (0x80 - (sum & 0x7f)) & 0x7f;
-   mess[length - 1] = 0xf7;
-   return( mess );
+  }
+  mess[length - 2] = (0x80 - (sum & 0x7f)) & 0x7f;
+  mess[length - 1] = 0xf7;
+  return mess;
 }
 */
 
 static double framesPerSecond[] = { 24.0, 25.0, 30.0, 30.0 };
 
-tMtcTime::tMtcTime( tMtcOffset *s )
+tMtcTime::tMtcTime(tMtcOffset *s)
 {
   type = (tMtcType) ((s->Data[0] & 0x60) >> 5);
-  if (type < Mtc24) type = Mtc24;
-  if (type > Mtc30Ndf) type = Mtc30Ndf;
+  if (type < Mtc24)
+  {
+    type = Mtc24;
+  }
+  if (type > Mtc30Ndf)
+  {
+    type = Mtc30Ndf;
+  }
   hour = s->Data[0] & 0x1f;
   min = s->Data[1];
   sec = s->Data[2];
   fm = s->Data[3];
 }
 
-tMtcTime::tMtcTime( long millisec, tMtcType t )
+tMtcTime::tMtcTime(long millisec, tMtcType t)
 {
   type = t;
-  if (type < Mtc24) type = Mtc24;
-  if (type > Mtc30Ndf) type = Mtc30Ndf;
+  if (type < Mtc24)
+  {
+    type = Mtc24;
+  }
+  if (type > Mtc30Ndf)
+  {
+    type = Mtc30Ndf;
+  }
   sec = millisec / 1000;
   long msec = millisec % 1000;
   min = sec / 60;
   sec = sec % 60;
   hour = min / 60;
   min = min % 60;
-  double frametime = 1000.0 / framesPerSecond[ type ];
+  double frametime = 1000.0 / framesPerSecond[type];
   fm = (long) ((double) msec / frametime);
 }
 
-tMtcTime::tMtcTime( char *str, tMtcType t )
+tMtcTime::tMtcTime(char *str, tMtcType t)
 {
   type = t;
-  if (type < Mtc24) type = Mtc24;
-  if (type > Mtc30Ndf) type = Mtc30Ndf;
+  if (type < Mtc24)
+  {
+    type = Mtc24;
+  }
+  if (type > Mtc30Ndf)
+  {
+    type = Mtc30Ndf;
+  }
   hour = 0;
   min = 0;
   sec = 0;
   fm = 0;
-  sscanf( str, "%ld:%ld:%ld.%ld", &hour, &min, &sec, &fm );
-  if (fm >= framesPerSecond[ type ])
-    fm = (long) framesPerSecond[ type ] - 1;
+  sscanf(str, "%ld:%ld:%ld.%ld", &hour, &min, &sec, &fm);
+  if (fm >= framesPerSecond[type])
+  {
+    fm = (long) framesPerSecond[type] - 1;
+  }
 }
 
-tMtcTime::tMtcTime( unsigned h, unsigned m, unsigned s, unsigned f, unsigned t )
+tMtcTime::tMtcTime(unsigned h, unsigned m, unsigned s, unsigned f, unsigned t)
 {
   hour = h;
   min = m;
   sec = s;
   fm = f;
   type = (tMtcType) t;
-  if (type < Mtc24) type = Mtc24;
-  if (type > Mtc30Ndf) type = Mtc30Ndf;
+  if (type < Mtc24)
+  {
+    type = Mtc24;
+  }
+  if (type > Mtc30Ndf)
+  {
+    type = Mtc30Ndf;
+  }
 }
 
-void tMtcTime::ToString( char *str )
+void tMtcTime::ToString(char *str)
 {
-  sprintf( str, "%ld:%ld:%ld.%ld", hour, min, sec, fm );
+  sprintf(str, "%ld:%ld:%ld.%ld", hour, min, sec, fm);
 }
 
 tMtcOffset *tMtcTime::ToOffset()
@@ -154,97 +182,103 @@ tMtcOffset *tMtcTime::ToOffset()
   mess[4] = 0x00;
   tMtcOffset *s = new tMtcOffset(0, mess, 5);
   delete mess;
-  return( s );
+  return s;
 }
 
 long tMtcTime::ToMillisec()
 {
   long msec = (((((hour * 60L) + min) * 60L) + sec) * 1000L) +
               ((fm * 1000L) / (long) framesPerSecond[type]);
-  return( msec );
+  return msec;
 }
 
-int sysex_channel( int Channel ) {
+int sysex_channel(int Channel)
+{
   if (Channel < 10)
-    return( Channel );
+  {
+    return(Channel);
+  }
   else if (Channel == 10)
-    return( 0 );
-  else   return( Channel - 1 );
+  {
+    return 0;
+  }
+  return Channel - 1;
 }
 
-int drumParam2Index( int par )
+int drumParam2Index(int par)
 {
   switch (par)
   {
     case drumPitch:
-      return( drumPitchIndex );
+      return(drumPitchIndex);
     case drumTva:
-      return( drumTvaIndex );
+      return(drumTvaIndex);
     case drumPan:
-      return( drumPanIndex );
+      return(drumPanIndex);
     case drumReverb:
-      return( drumReverbIndex );
+      return(drumReverbIndex);
     case drumChorus:
-      return( drumChorusIndex );
-    default:
-      assert( 0 );
-  }
-  return 0;
-}
-
-int drumIndex2Param( int index )
-{
-  switch (index)
-  {
-    case drumPitchIndex:
-      return( drumPitch );
-    case drumTvaIndex:
-      return( drumTva );
-    case drumPanIndex:
-      return( drumPan );
-    case drumReverbIndex:
-      return( drumReverb );
-    case drumChorusIndex:
-      return( drumChorus );
+      return(drumChorusIndex);
     default:
       assert(0);
   }
   return 0;
 }
 
-tDrumInstrumentParameter::tDrumInstrumentParameter( tNrpn *par )
-: pitch( par->Lsb.Value ), next(0)
+int drumIndex2Param(int index)
+{
+  switch (index)
+  {
+    case drumPitchIndex:
+      return drumPitch;
+    case drumTvaIndex:
+      return drumTva;
+    case drumPanIndex:
+      return drumPan;
+    case drumReverbIndex:
+      return drumReverb;
+    case drumChorusIndex:
+      return drumChorus;
+    default:
+      assert(0);
+  }
+  return 0;
+}
+
+tDrumInstrumentParameter::tDrumInstrumentParameter(tNrpn *par)
+  : pitch(par->Lsb.Value),
+    next(0)
 {
   for (int i = drumPitchIndex; i < numDrumParameters; i++)
   {
     param[i] = 0;
   }
-  param[ drumParam2Index( par->Msb.Value ) ] = par;
+  param[drumParam2Index(par->Msb.Value)] = par;
 }
 
-tNrpn *tDrumInstrumentParameter::Get( int index )
+tNrpn *tDrumInstrumentParameter::Get(int index)
 {
-  assert( (index >= drumPitchIndex) && (index < numDrumParameters) );
-  return( param[ index ] );
+  assert((index >= drumPitchIndex) && (index < numDrumParameters));
+  return(param[index]);
 }
 
-void tDrumInstrumentParameter::Put( tNrpn *par )
+void tDrumInstrumentParameter::Put(tNrpn *par)
 {
-  param[ par->Lsb.Value ] = par;
+  param[par->Lsb.Value] = par;
 }
 
 tDrumInstrumentParameter *tDrumInstrumentParameter::Next()
 {
-  return( next );
+  return next;
 }
 
 int tDrumInstrumentParameter::Pitch()
 {
-  return( pitch );
+  return pitch;
 }
 
 tDrumInstrumentParameter
-*tDrumInstrumentParameterList::GetElem( int pit )
+*tDrumInstrumentParameterList::GetElem(int pit)
 {
   tDrumInstrumentParameter *ptr = list;
   while (ptr)
@@ -255,52 +289,55 @@ tDrumInstrumentParameter
     }
     ptr = ptr->next;
   }
-  return( ptr );
+  return ptr;
 }
 
-tNrpn *tDrumInstrumentParameterList::GetParam( int pit, int index )
+tNrpn *tDrumInstrumentParameterList::GetParam(int pit, int index)
 {
-  tDrumInstrumentParameter *ptr = GetElem( pit );
+  tDrumInstrumentParameter *ptr = GetElem(pit);
   if (ptr)
-     return( ptr->Get( index ) );
-  else
-    return( 0 );
+  {
+    return ptr->Get(index);
+  }
+  return 0;
 }
 
-void tDrumInstrumentParameterList::PutParam( tNrpn *par )
+void tDrumInstrumentParameterList::PutParam(tNrpn *par)
 {
-  tDrumInstrumentParameter *ptr = GetElem( par->Lsb.Value );
+  tDrumInstrumentParameter *ptr = GetElem(par->Lsb.Value);
   if (!ptr)
   {
-    ptr = new tDrumInstrumentParameter( par );
+    ptr = new tDrumInstrumentParameter(par);
     ptr ->next = list;
     list = ptr;
   }
   else
   {
-    ptr->param[ drumParam2Index( par->Msb.Value ) ] = par;
+    ptr->param[drumParam2Index(par->Msb.Value)] = par;
   }
 }
 
-void tDrumInstrumentParameterList::DelParam( int pit, int index )
+void tDrumInstrumentParameterList::DelParam(int pit, int index)
 {
   if (list)
   {
-    tDrumInstrumentParameter *elem = GetElem( pit );
+    tDrumInstrumentParameter *elem = GetElem(pit);
     if (elem)
     {
       if (elem->Get(index))
-        delete elem->param[ index ];
-      elem->param[ index ] = 0;
+      {
+        delete elem->param[index];
+      }
+      elem->param[index] = 0;
     }
   }
 }
 
-void tDrumInstrumentParameterList::DelElem( int pit )
+void tDrumInstrumentParameterList::DelElem(int pit)
 {
   for (int i = drumPitchIndex; i < numDrumParameters; i++)
   {
-    DelParam( pit, i );
+    DelParam(pit, i);
   }
 
   tDrumInstrumentParameter *ptr = list;
@@ -327,29 +364,34 @@ void tDrumInstrumentParameterList::DelElem( int pit )
 
 tDrumInstrumentParameter *tDrumInstrumentParameterList::FirstElem()
 {
-  return( list );
+  return list;
 }
 
-tDrumInstrumentParameter *tDrumInstrumentParameterList::NextElem( tDrumInstrumentParameter *cur )
+tDrumInstrumentParameter *tDrumInstrumentParameterList::NextElem(
+  tDrumInstrumentParameter *cur)
 {
   if (cur)
   {
-    tDrumInstrumentParameter *ptr = GetElem( cur->pitch );
+    tDrumInstrumentParameter *ptr = GetElem(cur->pitch);
     if (ptr)
-      return( ptr->next );
+    {
+      return ptr->next;
+    }
     else
-      return( 0 );
+    {
+      return 0;
+    }
   }
   else
   {
-    return( 0 );
+    return 0;
   }
 }
 
 void tDrumInstrumentParameterList::Clear()
 {
   tDrumInstrumentParameter *ptr = list;
-  while( ptr )
+  while (ptr)
   {
     list = ptr->next;
     delete ptr;
@@ -376,10 +418,17 @@ void tSimpleEventArray::Clear()
 {
   int i;
 #ifdef E_DBUG
-  { for (int i = 0; i < nEvents; i++) Events[i]->edb(); }
+  {
+    for (int i = 0; i < nEvents; i++)
+    {
+      Events[i]->edb();
+    }
+  }
 #endif
   for (i = 0; i < nEvents; i++)
+  {
     delete Events[i];
+  }
   nEvents = 0;
 }
 
@@ -415,9 +464,13 @@ void tSimpleEventArray::Resize()
   MaxEvents += 50;
   JZEvent **tmp = new JZEvent * [MaxEvents];
   for (i = 0; i < nEvents; i++)
+  {
     tmp[i] = Events[i];
+  }
   for (; i < MaxEvents; i++)
+  {
     tmp[i] = 0;
+  }
   delete [] Events;
   Events = tmp;
 }
@@ -430,33 +483,46 @@ void tSimpleEventArray::RemoveEOT()
   int j=0;
   int newnEvents=nEvents;
   for (int i = 0; i < nEvents; i++) 
-    {
-      if(Events[i]!=0 && Events[i]->IsEndOfTrack())
   {
-    j++;
-    newnEvents--;
-  }
- 
-      JZEvent* item;
-      if(j<=MaxEvents){
-  item=Events[j++];
-      }
-      else{item=0;}
-      Events[i]=item;
+    if(Events[i]!=0 && Events[i]->IsEndOfTrack())
+    {
+      j++;
+      newnEvents--;
     }
+ 
+    JZEvent* item;
+    if (j<=MaxEvents)
+    {
+      item = Events[j++];
+    }
+    else
+    {
+      item = 0;
+    }
+    Events[i]=item;
+  }
   nEvents=newnEvents;
 }
 
 void tSimpleEventArray::Put(JZEvent *e)
 {
   if(e->IsEndOfTrack())
+  {
      RemoveEOT(); //JAVE remove old EOT if we are adding a new one
+  }
   if (nEvents >= MaxEvents)
+  {
     Resize();
+  }
   Events[nEvents++] = e;
   
 #ifdef E_DBUG
-  { for (int i = 0; i < nEvents; i++) Events[i]->edb(); }
+  {
+    for (int i = 0; i < nEvents; i++)
+    {
+      Events[i]->edb();
+    }
+  }
 #endif
 }
 
@@ -483,7 +549,8 @@ void tSimpleEventArray::GrabData(tSimpleEventArray &src)
 void tSimpleEventArray::Copy(tSimpleEventArray &src, long frclk, long toclk) {
   tEventIterator iter(&src);
   JZEvent *e = iter.Range(frclk, toclk);
-  while (e) {
+  while (e)
+  {
     Put(e->Copy());
     e = iter.Next();
   }
@@ -528,22 +595,34 @@ void tEventArray::Clear()
   Device  = 0;
 
   for (i = 0; i < mspModulationSysexParameters; i++)
-  ModulationSettings[i] = 0;
+  {
+    ModulationSettings[i] = 0;
+  }
 
   for (i = 0; i < bspBenderSysexParameters; i++)
-  BenderSettings[i] = 0;
+  {
+    BenderSettings[i] = 0;
+  }
 
   for (i = 0; i < cspCAfSysexParameters; i++)
-  CAfSettings[i] = 0;
+  {
+    CAfSettings[i] = 0;
+  }
 
   for (i = 0; i < pspPAfSysexParameters; i++)
-  PAfSettings[i] = 0;
+  {
+    PAfSettings[i] = 0;
+  }
 
   for (i = 0; i < cspCC1SysexParameters; i++)
-  CC1Settings[i] = 0;
+  {
+    CC1Settings[i] = 0;
+  }
 
   for (i = 0; i < cspCC2SysexParameters; i++)
-  CC2Settings[i] = 0;
+  {
+    CC2Settings[i] = 0;
+  }
 
   CC1ControllerNr = 0;
   CC2ControllerNr = 0;
@@ -553,10 +632,14 @@ void tEventArray::Clear()
   EqualizerType = 0;
 
   for (i = 0; i < rspReverbSysexParameters; i++)
-  ReverbSettings[i] = 0;
+  {
+    ReverbSettings[i] = 0;
+  }
 
   for (i = 0; i < cspChorusSysexParameters; i++)
-  ChorusSettings[i] = 0;
+  {
+    ChorusSettings[i] = 0;
+  }
 
   PartialReserve = 0;
   MasterVol = 0;
@@ -578,7 +661,9 @@ void tEventArray::Clear()
   DrumParams.Clear();
 
   if (Events)
+  {
     delete [] Events;
+  }
   Events = 0;
   MaxEvents = 0;
 
@@ -630,22 +715,34 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
   Chorus = 0;
 
   for (i = 0; i < mspModulationSysexParameters; i++)
-  ModulationSettings[i] = 0;
+  {
+    ModulationSettings[i] = 0;
+  }
 
   for (i = bspBendPitchControl; i < bspBenderSysexParameters; i++)
-  BenderSettings[i] = 0;
+  {
+    BenderSettings[i] = 0;
+  }
 
   for (i = 0; i < cspCAfSysexParameters; i++)
-  CAfSettings[i] = 0;
+  {
+    CAfSettings[i] = 0;
+  }
 
   for (i = 0; i < pspPAfSysexParameters; i++)
-  PAfSettings[i] = 0;
+  {
+    PAfSettings[i] = 0;
+  }
 
   for (i = 0; i < cspCC1SysexParameters; i++)
-  CC1Settings[i] = 0;
+  {
+    CC1Settings[i] = 0;
+  }
 
   for (i = 0; i < cspCC2SysexParameters; i++)
-  CC2Settings[i] = 0;
+  {
+    CC2Settings[i] = 0;
+  }
 
   CC1ControllerNr = 0;
   CC2ControllerNr = 0;
@@ -655,10 +752,14 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
   EqualizerType = 0;
 
   for (i = 0; i < rspReverbSysexParameters; i++)
-  ReverbSettings[i] = 0;
+  {
+    ReverbSettings[i] = 0;
+  }
 
   for (i = 0; i < cspChorusSysexParameters; i++)
-  ChorusSettings[i] = 0;
+  {
+    ChorusSettings[i] = 0;
+  }
 
   PartialReserve = 0;
   MasterVol = 0;
@@ -673,8 +774,10 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
     {
       if (!dont_delete_killed_events)
       {
-  for (int j = i; j < nEvents; j++)
-    delete Events[j];
+        for (int j = i; j < nEvents; j++)
+        {
+          delete Events[j];
+        }
       }
       nEvents = i;
       break;
@@ -682,296 +785,326 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
 
     // accept only events having clock == 0 as track defaults
     if (e->Clock != 0)
+    {
       continue;
+    }
 
     if (!Name)
+    {
       Name = e->IsTrackName();
+    }
     if (!Copyright)
+    {
       Copyright = e->IsCopyright();
+    }
     if (!Speed)
+    {
       Speed = e->IsSetTempo();
+    }
     if (!MtcOffset)
+    {
       MtcOffset = e->IsMtcOffset();
+    }
     if ((c = e->IsControl()) != 0)
     {
       switch (c->Control)
       {
-        case 0x07: if (!Volume) Volume = c; break;
-        case 0x0a: if (!Pan)    Pan    = c; break;
-        case 0x5b: if (!Reverb) Reverb = c; break;
-        case 0x5d: if (!Chorus) Chorus = c; break;
+        case 0x07:
+          if (!Volume)
+          {
+            Volume = c;
+          }
+          break;
+        case 0x0a:
+          if (!Pan)
+          {
+            Pan = c;
+          }
+          break;
+        case 0x5b:
+          if (!Reverb)
+          {
+            Reverb = c;
+          }
+          break;
+        case 0x5d:
+          if (!Chorus)
+          {
+            Chorus = c;
+          }
+          break;
       }
     }
     if ((s = e->IsSysEx()) != 0)
     {
-       int sxid = gpSynth->GetSysexId( s );
+      int sxid = gpSynth->GetSysexId(s);
 
-       if (!gpSynth->IsGS())
-       {
-         switch (sxid)
-         {
-           case SX_GM_MasterVol:
-             // GS has its own; SC-55 doesn't recognize GM Mastervol
-             MasterVol = s;
-             break;
-           default:
-             break;
-         }
-       }
+      if (!gpSynth->IsGS())
+      {
+        switch (sxid)
+        {
+          case SX_GM_MasterVol:
+            // GS has its own; SC-55 doesn't recognize GM Mastervol
+            MasterVol = s;
+            break;
+          default:
+            break;
+        }
+      }
 
-       if (gpSynth->IsGS())
-       {
-    switch (sxid)
-    {
-     case SX_GS_MasterVol:
-        MasterVol = s;
-        break;
-     case SX_GS_MasterPan:
-        MasterPan = s;
-        break;
-     case SX_GS_BendPitch:
-     case SX_GS_BendTvf:
-     case SX_GS_BendAmpl:
-     case SX_GS_BendLfo1Rate:
-     case SX_GS_BendLfo1Pitch:
-     case SX_GS_BendLfo1Tvf:
-     case SX_GS_BendLfo1Tva:
-     case SX_GS_BendLfo2Rate:
-     case SX_GS_BendLfo2Pitch:
-     case SX_GS_BendLfo2Tvf:
-     case SX_GS_BendLfo2Tva:
-        BenderSettings[sxid - SX_GS_BendPitch] = s;
-        break;
+      if (gpSynth->IsGS())
+      {
+        switch (sxid)
+        {
+          case SX_GS_MasterVol:
+            MasterVol = s;
+            break;
+          case SX_GS_MasterPan:
+            MasterPan = s;
+            break;
+          case SX_GS_BendPitch:
+          case SX_GS_BendTvf:
+          case SX_GS_BendAmpl:
+          case SX_GS_BendLfo1Rate:
+          case SX_GS_BendLfo1Pitch:
+          case SX_GS_BendLfo1Tvf:
+          case SX_GS_BendLfo1Tva:
+          case SX_GS_BendLfo2Rate:
+          case SX_GS_BendLfo2Pitch:
+          case SX_GS_BendLfo2Tvf:
+          case SX_GS_BendLfo2Tva:
+            BenderSettings[sxid - SX_GS_BendPitch] = s;
+            break;
 
-     case SX_GS_ModPitch:
-     case SX_GS_ModTvf:
-     case SX_GS_ModAmpl:
-     case SX_GS_ModLfo1Rate:
-     case SX_GS_ModLfo1Pitch:
-     case SX_GS_ModLfo1Tvf:
-     case SX_GS_ModLfo1Tva:
-     case SX_GS_ModLfo2Rate:
-     case SX_GS_ModLfo2Pitch:
-     case SX_GS_ModLfo2Tvf:
-     case SX_GS_ModLfo2Tva:
-        ModulationSettings[sxid - SX_GS_ModPitch] = s;
-        break;
+          case SX_GS_ModPitch:
+          case SX_GS_ModTvf:
+          case SX_GS_ModAmpl:
+          case SX_GS_ModLfo1Rate:
+          case SX_GS_ModLfo1Pitch:
+          case SX_GS_ModLfo1Tvf:
+          case SX_GS_ModLfo1Tva:
+          case SX_GS_ModLfo2Rate:
+          case SX_GS_ModLfo2Pitch:
+          case SX_GS_ModLfo2Tvf:
+          case SX_GS_ModLfo2Tva:
+            ModulationSettings[sxid - SX_GS_ModPitch] = s;
+            break;
 
-     case SX_GS_CafPitch:
-     case SX_GS_CafTvf:
-     case SX_GS_CafAmpl:
-     case SX_GS_CafLfo1Rate:
-     case SX_GS_CafLfo1Pitch:
-     case SX_GS_CafLfo1Tvf:
-     case SX_GS_CafLfo1Tva:
-     case SX_GS_CafLfo2Rate:
-     case SX_GS_CafLfo2Pitch:
-     case SX_GS_CafLfo2Tvf:
-     case SX_GS_CafLfo2Tva:
-        CAfSettings[sxid - SX_GS_CafPitch] = s;
-        break;
+          case SX_GS_CafPitch:
+          case SX_GS_CafTvf:
+          case SX_GS_CafAmpl:
+          case SX_GS_CafLfo1Rate:
+          case SX_GS_CafLfo1Pitch:
+          case SX_GS_CafLfo1Tvf:
+          case SX_GS_CafLfo1Tva:
+          case SX_GS_CafLfo2Rate:
+          case SX_GS_CafLfo2Pitch:
+          case SX_GS_CafLfo2Tvf:
+          case SX_GS_CafLfo2Tva:
+            CAfSettings[sxid - SX_GS_CafPitch] = s;
+            break;
 
-     case SX_GS_PafPitch:
-     case SX_GS_PafTvf:
-     case SX_GS_PafAmpl:
-     case SX_GS_PafLfo1Rate:
-     case SX_GS_PafLfo1Pitch:
-     case SX_GS_PafLfo1Tvf:
-     case SX_GS_PafLfo1Tva:
-     case SX_GS_PafLfo2Rate:
-     case SX_GS_PafLfo2Pitch:
-     case SX_GS_PafLfo2Tvf:
-     case SX_GS_PafLfo2Tva:
-        PAfSettings[sxid - SX_GS_PafPitch] = s;
-        break;
+          case SX_GS_PafPitch:
+          case SX_GS_PafTvf:
+          case SX_GS_PafAmpl:
+          case SX_GS_PafLfo1Rate:
+          case SX_GS_PafLfo1Pitch:
+          case SX_GS_PafLfo1Tvf:
+          case SX_GS_PafLfo1Tva:
+          case SX_GS_PafLfo2Rate:
+          case SX_GS_PafLfo2Pitch:
+          case SX_GS_PafLfo2Tvf:
+          case SX_GS_PafLfo2Tva:
+            PAfSettings[sxid - SX_GS_PafPitch] = s;
+            break;
 
-     case SX_GS_CC1Pitch:
-     case SX_GS_CC1Tvf:
-     case SX_GS_CC1Ampl:
-     case SX_GS_CC1Lfo1Rate:
-     case SX_GS_CC1Lfo1Pitch:
-     case SX_GS_CC1Lfo1Tvf:
-     case SX_GS_CC1Lfo1Tva:
-     case SX_GS_CC1Lfo2Rate:
-     case SX_GS_CC1Lfo2Pitch:
-     case SX_GS_CC1Lfo2Tvf:
-     case SX_GS_CC1Lfo2Tva:
-        CC1Settings[sxid - SX_GS_CC1Pitch] = s;
-        break;
+          case SX_GS_CC1Pitch:
+          case SX_GS_CC1Tvf:
+          case SX_GS_CC1Ampl:
+          case SX_GS_CC1Lfo1Rate:
+          case SX_GS_CC1Lfo1Pitch:
+          case SX_GS_CC1Lfo1Tvf:
+          case SX_GS_CC1Lfo1Tva:
+          case SX_GS_CC1Lfo2Rate:
+          case SX_GS_CC1Lfo2Pitch:
+          case SX_GS_CC1Lfo2Tvf:
+          case SX_GS_CC1Lfo2Tva:
+            CC1Settings[sxid - SX_GS_CC1Pitch] = s;
+            break;
 
-     case SX_GS_CC2Pitch:
-     case SX_GS_CC2Tvf:
-     case SX_GS_CC2Ampl:
-     case SX_GS_CC2Lfo1Rate:
-     case SX_GS_CC2Lfo1Pitch:
-     case SX_GS_CC2Lfo1Tvf:
-     case SX_GS_CC2Lfo1Tva:
-     case SX_GS_CC2Lfo2Rate:
-     case SX_GS_CC2Lfo2Pitch:
-     case SX_GS_CC2Lfo2Tvf:
-     case SX_GS_CC2Lfo2Tva:
-        CC2Settings[sxid - SX_GS_CC2Pitch] = s;
-        break;
+          case SX_GS_CC2Pitch:
+          case SX_GS_CC2Tvf:
+          case SX_GS_CC2Ampl:
+          case SX_GS_CC2Lfo1Rate:
+          case SX_GS_CC2Lfo1Pitch:
+          case SX_GS_CC2Lfo1Tvf:
+          case SX_GS_CC2Lfo1Tva:
+          case SX_GS_CC2Lfo2Rate:
+          case SX_GS_CC2Lfo2Pitch:
+          case SX_GS_CC2Lfo2Tvf:
+          case SX_GS_CC2Lfo2Tva:
+            CC2Settings[sxid - SX_GS_CC2Pitch] = s;
+            break;
 
-     case SX_GS_ReverbMacro:
-        ReverbType = s;
-        break;
+          case SX_GS_ReverbMacro:
+            ReverbType = s;
+            break;
 
-     case SX_GS_RevCharacter:
-     case SX_GS_RevPreLpf:
-     case SX_GS_RevLevel:
-     case SX_GS_RevTime:
-     case SX_GS_RevDelayFeedback:
-     case SX_GS_RevSendChorus:
-        ReverbSettings[ sxid - SX_GS_RevCharacter] = s;
-        break;
+          case SX_GS_RevCharacter:
+          case SX_GS_RevPreLpf:
+          case SX_GS_RevLevel:
+          case SX_GS_RevTime:
+          case SX_GS_RevDelayFeedback:
+          case SX_GS_RevSendChorus:
+            ReverbSettings[sxid - SX_GS_RevCharacter] = s;
+            break;
 
-     case SX_GS_ChorusMacro:
-        ChorusType = s;
-        break;
+          case SX_GS_ChorusMacro:
+            ChorusType = s;
+            break;
 
-     case SX_GS_ChoPreLpf:
-     case SX_GS_ChoLevel:
-     case SX_GS_ChoFeedback:
-     case SX_GS_ChoDelay:
-     case SX_GS_ChoRate:
-     case SX_GS_ChoDepth:
-     case SX_GS_ChoSendReverb:
-        ChorusSettings[ sxid - SX_GS_ChoPreLpf] = s;
-        break;
+          case SX_GS_ChoPreLpf:
+          case SX_GS_ChoLevel:
+          case SX_GS_ChoFeedback:
+          case SX_GS_ChoDelay:
+          case SX_GS_ChoRate:
+          case SX_GS_ChoDepth:
+          case SX_GS_ChoSendReverb:
+            ChorusSettings[sxid - SX_GS_ChoPreLpf] = s;
+            break;
 
-     case SX_GS_CC1CtrlNo:
-        CC1ControllerNr = s;
-        break;
+          case SX_GS_CC1CtrlNo:
+            CC1ControllerNr = s;
+            break;
 
-     case SX_GS_CC2CtrlNo:
-        CC2ControllerNr = s;
-        break;
+          case SX_GS_CC2CtrlNo:
+            CC2ControllerNr = s;
+            break;
 
-     case SX_GS_PartialReserve:
-        PartialReserve = s;
-        break;
+          case SX_GS_PartialReserve:
+            PartialReserve = s;
+            break;
 
-     case SX_GS_RxChannel:
-        RxChannel = s;
-        break;
+          case SX_GS_RxChannel:
+            RxChannel = s;
+            break;
 
-     case SX_GS_UseForRhythm:
-        UseForRhythm = s;
-        break;
+          case SX_GS_UseForRhythm:
+            UseForRhythm = s;
+            break;
 
-     default:
-        break;
-    }
-       }
-       else if (gpSynth->IsXG())
-       {
-    switch (sxid)
-    {
-     case SX_XG_BendPitch:
-     case SX_XG_BendTvf:
-     case SX_XG_BendAmpl:
-        BenderSettings[ sxid - SX_XG_BendPitch] = s;
-        break;
+          default:
+            break;
+        }
+      }
+      else if (gpSynth->IsXG())
+      {
+        switch (sxid)
+        {
+          case SX_XG_BendPitch:
+          case SX_XG_BendTvf:
+          case SX_XG_BendAmpl:
+            BenderSettings[sxid - SX_XG_BendPitch] = s;
+            break;
 
-     case SX_XG_BendLfoPitch:
-     case SX_XG_BendLfoTvf:
-     case SX_XG_BendLfoTva:
-        BenderSettings[ sxid + 1 - SX_XG_BendPitch] = s;
-        break;
+          case SX_XG_BendLfoPitch:
+          case SX_XG_BendLfoTvf:
+          case SX_XG_BendLfoTva:
+            BenderSettings[sxid + 1 - SX_XG_BendPitch] = s;
+            break;
 
-     case SX_XG_ModPitch:
-     case SX_XG_ModTvf:
-     case SX_XG_ModAmpl:
-        ModulationSettings[ sxid - SX_XG_ModPitch] = s;
-        break;
+          case SX_XG_ModPitch:
+          case SX_XG_ModTvf:
+          case SX_XG_ModAmpl:
+            ModulationSettings[sxid - SX_XG_ModPitch] = s;
+            break;
 
-     case SX_XG_ModLfoPitch:
-     case SX_XG_ModLfoTvf:
-     case SX_XG_ModLfoTva:
-        ModulationSettings[ sxid + 1 - SX_XG_ModPitch] = s;
-        break;
+          case SX_XG_ModLfoPitch:
+          case SX_XG_ModLfoTvf:
+          case SX_XG_ModLfoTva:
+            ModulationSettings[sxid + 1 - SX_XG_ModPitch] = s;
+            break;
 
-     case SX_XG_CafPitch:
-     case SX_XG_CafTvf:
-     case SX_XG_CafAmpl:
-        CAfSettings[ sxid - SX_XG_CafPitch] = s;
-        break;
+          case SX_XG_CafPitch:
+          case SX_XG_CafTvf:
+          case SX_XG_CafAmpl:
+            CAfSettings[sxid - SX_XG_CafPitch] = s;
+            break;
 
-     case SX_XG_CafLfoPitch:
-     case SX_XG_CafLfoTvf:
-     case SX_XG_CafLfoTva:
-        CAfSettings[ sxid + 1 - SX_XG_CafPitch] = s;
-        break;
+          case SX_XG_CafLfoPitch:
+          case SX_XG_CafLfoTvf:
+          case SX_XG_CafLfoTva:
+            CAfSettings[sxid + 1 - SX_XG_CafPitch] = s;
+            break;
 
-     case SX_XG_PafPitch:
-     case SX_XG_PafTvf:
-     case SX_XG_PafAmpl:
-        PAfSettings[ sxid - SX_XG_PafPitch] = s;
-        break;
+          case SX_XG_PafPitch:
+          case SX_XG_PafTvf:
+          case SX_XG_PafAmpl:
+            PAfSettings[sxid - SX_XG_PafPitch] = s;
+            break;
 
-     case SX_XG_PafLfoPitch:
-     case SX_XG_PafLfoTvf:
-     case SX_XG_PafLfoTva:
-        PAfSettings[ sxid + 1 - SX_XG_PafPitch] = s;
-        break;
+          case SX_XG_PafLfoPitch:
+          case SX_XG_PafLfoTvf:
+          case SX_XG_PafLfoTva:
+            PAfSettings[sxid + 1 - SX_XG_PafPitch] = s;
+            break;
 
-     case SX_XG_CC1Pitch:
-     case SX_XG_CC1Tvf:
-     case SX_XG_CC1Ampl:
-        CC1Settings[ sxid - SX_XG_CC1Pitch] = s;
-        break;
+          case SX_XG_CC1Pitch:
+          case SX_XG_CC1Tvf:
+          case SX_XG_CC1Ampl:
+            CC1Settings[sxid - SX_XG_CC1Pitch] = s;
+            break;
 
-     case SX_XG_CC1LfoPitch:
-     case SX_XG_CC1LfoTvf:
-     case SX_XG_CC1LfoTva:
-        CC1Settings[ sxid + 1 - SX_XG_CC1Pitch] = s;
-        break;
+          case SX_XG_CC1LfoPitch:
+          case SX_XG_CC1LfoTvf:
+          case SX_XG_CC1LfoTva:
+            CC1Settings[sxid + 1 - SX_XG_CC1Pitch] = s;
+            break;
 
-     case SX_XG_CC2Pitch:
-     case SX_XG_CC2Tvf:
-     case SX_XG_CC2Ampl:
-        CC2Settings[ sxid - SX_XG_CC2Pitch] = s;
-        break;
+          case SX_XG_CC2Pitch:
+          case SX_XG_CC2Tvf:
+          case SX_XG_CC2Ampl:
+            CC2Settings[sxid - SX_XG_CC2Pitch] = s;
+            break;
 
-     case SX_XG_CC2LfoPitch:
-     case SX_XG_CC2LfoTvf:
-     case SX_XG_CC2LfoTva:
-        CC2Settings[ sxid + 1 - SX_XG_CC2Pitch] = s;
-        break;
+          case SX_XG_CC2LfoPitch:
+          case SX_XG_CC2LfoTvf:
+          case SX_XG_CC2LfoTva:
+            CC2Settings[sxid + 1 - SX_XG_CC2Pitch] = s;
+            break;
 
-     case SX_XG_ReverbMacro:
-        ReverbType = s;
-        break;
+          case SX_XG_ReverbMacro:
+            ReverbType = s;
+            break;
 
-     case SX_XG_ChorusMacro:
-        ChorusType = s;
-        break;
+          case SX_XG_ChorusMacro:
+            ChorusType = s;
+            break;
 
-     case SX_XG_EqualizerMacro:
-        EqualizerType = s;
-        break;
+          case SX_XG_EqualizerMacro:
+            EqualizerType = s;
+            break;
 
-     case SX_XG_CC1CtrlNo:
-        CC1ControllerNr = s;
-        break;
+          case SX_XG_CC1CtrlNo:
+            CC1ControllerNr = s;
+            break;
 
-     case SX_XG_CC2CtrlNo:
-        CC2ControllerNr = s;
-        break;
+          case SX_XG_CC2CtrlNo:
+            CC2ControllerNr = s;
+            break;
 
-     case SX_XG_RxChannel:
-        RxChannel = s;
-        break;
+          case SX_XG_RxChannel:
+            RxChannel = s;
+            break;
 
-     case SX_XG_UseForRhythm:
-        UseForRhythm = s;
-        break;
+          case SX_XG_UseForRhythm:
+            UseForRhythm = s;
+            break;
 
-     default:
-        break;
-    }
-       }
+          default:
+            break;
+        }
+      }
     }
   }
 }
@@ -987,8 +1120,11 @@ void tEventArray::Length2Keyoff()
     {
 //      JZEvent *of = new tKeyOff(on->Clock + on->Length, on->Channel, on->Key);
       // SN++ added off veloc
-      JZEvent *of = new tKeyOff(on->Clock + on->Length, on->Channel,
-                              on->Key,on->OffVeloc);
+      JZEvent *of = new tKeyOff(
+        on->Clock + on->Length,
+        on->Channel,
+        on->Key,
+        on->OffVeloc);
 
       on->Length = 0;
       of->SetDevice(on->GetDevice());
@@ -1017,11 +1153,13 @@ void tEventArray::Keyoff2Length()
         {
           on->Length = of->Clock - on->Clock;
           if (on->Length <= 0L)
+          {
             on->Length = 1;
+          }
           of->Kill();
-    break;
-  }
-  -- e;
+          break;
+        }
+        --e;
       }
     }
   }
@@ -1031,7 +1169,9 @@ void tEventArray::Keyoff2Length()
   {
     tKeyOn *k = Events[i]->IsKeyOn();
     if (k && k->Length <= 0)
+    {
       k->Kill();
+    }
   }
   Cleanup(0);
 }
@@ -1040,8 +1180,8 @@ void tEventArray::Keyoff2Length()
 
 void tEventArray::Keyoff2Length()
 {
-  /* searches forward from a KeyOn to find the matching KeyOff.
-     This is compatible with Cubase */
+  // Searches forward from a KeyOn to find the matching KeyOff.
+  // This is compatible with Cubase.
   int i;
   for (i = 0; i < nEvents; i++)
   {
@@ -1052,14 +1192,20 @@ void tEventArray::Keyoff2Length()
       for (j = i + 1; j < nEvents; j++)
       {
         tKeyOff *of = Events[j]->IsKeyOff();
-        if (of && !of->IsKilled() && on->Key == of->Key && on->Channel == of->Channel)
+        if (
+          of &&
+          !of->IsKilled() &&
+          on->Key == of->Key &&
+          on->Channel == of->Channel)
         {
           on->Length = of->Clock - on->Clock;
           if (on->Length <= 0L)
+          {
             on->Length = 1;
+          }
           of->Kill();
-    break;
-  }
+          break;
+        }
       }
     }
   }
@@ -1070,10 +1216,14 @@ void tEventArray::Keyoff2Length()
   {
     tKeyOn *on = Events[i]->IsKeyOn();
     if (on && on->Length <= 0)
+    {
       on->Kill();
+    }
     tKeyOff *of = Events[i]->IsKeyOff();
     if (of)
+    {
       of->Kill();
+    }
   }
   Cleanup(0);
 }
@@ -1090,10 +1240,16 @@ void tEventArray::Write(tWriteBase &io)
   io.NextTrack();
 
   // Write copyright notice first (according to spec):
-  if (Copyright) Copyright->Write(io);
+  if (Copyright)
+  {
+    Copyright->Write(io);
+  }
 
   // Write MTC offset before any transmittable events (spec)
-  if (MtcOffset) MtcOffset->Write(io);
+  if (MtcOffset)
+  {
+    MtcOffset->Write(io);
+  }
 
   // Synth reset
   if (Reset)
@@ -1103,34 +1259,70 @@ void tEventArray::Write(tWriteBase &io)
 
   // Rpn / Nrpn:
   // All these must be written in order (three tControl's in a row)
-  if (VibRate) VibRate->Write(io);
-  if (VibDepth) VibDepth->Write(io);
-  if (VibDelay) VibDelay->Write(io);
-  if (Cutoff) Cutoff->Write(io);
-  if (Resonance) Resonance->Write(io);
-  if (EnvAttack) EnvAttack->Write(io);
-  if (EnvDecay) EnvDecay->Write(io);
-  if (EnvRelease) EnvRelease->Write(io);
-  if (BendPitchSens) BendPitchSens->Write(io);
+  if (VibRate)
+  {
+    VibRate->Write(io);
+  }
+  if (VibDepth)
+  {
+    VibDepth->Write(io);
+  }
+  if (VibDelay)
+  {
+    VibDelay->Write(io);
+  }
+  if (Cutoff)
+  {
+    Cutoff->Write(io);
+  }
+  if (Resonance)
+  {
+    Resonance->Write(io);
+  }
+  if (EnvAttack)
+  {
+    EnvAttack->Write(io);
+  }
+  if (EnvDecay)
+  {
+    EnvDecay->Write(io);
+  }
+  if (EnvRelease)
+  {
+    EnvRelease->Write(io);
+  }
+  if (BendPitchSens)
+  {
+    BendPitchSens->Write(io);
+  }
 
   tDrumInstrumentParameter *dpar = DrumParams.FirstElem();
-  while ( dpar )
+  while (dpar)
   {
     int index;
     for (index = drumPitchIndex; index < numDrumParameters; index++)
     {
       if (dpar->Get(index))
       {
-        dpar->Get(index)->Write( io );
+        dpar->Get(index)->Write(io);
       }
     }
-    dpar = DrumParams.NextElem( dpar );
+    dpar = DrumParams.NextElem(dpar);
   }
 
   // Bank: Must be sure bank is written before program:
-  if (Bank) Bank->Write(io);
-  if (Bank2) Bank2->Write(io);
-  if (Patch) Patch->Write(io);
+  if (Bank)
+  {
+    Bank->Write(io);
+  }
+  if (Bank2)
+  {
+    Bank2->Write(io);
+  }
+  if (Patch)
+  {
+    Patch->Write(io);
+  }
 
   // write jazz track info
   tJazzMeta *jazz = new tJazzMeta;
@@ -1140,40 +1332,50 @@ void tEventArray::Write(tWriteBase &io)
   jazz->SetIntroLength(gpSong->GetIntroLength());
   jazz->Write(io);
 
-  for (int i = 0; i < nEvents; i++) {
-  e = Events[i];
-  WrittenBefore = 0;
-  if (e->IsControl()) {
-    switch (e->IsControl()->Control) {
+  for (int i = 0; i < nEvents; i++)
+  {
+    e = Events[i];
+    WrittenBefore = 0;
+    if (e->IsControl())
+    {
+      switch (e->IsControl()->Control)
+      {
+        // Don't write these again if present as events
+        // and clock == 0 (should not happen)
+        case 0x65: // Rpn Msb
+        case 0x64: // Rpn Lsb
+        case 0x63: // Nrpn Msb
+        case 0x62: // Nrpn Lsb
+        case 0x06: // Rpn/Nrpn Data
+        case 0x00: // Bank
+        case 0x20: // Bank2
+          if (e->Clock == 0)
+          {
+            WrittenBefore = 1;
+          }
+          break;
+        default:
+          WrittenBefore = 0;
+      }
+    }
+    else if (e->IsProgram())
+    {
       // Don't write these again if present as events
       // and clock == 0 (should not happen)
-      case 0x65: // Rpn Msb
-      case 0x64: // Rpn Lsb
-      case 0x63: // Nrpn Msb
-      case 0x62: // Nrpn Lsb
-      case 0x06: // Rpn/Nrpn Data
-      case 0x00: // Bank
-      case 0x20: // Bank2
-        if (e->Clock == 0)
-          WrittenBefore = 1;
-        break;
-      default:
-        WrittenBefore = 0;
+      if (e->Clock == 0)
+      {
+        WrittenBefore = 1;
+      }
     }
-  }
-  else if (e->IsProgram()) {
-    // Don't write these again if present as events
-    // and clock == 0 (should not happen)
-    if (e->Clock == 0)
+    else if (e->IsCopyright() || e->IsMtcOffset())
+    {
+      // Will probably happen
       WrittenBefore = 1;
-  }
-  else if (e->IsCopyright() || e->IsMtcOffset()) {
-    // Will probably happen
-    WrittenBefore = 1;
-  }
-  if (!WrittenBefore) {
-        e->Write(io);
-  }
+    }
+    if (!WrittenBefore)
+    {
+      e->Write(io);
+    }
   }
   Keyoff2Length();
 }
@@ -1191,7 +1393,7 @@ void tEventArray::Read(tReadBase &io)
   int cha;
 
   io.NextTrack();
-  while ( ((e = io.Read()) != 0) )
+  while ((e = io.Read()) != 0)
   {
     SpecialEvent = 0;
     if (e->IsJazzMeta())
@@ -1231,35 +1433,51 @@ void tEventArray::Read(tReadBase &io)
               {
                 case 0x08:
                   if (!VibRate)
-                    VibRate = new tNrpn( 0, cha, Msb, Lsb, Data );
+                  {
+                    VibRate = new tNrpn(0, cha, Msb, Lsb, Data);
+                  }
                   break;
                 case 0x09:
                   if (!VibDepth)
-                    VibDepth = new tNrpn( 0, cha, Msb, Lsb, Data );
+                  {
+                    VibDepth = new tNrpn(0, cha, Msb, Lsb, Data);
+                  }
                   break;
                 case 0x0a:
                   if (!VibDelay)
-                    VibDelay = new tNrpn( 0, cha, Msb, Lsb, Data );
+                  {
+                    VibDelay = new tNrpn(0, cha, Msb, Lsb, Data);
+                  }
                   break;
                 case 0x20:
                   if (!Cutoff)
-                    Cutoff = new tNrpn( 0, cha, Msb, Lsb, Data );
+                  {
+                    Cutoff = new tNrpn(0, cha, Msb, Lsb, Data);
+                  }
                   break;
                 case 0x21:
                   if (!Resonance)
-                    Resonance = new tNrpn( 0, cha, Msb, Lsb, Data );
+                  {
+                    Resonance = new tNrpn(0, cha, Msb, Lsb, Data);
+                  }
                   break;
                 case 0x63:
                   if (!EnvAttack)
-                    EnvAttack = new tNrpn( 0, cha, Msb, Lsb, Data );
+                  {
+                    EnvAttack = new tNrpn(0, cha, Msb, Lsb, Data);
+                  }
                   break;
                 case 0x64:
                   if (!EnvDecay)
-                    EnvDecay = new tNrpn( 0, cha, Msb, Lsb, Data );
+                  {
+                    EnvDecay = new tNrpn(0, cha, Msb, Lsb, Data);
+                  }
                   break;
                 case 0x66:
                   if (!EnvRelease)
-                    EnvRelease = new tNrpn( 0, cha, Msb, Lsb, Data );
+                  {
+                    EnvRelease = new tNrpn(0, cha, Msb, Lsb, Data);
+                  }
                   break;
                 default:
                   break;
@@ -1270,14 +1488,16 @@ void tEventArray::Read(tReadBase &io)
             case drumPan:
             case drumReverb:
             case drumChorus:
-              DrumParams.PutParam( new tNrpn( 0, cha, Msb, Lsb, Data ) );
+              DrumParams.PutParam(new tNrpn(0, cha, Msb, Lsb, Data));
               break;
             case 0x00: // Rpn
               if (Lsb == 0x00)
               {
                 // Pitch Bend Sensivity
                 if (!BendPitchSens)
-                  BendPitchSens = new tRpn( 0, cha, Msb, Lsb, Data );
+                {
+                  BendPitchSens = new tRpn(0, cha, Msb, Lsb, Data);
+                }
               }
               break;
             default:
@@ -1327,7 +1547,7 @@ void tEventArray::Read(tReadBase &io)
     else if (e->IsSysEx())
     {
       // Get hold of the Reset sysex...
-      int sxid = gpSynth->GetSysexId( e->IsSysEx() );
+      int sxid = gpSynth->GetSysexId(e->IsSysEx());
 
       if ((sxid == SX_GM_ON) || (sxid == SX_GS_ON) || (sxid == SX_XG_ON))
       {
@@ -1359,8 +1579,11 @@ void tEventArray::Read(tReadBase &io)
     }
     if (e->IsEndOfTrack())
     {
-      //JAVE I want explicit end of track events
-      break; //break out of loop here because endoftrack is end, and we want it read FIXME we shoulnt break, we should keep on reading, and handle eot in track play instead
+      // JAVE I want explicit end of track events
+      // Break out of loop here because endoftrack is end, and we want it read
+      // FIXME we shoulnt break, we should keep on reading, and handle eot in
+      // track play instead.
+      break;
     }
   } // while read
 
@@ -1376,8 +1599,10 @@ void tEventArray::Read(tReadBase &io)
 long tEventArray::GetLastClock()
 {
   if (!nEvents)
+  {
     return 0;
-  return Events[nEvents-1]->Clock;
+  }
+  return Events[nEvents - 1]->Clock;
 }
 
 int tEventArray::IsEmpty()
@@ -1388,7 +1613,9 @@ int tEventArray::IsEmpty()
 long tEventArray::GetFirstClock()
 {
   if (nEvents)
+  {
     return Events[0]->Clock;
+  }
   return LastClock;
 }
 
@@ -1420,14 +1647,16 @@ class tTrackDlg : public wxForm
 
 
 tTrackDlg::tTrackDlg(JZTrackWindow *w, tTrack *t)
-  : wxForm( USED_WXFORM_BUTTONS ),
-    PatchChoice("Patch", t->IsDrumTrack() ? &Config.DrumSet(0) : &Config.VoiceName(0), &PatchNr),
+  : wxForm(USED_WXFORM_BUTTONS),
+    PatchChoice(
+      "Patch",
+      t->IsDrumTrack() ? &gpConfig->DrumSet(0) : &gpConfig->VoiceName(0),
+      &PatchNr),
     DeviceChoice("Device", Midi->GetOutputDevices().AsNamedValue(), &Device)
 {
   TrackWin = w;
   trk = t;
 }
-
 
 void tTrackDlg::OnCancel()
 {
@@ -1441,19 +1670,19 @@ void tTrackDlg::OnHelp()
   gpHelpInstance->ShowTopic("Trackname, midi channel etc");
 }
 
-
 void tTrackDlg::OnOk()
 {
-  trk->DialogBox->GetPosition( &Config(C_TrackDlgXpos), &Config(C_TrackDlgYpos) );
+  trk->DialogBox->GetPosition(&Config(C_TrackDlgXpos), &Config(C_TrackDlgYpos));
   trk->DialogBox = 0;
   trk->SetAudioMode(AudioMode);
 
-  if (ClearTrack) {
-  trk->Clear();
+  if (ClearTrack)
+  {
+    trk->Clear();
     delete TrackName;
-        TrackWin->Redraw();
+    TrackWin->Redraw();
     wxForm::OnOk();
-  return;
+    return;
   }
   trk->SetName(TrackName);
   delete TrackName;
@@ -1464,91 +1693,142 @@ void tTrackDlg::OnOk()
   trk->SetBank(BankNr);
   trk->SetPatch(PatchNr);
   trk->SetDevice(Device);
-  if (trk->ForceChannel) {
-     tChannelEvent *c;
-     tSysEx *s;
-     tEventIterator Iterator(trk);
-     trk->Sort();
-     JZEvent *e = Iterator.Range(0, (long unsigned) trk->GetLastClock() + 1);
-     while (e) {
-  if ((c = e->IsChannelEvent()) != 0) {
-     c = (tChannelEvent *)e->Copy();
-     c->Channel = trk->Channel - 1;
-     trk->Kill(e);
-     trk->Put(c);
-  }
-  else if ((s = e->IsSysEx()) != 0) {
-     // Check for sysex that contains channel number
-     unsigned char *chaptr = gpSynth->GetSysexChaPtr( s );
-     if (chaptr)
-     {
-        if (gpSynth->IsXG())
-        {
-     *chaptr = trk->Channel - 1;
-        }
-        else
-        {
-     *chaptr &= 0xf0;
-     *chaptr |= sysex_channel(trk->Channel);
-        }
-
-        s = (tSysEx *) e->Copy();
+  if (trk->ForceChannel)
+  {
+    tChannelEvent *c;
+    tSysEx *s;
+    tEventIterator Iterator(trk);
+    trk->Sort();
+    JZEvent *e = Iterator.Range(0, (long unsigned) trk->GetLastClock() + 1);
+    while (e)
+    {
+      if ((c = e->IsChannelEvent()) != 0)
+      {
+        c = (tChannelEvent *)e->Copy();
+        c->Channel = trk->Channel - 1;
         trk->Kill(e);
-        trk->Put(s);
-     }
-  }
-  e = Iterator.Next();
-     } // while e
-     if (trk->VibRate) trk->VibRate->SetCha( trk->Channel - 1 );
-     if (trk->VibDepth) trk->VibDepth->SetCha( trk->Channel - 1 );
-     if (trk->VibDelay) trk->VibDelay->SetCha( trk->Channel - 1 );
-     if (trk->Cutoff) trk->Cutoff->SetCha( trk->Channel - 1 );
-     if (trk->Resonance) trk->Resonance->SetCha( trk->Channel - 1 );
-     if (trk->EnvAttack) trk->EnvAttack->SetCha( trk->Channel - 1 );
-     if (trk->EnvDecay) trk->EnvDecay->SetCha( trk->Channel - 1 );
-     if (trk->EnvRelease) trk->EnvRelease->SetCha( trk->Channel - 1 );
-     if (trk->BendPitchSens) trk->BendPitchSens->SetCha( trk->Channel - 1 );
-     if (trk->Bank) trk->Bank->Channel = trk->Channel - 1;
-     if (trk->Patch) trk->Patch->Channel = trk->Channel - 1;
-     if (!trk->DrumParams.IsEmpty())
-     {
-  tDrumInstrumentParameter *dpar = trk->DrumParams.FirstElem();
-  while ( dpar ) {
-     int index;
-     for (index = drumPitchIndex; index < numDrumParameters; index++)
-     {
-        if (dpar->Get(index))
-     dpar->Get(index)->SetCha( trk->Channel - 1 );
-     }
-     dpar = trk->DrumParams.NextElem( dpar );
-  }
-     }
-     trk->Cleanup();
+        trk->Put(c);
+      }
+      else if ((s = e->IsSysEx()) != 0)
+      {
+        // Check for sysex that contains channel number
+        unsigned char *chaptr = gpSynth->GetSysexChaPtr(s);
+        if (chaptr)
+        {
+          if (gpSynth->IsXG())
+          {
+            *chaptr = trk->Channel - 1;
+          }
+          else
+          {
+            *chaptr &= 0xf0;
+            *chaptr |= sysex_channel(trk->Channel);
+          }
+
+          s = (tSysEx *) e->Copy();
+          trk->Kill(e);
+          trk->Put(s);
+        }
+      }
+      e = Iterator.Next();
+    } // while e
+
+    if (trk->VibRate)
+    {
+      trk->VibRate->SetCha(trk->Channel - 1);
+    }
+    if (trk->VibDepth)
+    {
+      trk->VibDepth->SetCha(trk->Channel - 1);
+    }
+    if (trk->VibDelay)
+    {
+      trk->VibDelay->SetCha(trk->Channel - 1);
+    }
+    if (trk->Cutoff)
+    {
+      trk->Cutoff->SetCha(trk->Channel - 1);
+    }
+    if (trk->Resonance)
+    {
+      trk->Resonance->SetCha(trk->Channel - 1);
+    }
+    if (trk->EnvAttack)
+    {
+      trk->EnvAttack->SetCha(trk->Channel - 1);
+    }
+    if (trk->EnvDecay)
+    {
+      trk->EnvDecay->SetCha(trk->Channel - 1);
+    }
+    if (trk->EnvRelease)
+    {
+      trk->EnvRelease->SetCha(trk->Channel - 1);
+    }
+    if (trk->BendPitchSens)
+    {
+      trk->BendPitchSens->SetCha(trk->Channel - 1);
+    }
+    if (trk->Bank)
+    {
+      trk->Bank->Channel = trk->Channel - 1;
+    }
+    if (trk->Patch)
+    {
+      trk->Patch->Channel = trk->Channel - 1;
+    }
+    if (!trk->DrumParams.IsEmpty())
+    {
+      tDrumInstrumentParameter *dpar = trk->DrumParams.FirstElem();
+      while (dpar)
+      {
+        for (int index = drumPitchIndex; index < numDrumParameters; ++index)
+        {
+          if (dpar->Get(index))
+          {
+            dpar->Get(index)->SetCha(trk->Channel - 1);
+          }
+        }
+        dpar = trk->DrumParams.NextElem(dpar);
+      }
+    }
+    trk->Cleanup();
   }
   TrackWin->Canvas->Refresh();
   wxForm::OnOk();
 }
-
-
 
 void tTrackDlg::EditForm(wxPanel *panel)
 {
   PatchNr   = trk->GetPatch() + (trk->GetBank() << 8);
   Device    = trk->GetDevice();
   TrackName = copystring(trk->GetName());
-  Add(wxMakeFormString("Trackname:", &TrackName, wxFORM_DEFAULT, NULL, NULL, wxVERTICAL, 300 ));
+  Add(wxMakeFormString(
+    "Trackname:",
+    &TrackName,
+    wxFORM_DEFAULT,
+    NULL,
+    NULL,
+    wxVERTICAL,
+    300));
 
   Add(wxMakeFormNewLine());
   Add(PatchChoice.mkFormItem(300, 200));
   Add(wxMakeFormNewLine());
   {
     char buf[500];
-    sprintf(buf, "Set Channel to %d to make a drum track", Config(C_DrumChannel));
+    sprintf(
+      buf,
+      "Set Channel to %d to make a drum track",
+      Config(C_DrumChannel));
     Add(wxMakeFormMessage(buf));
     Add(wxMakeFormNewLine());
   }
-  Add(wxMakeFormShort("Channel", &trk->Channel, wxFORM_DEFAULT,
-                       new wxList(wxMakeConstraintRange(1.0, 16.0), 0)));
+  Add(wxMakeFormShort(
+    "Channel",
+    &trk->Channel,
+    wxFORM_DEFAULT,
+    new wxList(wxMakeConstraintRange(1.0, 16.0), 0)));
   AudioMode = trk->GetAudioMode();
   Add(wxMakeFormNewLine());
   Add(wxMakeFormBool("Audio Track", &AudioMode));
@@ -1575,16 +1855,16 @@ void tTrack::Dialog(JZTrackWindow *parent)
   tTrackDlg *dlg;
   if (DialogBox)
   {
-    DialogBox->Show(TRUE);
+    DialogBox->Show(true);
     return;
   }
-  #ifdef __WXMSW__
-  bool modal = TRUE;  // keep button down
-  #else
-  bool modal = FALSE;
-  #endif
-  DialogBox = new wxDialogBox(parent, "Track Settings", modal, Config(C_TrackDlgXpos), Config(C_TrackDlgYpos) );
-  dlg = new tTrackDlg( (JZTrackWindow*) parent, this);
+#ifdef __WXMSW__
+  bool modal = true;  // keep button down
+#else
+  bool modal = false;
+#endif
+  DialogBox = new wxDialogBox(parent, "Track Settings", modal, Config(C_TrackDlgXpos), Config(C_TrackDlgYpos));
+  dlg = new tTrackDlg((JZTrackWindow*) parent, this);
   dlg->EditForm(DialogBox);
   DialogBox->Fit();
   DialogBox->Show(TRUE);
@@ -1607,20 +1887,21 @@ tTrack::tTrack()
   nRedo = 0;
   nUndo = 0;
   DialogBox = 0;
-  PatchNames = 0;
   ForceChannel = 1;
 }
 
 
 bool tTrack::IsDrumTrack()
 {
-  return Channel == Config(C_DrumChannel);
+  return Channel == gpConfig->GetValue(C_DrumChannel);
 }
 
 void tTrack::Merge(tEventArray *t)
 {
   for (int i = 0; i < t->nEvents; i++)
+  {
     Put(t->Events[i]);
+  }
   t->nEvents = 0;
 }
 
@@ -1649,7 +1930,9 @@ void tTrack::MergeRange(tEventArray *other, long FromClock, long ToClock, int Re
     {
       tChannelEvent *k = c->IsChannelEvent();
       if (k)
+      {
         k->Channel = Channel - 1;
+      }
     }
     Put(c);
     e = Copy.Next();
@@ -1679,13 +1962,13 @@ void tTrack::Undo()
       JZEvent *e = undo->Events[i];
       if (undo->bits(i))
       {
-  undo->bits.set(i, 0);
+        undo->bits.set(i, 0);
         e->UnKill();
         tEventArray::Put(e);
       }
       else
       {
-  undo->bits.set(i, 1);
+        undo->bits.set(i, 1);
         e->Kill();
       }
     }
@@ -1709,13 +1992,13 @@ void tTrack::Redo()
       JZEvent *e = undo->Events[i];
       if (undo->bits(i))
       {
-  undo->bits.set(i, 0);
+        undo->bits.set(i, 0);
         e->UnKill();
         tEventArray::Put(e);
       }
       else
       {
-  undo->bits.set(i, 1);
+        undo->bits.set(i, 1);
         e->Kill();
       }
     }
@@ -1732,7 +2015,9 @@ void tTrack::NewUndoBuffer()
   nRedo = 0;
   nUndo++;
   if (nUndo > MaxUndo)
+  {
     nUndo = MaxUndo;
+  }
 
   iUndo = (iUndo + 1) % MaxUndo;
   UndoBuffers[iUndo].Clear();
@@ -1742,17 +2027,21 @@ void tTrack::NewUndoBuffer()
 void tTrack::Clear()
 {
   for (int i = 0; i < MaxUndo; i++)
+  {
     UndoBuffers[i].Clear();
+  }
   State  = tsPlay;
   tEventArray::Clear();
 }
 
 // ----------------------- Copyright ------------------------------------
 
-char *tTrack::GetCopyright()
+char* tTrack::GetCopyright()
 {
   if (Copyright)
+  {
     return (char *)Copyright->Data;
+  }
   return "";
 }
 
@@ -1761,14 +2050,18 @@ char *tTrack::GetCopyright()
 void tTrack::SetCopyright(char *str)
 {
   if (Copyright)
+  {
     Kill(Copyright);
+  }
   if (str && strlen(str))
+  {
+    int len = 127;
+    if ((int)strlen(str) < len)
     {
-      int len = 127;
-      if ((int)strlen(str) < len)
-        len = strlen( str );
-      Put(new tCopyright(0, (unsigned char *)str, len));
+      len = strlen(str);
     }
+    Put(new tCopyright(0, (unsigned char *)str, len));
+  }
   Cleanup();
 }
 
@@ -1777,7 +2070,9 @@ void tTrack::SetCopyright(char *str)
 char *tTrack::GetName()
 {
   if (Name)
+  {
     return (char *)Name->Data;
+  }
   return "";
 }
 
@@ -1786,9 +2081,13 @@ char *tTrack::GetName()
 void tTrack::SetName(char *str)
 {
   if (Name)
+  {
     Kill(Name);
+  }
   if (strlen(str))
+  {
     Put(new tTrackName(0, (unsigned char *)str, strlen(str)));
+  }
   Cleanup();
 }
 
@@ -1797,14 +2096,18 @@ void tTrack::SetName(char *str)
 int tTrack::GetVolume()
 {
   if (Volume)
+  {
     return Volume->Value + 1;
+  }
   return 0;
 }
 
 void tTrack::SetVolume(int Value)
 {
   if (Volume)
+  {
     Kill(Volume);
+  }
   if (Value > 0)
   {
     JZEvent *e = new tControl(0, Channel - 1, 0x07, Value - 1);
@@ -1819,14 +2122,18 @@ void tTrack::SetVolume(int Value)
 int tTrack::GetPan()
 {
   if (Pan)
+  {
     return Pan->Value + 1;
+  }
   return 0;
 }
 
 void tTrack::SetPan(int Value)
 {
   if (Pan)
+  {
     Kill(Pan);
+  }
   if (Value > 0)
   {
     JZEvent *e = new tControl(0, Channel - 1, 0x0a, Value - 1);
@@ -1841,14 +2148,18 @@ void tTrack::SetPan(int Value)
 int tTrack::GetReverb()
 {
   if (Reverb)
+  {
     return Reverb->Value + 1;
+  }
   return 0;
 }
 
 void tTrack::SetReverb(int Value)
 {
   if (Reverb)
+  {
     Kill(Reverb);
+  }
   if (Value > 0)
   {
     JZEvent *e = new tControl(0, Channel - 1, 0x5B, Value - 1);
@@ -1863,14 +2174,18 @@ void tTrack::SetReverb(int Value)
 int tTrack::GetChorus()
 {
   if (Chorus)
+  {
     return Chorus->Value + 1;
+  }
   return 0;
 }
 
 void tTrack::SetChorus(int Value)
 {
   if (Chorus)
+  {
     Kill(Chorus);
+  }
   if (Value > 0)
   {
     JZEvent *e = new tControl(0, Channel - 1, 0x5D, Value - 1);
@@ -1884,7 +2199,7 @@ void tTrack::SetChorus(int Value)
 
 int tTrack::GetBank()
 {
-  if (!Config(C_UseTwoCommandBankSelect))
+  if (!gpConfig->GetValue(C_UseTwoCommandBankSelect))
   {
     DEBUG(fprintf(stderr, "Get single bank select command\n");)
     if (Bank)
@@ -1893,54 +2208,77 @@ int tTrack::GetBank()
       return Bank->Value;
     }
     else
+    {
       return 0;
+    }
   }
   DEBUG(fprintf(stderr, "Get double bank select command.\n");)
   if (Bank && Bank2)
   {
-    for (int i=0; Config.BankEntry(i).Command[0]>=0; i++)
-      if (Config.BankEntry(i).Command[0]==Bank->Value &&
-          Config.BankEntry(i).Command[1]==Bank2->Value)
+    for (int i=0; gpConfig->BankEntry(i).Command[0]>=0; i++)
+    {
+      if (
+        gpConfig->BankEntry(i).Command[0]==Bank->Value &&
+        gpConfig->BankEntry(i).Command[1]==Bank2->Value)
       {
-          DEBUG(fprintf(stderr,"Bank %d selected.\n\n",i);)
-          return i;
+        DEBUG(fprintf(stderr,"Bank %d selected.\n\n",i);)
+        return i;
       }
+    }
   }
   return 0;
 }
 
 void tTrack::SetBank(int Value)
 {
-  if (Bank) {
-  delete Bank;
-  Bank = 0;
+  if (Bank)
+  {
+    delete Bank;
+    Bank = 0;
   }
-  if (Bank2) {
-      delete Bank2;
-      Bank2 = 0;
+
+  if (Bank2)
+  {
+    delete Bank2;
+    Bank2 = 0;
   }
   if (Value >= 0)
   {
-    if (!Config(C_UseTwoCommandBankSelect))
+    if (!gpConfig->GetValue(C_UseTwoCommandBankSelect))
     {
       DEBUG(fprintf (stderr, "Single command bank select (Bank %d).\n",
             Value);)
-      Bank = new tControl(0, Channel - 1, Config(C_BankControlNumber), Value);
+      Bank = new tControl(
+        0,
+        Channel - 1,
+        gpConfig->GetValue(C_BankControlNumber),
+        Value);
       Midi->OutNow(this, Bank);
       return;
     }
-    while (Config.BankEntry(Value).Command[0]<0 && Value>0)
+    while (gpConfig->BankEntry(Value).Command[0]<0 && Value>0)
+    {
       Value--;
-    assert(Config.BankEntry(Value).Command[0]>=0);
-    DEBUG(fprintf (stderr, "Double command bank select (Bank %d).\n",Value);)
-    Bank  = new tControl(0, Channel - 1, Config(C_BankControlNumber),
-                        Config.BankEntry(Value).Command[0]);
+    }
+    assert(gpConfig->BankEntry(Value).Command[0] >= 0);
+    DEBUG(fprintf(stderr, "Double command bank select (Bank %d).\n",Value);)
+    Bank  = new tControl(
+      0,
+      Channel - 1,
+      gpConfig->GetValue(C_BankControlNumber),
+      gpConfig->BankEntry(Value).Command[0]);
     Midi->OutNow(this, Bank);
-    DEBUG(fprintf (stderr, "First bank select command: %d %d\n",
-      Bank->Control, Bank->Value);
-    )
-    Bank2 = new tControl(0, Channel - 1, Config(C_BankControlNumber2),
-                        Config.BankEntry(Value).Command[1]);
+    DEBUG(
+      fprintf(
+        stderr,
+        "First bank select command: %d %d\n",
+        Bank->Control,
+        Bank->Value);)
+    Bank2 = new tControl(
+      0,
+      Channel - 1,
+      gpConfig->GetValue(C_BankControlNumber2),
+      gpConfig->BankEntry(Value).Command[1]);
     Midi->OutNow(this, Bank2);
     DEBUG(fprintf (stderr, "Second bank select command: %d %d\n\n",
       Bank2->Control, Bank2->Value);
@@ -1954,13 +2292,16 @@ void tTrack::SetBank(int Value)
 int tTrack::GetPatch()
 {
   if (Patch)
+  {
     return Patch->Program + 1;
+  }
   return 0;
 }
 
 void tTrack::SetPatch(int PatchNr)
 {
-  if (Patch) {
+  if (Patch)
+  {
     delete Patch;
     Patch = 0;
   }
@@ -1977,19 +2318,23 @@ void tTrack::SetPatch(int PatchNr)
 int tTrack::GetVibRate()
 {
   if (VibRate)
+  {
     return VibRate->GetVal() + 1;
+  }
   return 0;
 }
 
 void tTrack::SetVibRate(int Value)
 {
-  if (VibRate) {
+  if (VibRate)
+  {
     delete VibRate;
     VibRate = 0;
   }
+
   if (Value > 0)
   {
-    VibRate = new tNrpn( 0, Channel - 1, 0x01, 0x08, Value - 1 );
+    VibRate = new tNrpn(0, Channel - 1, 0x01, 0x08, Value - 1);
     Midi->OutNow(this, VibRate);
     changed = true;
   }
@@ -2000,21 +2345,24 @@ void tTrack::SetVibRate(int Value)
 int tTrack::GetVibDepth()
 {
   if (VibDepth)
+  {
     return VibDepth->GetVal() + 1;
+  }
   return 0;
 }
 
 void tTrack::SetVibDepth(int Value)
 {
-  if (VibDepth) {
+  if (VibDepth)
+  {
     delete VibDepth;
     VibDepth = 0;
   }
   if (Value > 0)
   {
-  VibDepth = new tNrpn( 0, Channel - 1, 0x01, 0x09, Value - 1 );
-  Midi->OutNow(this,  VibDepth );
-        changed = true;
+    VibDepth = new tNrpn(0, Channel - 1, 0x01, 0x09, Value - 1);
+    Midi->OutNow(this,  VibDepth);
+    changed = true;
   }
 }
 
@@ -2023,21 +2371,25 @@ void tTrack::SetVibDepth(int Value)
 int tTrack::GetVibDelay()
 {
   if (VibDelay)
+  {
     return VibDelay->GetVal() + 1;
+  }
   return 0;
 }
 
 void tTrack::SetVibDelay(int Value)
 {
-  if (VibDelay) {
+  if (VibDelay)
+  {
     delete VibDelay;
     VibDelay = 0;
   }
+
   if (Value > 0)
   {
-  VibDelay = new tNrpn( 0, Channel - 1, 0x01, 0x0a, Value - 1 );
-  Midi->OutNow(this,  VibDelay );
-        changed = true;
+    VibDelay = new tNrpn(0, Channel - 1, 0x01, 0x0a, Value - 1);
+    Midi->OutNow(this,  VibDelay);
+    changed = true;
   }
 }
 
@@ -2046,21 +2398,25 @@ void tTrack::SetVibDelay(int Value)
 int tTrack::GetCutoff()
 {
   if (Cutoff)
+  {
     return Cutoff->GetVal() + 1;
+  }
   return 0;
 }
 
 void tTrack::SetCutoff(int Value)
 {
-  if (Cutoff) {
+  if (Cutoff)
+  {
     delete Cutoff;
     Cutoff = 0;
   }
+
   if (Value > 0)
   {
-  Cutoff = new tNrpn( 0, Channel - 1, 0x01, 0x20, Value - 1 );
-  Midi->OutNow(this,  Cutoff );
-        changed = true;
+    Cutoff = new tNrpn(0, Channel - 1, 0x01, 0x20, Value - 1);
+    Midi->OutNow(this,  Cutoff);
+    changed = true;
   }
 }
 
@@ -2069,21 +2425,25 @@ void tTrack::SetCutoff(int Value)
 int tTrack::GetResonance()
 {
   if (Resonance)
+  {
     return Resonance->GetVal() + 1;
+  }
   return 0;
 }
 
 void tTrack::SetResonance(int Value)
 {
-  if (Resonance) {
-  delete Resonance;
-  Resonance = 0;
+  if (Resonance)
+  {
+    delete Resonance;
+    Resonance = 0;
   }
+
   if (Value > 0)
   {
-  Resonance = new tNrpn( 0, Channel - 1, 0x01, 0x21, Value - 1 );
-  Midi->OutNow(this,  Resonance );
-        changed = true;
+    Resonance = new tNrpn(0, Channel - 1, 0x01, 0x21, Value - 1);
+    Midi->OutNow(this,  Resonance);
+    changed = true;
   }
 }
 
@@ -2092,21 +2452,25 @@ void tTrack::SetResonance(int Value)
 int tTrack::GetEnvAttack()
 {
   if (EnvAttack)
+  {
     return EnvAttack->GetVal() + 1;
+  }
   return 0;
 }
 
 void tTrack::SetEnvAttack(int Value)
 {
-  if (EnvAttack) {
-  delete EnvAttack;
-  EnvAttack = 0;
+  if (EnvAttack)
+  {
+    delete EnvAttack;
+    EnvAttack = 0;
   }
+
   if (Value > 0)
   {
-  EnvAttack = new tNrpn( 0, Channel - 1, 0x01, 0x63, Value - 1 );
-  Midi->OutNow(this,  EnvAttack );
-        changed = true;
+    EnvAttack = new tNrpn(0, Channel - 1, 0x01, 0x63, Value - 1);
+    Midi->OutNow(this,  EnvAttack);
+    changed = true;
   }
 }
 
@@ -2115,21 +2479,25 @@ void tTrack::SetEnvAttack(int Value)
 int tTrack::GetEnvDecay()
 {
   if (EnvDecay)
+  {
     return EnvDecay->GetVal() + 1;
+  }
   return 0;
 }
 
 void tTrack::SetEnvDecay(int Value)
 {
-  if (EnvDecay) {
-  delete EnvDecay;
-  EnvDecay = 0;
+  if (EnvDecay)
+  {
+    delete EnvDecay;
+    EnvDecay = 0;
   }
+
   if (Value > 0)
   {
-  EnvDecay = new tNrpn( 0, Channel - 1, 0x01, 0x64, Value - 1 );
-  Midi->OutNow(this,  EnvDecay );
-        changed = true;
+    EnvDecay = new tNrpn(0, Channel - 1, 0x01, 0x64, Value - 1);
+    Midi->OutNow(this,  EnvDecay);
+    changed = true;
   }
 }
 
@@ -2138,45 +2506,52 @@ void tTrack::SetEnvDecay(int Value)
 int tTrack::GetEnvRelease()
 {
   if (EnvRelease)
+  {
     return EnvRelease->GetVal() + 1;
+  }
   return 0;
 }
 
 void tTrack::SetEnvRelease(int Value)
 {
-  if (EnvRelease) {
-  delete EnvRelease;
-  EnvRelease = 0;
+  if (EnvRelease)
+  {
+    delete EnvRelease;
+    EnvRelease = 0;
   }
+
   if (Value > 0)
   {
-  EnvRelease = new tNrpn( 0, Channel - 1, 0x01, 0x66, Value - 1 );
-  Midi->OutNow(this,  EnvRelease );
-        changed = true;
+    EnvRelease = new tNrpn(0, Channel - 1, 0x01, 0x66, Value - 1);
+    Midi->OutNow(this,  EnvRelease);
+    changed = true;
   }
 }
 
 // ------------------------  DrumParam ------------------------------
 
-int tTrack::GetDrumParam( int pitch, int index )
+int tTrack::GetDrumParam(int pitch, int index)
 {
   if (!DrumParams.IsEmpty())
   {
-    tNrpn *par = DrumParams.GetParam( pitch, index );
+    tNrpn *par = DrumParams.GetParam(pitch, index);
     if (par)
-      return( par->GetVal() + 1 );
+    {
+      return(par->GetVal() + 1);
+    }
   }
   return 0;
 }
 
 void tTrack::SetDrumParam(int pitch, int index, int Value)
 {
-  DrumParams.DelParam( pitch, index );
+  DrumParams.DelParam(pitch, index);
   if (Value > 0)
   {
-  DrumParams.PutParam( new tNrpn( 0, Channel - 1, drumIndex2Param( index ), pitch, Value - 1 ) );
-  Midi->OutNow(this,  DrumParams.GetParam( pitch, index ) );
-        changed = true;
+    DrumParams.PutParam(
+      new tNrpn(0, Channel - 1, drumIndex2Param(index), pitch, Value - 1));
+    Midi->OutNow(this, DrumParams.GetParam(pitch, index));
+    changed = true;
   }
 }
 
@@ -2185,47 +2560,55 @@ void tTrack::SetDrumParam(int pitch, int index, int Value)
 int tTrack::GetBendPitchSens()
 {
   if (BendPitchSens)
+  {
     return BendPitchSens->GetVal() + 1;
+  }
   return 0;
 }
 
 void tTrack::SetBendPitchSens(int Value)
 {
-  if (BendPitchSens) {
-  delete BendPitchSens;
-  BendPitchSens = 0;
+  if (BendPitchSens)
+  {
+    delete BendPitchSens;
+    BendPitchSens = 0;
   }
+
   if (Value > 0)
   {
-  BendPitchSens = new tRpn( 0, Channel - 1, 0x00, 0x00, Value - 1 );
-  Midi->OutNow(this,  BendPitchSens );
-        changed = true;
+    BendPitchSens = new tRpn(0, Channel - 1, 0x00, 0x00, Value - 1);
+    Midi->OutNow(this,  BendPitchSens);
+    changed = true;
   }
 }
 
 // ------------------------  Modulation Sysex ------------------------------
 
-int tTrack::GetModulationSysex( int msp )
+int tTrack::GetModulationSysex(int msp)
 {
-   unsigned char *valp = gpSynth->GetSysexValPtr(ModulationSettings[ msp ]);
+  unsigned char *valp = gpSynth->GetSysexValPtr(ModulationSettings[msp]);
 
-   if (valp)
-      return *valp + 1;
+  if (valp)
+  {
+    return *valp + 1;
+  }
 
-   return 0;
+  return 0;
 }
 
 void tTrack::SetModulationSysex(int msp, int Value)
 {
-  if (ModulationSettings[ msp ])
-    Kill(ModulationSettings[ msp ]);
+  if (ModulationSettings[msp])
+  {
+    Kill(ModulationSettings[msp]);
+  }
   if (Value > 0)
   {
-    JZEvent *e = gpSynth->ModSX( msp, 0, Channel, Value - 1 );
+    JZEvent *e = gpSynth->ModSX(msp, 0, Channel, Value - 1);
     if (e)
     {
-       Put(e);
-       Midi->OutNow(this, e);
+      Put(e);
+      Midi->OutNow(this, e);
     }
   }
   Cleanup();
@@ -2233,27 +2616,31 @@ void tTrack::SetModulationSysex(int msp, int Value)
 
 // ------------------------  Bender Sysex ------------------------------
 
-int tTrack::GetBenderSysex( int bsp )
+int tTrack::GetBenderSysex(int bsp)
 {
-   unsigned char *valp = gpSynth->GetSysexValPtr(BenderSettings[ bsp ]);
+  unsigned char *valp = gpSynth->GetSysexValPtr(BenderSettings[bsp]);
 
-   if (valp)
-      return *valp + 1;
+  if (valp)
+  {
+    return *valp + 1;
+  }
 
-   return 0;
+  return 0;
 }
 
 void tTrack::SetBenderSysex(int bsp, int Value)
 {
-  if (BenderSettings[ bsp ])
-    Kill(BenderSettings[ bsp ]);
+  if (BenderSettings[bsp])
+  {
+    Kill(BenderSettings[bsp]);
+  }
   if (Value > 0)
   {
-    JZEvent *e = gpSynth->BendSX( bsp, 0, Channel, Value - 1 );
+    JZEvent *e = gpSynth->BendSX(bsp, 0, Channel, Value - 1);
     if (e)
     {
-       Put(e);
-       Midi->OutNow(this, e);
+      Put(e);
+      Midi->OutNow(this, e);
     }
   }
   Cleanup();
@@ -2261,27 +2648,31 @@ void tTrack::SetBenderSysex(int bsp, int Value)
 
 // ------------------------  CAf Sysex ------------------------------
 
-int tTrack::GetCAfSysex( int csp )
+int tTrack::GetCAfSysex(int csp)
 {
-   unsigned char *valp = gpSynth->GetSysexValPtr(CAfSettings[ csp ]);
+  unsigned char *valp = gpSynth->GetSysexValPtr(CAfSettings[csp]);
 
-   if (valp)
-      return *valp + 1;
+  if (valp)
+  {
+    return *valp + 1;
+  }
 
-   return 0;
+  return 0;
 }
 
 void tTrack::SetCAfSysex(int csp, int Value)
 {
-  if (CAfSettings[ csp ])
-    Kill(CAfSettings[ csp ]);
+  if (CAfSettings[csp])
+  {
+    Kill(CAfSettings[csp]);
+  }
   if (Value > 0)
   {
     JZEvent *e = gpSynth->CafSX(csp, 0, Channel, Value - 1);
     if (e)
     {
-       Put(e);
-       Midi->OutNow(this, e);
+      Put(e);
+      Midi->OutNow(this, e);
     }
   }
   Cleanup();
@@ -2289,27 +2680,31 @@ void tTrack::SetCAfSysex(int csp, int Value)
 
 // ------------------------  PAf Sysex ------------------------------
 
-int tTrack::GetPAfSysex( int psp )
+int tTrack::GetPAfSysex(int psp)
 {
-   unsigned char *valp = gpSynth->GetSysexValPtr(PAfSettings[psp]);
+  unsigned char *valp = gpSynth->GetSysexValPtr(PAfSettings[psp]);
 
-   if (valp)
-      return *valp + 1;
+  if (valp)
+  {
+    return *valp + 1;
+  }
 
-   return 0;
+  return 0;
 }
 
 void tTrack::SetPAfSysex(int psp, int Value)
 {
-  if (PAfSettings[ psp ])
-    Kill(PAfSettings[ psp ]);
+  if (PAfSettings[psp])
+  {
+    Kill(PAfSettings[psp]);
+  }
   if (Value > 0)
   {
     JZEvent *e = gpSynth->PafSX(psp, 0, Channel, Value - 1);
     if (e)
     {
-       Put(e);
-       Midi->OutNow(this, e);
+      Put(e);
+      Midi->OutNow(this, e);
     }
   }
   Cleanup();
@@ -2317,27 +2712,31 @@ void tTrack::SetPAfSysex(int psp, int Value)
 
 // ------------------------  CC1 Sysex ------------------------------
 
-int tTrack::GetCC1Sysex( int csp )
+int tTrack::GetCC1Sysex(int csp)
 {
-   unsigned char *valp = gpSynth->GetSysexValPtr(CC1Settings[ csp ]);
+  unsigned char *valp = gpSynth->GetSysexValPtr(CC1Settings[csp]);
 
-   if (valp)
-      return *valp + 1;
+  if (valp)
+  {
+    return *valp + 1;
+  }
 
-   return 0;
+  return 0;
 }
 
 void tTrack::SetCC1Sysex(int csp, int Value)
 {
-  if (CC1Settings[ csp ])
-    Kill(CC1Settings[ csp ]);
+  if (CC1Settings[csp])
+  {
+    Kill(CC1Settings[csp]);
+  }
   if (Value > 0)
   {
     JZEvent *e = gpSynth->CC1SX(csp, 0, Channel, Value - 1);
     if (e)
     {
-       Put(e);
-       Midi->OutNow(this, e);
+      Put(e);
+      Midi->OutNow(this, e);
     }
   }
   Cleanup();
@@ -2345,27 +2744,29 @@ void tTrack::SetCC1Sysex(int csp, int Value)
 
 // ------------------------  CC2 Sysex ------------------------------
 
-int tTrack::GetCC2Sysex( int csp )
+int tTrack::GetCC2Sysex(int csp)
 {
-   unsigned char *valp = gpSynth->GetSysexValPtr(CC2Settings[ csp ]);
+  unsigned char *valp = gpSynth->GetSysexValPtr(CC2Settings[csp]);
 
-   if (valp)
-      return *valp + 1;
+  if (valp)
+  {
+    return *valp + 1;
+  }
 
-   return 0;
+  return 0;
 }
 
 void tTrack::SetCC2Sysex(int csp, int Value)
 {
-  if (CC2Settings[ csp ])
-    Kill(CC2Settings[ csp ]);
+  if (CC2Settings[csp])
+    Kill(CC2Settings[csp]);
   if (Value > 0)
   {
     JZEvent *e = gpSynth->CC2SX(csp, 0, Channel, Value - 1);
     if (e)
     {
-       Put(e);
-       Midi->OutNow(this, e);
+      Put(e);
+      Midi->OutNow(this, e);
     }
   }
   Cleanup();
@@ -2375,25 +2776,29 @@ void tTrack::SetCC2Sysex(int csp, int Value)
 
 int tTrack::GetCC1ControllerNr()
 {
-   unsigned char *valp = gpSynth->GetSysexValPtr(CC1ControllerNr);
+  unsigned char *valp = gpSynth->GetSysexValPtr(CC1ControllerNr);
 
-   if (valp)
-      return *valp + 1;
+  if (valp)
+  {
+    return *valp + 1;
+  }
 
-   return 0;
+  return 0;
 }
 
 void tTrack::SetCC1ControllerNr(int Value)
 {
   if (CC1ControllerNr)
+  {
     Kill(CC1ControllerNr);
+  }
   if (Value > 0)
   {
-    JZEvent *e = gpSynth->ControllerNumberSX( 1, 0, Channel, Value - 1 );
+    JZEvent *e = gpSynth->ControllerNumberSX(1, 0, Channel, Value - 1);
     if (e)
     {
-       Put(e);
-       Midi->OutNow(this, e);
+      Put(e);
+      Midi->OutNow(this, e);
     }
   }
   Cleanup();
@@ -2403,25 +2808,29 @@ void tTrack::SetCC1ControllerNr(int Value)
 
 int tTrack::GetCC2ControllerNr()
 {
-   unsigned char *valp = gpSynth->GetSysexValPtr(CC2ControllerNr);
+  unsigned char *valp = gpSynth->GetSysexValPtr(CC2ControllerNr);
 
-   if (valp)
-      return *valp + 1;
+  if (valp)
+  {
+    return *valp + 1;
+  }
 
-   return 0;
+  return 0;
 }
 
 void tTrack::SetCC2ControllerNr(int Value)
 {
   if (CC2ControllerNr)
+  {
     Kill(CC2ControllerNr);
+  }
   if (Value > 0)
   {
     JZEvent *e = gpSynth->ControllerNumberSX(2, 0, Channel, Value - 1);
     if (e)
     {
-       Put(e);
-       Midi->OutNow(this, e);
+      Put(e);
+      Midi->OutNow(this, e);
     }
   }
   Cleanup();
@@ -2431,33 +2840,37 @@ void tTrack::SetCC2ControllerNr(int Value)
 
 int tTrack::GetReverbType(int lsb)
 {
-   unsigned char *valp = gpSynth->GetSysexValPtr(ReverbType);
+  unsigned char *valp = gpSynth->GetSysexValPtr(ReverbType);
 
-   if (valp)
-   {
-      if (lsb)
-      {
-   valp++;
-      }
+  if (valp)
+  {
+    if (lsb)
+    {
+      ++valp;
+    }
+    return *valp + 1;
+  }
 
-      return *valp + 1;
-   }
-
-   return 0;
+ return 0;
 }
 
 void tTrack::SetReverbType(int Value, int lsb)
 {
   if (ReverbType)
+  {
     Kill(ReverbType);
+  }
+
   if (Value > 0)
   {
     JZEvent *e = gpSynth->ReverbMacroSX(0, Value - 1, lsb - 1);
     if (e)
     {
-       Put(e);
-       if (Config(C_UseReverbMacro))
-    Midi->OutNow(this, e);
+      Put(e);
+      if (gpConfig->GetValue(C_UseReverbMacro))
+      {
+        Midi->OutNow(this, e);
+      }
     }
   }
   Cleanup();
@@ -2467,34 +2880,38 @@ void tTrack::SetReverbType(int Value, int lsb)
 
 int tTrack::GetChorusType(int lsb)
 {
-   unsigned char *valp = gpSynth->GetSysexValPtr(ChorusType);
+  unsigned char *valp = gpSynth->GetSysexValPtr(ChorusType);
 
-   if (valp)
-   {
-      if (lsb)
-      {
-   valp++;
-      }
+  if (valp)
+  {
+    if (lsb)
+    {
+      ++valp;
+    }
 
-      return *valp + 1;
-   }
+    return *valp + 1;
+  }
 
-   return 0;
+  return 0;
 }
 
 void tTrack::SetChorusType(int Value, int lsb)
 {
   if (ChorusType)
+  {
     Kill(ChorusType);
+  }
 
   if (Value > 0)
   {
     JZEvent *e = gpSynth->ChorusMacroSX(0, Value - 1, lsb - 1);
     if (e)
     {
-       Put(e);
-       if (Config(C_UseChorusMacro))
-    Midi->OutNow(this, e);
+      Put(e);
+      if (gpConfig->GetValue(C_UseChorusMacro))
+      {
+        Midi->OutNow(this, e);
+      }
     }
   }
   Cleanup();
@@ -2504,26 +2921,30 @@ void tTrack::SetChorusType(int Value, int lsb)
 
 int tTrack::GetEqualizerType()
 {
-   unsigned char *valp = gpSynth->GetSysexValPtr(EqualizerType);
+  unsigned char *valp = gpSynth->GetSysexValPtr(EqualizerType);
 
-   if (valp)
-      return *valp + 1;
+  if (valp)
+  {
+    return *valp + 1;
+  }
 
-   return 0;
+  return 0;
 }
 
 void tTrack::SetEqualizerType(int Value)
 {
   if (EqualizerType)
+  {
     Kill(EqualizerType);
+  }
 
   if (Value > 0)
   {
     JZEvent *e = gpSynth->EqualizerMacroSX(0, Value - 1);
     if (e)
     {
-       Put(e);
-       Midi->OutNow(this, e);
+      Put(e);
+      Midi->OutNow(this, e);
     }
   }
   Cleanup();
@@ -2531,29 +2952,35 @@ void tTrack::SetEqualizerType(int Value)
 
 // ------------------------  Reverb Parameters Sysex ------------------------------
 
-int tTrack::GetRevSysex( int rsp )
+int tTrack::GetRevSysex(int rsp)
 {
-   unsigned char *valp = gpSynth->GetSysexValPtr(ReverbSettings[rsp]);
+  unsigned char *valp = gpSynth->GetSysexValPtr(ReverbSettings[rsp]);
 
-   if (valp)
-      return *valp + 1;
+  if (valp)
+  {
+    return *valp + 1;
+  }
 
-   return 0;
+  return 0;
 }
 
 void tTrack::SetRevSysex(int rsp, int Value)
 {
-  if (ReverbSettings[ rsp ])
-    Kill(ReverbSettings[ rsp ]);
+  if (ReverbSettings[rsp])
+  {
+    Kill(ReverbSettings[rsp]);
+  }
 
   if (Value > 0)
   {
     JZEvent *e = gpSynth->ReverbParamSX(rsp, 0, Value - 1);
     if (e)
     {
-       Put(e);
-       if (!Config(C_UseReverbMacro))
-    Midi->OutNow(this, e);
+      Put(e);
+      if (!gpConfig->GetValue(C_UseReverbMacro))
+      {
+        Midi->OutNow(this, e);
+      }
     }
   }
   Cleanup();
@@ -2561,29 +2988,35 @@ void tTrack::SetRevSysex(int rsp, int Value)
 
 // ------------------------  Chorus Parameters Sysex ------------------------------
 
-int tTrack::GetChoSysex( int csp )
+int tTrack::GetChoSysex(int csp)
 {
-   unsigned char *valp = gpSynth->GetSysexValPtr(ChorusSettings[csp]);
+  unsigned char *valp = gpSynth->GetSysexValPtr(ChorusSettings[csp]);
 
-   if (valp)
-      return *valp + 1;
+  if (valp)
+  {
+    return *valp + 1;
+  }
 
-   return 0;
+  return 0;
 }
 
 void tTrack::SetChoSysex(int csp, int Value)
 {
-  if (ChorusSettings[ csp ])
-    Kill(ChorusSettings[ csp ]);
+  if (ChorusSettings[csp])
+  {
+    Kill(ChorusSettings[csp]);
+  }
 
   if (Value > 0)
   {
     JZEvent *e = gpSynth->ChorusParamSX(csp, 0, Value - 1);
     if (e)
     {
-       Put(e);
-       if (!Config(C_UseChorusMacro))
-    Midi->OutNow(this, e);
+      Put(e);
+      if (!gpConfig->GetValue(C_UseChorusMacro))
+      {
+        Midi->OutNow(this, e);
+      }
     }
   }
   Cleanup();
@@ -2592,27 +3025,32 @@ void tTrack::SetChoSysex(int csp, int Value)
 
 // ------------------------  Partial Reserve ------------------------------
 
-int tTrack::GetPartRsrv( int chan )
+int tTrack::GetPartRsrv(int chan)
 {
-   unsigned char *valp = gpSynth->GetSysexValPtr(PartialReserve);
+  unsigned char *valp = gpSynth->GetSysexValPtr(PartialReserve);
 
-   if (valp)
-      return *(valp + sysex_channel(chan)) + 1;
+  if (valp)
+  {
+    return *(valp + sysex_channel(chan)) + 1;
+  }
 
-   return 0;
+  return 0;
 }
 
 void tTrack::SetPartRsrv(unsigned char *rsrv)
 {
   if (PartialReserve)
-     Kill(PartialReserve);
+  {
+    Kill(PartialReserve);
+  }
 
-  if (rsrv) {
-     JZEvent *e = gpSynth->PartialReserveSX(0, Channel, rsrv);
+  if (rsrv)
+  {
+    JZEvent *e = gpSynth->PartialReserveSX(0, Channel, rsrv);
     if (e)
     {
-       Put(e);
-       Midi->OutNow(this, e);
+      Put(e);
+      Midi->OutNow(this, e);
     }
   }
   Cleanup();
@@ -2622,34 +3060,36 @@ void tTrack::SetPartRsrv(unsigned char *rsrv)
 
 int tTrack::GetMasterVol()
 {
-   unsigned char *valp = gpSynth->GetSysexValPtr(MasterVol);
+  unsigned char *valp = gpSynth->GetSysexValPtr(MasterVol);
 
-   if (valp)
-   {
-      if (gpSynth->GetSysexId(MasterVol) == SX_GM_MasterVol)
-      {
-   // first data byte is lsb; get msb instead!
-   valp++;
-      }
+  if (valp)
+  {
+    if (gpSynth->GetSysexId(MasterVol) == SX_GM_MasterVol)
+    {
+      // first data byte is lsb; get msb instead!
+      ++valp;
+    }
 
-      return *valp + 1;
-   }
+    return *valp + 1;
+  }
 
-   return 0;
+  return 0;
 }
 
 void tTrack::SetMasterVol(int Value)
 {
   if (MasterVol)
+  {
     Kill(MasterVol);
+  }
   if (Value > 0)
   {
-     JZEvent *e = gpSynth->MasterVolSX(0, Value - 1);
-     if (e)
-     {
-  Put(e);
-  Midi->OutNow(this, e);
-     }
+    JZEvent *e = gpSynth->MasterVolSX(0, Value - 1);
+    if (e)
+    {
+      Put(e);
+      Midi->OutNow(this, e);
+    }
   }
   Cleanup();
 }
@@ -2659,18 +3099,22 @@ void tTrack::SetMasterVol(int Value)
 
 int tTrack::GetMasterPan()
 {
-   unsigned char *valp = gpSynth->GetSysexValPtr(MasterPan);
+  unsigned char *valp = gpSynth->GetSysexValPtr(MasterPan);
 
-   if (valp)
-      return *valp + 1;
+  if (valp)
+  {
+    return *valp + 1;
+  }
 
-   return 0;
+  return 0;
 }
 
 void tTrack::SetMasterPan(int Value)
 {
   if (MasterPan)
+  {
     Kill(MasterPan);
+  }
   if (Value > 0)
   {
      JZEvent *e = gpSynth->MasterPanSX(0, Value - 1);
@@ -2685,7 +3129,7 @@ void tTrack::SetMasterPan(int Value)
 
 // ------------------------  Mode Sysex ------------------------------
 
-int tTrack::GetModeSysex( int param )
+int tTrack::GetModeSysex(int param)
 {
    unsigned char *valp = 0;
 
@@ -2702,7 +3146,7 @@ int tTrack::GetModeSysex( int param )
 
    if (valp)
    {
-      return *valp + 1;
+     return *valp + 1;
    }
 
    return 0;
@@ -2714,12 +3158,16 @@ void tTrack::SetModeSysex(int param, int Value)
   {
     case mspRxChannel:
       if (RxChannel)
+      {
         Kill(RxChannel);
+      }
       break;
 
     case mspUseForRhythm:
       if (UseForRhythm)
+      {
         Kill(UseForRhythm);
+      }
       break;
   }
 
@@ -2751,14 +3199,18 @@ void tTrack::SetModeSysex(int param, int Value)
 tMtcTime* tTrack::GetMtcOffset()
 {
   if (MtcOffset)
-    return( new tMtcTime( MtcOffset ) );
-  return( new tMtcTime( 0L, Mtc30Ndf ) );
+  {
+    return new tMtcTime(MtcOffset);
+  }
+  return(new tMtcTime(0L, Mtc30Ndf));
 }
 
 void tTrack::SetMtcOffset(tMtcTime* mtc)
 {
   if (MtcOffset)
+  {
     Kill(MtcOffset);
+  }
   if (mtc)
   {
     JZEvent *e = mtc->ToOffset();
@@ -2772,7 +3224,9 @@ void tTrack::SetMtcOffset(tMtcTime* mtc)
 int tTrack::GetDefaultSpeed()
 {
   if (Speed)
+  {
     return Speed->GetBPM();
+  }
   return 120;
 }
 
@@ -2781,20 +3235,24 @@ void tTrack::SetDefaultSpeed(int bpm)
 {
   JZEvent *e = new tSetTempo(0, bpm);
   if (Speed)
+  {
     Kill(Speed);
+  }
   Put(e);
   Midi->OutNow(this, e);
   Cleanup();
 }
 
-tSetTempo *tTrack::GetCurrentTempo( long clk )
+tSetTempo *tTrack::GetCurrentTempo(long clk)
 {
   tEventIterator Iterator(this);
   Sort();
   JZEvent *e = Iterator.Range(0, clk + 1);
   tSetTempo *t = Speed;
-  while (e) {
-    if (e->IsSetTempo()) {
+  while (e)
+  {
+    if (e->IsSetTempo())
+    {
       t = e->IsSetTempo();
     }
     e = Iterator.Next();
@@ -2803,13 +3261,14 @@ tSetTempo *tTrack::GetCurrentTempo( long clk )
   return t;
 }
 
-int tTrack::GetCurrentSpeed( long clk )
+int tTrack::GetCurrentSpeed(long clk)
 {
-  tSetTempo *t = GetCurrentTempo( clk );
+  tSetTempo *t = GetCurrentTempo(clk);
   if (t)
+  {
     return t->GetBPM();
-  else
-    return 120;
+  }
+  return 120;
 }
 
 
@@ -2821,9 +3280,12 @@ char *tTrack::GetStateChar()
 {
   switch (State)
   {
-    case tsPlay: return "P";
-    case tsMute: return "M";
-    case tsSolo: return "S";
+    case tsPlay:
+      return "P";
+    case tsMute:
+      return "M";
+    case tsSolo:
+      return "S";
   }
   return "?";
 }
@@ -2844,5 +3306,3 @@ void tTrack::SetChannel(int NewChannel)
 {
   Channel = NewChannel;
 }
-
-

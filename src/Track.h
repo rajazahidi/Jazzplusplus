@@ -395,7 +395,6 @@ class tTrack : public tEventArray
     tUndoBuffer UndoBuffers[MaxUndo];
 
     wxDialog *DialogBox;
-    tNamedValue *PatchNames;
 
     void Dialog(JZTrackWindow *parent);
 

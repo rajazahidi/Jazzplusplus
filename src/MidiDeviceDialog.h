@@ -23,6 +23,9 @@
 #ifndef JZ_MIDIDEVICEDIALOG_H
 #define JZ_MIDIDEVICEDIALOG_H
 
+#include <vector>
+#include <string>
+
 //*****************************************************************************
 // Description:
 //   This is the MIDI device selection dialog class declaration.
@@ -32,7 +35,7 @@ class JZMidiDeviceDialog : public wxDialog
   public:
 
     JZMidiDeviceDialog(
-      tNamedValue MidiDevices[],
+      const std::vector<std::pair<std::string, int> >& MidiDevices,
       long& DeviceIndex,
       wxWindow* pParent = 0,
       const wxString& Title = wxEmptyString);

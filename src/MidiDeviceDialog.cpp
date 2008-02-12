@@ -22,8 +22,9 @@
 
 #include "WxWidgets.h"
 
-#include "NamedValue.h"
 #include "MidiDeviceDialog.h"
+
+using namespace std;
 
 //*****************************************************************************
 // Description:
@@ -38,7 +39,7 @@ END_EVENT_TABLE()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZMidiDeviceDialog::JZMidiDeviceDialog(
-  tNamedValue MidiDevices[],
+  const vector<pair<string, int> >& MidiDevices,
   long& DeviceIndex,
   wxWindow* pParent,
   const wxString& Title)
@@ -48,9 +49,14 @@ JZMidiDeviceDialog::JZMidiDeviceDialog(
 {
   mpMidiDeviceListBox = new wxListBox(this, wxID_ANY);
 
-  for (int i = 0; MidiDevices[i].Name != 0; ++i)
+  for (
+    vector<pair<string, int> >::const_iterator iMidiDevice =
+      MidiDevices.begin();
+    iMidiDevice != MidiDevices.end();
+    ++iMidiDevice)
   {
-    mpMidiDeviceListBox->Append(MidiDevices[i].Name);
+    const string& MidiDeviceName = iMidiDevice->first;
+    mpMidiDeviceListBox->Append(MidiDeviceName.c_str());
   }
   mpMidiDeviceListBox->SetSelection(0);
 

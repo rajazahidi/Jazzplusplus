@@ -1541,7 +1541,10 @@ void HBContextDlg::OnScaleList()
 
 HBFrame::~HBFrame()
 {
-  GetPosition( &Config(C_HarmonyXpos), &Config(C_HarmonyYpos) );
+  int XPixel, YPixel;
+  GetPosition(&XPixel, &YPixel);
+  gpConfig->Put(C_HarmonyXpos, XPixel);
+  gpConfig->Put(C_HarmonyYpos, YPixel);
   delete mpToolBar;
   delete cnvs;
   the_harmony_browser = 0;
@@ -1634,7 +1637,14 @@ void HBFrame::OnMenuCommand(int id)
 
 
 HBFrame::HBFrame(wxFrame *parent)
-  : wxFrame(0, -1, "Harmony Browser", wxPoint(Config(C_HarmonyXpos), Config(C_HarmonyYpos)), wxSize(660, 530))
+  : wxFrame(
+      0,
+      wxID_ANY,
+      "Harmony Browser",
+      wxPoint(
+        gpConfig->GetValue(C_HarmonyXpos),
+        gpConfig->GetValue(C_HarmonyYpos)),
+      wxSize(660, 530))
 {
   int w, h;
   cnvs = 0;

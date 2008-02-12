@@ -85,18 +85,22 @@ class tSampleVoice {
 
       // compute offset in buffer
       long offset = 0;
-      if (first) {
+      if (first)
+      {
         if (clock >= buffer_clock)
-	  offset = set.Ticks2Samples(clock - buffer_clock);
-	else {
-	  // output starts somewhere in the middle of a sample
-	  long data_offs = set.Ticks2Samples(buffer_clock - clock);
-	  data += data_offs;
-	  length -= data_offs;
-	  if (length <= 0)
-	    return;
-	}
-	first = 0;
+        {
+          offset = set.Ticks2Samples(clock - buffer_clock);
+        }
+        else
+        {
+          // output starts somewhere in the middle of a sample
+          long data_offs = set.Ticks2Samples(buffer_clock - clock);
+          data += data_offs;
+          length -= data_offs;
+          if (length <= 0)
+            return;
+        }
+        first = 0;
       }
 
       // compute number of samples to put into this buffer
@@ -108,7 +112,7 @@ class tSampleVoice {
       length -= count;
       b += offset;
       while (count--)
-	*b++ += *data++;
+        *b++ += *data++;
     }
 
 
@@ -121,16 +125,19 @@ class tSampleVoice {
 
       if (first) {
 
-	if (to_smpl > 0 && to_smpl < length)
-	  length = to_smpl;
+        if (to_smpl > 0 && to_smpl < length)
+          length = to_smpl;
 
-        if (fr_smpl > 0 && fr_smpl < length) {
-	  data += fr_smpl;
-	  length -= fr_smpl;
-	}
-	first = FALSE;
-	if (length <= 0)
-	  return;
+        if (fr_smpl > 0 && fr_smpl < length)
+        {
+          data += fr_smpl;
+          length -= fr_smpl;
+        }
+        first = FALSE;
+        if (length <= 0)
+        {
+          return;
+        }
       }
 
       int count = bufsize;
@@ -140,7 +147,9 @@ class tSampleVoice {
       // update length and copy data
       length -= count;
       while (count--)
-	*b++ += *data++;
+      {
+        *b++ += *data++;
+      }
     }
 
 
@@ -185,7 +194,7 @@ tSampleSet::tSampleSet(long tpm)
   }
   speed    = 22050;
   channels = 1;
-  bits     = 16;	// dont change!!
+  bits     = 16;        // dont change!!
 
   for (i = 0; i < MAXPOLY; i++)
     voices[i] = new tSampleVoice(*this);
@@ -263,18 +272,18 @@ int tSampleSet::Load(const wxString& FileName)
       if (!wxFileExists(fname))
       {
         // try to prepend the SplFilePath
-	char tmp[128];
+        char tmp[128];
         strcpy(tmp, SplFilePath.c_str());
-	strcat(tmp, "/");
-	strcat(tmp, fname);
-	strcpy(fname, tmp);
+        strcat(tmp, "/");
+        strcat(tmp, fname);
+        strcpy(fname, tmp);
       }
       if (!wxFileExists(fname))
       {
-	char buf[500];
-	sprintf(buf, "File not found: \"%s\"", fname);
-	wxMessageBox(buf, "Error", wxOK);
-	continue;
+        char buf[500];
+        sprintf(buf, "File not found: \"%s\"", fname);
+        wxMessageBox(buf, "Error", wxOK);
+        continue;
       }
       assert(0 <= key && key < MAXSMPL);
       samples[key]->SetFilename(fname);
@@ -284,9 +293,9 @@ int tSampleSet::Load(const wxString& FileName)
       samples[key]->SetPitch(pitch);
       if (samples[key]->Load())
       {
-	char buf[500];
-	sprintf(buf, "could not load \"%s\"", samples[key]->GetFilename());
-	wxMessageBox(buf, "Error", wxOK);
+        char buf[500];
+        sprintf(buf, "could not load \"%s\"", samples[key]->GetFilename());
+        wxMessageBox(buf, "Error", wxOK);
       }
       if (samplewin[key])
       {
@@ -597,20 +606,25 @@ class tAudioGloblForm : public wxForm
       set(s)
     {
 
-      ossbug1      = Config(C_OssBug1);
-      ossbug2      = Config(C_OssBug2);
-      duplex_audio = Config(C_DuplexAudio);
+      ossbug1      = gpConfig->GetValue(C_OssBug1);
+      ossbug2      = gpConfig->GetValue(C_OssBug2);
+      duplex_audio = gpConfig->GetValue(C_DuplexAudio);
 
       static const char *speedtxt[] = { "8000", "11025", "22050", "44100", 0 };
       speed    = set.GetSpeed();
       speedstr = 0;
-      for (int i = 0; speedtxt[i]; i++) {
+      for (int i = 0; speedtxt[i]; i++)
+      {
         strlist.Append((wxObject *)speedtxt[i]);  // ???
-	if (atol(speedtxt[i]) == speed)
-	  speedstr = copystring(speedtxt[i]);
+        if (atol(speedtxt[i]) == speed)
+        {
+          speedstr = copystring(speedtxt[i]);
+        }
       }
       if (!speedstr)
-	speedstr = copystring(speedtxt[0]);
+      {
+        speedstr = copystring(speedtxt[0]);
+      }
 
       enable = Midi->GetAudioEnabled();
       stereo = (set.GetChannels() == 2);
@@ -654,28 +668,32 @@ class tAudioGloblForm : public wxForm
       set.SetSoftSync(softsync);
       Midi->SetAudioEnabled(enable);
 
-      if (Config(C_EnableAudio) != enable) {
-	Config(C_EnableAudio) = enable;
-	Config.Put(C_EnableAudio, enable);
+      if (gpConfig->GetValue(C_EnableAudio) != enable)
+      {
+//        Config(C_EnableAudio) = enable;
+        Config.Put(C_EnableAudio, enable);
       }
 
-      if (Config(C_OssBug1) != ossbug1) {
-	Config(C_OssBug1) = ossbug1;
+      if (gpConfig->GetValue(C_OssBug1) != ossbug1)
+      {
+//        Config(C_OssBug1) = ossbug1;
         Config.Put(C_OssBug1, ossbug1);
       }
 
-      if (Config(C_OssBug2) != ossbug2) {
-	Config(C_OssBug2) = ossbug2;
+      if (gpConfig->GetValue(C_OssBug2) != ossbug2)
+      {
+//        Config(C_OssBug2) = ossbug2;
         Config.Put(C_OssBug2, ossbug2);
       }
 
-      if (Config(C_DuplexAudio) != duplex_audio) {
-	Config(C_DuplexAudio) = duplex_audio;
+      if (gpConfig->GetValue(C_DuplexAudio) != duplex_audio)
+      {
+        Config(C_DuplexAudio) = duplex_audio;
         Config.Put(C_DuplexAudio, duplex_audio);
       }
 
       if (enable)
-	set.ReloadSamples();
+        set.ReloadSamples();
       wxEndBusyCursor();
       wxForm::OnOk();
     }
@@ -1160,11 +1178,11 @@ int tSampleSet::OnMenuCommand(int id)
           false,
           has_changed,
           "*.spl");
-	if (fname)
+        if (fname)
         {
-	  Load(fname);
+          Load(fname);
         }
-	return 1;
+        return 1;
       }
 
     case MEN_AUDIO_SAVE_AS:
@@ -1175,21 +1193,21 @@ int tSampleSet::OnMenuCommand(int id)
           true,
           has_changed,
           "*.spl");
-	if (fname)
+        if (fname)
         {
-	  Save(fname);
+          Save(fname);
         }
-	return 1;
+        return 1;
       }
 
     case MEN_AUDIO_SAVE:
       {
         if (mDefaultFileName == "noname.spl")
         {
-	  return OnMenuCommand(MEN_AUDIO_SAVE_AS);
+          return OnMenuCommand(MEN_AUDIO_SAVE_AS);
         }
-	Save(mDefaultFileName);
-	return 1;
+        Save(mDefaultFileName);
+        return 1;
       }
 
     case MEN_AUDIO_GLOBAL:
@@ -1203,10 +1221,14 @@ int tSampleSet::OnMenuCommand(int id)
     case MEN_AUDIO_NEW:
       if (spl_dialog == 0 && glb_dialog == 0)
       {
-	if (wxMessageBox("Clear Sample Set?", "Confirm", wxYES_NO) == wxNO)
-	  return 1;
-	for (int i = 0; i < MAXSMPL; i++)
-	  samples[i]->Clear();
+        if (wxMessageBox("Clear Sample Set?", "Confirm", wxYES_NO) == wxNO)
+        {
+          return 1;
+        }
+        for (int i = 0; i < MAXSMPL; i++)
+        {
+          samples[i]->Clear();
+        }
       }
       return 1;
 

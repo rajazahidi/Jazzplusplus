@@ -76,35 +76,67 @@ enum tClockSource { CsInt = 0, CsFsk, CsMidi, CsMtc };
 class JZRecordingInfo;
 
 
-class tDeviceList {
+class tDeviceList
+{
   public:
-    enum { MAXDEVS = 10 };
+
+    enum
+    {
+      eMaximumDeviceCount = 10
+    };
+
     tDeviceList();
-    tDeviceList(const char *name);
+
+    tDeviceList(const char* pName);
+
     virtual ~tDeviceList();
-    int GetCount() const {
-      return count;
+
+    unsigned GetCount() const
+    {
+      return mDeviceNames.size();
     }
-    const char* GetName(int i) const {
-      return names[i];
-    }
-    int add(const char *name) {
-      if (count < MAXDEVS) {
-        names[count] = copystring(name);
-	return count++;
+
+    const std::string& GetName(unsigned i) const
+    {
+      if (i < mDeviceNames.size())
+      {
+        return mDeviceNames[i];
       }
-      return MAXDEVS;
+      static std::string Unknown("Unknown");
+      return Unknown;
     }
-    virtual void Clear() {
-      count = 0;
+
+    unsigned Add(const char* pName)
+    {
+      mDeviceNames.push_back(pName);
+      return mDeviceNames.size();
+//      if (count < eMaximumDeviceCount)
+//      {
+//        names[count] = copystring(name);
+//	return count++;
+//      }
+//      return eMaximumDeviceCount;
     }
-    tNamedValue *AsNamedValue();
- protected:
-    int count;
-    char *names[MAXDEVS];
- private:
+
+    void Clear()
+    {
+      mDeviceNames.clear();
+//      count = 0;
+    }
+
+//    tNamedValue* AsNamedValue();
+
+  protected:
+
+//    int count;
+//    char *names[eMaximumDeviceCount];
+    std::vector<std::string> mDeviceNames;
+
+  private:
+
+    // Prevent accidental copy or assignment.
     tDeviceList(const tDeviceList &);
-    tDeviceList &operator=(const tDeviceList &);
+    tDeviceList& operator = (const tDeviceList &);
 };
 
 class tPlayer : public wxTimer

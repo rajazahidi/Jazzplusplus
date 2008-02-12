@@ -23,9 +23,8 @@
 #ifndef JZ_CONFIGURATION_H
 #define JZ_CONFIGURATION_H
 
-#include "WxWidgets.h"
-
-#include "NamedValue.h"
+#include <string>
+#include <vector>
 
 class tDoubleCommand
 {
@@ -119,95 +118,132 @@ enum TEMidiDriver
   eMidiDriverAlsa = 2  // C_DRV_ALSA  2
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tConfigEntry
 {
   public:
 
-    tConfigEntry( char* name, int ival )
-      : Type(ConfigEntryTypeInt),
-        Name(name),
-        Value(ival),
-        StrValue(0)
-    {
-    }
+    tConfigEntry(const char* pName, int IntegerValue);
 
-    tConfigEntry(char* name, char* sval);
+    tConfigEntry(const char* pName, const char* pStringValue);
 
-    tConfigEntry(char* name)
-      : Type(ConfigEntryTypeEmpty),
-        Name(name),
-        Value(0),
-        StrValue(0)
-    {
-    }
+    tConfigEntry(const char* pName, const std::string& StringValue);
+
+    tConfigEntry(const char* pName);
 
     ~tConfigEntry();
 
+    ConfigEntryType GetType() const
+    {
+      return Type;
+    }
+
+    const char* GetName() const
+    {
+      return Name;
+    }
+
+    const int& GetValue() const
+    {
+      return Value;
+    }
+
+    void SetValue(const int& value)
+    {
+      Value = value;
+    }
+
+    const char* GetStrValue() const
+    {
+      return StrValue;
+    }
+
+    void SetStrValue(const char* pStringValue);
+
   private:
 
-    friend class tConfig;
     ConfigEntryType Type;
     char* Name;
     int Value;
     char* StrValue;
-
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tConfig
 {
-  private:
-
-    tConfigEntry* Names[NumConfigNames];
-    tNamedValue *DrumNames;
-    int NumDrumNames;
-    tNamedValue *DrumSets;
-    int NumDrumSets;
-    tNamedValue *VoiceNames;
-    int NumVoiceNames;
-    tNamedValue *CtrlNames;
-    int NumCtrlNames;
-    tDoubleCommand *BankTable;
-    int NumBankEntries;
-
   public:
 
     tConfig();
+
     ~tConfig();
-    void LoadConfig(wxString fname );
+
+    void LoadConfig(const wxString& FileName);
+
     wxString File();
-    int Check( char* name );
-    int Load( char* buf );
 
-    tNamedValue& DrumName( int entry );
-    tNamedValue& DrumSet( int entry );
-    tNamedValue& VoiceName( int entry );
-    tNamedValue& CtrlName( int entry );
-    tDoubleCommand& BankEntry( int entry );
+    int Check(const char* pName) const;
+    int Load(char* buf);
 
-    char* Name( int entry )
+    std::pair<std::string, int>& DrumName(unsigned entry);
+    std::pair<std::string, int>& DrumSet(unsigned entry);
+    std::pair<std::string, int>& VoiceName(unsigned entry);
+    std::pair<std::string, int>& CtrlName(unsigned entry);
+    tDoubleCommand& BankEntry(unsigned entry);
+
+    const char* Name(int entry)
     {
-      assert( (entry >= 0) && (entry < NumConfigNames) );
-      return Names[entry]->Name;
+      assert((entry >= 0) && (entry < NumConfigNames));
+      return Names[entry]->GetName();
     }
 
-    char*& StrValue( int entry )
+//    char*& StrValue(int entry)
+    const char* StrValue(int entry)
     {
-      assert( (entry >= 0) && (entry < NumConfigNames) );
-      return Names[entry]->StrValue;
+      assert((entry >= 0) && (entry < NumConfigNames));
+      return Names[entry]->GetStrValue();
     }
 
-    int& operator () ( char* name );
-    int& operator () ( int name );
+    const int& GetValue(const char* pName) const;
+    const int& GetValue(int Index) const;
 
     bool Get(int entry, char *value);
     bool Get(int entry, long &value);
 
     bool Put(int entry, const char *value);
     bool Put(int entry, long value);
-    bool Put(int entry );
-    bool Put(int entry, int val);
-};
+    bool Put(int entry);
+    bool Put(int entry, int value);
 
-extern tConfig Config;
+    const std::vector<std::pair<std::string, int> >& GetDrumNames()
+    {
+      return mDrumNames;
+    }
+
+    const std::vector<std::pair<std::string, int> >& GetControlNames()
+    {
+      return mCtrlNames;
+    }
+
+    const std::vector<std::pair<std::string, int> >& GetVoiceNames()
+    {
+      return mVoiceNames;
+    }
+
+  private:
+
+    tConfigEntry* Names[NumConfigNames];
+
+    std::vector<std::pair<std::string, int> > mDrumNames;
+
+    std::vector<std::pair<std::string, int> > mDrumSets;
+
+    std::vector<std::pair<std::string, int> > mCtrlNames;
+
+    std::vector<std::pair<std::string, int> > mVoiceNames;
+
+    std::vector<tDoubleCommand> mBankTable;
+};
 
 #endif // !defined(JZ_CONFIGURATION_H)

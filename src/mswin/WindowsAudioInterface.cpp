@@ -27,6 +27,7 @@
 
 #include "WindowsAudioInterface.h"
 #include "RecordingInfo.h"
+#include "Globals.h"
 
 // not sure if mutex may cause a dead lock when used to
 // synchronize the wxTimer::Notify() interrupt and the
@@ -129,7 +130,7 @@ tWinAudioPlayer::tWinAudioPlayer(JZSong *song)
   long dummy    = 0;
   AudioBuffer   = new tEventArray();
   installed     = 0;
-  dummy = Config(C_EnableAudio);
+  dummy = gpConfig->GetValue(C_EnableAudio);
   audio_enabled = dummy;
   listener      = 0;
   hout_open     = 0;
@@ -137,7 +138,7 @@ tWinAudioPlayer::tWinAudioPlayer(JZSong *song)
 
   // check for device
   installed = 0;
-  can_duplex = (Config(C_DuplexAudio) != 0);
+  can_duplex = (gpConfig->GetValue(C_DuplexAudio) != 0);
   error = NoError;
   can_sync = 1;
 
@@ -228,9 +229,11 @@ int tWinAudioPlayer::OpenDsp()
   error = NoError;  // everything ok for now.
 
   if (!audio_enabled)
+  {
     return 0;
+  }
 
-  can_duplex = (Config(C_DuplexAudio) != 0);
+  can_duplex = (gpConfig->GetValue(C_DuplexAudio) != 0);
 
   // specify the data format
   WAVEFORMATEX fmt;

@@ -46,7 +46,6 @@ void CALLBACK MidiOutProc(
   DWORD dwParam1,
   DWORD dwParam2
 );
-
 }
 
 class tWinAudioPlayer;
@@ -275,7 +274,8 @@ class tMidiQueue
       return rd == wr;
     }
 
-    int nfree() const {
+    int nfree() const
+    {
       return (rd - wr - 1 + MIDI_BUFFER_SIZE) % MIDI_BUFFER_SIZE;
     }
 
@@ -349,12 +349,11 @@ struct tWinPlayerState
   tMidiQueue thru_buffer;
 
   tWinAudioPlayer* audio_player;
-  long       time_correction;
+  long time_correction;
 
   tWinSysexBufferArray* isx_buffers;
   tWinSysexBufferArray* osx_buffers;
   int sysex_found;
 };
-
 
 #endif // !defined(JZ_WINDOWSMIDIINTERFACE_H)

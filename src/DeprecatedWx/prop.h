@@ -236,6 +236,7 @@ typedef enum {
     wxPropertyValueIntegerPtr,
     wxPropertyValueLongPtr,
     wxPropertyValueRealPtr,
+    wxPropertyValueDoublePtr,
     wxPropertyValueboolPtr,
     wxPropertyValueStringPtr
 } wxPropertyValueType;
@@ -261,6 +262,7 @@ class wxPropertyValue: public wxObject
   wxPropertyValue(long *val);
   wxPropertyValue(bool *val);
   wxPropertyValue(float *val);
+  wxPropertyValue(double *val);
 
   ~wxPropertyValue(void);
 
@@ -269,12 +271,13 @@ class wxPropertyValue: public wxObject
   virtual long IntegerValue(void) const;
   virtual float RealValue(void) const;
   virtual bool BoolValue(void) const;
-  virtual wxChar *StringValue(void) const;
-  virtual int *IntegerValuePtr(void) const;
-  virtual long *LongValuePtr(void) const;
-  virtual float *RealValuePtr(void) const;
-  virtual bool *BoolValuePtr(void) const;
-  virtual wxChar **StringValuePtr(void) const;
+  virtual wxChar* StringValue(void) const;
+  virtual int* IntegerValuePtr(void) const;
+  virtual long* LongValuePtr(void) const;
+  virtual float* RealValuePtr(void) const;
+  virtual double* DoubleValuePtr(void) const;
+  virtual bool* BoolValuePtr(void) const;
+  virtual wxChar** StringValuePtr(void) const;
 
   // Get nth arg of clause (starting from 1)
   virtual wxPropertyValue *Arg(wxPropertyValueType type, int arg) const;
@@ -333,6 +336,7 @@ class wxPropertyValue: public wxObject
   void operator=(const long *val);
   void operator=(const bool *val);
   void operator=(const float *val);
+  void operator=(const double *val);
 
  public:
   wxObject*             m_clientData;
@@ -341,13 +345,14 @@ class wxPropertyValue: public wxObject
 
   union {
     long integer; // Also doubles as bool
-    wxChar *string;
+    wxChar* string;
     float real;
-    int *integerPtr;
-    long *longPtr;
-    bool *boolPtr;
+    int* integerPtr;
+    long* longPtr;
+    bool* boolPtr;
     wxChar **stringPtr;
-    float *realPtr;
+    float* realPtr;
+    double* doublePtr;
     wxPropertyValue *first;  // If is a list expr, points to the first node
     } m_value;
 

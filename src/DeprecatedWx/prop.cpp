@@ -164,6 +164,15 @@ wxPropertyValue::wxPropertyValue(float *val)
   m_next = NULL;
 }
 
+wxPropertyValue::wxPropertyValue(double *val)
+{
+  m_modifiedFlag = false;
+  m_type = wxPropertyValueDoublePtr;
+  m_value.doublePtr = val;
+  m_clientData = NULL;
+  m_next = NULL;
+}
+
 wxPropertyValue::wxPropertyValue(wxList *the_list)
 {
   m_modifiedFlag = false;
@@ -340,6 +349,8 @@ wxPropertyValue *wxPropertyValue::NewCopy(void) const
      return new wxPropertyValue(m_value.longPtr);
    case wxPropertyValueRealPtr:
      return new wxPropertyValue(m_value.realPtr);
+   case wxPropertyValueDoublePtr:
+     return new wxPropertyValue(m_value.doublePtr);
    case wxPropertyValueboolPtr:
      return new wxPropertyValue(m_value.boolPtr);
    case wxPropertyValueStringPtr:
@@ -385,6 +396,9 @@ void wxPropertyValue::Copy(wxPropertyValue& copyFrom)
       return ;
     case wxPropertyValueRealPtr:
       (*this) = copyFrom.RealValuePtr();
+      return ;
+    case wxPropertyValueDoublePtr:
+      (*this) = copyFrom.DoubleValuePtr();
       return ;
     case wxPropertyValueIntegerPtr:
       (*this) = copyFrom.IntegerValuePtr();
@@ -557,6 +571,13 @@ void wxPropertyValue::WritePropertyType(wxString& stream)    // Write as any oth
       stream.Append( tmp );
       break;
     }
+    case wxPropertyValueDoublePtr:
+    {
+      double d = *m_value.doublePtr;
+      tmp.Printf( wxT("%.6g"), d );
+      stream.Append( tmp );
+      break;
+    }
     case wxPropertyValueString:
     {
       stream.Append( m_value.string );
@@ -675,6 +696,8 @@ void wxPropertyValue::operator=(const long val)
     m_value.real = (float)val;
   else if (m_type == wxPropertyValueRealPtr)
     *m_value.realPtr = (float)val;
+  else if (m_type == wxPropertyValueDoublePtr)
+    *m_value.doublePtr = (double)val;
 
   m_clientData = NULL;
   m_next = NULL;
@@ -725,6 +748,8 @@ void wxPropertyValue::operator=(const float val)
     m_value.real = val;
   else if (m_type == wxPropertyValueRealPtr)
     *m_value.realPtr = val;
+  else if (m_type == wxPropertyValueDoublePtr)
+    *m_value.doublePtr = val;
 
   m_clientData = NULL;
   m_next = NULL;
@@ -788,6 +813,15 @@ void wxPropertyValue::operator=(const float *val)
   m_next = NULL;
 }
 
+void wxPropertyValue::operator=(const double *val)
+{
+  m_modifiedFlag = true;
+  m_type = wxPropertyValueDoublePtr;
+  m_value.doublePtr = (double*)val;
+  m_clientData = NULL;
+  m_next = NULL;
+}
+
 long wxPropertyValue::IntegerValue(void) const
   {
     if (m_type == wxPropertyValueInteger)
@@ -798,6 +832,8 @@ long wxPropertyValue::IntegerValue(void) const
       return *m_value.integerPtr;
     else if (m_type == wxPropertyValueRealPtr)
       return (long)(*m_value.realPtr);
+    else if (m_type == wxPropertyValueDoublePtr)
+      return (long)(*m_value.doublePtr);
     else return 0;
   }
 
@@ -817,6 +853,8 @@ float wxPropertyValue::RealValue(void) const
     return m_value.real;
   else if (m_type == wxPropertyValueRealPtr)
     return *m_value.realPtr;
+  else if (m_type == wxPropertyValueDoublePtr)
+    return *m_value.doublePtr;
   else if (m_type == wxPropertyValueInteger)
     return (float)m_value.integer;
   else if (m_type == wxPropertyValueIntegerPtr)
@@ -824,26 +862,34 @@ float wxPropertyValue::RealValue(void) const
   else return 0.0;
 }
 
-float *wxPropertyValue::RealValuePtr(void) const
+float* wxPropertyValue::RealValuePtr(void) const
 {
   return m_value.realPtr;
 }
 
-bool wxPropertyValue::BoolValue(void) const {
-    if (m_type == wxPropertyValueReal)
-      return (m_value.real != 0.0);
-    if (m_type == wxPropertyValueRealPtr)
-      return (*(m_value.realPtr) != 0.0);
-    else if (m_type == wxPropertyValueInteger)
-      return (m_value.integer != 0);
-    else if (m_type == wxPropertyValueIntegerPtr)
-      return (*(m_value.integerPtr) != 0);
-    else if (m_type == wxPropertyValuebool)
-      return (m_value.integer != 0);
-    else if (m_type == wxPropertyValueboolPtr)
-      return (*(m_value.boolPtr) != 0);
-    else return false;
-  }
+double* wxPropertyValue::DoubleValuePtr(void) const
+{
+  return m_value.doublePtr;
+}
+
+bool wxPropertyValue::BoolValue(void) const
+{
+  if (m_type == wxPropertyValueReal)
+    return (m_value.real != 0.0);
+  if (m_type == wxPropertyValueRealPtr)
+    return (*(m_value.realPtr) != 0.0f);
+  else if (m_type == wxPropertyValueDoublePtr)
+    return (*(m_value.doublePtr) != 0.0);
+  else if (m_type == wxPropertyValueInteger)
+    return (m_value.integer != 0);
+  else if (m_type == wxPropertyValueIntegerPtr)
+    return (*(m_value.integerPtr) != 0);
+  else if (m_type == wxPropertyValuebool)
+    return (m_value.integer != 0);
+  else if (m_type == wxPropertyValueboolPtr)
+    return (*(m_value.boolPtr) != 0);
+  else return false;
+}
 
 bool *wxPropertyValue::BoolValuePtr(void) const
 {

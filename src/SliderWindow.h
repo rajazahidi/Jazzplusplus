@@ -66,7 +66,7 @@ class tSliderWin : public wxFrame
     static void ItemCallback(wxItem& item, wxCommandEvent& event);
 #endif
 
-    int in_constructor;
+    bool in_constructor;
     wxFrame **ref;
 
     wxPanel* panel;

@@ -45,7 +45,7 @@ tSliderWin::tSliderWin(
       wxSize(geo[2], geo[3]))
 {
   this->geo = geo;
-  in_constructor = TRUE;
+  in_constructor = true;
   this->ref = ref;
   n_sliders   = 0;
   sliders_per_row = 1;
@@ -62,7 +62,7 @@ void tSliderWin::Initialize()
   AddItems();
   panel->Fit();
   AddEdits();
-  in_constructor = FALSE;
+  in_constructor = false;
 
   int cw, ch;
   GetClientSize(&cw, &ch);
@@ -93,31 +93,34 @@ END_EVENT_TABLE()
 
 
 */
-void tSliderWin::OnSize(wxSizeEvent& Event)//int w, int h)
+void tSliderWin::OnSize(wxSizeEvent& Event)
 {
   cout <<"tSliderWin::OnSize "<<in_constructor<<endl;
   wxSize sz = Event.GetSize();
-  int w = sz.GetWidth();
-  int h = sz.GetHeight();
 
   if (in_constructor)
+  {
     return;
+  }
 
   int cw, ch;
   GetClientSize(&cw, &ch);
   int pw = 0;
   int ph = 0;
   panel->GetSize(&pw, &ph);
-//   if (mpToolBar) {
-//     int tw = 0;
-//     int th = 0;
-//     mpToolBar->GetMaxSize(&tw, &th);
-//     mpToolBar->SetSize(0, 0, (int)cw, (int)th);
-//     panel->SetSize(0, (int)th, (int)cw, (int)ph);
-//     ph += (int)th; // add toolbar height to panel height
-//   }
-//   else
-    panel->SetSize(0, 0, (int)cw, (int)ph);
+//  if (mpToolBar)
+//  {
+//    int tw = 0;
+//    int th = 0;
+//    mpToolBar->GetMaxSize(&tw, &th);
+//    mpToolBar->SetSize(0, 0, (int)cw, (int)th);
+//    panel->SetSize(0, (int)th, (int)cw, (int)ph);
+//    ph += (int)th; // add toolbar height to panel height
+//  }
+//  else
+//  {
+    panel->SetSize(0, 0, cw, ph);
+//  }
 
   int n_rows = (n_sliders - 1) /  sliders_per_row + 1;
   int ay = (int)ph;
@@ -135,17 +138,18 @@ void tSliderWin::OnSize(wxSizeEvent& Event)//int w, int h)
       float x1 = x0 + (float)cw / n_cols;
       sliders[k]->SetSize((int)x0, (int)y0, (int)(x1 - x0), (int)(y1 - y0));
 //      sliders[k]->SetSize((int)x0, 0, (int)(x1 - x0), (int)(y0-y1));
-      cout<<"slider "<<k<<" size:"<<(int)x0<<" "<< (int)y0<<" "<< (int)(x1 - x0)<<" "<< (int)(y1 - y0)<<endl;
+      cout
+        << "slider " << k << " size:" << (int)x0 << " " << (int)y0
+        << " " << (int)(x1 - x0) << " " << (int)(y1 - y0)
+        << endl;
     }
   }
 
 }
 
-
-
 bool tSliderWin::OnClose()
 {
-  return TRUE;
+  return true;
 }
 
 

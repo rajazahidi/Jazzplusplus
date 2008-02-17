@@ -21,7 +21,7 @@
 //
 // Changes
 //
-// 2000.03.18	Takashi Iwai <iwai@ww.uni-erlangen.de>
+// 2000.03.18        Takashi Iwai <iwai@ww.uni-erlangen.de>
 // - Modified for ALSA 0.5.x.
 //   You'll need the latest CVS version of ALSA-lib, which is expected
 //   to be released as ver.0.5.7.
@@ -33,6 +33,7 @@
 
 #include "AlsaPlayer.h"
 #include "TrackFrame.h"
+#include "TrackWindow.h"
 #include "Dialogs.h"
 #include "Configuration.h"
 #include "Globals.h"
@@ -55,14 +56,16 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
   recd_clock = 0;
   echo_clock = 0;
 
-  if (snd_seq_open(&handle, "hw", SND_SEQ_OPEN_DUPLEX, 0) < 0) {
+  if (snd_seq_open(&handle, "hw", SND_SEQ_OPEN_DUPLEX, 0) < 0)
+  {
     perror("open sequencer");
     installed = 0;
     return;
   }
 
   // set myself into non blocking mode
-  if (set_blocking_mode(0) < 0) {
+  if (set_blocking_mode(0) < 0)
+  {
     installed = 0;
     return;
   }
@@ -117,8 +120,8 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
 
   snd_seq_set_output_buffer_size(handle, 65536);
 
-
-  if (installed) {
+  if (installed)
+  {
     thru = new tAlsaThru();
     SetSoftThru(
       gpConfig->GetValue(C_SoftThru),
@@ -148,23 +151,26 @@ void tAlsaPlayer::set_pool_sizes()
 
 
 
-void tAlsaPlayer::SetSoftThru(int on, int idev, int odev) 
+void tAlsaPlayer::SetSoftThru(int on, int idev, int odev)
 {
-  if (idev != ithru || odev != othru) {
+  if (idev != ithru || odev != othru)
+  {
     ithru = idev;
     othru = odev;
 
     thru->Stop();
 
   }
-  if (on && !thru->IsRunning()) {
+  if (on && !thru->IsRunning())
+  {
     thru->SetSource(iaddr[ithru].client, iaddr[ithru].port);
     thru->SetDestin(oaddr[othru].client, oaddr[othru].port);
 
     thru->Start();
 
   }
-  else if (!on && thru->IsRunning()){
+  else if (!on && thru->IsRunning())
+  {
 
     thru->Stop();
 
@@ -172,21 +178,25 @@ void tAlsaPlayer::SetSoftThru(int on, int idev, int odev)
 }
 
 // connect output addrs/queue with my client/oport
-void tAlsaPlayer::subscribe_out(int outp) {
-  if (snd_seq_connect_to(handle, self.port, oaddr[outp].client, oaddr[outp].port) < 0) {
+void tAlsaPlayer::subscribe_out(int outp)
+{
+  if (snd_seq_connect_to(handle, self.port, oaddr[outp].client, oaddr[outp].port) < 0)
+  {
     perror("subscribe output");
   }
 }
 
 // connect input addrs/queue with my client/iport
-void tAlsaPlayer::subscribe_inp(int inp) {
+void tAlsaPlayer::subscribe_inp(int inp)
+{
   snd_seq_port_subscribe_t *subs;
   snd_seq_port_subscribe_alloca(&subs);
   snd_seq_port_subscribe_set_time_update(subs, 1);
   snd_seq_port_subscribe_set_queue(subs, queue);
   snd_seq_port_subscribe_set_sender(subs, &iaddr[inp]);
   snd_seq_port_subscribe_set_dest(subs, &self);
-  if (snd_seq_subscribe_port(handle, subs) < 0) {
+  if (snd_seq_subscribe_port(handle, subs) < 0)
+  {
     perror("subscribe input");
   }
 }
@@ -211,7 +221,7 @@ void tAlsaPlayer::unsubscribe_inp(int inp) {
   }
 }
 
-// set the name of this client 
+// set the name of this client
 void tAlsaPlayer::set_client_info(snd_seq_t *handle, const char *name) {
   if (snd_seq_set_client_name(handle, (char *)name) < 0) {
     perror("ioctl");
@@ -255,9 +265,9 @@ int tAlsaPlayer::OutEvent(JZEvent *e, int now)
   {
     case StatKeyOn:
       {
-	tKeyOn *k = e->IsKeyOn();
-        set_event_header(&ev, e->Clock, SND_SEQ_EVENT_NOTEON);
-	ev.data.note.channel = k->Channel;
+        tKeyOn *k = e->IsKeyOn();
+        set_event_header(&ev, e->GetClock(), SND_SEQ_EVENT_NOTEON);
+        ev.data.note.channel = k->Channel;
         ev.data.note.note = k->Key;
         ev.data.note.velocity = k->Veloc;
         rc = write(&ev, now);
@@ -266,9 +276,9 @@ int tAlsaPlayer::OutEvent(JZEvent *e, int now)
 
     case StatKeyOff:
       {
-	tKeyOff *k = e->IsKeyOff();
-        set_event_header(&ev, e->Clock, SND_SEQ_EVENT_NOTEOFF);
-	ev.data.note.channel = k->Channel;
+        tKeyOff *k = e->IsKeyOff();
+        set_event_header(&ev, e->GetClock(), SND_SEQ_EVENT_NOTEOFF);
+        ev.data.note.channel = k->Channel;
         ev.data.note.note = k->Key;
         ev.data.note.velocity = k->OffVeloc;
         rc = write(&ev, now);
@@ -277,76 +287,76 @@ int tAlsaPlayer::OutEvent(JZEvent *e, int now)
 
     case StatProgram:
       {
-	tProgram *k = e->IsProgram();
-	set_event_header(&ev, e->Clock, SND_SEQ_EVENT_PGMCHANGE);
-	ev.data.control.channel = k->Channel;
-	ev.data.control.value = k->Program;
-	rc = write(&ev, now);
+        tProgram *k = e->IsProgram();
+        set_event_header(&ev, e->GetClock(), SND_SEQ_EVENT_PGMCHANGE);
+        ev.data.control.channel = k->Channel;
+        ev.data.control.value = k->Program;
+        rc = write(&ev, now);
       }
       break;
 
     case StatKeyPressure:
       {
-	tKeyPressure *k = e->IsKeyPressure();
-	set_event_header(&ev, e->Clock, SND_SEQ_EVENT_KEYPRESS);
-	ev.data.note.channel = k->Channel;
-	ev.data.note.note = k->Key;
-	ev.data.note.velocity = k->Value;
-	rc = write(&ev, now);
+        tKeyPressure *k = e->IsKeyPressure();
+        set_event_header(&ev, e->GetClock(), SND_SEQ_EVENT_KEYPRESS);
+        ev.data.note.channel = k->Channel;
+        ev.data.note.note = k->Key;
+        ev.data.note.velocity = k->Value;
+        rc = write(&ev, now);
       }
       break;
 
     case StatChnPressure:
       {
-	tChnPressure *k = e->IsChnPressure();
-	set_event_header(&ev, e->Clock, SND_SEQ_EVENT_CHANPRESS);
-	ev.data.control.channel = k->Channel;
-	ev.data.control.value = k->Value;
-	rc = write(&ev, now);
+        tChnPressure *k = e->IsChnPressure();
+        set_event_header(&ev, e->GetClock(), SND_SEQ_EVENT_CHANPRESS);
+        ev.data.control.channel = k->Channel;
+        ev.data.control.value = k->Value;
+        rc = write(&ev, now);
       }
       break;
 
     case StatControl:
       {
-	tControl *k = e->IsControl();
-	set_event_header(&ev, e->Clock, SND_SEQ_EVENT_CONTROLLER);
-	ev.data.control.channel = k->Channel;
-	ev.data.control.param = k->Control;
-	ev.data.control.value = k->Value;
-	rc = write(&ev, now);
+        tControl *k = e->IsControl();
+        set_event_header(&ev, e->GetClock(), SND_SEQ_EVENT_CONTROLLER);
+        ev.data.control.channel = k->Channel;
+        ev.data.control.param = k->Control;
+        ev.data.control.value = k->Value;
+        rc = write(&ev, now);
       }
       break;
 
     case StatPitch:
       {
-	tPitch *k = e->IsPitch();
-	set_event_header(&ev, e->Clock, SND_SEQ_EVENT_PITCHBEND);
-	ev.data.control.channel = k->Channel;
-	ev.data.control.value = k->Value;
-	rc = write(&ev, now);
+        tPitch *k = e->IsPitch();
+        set_event_header(&ev, e->GetClock(), SND_SEQ_EVENT_PITCHBEND);
+        ev.data.control.channel = k->Channel;
+        ev.data.control.value = k->Value;
+        rc = write(&ev, now);
       }
       break;
 
     case StatSetTempo:
       {
         int bpm = e->IsSetTempo()->GetBPM();
-	int us  = (int)( 60.0E6 / (double)bpm );
-	set_event_header(&ev, e->Clock, SND_SEQ_EVENT_TEMPO);
-	snd_seq_ev_set_queue_tempo(&ev, queue, us);
-	rc = write(&ev, now);
+        int us  = (int)( 60.0E6 / (double)bpm );
+        set_event_header(&ev, e->GetClock(), SND_SEQ_EVENT_TEMPO);
+        snd_seq_ev_set_queue_tempo(&ev, queue, us);
+        rc = write(&ev, now);
       }
       break;
 
     case StatSysEx:
       {
         tSysEx *s = e->IsSysEx();
-	// prepend 0xf0
-	char *buf = new char[s->Length + 1];
-	buf[0] = 0xF0;
-	memcpy(buf + 1, s->Data, s->Length);
-	set_event_header(&ev, e->Clock, s->Length + 1, buf);
-	rc = write(&ev, now);
-	delete [] buf;
+        // prepend 0xf0
+        char *buf = new char[s->Length + 1];
+        buf[0] = 0xF0;
+        memcpy(buf + 1, s->Data, s->Length);
+        set_event_header(&ev, e->GetClock(), s->Length + 1, buf);
+        rc = write(&ev, now);
+        delete [] buf;
       }
       break;
 
@@ -363,7 +373,7 @@ void tAlsaPlayer::OutBreak()
 }
 
 /** "echos" are used to synchronize.
-they are supposed to be read later by the Notify call chain 
+they are supposed to be read later by the Notify call chain
  */
 int tAlsaPlayer::compose_echo(int clock, unsigned int arg)
 {
@@ -455,20 +465,20 @@ void tAlsaPlayer::Notify()
     {
       PlayLoop->PrepareOutput(&mPlayBuffer, Song, OutClock, Now + DELTACLOCK, 0);
       if (AudioBuffer)
-	PlayLoop->PrepareOutput(AudioBuffer, Song, OutClock, Now + DELTACLOCK, 1);
+        PlayLoop->PrepareOutput(AudioBuffer, Song, OutClock, Now + DELTACLOCK, 1);
       OutClock = Now + DELTACLOCK;
       mPlayBuffer.Length2Keyoff();
     }
   }
 
   play_clock = Now;
-  if (mPlayBuffer.nEvents && mPlayBuffer.Events[0]->Clock < OutClock)
+  if (mPlayBuffer.nEvents && mPlayBuffer.Events[0]->GetClock() < OutClock)
   {
     FlushToDevice();
   }
   else
   {
-    OutBreak();	// does nothing unless OutClock has changed
+    OutBreak();        // does nothing unless OutClock has changed
   }
 }
 
@@ -492,7 +502,7 @@ void tAlsaPlayer::set_event_header(snd_seq_event_t *ev, long clock, int len, voi
 }
 
 /** init the alsa timer  */
-int tAlsaPlayer::start_timer(long clock) 
+int tAlsaPlayer::start_timer(long clock)
 {
   int time_base = Song->TicksPerQuarter;
   int cur_speed = Song->GetTrack(0)->GetCurrentSpeed(clock);
@@ -599,7 +609,7 @@ void tAlsaPlayer::recd_event(snd_seq_event_t *ev)
 {
   JZEvent *e = 0;
   cout << "tAlsaPlayer::recd_event got "<<(int)ev->type<<" (echo is "<<SND_SEQ_EVENT_ECHO<<") "<<endl;
-  switch (ev->type) 
+  switch (ev->type)
   {
 
     case SND_SEQ_EVENT_NOTEON:
@@ -639,22 +649,28 @@ void tAlsaPlayer::recd_event(snd_seq_event_t *ev)
 
     case SND_SEQ_EVENT_ECHO:
       if (ev->data.raw32.d[0])
-	StartAudio();
-      else{
-	recd_clock = ev->time.tick;
-	cout<<"recd_clock now:"<<recd_clock<<endl;
+      {
+        StartAudio();
+      }
+      else
+      {
+        recd_clock = ev->time.tick;
+        cout<<"recd_clock now:"<<recd_clock<<endl;
       }
       break;
 
   }
-  if (e) { //not all events are to be recorded, only those filtered out and put into e
-    e->Clock = PlayLoop->Ext2IntClock(ev->time.tick);
+  if (e)
+  {
+    // Not all events are to be recorded.  Only those filtered out and put into
+    // the event.
+    e->SetClock(PlayLoop->Ext2IntClock(ev->time.tick));
     RecdBuffer.Put(e);
   }
 }
 
 /** called periodically from Notify
-it calculates the rt clock by looking at timestamps on events in the queue, and also updates the display, so the name is 
+it calculates the rt clock by looking at timestamps on events in the queue, and also updates the display, so the name is
 not well chosen.
  */
 long tAlsaPlayer::GetRealTimeClock()
@@ -662,7 +678,8 @@ long tAlsaPlayer::GetRealTimeClock()
   // input recorded events (including my echo events)
   snd_seq_event_t *ie;
   long old_recd_clock = recd_clock;
-  while (snd_seq_event_input(handle, &ie) >= 0 && ie != 0) {
+  while (snd_seq_event_input(handle, &ie) >= 0 && ie != 0)
+  {
     recd_event(ie);
     snd_seq_free_event(ie);
   }
@@ -737,7 +754,7 @@ int tAlsaPlayer::select_list(tAlsaDeviceList &list, char *title, int def_device)
     for (int i = 0; i < ndevs; i++)
     {
       devs[i] = list.GetName(i);
-    }    
+    }
 
     wxSingleChoiceDialog dialog(gpTrackWindow, title, title, ndevs, devs);
 

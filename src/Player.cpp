@@ -1064,7 +1064,7 @@ void tMpuPlayer::OutNow(JZEvent *e)
 }
 
 
-void tMpuPlayer::FlushOutOfBand( long Clock )
+void tMpuPlayer::FlushOutOfBand(long Clock)
 // try to send all out of band events up to Clock to device
 {
   tEventIterator Iterator(&OutOfBandEvents);
@@ -1526,7 +1526,7 @@ int tSeq2Player::OutEvent(JZEvent *e, int now)
 {
   if (!now)
   {
-    OutBreak(e->Clock);
+    OutBreak(e->GetClock());
   }
 
   int Stat = e->Stat;
@@ -1600,7 +1600,7 @@ int tSeq2Player::OutEvent(JZEvent *e, int now)
         else
         {
           if (!GetAudioEnabled())
-            if (e->Clock > 0)
+            if (e->GetClock() > 0)
               SEQ_SET_TEMPO(bpm);
         }
       }
@@ -1623,7 +1623,7 @@ int tSeq2Player::OutEvent(JZEvent *e, int now)
 
             delete [] (char *)sysex;
          }
-         else if (e->Clock > 0) {
+         else if (e->GetClock() > 0) {
            // OSS wants small packets with max 6 bytes
            tSysEx *sx = e->IsSysEx();
            const int N = 6;
@@ -1900,7 +1900,7 @@ long tSeq2Player::GetRealTimeClock()
 
       if (e)
       {
-        e->Clock = PlayLoop->Ext2IntClock(recd_clock);
+        e->SetClock(PlayLoop->Ext2IntClock(recd_clock));
         RecdBuffer.Put(e);
         e = 0;
       }

@@ -267,7 +267,7 @@ void tCmdShift::ExecuteEvent(tTrack *t, JZEvent *e)
 {
   JZEvent *c = e->Copy();
   t->Kill(e);
-  c->Clock += DeltaClock;
+  c->SetClock(c->GetClock() + DeltaClock);
   t->Put(c);
 }
 
@@ -331,10 +331,12 @@ void tCmdQuantize::ExecuteEvent(tTrack *t, JZEvent *e)
   if ((k = e->IsKeyOn()) != 0)
   {
     k = (tKeyOn *)e->Copy();
-    if (NoteStart) {
-      k->Clock = Quantize(k->Clock, 0);
+    if (NoteStart)
+    {
+      k->SetClock(Quantize(k->GetClock(), 0));
     }
-    if (NoteLength) {
+    if (NoteLength)
+    {
       k->Length = Quantize(k->Length, 2);
     }
     t->Kill(e);
@@ -434,7 +436,7 @@ void tCmdVelocity::ExecuteEvent(tTrack *t, JZEvent *e)
     if (ToValue <= 0)
       val = FromValue;
     else
-      val = Interpolate(k->Clock, FromValue, ToValue);
+      val = Interpolate(k->GetClock(), FromValue, ToValue);
     switch (Mode) {
       case 0: break;
       case 1: val = k->Veloc + val; break;
@@ -469,7 +471,7 @@ void tCmdLength::ExecuteEvent(tTrack *t, JZEvent *e)
     if (ToValue <= 0)
       val = FromValue;
     else
-      val = Interpolate(k->Clock, FromValue, ToValue);
+      val = Interpolate(k->GetClock(), FromValue, ToValue);
     switch (Mode) {
       case 0: break;
       case 1: val = k->Length + val; break;
@@ -660,10 +662,13 @@ void tCmdCleanup::ExecuteEvent(tTrack *t, JZEvent *e)
     else if (shortenOverlaps) {
       // shorten length of overlapping notes
       tKeyOn *p = prev_note[k->Channel][k->Key];
-      if (p && p->Clock + p->Length >= k->Clock) {
-        p->Length = k->Clock - p->Clock - 1;
+      if (p && p->GetClock() + p->Length >= k->GetClock())
+      {
+        p->Length = k->GetClock() - p->GetClock() - 1;
         if (p->Length < lengthLimit)
+        {
           t->Kill(p);
+        }
       }
       prev_note[k->Channel][k->Key] = k;
     }
@@ -768,14 +773,14 @@ void tCmdCopy::ExecuteTrack(tTrack *s)
       JZEvent *e = Iterator.Range(Filter->FromClock, Filter->ToClock);
       while (e)
       {
-	long NewClock = e->Clock + DeltaClock;
+	long NewClock = e->GetClock() + DeltaClock;
 	if (NewClock >= StopClock)
 	  break;
 
 	if (Filter->IsSelected(e))
 	{
-	  JZEvent *cpy = e->Copy();
-	  cpy->Clock = NewClock;
+	  JZEvent* cpy = e->Copy();
+	  cpy->SetClock(NewClock);
 	  tmp.Put(cpy);
 	}
 
@@ -800,7 +805,7 @@ void tCmdCopy::ExecuteTrack(tTrack *s)
 	if (Filter->IsSelected(e))
 	{
 	  JZEvent *c = e->Copy();
-	  c->Clock += DeltaClock;
+	  c->SetClock(c->GetClock() + DeltaClock);
 	  d->Kill(e);
 	  d->Put(c);
 	}
@@ -860,7 +865,7 @@ void tCmdExchLeftRight::ExecuteEvent(tTrack *t, JZEvent *e)
   if (e->IsKeyOn())
   {
     tKeyOn *k = (tKeyOn *)e->Copy();
-    k->Clock = Filter->FromClock + Filter->ToClock - k->Clock;
+    k->SetClock(Filter->FromClock + Filter->ToClock - k->GetClock());
     t->Kill(e);
     t->Put(k);
   }
@@ -968,13 +973,13 @@ void tCmdMapper::ExecuteEvent(tTrack *t, JZEvent *e)
         break;
 
       case rhythm: {
-        binfo->SetClock(k->Clock);
+        binfo->SetClock(k->GetClock());
 //        long sng_tpb = binfo->TicksPerBar;
         long arr_tpb = array.Size() / n_bars;
         long arr_bar = (binfo->BarNr - start_bar) % n_bars;
-        long i = arr_tpb * arr_bar + arr_tpb * (k->Clock - binfo->Clock) / binfo->TicksPerBar;
-// printf("sng_tpb %ld, arr_tpb %ld, k->Clock %ld, binfo->Clock %ld,\n arr.Size() %ld, n_bars %ld, i %ld\n",
-//  sng_tpb, arr_tpb, k->Clock, binfo->Clock, array.Size(), n_bars, i);
+        long i = arr_tpb * arr_bar + arr_tpb * (k->GetClock() - binfo->Clock) / binfo->TicksPerBar;
+// printf("sng_tpb %ld, arr_tpb %ld, k->GetClock() %ld, binfo->Clock %ld,\n arr.Size() %ld, n_bars %ld, i %ld\n",
+//  sng_tpb, arr_tpb, k->GetClock(), binfo->Clock, array.Size(), n_bars, i);
 // fflush(stdout);
         sval = array[(int)i];
       }
@@ -1034,9 +1039,11 @@ void tCmdMapper::ExecuteEvent(tTrack *t, JZEvent *e)
 
       case clock: {
         tKeyOn *c = (tKeyOn *)k->Copy();
-        c->Clock += sval;
-        if (c->Clock < 0)
-          c->Clock = 0;
+        c->SetClock(c->GetClock() + sval);
+        if (c->GetClock() < 0)
+        {
+          c->SetClock(0);
+        }
         t->Kill(k);
         t->Put(c);
       }

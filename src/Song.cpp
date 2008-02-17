@@ -204,24 +204,26 @@ void JZSong::MergeTracks(
       while (e)
       {
         JZEvent *c = e->Copy();
-        c->Clock += delta;
-	c->SetDevice(t->GetDevice());
-	Destin->Put(c);
+        c->SetClock(c->GetClock() + delta);
+        c->SetDevice(t->GetDevice());
+        Destin->Put(c);
 
-	if(c->IsPlayTrack()){
-	  MergePlayTrackEvent(c->IsPlayTrack(),Destin,0);
-	}
+        if(c->IsPlayTrack())
+        {
+          MergePlayTrackEvent(c->IsPlayTrack(), Destin, 0);
+        }
 
-	e = Iterator.Next();
+        e = Iterator.Next();
       }
     }
   }
 }
 
 //should call recursively, so playtrack events will resolve playtrack events
-void JZSong::MergePlayTrackEvent(tPlayTrack* c, //the playtrack event
-				tEventArray *Destin,
-				int recursionDepth)
+void JZSong::MergePlayTrackEvent(
+  tPlayTrack* c, //the playtrack event
+  tEventArray *Destin,
+  int recursionDepth)
 {
   //recursion might be simple, but we have the infinite loop problem, if a playtrack point to itself, either directly or indirectly
   //we probaly need to keep a list of seen tracks, simpler is to limit the recursion level to 100 or something.
@@ -241,35 +243,46 @@ void JZSong::MergePlayTrackEvent(tPlayTrack* c, //the playtrack event
   f = IteratorEOT.Range(0, t->GetLastClock());
   loopLength=t->GetLastClock(); 
   while(f)
+  {
+    if (f->IsEndOfTrack())
     {
-      if(f->IsEndOfTrack())
-	loopLength=t->GetLastClock();
-      f=IteratorEOT.Next();
+      loopLength = t->GetLastClock();
     }
-		       
-  //looplength will be used to loop the track, for the duration of the playtrack event.
+    f = IteratorEOT.Next();
+  }
+
+  // looplength will be used to loop the track, for the duration of
+  // the playtrack event.
   long loopOffset=0;
-  //the loop below is supposed to repeat the referenced track for the duration of the playtrack event.
-  //also, we should look out for if we start playing in the middle of an playtrack event, curently it wont play anything.
-  //to fix this we could  search al unmuted tracks from the beginning to the start of the loop-point, and see if there are any playtrack events 
-  //which start+lengt end up after the startloop. then we could move the start of those to the beginning of the loop, and shorten the length.
-  //there would still be a problem with playtracks not even bar length.
-  while(loopOffset < c->eventlength){ 
+
+  //   The loop below is supposed to repeat the referenced track for the
+  // duration of the playtrack event.  Also, we should look out for if we
+  // start playing in the middle of an playtrack event, curently it wont
+  // play anything.
+  //   To fix this we could search all unmuted tracks from the beginning to
+  // the start of the loop-point, and see if there are any playtrack events
+  // which start + length end up after the startloop.  Then we could move the
+  // start of those to the beginning of the loop, and shorten the length.
+  // There would still be a problem with playtracks not even bar length.
+  while(loopOffset < c->eventlength)
+  { 
     f = IteratorPL.Range(0, (c->eventlength-loopOffset));  //no more events then the length of the playtrack! and ensure last iteration is no longer than what is left 
     while (f)
+    {
+      JZEvent *d = f->Copy();
+      d->SetClock(d->GetClock() + c->GetClock() + loopOffset);
+      if(d->IsKeyOn())
       {
-	JZEvent *d = f->Copy();
-	d->Clock += (c->Clock +loopOffset);
-	if(d->IsKeyOn()){
-	  d->IsKeyOn()->Key += c->transpose ;
-	}
-	if(d->IsPlayTrack()){
-	  MergePlayTrackEvent(d->IsPlayTrack(), Destin, recursionDepth);
-	}
-	d->SetDevice(t->GetDevice());
-	Destin->Put(d);
-	f = IteratorPL.Next();
+        d->IsKeyOn()->Key += c->transpose;
       }
+      if(d->IsPlayTrack())
+      {
+        MergePlayTrackEvent(d->IsPlayTrack(), Destin, recursionDepth);
+      }
+      d->SetDevice(t->GetDevice());
+      Destin->Put(d);
+      f = IteratorPL.Next();
+    }
     loopOffset+=loopLength;
   }
 }
@@ -347,7 +360,7 @@ void JZBarInfo::SetBar(int barnr)
   {
     // Events bis Taktanfang nach MeterChange durchsuchen
     // Meter-Event vor oder genau auf Taktanfang stehen
-    while (e && e->Clock <= Clock)
+    while (e && e->GetClock() <= Clock)
     {
       e->BarInfo(TicksPerBar, CountsPerBar, TicksPerQuarter);
       e = Iterator.Next();
@@ -371,7 +384,7 @@ void JZBarInfo::SetClock(long clock)
   e = Iterator.First();
   while (1)
   {
-    while (e && e->Clock <= Clock)
+    while (e && e->GetClock() <= Clock)
     {
       e->BarInfo(TicksPerBar, CountsPerBar, TicksPerQuarter);
       e = Iterator.Next();
@@ -392,7 +405,7 @@ void JZBarInfo::Next()
   ++ BarNr;
   Clock += TicksPerBar;
 
-  while (e && e->Clock <= Clock)
+  while (e && e->GetClock() <= Clock)
   {
     e->BarInfo(TicksPerBar, CountsPerBar, TicksPerQuarter);
     e = Iterator.Next();
@@ -441,10 +454,12 @@ void JZSong::SetTicksPerQuarter(int NewTicks)
     for (ee = 0; ee < t->nEvents; ee++)
     {
       JZEvent *e = t->Events[ee];
-      e->Clock = (long)(f * e->Clock + 0.5);
+      e->SetClock((long)(f * e->GetClock() + 0.5));
       tKeyOn *k = e->IsKeyOn();
       if (k)
+      {
         k->Length = (long)(f * k->Length + 0.5);
+      }
     }
   }
   TicksPerQuarter = NewTicks;

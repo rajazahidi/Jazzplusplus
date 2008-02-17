@@ -28,7 +28,7 @@ class JZEvent;
 #include <cstdio>
 
 //*****************************************************************************
-// Ausgabe-Device, kann sein
+// Output device, can be
 //   - Midi-Standard-File
 //   - Ascii-File
 //   - Midi-Port
@@ -42,18 +42,22 @@ class tReadBase
     {
     }
 
-    int TicksPerQuarter;	// nach Open bekannt
+    // Ths value is known after a call to Open.
+    int TicksPerQuarter;
+
     int nTracks;
 
-    virtual int  Open(const char *fname);
+    virtual int Open(const char* pFileName);
+
     virtual void Close();
 
-    virtual JZEvent *Read() = 0;
+    virtual JZEvent* Read() = 0;
+
     virtual int NextTrack() = 0;
 
   protected:
 
-    FILE *fd;
+    FILE* fd;
 };
 
 
@@ -65,62 +69,68 @@ class tWriteBase
     {
     }
 
-    virtual int  Open(const char *fname, int nTracks, int TicksPerQuarter);
+    virtual int Open(const char* pFileName, int nTracks, int TicksPerQuarter);
 
     virtual void Close();
 
-    virtual int Write(JZEvent *e)
+    virtual int Write(JZEvent* pEvent)
     {
-      return Write(e, (unsigned char *)0, 0);
+      return Write(pEvent, 0, 0);
     }
 
-    virtual int Write(JZEvent *e, unsigned char c)
+    virtual int Write(JZEvent* pEvent, unsigned char Character)
     {
-      return Write(e, &c, 1);
-    }
-
-    virtual int Write(JZEvent *e, unsigned char c1, unsigned char c2)
-    {
-      unsigned char arr[2];
-      arr[0] = c1;
-      arr[1] = c2;
-      return Write(e, arr, 2);
+      return Write(pEvent, &Character, 1);
     }
 
     virtual int Write(
-      JZEvent *e,
-      unsigned char c1,
-      unsigned char c2,
-      unsigned char c3)
+      JZEvent* pEvent,
+      unsigned char Character1,
+      unsigned char Character2)
     {
-      unsigned char arr[3];
-      arr[0] = c1;
-      arr[1] = c2;
-      arr[2] = c3;
-      return Write(e, arr, 3);
+      unsigned char Array[2];
+      Array[0] = Character1;
+      Array[1] = Character2;
+      return Write(pEvent, Array, 2);
     }
 
     virtual int Write(
-      JZEvent *e,
-      unsigned char c1,
-      unsigned char c2,
-      unsigned char c3,
-      unsigned char c4)
+      JZEvent* pEvent,
+      unsigned char Character1,
+      unsigned char Character2,
+      unsigned char Character3)
     {
-      unsigned char arr[4];
-      arr[0] = c1;
-      arr[1] = c2;
-      arr[2] = c3;
-      arr[3] = c4;
-      return Write(e, arr, 4);
+      unsigned char Array[3];
+      Array[0] = Character1;
+      Array[1] = Character2;
+      Array[2] = Character3;
+      return Write(pEvent, Array, 3);
     }
 
-    virtual int Write(JZEvent *e, unsigned char *s, int len) = 0;
-    virtual void NextTrack() {}
+    virtual int Write(
+      JZEvent* pEvent,
+      unsigned char Character1,
+      unsigned char Character2,
+      unsigned char Character3,
+      unsigned char Character4)
+    {
+      unsigned char Array[4];
+      Array[0] = Character1;
+      Array[1] = Character2;
+      Array[2] = Character3;
+      Array[3] = Character4;
+      return Write(pEvent, Array, 4);
+    }
+
+    virtual int Write(JZEvent* pEvent, unsigned char* pString, int Length) = 0;
+
+    virtual void NextTrack()
+    {
+    }
 
   protected:
 
-    FILE *fd;
+    FILE* fd;
 };
 
 
@@ -131,15 +141,25 @@ class tWriteBase
 class tGetMidiBytes : public tWriteBase
 {
   public:
-    int  Open(char *fname, int nTracks, int TicksPerQuarter) { return 1; }
-    void Close() {}
-    void NextTrack() {}
 
-    // Get JZEvent's bytes
-    int Write(JZEvent *e, unsigned char *s, int len);
+    int Open(const char* pFileName, int nTracks, int TicksPerQuarter)
+    {
+      return 1;
+    }
+
+    void Close()
+    {
+    }
+
+    void NextTrack()
+    {
+    }
+
+    // Get JZEvent's bytes.
+    int Write(JZEvent* pEvent, unsigned char* pString, int Length);
 
     unsigned char Buffer[10];
-    int  nBytes;
+    int nBytes;
 };
 
 // ********************************************************************
@@ -147,7 +167,7 @@ class tGetMidiBytes : public tWriteBase
 // ********************************************************************
 
 /*
- * normale Events (mit Kanal)
+ * Normal events (with the channel)
  */
 
 #define StatKeyOff	0x80
@@ -159,7 +179,7 @@ class tGetMidiBytes : public tWriteBase
 #define StatPitch	0xE0
 
 /*
- * Meta-Events (no channel)
+ * Meta events (no channel)
  */
 
 #define StatSysEx	0xF0
@@ -182,9 +202,9 @@ class tGetMidiBytes : public tWriteBase
 
 #define StatUnknown	0x00
 
-// proprietary event status
+// Proprietary event status
 #define StatJazzMeta    0x7F
-#define StatPlayTrack    0x7E
+#define StatPlayTrack   0x7E
 
 
 #define LastClock 	(0x7fffffffL)
@@ -228,44 +248,52 @@ class JZEvent
 {
   public:
 
-
 #ifdef E_DBUG
-  long Magic;
-  void edb() {
-    if (Magic != MAGIC) {
-      fprintf(stderr, "Magic failed\n");
-      fflush(stderr);
-      *(char *)0 = 0;
+    long Magic;
+    void edb()
+    {
+      if (Magic != MAGIC)
+      {
+        fprintf(stderr, "Magic failed\n");
+        fflush(stderr);
+        *(char *)0 = 0;
+      }
     }
-  }
 #else
-  void edb()
-  {
-  }
+    void edb()
+    {
+    }
 #endif
 
     unsigned char Stat;
-    long  Clock;  // should be protected ...
+    long mClock;  // should be protected ...
 
-    long GetClock() const {
-      return Clock & ~KilledClock;
+    long GetClock() const
+    {
+      return mClock & ~KilledClock;
     }
-    void SetClock(long c) {
-      Clock = c;
+    void SetClock(long c)
+    {
+      mClock = c;
     }
 
     // the device is dynamically set when events are copied to
     // the playback queue (from the track device)
-    enum { BROADCAST_DEVICE = 0 };
+    enum
+    {
+      BROADCAST_DEVICE = 0
+    };
+
     JZEvent(long clk, unsigned char sta)
     {
-      Clock = clk;
+      mClock = clk;
       Stat  = sta;
       Device = BROADCAST_DEVICE;
 #ifdef E_DBUG
       Magic = MAGIC;
 #endif
     }
+
     virtual ~JZEvent()
     {
       edb();
@@ -274,71 +302,133 @@ class JZEvent
 #endif
     }
 
-    void Kill()    { edb(); Clock |= KilledClock; }
-    void UnKill()  { edb(); Clock &= ~KilledClock; }
-    int IsKilled() { edb(); return (Clock & KilledClock) != 0; }
+    void Kill()
+    {
+      edb();
+      mClock |= KilledClock;
+    }
+
+    void UnKill()
+    {
+      edb();
+      mClock &= ~KilledClock;
+    }
+
+    int IsKilled()
+    {
+      edb();
+      return (mClock & KilledClock) != 0;
+    }
 
     virtual tMetaEvent 	*IsMetaEvent()	{ edb(); return 0; }
     virtual tChannelEvent *IsChannelEvent() { edb(); return 0; }
 
-    virtual tKeyOn 	*IsKeyOn()	{ edb(); return 0; }
-    virtual tKeyOff 	*IsKeyOff()	{ edb(); return 0; }
-    virtual tPitch 	*IsPitch()	{ edb(); return 0; }
-    virtual tControl 	*IsControl()	{ edb(); return 0; }
-    virtual tProgram 	*IsProgram()	{ edb(); return 0; }
-    virtual tSysEx 	*IsSysEx()	{ edb(); return 0; }
-    virtual tSongPtr 	*IsSongPtr()	{ edb(); return 0; }
-    virtual tMidiClock 	*IsMidiClock()	{ edb(); return 0; }
-    virtual tStartPlay 	*IsStartPlay()	{ edb(); return 0; }
-    virtual tContPlay 	*IsContPlay()	{ edb(); return 0; }
-    virtual tStopPlay 	*IsStopPlay()	{ edb(); return 0; }
-    virtual tText 	*IsText()	{ edb(); return 0; }
-    virtual tCopyright 	*IsCopyright()	{ edb(); return 0; }
-    virtual tTrackName 	*IsTrackName()	{ edb(); return 0; }
-    virtual tMarker 	*IsMarker()	{ edb(); return 0; }
-    virtual tSetTempo 	*IsSetTempo()	{ edb(); return 0; }
-    virtual tMtcOffset 	*IsMtcOffset()	{ edb(); return 0; }
-    virtual tTimeSignat	*IsTimeSignat()	{ edb(); return 0; }
-    virtual tKeySignat	*IsKeySignat()	{ edb(); return 0; }
-    virtual tKeyPressure *IsKeyPressure() { edb(); return 0; }
-    virtual tJazzMeta	*IsJazzMeta()	{ edb(); return 0; }
-    virtual tPlayTrack	*IsPlayTrack()	{ edb(); return 0; }
-    virtual tEndOfTrack	*IsEndOfTrack()	{ edb(); return 0; }
-    virtual tChnPressure       *IsChnPressure()       { edb(); return 0; }
+    virtual tKeyOn*       IsKeyOn()       { edb(); return 0; }
+    virtual tKeyOff*      IsKeyOff()      { edb(); return 0; }
+    virtual tPitch*       IsPitch()       { edb(); return 0; }
+    virtual tControl*     IsControl()     { edb(); return 0; }
+    virtual tProgram*     IsProgram()     { edb(); return 0; }
+    virtual tSysEx*       IsSysEx()       { edb(); return 0; }
+    virtual tSongPtr*     IsSongPtr()     { edb(); return 0; }
+    virtual tMidiClock*   IsMidiClock()   { edb(); return 0; }
+    virtual tStartPlay*   IsStartPlay()   { edb(); return 0; }
+    virtual tContPlay*    IsContPlay()    { edb(); return 0; }
+    virtual tStopPlay*    IsStopPlay()    { edb(); return 0; }
+    virtual tText*        IsText()        { edb(); return 0; }
+    virtual tCopyright*   IsCopyright()   { edb(); return 0; }
+    virtual tTrackName*   IsTrackName()   { edb(); return 0; }
+    virtual tMarker*      IsMarker()      { edb(); return 0; }
+    virtual tSetTempo*    IsSetTempo()    { edb(); return 0; }
+    virtual tMtcOffset*   IsMtcOffset()   { edb(); return 0; }
+    virtual tTimeSignat*  IsTimeSignat()  { edb(); return 0; }
+    virtual tKeySignat*   IsKeySignat()   { edb(); return 0; }
+    virtual tKeyPressure* IsKeyPressure() { edb(); return 0; }
+    virtual tJazzMeta*    IsJazzMeta()    { edb(); return 0; }
+    virtual tPlayTrack*   IsPlayTrack()   { edb(); return 0; }
+    virtual tEndOfTrack*  IsEndOfTrack()  { edb(); return 0; }
+    virtual tChnPressure* IsChnPressure() { edb(); return 0; }
 
-    virtual int Write(tWriteBase &io) { edb(); return io.Write(this); }
-
-    int Compare(JZEvent &e)
+    virtual int Write(tWriteBase& io)
     {
       edb();
-      if ((unsigned long)e.Clock > (unsigned long)Clock)
+      return io.Write(this);
+    }
+
+    int Compare(JZEvent& Event)
+    {
+      edb();
+      if ((unsigned long)Event.mClock > (unsigned long)mClock)
+      {
 	return -1;
-      if ((unsigned long)e.Clock < (unsigned long)Clock)
+      }
+      if ((unsigned long)Event.mClock < (unsigned long)mClock)
+      {
 	return 1;
+      }
       return 0;
     }
 
-    virtual void BarInfo(int &TicksPerBar, int &CountsPerBar, int TicksPerQuarter) {}
+    virtual void BarInfo(
+      int& TicksPerBar,
+      int& CountsPerBar,
+      int TicksPerQuarter)
+    {
+    }
 
-    virtual JZEvent* Copy() { edb(); return new JZEvent(*this); }
+    virtual JZEvent* Copy()
+    {
+      edb();
+      return new JZEvent(*this);
+    }
 
     // Filter
-    virtual int   GetValue()    	{ edb(); return 0; }
+    virtual int GetValue()
+    {
+      edb();
+      return 0;
+    }
 
     // Painting
-    virtual int   GetLength()		{ edb(); return 16; }
-    virtual int   GetPitch()    	{ edb(); return 64; }  // Value normiert auf 0..127
-    virtual void  SetPitch(int p) 	{ edb(); }
-    virtual const wxPen* GetPen()     	{ return wxBLACK_PEN; }
-    virtual const wxBrush* GetBrush()   { return wxBLACK_BRUSH; }
+    virtual int GetLength()
+    {
+      edb();
+      return 16;
+    }
 
-    int GetDevice() const {
+    // Value normalized to 0 to 127.
+    virtual int GetPitch()
+    {
+      edb();
+      return 64;
+    }
+
+    virtual void SetPitch(int p)
+    {
+      edb();
+    }
+
+    virtual const wxPen* GetPen()
+    {
+      return wxBLACK_PEN;
+    }
+
+    virtual const wxBrush* GetBrush()
+    {
+      return wxBLACK_BRUSH;
+    }
+
+    int GetDevice() const
+    {
       return Device;
     }
-    void SetDevice(int d) {
+
+    void SetDevice(int d)
+    {
       Device = d;
     }
+
  private:
+
     int Device;
 };
 
@@ -346,7 +436,9 @@ class JZEvent
 class tChannelEvent : public JZEvent
 {
   public:
+
     unsigned char Channel;
+
     tChannelEvent(long clk, unsigned char sta, int cha)
       : JZEvent(clk, sta)
     {
@@ -534,7 +626,12 @@ class tMetaEvent : public JZEvent
       edb(); return io.Write(this, Data, Length);
     }
     virtual tMetaEvent *IsMetaEvent() { edb(); return this; }
-    virtual JZEvent* Copy() { edb(); return new tMetaEvent(Clock, Stat, Data, Length); }
+
+    virtual JZEvent* Copy()
+    {
+      edb();
+      return new tMetaEvent(mClock, Stat, Data, Length);
+    }
 };
 
 
@@ -583,19 +680,35 @@ class tJazzMeta : public tMetaEvent
       Data[9] = x;
     }
     virtual tJazzMeta *IsJazzMeta() { edb(); return this; }
-    virtual JZEvent* Copy() { edb(); return new tJazzMeta(Clock, Data, Length); }
+
+    virtual JZEvent* Copy()
+    {
+      edb();
+      return new tJazzMeta(mClock, Data, Length);
+    }
 };
 
 
 class tSysEx : public tMetaEvent
 {
   public:
+
     tSysEx(long clk, unsigned char *dat, unsigned short len)
       : tMetaEvent(clk, StatSysEx, dat, len)
     {
     }
-    virtual tSysEx *IsSysEx() { edb(); return this; }
-    virtual JZEvent* Copy() { edb(); return new tSysEx(Clock, Data, Length); }
+
+    virtual tSysEx* IsSysEx()
+    {
+      edb();
+      return this;
+    }
+
+    virtual JZEvent* Copy()
+    {
+      edb();
+      return new tSysEx(mClock, Data, Length);
+    }
 
     // todo
     virtual int   GetPitch();
@@ -609,7 +722,12 @@ class tSongPtr : public tMetaEvent
     {
     }
     virtual tSongPtr *IsSongPtr() { edb(); return this; }
-    virtual JZEvent* Copy() { edb(); return new tSongPtr(Clock, Data, Length); }
+
+    virtual JZEvent* Copy()
+    {
+      edb();
+      return new tSongPtr(mClock, Data, Length);
+    }
 };
 
 class tMidiClock : public tMetaEvent
@@ -624,7 +742,11 @@ class tMidiClock : public tMetaEvent
     {
     }
     virtual tMidiClock *IsMidiClock() { edb(); return this; }
-    virtual JZEvent* Copy() { edb(); return new tMidiClock(Clock, Data, Length); }
+    virtual JZEvent* Copy()
+    {
+      edb();
+      return new tMidiClock(mClock, Data, Length);
+    }
 };
 
 class tStartPlay : public tMetaEvent
@@ -639,7 +761,12 @@ class tStartPlay : public tMetaEvent
     {
     }
     virtual tStartPlay *IsStartPlay() { edb(); return this; }
-    virtual JZEvent* Copy() { edb(); return new tStartPlay(Clock, Data, Length); }
+
+    virtual JZEvent* Copy()
+    {
+      edb();
+      return new tStartPlay(mClock, Data, Length);
+    }
 };
 
 class tContPlay : public tMetaEvent
@@ -654,7 +781,12 @@ class tContPlay : public tMetaEvent
     {
     }
     virtual tContPlay *IsContPlay() { edb(); return this; }
-    virtual JZEvent* Copy() { edb(); return new tContPlay(Clock, Data, Length); }
+
+    virtual JZEvent* Copy()
+    {
+      edb();
+      return new tContPlay(mClock, Data, Length);
+    }
 };
 
 class tStopPlay : public tMetaEvent
@@ -669,7 +801,12 @@ class tStopPlay : public tMetaEvent
     {
     }
     virtual tStopPlay *IsStopPlay() { edb(); return this; }
-    virtual JZEvent* Copy() { edb(); return new tStopPlay(Clock, Data, Length); }
+
+    virtual JZEvent* Copy()
+    {
+      edb();
+      return new tStopPlay(mClock, Data, Length);
+    }
 };
 
 class tText : public tMetaEvent
@@ -684,7 +821,13 @@ class tText : public tMetaEvent
     {
     }
     virtual tText *IsText() { edb(); return this; }
-    virtual JZEvent* Copy() { edb(); return new tText(Clock, Data, Length); }
+
+    virtual JZEvent* Copy()
+    {
+      edb();
+      return new tText(mClock, Data, Length);
+    }
+
     virtual unsigned char* GetText(){return Data;}
 };
 
@@ -698,7 +841,11 @@ class tCopyright : public tMetaEvent
     {
     }
     virtual tCopyright *IsCopyright() { edb(); return this; }
-    virtual JZEvent* Copy() { edb(); return new tCopyright(Clock, Data, Length); }
+    virtual JZEvent* Copy()
+    {
+      edb();
+      return new tCopyright(mClock, Data, Length);
+    }
 };
 
 class tTrackName : public tMetaEvent
@@ -721,7 +868,11 @@ class tTrackName : public tMetaEvent
 */
     }
     virtual tTrackName *IsTrackName() { edb(); return this; }
-    virtual JZEvent* Copy() { edb(); return new tTrackName(Clock, Data, Length); }
+    virtual JZEvent* Copy()
+    {
+      edb();
+      return new tTrackName(mClock, Data, Length);
+    }
 };
 
 
@@ -734,7 +885,12 @@ class tMarker : public tMetaEvent
     {
     }
     virtual tMarker *IsMarker() { edb(); return this; }
-    virtual JZEvent* Copy() { edb(); return new tMarker(Clock, Data, Length); }
+
+    virtual JZEvent* Copy()
+    {
+      edb();
+      return new tMarker(mClock, Data, Length);
+    }
 };
 
 /* the meaning of this event is to be able to reference a track and have that play the instant
@@ -790,7 +946,12 @@ class tPlayTrack : public tMetaEvent
       return io.Write(this, Data, Length);
     }
   virtual tPlayTrack *IsPlayTrack() { edb(); return this; }
-  virtual JZEvent* Copy() { edb(); return new tPlayTrack(Clock, track, transpose, eventlength); }
+
+  virtual JZEvent* Copy()
+  {
+    edb();
+    return new tPlayTrack(mClock, track, transpose, eventlength);
+  }
   
   //this event has no real "pitch" but the rest of jazz use the pitch, in the pianowin editor pitch is the y coord of the event
   virtual int   GetPitch(){
@@ -805,10 +966,17 @@ class tSetTempo : public JZEvent
   public:
     long uSec;
 
-    tSetTempo(long clk, unsigned char c1, unsigned char c2, unsigned char c3)
+    tSetTempo(
+      long clk,
+      unsigned char Character1,
+      unsigned char Character2,
+      unsigned char Character3)
       : JZEvent(clk, StatSetTempo)
     {
-      uSec = ((unsigned long)c1 << 16L) + ((unsigned long)c2 << 8L) + c3;
+      uSec =
+        ((unsigned long)Character1 << 16L) +
+        ((unsigned long)Character2 << 8L) +
+        Character3;
     }
 
     tSetTempo(long clk, long bpm)
@@ -838,7 +1006,12 @@ class tMtcOffset : public tMetaEvent
     {
     }
     virtual tMtcOffset *IsMtcOffset() { edb(); return this; }
-    virtual JZEvent* Copy() { edb(); return new tMtcOffset(Clock, Data, Length); }
+
+    virtual JZEvent* Copy()
+    {
+      edb();
+      return new tMtcOffset(mClock, Data, Length);
+    }
 };
 
 
@@ -848,13 +1021,18 @@ class tTimeSignat : public JZEvent
 
     unsigned char Numerator, Denomiator, Clocks, Quarter;
 
-    tTimeSignat(long clk, unsigned char c1, unsigned char c2, unsigned char c3 = 24, unsigned char c4 = 8)
+    tTimeSignat(
+      long clk,
+      unsigned char Character1,
+      unsigned char Character2,
+      unsigned char Character3 = 24,
+      unsigned char Character4 = 8)
       : JZEvent(clk, StatTimeSignat)
     {
-      Numerator   = c1;
-      Denomiator  = c2;
-      Clocks      = c3;
-      Quarter     = c4;
+      Numerator   = Character1;
+      Denomiator  = Character2;
+      Clocks      = Character3;
+      Quarter     = Character4;
     }
 
     virtual int Write(tWriteBase &io)
@@ -900,11 +1078,11 @@ class tKeySignat : public JZEvent
     int Sharps;
     int Minor;
 
-    tKeySignat(long clk, int c1, int c2)
+    tKeySignat(long clk, int Character1, int Character2)
       : JZEvent(clk, StatKeySignat)
     {
-      Sharps = c1;
-      Minor  = c2;
+      Sharps = Character1;
+      Minor  = Character2;
     }
 
     virtual int Write(tWriteBase &io)

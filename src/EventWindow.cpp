@@ -600,8 +600,6 @@ void JZEventFrame::GetVirtSize(long *w, long *h)
 /** update the play position to the clock argument, and trigger a redraw so the play bar will be drawn*/
 void JZEventFrame::NewPlayPosition(long Clock)
 {
-
-
   long scroll_clock = (FromClock + 5 * ToClock) / 6L;
 
   if (!SnapSel->Active && ((Clock > scroll_clock) || (Clock < FromClock)) && (Clock >= 0L) )

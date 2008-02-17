@@ -26,6 +26,8 @@
 
 #include "TrackFrame.h"
 #include "TrackWindow.h"
+#include "Player.h"
+#include "RecordingInfo.h"
 #include "JazzPlusPlusApplication.h"
 #include "ToolBar.h"
 #include "PianoFrame.h"
@@ -54,8 +56,9 @@
 #include "Bitmaps/playloop.xpm"
 #include "Bitmaps/record.xpm"
 
-// \todo: get rid of all this stuff, it's moving to JZProject
-JZTrackFrame* TrackWin = 0;
+#include <iostream>
+
+using namespace std;
 
 //*****************************************************************************
 // Description:
@@ -68,6 +71,8 @@ BEGIN_EVENT_TABLE(JZTrackFrame, wxFrame)
   EVT_MENU(wxID_OPEN, JZTrackFrame::OnFileOpen)
 
   EVT_MENU(wxID_EXIT, JZTrackFrame::OnFileExit)
+
+  EVT_MENU(ID_PLAY, JZTrackFrame::OnPlay)
 
   EVT_MENU(ID_PIANOWIN, JZTrackFrame::OnPianoWindow)
 
@@ -87,16 +92,13 @@ JZTrackFrame::JZTrackFrame(
   JZSong* pSong,
   const wxPoint& Position,
   const wxSize& Size)
-  : JZEventFrame(
-      pParent,
-      Title,
-      pSong,
-      Position,
-      Size),
+  : wxFrame(pParent, wxID_ANY, Title, Position, Size),
     mpToolBar(0),
     mpFileMenu(0),
-    mpEditMenu(0)//,
-//    mpPianoFrame(0)
+    mpEditMenu(0),
+//    mpPianoFrame(0),
+    mPreviousClock(0),
+    mPreviouslyRecording(false)
 {
   CreateToolBar();
 
@@ -107,6 +109,8 @@ JZTrackFrame::JZTrackFrame(
     pSong,
     wxPoint(0, 0),
     wxSize(600, 120));
+
+  gpTrackWindow = mpTrackWindow;
 
   mpTrackWindow->Create();
 
@@ -171,7 +175,7 @@ void JZTrackFrame::CreateMenu()
   mpFileMenu = new wxMenu;
 
   mpFileMenu->Append(wxID_NEW,  "&New");
-  mpFileMenu->Append(wxID_OPEN, "&Open");
+  mpFileMenu->Append(wxID_OPEN, "&Open...");
   mpFileMenu->Append(wxID_CLOSE, "&Close");
   mpFileMenu->Append(wxID_SAVE, "&Save Project");
   mpFileMenu->Append(wxID_SAVEAS, "Save Project &as...");
@@ -431,6 +435,15 @@ void JZTrackFrame::OnFileExit(wxCommandEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void JZTrackFrame::OnPlay(wxCommandEvent& Event)
+{
+  cout << "JZTrackFrame::OnPlay" << endl;
+  wxMouseEvent MouseEvent;
+  MousePlay(MouseEvent, ePlayButton);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZTrackFrame::OnPianoWindow(wxCommandEvent& Event)
 {
   JZPianoFrame* pPianoFrame = new JZPianoFrame(
@@ -463,4 +476,194 @@ void JZTrackFrame::OnHelpAbout(wxCommandEvent& Event)
 {
   JZAboutDialog AboutDialog(this);
   AboutDialog.ShowModal();
+}
+
+//-----------------------------------------------------------------------------
+// Description:
+//   Handle clicks in the play bar.
+// not playing:
+//   events selected:
+//     left : start rec/play
+//     right: mute + start rec/play
+//   no events selected:
+//     left+right: start play
+// playing:
+//   left+right: stop
+//-----------------------------------------------------------------------------
+void JZTrackFrame::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
+{
+  cout << "JZTrackFrame::MousePlay" << endl;
+
+  mpTrackWindow->MousePlay(Event, Mode);
+
+/*
+  if (Mode == eMouse && !Event.ButtonDown())
+  {
+    return;
+  }
+
+  // This is a little hack to keep it working for now.
+  // All this stuff needs to be moved.
+  JZRecordingInfo* pRecInfo = gpProject->GetRecInfo();
+
+  if (!gpProject->IsPlaying())
+  {
+    switch (Mode)
+    {
+      case eMouse:
+        int x, y;
+        Event.GetPosition(&x, &y);
+        gpProject->SetPlayPosition(x2BarClock((long)x));
+        gpProject->Mute((Event.RightDown() != 0));
+        if (mpSnapSel->Selected && (Event.ShiftDown() || Event.MiddleDown()))
+        {
+          gpProject->SetLoop(true);
+        }
+        else
+        {
+          gpProject->SetLoop(false);
+          mPreviouslyRecording = mpSnapSel->Selected;
+        }
+        break;
+
+      case eSpaceBar:
+        break;
+
+      case ePlayButton:
+        cout << "JZTrackFrame::PlayButton" << endl;
+        gpProject->SetLoop(false);
+        gpProject->SetRecord(false);
+        break;
+
+      case ePlayLoopButton:
+        if (!EventsSelected("please select loop range first"))
+        {
+          return;
+        }
+        gpProject->SetLoop(true);
+        gpProject->SetRecord(false);
+        break;
+
+      case eRecordButton:
+        if (!EventsSelected("please select record track/bar first"))
+        {
+          return;
+        }
+        JZBarInfo bi(gpProject);
+
+        bi.SetClock(mpFilter->FromClock);
+
+        if (bi.BarNr > 0)
+        {
+          bi.SetBar(bi.BarNr - 1);
+        }
+        gpProject->SetPlayPosition(bi.Clock);
+        gpProject->SetRecord(true);
+        gpProject->SetLoop(false);
+        break;
+    }
+
+    // todo: Figure out if we should have getters for these instead
+    // and make them private jppProject members
+    bool loop   = gpProject->mLoop;
+    bool muted  = gpProject->mMuted;
+    bool record = gpProject->mRecord;
+
+    // Is it possible to record?
+    if (record && mpSnapSel->Selected)
+    {
+      pRecInfo->mTrackIndex = mpFilter->FromTrack;
+
+      pRecInfo->mpTrack = gpProject->GetTrack(pRecInfo->mTrackIndex);
+
+      pRecInfo->mFromClock = mpFilter->FromClock;
+      pRecInfo->mToClock   = mpFilter->ToClock;
+
+      if (muted)
+      {
+        pRecInfo->mIsMuted = true;
+        pRecInfo->mpTrack->SetState(tsMute);
+#ifdef OBSOLETE
+        LineText(
+          *pDc,
+          xState,
+          Line2y(pRecInfo.mTrackIndex),
+          wState,
+          pRecInfo.Track->GetStateChar());
+#endif
+      }
+      else
+      {
+        pRecInfo->mIsMuted = false;
+      }
+    }
+    else
+    {
+      pRecInfo->mpTrack = 0;
+    }
+
+    // Is it possible to loop?
+    int loop_clock = 0;
+    if (loop && mpSnapSel->Selected)
+    {
+      mPreviousClock = mpFilter->FromClock;
+      loop_clock = mpFilter->ToClock;
+    }
+
+    // GO!
+    cout << "Go!" << endl;
+
+    //if (pRecInfo->Track)  // recording?
+      //gpProject->Midi->SetRecordInfo(pRecInfo);
+    //else
+      //gpProject->Midi->SetRecordInfo(0);
+
+    cout << "Midi->StartPlay" << endl;
+
+    gpProject->mStartTime = mPreviousClock;
+    gpProject->mStopTime = loop_clock;
+    gpProject->Play();
+
+  } //if(!Midi->Playing)
+  else
+  {
+    gpProject->Stop();
+    if (pRecInfo->mpTrack)
+    {
+      if (pRecInfo->mIsMuted)
+      {
+//        wxDC* pDc = new wxClientDC(mpTrackWindow);
+
+        pRecInfo->mpTrack->SetState(tsPlay);
+//        LineText(
+//          *pDc,
+//          xState,
+//          Line2y(pRecInfo->mTrackIndex),
+//          wState,
+//          pRecInfo->mpTrack->GetStateChar());
+
+//        delete pDc;
+      }
+      if (
+        !pRecInfo->mpTrack->GetAudioMode() &&
+        !gpProject->GetPlayer()->RecdBuffer.IsEmpty())
+      {
+        //int choice = wxMessageBox("Keep recorded events?", "You played", wxOK | wxCANCEL);
+        //if (choice == wxOK)
+        {
+          wxBeginBusyCursor();
+          gpProject->NewUndoBuffer();
+          pRecInfo->mpTrack->MergeRange(
+            &gpProject->GetPlayer()->RecdBuffer,
+            pRecInfo->mFromClock,
+            pRecInfo->mToClock,
+            pRecInfo->mIsMuted);
+          wxEndBusyCursor();
+          Refresh();
+          NextWin->Refresh();
+        }
+      }
+    }
+  }
+*/
 }

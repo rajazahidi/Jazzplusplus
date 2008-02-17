@@ -32,13 +32,17 @@
 class tConfig;
 class JZSong;
 class JZSynth;
+class tPlayer;
 class tHelp;
 class JZProject;
+class JZTrackFrame;
+class JZTrackWindow;
 
 extern tConfig* gpConfig;
 extern std::string gpStartUpSong;
 extern JZSong* gpSong;
 extern JZSynth* gpSynth;
+extern tPlayer* gpMidiPlayer;
 extern tHelp* HelpInstance;
 extern std::vector<std::pair<std::string, int> > gLimitSteps;
 extern std::vector<std::pair<std::string, int> > gModes;
@@ -49,5 +53,7 @@ extern std::vector<std::pair<std::string, int> > gQntSteps;
 extern std::vector<std::pair<std::string, int> > gSynthesizerTypes;
 extern std::vector<std::pair<std::string, int> > gSynthesierTypeFiles;
 extern JZProject* gpProject;
+extern JZTrackFrame* gpTrackFrame;
+extern JZTrackWindow* gpTrackWindow;
 
 #endif // !defined(JZ_GLOBALS_H)

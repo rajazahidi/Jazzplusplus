@@ -739,7 +739,8 @@ class tEventDlg : public tPropertyListDlg
 
 
 tEventDlg::tEventDlg(JZEvent *e, JZPianoFrame* w, tTrack *t)
-  : tPropertyListDlg( "Event" ), ClockDlg(w->Song, "Time ", e->Clock)
+  : tPropertyListDlg( "Event" ),
+    ClockDlg(w->Song, "Time ", e->GetClock())
 {
   Win   = w;
   Track = t;
@@ -760,7 +761,7 @@ void tEventDlg::OnCancel()
 
 bool tEventDlg::OnClose()
 {
-  Copy->Clock = ClockDlg.GetClock();
+  Copy->SetClock(ClockDlg.GetClock());
   Track->Kill(Event);
   Track->Put(Copy);
   Track->Cleanup();
@@ -1248,7 +1249,7 @@ bool tSysexDlg::OnClose()
   else
     len = 0;
 
-  long clk = ((tSysEx *)Copy)->Clock;
+  long clk = ((tSysEx *)Copy)->GetClock();
   delete Copy;
   Copy = new tSysEx( clk, d + 1, len - 1 );
 
@@ -1262,7 +1263,7 @@ bool tSysexDlg::OnClose()
   }
   printf("\n");
 
-  Midi->OutNow( (tSysEx *)Copy );
+  gpMidiPlayer->OutNow( (tSysEx *)Copy );
 #endif
 
   delete str;
@@ -1415,8 +1416,8 @@ void EventDialog(
   {
     case StatKeyOn:
       if (t->GetAudioMode()) {
-        if (!Midi->IsPlaying())
-	  Midi->EditSample(e->IsKeyOn()->Key);
+        if (!gpMidiPlayer->IsPlaying())
+	  gpMidiPlayer->EditSample(e->IsKeyOn()->Key);
 	break;
       }
       str = "Key On";

@@ -208,10 +208,14 @@ void tCtrlEditBase::OnRevert()
   {
     if (IsCtrlEdit(e))
     {
-      int k = Clock2i(e->Clock);
+      int k = Clock2i(e->GetClock());
       if (sticky)
-	while (i < k)
-	  array[i++] = val;
+      {
+        while (i < k)
+        {
+          array[i++] = val;
+        }
+      }
       val = GetValue(e);
       array[k] = val;
     }
@@ -292,10 +296,10 @@ void tCtrlEditBase::OnApply()
     {
       if(IsCtrlEdit(e))
       {
-        if (Clock2Val(e->Clock) != e->IsControl()->Value)
+        if (Clock2Val(e->GetClock()) != e->IsControl()->Value)
         {
           cpy = e->Copy()->IsControl();
-          cpy->Value = Clock2Val(e->Clock);
+          cpy->Value = Clock2Val(e->GetClock());
           track->Kill(e);
           track->Put(cpy);
         }
@@ -360,14 +364,17 @@ void tCtrlEditBase::DrawBars(wxDC* dc)
   BarInfo.SetClock(from_clock);
   long gclk,x;
   int  ii;
-  if (bars_state > 0) {
+  if (bars_state > 0)
+  {
     gclk = BarInfo.Clock;
-    while (gclk < to_clock) {
+    while (gclk < to_clock)
+    {
       gclk = BarInfo.Clock;
       x = parent->Clock2x(gclk-from_clock);
       edit->DrawBarLine(dc, x - x_off);
       if (bars_state == 2)
-        for (ii = 0; ii < BarInfo.CountsPerBar; ii++) {
+        for (ii = 0; ii < BarInfo.CountsPerBar; ii++)
+        {
           gclk += BarInfo.TicksPerBar / BarInfo.CountsPerBar;
           x = parent->Clock2x(gclk-from_clock);
           edit->DrawBarLine(dc, x - x_off);
@@ -426,8 +433,10 @@ tCtrlEdit::tCtrlEdit(
   : tCtrlEditBase(0, 127, parent, label, xoff, x, y, w, h, 1)
 {
   ctrl_num = CtrlNum;
-  if (ctrl_num == 10)	// panpot
+  if (ctrl_num == 10)  // panpot
+  {
     array.SetNull(64);
+  }
 }
 
 int tCtrlEdit::Missing()
@@ -489,8 +498,8 @@ int tVelocEdit::IsCtrlEdit(JZEvent *e)
     {
       return (
         parent->mpFilter->IsSelected(e) &&
-        (e->Clock >= parent->mpFilter->FromClock &&
-          e->Clock <= parent->mpFilter->ToClock));
+        (e->GetClock() >= parent->mpFilter->FromClock &&
+          e->GetClock() <= parent->mpFilter->ToClock));
     }
   }
   return 0;
@@ -531,7 +540,7 @@ void tVelocEdit::OnApply()
     {
       tKeyOn *cpy = k->Copy()->IsKeyOn();
 
-      int i = Clock2i(cpy->Clock);
+      int i = Clock2i(cpy->GetClock());
       cpy->Veloc = array[i];
       track->Kill(k);
       track->Put(cpy);
@@ -569,10 +578,12 @@ int tPolyAfterEdit::IsCtrlEdit(JZEvent *e)
   if (!parent->SnapSel->Selected)
   return e->IsKeyPressure() != 0;
   else
-      if (e->IsKeyPressure()) {
-        return( parent->mpFilter->IsSelected(e)  &&
-                (e->Clock >= parent->mpFilter->FromClock &&
-                 e->Clock <= parent->mpFilter->ToClock) );
+      if (e->IsKeyPressure())
+      {
+        return (
+          parent->mpFilter->IsSelected(e) &&
+          (e->GetClock() >= parent->mpFilter->FromClock &&
+          e->GetClock() <= parent->mpFilter->ToClock));
       }
   return 0;
 }
@@ -617,8 +628,11 @@ void tPolyAfterEdit::OnApply()
     while (e) {
       if (!parent->SnapSel->Selected || parent->mpFilter->IsSelected(e) )
       {
-	k = e->IsKeyPressure();
-	if (k) track->Kill(k);
+        k = e->IsKeyPressure();
+        if (k)
+        {
+          track->Kill(k);
+        }
       }
       e = iter.Next();
     }
@@ -632,32 +646,39 @@ void tPolyAfterEdit::OnApply()
     {
       if (!parent->SnapSel->Selected || parent->mpFilter->IsSelected(e) )
       {
-	keyon = e->IsKeyOn();
-	if (keyon) {
-	  key_clk = keyon->Clock+1;
-	  key_end = keyon->Clock + keyon->Length;
-	  key_val = keyon->Key;
-	  key_cha = keyon->Channel;
-	}
-	if (key_val>0)
-	{
-	  int i,temp=0;
-	  for (long iclk=key_clk;iclk<key_end && iclk<to_clk;iclk +=8) {
-	    i = Clock2i(iclk);
-	    // SN++ Ein neues Event wird nur erzeut wenn sich der Wert aendert
-	    //      und der Wert groesser als 0 ist.
-	    if (array[i] > 0 && array[i] != temp) {
-	    after = new tKeyPressure(iclk,key_cha,key_val,array[i]);
-	    track->Put(after);
-	      temp = array[i];
-	    }
-	  }
-	  key_val = -1;
-	}
+        keyon = e->IsKeyOn();
+        if (keyon)
+        {
+          key_clk = keyon->GetClock() + 1;
+          key_end = keyon->GetClock() + keyon->Length;
+          key_val = keyon->Key;
+          key_cha = keyon->Channel;
+        }
+        if (key_val>0)
+        {
+          int i,temp=0;
+          for (long iclk=key_clk;iclk<key_end && iclk<to_clk;iclk +=8)
+          {
+            i = Clock2i(iclk);
+
+            // SN++ Ein neues Event wird nur erzeut wenn sich der Wert aendert
+            //      und der Wert groesser als 0 ist.
+            if (array[i] > 0 && array[i] != temp)
+            {
+              after = new tKeyPressure(iclk, key_cha, key_val, array[i]);
+              track->Put(after);
+              temp = array[i];
+            }
+          }
+          key_val = -1;
+        }
       }
       e = iter.Next();
     }
-  } else { // OnEdit
+  }
+  else
+  {
+    // OnEdit
     // edit mode: Erzeugt keine neuen Events sondern aendert den Wert
     // bestehender Events.
     // SN++
@@ -668,15 +689,18 @@ void tPolyAfterEdit::OnApply()
       if (!parent->SnapSel->Selected || parent->mpFilter->IsSelected(e))
       {
         if(e->IsKeyPressure())
-	  if (Clock2Val(e->Clock) != e->IsKeyPressure()->Value) {
-	    cpy = e->Copy()->IsKeyPressure();
-	    cpy->Value = Clock2Val(e->Clock);
-	    track->Kill(e);
-      track->Put(cpy);
-    }
+        {
+          if (Clock2Val(e->GetClock()) != e->IsKeyPressure()->Value)
+          {
+            cpy = e->Copy()->IsKeyPressure();
+            cpy->Value = Clock2Val(e->GetClock());
+            track->Kill(e);
+            track->Put(cpy);
+          }
+        }
       }
-    e = iter.Next();
-  }
+      e = iter.Next();
+    }
   }
 
   track->Cleanup();
@@ -732,6 +756,7 @@ void tChannelAfterEdit::OnApply()
 {
   wxBeginBusyCursor();
   parent->Song->NewUndoBuffer();
+
   // delete old events, but skip clock 0 to preserve track defaults:
   // (dirty but might work...)
   tEventIterator iter(track);
@@ -744,7 +769,9 @@ void tChannelAfterEdit::OnApply()
     while (e)
     {
       if (IsCtrlEdit(e))
+      {
         track->Kill(e);
+      }
       e = iter.Next();
     }
 
@@ -753,43 +780,49 @@ void tChannelAfterEdit::OnApply()
     {
       e = iter.Range(0, from_clock - 1);
       while (e)
-	{
-	  if (IsCtrlEdit(e))
-	    {
-	      old_val = GetValue(e);
-	    }
-	  e = iter.Next();
-	}
+      {
+        if (IsCtrlEdit(e))
+        {
+          old_val = GetValue(e);
+        }
+        e = iter.Next();
+      }
     }
 
     // SN++ set-Mode
     // create new events
     long clock;
     for (clock = from_clock; clock < to_clock; clock += 8)
-      {
-	int new_val = Clock2Val(clock);
+    {
+      int new_val = Clock2Val(clock);
 
-	if (old_val != new_val)
-	  {
-	    e = NewEvent(clock, new_val);
-	    track->Put(e);
-	    old_val = new_val;
-	  }
+      if (old_val != new_val)
+      {
+        e = NewEvent(clock, new_val);
+        track->Put(e);
+        old_val = new_val;
       }
-  } else {
+    }
+  }
+  else
+  {
     // edit mode: Erzeugt keine neuen Events sondern aendert den Wert
     // bestehender Events.
     // SN++
     tChnPressure *cpy;
-    while (e) {
+    while (e)
+    {
       if(IsCtrlEdit(e))
-	if (Clock2Val(e->Clock) != GetValue(e)) {
-           cpy = e->Copy()->IsChnPressure();
-	   cpy->Value = Clock2Val(e->Clock);
-           track->Kill(e);
-           track->Put(cpy);
-	}
-      e=iter.Next();
+      {
+        if (Clock2Val(e->GetClock()) != GetValue(e))
+        {
+          cpy = e->Copy()->IsChnPressure();
+          cpy->Value = Clock2Val(e->GetClock());
+          track->Kill(e);
+          track->Put(cpy);
+        }
+      }
+      e = iter.Next();
     }
   }
 
@@ -836,14 +869,3 @@ JZEvent * tTempoEdit::NewEvent(long clock, int val)
 {
   return new tSetTempo(clock, val);
 }
-
-
-
-
-
-
-
-
-
-
-

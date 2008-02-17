@@ -142,6 +142,8 @@ bool JZJazzPlusPlusApplication::OnInit()
     wxPoint(10, 10),
     wxSize(600, 400));
 
+  gpTrackFrame = mpTrackFrame;
+
   // Show it and tell the application that it's our main window
   mpTrackFrame->Show(true);
   SetTopWindow(mpTrackFrame);

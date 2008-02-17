@@ -29,6 +29,15 @@
 
 #include "Rectangle.h"
 
+enum TEMousePlayMode
+{
+  eMouse,
+  eSpaceBar,
+  ePlayButton,
+  ePlayLoopButton,
+  eRecordButton
+};
+
 class tMouseMapper
 {
   public:

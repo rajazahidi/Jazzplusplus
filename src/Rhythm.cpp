@@ -72,10 +72,10 @@ void tRhyGroups::read(istream &is, int version)
 
 
 // pseudo key nr's for harmony browser and sound effects
-static const int MODE_ALL_OF	= -1;
-static const int MODE_ONE_OF	= -2;
-static const int MODE_PIANO	= -3;
-static const int MODE_CONTROL	= -4;
+static const int MODE_ALL_OF    = -1;
+static const int MODE_ONE_OF    = -2;
+static const int MODE_PIANO     = -3;
+static const int MODE_CONTROL   = -4;
 
 
 tRhythm::tRhythm(int k)
@@ -308,45 +308,45 @@ void tRhythm::Generate(tTrack *track, long fr_clock, long to_clock, long ticks_p
         if (the_harmony_browser)
         {
           long step = (clock - fr_clock) * total_steps / (to_clock - fr_clock);
-	  int keys[12], n_keys;
+          int keys[12], n_keys;
           if (key == CHORD_KEY)
             n_keys = the_harmony_browser->GetChordKeys(keys, (int)step, (int)total_steps);
           else
             n_keys = the_harmony_browser->GetBassKeys(keys, (int)step, (int)total_steps);
           for (int j = 0; j < n_keys; j++)
           {
-	    tKeyOn *k = new tKeyOn(clock, chan, keys[j], vel, len - clocks_per_step/2);
-	    track->Put(k);
-	  }
-	}
+            tKeyOn *k = new tKeyOn(clock, chan, keys[j], vel, len - clocks_per_step/2);
+            track->Put(k);
+          }
+        }
       }
 
       // paste pianowin buffer
       else if (key == PASTE_KEY)
       {
-        tEventArray &src = TrackWin->GetPianoWindow()->PasteBuffer;
+        tEventArray &src = gpTrackWindow->GetPianoWindow()->PasteBuffer;
         for (int ii = 0; ii < src.nEvents; ii++)
         {
           tKeyOn *on = src.Events[ii]->IsKeyOn();
           if (on)
           {
-	    tKeyOn *k = new tKeyOn(clock, chan, on->Key, vel, len - clocks_per_step/2);
-	    track->Put(k);
+            tKeyOn *k = new tKeyOn(clock, chan, on->Key, vel, len - clocks_per_step/2);
+            track->Put(k);
           }
-	}
+        }
       }
 
       // generate controller
-      else if (key == CONTROL_KEY) {
-	tControl *c = new tControl(clock, chan, parm - 1, vel);
-	track->Put(c);
+      else if (key == CONTROL_KEY)
+      {
+        tControl *c = new tControl(clock, chan, parm - 1, vel);
+        track->Put(c);
       }
-
       // generate note on events
       else
       {
-	tKeyOn *k = new tKeyOn(clock, chan, key, vel, len - clocks_per_step/2);
-	track->Put(k);
+        tKeyOn *k = new tKeyOn(clock, chan, key, vel, len - clocks_per_step/2);
+        track->Put(k);
       }
 
       clock += len;
@@ -374,10 +374,10 @@ void tRhythm::GenGroup(JZRndArray &out, int grp, JZBarInfo &bi, tRhythm *rhy[], 
       long clock = bi.Clock;
       while (clock < bi.Clock + bi.TicksPerBar)
       {
-	int i = Clock2i(clock, bi);
-	int j = r->Clock2i(clock, bi);
-	tmp[i] = r->history[j];
-	clock += clocks_per_step;
+        int i = Clock2i(clock, bi);
+        int j = r->Clock2i(clock, bi);
+        tmp[i] = r->history[j];
+        clock += clocks_per_step;
       }
       out.SetUnion(tmp, fuzz);
     }
@@ -397,9 +397,9 @@ void tRhythm::Generate(tTrack *track, JZBarInfo &bi, tRhythm *rhy[], int n_rhy)
     {
       GenGroup(tmp, gi, bi, rhy, n_rhy);
       if (groups[gi].listen > 0)
-	rrg.SetIntersection(tmp, groups[gi].listen);
+        rrg.SetIntersection(tmp, groups[gi].listen);
       else
-	rrg.SetDifference(tmp, -groups[gi].listen);
+        rrg.SetDifference(tmp, -groups[gi].listen);
     }
   }
 
@@ -510,22 +510,22 @@ JZToolDef tdefs[] =
 
   wxMenuBar *menu_bar = new wxMenuBar;
   wxMenu    *menu = new wxMenu;
-  menu->Append(MEN_LOAD,	"&Load");
-  menu->Append(MEN_SAVE,	"&Save");
-  menu->Append(MEN_CLOSE,	"&Close");
-  menu_bar->Append(menu,	"&File");
+  menu->Append(MEN_LOAD,        "&Load");
+  menu->Append(MEN_SAVE,        "&Save");
+  menu->Append(MEN_CLOSE,       "&Close");
+  menu_bar->Append(menu,        "&File");
 
   menu = new wxMenu;
-  menu->Append(MEN_ADD,	        "&Add");
-  menu->Append(MEN_DEL,	        "&Delete");
-  menu->Append(MEN_UP,	        "&Up");
-  menu->Append(MEN_DOWN,	"&Down");
-  menu->Append(MEN_GEN,	        "&Generate");
-  menu_bar->Append(menu,	"&Instrument");
+  menu->Append(MEN_ADD,         "&Add");
+  menu->Append(MEN_DEL,         "&Delete");
+  menu->Append(MEN_UP,          "&Up");
+  menu->Append(MEN_DOWN,        "&Down");
+  menu->Append(MEN_GEN,         "&Generate");
+  menu_bar->Append(menu,        "&Instrument");
 
   menu = new wxMenu;
-  menu->Append(MEN_HELP,	"&Help");
-  menu_bar->Append(menu,	"Help");
+  menu->Append(MEN_HELP,        "&Help");
+  menu_bar->Append(menu,        "Help");
 
   SetMenuBar(menu_bar);
 
@@ -681,10 +681,10 @@ void tRhythmWin::OnMenuCommand(int id) {
     case MEN_HELP: Help(); break;
     case MEN_CLOSE:
         // motif crashes, when Show(FALSE) is called before destructor!
-  	// Show(FALSE);
+      // Show(FALSE);
 //        DELETE_THIS();
         Destroy();
-	break;
+        break;
 
     case MEN_LOAD:
       {
@@ -694,12 +694,12 @@ void tRhythmWin::OnMenuCommand(int id) {
           false,
           has_changed,
           "*.rhy");
-	if (fname)
+        if (fname)
         {
-	  ifstream is(fname);
-	  is >> *this;
+          ifstream is(fname);
+          is >> *this;
           OnPaint();
-	}
+        }
       }
       break;
 
@@ -712,11 +712,11 @@ void tRhythmWin::OnMenuCommand(int id) {
           true,
           has_changed,
           "*.rhy");
-	if (fname)
+        if (fname)
         {
-	  ofstream os(fname);
-	  os << *this;
-	}
+          ofstream os(fname);
+          os << *this;
+        }
       }
       break;
 
@@ -852,27 +852,29 @@ void tRhythmWin::AddInstrumentDlg()
       r->n_keys = 0;
       r->mode   = keys[i];
       tEventArray events;
-      tCmdCopyToBuffer cmd(TrackWin->GetPianoWindow()->mpFilter, &events);
-      cmd.Execute(0);	// no UNDO
+      tCmdCopyToBuffer cmd(gpTrackFrame->GetPianoWindow()->mpFilter, &events);
+      cmd.Execute(0);   // no UNDO
 
       for (int ii = 0; ii < events.nEvents; ii++)
       {
-	tKeyOn *on = events.Events[ii]->IsKeyOn();
-	if (on) {
-	  r->keys[r->n_keys++] = on->Key;
-	  if (r->n_keys > 1)
-	    strcat(buf, ", ");
-	  Key2Str(on->Key, buf + strlen(buf));
-	  if (r->n_keys >= MAX_KEYS)
-	    break;
-	}
+        tKeyOn *on = events.Events[ii]->IsKeyOn();
+        if (on)
+        {
+          r->keys[r->n_keys++] = on->Key;
+          if (r->n_keys > 1)
+            strcat(buf, ", ");
+          Key2Str(on->Key, buf + strlen(buf));
+          if (r->n_keys >= MAX_KEYS)
+            break;
+        }
       }
       r->SetLabel(buf);
 
-      if (r->n_keys == 0) {
+      if (r->n_keys == 0)
+      {
         wxMessageBox("select some notes in pianowin first", "Error", wxOK);
-	delete r;
-	r = 0;
+        delete r;
+        r = 0;
       }
     }
 

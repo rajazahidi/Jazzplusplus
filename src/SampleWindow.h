@@ -42,7 +42,7 @@ class tSampleWin : public wxFrame
   friend class tCommandPainter;
   friend class tSmplWinSettingsForm;
   public:
-    tSampleWin(wxFrame *parent, tSampleWin **ref, tSample &);
+    tSampleWin(wxWindow* pParent, tSampleWin **ref, tSample &);
     ~tSampleWin();
     virtual void OnSize(int w, int h);
     virtual bool OnClose();

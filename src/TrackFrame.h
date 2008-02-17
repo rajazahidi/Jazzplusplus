@@ -34,7 +34,7 @@ class JZPianoFrame;
 
 //*****************************************************************************
 //*****************************************************************************
-class JZTrackFrame : public JZEventFrame, public tButtonLabelInterface
+class JZTrackFrame : public wxFrame, public tButtonLabelInterface
 {
   public:
 
@@ -73,11 +73,15 @@ class JZTrackFrame : public JZEventFrame, public tButtonLabelInterface
 
     void OnFileExit(wxCommandEvent& Event);
 
+    void OnPlay(wxCommandEvent& Event);
+
     void OnPianoWindow(wxCommandEvent& Event);
 
     void OnHelpContents(wxCommandEvent& Event);
 
     void OnHelpAbout(wxCommandEvent& Event);
+
+    void MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode);
 
   private:
 
@@ -91,6 +95,9 @@ class JZTrackFrame : public JZEventFrame, public tButtonLabelInterface
 
 //    JZPianoFrame* mpPianoFrame;
 
+    int mPreviousClock;
+    bool mPreviouslyRecording;
+
   DECLARE_EVENT_TABLE()
 };
 
@@ -98,7 +105,5 @@ inline
 void JZTrackFrame::ButtonLabelDisplay(const wxString& Text, bool IsButtonDown)
 {
 }
-
-extern JZTrackFrame* TrackWin;
 
 #endif // !defined(JZ_TRACKFRAME_H)

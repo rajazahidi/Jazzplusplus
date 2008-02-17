@@ -66,7 +66,6 @@ JZProject::JZProject()
     mpMidiPlayer(0),
     mpSynth(0),
     mpRecInfo(0),
-    mpSong(0),
     mChanged(false),
     mIsPlaying(false)
 {
@@ -156,9 +155,8 @@ JZProject::JZProject()
   }
   gpSynth = mpSynth;
 
-  mpSong = new JZSong;
+  gpSong = this;
   mpRecInfo = new JZRecordingInfo;
-  gpSong = mpSong;
 
 
   //--------------
@@ -168,11 +166,11 @@ JZProject::JZProject()
   if (gpConfig->GetValue(C_MidiDriver) == eMidiDriverOss)
   {
 #ifdef DEV_SEQUENCER2
-    mpMidiPlayer = new tAudioPlayer(mpSong);
+    mpMidiPlayer = new tAudioPlayer(this);
     if (!mpMidiPlayer->Installed())
     {
       delete mpMidiPlayer;
-      mpMidiPlayer = new tSeq2Player(mpSong);
+      mpMidiPlayer = new tSeq2Player(this);
     }
     if (!mpMidiPlayer->Installed())
     {
@@ -180,22 +178,22 @@ JZProject::JZProject()
       cerr
         << "(dev_sequencer2)Jazz will start with no play/record ability."
         << endl;
-      mpMidiPlayer = new tNullPlayer(mpSong);
+      mpMidiPlayer = new tNullPlayer(this);
     }
 #else
     cerr << "This programm lacks OSS driver support" << endl;
-    mpMidiPlayer = new tNullPlayer(mpSong);
+    mpMidiPlayer = new tNullPlayer(this);
 #endif // DEV_SEQUENCER2
   }
   else if (gpConfig->GetValue(C_MidiDriver) == eMidiDriverAlsa)
   {
 #ifdef DEV_ALSA
-    mpMidiPlayer = new tAlsaAudioPlayer(mpSong);
+    mpMidiPlayer = new tAlsaAudioPlayer(this);
     if (!mpMidiPlayer->Installed())
     {
       delete mpMidiPlayer;
       cout << "creating alsa player" << endl;
-      mpMidiPlayer = new tAlsaPlayer(mpSong);
+      mpMidiPlayer = new tAlsaPlayer(this);
     }
     if (!mpMidiPlayer->Installed())
     {
@@ -203,17 +201,17 @@ JZProject::JZProject()
         << "Could not install alsa driver." << '\n'
         << "Jazz will start with no play/record ability."
         << endl;
-      mpMidiPlayer = new tNullPlayer(mpSong);
+      mpMidiPlayer = new tNullPlayer(this);
     }
 #else
     cerr << "This programm lacks ALSA driver support" << endl;
-    mpMidiPlayer = new tNullPlayer(mpSong);
+    mpMidiPlayer = new tNullPlayer(this);
 #endif
   }
   else if (gpConfig->GetValue(C_MidiDriver) == eMidiDriverJazz)
   {
 #ifdef DEV_MPU401
-    mpMidiPlayer = new tMpuPlayer(mpSong);
+    mpMidiPlayer = new tMpuPlayer(this);
     if (!mpMidiPlayer->Installed())
     {
       cerr
@@ -221,11 +219,11 @@ JZProject::JZProject()
         << %midinethost << "\"\n"
         << "Jazz will start with no play/record ability."
         << endl;
-      mpMidiPlayer = new tNullPlayer(mpSong);
+      mpMidiPlayer = new tNullPlayer(this);
     }
 #else
     cerr << "This programm lacks JAZZ/MPU401 driver support" << endl;
-    mpMidiPlayer = new tNullPlayer(mpSong);
+    mpMidiPlayer = new tNullPlayer(this);
 #endif
   }
   else
@@ -245,34 +243,36 @@ JZProject::JZProject()
   switch (mpConfig->GetValue(C_ClockSource))
   {
     case CsMidi:
-      mpMidiPlayer = new tWinMidiPlayer(mpSong);
+      mpMidiPlayer = new tWinMidiPlayer(this);
       break;
     case CsMtc:
-      mpMidiPlayer = new tWinMtcPlayer(mpSong);
+      mpMidiPlayer = new tWinMtcPlayer(this);
       break;
     case CsFsk:
     case CsInt:
     default:
-      mpMidiPlayer = new tWinAudioPlayer(mpSong);
+      mpMidiPlayer = new tWinAudioPlayer(this);
       if (!mpMidiPlayer->Installed())
       {
 	mpMidiPlayer->ShowError();
         delete mpMidiPlayer;
-	mpMidiPlayer = new tWinIntPlayer(mpSong);
+	mpMidiPlayer = new tWinIntPlayer(this);
       }
       break;
   }
   if (!mpMidiPlayer->Installed())
   {
     mpMidiPlayer->ShowError();
-    mpMidiPlayer = new tNullPlayer(mpSong);
+    mpMidiPlayer = new tNullPlayer(this);
   }
 #endif // __WXMSW__
 
   if (!mpMidiPlayer)
   {
-    mpMidiPlayer = new tNullPlayer(mpSong);
+    mpMidiPlayer = new tNullPlayer(this);
   }
+
+  gpMidiPlayer = mpMidiPlayer;
 
   //-------------------------------------
   // This is the end of the driver setup.
@@ -311,7 +311,7 @@ JZProject::JZProject()
   {
     fclose(fd);
     tStdRead io;
-    mpSong->Read(io, gpStartUpSong.c_str());
+    Read(io, gpStartUpSong.c_str());
 //    if (gpStartUpSong == string("jazz.mid"))
 //    {
 //      lasts = gpStartUpSong;
@@ -331,7 +331,6 @@ JZProject::~JZProject()
   delete mpMidiPlayer; 
   delete mpSynth;
   delete mpRecInfo;
-  delete mpSong;
   delete mpConfig;
 }
 
@@ -541,7 +540,7 @@ void JZProject::Play()
 void JZProject::Stop()
 {
   mIsPlaying = false;
-  mpMidiPlayer->Stop();
+  mpMidiPlayer->StopPlay();
   // Stub
 }
 
@@ -591,7 +590,7 @@ tMetronomeInfo JZProject::GetMetronome()
 // Description:
 //   Returns a constant pointer to the internal RecInfo member.
 //-----------------------------------------------------------------------------
-const JZRecordingInfo* JZProject::GetRecInfo()
+JZRecordingInfo* JZProject::GetRecInfo()
 {
   return mpRecInfo;
 }

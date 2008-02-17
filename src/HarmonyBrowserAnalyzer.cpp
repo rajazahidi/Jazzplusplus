@@ -49,7 +49,7 @@ HBAnalyzer::~HBAnalyzer()
 
 void HBAnalyzer::Init(tFilter *f, int epc)
 {
-  Exit();	// cleanup from previous run
+  Exit();        // cleanup from previous run
 
   filter = f;
   start_clock = f->FromClock;
@@ -57,7 +57,7 @@ void HBAnalyzer::Init(tFilter *f, int epc)
   eighths_per_chord = epc;
 
   if (eighths_per_chord == 0)
-    steps = max_seq;	// map number of chords to selection
+    steps = max_seq;        // map number of chords to selection
   else
   {
     JZBarInfo BarInfo(filter->Song);
@@ -133,10 +133,12 @@ void HBAnalyzer::IterateEvents(void (HBAnalyzer::*Action)(tKeyOn *on, tTrack *t)
       JZEvent *e = Events.Range(filter->FromClock, filter->ToClock);
       while (e)
       {
-	tKeyOn *on = e->IsKeyOn();
-	if (on)
-	  (this->*Action)(on, t);
-	e = Events.Next();
+        tKeyOn *on = e->IsKeyOn();
+        if (on)
+        {
+          (this->*Action)(on, t);
+        }
+        e = Events.Next();
       }
       t->Cleanup();
     }
@@ -158,12 +160,16 @@ void HBAnalyzer::CountEvent(tKeyOn *on, tTrack *t)
   {
     long start = Step2Clock(i);
     long stop  = Step2Clock(i+1);
-    if (on->Clock + on->Length >= start && on->Clock < stop)
+    if (on->GetClock() + on->Length >= start && on->GetClock() < stop)
     {
-      if (on->Clock > start)
-	start = on->Clock;
-      if (on->Clock + on->Length < stop)
-	stop = on->Clock + on->Length;
+      if (on->GetClock() > start)
+      {
+        start = on->GetClock();
+      }
+      if (on->GetClock() + on->Length < stop)
+      {
+        stop = on->GetClock() + on->Length;
+      }
       count[i][on->Key % 12] += stop - start;
     }
   }
@@ -176,26 +182,30 @@ void HBAnalyzer::TransposeEvent(tKeyOn *on, tTrack *track)
   {
     long start = Step2Clock(i);
     long stop  = Step2Clock(i+1);
-    if (on->Clock + on->Length >= start && on->Clock < stop)
+    if (on->GetClock() + on->Length >= start && on->GetClock() < stop)
     {
       // key matches this step
       long fr = start;
       long to = stop;
-      if (on->Clock > fr)
-	fr = on->Clock;
-      if (on->Clock + on->Length < to)
-	to = on->Clock + on->Length;
+      if (on->GetClock() > fr)
+      {
+        fr = on->GetClock();
+      }
+      if (on->GetClock() + on->Length < to)
+      {
+        to = on->GetClock() + on->Length;
+      }
 
       // transpose if most of key length belongs to this step
       // OR: it covers the whole step
       if (to - fr >= on->Length/2 || (fr == start && to == stop))
       {
-	tKeyOn *cp = (tKeyOn *)on->Copy();
-	cp->Key += delta[i][on->Key % 12];
-	track->Kill(on);
-	track->Put(cp);
+        tKeyOn *cp = (tKeyOn *)on->Copy();
+        cp->Key += delta[i][on->Key % 12];
+        track->Kill(on);
+        track->Put(cp);
 
-	// do not transpose again
+        // do not transpose again
         break;
       }
     }
@@ -304,7 +314,7 @@ class tChordMatrix {
     tChordMatrix() {
       for (int i = 0; i < 12; i++)
         for (int j = 0; j < 12; j++)
-	  mat[i][j] = 0;
+          mat[i][j] = 0;
     }
     double* operator[](int i) { return mat[i]; }
   private:
@@ -336,12 +346,12 @@ void HBAnalyzer::GenerateMapping()
       for (j = 0; j < 12; j++)
       {
         double cost = 0;
-	if (!chord.Contains(j))
-	  cost += not_in_chord_costs;
-	if (!scale.Contains(j))
-	  cost += not_in_scale_costs;
-	cost += fabs(i-j) * costs_per_semitone;
-	cost *= count[step][i];
+        if (!chord.Contains(j))
+          cost += not_in_chord_costs;
+        if (!scale.Contains(j))
+          cost += not_in_scale_costs;
+        cost += fabs(i-j) * costs_per_semitone;
+        cost *= count[step][i];
         mat[i][j] = cost;
       }
     }
@@ -371,9 +381,11 @@ void HBAnalyzer::GenerateMapping()
 
 void HBAnalyzer::CreateChords()
 {
-  long *best = new long [steps];
+  long* pBest = new long [steps];
   for (int i = 0; i < steps; i++)
-    best[i] = -1;
+  {
+    pBest[i] = -1;
+  }
 
   HBContextIterator iter;
   while (iter())
@@ -387,18 +399,21 @@ void HBAnalyzer::CreateChords()
       for (int k = 0; k < 12; k++)
       {
         if (!chord.Contains(k))
+        {
           err += count[i][k];
+        }
         if (!scale.Contains(k))
+        {
           err += count[i][k];
+        }
       }
-      if (best[i] == -1 || err < best[i])
+      if (pBest[i] == -1 || err < pBest[i])
       {
-	*seq[i] = ct;
-	seq[i]->SetSeqNr(i+1);
-	best[i] = err;
+        *seq[i] = ct;
+        seq[i]->SetSeqNr(i + 1);
+        pBest[i] = err;
       }
     }
   }
-  delete [] best;
+  delete [] pBest;
 }
-

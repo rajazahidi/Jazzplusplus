@@ -27,6 +27,7 @@
 #include "HarmonyP.h"
 #include "Player.h"
 #include "TrackFrame.h"
+#include "TrackWindow.h"
 #include "PianoFrame.h"
 #include "GuitarFrame.h"
 #include "Song.h"
@@ -42,10 +43,6 @@
 #include <fstream>
 
 using namespace std;
-
-#ifdef wx_xt
-#define wxbMessageBox wxMessageBox
-#endif
 
 tHBInterface *the_harmony_browser = 0;
 
@@ -274,7 +271,7 @@ void HBPlayer::StartPlay(const HBContext &ct)
   if (bass_enabled)
   {
     tKeyOn e(0, bass_channel - 1, bass_key, bass_veloc);
-    Midi->OutNow(device, &e);
+    gpMidiPlayer->OutNow(device, &e);
   }
 
   if (chord_enabled)
@@ -282,7 +279,7 @@ void HBPlayer::StartPlay(const HBContext &ct)
     for (i = 0; i < n_chord_keys; i++)
     {
       tKeyOn e(0, chord_channel - 1, chord_keys[i], chord_veloc);
-      Midi->OutNow(device, &e);
+      gpMidiPlayer->OutNow(device, &e);
     }
   }
 
@@ -296,10 +293,10 @@ void HBPlayer::Notify()
   if (meldy_enabled)
   {
     tKeyOff of(0, meldy_channel - 1, meldy_keys[meldy_index]);
-    Midi->OutNow(device, &of);
+    gpMidiPlayer->OutNow(device, &of);
     meldy_index = (meldy_index + 1) % n_meldy_keys;
     tKeyOn on(0, meldy_channel - 1, meldy_keys[meldy_index], meldy_veloc);
-    Midi->OutNow(device, &on);
+    gpMidiPlayer->OutNow(device, &on);
   }
 }
 
@@ -316,7 +313,7 @@ void HBPlayer::StopPlay()
   if (bass_enabled)
   {
     tKeyOff e(0, bass_channel - 1, bass_key);
-    Midi->OutNow(device, &e);
+    gpMidiPlayer->OutNow(device, &e);
   }
 
   if (chord_enabled)
@@ -324,7 +321,7 @@ void HBPlayer::StopPlay()
     for (i = 0; i < n_chord_keys; i++)
     {
       tKeyOff e(0, chord_channel - 1, chord_keys[i]);
-      Midi->OutNow(device, &e);
+      gpMidiPlayer->OutNow(device, &e);
     }
   }
 
@@ -333,7 +330,7 @@ void HBPlayer::StopPlay()
     for (i = 0; i < n_meldy_keys; i++)
     {
       tKeyOff of(0, meldy_channel - 1, meldy_keys[i]);
-      Midi->OutNow(device, &of);
+      gpMidiPlayer->OutNow(device, &of);
     }
   }
 }
@@ -840,7 +837,7 @@ HBMatchMarkers::HBMatchMarkers(const HBContext &ct, HBCanvas *cv)
 
   if (cnvs->mark_piano)
   {
-    tEventArray &buf = TrackWin->GetPianoWindow()->PasteBuffer;
+    tEventArray &buf = gpTrackFrame->GetPianoWindow()->PasteBuffer;
     for (int i = 0; i < buf.nEvents; i++)
     {
       tKeyOn *on = buf.Events[i]->IsKeyOn();
@@ -1026,14 +1023,14 @@ void HBCanvas::OnEvent(wxMouseEvent &e)
       // paste to PianoWin buffer
       if (!mark_piano)
       {
-	tEventArray &buf = TrackWin->GetPianoWindow()->PasteBuffer;
+	tEventArray &buf = gpTrackFrame->GetPianoWindow()->PasteBuffer;
 	buf.Clear();
 	player.Paste(buf);
-	TrackWin->GetPianoWindow()->Redraw();
+	gpTrackFrame->GetPianoWindow()->Redraw();
       }
 
       // Show in GuitarWin
-      JZGuitarFrame* guitar = TrackWin->GetPianoWindow()->GetGuitarFrame();
+      JZGuitarFrame* guitar = gpTrackFrame->GetPianoWindow()->GetGuitarFrame();
       if (guitar)
       {
         guitar->ShowPitch(0);	// remove actual pianowin/mouse position
@@ -1067,11 +1064,11 @@ void HBCanvas::TransposeSelection()
     wxMessageBox("define a chord sequence first", "error", wxOK);
     return;
   }
-  if (TrackWin->EventsSelected("please select destination range in track window"))
+  if (gpTrackWindow->EventsSelected("please select destination range in track window"))
   {
     wxBeginBusyCursor();
     HBAnalyzer analyzer(seq, n_seq);
-    analyzer.Transpose(TrackWin->mpFilter, transpose_res);
+    analyzer.Transpose(gpTrackWindow->mpFilter, transpose_res);
     wxEndBusyCursor();
   }
 }
@@ -1134,11 +1131,11 @@ void HBCanvas::OnMenuCommand(int id, wxToolBar *mpToolBar)
       break;
 
     case MEN_ANALYZE:
-      if (TrackWin->EventsSelected("please select source range in track window"))
+      if (gpTrackWindow->EventsSelected("please select source range in track window"))
       {
 	wxBeginBusyCursor();
         HBAnalyzer analyzer(seq, (int)SEQMAX);
-        n_seq = analyzer.Analyze(TrackWin->mpFilter, analyze_res);
+        n_seq = analyzer.Analyze(gpTrackWindow->mpFilter, analyze_res);
         Refresh();
 	wxEndBusyCursor();
       }
@@ -1162,10 +1159,10 @@ void HBCanvas::OnMenuCommand(int id, wxToolBar *mpToolBar)
 
 HBAnalyzer * HBCanvas::getAnalyzer()
 {
-  if (n_seq > 0 && TrackWin->SnapSel->Selected)
+  if (n_seq > 0 && gpTrackWindow->mpSnapSel->Selected)
   {
     HBAnalyzer *analyzer = new HBAnalyzer(seq, n_seq);
-    analyzer->Init(TrackWin->mpFilter, transpose_res);
+    analyzer->Init(gpTrackWindow->mpFilter, transpose_res);
     return analyzer;
   }
   return 0;

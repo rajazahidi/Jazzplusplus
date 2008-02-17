@@ -36,11 +36,18 @@
 // ----------------------------------------------------------------------
 
 #ifdef sparc
-static void SwapW(void *p) {}
-static void SwapL(void *p) {}
-#else
 
 static void SwapW(void *p)
+{
+}
+
+static void SwapL(void *p)
+{
+}
+
+#else
+
+static void SwapW(void* p)
 {
   char *cp = (char *)p;
   char tmp = cp[0];
@@ -49,7 +56,7 @@ static void SwapW(void *p)
 }
 
 
-static void SwapL(void *p)
+static void SwapL(void* p)
 {
   short tmp, *sp = (short *)p;
   SwapW(&sp[0]);
@@ -66,22 +73,23 @@ static void SwapL(void *p)
 // --------------------------------------------------------------
 
 tStdChunk::tStdChunk()
+  : mpBase(0)
 {
   Size = 128;
-  Base = new unsigned char [Size];
+  mpBase = new unsigned char [Size];
   nRead = 0;
   Rewind();
 }
 
 tStdChunk::~tStdChunk()
 {
-  delete [] Base;
+  delete [] mpBase;
 }
 
 void tStdChunk::Rewind()
 {
   RunningStatus = 0;
-  cp = Base;
+  cp = mpBase;
   EofSeen = 0;
   Clock = 0;
 }
@@ -89,27 +97,29 @@ void tStdChunk::Rewind()
 
 inline void tStdChunk::Resize(int Needed)
 {
-  long Used = cp - Base;
+  long Used = cp - mpBase;
   long i, n = Size;
   if (Size - Used < Needed)
   {
     do {
       Size *= 2;
-      //Base = (unsigned char *)realloc(Base, Size);
+      //mpBase = (unsigned char *)realloc(mpBase, Size);
     } while (Size - Used < Needed);
     unsigned char *tmp = new unsigned char [Size];
     for (i = 0; i < n; i++)
-      tmp[i] = Base[i];
-    delete [] Base;
-    Base = tmp;
-    cp = Base + Used;
+    {
+      tmp[i] = mpBase[i];
+    }
+    delete [] mpBase;
+    mpBase = tmp;
+    cp = mpBase + Used;
   }
 }
 
 
 inline int tStdChunk::IsEof()
 {
-  return EofSeen || ((cp - Base) >= nRead);
+  return EofSeen || ((cp - mpBase) >= nRead);
 }
 
 
@@ -157,7 +167,7 @@ void tStdChunk::Put(JZEvent *e, unsigned char* Data, int Length)
   long  dif;
 
   Resize(Length + 20);
-  dif = e->Clock - Clock;
+  dif = e->GetClock() - Clock;
   PutVar(dif);
   Clock += dif;
 
@@ -178,24 +188,29 @@ if (e->Stat != 0x90)
     // KeyOff -> KeyOn mit Vel=0. Gives better Runningstatus!
     case StatKeyOff:
       // SN-- only if KeyOff veloc is zero
-      if (!e->IsKeyOff()->OffVeloc) {
-	Stat = StatKeyOn | e->IsChannelEvent()->Channel;
-	if (Stat != RunningStatus)
-	  {
-	    RunningStatus = Stat;
-	    *cp++ = Stat;
-	  }
-	*cp++ = Data[0];
-	*cp++ = 0;
-      } else {
-	Stat = StatKeyOff | e->IsChannelEvent()->Channel;
-	if (Stat != RunningStatus)
-	  {
-	    RunningStatus = Stat;
-	    *cp++ = Stat;
-	  }
-	while (Length--)
-	  *cp++ = *Data++;
+      if (!e->IsKeyOff()->OffVeloc)
+      {
+        Stat = StatKeyOn | e->IsChannelEvent()->Channel;
+        if (Stat != RunningStatus)
+        {
+          RunningStatus = Stat;
+          *cp++ = Stat;
+        }
+        *cp++ = Data[0];
+        *cp++ = 0;
+      }
+      else
+      {
+        Stat = StatKeyOff | e->IsChannelEvent()->Channel;
+        if (Stat != RunningStatus)
+        {
+          RunningStatus = Stat;
+          *cp++ = Stat;
+        }
+        while (Length--)
+        {
+          *cp++ = *Data++;
+        }
 
       }
       break;
@@ -210,11 +225,13 @@ if (e->Stat != 0x90)
       Stat = e->Stat | e->IsChannelEvent()->Channel;
       if (Stat != RunningStatus)
       {
-	RunningStatus = Stat;
-	*cp++ = Stat;
+        RunningStatus = Stat;
+        *cp++ = Stat;
       }
       while (Length--)
-	*cp++ = *Data++;
+      {
+        *cp++ = *Data++;
+      }
       break;
 
     case StatSysEx:
@@ -223,7 +240,9 @@ if (e->Stat != 0x90)
       *cp++ = Stat;
       PutVar(Length);
       while (Length--)
-	*cp++ = *Data++;
+      {
+        *cp++ = *Data++;
+      }
       break;
 
     /*
@@ -239,7 +258,7 @@ if (e->Stat != 0x90)
     case StatKeySignat:
     case StatMtcOffset:
 
-    default:	/* hopefully */
+    default:        /* hopefully */
 
 #if 0
 if (1)
@@ -258,9 +277,10 @@ if (1)
       *cp++ = Stat;
       PutVar(Length);
       while (Length--)
-	*cp++ = *Data++;
+      {
+        *cp++ = *Data++;
+      }
       break;
-
   }
 }
 
@@ -279,19 +299,19 @@ JZEvent *tStdChunk::Get()
 
     Clock += GetVar();
 
-    switch (Stat = *cp)	// Event-Typ
+    switch (Stat = *cp)        // Event-Typ
     {
 
-      case StatSysEx:		// Sysex
-	++ cp;
-	len = GetVar();
-	e = new tSysEx(Clock, cp, len);
-	cp += len;
-	//RunningStatus = 0;
-	return e;
+      case StatSysEx:          // Sysex
+        ++ cp;
+        len = GetVar();
+        e = new tSysEx(Clock, cp, len);
+        cp += len;
+        //RunningStatus = 0;
+        return e;
 
-      case 0xff:  		// Meta-Event
-	++ cp;
+      case 0xff:                // Meta-Event
+        ++ cp;
 
 #if 0
 if (1)
@@ -301,39 +321,39 @@ if (1)
 }
 #endif
 
-	switch (Stat = *cp++)	// Meta-Type
-	{
+        switch (Stat = *cp++)        // Meta-Type
+        {
 
-          case StatText:	// Text-Event
+          case StatText:        // Text-Event
             len = GetVar();
             e = new tText(Clock, cp, len);
             cp += len;
             return e;
 
-          case StatTrackName:	// Track-Name
+          case StatTrackName:        // Track-Name
             len = GetVar();
             e = new tTrackName(Clock, cp, len);
             cp += len;
             return e;
 
-          case StatPlayTrack:	// JAVE playtrack event
+          case StatPlayTrack:        // JAVE playtrack event
             len = GetVar();
-	    fprintf(stderr, "reading playtrack event\n");
+            fprintf(stderr, "reading playtrack event\n");
             e = new tPlayTrack(Clock, cp, len);
             cp += len;
             return e;
 
 
-          case StatJazzMeta:	// Jazz Meta Event
+          case StatJazzMeta:        // Jazz Meta Event
             len = GetVar();
-	    if (memcmp(cp, "JAZ2", 4) == 0)
-	      e = new tJazzMeta(Clock, cp, len);
-	    else
-	      e = new tMetaEvent(Clock, Stat, cp, len);
+            if (memcmp(cp, "JAZ2", 4) == 0)
+              e = new tJazzMeta(Clock, cp, len);
+            else
+              e = new tMetaEvent(Clock, Stat, cp, len);
             cp += len;
             return e;
 
-          case StatCopyright:	// Copyright notice
+          case StatCopyright:        // Copyright notice
             len = GetVar();
             e = new tCopyright(Clock, cp, len);
             cp += len;
@@ -346,11 +366,11 @@ if (1)
             return e;
 
           case StatEndOfTrack:
-	    EofSeen = 1;
-	    cp += GetVar();
-	    e = new tEndOfTrack(Clock); //JAVE return an explicit event rather than 0
-	    return e;
-	    //return 0;		// EOF
+            EofSeen = 1;
+            cp += GetVar();
+            e = new tEndOfTrack(Clock); //JAVE return an explicit event rather than 0
+            return e;
+            //return 0;                // EOF
 
           case StatSetTempo:
             len = GetVar();
@@ -364,31 +384,31 @@ if (1)
             cp += len;
             return e;
 
-          case StatMtcOffset:		// MtcOffset
-	    len = GetVar();
-	    e = new tMtcOffset(Clock, cp, len);
-	    cp += len;
-	    RunningStatus = 0;
-	    return e;
+          case StatMtcOffset:                // MtcOffset
+            len = GetVar();
+            e = new tMtcOffset(Clock, cp, len);
+            cp += len;
+            RunningStatus = 0;
+            return e;
 
-	  default:		// Text und andere ignorieren
+          default:                // Text und andere ignorieren
             len = GetVar();
             e = new tMetaEvent(Clock, Stat, cp, len);
             cp += len;
             return e;
-	}
-	break;
+        }
+        break;
 
       default:
 
-        if (cp[0] & 0x80)	// neuer Running Status?
+        if (cp[0] & 0x80)        // neuer Running Status?
           RunningStatus = *cp++;
-	Stat  = RunningStatus & 0xF0;
-	Channel = RunningStatus & 0x0F;
+        Stat  = RunningStatus & 0xF0;
+        Channel = RunningStatus & 0x0F;
 
         switch(Stat)
         {
-	case StatKeyOff:  // SN++ added off veloc
+          case StatKeyOff:  // SN++ added off veloc
             e = new tKeyOff(Clock, Channel, cp[0],cp[1]);
             cp += 2;
             return e;
@@ -396,14 +416,14 @@ if (1)
           case StatKeyOn:
             if (cp[1])
               e = new tKeyOn(Clock, Channel, cp[0], cp[1]);
-	    else
-	      e = new tKeyOff(Clock, Channel, cp[0]);
+            else
+              e = new tKeyOff(Clock, Channel, cp[0]);
             cp += 2;
             return e;
 
           case StatKeyPressure:
 // SN++ Aftertouch
-	    e = new tKeyPressure(Clock, Channel, cp[0], cp[1]);
+            e = new tKeyPressure(Clock, Channel, cp[0], cp[1]);
             cp += 2;
             return e;
 
@@ -449,7 +469,7 @@ void tStdChunk::Load(FILE *fd)
   fread(&Size, 4, 1, fd);
   SwapL(&Size);
   Resize(Size);
-  fread(Base, Size, 1, fd);
+  fread(mpBase, Size, 1, fd);
   nRead = Size;
 }
 
@@ -464,10 +484,10 @@ void tStdChunk::Save(FILE *fd)
   *cp++ = 0x2f;
   *cp++ = 0x00;
   fwrite("MTrk", 4, 1, fd);
-  Size = hSize = cp - Base;
+  Size = hSize = cp - mpBase;
   SwapL(&hSize);
   fwrite(&hSize, 4, 1, fd);
-  fwrite(Base, Size, 1, fd);
+  fwrite(mpBase, Size, 1, fd);
 }
 
 // ----------------------------------------------------------------------
@@ -491,16 +511,28 @@ void tFileHeader::Swap()
 // ---------------------------- ReadStd -----------------------------
 
 
-int tStdRead::Open(const char *fname)
+tStdRead::tStdRead()
+  : tReadBase(),
+    mpTracks(0),
+    TrackNr(0)
+{
+}
+
+tStdRead::~tStdRead()
+{
+  delete [] mpTracks;
+}
+
+int tStdRead::Open(const char* pFileName)
 {
   tFileHeader h;
   long hSize;
   int i;
   char Type[4];
 
-  if (!tReadBase::Open(fname))
+  if (!tReadBase::Open(pFileName))
   {
-    Error("cant open %s", fname);
+    Error("cant open %s", pFileName);
     return 0;
   }
 
@@ -521,26 +553,26 @@ int tStdRead::Open(const char *fname)
   nTracks = h.nTracks;
   TicksPerQuarter = h.Unit;
 
-  Tracks = new tStdChunk [nTracks];
+  mpTracks = new tStdChunk [nTracks];
   for (i = 0; i < nTracks; i++)
-    Tracks[i] . Load(fd);
+  {
+    mpTracks[i].Load(fd);
+  }
 
   TrackNr = -1;
 
   return nTracks;
 }
 
-
 void tStdRead::Close()
 {
   tReadBase::Close();
 }
 
-
 JZEvent *tStdRead::Read()
 {
   assert(TrackNr >= 0 && TrackNr < nTracks);
-  return Tracks[TrackNr].Get();
+  return mpTracks[TrackNr].Get();
 }
 
 int tStdRead::NextTrack()
@@ -552,18 +584,32 @@ int tStdRead::NextTrack()
 
 // ------------------------------ tWriteStd ---------------------------------
 
-
-int tStdWrite::Open(char *fname, int ntracks, int timebase)
+tStdWrite::tStdWrite()
+  : tWriteBase(),
+    mpTracks(0),
+    TrackNr(0),
+    nTracks(0),
+    TicksPerQuarter(0)
 {
-  if (!tWriteBase::Open(fname, ntracks, timebase))
+}
+
+tStdWrite::~tStdWrite()
+{
+  delete [] mpTracks;
+}
+
+int tStdWrite::Open(char* pFileName, int ntracks, int timebase)
+{
+  if (!tWriteBase::Open(pFileName, ntracks, timebase))
+  {
     return 0;
+  }
   nTracks = ntracks;
   TicksPerQuarter = timebase;
-  Tracks = new tStdChunk [ntracks];
+  mpTracks = new tStdChunk [ntracks];
   TrackNr = -1;
   return nTracks;
 }
-
 
 void tStdWrite::Close()
 {
@@ -582,20 +628,21 @@ void tStdWrite::Close()
   fwrite(&h, 6, 1, fd);
 
   for (i = 0; i < nTracks; i++)
-    Tracks[i] . Save(fd);
+  {
+    mpTracks[i].Save(fd);
+  }
 
   tWriteBase::Close();
 }
 
-
 void tStdWrite::NextTrack()
 {
-  ++ TrackNr;
+  ++TrackNr;
 }
 
 int tStdWrite::Write(JZEvent *e, unsigned char* data, int len)
 {
   assert(TrackNr >= 0 && TrackNr < nTracks);
-  Tracks[TrackNr].Put(e, data, len);
+  mpTracks[TrackNr].Put(e, data, len);
   return 0;
 }

@@ -23,10 +23,12 @@
 #ifndef JZ_TRACKWINDOW_H
 #define JZ_TRACKWINDOW_H
 
+#include "MouseAction.h"
 #include "Rectangle.h"
 
 class JZTrackFrame;
 class JZSong;
+class tFilter;
 class tSnapSelection;
 class wxFont;
 
@@ -52,6 +54,10 @@ class JZTrackWindow : public wxScrolledWindow
 {
   public:
 
+    tFilter* mpFilter;
+
+    tSnapSelection* mpSnapSel;
+
     enum TELitits
     {
       eMaxBars = 200
@@ -66,6 +72,12 @@ class JZTrackWindow : public wxScrolledWindow
     virtual ~JZTrackWindow();
 
     void Create();
+
+    void NewPlayPosition(long Clock);
+
+    void MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode);
+
+    int EventsSelected(const wxString& Message);
 
   private:
 
@@ -114,6 +126,8 @@ class JZTrackWindow : public wxScrolledWindow
 
     int Clock2x(int Clock);
 
+    int x2BarClock(int x, int Next = 0);
+
     int y2yLine(int y, int Up = 0);
 
     const char* NumberStr() const;
@@ -129,14 +143,13 @@ class JZTrackWindow : public wxScrolledWindow
     int hTop;
     int wLeft;
     int mClocksPerPixel;
+    long mPlayClock;
     bool mUseColors;
     int mLittleBit;
     int xEvents, yEvents, wEvents, hEvents;
     int mCanvasX, mCanvasY, mCanvasWidth, mCanvasHeight;
     int mFromClock, mToClock;
     int mFromLine, mToLine;
-
-    tSnapSelection* mpSnapSel;
 
     int xNumber, wNumber;
     int xName,   wName;
@@ -154,6 +167,9 @@ class JZTrackWindow : public wxScrolledWindow
 
     int mFontSize;
     wxFont* mpFont;
+
+    bool mPreviouslyRecording;
+    int mPreviousClock;
 
     JZRectangle Marked;
 

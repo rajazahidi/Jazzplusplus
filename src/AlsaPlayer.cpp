@@ -440,30 +440,36 @@ void tAlsaPlayer::Notify()
     // clear and rebuild
     cout << "tAlsaPlayer::Notify rewind" << endl;
     ResetPlay(Now);
-    PlayBuffer.Clear();
+    mPlayBuffer.Clear();
     OutClock = Now + FIRST_DELTACLOCK;
-    PlayLoop->PrepareOutput(&PlayBuffer, Song, Now, OutClock, 0);
-    if (AudioBuffer) {
+    PlayLoop->PrepareOutput(&mPlayBuffer, Song, Now, OutClock, 0);
+    if (AudioBuffer)
+    {
       AudioBuffer->Clear();
       PlayLoop->PrepareOutput(AudioBuffer, Song, Now, OutClock, 1);
     }
-    PlayBuffer.Length2Keyoff();
+    mPlayBuffer.Length2Keyoff();
   } else {
     // time to put more events
-    if ( Now >= (OutClock - ADVANCE_PLAY) ) {
-      PlayLoop->PrepareOutput(&PlayBuffer, Song, OutClock, Now + DELTACLOCK, 0);
+    if ( Now >= (OutClock - ADVANCE_PLAY) )
+    {
+      PlayLoop->PrepareOutput(&mPlayBuffer, Song, OutClock, Now + DELTACLOCK, 0);
       if (AudioBuffer)
 	PlayLoop->PrepareOutput(AudioBuffer, Song, OutClock, Now + DELTACLOCK, 1);
       OutClock = Now + DELTACLOCK;
-      PlayBuffer.Length2Keyoff();
+      mPlayBuffer.Length2Keyoff();
     }
   }
 
   play_clock = Now;
-  if (PlayBuffer.nEvents && PlayBuffer.Events[0]->Clock < OutClock)
+  if (mPlayBuffer.nEvents && mPlayBuffer.Events[0]->Clock < OutClock)
+  {
     FlushToDevice();
+  }
   else
+  {
     OutBreak();	// does nothing unless OutClock has changed
+  }
 }
 
 void tAlsaPlayer::set_event_header(snd_seq_event_t *ev, long clock,int type)
@@ -576,7 +582,7 @@ void tAlsaPlayer::StopPlay()
   flush_output();
   stop_queue_timer();
   clear_input_queue();
-  TrackWin->NewPlayPosition(-1L);
+  gpTrackWindow->NewPlayPosition(-1L);
   RecdBuffer.Keyoff2Length();
 }
 
@@ -661,7 +667,9 @@ long tAlsaPlayer::GetRealTimeClock()
     snd_seq_free_event(ie);
   }
   if (recd_clock != old_recd_clock)
-    TrackWin->NewPlayPosition(PlayLoop->Ext2IntClock(recd_clock/48 * 48));
+  {
+    gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(recd_clock/48 * 48));
+  }
   return recd_clock;
 }
 
@@ -731,7 +739,7 @@ int tAlsaPlayer::select_list(tAlsaDeviceList &list, char *title, int def_device)
       devs[i] = list.GetName(i);
     }    
 
-    wxSingleChoiceDialog dialog(TrackWin, title, title, ndevs, devs);
+    wxSingleChoiceDialog dialog(gpTrackWindow, title, title, ndevs, devs);
 
     if (def_device != -1)
     {

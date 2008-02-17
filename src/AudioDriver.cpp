@@ -397,7 +397,7 @@ void tAudioPlayer::MidiSync()
       else
 	curr_speed = new_speed;
       // xview has reentrancy problems!!
-      // TrackWin->DrawSpeed(curr_speed);
+      // gpTrackWindow->DrawSpeed(curr_speed);
     }
 
   }
@@ -429,7 +429,7 @@ void tAudioPlayer::StopPlay()
   }
   recbuffers.Clear();
   // xview has reentrancy problems!!
-  // TrackWin->DrawSpeed(midi_speed);
+  // gpTrackWindow->DrawSpeed(midi_speed);
 }
 
 

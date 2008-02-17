@@ -40,12 +40,12 @@
 
 #include <iostream>
 
-#define MEN_LOAD	1
-#define MEN_SAVE	2
-#define MEN_CLOSE	3
-#define MEN_PLAY	4
-#define MEN_HELP	5
-#define MEN_SAVEAS	6
+#define MEN_LOAD        1
+#define MEN_SAVE        2
+#define MEN_CLOSE       3
+#define MEN_PLAY        4
+#define MEN_HELP        5
+#define MEN_SAVEAS      6
 #define MEN_REVERT      7
 
 #define MEN_CUT         10
@@ -222,21 +222,21 @@ class tSamplePlayPosition : public wxTimer
 
     void StopListen() {
       Stop();
-      if (Midi->IsListening())
-	Midi->ListenAudio(-1);
+      if (gpMidiPlayer->IsListening())
+        gpMidiPlayer->ListenAudio(-1);
       if (visible)
-	Draw();
+        Draw();
     }
 
     void StartListen(long fr, long to) {
       fr_smpl = fr;
       to_smpl = to;
-      Midi->ListenAudio(spl, fr_smpl, to_smpl);
+      gpMidiPlayer->ListenAudio(spl, fr_smpl, to_smpl);
       Start(100);
     }
 
     bool IsListening() const {
-      return Midi->IsListening();
+      return gpMidiPlayer->IsListening();
     }
 
     void Draw()
@@ -285,7 +285,7 @@ tSampleCnvs::tSampleCnvs(tSampleWin *win, tSample &sample)
   this->win = win;
   sel_fr = sel_to = -1;
   mouse_up_sets_insertion_point = 0;
-  playpos = new tSamplePlayPosition(*this, Midi, spl);
+  playpos = new tSamplePlayPosition(*this, gpMidiPlayer, spl);
   midi_time = TRUE;
   midi_offs = 0;
   mouse_down = 0;
@@ -493,14 +493,14 @@ void tSampleCnvs::DrawTicks(int x, int y, int w)
     for (int sec = tfr; sec < tto; sec++) {
       for (long mil = 0; mil < 1000; mil += 100) {
         long t = spl->Time2Samples(sec * 1000 + mil);
-	int xx = Map.XToY(t);
-	// draw a tickmark line
-	dc->DrawLine(xx, y - 5, xx, y);
-	// draw a text
+        int xx = Map.XToY(t);
+        // draw a tickmark line
+        dc->DrawLine(xx, y - 5, xx, y);
+        // draw a text
         char buf[50];
-	sprintf(buf, "%ld.%ld", sec, mil/100);
-	int fw, fh;
-	dc->GetTextExtent(buf, &fw, &fh);
+        sprintf(buf, "%ld.%ld", sec, mil/100);
+        int fw, fh;
+        dc->GetTextExtent(buf, &fw, &fh);
         dc->DrawText(buf, xx - fw/2, y + 2);
       }
     }
@@ -518,19 +518,19 @@ void tSampleCnvs::DrawTicks(int x, int y, int w)
       long ticks_per_step = ticks_per_count / 4;
       for (int i = 0; i < bi.CountsPerBar; i++) {
         for (int j = 0; j < 4; j++) {
-	  long clock = bi.Clock + i * ticks_per_count + j * ticks_per_step;
-	  int xx = Map.XToY(clock);
-	  // draw a tickmark line
-	  dc->DrawLine(xx, y - 5, xx, y);
-	  // draw a text
-	  if (j == 0) {
-	    char buf[50];
-	    sprintf(buf, "%d", i + 1);
-	    int fw, fh;
-	    dc->GetTextExtent(buf, &fw, &fh);
-	    dc->DrawText(buf, xx - fw/2, y + 2);
-	  }
-	}
+          long clock = bi.Clock + i * ticks_per_count + j * ticks_per_step;
+          int xx = Map.XToY(clock);
+          // draw a tickmark line
+          dc->DrawLine(xx, y - 5, xx, y);
+          // draw a text
+          if (j == 0) {
+            char buf[50];
+            sprintf(buf, "%d", i + 1);
+            int fw, fh;
+            dc->GetTextExtent(buf, &fw, &fh);
+            dc->DrawText(buf, xx - fw/2, y + 2);
+          }
+        }
       }
 
       bi.Next();
@@ -649,9 +649,9 @@ int tSampleWin::geo[4] = { 30, 30, 600, 300 };
 
 tSample *tSampleWin::copy_buffer;
 
-tSampleWin::tSampleWin(wxFrame *parent, tSampleWin **ref, tSample &sample)
+tSampleWin::tSampleWin(wxWindow* pParent, tSampleWin **ref, tSample &sample)
   : wxFrame(
-      0,
+      pParent,
       wxID_ANY,
       (char *)sample.GetFilename(),
       wxPoint(geo[0], geo[1]),
@@ -693,16 +693,16 @@ tSampleWin::tSampleWin(wxFrame *parent, tSampleWin **ref, tSample &sample)
 
   wxMenuBar *menu_bar = new wxMenuBar;
   wxMenu    *menu = new wxMenu;
-  menu->Append(MEN_REVERT,	"&Revert to Saved");
-  menu->Append(MEN_LOAD,	"&Load ...");
-  menu->Append(MEN_SAVE,	"&Save");
-  menu->Append(MEN_SAVEAS,	"&Save as ...");
-  menu->Append(MEN_CLOSE,	"&Close");
-  menu_bar->Append(menu,	"&File");
+  menu->Append(MEN_REVERT,      "&Revert to Saved");
+  menu->Append(MEN_LOAD,        "&Load ...");
+  menu->Append(MEN_SAVE,        "&Save");
+  menu->Append(MEN_SAVEAS,      "&Save as ...");
+  menu->Append(MEN_CLOSE,       "&Close");
+  menu_bar->Append(menu,        "&File");
 
   menu = new wxMenu;
-  menu->Append(MEN_CUT,		"&Cut");
-  menu->Append(MEN_COPY,	"Co&py");
+  menu->Append(MEN_CUT,         "&Cut");
+  menu->Append(MEN_COPY,        "Co&py");
 
   menu->Append(MEN_PASTE,       "&Paste");
   menu->Append(MEN_PASTE_MIX,   "Paste &Merge");
@@ -710,13 +710,13 @@ tSampleWin::tSampleWin(wxFrame *parent, tSampleWin **ref, tSample &sample)
   sub->Append(MEN_SILENCE_OVR,  "&Replace");
   sub->Append(MEN_SILENCE_INS,  "&Insert");
   sub->Append(MEN_SILENCE_APP,  "&Append");
-  menu->Append(MEN_SILENCE,	"&Silence", sub);
+  menu->Append(MEN_SILENCE,     "&Silence", sub);
   sub = new wxMenu;
-  sub->Append(MEN_FLIP_LEFT,  "Left");
-  sub->Append(MEN_FLIP_RIGHT, "Right");
-  menu->Append(MEN_FLIP, "In&vert Phase", sub);
-  menu->Append(MEN_VOLUME_MAX,   "&Maximize Volume");
-  menu_bar->Append(menu,	 "&Edit");
+  sub->Append(MEN_FLIP_LEFT,    "Left");
+  sub->Append(MEN_FLIP_RIGHT,   "Right");
+  menu->Append(MEN_FLIP,        "In&vert Phase", sub);
+  menu->Append(MEN_VOLUME_MAX,  "&Maximize Volume");
+  menu_bar->Append(menu,        "&Edit");
 
   menu = new wxMenu;
   menu->Append(MEN_VOLUME_PNT,   "&Volume ...");
@@ -724,7 +724,7 @@ tSampleWin::tSampleWin(wxFrame *parent, tSampleWin **ref, tSample &sample)
   menu->Append(MEN_TRANSP_PNT,   "&Pitch ...");
   menu->Append(MEN_WAHWAH,       "&Filter ...");
   menu->Append(MEN_CANCEL,       "&None ...");
-  menu_bar->Append(menu,	 "&Painters");
+  menu_bar->Append(menu,         "&Painters");
 
   menu = new wxMenu;
   menu->Append(MEN_EQUALIZER,    "&Equalizer...");
@@ -737,15 +737,15 @@ tSampleWin::tSampleWin(wxFrame *parent, tSampleWin **ref, tSample &sample)
   menu->Append(MEN_STRETCHER,    "&Time stretcher...");
   menu->Append(MEN_REVERSE,      "Re&verse");
   menu->Append(MEN_SYNTH,        "&Synth...");
-  menu_bar->Append(menu,	 "&Effects");
+  menu_bar->Append(menu,         "&Effects");
 
   menu = new wxMenu;
   menu->Append(MEN_TRANSP_SET,   "&Pitch Painter ...");
   menu->Append(MEN_WAHSETTINGS,  "&Filter Painter ...");
-  //menu->Append(MEN_ZOOM_IN,	"Zoom &In");
-  //menu->Append(MEN_ZOOM_OUT,	"Zoom &Out");
-  menu->Append(MEN_SETTINGS,	"&View Settings...");
-  menu_bar->Append(menu,	"&Settings");
+  //menu->Append(MEN_ZOOM_IN,     "Zoom &In");
+  //menu->Append(MEN_ZOOM_OUT,    "Zoom &Out");
+  menu->Append(MEN_SETTINGS,     "&View Settings...");
+  menu_bar->Append(menu,         "&Settings");
 
   SetMenuBar(menu_bar);
 
@@ -930,7 +930,7 @@ extern int effect(tSample &spl);
 
 void tSampleWin::OnMenuCommand(int id)
 {
-  if (Midi->IsPlaying())
+  if (gpMidiPlayer->IsPlaying())
   {
     return;
   }
@@ -981,11 +981,11 @@ void tSampleWin::OnMenuCommand(int id)
     case MEN_REVERSE:
       {
         long fr, to;
-	if (HaveSelection(fr, to))
-	{
-	  spl.Reverse(fr, to);
-	  Redraw();
-	}
+        if (HaveSelection(fr, to))
+        {
+          spl.Reverse(fr, to);
+          Redraw();
+        }
       }
       break;
 
@@ -1082,48 +1082,50 @@ void tSampleWin::OnMenuCommand(int id)
       break;
 
     case MEN_ACCEPT:
-      if (on_accept) {
+      if (on_accept)
+      {
         long fr = GetPaintOffset();
-	long to = fr + GetPaintLength();
+        long to = fr + GetPaintLength();
         on_accept->OnAccept(fr, to);
-	delete on_accept;
-	on_accept = 0;
+        delete on_accept;
+        on_accept = 0;
       }
       break;
 
     case MEN_CANCEL:
-      if (on_accept) {
-	delete on_accept;
-	on_accept = 0;
+      if (on_accept)
+      {
+        delete on_accept;
+        on_accept = 0;
       }
       break;
 
     case MEN_CUT:
       {
-	long fr, to;
-	if (HaveSelection(fr, to, SelWarn))
-	{
-	  spl.Cut(*copy_buffer, fr, to);
-	  cnvs->ClearSelection();
-	  cnvs->SetInsertionPoint(fr);
-	  Redraw();
-	}
+        long fr, to;
+        if (HaveSelection(fr, to, SelWarn))
+        {
+          spl.Cut(*copy_buffer, fr, to);
+          cnvs->ClearSelection();
+          cnvs->SetInsertionPoint(fr);
+          Redraw();
+        }
       }
       break;
 
     case MEN_COPY:
       {
-	long fr, to;
-	if (HaveSelection(fr, to, SelAll))
-	  spl.Copy(*copy_buffer, fr, to);
+        long fr, to;
+        if (HaveSelection(fr, to, SelAll))
+          spl.Copy(*copy_buffer, fr, to);
       }
       break;
 
     case MEN_ZOOM_IN:
       {
-	long fr, to;
-	if (HaveSelection(fr, to, SelWarn))
-	  SetViewPos(fr, to);
+        long fr, to;
+        if (HaveSelection(fr, to, SelWarn))
+          SetViewPos(fr, to);
       }
       break;
 
@@ -1180,13 +1182,13 @@ void tSampleWin::OnMenuCommand(int id)
 
     case MEN_PASTE_MIX:
       {
-	long offs;
-	if (HaveInsertionPoint(offs))
-	{
+        long offs;
+        if (HaveInsertionPoint(offs))
+        {
           spl.PasteMix(*copy_buffer, offs);
-	  cnvs->SetSelection(offs, offs + copy_buffer->GetLength());
-	  Redraw();
-	}
+          cnvs->SetSelection(offs, offs + copy_buffer->GetLength());
+          Redraw();
+        }
       }
       break;
 
@@ -1196,48 +1198,48 @@ void tSampleWin::OnMenuCommand(int id)
         if (HaveInsertionPoint(offs, FALSE))
         {
           spl.PasteIns(*copy_buffer, offs);
-	  cnvs->SetSelection(offs, offs + copy_buffer->GetLength());
-	  Redraw();
+          cnvs->SetSelection(offs, offs + copy_buffer->GetLength());
+          Redraw();
         }
-	else if (HaveSelection(fr, to, SelWarn))
-	{
-	  spl.PasteOvr(*copy_buffer, fr, to);
+        else if (HaveSelection(fr, to, SelWarn))
+        {
+          spl.PasteOvr(*copy_buffer, fr, to);
           cnvs->SetInsertionPoint(fr);
-	  Redraw();
-	}
+          Redraw();
+        }
       }
       break;
 
     case MEN_SILENCE_INS:
       {
         long fr, to;
-	if (HaveSelection(fr, to, SelWarn))
-	{
-	  spl.InsertSilence(fr, to - fr);
-	  Redraw();
-	}
+        if (HaveSelection(fr, to, SelWarn))
+        {
+          spl.InsertSilence(fr, to - fr);
+          Redraw();
+        }
       }
       break;
 
     case MEN_SILENCE_APP:
       {
         long fr, to;
-	if (HaveSelection(fr, to, SelWarn))
-	{
-	  spl.InsertSilence(to, to - fr);
-	  Redraw();
-	}
+        if (HaveSelection(fr, to, SelWarn))
+        {
+          spl.InsertSilence(to, to - fr);
+          Redraw();
+        }
       }
       break;
 
     case MEN_SILENCE_OVR:
       {
         long fr, to;
-	if (HaveSelection(fr, to, SelWarn))
-	{
-	  spl.ReplaceSilence(fr, to - fr);
-	  Redraw();
-	}
+        if (HaveSelection(fr, to, SelWarn))
+        {
+          spl.ReplaceSilence(fr, to - fr);
+          Redraw();
+        }
       }
       break;
 
@@ -1269,17 +1271,17 @@ void tSampleWin::OnMenuCommand(int id)
         wxString fname = file_selector(defname, "Load Sample", FALSE, FALSE, "*.wav");
         if (!fname.empty())
         {
-	  wxBeginBusyCursor();
-	  cnvs->ClearSelection();
-	  spl.SetFilename(fname);
-	  if (spl.Load(TRUE))
-	    LoadError(spl);
-	  spl->RefreshDialogs();
-	  SetTitle(fname);
-	  Redraw();
-	  wxEndBusyCursor();
-	}
-	delete [] defname;
+          wxBeginBusyCursor();
+          cnvs->ClearSelection();
+          spl.SetFilename(fname);
+          if (spl.Load(TRUE))
+            LoadError(spl);
+          spl->RefreshDialogs();
+          SetTitle(fname);
+          Redraw();
+          wxEndBusyCursor();
+        }
+        delete [] defname;
       }
       break;
 
@@ -1289,29 +1291,33 @@ void tSampleWin::OnMenuCommand(int id)
         wxString fname = file_selector(defname, "Save Sample", TRUE, FALSE, "*.wav");
         if (!fname.empty())
         {
-	  spl.SetFilename(fname);
-	  OnMenuCommand(MEN_SAVE);
-	  spl->RefreshDialogs();
-	  SetTitle(fname);
-	}
-	delete [] defname;
+          spl.SetFilename(fname);
+          OnMenuCommand(MEN_SAVE);
+          spl->RefreshDialogs();
+          SetTitle(fname);
+        }
+        delete [] defname;
       }
       break;
 
     case MEN_SAVE:
       {
         if (spl.GetFilename()[0] == 0)
-	  OnMenuCommand(MEN_SAVEAS);
-	else
-	{
-	  wxBeginBusyCursor();
-	  cnvs->ClearSelection();
-	  int err = spl.Save();
-	  Redraw();
-	  wxEndBusyCursor();
-	  if (err)
-	    wxMessageBox("writing failed!!", "Error", wxOK);
-	}
+        {
+          OnMenuCommand(MEN_SAVEAS);
+        }
+        else
+        {
+          wxBeginBusyCursor();
+          cnvs->ClearSelection();
+          int err = spl.Save();
+          Redraw();
+          wxEndBusyCursor();
+          if (err)
+          {
+            wxMessageBox("writing failed!!", "Error", wxOK);
+          }
+        }
       }
       break;
 

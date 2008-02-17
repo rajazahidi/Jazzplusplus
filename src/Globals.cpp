@@ -24,6 +24,7 @@
 #include "Globals.h"
 #include "Song.h"
 #include "Synth.h"
+#include "Player.h"
 #include "Help.h"
 #include "NamedValue.h"
 #include "Project.h"
@@ -37,6 +38,8 @@ tConfig* gpConfig = 0;
 JZSong* gpSong = 0;
 
 JZSynth* gpSynth = 0;
+
+tPlayer* gpMidiPlayer = 0;
 
 tHelp* HelpInstance = 0;
 
@@ -57,3 +60,7 @@ vector<pair<string, int> > gSynthesizerTypes;
 vector<pair<string, int> > gSynthesierTypeFiles;
 
 JZProject* gpProject = 0;
+
+JZTrackFrame* gpTrackFrame = 0;
+
+JZTrackWindow* gpTrackWindow = 0;

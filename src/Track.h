@@ -230,21 +230,22 @@ class tDrumInstrumentParameterList
 
 enum tMtcType { Mtc24 = 0, Mtc25, Mtc30Df, Mtc30Ndf };
 
-class tMtcTime {
-public:
-  tMtcType type;
-  long hour;
-  long min;
-  long sec;
-  long fm;
+class tMtcTime
+{
+  public:
+    tMtcType type;
+    long hour;
+    long min;
+    long sec;
+    long fm;
 
-  tMtcTime( tMtcOffset *s ); // an mtc offset or mtc full message
-  tMtcTime( long millisek, tMtcType t );
-  tMtcTime( char *str, tMtcType t );
-  tMtcTime( unsigned h, unsigned m, unsigned s, unsigned f, unsigned t );
-  void ToString( char *str );
-  tMtcOffset *ToOffset();
-  long ToMillisec();
+    tMtcTime( tMtcOffset *s ); // an mtc offset or mtc full message
+    tMtcTime( long millisek, tMtcType t );
+    tMtcTime( char *str, tMtcType t );
+    tMtcTime( unsigned h, unsigned m, unsigned s, unsigned f, unsigned t );
+    void ToString( char *str );
+    tMtcOffset *ToOffset();
+    long ToMillisec();
 };
 
 
@@ -252,18 +253,31 @@ class tSimpleEventArray : public wxObject
 {
   public:
 
-    long   nEvents;  // act Number of Events in **Events
-    long   MaxEvents;  // Memory allocated in **Events
-    JZEvent **Events;
-    void   Resize();  // resize **Events
+    // Actual number of events in **Events.
+    long nEvents;
+
+    // Memory allocated in **Events
+    long MaxEvents;
+
+    JZEvent** Events;
+
+    // Resize **Events
+    void Resize();
 
     virtual void Clear();
-    void Put(JZEvent *e);
-    void   GrabData(tSimpleEventArray &src);
-    void   Copy(tSimpleEventArray &src, long frclk, long toclk);
+
+    void Put(JZEvent* pEvent);
+
+    void GrabData(tSimpleEventArray &src);
+
+    void Copy(tSimpleEventArray& src, long frclk, long toclk);
+
     tSimpleEventArray();
+
     virtual ~tSimpleEventArray();
+
     void Sort();
+
     void RemoveEOT();
 };
 
@@ -295,54 +309,56 @@ class tEventArray : public tSimpleEventArray
 
   public:
 
-    tTrackName *Name;
-    tCopyright *Copyright;
-    tProgram   *Patch;
-    tSetTempo  *Speed;
-    tControl   *Volume;
-    tControl   *Pan;
-    tControl   *Reverb;
-    tControl   *Chorus;
-    tControl   *Bank;
-    tControl   *Bank2;
+    tTrackName* mName;
+    tCopyright* Copyright;
+    tProgram* mPatch;
+    tSetTempo* Speed;
+    tControl* Volume;
+    tControl* Pan;
+    tControl* Reverb;
+    tControl* Chorus;
+    tControl* mpBank;
+    tControl* mpBank2;
 
-    tSysEx *Reset;
+  public:
 
-    tSysEx  *ModulationSettings[mspModulationSysexParameters];
-    tSysEx  *BenderSettings[bspBenderSysexParameters];
-    tSysEx  *CAfSettings[cspCAfSysexParameters];
-    tSysEx  *PAfSettings[pspPAfSysexParameters];
-    tSysEx  *CC1Settings[cspCC1SysexParameters];
-    tSysEx  *CC2Settings[cspCC2SysexParameters];
+    tSysEx* Reset;
 
-    tSysEx  *CC1ControllerNr;
-    tSysEx  *CC2ControllerNr;
+    tSysEx* ModulationSettings[mspModulationSysexParameters];
+    tSysEx* BenderSettings[bspBenderSysexParameters];
+    tSysEx* CAfSettings[cspCAfSysexParameters];
+    tSysEx* PAfSettings[pspPAfSysexParameters];
+    tSysEx* CC1Settings[cspCC1SysexParameters];
+    tSysEx* CC2Settings[cspCC2SysexParameters];
 
-    tSysEx  *ReverbType;
-    tSysEx  *ChorusType;
-    tSysEx  *EqualizerType;
+    tSysEx* CC1ControllerNr;
+    tSysEx* CC2ControllerNr;
 
-    tSysEx  *ReverbSettings[rspReverbSysexParameters];
-    tSysEx  *ChorusSettings[cspChorusSysexParameters];
+    tSysEx* ReverbType;
+    tSysEx* ChorusType;
+    tSysEx* EqualizerType;
 
-    tSysEx  *PartialReserve;
-    tSysEx  *MasterVol;
-    tSysEx  *MasterPan;
+    tSysEx* ReverbSettings[rspReverbSysexParameters];
+    tSysEx* ChorusSettings[cspChorusSysexParameters];
 
-    tSysEx  *RxChannel;
-    tSysEx  *UseForRhythm;
+    tSysEx* PartialReserve;
+    tSysEx* MasterVol;
+    tSysEx* MasterPan;
 
-    tMtcOffset  *MtcOffset;
+    tSysEx* RxChannel;
+    tSysEx* UseForRhythm;
 
-    tNrpn   *VibRate;
-    tNrpn   *VibDepth;
-    tNrpn   *VibDelay;
-    tNrpn   *Cutoff;
-    tNrpn   *Resonance;
-    tNrpn   *EnvAttack;
-    tNrpn   *EnvDecay;
-    tNrpn   *EnvRelease;
-    tRpn    *BendPitchSens;
+    tMtcOffset* MtcOffset;
+
+    tNrpn* VibRate;
+    tNrpn* VibDepth;
+    tNrpn* VibDelay;
+    tNrpn* Cutoff;
+    tNrpn* Resonance;
+    tNrpn* EnvAttack;
+    tNrpn* EnvDecay;
+    tNrpn* EnvRelease;
+    tRpn* BendPitchSens;
 
     tDrumInstrumentParameterList DrumParams;
 
@@ -367,10 +383,14 @@ class tEventArray : public tSimpleEventArray
     long GetFirstClock();
 
     int State;    // tsXXX
+
   public:
+
     int GetAudioMode() const { return audio_mode; }
     void SetAudioMode(int x) { audio_mode = x; }
+
   protected:
+
     int audio_mode;
 };
 

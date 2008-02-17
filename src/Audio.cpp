@@ -30,6 +30,7 @@
 #include "Globals.h"
 #include "Player.h"
 #include "TrackFrame.h"
+#include "TrackWindow.h"
 #include "SampleWindow.h"
 #include "Random.h"
 #include "FindFile.h"
@@ -223,7 +224,7 @@ void tSampleSet::Edit(int key)
   {
     tSample* spl = samples[key];
 
-    samplewin[key] = new tSampleWin(TrackWin, &samplewin[key], *spl);
+    samplewin[key] = new tSampleWin(gpTrackWindow, &samplewin[key], *spl);
   }
   samplewin[key]->Show(TRUE);
   samplewin[key]->Redraw();
@@ -244,7 +245,7 @@ int tSampleSet::Load(const wxString& FileName)
   int version;
 
   // enable audio when loading a sample set
-  Midi->SetAudioEnabled(TRUE);
+  gpMidiPlayer->SetAudioEnabled(TRUE);
 
   wxBeginBusyCursor();
   for (int i = 0; i < MAXSMPL; i++)
@@ -392,49 +393,68 @@ int tSampleSet::FillBuffers(long last_clock)
 
   int nfree = free_buffers.Count();
   if (nfree <= 0)
+  {
     return 0;
+  }
 
   long max_buffer_clock = BufferClock(buffers_written + nfree);
 
-  if (max_buffer_clock <= last_clock) {
+  if (max_buffer_clock <= last_clock)
+  {
     last_clock = max_buffer_clock;
   }
-  else {
+  else
+  {
     nfree = (int)((last_clock - start_clock) / clocks_per_buffer) - buffers_written;
   }
 
   if (nfree <= 0)
+  {
     return 0;
+  }
 
 
   // iterate the events and add sounding voices
-  while (event_index < events->nEvents) {
+  while (event_index < events->nEvents)
+  {
     JZEvent *e = events->Events[event_index];
-    if (e->Clock >= last_clock)
+    if (e->GetClock() >= last_clock)
+    {
       break;
+    }
     event_index++;
 
     tKeyOn *k = e->IsKeyOn();
-    if (k && num_voices < MAXPOLY) {
-      voices[num_voices++]->Start(samples[k->Key], k->Clock);
+    if (k && num_voices < MAXPOLY)
+    {
+      voices[num_voices++]->Start(samples[k->Key], k->GetClock());
     }
   }
 
   // add remaining sample data to the buffers
-  for (i = 0; i < nfree; i++) {
+  for (i = 0; i < nfree; i++)
+  {
     tAudioBuffer *buf = free_buffers.Get();
     buf->Clear();
     long buffer_clock = BufferClock(buffers_written + i);
-    // cout << "write " << (buffers_written + i) % buffer_count  << ", clock " << buffer_clock << endl;
-    for (int k = 0; k < num_voices; k++) {
+
+//    cout
+//      << "write " << (buffers_written + i) % buffer_count
+//      << ", clock " << buffer_clock
+//      << endl;
+
+    for (int k = 0; k < num_voices; k++)
+    {
       voices[k]->AddBuffer(buf->data, buffer_clock, bufshorts);
     }
     full_buffers.Put(buf);
   }
 
   // delete finished voices
-  for (i = 0; i < num_voices; i++) {
-    if (voices[i]->Finished()) {
+  for (i = 0; i < num_voices; i++)
+  {
+    if (voices[i]->Finished())
+    {
       tSampleVoice *v = voices[i];
       voices[i] = voices[num_voices-1];
       voices[num_voices-1] = v;
@@ -552,7 +572,7 @@ class tSamplesDlg : public wxDialog
 {
   friend class tSampleSet;
   public:
-    tSamplesDlg(wxFrame *parent, tSampleSet &set);
+    tSamplesDlg(wxWindow* pParent, tSampleSet &set);
     ~tSamplesDlg();
 #ifdef OBSOLETE
     static void CloseButton(wxItem &item, wxCommandEvent& event);
@@ -626,7 +646,7 @@ class tAudioGloblForm : public wxForm
         speedstr = copystring(speedtxt[0]);
       }
 
-      enable = Midi->GetAudioEnabled();
+      enable = gpMidiPlayer->GetAudioEnabled();
       stereo = (set.GetChannels() == 2);
       softsync = set.GetSoftSync();
 
@@ -666,7 +686,7 @@ class tAudioGloblForm : public wxForm
       set.SetSpeed(speed);
       set.SetChannels(stereo ? 2 : 1);
       set.SetSoftSync(softsync);
-      Midi->SetAudioEnabled(enable);
+      gpMidiPlayer->SetAudioEnabled(enable);
 
       if (gpConfig->GetValue(C_EnableAudio) != enable)
       {
@@ -727,7 +747,7 @@ void tSampleSet::GlobalSettingsDlg()
   if (glb_dialog == 0)
   {
 #ifdef OBSOLETE
-    glb_dialog = new wxDialogBox(TrackWin, "Audio Settings", FALSE );
+    glb_dialog = new wxDialogBox(gpTrackWindow, "Audio Settings", FALSE );
     tAudioGloblForm *form  = new tAudioGloblForm(*this);
     form->AssociatePanel(glb_dialog);
     glb_dialog->Fit();
@@ -830,8 +850,8 @@ void tSampleSet::AddNote(const char *fname, long frc, long toc)
   track->Cleanup();
 
   // repaint trackwin
-//  TrackWin->Redraw();
-  TrackWin->Update();
+//  gpTrackWindow->Redraw();
+  gpTrackWindow->Update();
 }
 
 
@@ -930,8 +950,8 @@ tAudioBuffer * tAudioRecordBuffer::RequestBuffer() {
 char * tSamplesDlg::path = 0;
 int    tSamplesDlg::current = 0;
 
-tSamplesDlg::tSamplesDlg(wxFrame *parent, tSampleSet &s)
-  : wxDialog(parent, -1,"Sample Settings"),
+tSamplesDlg::tSamplesDlg(wxWindow* pParent, tSampleSet &s)
+  : wxDialog(pParent, wxID_ANY, "Sample Settings"),
     set(s)
 {
   if (path == 0)
@@ -1075,8 +1095,9 @@ void tSamplesDlg::OnPlayButton()
 {
   if (set.is_playing)
     return;
-  if (Midi->IsListening()) {
-    Midi->ListenAudio(-1);
+  if (gpMidiPlayer->IsListening())
+  {
+    gpMidiPlayer->ListenAudio(-1);
     return;
   }
   Win2Sample(current);
@@ -1084,7 +1105,7 @@ void tSamplesDlg::OnPlayButton()
   tSample *spl = set.samples[current];
   wxBeginBusyCursor();
   spl->Load();
-  Midi->ListenAudio(current);
+  gpMidiPlayer->ListenAudio(current);
   wxEndBusyCursor();
 }
 
@@ -1151,7 +1172,7 @@ void tSampleSet::SamplesDlg()
     return;
   }
   if (spl_dialog == 0)
-    spl_dialog = new tSamplesDlg(TrackWin, *this);
+    spl_dialog = new tSamplesDlg(gpTrackWindow, *this);
   spl_dialog->Show(TRUE);
 }
 

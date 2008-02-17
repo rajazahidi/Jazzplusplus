@@ -48,27 +48,33 @@
 
 class tPlayLoop
 {
-  long StartClock;
-  long StopClock;
-public:
-  tPlayLoop();
-  void Set(long Start, long Stop);
-  void Reset();
+  public:
 
-  // external clock -> internal clock where
-  //   external clock == physical clock
-  //   internal clock == song position
-  long Ext2IntClock(long Clock);
+    tPlayLoop();
 
-  // the other way round
-  long Int2ExtClock(long Clock);
+    void Set(long Start, long Stop);
 
-  void PrepareOutput(
-    tEventArray *buf,
-    JZSong *s,
-    long ExtFr,
-    long ExtTo,
-    int  mode = 0);
+    void Reset();
+
+    // external clock -> internal clock where
+    //   external clock == physical clock
+    //   internal clock == song position
+    long Ext2IntClock(long Clock);
+
+    // the other way round
+    long Int2ExtClock(long Clock);
+
+    void PrepareOutput(
+      tEventArray *buf,
+      JZSong* pSong,
+      long ExtFr,
+      long ExtTo,
+      int mode = 0);
+
+  private:
+
+    long mStartClock;
+    long mStopClock;
 };
 
 enum tClockSource { CsInt = 0, CsFsk, CsMidi, CsMtc };
@@ -113,7 +119,7 @@ class tDeviceList
 //      if (count < eMaximumDeviceCount)
 //      {
 //        names[count] = copystring(name);
-//	return count++;
+//        return count++;
 //      }
 //      return eMaximumDeviceCount;
     }
@@ -144,7 +150,7 @@ class tPlayer : public wxTimer
   protected:
 
     long OutClock;
-    tPlayLoop *PlayLoop;
+    tPlayLoop* PlayLoop;
     // timer value for polling the record queue
     int poll_millisec;
     JZRecordingInfo* rec_info;   // 0 == not recording
@@ -152,21 +158,29 @@ class tPlayer : public wxTimer
 
   public:
 
-    bool Playing;	// successful StartPlay
+    bool Playing;        // successful StartPlay
 
-    virtual int Installed() = 0;	// Hardware found
+    virtual int Installed() = 0;        // Hardware found
     // if unable to install, pop up a messagebox explaining why.
     virtual void ShowError();
 
     JZSong *Song;
-    tEventArray PlayBuffer;
+    tEventArray mPlayBuffer;
     tEventArray RecdBuffer;
     void SetRecordInfo(JZRecordingInfo* inf)
     {
       rec_info = inf;
     }
-    bool IsPlaying() const { return Playing; }
-    virtual int FindMidiDevice() { return -1; }
+
+    bool IsPlaying() const
+    {
+      return Playing;
+    }
+
+    virtual int FindMidiDevice()
+    {
+      return -1;
+    }
 
     virtual int SupportsMultipleDevices() { return 0; }
     virtual tDeviceList & GetOutputDevices() { return DummyDeviceList; }
@@ -186,7 +200,7 @@ class tPlayer : public wxTimer
     virtual int OnMenuCommand(int id) {
       if (Playing)
       {
-	return 0;
+        return 0;
       }
       return samples.OnMenuCommand(id);
     }
@@ -200,12 +214,17 @@ class tPlayer : public wxTimer
     void EditSample(int key) {
       samples.Edit(key);
     }
-    virtual long GetListenerPlayPosition() {
+
+    virtual long GetListenerPlayPosition()
+    {
       return -1L;
     }
-    void LoadDefaultSettings() {
+
+    void LoadDefaultSettings()
+    {
       samples.LoadDefaultSettings();
     }
+
   protected:
     tSampleSet samples;
 
@@ -213,25 +232,28 @@ class tPlayer : public wxTimer
     tPlayer(JZSong *song);
     virtual ~tPlayer();
 
-
     void Notify();
-
 
     virtual void FlushToDevice();
 
     // return 0 = ok, 1 = buffer full, try again later
-    virtual int OutEvent(JZEvent *e) = 0;
+    virtual int OutEvent(JZEvent* pEvent) = 0;
+
     virtual void OutBreak() = 0;
 
     // send event immediately ignoring clock
-    void OutNow(tTrack *t, JZEvent *e) {
-      e->SetDevice(t->GetDevice());
-      OutNow(e);
+    void OutNow(tTrack *t, JZEvent* pEvent)
+    {
+      pEvent->SetDevice(t->GetDevice());
+      OutNow(pEvent);
     }
-    void OutNow(int device, JZEvent *e) {
-      e->SetDevice(device);
-      OutNow(e);
+
+    void OutNow(int device, JZEvent* pEvent)
+    {
+      pEvent->SetDevice(device);
+      OutNow(pEvent);
     }
+
     void OutNow(tTrack *t, tParam *r);
 
     // what's played right now?
@@ -241,21 +263,32 @@ class tPlayer : public wxTimer
     virtual void StopPlay();
     virtual void AllNotesOff(int Reset = 0);
 
-    virtual void SetSoftThru(int on, int idev, int odev) { }
-    virtual void SetHardThru(int on, int idev, int odev) { }
+    virtual void SetSoftThru(int on, int idev, int odev)
+    {
+    }
 
-    virtual void InitMtcRec() { }
-    virtual tMtcTime* FreezeMtcRec() { return(0); }
+    virtual void SetHardThru(int on, int idev, int odev)
+    {
+    }
+
+    virtual void InitMtcRec()
+    {
+    }
+
+    virtual tMtcTime* FreezeMtcRec()
+    {
+      return 0;
+    }
 
   protected:
-    virtual void OutNow(JZEvent *e) = 0;
+
+    virtual void OutNow(JZEvent* pEvent) = 0;
     
   private:
 
     tDeviceList DummyDeviceList;
 };
 
-extern tPlayer *Midi;
 extern char *midinethost;
 
 // --------------------------------------------------------
@@ -294,7 +327,7 @@ class tBuffer : public tWriteBase
     {
       if (Written < (int)sizeof(Buffer))
       {
-	Buffer[Written++] = c;
+        Buffer[Written++] = c;
         return 0;
       }
       return -1;
@@ -325,18 +358,18 @@ class tBuffer : public tWriteBase
       buf = val & 0x7f;
       while ((val >>= 7) > 0)
       {
-	buf <<= 8;
-	buf |= 0x80;
-	buf += (val & 0x7f);
+        buf <<= 8;
+        buf |= 0x80;
+        buf += (val & 0x7f);
       }
 
       while (1)
       {
         Put((unsigned char)buf);
-	if (buf & 0x80)
-	  buf >>= 8;
-	else
-	  break;
+        if (buf & 0x80)
+          buf >>= 8;
+        else
+          break;
       }
     }
 
@@ -347,13 +380,13 @@ class tBuffer : public tWriteBase
       val = Get(dev);
       if (val & 0x80)
       {
-	val &= 0x7f;
-	do
-	{
-	  c = Get(dev);
-	  assert(c > 0);
-	  val = (val << 7) + (c & 0x7f);
-	} while (c & 0x80);
+        val &= 0x7f;
+        do
+        {
+          c = Get(dev);
+          assert(c > 0);
+          val = (val << 7) + (c & 0x7f);
+        } while (c & 0x80);
       }
       return val;
     }
@@ -365,10 +398,10 @@ class tBuffer : public tWriteBase
       {
         bytes = write_noack_mpu(Buffer + Read, Written - Read);
         if (bytes > 0)
-	  Read += bytes;
+          Read += bytes;
       }
       if (Read != Written)
-	return 0;
+        return 0;
       Read = Written = 0;
       return 1;
     }
@@ -376,7 +409,7 @@ class tBuffer : public tWriteBase
     int ReadFile(int dev)
     {
       int i, bytes;
-      if (Read)	// move data to beginning of buffer
+      if (Read)        // move data to beginning of buffer
       {
         for (i = 0; i < Written - Read; i++)
           Buffer[i] = Buffer[i + Read];
@@ -398,7 +431,7 @@ class tBuffer : public tWriteBase
     {
       int i;
       for (i = 0; i < len; i++)
-	Put(data[i]);
+        Put(data[i]);
       return 0;
     }
 };
@@ -517,8 +550,8 @@ SEQ_USE_EXTBUF();
 extern int seqfd;
 extern int mididev;
 void seqbuf_dump(void);
-#define seqbuf_empty()	(_seqbufptr == 0)
-#define seqbuf_clear()  (_seqbufptr = 0)
+#define seqbuf_empty() (_seqbufptr == 0)
+#define seqbuf_clear() (_seqbufptr = 0)
 void seqbuf_flush_last_event();
 
 

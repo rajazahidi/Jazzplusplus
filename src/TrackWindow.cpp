@@ -25,6 +25,8 @@
 #include "TrackWindow.h"
 #include "TrackFrame.h"
 #include "Project.h"
+#include "Player.h"
+#include "RecordingInfo.h"
 #include "Globals.h"
 
 #include <iostream>
@@ -53,12 +55,14 @@ JZTrackWindow::JZTrackWindow(
       Size,
       wxHSCROLL | wxVSCROLL | wxNO_FULL_REPAINT_ON_RESIZE),
     mpSong(pSong),
+    mpFilter(0),
     mpGreyColor(0),
     mpGreyBrush(0),
     hLine(0),
     hTop(40),
     wLeft(100),
     mClocksPerPixel(36),
+    mPlayClock(-1),
     mUseColors(true),
     mLittleBit(0),
     mCanvasX(0),
@@ -78,7 +82,9 @@ JZTrackWindow::JZTrackWindow(
     mpFixedFont(0),
     mFixedFontHeight(0),
     mFontSize(12),
-    mpFont(0)
+    mpFont(0),
+    mPreviouslyRecording(false),
+    mPreviousClock(0)
 {
 #ifdef __WXMSW__
   mpGreyColor = new wxColor(192, 192, 192);
@@ -89,6 +95,8 @@ JZTrackWindow::JZTrackWindow(
   mpGreyBrush = new wxBrush(*mpGreyColor, wxSOLID);
 
   mpSnapSel = new tSnapSelection(this);
+
+  mpFilter = new tFilter(mpSong);
 }
 
 //-----------------------------------------------------------------------------
@@ -100,6 +108,7 @@ JZTrackWindow::~JZTrackWindow()
   delete mpFixedFont;
   delete mpFont;
   delete mpSnapSel;
+  delete mpFilter;
 }
 
 //-----------------------------------------------------------------------------
@@ -154,6 +163,50 @@ void JZTrackWindow::Create()
   UnMark();
 
   delete pDc;
+}
+
+//   Update the play position to the clock argument, and trigger a redraw so
+// the play bar will be drawn.
+void JZTrackWindow::NewPlayPosition(long Clock)
+{
+  long scroll_clock = (mFromClock + 5 * mToClock) / 6L;
+
+  if (
+    !mpSnapSel->Active &&
+    ((Clock > scroll_clock) || (Clock < mFromClock)) && (Clock >= 0L))
+  {
+    // Avoid permanent redraws when end of scroll range is reached.
+    if (
+      Clock > mFromClock &&
+      mToClock >= mpSong->MaxQuarters * mpSong->TicksPerQuarter)
+    {
+      return;
+    }
+//    long x = Clock2x(Clock);
+//    Canvas->SetScrollPosition(x - wLeft, CanvasY);
+  }
+
+  if (!mpSnapSel->Active)	// sets clipping
+  {
+    if (mPlayClock != Clock)
+    {
+      long OldPlayClock = mPlayClock;
+      mPlayClock = Clock;
+      wxRect invalidateRect;
+      invalidateRect.x = Clock2x(OldPlayClock) - 1;
+      invalidateRect.y = mCanvasY;
+      invalidateRect.width = 3;
+      invalidateRect.height= 100000000;
+      //DrawPlayPosition();
+      Refresh(true, &invalidateRect);
+
+      invalidateRect.x = Clock2x(mPlayClock) - 1;
+      Refresh(true, &invalidateRect);
+      //DrawPlayPosition();
+
+      Refresh();
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -390,13 +443,11 @@ void JZTrackWindow::DrawNumbers(wxDC& Dc)
 //-----------------------------------------------------------------------------
 void JZTrackWindow::DrawSpeed(wxDC& Dc, int Value, bool Down)
 {
-//  if (Value < 0)
-//  {
-//    Value = gpProject->GetTrack(0)->GetDefaultSpeed();
-//  }
+  if (Value < 0)
+  {
+    Value = gpProject->GetTrack(0)->GetDefaultSpeed();
+  }
 
-//  char buf[50];
-//  sprintf(buf, "speed: %3d", Value);
   ostringstream Oss;
   Oss << "speed: " << setw(3) << Value;
 
@@ -410,15 +461,14 @@ void JZTrackWindow::DrawSpeed(wxDC& Dc, int Value, bool Down)
 //-----------------------------------------------------------------------------
 void JZTrackWindow::DrawPlayPosition(wxDC& Dc)
 {
-#if 0
-  if (!mpSnapSel->Active && PlayClock >= FromClock && PlayClock < ToClock)
+  if (!mpSnapSel->Active && mPlayClock >= mFromClock && mPlayClock < mToClock)
   {
     Dc.SetBrush(*wxBLACK_BRUSH);
     Dc.SetPen(*wxBLACK_PEN);
 
 //    Dc.SetLogicalFunction(wxXOR);
 
-    int x = Clock2x(PlayClock);
+    int x = Clock2x(mPlayClock);
 
     // Draw a line, 2 pixwels wide.
     Dc.DrawLine(x,     mCanvasY, x,     yEvents + hEvents);
@@ -430,7 +480,6 @@ void JZTrackWindow::DrawPlayPosition(wxDC& Dc)
 //  {
 //    mpNextWin->DrawPlayPosition(Dc);
 //  }
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -573,7 +622,7 @@ void JZTrackWindow::DrawEvents(wxDC& Dc)
 #if 0
 	while (e)       // slow!
 	{
-	  float x = Clock2x(e->Clock);
+	  float x = Clock2x(e->GetClock());
 	  Dc.SetPen(e->GetPen());
 	  Dc.DrawLine(x, y0, x, y1);
 	  e = Iterator.Next();
@@ -583,14 +632,19 @@ void JZTrackWindow::DrawEvents(wxDC& Dc)
 	int h = y1 - y0;
 	while (e)       // very slow!
 	{
-	  int x1 = Clock2x(e->Clock + e->GetLength());
-	  if (x1 > xdone) {
-	    int x0 = Clock2x(e->Clock);
+	  int x1 = Clock2x(e->GetClock() + e->GetLength());
+	  if (x1 > xdone)
+          {
+	    int x0 = Clock2x(e->GetClock());
 	    if (x0 < xdone)
+            {
 	      x0 = xdone;
+            }
 	    int w = x1 - x0;
 	    if (w < 2)
+            {
 	      w = 2;
+            }
 	    xdone = x0 + w;
 	    Dc.SetPen(*e->GetPen());
 	    Dc.SetBrush(*e->GetBrush());
@@ -606,10 +660,10 @@ void JZTrackWindow::DrawEvents(wxDC& Dc)
 	float xblack = -1.0;
 	while (e)
 	{
-	  int x = Clock2x(e->Clock);
+	  int x = Clock2x(e->GetClock());
 
 	  // Avoid painting events ON the bar
-	  if ( !(e->Clock % BarInfo.TicksPerBar) ) x = x + 1;
+	  if ( !(e->GetClock() % BarInfo.TicksPerBar) ) x = x + 1;
 
 	  if (x > xblack)
 	  {
@@ -730,6 +784,20 @@ int JZTrackWindow::Clock2x(int Clock)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+int JZTrackWindow::x2BarClock(int x, int Next)
+{
+  long Clock = x2Clock(x);
+  JZBarInfo BarInfo(mpSong);
+  BarInfo.SetClock(Clock);
+  while (Next--)
+  {
+    BarInfo.Next();
+  }
+  return BarInfo.Clock;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZTrackWindow::y2yLine(int y, int Up)
 {
   if (Up)
@@ -765,3 +833,185 @@ const char* JZTrackWindow::NumberStr() const
   return pString;
 }
 
+int JZTrackWindow::EventsSelected(const wxString& Message)
+{
+  if (!mpSnapSel->Selected)
+  {
+    wxMessageBox(Message, "Error", wxOK);
+    return 0;
+  }
+  return 1;
+}
+
+void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
+{
+  cout << "JZTrackWindow::MousePlay" << endl;
+
+  if (Mode == eMouse && !Event.ButtonDown())
+  {
+    return;
+  }
+
+  // This is a little hack to keep it working for now.
+  // All this stuff needs to be moved.
+  JZRecordingInfo* pRecInfo = gpProject->GetRecInfo();
+
+  if (!gpProject->IsPlaying())
+  {
+    switch (Mode)
+    {
+      case eMouse:
+        int x, y;
+        Event.GetPosition(&x, &y);
+        gpProject->SetPlayPosition(x2BarClock(x));
+        gpProject->Mute((Event.RightDown() != 0));
+        if (mpSnapSel->Selected && (Event.ShiftDown() || Event.MiddleDown()))
+        {
+          gpProject->SetLoop(true);
+        }
+        else
+        {
+          gpProject->SetLoop(false);
+          mPreviouslyRecording = mpSnapSel->Selected;
+        }
+        break;
+
+      case eSpaceBar:
+        break;
+
+      case ePlayButton:
+        cout << "JZTrackFrame::PlayButton" << endl;
+        gpProject->SetLoop(false);
+        gpProject->SetRecord(false);
+        break;
+
+      case ePlayLoopButton:
+        if (!EventsSelected("please select loop range first"))
+        {
+          return;
+        }
+        gpProject->SetLoop(true);
+        gpProject->SetRecord(false);
+        break;
+
+      case eRecordButton:
+        if (!EventsSelected("please select record track/bar first"))
+        {
+          return;
+        }
+        JZBarInfo bi(gpProject);
+
+        bi.SetClock(mpFilter->FromClock);
+
+        if (bi.BarNr > 0)
+        {
+          bi.SetBar(bi.BarNr - 1);
+        }
+        gpProject->SetPlayPosition(bi.Clock);
+        gpProject->SetRecord(true);
+        gpProject->SetLoop(false);
+        break;
+    }
+
+    // todo: Figure out if we should have getters for these instead
+    // and make them private jppProject members
+    bool loop   = gpProject->mLoop;
+    bool muted  = gpProject->mMuted;
+    bool record = gpProject->mRecord;
+
+    // Is it possible to record?
+    if (record && mpSnapSel->Selected)
+    {
+      pRecInfo->mTrackIndex = mpFilter->FromTrack;
+
+      pRecInfo->mpTrack = gpProject->GetTrack(pRecInfo->mTrackIndex);
+
+      pRecInfo->mFromClock = mpFilter->FromClock;
+      pRecInfo->mToClock   = mpFilter->ToClock;
+
+      if (muted)
+      {
+        pRecInfo->mIsMuted = true;
+        pRecInfo->mpTrack->SetState(tsMute);
+#ifdef OBSOLETE
+        LineText(
+          *pDc,
+          xState,
+          Line2y(pRecInfo.mTrackIndex),
+          wState,
+          pRecInfo.Track->GetStateChar());
+#endif
+      }
+      else
+      {
+        pRecInfo->mIsMuted = false;
+      }
+    }
+    else
+    {
+      pRecInfo->mpTrack = 0;
+    }
+
+    // Is it possible to loop?
+    int loop_clock = 0;
+    if (loop && mpSnapSel->Selected)
+    {
+      mPreviousClock = mpFilter->FromClock;
+      loop_clock = mpFilter->ToClock;
+    }
+
+    // GO!
+    cout << "Go!" << endl;
+
+    //if (pRecInfo->Track)  // recording?
+      //gpProject->Midi->SetRecordInfo(pRecInfo);
+    //else
+      //gpProject->Midi->SetRecordInfo(0);
+
+    cout << "Midi->StartPlay" << endl;
+
+    gpProject->mStartTime = mPreviousClock;
+    gpProject->mStopTime = loop_clock;
+    gpProject->Play();
+
+  } //if(!Midi->Playing)
+  else
+  {
+    gpProject->Stop();
+    if (pRecInfo->mpTrack)
+    {
+      if (pRecInfo->mIsMuted)
+      {
+//        wxDC* pDc = new wxClientDC(mpTrackWindow);
+
+        pRecInfo->mpTrack->SetState(tsPlay);
+//        LineText(
+//          *pDc,
+//          xState,
+//          Line2y(pRecInfo->mTrackIndex),
+//          wState,
+//          pRecInfo->mpTrack->GetStateChar());
+
+//        delete pDc;
+      }
+      if (
+        !pRecInfo->mpTrack->GetAudioMode() &&
+        !gpProject->GetPlayer()->RecdBuffer.IsEmpty())
+      {
+        //int choice = wxMessageBox("Keep recorded events?", "You played", wxOK | wxCANCEL);
+        //if (choice == wxOK)
+        {
+          wxBeginBusyCursor();
+          gpProject->NewUndoBuffer();
+          pRecInfo->mpTrack->MergeRange(
+            &gpProject->GetPlayer()->RecdBuffer,
+            pRecInfo->mFromClock,
+            pRecInfo->mToClock,
+            pRecInfo->mIsMuted);
+          wxEndBusyCursor();
+          Refresh();
+        }
+      }
+    }
+  }
+}

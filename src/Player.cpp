@@ -25,6 +25,7 @@
 #include "Player.h"
 #include "Synth.h"
 #include "TrackFrame.h"
+#include "TrackWindow.h"
 #include "EventWindow.h"
 #include "Dialogs.h"
 #include "Audio.h"
@@ -40,9 +41,6 @@
 #ifndef _MSC_VER
 #include <sys/ioctl.h>
 #endif
-
-#define dprintf(a)  printf a
-#define ddprintf(a)  printf a
 
 // extern "C" unsigned long ntohl( unsigned long );
 
@@ -73,8 +71,6 @@ char *midinetservice = NULL;
 #include <fcntl.h>
 
 using namespace std;
-
-tPlayer *Midi = 0;
 
 // ------------------------- tDeviceList --------------------------
 
@@ -119,26 +115,28 @@ tDeviceList::~tDeviceList()
 // ------------------------- tPlayLoop --------------------------
 
 tPlayLoop::tPlayLoop()
+  : mStartClock(0),
+    mStopClock(0)
 {
-  Reset();
 }
 
 void tPlayLoop::Reset()
 {
-  StartClock = StopClock  = 0;
+  mStartClock = mStopClock = 0;
 }
 
 void tPlayLoop::Set(long Start, long Stop)
 {
-  StartClock = Start;
-  StopClock  = Stop;
+  mStartClock = Start;
+  mStopClock = Stop;
 }
 
 
 long tPlayLoop::Ext2IntClock(long Clock)
 {
-  if (StopClock) {
-    return (Clock - StartClock) % (StopClock - StartClock) + StartClock;
+  if (mStopClock)
+  {
+    return (Clock - mStartClock) % (mStopClock - mStartClock) + mStartClock;
   }
   return Clock;
 }
@@ -148,32 +146,46 @@ long tPlayLoop::Int2ExtClock(long Clock)
   return Clock;
 }
 
-/** copy events from song to output buffer*/
+// Copy events from song to output buffer.
 void tPlayLoop::PrepareOutput(
-  tEventArray *buf,
-  JZSong *s,
-  long ExtFr, long ExtTo,
-  int mode)
+  tEventArray* buf,
+  JZSong* pSong,
+  long ExtFr,
+  long ExtTo,
+  int Mode)
 {
   if (buf == 0)
-    return;
-
-  long fr = Ext2IntClock(ExtFr);
-  long delta = ExtFr - fr;
-  long size = ExtTo - ExtFr;
-  while (StopClock && fr + size > StopClock)
   {
-
-    s->MergeTracks(fr, StopClock, buf, &TrackWin->MetronomeInfo, delta, mode);
-
-    size  -= StopClock - fr;
-    fr     = StartClock;
-    delta += StopClock - StartClock;
+    return;
   }
 
-  if (size > 0)
+  long From = Ext2IntClock(ExtFr);
+  long Delta = ExtFr - From;
+  long Size = ExtTo - ExtFr;
+  while (mStopClock && From + Size > mStopClock)
   {
-    s->MergeTracks(fr, fr + size, buf, &TrackWin->MetronomeInfo, delta, mode);
+    pSong->MergeTracks(
+      From,
+      mStopClock,
+      buf,
+      &gpProject->mMetronomeInfo,
+      Delta,
+      Mode);
+
+    Size  -= mStopClock - From;
+    From   = mStartClock;
+    Delta += mStopClock - mStartClock;
+  }
+
+  if (Size > 0)
+  {
+    pSong->MergeTracks(
+      From,
+      From + Size,
+      buf,
+      &gpProject->mMetronomeInfo,
+      Delta,
+      Mode);
   }
 }
 
@@ -206,162 +218,262 @@ void tPlayer::ShowError()
 
 void tPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 {
-
   cout<< "tPlayer::StartPlay" << endl;
+
   int i;
 
   if (LoopClock > 0)
+  {
     PlayLoop->Set(Clock, LoopClock);
+  }
   else
+  {
     PlayLoop->Reset();
+  }
 
   Clock = PlayLoop->Int2ExtClock(Clock);
-  PlayBuffer.Clear();
+  mPlayBuffer.Clear();
   RecdBuffer.Clear();
   if (AudioBuffer)
+  {
     AudioBuffer->Clear();
+  }
 
   tTrack *t;
 
-  if ( !Continue ) {
+  if ( !Continue )
+  {
+    if (
+      gpConfig->GetValue(C_SendSynthReset) == 2 ||
+      ((Clock == 0) && (gpConfig->GetValue(C_SendSynthReset) == 1)))
+    {
+      // fixme: we should have different synths for each device
+      t = Song->GetTrack(0);
+      OutNow(t, gpSynth->Reset());
+    }
 
-     if (
-       gpConfig->GetValue(C_SendSynthReset) == 2 ||
-       ((Clock == 0) && (gpConfig->GetValue(C_SendSynthReset) == 1)))
-     {
-        // fixme: we should have different synths for each device
-        t = Song->GetTrack(0);
-        OutNow(t, gpSynth->Reset());
-     }
+    // Send Volume, Pan, Chorus, etc
+    for (i = 0; i < Song->nTracks; ++i)
+    {
+      t = Song->GetTrack(i);
+      if (t->mpBank)
+      {
+        OutNow(t, t->mpBank);
+      }
+      if (t->mpBank2)
+      {
+        OutNow(t, t->mpBank2);
+      }
+      if (t->mPatch)
+      {
+        OutNow(t, t->mPatch);
+      }
+      if (t->Volume)
+      {
+        OutNow(t, t->Volume);
+      }
+      if (t->Pan)
+      {
+        OutNow(t, t->Pan);
+      }
+      if (t->Reverb)
+      {
+        OutNow(t, t->Reverb);
+      }
+      if (t->Chorus)
+      {
+        OutNow(t, t->Chorus);
+      }
+      if (t->VibRate)
+      {
+        OutNow(t, t->VibRate);
+      }
+      if (t->VibDepth)
+      {
+        OutNow(t, t->VibDepth);
+      }
+      if (t->VibDelay)
+      {
+        OutNow(t, t->VibDelay);
+      }
+      if (t->Cutoff)
+      {
+        OutNow(t, t->Cutoff);
+      }
+      if (t->Resonance)
+      {
+        OutNow(t, t->Resonance);
+      }
+      if (t->EnvAttack)
+      {
+        OutNow(t, t->EnvAttack);
+      }
+      if (t->EnvDecay)
+      {
+        OutNow(t, t->EnvDecay);
+      }
+      if (t->EnvRelease)
+      {
+        OutNow(t, t->EnvRelease);
+      }
 
-     // Send Volume, Pan, Chorus, etc
-     for (i = 0; i < Song->nTracks; i++)
-     {
-        t = Song->GetTrack(i);
-        if (t->Bank)
-           OutNow(t, t->Bank);
-        if (t->Bank2)
-           OutNow(t, t->Bank2);
-        if (t->Patch)
-           OutNow(t, t->Patch);
-        if (t->Volume)
-           OutNow(t, t->Volume);
-        if (t->Pan)
-           OutNow(t, t->Pan);
-        if (t->Reverb)
-           OutNow(t, t->Reverb);
-        if (t->Chorus)
-           OutNow(t, t->Chorus);
-        if (t->VibRate)
-           OutNow(t, t->VibRate);
-        if (t->VibDepth)
-           OutNow(t, t->VibDepth);
-        if (t->VibDelay)
-           OutNow(t, t->VibDelay);
-        if (t->Cutoff)
-           OutNow(t, t->Cutoff);
-        if (t->Resonance)
-           OutNow(t, t->Resonance);
-        if (t->EnvAttack)
-           OutNow(t, t->EnvAttack);
-        if (t->EnvDecay)
-           OutNow(t, t->EnvDecay);
-        if (t->EnvRelease)
-           OutNow(t, t->EnvRelease);
-        int j;
-        if (!t->DrumParams.IsEmpty())
+      int j;
+      if (!t->DrumParams.IsEmpty())
+      {
+        tDrumInstrumentParameter *dpar = t->DrumParams.FirstElem();
+        while (dpar)
         {
-           tDrumInstrumentParameter *dpar = t->DrumParams.FirstElem();
-           while ( dpar )
-           {
-              for (j = drumPitchIndex; j < numDrumParameters; j++)
-              {
-                 if (dpar->Get(j))
-                    OutNow(t, dpar->Get(j));
-              }
-              dpar = t->DrumParams.NextElem( dpar );
-           }
+          for (j = drumPitchIndex; j < numDrumParameters; j++)
+          {
+            if (dpar->Get(j))
+            {
+              OutNow(t, dpar->Get(j));
+            }
+          }
+          dpar = t->DrumParams.NextElem( dpar );
         }
-        if (t->BendPitchSens)
-           OutNow(t, t->BendPitchSens);
-        for (j = mspModPitchControl; j < mspModulationSysexParameters; j++) {
-           if (t->ModulationSettings[j])
-              OutNow(t, t->ModulationSettings[j]);
-        }
-        for (j = bspBendPitchControl; j < bspBenderSysexParameters; j++) {
-           if (t->BenderSettings[j])
-              OutNow(t, t->BenderSettings[j]);
-        }
-        for (j = cspCAfPitchControl; j < cspCAfSysexParameters; j++) {
-           if (t->CAfSettings[j])
-              OutNow(t, t->CAfSettings[j]);
-        }
-        for (j = pspPAfPitchControl; j < pspPAfSysexParameters; j++) {
-           if (t->PAfSettings[j])
-              OutNow(t, t->PAfSettings[j]);
-        }
-        for (j = cspCC1PitchControl; j < cspCC1SysexParameters; j++) {
-           if (t->CC1Settings[j])
-                OutNow(t, t->CC1Settings[j]);
-        }
-        for (j = cspCC2PitchControl; j < cspCC2SysexParameters; j++) {
-           if (t->CC2Settings[j])
-              OutNow(t, t->CC2Settings[j]);
-        }
-        if (t->CC1ControllerNr)
-           OutNow(t, t->CC1ControllerNr);
-        if (t->CC2ControllerNr)
-           OutNow(t, t->CC2ControllerNr);
-        if (gpConfig->GetValue(C_UseReverbMacro))
+      }
+
+      if (t->BendPitchSens)
+      {
+        OutNow(t, t->BendPitchSens);
+      }
+
+      for (j = mspModPitchControl; j < mspModulationSysexParameters; j++)
+      {
+        if (t->ModulationSettings[j])
         {
-           if (t->ReverbType)
-              OutNow(t, t->ReverbType);
+          OutNow(t, t->ModulationSettings[j]);
         }
-        else {
-           for (j = 0; j < rspReverbSysexParameters; j++) {
-              if (t->ReverbSettings[j])
-                 OutNow(t, t->ReverbSettings[j]);
-           }
-        }
-        if (gpConfig->GetValue(C_UseChorusMacro))
+      }
+
+      for (j = bspBendPitchControl; j < bspBenderSysexParameters; j++)
+      {
+        if (t->BenderSettings[j])
         {
-           if (t->ChorusType)
-              OutNow(t, t->ChorusType);
+          OutNow(t, t->BenderSettings[j]);
         }
-        else {
-           for (j = 0; j < cspChorusSysexParameters; j++) {
-              if (t->ChorusSettings[j])
-                 OutNow(t, t->ChorusSettings[j]);
-           }
+      }
+
+      for (j = cspCAfPitchControl; j < cspCAfSysexParameters; j++)
+      {
+        if (t->CAfSettings[j])
+        {
+          OutNow(t, t->CAfSettings[j]);
         }
-        if (t->EqualizerType)
-           OutNow(t, t->EqualizerType);
-        if (t->PartialReserve)
-           OutNow(t, t->PartialReserve);
-        if (t->MasterVol)
-           OutNow(t, t->MasterVol);
-        if (t->MasterPan)
-           OutNow(t, t->MasterPan);
-        if (t->RxChannel)
-           OutNow(t, t->RxChannel);
-        if (t->UseForRhythm && *gpSynth->GetSysexValPtr(t->UseForRhythm))
-           OutNow(t, t->UseForRhythm);
-     } // for
+      }
+
+      for (j = pspPAfPitchControl; j < pspPAfSysexParameters; j++)
+      {
+        if (t->PAfSettings[j])
+        {
+          OutNow(t, t->PAfSettings[j]);
+        }
+      }
+
+      for (j = cspCC1PitchControl; j < cspCC1SysexParameters; j++)
+      {
+        if (t->CC1Settings[j])
+        {
+          OutNow(t, t->CC1Settings[j]);
+        }
+      }
+
+      for (j = cspCC2PitchControl; j < cspCC2SysexParameters; j++)
+      {
+        if (t->CC2Settings[j])
+        {
+          OutNow(t, t->CC2Settings[j]);
+        }
+      }
+
+      if (t->CC1ControllerNr)
+      {
+        OutNow(t, t->CC1ControllerNr);
+      }
+
+      if (t->CC2ControllerNr)
+      {
+        OutNow(t, t->CC2ControllerNr);
+      }
+
+      if (gpConfig->GetValue(C_UseReverbMacro))
+      {
+        if (t->ReverbType)
+        {
+          OutNow(t, t->ReverbType);
+        }
+      }
+      else
+      {
+        for (j = 0; j < rspReverbSysexParameters; j++)
+        {
+          if (t->ReverbSettings[j])
+          {
+            OutNow(t, t->ReverbSettings[j]);
+          }
+        }
+      }
+      if (gpConfig->GetValue(C_UseChorusMacro))
+      {
+        if (t->ChorusType)
+        {
+          OutNow(t, t->ChorusType);
+        }
+      }
+      else
+      {
+        for (j = 0; j < cspChorusSysexParameters; j++)
+        {
+          if (t->ChorusSettings[j])
+          {
+            OutNow(t, t->ChorusSettings[j]);
+          }
+        }
+      }
+
+      if (t->EqualizerType)
+      {
+        OutNow(t, t->EqualizerType);
+      }
+      if (t->PartialReserve)
+      {
+        OutNow(t, t->PartialReserve);
+      }
+      if (t->MasterVol)
+      {
+        OutNow(t, t->MasterVol);
+      }
+      if (t->MasterPan)
+      {
+        OutNow(t, t->MasterPan);
+      }
+      if (t->RxChannel)
+      {
+        OutNow(t, t->RxChannel);
+      }
+      if (t->UseForRhythm && *gpSynth->GetSysexValPtr(t->UseForRhythm))
+      {
+        OutNow(t, t->UseForRhythm);
+      }
+    } // for
   } // if !Continue
 
   t = Song->GetTrack(0);
   JZEvent *e = t->GetCurrentTempo(Clock);
   if (e)
-     OutNow(e);
+  {
+    OutNow(e);
+  }
 
   // Send songpointer?
   if (gpConfig->GetValue(C_RealTimeOut))
   {
-     unsigned char s[2];
-     s[0] = Clock & 0x7f;
-     s[1] = (Clock & 0x3fff) >> 7;
-     tSongPtr SongPtr( 0, s, 2 );
-     OutNow( &SongPtr );
+    unsigned char s[2];
+    s[0] = Clock & 0x7f;
+    s[1] = (Clock & 0x3fff) >> 7;
+    tSongPtr SongPtr(0, s, 2);
+    OutNow(&SongPtr);
   }
 
   SetHardThru(
@@ -370,11 +482,13 @@ void tPlayer::StartPlay(long Clock, long LoopClock, int Continue)
     gpConfig->GetValue(C_ThruOutput));
 
   OutClock = Clock + FIRST_DELTACLOCK;
-  TrackWin->NewPlayPosition(PlayLoop->Ext2IntClock(Clock));
-  PlayLoop->PrepareOutput(&PlayBuffer, Song, Clock, Clock + FIRST_DELTACLOCK, 0);
+  gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(Clock));
+  PlayLoop->PrepareOutput(&mPlayBuffer, Song, Clock, Clock + FIRST_DELTACLOCK, 0);
   if (AudioBuffer)
-     PlayLoop->PrepareOutput(AudioBuffer, Song, Clock, Clock + FIRST_DELTACLOCK, 1);
-  PlayBuffer.Length2Keyoff();
+  {
+    PlayLoop->PrepareOutput(AudioBuffer, Song, Clock, Clock + FIRST_DELTACLOCK, 1);
+  }
+  mPlayBuffer.Length2Keyoff();
 
   // Notify() has to be called very often because voxware
   // midi thru is done there
@@ -386,35 +500,41 @@ void tPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 
 void tPlayer::StopPlay()
 {
-  Stop();        // stop wxTimer
+  // Stop the wxTimer.
+  Stop();
   Playing = false;
 
   long Clock = GetRealTimeClock();
 
   // SN++ Patch: Notes off for not GM/GS devices
   int ii;
-  tKeyOff off(0,0,0);
+  tKeyOff off(0, 0, 0);
 
   for (ii = 0; ii < Song->nTracks; ii++)
   {
-   tTrack *Track = Song->GetTrack(ii);
-   if (Track) {
-     tEventIterator Iterator(Track);
-     JZEvent *e = Iterator.First();
-     while (e && e->Clock<Clock+100) {
-      tKeyOn *k = e->IsKeyOn();
-      if (k)
-        if (k->Clock+k->Length>=Clock-100) {
-          off.Channel = k->Channel;
-          off.Key     = k->Key;
-          OutNow(&off);
+    tTrack *Track = Song->GetTrack(ii);
+    if (Track)
+    {
+      tEventIterator Iterator(Track);
+      JZEvent *e = Iterator.First();
+      while (e && e->GetClock() < Clock + 100)
+      {
+        tKeyOn *k = e->IsKeyOn();
+        if (k)
+        {
+          if (k->GetClock() + k->Length >= Clock - 100)
+          {
+            off.Channel = k->Channel;
+            off.Key     = k->Key;
+            OutNow(&off);
+          }
         }
-      e = Iterator.Next();
-     }
-   }
+        e = Iterator.Next();
+      }
+    }
   }
 
-  TrackWin->NewPlayPosition(-1L);
+  gpTrackWindow->NewPlayPosition(-1L);
 }
 
 
@@ -429,14 +549,17 @@ void tPlayer::Notify()
   }
 
   // time to put more events
-  if ( Now >= (OutClock - ADVANCE_PLAY) )
+  if (Now >= (OutClock - ADVANCE_PLAY))
   {
-    dprintf(("*** Notify: more events to playbuffer\n"));
-    PlayLoop->PrepareOutput(&PlayBuffer, Song, OutClock, Now + DELTACLOCK, 0);
+    cout << "*** Notify: more events to playbuffer" << endl;
+
+    PlayLoop->PrepareOutput(&mPlayBuffer, Song, OutClock, Now + DELTACLOCK, 0);
     if (AudioBuffer)
+    {
       PlayLoop->PrepareOutput(AudioBuffer, Song, OutClock, Now + DELTACLOCK, 1);
+    }
     OutClock = Now + DELTACLOCK;
-    PlayBuffer.Length2Keyoff();
+    mPlayBuffer.Length2Keyoff();
   }
 
   // optimization:
@@ -445,10 +568,15 @@ void tPlayer::Notify()
   //   send them to driver
   // else
   //   tell the driver that there is nothing to do at the moment
-  if (PlayBuffer.nEvents && PlayBuffer.Events[0]->Clock < OutClock)
+  if (mPlayBuffer.nEvents && mPlayBuffer.Events[0]->GetClock() < OutClock)
+  {
     FlushToDevice();
+  }
   else
-    OutBreak();        // does nothing unless OutClock has changed
+  {
+    // Does nothing unless OutClock has changed.
+    OutBreak();
+  }
 }
 
 
@@ -457,7 +585,7 @@ void tPlayer::FlushToDevice()
 {
   int BufferFull = 0;
 
-  tEventIterator Iterator(&PlayBuffer);
+  tEventIterator Iterator(&mPlayBuffer);
   JZEvent *e = Iterator.Range(0, OutClock);
   while (!BufferFull && e)
   {
@@ -472,7 +600,7 @@ void tPlayer::FlushToDevice()
 
   if (!BufferFull)
     OutBreak();
-  PlayBuffer.Cleanup(0);
+  mPlayBuffer.Cleanup(0);
 }
 
 
@@ -482,7 +610,7 @@ void tPlayer::AllNotesOff(int Reset)
   tPitch   Pitch  (0, 0, 0);
   tControl CtrlRes(0, 0, 0x79, 0);
 
-  tDeviceList &devs = Midi->GetOutputDevices();
+  tDeviceList &devs = gpMidiPlayer->GetOutputDevices();
   for (unsigned dev = 0; dev < devs.GetCount(); dev++)
   {
     for (int c = 0; c < 16; c++)
@@ -749,7 +877,7 @@ int tMpuPlayer::OutEvent(JZEvent *e)
         e->Write(midi);
         Stat = midi.Buffer[0]; // Status + Channel
 
-        OutBreak(e->Clock);
+        OutBreak(e->GetClock());
 
         if ( (c = e->IsChannelEvent()) != 0 ) {
                 switch (c->Channel) {
@@ -793,7 +921,7 @@ int tMpuPlayer::OutEvent(JZEvent *e)
                 ActiveTrack = 6;
         }
 
-        long Time = e->Clock - TrackClock[ActiveTrack];
+        long Time = e->GetClock() - TrackClock[ActiveTrack];
         assert(Time < 240);
 
         if (Stat != TrackRunningStatus[ActiveTrack])
@@ -813,15 +941,17 @@ int tMpuPlayer::OutEvent(JZEvent *e)
         for (i = 1; i < midi.nBytes; i++)
           PlyBytes.Put(midi.Buffer[i]);
 
-        TrackClock[ActiveTrack] = e->Clock;
+        TrackClock[ActiveTrack] = e->GetClock();
         return 0;
       }
 
     case StatSetTempo:
     case StatSysEx:
       {
-        if (e->Clock > 0)
+        if (e->GetClock() > 0)
+        {
           OutOfBandEvents.Put(e->Copy());
+        }
         return 0;
       }
    default:        // Meterchange etc
@@ -833,7 +963,7 @@ int tMpuPlayer::OutEvent(JZEvent *e)
 
 void tMpuPlayer::OutBreak()
 {
-  // send a break to the driver starting at PlyBytes.Clock and ending at OutClock
+  // send a break to the driver starting at PlyBytes.GetClock() and ending at OutClock
   if (!PlyBytes.WriteFile(dev))
     return;
 
@@ -995,11 +1125,11 @@ long tMpuPlayer::GetRealTimeClock()
 #ifdef SLOW_MACHINE
       /* Update screen every 4 beats (120 ticks/beat) */
       if ( (clock_to_host_counter % 32) == 0 )
-        TrackWin->NewPlayPosition(PlayLoop->Ext2IntClock(playclock));
+        gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(playclock));
 #else
       /* Update screen every 8'th note (120 ticks/beat) */
       if ( (clock_to_host_counter % 4) == 0 )
-        TrackWin->NewPlayPosition(PlayLoop->Ext2IntClock(playclock));
+        gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(playclock));
 #endif
       FlushOutOfBand(playclock);
     }
@@ -1027,12 +1157,12 @@ long tMpuPlayer::GetRealTimeClock()
                 d0 = c;
                 break;
             case 3:
-                Midi->StopPlay();
+                gpMidiPlayer->StopPlay();
                 d1 = c;
                 ExtClock = (d0 + (128 * d1)) * (Song->TicksPerQuarter / 4);
                 receiving_song_ptr = 0;
                 d0 = d1 = 0;
-                Midi->StartPlay( ExtClock, 0, 1 );
+                gpMidiPlayer->StartPlay( ExtClock, 0, 1 );
                 return( -1 );
             default:
                 receiving_song_ptr = 0;
@@ -1171,7 +1301,7 @@ void seqbuf_dump(void)
     size = write (seqfd, _seqbuf, _seqbufptr);
     if (size == -1 && errno == EAGAIN)
     {
-      dprintf(("write /dev/sequencer2: EAGAIN\n"));
+      cout << "write /dev/sequencer2: EAGAIN" << endl;
       return;
     }
 
@@ -1347,7 +1477,7 @@ tSeq2Player::~tSeq2Player()
 
    if (ninp > 0) {
      char *title = "MIDI Device";
-     wxSingleChoiceDialog *dialog = new wxSingleChoiceDialog(TrackWin,
+     wxSingleChoiceDialog *dialog = new wxSingleChoiceDialog(gpTrackWindow,
                                                              title,
                                                              title,
                                                              ninp,
@@ -1531,13 +1661,13 @@ void tSeq2Player::OutBreak(long clock)
     while (echo_clock + 48 < clock)
     {
       echo_clock += 48;
-      dprintf(("<< echo %ld\n", echo_clock - start_clock));
+      cout << "<< echo " << echo_clock - start_clock << endl;
       SEQ_WAIT_TIME(echo_clock - start_clock);
       SEQ_ECHO_BACK(echo_clock - start_clock);
     }
     if (echo_clock < clock)
     {
-      dprintf(("<< wait: %ld\n", clock - start_clock));
+      cout << "<< wait: " << clock - start_clock << endl;
       SEQ_WAIT_TIME(clock - start_clock);
     }
   }
@@ -1601,7 +1731,7 @@ void tSeq2Player::StartPlay(long Clock, long LoopClock, int Continue)
   play_clock   = Clock;
   recd_clock   = Clock;
 
-  TrackWin->NewPlayPosition(PlayLoop->Ext2IntClock(Clock));
+  gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(Clock));
 
   // send initial program changes, controller etc
   SEQ_START_TIMER();
@@ -1647,7 +1777,7 @@ void tSeq2Player::StopPlay()
   {
     through = new tOSSThru();
   }
-  TrackWin->NewPlayPosition(-1L);
+  gpTrackWindow->NewPlayPosition(-1L);
   RecdBuffer.Keyoff2Length();
 }
 
@@ -1655,7 +1785,7 @@ void tSeq2Player::StopPlay()
 void tSeq2Player::FlushToDevice()
 // try to send all events up to OutClock to device
 {
-  tEventIterator Iterator(&PlayBuffer);
+  tEventIterator Iterator(&mPlayBuffer);
   JZEvent *e = Iterator.Range(0, OutClock);
   if (e)
   {
@@ -1666,7 +1796,7 @@ void tSeq2Player::FlushToDevice()
       e = Iterator.Next();
     } while (e);
 
-    PlayBuffer.Cleanup(0);
+    mPlayBuffer.Cleanup(0);
   }
   OutBreak(OutClock);
   seqbuf_dump();
@@ -1778,7 +1908,7 @@ long tSeq2Player::GetRealTimeClock()
     }
   }
 
-  TrackWin->NewPlayPosition(PlayLoop->Ext2IntClock(recd_clock/48 * 48));
+  gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(recd_clock/48 * 48));
   return recd_clock;
 }
 

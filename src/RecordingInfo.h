@@ -44,7 +44,7 @@ class JZRecordingInfo
     long mToClock;
 
     // This is the recording track index.
-//    long mTrackIndex;
+    int mTrackIndex;
 
     // This value determines if the recording track is muted.
     bool mIsMuted;

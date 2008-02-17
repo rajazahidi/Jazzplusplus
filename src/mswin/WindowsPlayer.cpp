@@ -26,6 +26,7 @@
 #include "WindowsMidiInterface.h"
 #include "JazzPlusPlusApplication.h"
 #include "TrackFrame.h"
+#include "TrackWindow.h"
 #include "Dialogs.h"
 #include "MidiDeviceDialog.h"
 #include "Globals.h"
@@ -338,9 +339,9 @@ DWORD tWinPlayer::Event2Dword(JZEvent *e)
     case StatSetTempo:
       {
         tSetTempo *t = e->IsSetTempo();
-        if (t && t->Clock > 0)
+        if (t && t->GetClock() > 0)
         {
-          SetTempo( t->GetBPM(), t->Clock );
+          SetTempo( t->GetBPM(), t->GetClock() );
           OutOfBandEvents.Put( e->Copy() );
         }
       }
@@ -436,9 +437,13 @@ int tWinPlayer::OutEvent(JZEvent *e)
 {
   DWORD d = Event2Dword(e);
   if (d)
-    state->play_buffer.put(d, Clock2Time(e->Clock));
-  else if (e->IsSysEx() && (e->Clock > 0))
-    OutSysex(e, Clock2Time(e->Clock));
+  {
+    state->play_buffer.put(d, Clock2Time(e->GetClock()));
+  }
+  else if (e->IsSysEx() && (e->GetClock() > 0))
+  {
+    OutSysex(e, Clock2Time(e->GetClock()));
+  }
   return 0;
 }
 
@@ -448,32 +453,36 @@ int tWinMidiPlayer::OutEvent(JZEvent *e)
 {
   DWORD d = Event2Dword(e);
   if (d)
-    state->play_buffer.put(d, e->Clock);
-  else if (e->IsSysEx() && (e->Clock > 0))
-    OutSysex(e, e->Clock);
+  {
+    state->play_buffer.put(d, e->GetClock());
+  }
+  else if (e->IsSysEx() && (e->GetClock() > 0))
+  {
+    OutSysex(e, e->GetClock());
+  }
   return 0;
 }
 
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinPlayer::OutNow(JZEvent *e)
+void tWinPlayer::OutNow(JZEvent* pEvent)
 {
-  DWORD d = Event2Dword(e);
+  DWORD d = Event2Dword(pEvent);
   if (d)
   {
     midiOutShortMsg(state->hout, d);
   }
-  else if (e->Stat == StatSetTempo)
+  else if (pEvent->Stat == StatSetTempo)
   {
     if (state->playing)
     {
-      SetTempo(e->IsSetTempo()->GetBPM(), OutClock);
+      SetTempo(pEvent->IsSetTempo()->GetBPM(), OutClock);
     }
   }
-  else if (e->Stat == StatSysEx)
+  else if (pEvent->Stat == StatSysEx)
   {
-    tSysEx *s = e->IsSysEx();
+    tSysEx *s = pEvent->IsSysEx();
     if (s->Length + 1 < maxSysLen)
     {
       pSysBuf[0] = 0xf0;
@@ -503,15 +512,15 @@ void tWinPlayer::OutNow(tParam *r)
   OutNow(&r->ResetLsb);
 }
 
-void tWinPlayer::FillMidiClocks( long to )
+void tWinPlayer::FillMidiClocks(long to)
 {
   while (midiClockOut <= to)
   {
-    tMidiClock *e = new tMidiClock( midiClockOut );
-    PlayBuffer.Put( e );
+    tMidiClock* pEvent = new tMidiClock(midiClockOut);
+    mPlayBuffer.Put(pEvent);
     midiClockOut = midiClockOut + state->ticks_per_signal;
   }
-  PlayBuffer.Sort();
+  mPlayBuffer.Sort();
 }
 
 //-----------------------------------------------------------------------------
@@ -553,20 +562,26 @@ void tWinPlayer::OutBreak()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-static DWORD GetMtcTime( tWinPlayerState *state )
+static DWORD GetMtcTime(tWinPlayerState* pState)
 {
-  DWORD frames = state->mtc_frames;
-  switch (state->mtc_start.type)
+  DWORD frames = pState->mtc_frames;
+  switch (pState->mtc_start.type)
   {
     case 0:
-      return( ((frames / 24) * 1000) + (((frames % 24) * state->time_per_frame) / 1000) );
+      return (
+        ((frames / 24) * 1000) +
+        (((frames % 24) * pState->time_per_frame) / 1000));
     case 1:
-      return( ((frames / 25) * 1000) + (((frames % 25) * state->time_per_frame) / 1000) );
+      return (
+        ((frames / 25) * 1000) +
+        (((frames % 25) * pState->time_per_frame) / 1000));
     case 2:
     case 3:
-      return( ((frames / 30) * 1000) + (((frames % 30) * state->time_per_frame) / 1000) );
+      return (
+        ((frames / 30) * 1000) +
+        (((frames % 30) * pState->time_per_frame) / 1000));
     default:
-      return( 0 );
+      return 0;
   }
 }
 
@@ -614,7 +629,7 @@ void tWinPlayer::StartPlay(long Clock, long LoopClock, int Continue)
     state->play_buffer.put(START_AUDIO, state->start_time);
 
   OutOfBandEvents.Clear();
-  TrackWin->NewPlayPosition(PlayLoop->Ext2IntClock(Clock));
+  gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(Clock));
   state->playing = TRUE;  // allow for SetTempo in OutNow()
   tPlayer::StartPlay(Clock, LoopClock, Continue);
 
@@ -626,7 +641,7 @@ void tWinPlayer::StartPlay(long Clock, long LoopClock, int Continue)
     else
       e = new tContPlay( 0 );
     OutNow( e );
-    FillMidiClocks( PlayBuffer.GetLastClock() ); // also does a sort
+    FillMidiClocks(mPlayBuffer.GetLastClock()); // also does a sort
   }
 
 
@@ -748,18 +763,20 @@ void tWinPlayer::FlushToDevice()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinPlayer::FlushToDevice( long clock )
+void tWinPlayer::FlushToDevice(long clock)
 {
-  tEventIterator Iterator(&PlayBuffer);
-  JZEvent *e = Iterator.Range(0, clock);
-  if (e) {
-    do {
-      OutEvent(e);
-      e->Kill();
-      e = Iterator.Next();
-    } while (e);
+  tEventIterator Iterator(&mPlayBuffer);
+  JZEvent* pEvent = Iterator.Range(0, clock);
+  if (pEvent)
+  {
+    do
+    {
+      OutEvent(pEvent);
+      pEvent->Kill();
+      pEvent = Iterator.Next();
+    } while (pEvent);
 
-    PlayBuffer.Cleanup(0);
+    mPlayBuffer.Cleanup(0);
   }
 }
 
@@ -775,14 +792,14 @@ long tWinIntPlayer::GetRealTimeClock()
     JZEvent     *e = Dword2Event(m->data);
     if (e)
     {
-      e->Clock = PlayLoop->Ext2IntClock(Time2RealTimeClock(m->ref));
+      e->SetClock(PlayLoop->Ext2IntClock(Time2RealTimeClock(m->ref)));
       RecdBuffer.Put(e);
     }
   }
 
   long clock = Time2RealTimeClock( (long)timeGetTime() + state->time_correction );
 
-  TrackWin->NewPlayPosition(PlayLoop->Ext2IntClock(clock/48 * 48));
+  gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(clock/48 * 48));
 
   if ( !OutOfBandEvents.IsEmpty() )
   {
@@ -830,10 +847,10 @@ long tWinMidiPlayer::GetRealTimeClock()
         DWORD w;
         unsigned char c[4];
       } u;
-      Midi->StopPlay();
+      gpMidiPlayer->StopPlay();
       u.w = m->data;
       clock = ((long)u.c[1] + (128L * (long)u.c[2])) * (Song->TicksPerQuarter / 4);
-      Midi->StartPlay( clock, 0, 1 );
+      gpMidiPlayer->StartPlay( clock, 0, 1 );
       return -1;
     }
 
@@ -841,7 +858,7 @@ long tWinMidiPlayer::GetRealTimeClock()
     JZEvent     *e = Dword2Event(m->data);
     if (e)
     {
-      e->Clock = PlayLoop->Ext2IntClock( m->ref );
+      e->SetClock(PlayLoop->Ext2IntClock(m->ref));
       RecdBuffer.Put(e);
     }
   }
@@ -857,7 +874,7 @@ long tWinMidiPlayer::GetRealTimeClock()
     clock = state->virtual_clock + delta_clock;
   }
 
-  TrackWin->NewPlayPosition(PlayLoop->Ext2IntClock(clock/48 * 48));
+  gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(clock/48 * 48));
   return clock;
 }
 
@@ -873,10 +890,10 @@ long tWinMtcPlayer::GetRealTimeClock()
     if (m->data == 0xf1)
     {
       // MTC starting (from midi input handler)
-      Midi->StopPlay();
+      gpMidiPlayer->StopPlay();
       clock = PlayLoop->Ext2IntClock( Time2Clock( m->ref ) );
       lastValidMtcClock = clock;
-      Midi->StartPlay( clock, 0, 1 );
+      gpMidiPlayer->StartPlay( clock, 0, 1 );
       return -1;
     }
 
@@ -884,7 +901,7 @@ long tWinMtcPlayer::GetRealTimeClock()
     JZEvent     *e = Dword2Event(m->data);
     if (e)
     {
-      e->Clock = PlayLoop->Ext2IntClock(Time2Clock(m->ref));
+      e->SetClock(PlayLoop->Ext2IntClock(Time2Clock(m->ref)));
       RecdBuffer.Put(e);
     }
   }
@@ -916,7 +933,7 @@ long tWinMtcPlayer::GetRealTimeClock()
     clock = lastValidMtcClock;
   }
 
-  TrackWin->NewPlayPosition(PlayLoop->Ext2IntClock(clock/48 * 48));
+  gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(clock/48 * 48));
 
   if ( !OutOfBandEvents.IsEmpty() )
   {
@@ -1001,7 +1018,7 @@ void tWinPlayer::SettingsDlg(long& InputDevice, long& OutputDevice)
   JZMidiDeviceDialog MidiOutputDeviceDialog(
     MidiDevices,
     OutputDevice,
-    TrackWin,
+    gpTrackWindow,
     "Output MIDI device");
   MidiOutputDeviceDialog.ShowModal();
 

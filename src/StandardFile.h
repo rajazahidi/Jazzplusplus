@@ -27,61 +27,85 @@
 
 #include <stdio.h>
 
+class JZEvent;
 class tStdChunk
 {
-  long Size;		// Groesse von Base
-  long nRead;		// soviele Bytes aus Datei gelesen
-  unsigned char *Base;  // Puffer for Daten
-  unsigned char *cp;	// Aktueller Schreib/Lese Pointer
-  long Clock;		// Absolute Clock
-  int  EofSeen;  	// endoftrack meta-event gelesen
-  int  RunningStatus;	// letzter Status
+  public:
 
-  void Resize(int SizeNeeded);
-  void PutVar(unsigned long val);
-  unsigned long GetVar();
+    tStdChunk();
 
-public:
+    ~tStdChunk();
 
-  int  IsEof();		// nur nach Load, Save hat nie Eof
-  void Load(FILE *fd);
-  void Save(FILE *fd);	// haengt EndOfTrack an
-  tStdChunk();
-  ~tStdChunk();
-  void Put(JZEvent *e, unsigned char *Data, int Length);
-  JZEvent *Get();	// NULL bei Trackende
-  void Rewind();	// Schreib/Lesezeiger zurÅcksetzen
+    int IsEof();            // Only after Load, Save never has Eof.
+
+    void Load(FILE* fd);
+
+    void Save(FILE* fd);    // Depends on EndOfTrack
+
+    void Put(JZEvent* pEvent, unsigned char* pData, int Length);
+
+    // A return value of NULL indicates we are at the end of the track.
+    JZEvent* Get();
+
+    void Rewind();
+
+  private:
+
+    long Size;             // Size of base
+    long nRead;            // Number of bytes read from the file
+    unsigned char* mpBase; // Buffer for data.
+    unsigned char* cp;     // Aktueller Schreib/Lese pointer
+    long Clock;            // Absolute Clock
+    int EofSeen;           // endoftrack meta-event read
+    int RunningStatus;
+
+    void Resize(int SizeNeeded);
+    void PutVar(unsigned long val);
+    unsigned long GetVar();
 };
 
 
 class tStdRead : public tReadBase
 {
-    tStdChunk *Tracks;
-    int TrackNr;
-
   public:
 
-    virtual int  Open(const char *fname);
+    tStdRead();
+
+    virtual ~tStdRead();
+
+    virtual int Open(const char* pFileName);
     virtual void Close();
 
-    virtual JZEvent *Read();
+    virtual JZEvent* Read();
     virtual int NextTrack();
+
+  private:
+
+    tStdChunk* mpTracks;
+    int TrackNr;
 };
 
 
 
 class tStdWrite : public tWriteBase
 {
-    tStdChunk *Tracks;
+  public:
+
+    tStdWrite();
+
+    virtual ~tStdWrite();
+
+    virtual int Open(char* pFileName, int nTracks, int TicksPerQuarter);
+    virtual void Close();
+    virtual int Write(JZEvent* Event, unsigned char *s, int len);
+    virtual void NextTrack();
+
+  private:
+
+    tStdChunk* mpTracks;
     int TrackNr;
     int nTracks;
     int TicksPerQuarter;
-
-  public:
-    virtual int  Open(char *fname, int nTracks, int TicksPerQuarter);
-    virtual void Close();
-    virtual int Write(JZEvent *e, unsigned char *s, int len);
-    virtual void NextTrack();
 };
 
 #endif // !defined(JZ_STANDARDFILE_H)

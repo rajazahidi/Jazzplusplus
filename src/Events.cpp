@@ -100,9 +100,9 @@ void tWriteBase::Close()
 // tGetMidiBytes
 // -------------------------------------------------------
 
-int tGetMidiBytes::Write(JZEvent *e, unsigned char *s, int len)
+int tGetMidiBytes::Write(JZEvent* pEvent, unsigned char* pString, int Length)
 {
-  int Stat = e->Stat;
+  int Stat = pEvent->Stat;
 
   switch (Stat)
   {
@@ -116,9 +116,11 @@ int tGetMidiBytes::Write(JZEvent *e, unsigned char *s, int len)
     case StatPitch:
       nBytes = 0;
 
-      Buffer[nBytes++] = Stat | ((tChannelEvent *)e)->Channel;
-      while(len--)
-        Buffer[nBytes++] = *s++;
+      Buffer[nBytes++] = Stat | ((tChannelEvent *)pEvent)->Channel;
+      while(Length--)
+      {
+        Buffer[nBytes++] = *pString++;
+      }
       return 0;
 
     default:

@@ -401,10 +401,11 @@ void tDrumInstrumentParameterList::Clear()
 
 
 tSimpleEventArray::tSimpleEventArray()
+  : wxObject(),
+    nEvents(0),
+    MaxEvents(0),
+    Events(0)
 {
-  Events = 0;
-  nEvents = 0;
-  MaxEvents = 0;
 }
 
 tSimpleEventArray::~tSimpleEventArray()
@@ -462,36 +463,43 @@ void tSimpleEventArray::Resize()
 {
   long i;
   MaxEvents += 50;
-  JZEvent **tmp = new JZEvent * [MaxEvents];
-  for (i = 0; i < nEvents; i++)
+  JZEvent** ppEvents = new JZEvent* [MaxEvents];
+
+  // Copy the previuosly existing event pointers.
+  for (i = 0; i < nEvents; ++i)
   {
-    tmp[i] = Events[i];
+    ppEvents[i] = Events[i];
   }
-  for (; i < MaxEvents; i++)
+
+  // Initialize the new event pointers to 0.
+  for (; i < MaxEvents; ++i)
   {
-    tmp[i] = 0;
+    ppEvents[i] = 0;
   }
+
+  // Delete the old event pointers
   delete [] Events;
-  Events = tmp;
+
+  // Set the data member to the new storage location.
+  Events = ppEvents;
 }
 
-/** JAVE remove the(any) end of track event from the track
-there can only be one eot in a track, so remove it before inserting a new one
-*/
+//   Remove any end of track (EOT) events from the track.  There can only be
+// one EOT event in a track, so remove it before inserting a new one.
 void tSimpleEventArray::RemoveEOT()
 {
-  int j=0;
-  int newnEvents=nEvents;
-  for (int i = 0; i < nEvents; i++) 
+  int j = 0;
+  int newnEvents = nEvents;
+  for (int i = 0; i < nEvents; ++i)
   {
-    if(Events[i]!=0 && Events[i]->IsEndOfTrack())
+    if (Events[i] != 0 && Events[i]->IsEndOfTrack())
     {
-      j++;
-      newnEvents--;
+      ++j;
+      --newnEvents;
     }
  
     JZEvent* item;
-    if (j<=MaxEvents)
+    if (j <= MaxEvents)
     {
       item = Events[j++];
     }
@@ -499,16 +507,17 @@ void tSimpleEventArray::RemoveEOT()
     {
       item = 0;
     }
-    Events[i]=item;
+    Events[i] = item;
   }
-  nEvents=newnEvents;
+  nEvents = newnEvents;
 }
 
-void tSimpleEventArray::Put(JZEvent *e)
+void tSimpleEventArray::Put(JZEvent* e)
 {
-  if(e->IsEndOfTrack())
+  if (e->IsEndOfTrack())
   {
-     RemoveEOT(); //JAVE remove old EOT if we are adding a new one
+    // Remove the old EOT if we are adding a new one.
+    RemoveEOT();
   }
   if (nEvents >= MaxEvents)
   {
@@ -526,29 +535,28 @@ void tSimpleEventArray::Put(JZEvent *e)
 #endif
 }
 
-
-/**
- * move the data from source to this. this will be cleaned up
- * first and src will be empty afterwards.
- */
-
-void tSimpleEventArray::GrabData(tSimpleEventArray &src)
+// Description:
+//   Move the data from passed event array this instance.
+void tSimpleEventArray::GrabData(tSimpleEventArray& src)
 {
   Clear();
+
   delete [] Events;
 
   Events = src.Events;
   nEvents = src.nEvents;
   MaxEvents = src.MaxEvents;
+
   src.Events = 0;
   src.nEvents = 0;
   src.MaxEvents = 0;
 }
 
 
-void tSimpleEventArray::Copy(tSimpleEventArray &src, long frclk, long toclk) {
+void tSimpleEventArray::Copy(tSimpleEventArray& src, long frclk, long toclk)
+{
   tEventIterator iter(&src);
-  JZEvent *e = iter.Range(frclk, toclk);
+  JZEvent* e = iter.Range(frclk, toclk);
   while (e)
   {
     Put(e->Copy());
@@ -557,8 +565,19 @@ void tSimpleEventArray::Copy(tSimpleEventArray &src, long frclk, long toclk) {
 }
 
 
-
 tEventArray::tEventArray()
+  : tSimpleEventArray(),
+    mName(0),
+    Copyright(0),
+    mPatch(0),
+    Speed(0),
+    Volume(0),
+    Pan(0),
+    Reverb(0),
+    Chorus(0),
+    mpBank(0),
+    mpBank2(0),
+    Reset(0)
 {
   nEvents = 0;
 
@@ -580,19 +599,32 @@ void tEventArray::Clear()
 
   tSimpleEventArray::Clear();
 
-  Name   = 0;
+//  delete mName;
+  mName = 0;
+
   Copyright = 0;
-  Patch  = 0;
+
+  delete mPatch;
+  mPatch = 0;
+
   Volume = 0;
-  Pan    = 0;
+
+  Pan = 0;
+
   Reverb = 0;
+
   Chorus = 0;
-  Bank   = 0;
-  Bank2  = 0;
-  Reset  = 0;
-  Speed  = 0;
+
+  delete mpBank;
+  mpBank = 0;
+
+  delete mpBank2;
+  mpBank2 = 0;
+
+  Reset = 0;
+  Speed = 0;
   Channel = 1;
-  Device  = 0;
+  Device = 0;
 
   for (i = 0; i < mspModulationSysexParameters; i++)
   {
@@ -706,12 +738,19 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
   Sort();  // moves all killed events to the end of array
 
   // clear track defaults
-  Name = 0;
+//  delete mName;
+  mName = 0;
+
   Copyright = 0;
+
   Speed = 0;
+
   Volume = 0;
+
   Pan = 0;
+
   Reverb = 0;
+
   Chorus = 0;
 
   for (i = 0; i < mspModulationSysexParameters; i++)
@@ -784,15 +823,16 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
     }
 
     // accept only events having clock == 0 as track defaults
-    if (e->Clock != 0)
+    if (e->GetClock() != 0)
     {
       continue;
     }
 
-    if (!Name)
+    if (!mName)
     {
-      Name = e->IsTrackName();
+      mName = e->IsTrackName();
     }
+
     if (!Copyright)
     {
       Copyright = e->IsCopyright();
@@ -1118,10 +1158,10 @@ void tEventArray::Length2Keyoff()
     tKeyOn *on;
     if ((on = Events[i]->IsKeyOn()) != 0 && on->Length != 0)
     {
-//      JZEvent *of = new tKeyOff(on->Clock + on->Length, on->Channel, on->Key);
+//      JZEvent *of = new tKeyOff(on->GetClock() + on->Length, on->Channel, on->Key);
       // SN++ added off veloc
       JZEvent *of = new tKeyOff(
-        on->Clock + on->Length,
+        on->GetClock() + on->Length,
         on->Channel,
         on->Key,
         on->OffVeloc);
@@ -1151,7 +1191,7 @@ void tEventArray::Keyoff2Length()
         tKeyOn *on = (*e)->IsKeyOn();
         if (on && on->Key == of->Key && on->Channel == of->Channel && on->Length == 0)
         {
-          on->Length = of->Clock - on->Clock;
+          on->Length = of->GetClock() - on->GetClock();
           if (on->Length <= 0L)
           {
             on->Length = 1;
@@ -1198,7 +1238,7 @@ void tEventArray::Keyoff2Length()
           on->Key == of->Key &&
           on->Channel == of->Channel)
         {
-          on->Length = of->Clock - on->Clock;
+          on->Length = of->GetClock() - on->GetClock();
           if (on->Length <= 0L)
           {
             on->Length = 1;
@@ -1310,18 +1350,20 @@ void tEventArray::Write(tWriteBase &io)
     dpar = DrumParams.NextElem(dpar);
   }
 
-  // Bank: Must be sure bank is written before program:
-  if (Bank)
+  // mpBank: Must be sure bank is written before program:
+  if (mpBank)
   {
-    Bank->Write(io);
+    mpBank->Write(io);
   }
-  if (Bank2)
+
+  if (mpBank2)
   {
-    Bank2->Write(io);
+    mpBank2->Write(io);
   }
-  if (Patch)
+
+  if (mPatch)
   {
-    Patch->Write(io);
+    mPatch->Write(io);
   }
 
   // write jazz track info
@@ -1347,9 +1389,9 @@ void tEventArray::Write(tWriteBase &io)
         case 0x63: // Nrpn Msb
         case 0x62: // Nrpn Lsb
         case 0x06: // Rpn/Nrpn Data
-        case 0x00: // Bank
+        case 0x00: // mpBank
         case 0x20: // Bank2
-          if (e->Clock == 0)
+          if (e->GetClock() == 0)
           {
             WrittenBefore = 1;
           }
@@ -1362,7 +1404,7 @@ void tEventArray::Write(tWriteBase &io)
     {
       // Don't write these again if present as events
       // and clock == 0 (should not happen)
-      if (e->Clock == 0)
+      if (e->GetClock() == 0)
       {
         WrittenBefore = 1;
       }
@@ -1392,9 +1434,12 @@ void tEventArray::Read(tReadBase &io)
   Msb = Lsb = Data = 0xff;
   int cha;
 
+  bool NeedToDelete;
+
   io.NextTrack();
   while ((e = io.Read()) != 0)
   {
+    NeedToDelete = false;
     SpecialEvent = 0;
     if (e->IsJazzMeta())
     {
@@ -1506,19 +1551,19 @@ void tEventArray::Read(tReadBase &io)
           Msb = Lsb = Data = 0xff;
           break;
         case 0x00:
-          if (!Bank)
+          if (!mpBank)
           {
             SpecialEvent = 1;
-            Bank = e->IsControl(); // Bank
-            Bank->Clock = 0;
+            mpBank = e->IsControl();
+            mpBank->SetClock(0);
           }
           break;
         case 0x20:
-          if (!Bank2)
+          if (!mpBank2)
           {
             SpecialEvent = 1;
-            Bank2 = e->IsControl(); // Bank
-            Bank2->Clock = 0;
+            mpBank2 = e->IsControl();
+            mpBank2->SetClock(0);
           }
           break;
         default:
@@ -1528,10 +1573,10 @@ void tEventArray::Read(tReadBase &io)
     }
     else if (e->IsProgram())
     {
-      if (!Patch)
+      if (!mPatch)
       {
-        Patch = e->IsProgram();
-        Patch->Clock = 0;
+        mPatch = e->IsProgram();
+        mPatch->SetClock(0);
         SpecialEvent = 1;
       }
     }
@@ -1540,12 +1585,15 @@ void tEventArray::Read(tReadBase &io)
       if (!Copyright)
       {
         Copyright = e->IsCopyright();
+
         // Just make sure clock is zero, then put into event array
-        Copyright->Clock = 0;
+        Copyright->SetClock(0);
       }
     }
     else if (e->IsSysEx())
     {
+      NeedToDelete = true;
+
       // Get hold of the Reset sysex...
       int sxid = gpSynth->GetSysexId(e->IsSysEx());
 
@@ -1564,6 +1612,7 @@ void tEventArray::Read(tReadBase &io)
           if (!Reset)
           {
             Reset = e->IsSysEx();
+            NeedToDelete = false;
           }
         }
       }
@@ -1585,6 +1634,12 @@ void tEventArray::Read(tReadBase &io)
       // track play instead.
       break;
     }
+
+    if (NeedToDelete)
+    {
+      delete e;
+    }
+
   } // while read
 
   if (!Channel)
@@ -1602,7 +1657,7 @@ long tEventArray::GetLastClock()
   {
     return 0;
   }
-  return Events[nEvents - 1]->Clock;
+  return Events[nEvents - 1]->GetClock();
 }
 
 int tEventArray::IsEmpty()
@@ -1614,7 +1669,7 @@ long tEventArray::GetFirstClock()
 {
   if (nEvents)
   {
-    return Events[0]->Clock;
+    return Events[0]->GetClock();
   }
   return LastClock;
 }
@@ -1652,7 +1707,7 @@ tTrackDlg::tTrackDlg(JZTrackWindow *w, tTrack *t)
       "Patch",
       t->IsDrumTrack() ? &gpConfig->DrumSet(0) : &gpConfig->VoiceName(0),
       &PatchNr),
-    DeviceChoice("Device", Midi->GetOutputDevices().AsNamedValue(), &Device)
+    DeviceChoice("Device", gpMidiPlayer->GetOutputDevices().AsNamedValue(), &Device)
 {
   TrackWin = w;
   trk = t;
@@ -1769,13 +1824,13 @@ void tTrackDlg::OnOk()
     {
       trk->BendPitchSens->SetCha(trk->Channel - 1);
     }
-    if (trk->Bank)
+    if (trk->mpBank)
     {
-      trk->Bank->Channel = trk->Channel - 1;
+      trk->mpBank->Channel = trk->Channel - 1;
     }
-    if (trk->Patch)
+    if (trk->mPatch)
     {
-      trk->Patch->Channel = trk->Channel - 1;
+      trk->mPatch->Channel = trk->Channel - 1;
     }
     if (!trk->DrumParams.IsEmpty())
     {
@@ -1838,7 +1893,7 @@ void tTrackDlg::EditForm(wxPanel *panel)
   Add(wxMakeFormNewLine());
   Add(wxMakeFormBool("Clear track (NB! erase all events, name etc...)", &ClearTrack));
 
-  if (Midi->SupportsMultipleDevices())
+  if (gpMidiPlayer->SupportsMultipleDevices())
   {
     Add(wxMakeFormNewLine());
     Add(DeviceChoice.mkFormItem(300, 50));
@@ -1945,7 +2000,7 @@ void tTrack::Cleanup()
 {
   // on audio tracks, adjust length of keyon events to
   // actual sample length
-  Midi->AdjustAudioLength(this);
+  gpMidiPlayer->AdjustAudioLength(this);
   tEventArray::Cleanup(TRUE);
 }
 
@@ -2067,11 +2122,11 @@ void tTrack::SetCopyright(char *str)
 
 // ----------------------- Name ------------------------------------
 
-char *tTrack::GetName()
+char* tTrack::GetName()
 {
-  if (Name)
+  if (mName)
   {
-    return (char *)Name->Data;
+    return (char *)mName->Data;
   }
   return "";
 }
@@ -2080,9 +2135,9 @@ char *tTrack::GetName()
 
 void tTrack::SetName(char *str)
 {
-  if (Name)
+  if (mName)
   {
-    Kill(Name);
+    Kill(mName);
   }
   if (strlen(str))
   {
@@ -2112,7 +2167,7 @@ void tTrack::SetVolume(int Value)
   {
     JZEvent *e = new tControl(0, Channel - 1, 0x07, Value - 1);
     Put(e);
-    Midi->OutNow(this, e);
+    gpMidiPlayer->OutNow(this, e);
   }
   Cleanup();
 }
@@ -2138,7 +2193,7 @@ void tTrack::SetPan(int Value)
   {
     JZEvent *e = new tControl(0, Channel - 1, 0x0a, Value - 1);
     Put(e);
-    Midi->OutNow(this, e);
+    gpMidiPlayer->OutNow(this, e);
   }
   Cleanup();
 }
@@ -2164,7 +2219,7 @@ void tTrack::SetReverb(int Value)
   {
     JZEvent *e = new tControl(0, Channel - 1, 0x5B, Value - 1);
     Put(e);
-    Midi->OutNow(this, e);
+    gpMidiPlayer->OutNow(this, e);
   }
   Cleanup();
 }
@@ -2190,7 +2245,7 @@ void tTrack::SetChorus(int Value)
   {
     JZEvent *e = new tControl(0, Channel - 1, 0x5D, Value - 1);
     Put(e);
-    Midi->OutNow(this, e);
+    gpMidiPlayer->OutNow(this, e);
   }
   Cleanup();
 }
@@ -2202,10 +2257,10 @@ int tTrack::GetBank()
   if (!gpConfig->GetValue(C_UseTwoCommandBankSelect))
   {
     DEBUG(fprintf(stderr, "Get single bank select command\n");)
-    if (Bank)
+    if (mpBank)
     {
-      DEBUG(fprintf(stderr,"Bank %d selected.\n\n",Bank->Value);)
-      return Bank->Value;
+      DEBUG(fprintf(stderr,"Bank %d selected.\n\n",mpBank->Value);)
+      return mpBank->Value;
     }
     else
     {
@@ -2213,13 +2268,13 @@ int tTrack::GetBank()
     }
   }
   DEBUG(fprintf(stderr, "Get double bank select command.\n");)
-  if (Bank && Bank2)
+  if (mpBank && mpBank2)
   {
     for (int i=0; gpConfig->BankEntry(i).Command[0]>=0; i++)
     {
       if (
-        gpConfig->BankEntry(i).Command[0]==Bank->Value &&
-        gpConfig->BankEntry(i).Command[1]==Bank2->Value)
+        gpConfig->BankEntry(i).Command[0] == mpBank->Value &&
+        gpConfig->BankEntry(i).Command[1] == mpBank2->Value)
       {
         DEBUG(fprintf(stderr,"Bank %d selected.\n\n",i);)
         return i;
@@ -2231,29 +2286,30 @@ int tTrack::GetBank()
 
 void tTrack::SetBank(int Value)
 {
-  if (Bank)
+  if (mpBank)
   {
-    delete Bank;
-    Bank = 0;
+    delete mpBank;
+    mpBank = 0;
   }
 
-  if (Bank2)
+  if (mpBank2)
   {
-    delete Bank2;
-    Bank2 = 0;
+    delete mpBank2;
+    mpBank2 = 0;
   }
+
   if (Value >= 0)
   {
     if (!gpConfig->GetValue(C_UseTwoCommandBankSelect))
     {
       DEBUG(fprintf (stderr, "Single command bank select (Bank %d).\n",
             Value);)
-      Bank = new tControl(
+      mpBank = new tControl(
         0,
         Channel - 1,
         gpConfig->GetValue(C_BankControlNumber),
         Value);
-      Midi->OutNow(this, Bank);
+      gpMidiPlayer->OutNow(this, mpBank);
       return;
     }
     while (gpConfig->BankEntry(Value).Command[0]<0 && Value>0)
@@ -2262,26 +2318,31 @@ void tTrack::SetBank(int Value)
     }
     assert(gpConfig->BankEntry(Value).Command[0] >= 0);
     DEBUG(fprintf(stderr, "Double command bank select (Bank %d).\n",Value);)
-    Bank  = new tControl(
+    mpBank  = new tControl(
       0,
       Channel - 1,
       gpConfig->GetValue(C_BankControlNumber),
       gpConfig->BankEntry(Value).Command[0]);
-    Midi->OutNow(this, Bank);
+    gpMidiPlayer->OutNow(this, mpBank);
     DEBUG(
       fprintf(
         stderr,
         "First bank select command: %d %d\n",
-        Bank->Control,
-        Bank->Value);)
-    Bank2 = new tControl(
+        mpBank->Control,
+        mpBank->Value);)
+    mpBank2 = new tControl(
       0,
       Channel - 1,
       gpConfig->GetValue(C_BankControlNumber2),
       gpConfig->BankEntry(Value).Command[1]);
-    Midi->OutNow(this, Bank2);
-    DEBUG(fprintf (stderr, "Second bank select command: %d %d\n\n",
-      Bank2->Control, Bank2->Value);
+
+    gpMidiPlayer->OutNow(this, mpBank2);
+
+    DEBUG(fprintf(
+      stderr,
+      "Second bank select command: %d %d\n\n",
+      mpBank2->Control,
+      mpBank2->Value);
     )
     changed = true;
   }
@@ -2291,24 +2352,24 @@ void tTrack::SetBank(int Value)
 
 int tTrack::GetPatch()
 {
-  if (Patch)
+  if (mPatch)
   {
-    return Patch->Program + 1;
+    return mPatch->Program + 1;
   }
   return 0;
 }
 
 void tTrack::SetPatch(int PatchNr)
 {
-  if (Patch)
+  if (mPatch)
   {
-    delete Patch;
-    Patch = 0;
+    delete mPatch;
+    mPatch = 0;
   }
   if (PatchNr > 0)
   {
-    Patch = new tProgram(0, Channel - 1, PatchNr - 1);
-    Midi->OutNow(this, Patch);
+    mPatch = new tProgram(0, Channel - 1, PatchNr - 1);
+    gpMidiPlayer->OutNow(this, mPatch);
     changed = true;
   }
 }
@@ -2335,7 +2396,7 @@ void tTrack::SetVibRate(int Value)
   if (Value > 0)
   {
     VibRate = new tNrpn(0, Channel - 1, 0x01, 0x08, Value - 1);
-    Midi->OutNow(this, VibRate);
+    gpMidiPlayer->OutNow(this, VibRate);
     changed = true;
   }
 }
@@ -2361,7 +2422,7 @@ void tTrack::SetVibDepth(int Value)
   if (Value > 0)
   {
     VibDepth = new tNrpn(0, Channel - 1, 0x01, 0x09, Value - 1);
-    Midi->OutNow(this,  VibDepth);
+    gpMidiPlayer->OutNow(this,  VibDepth);
     changed = true;
   }
 }
@@ -2388,7 +2449,7 @@ void tTrack::SetVibDelay(int Value)
   if (Value > 0)
   {
     VibDelay = new tNrpn(0, Channel - 1, 0x01, 0x0a, Value - 1);
-    Midi->OutNow(this,  VibDelay);
+    gpMidiPlayer->OutNow(this,  VibDelay);
     changed = true;
   }
 }
@@ -2415,7 +2476,7 @@ void tTrack::SetCutoff(int Value)
   if (Value > 0)
   {
     Cutoff = new tNrpn(0, Channel - 1, 0x01, 0x20, Value - 1);
-    Midi->OutNow(this,  Cutoff);
+    gpMidiPlayer->OutNow(this,  Cutoff);
     changed = true;
   }
 }
@@ -2442,7 +2503,7 @@ void tTrack::SetResonance(int Value)
   if (Value > 0)
   {
     Resonance = new tNrpn(0, Channel - 1, 0x01, 0x21, Value - 1);
-    Midi->OutNow(this,  Resonance);
+    gpMidiPlayer->OutNow(this,  Resonance);
     changed = true;
   }
 }
@@ -2469,7 +2530,7 @@ void tTrack::SetEnvAttack(int Value)
   if (Value > 0)
   {
     EnvAttack = new tNrpn(0, Channel - 1, 0x01, 0x63, Value - 1);
-    Midi->OutNow(this,  EnvAttack);
+    gpMidiPlayer->OutNow(this,  EnvAttack);
     changed = true;
   }
 }
@@ -2496,7 +2557,7 @@ void tTrack::SetEnvDecay(int Value)
   if (Value > 0)
   {
     EnvDecay = new tNrpn(0, Channel - 1, 0x01, 0x64, Value - 1);
-    Midi->OutNow(this,  EnvDecay);
+    gpMidiPlayer->OutNow(this,  EnvDecay);
     changed = true;
   }
 }
@@ -2523,7 +2584,7 @@ void tTrack::SetEnvRelease(int Value)
   if (Value > 0)
   {
     EnvRelease = new tNrpn(0, Channel - 1, 0x01, 0x66, Value - 1);
-    Midi->OutNow(this,  EnvRelease);
+    gpMidiPlayer->OutNow(this,  EnvRelease);
     changed = true;
   }
 }
@@ -2550,7 +2611,7 @@ void tTrack::SetDrumParam(int pitch, int index, int Value)
   {
     DrumParams.PutParam(
       new tNrpn(0, Channel - 1, drumIndex2Param(index), pitch, Value - 1));
-    Midi->OutNow(this, DrumParams.GetParam(pitch, index));
+    gpMidiPlayer->OutNow(this, DrumParams.GetParam(pitch, index));
     changed = true;
   }
 }
@@ -2577,7 +2638,7 @@ void tTrack::SetBendPitchSens(int Value)
   if (Value > 0)
   {
     BendPitchSens = new tRpn(0, Channel - 1, 0x00, 0x00, Value - 1);
-    Midi->OutNow(this,  BendPitchSens);
+    gpMidiPlayer->OutNow(this,  BendPitchSens);
     changed = true;
   }
 }
@@ -2608,7 +2669,7 @@ void tTrack::SetModulationSysex(int msp, int Value)
     if (e)
     {
       Put(e);
-      Midi->OutNow(this, e);
+      gpMidiPlayer->OutNow(this, e);
     }
   }
   Cleanup();
@@ -2640,7 +2701,7 @@ void tTrack::SetBenderSysex(int bsp, int Value)
     if (e)
     {
       Put(e);
-      Midi->OutNow(this, e);
+      gpMidiPlayer->OutNow(this, e);
     }
   }
   Cleanup();
@@ -2672,7 +2733,7 @@ void tTrack::SetCAfSysex(int csp, int Value)
     if (e)
     {
       Put(e);
-      Midi->OutNow(this, e);
+      gpMidiPlayer->OutNow(this, e);
     }
   }
   Cleanup();
@@ -2704,7 +2765,7 @@ void tTrack::SetPAfSysex(int psp, int Value)
     if (e)
     {
       Put(e);
-      Midi->OutNow(this, e);
+      gpMidiPlayer->OutNow(this, e);
     }
   }
   Cleanup();
@@ -2736,7 +2797,7 @@ void tTrack::SetCC1Sysex(int csp, int Value)
     if (e)
     {
       Put(e);
-      Midi->OutNow(this, e);
+      gpMidiPlayer->OutNow(this, e);
     }
   }
   Cleanup();
@@ -2766,7 +2827,7 @@ void tTrack::SetCC2Sysex(int csp, int Value)
     if (e)
     {
       Put(e);
-      Midi->OutNow(this, e);
+      gpMidiPlayer->OutNow(this, e);
     }
   }
   Cleanup();
@@ -2798,7 +2859,7 @@ void tTrack::SetCC1ControllerNr(int Value)
     if (e)
     {
       Put(e);
-      Midi->OutNow(this, e);
+      gpMidiPlayer->OutNow(this, e);
     }
   }
   Cleanup();
@@ -2830,7 +2891,7 @@ void tTrack::SetCC2ControllerNr(int Value)
     if (e)
     {
       Put(e);
-      Midi->OutNow(this, e);
+      gpMidiPlayer->OutNow(this, e);
     }
   }
   Cleanup();
@@ -2869,7 +2930,7 @@ void tTrack::SetReverbType(int Value, int lsb)
       Put(e);
       if (gpConfig->GetValue(C_UseReverbMacro))
       {
-        Midi->OutNow(this, e);
+        gpMidiPlayer->OutNow(this, e);
       }
     }
   }
@@ -2910,7 +2971,7 @@ void tTrack::SetChorusType(int Value, int lsb)
       Put(e);
       if (gpConfig->GetValue(C_UseChorusMacro))
       {
-        Midi->OutNow(this, e);
+        gpMidiPlayer->OutNow(this, e);
       }
     }
   }
@@ -2944,7 +3005,7 @@ void tTrack::SetEqualizerType(int Value)
     if (e)
     {
       Put(e);
-      Midi->OutNow(this, e);
+      gpMidiPlayer->OutNow(this, e);
     }
   }
   Cleanup();
@@ -2979,7 +3040,7 @@ void tTrack::SetRevSysex(int rsp, int Value)
       Put(e);
       if (!gpConfig->GetValue(C_UseReverbMacro))
       {
-        Midi->OutNow(this, e);
+        gpMidiPlayer->OutNow(this, e);
       }
     }
   }
@@ -3015,7 +3076,7 @@ void tTrack::SetChoSysex(int csp, int Value)
       Put(e);
       if (!gpConfig->GetValue(C_UseChorusMacro))
       {
-        Midi->OutNow(this, e);
+        gpMidiPlayer->OutNow(this, e);
       }
     }
   }
@@ -3050,7 +3111,7 @@ void tTrack::SetPartRsrv(unsigned char *rsrv)
     if (e)
     {
       Put(e);
-      Midi->OutNow(this, e);
+      gpMidiPlayer->OutNow(this, e);
     }
   }
   Cleanup();
@@ -3088,7 +3149,7 @@ void tTrack::SetMasterVol(int Value)
     if (e)
     {
       Put(e);
-      Midi->OutNow(this, e);
+      gpMidiPlayer->OutNow(this, e);
     }
   }
   Cleanup();
@@ -3121,7 +3182,7 @@ void tTrack::SetMasterPan(int Value)
     if (e)
     {
        Put(e);
-       Midi->OutNow(this, e);
+       gpMidiPlayer->OutNow(this, e);
     }
   }
   Cleanup();
@@ -3188,7 +3249,7 @@ void tTrack::SetModeSysex(int param, int Value)
     if (e)
     {
       Put(e);
-      Midi->OutNow(this, e);
+      gpMidiPlayer->OutNow(this, e);
     }
   }
   Cleanup();
@@ -3239,7 +3300,7 @@ void tTrack::SetDefaultSpeed(int bpm)
     Kill(Speed);
   }
   Put(e);
-  Midi->OutNow(this, e);
+  gpMidiPlayer->OutNow(this, e);
   Cleanup();
 }
 

@@ -130,10 +130,15 @@ class JZProject : public JZSong
     // Sets selection
 //    void SetSelection();
 
-    const JZRecordingInfo* GetRecInfo();
+    JZRecordingInfo* GetRecInfo();
 
     // Sets RecInfo, JZProject takes ownership of this object
     void SetRecInfo(JZRecordingInfo* pRecInfo);
+
+    tPlayer* GetPlayer()
+    {
+      return mpMidiPlayer;
+    }
 
   private:
 
@@ -152,8 +157,6 @@ class JZProject : public JZSong
     JZSynth* mpSynth;
 
     JZRecordingInfo* mpRecInfo;
-
-    JZSong* mpSong;
 
     bool mChanged;
 

@@ -531,7 +531,7 @@ void wxPropertyValue::WritePropertyType(wxString& stream)    // Write as any oth
     }
     case wxPropertyValueIntegerPtr:
     {
-      tmp.Printf( wxT("%ld"), *m_value.integerPtr );
+      tmp.Printf( wxT("%d"), *m_value.integerPtr );
       stream.Append( tmp );
       break;
     }

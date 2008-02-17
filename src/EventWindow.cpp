@@ -905,11 +905,18 @@ void tMeterChangeDlg::AddProperties()
 //   Add(wxMakeFormNewLine());
 //   Add(wxMakeFormMessage("Supported Denomiators: 2,4,8,16,32"));
 //   AssociatePanel(panel);
-  sheet->AddProperty(new wxProperty("BarNr",wxPropertyValue((long*) &BarNr), "integer"));//JAVE validators here? problem is i dont know which ranges are valid FIXME
-  sheet->AddProperty(new wxProperty("Numerator",wxPropertyValue((long*) &Numerator), "integer"));
-  sheet->AddProperty(new wxProperty("Denomiator(2,4,8,16,32)",wxPropertyValue((long*) &Denomiator), "integer"));//JAVE should be a integer list instead FIXME
-
-
+  sheet->AddProperty(new wxProperty(
+    "BarNr",
+    wxPropertyValue(&BarNr),
+    "integer"));//JAVE validators here? problem is i dont know which ranges are valid FIXME
+  sheet->AddProperty(new wxProperty(
+    "Numerator",
+    wxPropertyValue(&Numerator),
+    "integer"));
+  sheet->AddProperty(new wxProperty(
+    "Denomiator(2,4,8,16,32)",
+    wxPropertyValue(&Denomiator),
+     "integer"));//JAVE should be a integer list instead FIXME
 }
 
 
@@ -927,9 +934,6 @@ void JZEventFrame::MenMeterChange()
   dlg->Create();
 
 }
-
-
-
 
 
 void JZEventFrame::ZoomIn()
@@ -953,7 +957,8 @@ void JZEventFrame::ZoomIn()
 
 void JZEventFrame::ZoomOut()
 {
-  if (ClocksPerPixel <= 120) {
+  if (ClocksPerPixel <= 120)
+  {
     ClocksPerPixel *= 2;
     long x = CanvasX / 2;
     long y = CanvasY;
@@ -966,5 +971,3 @@ void JZEventFrame::ZoomOut()
     //  Redraw();
   }
 }
-
-

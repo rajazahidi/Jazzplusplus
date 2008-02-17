@@ -276,7 +276,7 @@ void tTransposeDlg::AddProperties()
     "string"));
   sheet->AddProperty(new wxProperty(
     "Amount",
-    wxPropertyValue((long*) &Notes),
+    wxPropertyValue(&Notes),
     "integer",
     new wxIntegerListValidator(-12, 12)));
   sheet->AddProperty(new wxProperty(
@@ -324,7 +324,11 @@ void tSetChannelDlg::AddProperties()
 //   Add(wxMakeFormNewLine());
   // AssociatePanel(panel);
 
-  sheet->AddProperty(new wxProperty("new Channel", wxPropertyValue((long*)&NewChannel), "integer", new wxIntegerListValidator(1, 16)));
+  sheet->AddProperty(new wxProperty(
+    "new Channel",
+    wxPropertyValue(&NewChannel),
+    "integer",
+    new wxIntegerListValidator(1, 16)));
 }
 
 
@@ -362,12 +366,12 @@ void tVelocityDlg::AddProperties()
 {
   sheet->AddProperty(new wxProperty(
     "Start",
-    wxPropertyValue((long*)&FromValue),
+    wxPropertyValue(&FromValue),
     "integer",
     new wxIntegerListValidator(0, 127)));
   sheet->AddProperty(new wxProperty(
     "Stop",
-    wxPropertyValue((long*)&ToValue),
+    wxPropertyValue(&ToValue),
     "integer",
     new wxIntegerListValidator(0, 127)));
   sheet->AddProperty(new wxProperty(
@@ -704,8 +708,8 @@ void tQuantizeDlg::AddProperties()
     "bool"));
   sheet->AddProperty(new wxProperty(
     "Groove",
-    wxPropertyValue((double*)&Groove),
-    "double",
+    wxPropertyValue(&Groove),
+    "int",
     new wxRealListValidator(-100, 100)));
   sheet->AddProperty(new wxProperty(
     "Delay",
@@ -899,7 +903,11 @@ bool tPitchDlg::OnClose()
 void tPitchDlg::AddProperties()
 {
   //Add(wxMakeFormShort("Pitch:", &Value, wxFORM_DEFAULT, new wxList(wxMakeConstraintRange(-8191.0, 8191.0), 0)));
-  sheet->AddProperty(new wxProperty("Pitch:", wxPropertyValue((long*)&Value), "integer", new wxIntegerListValidator(-8191,8191)));
+  sheet->AddProperty(new wxProperty(
+    "Pitch:",
+    wxPropertyValue(&Value),
+    "integer",
+    new wxIntegerListValidator(-8191, 8191)));
 
   tChEventDlg::AddProperties();
 }

@@ -806,7 +806,7 @@ tSysEx* tSynthSysex::operator()(long clk, int id, int channel, int datalen, unsi
    int len = sxlen[id] + datalen - 1;
    unsigned char* sx = new unsigned char[len];
    memcpy( sx, sxdata[id], sxlen[id] );
-   tSysEx* s;
+   tSysEx* s = 0;
 
    if (id == SX_GM_MasterVol)
    {

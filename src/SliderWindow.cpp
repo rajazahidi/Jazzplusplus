@@ -123,7 +123,6 @@ void tSliderWin::OnSize(wxSizeEvent& Event)
 //  }
 
   int n_rows = (n_sliders - 1) /  sliders_per_row + 1;
-  int ay = (int)ph;
   for (int row = 0; row < n_rows; row++)
   {
     float y0 = ph + row * (ch - ph) / n_rows;

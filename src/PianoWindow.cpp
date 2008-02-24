@@ -25,13 +25,8 @@
 #include "PianoWindow.h"
 #include "PianoFrame.h"
 
-#ifdef wx_xt
-#define ScLine 1L
-#define ScPage 200L
-#else
 #define ScLine 50L
 #define ScPage 8L
-#endif
 
 //*****************************************************************************
 // Description:

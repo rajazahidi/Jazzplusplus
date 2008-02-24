@@ -3,11 +3,10 @@
 \input{psbox.tex}
 \parskip=10pt
 \parindent=0pt
-\title{the JAZZ++ midi sequencer\\
-version 3.2}%
+\title{JAZZ++ MIDI sequencer version 5.0}%
 \author{Andreas Voss $<$Andreas.Voss@jazzware.com$>$\\
 Per Sigmond $<$Per.Sigmond@jazzware.com$>$}%
-\date{January 2008}%
+\date{February 2008}%
 \makeindex%
 \begin{document}%
 \maketitle%
@@ -33,9 +32,10 @@ JAZZ++ has support for {\em GM} (General MIDI) equipment with both {\em GS}
 and {\em XG} extensions.
 
 JAZZ++ offers special functions like GS/XG sound editing, setting of effect
-types, a {\em random rhythm generator} and a {\em harmony browser}. Windows versions of
-JAZZ++ can be synchronized to other sound equipment (e.g. a tape recorder)
-using Midi Time Code (MTC) or SongPointer synchronization techniques.
+types, a {\em random rhythm generator} and a {\em harmony browser}. Windows
+versions of JAZZ++ can be synchronized to other sound equipment (e.g. a tape
+recorder) using MIDI Time Code (MTC) or SongPointer synchronization
+techniques.
 
 As an extension to normal MIDI sequencing, JAZZ++ provides audio play
 (*.wav files), audio recording and audio/midi integration. A multi function
@@ -51,21 +51,20 @@ As an extension to normal MIDI sequencing, JAZZ++ provides audio play
 \section{System requirements}\label{requirements}
 
 \subsection{MIDI and audio equipment}
-To play midi music your PC must be attached to a midi synthesizer device. The
-synthesizer can either be an integrated part of a sound-card, or an
-external device attached to the PC with a cable. To record midi music you
-will need a midi-capable piano-keyboard attached to the PC (as an alternative
-you can enter notes using the mouse).
+To play MIDI music your PC must be attached to a MIDI synthesizer device. The
+synthesizer can either be an integrated part of a sound-card, or an external
+device attached to the PC with a cable.  To record MIDI music you will need a
+midi-capable piano-keyboard attached to the PC (as an alternative you can
+enter notes using the mouse).
 
 For audio you need an audio capable sound card.
 
-\subsection{Unix operating systems}
+\subsection{Linux operating systems}
 
 The device-independent part of JAZZ++ (the sequencer / editor part) is known
 to run on Linux, Sun-OS4 and Solaris2 systems, but should compile and run
-(with some minor hacking) on any system supporting Unix/X11. To compile
-you will need the "wxwin" GUI package (free) together with either XView
-(free) or Motif.
+(with some minor hacking) on any system supporting Linux/X11. To compile you
+will need the wxWidgets GUI package together with GTK.
 
 The device-dependant part (midi-driver) currently supports:
 \begin{itemize}
@@ -82,26 +81,26 @@ than the JAZZ++/OSS solution (e.g. support for external timing source).
 
 \subsection{Windows operating systems}
 
-JAZZ++ supports the windows midi / audio driver interface. A driver for your
-midi interface card or sound card must be installed before JAZZ++ can play /
-record midi or audio.
+JAZZ++ supports the windows MIDI / audio driver interface. A driver for your
+MIDI interface card or sound card must be installed before JAZZ++ can play /
+record MIDI or audio.
 
-Provided such a midi driver is installed in your system, JAZZ++ currently
-supports 32-bit platforms (e.g. win95).
+Provided such a MIDI driver is installed in your system, JAZZ++ currently
+supports 32-bit platforms.
 
 \subsection{CPU and memory}
-For midi-only operation a 486 CPU (or equivalent) is sufficient in most
-cases. For satisfactory audio operation a Pentium CPU with 32 MBytes
+For MIDI-only operation a 486 CPU (or equivalent) is sufficient in most
+cases.  For satisfactory audio operation a Pentium CPU with 32 MBytes
 RAM is recommended.
 
 
 \section{Where to get it}\label{wheretoget}
 
-For latest updates on software from {\em JazzWare}, please look at the
+For latest updates on software from {\em sourceforge}, please look at the
 JAZZ++ homepage at
 
 \begin{indented}{2cm}
-{\tt http://www.jazzware.com}
+{\tt http://jazzplusplus.sourceforge.net}
 \end{indented}
 
 You are welcome to join the JAZZ++ mailing list by sending mail to
@@ -121,7 +120,7 @@ manual.
 
 \section{Copyright}\label{copyright}
 
-The JAZZ++ Midi Sequencer is copyright (C) 1994-2000 Andreas Voss and 
+The JAZZ++ MIDI Sequencer is copyright (C) 1994-2000 Andreas Voss and 
 Per Sigmond, all rights reserved.
 
 JAZZ++ program is free software; you can redistribute it and/or modify

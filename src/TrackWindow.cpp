@@ -35,11 +35,21 @@
 
 using namespace std;
 
+//*****************************************************************************
+//*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(JZTrackWindow, wxScrolledWindow)
   EVT_SIZE(JZTrackWindow::OnSize)
 END_EVENT_TABLE()
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+const int JZTrackWindow::mScrollLine = 50;
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+const int JZTrackWindow::mScrollPage = 8;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -165,8 +175,10 @@ void JZTrackWindow::Create()
   delete pDc;
 }
 
+//-----------------------------------------------------------------------------
 //   Update the play position to the clock argument, and trigger a redraw so
 // the play bar will be drawn.
+//-----------------------------------------------------------------------------
 void JZTrackWindow::NewPlayPosition(long Clock)
 {
   long scroll_clock = (mFromClock + 5 * mToClock) / 6L;
@@ -182,11 +194,11 @@ void JZTrackWindow::NewPlayPosition(long Clock)
     {
       return;
     }
-//    long x = Clock2x(Clock);
-//    Canvas->SetScrollPosition(x - wLeft, CanvasY);
+    int x = Clock2x(Clock);
+    SetScrollPosition(x - wLeft, mCanvasY);
   }
 
-  if (!mpSnapSel->Active)	// sets clipping
+  if (!mpSnapSel->Active)  // sets clipping
   {
     if (mPlayClock != Clock)
     {
@@ -237,6 +249,39 @@ void JZTrackWindow::OnSize(wxSizeEvent& Event)
   GetClientSize(&mCanvasWidth, &mCanvasHeight);
   if (mCanvasWidth && mCanvasHeight)
   {
+    SetScrollRanges();
+    Refresh();
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::ZoomIn()
+{
+  if (mClocksPerPixel >= 2)
+  {
+    mClocksPerPixel /= 2;
+    int x = mCanvasX * 2;
+    int y = mCanvasY;
+
+    SetScrollRanges();
+    SetScrollPosition(x, y);
+    Refresh();
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::ZoomOut()
+{
+  if (mClocksPerPixel <= 120)
+  {
+    mClocksPerPixel *= 2;
+    int x = mCanvasX / 2;
+    int y = mCanvasY;
+
+    SetScrollRanges();
+    SetScrollPosition(x, y);
     Refresh();
   }
 }
@@ -246,6 +291,9 @@ void JZTrackWindow::OnSize(wxSizeEvent& Event)
 void JZTrackWindow::OnDraw(wxDC& Dc)
 {
   GetViewStart(&mCanvasX, &mCanvasY);
+  mCanvasX *= mScrollLine;
+  mCanvasY *= mScrollLine;
+
   GetClientSize(&mCanvasWidth, &mCanvasHeight);
 
   xEvents = mCanvasX + wLeft;
@@ -342,7 +390,9 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
     yEvents,
     mCanvasX + mCanvasWidth,
     yEvents + hEvents);
+
   int TrackNumber = mFromLine;
+
   for (int y = Line2y(TrackNumber); y < yEvents + hEvents; y += hLine)
   {
     // SN+    Dc.HLine(y);
@@ -553,7 +603,6 @@ void JZTrackWindow::DrawCounters(wxDC& Dc)
     tTrack* pTrack = gpProject->GetTrack(i);
     if (pTrack)
     {
-      char buf[20];
       int Value;
       switch (mCounterMode)
       {
@@ -579,8 +628,9 @@ void JZTrackWindow::DrawCounters(wxDC& Dc)
           Value = 0;
           break;
       }
-      sprintf(buf, "%3d", Value);
-      LineText(Dc, xPatch, Line2y(i), wPatch, buf);
+      ostringstream Oss;
+      Oss << setw(3) << Value;
+      LineText(Dc, xPatch, Line2y(i), wPatch, Oss.str().c_str());
     }
     else
     {
@@ -620,62 +670,62 @@ void JZTrackWindow::DrawEvents(wxDC& Dc)
       if (mUseColors)
       {
 #if 0
-	while (e)       // slow!
-	{
-	  float x = Clock2x(e->GetClock());
-	  Dc.SetPen(e->GetPen());
-	  Dc.DrawLine(x, y0, x, y1);
-	  e = Iterator.Next();
-	}
+        while (e)       // slow!
+        {
+          float x = Clock2x(e->GetClock());
+          Dc.SetPen(e->GetPen());
+          Dc.DrawLine(x, y0, x, y1);
+          e = Iterator.Next();
+        }
 #else
-	int xdone = -1;
-	int h = y1 - y0;
-	while (e)       // very slow!
-	{
-	  int x1 = Clock2x(e->GetClock() + e->GetLength());
-	  if (x1 > xdone)
+        int xdone = -1;
+        int h = y1 - y0;
+        while (e)       // very slow!
+        {
+          int x1 = Clock2x(e->GetClock() + e->GetLength());
+          if (x1 > xdone)
           {
-	    int x0 = Clock2x(e->GetClock());
-	    if (x0 < xdone)
+            int x0 = Clock2x(e->GetClock());
+            if (x0 < xdone)
             {
-	      x0 = xdone;
+              x0 = xdone;
             }
-	    int w = x1 - x0;
-	    if (w < 2)
+            int w = x1 - x0;
+            if (w < 2)
             {
-	      w = 2;
+              w = 2;
             }
-	    xdone = x0 + w;
-	    Dc.SetPen(*e->GetPen());
-	    Dc.SetBrush(*e->GetBrush());
-	    Dc.DrawRectangle(x0, y0, w, h);
-	  }
-	  e = Iterator.Next();
-	}
+            xdone = x0 + w;
+            Dc.SetPen(*e->GetPen());
+            Dc.SetBrush(*e->GetBrush());
+            Dc.DrawRectangle(x0, y0, w, h);
+          }
+          e = Iterator.Next();
+        }
 #endif
-	Dc.SetPen(*wxBLACK_PEN);
+        Dc.SetPen(*wxBLACK_PEN);
       }
       else
       {
-	float xblack = -1.0;
-	while (e)
-	{
-	  int x = Clock2x(e->GetClock());
+        float xblack = -1.0;
+        while (e)
+        {
+          int x = Clock2x(e->GetClock());
 
-	  // Avoid painting events ON the bar
-	  if ( !(e->GetClock() % BarInfo.TicksPerBar) ) x = x + 1;
+          // Avoid painting events ON the bar
+          if ( !(e->GetClock() % BarInfo.TicksPerBar) ) x = x + 1;
 
-	  if (x > xblack)
-	  {
-	    Dc.DrawLine(x, y0, x, y1);
+          if (x > xblack)
+          {
+            Dc.DrawLine(x, y0, x, y1);
 #ifndef SLOW_MACHINE
-	    xblack = x;
+            xblack = x;
 #else
-	    xblack = x + 4;
+            xblack = x + 4;
 #endif
-	  }
-	  e = Iterator.Next();
-	}
+          }
+          e = Iterator.Next();
+        }
       }
     }
     ++TrackNumber;
@@ -833,6 +883,8 @@ const char* JZTrackWindow::NumberStr() const
   return pString;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZTrackWindow::EventsSelected(const wxString& Message)
 {
   if (!mpSnapSel->Selected)
@@ -843,10 +895,44 @@ int JZTrackWindow::EventsSelected(const wxString& Message)
   return 1;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::GetVirtualSize(int& Width, int& Height) const
+{
+  int Clock = mpSong->MaxQuarters * mpSong->TicksPerQuarter;
+  Width = Clock / mClocksPerPixel + wLeft;
+  Height = 127 * hLine + hTop;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::SetScrollRanges()
+{
+  int Width, Height;
+  GetVirtualSize(Width, Height);
+  SetScrollbars(
+    mScrollLine,
+    mScrollLine,
+    Width / mScrollLine,
+    Height / mScrollLine,
+    mScrollLine,
+    mScrollLine);
+  EnableScrolling(false, false);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::SetScrollPosition(int x, int y)
+{
+  x /= mScrollLine;
+  y /= mScrollLine;
+  Scroll(x, y);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
 {
-  cout << "JZTrackWindow::MousePlay" << endl;
-
   if (Mode == eMouse && !Event.ButtonDown())
   {
     return;

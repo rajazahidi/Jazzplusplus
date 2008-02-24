@@ -79,7 +79,17 @@ class JZTrackWindow : public wxScrolledWindow
 
     int EventsSelected(const wxString& Message);
 
+    void ZoomIn();
+
+    void ZoomOut();
+
+    void SetScrollRanges();
+
+    void SetScrollPosition(int x, int y);
+
   private:
+
+    void GetVirtualSize(int& Width, int& Height) const;
 
     void OnSize(wxSizeEvent& Event);
 
@@ -133,6 +143,9 @@ class JZTrackWindow : public wxScrolledWindow
     const char* NumberStr() const;
 
   private:
+
+    static const int mScrollLine;
+    static const int mScrollPage;
 
     JZSong* mpSong;
 

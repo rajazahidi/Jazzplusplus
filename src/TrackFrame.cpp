@@ -34,6 +34,7 @@
 #include "Project.h"
 #include "Globals.h"
 #include "Configuration.h"
+#include "Harmony.h"
 #include "AboutDialog.h"
 
 // These are the tool bar icons.
@@ -78,6 +79,12 @@ BEGIN_EVENT_TABLE(JZTrackFrame, wxFrame)
 
   EVT_MENU(ID_METRONOME_ON, JZTrackFrame::OnMetroOn)
 
+  EVT_MENU(wxID_ZOOM_IN, JZTrackFrame::OnZoomIn)
+
+  EVT_MENU(wxID_ZOOM_OUT, JZTrackFrame::OnZoomOut)
+
+  EVT_MENU(ID_TOOLS_HARMONY_BROWSER, JZTrackFrame::OnToolsHarmonyBrowser)
+
   EVT_MENU(wxID_HELP_CONTENTS, JZTrackFrame::OnHelpContents)
 
   EVT_MENU(wxID_ABOUT, JZTrackFrame::OnHelpAbout)
@@ -96,6 +103,7 @@ JZTrackFrame::JZTrackFrame(
     mpToolBar(0),
     mpFileMenu(0),
     mpEditMenu(0),
+    mpToolsMenu(0),
 //    mpPianoFrame(0),
     mPreviousClock(0),
     mPreviouslyRecording(false)
@@ -212,9 +220,9 @@ void JZTrackFrame::CreateMenu()
   mpEditMenu->Append(wxID_DELETE, "&Delete");
   mpEditMenu->Append(wxID_DELETE, "&Silence");
 
+#if 0
   mpEditMenu->AppendSeparator();
 
-#if 0
   mpEditMenu->Append(MEN_SPLIT, "Split");
   mpEditMenu->Append(MEN_REPLICATE, "&Duplicate");
 
@@ -249,9 +257,13 @@ void JZTrackFrame::CreateMenu()
   misc_menu->Append(MEN_ARPEGGIO, "Random Arpeggio...");
   misc_menu->Append(MEN_MAPPER,   "Ma&pper...");
   misc_menu->Append(MEN_EVENTLIST, "Event &List...");
-
   misc_menu->Append(MEN_COPYRIGHT,"&Set Music Copyright ...");
+#endif
 
+  mpToolsMenu = new wxMenu;
+  mpToolsMenu->Append(ID_TOOLS_HARMONY_BROWSER,  "&Harmony Browser...");
+
+#if 0
   // Move to Project Menu
   mpFileMenu->Append(MEN_LOAD_TMPL,     "Load &Template...");
   mpFileMenu->Append(MEN_LOADPATTERN,   "Load Pattern...");
@@ -346,6 +358,8 @@ void JZTrackFrame::CreateMenu()
   wxMenuBar* pMenuBar = new wxMenuBar();
   pMenuBar->Append(mpFileMenu, "&File");
   pMenuBar->Append(mpEditMenu, "&Edit");
+  pMenuBar->Append(mpToolsMenu, "&Tools");
+
 #if 0
   pMenuBar->Append(misc_menu, "&View");
   pMenuBar->Append(parts_menu, "&Parts");
@@ -391,7 +405,8 @@ bool JZTrackFrame::OnClose()
 //#endif
 //  }
 
-//OLD  delete the_harmony_browser;
+  delete gpHarmonyBrowser;
+
   return true;
 }
 
@@ -415,7 +430,7 @@ void JZTrackFrame::OnFileOpen(wxCommandEvent& Event)
     gpProject->OpenSong(FileName);
     SetTitle(FileName);
 //    NextWin->NewPosition(1, 0);
-//    Canvas->SetScrollRanges();
+    mpTrackWindow->SetScrollRanges();
 //    NextWin->Canvas->SetScrollRanges();
     Refresh();
 //    tTrack::changed = false;
@@ -461,6 +476,27 @@ void JZTrackFrame::OnPianoWindow(wxCommandEvent& Event)
 void JZTrackFrame::OnMetroOn(wxCommandEvent& Event)
 {
   MetronomeInfo.IsOn = !MetronomeInfo.IsOn;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnZoomIn(wxCommandEvent& Event)
+{
+  mpTrackWindow->ZoomIn();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnZoomOut(wxCommandEvent& Event)
+{
+  mpTrackWindow->ZoomOut();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnToolsHarmonyBrowser(wxCommandEvent& Event)
+{
+  CreateHarmonyBrowser(this);
 }
 
 //-----------------------------------------------------------------------------

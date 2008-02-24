@@ -73,9 +73,15 @@ class JZTrackFrame : public wxFrame, public tButtonLabelInterface
 
     void OnFileExit(wxCommandEvent& Event);
 
+    void OnZoomIn(wxCommandEvent& Event);
+
+    void OnZoomOut(wxCommandEvent& Event);
+
     void OnPlay(wxCommandEvent& Event);
 
     void OnPianoWindow(wxCommandEvent& Event);
+
+    void OnToolsHarmonyBrowser(wxCommandEvent& Event);
 
     void OnHelpContents(wxCommandEvent& Event);
 
@@ -90,6 +96,8 @@ class JZTrackFrame : public wxFrame, public tButtonLabelInterface
     wxMenu* mpFileMenu;
 
     wxMenu* mpEditMenu;
+
+    wxMenu* mpToolsMenu;
 
     JZTrackWindow* mpTrackWindow;
 

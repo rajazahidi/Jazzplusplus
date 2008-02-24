@@ -44,8 +44,6 @@
 
 using namespace std;
 
-tHBInterface *the_harmony_browser = 0;
-
 #define MEN_CLOSE	1
 #define MEN_MIDI	2
 #define MEN_TRANSPOSE	4
@@ -1544,7 +1542,7 @@ HBFrame::~HBFrame()
   gpConfig->Put(C_HarmonyYpos, YPixel);
   delete mpToolBar;
   delete cnvs;
-  the_harmony_browser = 0;
+  gpHarmonyBrowser = 0;
 }
 
 bool HBFrame::OnClose()
@@ -1755,10 +1753,12 @@ void HBFrame::TransposeSelection()
   cnvs->TransposeSelection();
 }
 
-void harmony_browser(JZEventFrame *parent)
+void CreateHarmonyBrowser(wxFrame* pParent)
 {
-  if (!the_harmony_browser)
-    the_harmony_browser = new HBFrame((wxFrame *)parent);
-  ((HBFrame *)the_harmony_browser)->Show(TRUE);
+  if (!gpHarmonyBrowser)
+  {
+    gpHarmonyBrowser = new HBFrame(pParent);
+  }
+  ((HBFrame *)gpHarmonyBrowser)->Show(true);
 }
 

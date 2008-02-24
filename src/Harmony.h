@@ -71,8 +71,6 @@ class HBFrame : public wxFrame, public tHBInterface
     DECLARE_EVENT_TABLE()
 };
 
-extern tHBInterface* the_harmony_browser;
-
-extern void harmony_browser(JZEventFrame* pParent);
+extern void CreateHarmonyBrowser(wxFrame* pParent);
 
 #endif // !defined(JZ_HARMONY_H)

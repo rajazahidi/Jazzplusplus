@@ -64,3 +64,5 @@ JZProject* gpProject = 0;
 JZTrackFrame* gpTrackFrame = 0;
 
 JZTrackWindow* gpTrackWindow = 0;
+
+tHBInterface* gpHarmonyBrowser = 0;

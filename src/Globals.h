@@ -37,6 +37,7 @@ class tHelp;
 class JZProject;
 class JZTrackFrame;
 class JZTrackWindow;
+class tHBInterface;
 
 extern tConfig* gpConfig;
 extern std::string gpStartUpSong;
@@ -55,5 +56,6 @@ extern std::vector<std::pair<std::string, int> > gSynthesierTypeFiles;
 extern JZProject* gpProject;
 extern JZTrackFrame* gpTrackFrame;
 extern JZTrackWindow* gpTrackWindow;
+extern tHBInterface* gpHarmonyBrowser;
 
 #endif // !defined(JZ_GLOBALS_H)

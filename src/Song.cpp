@@ -88,10 +88,12 @@ void JZSong::Read(tReadBase &io, const char *fname)
     SetTicksPerQuarter(192);
   }
 
-  // adjust song length = midi length + 16 bars
-  long newlen = GetLastClock() / TicksPerQuarter + 16 * 4;
-  if (newlen > MaxQuarters)
-    MaxQuarters = newlen;
+  // Adjust the song length to equal the MIDI file length plus 16 bars.
+  long NewLength = GetLastClock() / TicksPerQuarter + 16 * 4;
+  if (NewLength > MaxQuarters)
+  {
+    MaxQuarters = NewLength;
+  }
 
   wxEndBusyCursor();
 }

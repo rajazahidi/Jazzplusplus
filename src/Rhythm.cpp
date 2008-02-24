@@ -305,14 +305,14 @@ void tRhythm::Generate(tTrack *track, long fr_clock, long to_clock, long ticks_p
       // generate keys from harmony browser
       if (key == CHORD_KEY || key == BASS_KEY)
       {
-        if (the_harmony_browser)
+        if (gpHarmonyBrowser)
         {
           long step = (clock - fr_clock) * total_steps / (to_clock - fr_clock);
           int keys[12], n_keys;
           if (key == CHORD_KEY)
-            n_keys = the_harmony_browser->GetChordKeys(keys, (int)step, (int)total_steps);
+            n_keys = gpHarmonyBrowser->GetChordKeys(keys, (int)step, (int)total_steps);
           else
-            n_keys = the_harmony_browser->GetBassKeys(keys, (int)step, (int)total_steps);
+            n_keys = gpHarmonyBrowser->GetBassKeys(keys, (int)step, (int)total_steps);
           for (int j = 0; j < n_keys; j++)
           {
             tKeyOn *k = new tKeyOn(clock, chan, keys[j], vel, len - clocks_per_step/2);
@@ -778,7 +778,7 @@ void tRhythmWin::AddInstrumentDlg()
   keys[n++] = MODE_CONTROL;
 
 #if 0
-  if (the_harmony_browser && the_harmony_browser->SeqDefined())
+  if (gpHarmonyBrowser && gpHarmonyBrowser->SeqDefined())
   {
     names[n] = "harmony: chords";
     keys[n++] = CHORD_KEY;

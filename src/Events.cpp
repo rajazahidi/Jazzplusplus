@@ -68,14 +68,14 @@ int tWriteBase::Open(const char *fname, int nTracks, int TicksPerQuarter)
 #ifndef __WXMSW__
     FILE *testfd = fopen(fname, "r");
     if (testfd) {
-	fclose( testfd );
-    	char *syscmd;
-    	syscmd = new char[ strlen( "cp" ) + 2*strlen( fname ) + strlen( ".backup" ) + 3 ];
-    	sprintf( syscmd, "cp %s %s.backup", fname, fname );
-    	if (system( syscmd ) != 0) {
-		fprintf(stderr, "Could not make backup file %s.backup\n", fname );
-    	}
-    	delete syscmd;
+        fclose( testfd );
+            char *syscmd;
+            syscmd = new char[ strlen( "cp" ) + 2*strlen( fname ) + strlen( ".backup" ) + 3 ];
+            sprintf( syscmd, "cp %s %s.backup", fname, fname );
+            if (system( syscmd ) != 0) {
+                fprintf(stderr, "Could not make backup file %s.backup\n", fname );
+            }
+            delete syscmd;
     }
 #endif
     fd = fopen(fname, "wb");

@@ -529,15 +529,15 @@ int JZEventFrame::OnMouseEvent(wxMouseEvent &e)
     {
       if (e.LeftDown())
       {
-	{
-	  SnapSelStart(e);
+        {
+          SnapSelStart(e);
 
-	  if (SnapSel->Selected){
-	    Refresh(); //redraw the whole window instead(inefficient, we should rather invalidate a rect)
-	  }
-	  SnapSel->Event(e);
-	  MouseAction = SnapSel;
-	}
+          if (SnapSel->Selected){
+            Refresh(); //redraw the whole window instead(inefficient, we should rather invalidate a rect)
+          }
+          SnapSel->Event(e);
+          MouseAction = SnapSel;
+        }
       }
     }
   }
@@ -552,10 +552,10 @@ int JZEventFrame::OnMouseEvent(wxMouseEvent &e)
 
       if (MouseAction == SnapSel)
       {
-	SnapSelStop(e);
-	Redraw(); //ineficcient, invalidate rect first instead
-	MouseAction = 0;
-	return 1;
+        SnapSelStop(e);
+        Redraw(); //ineficcient, invalidate rect first instead
+        MouseAction = 0;
+        return 1;
       }
 
       MouseAction = 0;
@@ -606,7 +606,7 @@ void JZEventFrame::NewPlayPosition(long Clock)
 //    Canvas->SetScrollPosition(x - wLeft, CanvasY);
   }
 
-  if (!SnapSel->Active)	// sets clipping
+  if (!SnapSel->Active)        // sets clipping
   {
     if (PlayClock != Clock)
     {
@@ -827,7 +827,7 @@ void JZEventFrame::MenConvertToModulation()
   cmd.Execute();
   Redraw();
   if (NextWin)
-  	NextWin->Redraw();
+          NextWin->Redraw();
 
 
 }

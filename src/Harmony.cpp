@@ -44,34 +44,34 @@
 
 using namespace std;
 
-#define MEN_CLOSE	1
-#define MEN_MIDI	2
-#define MEN_TRANSPOSE	4
-#define MEN_CLEARSEQ	6
-#define MEN_EDIT	7
-#define MEN_MOUSE	8
-#define MEN_HELP	9
+#define MEN_CLOSE        1
+#define MEN_MIDI        2
+#define MEN_TRANSPOSE        4
+#define MEN_CLEARSEQ        6
+#define MEN_EDIT        7
+#define MEN_MOUSE        8
+#define MEN_HELP        9
 
-#define MEN_MAJSCALE	10
-#define MEN_HARSCALE	11
-#define MEN_MELSCALE	12
+#define MEN_MAJSCALE        10
+#define MEN_HARSCALE        11
+#define MEN_MELSCALE        12
 
-#define MEN_EQ4		13
-#define MEN_EQ3		14
-#define MEN_EQ2		15
-#define MEN_EQ1		16
-#define MEN_EQH		17
-#define MEN_EQ0		18
-#define MEN_251		19
-#define MEN_TRITONE	20
-#define MEN_PIANO	21
-#define MEN_EQB		22
-#define MEN_HAUNSCH	23
-#define MEN_ANALYZE	24
-#define MEN_IONSCALE	25
-#define MEN_SETTINGS	26
-#define MEN_LOAD	27
-#define MEN_SAVE	28
+#define MEN_EQ4                13
+#define MEN_EQ3                14
+#define MEN_EQ2                15
+#define MEN_EQ1                16
+#define MEN_EQH                17
+#define MEN_EQ0                18
+#define MEN_251                19
+#define MEN_TRITONE        20
+#define MEN_PIANO        21
+#define MEN_EQB                22
+#define MEN_HAUNSCH        23
+#define MEN_ANALYZE        24
+#define MEN_IONSCALE        25
+#define MEN_SETTINGS        26
+#define MEN_LOAD        27
+#define MEN_SAVE        28
 
 
 #include "Bitmaps/open.xpm"
@@ -139,7 +139,7 @@ class HBPlayer : public wxTimer
     void StopPlay();
     void SettingsDialog(wxFrame *parent);
     int  IsPlaying() const { return playing; }
-    const HBContext &Context()	{ return context; }
+    const HBContext &Context()        { return context; }
 
     virtual void Notify();
 
@@ -420,7 +420,7 @@ class HBCanvas : public wxScrolledWindow
     void ClearSeq();
     virtual void OnEvent(wxMouseEvent &e);
 
-    int SeqDefined()	{ return n_seq > 0; }
+    int SeqDefined()        { return n_seq > 0; }
     int GetChordKeys(int *out, int step, int n_steps);
     int GetSelectedChord(int *out);
     int GetSelectedScale(int *out);
@@ -585,16 +585,16 @@ void HBCanvas::SetMarker(int id, wxToolBar *mpToolBar)
 
   switch (id)
   {
-    case MEN_EQ4:	mark_4_common = 1; break;
-    case MEN_EQ3:	mark_3_common = 1; break;
-    case MEN_EQ2:	mark_2_common = 1; break;
-    case MEN_EQ1:	mark_1_common = 1; break;
-    case MEN_EQB:	mark_b_common = 1; break;
-    case MEN_EQH:	mark_1_semi = 1; break;
-    case MEN_EQ0:	mark_0_common = 1; break;
-    case MEN_251: 	mark_251 = 1; break;
-    case MEN_TRITONE:	mark_tritone = 1; break;
-    case MEN_PIANO:	mark_piano = 1; break;
+    case MEN_EQ4:        mark_4_common = 1; break;
+    case MEN_EQ3:        mark_3_common = 1; break;
+    case MEN_EQ2:        mark_2_common = 1; break;
+    case MEN_EQ1:        mark_1_common = 1; break;
+    case MEN_EQB:        mark_b_common = 1; break;
+    case MEN_EQH:        mark_1_semi = 1; break;
+    case MEN_EQ0:        mark_0_common = 1; break;
+    case MEN_251:         mark_251 = 1; break;
+    case MEN_TRITONE:        mark_tritone = 1; break;
+    case MEN_PIANO:        mark_piano = 1; break;
   }
 
 #ifndef wx_xt
@@ -748,7 +748,7 @@ class HBSettingsForm : public wxForm
 {
   public:
     HBSettingsForm(HBCanvas *c)
-	: wxForm( USED_WXFORM_BUTTONS )
+        : wxForm( USED_WXFORM_BUTTONS )
     { cnvs = c; }
     virtual void OnOk() { cnvs->OnPaint(); wxForm::OnOk(); }
     virtual void OnHelp();
@@ -796,7 +796,7 @@ class HBMatchMarkers : public HBMatch
   public:
     HBMatchMarkers(const HBContext &ct, HBCanvas *cv);
     virtual bool operator()(const HBContext &);
-    const char * GetText() { return msg + 2; }	// + 2 for ", "
+    const char * GetText() { return msg + 2; }        // + 2 for ", "
   private:
     HBCanvas  *cnvs;
     HBContext context;
@@ -975,34 +975,34 @@ void HBCanvas::OnEvent(wxMouseEvent &e)
       player.StartPlay(context);
       if (e.LeftDown() && e.ShiftDown() || e.MiddleDown())
       {
-	if (context.SeqNr())
-	{
-	  // remove a chord
-	  if (context.SeqNr() == n_seq)
-	  {
-	    // remove markers first
-	    if (mouse_context.SeqNr() == n_seq)
-	    {
-	      DrawMarkers(mouse_context, dc);
-	      mouse_context.SetSeqNr(0);
-	      DrawMarkers(mouse_context, dc);
-	    }
-	    -- n_seq;
-	    UnDrawChord(context);
-	    context.SetSeqNr(0);
-	    Refresh();
-	  }
-	}
-	else if (n_seq < SEQMAX)
-	{
-	  // add a chord
-	  context.SetSeqNr(n_seq + 1);
-	  *seq[n_seq ++] = context;
-	  DrawMarkers(mouse_context, dc);
-	  DrawChord(context);
-	  DrawMarkers(mouse_context, dc);
-	  Refresh();
-	}
+        if (context.SeqNr())
+        {
+          // remove a chord
+          if (context.SeqNr() == n_seq)
+          {
+            // remove markers first
+            if (mouse_context.SeqNr() == n_seq)
+            {
+              DrawMarkers(mouse_context, dc);
+              mouse_context.SetSeqNr(0);
+              DrawMarkers(mouse_context, dc);
+            }
+            -- n_seq;
+            UnDrawChord(context);
+            context.SetSeqNr(0);
+            Refresh();
+          }
+        }
+        else if (n_seq < SEQMAX)
+        {
+          // add a chord
+          context.SetSeqNr(n_seq + 1);
+          *seq[n_seq ++] = context;
+          DrawMarkers(mouse_context, dc);
+          DrawChord(context);
+          DrawMarkers(mouse_context, dc);
+          Refresh();
+        }
       }
     }
     else if (e.Dragging() && player.IsPlaying() && context != player.Context())
@@ -1021,17 +1021,17 @@ void HBCanvas::OnEvent(wxMouseEvent &e)
       // paste to PianoWin buffer
       if (!mark_piano)
       {
-	tEventArray &buf = gpTrackFrame->GetPianoWindow()->PasteBuffer;
-	buf.Clear();
-	player.Paste(buf);
-	gpTrackFrame->GetPianoWindow()->Redraw();
+        tEventArray &buf = gpTrackFrame->GetPianoWindow()->PasteBuffer;
+        buf.Clear();
+        player.Paste(buf);
+        gpTrackFrame->GetPianoWindow()->Redraw();
       }
 
       // Show in GuitarWin
       JZGuitarFrame* guitar = gpTrackFrame->GetPianoWindow()->GetGuitarFrame();
       if (guitar)
       {
-        guitar->ShowPitch(0);	// remove actual pianowin/mouse position
+        guitar->ShowPitch(0);        // remove actual pianowin/mouse position
 //        guitar->Redraw();
         guitar->Update();
       }
@@ -1077,33 +1077,33 @@ void HBCanvas::OnMenuCommand(int id, wxToolBar *mpToolBar)
   {
     case MEN_LOAD:
       {
-	wxString fname = file_selector(
+        wxString fname = file_selector(
           default_filename,
           "Load Harmonies",
           false,
           has_changed,
           "*.har");
-	if (fname)
+        if (fname)
         {
-	  ifstream is(fname);
-	  is >> *this;
-	}
+          ifstream is(fname);
+          is >> *this;
+        }
       }
       break;
 
     case MEN_SAVE:
       {
-	wxString fname = file_selector(
+        wxString fname = file_selector(
           default_filename,
           "Save Harmonies",
           true,
           has_changed,
           "*.har");
-	if (fname)
+        if (fname)
         {
-	  ofstream os(fname);
-	  os << *this;
-	}
+          ofstream os(fname);
+          os << *this;
+        }
       }
       break;
 
@@ -1131,11 +1131,11 @@ void HBCanvas::OnMenuCommand(int id, wxToolBar *mpToolBar)
     case MEN_ANALYZE:
       if (gpTrackWindow->EventsSelected("please select source range in track window"))
       {
-	wxBeginBusyCursor();
+        wxBeginBusyCursor();
         HBAnalyzer analyzer(seq, (int)SEQMAX);
         n_seq = analyzer.Analyze(gpTrackWindow->mpFilter, analyze_res);
         Refresh();
-	wxEndBusyCursor();
+        wxEndBusyCursor();
       }
       break;
 
@@ -1181,66 +1181,66 @@ const int n_scale_names = 45;
 
 
 tNamedChord chord_names[n_chord_names] = {
-  { " j7",	0x891},
-  { " m7",	0x489},
-  { " 7",	0x491},
-  { " m75-",	0x449},
-  { " mj7",	0x889},
-  { " j75+",	0x911},
-  { " dim",	0x249},
-  { " sus4",	0xa1},
-  { " 7sus4",	0x4a1},
-  { " j7sus4",	0x8a1},
-  { " alt (79+13-)",	0x519},
-  { " 75-",	0x451},
+  { " j7",        0x891},
+  { " m7",        0x489},
+  { " 7",        0x491},
+  { " m75-",        0x449},
+  { " mj7",        0x889},
+  { " j75+",        0x911},
+  { " dim",        0x249},
+  { " sus4",        0xa1},
+  { " 7sus4",        0x4a1},
+  { " j7sus4",        0x8a1},
+  { " alt (79+13-)",        0x519},
+  { " 75-",        0x451},
 };
 
 tNamedChord scale_names[n_scale_names] = {
-  { "***** major scales *****",		0x0},
-  { "maj I   (ionic)",			0xab5},
-  { "maj IV  (lydic)",			0xad5},
-  { "har III (ion #5)",			0xb35},
-  { "har VI  (lyd #9)",			0xad9},
-  { "mel III (lyd #5)",			0xb55},
-  { "augmented",			0x333},
-  { "hj I    (ionic b13)",		0x9b5},
-  { "***** minor scales *****",		0x0},
-  { "minor penta",			0x4a9},
-  { "maj VI   (aeolic)",		0x5ad},
-  { "maj II   (doric)",			0x6ad},
-  { "mel II   (doric b9)",		0x6ab},
-  { "maj III  (phrygic)",		0x5ab},
-  { "japan penta",			0x4a3},
-  { "har IV   (dor #11)",		0x6cd},
-  { "har I    (harmonic minor)",	0x9ad},
-  { "mel I    (melodic minor)",		0xaad},
-  { "gipsy",				0x9cd},
-  { "hj IV    (melodic #11)",		0xacd},
-  { "***** dominant scales *****",	0x0},
-  { "major penta",			0x295},
-  { "ind. penta",			0x4b1},
-  { "maj V (mixolyd)",			0x6b5},
-  { "har V (har dominant)",		0x5b3},
-  { "mel IV (mixo #11)",		0x6d5},
-  { "mixo #11b9",			0x6d3},
-  { "mel V (mixo b13)",			0x5b5},
-  { "hj V  (mixo b9)",			0x6b3},
-  { "full",				0x555},
-  { "hj III (har alt)",			0x59b},
-  { "mel VII (alt)",			0x55b},
-  { "half/full",			0x6db},
-  { "***** semi dimin *****",		0x0},
-  { "maj VII (locr)",			0x56b},
-  { "mel VI  (locr 9)",			0x56d},
-  { "har II  (locr 13)",		0x66b},
-  { "hj II   (doric b5)",		0x66d},
-  { "***** dimin *****",		0x0},
-  { "har VII (har dim)",		0x35b},
-  { "full/half",			0xa6d},
-  { "hj VII  (locr dim)",		0x36b},
-  { "***** blues scales *****",		0x0},
-  { "minor penta b5",			0x4e9},
-  { "blues scale",			0x4f9},
+  { "***** major scales *****",                0x0},
+  { "maj I   (ionic)",                        0xab5},
+  { "maj IV  (lydic)",                        0xad5},
+  { "har III (ion #5)",                        0xb35},
+  { "har VI  (lyd #9)",                        0xad9},
+  { "mel III (lyd #5)",                        0xb55},
+  { "augmented",                        0x333},
+  { "hj I    (ionic b13)",                0x9b5},
+  { "***** minor scales *****",                0x0},
+  { "minor penta",                        0x4a9},
+  { "maj VI   (aeolic)",                0x5ad},
+  { "maj II   (doric)",                        0x6ad},
+  { "mel II   (doric b9)",                0x6ab},
+  { "maj III  (phrygic)",                0x5ab},
+  { "japan penta",                        0x4a3},
+  { "har IV   (dor #11)",                0x6cd},
+  { "har I    (harmonic minor)",        0x9ad},
+  { "mel I    (melodic minor)",                0xaad},
+  { "gipsy",                                0x9cd},
+  { "hj IV    (melodic #11)",                0xacd},
+  { "***** dominant scales *****",        0x0},
+  { "major penta",                        0x295},
+  { "ind. penta",                        0x4b1},
+  { "maj V (mixolyd)",                        0x6b5},
+  { "har V (har dominant)",                0x5b3},
+  { "mel IV (mixo #11)",                0x6d5},
+  { "mixo #11b9",                        0x6d3},
+  { "mel V (mixo b13)",                        0x5b5},
+  { "hj V  (mixo b9)",                        0x6b3},
+  { "full",                                0x555},
+  { "hj III (har alt)",                        0x59b},
+  { "mel VII (alt)",                        0x55b},
+  { "half/full",                        0x6db},
+  { "***** semi dimin *****",                0x0},
+  { "maj VII (locr)",                        0x56b},
+  { "mel VI  (locr 9)",                        0x56d},
+  { "har II  (locr 13)",                0x66b},
+  { "hj II   (doric b5)",                0x66d},
+  { "***** dimin *****",                0x0},
+  { "har VII (har dim)",                0x35b},
+  { "full/half",                        0xa6d},
+  { "hj VII  (locr dim)",                0x36b},
+  { "***** blues scales *****",                0x0},
+  { "minor penta b5",                        0x4e9},
+  { "blues scale",                        0x4f9},
 };
 
 
@@ -1288,8 +1288,8 @@ class HBContextDlg : public wxDialog
     HBChord    scale;
     int        chord_key;
     int        scale_key;
-    int	       ChordKey(int i = 0) const { return (chord_key + i) % 12; }
-    int	       ScaleKey(int i = 0) const { return (chord_key + i) % 12; } // yes, its chord_key!
+    int               ChordKey(int i = 0) const { return (chord_key + i) % 12; }
+    int               ScaleKey(int i = 0) const { return (chord_key + i) % 12; } // yes, its chord_key!
     HBContext  *pcontext;
 
     HBPlayer   player;
@@ -1396,8 +1396,8 @@ void HBContextDlg::ShowValues()
     {
       if (chord_names[i].bits == c.Keys())
       {
-	chord_lst->SetSelection(i);
-	break;
+        chord_lst->SetSelection(i);
+        break;
       }
     }
   }
@@ -1412,8 +1412,8 @@ void HBContextDlg::ShowValues()
     {
       if (scale_names[i].bits == s.Keys())
       {
-	scale_lst->SetSelection(i);
-	break;
+        scale_lst->SetSelection(i);
+        break;
       }
     }
   }
@@ -1594,14 +1594,14 @@ void HBFrame::OnMenuCommand(int id)
   {
     case MEN_HELP:
         gpHelpInstance->ShowTopic("Harmony browser");
-	break;
+        break;
 
     case MEN_MOUSE:
-	wxMessageBox("left: select chord\n"
-	              "  +shift: put chord into sequence\n"
-	              "middle: same as left+shift\n"
-	              "right: play chord\n", "Mousebuttons", wxOK);
-	break;
+        wxMessageBox("left: select chord\n"
+                      "  +shift: put chord into sequence\n"
+                      "middle: same as left+shift\n"
+                      "right: play chord\n", "Mousebuttons", wxOK);
+        break;
 
     case MEN_MIDI:
       cnvs->player.SettingsDialog(this);
@@ -1613,8 +1613,8 @@ void HBFrame::OnMenuCommand(int id)
 
     case MEN_EDIT:
       {
-	if (!SeqSelected())
-	  return;
+        if (!SeqSelected())
+          return;
       }
       (void) new HBContextDlg(cnvs, this, cnvs->seq[cnvs->mouse_context.SeqNr() - 1]);
       break;
@@ -1651,15 +1651,15 @@ HBFrame::HBFrame(wxFrame *parent)
   wxMenu    *menu;
   /*
   wxMenu    *menu = new wxMenu;
-  menu->Append(MEN_EDIT,	"&Edit chord");
-  menu->Append(MEN_SETTINGS,	"Se&ttings");
-  menu->Append(MEN_MIDI,	"&Midi");
-  menu->Append(MEN_HELP,	"&Help");
-  menu->Append(MEN_MOUSE,	"Help &mouse");
-  menu->Append(MEN_LOAD,	"&Load");
-  menu->Append(MEN_SAVE,	"&Save");
-  menu->Append(MEN_CLOSE,	"Cl&ose");
-  menu_bar->Append(menu,	"&Menu");
+  menu->Append(MEN_EDIT,        "&Edit chord");
+  menu->Append(MEN_SETTINGS,        "Se&ttings");
+  menu->Append(MEN_MIDI,        "&Midi");
+  menu->Append(MEN_HELP,        "&Help");
+  menu->Append(MEN_MOUSE,        "Help &mouse");
+  menu->Append(MEN_LOAD,        "&Load");
+  menu->Append(MEN_SAVE,        "&Save");
+  menu->Append(MEN_CLOSE,        "Cl&ose");
+  menu_bar->Append(menu,        "&Menu");
   */
 
   menu = new wxMenu("",wxMENU_TEAROFF);

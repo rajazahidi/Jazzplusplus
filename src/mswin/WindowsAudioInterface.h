@@ -74,7 +74,7 @@ class tWinAudioPlayer : public tWinIntPlayer
   private:
     ErrorCode error;
 
-    int can_duplex;	// TRUE = can do full duplex record/play
+    int can_duplex;        // TRUE = can do full duplex record/play
     int can_sync;       // TRUE = can determine exact output play position
 
     int  OpenDsp();    // 0 = ok

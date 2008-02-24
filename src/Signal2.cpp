@@ -97,14 +97,14 @@ void sig_reverb(
 
 /*
           isig
-	   |
-	  delay --  lfo_delay
-	   |
-	  pan ----- lfo_pan
-	   |
-	  mixer --- const(volume)
-	   |
-	  osig
+           |
+          delay --  lfo_delay
+           |
+          pan ----- lfo_pan
+           |
+          mixer --- const(volume)
+           |
+          osig
 */
 
 void sig_chorus(
@@ -189,12 +189,12 @@ static void setup_wav_control(tSigWaveCtrl &wav, JZRndArray &arr)
 }
 
 void sig_wavsynth(
-  tSample &spl,		// destin
-  double duration,	// length in seconds
-  int midi_key,		// base frequency
-  double fshift,	// frequeny modulation factor, 0 = off
-  int ntables,		// number of wavetables to be mixed
-  JZRndArray *arr[][4],	// (fft, vol, pitch, pan) * N
+  tSample &spl,                // destin
+  double duration,        // length in seconds
+  int midi_key,                // base frequency
+  double fshift,        // frequeny modulation factor, 0 = off
+  int ntables,                // number of wavetables to be mixed
+  JZRndArray *arr[][4],        // (fft, vol, pitch, pan) * N
   int noisegen          // first array is noise filter
 )
 {

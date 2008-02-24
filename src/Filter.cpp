@@ -35,12 +35,12 @@
 
 const tFltEvent FltEvents[nFltEvents] =
 {
-  { StatKeyOn,		"Note", 	1,	0,	127},
+  { StatKeyOn,                "Note",         1,        0,        127},
   { StatKeyPressure,    "Poly Aftertouch",1,    0,      127},
-  { StatControl, 	"Controller", 	1,	0,	127},
-  { StatProgram, 	"Patch",	1,	0,	127},
-  { StatPitch,		"Pitch", 	1,	-8192,	8192},
-  { StatTimeSignat,	"Meter",	1,	0,	0},
+  { StatControl,         "Controller",         1,        0,        127},
+  { StatProgram,         "Patch",        1,        0,        127},
+  { StatPitch,                "Pitch",         1,        -8192,        8192},
+  { StatTimeSignat,        "Meter",        1,        0,        0},
   { StatChnPressure,    "Channel Aftertouch",1, 0,      0},
   { StatSysEx,          "SysEx",        1,      0,      0}
 };
@@ -156,11 +156,11 @@ void tFilterDlg::AddProperties()
 //       {
 //         Add(wxMakeFormShort("Min:", &Filter->FltEvents[i].FromValue, wxFORM_DEFAULT,0,0,0,90));
 //         Add(wxMakeFormShort("Max:", &Filter->FltEvents[i].ToValue, wxFORM_DEFAULT,0,0,0,90));
-// 	Add(wxMakeFormBool(Filter->FltEvents[i].Name, &Filter->FltEvents[i].Selected, wxFORM_DEFAULT));
+//         Add(wxMakeFormBool(Filter->FltEvents[i].Name, &Filter->FltEvents[i].Selected, wxFORM_DEFAULT));
 //         Add(wxMakeFormNewLine());
 //       }
 //       else
-// 	Add(wxMakeFormBool(Filter->FltEvents[i].Name, &Filter->FltEvents[i].Selected, wxFORM_DEFAULT));
+//         Add(wxMakeFormBool(Filter->FltEvents[i].Name, &Filter->FltEvents[i].Selected, wxFORM_DEFAULT));
 //     }
 
 //     Add(wxMakeFormBool("Other", &Filter->OtherSelected));

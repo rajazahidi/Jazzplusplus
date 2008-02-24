@@ -139,7 +139,7 @@ class tRhythmWin : public wxFrame
     enum       { MAX_INSTRUMENTS = 20 };
     tRhythm    *instruments[MAX_INSTRUMENTS];
     int        n_instruments;
-    int        act_instrument;	// -1 if none
+    int        act_instrument;        // -1 if none
 
     // this one is edited and copied from/to instruments[i]
     tRhythm    edit;
@@ -158,8 +158,8 @@ class tRhythmWin : public wxFrame
     static void Generate(wxButton &but, wxCommandEvent& event);
     static void Help();
 
-    void Instrument2Win(int i = -1);	// instrument[act_instrument] -> win
-    void Win2Instrument(int i = -1);	// win -> instrument[act_instrument]
+    void Instrument2Win(int i = -1);        // instrument[act_instrument] -> win
+    void Win2Instrument(int i = -1);        // win -> instrument[act_instrument]
     void AddInstrumentDlg();
     void AddInstrument(tRhythm *r);
     void DelInstrument();

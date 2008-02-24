@@ -27,7 +27,7 @@ DEFINE_ARRAY(JZIntArray, int)
 JZUniqIds::JZUniqIds()
   : mArray(0)
 {
-  mArray[0] = 1; 	// 0 is an invalid id
+  mArray[0] = 1;         // 0 is an invalid id
 }
 
 int JZUniqIds::Get()

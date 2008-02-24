@@ -118,7 +118,7 @@ class JZEventFrame : public wxFrame
     // filled by OnPaint()
     //wxDC *dc;
     long xEvents, yEvents, wEvents, hEvents;
-    long CanvasX, CanvasY, CanvasW, CanvasH;	// canvas coords
+    long CanvasX, CanvasY, CanvasW, CanvasH;        // canvas coords
     long FromClock, ToClock;
     long FromLine, ToLine;
 

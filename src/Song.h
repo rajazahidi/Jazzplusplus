@@ -89,7 +89,7 @@ class JZSong
 
     tTrack *GetTrack(int Nr);
     long GetLastClock();
-    int NumUsedTracks();	// number of used tracks
+    int NumUsedTracks();        // number of used tracks
     int Speed();
 
 // SN++

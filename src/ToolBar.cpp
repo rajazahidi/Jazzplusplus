@@ -66,7 +66,7 @@ JZToolBar::JZToolBar(wxFrame* pFrame, JZToolDef* pToolDef)
 
       if (pToolDef->mSticky)
       {
-	mpToolBar->AddCheckTool(
+        mpToolBar->AddCheckTool(
           pToolDef->mId,
           "",
           Bitmap,
@@ -75,7 +75,7 @@ JZToolBar::JZToolBar(wxFrame* pFrame, JZToolDef* pToolDef)
       }
       else
       {
-	mpToolBar->AddTool(pToolDef->mId, Bitmap, pToolDef->mpToolTip);
+        mpToolBar->AddTool(pToolDef->mId, Bitmap, pToolDef->mpToolTip);
       }
     }
 

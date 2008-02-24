@@ -434,13 +434,13 @@ bool tConfig::Get(int entry, char *value)
    {
       if (strncmp(buf, name, len) == 0)
       {
-	 while (isspace(buf[len]))
-	    len++;
-	 int end = strlen(buf) - 1;
-	 while (end > 0 && isspace(buf[end]))
-	    buf[end--] = 0;
-	 strcpy(value, buf + len);
-	 found = true;
+         while (isspace(buf[len]))
+            len++;
+         int end = strlen(buf) - 1;
+         while (end > 0 && isspace(buf[end]))
+            buf[end--] = 0;
+         strcpy(value, buf + len);
+         found = true;
       }
    }
    fclose(fd);
@@ -697,7 +697,7 @@ void tConfig::LoadConfig(const wxString& FileName)
         }
         mVoiceNames[VoiceIndex + 1].second = val + 1;
 
-        buf[strlen(buf) - 1] = 0;	// cut off \n
+        buf[strlen(buf) - 1] = 0;        // cut off \n
         mVoiceNames[VoiceIndex + 1].first = buf + j;
 
         ++VoiceIndex;
@@ -719,7 +719,7 @@ void tConfig::LoadConfig(const wxString& FileName)
         }
         mDrumSets[DrumsetIndex + 1].second = val + 1;
 
-        buf[strlen(buf) - 1] = 0;	// cut off \n
+        buf[strlen(buf) - 1] = 0;        // cut off \n
         mDrumSets[DrumsetIndex + 1].first = buf + j;
 
         ++DrumsetIndex;
@@ -730,7 +730,7 @@ void tConfig::LoadConfig(const wxString& FileName)
       {
         sscanf(buf, " %d %n", &i, &j);
         assert(0 <= i && i <= 127);
-        buf[strlen(buf) - 1] = 0;	// cut off \n
+        buf[strlen(buf) - 1] = 0;        // cut off \n
 
         mCtrlNames[i + 1].first = buf + j;
       }
@@ -740,7 +740,7 @@ void tConfig::LoadConfig(const wxString& FileName)
       {
         sscanf(buf, " %d %n", &i, &j);
         assert(0 <= i && i <= 127);
-        buf[strlen(buf) - 1] = 0;	// cut off \n
+        buf[strlen(buf) - 1] = 0;        // cut off \n
 
         mDrumNames[i + 1].first = buf + j;
       }

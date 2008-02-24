@@ -99,7 +99,7 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
     wxFont *DrumFont;
 
     long SnapClocks();
-    int SnapDenomiator;	// 16 for 16-tel
+    int SnapDenomiator;        // 16 for 16-tel
     long SnapClock(long Clock, int up = 0);
 
 
@@ -107,7 +107,7 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
     void Setup();
     void NewPosition(int TrackNr, long Clock);
     void ShowPitch(int pitch);
-    int  Channel();	// Channel of actual track 0..15
+    int  Channel();        // Channel of actual track 0..15
 
     void OnMenuCommand(int Id);
     void OnPaintSub(wxDC* dc,long x, long y);
@@ -116,7 +116,7 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
 
     void SnapDlg(wxCommandEvent& Event);
 
-    int TrackNr;	// aktueller Track
+    int TrackNr;        // aktueller Track
     tTrack *Track;
 
     tEventArray PasteBuffer;
@@ -225,15 +225,15 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
     long ClocksPerPixel;
     JZSong* Song;
     wxFont* mpFont;
-    wxFont* mpFixedFont;	//remains with 12pt/ bleibt bei 12pt
-    int hFixedFont;	//Height letters/ Hoehe eines Buchstaben
+    wxFont* mpFixedFont;        //remains with 12pt/ bleibt bei 12pt
+    int hFixedFont;        //Height letters/ Hoehe eines Buchstaben
     long hTop;
     long wLeft;
     long LittleBit;
     long FromLine, ToLine;
     long hLine;
     long xEvents, yEvents, wEvents, hEvents;
-    long CanvasX, CanvasY, CanvasW, CanvasH;	// canvas coords
+    long CanvasX, CanvasY, CanvasW, CanvasH;        // canvas coords
     long FromClock, ToClock;
     tSnapSelection* SnapSel;
     bool UseColors;

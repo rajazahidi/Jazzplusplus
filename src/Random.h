@@ -50,20 +50,20 @@ class JZRndArray
   protected:
 
     JZIntArray mArray;
-    int n;	// number of elements in array
+    int n;        // number of elements in array
     int nul, min, max;
 
   public:
 
-    int Null()				{ return nul; }
-    void SetNull(int n)			{ nul = n; }
+    int Null()                                { return nul; }
+    void SetNull(int n)                        { nul = n; }
     JZRndArray(int n, int min, int max);
     JZRndArray & operator = (const JZRndArray &);
     JZRndArray(JZRndArray const &);
 
     virtual ~JZRndArray();
-    int &operator[] (int i) 		{ return mArray[i]; }
-    int  operator[] (int i) const 	{ return mArray[i]; }
+    int &operator[] (int i)                 { return mArray[i]; }
+    int  operator[] (int i) const         { return mArray[i]; }
     /* PAT - The following ifdef was removed due to changes in gcc 3.x.  If it
        needs to be put back for compatibility purposes, it will need to return
        in an alternate form. */
@@ -76,17 +76,17 @@ class JZRndArray
     #endif*/
       return (float)operator[]((double)f);
     }
-    int Size() const 			{ return n; }
-    int Min() const			{ return min; }
-    int Max() const			{ return max; }
+    int Size() const                         { return n; }
+    int Min() const                        { return min; }
+    int Max() const                        { return max; }
     void SetMinMax(int min, int max);
-    void Resize(int nn) 		{ n = nn; }
+    void Resize(int nn)                 { n = nn; }
 
     friend std::ostream & operator << (std::ostream &, JZRndArray const &);
     friend std::istream & operator >> (std::istream &, JZRndArray &);
 
-    int Random();	// returns index 0..n-1 (arrayvalues -> empiric distribution)
-    int Random(double rndval);	// returns index 0..n-1 (arrayvalues -> empiric distribution)
+    int Random();        // returns index 0..n-1 (arrayvalues -> empiric distribution)
+    int Random(double rndval);        // returns index 0..n-1 (arrayvalues -> empiric distribution)
     int Random(int i);  // return 0/1
     int Interval(int seed);
 
@@ -99,11 +99,11 @@ class JZRndArray
 };
 
 
-#define ARED_GAP	1
-#define ARED_XTICKS 	2
-#define ARED_YTICKS	4
-#define ARED_MINMAX	8
-#define ARED_RHYTHM	16
+#define ARED_GAP        1
+#define ARED_XTICKS         2
+#define ARED_YTICKS        4
+#define ARED_MINMAX        8
+#define ARED_RHYTHM        16
 #define ARED_BLOCKS     32
 #define ARED_LINES      64
 
@@ -128,11 +128,11 @@ class tArrayEdit : public wxScrolledWindow
     long x, y, w, h, ynul;
     void DrawBar(wxDC *dc, int i, int black);
 
-    int dragging;		// Dragging-Event valid
-    int index;		// ctrl down: drag this one
+    int dragging;                // Dragging-Event valid
+    int index;                // ctrl down: drag this one
 
     JZRndArray& mArray;
-    int &n, &min, &max, &nul;	// shorthand for mArray.n, mArray.min, ...
+    int &n, &min, &max, &nul;        // shorthand for mArray.n, mArray.min, ...
     wxString mLabel;
     tArrayEditDrawBars *draw_bars;
 

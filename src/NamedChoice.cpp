@@ -52,7 +52,7 @@ wxFormItem *tNamedChoice::mkFormItem(int w, int h)
   // following adapted from wxwin/src/base/wb_form.cc
   wxList *list = new wxList;
   for (int i = 0; mpValues[i].Name; i++)
-    if (*mpValues[i].Name)	// omit empty entries
+    if (*mpValues[i].Name)        // omit empty entries
       list->Append((wxObject *)copystring(mpValues[i].Name));
 
   wxFormItemConstraint *constraint = wxMakeConstraintStrings(list);

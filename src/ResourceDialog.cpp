@@ -182,11 +182,11 @@ int jppResourceDialog::ShowModal() {
     if(!win)
     {
       wxMessageBox("Unable to locate widget named:\n"
-		   "    " + pResourceElement->resource + "\n"
-		   "Tried to find it in the dialog named:\n"
-		   "    " + dialogName,
-		   "Error Finding Resource",
-		   wxOK | wxICON_ERROR);
+                   "    " + pResourceElement->resource + "\n"
+                   "Tried to find it in the dialog named:\n"
+                   "    " + dialogName,
+                   "Error Finding Resource",
+                   wxOK | wxICON_ERROR);
       return wxID_CANCEL;
     }
 
@@ -244,31 +244,31 @@ bool jppResourceDialog::LoadData(jppResourceElement *pResourceElement, wxWindow 
     if(win->IsKindOf(CLASSINFO(wxChoice))) {
       wxChoice *choice = (wxChoice*)win;
       if(choice->GetCount() != pResourceElement->longarr.GetCount()) {
-	wxMessageBox("Error handling data for this widget:\n"
+        wxMessageBox("Error handling data for this widget:\n"
                      "    dialog = " + dialogName + "\n"
                      "    control = " + pResourceElement->resource + "\n"
-		     "Length mismatch with translation array.",
-		     "Error Loading Data",
-		     wxOK | wxICON_ERROR);
+                     "Length mismatch with translation array.",
+                     "Error Loading Data",
+                     wxOK | wxICON_ERROR);
       } else {
-	int i;
-	for(i=0; i<pResourceElement->longarr.GetCount(); i++) {
-	  if(value == pResourceElement->longarr[i]) break;
-	}
-	
-	if(i == pResourceElement->longarr.GetCount()) {
-	  // We couldn't find the value in the list.
-	  wxMessageBox("Error handling data for this widget:\n"
-		       "    dialog = " + dialogName + "\n"
-		       "    control = " + pResourceElement->resource + "\n"
-		       "Initial value not found in translation array.",
-		       "Error Loading Data",
-		       wxOK | wxICON_ERROR);
-	  return false;
-	}
+        int i;
+        for(i=0; i<pResourceElement->longarr.GetCount(); i++) {
+          if(value == pResourceElement->longarr[i]) break;
+        }
+        
+        if(i == pResourceElement->longarr.GetCount()) {
+          // We couldn't find the value in the list.
+          wxMessageBox("Error handling data for this widget:\n"
+                       "    dialog = " + dialogName + "\n"
+                       "    control = " + pResourceElement->resource + "\n"
+                       "Initial value not found in translation array.",
+                       "Error Loading Data",
+                       wxOK | wxICON_ERROR);
+          return false;
+        }
 
-	choice->SetSelection(i);
-	used = 1;
+        choice->SetSelection(i);
+        used = 1;
       }
     } else if(win->IsKindOf(CLASSINFO(wxSlider))) {
       used = 1;
@@ -278,10 +278,10 @@ bool jppResourceDialog::LoadData(jppResourceElement *pResourceElement, wxWindow 
   
   if(!used) {
     wxMessageBox("Unable to locate a mapping for this widget:\n"
-		 "    dialog = " + dialogName + "\n"
-		 "    widget = " + pResourceElement->resource,
-		 "Error Loading Data",
-		 wxOK | wxICON_ERROR);
+                 "    dialog = " + dialogName + "\n"
+                 "    widget = " + pResourceElement->resource,
+                 "Error Loading Data",
+                 wxOK | wxICON_ERROR);
   }
 
   return used;
@@ -305,28 +305,28 @@ bool jppResourceDialog::StoreData(jppResourceElement *pResourceElement, wxWindow
       int sel = ((wxChoice*)win)->GetSelection();
 
       if(sel < 0 || sel >= pResourceElement->longarr.GetCount()) {
-	wxMessageBox("Error handling data for this widget:\n"
-		     "    dialog = " + dialogName + "\n"
-		     "    control = " + pResourceElement->resource + "\n"
-		     "Selection value out of range.",
-		     "Error Loading Data",
-		     wxOK | wxICON_ERROR);
-	return false;
+        wxMessageBox("Error handling data for this widget:\n"
+                     "    dialog = " + dialogName + "\n"
+                     "    control = " + pResourceElement->resource + "\n"
+                     "Selection value out of range.",
+                     "Error Loading Data",
+                     wxOK | wxICON_ERROR);
+        return false;
       }
 
       if(pResourceElement->longptr)
-	*(pResourceElement->longptr) = pResourceElement->longarr[sel];
+        *(pResourceElement->longptr) = pResourceElement->longarr[sel];
       if(pResourceElement->intptr)
-	*(pResourceElement->intptr) = (int)pResourceElement->longarr[sel];
+        *(pResourceElement->intptr) = (int)pResourceElement->longarr[sel];
 
     } else if(win->IsKindOf(CLASSINFO(wxSlider))) {
 
       int value = ((wxSlider*)win)->GetValue();
 
       if(pResourceElement->longptr)
-	*(pResourceElement->longptr) = value;
+        *(pResourceElement->longptr) = value;
       if(pResourceElement->intptr)
-	*(pResourceElement->intptr) = value;
+        *(pResourceElement->intptr) = value;
     }
   }
 

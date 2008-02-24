@@ -80,7 +80,7 @@ class tCtrlEditBase : public tArrayEditDrawBars
     int  sticky;
 
 // SN++
-	int x_off;
+    int x_off;
     int ctrlmode;
     tTrack *track;
     long   from_clock;

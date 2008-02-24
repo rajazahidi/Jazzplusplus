@@ -121,7 +121,7 @@ class tCMixCmd
 
     enum { SIZE = 512 };
     float array[SIZE];
-    float tabs[2];	/* for lineset */
+    float tabs[2];        /* for lineset */
     int lineset;
 };
 

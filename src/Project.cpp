@@ -254,9 +254,9 @@ JZProject::JZProject()
       mpMidiPlayer = new tWinAudioPlayer(this);
       if (!mpMidiPlayer->Installed())
       {
-	mpMidiPlayer->ShowError();
+        mpMidiPlayer->ShowError();
         delete mpMidiPlayer;
-	mpMidiPlayer = new tWinIntPlayer(this);
+        mpMidiPlayer = new tWinIntPlayer(this);
       }
       break;
   }

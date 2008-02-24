@@ -77,7 +77,7 @@ int tMouseMapper::Action(wxMouseEvent &e)
   if (left_action > 0 && e.LeftDown() &&!e.ShiftDown() && !e.ControlDown())
     return left_action;
 
-  int i = 0;	// left down
+  int i = 0;        // left down
   if (e.MiddleDown())
     i = 1;
   else
@@ -136,7 +136,7 @@ int tSelection::ButtonDown(wxMouseEvent &e)
       JZRectangle rr = r;
       rr.SetNormal();
 //       if (rr.width && rr.height)
-// 	Dc.DrawRectangle(rr.x, rr.y, rr.width, rr.height);
+//         Dc.DrawRectangle(rr.x, rr.y, rr.width, rr.height);
       Dragging(e);
     }
     else
@@ -298,7 +298,7 @@ static void SnapVec(long &x, long *Coords, int nCoords, int up)
     if (Coords[i] > x)
     {
       if (up || i == 0)
-	x = Coords[i];
+        x = Coords[i];
       else
         x = Coords[i-1];
       return;

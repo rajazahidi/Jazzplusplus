@@ -1547,42 +1547,42 @@ The Event List Editor recognizes the following events:
       A keypressure event. It defines a pressure on channel 1, value 90 for the note 4C.
 
 \item {\tt 1:2:030 ctl 1 10 40}\\
-	A controller event. 1 is the midi channel, 10 the controller number (pan) and
-	40 the value.
+        A controller event. 1 is the midi channel, 10 the controller number (pan) and
+        40 the value.
 
 \item {\tt 1:2:030 prg 1 5}\\
-	A program change event, here program 5 on channel 1)
+        A program change event, here program 5 on channel 1)
 
 \item {\tt 1:2:030 cpr 1 50}\\
-	A channel pressure event, here value 50 on channel 1
+        A channel pressure event, here value 50 on channel 1
 
 \item {\tt 1:2:030 pit 1 -4074}\\
-	A pitchbend event, valid values are in -8191 .. 8191
+        A pitchbend event, valid values are in -8191 .. 8191
 
 \item {\tt 1:2:030 sys f0 11 22 33 44 f7}\\
-	A system exclusive message, hex values including the start- 
-	(f0) and stop- (f7) byte.
+        A system exclusive message, hex values including the start- 
+        (f0) and stop- (f7) byte.
 
 \item {\tt 1:2:030 txt here is some text}\\
-	A text event. All text up to the end of the line is text.
+        A text event. All text up to the end of the line is text.
 
 \item {\tt 1:2:030 cpy copyright text}\\
-	A copyright event. All text up to the end of the line is text.
+        A copyright event. All text up to the end of the line is text.
 
 \item {\tt 1:2:030 trn copyright text}\\
-	A trackname event. All text up to the end of the line is text.
+        A trackname event. All text up to the end of the line is text.
 
 \item {\tt 1:2:030 spd 120}\\
-	A set tempo event. The value is in beats per minute.
+        A set tempo event. The value is in beats per minute.
 
 \item {\tt 1:2:030 tsi 7/8}\\
-	A time signature event. The denomiator must be a power of 2, e.g one
-	of 2,4,8,16,32.
+        A time signature event. The denomiator must be a power of 2, e.g one
+        of 2,4,8,16,32.
 
 \item {\tt 1:2:030 ksi maj 3}\\
-	A key signature event. The string 'maj' indicates a major scale,
-	'min' would mean a minor scale. The number is the number of
-	sharps in the scale.
+        A key signature event. The string 'maj' indicates a major scale,
+        'min' would mean a minor scale. The number is the number of
+        sharps in the scale.
 
 \end{itemize}
 

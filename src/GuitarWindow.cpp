@@ -210,22 +210,22 @@ void JZGuitarWindow::DrawBoard(wxDC& Dc)
       case 0:
       case 11:
       case 23:
-	Dc.DrawLine(x + 2, y1, x + 2, y2);
-	break;
+        Dc.DrawLine(x + 2, y1, x + 2, y2);
+        break;
 
       case 4:
       case 6:
       case 16:
       case 18:
-	Dc.DrawLine(x + 2, y1 + d1, x + 2, y2 - d1);
-	break;
+        Dc.DrawLine(x + 2, y1 + d1, x + 2, y2 - d1);
+        break;
 
       default:
       case 2:
       case 8:
       case 14:
       case 20:
-	break;
+        break;
 
     }
   }
@@ -304,7 +304,7 @@ void JZGuitarWindow::DrawPitch(wxDC& Dc, int Pitch, bool Show)
     {
       for (int p = Pitch % 12; p < 127; p += 12)
       {
-	DrawPitch(Dc, p, i, Show);
+        DrawPitch(Dc, p, i, Show);
       }
     }
   }

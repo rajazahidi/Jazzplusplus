@@ -202,23 +202,23 @@ int tSample::LoadWav()
 #else
 
 typedef struct {
-  char          main_type[4];	/* 'RIFF' */
-  long	        length;		/* filelen */
-  char          sub_type[4];	/* 'WAVE' */
+  char          main_type[4];        /* 'RIFF' */
+  long                length;                /* filelen */
+  char          sub_type[4];        /* 'WAVE' */
 } RIFFHeader;
 
 typedef struct {
-  char          type[4];	/* 'fmt ' */
-  u_long	length;		/* length of sub_chunk, =16 */
+  char          type[4];        /* 'fmt ' */
+  u_long        length;                /* length of sub_chunk, =16 */
 } ChunkHeader;
 
 typedef struct {
-  u_short	format;		/* should be 1 for PCM-code */
-  u_short	modus;		/* 1 Mono, 2 Stereo */
-  u_long	sample_fq;	/* frequence of sample */
-  u_long	byte_p_sec;
-  u_short	byte_p_spl;	/* samplesize; 1 or 2 bytes */
-  u_short	bit_p_spl;	/* 8, 12 or 16 bit */
+  u_short        format;                /* should be 1 for PCM-code */
+  u_short        modus;                /* 1 Mono, 2 Stereo */
+  u_long        sample_fq;        /* frequence of sample */
+  u_long        byte_p_sec;
+  u_short        byte_p_spl;        /* samplesize; 1 or 2 bytes */
+  u_short        bit_p_spl;        /* 8, 12 or 16 bit */
 } FmtChunk;
 
 
@@ -870,7 +870,7 @@ tFloatSample::ExpSegments(long size, int nargs, float pval[])
     i = (j - 1) + pvals[k];
     for(l = j; l < i; l++) {
       if (l < size)
-	data[l] = data[l-1] * c;
+        data[l] = data[l-1] * c;
     }
   }
   Normalize();

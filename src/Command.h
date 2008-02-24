@@ -47,7 +47,7 @@ class tScale
     int Prev(int Key);
     int Transpose(int Key, int Steps);
     int FitInto(int Key);
-    static int Analyze(tFilter *f);	// returns ScaleNr
+    static int Analyze(tFilter *f);        // returns ScaleNr
 };
 
 
@@ -163,8 +163,8 @@ class tCmdQuantize : public tCommand
     long Quantize(long Clock, int islen);
   public:
     long QntClocks;
-    int NoteStart;	// yes
-    int NoteLength;	// no
+    int NoteStart;        // yes
+    int NoteLength;        // no
     int Delay;         // zero
     int Groove;         // zero
     tCmdQuantize(tFilter *f, long QntClocks, int groove, int delay);
@@ -186,7 +186,7 @@ class tCmdTranspose : public tCommand
 class tCmdSetChannel : public tCommand
 {
   public:
-    int NewChannel;	// 0
+    int NewChannel;        // 0
     tCmdSetChannel(tFilter *f, int NewChannel);
     virtual void ExecuteEvent(tTrack *t, JZEvent *e);
 };
@@ -208,10 +208,10 @@ class tCmdCopy : public tCommand
     int  DestTrack;
     long DestClock;
 
-    int EraseSource;	// no
-    int EraseDestin;	// yes
-    int InsertSpace;	// no
-    long RepeatClock;	// -1L
+    int EraseSource;        // no
+    int EraseDestin;        // yes
+    int InsertSpace;        // no
+    long RepeatClock;        // -1L
 
     tCmdCopy(tFilter *f, long DestTrack, long DestClock);
     virtual void ExecuteTrack(tTrack *t);

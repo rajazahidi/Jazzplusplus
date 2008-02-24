@@ -90,12 +90,12 @@ int Str2Key(const char *pString)
       int i;
       for (i = 0; sKey[i]; ++i)
       {
-	if (pString[0] == sKey[i])
-	{
-	  Key += nKey[i];
-	  ++pString;
-	  break;
-	}
+        if (pString[0] == sKey[i])
+        {
+          Key += nKey[i];
+          ++pString;
+          break;
+        }
       }
       if (!sKey[i])
       {

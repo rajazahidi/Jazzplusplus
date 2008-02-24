@@ -59,7 +59,7 @@ void HBChord::Name(char *buf, int key, int flat)
   HBChord c = *this;
   strcpy(buf, ScaleName(key, flat));
   int i = strlen(buf);
-  c.Rotate(-key);	// transpose to C
+  c.Rotate(-key);        // transpose to C
 
   // special cases
   if (c == C0)
@@ -314,7 +314,7 @@ const char * HBContext::ChordName() const
 
 const char * HBContext::ChordNrName() const
 {
-  return chord_nr_names[chord_nr];	// "IV"
+  return chord_nr_names[chord_nr];        // "IV"
 }
 
 const char * HBContext::ScaleName() const
@@ -460,10 +460,10 @@ bool HBContextIterator::operator()()
     {
       while (context.chord_nr < 6)
       {
-	++ context.chord_nr;
-	context.Initialize();
-	if (match(context))
-	  return true;
+        ++ context.chord_nr;
+        context.Initialize();
+        if (match(context))
+          return true;
       }
       context.chord_nr = -1;
       context.scale_nr ++;
@@ -533,69 +533,69 @@ struct scdef {
 
 scdef scales[] =  {
   { "***** major scales *****", ""},
-  { "major penta", 	"1 9 3 5 13" },
-  { "ionic",		"1 9 3 11 5 13 j7" },
-  { "lydic",		"1 9 3 11+ 5 13 j7"},
-  { "har III (ion 5+)",	"1 9 3 11 5+ 13 j7"},
-  { "har VI (lyd 9+)",	"1 9+ 3 11+ 5 13 j7"},
-  { "mel III (lyd 5+)",	"1 9 3 11+ 5+ 13 j7"},
-  { "augmented",	"1 9- 3 11 5+ 13"},
-  { "ionic 13-",	"1 9 3 11 5 13- j7"},
+  { "major penta",         "1 9 3 5 13" },
+  { "ionic",                "1 9 3 11 5 13 j7" },
+  { "lydic",                "1 9 3 11+ 5 13 j7"},
+  { "har III (ion 5+)",        "1 9 3 11 5+ 13 j7"},
+  { "har VI (lyd 9+)",        "1 9+ 3 11+ 5 13 j7"},
+  { "mel III (lyd 5+)",        "1 9 3 11+ 5+ 13 j7"},
+  { "augmented",        "1 9- 3 11 5+ 13"},
+  { "ionic 13-",        "1 9 3 11 5 13- j7"},
   { "***** minor scales *****", ""},
-  { "minor penta", 	"1 3- 11 5 7"},
-  { "aeolic",		"1 9 3- 11 5 13- 7"},
-  { "doric",		"1 9 3- 11 5 13 7"},
+  { "minor penta",         "1 3- 11 5 7"},
+  { "aeolic",                "1 9 3- 11 5 13- 7"},
+  { "doric",                "1 9 3- 11 5 13 7"},
   { "mel II (doric 9-)","1 9- 3- 11 5 13 7"},
-  { "phrygic",		"1 9- 3- 11 5 13- 7"},
-  { "jap. penta",	"1 9- 11 5 7"},
-  { "har IV (dor 11+)",	"1 9 3- 11+ 5 13 7"},
-  { "harmonic minor",	"1 9 3- 11 5 13- j7"},
-  { "melodic minor",	"1 9 3- 11 5 13 j7"},
-  { "gipsy",		"1 9 3- 11+ 5 13- j7" },
-  { "melodic 11+",	"1 9 3- 11+ 5 13 j7" },
+  { "phrygic",                "1 9- 3- 11 5 13- 7"},
+  { "jap. penta",        "1 9- 11 5 7"},
+  { "har IV (dor 11+)",        "1 9 3- 11+ 5 13 7"},
+  { "harmonic minor",        "1 9 3- 11 5 13- j7"},
+  { "melodic minor",        "1 9 3- 11 5 13 j7"},
+  { "gipsy",                "1 9 3- 11+ 5 13- j7" },
+  { "melodic 11+",        "1 9 3- 11+ 5 13 j7" },
   { "***** dominant scales *****", "" },
-  { "major penta",	"1 9 3 5 13" },
-  { "ind. penta", 	"1 3 11 5 7" },
-  { "mixolyd",		"1 9 3 11 5 13 7" },
-  { "har V (har dominant)",	"1 9- 3 11 5 13- 7" },
+  { "major penta",        "1 9 3 5 13" },
+  { "ind. penta",         "1 3 11 5 7" },
+  { "mixolyd",                "1 9 3 11 5 13 7" },
+  { "har V (har dominant)",        "1 9- 3 11 5 13- 7" },
   { "mel IV (mixo 11+)","1 9 3 11+ 5 13 7" },
-  { "mixo 11+9-",	"1 9- 3 11+ 5 13 7" },
-  { "mel V (mixo 13-)",	"1 9 3 11 5 13- 7" },
-  { "mixo 9-",		"1 9- 3 11 5 13 7" },
-  { "full 1",		"1 9 3 5- 13- 7" },
-  { "full 2",		"1 9 3 11+ 5+ 7" },
-  { "har alt",		"1 9- 9+ 3 5 13- 7" },
+  { "mixo 11+9-",        "1 9- 3 11+ 5 13 7" },
+  { "mel V (mixo 13-)",        "1 9 3 11 5 13- 7" },
+  { "mixo 9-",                "1 9- 3 11 5 13 7" },
+  { "full 1",                "1 9 3 5- 13- 7" },
+  { "full 2",                "1 9 3 11+ 5+ 7" },
+  { "har alt",                "1 9- 9+ 3 5 13- 7" },
   { "mel VII (altered)","1 9- 9+ 3 11+ 13- 7" },
-  { "semi/full",	"1 9- 9+ 3 11+ 5 13 7" },
+  { "semi/full",        "1 9- 9+ 3 11+ 5 13 7" },
   { "***** semi dimin *****", ""},
-  { "locrian",		"1 9- 3- 11 5- 13- 7" },
+  { "locrian",                "1 9- 3- 11 5- 13- 7" },
   { "mel VI (locrian 9)", "1 9 3- 11 5- 13- 7" },
   { "har II (locrian 13)", "1 9- 3- 11 5- 13 7" },
-  { "doric 5-", 	"1 9 3- 11 5- 13 7" },
+  { "doric 5-",         "1 9 3- 11 5- 13 7" },
   { "***** dimin *****", ""},
   { "har VII (har dim)","1 9- 3- 11- 5- 13- 7-"},
-  { "full/semi",	"1 9 3- 11 5- 13 7- 15-"},
-  { "locrian dim",	"1 9- 3- 11 5- 13- 7-" },
+  { "full/semi",        "1 9 3- 11 5- 13 7- 15-"},
+  { "locrian dim",        "1 9- 3- 11 5- 13- 7-" },
   { "***** blues scales *****", "" },
-  { "minor penta 5-",	"1 3- 11 5- 5 7" },
-  { "blues scale",	"1 3- 3 11 5- 5 7"},
+  { "minor penta 5-",        "1 3- 11 5- 5 7" },
+  { "blues scale",        "1 3- 3 11 5- 5 7"},
   { 0, 0 }
 };
 
 
 scdef chords[] =  {
-  { "j7",		"1 3 5 j7"},
-  { "m7",		"1 3- 5 7" },
-  { "7",		"1 3 5 7" },
-  { "m75-",		"1 3- 5- 7" },
-  { "mj7",		"1 3- 5 j7" },
-  { "j75+",		"1 3 5+ j7" },
-  { "0",		"1 3- 5- 6" },
-  { "sus4",		"1 4 5" },
-  { "7sus4",		"1 4 5 7" },
-  { "j7sus4",		"1 4 5 j7" },
-  { "alt (79+13-)",	"1 3 9+ 13- 7" },
-  { "75-",		"1 3 5- 7" },
+  { "j7",                "1 3 5 j7"},
+  { "m7",                "1 3- 5 7" },
+  { "7",                "1 3 5 7" },
+  { "m75-",                "1 3- 5- 7" },
+  { "mj7",                "1 3- 5 j7" },
+  { "j75+",                "1 3 5+ j7" },
+  { "0",                "1 3- 5- 6" },
+  { "sus4",                "1 4 5" },
+  { "7sus4",                "1 4 5 7" },
+  { "j7sus4",                "1 4 5 j7" },
+  { "alt (79+13-)",        "1 3 9+ 13- 7" },
+  { "75-",                "1 3 5- 7" },
 };
 
 long scansc(const char *s)

@@ -54,7 +54,7 @@ class tAudioListener : public wxTimer
       hard_exit = TRUE;
       player = p;
       player->listener = this;
-      player->rec_info = 0; 	// not recording!
+      player->rec_info = 0;         // not recording!
       channels = player->samples.GetChannels();
 
       count = player->samples.PrepareListen(key);
@@ -282,7 +282,7 @@ int tWinAudioPlayer::OpenDsp()
       res = waveOutPrepareHeader(hout, hdr, sizeof(WAVEHDR));
       if (res != MMSYSERR_NOERROR)
       {
-	error = ErrOutPrepare;
+        error = ErrOutPrepare;
         return 1;
       }
     }
@@ -321,7 +321,7 @@ int tWinAudioPlayer::OpenDsp()
       res = waveInAddBuffer(hinp, hdr, sizeof(WAVEHDR));
       if (res != MMSYSERR_NOERROR)
       {
-	error = ErrInpPrepare;
+        error = ErrInpPrepare;
         return 1;
       }
     }
@@ -359,7 +359,7 @@ int tWinAudioPlayer::CloseDsp()
       res = waveOutUnprepareHeader(hout, hdr, sizeof(WAVEHDR));
       if (res != MMSYSERR_NOERROR)
       {
-	error = ErrOutUnprepare;
+        error = ErrOutUnprepare;
         return 1;
       }
       delete hdr;
@@ -384,7 +384,7 @@ int tWinAudioPlayer::CloseDsp()
       res = waveInUnprepareHeader(hinp, (WAVEHDR *)buf->hdr, sizeof(WAVEHDR));
       if (res != MMSYSERR_NOERROR)
       {
-	error = ErrInpUnprepare;
+        error = ErrInpUnprepare;
         return 1;
       }
       delete buf->hdr;
@@ -490,11 +490,11 @@ void tWinAudioPlayer::Notify()
         res = waveOutGetPosition(hout, &mmtime, sizeof(mmtime));
         if (res == MMSYSERR_NOERROR && mmtime.wType == TIME_SAMPLES)
         {
-	  long time_now          = (long)timeGetTime();
-	  long audio_now         = (long)((double)start_time + (double)mmtime.u.sample * 1000.0 / (double)samples.speed);
-	  // low pass filter for time-correction (not really necessary)
-	  const long low = 50;
-	  state->time_correction = (low * state->time_correction + (100 - low) * (audio_now - time_now) ) / 100L;
+          long time_now          = (long)timeGetTime();
+          long audio_now         = (long)((double)start_time + (double)mmtime.u.sample * 1000.0 / (double)samples.speed);
+          // low pass filter for time-correction (not really necessary)
+          const long low = 50;
+          state->time_correction = (low * state->time_correction + (100 - low) * (audio_now - time_now) ) / 100L;
         }
       }
     }
@@ -534,11 +534,11 @@ void tWinAudioPlayer::Notify()
         res = waveInGetPosition(hinp, &mmtime, sizeof(mmtime));
         if (res == MMSYSERR_NOERROR && mmtime.wType == TIME_SAMPLES)
         {
-	  long time_now          = (long)timeGetTime();
-	  long audio_now         = (long)((double)state->start_time + (double)mmtime.u.sample * 1000.0 / (double)samples.speed);
-	  // low pass filter for time-correction (not really necessary)
-	  const long low = 50;
-	  state->time_correction = (low * state->time_correction + (100 - low) * (audio_now - time_now) ) / 100L;
+          long time_now          = (long)timeGetTime();
+          long audio_now         = (long)((double)state->start_time + (double)mmtime.u.sample * 1000.0 / (double)samples.speed);
+          // low pass filter for time-correction (not really necessary)
+          const long low = 50;
+          state->time_correction = (low * state->time_correction + (100 - low) * (audio_now - time_now) ) / 100L;
         }
       }
     }

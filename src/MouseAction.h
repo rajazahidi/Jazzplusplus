@@ -69,22 +69,22 @@ class tMouseAction
 {
   public:
     virtual ~tMouseAction()                     {}
-    virtual int Dragging(wxMouseEvent &) 	{ return 0; };
-    virtual int LeftDown(wxMouseEvent &) 	{ return 0; };
-    virtual int LeftUp(wxMouseEvent &) 	        { return 0; };
-    virtual int RightDown(wxMouseEvent &) 	{ return 0; };
-    virtual int RightUp(wxMouseEvent &) 	{ return 0; };
-    virtual int MiddleDown(wxMouseEvent &) 	{ return 0; };
-    virtual int MiddleUp(wxMouseEvent &) 	{ return 0; };
+    virtual int Dragging(wxMouseEvent &)         { return 0; };
+    virtual int LeftDown(wxMouseEvent &)         { return 0; };
+    virtual int LeftUp(wxMouseEvent &)                 { return 0; };
+    virtual int RightDown(wxMouseEvent &)         { return 0; };
+    virtual int RightUp(wxMouseEvent &)         { return 0; };
+    virtual int MiddleDown(wxMouseEvent &)         { return 0; };
+    virtual int MiddleUp(wxMouseEvent &)         { return 0; };
     virtual int Event(wxMouseEvent &e)
     {
-      if (e.Dragging())		return Dragging(e);
-      else if (e.LeftDown())	return LeftDown(e);
-      else if (e.LeftUp())	return LeftUp(e);
-      else if (e.MiddleDown())	return MiddleDown(e);
-      else if (e.MiddleUp())	return MiddleUp(e);
-      else if (e.RightDown())	return RightDown(e);
-      else if (e.RightUp())	return RightUp(e);
+      if (e.Dragging())                return Dragging(e);
+      else if (e.LeftDown())        return LeftDown(e);
+      else if (e.LeftUp())        return LeftUp(e);
+      else if (e.MiddleDown())        return MiddleDown(e);
+      else if (e.MiddleUp())        return MiddleUp(e);
+      else if (e.RightDown())        return RightDown(e);
+      else if (e.RightUp())        return RightUp(e);
       return 0;
     }
 };
@@ -111,7 +111,7 @@ class tSelection : public tMouseAction
     int Active;
     virtual void Snap(int &x, int &y, int drag) {}
     JZRectangle r;
-    bool Selected;		// r is valid
+    bool Selected;                // r is valid
     virtual int Dragging(wxMouseEvent &);
     virtual int Event(wxMouseEvent &e);
     virtual int ButtonDown(wxMouseEvent &);
@@ -180,7 +180,7 @@ class tMouseCounter : public wxTimer, public tMouseAction
 {
     int Min, Max, Delta;
     int Timeout;
-    int Wait;	// don't inc/dec at Init
+    int Wait;        // don't inc/dec at Init
     tButtonLabelInterface *win;
 
     virtual int LeftDown(wxMouseEvent &);

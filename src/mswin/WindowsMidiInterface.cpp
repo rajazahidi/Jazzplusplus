@@ -168,9 +168,9 @@ void FAR PASCAL midiIntInputHandler(
           // ignore active sensing and real time messages except midi stop
           if ( (dwParam1 & 0x000000ff) < 0xf8)
           {
-  	    state->recd_buffer.put(dwParam1, now );
+              state->recd_buffer.put(dwParam1, now );
 
-	    /* Midi thru */
+            /* Midi thru */
             if ( state->soft_thru )
             {
               if (!state->thru_buffer.empty() || midiOutShortMsg(state->hout, dwParam1) == MIDIERR_NOTREADY)
@@ -291,7 +291,7 @@ void FAR PASCAL midiMidiInputHandler(
           {
             state->recd_buffer.put(dwParam1, state->virtual_clock + ( ((now - state->signal_time) * 1000L) / state->time_per_tick) );
 
-	    /* Midi thru, do not put stop-play thru */
+            /* Midi thru, do not put stop-play thru */
             if ( state->soft_thru && (dwParam1 != 0xfc) )
             {
               if (!state->thru_buffer.empty() || midiOutShortMsg(state->hout, dwParam1) == MIDIERR_NOTREADY)
@@ -478,7 +478,7 @@ void FAR PASCAL midiMtcInputHandler(
               state->recd_buffer.put(dwParam1, mtc_time + (now - state->signal_time) );
             }
 
-	    /* Midi thru */
+            /* Midi thru */
             if ( state->soft_thru )
             {
               if (!state->thru_buffer.empty() || midiOutShortMsg(state->hout, dwParam1) == MIDIERR_NOTREADY)

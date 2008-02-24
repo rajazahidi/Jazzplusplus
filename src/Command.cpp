@@ -95,7 +95,9 @@ void tScale::Init(int ScaleNr, tFilter *f)
       }
     }
     if (!found)
-      ScaleKeys[0] = 1;	// avoid loop in Member()
+    {
+      ScaleKeys[0] = 1; // avoid loop in Member()
+    }
   }
 
   else
@@ -568,30 +570,30 @@ void tCmdConvertToModulation::ExecuteTrack(tTrack *t)
   {
     if (Filter->IsSelected(e) && e->IsKeyOn())
       {
-	if(startclock==-1)
-	  {
-	    startclock=e->IsKeyOn()->GetClock();
-	    startvelocity=e->IsKeyOn()->Veloc;
-	    channel=e->IsKeyOn()->Channel;
-	    startkey=e->IsKeyOn()->Key;
-	    previouspitch=e->GetPitch();
-	  }
-	pitchdiff=e->GetPitch()-previouspitch;
+        if (startclock == -1)
+        {
+          startclock=e->IsKeyOn()->GetClock();
+          startvelocity=e->IsKeyOn()->Veloc;
+          channel=e->IsKeyOn()->Channel;
+          startkey=e->IsKeyOn()->Key;
+          previouspitch=e->GetPitch();
+        }
+        pitchdiff=e->GetPitch()-previouspitch;
 
-	tPitch* pitchmodulation=0;
-	pitchmodulation = new tPitch(e->GetClock(), channel, pitchsteparray[pitchdiff+4]);
+        tPitch* pitchmodulation=0;
+        pitchmodulation = new tPitch(e->GetClock(), channel, pitchsteparray[pitchdiff+4]);
 
-	t->Put(pitchmodulation);
+        t->Put(pitchmodulation);
 
 
-	t->Kill(e); //remove the old event
+        t->Kill(e); //remove the old event
 
-	t->Put(new tControl(e->GetClock(), channel, 0x07, e->IsKeyOn()->Veloc));
-	t->Put(new tControl(e->GetClock()+e->IsKeyOn()->Length, channel, 0x07,0));
+        t->Put(new tControl(e->GetClock(), channel, 0x07, e->IsKeyOn()->Veloc));
+        t->Put(new tControl(e->GetClock()+e->IsKeyOn()->Length, channel, 0x07,0));
 
-	lastlength=e->IsKeyOn()->Length;
-	endclock=e->GetClock();
-	previouspitch=e->GetPitch();
+        lastlength=e->IsKeyOn()->Length;
+        endclock=e->GetClock();
+        previouspitch=e->GetPitch();
       }
       //ExecuteEvent(t, e);
     e = Iterator.Next();
@@ -620,12 +622,12 @@ void tCmdMidiDelay::ExecuteEvent(tTrack *t, JZEvent *e)
   tKeyOn *k;
 
   for(int i=1; i< repeat; i++)
-    {
-      if(e->IsKeyOn()){ //only echo note events
-	k = (tKeyOn *)e->Copy();
-	k->SetClock(k->GetClock()+ clockDelay*i  );
-	k->Veloc=(unsigned char)(pow(scale,i)*k->Veloc);
-	t->Put(k);
+  {
+    if(e->IsKeyOn()){ //only echo note events
+      k = (tKeyOn *)e->Copy();
+      k->SetClock(k->GetClock()+ clockDelay*i  );
+        k->Veloc=(unsigned char)(pow(scale,i)*k->Veloc);
+        t->Put(k);
       }
     }
   
@@ -728,10 +730,10 @@ tCmdCopy::tCmdCopy(tFilter *f, long dt, long dc)
   DestTrack = dt;
   DestClock = dc;
 
-  EraseSource = 0;	// no
-  EraseDestin = 1;	// yes
-  InsertSpace = 0;	// no
-  RepeatClock = -1;	// -1L
+  EraseSource = 0;        // no
+  EraseDestin = 1;        // yes
+  InsertSpace = 0;        // no
+  RepeatClock = -1;        // -1L
 
   Reverse = DestTrack > Filter->FromTrack;
   if (Reverse)
@@ -773,23 +775,23 @@ void tCmdCopy::ExecuteTrack(tTrack *s)
       JZEvent *e = Iterator.Range(Filter->FromClock, Filter->ToClock);
       while (e)
       {
-	long NewClock = e->GetClock() + DeltaClock;
-	if (NewClock >= StopClock)
-	  break;
+        long NewClock = e->GetClock() + DeltaClock;
+        if (NewClock >= StopClock)
+          break;
 
-	if (Filter->IsSelected(e))
-	{
-	  JZEvent* cpy = e->Copy();
-	  cpy->SetClock(NewClock);
-	  tmp.Put(cpy);
-	}
+        if (Filter->IsSelected(e))
+        {
+          JZEvent* cpy = e->Copy();
+          cpy->SetClock(NewClock);
+          tmp.Put(cpy);
+        }
 
-	e = Iterator.Next();
-	if (!e)
-	{
-	  e = Iterator.First();
-	  DeltaClock += Filter->ToClock - Filter->FromClock;
-	}
+        e = Iterator.Next();
+        if (!e)
+        {
+          e = Iterator.First();
+          DeltaClock += Filter->ToClock - Filter->FromClock;
+        }
       }
     }
 
@@ -802,14 +804,14 @@ void tCmdCopy::ExecuteTrack(tTrack *s)
       long DeltaClock = StopClock - StartClock;
       while (e)
       {
-	if (Filter->IsSelected(e))
-	{
-	  JZEvent *c = e->Copy();
-	  c->SetClock(c->GetClock() + DeltaClock);
-	  d->Kill(e);
-	  d->Put(c);
-	}
-	e = Iterator.Next();
+        if (Filter->IsSelected(e))
+        {
+          JZEvent *c = e->Copy();
+          c->SetClock(c->GetClock() + DeltaClock);
+          d->Kill(e);
+          d->Put(c);
+        }
+        e = Iterator.Next();
       }
       d->Cleanup();
     }
@@ -822,9 +824,9 @@ void tCmdCopy::ExecuteTrack(tTrack *s)
       JZEvent *e = Iterator.Range(Filter->FromClock, Filter->ToClock);
       while (e)
       {
-	if (Filter->IsSelected(e))
-	  s->Kill(e);
-	e = Iterator.Next();
+        if (Filter->IsSelected(e))
+          s->Kill(e);
+        e = Iterator.Next();
       }
       s->Cleanup();
     }
@@ -837,9 +839,9 @@ void tCmdCopy::ExecuteTrack(tTrack *s)
       JZEvent *e = Iterator.Range(StartClock, StopClock);
       while (e)
       {
-	if (Filter->IsSelected(e))
-	  d->Kill(e);
-	e = Iterator.Next();
+        if (Filter->IsSelected(e))
+          d->Kill(e);
+        e = Iterator.Next();
       }
       d->Cleanup();
     }
@@ -989,7 +991,7 @@ void tCmdMapper::ExecuteEvent(tTrack *t, JZEvent *e)
         sval = array.Random();
         if (add)
           sval -= array.Size()/2;
-	break;
+        break;
 
       default:
         break;
@@ -999,25 +1001,25 @@ void tCmdMapper::ExecuteEvent(tTrack *t, JZEvent *e)
     {
       case veloc: {
         if (add)
-	  sval = k->Veloc + sval;
+          sval = k->Veloc + sval;
         if (sval > 127)
           sval = 127;
-	if (sval < 1)
-	  sval = 1;
+        if (sval < 1)
+          sval = 1;
         tKeyOn *c = (tKeyOn *)k->Copy();
         t->Kill(k);
-	c->Veloc = sval;
+        c->Veloc = sval;
         t->Put(c);
       }
       break;
 
       case key: {
         if (add)
-	  sval = k->Key + sval;
+          sval = k->Key + sval;
         if (sval > 127)
           sval = 127;
-	if (sval < 1)
-	  sval = 1;
+        if (sval < 1)
+          sval = 1;
         tKeyOn *c = (tKeyOn *)k->Copy();
         t->Kill(k);
         c->Key = sval;
@@ -1027,9 +1029,9 @@ void tCmdMapper::ExecuteEvent(tTrack *t, JZEvent *e)
 
       case length: {
         if (add)
-	  sval = k->Length + sval;
-	if (sval < 1)
-	  sval = 1;
+          sval = k->Length + sval;
+        if (sval < 1)
+          sval = 1;
         tKeyOn *c = (tKeyOn *)k->Copy();
         t->Kill(k);
         c->Length = sval;

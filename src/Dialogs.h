@@ -35,7 +35,7 @@ class JZEvent;
 class tShiftDlg : public tPropertyListDlg
 {
  public:
-  long  Steps;	// 0 was static
+  long  Steps;        // 0 was static
   long Unit;
   
   tFilter* Filter;
@@ -90,7 +90,7 @@ class tTransposeDlg : public tPropertyListDlg
 {
   public:
 
-    static int  Notes;	// 0
+    static int  Notes;        // 0
     static bool FitIntoScale;
     static int Scale;
 
@@ -110,7 +110,7 @@ class tSetChannelDlg : public tPropertyListDlg
 {
   public:
 
-    static int  NewChannel;	// 0
+    static int  NewChannel;        // 0
 
     tFilter *Filter;
     JZSong   *Song;
@@ -199,7 +199,7 @@ class tDeleteDlg : public tPropertyListDlg
   JZEventFrame *EventWin;
 
  public:
-  static bool LeaveSpace;	// 1
+  static bool LeaveSpace;        // 1
 
   tDeleteDlg(JZEventFrame *w, tFilter *f);
   void AddProperties();

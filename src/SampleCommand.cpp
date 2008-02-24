@@ -156,14 +156,14 @@ void tCMixCmd::tableset(float dur, int size, float *tab)
 
 float tCMixCmd::tablei(long nsample, float *array, float *tab)
 {
-	register int loc1,loc2;
+        register int loc1,loc2;
         float frac = ((float)(nsample)/(*tab)) * *(tab+1);
-	if(frac < 0) return(array[0]);
-	if(frac >= *(tab+1)) return(array[(int)*(tab+1)]);
-	loc1 = (int)frac;
-	loc2 = loc1+1;
-	frac = frac - (float)loc1;
-	return(*(array+loc1) + frac * (*(array+loc2) - *(array+loc1)));
+        if(frac < 0) return(array[0]);
+        if(frac >= *(tab+1)) return(array[(int)*(tab+1)]);
+        loc1 = (int)frac;
+        loc2 = loc1+1;
+        frac = frac - (float)loc1;
+        return(*(array+loc1) + frac * (*(array+loc2) - *(array+loc1)));
 }
 
 /* p0,2,4,5,6,8,10.. are times, p1,3,5,7,9,11.. are amps, total number of
@@ -172,23 +172,23 @@ float tCMixCmd::tablei(long nsample, float *array, float *tab)
 
 void tCMixCmd::setline(const float *p, short n_args,int length,float *array)
 {
-	double increm;
-	int i,j,k,points;
+        double increm;
+        int i,j,k,points;
 
-	increm = (double)(p[n_args - 2] - p[0])/(double)length;
-	for(j=0,i=0; j < (n_args-2); j += 2) {
-		points = (int)((double)(p[j+2] - p[j]) / increm +.5);
-		if(p[j+2] != p[j]) {
-			if(points <= 0) points = 1;
-			for(k=0; k < points; k++) {
-				array[i++] = ((float)k/(float)points)
-					* (p[j+3] - p[j+1]) + p[j+1];
-				if(i == length) return;
-			}
-		}
-	}
-	i--;
-	while(++i < length) array[i] = array[i-1];
+        increm = (double)(p[n_args - 2] - p[0])/(double)length;
+        for(j=0,i=0; j < (n_args-2); j += 2) {
+                points = (int)((double)(p[j+2] - p[j]) / increm +.5);
+                if(p[j+2] != p[j]) {
+                        if(points <= 0) points = 1;
+                        for(k=0; k < points; k++) {
+                                array[i++] = ((float)k/(float)points)
+                                        * (p[j+3] - p[j+1]) + p[j+1];
+                                if(i == length) return;
+                        }
+                }
+        }
+        i--;
+        while(++i < length) array[i] = array[i-1];
 }
 
 
@@ -345,7 +345,7 @@ void tShifterCmd::StretchLength(tSample &spl, long newlen, bool keep_pitch, floa
 
 
 /*  rotate -- a pitch-shifting instrument based upon the idea
-*	of old rotating tape-head pitch shifters
+*        of old rotating tape-head pitch shifters
 *
 *  p0 = input skip
 *  p1 = output skip
@@ -357,7 +357,7 @@ void tShifterCmd::StretchLength(tSample &spl, long newlen, bool keep_pitch, floa
 *  p7 = stereo spread (0-1) [optional]
 *  assumes function table 1 is the amplitude envelope  (switched off - av)
 *  assumes function table 2 is the window envelope     (inline - av)
-*	<usually a hanning window -- use "makegen(2, 25, 1000, 1)">
+*        <usually a hanning window -- use "makegen(2, 25, 1000, 1)">
 *
 */
 

@@ -255,8 +255,8 @@ void tDistortion::MakeCurve(int cvtype)
   {
     case CV_LINEAR:
       {
-	JZMapper map(0, N, ymin, ymax);
-	for (int i = 0; i < N; i++)
+        JZMapper map(0, N, ymin, ymax);
+        for (int i = 0; i < N; i++)
           arr[i] = (int)map.XToY(i);
       }
       break;
@@ -528,28 +528,28 @@ void tSynthDlg::OnMenuCommand(int id)
   {
     case SYN_LOAD:
       {
-	wxString fname = file_selector(default_filename, "Load Synth", 0, 0, "*.syn");
-	if (fname)
+        wxString fname = file_selector(default_filename, "Load Synth", 0, 0, "*.syn");
+        if (fname)
         {
-	  ifstream is(fname);
-	  is >> *this;
-	  SetupEdits();
-	  int cw, ch;
-	  GetClientSize(&cw, &ch);
-	  //	  OnSize(cw, ch);
-	  //          OnPaint();
-	  Refresh();
-	}
+          ifstream is(fname);
+          is >> *this;
+          SetupEdits();
+          int cw, ch;
+          GetClientSize(&cw, &ch);
+          //          OnSize(cw, ch);
+          //          OnPaint();
+          Refresh();
+        }
       }
       break;
 
     case SYN_SAVE:
       {
-	wxString fname = file_selector(default_filename, "Save Synth", 1, 0, "*.syn");
-	if (fname) {
-	  ofstream os(fname);
-	  os << *this;
-	}
+        wxString fname = file_selector(default_filename, "Save Synth", 1, 0, "*.syn");
+        if (fname) {
+          ofstream os(fname);
+          os << *this;
+        }
       }
       break;
 
@@ -581,13 +581,13 @@ void tSynthDlg::AddItems()
   //cancel = new wxButton(panel, (wxFunction)ItemCallback, "Close");
   //panel->NewLine();
   chk_fft = new wxCheckBox(panel, -1, "Harmonics"); //    (wxFunction)ItemCallback,
-  chk_fft->SetValue(fft_enable);			 			   
-  chk_vol = new wxCheckBox(panel, -1, "Envelope");  //	  (wxFunction)ItemCallback,
-  chk_vol->SetValue(vol_enable);			 			   
-  chk_pan = new wxCheckBox(panel, -1, "Panpot");    //	  (wxFunction)ItemCallback,
-  chk_pan->SetValue(pan_enable);			 			   
-  chk_frq = new wxCheckBox(panel, -1, "Pitch");     //	  (wxFunction)ItemCallback,
-  chk_frq->SetValue(frq_enable);			 			   
+  chk_fft->SetValue(fft_enable);                                                    
+  chk_vol = new wxCheckBox(panel, -1, "Envelope");  //          (wxFunction)ItemCallback,
+  chk_vol->SetValue(vol_enable);                                                    
+  chk_pan = new wxCheckBox(panel, -1, "Panpot");    //          (wxFunction)ItemCallback,
+  chk_pan->SetValue(pan_enable);                                                    
+  chk_frq = new wxCheckBox(panel, -1, "Pitch");     //          (wxFunction)ItemCallback,
+  chk_frq->SetValue(frq_enable);                                                    
   chk_noise = new wxCheckBox(panel, -1, "Noise");     //  (wxFunction)ItemCallback,
   chk_noise->SetValue(noise_enable);
 #ifdef OBSOLETE
@@ -1033,10 +1033,10 @@ void tShifterForm::OnOk()
 
 
 int tSplFilterForm::type                = 0;
-int tSplFilterForm::order 		= 2;
-int tSplFilterForm::freq		= 1000;
-int tSplFilterForm::lo_freq		= 400;
-int tSplFilterForm::hi_freq		= 2000;
+int tSplFilterForm::order                 = 2;
+int tSplFilterForm::freq                = 1000;
+int tSplFilterForm::lo_freq                = 400;
+int tSplFilterForm::hi_freq                = 2000;
 int tSplFilterForm::band_width          = 20;  // in % of corner freq
 static const char *filter_types[] = { "Low Pass", "High Pass", "Band Pass", "Band Stop", 0 };
 
@@ -1278,11 +1278,11 @@ void tChorusForm::OnOk()
   wxBeginBusyCursor();
   sig_chorus(
     spl,
-    xpitch_freq,	// pitch modification freq in Hz
-    xpitch_range,   	// variable delay in seconds
-    xpan_freq,      	// pan freq in Hz
-    xpan_spread,    	// 0..1
-    xvolume	 	// -1..1
+    xpitch_freq,        // pitch modification freq in Hz
+    xpitch_range,           // variable delay in seconds
+    xpan_freq,              // pan freq in Hz
+    xpan_spread,            // 0..1
+    xvolume                 // -1..1
   );
   win.Redraw();
   wxEndBusyCursor();
@@ -1341,8 +1341,8 @@ void tStereoForm::OnOk()
   wxBeginBusyCursor();
   sig_stereo(
     spl,
-    xdelay,	 	// in samples
-    xstereo_spread	// 0..1
+    xdelay,                 // in samples
+    xstereo_spread        // 0..1
   );
   win.Redraw();
   wxEndBusyCursor();

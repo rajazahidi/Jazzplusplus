@@ -251,15 +251,15 @@ class tSigValArray
       if (ofs >= size-1)
       {
         val = array[size-1];
-	return;
+        return;
       }
       float rem = x - ofs;
       tSigValue &v1 = array[ofs];
       tSigValue &v2 = array[ofs+1];
       for (int i = 0; i < channels; i++)
       {
-	tLineMap<float> map(0, 1, v1[i], v2[i]);
-	val[i] = map(rem);
+        tLineMap<float> map(0, 1, v1[i], v2[i]);
+        val[i] = map(rem);
       }
     }
     void CyclicInterpolate(tSigValue &val, float x) const
@@ -270,8 +270,8 @@ class tSigValArray
       tSigValue &v2 = array[(ofs+1) % size];
       for (int i = 0; i < channels; i++)
       {
-	tLineMap<float> map(0, 1, v1[i], v2[i]);
-	val[i] = map(rem);
+        tLineMap<float> map(0, 1, v1[i], v2[i]);
+        val[i] = map(rem);
       }
     }
     long Size() const
@@ -355,8 +355,8 @@ class tSigInput
     void GetSample(tSigValue &ret)
     {
       if (synth.current >= current) {
-	current = synth.current + 1;
-	NextValue();
+        current = synth.current + 1;
+        NextValue();
       }
       ret = val;
     }
@@ -364,12 +364,12 @@ class tSigInput
     float GetControl()
     {
       if (synth.current >= current) {
-	current = synth.current + 100;
-	NextValue();
-	ctl = 0;
-	for (int i = 0; i < channels; i++)
-	  ctl += val[i];
-	ctl = ctl / channels;
+        current = synth.current + 100;
+        NextValue();
+        ctl = 0;
+        for (int i = 0; i < channels; i++)
+          ctl += val[i];
+        ctl = ctl / channels;
       }
       return ctl;
     }
@@ -493,7 +493,7 @@ class tSampleResizingIterator : public tSampleIterator<T, SPL>
       long idata = this->GetCurrent() * this->GetChannels();
       for (int i = 0; i < this->GetChannels(); i++)
       {
-	this->data[idata++] = (T)v[i];
+        this->data[idata++] = (T)v[i];
       }
     }
 };
@@ -584,9 +584,9 @@ class tSigWaveOscil : public tSignalModifier
     tSigWaveOscil(tSigSynth &synth, int N, double f, double ffact = FSEMI)
       : tSignalModifier(synth),
         array(N, synth.GetChannels()),
-	freq(f),
-	SR(synth.GetSamplingRate()),
-	frqfact(ffact)
+        freq(f),
+        SR(synth.GetSamplingRate()),
+        frqfact(ffact)
     {
       dx = N / SR * freq;
       x  = 0;
@@ -609,7 +609,7 @@ class tSigWaveOscil : public tSignalModifier
 
     void NextValue() {
       if (have_freq_control && controls[0]->HasChanged()) {
-	dx = array.Size() / SR * freq * fmap(controls[0]->GetControl());
+        dx = array.Size() / SR * freq * fmap(controls[0]->GetControl());
       }
       array.CyclicInterpolate(val, x);
       x += dx;
@@ -638,7 +638,7 @@ class tSigWaveCtrl : public tSigInput
     tSigWaveCtrl(tSigSynth &synth, int N, double durat)
       : tSigInput(synth),
         array(N, synth.GetChannels()),
-	xmap(0, synth.GetSamplingRate() * durat, 0, N)
+        xmap(0, synth.GetSamplingRate() * durat, 0, N)
     {
     }
 
@@ -753,7 +753,7 @@ class tSigPanpot : public tSignalModifier
       float p = controls[0]->GetControl();
       inputs[0]->GetSample(val);
       if (p > 0)
-	val[0] *= (1 - p);
+        val[0] *= (1 - p);
       else
         val[1] *= (1 + p);
     }
@@ -908,7 +908,7 @@ class tSigFilter : public tSignalModifier
       if (have_control && controls[0]->HasChanged()) {
         float f = freq * fmap(controls[0]->GetControl());
         for (int i = 0; i < channels; i++)
-	  filter[i].Setup(sr, f, bandw);
+          filter[i].Setup(sr, f, bandw);
       }
       inputs[0]->GetSample(val);
       for (int i = 0; i < channels; i++)
@@ -1114,8 +1114,8 @@ class tSigStereoSpread : public tSignalModifier
       float a = (lfo() + 1)/2; // map to 0..1
       if (channels > 1) {
         float tmp = val[0];
-	val[0] -= a * val[1];
-	val[1] -= a * tmp;
+        val[0] -= a * val[1];
+        val[1] -= a * tmp;
       }
       return 1;
     }
@@ -1147,11 +1147,11 @@ class tSigMix2 : public tSignalModifier
       inputs[1]->GetSample(v2);
       float p = controls[0]->GetControl();
       if (p > 0)
-	for (int i = 0; i < channels; i++)
-	  val[i] = v1[i] + (1 - p) * v2[i];
+        for (int i = 0; i < channels; i++)
+          val[i] = v1[i] + (1 - p) * v2[i];
       else
-	for (int i = 0; i < channels; i++)
-	  val[i] = v1[i] * (1 + p) + v2[i];
+        for (int i = 0; i < channels; i++)
+          val[i] = v1[i] * (1 + p) + v2[i];
     }
   protected:
     long len1;
@@ -1176,14 +1176,14 @@ class tSigMixer : public tSignalModifier
       for (unsigned i = 0; i < inputs.size(); i++)
       {
         tSigValue v;
-	inputs[i]->GetSample(v);
-	if (i < ControlCount)
+        inputs[i]->GetSample(v);
+        if (i < ControlCount)
         {
-	  float vol = controls[i]->GetControl();
-	  vol = map(vol);
-	  v *= vol * vol;
-	}
-	val += v;
+          float vol = controls[i]->GetControl();
+          vol = map(vol);
+          v *= vol * vol;
+        }
+        val += v;
       }
     }
 

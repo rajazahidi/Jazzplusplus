@@ -67,7 +67,7 @@ bool tShiftDlg::OnClose()
   cmd.Execute();
   EventWin->Redraw();
   if (EventWin->NextWin)
-  	EventWin->NextWin->Redraw();
+          EventWin->NextWin->Redraw();
   //  wxForm::OnOk();
   return false;
 }
@@ -520,7 +520,7 @@ bool tMidiDelayDlg::OnClose()
   cmd.Execute();
   EventWin->Redraw();
   if (EventWin->NextWin)
-  	EventWin->NextWin->Redraw();
+          EventWin->NextWin->Redraw();
   //tPropertyListDlg::OnClose();
   return false;
 }
@@ -679,7 +679,7 @@ bool tQuantizeDlg::OnClose()
   qnt.Execute();
   EventWin->Redraw();
   if (EventWin->NextWin)
- 	 EventWin->NextWin->Redraw();
+          EventWin->NextWin->Redraw();
   //tPropertyListDlg::OnClose();
   return false;
 }
@@ -790,7 +790,7 @@ class tChEventDlg : public tEventDlg
     tChEventDlg(tChannelEvent *e, JZPianoFrame* w, tTrack *t)
       : tEventDlg(e, w, t)
     {
-      Channel = e->Channel + 1;		// 1..16
+      Channel = e->Channel + 1;                // 1..16
     }
     void AddProperties();
     bool OnClose();
@@ -1386,17 +1386,17 @@ static JZEvent *CreateEventDialog(long Clock, int Channel, int Pitch)
         e = new tSetTempo(Clock, 100);
         break;
      case StatSysEx:
-	e = new tSysEx(Clock, (unsigned char*) "", 0);
-	break;
+        e = new tSysEx(Clock, (unsigned char*) "", 0);
+        break;
      case StatPlayTrack:
-	e = new tPlayTrack(Clock, 0, Pitch);
-	break;
+        e = new tPlayTrack(Clock, 0, Pitch);
+        break;
      case StatEndOfTrack:
-	e = new tEndOfTrack(Clock);
-	break;
+        e = new tEndOfTrack(Clock);
+        break;
      case StatText:
-	e = new tText(Clock, (unsigned char*)"");
-	break;
+        e = new tText(Clock, (unsigned char*)"");
+        break;
     }
   }
   return e;
@@ -1425,8 +1425,8 @@ void EventDialog(
     case StatKeyOn:
       if (t->GetAudioMode()) {
         if (!gpMidiPlayer->IsPlaying())
-	  gpMidiPlayer->EditSample(e->IsKeyOn()->Key);
-	break;
+          gpMidiPlayer->EditSample(e->IsKeyOn()->Key);
+        break;
       }
       str = "Key On";
       dlg = new tKeyOnDlg(e->IsKeyOn(), w, t);

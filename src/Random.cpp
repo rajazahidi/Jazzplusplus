@@ -155,7 +155,7 @@ int JZRndArray::Random(double rndval)
 
 int JZRndArray::Interval(int seed)
 {
-  if (seed < 0)		// initial ?
+  if (seed < 0)                // initial ?
     seed = int(rnd.asDouble() * n);
   int delta = Random();
   if (rnd.asDouble() < 0.5)
@@ -277,7 +277,7 @@ tArrayEdit::tArrayEdit(wxFrame *frame, JZRndArray &ar, long xx, long yy, long ww
   xmin = 0;
   xmax = n;
 
-  x = 0;	// draw to topleft corner of canvas
+  x = 0;        // draw to topleft corner of canvas
   y = 0;
   w = ww;
   h = hh;
@@ -504,11 +504,11 @@ void tArrayEdit::DrawYTicks(wxDC* dc)
       for (int val = min; val < max; val += step)
       {
         const char *buf = GetYText(val);
-	//sprintf(buf, "%d", val);
-	dc->GetTextExtent((char *)buf, &tw, &th);
-	float yy = y + h - h * (val - min) / (max - min) - th/2;
-	dc->DrawText(buf, x - tw - TICK_LINE, (int)yy);
-	//dc->DrawLine(x - TICK_LINE, yy, x, yy);
+        //sprintf(buf, "%d", val);
+        dc->GetTextExtent((char *)buf, &tw, &th);
+        float yy = y + h - h * (val - min) / (max - min) - th/2;
+        dc->DrawText(buf, x - tw - TICK_LINE, (int)yy);
+        //dc->DrawLine(x - TICK_LINE, yy, x, yy);
       }
     }
   }
@@ -661,16 +661,16 @@ int tArrayEdit::Dragging(wxMouseEvent &e)
     if (i < index)
       for (; i <= index; i++)
       {
-	DrawBar(dc, i, 0);
-	mArray[i] = val;
-	DrawBar(dc, i, 1);
+        DrawBar(dc, i, 0);
+        mArray[i] = val;
+        DrawBar(dc, i, 1);
       }
     else
       for (; i >= index; i--)
       {
-	DrawBar(dc, i, 0);
-	mArray[i] = val;
-	DrawBar(dc, i, 1);
+        DrawBar(dc, i, 0);
+        mArray[i] = val;
+        DrawBar(dc, i, 1);
       }
     index = k;
   }

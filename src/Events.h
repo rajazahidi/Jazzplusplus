@@ -170,45 +170,45 @@ class tGetMidiBytes : public tWriteBase
  * Normal events (with the channel)
  */
 
-#define StatKeyOff	0x80
-#define StatKeyOn	0x90
-#define StatKeyPressure	0xA0		// Key pressure
-#define StatControl	0xB0
-#define StatProgram	0xC0
-#define StatChnPressure	0xD0            // SN++ Channel pressure
-#define StatPitch	0xE0
+#define StatKeyOff        0x80
+#define StatKeyOn        0x90
+#define StatKeyPressure        0xA0                // Key pressure
+#define StatControl        0xB0
+#define StatProgram        0xC0
+#define StatChnPressure        0xD0            // SN++ Channel pressure
+#define StatPitch        0xE0
 
 /*
  * Meta events (no channel)
  */
 
-#define StatSysEx	0xF0
-#define StatSongPtr	0xF2
-#define StatSongSelect	0xF3
-#define StatTuneRequest	0xF6
+#define StatSysEx        0xF0
+#define StatSongPtr        0xF2
+#define StatSongSelect        0xF3
+#define StatTuneRequest        0xF6
 #define StatMidiClock   0xf8
 #define StatStartPlay   0xfa
 #define StatContPlay    0xfb
 #define StatStopPlay    0xfc
-#define StatText	0x01
-#define StatCopyright	0x02
-#define StatTrackName	0x03
-#define StatMarker	0x06
-#define StatEndOfTrack	0x2F
-#define StatSetTempo	0x51
-#define StatMtcOffset	0x54
-#define StatTimeSignat	0x58
-#define StatKeySignat	0x59
+#define StatText        0x01
+#define StatCopyright        0x02
+#define StatTrackName        0x03
+#define StatMarker        0x06
+#define StatEndOfTrack        0x2F
+#define StatSetTempo        0x51
+#define StatMtcOffset        0x54
+#define StatTimeSignat        0x58
+#define StatKeySignat        0x59
 
-#define StatUnknown	0x00
+#define StatUnknown        0x00
 
 // Proprietary event status
 #define StatJazzMeta    0x7F
 #define StatPlayTrack   0x7E
 
 
-#define LastClock 	(0x7fffffffL)
-#define KilledClock 	(0x80000000L)
+#define LastClock         (0x7fffffffL)
+#define KilledClock         (0x80000000L)
 
 
 
@@ -320,7 +320,7 @@ class JZEvent
       return (mClock & KilledClock) != 0;
     }
 
-    virtual tMetaEvent 	*IsMetaEvent()	{ edb(); return 0; }
+    virtual tMetaEvent         *IsMetaEvent()        { edb(); return 0; }
     virtual tChannelEvent *IsChannelEvent() { edb(); return 0; }
 
     virtual tKeyOn*       IsKeyOn()       { edb(); return 0; }
@@ -359,11 +359,11 @@ class JZEvent
       edb();
       if ((unsigned long)Event.mClock > (unsigned long)mClock)
       {
-	return -1;
+        return -1;
       }
       if ((unsigned long)Event.mClock < (unsigned long)mClock)
       {
-	return 1;
+        return 1;
       }
       return 0;
     }
@@ -457,16 +457,16 @@ class tKeyOn : public tChannelEvent
   public:
     unsigned char  Key;
     unsigned char  Veloc;
-    unsigned short Length;	// 0 if corresponding tKeyOff exists
+    unsigned short Length;        // 0 if corresponding tKeyOff exists
     // SN++
     unsigned short OffVeloc;
 
     tKeyOn(long clk, int cha, unsigned char key, unsigned char vel, unsigned short len = 0)
       : tChannelEvent(clk, StatKeyOn, cha)
     {
-      Key 	= key;
-      Veloc 	= vel;
-      Length 	= len;
+      Key         = key;
+      Veloc         = vel;
+      Length         = len;
       OffVeloc  = 0;
     }
 
@@ -475,13 +475,13 @@ class tKeyOn : public tChannelEvent
       edb(); return io.Write(this, Key, Veloc);
     }
 
-    virtual tKeyOn *IsKeyOn() 		{ edb(); return this; }
-    virtual JZEvent* Copy() 		{ edb(); return new tKeyOn(*this); }
-    virtual int   GetLength()		{ edb(); return Length; }
-    virtual int   GetValue()     	{ edb(); return Key; }
-    virtual int   GetPitch()     	{ edb(); return Key; }
-    virtual void  SetPitch(int p) 	{ edb(); Key = p; }
-    virtual const wxPen* GetPen()     	{ return wxBLACK_PEN; }
+    virtual tKeyOn *IsKeyOn()                 { edb(); return this; }
+    virtual JZEvent* Copy()                 { edb(); return new tKeyOn(*this); }
+    virtual int   GetLength()                { edb(); return Length; }
+    virtual int   GetValue()             { edb(); return Key; }
+    virtual int   GetPitch()             { edb(); return Key; }
+    virtual void  SetPitch(int p)         { edb(); Key = p; }
+    virtual const wxPen* GetPen()             { return wxBLACK_PEN; }
     virtual const wxBrush* GetBrush()   { return wxBLACK_BRUSH; }
 };
 
@@ -534,12 +534,12 @@ class tPitch : public tChannelEvent
       edb(); return io.Write(this, (unsigned char)(v & 0x7F), (unsigned char)(v >> 7));
     }
 
-    virtual tPitch *IsPitch()		{ edb(); return this; }
-    virtual JZEvent* Copy()      	{ edb(); return new tPitch(*this); }
-    virtual int   GetValue()    	{ edb(); return Value; }
-    virtual int   GetPitch()    	{ edb(); return (Value + 8192) >> 7; }
-    virtual void  SetPitch(int p)    	{ edb(); Value = (p << 7) - 8192; }
-    virtual const wxPen* GetPen()     	{ return wxRED_PEN; }
+    virtual tPitch *IsPitch()                { edb(); return this; }
+    virtual JZEvent* Copy()              { edb(); return new tPitch(*this); }
+    virtual int   GetValue()            { edb(); return Value; }
+    virtual int   GetPitch()            { edb(); return (Value + 8192) >> 7; }
+    virtual void  SetPitch(int p)            { edb(); Value = (p << 7) - 8192; }
+    virtual const wxPen* GetPen()             { return wxRED_PEN; }
     virtual const wxBrush* GetBrush()   { return wxRED_BRUSH; }
 };
 
@@ -563,12 +563,12 @@ class tControl : public tChannelEvent
     {
       edb(); return io.Write(this, Control, Value);
     }
-    virtual tControl *IsControl()	{ edb(); return this; }
-    virtual JZEvent* Copy() 		{ edb(); return new tControl(*this); }
-    virtual int   GetValue()     	{ edb(); return Control; }
-    virtual int   GetPitch()     	{ edb(); return Control; }
-    virtual void  SetPitch(int p)     	{ edb(); Control = p; }
-    virtual const wxPen* GetPen()     	{ return wxCYAN_PEN; }
+    virtual tControl *IsControl()        { edb(); return this; }
+    virtual JZEvent* Copy()                 { edb(); return new tControl(*this); }
+    virtual int   GetValue()             { edb(); return Control; }
+    virtual int   GetPitch()             { edb(); return Control; }
+    virtual void  SetPitch(int p)             { edb(); Control = p; }
+    virtual const wxPen* GetPen()             { return wxCYAN_PEN; }
     virtual const wxBrush* GetBrush()   { return wxCYAN_BRUSH; }
 };
 
@@ -588,12 +588,12 @@ class tProgram : public tChannelEvent
     {
       edb(); return io.Write(this, Program);
     }
-    virtual tProgram *IsProgram() 	{ edb(); return this; }
-    virtual JZEvent* Copy() 		{ edb(); return new tProgram(*this); }
-    virtual int   GetValue()     	{ edb(); return Program; }
-    virtual int   GetPitch()     	{ edb(); return Program; }
-    virtual void  SetPitch(int p)	{ edb(); Program = p; }
-    virtual const wxPen* GetPen()     	{ return wxGREEN_PEN; }
+    virtual tProgram *IsProgram()         { edb(); return this; }
+    virtual JZEvent* Copy()                 { edb(); return new tProgram(*this); }
+    virtual int   GetValue()             { edb(); return Program; }
+    virtual int   GetPitch()             { edb(); return Program; }
+    virtual void  SetPitch(int p)        { edb(); Program = p; }
+    virtual const wxPen* GetPen()             { return wxGREEN_PEN; }
     virtual const wxBrush* GetBrush()   { return wxGREEN_BRUSH; }
 };
 
@@ -612,7 +612,7 @@ class tMetaEvent : public JZEvent
       Length = len;
       Data = new unsigned char [len + 1];
       if (dat)
-	memcpy(Data, dat, len);
+        memcpy(Data, dat, len);
       Data[len] = 0;
     }
 
@@ -855,14 +855,14 @@ class tTrackName : public tMetaEvent
       : tMetaEvent(clk, StatTrackName, dat, len)
     {
 // SN++ Diese Restriktion ist viel zu hart. Es genuegt, den Namen im Mixerdialog
-//		zu begrenzen!!!
+//                zu begrenzen!!!
 /*
 #ifdef wx_motif
       // clip to 16 chars
       if (len > 16)
       {
-	Data[16] = 0;
-	Length   = 16;
+        Data[16] = 0;
+        Length   = 16;
       }
 #endif
 */
@@ -906,7 +906,7 @@ class tPlayTrack : public tMetaEvent
   int transpose; //how many steps to transpose the track
   int eventlength; //the length of the event, confusing with the Length field of tMetaEvent, that seems to be for serialization
 
-  virtual int   GetLength()		{ edb(); return eventlength; }
+  virtual int   GetLength()                { edb(); return eventlength; }
   
   tPlayTrack(long clk, unsigned char *chardat, unsigned short len)
     : tMetaEvent(clk, StatPlayTrack, chardat, len)
@@ -917,9 +917,9 @@ class tPlayTrack : public tMetaEvent
       transpose=0;
       eventlength=0;
       if(dat!=0){
-	track=dat[0];
-	transpose=dat[1];
-	eventlength=dat[2];
+        track=dat[0];
+        transpose=dat[1];
+        eventlength=dat[2];
       }
     }
   
@@ -1115,7 +1115,7 @@ class tKeyPressure: public tChannelEvent
     virtual tKeyPressure *IsKeyPressure() { edb(); return this; }
     virtual JZEvent* Copy()          { edb(); return new tKeyPressure(*this); }
     virtual int   GetValue()        { edb(); return Value; }
-	virtual int   GetPitch()        { edb(); return Key; }
+        virtual int   GetPitch()        { edb(); return Key; }
     virtual void  SetPitch(int p)   { edb(); Key = p; }
 
 };
@@ -1136,11 +1136,11 @@ class tChnPressure : public tChannelEvent
     {
       edb(); return io.Write(this, Value);
     }
-    virtual tChnPressure  *IsChnPressure() 	        { edb(); return this; }
-    virtual JZEvent* Copy() 		{ edb(); return new tChnPressure(*this); }
-    virtual int   GetValue()     	{ edb(); return Value; }
-    virtual int   GetPitch()     	{ edb(); return 0; }
-    virtual void  SetPitch(int v)	{ edb();  }
+    virtual tChnPressure  *IsChnPressure()                 { edb(); return this; }
+    virtual JZEvent* Copy()                 { edb(); return new tChnPressure(*this); }
+    virtual int   GetValue()             { edb(); return Value; }
+    virtual int   GetPitch()             { edb(); return 0; }
+    virtual void  SetPitch(int v)        { edb();  }
     virtual const wxPen* GetPen()       { return wxGREEN_PEN; }
     virtual const wxBrush* GetBrush()   { return wxGREEN_BRUSH; }
 };

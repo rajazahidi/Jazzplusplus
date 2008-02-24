@@ -277,8 +277,8 @@ int tNamedValueListValidator::MapName2Value(const char* Selection)
     {
       if (!strcmp(Selection, iValue->first.c_str()))
       {
-	Result = iValue->second;
-	break;
+        Result = iValue->second;
+        break;
       }
     }
   }

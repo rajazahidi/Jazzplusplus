@@ -29,12 +29,12 @@ class JZSong;
 class tTrack;
 
 
-#define FltKeyOn	0
+#define FltKeyOn        0
 #define FltKeyPressure  1  // SN++ PolyAftertouch gehoert to KeyOn Events!
-#define FltControl	2
-#define FltProgram	3
-#define FltPitch	4
-#define FltTempo	5
+#define FltControl        2
+#define FltProgram        3
+#define FltPitch        4
+#define FltTempo        5
 #define FltChnPressure  6  // SN++ Channel Aftertouch
 #define FltSysEx        7
 
@@ -65,8 +65,8 @@ class tFilter : public wxObject
     bool      OtherSelected;
 
     JZSong *Song;
-    long FromClock, ToClock;	// einschl .. ausschl
-    int  FromTrack, ToTrack;	// 1..n einschl .. einschl
+    long FromClock, ToClock;        // einschl .. ausschl
+    int  FromTrack, ToTrack;        // 1..n einschl .. einschl
 
     void Dialog(wxFrame *parent, int ShowEventStats = 1);
 
@@ -82,24 +82,24 @@ class tFilter : public wxObject
       for (int i = 0; i < nFltEvents; i++)
       {
         if (e->Stat == FltEvents[i].Stat)
-	{
-	   // SN++ Aftertouch gehoert eigendlich zu KeyOn Events.
-	  if (e->Stat == StatKeyPressure) {
+        {
+           // SN++ Aftertouch gehoert eigendlich zu KeyOn Events.
+          if (e->Stat == StatKeyPressure) {
             int aval = e->IsKeyPressure()->Key;
             return FltEvents[i].Selected &&
-		   FltEvents[i].FromValue <= aval && aval <= FltEvents[i].ToValue;
-	  }
- 	  if( e->Stat == StatTimeSignat)
-	    return FltEvents[i].Selected;
-	  // SN++
+                   FltEvents[i].FromValue <= aval && aval <= FltEvents[i].ToValue;
+          }
+           if( e->Stat == StatTimeSignat)
+            return FltEvents[i].Selected;
+          // SN++
           if( e->Stat == StatChnPressure)
-	    return FltEvents[i].Selected;
+            return FltEvents[i].Selected;
 
           if (e->Stat == StatSysEx)
-	    return FltEvents[i].Selected;
+            return FltEvents[i].Selected;
 
           return FltEvents[i].Selected && FltEvents[i].FromValue <= val && val <= FltEvents[i].ToValue;
-	}
+        }
       }
       return OtherSelected;
     }

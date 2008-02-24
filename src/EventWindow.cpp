@@ -38,13 +38,8 @@ using namespace std;
 // tCanvas
 // ************************************************************************
 
-#ifdef wx_xt
-#define ScLine 1L
-#define ScPage 200L
-#else
 #define ScLine 50L
 #define ScPage 8L
-#endif
 
 
 //notice, there is a conflict between this and the subclass event tables that i dont know how to resolv

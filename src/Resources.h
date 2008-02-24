@@ -58,7 +58,9 @@
 #define ID_CUT_PASTE_EVENTS                  wxID_HIGHEST + 21
 #define ID_SHOW_ALL_EVENTS_FROM_ALL_TRACKS   wxID_HIGHEST + 22
 
-#define MEN_CLEAR	                     wxID_HIGHEST + 30
-#define MEN_SETTINGS	                     wxID_HIGHEST + 41
+#define ID_TOOLS_HARMONY_BROWSER             wxID_HIGHEST + 25
+
+#define MEN_CLEAR                            wxID_HIGHEST + 30
+#define MEN_SETTINGS                         wxID_HIGHEST + 41
 
 #endif // !defined(JZ_RESOURCES_H)

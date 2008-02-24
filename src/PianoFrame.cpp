@@ -1299,10 +1299,10 @@ void JZPianoFrame::OnPaintSub(wxDC* dc, long x, long y)
   dc->SetPen(*wxBLACK_PEN);
   DrawPianoRoll(dc);
 
-
-  // draw chords from harmony-browser
-  if (VisibleHBChord && the_harmony_browser && !Track->IsDrumTrack()) {
-    HBAnalyzer *an = the_harmony_browser->getAnalyzer();
+  // Draw chords from harmony-browser.
+  if (VisibleHBChord && gpHarmonyBrowser && !Track->IsDrumTrack())
+  {
+    HBAnalyzer *an = gpHarmonyBrowser->getAnalyzer();
     if (an != 0)
     {
       wxBrush cbrush = *wxBLUE_BRUSH;

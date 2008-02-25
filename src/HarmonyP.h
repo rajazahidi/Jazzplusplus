@@ -38,8 +38,17 @@ class HBChord
     friend std::istream& operator >> (std::istream& is, HBChord &a);
 
   public:
-    HBChord()                 { keys = 0; }
-    HBChord(long k)         { keys = k; }
+
+    HBChord()
+    {
+      keys = 0;
+    }
+
+    HBChord(int k)
+    {
+      keys = k;
+    }
+
     HBChord(
       int a,
       int b,
@@ -58,8 +67,15 @@ class HBChord
     int Count() const;                // # keys in chord
     int Iter(int key) const;        // next key in chord
 
-    void Clear()        { keys = 0; }
-    long Keys()        const        { return keys; }
+    void Clear()
+    {
+      keys = 0;
+    }
+
+    int Keys() const
+    {
+      return keys;
+    }
 
     bool Contains(int key) const        // key in chord?
     {
@@ -179,7 +195,7 @@ class HBChord
     }
 
   protected:
-    long keys;
+    int keys;
 
   private:
     static const char * const scale_names[2][12];

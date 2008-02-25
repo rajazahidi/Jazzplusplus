@@ -68,12 +68,12 @@ void HBAnalyzer::Init(tFilter *f, int epc)
     steps = (stop_bar - start_bar) * 8L / eighths_per_chord;
   }
 
-  count = new long * [steps];
-  delta = new long * [steps];
+  count = new int* [steps];
+  delta = new int* [steps];
   for (int i = 0; i < steps; i++)
   {
-    count[i] = new long [12];
-    delta[i] = new long [12];
+    count[i] = new int[12];
+    delta[i] = new int[12];
     for (int j = 0; j < 12; j++)
     {
       count[i][j] = 0;
@@ -147,10 +147,10 @@ void HBAnalyzer::IterateEvents(void (HBAnalyzer::*Action)(tKeyOn *on, tTrack *t)
 }
 
 
-long HBAnalyzer::Step2Clock(int step)
+int HBAnalyzer::Step2Clock(int step)
 {
-  long fr = filter->FromClock;
-  long to = filter->ToClock;
+  int fr = filter->FromClock;
+  int to = filter->ToClock;
   return (step * (to - fr)) / steps + fr;
 }
 
@@ -158,8 +158,8 @@ void HBAnalyzer::CountEvent(tKeyOn *on, tTrack *t)
 {
   for (int i = 0; i < steps; i++)
   {
-    long start = Step2Clock(i);
-    long stop  = Step2Clock(i+1);
+    int start = Step2Clock(i);
+    int stop  = Step2Clock(i+1);
     if (on->GetClock() + on->Length >= start && on->GetClock() < stop)
     {
       if (on->GetClock() > start)
@@ -180,13 +180,13 @@ void HBAnalyzer::TransposeEvent(tKeyOn *on, tTrack *track)
 {
   for (int i = 0; i < steps; i++)
   {
-    long start = Step2Clock(i);
-    long stop  = Step2Clock(i+1);
+    int start = Step2Clock(i);
+    int stop  = Step2Clock(i+1);
     if (on->GetClock() + on->Length >= start && on->GetClock() < stop)
     {
       // key matches this step
-      long fr = start;
-      long to = stop;
+      int fr = start;
+      int to = stop;
       if (on->GetClock() > fr)
       {
         fr = on->GetClock();
@@ -229,8 +229,8 @@ int HBAnalyzer::NumCount(int i)
 int HBAnalyzer::MaxCount(int i, const HBChord &done)
 {
   // find the most used note in step i
-  int  imax = 0;
-  long nmax = 0;
+  int imax = 0;
+  int nmax = 0;
   for (int k = 0; k < 12; k++)
   {
     if (count[i][k] > nmax && !done.Contains(k))
@@ -381,7 +381,7 @@ void HBAnalyzer::GenerateMapping()
 
 void HBAnalyzer::CreateChords()
 {
-  long* pBest = new long [steps];
+  int* pBest = new int[steps];
   for (int i = 0; i < steps; i++)
   {
     pBest[i] = -1;
@@ -395,7 +395,7 @@ void HBAnalyzer::CreateChords()
     const HBChord scale = ct.Scale();
     for (int i = 0; i < steps; i++)
     {
-      long err = 0;
+      int err = 0;
       for (int k = 0; k < 12; k++)
       {
         if (!chord.Contains(k))

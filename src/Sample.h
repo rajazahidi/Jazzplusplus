@@ -28,16 +28,10 @@ class tSampleSet;
 #include <iostream>
 #include <cmath>
 
-
 #include <assert.h>
 #include <sys/stat.h>
 #include <string.h>
 
-#ifdef wx_x
-#include <time.h>
-#endif
-
-// #include "jazzlib.h"
 #include "SignalInterface.h"
 
 // msvc 5.0 has a buggy optimizer!! it cannot compute the following:
@@ -52,38 +46,36 @@ class tSampleSet;
 
 /* Definitions for Microsoft WAVE format */
 
-#define RIFF                0x46464952
-#define WAVE                0x45564157
-#define FMT                0x20746D66
-#define DATA                0x61746164
+#define RIFF            0x46464952
+#define WAVE            0x45564157
+#define FMT             0x20746D66
+#define DATA            0x61746164
 #define PCM_CODE        1
-#define WAVE_MONO        1
-#define WAVE_STEREO        2
+#define WAVE_MONO       1
+#define WAVE_STEREO     2
 
-/* it's in chunks like .voc and AMIGA iff, but my source say there
-   are in only in this combination, so I combined them in one header;
-   it works on all WAVE-file I have
-*/
-typedef unsigned short u_short;
-typedef unsigned long u_long;
+//   It's in chunks like .voc and AMIGA iff, but my source says they
+// are in only in this combination, so I combined them in one header;
+// it works on all WAVE-file I have tested.
 
 // 'old' format for writing .wav files
-typedef struct _waveheader {
-  u_long        main_chunk;        /* 'RIFF' */
-  u_long        length;                /* filelen */
-  u_long        chunk_type;        /* 'WAVE' */
+typedef struct _waveheader
+{
+  unsigned main_chunk;        /* 'RIFF' */
+  unsigned length;                /* filelen */
+  unsigned chunk_type;        /* 'WAVE' */
 
-  u_long        sub_chunk;        /* 'fmt ' */
-  u_long        sc_len;                /* length of sub_chunk, =16 */
-  u_short        format;                /* should be 1 for PCM-code */
-  u_short        modus;                /* 1 Mono, 2 Stereo */
-  u_long        sample_fq;        /* frequence of sample */
-  u_long        byte_p_sec;
-  u_short        byte_p_spl;        /* samplesize; 1 or 2 bytes */
-  u_short        bit_p_spl;        /* 8, 12 or 16 bit */
+  unsigned sub_chunk;        /* 'fmt ' */
+  unsigned sc_len;                /* length of sub_chunk, =16 */
+  unsigned short format;                /* should be 1 for PCM-code */
+  unsigned short modus;                /* 1 Mono, 2 Stereo */
+  unsigned sample_fq;        /* frequence of sample */
+  unsigned byte_p_sec;
+  unsigned short byte_p_spl;        /* samplesize; 1 or 2 bytes */
+  unsigned short bit_p_spl;        /* 8, 12 or 16 bit */
 
-  u_long        data_chunk;        /* 'data' */
-  u_long        data_length;        /* # sample bytes */
+  unsigned data_chunk;        /* 'data' */
+  unsigned data_length;        /* # sample bytes */
 } WaveHeader;
 
 
@@ -112,75 +104,80 @@ class tFloatSample // : public tCMIX
   friend class tSample;
   public:
     tFloatSample(tSample &spl);
-    tFloatSample(tSample &spl, long fr, long to);
-    tFloatSample(int ch, long sr);
+    tFloatSample(tSample &spl, int fr, int to);
+    tFloatSample(int ch, int sr);
     virtual ~tFloatSample();
-    float Peak(long fr = -1, long to = -1);
-    void Rescale(float maxval = 32766.0, long fr = -1, long to = -1);
-    void RescaleToShort(long fr = -1, long to = -1);
-    float &operator[](long i) { return data[i]; }
-    void Initialize(long size = 0);
-    void PasteMix(tFloatSample &src, long offs = 0);
-    void PasteMix(tSample &src, long offs = 0);
+    float Peak(int fr = -1, int to = -1);
+    void Rescale(float maxval = 32766.0, int fr = -1, int to = -1);
+    void RescaleToShort(int fr = -1, int to = -1);
+    float &operator[](int i) { return data[i]; }
+    void Initialize(int size = 0);
+    void PasteMix(tFloatSample &src, int offs = 0);
+    void PasteMix(tSample &src, int offs = 0);
     void RemoveTrailingSilence(float peak = 50);
 
     // CMIX Interface functions
 
-    virtual long SetNote(float offs, float dur);
+    virtual int SetNote(float offs, float dur);
     virtual void EndNote();
     virtual int AddOut(float *p);
     virtual int GetIn(float *p);
     int GetSample(float i, float *p);
-    long Seconds2Samples(float time);
-    float Samples2Seconds(long samples);
-    void InsertSilence(long pos, long length);
+    int Seconds2Samples(float time);
+    float Samples2Seconds(int samples);
+    void InsertSilence(int pos, int length);
     void Convert2Mono();
     void ClipToCurrent();
 
     // CMIX wavetables (gen routines)
     void Normalize();  // make values in 0..1
-    void HanningWindow(long size);
+    void HanningWindow(int size);
 
     // Effects
 
-    void Echo(int num_echos, long delay, float ampl);
-    void RndEcho(int num_echos, long delay, float ampl);
-    void RndEchoStereo(int num_echos, long delay, float ampl);
+    void Echo(int num_echos, int delay, float ampl);
+    void RndEcho(int num_echos, int delay, float ampl);
+    void RndEchoStereo(int num_echos, int delay, float ampl);
 
     /**
      * see args of tSplFilter::Setup() for this.
      */
-    void Filter(long fr, long to, tSplFilter::Type type, int order, double freq, double bw);
+    void Filter(int fr, int to, tSplFilter::Type type, int order, double freq, double bw);
 
     /**
      * signal template classes interface
      */
 
-    void AssureLength(long new_length);
+    void AssureLength(int new_length);
 
-    int GetChannels() const {
+    int GetChannels() const
+    {
       return channels;
     }
 
-    long GetSamplingRate() const {
+    int GetSamplingRate() const
+    {
       return sampling_rate;
     }
 
-    float *GetData() {
+    float *GetData()
+    {
       return data;
     }
-    long GetLength() const {
+
+    int GetLength() const
+    {
       return length;
     }
 
   protected:
     float *data;
-    long  length;
-    int   channels;
-    long  sampling_rate;
+    int length;
+    int channels;
+    int sampling_rate;
 
     // CMIX-IO position
-    long  current;
+    int  current;
 };
 
 
@@ -255,7 +252,7 @@ class tSample {
       return filename;
     }
 
-    long GetLength() const {
+    int GetLength() const {
       return length;
     }
 
@@ -275,7 +272,7 @@ class tSample {
     void GotoRAM() {
       // try to swap this sample into memory ...
       volatile short dummy;
-      for (long i = 0; i < length; i++)
+      for (int i = 0; i < length; i++)
         dummy = data[i];
     }
 
@@ -297,46 +294,46 @@ class tSample {
     }
 
     int GetChannels() const;
-    long GetSamplingRate() const;
+    int GetSamplingRate() const;
 
     /**
      * align offset to channel boundary
      */
-    long Align(long offs) const;
+    int Align(int offs) const;
 
     /**
      * copy part of the data into another tSample o. If o
      * contains other data these will be erased.
      */
 
-    void Copy(tSample &dst, long fr_smpl = -1, long to_smpl = -1);
+    void Copy(tSample &dst, int fr_smpl = -1, int to_smpl = -1);
 
     /**
      * like Copy but deletes the source selection afterwards.
      */
 
-    void Cut(tSample &dst, long fr_smpl = -1, long to_smpl = -1);
+    void Cut(tSample &dst, int fr_smpl = -1, int to_smpl = -1);
 
     /**
      * delete part of this sample.
      */
-    void Delete(long fr_smpl = -1, long to_smpl = -1);
+    void Delete(int fr_smpl = -1, int to_smpl = -1);
 
     /**
      * paste some data into this sample, data are inserted
      */
-    void PasteIns(tSample &src, long offs);
+    void PasteIns(tSample &src, int offs);
 
     /**
      * paste some data into this sample, data are mixed with
      * the current contents.
      */
-    void PasteMix(tSample &src, long offs);
-    void PasteOvr(tSample &src, long fr, long to);
-    void ReplaceSilence(long offs, long len);
+    void PasteMix(tSample &src, int offs);
+    void PasteOvr(tSample &src, int fr, int to);
+    void ReplaceSilence(int offs, int len);
     void Rescale(short maxval = 32766);
-    void Reverse(long fr, long to);
-    long Peak();
+    void Reverse(int fr, int to);
+    int Peak();
 
     /**
      * flip phase of left/right channel
@@ -351,7 +348,7 @@ class tSample {
      * inserts some zero values at pos
      */
 
-    void InsertSilence(long pos, long length);
+    void InsertSilence(int pos, int length);
 
     /**
      * initialize length and data from the float sample
@@ -364,33 +361,33 @@ class tSample {
      * original data are overwritten.
      */
 
-    void Set(tFloatSample &fs, long offs);
+    void Set(tFloatSample &fs, int offs);
 
     /**
      * like Set() but try to make a smooth transition
      */
-    void SetSmooth(tFloatSample &fs, long offs, long fade_len = -1);
+    void SetSmooth(tFloatSample &fs, int offs, int fade_len = -1);
 
-    long Seconds2Samples(float time);
-    float Samples2Seconds(long samples);
+    int Seconds2Samples(float time);
+    float Samples2Seconds(int samples);
 
-    void AssureLength(long len);
+    void AssureLength(int len);
 
   protected:
 
     void FreeData();
-    void MakeData(long length, int zero = 1);
+    void MakeData(int length, int zero = 1);
 
-    int Convert(std::istream& is, long byte_count, int channels, int bits, long speed);
-    long length;  // number of shorts
-    short *data;  // signed shorts
-    tSampleSet &set;
+    int Convert(std::istream& is, int byte_count, int channels, int bits, int speed);
+    int length;  // number of shorts
+    short* data;  // signed shorts
+    tSampleSet& set;
 
-    char  *label;   // msvc cannot delete 'const char *' ????
-    char  *filename;
-    int    volume;
-    int    pan;
-    int    pitch;  // delta pitch
+    char* label;   // msvc cannot delete 'const char *' ????
+    char* filename;
+    int volume;
+    int pan;
+    int pitch;  // delta pitch
 
 #ifdef HAVE_IOS_OPENMODE
     std::_Ios_Openmode openread;
@@ -398,10 +395,10 @@ class tSample {
     int openread;
 #endif
 
-    int    dirty;
+    int dirty;
 
-    int    external_flag;  // reload on disk change?
-    long external_time;  // last modified on disk
+    int external_flag;  // reload on disk change?
+    int external_time;  // last modified on disk
 
 };
 

@@ -50,10 +50,10 @@ class JZProject : public JZSong
     ~JZProject();
 
     // restart play here if space bar hit
-    long mStartTime;
+    int mStartTime;
 
     // Not yet sure what this does
-    long mStopTime;
+    int mStopTime;
 
     // Loop flag, loops play if true
     bool mLoop;
@@ -113,7 +113,7 @@ class JZProject : public JZSong
     void Stop();
 
     // Sets the playback cursor to a specific position
-    void SetPlayPosition(long newposition);
+    void SetPlayPosition(int newposition);
 
     // Mutes playback
     void Mute(bool newmute);
@@ -125,7 +125,7 @@ class JZProject : public JZSong
     void SetRecord(bool newrecord);
 
     // Beats me what this does.
-    void SetLoopClock(long newclock);
+    void SetLoopClock(int newclock);
 
     // Sets selection
 //    void SetSelection();

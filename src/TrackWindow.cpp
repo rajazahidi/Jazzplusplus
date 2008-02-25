@@ -179,9 +179,9 @@ void JZTrackWindow::Create()
 //   Update the play position to the clock argument, and trigger a redraw so
 // the play bar will be drawn.
 //-----------------------------------------------------------------------------
-void JZTrackWindow::NewPlayPosition(long Clock)
+void JZTrackWindow::NewPlayPosition(int Clock)
 {
-  long scroll_clock = (mFromClock + 5 * mToClock) / 6L;
+  int scroll_clock = (mFromClock + 5 * mToClock) / 6L;
 
   if (
     !mpSnapSel->Active &&
@@ -202,7 +202,7 @@ void JZTrackWindow::NewPlayPosition(long Clock)
   {
     if (mPlayClock != Clock)
     {
-      long OldPlayClock = mPlayClock;
+      int OldPlayClock = mPlayClock;
       mPlayClock = Clock;
       wxRect invalidateRect;
       invalidateRect.x = Clock2x(OldPlayClock) - 1;
@@ -433,7 +433,7 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
 
   if (Marked.x > 0)
   {
-    LineText(Dc, (long)Marked.x, (long)Marked.y, (long)Marked.width, ">");
+    LineText(Dc, Marked.x, Marked.y, Marked.width, ">");
   }
   Dc.DestroyClippingRegion();
   DrawPlayPosition(Dc);
@@ -662,7 +662,7 @@ void JZTrackWindow::DrawEvents(wxDC& Dc)
     if (Track)
     {
       tEventIterator Iterator(Track);
-      long StopClk = x2Clock(mCanvasX + mCanvasWidth);
+      int StopClk = x2Clock(mCanvasX + mCanvasWidth);
       JZEvent *e = Iterator.Range(mFromClock, StopClk);
       int y0 = y + mLittleBit;
       int y1 = y + hLine - mLittleBit;
@@ -836,7 +836,7 @@ int JZTrackWindow::Clock2x(int Clock)
 //-----------------------------------------------------------------------------
 int JZTrackWindow::x2BarClock(int x, int Next)
 {
-  long Clock = x2Clock(x);
+  int Clock = x2Clock(x);
   JZBarInfo BarInfo(mpSong);
   BarInfo.SetClock(Clock);
   while (Next--)

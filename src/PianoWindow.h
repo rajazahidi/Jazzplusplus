@@ -39,7 +39,7 @@ class JZPianoWindow : public wxScrolledWindow
 
     JZPianoFrame* mpPianoFrame;
 
-    void SetScrollPosition(long x, long y);
+    void SetScrollPosition(int x, int y);
 
     void SetScrollRanges();
 

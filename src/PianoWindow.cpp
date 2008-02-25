@@ -66,7 +66,7 @@ void JZPianoWindow::OnDraw(wxDC& Dc)
   // OnPaint never seems to get called, but OnDraw does get called.
   int x = 0, y = 0;
   GetViewStart(&x, &y);
-  mpPianoFrame->OnPaintSub(&Dc, (long)x * ScLine, (long)y * ScLine);  
+  mpPianoFrame->OnPaintSub(&Dc, x * ScLine, y * ScLine);  
 }
 
 
@@ -94,13 +94,13 @@ bool JZPianoWindow::OnCharHook(wxKeyEvent& Event)
 
 void JZPianoWindow::SetScrollRanges()
 {
-  long w, h;
+  int w, h;
   mpPianoFrame->GetVirtSize(&w, &h);
   SetScrollbars(ScLine, ScLine, w/ScLine, h/ScLine, ScPage, ScPage);
   EnableScrolling(FALSE, FALSE);
 }
 
-void JZPianoWindow::SetScrollPosition(long x, long y)
+void JZPianoWindow::SetScrollPosition(int x, int y)
 {
   x /= ScLine;
   y /= ScLine;

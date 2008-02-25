@@ -1173,7 +1173,7 @@ HBAnalyzer * HBCanvas::getAnalyzer()
 struct tNamedChord
 {
   const char *name;
-  long bits;
+  int bits;
 };
 
 const int n_chord_names = 12;

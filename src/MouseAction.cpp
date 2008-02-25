@@ -253,8 +253,8 @@ void tSelection::Draw(wxDC& Dc)
 //  }
 }
 
-/** draw, but use clipping to redruce drawing*/
-void tSelection::Draw(wxDC& Dc, long x, long y, long w, long h)
+// Draw, but use clipping to redruce drawing
+void tSelection::Draw(wxDC& Dc, int x, int y, int w, int h)
 {
 //   if (Selected)
 //   {
@@ -264,10 +264,10 @@ void tSelection::Draw(wxDC& Dc, long x, long y, long w, long h)
     //  }
 }
 
-/**i think this one is meant to select a rectangle and repaint it.
-it did this by drawing directly in the dc. this is bad, so i tried changing it to
-invalidation instead*/
-void tSelection::Select(JZRectangle &rr, long x, long y, long w, long h)
+//   I think this one is meant to select a rectangle and repaint it.
+// It did this by drawing directly in the device context.  This is bad, so I
+// tried changing it to invalidation instead.
+void tSelection::Select(JZRectangle &rr, int x, int y, int w, int h)
 {
   // clear old rectangle
   //  Draw(x, y, w, h);
@@ -290,7 +290,7 @@ void tSelection::Select(JZRectangle &rr)
 
 
 
-static void SnapVec(long &x, long *Coords, int nCoords, int up)
+static void SnapVec(int &x, int *Coords, int nCoords, int up)
 {
   int i;
   for (i = 0; i < nCoords; i++)
@@ -308,7 +308,7 @@ static void SnapVec(long &x, long *Coords, int nCoords, int up)
 }
 
 
-static void SnapMod(long &x, long Min, long Max, long Step, int up)
+static void SnapMod(int &x, int Min, int Max, int Step, int up)
 {
   if (x <= Min)
   {
@@ -329,8 +329,8 @@ static void SnapMod(long &x, long Min, long Max, long Step, int up)
 
 void tSnapSelection::Snap(float &fx, float &fy, int drag)
 {
-  long x = (long)fx;
-  long y = (long)fy;
+  int x = (int)fx;
+  int y = (int)fy;
   if (xCoords)
     SnapVec(x, xCoords, nxCoords, drag);
   else if (xStep)
@@ -353,21 +353,21 @@ tSnapSelection::tSnapSelection(wxScrolledWindow *c)
   xStep = yStep = 0;
 }
 
-void tSnapSelection::SetXSnap(long nx, long *cx)
+void tSnapSelection::SetXSnap(int nx, int *cx)
 {
   xCoords = cx;
   nxCoords = nx;
   xStep = 0;
 }
 
-void tSnapSelection::SetYSnap(long ny, long *cy)
+void tSnapSelection::SetYSnap(int ny, int *cy)
 {
   yCoords = cy;
   nyCoords = ny;
   yStep = 0;
 }
 
-void tSnapSelection::SetXSnap(long xmin, long xmax, long xstep)
+void tSnapSelection::SetXSnap(int xmin, int xmax, int xstep)
 {
   xMin = xmin;
   xMax = xmax;
@@ -375,7 +375,7 @@ void tSnapSelection::SetXSnap(long xmin, long xmax, long xstep)
   xCoords = 0;
 }
 
-void tSnapSelection::SetYSnap(long ymin, long ymax, long ystep)
+void tSnapSelection::SetYSnap(int ymin, int ymax, int ystep)
 {
   yMin = ymin;
   yMax = ymax;
@@ -537,7 +537,7 @@ tMouseButton::tMouseButton(
   this->down = copystring(down);
   this->up   = copystring(up);
   wxDC* dc=new wxClientDC(win);
-  win->LineText(dc, (long)r->x, (long)r->y, (long)r->width, (char *)down, (long)r->height, TRUE);
+  win->LineText(dc, r->x, r->y, r->width, (char *)down, r->height, TRUE);
 }
 
 tMouseButton::~tMouseButton()
@@ -552,7 +552,7 @@ int tMouseButton::Event(wxMouseEvent &e)
   {
     Action();
     wxDC* dc=new wxClientDC(win);
-    win->LineText(dc, (long)r.x, (long)r.y, (long)r.width, (char *)up, (long)r.height, FALSE);
+    win->LineText(dc, r.x, r.y, r.width, (char *)up, r.height, false);
     delete this;
     return 1;
   }

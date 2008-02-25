@@ -107,7 +107,7 @@ tMtcTime::tMtcTime(tMtcOffset *s)
   fm = s->Data[3];
 }
 
-tMtcTime::tMtcTime(long millisec, tMtcType t)
+tMtcTime::tMtcTime(int millisec, tMtcType t)
 {
   type = t;
   if (type < Mtc24)
@@ -119,13 +119,13 @@ tMtcTime::tMtcTime(long millisec, tMtcType t)
     type = Mtc30Ndf;
   }
   sec = millisec / 1000;
-  long msec = millisec % 1000;
+  int msec = millisec % 1000;
   min = sec / 60;
   sec = sec % 60;
   hour = min / 60;
   min = min % 60;
   double frametime = 1000.0 / framesPerSecond[type];
-  fm = (long) ((double) msec / frametime);
+  fm = (int) ((double) msec / frametime);
 }
 
 tMtcTime::tMtcTime(char *str, tMtcType t)
@@ -146,7 +146,7 @@ tMtcTime::tMtcTime(char *str, tMtcType t)
   sscanf(str, "%ld:%ld:%ld.%ld", &hour, &min, &sec, &fm);
   if (fm >= framesPerSecond[type])
   {
-    fm = (long) framesPerSecond[type] - 1;
+    fm = (int) framesPerSecond[type] - 1;
   }
 }
 
@@ -185,10 +185,10 @@ tMtcOffset *tMtcTime::ToOffset()
   return s;
 }
 
-long tMtcTime::ToMillisec()
+int tMtcTime::ToMillisec()
 {
-  long msec = (((((hour * 60L) + min) * 60L) + sec) * 1000L) +
-              ((fm * 1000L) / (long) framesPerSecond[type]);
+  int msec = (((((hour * 60L) + min) * 60L) + sec) * 1000L) +
+              ((fm * 1000L) / (int) framesPerSecond[type]);
   return msec;
 }
 
@@ -461,7 +461,7 @@ void tUndoBuffer::Clear()
 
 void tSimpleEventArray::Resize()
 {
-  long i;
+  int i;
   MaxEvents += 50;
   JZEvent** ppEvents = new JZEvent* [MaxEvents];
 
@@ -553,7 +553,7 @@ void tSimpleEventArray::GrabData(tSimpleEventArray& src)
 }
 
 
-void tSimpleEventArray::Copy(tSimpleEventArray& src, long frclk, long toclk)
+void tSimpleEventArray::Copy(tSimpleEventArray& src, int frclk, int toclk)
 {
   tEventIterator iter(&src);
   JZEvent* e = iter.Range(frclk, toclk);
@@ -1651,7 +1651,7 @@ void tEventArray::Read(tReadBase &io)
 }
 
 
-long tEventArray::GetLastClock()
+int tEventArray::GetLastClock()
 {
   if (!nEvents)
   {
@@ -1665,7 +1665,7 @@ int tEventArray::IsEmpty()
   return nEvents == 0;
 }
 
-long tEventArray::GetFirstClock()
+int tEventArray::GetFirstClock()
 {
   if (nEvents)
   {
@@ -1686,9 +1686,9 @@ class tTrackDlg : public wxForm
   char *TrackName;
   tNamedChoice PatchChoice;
   tNamedChoice DeviceChoice;
-  long PatchNr;
-  long Device;
-  long BankNr;
+  int PatchNr;
+  int Device;
+  int BankNr;
   int ClearTrack;
   int AudioMode;
 
@@ -1754,7 +1754,7 @@ void tTrackDlg::OnOk()
     tSysEx *s;
     tEventIterator Iterator(trk);
     trk->Sort();
-    JZEvent *e = Iterator.Range(0, (long unsigned) trk->GetLastClock() + 1);
+    JZEvent *e = Iterator.Range(0, (unsigned) trk->GetLastClock() + 1);
     while (e)
     {
       if ((c = e->IsChannelEvent()) != 0)
@@ -1961,7 +1961,7 @@ void tTrack::Merge(tEventArray *t)
 }
 
 
-void tTrack::MergeRange(tEventArray *other, long FromClock, long ToClock, int Replace)
+void tTrack::MergeRange(tEventArray *other, int FromClock, int ToClock, int Replace)
 {
   // Erase destin
   if (Replace)
@@ -3304,7 +3304,7 @@ void tTrack::SetDefaultSpeed(int bpm)
   Cleanup();
 }
 
-tSetTempo *tTrack::GetCurrentTempo(long clk)
+tSetTempo *tTrack::GetCurrentTempo(int clk)
 {
   tEventIterator Iterator(this);
   Sort();
@@ -3322,7 +3322,7 @@ tSetTempo *tTrack::GetCurrentTempo(long clk)
   return t;
 }
 
-int tTrack::GetCurrentSpeed(long clk)
+int tTrack::GetCurrentSpeed(int clk)
 {
   tSetTempo *t = GetCurrentTempo(clk);
   if (t)

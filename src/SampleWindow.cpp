@@ -141,12 +141,12 @@ class tSampleCnvs : public wxScrolledWindow
     virtual void OnSize(int w, int h);
     virtual void OnEvent(wxMouseEvent &evt);
     void ClearSelection();
-    void SetInsertionPoint(long offs);
-    void SetSelection(long fr, long to);
+    void SetInsertionPoint(int offs);
+    void SetSelection(int fr, int to);
 
-    int Sample2Pixel(long sample);
-    long  Pixel2Sample(float pixel);
-    void  Play();
+    int Sample2Pixel(int sample);
+    int Pixel2Sample(float pixel);
+    void Play();
 
 
   private:
@@ -155,21 +155,21 @@ class tSampleCnvs : public wxScrolledWindow
     tSample &spl;
     void DrawTicks(int x, int y, int w);
 
-    long paint_offset;
-    long paint_length;
+    int paint_offset;
+    int paint_length;
 
     tSnapSelection snapsel;
     // sel_fr == 0: no selection and no insertion point
     // sel_fr >  0 && sel_fr == sel_to: insertion point
     // sel_fr >  0 && sel_fr <  sel_to: selected range
-    long sel_fr, sel_to;
+    int sel_fr, sel_to;
     tInsertionPoint inspt;
     int mouse_up_sets_insertion_point;
     tSamplePlayPosition *playpos;
 
     // for tickmark display
     bool midi_time;
-    long midi_offs;
+    int midi_offs;
 
     bool mouse_down;
 };
@@ -228,7 +228,8 @@ class tSamplePlayPosition : public wxTimer
         Draw();
     }
 
-    void StartListen(long fr, long to) {
+    void StartListen(int fr, int to)
+    {
       fr_smpl = fr;
       to_smpl = to;
       gpMidiPlayer->ListenAudio(spl, fr_smpl, to_smpl);
@@ -252,8 +253,9 @@ class tSamplePlayPosition : public wxTimer
       dc->SetLogicalFunction(wxCOPY);
     }
 
-    virtual void Notify() {
-      long pos = player->GetListenerPlayPosition();
+    virtual void Notify()
+    {
+      int pos = player->GetListenerPlayPosition();
       if (pos < 0) {
         StopListen();
         return;
@@ -270,8 +272,8 @@ class tSamplePlayPosition : public wxTimer
     tSample &spl;
     bool visible;
   int x;
-    long fr_smpl;
-    long to_smpl;
+    int fr_smpl;
+    int to_smpl;
 };
 
 
@@ -377,7 +379,7 @@ void tSampleCnvs::ClearSelection()
 }
 
 
-void tSampleCnvs::SetInsertionPoint(long offs)
+void tSampleCnvs::SetInsertionPoint(int offs)
 {
   ClearSelection();
   sel_fr = sel_to = offs;
@@ -386,7 +388,7 @@ void tSampleCnvs::SetInsertionPoint(long offs)
 }
 
 
-void tSampleCnvs::SetSelection(long fr, long to)
+void tSampleCnvs::SetSelection(int fr, int to)
 {
   ClearSelection();
   sel_fr = fr;
@@ -405,10 +407,10 @@ void tSampleCnvs::SetSelection(long fr, long to)
 }
 
 
-int tSampleCnvs::Sample2Pixel(long sample)
+int tSampleCnvs::Sample2Pixel(int sample)
 {
-  long offs   = win->GetPaintOffset();
-  long length = win->GetPaintLength();
+  int offs   = win->GetPaintOffset();
+  int length = win->GetPaintLength();
   int cw, ch;
   GetClientSize(&cw, &ch);
   JZMapper Map(offs, offs + length, 0, cw);
@@ -416,14 +418,14 @@ int tSampleCnvs::Sample2Pixel(long sample)
 }
 
 
-long tSampleCnvs::Pixel2Sample(float pixel)
+int tSampleCnvs::Pixel2Sample(float pixel)
 {
-  long offs   = win->GetPaintOffset();
-  long length = win->GetPaintLength();
+  int offs   = win->GetPaintOffset();
+  int length = win->GetPaintLength();
   int cw, ch;
   GetClientSize(&cw, &ch);
   JZMapper Map(0, cw, offs, offs + length);
-  long ofs = (long)Map.XToY(pixel);
+  int ofs = Map.XToY(pixel);
   return spl.Align(ofs);
 }
 
@@ -482,17 +484,19 @@ void tSampleCnvs::DrawTicks(int x, int y, int w)
   wxFont f = dc->GetFont();
   dc->SetFont(*wxSMALL_FONT);
 
-  long sfr = win->GetPaintOffset();
-  long sto = sfr + win->GetPaintLength();
+  int sfr = win->GetPaintOffset();
+  int sto = sfr + win->GetPaintLength();
 
   if (!midi_time) {
     // display time
     JZMapper Map(sfr, sto, x, x+w);
     int tfr = spl->Samples2Time(sfr) / 1000;
     int tto = spl->Samples2Time(sto) / 1000 + 1;
-    for (int sec = tfr; sec < tto; sec++) {
-      for (long mil = 0; mil < 1000; mil += 100) {
-        long t = spl->Time2Samples(sec * 1000 + mil);
+    for (int sec = tfr; sec < tto; sec++)
+    {
+      for (int mil = 0; mil < 1000; mil += 100)
+      {
+        int t = spl->Time2Samples(sec * 1000 + mil);
         int xx = Map.XToY(t);
         // draw a tickmark line
         dc->DrawLine(xx, y - 5, xx, y);
@@ -505,20 +509,23 @@ void tSampleCnvs::DrawTicks(int x, int y, int w)
       }
     }
   }
-  else {
-    // display midi counts
-    long cfr = (long)spl->Samples2Ticks(sfr);
-    long cto = (long)spl->Samples2Ticks(sto);
+  else
+  {
+    // Display midi counts.
+    int cfr = spl->Samples2Ticks(sfr);
+    int cto = spl->Samples2Ticks(sto);
     JZMapper Map(cfr, cto, x, x+w);
     JZBarInfo bi(gpSong);
     bi.SetClock(cfr);
     bi.SetBar(bi.BarNr);
-    while (bi.Clock < cto) {
-      long ticks_per_count = bi.TicksPerBar / bi.CountsPerBar;
-      long ticks_per_step = ticks_per_count / 4;
-      for (int i = 0; i < bi.CountsPerBar; i++) {
+    while (bi.Clock < cto)
+    {
+      int ticks_per_count = bi.TicksPerBar / bi.CountsPerBar;
+      int ticks_per_step = ticks_per_count / 4;
+      for (int i = 0; i < bi.CountsPerBar; i++)
+      {
         for (int j = 0; j < 4; j++) {
-          long clock = bi.Clock + i * ticks_per_count + j * ticks_per_step;
+          int clock = bi.Clock + i * ticks_per_count + j * ticks_per_step;
           int xx = Map.XToY(clock);
           // draw a tickmark line
           dc->DrawLine(xx, y - 5, xx, y);
@@ -543,13 +550,13 @@ void tSampleCnvs::DrawTicks(int x, int y, int w)
 
 void tSampleCnvs::DrawSample(int channel, int x, int y, int w, int h)
 {
-  const short *data = spl.GetData();
-  long length       = spl.GetLength();
-  long step         = spl.GetChannels();
+  const short* data = spl.GetData();
+  int length = spl.GetLength();
+  int step = spl.GetChannels();
 
   // compute display range from position scrollbar
-  long xfr = paint_offset + channel;
-  long xto = paint_offset + paint_length;
+  int xfr = paint_offset + channel;
+  int xto = paint_offset + paint_length;
   if (xto > length)
     xto = length;
 
@@ -565,10 +572,10 @@ void tSampleCnvs::DrawSample(int channel, int x, int y, int w, int h)
   short prev_ymax = 0;
   short ymin = 0;
   short ymax = 0;
-  long  x1   = x;
-  for (long n = xfr; n < xto; n += step)
+  int x1 = x;
+  for (int n = xfr; n < xto; n += step)
   {
-    long  x2 = (long)XMap.XToY(n);
+    int x2 = XMap.XToY(n);
     short sy = data[n];
     if (x1 != x2) {
       // new x-coordinate
@@ -609,8 +616,8 @@ void tSampleCnvs::Play()
     playpos->StopListen();
   else
   {
-    long fr_smpl = sel_fr > 0L ? sel_fr : -1L;
-    long to_smpl = sel_to > sel_fr ? sel_to : -1L;
+    int fr_smpl = sel_fr > 0L ? sel_fr : -1L;
+    int to_smpl = sel_to > sel_fr ? sel_to : -1L;
     playpos->StartListen(fr_smpl, to_smpl);
   }
 }
@@ -853,7 +860,7 @@ void tSampleWin::Redraw()
   cnvs->Redraw();
 }
 
-bool tSampleWin::HaveInsertionPoint(long &offs, bool warn)
+bool tSampleWin::HaveInsertionPoint(int &offs, bool warn)
 {
   if (cnvs->sel_fr == cnvs->sel_to && cnvs->sel_fr >= 0) {
     offs = cnvs->sel_fr;
@@ -867,7 +874,7 @@ bool tSampleWin::HaveInsertionPoint(long &offs, bool warn)
   }
 }
 
-bool tSampleWin::HaveSelection(long &fr_smpl, long &to_smpl, HaveSelectionMode mode)
+bool tSampleWin::HaveSelection(int &fr_smpl, int &to_smpl, HaveSelectionMode mode)
 {
   if (cnvs->sel_fr < cnvs->sel_to && cnvs->sel_fr >= 0) {
     fr_smpl = cnvs->sel_fr;
@@ -980,7 +987,7 @@ void tSampleWin::OnMenuCommand(int id)
 
     case MEN_REVERSE:
       {
-        long fr, to;
+        int fr, to;
         if (HaveSelection(fr, to))
         {
           spl.Reverse(fr, to);
@@ -1084,8 +1091,8 @@ void tSampleWin::OnMenuCommand(int id)
     case MEN_ACCEPT:
       if (on_accept)
       {
-        long fr = GetPaintOffset();
-        long to = fr + GetPaintLength();
+        int fr = GetPaintOffset();
+        int to = fr + GetPaintLength();
         on_accept->OnAccept(fr, to);
         delete on_accept;
         on_accept = 0;
@@ -1102,7 +1109,7 @@ void tSampleWin::OnMenuCommand(int id)
 
     case MEN_CUT:
       {
-        long fr, to;
+        int fr, to;
         if (HaveSelection(fr, to, SelWarn))
         {
           spl.Cut(*copy_buffer, fr, to);
@@ -1115,7 +1122,7 @@ void tSampleWin::OnMenuCommand(int id)
 
     case MEN_COPY:
       {
-        long fr, to;
+        int fr, to;
         if (HaveSelection(fr, to, SelAll))
           spl.Copy(*copy_buffer, fr, to);
       }
@@ -1123,7 +1130,7 @@ void tSampleWin::OnMenuCommand(int id)
 
     case MEN_ZOOM_IN:
       {
-        long fr, to;
+        int fr, to;
         if (HaveSelection(fr, to, SelWarn))
           SetViewPos(fr, to);
       }
@@ -1182,7 +1189,7 @@ void tSampleWin::OnMenuCommand(int id)
 
     case MEN_PASTE_MIX:
       {
-        long offs;
+        int offs;
         if (HaveInsertionPoint(offs))
         {
           spl.PasteMix(*copy_buffer, offs);
@@ -1194,7 +1201,7 @@ void tSampleWin::OnMenuCommand(int id)
 
     case MEN_PASTE:
       {
-        long offs, fr, to;
+        int offs, fr, to;
         if (HaveInsertionPoint(offs, FALSE))
         {
           spl.PasteIns(*copy_buffer, offs);
@@ -1212,7 +1219,7 @@ void tSampleWin::OnMenuCommand(int id)
 
     case MEN_SILENCE_INS:
       {
-        long fr, to;
+        int fr, to;
         if (HaveSelection(fr, to, SelWarn))
         {
           spl.InsertSilence(fr, to - fr);
@@ -1223,7 +1230,7 @@ void tSampleWin::OnMenuCommand(int id)
 
     case MEN_SILENCE_APP:
       {
-        long fr, to;
+        int fr, to;
         if (HaveSelection(fr, to, SelWarn))
         {
           spl.InsertSilence(to, to - fr);
@@ -1234,7 +1241,7 @@ void tSampleWin::OnMenuCommand(int id)
 
     case MEN_SILENCE_OVR:
       {
-        long fr, to;
+        int fr, to;
         if (HaveSelection(fr, to, SelWarn))
         {
           spl.ReplaceSilence(fr, to - fr);
@@ -1334,26 +1341,26 @@ void tSampleWin::PlaySample() {
   cnvs->Play();
 }
 
-long tSampleWin::GetPaintLength()
+int tSampleWin::GetPaintLength()
 {
   // return the visible amount of sample data
   double sb = zoom_scrol->GetThumbPosition();
   JZMapper Map(0, 1000, spl.GetLength(), 0);
-  long len = (long)Map.XToY(sb);
+  int len = Map.XToY(sb);
   return spl.Align(len);
 }
 
 
-long tSampleWin::GetPaintOffset()
+int tSampleWin::GetPaintOffset()
 {
   // return the visible Offset in sample data
   double sb = pos_scrol->GetThumbPosition();
   JZMapper Map(0, 1000, 0, spl.GetLength());
-  long ofs = (long)Map.XToY(sb);
+  int ofs = Map.XToY(sb);
   return spl.Align(ofs);
 }
 
-void tSampleWin::SetViewPos(long fr, long to)
+void tSampleWin::SetViewPos(int fr, int to)
 {
   JZMapper Map(0, spl.GetLength(), 0, 1000);
   int zval = 1000 - (int)Map.XToY(to - fr);

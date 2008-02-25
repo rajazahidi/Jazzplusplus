@@ -33,16 +33,16 @@ class JZBarInfo
 {
   public:
 
-    int   BarNr;
-    long  Clock;
-    int   TicksPerBar;
-    int   CountsPerBar;
+    int BarNr;
+    int Clock;
+    int TicksPerBar;
+    int CountsPerBar;
 
     JZBarInfo(JZSong *Song);
 
     void SetBar(int Bar = 0);
 
-    void SetClock(long Clock = 0);
+    void SetClock(int Clock = 0);
 
     void Next();
 
@@ -63,11 +63,11 @@ class JZSong
   friend class JZBarInfo;
 
   void MakeMetronome(
-    long FrClock,
-    long ToClock,
+    int FrClock,
+    int ToClock,
     tEventArray *Destin,
     tMetronomeInfo* MetronomeInfo,
-    long delta = 0);
+    int delta = 0);
 
   public:
 
@@ -88,7 +88,7 @@ class JZSong
     void Write(tWriteBase &io, const char *fname = 0);
 
     tTrack *GetTrack(int Nr);
-    long GetLastClock();
+    int GetLastClock();
     int NumUsedTracks();        // number of used tracks
     int Speed();
 
@@ -96,16 +96,16 @@ class JZSong
     void moveTrack(int from,int to);
 //
 
-    void Clock2String(long Clock, char *buf);
-    long String2Clock(const char *buf);
+    void Clock2String(int Clock, char *buf);
+    int String2Clock(const char *buf);
 
     // merge Events from all Tracks into Destin
     void MergeTracks(
-      long FrClock,
-      long ToClock,
+      int FrClock,
+      int ToClock,
       tEventArray *Destin,
       tMetronomeInfo* MetronomeInfo,
-      long DeltaClock = 0,
+      int DeltaClock = 0,
       int mode = 0);
 
     void MergePlayTrackEvent(

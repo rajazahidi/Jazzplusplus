@@ -31,9 +31,9 @@ class tMetronomeInfo
 
     tMetronomeInfo();
 
-    tKeyOn* Normal(long clock);
+    tKeyOn* Normal(int clock);
 
-    tKeyOn* Accented(long clock);
+    tKeyOn* Accented(int clock);
 
     unsigned char KeyAcc;
     unsigned char KeyNorm;

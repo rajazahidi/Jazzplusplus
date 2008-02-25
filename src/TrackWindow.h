@@ -73,7 +73,7 @@ class JZTrackWindow : public wxScrolledWindow
 
     void Create();
 
-    void NewPlayPosition(long Clock);
+    void NewPlayPosition(int Clock);
 
     void MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode);
 
@@ -156,7 +156,7 @@ class JZTrackWindow : public wxScrolledWindow
     int hTop;
     int wLeft;
     int mClocksPerPixel;
-    long mPlayClock;
+    int mPlayClock;
     bool mUseColors;
     int mLittleBit;
     int xEvents, yEvents, wEvents, hEvents;
@@ -170,7 +170,7 @@ class JZTrackWindow : public wxScrolledWindow
     int xPatch,  wPatch;
 
     int nBars;
-    long xBars[eMaxBars];
+    int xBars[eMaxBars];
 
     TECounterModes mCounterMode;
     TENumberModes mNumberMode;

@@ -36,7 +36,7 @@ tMetronomeInfo::tMetronomeInfo()
 {
 }
 
-tKeyOn* tMetronomeInfo::Normal(long clock)
+tKeyOn* tMetronomeInfo::Normal(int clock)
 {
   return new tKeyOn(
     clock,
@@ -46,7 +46,7 @@ tKeyOn* tMetronomeInfo::Normal(long clock)
     15);
 }
 
-tKeyOn* tMetronomeInfo::Accented(long clock)
+tKeyOn* tMetronomeInfo::Accented(int clock)
 {
   return new tKeyOn(
     clock,

@@ -49,7 +49,7 @@ class tParam
   public:
 
     tParam(
-      long clk,
+      int clk,
       int cha,
       unsigned char id1,
       unsigned char msb,
@@ -87,7 +87,7 @@ class tNrpn : public tParam
   public:
 
     tNrpn(
-      long clk,
+      int clk,
       int cha,
       unsigned char msb,
       unsigned char lsb,
@@ -102,7 +102,7 @@ class tRpn : public tParam
   public:
 
     tRpn(
-      long clk,
+      int clk,
       int cha,
       unsigned char msb,
       unsigned char lsb,
@@ -234,18 +234,18 @@ class tMtcTime
 {
   public:
     tMtcType type;
-    long hour;
-    long min;
-    long sec;
-    long fm;
+    int hour;
+    int min;
+    int sec;
+    int fm;
 
     tMtcTime( tMtcOffset *s ); // an mtc offset or mtc full message
-    tMtcTime( long millisek, tMtcType t );
+    tMtcTime( int millisek, tMtcType t );
     tMtcTime( char *str, tMtcType t );
     tMtcTime( unsigned h, unsigned m, unsigned s, unsigned f, unsigned t );
     void ToString( char *str );
     tMtcOffset *ToOffset();
-    long ToMillisec();
+    int ToMillisec();
 };
 
 
@@ -254,10 +254,10 @@ class tSimpleEventArray : public wxObject
   public:
 
     // Actual number of events in **Events.
-    long nEvents;
+    int nEvents;
 
     // Memory allocated in **Events
-    long MaxEvents;
+    int MaxEvents;
 
     JZEvent** Events;
 
@@ -270,7 +270,7 @@ class tSimpleEventArray : public wxObject
 
     void GrabData(tSimpleEventArray &src);
 
-    void Copy(tSimpleEventArray& src, long frclk, long toclk);
+    void Copy(tSimpleEventArray& src, int frclk, int toclk);
 
     tSimpleEventArray();
 
@@ -378,9 +378,9 @@ class tEventArray : public tSimpleEventArray
     void Read(tReadBase &io);
     void Write(tWriteBase &io);
 
-    long GetLastClock();
-    int  IsEmpty();
-    long GetFirstClock();
+    int GetLastClock();
+    int IsEmpty();
+    int GetFirstClock();
 
     int State;    // tsXXX
 
@@ -433,7 +433,7 @@ class tTrack : public tEventArray
     }
 
     void Merge(tEventArray *other);
-    void MergeRange(tEventArray *other, long FromClock, long ToClock, int Replace = 0);
+    void MergeRange(tEventArray *other, int FromClock, int ToClock, int Replace = 0);
     void Undo();
     void Redo();
     void NewUndoBuffer();
@@ -546,9 +546,9 @@ class tTrack : public tEventArray
     int  GetDefaultSpeed();  // beats per minute
     void SetDefaultSpeed(int bpm);
 
-    int  GetCurrentSpeed( long clk );  // beats per minute
+    int  GetCurrentSpeed( int clk );  // beats per minute
 
-    tSetTempo *GetCurrentTempo( long clk );
+    tSetTempo *GetCurrentTempo( int clk );
 
     int  GetMasterVol();
     void SetMasterVol(int MasterVol);
@@ -576,7 +576,7 @@ class tTrack : public tEventArray
 class tEventIterator
 {
     tSimpleEventArray *Track;
-    long Start, Stop, Actual;
+    int Start, Stop, Actual;
 
   public:
 
@@ -589,11 +589,11 @@ class tEventIterator
     }
 
 
-    JZEvent *GreaterEqual(long Clock)
+    JZEvent *GreaterEqual(int Clock)
     {
-      long lo = Start;
-      long hi = Stop;
-      long clk = 0;
+      int lo = Start;
+      int hi = Stop;
+      int clk = 0;
       while (lo < hi)
       {
         Actual  = (hi + lo) / 2;
@@ -619,14 +619,14 @@ class tEventIterator
     }
 
 
-    JZEvent *First(long Clock = 0)
+    JZEvent *First(int Clock = 0)
     {
       Actual = Start;
       return GreaterEqual(Clock);
     }
 
 
-    JZEvent *Range(long frClock, unsigned long toClock)
+    JZEvent *Range(int frClock, unsigned toClock)
     {
       Start = Actual = 0;
       Stop  = Track->nEvents;
@@ -650,7 +650,7 @@ class tEventIterator
       return (Actual < Stop ? Track->Events[Actual] : 0);
     }
 
-    long EventsLeft()
+    int EventsLeft()
     {
       return Stop - Actual;
     }

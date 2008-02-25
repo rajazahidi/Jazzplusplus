@@ -89,9 +89,9 @@ class JZGuitarWindow : public wxScrolledWindow
     int mWidth, mHeight;
     int mStringHeight, mFretWidth;        // rounded values
     int mTextWidth, mTextHeight;
-    int mActivePitch;        // mouse move
-    int mPlayPitch;        // sound
-    long put_clock;        // left up
+    int mActivePitch;     // mouse move
+    int mPlayPitch;       // sound
+    int put_clock;        // left up
 
     wxFont* mpFont;
 

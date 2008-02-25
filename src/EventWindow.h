@@ -47,7 +47,7 @@ class tCanvas: public wxScrolledWindow
     void OnChar(wxKeyEvent& event);
     bool OnCharHook(wxKeyEvent& event);
     void SetScrollRanges();
-    void SetScrollPosition(long x, long y);
+    void SetScrollPosition(int x, int y);
     void OnDraw(wxDC& dc);
     DECLARE_EVENT_TABLE()
 };
@@ -103,13 +103,13 @@ class JZEventFrame : public wxFrame
     wxFont* mpFixedFont; // remains with 12pt
     int hFixedFont;   // Height of letters
 
-    long   LittleBit;
-    long   hLine;
+    int   LittleBit;
+    int   hLine;
 
-    long   hTop;
-    long   wLeft;
-    long   FontSize;
-    long   ClocksPerPixel;
+    int   hTop;
+    int   wLeft;
+    int   FontSize;
+    int   ClocksPerPixel;
     bool   UseColors;
 
     // Parameters changed, e.g. Song loaded
@@ -117,10 +117,10 @@ class JZEventFrame : public wxFrame
 
     // filled by OnPaint()
     //wxDC *dc;
-    long xEvents, yEvents, wEvents, hEvents;
-    long CanvasX, CanvasY, CanvasW, CanvasH;        // canvas coords
-    long FromClock, ToClock;
-    long FromLine, ToLine;
+    int xEvents, yEvents, wEvents, hEvents;
+    int CanvasX, CanvasY, CanvasW, CanvasH;        // canvas coords
+    int FromClock, ToClock;
+    int FromLine, ToLine;
 
     // Mousehandling
     tSnapSelection *SnapSel;
@@ -129,23 +129,25 @@ class JZEventFrame : public wxFrame
     virtual void SnapSelStop(wxMouseEvent &e);
 
     // methods
-    long y2Line(long y, int up = 0);
-    long y2yLine(long y, int up = 0);
-    long Line2y(long line);
-    void LineText(wxDC *dc, long x, long y, long w, const char *str, int h = -1, bool down = FALSE);
-    long x2Clock(long x);
-    long Clock2x(long clk);
-    long x2BarClock(long x, int Next = 0);
+    int y2Line(int y, int up = 0);
+    int y2yLine(int y, int up = 0);
+    int Line2y(int line);
+    void LineText(wxDC *dc, int x, int y, int w, const char *str, int h = -1, bool down = FALSE);
+    int x2Clock(int x);
+    int Clock2x(int clk);
+    int x2BarClock(int x, int Next = 0);
 
-    long    PlayClock;
-    virtual void NewPlayPosition(long Clock);
+    int PlayClock;
+    virtual void NewPlayPosition(int Clock);
     virtual void DrawPlayPosition(wxDC* dc);
 
     // sent by trackwin: scroll to Position
-    virtual void NewPosition(int TrackNr, long Clock){}
+    virtual void NewPosition(int TrackNr, int Clock)
+    {
+    }
 
     // Events
-    virtual void OnPaintSub(wxDC *dc, long x, long y);
+    virtual void OnPaintSub(wxDC *dc, int x, int y);
     virtual int  OnMouseEvent(wxMouseEvent& Event);
     virtual bool OnKeyEvent(wxKeyEvent& Event); // true = processed by eventwin
     virtual void OnSize(wxSizeEvent& Event);
@@ -162,7 +164,7 @@ class JZEventFrame : public wxFrame
     // Mixer-Dialog
     wxDialog* MixerForm;
 
-    virtual void GetVirtSize(long *w, long *h);
+    virtual void GetVirtSize(int *w, int *h);
 
     // Edit-Menu
 
@@ -172,7 +174,7 @@ class JZEventFrame : public wxFrame
     void MenQuantize();
     void MenSetChannel();
     void MenTranspose();
-    void MenShift(long Unit);
+    void MenShift(int Unit);
     void MenDelete();
     void MenVelocity();
     void MenLength();

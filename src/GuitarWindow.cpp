@@ -325,10 +325,10 @@ void JZGuitarWindow::OnMouseMove(wxMouseEvent& Event)
   PrepareDC(Dc);
 
   wxPoint Position = Event.GetPosition();
-  long x = Dc.DeviceToLogicalX(Position.x);
-  long y = Dc.DeviceToLogicalY(Position.y);
+  int x = Dc.DeviceToLogicalX(Position.x);
+  int y = Dc.DeviceToLogicalY(Position.y);
 
-  int Pitch = Xy2Pitch(int(x), int(y));
+  int Pitch = Xy2Pitch(x, y);
 
   ShowPitch(Dc, Pitch);
 }

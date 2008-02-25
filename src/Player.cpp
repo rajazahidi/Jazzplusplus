@@ -42,8 +42,6 @@
 #include <sys/ioctl.h>
 #endif
 
-// extern "C" unsigned long ntohl( unsigned long );
-
 #define CLOCK_TO_HOST_TICKS 15  // midinetd sends clock
                                 // information every 15'th
                                 // tick

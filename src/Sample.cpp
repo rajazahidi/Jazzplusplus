@@ -102,7 +102,7 @@ void tSample::FreeData()
   dirty  = 1;
 }
 
-void tSample::MakeData(long new_length, int zero)
+void tSample::MakeData(int new_length, int zero)
 {
   delete [] data;
   length = new_length;
@@ -115,26 +115,30 @@ void tSample::MakeData(long new_length, int zero)
 void tSample::Set(tFloatSample &fs)
 {
   MakeData(fs.GetLength());
-  for (long i = 0; i < length; i++)
+  for (int i = 0; i < length; i++)
+  {
     data[i] = (short)fs[i];
+  }
 }
 
 
-void tSample::Set(tFloatSample &fs, long offs)
+void tSample::Set(tFloatSample &fs, int offs)
 {
-  long len = fs.GetLength();
+  int len = fs.GetLength();
   AssureLength(offs + len);
-  for (long i = 0; i < len; i++)
+  for (int i = 0; i < len; i++)
+  {
     data[offs + i] = (short)fs[i];
+  }
 }
 
 /**
  * like Set(tFloatSample, ofs) but makes a smooth fade in / fade out
  */
 
-void tSample::SetSmooth(tFloatSample &fs, long offs, long fade)
+void tSample::SetSmooth(tFloatSample &fs, int offs, int fade)
 {
-  long len = fs.GetLength();
+  int len = fs.GetLength();
   AssureLength(offs + len);
 
   if (fade < 0)
@@ -143,10 +147,10 @@ void tSample::SetSmooth(tFloatSample &fs, long offs, long fade)
   if (fade <= 0 || fade >= fs.length/2)
     return;
 
-  long i = 0;
-  long ofs1 = fade;
-  long ofs2 = fs.length - fade;
-  long ofs3 = fs.length;
+  int i = 0;
+  int ofs1 = fade;
+  int ofs2 = fs.length - fade;
+  int ofs3 = fs.length;
   JZMapper fi(0, fade, 0, 1);
   JZMapper fo(0, fade, 1, 0);
 
@@ -201,31 +205,35 @@ int tSample::LoadWav()
 
 #else
 
-typedef struct {
-  char          main_type[4];        /* 'RIFF' */
-  long                length;                /* filelen */
-  char          sub_type[4];        /* 'WAVE' */
+typedef struct
+{
+  char main_type[4]; // 'RIFF'
+  int length;        // filelen
+  char sub_type[4];  // 'WAVE'
 } RIFFHeader;
 
-typedef struct {
-  char          type[4];        /* 'fmt ' */
-  u_long        length;                /* length of sub_chunk, =16 */
+typedef struct
+{
+  char type[4];         // 'fmt '
+  ios::pos_type length; // length of sub_chunk, = 16
 } ChunkHeader;
 
-typedef struct {
-  u_short        format;                /* should be 1 for PCM-code */
-  u_short        modus;                /* 1 Mono, 2 Stereo */
-  u_long        sample_fq;        /* frequence of sample */
-  u_long        byte_p_sec;
-  u_short        byte_p_spl;        /* samplesize; 1 or 2 bytes */
-  u_short        bit_p_spl;        /* 8, 12 or 16 bit */
+typedef struct
+{
+  unsigned short format;     // should be 1 for PCM-code
+  unsigned short modus;      // 1 Mono, 2 Stereo
+  unsigned sample_fq;        // frequence of sample
+  unsigned byte_p_sec;
+  unsigned short byte_p_spl; // samplesize; 1 or 2 bytes
+  unsigned short bit_p_spl;  // 8, 12 or 16 bit
 } FmtChunk;
 
 
 int tSample::LoadWav()
 {
   struct stat buf;
-  if (stat(filename, &buf) == -1) {
+  if (stat(filename, &buf) == -1)
+  {
     perror(filename);
     return 1;
   }
@@ -241,17 +249,19 @@ int tSample::LoadWav()
     return 2;
 
   int channels      = 0;
-  long data_length  = 0;
-  u_short bit_p_spl = 0;
-  u_short sample_fq = 0;
+  int data_length   = 0;
+  unsigned short bit_p_spl = 0;
+  unsigned short sample_fq = 0;
 
-  while (rh.length > 0) {
+  while (rh.length > 0)
+  {
     is.read((char *)&ch, sizeof(ch));
     rh.length -= sizeof(ch);
-    long pos = is.tellg();
+    ios::pos_type pos = is.tellg();
 
     // "fmt " chunk
-    if (strncmp(ch.type, "fmt ", 4) == 0) {
+    if (strncmp(ch.type, "fmt ", 4) == 0)
+    {
       FmtChunk fc;
       is.read((char *)&fc, sizeof(fc));
       if (fc.format != PCM_CODE)
@@ -262,7 +272,8 @@ int tSample::LoadWav()
     }
 
     // "data" chunk
-    if (strncmp(ch.type, "data", 4) == 0) {
+    if (strncmp(ch.type, "data", 4) == 0)
+    {
       data_length = ch.length;
       break;
     }
@@ -283,7 +294,7 @@ int tSample::LoadWav()
 
 
 
-int tSample::Convert(istream &is, long bytes, int channels, int bits, long speed)
+int tSample::Convert(istream &is, int bytes, int channels, int bits, int speed)
 {
 
   // load the file
@@ -293,7 +304,8 @@ int tSample::Convert(istream &is, long bytes, int channels, int bits, long speed
   is.read((char *)data, length * 2);
 
   // convert 8 -> 16 bit
-  if (bits == 8) {
+  if (bits == 8)
+  {
     int i;
     char *tmp = (char *)data;
     length = bytes;
@@ -318,14 +330,16 @@ int tSample::Convert(istream &is, long bytes, int channels, int bits, long speed
     channels = 2;
   }
   // convert stereo -> mono
-  else if (channels == 2 && set.channels == 1) {
+  else if (channels == 2 && set.channels == 1)
+  {
     short *old = data;
     length = length / 2;
     data = new short [length];
     int i = 0;
     int j = 0;
-    while (i < length) {
-      long val = ((long)old[j] + old[j+1]) / 2L;
+    while (i < length)
+    {
+      int val = ((int)old[j] + old[j+1]) / 2;
       data[i++] = (short)val;
       j += 2;
     }
@@ -335,7 +349,7 @@ int tSample::Convert(istream &is, long bytes, int channels, int bits, long speed
 
   // convert sampling speed
   if (pitch != 0)
-    speed = (long)(speed * pow(FSEMI, pitch));
+    speed = (int)(speed * pow(FSEMI, pitch));
   if (speed != set.speed)
   {
     float f = (float)speed / (float)set.speed;
@@ -344,17 +358,17 @@ int tSample::Convert(istream &is, long bytes, int channels, int bits, long speed
 
   // apply volume and pan
   if (volume != 127 || pan != 0) {
-    long ch1 = volume;
-    long ch2 = volume;
+    int ch1 = volume;
+    int ch2 = volume;
     int  ppan = (set.channels == 2) ? pan : 0;
     if (ppan > 0)
-      ch1 = (long)volume * (63L - ppan) / 64L;
+      ch1 = (int)volume * (63L - ppan) / 64L;
     else if (ppan < 0)
-      ch2 = (long)volume * (63L + ppan) / 64L;
+      ch2 = (int)volume * (63L + ppan) / 64L;
     for (int i = 0; i < length-1; i += 2)
     {
-      data[i]   = (short)((long)data[i]   * ch1 >> 7);
-      data[i+1] = (short)((long)data[i+1] * ch2 >> 7);
+      data[i]   = (short)((int)data[i]   * ch1 >> 7);
+      data[i+1] = (short)((int)data[i+1] * ch2 >> 7);
     }
   }
 
@@ -407,34 +421,35 @@ int tSample::Load(int force)
   return 0;
 }
 
-long tSample::Align(long offs) const {
+int tSample::Align(int offs) const
+{
   if (offs < 0)
     offs = 0;
   else if (offs > length)
     offs = length;
-  return offs & -(long)set.channels;
+  return offs & -(int)set.channels;
 }
 
 
-void tSample::Copy(tSample &dst, long fr_smpl, long to_smpl)
+void tSample::Copy(tSample &dst, int fr_smpl, int to_smpl)
 {
   fr_smpl = (fr_smpl < 0) ? 0 : fr_smpl;
   to_smpl = (to_smpl < 0) ? length : to_smpl;
-  long count = to_smpl - fr_smpl;
+  int count = to_smpl - fr_smpl;
   dst.MakeData(count);
   memcpy(dst.data, data + fr_smpl, count * sizeof(short));
 }
 
 
-void tSample::Delete(long fr_smpl, long to_smpl)
+void tSample::Delete(int fr_smpl, int to_smpl)
 {
   fr_smpl = (fr_smpl < 0) ? 0 : fr_smpl;
   to_smpl = (to_smpl < 0) ? length : to_smpl;
-  long new_length = length - (to_smpl - fr_smpl);
+  int new_length = length - (to_smpl - fr_smpl);
   short *new_data = new short [new_length];
 
-  long fr_offs = fr_smpl * sizeof(short);
-  long to_offs = to_smpl * sizeof(short);
+  int fr_offs = fr_smpl * sizeof(short);
+  int to_offs = to_smpl * sizeof(short);
   memcpy(new_data, data, fr_offs);
   memcpy(new_data + fr_smpl, data + to_smpl, (length - to_smpl) * sizeof(short));
 
@@ -443,20 +458,20 @@ void tSample::Delete(long fr_smpl, long to_smpl)
   length = new_length;
 }
 
-void tSample::Cut(tSample &dst, long fr_smpl, long to_smpl)
+void tSample::Cut(tSample &dst, int fr_smpl, int to_smpl)
 {
   Copy(dst, fr_smpl, to_smpl);
   Delete(fr_smpl, to_smpl);
 }
 
-void tSample::InsertSilence(long pos, long len)
+void tSample::InsertSilence(int pos, int len)
 {
-  long new_length = length + len;
+  int new_length = length + len;
   short *new_data = new short [new_length];
 
-  long bytes1 = pos * sizeof(short);
-  long bytes2 = len * sizeof(short);
-  long bytes3 = (length - pos) * sizeof(short);
+  int bytes1 = pos * sizeof(short);
+  int bytes2 = len * sizeof(short);
+  int bytes3 = (length - pos) * sizeof(short);
   memcpy(new_data, data, bytes1);
   memset(new_data + pos, 0, bytes2);
   memcpy(new_data + pos + len, data + pos, bytes3);
@@ -467,31 +482,33 @@ void tSample::InsertSilence(long pos, long len)
 }
 
 
-void tSample::ReplaceSilence(long offs, long len)
+void tSample::ReplaceSilence(int offs, int len)
 {
   AssureLength(offs + len);
   while (len-- > 0)
     data[offs++] = 0;
 }
 
-void tSample::PasteIns(tSample &src, long offs)
+void tSample::PasteIns(tSample &src, int offs)
 {
   InsertSilence(offs, src.length);
   memcpy(data + offs, src.data, src.length * sizeof(short));
 }
 
 
-void tSample::PasteMix(tSample &src, long offs)
+void tSample::PasteMix(tSample &src, int offs)
 {
   AssureLength(offs + src.length);
   tFloatSample fs(*this);
-  for (long i = 0; i < src.length; i++)
+  for (int i = 0; i < src.length; i++)
+  {
     fs[offs + i] += src.data[i];
+  }
   fs.RescaleToShort();
   Set(fs);
 }
 
-void tSample::Reverse(long fr, long to)
+void tSample::Reverse(int fr, int to)
 {
   // maybe swaps channels too
   if (to >= length)
@@ -509,45 +526,48 @@ void tSample::Reverse(long fr, long to)
 // swap phase on left/right channel
 void tSample::Flip(int ch)
 {
-  long i = ch;
-  long step = set.GetChannels();
-  while (i < length) {
+  int i = ch;
+  int step = set.GetChannels();
+  while (i < length)
+  {
     data[i] = -data[i];
     i += step;
   }
 }
 
 
-void tSample::PasteOvr(tSample &src, long fr, long to)
+void tSample::PasteOvr(tSample &src, int fr, int to)
 {
   Delete(fr, to);
   PasteIns(src, fr);
 }
 
 
-void tSample::AssureLength(long new_len)
+void tSample::AssureLength(int new_len)
 {
   if (new_len > length)
     InsertSilence(length, new_len - length);
 }
 
 
-long tSample::GetSamplingRate() const {
+int tSample::GetSamplingRate() const
+{
   return set.GetSpeed();
 }
 
 
-int tSample::GetChannels() const {
+int tSample::GetChannels() const
+{
   return set.GetChannels();
 }
 
 
-long tSample::Peak()
+int tSample::Peak()
 {
-  long peak = 0;
-  for (long i = 0; i < length; i++)
+  int peak = 0;
+  for (int i = 0; i < length; i++)
   {
-    long d = abs(data[i]);
+    int d = abs(data[i]);
     if (d > peak)
       peak = d;
   }
@@ -560,7 +580,7 @@ void tSample::Rescale(short maxval)
   if (peak > 0.0)
   {
     float f = maxval / peak;
-    for (long i = 0; i < length; i++)
+    for (int i = 0; i < length; i++)
       data[i] = (short)(f * data[i]);
   }
 }
@@ -582,19 +602,19 @@ void tSample::TransposeSemis(float semis)
 
 void tSample::Transpose(float f)
 {
-  long channels   = set.GetChannels();
-  long new_length = ((long)((double)length / (double)f) & (-channels));
+  int channels   = set.GetChannels();
+  int new_length = ((int)((double)length / (double)f) & (-channels));
   short *new_data = new short [new_length];
 
-  const long N = new_length / channels;
-  for (long i = 0; i < N; i++)
+  const int N = new_length / channels;
+  for (int i = 0; i < N; i++)
   {
     float x = f * i;
     float ofs = floor(x);
     float rem = x - ofs;
-    long j = (long)ofs * channels;
-    long k = i * channels;
-    for (long c = 0; c < channels; c++)
+    int j = (int)ofs * channels;
+    int k = i * channels;
+    for (int c = 0; c < channels; c++)
     {
       JZMapper Map(0, 1, data[j + c], data[j + channels + c]);
       new_data[k + c] = (short)Map.XToY(rem);
@@ -606,13 +626,13 @@ void tSample::Transpose(float f)
 }
 
 
-long tSample::Seconds2Samples(float time)
+int tSample::Seconds2Samples(float time)
 {
   JZMapper Map(0.0, 1.0, 0.0, (double)set.speed * set.channels);
-  return (long)Map.XToY(time);
+  return Map.XToY(time);
 }
 
-float tSample::Samples2Seconds(long samples)
+float tSample::Samples2Seconds(int samples)
 {
   JZMapper Map(0.0, (double)set.speed * set.channels, 0.0, 1.0);
   return (float)Map.XToY(samples);
@@ -627,18 +647,21 @@ float tSample::Samples2Seconds(long samples)
  *   bw      : bandwith as fraction of freq in 0..1
  */
 
-void tFloatSample::Filter(long fr, long to, tSplFilter::Type type, int order, double freq, double bw)
+void tFloatSample::Filter(int fr, int to, tSplFilter::Type type, int order, double freq, double bw)
 {
-  long i;
-  if (fr < 0) fr = 0;
-  if (to < 0) to = length;
+  int i;
+  if (fr < 0)
+    fr = 0;
+  if (to < 0)
+    to = length;
+
   //double a0 = freq / (double)sampling_rate;
   tSplFilter *filters = new tSplFilter[channels];
   for (i = 0; i < channels; i++)
     filters[i].Init(type, (float)sampling_rate, freq, bw);
   for (i = fr; i < to; i += channels)
   {
-    for (long c = 0; c < channels; c++)
+    for (int c = 0; c < channels; c++)
       data[i + c] = filters[c].Loop(data[i + c]);
   }
   delete [] filters;
@@ -693,24 +716,24 @@ tFloatSample::tFloatSample(tSample &spl)
   current = 0;
   length = spl.length;
   data   = new float [length];
-  for (long i = 0; i < length; i++)
+  for (int i = 0; i < length; i++)
     data[i] = (float)spl.data[i];
   channels = spl->GetChannels();
   sampling_rate = spl->GetSpeed();
 }
 
-tFloatSample::tFloatSample(tSample &spl, long fr, long to)
+tFloatSample::tFloatSample(tSample &spl, int fr, int to)
 {
   current = 0;
   length = to - fr;
   data   = new float [length];
-  for (long i = 0; i < length; i++)
+  for (int i = 0; i < length; i++)
     data[i] = (float)spl.data[i + fr];
   channels = spl->GetChannels();
   sampling_rate = spl->GetSpeed();
 }
 
-tFloatSample::tFloatSample(int ch, long sr)
+tFloatSample::tFloatSample(int ch, int sr)
 {
   current = 0;
   channels = ch;
@@ -727,14 +750,14 @@ tFloatSample::~tFloatSample()
 }
 
 
-float tFloatSample::Peak(long fr, long to)
+float tFloatSample::Peak(int fr, int to)
 {
   if (fr < 0)
     fr = 0;
   if (to < 0)
     to = length;
   float peak = 0;
-  for (long i = fr; i < to; i++)
+  for (int i = fr; i < to; i++)
   {
     float d = fabs(data[i]);
     if (d > peak)
@@ -744,7 +767,7 @@ float tFloatSample::Peak(long fr, long to)
 }
 
 
-void tFloatSample::Rescale(float maxval, long fr, long to)
+void tFloatSample::Rescale(float maxval, int fr, int to)
 {
   if (fr < 0)
     fr = 0;
@@ -754,13 +777,13 @@ void tFloatSample::Rescale(float maxval, long fr, long to)
   if (peak > 0.0)
   {
     float f = maxval / peak;
-    for (long i = fr; i < to; i++)
+    for (int i = fr; i < to; i++)
       data[i] *= f;
   }
 }
 
 
-void tFloatSample::RescaleToShort(long fr, long to)
+void tFloatSample::RescaleToShort(int fr, int to)
 {
   if (fr < 0)
     fr = 0;
@@ -770,13 +793,13 @@ void tFloatSample::RescaleToShort(long fr, long to)
   if (peak > 32767)
   {
     float f = 32767.0 / peak;
-    for (long i = fr; i < to; i++)
+    for (int i = fr; i < to; i++)
       data[i] *= f;
   }
 }
 
 
-void tFloatSample::Initialize(long size)
+void tFloatSample::Initialize(int size)
 {
   delete [] data;
   length = 0;
@@ -789,26 +812,26 @@ void tFloatSample::Initialize(long size)
 }
 
 
-void tFloatSample::PasteMix(tFloatSample &src, long offs)
+void tFloatSample::PasteMix(tFloatSample &src, int offs)
 {
   AssureLength(offs + src.length);
-  for (long i = 0; i < src.length; i++)
+  for (int i = 0; i < src.length; i++)
     data[offs + i] += src.data[i];
 }
 
 void tFloatSample::RemoveTrailingSilence(float peak)
 {
-  long len1 = length - channels;  // last value
+  int len1 = length - channels;  // last value
   while (len1 > 0 && fabs(data[len1]) < peak)
     len1 -= channels;
   length = len1 + channels;
 }
 
 
-void tFloatSample::PasteMix(tSample &src, long offs)
+void tFloatSample::PasteMix(tSample &src, int offs)
 {
   AssureLength(offs + src.length);
-  for (long i = 0; i < src.length; i++)
+  for (int i = 0; i < src.length; i++)
     data[offs + i] += src.data[i];
 }
 
@@ -831,11 +854,11 @@ void tFloatSample::Normalize()
 }
 
 // gen25 1
-void tFloatSample::HanningWindow(long size)
+void tFloatSample::HanningWindow(int size)
 {
   channels = 1;
   Initialize(size);
-  for (long i = 0; i < length; i++)
+  for (int i = 0; i < length; i++)
     data[i] = -cos(2.0*M_PI * (float)i/(float)(length)) * 0.5 + 0.5;
   Normalize();
 }
@@ -843,17 +866,17 @@ void tFloatSample::HanningWindow(long size)
 #if 0
 
 // gen25 2
-void tFloatSample::HammingWindow(long size)
+void tFloatSample::HammingWindow(int size)
 {
   channels = 1;
   Initialize(size);
-  for (long i = 0; i < length; i++)
+  for (int i = 0; i < length; i++)
     data[i] = 0.54 - 0.46*cos(2.0*M_PI * (float)i/(float)(length));
   Normalize();
 }
 
 // gen5(gen)
-tFloatSample::ExpSegments(long size, int nargs, float pval[])
+tFloatSample::ExpSegments(int size, int nargs, float pval[])
 {
   channels = 1;
   Initialize(size);
@@ -877,7 +900,7 @@ tFloatSample::ExpSegments(long size, int nargs, float pval[])
 }
 
 // gen6
-tFloatSample::LineSegments(long size, int nargs, float pval[])
+tFloatSample::LineSegments(int size, int nargs, float pval[])
 {
   channels = 1;
   Initialize(size);
@@ -892,33 +915,33 @@ tFloatSample::LineSegments(long size, int nargs, float pval[])
 //                         CMIX Interface
 // **********************************************************
 
-long tFloatSample::Seconds2Samples(float time)
+int tFloatSample::Seconds2Samples(float time)
 {
   JZMapper Map(0.0, 1.0, 0.0, (double)sampling_rate * channels);
-  return (long)Map.XToY(time);
+  return Map.XToY(time);
 }
 
-float tFloatSample::Samples2Seconds(long samples)
+float tFloatSample::Samples2Seconds(int samples)
 {
   JZMapper Map(0.0, (double)sampling_rate * channels, 0.0, 1.0);
   return (float)Map.XToY(samples);
 }
 
-void tFloatSample::AssureLength(long new_len)
+void tFloatSample::AssureLength(int new_len)
 {
   if (new_len > length)
     InsertSilence(length, new_len - length);
 }
 
 
-void tFloatSample::InsertSilence(long pos, long len)
+void tFloatSample::InsertSilence(int pos, int len)
 {
-  long new_length = length + len;
+  int new_length = length + len;
   float *new_data = new float [new_length];
 
-  long bytes1 = pos * sizeof(float);
-  long bytes2 = len * sizeof(float);
-  long bytes3 = (length - pos) * sizeof(float);
+  int bytes1 = pos * sizeof(float);
+  int bytes2 = len * sizeof(float);
+  int bytes3 = (length - pos) * sizeof(float);
   memcpy(new_data, data, bytes1);
   memset(new_data + pos, 0, bytes2);
   memcpy(new_data + pos + len, data + pos, bytes3);
@@ -929,17 +952,17 @@ void tFloatSample::InsertSilence(long pos, long len)
 }
 
 
-long tFloatSample::SetNote(float foffs, float durat)
+int tFloatSample::SetNote(float foffs, float durat)
 {
-  long offs;
-  long size;
+  int offs;
+  int size;
   if (foffs < 0)
-    offs = -(long)foffs;
+    offs = -(int)foffs;
   else
     offs = Seconds2Samples(foffs);
 
   if (durat < 0)
-    size = -(long)durat;
+    size = -(int)durat;
   else
     size = Seconds2Samples(durat);
 
@@ -988,10 +1011,10 @@ int tFloatSample::GetSample(float x, float *p)
   float ofs = floor(x);
   float rem = x - ofs;
 
-  long i = (long)ofs * channels;
+  int i = (int)ofs * channels;
   if (i >= length)
     return 0;
-  for (long c = 0; c < channels; c++)
+  for (int c = 0; c < channels; c++)
   {
     JZMapper Map(0, 1, data[i + c], data[i + channels + c]);
     p[c] = Map.XToY(rem);
@@ -1006,23 +1029,23 @@ void tFloatSample::Convert2Mono()
   if (channels != 2)  // only stereo so far
     return;
   float *dst = data;
-  for (long i = 0; i < length - 1; i += 2)
+  for (int i = 0; i < length - 1; i += 2)
     *dst++ = (data[i] + data[i+1]) / 2.0;
   length = length / 2;
   channels = 1;
 }
 
 
-void tFloatSample::Echo(int num_echos, long delay, float ampl)
+void tFloatSample::Echo(int num_echos, int delay, float ampl)
 {
   delay = (delay & -channels);
-  AssureLength(length + (long)num_echos * delay);
-  const long N = length;
-  for (long i = N-1; i >= 0; i--)
+  AssureLength(length + num_echos * delay);
+  const int N = length;
+  for (int i = N-1; i >= 0; i--)
   {
     float a = ampl;
-    long k = i - delay;
-    for (long j = 0; k >= 0 && j < num_echos; j++)
+    int k = i - delay;
+    for (int j = 0; k >= 0 && j < num_echos; j++)
     {
       data[i] += data[k] * a;
       a *= ampl;
@@ -1031,26 +1054,26 @@ void tFloatSample::Echo(int num_echos, long delay, float ampl)
   }
 }
 
-void tFloatSample::RndEcho(int num_echos, long delay, float ampl)
+void tFloatSample::RndEcho(int num_echos, int delay, float ampl)
 {
-  long i;
+  int i;
 
-  long *delays = new long [num_echos];
+  int *delays = new int [num_echos];
   for (i = 0; i < num_echos; i++)
   {
     // compute random delays in the range 0.5 * delay ... 1.5 * delay
-    long d = (long) ((rnd.asDouble() + 0.5) * (double)delay);
+    int d = (int) ((rnd.asDouble() + 0.5) * (double)delay);
     d &= -channels;
     delays[i] = d;
   }
 
-  AssureLength(length + (long)num_echos * delay);
-  const long N = length;
+  AssureLength(length + (int)num_echos * delay);
+  const int N = length;
   for (i = N-1; i >= 0; i--)
   {
     float a = ampl;
-    long k = i - delay;
-    for (long j = 0; k >= 0 && j < num_echos; j++)
+    int k = i - delay;
+    for (int j = 0; k >= 0 && j < num_echos; j++)
     {
       data[i] += data[k] * a;
       a *= ampl;
@@ -1060,31 +1083,31 @@ void tFloatSample::RndEcho(int num_echos, long delay, float ampl)
   delete [] delays;
 }
 
-void tFloatSample::RndEchoStereo(int num_echos, long delay, float ampl)
+void tFloatSample::RndEchoStereo(int num_echos, int delay, float ampl)
 {
-  long i;
+  int i;
   assert(channels == 2);
 
-  long *delays = new long [num_echos];
+  int *delays = new int [num_echos];
   float *ipans = new float [num_echos];
   float *opans = new float [num_echos];
   for (i = 0; i < num_echos; i++)
   {
     // compute random delays in the range 0.5 * delay ... 1.5 * delay
-    long d = (long) ((rnd.asDouble() + 0.5) * (double)delay);
+    int d = (int) ((rnd.asDouble() + 0.5) * (double)delay);
     d &= -channels;
     delays[i] = d;
     ipans[i] = (float)rnd.asDouble();
     opans[i] = (float)rnd.asDouble();
   }
 
-  AssureLength(length + (long)num_echos * delay);
-  const long N = length - channels;
+  AssureLength(length + (int)num_echos * delay);
+  const int N = length - channels;
   for (i = N; i >= 0; i -= channels)
   {
     float a = ampl;
-    long k = i - delay;
-    for (long j = 0; k >= 0 && j < num_echos; j++)
+    int k = i - delay;
+    for (int j = 0; k >= 0 && j < num_echos; j++)
     {
       float ipan = ipans[j];
       float opan = opans[j];

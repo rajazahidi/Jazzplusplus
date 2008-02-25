@@ -89,7 +89,7 @@ void JZSong::Read(tReadBase &io, const char *fname)
   }
 
   // Adjust the song length to equal the MIDI file length plus 16 bars.
-  long NewLength = GetLastClock() / TicksPerQuarter + 16 * 4;
+  int NewLength = GetLastClock() / TicksPerQuarter + 16 * 4;
   if (NewLength > MaxQuarters)
   {
     MaxQuarters = NewLength;
@@ -129,12 +129,12 @@ tTrack *JZSong::GetTrack(int Nr)
 }
 
 
-long JZSong::GetLastClock()
+int JZSong::GetLastClock()
 {
-  long max = 0;
+  int max = 0;
   for (int i = 0; i < nTracks; i++)
   {
-    long clk = Tracks[i]->GetLastClock();
+    int clk = Tracks[i]->GetLastClock();
     if (clk > max)
       max = clk;
   }
@@ -142,20 +142,20 @@ long JZSong::GetLastClock()
 }
 
 
-void JZSong::Clock2String(long clk, char *buf)
+void JZSong::Clock2String(int clk, char *buf)
 {
   JZBarInfo b(this);
   b.SetClock(clk);
   clk -= b.Clock;
-  long TicksPerCount = b.TicksPerBar / b.CountsPerBar;
+  int TicksPerCount = b.TicksPerBar / b.CountsPerBar;
   int Count = clk / TicksPerCount;
   sprintf(buf, "%3d:%d:%03ld", b.BarNr + 1 - intro_length, Count + 1, clk % TicksPerCount);
 }
 
-long JZSong::String2Clock(const char *buf)
+int JZSong::String2Clock(const char *buf)
 {
   int bar = 1;
-  long clk = 0;
+  int clk = 0;
   int  cnt = 1;
   sscanf(buf, "%d:%d:%ld", &bar, &cnt, &clk);
   -- bar;
@@ -163,17 +163,17 @@ long JZSong::String2Clock(const char *buf)
   bar += intro_length;  // buf is from user input!
   JZBarInfo b(this);
   b.SetBar(bar);
-  long TicksPerCount = b.TicksPerBar / b.CountsPerBar;
+  int TicksPerCount = b.TicksPerBar / b.CountsPerBar;
   return b.Clock + cnt * TicksPerCount + clk;
 }
 
 
 void JZSong::MergeTracks(
-  long FrClock,
-  long ToClock,
+  int FrClock,
+  int ToClock,
   tEventArray *Destin,
   tMetronomeInfo *MetronomeInfo,
-  long delta,
+  int delta,
   int mode)
 {
   int i;
@@ -240,7 +240,7 @@ void JZSong::MergePlayTrackEvent(
 
   //FIXME this is just to test the idea, it would be good to modify getlastclock instead i think
   //find an EOT event, otherwise default to the last clock(should be + length of the last event as well)
-  long loopLength=0;
+  int loopLength = 0;
   tEventIterator IteratorEOT(t); //get an iterator of all events the playtrack is pointing to 
   f = IteratorEOT.Range(0, t->GetLastClock());
   loopLength=t->GetLastClock(); 
@@ -255,7 +255,7 @@ void JZSong::MergePlayTrackEvent(
 
   // looplength will be used to loop the track, for the duration of
   // the playtrack event.
-  long loopOffset=0;
+  int loopOffset=0;
 
   //   The loop below is supposed to repeat the referenced track for the
   // duration of the playtrack event.  Also, we should look out for if we
@@ -291,15 +291,15 @@ void JZSong::MergePlayTrackEvent(
 
 
 void JZSong::MakeMetronome(
-  long FrClock,
-  long ToClock,
+  int FrClock,
+  int ToClock,
   tEventArray *Destin,
   tMetronomeInfo *MetronomeInfo,
-  long delta)
+  int delta)
 {
   JZBarInfo BarInfo( this );
   BarInfo.SetClock(FrClock);
-  long clk = BarInfo.Clock;
+  int clk = BarInfo.Clock;
   int count = 1;
 
   while (clk < FrClock)
@@ -378,7 +378,7 @@ void JZBarInfo::SetBar(int barnr)
 }
 
 
-void JZBarInfo::SetClock(long clock)
+void JZBarInfo::SetClock(int clock)
 {
   BarNr = 0;
   Clock = 0;
@@ -456,11 +456,11 @@ void JZSong::SetTicksPerQuarter(int NewTicks)
     for (ee = 0; ee < t->nEvents; ee++)
     {
       JZEvent *e = t->Events[ee];
-      e->SetClock((long)(f * e->GetClock() + 0.5));
+      e->SetClock((int)(f * e->GetClock() + 0.5));
       tKeyOn *k = e->IsKeyOn();
       if (k)
       {
-        k->Length = (long)(f * k->Length + 0.5);
+        k->Length = (int)(f * k->Length + 0.5);
       }
     }
   }
@@ -480,9 +480,9 @@ int JZSong::SetMeterChange(int BarNr, int Numerator, int Denomiator)
 
   JZBarInfo BarInfo(this);
   BarInfo.SetBar(BarNr - 1);
-  long FrClock = BarInfo.Clock;
+  int FrClock = BarInfo.Clock;
   BarInfo.Next();
-  long ToClock = BarInfo.Clock;
+  int ToClock = BarInfo.Clock;
 
   // evtl vorhandene TimeSignatures loeschen
 

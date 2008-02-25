@@ -58,7 +58,7 @@ tCommandPainter::~tCommandPainter()
   win.ClrParam();
 }
 
-void tCommandPainter::OnAccept(long fr, long to)
+void tCommandPainter::OnAccept(int fr, int to)
 {
   wxBeginBusyCursor();
   cmd.Execute(fr, to);
@@ -159,7 +159,7 @@ double tEqualizer::Index2Hertz(int index)
 
 void tEqualizer::Action()
 {
-  long fr, to;
+  int fr, to;
   if (!win.HaveSelection(fr, to))
     return;
 
@@ -167,9 +167,9 @@ void tEqualizer::Action()
   tFloatSample fs(spl, fr, to);
   float oldpeak = fs.Peak();
 
-  long i = 0;
-  long channels = fs.GetChannels();
-  long n = to - fr;
+  int i = 0;
+  int channels = fs.GetChannels();
+  int n = to - fr;
   float *data = fs.GetData();
 
   for (i = 0; i < channels; i++)
@@ -177,7 +177,7 @@ void tEqualizer::Action()
 
   for (i = 0; i < n; i += channels)
   {
-    for (long c = 0; c < channels; c++)
+    for (int c = 0; c < channels; c++)
       data[i + c] = equ[c]->operator()(data[i + c]);
   }
   fs.Rescale(oldpeak);
@@ -302,7 +302,7 @@ void tDistortion::MakeSine(int degree)
 
 void tDistortion::Action()
 {
-  long fr, to;
+  int fr, to;
   if (!win.HaveSelection(fr, to))
     return;
 
@@ -311,7 +311,7 @@ void tDistortion::Action()
   short *data = spl.GetData();
   JZMapper xmap(0, 32767, 0, 100);
   JZMapper ymap(0, 100, 0, 32767);
-  for (long i = fr; i < to; i++)
+  for (int i = fr; i < to; i++)
   {
     short   x = data[i];
     if (x > 0)
@@ -907,12 +907,12 @@ void tEchoForm::OnOk()
   if (rand)
   {
     if (fs.GetChannels() == 2)
-      fs.RndEchoStereo(num_echos, (long)dmap(delay), (float)amap(ampl));
+      fs.RndEchoStereo(num_echos, dmap(delay), (float)amap(ampl));
     else
-      fs.RndEcho(num_echos, (long)dmap(delay), (float)amap(ampl));
+      fs.RndEcho(num_echos, dmap(delay), (float)amap(ampl));
   }
   else
-    fs.Echo(num_echos, (long)dmap(delay), (float)amap(ampl));
+    fs.Echo(num_echos, dmap(delay), (float)amap(ampl));
   fs.Rescale(peak);
   fs.RemoveTrailingSilence(10);
   spl.Set(fs);
@@ -1109,7 +1109,7 @@ void tSplFilterForm::ScanResults()
       type = i;
 
   // limit frequencies to reasonable values
-  long sr2 = win.GetSample().GetSamplingRate()/2;
+  int sr2 = win.GetSample().GetSamplingRate()/2;
 
   if (freq <= 10) freq = 10;
   if (freq > sr2) freq = sr2;
@@ -1126,7 +1126,7 @@ void tSplFilterForm::ScanResults()
 
 void tSplFilterForm::OnOk()
 {
-  long fr, to;
+  int fr, to;
 
   if (!win.HaveSelection(fr, to))
     return;
@@ -1335,7 +1335,7 @@ void tStereoForm::EditForm(wxPanel *panel)
 void tStereoForm::OnOk()
 {
   tSample &spl           = win.GetSample();
-  long    xdelay         = spl.Seconds2Samples(delay/1000.0);
+  int    xdelay         = spl.Seconds2Samples(delay/1000.0);
   double  xstereo_spread = stereo_spread / 100.0;
 
   wxBeginBusyCursor();
@@ -1444,7 +1444,7 @@ void tStretcherForm::OnOk()
   length = length * (double)oldspeed / (double)newspeed;
 
   tShifterCmd shifter(spl.GetSamplingRate());
-  shifter.StretchLength(spl, (long)length,  keep_pitch, winsize);
+  shifter.StretchLength(spl, length, keep_pitch, winsize);
 
   win.Redraw();
   wxEndBusyCursor();

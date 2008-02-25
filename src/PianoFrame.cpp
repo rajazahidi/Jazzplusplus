@@ -102,7 +102,7 @@ const char mouse_help[] =
   "        +Ctrl+Shift:  Copy event\n";
 
 
-static long PianoFontSizes[] =
+static int PianoFontSizes[] =
 {
   6,  // Tiny
   7,  // Small
@@ -521,7 +521,7 @@ void JZPianoFrame::Setup()
 {
   // This section is from JZEventFrame::Setup()
 
-  long lx,ly;
+  int lx,ly;
 
   wxDC *dc = new wxClientDC(Canvas);
 
@@ -581,13 +581,7 @@ void JZPianoFrame::OnGuitar(wxCommandEvent& Event)
 
 
 
-
-
-
-
-
-
-void JZPianoFrame::NewPosition(int track, long clock)
+void JZPianoFrame::NewPosition(int track, int clock)
 {
   FromLines[TrackNr] = FromLine;
 
@@ -602,7 +596,7 @@ void JZPianoFrame::NewPosition(int track, long clock)
   // change position
   if (clock >= 0)
   {
-    long x = Clock2x(clock);
+    int x = Clock2x(clock);
     Canvas->SetScrollPosition(x - wLeft, Line2y(FromLines[TrackNr]));
   }
 
@@ -752,7 +746,7 @@ void JZPianoFrame::OnCtrlTempo(wxCommandEvent& Event)
 {
   tEventIterator Iterator(Track);
   Track->Sort();
-  JZEvent* pEvent = Iterator.Range(0, (long unsigned) Track->GetLastClock() + 1);
+  JZEvent* pEvent = Iterator.Range(0, (unsigned) Track->GetLastClock() + 1);
   tSetTempo *t;
   int Min = 240;
   int Max = 20;
@@ -907,7 +901,7 @@ void JZPianoFrame::OnShiftLeft(wxCommandEvent& Event)
 {
   if (EventsSelected())
     {
-      long steps =  -SnapClocks();
+      int steps =  -SnapClocks();
       tCmdShift cmd(mpFilter, steps);
       cmd.Execute();
       Redraw();
@@ -919,7 +913,7 @@ void JZPianoFrame::OnShiftRight(wxCommandEvent& Event)
 {
   if (EventsSelected())
     {
-      long steps = SnapClocks();
+      int steps = SnapClocks();
       tCmdShift cmd(mpFilter, steps);
       cmd.Execute();
       Redraw();
@@ -1176,9 +1170,9 @@ const int isBlack[12] = {0,1,0,1,0,0,1,0,1,0,1,0};
 #define IsBlack(Key)  isBlack[(Key) % 12]
 
 
-void JZPianoFrame::OnPaintSub(wxDC* dc, long x, long y)
+void JZPianoFrame::OnPaintSub(wxDC* dc, int x, int y)
 {
-//  long OldFromClock = FromClock;
+//  int OldFromClock = FromClock;
 
   OnEventWinPaintSub(x, y);
 
@@ -1195,7 +1189,7 @@ void JZPianoFrame::OnPaintSub(wxDC* dc, long x, long y)
 //
   xPiano  = CanvasX;
 
-  long StopClk;
+  int StopClk;
   JZBarInfo BarInfo(Song);
   char buf[20];
 
@@ -1266,7 +1260,7 @@ void JZPianoFrame::OnPaintSub(wxDC* dc, long x, long y)
   dc->SetFont(*mpFixedFont);
   BarInfo.SetClock(FromClock);
   StopClk = x2Clock(CanvasX + CanvasW);
-  long clk = BarInfo.Clock;
+  int clk = BarInfo.Clock;
   int intro = Song->GetIntroLength();
   while (clk < StopClk)
   {
@@ -1320,23 +1314,25 @@ void JZPianoFrame::OnPaintSub(wxDC* dc, long x, long y)
       dc->SetPen(*wxTRANSPARENT_PEN);
 
       int steps = an->Steps();
-      for (int step = 0; step < steps; step ++) {
-        long start = an->Step2Clock(step);
-        long stop  = an->Step2Clock(step + 1);
-        if (stop > FromClock && start < ToClock) {
+      for (int step = 0; step < steps; step ++)
+      {
+        int start = an->Step2Clock(step);
+        int stop  = an->Step2Clock(step + 1);
+        if (stop > FromClock && start < ToClock)
+        {
           // this chord is visible
           HBContext *context = an->GetContext(step);
           HBChord chord = context->Chord();
           HBChord scale = context->Scale();
 
-          long x = Clock2x(start);
+          int x = Clock2x(start);
           if (x < xEvents)        // clip to left border
             x = xEvents;
-          long w = Clock2x(stop) - x;
+          int w = Clock2x(stop) - x;
           if (w <= 0)
             continue;
 
-          long h = hLine;
+          int h = hLine;
           for (int i = 0; i < 12; i++)
           {
             int pitch = i;
@@ -1354,7 +1350,7 @@ void JZPianoFrame::OnPaintSub(wxDC* dc, long x, long y)
               dc->SetBrush(*brush);
               while (pitch < 127)
               {
-                long y = Pitch2y(pitch);
+                int y = Pitch2y(pitch);
                 if (y >= yEvents && y <= yEvents + hEvents - h) // y-clipping
                 {
                   dc->DrawRectangle(x, y, w, h);
@@ -1432,9 +1428,9 @@ void JZPianoFrame::DrawPianoRoll(wxDC* dc)
 
 //  dc->SetTextBackground(*wxLIGHT_GREY);
 
-  long wBlack = wPiano * 2 / 3;
+  int wBlack = wPiano * 2 / 3;
   int Pitch = 127 - FromLine;
-  long y = Line2y(FromLine);
+  int y = Line2y(FromLine);
 
   if (
     VisibleKeyOn &&
@@ -1570,8 +1566,8 @@ void JZPianoFrame::DrawEvent(wxDC* dc, JZEvent* pEvent, const wxBrush* Brush, in
 //OBSOLETE  dc->BeginDrawing();
   if (xoor)
     dc->SetLogicalFunction(wxXOR);
-  long x = Clock2x(pEvent->GetClock());
-  long y = Pitch2y(pEvent->GetPitch());
+  int x = Clock2x(pEvent->GetClock());
+  int y = Pitch2y(pEvent->GetPitch());
   if (!xoor)        
   {
     dc->SetBrush(*wxWHITE_BRUSH);
@@ -1616,8 +1612,8 @@ void JZPianoFrame::DrawEvents(wxDC* dc, tTrack *t, int Stat, const wxBrush* Brus
 
   // Coordinate for Linien
 
-  long x0 = Clock2x(0);
-  long y0 = Line2y(64);
+  int x0 = Clock2x(0);
+  int y0 = Line2y(64);
   char buf[20];
 
   while (pEvent)
@@ -1625,11 +1621,11 @@ void JZPianoFrame::DrawEvents(wxDC* dc, tTrack *t, int Stat, const wxBrush* Brus
     if (pEvent->Stat == Stat)
     {
       int Pitch   = pEvent->GetPitch();
-      long Length = pEvent->GetLength();
-      long Clock  = pEvent->GetClock();
+      int Length = pEvent->GetLength();
+      int Clock  = pEvent->GetClock();
 
-      long x1 = Clock2x(Clock);
-      long y1 = Line2y(127 - Pitch);
+      int x1 = Clock2x(Clock);
+      int y1 = Line2y(127 - Pitch);
 //        if (pEvent->IsPlayTrack()) {
 //          y1=Line2y(127-pEvent->IsPlayTrack()->track); //JAVE so the y position of playtrack events tell which track they play (the drawing should rather be polymorpic in my opinion)
       //use pitch instead
@@ -1637,7 +1633,7 @@ void JZPianoFrame::DrawEvents(wxDC* dc, tTrack *t, int Stat, const wxBrush* Brus
       // event partially visible?
       if (Clock + Length >= FromClock && FromPitch < Pitch && Pitch <= ToPitch)
       {
-        long DrawLength = Length/ClocksPerPixel;
+        int DrawLength = Length/ClocksPerPixel;
         // do clipping ourselves
         if (x1 < xEvents)
         {
@@ -1698,7 +1694,7 @@ void JZPianoFrame::DrawEvents(wxDC* dc, tTrack *t, int Stat, const wxBrush* Brus
           
           dc->GetTextExtent((const char*)pEvent->IsText()->GetText(), &textX, &textY); 
           dc->SetBrush(*wxWHITE_BRUSH);
-          long textlabely=CanvasY+hTop;//text labels drawn at top
+          int textlabely=CanvasY+hTop;//text labels drawn at top
           dc->DrawRectangle(x1-textX, textlabely + LittleBit, textX, textY);//hLine - 2 * LittleBit);
           dc->DrawText(buf, x1-textX, textlabely + LittleBit);
         }
@@ -1724,15 +1720,15 @@ void JZPianoFrame::DrawEvents(wxDC* dc, tTrack *t, int Stat, const wxBrush* Brus
 // Utilities
 // ********************************************************************
 
-long JZPianoFrame::SnapClocks()
+int JZPianoFrame::SnapClocks()
 {
-  long clk = Song->TicksPerQuarter * 4L / SnapDenomiator;
+  int clk = Song->TicksPerQuarter * 4L / SnapDenomiator;
   if (clk < 1)
     return 1;
   return clk;
 }
 
-int JZPianoFrame::y2Pitch(long y)
+int JZPianoFrame::y2Pitch(int y)
 {
   int pitch = 127 - y2Line(y);
   if (pitch < 0)
@@ -1743,13 +1739,13 @@ int JZPianoFrame::y2Pitch(long y)
 }
 
 
-long JZPianoFrame::Pitch2y(int Pitch)
+int JZPianoFrame::Pitch2y(int Pitch)
 {
   return Line2y(127 - Pitch);
 }
 
 
-JZEvent *JZPianoFrame::FindEvent(tTrack *Track, long Clock, int Pitch)
+JZEvent *JZPianoFrame::FindEvent(tTrack *Track, int Clock, int Pitch)
 // Pitch == -1: search for any pitches
 {
   tEventIterator Iterator(Track);
@@ -1901,7 +1897,7 @@ void JZPianoFrame::Copy(tTrack *t, JZEvent* pEvent, int Kill)
 }
 
 
-void JZPianoFrame::Paste(tTrack *t, long Clock, int Pitch)
+void JZPianoFrame::Paste(tTrack *t, int Clock, int Pitch)
 {
   if (PasteBuffer.nEvents == 0)
   {
@@ -1935,7 +1931,7 @@ void JZPianoFrame::Paste(tTrack *t, long Clock, int Pitch)
       }
     }
 
-    long DeltaClock = Clock - pEvent->GetClock();
+    int DeltaClock = Clock - pEvent->GetClock();
     int  DeltaPitch = 0;
     if (Pitch >= 0)
       DeltaPitch = Pitch - pEvent->GetPitch();
@@ -2018,7 +2014,7 @@ tMousePlay::tMousePlay(JZPianoFrame *win, wxMouseEvent& Event)
 
 int tMousePlay::ProcessEvent(wxMouseEvent& Event)
 {
-  long x, y;
+  int x, y;
 
   int OldPitch = Pitch;
   Win->LogicalMousePosition(Event, &x, &y);
@@ -2147,13 +2143,13 @@ int tKeyLengthDragger::Event(wxMouseEvent& Event)
 
 int tKeyLengthDragger::Dragging(wxMouseEvent& Event)
 {
-  long fx, fy;
+  int fx, fy;
 
   wxClientDC dc(Win->Canvas);
   Win->Canvas->PrepareDC(dc); //to translate scrolled coordinates
   Win->DrawEvent(&dc, Copy, Copy->GetBrush(), 1, 1);
   Win->LogicalMousePosition(Event, &fx, &fy);
-  long Clock = Win->x2Clock(fx);
+  int Clock = Win->x2Clock(fx);
   int  Length = Clock - Copy->GetClock();
   if (Length <= 0)
   {
@@ -2266,12 +2262,12 @@ int tPlayTrackLengthDragger::Event(wxMouseEvent& Event)
 
 int tPlayTrackLengthDragger::Dragging(wxMouseEvent& Event)
 {
-  long fx, fy;
+  int fx, fy;
   wxClientDC dc(Win->Canvas);
   Win->Canvas->PrepareDC(dc);
   Win->DrawEvent(&dc, Copy, Copy->GetBrush(), 1, 1);
   Win->LogicalMousePosition(Event, &fx, &fy);
-  long Clock = Win->x2Clock(fx);
+  int Clock = Win->x2Clock(fx);
   int  Length = Clock - Copy->GetClock();
   if (Length <= 0)
     Length = 1;
@@ -2371,11 +2367,11 @@ void JZPianoFrame::MouseCutPaste(wxMouseEvent& Event, bool cut)
   Canvas->PrepareDC(dc);
   wxPoint point = Event.GetLogicalPosition(dc);
 
-  long   x=point.x;
-  long   y=point.y;
+  int x = point.x;
+  int y = point.y;
 
-  long Clock = x2Clock(x);
-  int  Pitch = y2Pitch(y);
+  int Clock = x2Clock(x);
+  int Pitch = y2Pitch(y);
   JZEvent *m = FindEvent(Track, Clock, Pitch);
   if (m)
   {
@@ -2397,11 +2393,11 @@ void JZPianoFrame::MouseEvents(wxMouseEvent& Event)
 
   if (action)
   {
-    long x, y;
+    int x, y;
     LogicalMousePosition(Event, &x, &y);
 
-    long Clock = x2Clock(x);
-    int  Pitch = y2Pitch(y);
+    int Clock = x2Clock(x);
+    int Pitch = y2Pitch(y);
     JZEvent *m = FindEvent(Track, Clock, Pitch);
     tKeyOn *k = 0;
     tPlayTrack *p = 0;
@@ -2486,26 +2482,33 @@ void JZPianoFrame::MouseEvents(wxMouseEvent& Event)
 // dispatch Mouseevent
 // ------------------------------------------------------------------------
 
-/** indicate which key on the pianoroll that the mouse is hovering over by highlighting it
-
-this function is bd because it draws directly in the dc, rather it should invalidate and let OnDraw do the actual painting
-
-currently the code dont work becuase it doesnt care about scrolling(because i get the dc the wrong way)
-*/
+//   Indicate which key on the pianoroll that the mouse is hovering over by
+// highlighting it.  This function is bad because it draws directly in the dc,
+// rather it should invalidate and let OnDraw do the actual painting.
+// Currently the code doesn't work because it doesn't care about scrolling
+// (because I get the dc the wrong way).
 void JZPianoFrame::ShowPitch(int pitch)
 {
-  long line = y2Line(Pitch2y(pitch)); //this is the current position of the mouse, MouseLine is the last position
+  // This is the current position of the mouse, MouseLine is the last position
+  int line = y2Line(Pitch2y(pitch));
   if (line >= FromLine && line != MouseLine)
   {
     wxClientDC dc(Canvas);
     Canvas->PrepareDC(dc); //to translate scrolled coordinates
     dc.SetLogicalFunction(wxXOR);
+
     //dc.SetBrush(wxBLACK_BRUSH);
     dc.SetBrush(*wxBLUE_BRUSH);
     if (MouseLine >= 0) 
-      dc.DrawRectangle(xPiano, Line2y(MouseLine) + LittleBit, wPiano, hLine - 2*LittleBit); //erase the previous highlight
+    {
+      // Erase the previous highlight.
+      dc.DrawRectangle(xPiano, Line2y(MouseLine) + LittleBit, wPiano, hLine - 2 * LittleBit);
+    }
     MouseLine = line;
-    dc.DrawRectangle(xPiano, Line2y(MouseLine) + LittleBit, wPiano, hLine - 2*LittleBit); //draw the new position
+
+    // Draw the new position.
+    dc.DrawRectangle(xPiano, Line2y(MouseLine) + LittleBit, wPiano, hLine - 2*LittleBit);
+
     dc.SetLogicalFunction(wxCOPY);
   }
 }
@@ -2515,7 +2518,7 @@ int JZPianoFrame::OnMouseEvent(wxMouseEvent& Event)
 {
   if (Event.Moving() && !Event.Dragging() && !MouseAction)
   {
-    long fx, fy;
+    int fx, fy;
     LogicalMousePosition(Event, &fx, &fy);
     int pitch = y2Pitch(fy);
     ShowPitch(pitch);
@@ -2527,7 +2530,7 @@ int JZPianoFrame::OnMouseEvent(wxMouseEvent& Event)
 
   if (!MouseAction)
   {
-    long x, y;
+    int x, y;
     LogicalMousePosition(Event, &x, &y);
 
     if (y > yEvents)        // click in event area?
@@ -2554,7 +2557,7 @@ int JZPianoFrame::OnMouseEvent(wxMouseEvent& Event)
       {
         if (!gpMidiPlayer->Playing)
         {
-          long Clock, LoopClock;
+          int Clock, LoopClock;
           if (action == MA_CYCLE)
           {
             if (SnapSel->Selected)
@@ -2564,13 +2567,13 @@ int JZPianoFrame::OnMouseEvent(wxMouseEvent& Event)
             }
             else
             {
-              Clock = x2BarClock((long)x, 0);
-              LoopClock = x2BarClock((long)x, 4);
+              Clock = x2BarClock(x, 0);
+              LoopClock = x2BarClock(x, 4);
             }
           }
           else
           {
-            Clock = SnapClock(x2Clock((long)x));
+            Clock = SnapClock(x2Clock(x));
             LoopClock = 0;
           }
           gpMidiPlayer->SetRecordInfo(0);
@@ -2657,8 +2660,8 @@ void JZPianoFrame::SnapSelStop(wxMouseEvent& Event)
   if (SnapSel->Selected)
   {
 
-    long fr = y2Pitch((long)(SnapSel->r.y + SnapSel->r.height - 1));
-    long to = y2Pitch((long)SnapSel->r.y + 1);
+    int fr = y2Pitch((SnapSel->r.y + SnapSel->r.height - 1));
+    int to = y2Pitch(SnapSel->r.y + 1);
 
 
     mpFilter->FltEvents[FltKeyOn].Selected = VisibleKeyOn;
@@ -2698,8 +2701,8 @@ void JZPianoFrame::SnapSelStop(wxMouseEvent& Event)
 
     mpFilter->FromTrack = TrackNr;
     mpFilter->ToTrack   = TrackNr;
-    mpFilter->FromClock = SnapClock(x2Clock((long)SnapSel->r.x + 1));
-    mpFilter->ToClock   = SnapClock(x2Clock((long)(SnapSel->r.x + SnapSel->r.width + 1)));
+    mpFilter->FromClock = SnapClock(x2Clock(SnapSel->r.x + 1));
+    mpFilter->ToClock   = SnapClock(x2Clock((SnapSel->r.x + SnapSel->r.width + 1)));
   }
 
   // SN++ Veloc- oder Aftertouch-Editor updaten
@@ -2712,8 +2715,8 @@ void JZPianoFrame::SnapSelStop(wxMouseEvent& Event)
 void JZPianoFrame::SnapSelStart(wxMouseEvent &)
 {
   nSnaps = 0;
-  long clk = SnapClock(FromClock, 0);
-  long qnt = SnapClocks();
+  int clk = SnapClock(FromClock, 0);
+  int qnt = SnapClocks();
   while (clk <= ToClock && nSnaps < MaxSnaps)
   {
     xSnaps[nSnaps++] = Clock2x(clk);
@@ -2731,9 +2734,9 @@ void JZPianoFrame::SnapSelStart(wxMouseEvent &)
 }
 
 
-long JZPianoFrame::SnapClock(long clk, int up)
+int JZPianoFrame::SnapClock(int clk, int up)
 {
-  long qnt = SnapClocks();
+  int qnt = SnapClocks();
   clk -= (clk % qnt);
   if (up)
     clk += qnt;
@@ -2777,10 +2780,11 @@ void JZPianoFrame::PressRadio(int id)
 
 
 
-void JZPianoFrame::SetSnapDenom(long value)
+void JZPianoFrame::SetSnapDenom(int value)
 {
   const int N = 4;
-  const struct { int id; long val; } tab[N] = {
+  const struct { int id; int val; } tab[N] =
+  {
     { MEN_SNAP_8,    8 },
     { MEN_SNAP_8D,  12 },
     { MEN_SNAP_16,  16 },
@@ -2821,9 +2825,9 @@ void JZPianoFrame::SetVisibleAllTracks(bool value)
 // Function slurped from JZEventFrame
 ///////////////////////////////////////////////////////////////////////////////
 
-void JZPianoFrame::NewPlayPosition(long Clock)
+void JZPianoFrame::NewPlayPosition(int Clock)
 {
-  long scroll_clock = (FromClock + 5 * ToClock) / 6L;
+  int scroll_clock = (FromClock + 5 * ToClock) / 6L;
 
   if (
     !SnapSel->Active &&
@@ -2835,7 +2839,7 @@ void JZPianoFrame::NewPlayPosition(long Clock)
       return;
     }
 
-    long x = Clock2x(Clock);
+    int x = Clock2x(Clock);
     Canvas->SetScrollPosition(x - wLeft, CanvasY);
   }
 
@@ -2843,7 +2847,7 @@ void JZPianoFrame::NewPlayPosition(long Clock)
   {
     if (PlayClock != Clock)
     {
- //     long oldplayclock=PlayClock;
+ //     int oldplayclock=PlayClock;
 //      PlayClock = Clock;
 //        wxRect invalidateRect;
 //        invalidateRect.x=Clock2x(oldplayclock)-1;
@@ -2873,7 +2877,7 @@ void JZPianoFrame::DrawPlayPosition(wxDC* dc)
   //    dc->SetLogicalFunction(wxXOR);
     dc->SetBrush(*wxBLACK_BRUSH);
     dc->SetPen(*wxBLACK_PEN);
-    long x = Clock2x(PlayClock);
+    int x = Clock2x(PlayClock);
     //dc->DrawRectangle(x, CanvasY, 2*LittleBit, hTop);
     dc->DrawLine(x,  CanvasY,x,  yEvents+hEvents); //draw a line, 2 pixwels wide
     dc->DrawLine(x+1,CanvasY,x+1,yEvents+hEvents);
@@ -2886,12 +2890,12 @@ void JZPianoFrame::Redraw()
   Canvas->Refresh();
 }
 
-long JZPianoFrame::Clock2x(long clk)
+int JZPianoFrame::Clock2x(int clk)
 {
   return xEvents + (clk - FromClock) / ClocksPerPixel;
 }
 
-long JZPianoFrame::Line2y(long Line)
+int JZPianoFrame::Line2y(int Line)
 {
   return Line * hLine + hTop;
 }
@@ -2919,8 +2923,8 @@ void JZPianoFrame::ActMidiDelayDialog(wxCommandEvent& Event)
 {
   if (!EventsSelected())
     return;
-  long scale = 50; //in percent
-  long clockDelay = 10;
+  int scale = 50; //in percent
+  int clockDelay = 10;
   int repeat = 6;
 
   jppResourceDialog dialog(this, "midiDelay");
@@ -2944,7 +2948,7 @@ void JZPianoFrame::ActSequenceLengthDialog(wxCommandEvent& Event)
 {
   if (!EventsSelected())
     return;
-  long scale = 100; //in percent
+  int scale = 100; //in percent
 
   jppResourceDialog dialog(this, "sequenceLength");
   
@@ -2965,7 +2969,7 @@ void JZPianoFrame::ActVelocityDialog(wxCommandEvent& Event)
 {
   int FromValue = 64;
   int ToValue = 0;
-  long modes[] =
+  int modes[] =
 {
   8,  // set
   12,  // add
@@ -2973,7 +2977,7 @@ void JZPianoFrame::ActVelocityDialog(wxCommandEvent& Event)
   -1, // End of list
 };
 
-  long Mode = modes[0];
+  int Mode = modes[0];
 
 
   if (!EventsSelected())
@@ -3014,8 +3018,8 @@ void JZPianoFrame::ZoomIn()
 
   if (ClocksPerPixel >= 2) {
     ClocksPerPixel /= 2;
-    long x = CanvasX * 2;
-    long y = CanvasY;
+    int x = CanvasX * 2;
+    int y = CanvasY;
 
     OnEventWinPaintSub(x, y);
     Canvas->SetScrollRanges();
@@ -3028,10 +3032,11 @@ void JZPianoFrame::ZoomIn()
 
 void JZPianoFrame::ZoomOut()
 {
-  if (ClocksPerPixel <= 120) {
+  if (ClocksPerPixel <= 120)
+  {
     ClocksPerPixel *= 2;
-    long x = CanvasX / 2;
-    long y = CanvasY;
+    int x = CanvasX / 2;
+    int y = CanvasY;
 
     OnEventWinPaintSub(x, y);
     Canvas->SetScrollRanges();
@@ -3041,12 +3046,12 @@ void JZPianoFrame::ZoomOut()
   }
 }
 
-long JZPianoFrame::x2Clock(long x)
+int JZPianoFrame::x2Clock(int x)
 {
   return (x - xEvents) * ClocksPerPixel + FromClock;
 }
 
-long JZPianoFrame::y2Line(long y, int up)
+int JZPianoFrame::y2Line(int y, int up)
 {
   if (up)
     y += hLine;
@@ -3054,9 +3059,9 @@ long JZPianoFrame::y2Line(long y, int up)
   return y / hLine;
 }
 
-long JZPianoFrame::x2BarClock(long x, int next)
+int JZPianoFrame::x2BarClock(int x, int next)
 {
-  long clk = x2Clock(x);
+  int clk = x2Clock(x);
   JZBarInfo b(Song);
   b.SetClock(clk);
   while (next--)
@@ -3070,8 +3075,8 @@ int JZPianoFrame::OnEventWinMouseEvent(wxMouseEvent& Event)
   {
     // create SnapSel?
 
-    long x;
-    long y;
+    int x;
+    int y;
     LogicalMousePosition(Event, &x, &y);
     if (xEvents < x && x < xEvents + wEvents && yEvents < y && y < yEvents + hEvents)
     {
@@ -3111,7 +3116,7 @@ int JZPianoFrame::OnEventWinMouseEvent(wxMouseEvent& Event)
   return 0;
 }
 
-void JZPianoFrame::OnEventWinPaintSub(long x, long y)
+void JZPianoFrame::OnEventWinPaintSub(int x, int y)
 {
   CanvasX = x;
   CanvasY = y;
@@ -3131,7 +3136,7 @@ void JZPianoFrame::OnEventWinPaintSub(long x, long y)
   ToClock = x2Clock(CanvasX + CanvasW);
 }
 
-long JZPianoFrame::y2yLine(long y, int up)
+int JZPianoFrame::y2yLine(int y, int up)
 {
   if (up)
     y += hLine;
@@ -3141,9 +3146,9 @@ long JZPianoFrame::y2yLine(long y, int up)
   return y;
 }
 
-void JZPianoFrame::GetVirtSize(long *w, long *h)
+void JZPianoFrame::GetVirtSize(int *w, int *h)
 {
-  long clk = Song->MaxQuarters * Song->TicksPerQuarter;
+  int clk = Song->MaxQuarters * Song->TicksPerQuarter;
   *w = clk / ClocksPerPixel + wLeft;
   *h = 127 * hLine + hTop;
 }
@@ -3175,7 +3180,7 @@ bool JZPianoFrame::OnCharHook(wxKeyEvent& Event)
 
 
 
-void JZPianoFrame::LogicalMousePosition(wxMouseEvent& Event, long* x, long* y)
+void JZPianoFrame::LogicalMousePosition(wxMouseEvent& Event, int* x, int* y)
 {
   Event.GetPosition(x, y);
   *x += CanvasX;
@@ -3201,8 +3206,14 @@ void JZPianoFrame::InitColors()
 
 /* Draws the a 3D button with text in it.  Used to draw the little area in the
    top left of the window. */
-void JZPianoFrame::LineText(wxDC *dc, long x, long y, long w, long h,
-                         wxString str, bool down)
+void JZPianoFrame::LineText(
+  wxDC* dc,
+  int x,
+  int y,
+  int w,
+  int h,
+  wxString str,
+  bool down)
 {
   dc->SetBrush(*wxLIGHT_GREY_BRUSH); // Fill
   dc->SetPen(*wxLIGHT_GREY_PEN);     // Outline

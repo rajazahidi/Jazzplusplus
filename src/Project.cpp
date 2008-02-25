@@ -546,7 +546,7 @@ void JZProject::Stop()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZProject::SetPlayPosition(long newposition)
+void JZProject::SetPlayPosition(int newposition)
 {
   mStartTime = newposition;
 }
@@ -574,7 +574,7 @@ void JZProject::SetRecord(bool newrecord)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZProject::SetLoopClock(long newclock)
+void JZProject::SetLoopClock(int newclock)
 {
   mStopTime = newclock;
 }

@@ -48,9 +48,9 @@ class tSampleWin : public wxFrame
     virtual bool OnClose();
     virtual void OnMenuCommand(int id);
     void Redraw();
-    bool HaveInsertionPoint(long &offs, bool warn = TRUE);
+    bool HaveInsertionPoint(int &offs, bool warn = TRUE);
     enum HaveSelectionMode { SelWarn, SelNoWarn, SelAll} ;
-    bool HaveSelection(long &fr_smpl, long &to_smpl, HaveSelectionMode = SelAll);
+    bool HaveSelection(int &fr_smpl, int &to_smpl, HaveSelectionMode = SelAll);
 
     void AddParam(JZRndArray *array, const char *label);
     void ClrParam();
@@ -61,13 +61,13 @@ class tSampleWin : public wxFrame
     void PlaySample();
 
   private:
-    long GetPaintLength();
-    long GetPaintOffset();
+    int GetPaintLength();
+    int GetPaintOffset();
 #ifdef OBSOLETE
     static void ScrollCallback(wxItem &itm, wxCommandEvent& event);
     void OnScroll(wxItem &item);
 #endif
-    void SetViewPos(long fr, long to);
+    void SetViewPos(int fr, int to);
     void LoadError(tSample &spl);
 
     tSample     &spl;

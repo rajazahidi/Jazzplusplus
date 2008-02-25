@@ -125,7 +125,7 @@ class tArrayEdit : public wxScrolledWindow
   protected:
 
     // paint position
-    long x, y, w, h, ynul;
+    int x, y, w, h, ynul;
     void DrawBar(wxDC *dc, int i, int black);
 
     int dragging;                // Dragging-Event valid
@@ -156,10 +156,10 @@ class tArrayEdit : public wxScrolledWindow
     tArrayEdit(
       wxFrame* pParent,
       JZRndArray& Array,
-      long xx,
-      long yy,
-      long ww,
-      long hh,
+      int xx,
+      int yy,
+      int ww,
+      int hh,
       int style_bits = (ARED_GAP | ARED_XTICKS));
 
     virtual ~tArrayEdit();
@@ -178,7 +178,7 @@ class tArrayEdit : public wxScrolledWindow
     void SetYMinMax(int min, int max);
     // for display x-axis only, does not resize the array (both values inclusive)
     void SetXMinMax(int xmin, int xmax);
-    void DrawBarLine (wxDC *dc, long xx);
+    void DrawBarLine (wxDC *dc, int xx);
     void SetDrawBars(tArrayEditDrawBars *x) { draw_bars = x; }
     void Init() {}
 
@@ -194,10 +194,10 @@ class tRhyArrayEdit : public tArrayEdit
     tRhyArrayEdit(
       wxFrame *parent,
       JZRndArray& Array,
-      long xx,
-      long yy,
-      long ww,
-      long hh,
+      int xx,
+      int yy,
+      int ww,
+      int hh,
       int style_bits = (ARED_GAP | ARED_XTICKS | ARED_RHYTHM));
 
     void SetMeter(int steps_per_count, int count_per_bar, int n_bars);

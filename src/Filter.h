@@ -65,8 +65,8 @@ class tFilter : public wxObject
     bool      OtherSelected;
 
     JZSong *Song;
-    long FromClock, ToClock;        // einschl .. ausschl
-    int  FromTrack, ToTrack;        // 1..n einschl .. einschl
+    int FromClock, ToClock;        // einschl .. ausschl
+    int FromTrack, ToTrack;        // 1..n einschl .. einschl
 
     void Dialog(wxFrame *parent, int ShowEventStats = 1);
 

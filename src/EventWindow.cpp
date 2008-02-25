@@ -64,9 +64,9 @@ onpaint seems never to get called
 //void tCanvas::OnDraw(wxDC& dc)
 //{
 //  //onpaint never seems to get called, but ondraw does get called
-//  int x=0, y=0;
+//  int x = 0, y = 0;
 //  GetViewStart(&x, &y);
-//  EventWin->OnPaintSub(&dc, (long)x * ScLine, (long)y * ScLine);  
+//  EventWin->OnPaintSub(&dc, x * ScLine, y * ScLine);  
 //  cout << "tCanvas::OnDraw\n";
 //}
 
@@ -123,7 +123,7 @@ bool JZEventFrame::OnCharHook(wxKeyEvent& e)
 
 //void tCanvas::SetScrollRanges()
 //{
-//  long w, h;
+//  int w, h;
 //  EventWin->GetVirtSize(&w, &h);
 //  SetScrollbars(ScLine, ScLine, w/ScLine, h/ScLine, ScPage, ScPage);
 //#ifdef wx_xt
@@ -133,7 +133,7 @@ bool JZEventFrame::OnCharHook(wxKeyEvent& e)
 //#endif
 //}
 
-//void tCanvas::SetScrollPosition(long x, long y)
+//void tCanvas::SetScrollPosition(int x, int y)
 //{
 //  x /= ScLine;
 //  y /= ScLine;
@@ -269,7 +269,7 @@ void JZEventFrame::Create()
 void JZEventFrame::Setup()
 {
 /*
-  long x,y;
+  int x, y;
 
   wxDC* dc = new wxClientDC(Canvas);
   //dc is from Canvas
@@ -351,34 +351,31 @@ they dont overlap
 // *******************************************************************
 
 
-long JZEventFrame::x2Clock(long x)
+int JZEventFrame::x2Clock(int x)
 {
   return (x - xEvents) * ClocksPerPixel + FromClock;
 }
 
 
-long JZEventFrame::Clock2x(long clk)
+int JZEventFrame::Clock2x(int clk)
 {
   return xEvents + (clk - FromClock) / ClocksPerPixel;
 }
 
-
-
-
-long JZEventFrame::x2BarClock(long x, int next)
+int JZEventFrame::x2BarClock(int x, int next)
 {
-  long clk = x2Clock(x);
+  int clk = x2Clock(x);
   JZBarInfo b(Song);
   b.SetClock(clk);
   while (next--)
+  {
     b.Next();
+  }
   return b.Clock;
 }
 
 
-
-
-long JZEventFrame::y2yLine(long y, int up)
+int JZEventFrame::y2yLine(int y, int up)
 {
   if (up)
     y += hLine;
@@ -388,7 +385,7 @@ long JZEventFrame::y2yLine(long y, int up)
   return y;
 }
 
-long JZEventFrame::y2Line(long y, int up)
+int JZEventFrame::y2Line(int y, int up)
 {
   if (up)
     y += hLine;
@@ -397,12 +394,12 @@ long JZEventFrame::y2Line(long y, int up)
 }
 
 
-long JZEventFrame::Line2y(long Line)
+int JZEventFrame::Line2y(int Line)
 {
   return Line * hLine + hTop;
 }
 
-void JZEventFrame::LineText(wxDC *dc, long x, long y, long w, const char *str, int h, bool down)
+void JZEventFrame::LineText(wxDC *dc, int x, int y, int w, const char *str, int h, bool down)
 {
   if (h <= 0)
   {
@@ -482,7 +479,7 @@ void JZEventFrame::Redraw()
    x and y is the coordinates of the start of the view
    
 */
-void JZEventFrame::OnPaintSub(wxDC *dc, long x, long y)
+void JZEventFrame::OnPaintSub(wxDC *dc, int x, int y)
 {
   //printf("EventWin::OnPaintSub: x %ld, y %ld, w %ld, h %ld\n", x, y, w, h);
   CanvasX = x;
@@ -522,8 +519,8 @@ int JZEventFrame::OnMouseEvent(wxMouseEvent &e)
   {
     // create SnapSel?
 
-    long x;
-    long y;
+    int x;
+    int y;
     e.GetPosition(&x, &y);
     if (xEvents < x && x < xEvents + wEvents && yEvents < y && y < yEvents + hEvents)
     {
@@ -573,14 +570,21 @@ bool JZEventFrame::OnClose()
   return FALSE;
 }
 
-void JZEventFrame::OnMenuCommand(int) {}
-void JZEventFrame::SnapSelStart(wxMouseEvent &e){}
-void JZEventFrame::SnapSelStop(wxMouseEvent &e) {}
-void JZEventFrame::GetVirtSize(long *w, long *h)
+void JZEventFrame::OnMenuCommand(int)
 {
+}
 
+void JZEventFrame::SnapSelStart(wxMouseEvent& MouseEvent)
+{
+}
 
-  long clk = Song->MaxQuarters * Song->TicksPerQuarter;
+void JZEventFrame::SnapSelStop(wxMouseEvent& MouseEvent)
+{
+}
+
+void JZEventFrame::GetVirtSize(int *w, int *h)
+{
+  int clk = Song->MaxQuarters * Song->TicksPerQuarter;
   *w = clk / ClocksPerPixel + wLeft;
   *h = 127 * hLine + hTop;
 
@@ -588,21 +592,22 @@ void JZEventFrame::GetVirtSize(long *w, long *h)
   *w = 5000L;
 }
 
-// ------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // PlayPosition
-// -----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
-/** update the play position to the clock argument, and trigger a redraw so the play bar will be drawn*/
-void JZEventFrame::NewPlayPosition(long Clock)
+//   Update the play position to the clock argument, and trigger a redraw so
+// the play bar will be drawn.
+void JZEventFrame::NewPlayPosition(int Clock)
 {
-  long scroll_clock = (FromClock + 5 * ToClock) / 6L;
+  int scroll_clock = (FromClock + 5 * ToClock) / 6;
 
-  if (!SnapSel->Active && ((Clock > scroll_clock) || (Clock < FromClock)) && (Clock >= 0L) )
+  if (!SnapSel->Active && ((Clock > scroll_clock) || (Clock < FromClock)) && (Clock >= 0))
   {
     // avoid permenent redraws when end of scroll range is reached
     if (Clock > FromClock && ToClock >= Song->MaxQuarters * Song->TicksPerQuarter)
       return;
-//    long x = Clock2x(Clock);
+//    int x = Clock2x(Clock);
 //    Canvas->SetScrollPosition(x - wLeft, CanvasY);
   }
 
@@ -610,7 +615,7 @@ void JZEventFrame::NewPlayPosition(long Clock)
   {
     if (PlayClock != Clock)
     {
-//      long oldplayclock=PlayClock;
+//      int oldplayclock=PlayClock;
 //      PlayClock = Clock;
 //      wxRect invalidateRect;
 //      invalidateRect.x=Clock2x(oldplayclock)-1;
@@ -642,7 +647,8 @@ void JZEventFrame::DrawPlayPosition(wxDC* dc)
   //    dc->SetLogicalFunction(wxXOR);
     dc->SetBrush(*wxBLACK_BRUSH);
     dc->SetPen(*wxBLACK_PEN);
-    long x = Clock2x(PlayClock);
+    int x = Clock2x(PlayClock);
+
     //cout<<"JZEventFrame::DrawPlayPosition play pos x "<<x<<" "<<FromClock<<" "<<ToClock<<endl;
     //dc->DrawRectangle(x, CanvasY, 2*LittleBit, hTop);
     dc->DrawLine(x,  CanvasY,x,  yEvents+hEvents); //draw a line, 2 pixwels wide
@@ -753,7 +759,7 @@ void JZEventFrame::MenTranspose()
 
 /**show the "shift events" dialog */
 
-void JZEventFrame::MenShift(long Unit)
+void JZEventFrame::MenShift(int Unit)
 {
   if (EventsSelected())
   {
@@ -937,8 +943,8 @@ void JZEventFrame::ZoomIn()
   if (ClocksPerPixel >= 2)
   {
     ClocksPerPixel /= 2;
-    long x = CanvasX * 2;
-    long y = CanvasY;
+    int x = CanvasX * 2;
+    int y = CanvasY;
 
 //    wxDC* dc=new wxClientDC(Canvas);
 //    JZEventFrame::OnPaintSub(dc, x, y);
@@ -955,8 +961,8 @@ void JZEventFrame::ZoomOut()
   if (ClocksPerPixel <= 120)
   {
     ClocksPerPixel *= 2;
-    long x = CanvasX / 2;
-    long y = CanvasY;
+    int x = CanvasX / 2;
+    int y = CanvasY;
 
     //wxDC* dc=new wxClientDC(Canvas);
     //JZEventFrame::OnPaintSub(dc, x, y);

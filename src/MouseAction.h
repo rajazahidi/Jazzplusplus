@@ -117,9 +117,9 @@ class tSelection : public tMouseAction
     virtual int ButtonDown(wxMouseEvent &);
     virtual int ButtonUp(wxMouseEvent &);
     virtual void Draw(wxDC& Dc);
-    virtual void Draw(wxDC& Dc, long x, long y, long w, long h); // clipping
+    virtual void Draw(wxDC& Dc, int x, int y, int w, int h); // clipping
     // may not be called while dragging
-    void Select(JZRectangle &rr, long x, long y, long w, long h);
+    void Select(JZRectangle &rr, int x, int y, int w, int h);
     void Select(JZRectangle &rr);
 
   private:
@@ -132,17 +132,17 @@ class tSelection : public tMouseAction
 class tSnapSelection : public tSelection
 {
 protected:
-  long  *xCoords, nxCoords;
-  long  *yCoords, nyCoords;
-  long  xMin, xMax, xStep, yMin, yMax, yStep;
+  int  *xCoords, nxCoords;
+  int  *yCoords, nyCoords;
+  int  xMin, xMax, xStep, yMin, yMax, yStep;
 
 public:
   tSnapSelection(wxScrolledWindow *c);
   virtual void Snap(float &x, float &y, int up);
-  void SetXSnap(long ny, long *cx);
-  void SetYSnap(long ny, long *cy);
-  void SetXSnap(long xMin, long xMax, long xStep);
-  void SetYSnap(long yMin, long yMax, long yStep);
+  void SetXSnap(int ny, int *cx);
+  void SetYSnap(int ny, int *cy);
+  void SetXSnap(int xMin, int xMax, int xStep);
+  void SetYSnap(int yMin, int yMax, int yStep);
 };
 
 

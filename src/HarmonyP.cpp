@@ -598,7 +598,7 @@ scdef chords[] =  {
   { "75-",                "1 3 5- 7" },
 };
 
-long scansc(const char *s)
+int scansc(const char *s)
 {
   HBChord res(0);
   while (*s)
@@ -641,7 +641,7 @@ void gensc(scdef *scd)
   while (scd->name)
   {
     cout << "  { \"" << scd->name << "\",\t";
-    long keys = scansc(scd->def);
+    int keys = scansc(scd->def);
     cout << "0x" << hex << keys << "},\n";
     scd++;
   }

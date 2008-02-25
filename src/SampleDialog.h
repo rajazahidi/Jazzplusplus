@@ -42,7 +42,7 @@ class tCommandPainter
   public:
     tCommandPainter(tSampleWin &w, tPaintableCommand &cmd);
     virtual ~tCommandPainter();
-    virtual void OnAccept(long fr, long to);
+    virtual void OnAccept(int fr, int to);
   protected:
     tSampleWin &win;
     tPaintableCommand &cmd;

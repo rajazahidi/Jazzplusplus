@@ -67,7 +67,7 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
     void OnSnap8D(wxCommandEvent& Event);
     void OnSnap16(wxCommandEvent& Event);
     void OnSnap16D(wxCommandEvent& Event);
-    long xPiano, wPiano;
+    int xPiano, wPiano;
 
     int  nSnaps;
     enum TESizes
@@ -75,7 +75,7 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
       MaxSnaps = 500
     };
 
-    long xSnaps[MaxSnaps];
+    int xSnaps[MaxSnaps];
 
     int  FromLines[MaxTracks];
 
@@ -94,23 +94,23 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
     bool VisibleHBChord;
     bool VisibleMono;
 
-    long MouseLine;
+    int MouseLine;
 
     wxFont *DrumFont;
 
-    long SnapClocks();
+    int SnapClocks();
     int SnapDenomiator;        // 16 for 16-tel
-    long SnapClock(long Clock, int up = 0);
+    int SnapClock(int Clock, int up = 0);
 
 
     void CreateMenu();
     void Setup();
-    void NewPosition(int TrackNr, long Clock);
+    void NewPosition(int TrackNr, int Clock);
     void ShowPitch(int pitch);
     int  Channel();        // Channel of actual track 0..15
 
     void OnMenuCommand(int Id);
-    void OnPaintSub(wxDC* dc,long x, long y);
+    void OnPaintSub(wxDC* dc, int x, int y);
     void SnapSelStart(wxMouseEvent &e);
     void SnapSelStop(wxMouseEvent &e);
 
@@ -136,20 +136,20 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
     }
 
     // Utils
-    int y2Pitch(long y);
-    long Pitch2y(int Pitch);
-    JZEvent *FindEvent(tTrack *t, long Clock, int Pitch);
+    int y2Pitch(int y);
+    int Pitch2y(int Pitch);
+    JZEvent *FindEvent(tTrack *t, int Clock, int Pitch);
     void Copy(tTrack *t, JZEvent *e, int Kill);
-    void Paste(tTrack *t, long Clock, int Pitch);
+    void Paste(tTrack *t, int Clock, int Pitch);
     // SN++ Key_Aftertouch Utils
     void paste_keys_aftertouch(tTrack *t, JZEvent *e);
     void kill_keys_aftertouch(tTrack *t, JZEvent *e);
     int  nKeyOnEvents();
-    void LogicalMousePosition(wxMouseEvent &e, long *x, long *y);
+    void LogicalMousePosition(wxMouseEvent &e, int *x, int *y);
 
     bool OnClose();
 
-    void SetSnapDenom(long value);
+    void SetSnapDenom(int value);
     void PressRadio(int id = 0);
     void SetVisibleAllTracks(bool value);
 // SN++ made public for mouse keylength dragger
@@ -192,53 +192,53 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
   // Functions slurped from JZEventFrame
   public:
 
-    void NewPlayPosition(long Clock);
+    void NewPlayPosition(int Clock);
     void DrawPlayPosition(wxDC* dc);
     void Redraw();
     void CreateCanvas();
-    long Clock2x(long clk);
-    long x2Clock(long x);
-    long Line2y(long Line);
-    long y2Line(long y, int up = 0);
+    int Clock2x(int clk);
+    int x2Clock(int x);
+    int Line2y(int Line);
+    int y2Line(int y, int up = 0);
     int EventsSelected(const char *msg = 0);
     void ZoomIn();
     void ZoomOut();
     void LineText(
       wxDC *dc,
-      long x,
-      long y,
-      long w,
-      long h,
+      int x,
+      int y,
+      int w,
+      int h,
       wxString str = "",
       bool down = FALSE);
-    long x2BarClock(long x, int next);
+    int x2BarClock(int x, int next);
     int OnEventWinMouseEvent(wxMouseEvent &e);
-    void OnEventWinPaintSub(long x, long y);
-    long y2yLine(long y, int up = 0);
-    void GetVirtSize(long *w, long *h);
+    void OnEventWinPaintSub(int x, int y);
+    int y2yLine(int y, int up = 0);
+    void GetVirtSize(int *w, int *h);
     bool OnCharHook(wxKeyEvent& e);
 
     JZPianoWindow *Canvas;
     tFilter* mpFilter;
 
-    long FontSize;
-    long ClocksPerPixel;
+    int FontSize;
+    int ClocksPerPixel;
     JZSong* Song;
     wxFont* mpFont;
     wxFont* mpFixedFont;        //remains with 12pt/ bleibt bei 12pt
     int hFixedFont;        //Height letters/ Hoehe eines Buchstaben
-    long hTop;
-    long wLeft;
-    long LittleBit;
-    long FromLine, ToLine;
-    long hLine;
-    long xEvents, yEvents, wEvents, hEvents;
-    long CanvasX, CanvasY, CanvasW, CanvasH;        // canvas coords
-    long FromClock, ToClock;
+    int hTop;
+    int wLeft;
+    int LittleBit;
+    int FromLine, ToLine;
+    int hLine;
+    int xEvents, yEvents, wEvents, hEvents;
+    int CanvasX, CanvasY, CanvasW, CanvasH;        // canvas coords
+    int FromClock, ToClock;
     tSnapSelection* SnapSel;
     bool UseColors;
     tMouseAction *MouseAction;
-    long PlayClock;
+    int PlayClock;
     wxDialog* DialogBox;
     wxDialog* MixerForm;
 

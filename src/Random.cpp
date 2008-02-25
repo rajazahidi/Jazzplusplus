@@ -260,7 +260,7 @@ istream & operator >> (istream &is, JZRndArray &a)
 // length of tickmark line
 #define TICK_LINE 0
 
-tArrayEdit::tArrayEdit(wxFrame *frame, JZRndArray &ar, long xx, long yy, long ww, long hh, int sty)
+tArrayEdit::tArrayEdit(wxFrame *frame, JZRndArray &ar, int xx, int yy, int ww, int hh, int sty)
   : wxScrolledWindow(frame,-1, wxPoint(xx, yy), wxSize(ww, hh)),
     mArray(ar),
     n(ar.n),
@@ -282,7 +282,7 @@ tArrayEdit::tArrayEdit(wxFrame *frame, JZRndArray &ar, long xx, long yy, long ww
   w = ww;
   h = hh;
 
-  long tw, th;
+  int tw, th;
 
   wxDC *dc = new wxClientDC(this);
   dc->SetFont(*wxSMALL_FONT);
@@ -378,7 +378,7 @@ void tArrayEdit::DrawBar(wxDC *dc, int i, int black)
     if (!gap && w / n > 3)
       gap = 1;
   }
-  long xbar, ybar, wbar, hbar;
+  int xbar, ybar, wbar, hbar;
 
   wbar = w / n - 2 * gap;
   xbar = x + i * w / n + gap;
@@ -733,7 +733,7 @@ void tArrayEdit::SetYMinMax(int mi, int ma)
   ynul = y + h - h * (nul - min) / (max - min);
 }
 
-void tArrayEdit::DrawBarLine (wxDC *dc, long xx)
+void tArrayEdit::DrawBarLine (wxDC *dc, int xx)
 {
   //  wxDC *dc = new wxClientDC(this);//GetDC();
   //  fprintf(stderr,"x: %ld, xx: %ld\n",x,xx);
@@ -750,10 +750,10 @@ void tArrayEdit::DrawBarLine (wxDC *dc, long xx)
 tRhyArrayEdit::tRhyArrayEdit(
   wxFrame *parent,
   JZRndArray& Array,
-  long xx,
-  long yy,
-  long ww,
-  long hh,
+  int xx,
+  int yy,
+  int ww,
+  int hh,
   int sty)
   : tArrayEdit(parent, Array, xx, yy, ww, hh, sty)
 {

@@ -143,7 +143,7 @@ tMtcTime::tMtcTime(char *str, tMtcType t)
   min = 0;
   sec = 0;
   fm = 0;
-  sscanf(str, "%ld:%ld:%ld.%ld", &hour, &min, &sec, &fm);
+  sscanf(str, "%d:%d:%d.%d", &hour, &min, &sec, &fm);
   if (fm >= framesPerSecond[type])
   {
     fm = (int) framesPerSecond[type] - 1;
@@ -169,7 +169,7 @@ tMtcTime::tMtcTime(unsigned h, unsigned m, unsigned s, unsigned f, unsigned t)
 
 void tMtcTime::ToString(char *str)
 {
-  sprintf(str, "%ld:%ld:%ld.%ld", hour, min, sec, fm);
+  sprintf(str, "%d:%d:%d.%d", hour, min, sec, fm);
 }
 
 tMtcOffset *tMtcTime::ToOffset()
@@ -3263,7 +3263,7 @@ tMtcTime* tTrack::GetMtcOffset()
   {
     return new tMtcTime(MtcOffset);
   }
-  return(new tMtcTime(0L, Mtc30Ndf));
+  return(new tMtcTime(0, Mtc30Ndf));
 }
 
 void tTrack::SetMtcOffset(tMtcTime* mtc)

@@ -82,7 +82,10 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
   self.client  = client;
   self.port    = create_port(handle, "Input/Output");
 
-  cerr << "created client:port = " << self.client << ':' << self.port << endl;
+  cout
+    << "created client:port = " << static_cast<int>(self.client)
+    << ':' << static_cast<int>(self.port)
+    << endl;
 
   // allocate a queue
   queue = snd_seq_alloc_named_queue(handle, "Jazz++");

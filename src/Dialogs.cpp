@@ -39,6 +39,9 @@
 #include "Help.h"
 #include "DeprecatedWx/proplist.h"
 
+#include <sstream>
+#include <iomanip>
+
 using namespace std;
 
 // **************************************************************************
@@ -713,8 +716,8 @@ void tQuantizeDlg::AddProperties()
     new wxRealListValidator(-100, 100)));
   sheet->AddProperty(new wxProperty(
     "Delay",
-    wxPropertyValue((double*)&Delay),
-    "double",
+    wxPropertyValue(&Delay),
+    "int",
     new wxRealListValidator(-100, 100)));
 }
 
@@ -798,7 +801,11 @@ class tChEventDlg : public tEventDlg
 
 void tChEventDlg::AddProperties()
 {
-  sheet->AddProperty(new wxProperty("Channel", wxPropertyValue((long*)&Channel), "integer", new wxIntegerListValidator(1,16)));
+  sheet->AddProperty(new wxProperty(
+    "Channel",
+    wxPropertyValue(&Channel),
+    "integer",
+    new wxIntegerListValidator(1, 16)));
   tEventDlg::AddProperties();
 }
 
@@ -861,12 +868,27 @@ void tKeyOnDlg::AddProperties()
 //   sheet->AddProperty(new wxProperty("test", wxPropertyValue((char**)&tst), "string"));
 
   sheet->AddProperty(PitchDlg.mkProperty());
-  sheet->AddProperty(new wxProperty("Velocity", wxPropertyValue((long*)&Veloc), "integer", new wxIntegerListValidator(1,127)));
+  sheet->AddProperty(new wxProperty(
+    "Velocity",
+    wxPropertyValue(&Veloc),
+    "integer",
+    new wxIntegerListValidator(1, 127)));
   // SN++ off veloc support
-  //  Add(wxMakeFormShort("OffVel:", &OffVeloc, wxFORM_DEFAULT, new wxList(wxMakeConstraintRange(0.0, 127.0), 0)));
-  sheet->AddProperty(new wxProperty("Off Velocity", wxPropertyValue((long*)&OffVeloc), "integer", new wxIntegerListValidator(0,127)));
-  sheet->AddProperty(new wxProperty("Length", wxPropertyValue((long*)&Length), "integer"));
-  //  Add(wxMakeFormShort("Length:", &Length, wxFORM_DEFAULT,0,0,0,120));
+//  Add(wxMakeFormShort(
+//    "OffVel:",
+//     &OffVeloc,
+//     wxFORM_DEFAULT,
+//     new wxList(wxMakeConstraintRange(0.0, 127.0), 0)));
+  sheet->AddProperty(new wxProperty(
+    "Off Velocity",
+    wxPropertyValue(&OffVeloc),
+    "integer",
+    new wxIntegerListValidator(0, 127)));
+  sheet->AddProperty(new wxProperty(
+    "Length",
+    wxPropertyValue(&Length),
+    "integer"));
+//  Add(wxMakeFormShort("Length:", &Length, wxFORM_DEFAULT, 0, 0, 0, 120));
   tChEventDlg::AddProperties();
 }
 
@@ -959,8 +981,9 @@ void tControlDlg::AddProperties()
 
   sheet->AddProperty(new wxProperty(
     "Value",
-    wxPropertyValue((long*)&Value),
-    "integer", new wxIntegerListValidator(0,127)));
+    wxPropertyValue(&Value),
+    "integer",
+    new wxIntegerListValidator(0, 127)));
 
 //  Add(wxMakeFormShort(
 //    "Value:",
@@ -977,7 +1000,7 @@ class tPlayTrackDlg : public tEventDlg
 {
  public:
 
-  long transpose;
+  int transpose;
   int track;
   int eventlength;
 
@@ -1014,9 +1037,21 @@ bool tPlayTrackDlg::OnClose()
 
 void tPlayTrackDlg::AddProperties()
 {
-  sheet->AddProperty(new wxProperty("Track", wxPropertyValue((long*)&track), "integer", new wxIntegerListValidator(0,127)));
-  sheet->AddProperty(new wxProperty("Transpose", wxPropertyValue((long*)&transpose), "integer", new wxIntegerListValidator(-127,127)));
-  sheet->AddProperty(new wxProperty("Length", wxPropertyValue((long*)&eventlength), "integer", new wxIntegerListValidator(0,127)));
+  sheet->AddProperty(new wxProperty(
+    "Track",
+    wxPropertyValue(&track),
+    "integer",
+    new wxIntegerListValidator(0, 127)));
+  sheet->AddProperty(new wxProperty(
+    "Transpose",
+    wxPropertyValue(&transpose),
+    "integer",
+    new wxIntegerListValidator(-127, 127)));
+  sheet->AddProperty(new wxProperty(
+    "Length",
+    wxPropertyValue(&eventlength),
+    "integer",
+    new wxIntegerListValidator(0, 127)));
   tEventDlg::AddProperties();
 }
 
@@ -1094,7 +1129,7 @@ tEndOfTrackDlg::tEndOfTrackDlg(tEndOfTrack *e, JZPianoFrame* w, tTrack *t)
 
 bool tEndOfTrackDlg::OnClose()
 {
-  tEndOfTrack* p=(tEndOfTrack*)Copy;
+//  tEndOfTrack* p=(tEndOfTrack*)Copy;
   Choice.GetValue();
   return tEventDlg::OnClose();
 }
@@ -1183,7 +1218,11 @@ bool tSetTempoDlg::OnClose()
 void tSetTempoDlg::AddProperties()
 {
   //  Add(wxMakeFormShort("Tempo:", &Value, wxFORM_DEFAULT, new wxList(wxMakeConstraintRange(20.0, 240.0), 0)));
-  sheet->AddProperty(new wxProperty("Tempo", wxPropertyValue((long*)&Value), "integer", new wxIntegerListValidator(20,240)));
+  sheet->AddProperty(new wxProperty(
+    "Tempo",
+    wxPropertyValue(&Value),
+    "integer",
+    new wxIntegerListValidator(20, 240)));
   tEventDlg::AddProperties();
 }
 
@@ -1234,10 +1273,12 @@ bool tSysexDlg::OnClose()
 
   int jstop = strlen(str);
 
-  for (i = 0, j = 0; j <= jstop; j += k, i++)
+  unsigned int TempInteger;
+  for (i = 0, j = 0; j <= jstop; j += k, ++i)
   {
-    sscanf( str + j, "%02x %n", &d[i], &k );
+    sscanf(str + j, "%02x %n", &TempInteger, &k);
 
+    d[i] = static_cast<unsigned char>(TempInteger);
     if (d[i] == 0xf7)
       break;
   }
@@ -1283,35 +1324,38 @@ bool tSysexDlg::OnClose()
 void tSysexDlg::AddProperties()
 {
 //  char label1[100];
-  char label2[100];
-  unsigned char *uptr;
+  unsigned char* uptr;
 
   if (Event->IsSysEx()->Length)
   {
-//    sprintf(label1, "Loaded sysex: %s", tSynthSysex::GetSysexName(gpSynth->GetSysexId(Event->IsSysEx())));
+//    sprintf(
+//      label1,
+//      "Loaded sysex: %s",
+//      tSynthSysex::GetSysexName(gpSynth->GetSysexId(Event->IsSysEx())));
 
 //    Add(wxMakeFormMessage(label1));
 
     sheet->AddProperty(new wxProperty(
       "Loaded sysex",
-      wxPropertyValue(tSynthSysex::GetSysexName(gpSynth->GetSysexId(Event->IsSysEx()))),
+      wxPropertyValue(tSynthSysex::GetSysexName(gpSynth->GetSysexId(
+        Event->IsSysEx()))),
       "string"));//r/o
 
     uptr = gpSynth->GetSysexValPtr(Event->IsSysEx());
 
     if (uptr)
     {
-      sprintf(
-        label2,
-        "First data byte is at offset %d, value %02x (%d decimal)",
-        uptr - Event->IsSysEx()->Data + 1,
-        *uptr,
-        *uptr);
+      ostringstream Oss;
+      Oss
+        << "First data byte is at offset "
+        << uptr - Event->IsSysEx()->Data + 1 << ", value "
+        << setw(2) << hex << static_cast<int>(*uptr)
+        << dec << " (" << static_cast<int>(*uptr) << " decimal)";
       sheet->AddProperty(new wxProperty(
-        label2,
+        Oss.str().c_str(),
         wxPropertyValue((char*)""),
         "string"));//r/o
-//      Add(wxMakeFormMessage(label2));
+//      Add(wxMakeFormMessage(Oss.str().c_str()));
     }
   }
   else

@@ -463,7 +463,7 @@ if (1)
 void tStdChunk::Load(FILE *fd)
 {
   char Type[4];
-  long Size;
+  int Size;
 
   fread(Type, 4, 1, fd);
   fread(&Size, 4, 1, fd);
@@ -476,7 +476,7 @@ void tStdChunk::Load(FILE *fd)
 
 void tStdChunk::Save(FILE *fd)
 {
-  long Size, hSize;
+  int Size, hSize;
 
   Resize(4);
   *cp++ = 0x00;
@@ -526,7 +526,7 @@ tStdRead::~tStdRead()
 int tStdRead::Open(const char* pFileName)
 {
   tFileHeader h;
-  long hSize;
+  int hSize;
   int i;
   char Type[4];
 

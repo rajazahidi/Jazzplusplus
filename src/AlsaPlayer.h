@@ -87,7 +87,9 @@ class tAlsaPlayer : public tPlayer
     void unsubscribe_out(int dev);
     void thru_connect();
     void thru_disconnect();
-    void scan_clients(tAlsaDeviceList &list, int device_caps);
+    void scan_clients(
+      tAlsaDeviceList& Devicelist,
+      unsigned DeviceCapabilities);
     int select_list(tAlsaDeviceList &list, char *title, int def_device);
     int  start_timer(long clock);
     int write(snd_seq_event_t *ev) { return write(ev, 0); } // 0 == ok

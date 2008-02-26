@@ -692,7 +692,9 @@ long tAlsaPlayer::GetRealTimeClock()
 
 
 /** this function goes through each client, and each port on each client*/
-void tAlsaPlayer::scan_clients(tAlsaDeviceList &list, int cap)
+void tAlsaPlayer::scan_clients(
+  tAlsaDeviceList& DeviceList,
+  unsigned DeviceCapabilities)
 {
   snd_seq_client_info_t *cinfo;
   snd_seq_port_info_t *pinfo;
@@ -700,7 +702,7 @@ void tAlsaPlayer::scan_clients(tAlsaDeviceList &list, int cap)
   snd_seq_client_info_alloca(&cinfo);
   snd_seq_port_info_alloca(&pinfo);
 
-  list.Clear();
+  DeviceList.Clear();
 
   snd_seq_client_info_set_client(cinfo, 0);
   while (snd_seq_query_next_client(handle, cinfo) >= 0)
@@ -712,14 +714,16 @@ void tAlsaPlayer::scan_clients(tAlsaDeviceList &list, int cap)
     snd_seq_port_info_set_port(pinfo, -1);
     while (snd_seq_query_next_port(handle, pinfo) >= 0)
     {
-      if ((snd_seq_port_info_get_capability(pinfo) & cap) == cap)
+      if (
+        (snd_seq_port_info_get_capability(pinfo) & DeviceCapabilities) ==
+          DeviceCapabilities)
       {
         snd_seq_addr_t a = *snd_seq_port_info_get_addr(pinfo);
         char buf[500];
         strcpy(buf, snd_seq_client_info_get_name(cinfo));
         strcat(buf, " ");
         strcat(buf, snd_seq_port_info_get_name(pinfo));
-        list.add(buf, a);
+        DeviceList.add(buf, a);
       }
     }
   }

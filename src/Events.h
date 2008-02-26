@@ -320,7 +320,7 @@ class JZEvent
       return (mClock & KilledClock) != 0;
     }
 
-    virtual tMetaEvent         *IsMetaEvent()        { edb(); return 0; }
+    virtual tMetaEvent    *IsMetaEvent()    { edb(); return 0; }
     virtual tChannelEvent *IsChannelEvent() { edb(); return 0; }
 
     virtual tKeyOn*       IsKeyOn()       { edb(); return 0; }
@@ -603,7 +603,7 @@ class tMetaEvent : public JZEvent
 {
   public:
 
-    unsigned char *Data;
+    unsigned char* Data;
     unsigned short Length;
 
     tMetaEvent(int clk, unsigned char sta, unsigned char *dat, unsigned short len)

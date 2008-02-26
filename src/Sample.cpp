@@ -449,9 +449,11 @@ void tSample::Delete(int fr_smpl, int to_smpl)
   short *new_data = new short [new_length];
 
   int fr_offs = fr_smpl * sizeof(short);
-  int to_offs = to_smpl * sizeof(short);
   memcpy(new_data, data, fr_offs);
-  memcpy(new_data + fr_smpl, data + to_smpl, (length - to_smpl) * sizeof(short));
+  memcpy(
+    new_data + fr_smpl,
+    data + to_smpl,
+    (length - to_smpl) * sizeof(short));
 
   delete [] data;
   data = new_data;

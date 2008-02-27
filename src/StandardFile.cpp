@@ -31,6 +31,10 @@
 #include <assert.h>
 #include <stdarg.h>
 
+#include <sstream>
+
+using namespace std;
+
 // ----------------------------------------------------------------------
 // StdFile-Util
 // ----------------------------------------------------------------------
@@ -287,7 +291,7 @@ if (1)
 
 
 
-JZEvent *tStdChunk::Get()
+JZEvent* tStdChunk::Get()
 {
   int len;
   unsigned char Stat;
@@ -296,12 +300,10 @@ JZEvent *tStdChunk::Get()
 
   while (!IsEof())
   {
-
     Clock += GetVar();
 
     switch (Stat = *cp)        // Event-Typ
     {
-
       case StatSysEx:          // Sysex
         ++ cp;
         len = GetVar();
@@ -311,7 +313,7 @@ JZEvent *tStdChunk::Get()
         return e;
 
       case 0xff:                // Meta-Event
-        ++ cp;
+        ++cp;
 
 #if 0
 if (1)
@@ -323,7 +325,6 @@ if (1)
 
         switch (Stat = *cp++)        // Meta-Type
         {
-
           case StatText:        // Text-Event
             len = GetVar();
             e = new tText(Clock, cp, len);
@@ -342,7 +343,6 @@ if (1)
             e = new tPlayTrack(Clock, cp, len);
             cp += len;
             return e;
-
 
           case StatJazzMeta:        // Jazz Meta Event
             len = GetVar();
@@ -406,51 +406,55 @@ if (1)
         Stat  = RunningStatus & 0xF0;
         Channel = RunningStatus & 0x0F;
 
-        switch(Stat)
-        {
-          case StatKeyOff:  // SN++ added off veloc
-            e = new tKeyOff(Clock, Channel, cp[0],cp[1]);
-            cp += 2;
-            return e;
+      switch(Stat)
+      {
+        case StatKeyOff:  // SN++ added off veloc
+          e = new tKeyOff(Clock, Channel, cp[0],cp[1]);
+          cp += 2;
+          return e;
 
-          case StatKeyOn:
-            if (cp[1])
-              e = new tKeyOn(Clock, Channel, cp[0], cp[1]);
-            else
-              e = new tKeyOff(Clock, Channel, cp[0]);
-            cp += 2;
-            return e;
+        case StatKeyOn:
+          if (cp[1])
+            e = new tKeyOn(Clock, Channel, cp[0], cp[1]);
+          else
+            e = new tKeyOff(Clock, Channel, cp[0]);
+          cp += 2;
+          return e;
 
-          case StatKeyPressure:
+        case StatKeyPressure:
 // SN++ Aftertouch
-            e = new tKeyPressure(Clock, Channel, cp[0], cp[1]);
-            cp += 2;
-            return e;
+          e = new tKeyPressure(Clock, Channel, cp[0], cp[1]);
+          cp += 2;
+          return e;
 
-          case StatControl:
-            e = new tControl(Clock, Channel, cp[0], cp[1]);
-            cp += 2;
-            return e;
+        case StatControl:
+          e = new tControl(Clock, Channel, cp[0], cp[1]);
+          cp += 2;
+          return e;
 
-          case StatPitch:
-            e = new tPitch(Clock, Channel, cp[0], cp[1]);
-            cp += 2;
-            return e;
+        case StatPitch:
+          e = new tPitch(Clock, Channel, cp[0], cp[1]);
+          cp += 2;
+          return e;
 
-          case StatProgram:
-            e = new tProgram(Clock, Channel, cp[0]);
-            cp += 1;
-            return e;
+        case StatProgram:
+          e = new tProgram(Clock, Channel, cp[0]);
+          cp += 1;
+          return e;
 
-          case StatChnPressure:
-            e = new tChnPressure(Clock, Channel, cp[0]);
-            cp += 1;
-            return e;
+        case StatChnPressure:
+          e = new tChnPressure(Clock, Channel, cp[0]);
+          cp += 1;
+          return e;
 
-          default:
-            Error("GetEvent: unknown Status %d", Stat);
-            return 0;
+        default:
+        {
+          ostringstream Oss;
+          Oss << "GetEvent: unknown Status " << Stat;
+          Error(Oss.str());
+          return 0;
         }
+      }
     }
   }
   return 0; // eof
@@ -532,7 +536,9 @@ int tStdRead::Open(const char* pFileName)
 
   if (!tReadBase::Open(pFileName))
   {
-    Error("cant open %s", pFileName);
+    ostringstream Oss;
+    Oss << "Can't open " << pFileName;
+    Error(Oss.str());
     return 0;
   }
 

@@ -22,14 +22,13 @@
 
 #include "WxWidgets.h"
 
-void Error(char *fmt, ...)
-{
-  char buf[200];
-  va_list argptr;
-  va_start(argptr, fmt);
-  vsprintf(buf, fmt, argptr);
-  va_end(argptr);
-  wxMessageBox(buf, "fatal error", wxOK);
-  //exit(1);
-}
+#include <string>
 
+using namespace std;
+
+//*****************************************************************************
+//*****************************************************************************
+void Error(const string& ErrorMessage)
+{
+  ::wxMessageBox(ErrorMessage.c_str(), "Fatal Error", wxOK);
+}

@@ -33,55 +33,73 @@
 #include <assert.h>
 #include <stdarg.h>
 
+#include <sstream>
 
-int tReadBase::Open(const char *fname)
+using namespace std;
+
+//*****************************************************************************
+//*****************************************************************************
+
+int tReadBase::Open(const char* pFileName)
 {
-  if (fname == NULL)
+  if (pFileName == NULL)
+  {
     fd = stdin;
+  }
   else
   {
-    fd = fopen(fname, "rb");
-    if (fd == NULL) {
-      Error("Error opening file %s", fname);
+    fd = fopen(pFileName, "rb");
+    if (fd == NULL)
+    {
+      ostringstream Oss;
+      Oss << "Error opening file ", pFileName;
+      Error(Oss.str());
       return 0;
     }
   }
   return 1;
 }
 
-
 void tReadBase::Close()
 {
   if (fd != stdin)
+  {
     fclose(fd);
+  }
 }
 
+//*****************************************************************************
+//*****************************************************************************
 
-
-
-int tWriteBase::Open(const char *fname, int nTracks, int TicksPerQuarter)
+int tWriteBase::Open(const char* pFileName, int nTracks, int TicksPerQuarter)
 {
-  if (fname == NULL)
+  if (pFileName == NULL)
+  {
     fd = stdout;
+  }
   else
   {
 #ifndef __WXMSW__
-    FILE *testfd = fopen(fname, "r");
-    if (testfd) {
-        fclose( testfd );
-            char *syscmd;
-            syscmd = new char[ strlen( "cp" ) + 2*strlen( fname ) + strlen( ".backup" ) + 3 ];
-            sprintf( syscmd, "cp %s %s.backup", fname, fname );
-            if (system( syscmd ) != 0) {
-                fprintf(stderr, "Could not make backup file %s.backup\n", fname );
-            }
-            delete syscmd;
+    FILE *testfd = fopen(pFileName, "r");
+    if (testfd)
+    {
+      fclose(testfd);
+      char *syscmd;
+      syscmd = new char[strlen("cp") + 2 * strlen(pFileName) + strlen(".backup") + 3];
+      sprintf(syscmd, "cp %s %s.backup", pFileName, pFileName);
+      if (system(syscmd) != 0)
+      {
+        fprintf(stderr, "Could not make backup file %s.backup\n", pFileName);
+      }
+      delete syscmd;
     }
 #endif
-    fd = fopen(fname, "wb");
+    fd = fopen(pFileName, "wb");
     if (fd == NULL)
     {
-      Error("Error opening file %s", fname);
+      ostringstream Oss;
+      Oss << "Error opening file " << pFileName;
+      Error(Oss.str());
       return 0;
     }
   }
@@ -92,13 +110,14 @@ int tWriteBase::Open(const char *fname, int nTracks, int TicksPerQuarter)
 void tWriteBase::Close()
 {
   if (fd != stdout)
+  {
     fclose(fd);
+  }
 }
 
-
-// -------------------------------------------------------
+//*****************************************************************************
 // tGetMidiBytes
-// -------------------------------------------------------
+//*****************************************************************************
 
 int tGetMidiBytes::Write(JZEvent* pEvent, unsigned char* pString, int Length)
 {
@@ -128,26 +147,28 @@ int tGetMidiBytes::Write(JZEvent* pEvent, unsigned char* pString, int Length)
   }
 }
 
+//*****************************************************************************
+//*****************************************************************************
 
 int tSysEx::GetPitch()
 {
-   edb();
-   int id = gpSynth->GetSysexId( this );
+  edb();
+  int id = gpSynth->GetSysexId( this );
 
-   if ((id >= SX_GM_ON) && (id < SX_GS_ON))
-   {
-      return SX_GROUP_GM;
-   }
-   else if ((id >= SX_GS_ON) && (id < SX_XG_ON))
-   {
-      return SX_GROUP_GS;
-   }
-   else if ((id >= SX_XG_ON) && (id < NumSysexIds))
-   {
-      return SX_GROUP_XG;
-   }
-   else
-   {
-      return SX_GROUP_UNKNOWN;
-   }
+  if ((id >= SX_GM_ON) && (id < SX_GS_ON))
+  {
+    return SX_GROUP_GM;
+  }
+  else if ((id >= SX_GS_ON) && (id < SX_XG_ON))
+  {
+    return SX_GROUP_GS;
+  }
+  else if ((id >= SX_XG_ON) && (id < NumSysexIds))
+  {
+    return SX_GROUP_XG;
+  }
+  else
+  {
+    return SX_GROUP_UNKNOWN;
+  }
 }

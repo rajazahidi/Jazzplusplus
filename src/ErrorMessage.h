@@ -23,6 +23,10 @@
 #ifndef JZ_ERRORMESSAGE_H
 #define JZ_ERRORMESSAGE_H
 
-void Error(char *fmt, ...);
+#include <string>
+
+//*****************************************************************************
+//*****************************************************************************
+void Error(const std::string& ErrorMessage);
 
 #endif // !defined(JZ_ERRORMESSAGE_H)

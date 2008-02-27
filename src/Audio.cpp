@@ -875,7 +875,7 @@ void tSampleSet::SaveWave(const char *fname, long frc, long toc, tAudioRecordBuf
   long start_index = Ticks2Samples(frc - start_clock);
   long end_index   = Ticks2Samples(toc - start_clock);
 
-  unsigned int bufsize = buf.bufbytes / 2;
+  int bufsize = buf.bufbytes / 2;
 
   // recording aborted?
   if (end_index > buf.num_buffers * bufsize)

@@ -250,6 +250,7 @@ void JZTrackWindow::OnSize(wxSizeEvent& Event)
   if (mCanvasWidth && mCanvasHeight)
   {
     SetScrollRanges();
+    SetScrollPosition(0, 0);
     Refresh();
   }
 }

@@ -431,6 +431,7 @@ void JZTrackFrame::OnFileOpen(wxCommandEvent& Event)
     SetTitle(FileName);
 //    NextWin->NewPosition(1, 0);
     mpTrackWindow->SetScrollRanges();
+    mpTrackWindow->SetScrollPosition(0, 0);
 //    NextWin->Canvas->SetScrollRanges();
     Refresh();
 //    tTrack::changed = false;

@@ -33,30 +33,32 @@
 #define ID_EXPORT_MIDI                       wxID_HIGHEST + 1
 #define ID_EXPORT_SELECTION_AS_MIDI          wxID_HIGHEST + 2
 
-#define ID_TRIM                              wxID_HIGHEST + 3
-#define ID_QUANTIZE                          wxID_HIGHEST + 4
-#define ID_SHIFT_LEFT                        wxID_HIGHEST + 5
-#define ID_SHIFT_RIGHT                       wxID_HIGHEST + 6
-#define ID_SNAP_8                            wxID_HIGHEST + 7
-#define ID_SNAP_8D                           wxID_HIGHEST + 8
-#define ID_SNAP_16                           wxID_HIGHEST + 9
-#define ID_SNAP_16D                          wxID_HIGHEST + 10
-#define ID_MIXER                             wxID_HIGHEST + 11
-#define ID_PIANOWIN                          wxID_HIGHEST + 12
-#define ID_METRONOME_ON                      wxID_HIGHEST + 13
+#define ID_SETTINGS_SYNTH                    wxID_HIGHEST + 3
 
-#define ID_PLAY                              wxID_HIGHEST + 14
-#define ID_PLAY_LOOP                         wxID_HIGHEST + 15
-#define ID_RECORD                            wxID_HIGHEST + 16
-#define ID_METRONOME                         wxID_HIGHEST + 17
+#define ID_TRIM                              wxID_HIGHEST + 4
+#define ID_QUANTIZE                          wxID_HIGHEST + 5
+#define ID_SHIFT_LEFT                        wxID_HIGHEST + 6
+#define ID_SHIFT_RIGHT                       wxID_HIGHEST + 7
+#define ID_SNAP_8                            wxID_HIGHEST + 8
+#define ID_SNAP_8D                           wxID_HIGHEST + 9
+#define ID_SNAP_16                           wxID_HIGHEST + 10
+#define ID_SNAP_16D                          wxID_HIGHEST + 11
+#define ID_MIXER                             wxID_HIGHEST + 12
+#define ID_PIANOWIN                          wxID_HIGHEST + 13
+#define ID_METRONOME_ON                      wxID_HIGHEST + 14
 
-#define ID_SELECT                            wxID_HIGHEST + 18
+#define ID_PLAY                              wxID_HIGHEST + 15
+#define ID_PLAY_LOOP                         wxID_HIGHEST + 16
+#define ID_RECORD                            wxID_HIGHEST + 17
+#define ID_METRONOME                         wxID_HIGHEST + 18
 
-#define ID_CHANGE_LENGTH                     wxID_HIGHEST + 19
+#define ID_SELECT                            wxID_HIGHEST + 19
 
-#define ID_EVENT_DIALOG                      wxID_HIGHEST + 20
-#define ID_CUT_PASTE_EVENTS                  wxID_HIGHEST + 21
-#define ID_SHOW_ALL_EVENTS_FROM_ALL_TRACKS   wxID_HIGHEST + 22
+#define ID_CHANGE_LENGTH                     wxID_HIGHEST + 20
+
+#define ID_EVENT_DIALOG                      wxID_HIGHEST + 21
+#define ID_CUT_PASTE_EVENTS                  wxID_HIGHEST + 22
+#define ID_SHOW_ALL_EVENTS_FROM_ALL_TRACKS   wxID_HIGHEST + 23
 
 #define ID_TOOLS_HARMONY_BROWSER             wxID_HIGHEST + 25
 

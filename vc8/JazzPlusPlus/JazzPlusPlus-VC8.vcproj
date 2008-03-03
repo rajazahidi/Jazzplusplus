@@ -717,6 +717,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\SynthesizerSettingsDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\SynthesizerSettingsDialog.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\ToolBar.cpp"
 				>
 			</File>

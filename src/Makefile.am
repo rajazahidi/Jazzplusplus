@@ -68,6 +68,7 @@ Song.cpp \
 StandardFile.cpp \
 StringReadWrite.cpp \
 Synth.cpp \
+SynthesizerSettingsDialog.cpp \
 ToolBar.cpp \
 Track.cpp \
 TrackFrame.cpp \
@@ -142,6 +143,7 @@ Song.h \
 StandardFile.h \
 StringReadWrite.h \
 Synth.h \
+SynthesizerSettingsDialog.h \
 ToolBar.h \
 TrackFrame.h \
 Track.h \

@@ -35,6 +35,7 @@
 #include "Globals.h"
 #include "Configuration.h"
 #include "Harmony.h"
+#include "SynthesizerSettingsDialog.h"
 #include "AboutDialog.h"
 
 // These are the tool bar icons.
@@ -84,6 +85,8 @@ BEGIN_EVENT_TABLE(JZTrackFrame, wxFrame)
   EVT_MENU(wxID_ZOOM_OUT, JZTrackFrame::OnZoomOut)
 
   EVT_MENU(ID_TOOLS_HARMONY_BROWSER, JZTrackFrame::OnToolsHarmonyBrowser)
+
+  EVT_MENU(ID_SETTINGS_SYNTH, JZTrackFrame::OnSettingsSynthesizerType)
 
   EVT_MENU(wxID_HELP_CONTENTS, JZTrackFrame::OnHelpContents)
 
@@ -233,22 +236,22 @@ void JZTrackFrame::CreateMenu()
   mpEditMenu->AppendSeparator();
 
   /* Move Elsewhere
-  mpEditMenu->Append(MEN_QUANTIZE,      "&Quantize ...");
-  mpEditMenu->Append(MEN_SETCHAN,       "&Set MIDI Channel ...");
-  mpEditMenu->Append(MEN_TRANSP,        "&Transpose ...");
-  mpEditMenu->Append(MEN_VELOC,         "&Velocity ...");
-  mpEditMenu->Append(MEN_LENGTH,        "&Length ...");
-  mpEditMenu->Append(MEN_SHIFT,         "Shi&ft ...");
-  mpEditMenu->Append(MEN_CLEANUP,       "C&leanup ...");
-  mpEditMenu->Append(MEN_SEARCHREP,     "Search Re&place ...");
+  mpEditMenu->Append(MEN_QUANTIZE,      "&Quantize...");
+  mpEditMenu->Append(MEN_SETCHAN,       "&Set MIDI Channel...");
+  mpEditMenu->Append(MEN_TRANSP,        "&Transpose...");
+  mpEditMenu->Append(MEN_VELOC,         "&Velocity...");
+  mpEditMenu->Append(MEN_LENGTH,        "&Length...");
+  mpEditMenu->Append(MEN_SHIFT,         "Shi&ft...");
+  mpEditMenu->Append(MEN_CLEANUP,       "C&leanup...");
+  mpEditMenu->Append(MEN_SEARCHREP,     "Search Re&place...");
   */
 
   // Miscellaneous Menu is Stupid.
   // Now it's a View Menu
   misc_menu = new wxMenu;
-  misc_menu->Append(MEN_TMERGE,   "Mer&ge Tracks ...");
-  misc_menu->Append(MEN_TSPLIT,   "&Split Tracks ...");
-  misc_menu->Append(MEN_METERCH,  "&Meterchange ...");
+  misc_menu->Append(MEN_TMERGE,   "Mer&ge Tracks...");
+  misc_menu->Append(MEN_TSPLIT,   "&Split Tracks...");
+  misc_menu->Append(MEN_METERCH,  "&Meterchange...");
   misc_menu->Append(MEN_RESET,    "&Reset Midi");
   misc_menu->Append(MEN_HARMONY,  "&Harmony Browser...");
   misc_menu->Append(MEN_RHYTHM,   "Random R&hythm...");
@@ -257,7 +260,7 @@ void JZTrackFrame::CreateMenu()
   misc_menu->Append(MEN_ARPEGGIO, "Random Arpeggio...");
   misc_menu->Append(MEN_MAPPER,   "Ma&pper...");
   misc_menu->Append(MEN_EVENTLIST, "Event &List...");
-  misc_menu->Append(MEN_COPYRIGHT,"&Set Music Copyright ...");
+  misc_menu->Append(MEN_COPYRIGHT,"&Set Music Copyright...");
 #endif
 
   mpToolsMenu = new wxMenu;
@@ -270,44 +273,44 @@ void JZTrackFrame::CreateMenu()
   mpFileMenu->Append(MEN_SAVEPATTERN,   "Save Pattern...");
   mpFileMenu->AppendSeparator();
 
-  parts_menu = new wxMenu("");
-  parts_menu->Append(MEN_MIXER,    "&Mixer ...");
-  parts_menu->Append(MEN_MASTER,   "Mas&ter ...");
-  parts_menu->Append(MEN_SOUND,    "&Sound ...");
-  parts_menu->Append(MEN_VIBRATO,  "&Vibrato ...");
-  parts_menu->Append(MEN_ENVELOPE, "&Envelope ...");
+  parts_menu = new wxMenu;
+  parts_menu->Append(MEN_MIXER,    "&Mixer...");
+  parts_menu->Append(MEN_MASTER,   "Mas&ter...");
+  parts_menu->Append(MEN_SOUND,    "&Sound...");
+  parts_menu->Append(MEN_VIBRATO,  "&Vibrato...");
+  parts_menu->Append(MEN_ENVELOPE, "&Envelope...");
 
-  bender_menu = new wxMenu("");
+  bender_menu = new wxMenu;
   bender_menu->Append(MEN_BEND_BASIC,    "&Bender Basic...");
   bender_menu->Append(MEN_BEND_LFO1,    "&Bender LFO1...");
   bender_menu->Append(MEN_BEND_LFO2,    "&Bender LFO2...");
   parts_menu->Append(MEN_SUB_BENDER, "&Bender...", bender_menu );
 
-  modulation_menu = new wxMenu("");
+  modulation_menu = new wxMenu;
   modulation_menu->Append(MEN_MOD_BASIC,    "&Modulation Basic...");
   modulation_menu->Append(MEN_MOD_LFO1,    "&Modulation LFO1...");
   modulation_menu->Append(MEN_MOD_LFO2,    "&Modulation LFO2...");
   parts_menu->Append(MEN_SUB_MODUL, "&Modulation...", modulation_menu );
 
-  caf_menu = new wxMenu("");
+  caf_menu = new wxMenu;
   caf_menu->Append(MEN_CAF_BASIC,    "&CAf Basic...");
   caf_menu->Append(MEN_CAF_LFO1,    "&CAf LFO1...");
   caf_menu->Append(MEN_CAF_LFO2,    "&CAf LFO2...");
   parts_menu->Append(MEN_SUB_CAF, "&CAf...", caf_menu );
 
-  paf_menu = new wxMenu("");
+  paf_menu = new wxMenu;
   paf_menu->Append(MEN_PAF_BASIC,    "&PAf Basic...");
   paf_menu->Append(MEN_PAF_LFO1,    "&PAf LFO1...");
   paf_menu->Append(MEN_PAF_LFO2,    "&PAf LFO2...");
   parts_menu->Append(MEN_SUB_PAF, "&PAf...", paf_menu );
 
-  cc1_menu = new wxMenu("");
+  cc1_menu = new wxMenu;
   cc1_menu->Append(MEN_CC1_BASIC,    "&CC1 Basic...");
   cc1_menu->Append(MEN_CC1_LFO1,    "&CC1 LFO1...");
   cc1_menu->Append(MEN_CC1_LFO2,    "&CC1 LFO2...");
   parts_menu->Append(MEN_SUB_CC1, "&CC1...", cc1_menu );
 
-  cc2_menu = new wxMenu("");
+  cc2_menu = new wxMenu;
   cc2_menu->Append(MEN_CC2_BASIC,    "&CC2 Basic...");
   cc2_menu->Append(MEN_CC2_LFO1,    "&CC2 LFO1...");
   cc2_menu->Append(MEN_CC2_LFO2,    "&CC2 LFO2...");
@@ -316,25 +319,29 @@ void JZTrackFrame::CreateMenu()
   parts_menu->Append(MEN_DRUM_PARAM,    "&Drum Parameters...");
   parts_menu->Append(MEN_PART_RSRV,    "&Partial Reserve...");
   parts_menu->Append(MEN_PART_MODE,    "&Part Mode...");
+#endif
 
-  setting_menu = new wxMenu("");
-  setting_menu->Append(MEN_FILTER,    "&Filter ...");
-  setting_menu->Append(MEN_TWSETTING, "&Window ...");
-  setting_menu->Append(MEN_SONG,      "&Song ...");
-  setting_menu->Append(MEN_METRONOME, "&Metronome ...");
-  setting_menu->Append(MEN_EFFECTS,   "&Effects ...");
-  setting_menu->Append(MEN_TIMING,    "&Timing ...");
-  setting_menu->Append(MEN_MIDI_THRU, "&Midi Thru ...");
-  setting_menu->Append(MEN_SYNTH_SETTINGS, "&Synth Type ...");
+  wxMenu* pSettingMenu = new wxMenu;
+#if 0
+  pSettingMenu->Append(MEN_FILTER,    "&Filter...");
+  pSettingMenu->Append(MEN_TWSETTING, "&Window...");
+  pSettingMenu->Append(MEN_SONG,      "&Song...");
+  pSettingMenu->Append(MEN_METRONOME, "&Metronome...");
+  pSettingMenu->Append(MEN_EFFECTS,   "&Effects...");
+  pSettingMenu->Append(MEN_TIMING,    "&Timing...");
+  pSettingMenu->Append(MEN_MIDI_THRU, "&Midi Thru...");
+#endif
+  pSettingMenu->Append(ID_SETTINGS_SYNTH, "&Synthesizer Type...");
 
+#if 0
 #ifdef __WXMSW__
-  setting_menu->Append(MEN_DEVICE, "&Midi Device...");
+  pSettingMenu->Append(MEN_DEVICE, "&Midi Device...");
 #else
   if (
     gpConfig->GetValue(C_MidiDriver) == eMidiDriverOss ||
     gpConfig->GetValue(C_MidiDriver) == eMidiDriverAlsa)
   {
-    setting_menu->Append(MEN_DEVICE, "&Midi Device...");
+    pSettingMenu->Append(MEN_DEVICE, "&Midi Device...");
   }
 #endif
   save_settings_menu = new wxMenu;
@@ -345,7 +352,7 @@ void JZTrackFrame::CreateMenu()
   save_settings_menu->Append( MEN_SAVE_METRO, "&Metronome" );
   // save_settings_menu->Append( MEN_SAVE_SYNTH, "&Synth Type" );
   save_settings_menu->Append( MEN_SAVE_ALL, "&Save All" );
-  setting_menu->Append(MEN_SAVE_SET, "&Save settings", save_settings_menu );
+  pSettingMenu->Append(MEN_SAVE_SET, "&Save settings", save_settings_menu );
 #endif
 
   wxMenu* mpHelpMenu = new wxMenu;
@@ -363,12 +370,15 @@ void JZTrackFrame::CreateMenu()
 #if 0
   pMenuBar->Append(misc_menu, "&View");
   pMenuBar->Append(parts_menu, "&Parts");
-  pMenuBar->Append(setting_menu, "&Settings");
+#endif
 
-  audio_menu = new wxMenu();
-  audio_menu->Append(MEN_AUDIO_GLOBAL, "&Global Settings ...");
-  audio_menu->Append(MEN_AUDIO_SAMPLES, "Sample Se&ttings ... ");
-  audio_menu->Append(MEN_AUDIO_LOAD, "&Load Set ...");
+  pMenuBar->Append(pSettingMenu, "&Settings");
+
+#if 0
+  audio_menu = new wxMenu;
+  audio_menu->Append(MEN_AUDIO_GLOBAL, "&Global Settings...");
+  audio_menu->Append(MEN_AUDIO_SAMPLES, "Sample Se&ttings... ");
+  audio_menu->Append(MEN_AUDIO_LOAD, "&Load Set...");
   audio_menu->Append(MEN_AUDIO_SAVE, "&Save Set");
   audio_menu->Append(MEN_AUDIO_SAVE_AS, "Save Set &As");
   audio_menu->Append(MEN_AUDIO_NEW, "&New Set");
@@ -498,6 +508,14 @@ void JZTrackFrame::OnZoomOut(wxCommandEvent& Event)
 void JZTrackFrame::OnToolsHarmonyBrowser(wxCommandEvent& Event)
 {
   CreateHarmonyBrowser(this);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnSettingsSynthesizerType(wxCommandEvent& Event)
+{
+  JZSynthesizerDialog SynthesizerDialog(this);
+  SynthesizerDialog.ShowModal();
 }
 
 //-----------------------------------------------------------------------------

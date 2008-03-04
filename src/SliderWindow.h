@@ -40,7 +40,6 @@ class tSliderWin : public wxFrame
 
     tSliderWin(
       wxWindow* pParent,
-      wxFrame **ref,
       const wxString& Title,
       int geo[4],
       JZToolDef *tdefs = NULL);
@@ -67,7 +66,6 @@ class tSliderWin : public wxFrame
 #endif
 
     bool in_constructor;
-    wxFrame **ref;
 
     wxPanel* panel;
 

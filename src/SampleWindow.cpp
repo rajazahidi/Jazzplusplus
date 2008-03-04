@@ -954,7 +954,7 @@ void tSampleWin::OnMenuCommand(int id)
   {
     case MEN_EQUALIZER:
       if (equalizer == 0)
-        equalizer = new tEqualizer(*this, (wxFrame **)&equalizer);
+        equalizer = new tEqualizer(*this);
       equalizer->Show(TRUE);
       break;
 
@@ -967,7 +967,7 @@ void tSampleWin::OnMenuCommand(int id)
 
     case MEN_DISTORTION:
       if (distortion == 0)
-        distortion = new tDistortion(*this, (wxFrame **)&distortion);
+        distortion = new tDistortion(*this);
       distortion->Show(TRUE);
       break;
 
@@ -977,7 +977,7 @@ void tSampleWin::OnMenuCommand(int id)
       {
         // Old version was not modal.
         reverb = new wxDialog(this, wxID_ANY, "Reverb");
-        tReverbForm *form = new tReverbForm(*this, (void **)&reverb);
+        tReverbForm *form = new tReverbForm(*this);
         form->EditForm(reverb);
         reverb->Fit();
       }
@@ -1003,7 +1003,7 @@ void tSampleWin::OnMenuCommand(int id)
       if (shifter == 0)
       {
         shifter = new wxDialogBox(this, "Shifter", FALSE );
-        tShifterForm *form = new tShifterForm(*this, (void **)&shifter);
+        tShifterForm *form = new tShifterForm(*this);
         form->EditForm(shifter);
         shifter->Fit();
       }
@@ -1018,7 +1018,7 @@ void tSampleWin::OnMenuCommand(int id)
       if (stretcher == 0)
       {
         stretcher = new wxDialogBox(this, "Stretcher", FALSE );
-        tStretcherForm *form = new tStretcherForm(*this, (void **)&stretcher);
+        tStretcherForm *form = new tStretcherForm(*this);
         form->EditForm(stretcher);
         stretcher->Fit();
       }
@@ -1033,7 +1033,7 @@ void tSampleWin::OnMenuCommand(int id)
       if (filter == 0)
       {
         filter = new wxDialogBox(this, "Filter", FALSE );
-        tSplFilterForm *form = new tSplFilterForm(*this, (void **)&filter);
+        tSplFilterForm *form = new tSplFilterForm(*this);
         form->EditForm(filter);
         filter->Fit();
       }
@@ -1059,7 +1059,7 @@ void tSampleWin::OnMenuCommand(int id)
       if (echo == 0)
       {
         echo = new wxDialogBox(this, "Echo", FALSE );
-        tEchoForm *form = new tEchoForm(*this, (void **)&echo);
+        tEchoForm *form = new tEchoForm(*this);
         form->EditForm(echo);
         echo->Fit();
       }
@@ -1074,7 +1074,7 @@ void tSampleWin::OnMenuCommand(int id)
       if (chorus == 0)
       {
         chorus = new wxDialogBox(this, "Chorus", FALSE );
-        tChorusForm *form = new tChorusForm(*this, (void **)&chorus);
+        tChorusForm *form = new tChorusForm(*this);
         form->EditForm(chorus);
         chorus->Fit();
       }
@@ -1086,7 +1086,7 @@ void tSampleWin::OnMenuCommand(int id)
 
     case MEN_SYNTH:
       if (synth == 0)
-        synth = new tSynthDlg(*this, (wxFrame **)&synth);
+        synth = new tSynthDlg(*this);
       synth->Show(TRUE);
       break;
 
@@ -1162,7 +1162,7 @@ void tSampleWin::OnMenuCommand(int id)
       if (wah_settings == 0)
       {
         wah_settings = new wxDialogBox(this, "Filter Painter", FALSE);
-        tWahSettingsForm *form = new tWahSettingsForm(*this, (void **)&wah_settings, wah_command);
+        tWahSettingsForm *form = new tWahSettingsForm(*this);
         form->EditForm(wah_settings);
         wah_settings->Fit();
       }
@@ -1175,7 +1175,7 @@ void tSampleWin::OnMenuCommand(int id)
       if (pitch_settings == 0)
       {
         pitch_settings = new wxDialogBox(this, "Pitch Painter");
-        tSplPitchForm *form = new tSplPitchForm(*this, (void **)&pitch_settings, pitch_command);
+        tSplPitchForm *form = new tSplPitchForm(*this);
         form->EditForm(pitch_settings);
         pitch_settings->Fit();
       }

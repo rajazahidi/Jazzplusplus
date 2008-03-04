@@ -33,7 +33,6 @@ using namespace std;
 
 tSliderWin::tSliderWin(
   wxWindow* pParent,
-  wxFrame **ref,
   const wxString& Title,
   int geo[4],
   JZToolDef *tdefs)
@@ -46,7 +45,6 @@ tSliderWin::tSliderWin(
 {
   this->geo = geo;
   in_constructor = true;
-  this->ref = ref;
   n_sliders   = 0;
   sliders_per_row = 1;
   panel = new wxPanel(this, 0, 0, 1000, 1000);
@@ -75,11 +73,12 @@ void tSliderWin::Initialize()
 
 tSliderWin::~tSliderWin()
 {
-  *ref = 0;
   GetPosition(&geo[0], &geo[1]);
   GetSize(&geo[2], &geo[3]);
-  for (int i = 0; i < n_sliders; i++)
+  for (int i = 0; i < n_sliders; ++i)
+  {
     delete sliders[i];
+  }
 }
 
 

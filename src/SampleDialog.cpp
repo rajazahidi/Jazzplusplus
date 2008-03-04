@@ -100,8 +100,8 @@ const char* tEquArrayEdit::GetXText(int val)
 
 int tEqualizer::geo[4] = { 50, 80, 350, 200 };
 
-tEqualizer::tEqualizer(tSampleWin &w, wxFrame **ref)
-  : tSliderWin(&w, ref, "Equalizer", geo),
+tEqualizer::tEqualizer(tSampleWin &w)
+  : tSliderWin(&w, "Equalizer", geo),
     array(12, -100, 100),
     win(w),
     spl(w.GetSample())
@@ -201,8 +201,8 @@ static char *cv_strings[] = { "Linear", "Expo 1", "Expo 2", "Expo 3", "Expo 4", 
 
 int tDistortion::geo[4] = { 50, 80, 300, 320 };
 
-tDistortion::tDistortion(tSampleWin &w, wxFrame **ref)
-: tSliderWin(&w, ref, "Distortion", geo),
+tDistortion::tDistortion(tSampleWin &w)
+: tSliderWin(&w, "Distortion", geo),
   arr(200, 0, 100),
   win(w)
 {
@@ -452,8 +452,8 @@ static JZToolDef syn_tdefs[] = {
 };
 
 
-tSynthDlg::tSynthDlg(tSampleWin &w, wxFrame **ref)
-: tSliderWin(&w, ref, "Additive Synthesis", geo, syn_tdefs),
+tSynthDlg::tSynthDlg(tSampleWin &w)
+: tSliderWin(&w, "Additive Synthesis", geo, syn_tdefs),
   win(w)
 {
   Initialize();
@@ -784,11 +784,10 @@ int tReverbForm::brightness = 20;  // lowpass freq
 int tReverbForm::volume     = 20;  // effect volume
 int tReverbForm::rvbtime    = 30;  // echo absorbtion
 
-tReverbForm::tReverbForm(tSampleWin &w, void **r)
+tReverbForm::tReverbForm(tSampleWin &w)
   : wxForm( USED_WXFORM_BUTTONS ),
     win(w)
 {
-  ref = r;
 }
 
 
@@ -818,7 +817,6 @@ void tReverbForm::EditForm(wxPanel *panel)
 
 void tReverbForm::OnCancel()
 {
-  *ref = 0;
   wxForm::OnCancel();
 }
 
@@ -842,7 +840,6 @@ void tReverbForm::OnOk()
   wxEndBusyCursor();
   win.Redraw();
 
-  *ref = 0;
   wxForm::OnOk();
 }
 
@@ -859,40 +856,10 @@ int tEchoForm::ampl        = 25;  // percent
 bool tEchoForm::rand       = FALSE;
 
 
-tEchoForm::tEchoForm(tSampleWin &w, void **r)
+tEchoForm::tEchoForm(tSampleWin &w)
 : wxForm( USED_WXFORM_BUTTONS ),
   win(w)
 {
-  ref = r;
-}
-
-
-void tEchoForm::OnHelp()
-{
-  gpHelpInstance->ShowTopic("Echo");
-}
-
-
-void tEchoForm::EditForm(wxPanel *panel)
-{
-  Add(wxMakeFormShort(" ",   &num_echos, wxFORM_DEFAULT, new wxList(wxMakeConstraintRange(1.0, 20.0), 0)));
-  Add(wxMakeFormMessage("Number of Echos"));
-  Add(wxMakeFormNewLine());
-  Add(wxMakeFormShort(" ",  &delay, wxFORM_DEFAULT, new wxList(wxMakeConstraintRange(1.0, 100.0), 0)));
-  Add(wxMakeFormMessage("Delay"));
-  Add(wxMakeFormNewLine());
-  Add(wxMakeFormShort(" ", &ampl,   wxFORM_DEFAULT, new wxList(wxMakeConstraintRange(0.0, 100.0), 0)));
-  Add(wxMakeFormMessage("Amplitude"));
-  Add(wxMakeFormNewLine());
-  Add(wxMakeFormBool("Random Delay", &rand));
-  Add(wxMakeFormNewLine());
-
-  AssociatePanel(panel);
-}
-
-void tEchoForm::OnCancel()
-{
-  *ref = 0;
   wxForm::OnCancel();
 }
 
@@ -918,7 +885,6 @@ void tEchoForm::OnOk()
   spl.Set(fs);
   win.Redraw();
   wxEndBusyCursor();
-  *ref = 0;
   wxForm::OnOk();
 }
 
@@ -935,11 +901,10 @@ int tShifterForm::shift_frac   = 0;
 bool tShifterForm::keep_length = 1;
 
 
-tShifterForm::tShifterForm(tSampleWin &w, void **r)
+tShifterForm::tShifterForm(tSampleWin &w)
 : wxForm( USED_WXFORM_BUTTONS ),
   win(w)
 {
-  ref = r;
 }
 
 
@@ -973,7 +938,6 @@ void tShifterForm::EditForm(wxPanel *panel)
 
 void tShifterForm::OnCancel()
 {
-  *ref = 0;
   wxForm::OnCancel();
 }
 
@@ -1023,7 +987,6 @@ void tShifterForm::OnOk()
 
   win.Redraw();
   wxEndBusyCursor();
-  *ref = 0;
   wxForm::OnOk();
 }
 
@@ -1041,11 +1004,10 @@ int tSplFilterForm::band_width          = 20;  // in % of corner freq
 static const char *filter_types[] = { "Low Pass", "High Pass", "Band Pass", "Band Stop", 0 };
 
 
-tSplFilterForm::tSplFilterForm(tSampleWin &w, void **r, bool p)
+tSplFilterForm::tSplFilterForm(tSampleWin &w, bool p)
 : wxForm( USED_WXFORM_BUTTONS ),
   win(w)
 {
-  ref = r;
   painter = p;
 }
 
@@ -1097,7 +1059,6 @@ void tSplFilterForm::EditForm(wxPanel *panel)
 
 void tSplFilterForm::OnCancel()
 {
-  *ref = 0;
   wxForm::OnCancel();
 }
 
@@ -1144,7 +1105,6 @@ void tSplFilterForm::OnOk()
   spl.SetSmooth(fs, fr);
   win.Redraw();
   wxEndBusyCursor();
-  *ref = 0;
   wxForm::OnOk();
 }
 
@@ -1152,8 +1112,8 @@ void tSplFilterForm::OnOk()
 //                        filter painter settings
 // -------------------------------------------------------------------------
 
-tWahSettingsForm::tWahSettingsForm(tSampleWin &win, void **ref, tWahWah &w)
-  : tSplFilterForm(win, ref, TRUE),
+tWahSettingsForm::tWahSettingsForm(tSampleWin &win, tWahWah &w)
+  : tSplFilterForm(win, TRUE),
     wah(w)
 {
   type = (int)wah.filter_type;
@@ -1172,7 +1132,6 @@ void tWahSettingsForm::OnOk()
   wah.hi_freq     = hi_freq;
   wah.order       = 2; // order;
   wah.band_width  = (double)band_width / 100.0;
-  *ref = 0;
   wxForm::OnOk();
 }
 
@@ -1182,12 +1141,11 @@ void tWahSettingsForm::OnOk()
 
 int tSplPitchForm::range = 1;
 
-tSplPitchForm::tSplPitchForm(tSampleWin &w, void **r, tSplPitch &p)
+tSplPitchForm::tSplPitchForm(tSampleWin &w, tSplPitch &p)
 : wxForm( USED_WXFORM_BUTTONS ),
   win(w),
   pitch(p)
 {
-  ref = r;
 }
 
 void tSplPitchForm::EditForm(wxPanel *panel)
@@ -1201,13 +1159,11 @@ void tSplPitchForm::OnOk()
 {
   float frange = pow(FSEMI, range);
   pitch.SetRange(frange);
-  *ref = 0;
   wxForm::OnOk();
 }
 
 void tSplPitchForm::OnCancel()
 {
-  *ref = 0;
   wxForm::OnOk();
 }
 
@@ -1227,11 +1183,10 @@ int tChorusForm::pan_freq      = 20;
 int tChorusForm::pan_spread    = 50;
 int tChorusForm::volume        = 50;
 
-tChorusForm::tChorusForm(tSampleWin &w, void **r)
+tChorusForm::tChorusForm(tSampleWin &w)
 : wxForm( USED_WXFORM_BUTTONS ),
   win(w)
 {
-  ref = r;
 }
 
 void tChorusForm::EditForm(wxPanel *panel)
@@ -1287,13 +1242,11 @@ void tChorusForm::OnOk()
   win.Redraw();
   wxEndBusyCursor();
 
-  *ref = 0;
   wxForm::OnOk();
 }
 
 void tChorusForm::OnCancel()
 {
-  *ref = 0;
   wxForm::OnCancel();
 }
 
@@ -1311,11 +1264,10 @@ void tChorusForm::OnHelp()
 int tStereoForm::delay         = 10;  // millisec
 int tStereoForm::stereo_spread = 50;
 
-tStereoForm::tStereoForm(tSampleWin &w, void **r)
+tStereoForm::tStereoForm(tSampleWin &w)
 : wxForm( USED_WXFORM_BUTTONS ),
   win(w)
 {
-  ref = r;
 }
 
 void tStereoForm::EditForm(wxPanel *panel)
@@ -1347,13 +1299,11 @@ void tStereoForm::OnOk()
   win.Redraw();
   wxEndBusyCursor();
 
-  *ref = 0;
   wxForm::OnOk();
 }
 
 void tStereoForm::OnCancel()
 {
-  *ref = 0;
   wxForm::OnCancel();
 }
 
@@ -1375,12 +1325,11 @@ int tStretcherForm::newspeed    = 0;
 bool tStretcherForm::keep_pitch = 1;
 
 
-tStretcherForm::tStretcherForm(tSampleWin &w, void **r)
+tStretcherForm::tStretcherForm(tSampleWin &w)
 : wxForm( USED_WXFORM_BUTTONS ),
   win(w),
   spl(w.GetSample())
 {
-  ref = r;
 }
 
 
@@ -1428,7 +1377,6 @@ void tStretcherForm::EditForm(wxPanel *panel)
 
 void tStretcherForm::OnCancel()
 {
-  *ref = 0;
   wxForm::OnCancel();
 }
 
@@ -1448,7 +1396,6 @@ void tStretcherForm::OnOk()
 
   win.Redraw();
   wxEndBusyCursor();
-  *ref = 0;
   wxForm::OnOk();
 }
 

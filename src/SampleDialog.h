@@ -52,7 +52,7 @@ class tCommandPainter
 class tEqualizer : public tSliderWin
 {
   public:
-    tEqualizer(tSampleWin &win, wxFrame **ref);
+    tEqualizer(tSampleWin &win);
     virtual ~tEqualizer();
     virtual void AddItems();
     virtual void AddEdits();
@@ -75,7 +75,7 @@ class tEqualizer : public tSliderWin
 class tDistortion : public tSliderWin
 {
   public:
-    tDistortion(tSampleWin &win, wxFrame **ref);
+    tDistortion(tSampleWin &win);
     virtual void AddItems();
     virtual void AddEdits();
 #ifdef OBSOLETE
@@ -103,7 +103,7 @@ class tRhyArrayEdit;
 class tSynthDlg : public tSliderWin
 {
   public:
-    tSynthDlg(tSampleWin &win, wxFrame **ref);
+    tSynthDlg(tSampleWin &win);
     virtual ~tSynthDlg();
     virtual void AddItems();
     virtual void AddEdits();
@@ -153,7 +153,7 @@ class tSynthDlg : public tSliderWin
 class tReverbForm : public tPropertyListDlg
 {
   public:
-    tReverbForm(tSampleWin &win, void **ref);
+    tReverbForm(tSampleWin &win);
     void EditForm(wxPanel *panel);
     void OnOk();
     void OnCancel();
@@ -165,7 +165,6 @@ class tReverbForm : public tPropertyListDlg
     static int rvbtime;
     static int volume;
 
-    void **ref;
     tSampleWin &win;
 };
 
@@ -173,7 +172,7 @@ class tReverbForm : public tPropertyListDlg
 class tEchoForm : public tPropertyListDlg
 {
   public:
-    tEchoForm(tSampleWin &win, void **ref);
+    tEchoForm(tSampleWin &win);
     void EditForm(wxPanel *panel);
     void OnOk();
     void OnCancel();
@@ -183,14 +182,13 @@ class tEchoForm : public tPropertyListDlg
     static int delay;
     static int ampl;
     static bool rand;
-    void **ref;
     tSampleWin &win;
 };
 
 class tShifterForm : public tPropertyListDlg
 {
   public:
-    tShifterForm(tSampleWin &win, void **ref);
+    tShifterForm(tSampleWin &win);
     void EditForm(wxPanel *panel);
     void OnOk();
     void OnCancel();
@@ -200,7 +198,6 @@ class tShifterForm : public tPropertyListDlg
     static int shift_frac;
     static bool keep_length;
     static int winsize;
-    void **ref;
     tSampleWin &win;
 };
 
@@ -208,7 +205,7 @@ class tShifterForm : public tPropertyListDlg
 class tStretcherForm : public tPropertyListDlg
 {
   public:
-    tStretcherForm(tSampleWin &win, void **ref);
+    tStretcherForm(tSampleWin &win);
     void EditForm(wxPanel *panel);
     void OnOk();
     void OnCancel();
@@ -220,7 +217,6 @@ class tStretcherForm : public tPropertyListDlg
     static int oldspeed;
     static int newspeed;
     static bool keep_pitch;
-    void **ref;
     tSampleWin &win;
     tSample    &spl;
 };
@@ -229,7 +225,7 @@ class tStretcherForm : public tPropertyListDlg
 class tSplFilterForm : public tPropertyListDlg
 {
   public:
-    tSplFilterForm(tSampleWin &win, void **ref, bool painter = FALSE);
+    tSplFilterForm(tSampleWin &win, bool painter = FALSE);
     void EditForm(wxPanel *panel);
     void OnOk();
     void OnCancel();
@@ -242,7 +238,6 @@ class tSplFilterForm : public tPropertyListDlg
     static int lo_freq;
     static int hi_freq;
     static int band_width;
-    void **ref;
     tSampleWin &win;
     wxList  typelist;
     char    *typestring;
@@ -254,7 +249,7 @@ class tWahWah;
 class tWahSettingsForm : public tSplFilterForm
 {
   public:
-    tWahSettingsForm(tSampleWin &win, void **ref, tWahWah &wah);
+    tWahSettingsForm(tSampleWin &win, tWahWah &wah);
     void OnOk();
     void OnHelp();
   private:
@@ -265,14 +260,13 @@ class tSplPitch;
 class tSplPitchForm : public tPropertyListDlg
 {
   public:
-    tSplPitchForm(tSampleWin &win, void **ref, tSplPitch &pitch_painter);
+    tSplPitchForm(tSampleWin &win, tSplPitch &pitch_painter);
     void EditForm(wxPanel *panel);
     void OnOk();
     void OnCancel();
     void OnHelp();
   protected:
     static int range;
-    void **ref;
     tSampleWin &win;
     tSplPitch  &pitch;
 };
@@ -281,13 +275,12 @@ class tSplPitchForm : public tPropertyListDlg
 class tChorusForm : public tPropertyListDlg
 {
   public:
-    tChorusForm(tSampleWin &win, void **ref);
+    tChorusForm(tSampleWin &win);
     void EditForm(wxPanel *panel);
     void OnOk();
     void OnCancel();
     void OnHelp();
   private:
-    void **ref;
     tSampleWin &win;
 
     static int pitch_freq;
@@ -301,13 +294,12 @@ class tChorusForm : public tPropertyListDlg
 class tStereoForm : public tPropertyListDlg
 {
   public:
-    tStereoForm(tSampleWin &win, void **ref);
+    tStereoForm(tSampleWin &win);
     void EditForm(wxPanel *panel);
     void OnOk();
     void OnCancel();
     void OnHelp();
   private:
-    void **ref;
     tSampleWin &win;
 
     static int delay;

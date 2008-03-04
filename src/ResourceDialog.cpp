@@ -30,7 +30,8 @@ using namespace std;
  * jppResourceElement
  *****************************************************************************/
 
-jppResourceElement::jppResourceElement() {
+jppResourceElement::jppResourceElement()
+{
   // Set all pointer fields to zero.
   string = 0;
   intptr = 0;
@@ -47,8 +48,10 @@ jppResourceElement::jppResourceElement() {
 
 bool jppResourceDialog::initialized;
 
-void jppResourceDialog::LoadResource(const wxString& xrcfile) {
-  if(!initialized) {
+void jppResourceDialog::LoadResource(const wxString& xrcfile)
+{
+  if (!initialized)
+  {
     wxFileSystem::AddHandler(new wxZipFSHandler);
     wxXmlResource::Get()->InitAllHandlers();
     initialized = true;
@@ -86,7 +89,8 @@ jppResourceDialog::~jppResourceDialog()
   }
 }
 
-void jppResourceDialog::Attach(const wxString& name, wxString *data) {
+void jppResourceDialog::Attach(const wxString& name, wxString *data)
+{
   jppResourceElement *pResourceElement = new jppResourceElement;
   pResourceElement->resource = name;
   pResourceElement->string = data;
@@ -94,7 +98,8 @@ void jppResourceDialog::Attach(const wxString& name, wxString *data) {
   links.push_back(pResourceElement);
 }
 
-void jppResourceDialog::Attach(const wxString& name, bool *data) {
+void jppResourceDialog::Attach(const wxString& name, bool *data)
+{
   jppResourceElement *pResourceElement = new jppResourceElement;
   pResourceElement->resource = name;
   pResourceElement->boolptr = data;
@@ -102,7 +107,8 @@ void jppResourceDialog::Attach(const wxString& name, bool *data) {
   links.push_back(pResourceElement);
 }
 
-void jppResourceDialog::Attach(const wxString& name, long *data) {
+void jppResourceDialog::Attach(const wxString& name, long *data)
+{
   jppResourceElement *pResourceElement = new jppResourceElement;
   pResourceElement->resource = name;
   pResourceElement->longptr = data;
@@ -110,7 +116,8 @@ void jppResourceDialog::Attach(const wxString& name, long *data) {
   links.push_back(pResourceElement);
 }
 
-void jppResourceDialog::Attach(const wxString& name, int *data) {
+void jppResourceDialog::Attach(const wxString& name, int *data)
+{
   jppResourceElement *pResourceElement = new jppResourceElement;
   pResourceElement->resource = name;
   pResourceElement->intptr = data;
@@ -118,7 +125,8 @@ void jppResourceDialog::Attach(const wxString& name, int *data) {
   links.push_back(pResourceElement);
 }
 
-void jppResourceDialog::Attach(const wxString& name, long *data, wxArrayLong a) {
+void jppResourceDialog::Attach(const wxString& name, long *data, wxArrayLong a)
+{
   jppResourceElement *pResourceElement = new jppResourceElement;
   pResourceElement->resource = name;
   pResourceElement->longptr = data;
@@ -126,21 +134,24 @@ void jppResourceDialog::Attach(const wxString& name, long *data, wxArrayLong a) 
   links.push_back(pResourceElement);
 }
 
-void jppResourceDialog::Attach(const wxString& name, long *data, long *a) {
+void jppResourceDialog::Attach(const wxString& name, long *data, long *a)
+{
   wxArrayLong arr;
-  while(*a != -1) {
+  while (*a != -1)
+  {
     arr.Add(*a);
     a++;
   }
   Attach(name, data, arr);
 }
 
-void jppResourceDialog::Attach(const wxString& name, int *data, wxArrayInt a) {
+void jppResourceDialog::Attach(const wxString& name, int *data, wxArrayInt a)
+{
   jppResourceElement *pResourceElement = new jppResourceElement;
   pResourceElement->resource = name;
   pResourceElement->intptr = data;
 
-  for(int i=0; i<a.GetCount(); i++)
+  for (unsigned i = 0; i < a.GetCount(); ++i)
   {
     pResourceElement->longarr.Add(a[i]);
   }
@@ -148,9 +159,11 @@ void jppResourceDialog::Attach(const wxString& name, int *data, wxArrayInt a) {
   links.push_back(pResourceElement);
 }
 
-void jppResourceDialog::Attach(const wxString& name, int *data, int *a) {
+void jppResourceDialog::Attach(const wxString& name, int *data, int *a)
+{
   wxArrayInt arr;
-  while(*a != -1) {
+  while (*a != -1)
+  {
     arr.Add(*a);
     a++;
   }
@@ -158,12 +171,15 @@ void jppResourceDialog::Attach(const wxString& name, int *data, int *a) {
 }
 
 
-int jppResourceDialog::ShowModal() {
+int jppResourceDialog::ShowModal()
+{
 
   // Don't bother with dialogs that don't exist.  An error message will be
   // produced by the system at some point.
-  if(!dialog) return wxID_CANCEL;
-
+  if (!dialog)
+  {
+    return wxID_CANCEL;
+  }
 
   // Iterate through the list of attachments.  If we can't find the resource,
   // let the user know.  Upon finding the resource, attempt to load the
@@ -179,7 +195,7 @@ int jppResourceDialog::ShowModal() {
     wxWindow* win = wxWindow::FindWindowByName(
       pResourceElement->resource, dialog);
 
-    if(!win)
+    if (!win)
     {
       wxMessageBox("Unable to locate widget named:\n"
                    "    " + pResourceElement->resource + "\n"
@@ -213,7 +229,7 @@ int jppResourceDialog::ShowModal() {
         pResourceElement->resource,
         dialog);
 
-      if(!StoreData(pResourceElement, win))
+      if (!StoreData(pResourceElement, win))
       {
         return wxID_CANCEL;
       }
@@ -223,60 +239,78 @@ int jppResourceDialog::ShowModal() {
   return res;
 }
 
-bool jppResourceDialog::LoadData(jppResourceElement *pResourceElement, wxWindow *win) {
+bool jppResourceDialog::LoadData(jppResourceElement *pResourceElement, wxWindow *win)
+{
   bool used = 0;
 
-  if(pResourceElement->string) {
-    if(win->IsKindOf(CLASSINFO(wxTextCtrl))) {
+  if (pResourceElement->string)
+  {
+    if (win->IsKindOf(CLASSINFO(wxTextCtrl)))
+    {
       used = 1;
       ((wxTextCtrl*)win)->SetValue(*pResourceElement->string);
     }
-  } else if(pResourceElement->boolptr) {
-    if(win->IsKindOf(CLASSINFO(wxCheckBox))) {
+  }
+  else if (pResourceElement->boolptr)
+  {
+    if (win->IsKindOf(CLASSINFO(wxCheckBox)))
+    {
       used = 1;
       ((wxCheckBox*)win)->SetValue(*pResourceElement->boolptr);
     }
-  } else if(pResourceElement->longptr || pResourceElement->intptr) {
+  }
+  else if (pResourceElement->longptr || pResourceElement->intptr)
+  {
     long value;
-    if(pResourceElement->longptr) value = *pResourceElement->longptr;
-    if(pResourceElement->intptr) value = *pResourceElement->intptr;
+    if (pResourceElement->longptr) value = *pResourceElement->longptr;
+    if (pResourceElement->intptr) value = *pResourceElement->intptr;
 
-    if(win->IsKindOf(CLASSINFO(wxChoice))) {
+    if (win->IsKindOf(CLASSINFO(wxChoice)))
+    {
       wxChoice *choice = (wxChoice*)win;
-      if(choice->GetCount() != pResourceElement->longarr.GetCount()) {
-        wxMessageBox("Error handling data for this widget:\n"
-                     "    dialog = " + dialogName + "\n"
-                     "    control = " + pResourceElement->resource + "\n"
-                     "Length mismatch with translation array.",
-                     "Error Loading Data",
-                     wxOK | wxICON_ERROR);
-      } else {
-        int i;
-        for(i=0; i<pResourceElement->longarr.GetCount(); i++) {
-          if(value == pResourceElement->longarr[i]) break;
+      if (choice->GetCount() != pResourceElement->longarr.GetCount())
+      {
+        wxMessageBox(
+          "Error handling data for this widget:\n"
+          "    dialog = " + dialogName + "\n"
+          "    control = " + pResourceElement->resource + "\n"
+          "Length mismatch with translation array.",
+          "Error Loading Data",
+          wxOK | wxICON_ERROR);
+      }
+      else
+      {
+        unsigned i;
+        for (i = 0; i < pResourceElement->longarr.GetCount(); ++i)
+        {
+          if (value == pResourceElement->longarr[i]) break;
         }
         
-        if(i == pResourceElement->longarr.GetCount()) {
+        if (i == pResourceElement->longarr.GetCount())
+        {
           // We couldn't find the value in the list.
-          wxMessageBox("Error handling data for this widget:\n"
-                       "    dialog = " + dialogName + "\n"
-                       "    control = " + pResourceElement->resource + "\n"
-                       "Initial value not found in translation array.",
-                       "Error Loading Data",
-                       wxOK | wxICON_ERROR);
+          wxMessageBox(
+            "Error handling data for this widget:\n"
+            "    dialog = " + dialogName + "\n"
+            "    control = " + pResourceElement->resource + "\n"
+            "Initial value not found in translation array.",
+            "Error Loading Data",
+            wxOK | wxICON_ERROR);
           return false;
         }
 
         choice->SetSelection(i);
         used = 1;
       }
-    } else if(win->IsKindOf(CLASSINFO(wxSlider))) {
+    } else if (win->IsKindOf(CLASSINFO(wxSlider)))
+    {
       used = 1;
       ((wxSlider*)win)->SetValue((int)value);
     }
   }
   
-  if(!used) {
+  if (!used)
+  {
     wxMessageBox("Unable to locate a mapping for this widget:\n"
                  "    dialog = " + dialogName + "\n"
                  "    widget = " + pResourceElement->resource,
@@ -287,46 +321,68 @@ bool jppResourceDialog::LoadData(jppResourceElement *pResourceElement, wxWindow 
   return used;
 }
 
-bool jppResourceDialog::StoreData(jppResourceElement *pResourceElement, wxWindow *win) {
+bool jppResourceDialog::StoreData(
+  jppResourceElement *pResourceElement,
+  wxWindow *win)
+{
   // We don't need to do as much error checking here.  Most of that will have
   // been done in LoadData before things have had opportunity to modify
   // themselves.
 
-  if(pResourceElement->string) {
-    if(win->IsKindOf(CLASSINFO(wxTextCtrl))) {
+  if (pResourceElement->string)
+  {
+    if (win->IsKindOf(CLASSINFO(wxTextCtrl)))
+    {
       *(pResourceElement->string) = ((wxTextCtrl*)win)->GetValue();
     }
-  } else if(pResourceElement->boolptr) {
-    if(win->IsKindOf(CLASSINFO(wxCheckBox))) {
+  }
+  else if (pResourceElement->boolptr)
+  {
+    if (win->IsKindOf(CLASSINFO(wxCheckBox)))
+    {
       *(pResourceElement->boolptr) = ((wxCheckBox*)win)->GetValue();
     }
-  } else if(pResourceElement->longptr || pResourceElement->intptr) {
-    if(win->IsKindOf(CLASSINFO(wxChoice))) {
+  }
+  else if (pResourceElement->longptr || pResourceElement->intptr)
+  {
+    if (win->IsKindOf(CLASSINFO(wxChoice)))
+    {
       int sel = ((wxChoice*)win)->GetSelection();
 
-      if(sel < 0 || sel >= pResourceElement->longarr.GetCount()) {
-        wxMessageBox("Error handling data for this widget:\n"
-                     "    dialog = " + dialogName + "\n"
-                     "    control = " + pResourceElement->resource + "\n"
-                     "Selection value out of range.",
-                     "Error Loading Data",
-                     wxOK | wxICON_ERROR);
+      if (sel < 0 || sel >= (int)pResourceElement->longarr.GetCount())
+      {
+        wxMessageBox(
+          "Error handling data for this widget:\n"
+          "    dialog = " + dialogName + "\n"
+          "    control = " + pResourceElement->resource + "\n"
+          "Selection value out of range.",
+          "Error Loading Data",
+          wxOK | wxICON_ERROR);
         return false;
       }
 
-      if(pResourceElement->longptr)
+      if (pResourceElement->longptr)
+      {
         *(pResourceElement->longptr) = pResourceElement->longarr[sel];
-      if(pResourceElement->intptr)
+      }
+      if (pResourceElement->intptr)
+      {
         *(pResourceElement->intptr) = (int)pResourceElement->longarr[sel];
+      }
 
-    } else if(win->IsKindOf(CLASSINFO(wxSlider))) {
-
+    }
+    else if (win->IsKindOf(CLASSINFO(wxSlider)))
+    {
       int value = ((wxSlider*)win)->GetValue();
 
-      if(pResourceElement->longptr)
+      if (pResourceElement->longptr)
+      {
         *(pResourceElement->longptr) = value;
-      if(pResourceElement->intptr)
+      }
+      if (pResourceElement->intptr)
+      {
         *(pResourceElement->intptr) = value;
+      }
     }
   }
 

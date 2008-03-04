@@ -299,8 +299,9 @@ class tSigSynth
   public:
 
     tSigSynth(long sr, int ch)
-      : sampling_rate(sr),
+      : generators(),
         channels(ch),
+        sampling_rate(sr),
         current(0)
     {
     }
@@ -797,6 +798,9 @@ class tSigDelay : public tSignalModifier
 class tOpFilter
 {
   public:
+    virtual ~tOpFilter()
+    {
+    }
     virtual void Setup(float sr, float hp, float dummy) = 0;
     virtual float Loop(float sig) = 0;
 };
@@ -804,7 +808,13 @@ class tOpFilter
 class tOpLowpass : public tOpFilter
 {
   public:
-    tOpLowpass() { y1 = 0; }
+    tOpLowpass()
+    {
+      y1 = 0;
+    }
+    virtual ~tOpLowpass()
+    {
+    }
     virtual void Setup(float sr, float hp, float dummy)
     {
       double b = 2.0 - cos(hp * 2.0 * PI / sr);
@@ -823,7 +833,13 @@ class tOpLowpass : public tOpFilter
 class tOpHighpass : public tOpFilter
 {
   public:
-    tOpHighpass() { y1 = 0; }
+    tOpHighpass()
+    {
+      y1 = 0;
+    }
+    virtual ~tOpHighpass()
+    {
+    }
     virtual void Setup(float sr, float hp, float dummy) {
       double b = 2.0 - cos(hp * 2.0 * PI / sr);
       c2 = b - sqrt(b * b - 1.0);
@@ -841,7 +857,13 @@ class tOpHighpass : public tOpFilter
 class tOpBandpass : public tOpFilter
 {
   public:
-    tOpBandpass() { y1 = y2 = 0; }
+    tOpBandpass()
+    {
+      y1 = y2 = 0;
+    }
+    virtual ~tOpBandpass()
+    {
+    }
     // bw = Hz = upper - lower half power point
     virtual void Setup(float sr, float cf, float bw)
     {
@@ -864,7 +886,13 @@ class tOpBandpass : public tOpFilter
 class tOpBandstop : public tOpFilter
 {
   public:
-    tOpBandstop() { y1 = y2 = 0; }
+    tOpBandstop()
+    {
+      y1 = y2 = 0;
+    }
+    virtual ~tOpBandstop()
+    {
+    }
     virtual void Setup(float sr, float cf, float bw)
     {
       double cosf = cos(cf * 2.0 * PI / sr);

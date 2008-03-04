@@ -483,14 +483,14 @@ void tRhythm::Generate(tTrack *track, JZBarInfo &bi, tRhythm *rhy[], int n_rhy)
 #define MEN_DOWN  9
 
 
-#include "Bitmaps/open.xpm"
-#include "Bitmaps/save.xpm"
-#include "Bitmaps/rrgadd.xpm"
-#include "Bitmaps/rrgdel.xpm"
-#include "Bitmaps/rrgup.xpm"
-#include "Bitmaps/rrgdown.xpm"
-#include "Bitmaps/rrggen.xpm"
-#include "Bitmaps/help.xpm"
+//#include "Bitmaps/open.xpm"
+//#include "Bitmaps/save.xpm"
+//#include "Bitmaps/rrgadd.xpm"
+//#include "Bitmaps/rrgdel.xpm"
+//#include "Bitmaps/rrgup.xpm"
+//#include "Bitmaps/rrgdown.xpm"
+//#include "Bitmaps/rrggen.xpm"
+//#include "Bitmaps/help.xpm"
 
 tRhythmWin::tRhythmWin(JZEventFrame *e, JZSong *s)
   : wxFrame(

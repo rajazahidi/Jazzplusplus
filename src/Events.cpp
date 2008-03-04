@@ -52,7 +52,7 @@ int tReadBase::Open(const char* pFileName)
     if (fd == NULL)
     {
       ostringstream Oss;
-      Oss << "Error opening file ", pFileName;
+      Oss << "Error opening file " << pFileName;
       Error(Oss.str());
       return 0;
     }

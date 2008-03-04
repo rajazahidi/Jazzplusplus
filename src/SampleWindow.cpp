@@ -414,7 +414,7 @@ int tSampleCnvs::Sample2Pixel(int sample)
   int cw, ch;
   GetClientSize(&cw, &ch);
   JZMapper Map(offs, offs + length, 0, cw);
-  return Map.XToY(sample);
+  return static_cast<int>(Map.XToY(sample));
 }
 
 
@@ -425,7 +425,7 @@ int tSampleCnvs::Pixel2Sample(float pixel)
   int cw, ch;
   GetClientSize(&cw, &ch);
   JZMapper Map(0, cw, offs, offs + length);
-  int ofs = Map.XToY(pixel);
+  int ofs = static_cast<int>(Map.XToY(pixel));
   return spl.Align(ofs);
 }
 
@@ -497,12 +497,12 @@ void tSampleCnvs::DrawTicks(int x, int y, int w)
       for (int mil = 0; mil < 1000; mil += 100)
       {
         int t = spl->Time2Samples(sec * 1000 + mil);
-        int xx = Map.XToY(t);
+        int xx = static_cast<int>(Map.XToY(t));
         // draw a tickmark line
         dc->DrawLine(xx, y - 5, xx, y);
         // draw a text
         char buf[50];
-        sprintf(buf, "%ld.%ld", sec, mil/100);
+        sprintf(buf, "%d.%d", sec, mil/100);
         int fw, fh;
         dc->GetTextExtent(buf, &fw, &fh);
         dc->DrawText(buf, xx - fw/2, y + 2);
@@ -512,8 +512,8 @@ void tSampleCnvs::DrawTicks(int x, int y, int w)
   else
   {
     // Display midi counts.
-    int cfr = spl->Samples2Ticks(sfr);
-    int cto = spl->Samples2Ticks(sto);
+    int cfr = static_cast<int>(spl->Samples2Ticks(sfr));
+    int cto = static_cast<int>(spl->Samples2Ticks(sto));
     JZMapper Map(cfr, cto, x, x+w);
     JZBarInfo bi(gpSong);
     bi.SetClock(cfr);
@@ -526,7 +526,7 @@ void tSampleCnvs::DrawTicks(int x, int y, int w)
       {
         for (int j = 0; j < 4; j++) {
           int clock = bi.Clock + i * ticks_per_count + j * ticks_per_step;
-          int xx = Map.XToY(clock);
+          int xx = static_cast<int>(Map.XToY(clock));
           // draw a tickmark line
           dc->DrawLine(xx, y - 5, xx, y);
           // draw a text
@@ -575,9 +575,10 @@ void tSampleCnvs::DrawSample(int channel, int x, int y, int w, int h)
   int x1 = x;
   for (int n = xfr; n < xto; n += step)
   {
-    int x2 = XMap.XToY(n);
+    int x2 = static_cast<int>(XMap.XToY(n));
     short sy = data[n];
-    if (x1 != x2) {
+    if (x1 != x2)
+    {
       // new x-coordinate
 
       short y1min, y1max;
@@ -591,16 +592,17 @@ void tSampleCnvs::DrawSample(int channel, int x, int y, int w, int h)
       else
         y1min = ymin;
 
-      float y1 = (float)YMap.XToY(y1min);
-      float y2 = (float)YMap.XToY(y1max);
-      dc->DrawLine((float)x1, y1, (float)x1, y2);
+      int y1 = static_cast<int>(YMap.XToY(y1min));
+      int y2 = static_cast<int>(YMap.XToY(y1max));
+      dc->DrawLine(x1, y1, x1, y2);
       prev_ymin = ymin;
       prev_ymax = ymax;
       ymin = sy;
       ymax = sy;
       x1   = x2;
     }
-    else {
+    else
+    {
       if (sy > ymax)
         ymax = sy;
       else if (sy < ymin)
@@ -1346,7 +1348,7 @@ int tSampleWin::GetPaintLength()
   // return the visible amount of sample data
   double sb = zoom_scrol->GetThumbPosition();
   JZMapper Map(0, 1000, spl.GetLength(), 0);
-  int len = Map.XToY(sb);
+  int len = static_cast<int>(Map.XToY(sb));
   return spl.Align(len);
 }
 
@@ -1356,7 +1358,7 @@ int tSampleWin::GetPaintOffset()
   // return the visible Offset in sample data
   double sb = pos_scrol->GetThumbPosition();
   JZMapper Map(0, 1000, 0, spl.GetLength());
-  int ofs = Map.XToY(sb);
+  int ofs = static_cast<int>(Map.XToY(sb));
   return spl.Align(ofs);
 }
 

@@ -371,7 +371,6 @@ double tShifterCmd::rotate(float p[], int n_args, tFloatSample &sinp, tFloatSamp
   float pcpart;
   float *wintable;
   int wlen;
-  extern int resetval;
 
   sinp.SetNote(p[0], p[2]);
   nsamps = sout.SetNote(p[1], p[2]);
@@ -438,7 +437,6 @@ void tSplEqualizer::Prepare()
 
   tSplFilter::Type type;
   double sr = (double)sampling_rate;
-  int order = 2;
 
   // first one is lowpass/highpass
   type = array[0] > 0 ? tSplFilter::LOWPASS : tSplFilter::HIGHPASS;

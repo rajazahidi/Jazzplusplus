@@ -149,7 +149,12 @@ void JZSong::Clock2String(int clk, char *buf)
   clk -= b.Clock;
   int TicksPerCount = b.TicksPerBar / b.CountsPerBar;
   int Count = clk / TicksPerCount;
-  sprintf(buf, "%3d:%d:%03ld", b.BarNr + 1 - intro_length, Count + 1, clk % TicksPerCount);
+  sprintf(
+    buf,
+    "%3d:%d:%03d",
+    b.BarNr + 1 - intro_length,
+    Count + 1,
+    clk % TicksPerCount);
 }
 
 int JZSong::String2Clock(const char *buf)
@@ -157,7 +162,7 @@ int JZSong::String2Clock(const char *buf)
   int bar = 1;
   int clk = 0;
   int  cnt = 1;
-  sscanf(buf, "%d:%d:%ld", &bar, &cnt, &clk);
+  sscanf(buf, "%d:%d:%d", &bar, &cnt, &clk);
   -- bar;
   -- cnt;
   bar += intro_length;  // buf is from user input!

@@ -631,7 +631,7 @@ void tSample::Transpose(float f)
 int tSample::Seconds2Samples(float time)
 {
   JZMapper Map(0.0, 1.0, 0.0, (double)set.speed * set.channels);
-  return Map.XToY(time);
+  return static_cast<int>(Map.XToY(time));
 }
 
 float tSample::Samples2Seconds(int samples)
@@ -920,7 +920,7 @@ tFloatSample::LineSegments(int size, int nargs, float pval[])
 int tFloatSample::Seconds2Samples(float time)
 {
   JZMapper Map(0.0, 1.0, 0.0, (double)sampling_rate * channels);
-  return Map.XToY(time);
+  return static_cast<int>(Map.XToY(time));
 }
 
 float tFloatSample::Samples2Seconds(int samples)

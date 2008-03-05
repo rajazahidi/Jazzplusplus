@@ -46,7 +46,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(EXT_PKGS)\wxMSW-2.8.7-VC8\lib\vc_lib\mswd&quot;;&quot;$(EXT_PKGS)\wxMSW-2.8.7-VC8\include&quot;;..\..\src;..\..\src\mswin"
+				AdditionalIncludeDirectories="&quot;$(EXT_PKGS)\wxMSW-2.8.7-VC8\lib\vc_lib\mswd&quot;;&quot;$(EXT_PKGS)\wxMSW-2.8.7-VC8\include&quot;;..\src;..\src\mswin"
 				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;WINVER=0x0400;STRICT;NOMINMAX;__WXDEBUG__;WXDEBUG=1"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -69,7 +69,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="$(EXT_PKGS)\wxMSW-2.8.6-VC8\include"
+				AdditionalIncludeDirectories="$(EXT_PKGS)\wxMSW-2.8.7-VC8\include"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -146,7 +146,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="3"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="&quot;$(EXT_PKGS)\wxMSW-2.8.6-VC8\lib\vc_lib\msw&quot;;&quot;$(EXT_PKGS)\wxMSW-2.8.6-VC8\include&quot;;..\..\src;..\..\src\mswin"
+				AdditionalIncludeDirectories="&quot;$(EXT_PKGS)\wxMSW-2.8.7-VC8\lib\vc_lib\msw&quot;;&quot;$(EXT_PKGS)\wxMSW-2.8.7-VC8\include&quot;;..\src;..\src\mswin"
 				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;WINVER=0x0400;STRICT;NOMINMAX"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -170,7 +170,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="$(EXT_PKGS)\wxMSW-2.8.6-VC8\include"
+				AdditionalIncludeDirectories="$(EXT_PKGS)\wxMSW-2.8.7-VC8\include"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -181,7 +181,7 @@
 				OutputFile=".\$(OutDir)\JazzPlusPlus.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="&quot;$(EXT_PKGS)\wxMSW-2.8.6-VC8\lib\vc_lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(EXT_PKGS)\wxMSW-2.8.7-VC8\lib\vc_lib&quot;"
 				IgnoreDefaultLibraryNames=""
 				ProgramDatabaseFile=".\$(OutDir)\JazzPlusPlus.pdb"
 				SubSystem="2"
@@ -221,575 +221,575 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath="..\..\src\AboutDialog.cpp"
+				RelativePath="..\src\AboutDialog.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\AboutDialog.h"
+				RelativePath="..\src\AboutDialog.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Audio.cpp"
+				RelativePath="..\src\Audio.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Audio.h"
+				RelativePath="..\src\Audio.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\ClockDialog.cpp"
+				RelativePath="..\src\ClockDialog.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\ClockDialog.h"
+				RelativePath="..\src\ClockDialog.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Command.cpp"
+				RelativePath="..\src\Command.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Command.h"
+				RelativePath="..\src\Command.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Configuration.cpp"
+				RelativePath="..\src\Configuration.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Configuration.h"
+				RelativePath="..\src\Configuration.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\ControlEdit.cpp"
+				RelativePath="..\src\ControlEdit.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\ControlEdit.h"
+				RelativePath="..\src\ControlEdit.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\DeprecatedStringUtils.cpp"
+				RelativePath="..\src\DeprecatedStringUtils.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\DeprecatedStringUtils.h"
+				RelativePath="..\src\DeprecatedStringUtils.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Dialogs.cpp"
+				RelativePath="..\src\Dialogs.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Dialogs.h"
+				RelativePath="..\src\Dialogs.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\DynamicArray.cpp"
+				RelativePath="..\src\DynamicArray.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\DynamicArray.h"
+				RelativePath="..\src\DynamicArray.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\ErrorMessage.cpp"
+				RelativePath="..\src\ErrorMessage.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\ErrorMessage.h"
+				RelativePath="..\src\ErrorMessage.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Events.cpp"
+				RelativePath="..\src\Events.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Events.h"
+				RelativePath="..\src\Events.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\EventWindow.cpp"
+				RelativePath="..\src\EventWindow.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\EventWindow.h"
+				RelativePath="..\src\EventWindow.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\FileSelector.cpp"
+				RelativePath="..\src\FileSelector.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\FileSelector.h"
+				RelativePath="..\src\FileSelector.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Filter.cpp"
+				RelativePath="..\src\Filter.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Filter.h"
+				RelativePath="..\src\Filter.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\FindFile.cpp"
+				RelativePath="..\src\FindFile.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\FindFile.h"
+				RelativePath="..\src\FindFile.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\FrequencyTable.cpp"
+				RelativePath="..\src\FrequencyTable.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\FrequencyTable.h"
+				RelativePath="..\src\FrequencyTable.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\GetOptionIndex.cpp"
+				RelativePath="..\src\GetOptionIndex.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\GetOptionIndex.h"
+				RelativePath="..\src\GetOptionIndex.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Globals.cpp"
+				RelativePath="..\src\Globals.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Globals.h"
+				RelativePath="..\src\Globals.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\GuitarFrame.cpp"
+				RelativePath="..\src\GuitarFrame.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\GuitarFrame.h"
+				RelativePath="..\src\GuitarFrame.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\GuitarSettings.cpp"
+				RelativePath="..\src\GuitarSettings.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\GuitarSettings.h"
+				RelativePath="..\src\GuitarSettings.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\GuitarSettingsDialog.cpp"
+				RelativePath="..\src\GuitarSettingsDialog.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\GuitarSettingsDialog.h"
+				RelativePath="..\src\GuitarSettingsDialog.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\GuitarWindow.cpp"
+				RelativePath="..\src\GuitarWindow.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\GuitarWindow.h"
+				RelativePath="..\src\GuitarWindow.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Harmony.cpp"
+				RelativePath="..\src\Harmony.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Harmony.h"
+				RelativePath="..\src\Harmony.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\HarmonyBrowserAnalyzer.cpp"
+				RelativePath="..\src\HarmonyBrowserAnalyzer.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\HarmonyBrowserAnalyzer.h"
+				RelativePath="..\src\HarmonyBrowserAnalyzer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\HarmonyP.cpp"
+				RelativePath="..\src\HarmonyP.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\HarmonyP.h"
+				RelativePath="..\src\HarmonyP.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Help.cpp"
+				RelativePath="..\src\Help.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Help.h"
+				RelativePath="..\src\Help.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\JazzPlusPlusApplication.cpp"
+				RelativePath="..\src\JazzPlusPlusApplication.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\JazzPlusPlusApplication.h"
+				RelativePath="..\src\JazzPlusPlusApplication.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\KeyDialog.cpp"
+				RelativePath="..\src\KeyDialog.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\KeyDialog.h"
+				RelativePath="..\src\KeyDialog.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\KeyStringConverters.cpp"
+				RelativePath="..\src\KeyStringConverters.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\KeyStringConverters.h"
+				RelativePath="..\src\KeyStringConverters.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Mapper.cpp"
+				RelativePath="..\src\Mapper.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Mapper.h"
+				RelativePath="..\src\Mapper.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\MeasureChoice.cpp"
+				RelativePath="..\src\MeasureChoice.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\MeasureChoice.h"
+				RelativePath="..\src\MeasureChoice.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Metronome.cpp"
+				RelativePath="..\src\Metronome.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Metronome.h"
+				RelativePath="..\src\Metronome.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\MidiDeviceDialog.cpp"
+				RelativePath="..\src\MidiDeviceDialog.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\MidiDeviceDialog.h"
+				RelativePath="..\src\MidiDeviceDialog.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\MouseAction.cpp"
+				RelativePath="..\src\MouseAction.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\MouseAction.h"
+				RelativePath="..\src\MouseAction.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\NamedChoice.cpp"
+				RelativePath="..\src\NamedChoice.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\NamedChoice.h"
+				RelativePath="..\src\NamedChoice.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\NamedValue.cpp"
+				RelativePath="..\src\NamedValue.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\NamedValue.h"
+				RelativePath="..\src\NamedValue.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\NamedValueChoice.cpp"
+				RelativePath="..\src\NamedValueChoice.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\NamedValueChoice.h"
+				RelativePath="..\src\NamedValueChoice.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\PianoFrame.cpp"
+				RelativePath="..\src\PianoFrame.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\PianoFrame.h"
+				RelativePath="..\src\PianoFrame.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\PianoWindow.cpp"
+				RelativePath="..\src\PianoWindow.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\PianoWindow.h"
+				RelativePath="..\src\PianoWindow.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Player.cpp"
+				RelativePath="..\src\Player.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Player.h"
+				RelativePath="..\src\Player.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Project.cpp"
+				RelativePath="..\src\Project.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Project.h"
+				RelativePath="..\src\Project.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\DeprecatedWx\prop.cpp"
+				RelativePath="..\src\DeprecatedWx\prop.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\DeprecatedWx\prop.h"
+				RelativePath="..\src\DeprecatedWx\prop.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\PropertyListDialog.cpp"
+				RelativePath="..\src\PropertyListDialog.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\PropertyListDialog.h"
+				RelativePath="..\src\PropertyListDialog.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\DeprecatedWx\propform.cpp"
+				RelativePath="..\src\DeprecatedWx\propform.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\DeprecatedWx\propform.h"
+				RelativePath="..\src\DeprecatedWx\propform.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\DeprecatedWx\proplist.cpp"
+				RelativePath="..\src\DeprecatedWx\proplist.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\DeprecatedWx\proplist.h"
+				RelativePath="..\src\DeprecatedWx\proplist.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Random.cpp"
+				RelativePath="..\src\Random.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Random.h"
+				RelativePath="..\src\Random.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\RecordingInfo.cpp"
+				RelativePath="..\src\RecordingInfo.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\RecordingInfo.h"
+				RelativePath="..\src\RecordingInfo.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Rectangle.cpp"
+				RelativePath="..\src\Rectangle.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Rectangle.h"
+				RelativePath="..\src\Rectangle.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\ResourceDialog.cpp"
+				RelativePath="..\src\ResourceDialog.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\ResourceDialog.h"
+				RelativePath="..\src\ResourceDialog.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Resources.h"
+				RelativePath="..\src\Resources.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Rhythm.cpp"
+				RelativePath="..\src\Rhythm.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Rhythm.h"
+				RelativePath="..\src\Rhythm.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Sample.cpp"
+				RelativePath="..\src\Sample.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Sample.h"
+				RelativePath="..\src\Sample.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\SampleCommand.cpp"
+				RelativePath="..\src\SampleCommand.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\SampleCommand.h"
+				RelativePath="..\src\SampleCommand.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\SampleDialog.cpp"
+				RelativePath="..\src\SampleDialog.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\SampleDialog.h"
+				RelativePath="..\src\SampleDialog.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\SampleWindow.cpp"
+				RelativePath="..\src\SampleWindow.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\SampleWindow.h"
+				RelativePath="..\src\SampleWindow.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\SelectControllerDialog.cpp"
+				RelativePath="..\src\SelectControllerDialog.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\SelectControllerDialog.h"
+				RelativePath="..\src\SelectControllerDialog.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\DeprecatedWx\setup.h"
+				RelativePath="..\src\DeprecatedWx\setup.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Signal2.cpp"
+				RelativePath="..\src\Signal2.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Signal2.h"
+				RelativePath="..\src\Signal2.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\SliderWindow.cpp"
+				RelativePath="..\src\SliderWindow.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\SliderWindow.h"
+				RelativePath="..\src\SliderWindow.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Song.cpp"
+				RelativePath="..\src\Song.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Song.h"
+				RelativePath="..\src\Song.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\StandardFile.cpp"
+				RelativePath="..\src\StandardFile.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\StandardFile.h"
+				RelativePath="..\src\StandardFile.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\StringReadWrite.cpp"
+				RelativePath="..\src\StringReadWrite.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\StringReadWrite.h"
+				RelativePath="..\src\StringReadWrite.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Synth.cpp"
+				RelativePath="..\src\Synth.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Synth.h"
+				RelativePath="..\src\Synth.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\SynthesizerSettingsDialog.cpp"
+				RelativePath="..\src\SynthesizerSettingsDialog.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\SynthesizerSettingsDialog.h"
+				RelativePath="..\src\SynthesizerSettingsDialog.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\ToolBar.cpp"
+				RelativePath="..\src\ToolBar.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\ToolBar.h"
+				RelativePath="..\src\ToolBar.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Track.cpp"
+				RelativePath="..\src\Track.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Track.h"
+				RelativePath="..\src\Track.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\TrackFrame.cpp"
+				RelativePath="..\src\TrackFrame.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\TrackFrame.h"
+				RelativePath="..\src\TrackFrame.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\TrackWindow.cpp"
+				RelativePath="..\src\TrackWindow.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\TrackWindow.h"
+				RelativePath="..\src\TrackWindow.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\mswin\WindowsAudioInterface.cpp"
+				RelativePath="..\src\mswin\WindowsAudioInterface.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\mswin\WindowsAudioInterface.h"
+				RelativePath="..\src\mswin\WindowsAudioInterface.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\mswin\WindowsConsole.cpp"
+				RelativePath="..\src\mswin\WindowsConsole.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\mswin\WindowsConsole.h"
+				RelativePath="..\src\mswin\WindowsConsole.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\mswin\WindowsMidiInterface.cpp"
+				RelativePath="..\src\mswin\WindowsMidiInterface.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\mswin\WindowsMidiInterface.h"
+				RelativePath="..\src\mswin\WindowsMidiInterface.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\mswin\WindowsPlayer.cpp"
+				RelativePath="..\src\mswin\WindowsPlayer.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\mswin\WindowsPlayer.h"
+				RelativePath="..\src\mswin\WindowsPlayer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\WxWidgets.h"
+				RelativePath="..\src\WxWidgets.h"
 				>
 			</File>
 		</Filter>
@@ -798,7 +798,7 @@
 			Filter="*.tex"
 			>
 			<File
-				RelativePath="..\..\doc\jazz.tex"
+				RelativePath="..\doc\jazz.tex"
 				>
 			</File>
 		</Filter>

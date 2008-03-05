@@ -1309,7 +1309,7 @@ void JZPianoFrame::OnPaintSub(wxDC* dc, int x, int y)
       sbrush.SetColour(230,255,230);
 #endif
 
-      //dc->SetClippingRegion(xEvents, yEvents, xEvents + wEvents, yEvents + hEvents);
+      //dc->SetClippingRegion(xEvents, yEvents, wEvents, hEvents);
       dc->SetLogicalFunction(wxXOR);
       dc->SetPen(*wxTRANSPARENT_PEN);
 
@@ -1602,7 +1602,7 @@ void JZPianoFrame::DrawEvent(wxDC* dc, JZEvent* pEvent, const wxBrush* Brush, in
 
 void JZPianoFrame::DrawEvents(wxDC* dc, tTrack *t, int Stat, const wxBrush* Brush, int force_color)
 {
-  //dc->SetClippingRegion(xEvents, yEvents, xEvents + wEvents, yEvents + hEvents);
+  //dc->SetClippingRegion(xEvents, yEvents, wEvents, hEvents);
   dc->SetBrush(*Brush);
 
   tEventIterator Iterator(t);

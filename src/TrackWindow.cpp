@@ -163,11 +163,11 @@ void JZTrackWindow::Create()
   wLeft = wNumber + wName + wState + wPatch + 1;
 
   cout
-    << " " << wNumber
-    << " " << wName
-    << " " << wState
-    << " " << wPatch
-    << " " << wLeft
+    << ' ' << wNumber
+    << ' ' << wName
+    << ' ' << wState
+    << ' ' << wPatch
+    << ' ' << wLeft
     << endl;
 
   UnMark();
@@ -386,11 +386,11 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
   }
 
   // For each track show the num, name, state, prg.
-  Dc.SetClippingRegion(
-    mCanvasX,
-    yEvents,
-    mCanvasX + mCanvasWidth,
-    yEvents + hEvents);
+//OLD  Dc.SetClippingRegion(
+//OLD    mCanvasX,
+//OLD    yEvents,
+//OLD    mCanvasWidth,
+//OLD    hEvents);
 
   int TrackNumber = mFromLine;
 
@@ -405,8 +405,14 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
     tTrack* pTrack = gpProject->GetTrack(TrackNumber);
     if (pTrack)
     {
+      Dc.SetClippingRegion(
+        xName,
+        yEvents,
+        wName + wState,
+        hEvents);
+
       // TrackName, show the button pressed when dialog is open
-      //Dc.DrawText(pTrack->GetName(), xName + mLittleBit, y + mLittleBit);
+//      Dc.DrawText(pTrack->GetName(), xName + mLittleBit, y + mLittleBit);
       if (pTrack->DialogBox)
       {
         LineText(Dc, xName, y, wName, pTrack->GetName(), -1, true);
@@ -417,12 +423,13 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
       }
 
       // TrackStatus
-      //Dc.DrawText(pTrack->GetStateChar(), xState + mLittleBit, y + mLittleBit);
+//      Dc.DrawText(pTrack->GetStateChar(), xState + mLittleBit, y + mLittleBit);
       LineText(Dc, xState, y, wState, pTrack->GetStateChar());
+      Dc.DestroyClippingRegion();
     }
     ++TrackNumber;
   }
-  Dc.DestroyClippingRegion();
+//OLD  Dc.DestroyClippingRegion();
 
   DrawNumbers(Dc);
   DrawSpeed(Dc);
@@ -453,7 +460,7 @@ void JZTrackWindow::DrawNumbers(wxDC& Dc)
   const char* pString = NumberStr();
   LineText(Dc, xNumber, mCanvasY - 1, wNumber, pString, hTop);
 
-  Dc.SetClippingRegion(xNumber, yEvents, xNumber + wNumber, yEvents + hEvents);
+  Dc.SetClippingRegion(xNumber, yEvents, wNumber, hEvents);
   for (int i = mFromLine; i < mToLine; ++i)
   {
     tTrack* pTrack = gpProject->GetTrack(i);
@@ -598,7 +605,7 @@ void JZTrackWindow::DrawCounters(wxDC& Dc)
   const char* pString = CounterStr();
   LineText(Dc, xPatch, mCanvasY - 1, wPatch, pString, hTop);
 
-  Dc.SetClippingRegion(xPatch, yEvents, xPatch + wPatch, yEvents + hEvents);
+  Dc.SetClippingRegion(xPatch, yEvents, wPatch, hEvents);
   for (i = mFromLine; i < mToLine; i++)
   {
     tTrack* pTrack = gpProject->GetTrack(i);
@@ -967,7 +974,6 @@ void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
         break;
 
       case ePlayButton:
-        cout << "JZTrackFrame::PlayButton" << endl;
         gpProject->SetLoop(false);
         gpProject->SetRecord(false);
         break;
@@ -1048,14 +1054,11 @@ void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
     }
 
     // GO!
-    cout << "Go!" << endl;
 
     //if (pRecInfo->Track)  // recording?
       //gpProject->Midi->SetRecordInfo(pRecInfo);
     //else
       //gpProject->Midi->SetRecordInfo(0);
-
-    cout << "Midi->StartPlay" << endl;
 
     gpProject->mStartTime = mPreviousClock;
     gpProject->mStopTime = loop_clock;

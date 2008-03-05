@@ -258,7 +258,7 @@ void tSelection::Draw(wxDC& Dc, int x, int y, int w, int h)
 {
 //   if (Selected)
 //   {
-    Dc.SetClippingRegion(x, y, x+w, y+h);
+    Dc.SetClippingRegion(x, y, w, h);
     Draw(Dc);
     Dc.DestroyClippingRegion();
     //  }

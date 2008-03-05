@@ -386,21 +386,22 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
   }
 
   // For each track show the num, name, state, prg.
-//OLD  Dc.SetClippingRegion(
-//OLD    mCanvasX,
-//OLD    yEvents,
-//OLD    mCanvasWidth,
-//OLD    hEvents);
-
   int TrackNumber = mFromLine;
 
   for (int y = Line2y(TrackNumber); y < yEvents + hEvents; y += hLine)
   {
-    // SN+    Dc.HLine(y);
+    Dc.SetClippingRegion(
+      mCanvasX,
+      yEvents,
+      mCanvasWidth,
+      hEvents);
+
     Dc.SetPen(*wxGREY_PEN);
     Dc.DrawLine(xEvents + 1, y, mCanvasX + mCanvasWidth, y);
     Dc.SetPen(*wxBLACK_PEN);
     Dc.DrawLine(mCanvasX, y, xEvents, y);
+
+    Dc.DestroyClippingRegion();
 
     tTrack* pTrack = gpProject->GetTrack(TrackNumber);
     if (pTrack)
@@ -429,7 +430,6 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
     }
     ++TrackNumber;
   }
-//OLD  Dc.DestroyClippingRegion();
 
   DrawNumbers(Dc);
   DrawSpeed(Dc);

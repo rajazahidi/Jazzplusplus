@@ -1,0 +1,19 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "A JazzPlusPlus Application", "JazzPlusPlus-VC9.vcproj", "{8C82269C-4753-428B-B9B1-D21B46C6AD83}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug GUI VC9|Win32 = Debug GUI VC9|Win32
+		Release GUI VC9|Win32 = Release GUI VC9|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8C82269C-4753-428B-B9B1-D21B46C6AD83}.Debug GUI VC9|Win32.ActiveCfg = Debug GUI VC9|Win32
+		{8C82269C-4753-428B-B9B1-D21B46C6AD83}.Debug GUI VC9|Win32.Build.0 = Debug GUI VC9|Win32
+		{8C82269C-4753-428B-B9B1-D21B46C6AD83}.Release GUI VC9|Win32.ActiveCfg = Release GUI VC9|Win32
+		{8C82269C-4753-428B-B9B1-D21B46C6AD83}.Release GUI VC9|Win32.Build.0 = Release GUI VC9|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

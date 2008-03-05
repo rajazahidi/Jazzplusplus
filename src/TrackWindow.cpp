@@ -107,6 +107,8 @@ JZTrackWindow::JZTrackWindow(
   mpSnapSel = new tSnapSelection(this);
 
   mpFilter = new tFilter(mpSong);
+
+  SetBackgroundColour(*wxWHITE);
 }
 
 //-----------------------------------------------------------------------------
@@ -312,12 +314,7 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
   xState  = xName   + wName;
   xPatch  = xState  + wState;
 
-//  int StopClk;
-
   Dc.DestroyClippingRegion();
-
-  Dc.SetBackground(*wxWHITE_BRUSH);
-  Dc.Clear();
 
   Dc.SetPen(*wxBLACK_PEN);
 
@@ -327,7 +324,6 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
   DrawVerticalLine(Dc, xState);
   DrawVerticalLine(Dc, xPatch);
 
-  // SN+ Dc.VLine(xEvents);
   DrawVerticalLine(Dc, xEvents - 1);
   DrawHorizontalLine(Dc, yEvents);
   DrawHorizontalLine(Dc, yEvents - 1);
@@ -336,7 +332,7 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
   {
     JZBarInfo BarInfo(mpSong);
     BarInfo.SetClock(mFromClock);
-//    StopClk = x2Clock(mCanvasX + mCanvasWidth);
+
     nBars = 0;
     int intro = gpProject->GetIntroLength();
     Dc.SetPen(*wxGREY_PEN);
@@ -349,7 +345,6 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
       }
       if (x >= xEvents)   // so ne Art clipping
       {
-        // SN+-      if ((BarInfo.BarNr % 4) == 0)
         int c;
         if (mClocksPerPixel > 48)
         {
@@ -385,7 +380,7 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
     Dc.SetPen(*wxBLACK_PEN);
   }
 
-  // For each track show the num, name, state, prg.
+  // For each track show the MIDI channel, name, state, prg.
   int TrackNumber = mFromLine;
 
   for (int y = Line2y(TrackNumber); y < yEvents + hEvents; y += hLine)
@@ -412,10 +407,10 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
         wName + wState,
         hEvents);
 
-      // TrackName, show the button pressed when dialog is open
-//      Dc.DrawText(pTrack->GetName(), xName + mLittleBit, y + mLittleBit);
+      // Draw the track name.
       if (pTrack->DialogBox)
       {
+        // Show the button pressed when the dialog box is open.
         LineText(Dc, xName, y, wName, pTrack->GetName(), -1, true);
       }
       else
@@ -423,9 +418,9 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
         LineText(Dc, xName, y, wName, pTrack->GetName(), -1, false);
       }
 
-      // TrackStatus
-//      Dc.DrawText(pTrack->GetStateChar(), xState + mLittleBit, y + mLittleBit);
+      // Draw the track status.
       LineText(Dc, xState, y, wState, pTrack->GetStateChar());
+
       Dc.DestroyClippingRegion();
     }
     ++TrackNumber;
@@ -443,7 +438,9 @@ void JZTrackWindow::OnDraw(wxDC& Dc)
   {
     LineText(Dc, Marked.x, Marked.y, Marked.width, ">");
   }
+
   Dc.DestroyClippingRegion();
+
   DrawPlayPosition(Dc);
 
   // Draw the selection box.

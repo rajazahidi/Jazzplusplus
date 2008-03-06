@@ -69,20 +69,27 @@ JZSynthesizerDialog::JZSynthesizerDialog(wxWindow* pParent)
   wxBoxSizer* pListControlSizer = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer* pButtonSizer = new wxBoxSizer(wxHORIZONTAL);
 
-  wxStaticBox* pStaticBox;
-  wxStaticBoxSizer* pStaticBoxSizer;
+  wxBoxSizer* pLeftSizer = new wxBoxSizer(wxVERTICAL);
+  wxBoxSizer* pRightSizer = new wxBoxSizer(wxVERTICAL);
 
-  pStaticBox = new wxStaticBox(this, wxID_ANY, "Synthesizer Type");
-  pStaticBoxSizer = new wxStaticBoxSizer(pStaticBox, wxHORIZONTAL);
-  pStaticBoxSizer->Add(mpSynthesizerListbox, 0, wxGROW);
-  pListControlSizer->Add(pStaticBoxSizer, 0, wxALIGN_CENTER | wxALL, 3);
+  pLeftSizer->Add(
+    new wxStaticText(this, wxID_ANY, "Synthesizer Type"),
+    0,
+    wxALL,
+    2);
+  pLeftSizer->Add(mpSynthesizerListbox, 0, wxGROW | wxALL, 2);
 
-  pStaticBox = new wxStaticBox(this, wxID_ANY, "Send MIDI Reset");
-  pStaticBoxSizer = new wxStaticBoxSizer(pStaticBox, wxHORIZONTAL);
-  pStaticBoxSizer->Add(mpStartListbox);
-  pListControlSizer->Add(pStaticBoxSizer, 0, wxGROW | wxALL, 3);
+  pRightSizer->Add(
+    new wxStaticText(this, wxID_ANY, "Send MIDI Reset"),
+    0,
+    wxALL,
+    2);
+  pRightSizer->Add(mpStartListbox, 0, wxALL, 2);
 
-  pTopSizer->Add(pListControlSizer);
+  pListControlSizer->Add(pLeftSizer, 0, wxALL, 3);
+  pListControlSizer->Add(pRightSizer, 0, wxALL, 3);
+
+  pTopSizer->Add(pListControlSizer, 0, wxCENTER);
 
   pButtonSizer->Add(pOkButton, 0, wxALL, 5);
   pButtonSizer->Add(pCancelButton, 0, wxALL, 5);

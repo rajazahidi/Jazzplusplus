@@ -1,7 +1,27 @@
 Quick and dirty installation instructions.
 
 Linux
------
+=====
+
+wxWidgets
+---------
+
+wxWidgets 2.8.7 or greater is required for Jazz++.  Use the following configure
+options when building wxWidgets...
+
+--disable-no_exceptions
+--disable-no_rtti
+--disable-shared
+--disable-compat26
+--disable-unicode
+--with-regex=builtin
+--enable-std_iostreams
+--enable-std_string
+--enable-stl
+--with-gtk
+
+Jazz++
+------
 
 Run the following from this directory.
 

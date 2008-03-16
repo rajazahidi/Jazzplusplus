@@ -1,3 +1,7 @@
+The instructions in the file are obsolete.
+
+
+
 How To Work on Dialogs
 
 Feel free to add to this file as you learn things while porting dialogs.

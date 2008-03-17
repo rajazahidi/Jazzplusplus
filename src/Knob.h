@@ -1,0 +1,171 @@
+//*****************************************************************************
+// The JAZZ++ Midi Sequencer
+//
+// Copyright (C) 2008 Peter J. Stieber
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+//*****************************************************************************
+
+#ifndef JZ_KNOB_H
+#define JZ_KNOB_H
+
+//*****************************************************************************
+// Description:
+//   This is the knob class declaration.  This is a custom control that looks
+// like a mixer knob.
+//*****************************************************************************
+class JZKnob : public wxControl
+{
+  public:
+
+    JZKnob();
+
+    JZKnob(
+      wxWindow* pParent,
+      wxWindowID Id,
+      int Value,
+      int MinValue,
+      int MaxValue,
+      unsigned int MinAngle = 240,
+      unsigned int Range = 300,
+      const wxPoint& Position = wxDefaultPosition,
+      const wxSize& Size = wxSize(40, 40),
+      long WindowStyle = wxNO_BORDER,
+      const wxValidator& Validator = wxDefaultValidator,
+      const wxString& Name = wxT("knob"));
+
+    void Create(
+      wxWindow* pParent,
+      wxWindowID Id,
+      int Value,
+      int MinValue,
+      int MaxValue,
+      unsigned int MinAngle = 240,
+      unsigned int Range = 300,
+      const wxPoint& Position = wxDefaultPosition,
+      const wxSize& Size = wxSize(40, 40),
+      long WindowStyle = wxNO_BORDER,
+      const wxValidator& Validator = wxDefaultValidator,
+      const wxString& Name = wxT("knob"));
+
+    // Retrieve/change the range
+    void SetRange(int MinValue, int MaxValue);
+
+    int GetMin() const;
+
+    int GetMax() const;
+
+    void SetMin(int MinValue);
+
+    void SetMax(int MaxValue);
+
+    unsigned int GetMinAngle() const;
+
+    int GetMaxAngle() const;
+
+    int GetValue() const;
+
+    int SetValue(int Value);
+
+  private:
+
+    void GetCenter(int& x, int& y) const;
+
+    void OnSize(wxSizeEvent& Event);
+
+    void OnEraseBackground(wxEraseEvent& Event);
+
+    void OnPaint(wxPaintEvent& Event);
+
+    void OnMouse(wxMouseEvent& Event);
+
+  private:
+
+    int mMin;
+
+    int mMax;
+
+    int mSetting;
+
+    unsigned int mMaxAngle;
+
+    unsigned int mRange;
+
+    wxBitmap mBuffer;
+
+  DECLARE_EVENT_TABLE()
+};
+
+//*****************************************************************************
+// Description:
+//   These are the knob inline member functions.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZKnob::GetMin() const
+{
+  return mMin;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZKnob::GetMax() const
+{
+  return mMax;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+void JZKnob::SetMin(int MinValue)
+{
+  SetRange(MinValue, GetMax());
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+void JZKnob::SetMax(int MaxValue)
+{
+  SetRange(GetMin(), MaxValue);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+unsigned int JZKnob::GetMinAngle() const
+{
+  return (mMaxAngle - mRange) % 360;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZKnob::GetMaxAngle() const
+{
+  return mMaxAngle;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZKnob::GetValue() const
+{
+  return mSetting;
+}
+
+#endif // !defined(JZ_KNOB_H)

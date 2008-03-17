@@ -39,6 +39,7 @@ Help.cpp \
 JazzPlusPlusApplication.cpp \
 KeyDialog.cpp \
 KeyStringConverters.cpp \
+Knob.cpp \
 Mapper.cpp \
 MeasureChoice.cpp \
 MidiDeviceDialog.cpp \

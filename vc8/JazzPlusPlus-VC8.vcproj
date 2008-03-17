@@ -453,6 +453,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Knob.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Knob.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Mapper.cpp"
 				>
 			</File>

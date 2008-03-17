@@ -292,7 +292,7 @@ void JZKnob::OnMouse(wxMouseEvent& Event)
       ScrollEvent = wxEVT_SCROLL_THUMBTRACK;
     }
 
-    wxScrollEvent ScrollEvent(ScrollEvent, m_windowId);
+    wxScrollEvent ScrollEvent(wxEVT_SCROLL_CHANGED, m_windowId);
     ScrollEvent.SetPosition(NewValue);
     ScrollEvent.SetEventObject(this);
     GetEventHandler()->ProcessEvent(ScrollEvent);

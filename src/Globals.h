@@ -39,6 +39,12 @@ class JZTrackFrame;
 class JZTrackWindow;
 class tHBInterface;
 
+enum TESizes
+{
+  // This is the same as the number of keys in the piano window.
+  eMaxTrackCount = 127
+};
+
 extern tConfig* gpConfig;
 extern std::string gpStartUpSong;
 extern JZSong* gpSong;

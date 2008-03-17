@@ -77,7 +77,7 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
 
     int xSnaps[MaxSnaps];
 
-    int  FromLines[MaxTracks];
+    int mFromLines[eMaxTrackCount];
 
     int  IsVisible(JZEvent *e);
     int  IsVisible(tTrack *t);
@@ -215,7 +215,7 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
     int OnEventWinMouseEvent(wxMouseEvent &e);
     void OnEventWinPaintSub(int x, int y);
     int y2yLine(int y, int up = 0);
-    void GetVirtSize(int *w, int *h);
+    void GetVirtualEventSize(int& Width, int& Height);
     bool OnCharHook(wxKeyEvent& e);
 
     JZPianoWindow *Canvas;
@@ -227,12 +227,12 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
     wxFont* mpFont;
     wxFont* mpFixedFont;        //remains with 12pt/ bleibt bei 12pt
     int hFixedFont;        //Height letters/ Hoehe eines Buchstaben
-    int hTop;
-    int wLeft;
+    int mTopInfoHeight;
+    int mLeftInfoWidth;
     int LittleBit;
     int FromLine, ToLine;
-    int hLine;
-    int xEvents, yEvents, wEvents, hEvents;
+    int mTrackHeight;
+    int mEventsX, mEventsY, mEventsWidth, mEventsHeight;
     int CanvasX, CanvasY, CanvasW, CanvasH;        // canvas coords
     int FromClock, ToClock;
     tSnapSelection* SnapSel;

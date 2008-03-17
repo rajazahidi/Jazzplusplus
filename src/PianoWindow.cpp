@@ -94,10 +94,10 @@ bool JZPianoWindow::OnCharHook(wxKeyEvent& Event)
 
 void JZPianoWindow::SetScrollRanges()
 {
-  int w, h;
-  mpPianoFrame->GetVirtSize(&w, &h);
-  SetScrollbars(ScLine, ScLine, w/ScLine, h/ScLine, ScPage, ScPage);
-  EnableScrolling(FALSE, FALSE);
+  int Width, Height;
+  mpPianoFrame->GetVirtualEventSize(Width, Height);
+  SetScrollbars(ScLine, ScLine, Width / ScLine, Height / ScLine);
+  EnableScrolling(false, false);
 }
 
 void JZPianoWindow::SetScrollPosition(int x, int y)

@@ -230,9 +230,9 @@ int tSelection::ButtonUp(wxMouseEvent &e)
 // in the parent window.
 void tSelection::Draw(wxDC& Dc)
 {
-  cout
-    << "tSelection::Draw ---------------------------------------------------"
-    << endl;
+//  cout
+//    << "tSelection::Draw ---------------------------------------------------"
+//    << endl;
   //    Dc.DrawRectangle(100,100,100,100);
 // if (Selected) //we cant check for "selected" here, because...
 // {

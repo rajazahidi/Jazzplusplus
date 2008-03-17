@@ -25,6 +25,7 @@
 
 #include "Track.h"
 #include "Configuration.h"
+#include "Globals.h"
 
 class tMetronomeInfo;
 class JZSong;
@@ -55,9 +56,6 @@ class JZBarInfo
     int TicksPerQuarter;
 };
 
-// same as keys in pianowin
-#define MaxTracks 127
-
 class JZSong
 {
   friend class JZBarInfo;
@@ -75,7 +73,8 @@ class JZSong
     int nTracks;
     int TicksPerQuarter;
 
-    tTrack *Tracks[MaxTracks];
+    tTrack mTracks[eMaxTrackCount];
+
     void NewUndoBuffer();
     void Undo();
     void Redo();

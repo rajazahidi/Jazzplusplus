@@ -123,14 +123,10 @@ bool JZEventFrame::OnCharHook(wxKeyEvent& e)
 
 //void tCanvas::SetScrollRanges()
 //{
-//  int w, h;
-//  EventWin->GetVirtSize(&w, &h);
-//  SetScrollbars(ScLine, ScLine, w/ScLine, h/ScLine, ScPage, ScPage);
-//#ifdef wx_xt
-//  EnableScrolling(TRUE, TRUE);
-//#else
-//  EnableScrolling(FALSE, FALSE);
-//#endif
+//  int Width, Height;
+//  EventWin->GetVirtualEventSize(Width, Height);
+//  SetScrollbars(ScLine, ScLine, Width / ScLine, Height / ScLine);
+//  EnableScrolling(false, false);
 //}
 
 //void tCanvas::SetScrollPosition(int x, int y)
@@ -161,16 +157,16 @@ JZEventFrame::JZEventFrame(
     mpFixedFont(0),
     hFixedFont(0),
     LittleBit(1),
-    hLine(0),
-    hTop(40),
-    wLeft(100),
+    mTrackHeight(0),
+    mTopInfoHeight(40),
+    mLeftInfoWidth(100),
     FontSize(12),
     ClocksPerPixel(36),
     UseColors(true),
-    xEvents(wLeft),
-    yEvents(hTop),
-    wEvents(0),
-    hEvents(0),
+    mEventsX(mLeftInfoWidth),
+    mEventsY(mTopInfoHeight),
+    mEventsWidth(0),
+    mEventsHeight(0),
     CanvasX(0),
     CanvasY(0),
     CanvasW(0),
@@ -242,7 +238,7 @@ size it to the client area of the frame(frame size minus toolbar and menus )
 //void JZEventFrame::CreateCanvas()
 //{
 //  cout << "createcanvas\n"; 
-// int w, h;
+//  int w, h;
 //  GetClientSize(&w, &h);
 //  Canvas = new tCanvas(this, 0, 0, w, h);
 //}
@@ -288,7 +284,7 @@ void JZEventFrame::Setup()
   LittleBit = (int)(x/2);
 
   dc->GetTextExtent("HXWjgi", &x, &y);
-  hLine = (int)y + LittleBit;
+  mTrackHeight = (int)y + LittleBit;
   delete dc;
 */
 }
@@ -298,11 +294,9 @@ void JZEventFrame::Setup()
 this onsize handler is supposed to take care of handling of the resizing the two subwindows sizes to 
 they dont overlap
 */
- void JZEventFrame::OnSize(wxSizeEvent& event)//int w, int h)
- {
-   //   wxFrame::OnSize(event);
-
-
+void JZEventFrame::OnSize(wxSizeEvent& Event)
+{
+   //   wxFrame::OnSize(Event);
 
    //the below code is from the toolbar sample, the layoutchidlren function
     wxSize size = GetClientSize();
@@ -353,13 +347,13 @@ they dont overlap
 
 int JZEventFrame::x2Clock(int x)
 {
-  return (x - xEvents) * ClocksPerPixel + FromClock;
+  return (x - mEventsX) * ClocksPerPixel + FromClock;
 }
 
 
 int JZEventFrame::Clock2x(int clk)
 {
-  return xEvents + (clk - FromClock) / ClocksPerPixel;
+  return mEventsX + (clk - FromClock) / ClocksPerPixel;
 }
 
 int JZEventFrame::x2BarClock(int x, int next)
@@ -378,32 +372,36 @@ int JZEventFrame::x2BarClock(int x, int next)
 int JZEventFrame::y2yLine(int y, int up)
 {
   if (up)
-    y += hLine;
-  y -= hTop;
-  y -= y % hLine;
-  y += hTop;
+  {
+    y += mTrackHeight;
+  }
+  y -= mTopInfoHeight;
+  y -= y % mTrackHeight;
+  y += mTopInfoHeight;
   return y;
 }
 
 int JZEventFrame::y2Line(int y, int up)
 {
   if (up)
-    y += hLine;
-  y -= hTop;
-  return y / hLine;
+  {
+    y += mTrackHeight;
+  }
+  y -= mTopInfoHeight;
+  return y / mTrackHeight;
 }
 
 
 int JZEventFrame::Line2y(int Line)
 {
-  return Line * hLine + hTop;
+  return Line * mTrackHeight + mTopInfoHeight;
 }
 
 void JZEventFrame::LineText(wxDC *dc, int x, int y, int w, const char *str, int h, bool down)
 {
   if (h <= 0)
   {
-    h = hLine;
+    h = mTrackHeight;
     y = y2yLine(y);
   }
   if (w && h)
@@ -490,14 +488,13 @@ void JZEventFrame::OnPaintSub(wxDC *dc, int x, int y)
   CanvasW = xc;
   CanvasH = yc;
 
-  xEvents = CanvasX + wLeft;
-  yEvents = CanvasY + hTop;
-  wEvents = CanvasW - wLeft;
-  hEvents = CanvasH - hTop;
-  //printf("EventWin::OnPaint: xe %ld, ye %ld, we %ld, he %ld\n", xEvents, yEvents, wEvents, hEvents);
+  mEventsX = CanvasX + mLeftInfoWidth;
+  mEventsY = CanvasY + mTopInfoHeight;
+  mEventsWidth = CanvasW - mLeftInfoWidth;
+  mEventsHeight = CanvasH - mTopInfoHeight;
 
-  FromLine = CanvasY / hLine; 
-  ToLine   = (CanvasY + CanvasH - hTop) / hLine;
+  FromLine = CanvasY / mTrackHeight; 
+  ToLine   = (CanvasY + CanvasH - mTopInfoHeight) / mTrackHeight;
   FromClock = CanvasX * ClocksPerPixel;
   ToClock = x2Clock(CanvasX + CanvasW);
 }
@@ -522,7 +519,7 @@ int JZEventFrame::OnMouseEvent(wxMouseEvent &e)
     int x;
     int y;
     e.GetPosition(&x, &y);
-    if (xEvents < x && x < xEvents + wEvents && yEvents < y && y < yEvents + hEvents)
+    if (mEventsX < x && x < mEventsX + mEventsWidth && mEventsY < y && y < mEventsY + mEventsHeight)
     {
       if (e.LeftDown())
       {
@@ -582,14 +579,13 @@ void JZEventFrame::SnapSelStop(wxMouseEvent& MouseEvent)
 {
 }
 
-void JZEventFrame::GetVirtSize(int *w, int *h)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZEventFrame::GetVirtualEventSize(int& Width, int& Height)
 {
-  int clk = Song->MaxQuarters * Song->TicksPerQuarter;
-  *w = clk / ClocksPerPixel + wLeft;
-  *h = 127 * hLine + hTop;
-
-
-  *w = 5000L;
+  int TotalClockTics = Song->MaxQuarters * Song->TicksPerQuarter;
+  Width = TotalClockTics / ClocksPerPixel + mLeftInfoWidth;
+  Height = 127 * mTrackHeight + mTopInfoHeight;
 }
 
 //-----------------------------------------------------------------------------
@@ -608,7 +604,7 @@ void JZEventFrame::NewPlayPosition(int Clock)
     if (Clock > FromClock && ToClock >= Song->MaxQuarters * Song->TicksPerQuarter)
       return;
 //    int x = Clock2x(Clock);
-//    Canvas->SetScrollPosition(x - wLeft, CanvasY);
+//    Canvas->SetScrollPosition(x - mLeftInfoWidth, CanvasY);
   }
 
   if (!SnapSel->Active)        // sets clipping
@@ -641,22 +637,24 @@ void JZEventFrame::NewPlayPosition(int Clock)
 /** draw the "play position", by placing a vertical line where the "play clock" is */
 void JZEventFrame::DrawPlayPosition(wxDC* dc)
 {
-   if (!SnapSel->Active && PlayClock >= FromClock && PlayClock < ToClock)
-   {
-    //    wxDC* dc=new wxClientDC(this);
-  //    dc->SetLogicalFunction(wxXOR);
+  if (!SnapSel->Active && PlayClock >= FromClock && PlayClock < ToClock)
+  {
+//    wxDC* dc = new wxClientDC(this);
+//    dc->SetLogicalFunction(wxXOR);
     dc->SetBrush(*wxBLACK_BRUSH);
     dc->SetPen(*wxBLACK_PEN);
     int x = Clock2x(PlayClock);
 
     //cout<<"JZEventFrame::DrawPlayPosition play pos x "<<x<<" "<<FromClock<<" "<<ToClock<<endl;
-    //dc->DrawRectangle(x, CanvasY, 2*LittleBit, hTop);
-    dc->DrawLine(x,  CanvasY,x,  yEvents+hEvents); //draw a line, 2 pixwels wide
-    dc->DrawLine(x+1,CanvasY,x+1,yEvents+hEvents);
+    //dc->DrawRectangle(x, CanvasY, 2*LittleBit, mTopInfoHeight);
+    dc->DrawLine(x,     CanvasY, x,     mEventsY + mEventsHeight); //draw a line, 2 pixwels wide
+    dc->DrawLine(x + 1, CanvasY, x + 1, mEventsY + mEventsHeight);
     dc->SetLogicalFunction(wxCOPY);
-      }
+  }
   if (NextWin)
+  {
     NextWin->DrawPlayPosition(dc);
+  }
 }
 
 // **************************************************************************
@@ -668,7 +666,9 @@ int JZEventFrame::EventsSelected(const char *msg)
   if (!SnapSel->Selected)
   {
     if (msg == 0)
+    {
       msg = "please select some events first";
+    }
     wxMessageBox((char *)msg, "Error", wxOK);
     return 0;
   }

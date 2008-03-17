@@ -58,7 +58,7 @@ class JZTrackWindow : public wxScrolledWindow
 
     tSnapSelection* mpSnapSel;
 
-    enum TELitits
+    enum TELimits
     {
       eMaxBars = 200
     };
@@ -83,17 +83,21 @@ class JZTrackWindow : public wxScrolledWindow
 
     void ZoomOut();
 
-    void SetScrollRanges();
+    void SetScrollRanges(const int& x, const int& y);
 
     void SetScrollPosition(int x, int y);
 
   private:
 
-    void GetVirtualSize(int& Width, int& Height) const;
+    void GetVirtualEventSize(int& Width, int& Height) const;
 
     void OnSize(wxSizeEvent& Event);
 
+    void OnEraseBackground(wxEraseEvent& Event);
+
     virtual void OnDraw(wxDC& Dc);
+
+    void Draw(wxDC& Dc);
 
     void DrawPlayPosition(wxDC& Dc);
 
@@ -118,7 +122,9 @@ class JZTrackWindow : public wxScrolledWindow
 
     void UnMark();
 
-    const char* CounterStr();
+    const char* GetCounterString();
+
+    const char* GetNumberString() const;
 
     // Was the VLine macro
     void DrawVerticalLine(wxDC& Dc, int XPosition) const;
@@ -130,7 +136,7 @@ class JZTrackWindow : public wxScrolledWindow
 
     int x2wBar(int x);
 
-    int Line2y(int Line);
+    int Track2y(int Track);
 
     int x2Clock(int x);
 
@@ -140,37 +146,38 @@ class JZTrackWindow : public wxScrolledWindow
 
     int y2yLine(int y, int Up = 0);
 
-    const char* NumberStr() const;
-
   private:
 
     static const int mScrollLine;
-    static const int mScrollPage;
 
     JZSong* mpSong;
 
     wxColor* mpGreyColor;
     wxBrush* mpGreyBrush;
 
-    int hLine;
-    int hTop;
-    int wLeft;
+    int mTrackHeight;
+    int mTopInfoHeight;
+    int mLeftInfoWidth;
     int mClocksPerPixel;
     int mPlayClock;
     bool mUseColors;
     int mLittleBit;
-    int xEvents, yEvents, wEvents, hEvents;
-    int mCanvasX, mCanvasY, mCanvasWidth, mCanvasHeight;
+    int mEventsX, mEventsY, mEventsWidth, mEventsHeight;
+    int mScrolledX, mScrolledY;
+    int mCanvasWidth, mCanvasHeight;
     int mFromClock, mToClock;
     int mFromLine, mToLine;
 
-    int xNumber, wNumber;
-    int xName,   wName;
-    int xState,  wState;
-    int xPatch,  wPatch;
+    // The values indicate the staring postions and widths of the track fields
+    // on the left hand side of the screen.  Note that the position of the
+    // first field displayed is always 0, so it doesn't need to be recorded.
+    int mNumberWidth;
+    int mTrackNameX, mTrackNameWidth;
+    int mStateX, mStateWidth;
+    int mPatchX, mPatchWidth;
 
-    int nBars;
-    int xBars[eMaxBars];
+    int mBarCount;
+    int mBarX[eMaxBars];
 
     TECounterModes mCounterMode;
     TENumberModes mNumberMode;
@@ -185,6 +192,10 @@ class JZTrackWindow : public wxScrolledWindow
     int mPreviousClock;
 
     JZRectangle Marked;
+
+    bool mDrawing;
+
+    wxBitmap* mpFrameBuffer;
 
   DECLARE_EVENT_TABLE()
 };

@@ -393,12 +393,12 @@ JZPianoFrame::JZPianoFrame(
   DialogBox = 0;
   MixerForm = 0;
 
-  hTop   = 40;
-  wLeft  = 100;
-  xEvents = wLeft;
-  yEvents = hTop;
-  wEvents = hEvents = 0;
-  hLine = 0;
+  mTopInfoHeight = 40;
+  mLeftInfoWidth = 100;
+  mEventsX = mLeftInfoWidth;
+  mEventsY = mTopInfoHeight;
+  mEventsWidth = mEventsHeight = 0;
+  mTrackHeight = 0;
   LittleBit = 1;
 
   FontSize = PianoFontSizes[1]; // Must be an entry in the array.
@@ -426,9 +426,9 @@ JZPianoFrame::JZPianoFrame(
   mpToolBar->ToggleTool(MEN_SNAP_16, TRUE);
   nSnaps = 0;
 
-  for (int i = 0; i < MaxTracks; i++)
+  for (int i = 0; i < eMaxTrackCount; i++)
   {
-    FromLines[i] = 64;
+    mFromLines[i] = 64;
   }
 
   DrumFont = 0;
@@ -479,6 +479,7 @@ JZPianoFrame::~JZPianoFrame()
   {
     delete mpGuitarFrame;
   }
+  
   delete mpToolBar;
 }
 
@@ -541,7 +542,7 @@ void JZPianoFrame::Setup()
   LittleBit = (int)(lx/2);
 
   dc->GetTextExtent("HXWjgi", &lx, &ly);
-  hLine = (int)ly + LittleBit;
+  mTrackHeight = (int)ly + LittleBit;
   delete dc;
 
 
@@ -552,7 +553,7 @@ void JZPianoFrame::Setup()
   dc=new wxClientDC(Canvas);
   dc->SetFont(*mpFixedFont);
   dc->GetTextExtent("H", &x, &y);
-  hTop = hFixedFont + 2 * LittleBit;
+  mTopInfoHeight = hFixedFont + 2 * LittleBit;
 
   dc->SetFont(*mpFont);
   dc->GetTextExtent("H", &x, &y);
@@ -564,7 +565,7 @@ void JZPianoFrame::Setup()
   dc->GetTextExtent("Low Conga mid 2 or so", &x, &y);
   wPiano = (int)x + LittleBit;
 
-  wLeft = wPiano;
+  mLeftInfoWidth = wPiano;
   delete dc;
 }
 
@@ -583,7 +584,7 @@ void JZPianoFrame::OnGuitar(wxCommandEvent& Event)
 
 void JZPianoFrame::NewPosition(int track, int clock)
 {
-  FromLines[TrackNr] = FromLine;
+  mFromLines[TrackNr] = FromLine;
 
   // change track
   if (track >= 0)
@@ -597,7 +598,7 @@ void JZPianoFrame::NewPosition(int track, int clock)
   if (clock >= 0)
   {
     int x = Clock2x(clock);
-    Canvas->SetScrollPosition(x - wLeft, Line2y(FromLines[TrackNr]));
+    Canvas->SetScrollPosition(x - mLeftInfoWidth, Line2y(mFromLines[TrackNr]));
   }
 
 // SN++ Ist geaendert. OnPaint zeichnet immer neu -> Bug Fix bei ZoomOut!
@@ -1197,41 +1198,41 @@ void JZPianoFrame::OnPaintSub(wxDC* dc, int x, int y)
   dc->DestroyClippingRegion();
   dc->SetBackground(*wxWHITE_BRUSH);
   DrawPlayPosition(dc);
-  SnapSel->Draw(*dc, xEvents, yEvents, wEvents, hEvents);
+  SnapSel->Draw(*dc, mEventsX, mEventsY, mEventsWidth, mEventsHeight);
   dc->Clear();
 
 
   ///////////////////////////////////////////////////////////////
   // horizontal lines(ripped from drawpianoroll code)
 
-//     for (y = Line2y(FromLine); y < yEvents + hEvents; y += hLine)
-//      if (y > yEvents)        // cheaper than clipping
-//        dc->DrawLine(xEvents+1, y, xEvents + wEvents, y);
+//     for (y = Line2y(FromLine); y < mEventsY + mEventsHeight; y += mTrackHeight)
+//      if (y > mEventsY)        // cheaper than clipping
+//        dc->DrawLine(mEventsX+1, y, mEventsX + mEventsWidth, y);
 
   dc->SetPen(*wxGREY_PEN);
   wxBrush blackKeysBrush=wxBrush(wxColor(250,240,240),wxSOLID);
   int Pitch = 127 - FromLine;
   y = Line2y(FromLine);
-    while (Pitch >= 0 && y < yEvents + hEvents)
+    while (Pitch >= 0 && y < mEventsY + mEventsHeight)
     {
       if (IsBlack(Pitch))
       {
         dc->SetBrush(blackKeysBrush);//*wxLIGHT_GREY_PEN
-        dc->DrawRectangle(CanvasX, y, 2000, hLine);
+        dc->DrawRectangle(CanvasX, y, 2000, mTrackHeight);
       }
       else if ((Pitch % 12) == 0)
       {
         dc->SetPen(*wxCYAN_PEN);
-        dc->DrawLine(CanvasX, y + hLine, 2000, y + hLine);
+        dc->DrawLine(CanvasX, y + mTrackHeight, 2000, y + mTrackHeight);
 
       }
       else if (!IsBlack(Pitch - 1))
       {
         dc->SetPen(*wxGREEN_PEN);
-        dc->DrawLine(CanvasX, y + hLine, 2000, y + hLine);
+        dc->DrawLine(CanvasX, y + mTrackHeight, 2000, y + mTrackHeight);
       }
 
-      y += hLine;
+      y += mTrackHeight;
       --Pitch;
     }
 
@@ -1241,7 +1242,7 @@ void JZPianoFrame::OnPaintSub(wxDC* dc, int x, int y)
 
   MouseLine = -1;
 
-  #define VLine(x) DrawLine(x, CanvasY, x, yEvents+hEvents)
+  #define VLine(x) DrawLine(x, CanvasY, x, mEventsY + mEventsHeight)
   #define HLine(y) DrawLine(CanvasX, y, CanvasX + CanvasW, y)
 
   dc->SetPen(*wxBLACK_PEN);
@@ -1249,11 +1250,11 @@ void JZPianoFrame::OnPaintSub(wxDC* dc, int x, int y)
   // vertical lines
 
   dc->VLine(xPiano);
-  dc->VLine(xEvents);
-  dc->VLine(xEvents-1);
-  dc->HLine(yEvents);
-  dc->HLine(yEvents-1);
-  dc->HLine(yEvents + hEvents);
+  dc->VLine(mEventsX);
+  dc->VLine(mEventsX-1);
+  dc->HLine(mEventsY);
+  dc->HLine(mEventsY-1);
+  dc->HLine(mEventsY + mEventsHeight);
 
   // draw vlines and bar numbers
 
@@ -1270,11 +1271,11 @@ void JZPianoFrame::OnPaintSub(wxDC* dc, int x, int y)
     int i;
     dc->SetPen(*wxBLACK_PEN);
     sprintf(buf, "%d", BarInfo.BarNr + 1 - intro);
-    if (x > xEvents)
+    if (x > mEventsX)
     {
-      dc->DrawText(buf, x + LittleBit, yEvents - hFixedFont - 2);
+      dc->DrawText(buf, x + LittleBit, mEventsY - hFixedFont - 2);
       dc->SetPen(*wxGREY_PEN);
-      dc->DrawLine(x, yEvents - hFixedFont, x, yEvents+hEvents);
+      dc->DrawLine(x, mEventsY - hFixedFont, x, mEventsY + mEventsHeight);
     }
 
     dc->SetPen(*wxLIGHT_GREY_PEN);
@@ -1282,13 +1283,15 @@ void JZPianoFrame::OnPaintSub(wxDC* dc, int x, int y)
     {
       clk += BarInfo.TicksPerBar / BarInfo.CountsPerBar;
       x = Clock2x(clk);
-      if (x > xEvents)
-        dc->DrawLine(x, yEvents+1, x, yEvents+hEvents);
+      if (x > mEventsX)
+      {
+        dc->DrawLine(x, mEventsY + 1, x, mEventsY + mEventsHeight);
+      }
     }
     BarInfo.Next();
   }
 
-  LineText(dc, CanvasX, CanvasY, wPiano, hTop);
+  LineText(dc, CanvasX, CanvasY, wPiano, mTopInfoHeight);
 
   dc->SetPen(*wxBLACK_PEN);
   DrawPianoRoll(dc);
@@ -1309,7 +1312,7 @@ void JZPianoFrame::OnPaintSub(wxDC* dc, int x, int y)
       sbrush.SetColour(230,255,230);
 #endif
 
-      //dc->SetClippingRegion(xEvents, yEvents, wEvents, hEvents);
+      //dc->SetClippingRegion(mEventsX, mEventsY, mEventsWidth, mEventsHeight);
       dc->SetLogicalFunction(wxXOR);
       dc->SetPen(*wxTRANSPARENT_PEN);
 
@@ -1326,13 +1329,13 @@ void JZPianoFrame::OnPaintSub(wxDC* dc, int x, int y)
           HBChord scale = context->Scale();
 
           int x = Clock2x(start);
-          if (x < xEvents)        // clip to left border
-            x = xEvents;
+          if (x < mEventsX)        // clip to left border
+            x = mEventsX;
           int w = Clock2x(stop) - x;
           if (w <= 0)
             continue;
 
-          int h = hLine;
+          int h = mTrackHeight;
           for (int i = 0; i < 12; i++)
           {
             int pitch = i;
@@ -1351,7 +1354,7 @@ void JZPianoFrame::OnPaintSub(wxDC* dc, int x, int y)
               while (pitch < 127)
               {
                 int y = Pitch2y(pitch);
-                if (y >= yEvents && y <= yEvents + hEvents - h) // y-clipping
+                if (y >= mEventsY && y <= mEventsY + mEventsHeight - h) // y-clipping
                 {
                   dc->DrawRectangle(x, y, w, h);
                 }
@@ -1409,7 +1412,7 @@ void JZPianoFrame::OnPaintSub(wxDC* dc, int x, int y)
   dc->SetBrush(*wxBLACK_BRUSH);
   dc->SetBackground(*wxWHITE_BRUSH);        // xor-bug
 
-  SnapSel->Draw(*dc, xEvents, yEvents, wEvents, hEvents);
+  SnapSel->Draw(*dc, mEventsX, mEventsY, mEventsWidth, mEventsHeight);
 
   DrawPlayPosition(dc);
 //OBSOLETE  dc->EndDrawing();
@@ -1423,7 +1426,7 @@ void JZPianoFrame::DrawPianoRoll(wxDC* dc)
   char buf[20];
 
   dc->SetBrush(*wxLIGHT_GREY_BRUSH);
-  dc->DrawRectangle(xPiano, yEvents, wPiano, hEvents); //draw grey bg for keyboard
+  dc->DrawRectangle(xPiano, mEventsY, wPiano, mEventsHeight); //draw grey bg for keyboard
   dc->SetBrush(*wxBLACK_BRUSH);
 
 //  dc->SetTextBackground(*wxLIGHT_GREY);
@@ -1439,45 +1442,45 @@ void JZPianoFrame::DrawPianoRoll(wxDC* dc)
   {
     dc->SetFont(*mpFixedFont);
 
-    while (Pitch >= 0 && y < yEvents + hEvents)
+    while (Pitch >= 0 && y < mEventsY + mEventsHeight)
     {
       if (IsBlack(Pitch))
       {
-        dc->DrawRectangle(CanvasX, y, wBlack, hLine);
-        dc->DrawLine(CanvasX + wBlack, y + hLine/2, CanvasX + wPiano, y + hLine/2);
+        dc->DrawRectangle(CanvasX, y, wBlack, mTrackHeight);
+        dc->DrawLine(CanvasX + wBlack, y + mTrackHeight/2, CanvasX + wPiano, y + mTrackHeight/2);
         dc->SetPen(*wxWHITE_PEN);
-        dc->DrawLine(CanvasX + wBlack+1, y + hLine/2+1, CanvasX + wPiano, y + hLine/2+1);
+        dc->DrawLine(CanvasX + wBlack+1, y + mTrackHeight/2+1, CanvasX + wPiano, y + mTrackHeight/2+1);
         dc->DrawLine(CanvasX, y, CanvasX + wBlack, y);
         dc->SetPen(*wxBLACK_PEN);
       }
       else if ((Pitch % 12) == 0)
       {
-        dc->DrawLine(CanvasX, y + hLine, CanvasX + wPiano, y + hLine);
+        dc->DrawLine(CanvasX, y + mTrackHeight, CanvasX + wPiano, y + mTrackHeight);
         dc->SetPen(*wxWHITE_PEN);
-        dc->DrawLine(CanvasX, y + hLine+1, CanvasX + wPiano, y + hLine+1);
+        dc->DrawLine(CanvasX, y + mTrackHeight + 1, CanvasX + wPiano, y + mTrackHeight + 1);
         dc->SetPen(*wxBLACK_PEN);
         sprintf(buf, "%d", Pitch / 12);
-        dc->DrawText(buf, CanvasX + wBlack + LittleBit, y + hLine / 2);
+        dc->DrawText(buf, CanvasX + wBlack + LittleBit, y + mTrackHeight / 2);
       }
       else if (!IsBlack(Pitch - 1))
       {
-        dc->DrawLine(CanvasX, y + hLine, CanvasX + wPiano, y + hLine);
+        dc->DrawLine(CanvasX, y + mTrackHeight, CanvasX + wPiano, y + mTrackHeight);
         dc->SetPen(*wxWHITE_PEN);
-        dc->DrawLine(CanvasX, y + hLine+1, CanvasX + wPiano, y + hLine+1);
+        dc->DrawLine(CanvasX, y + mTrackHeight + 1, CanvasX + wPiano, y + mTrackHeight + 1);
         dc->SetPen(*wxBLACK_PEN);
       }
 
-      y += hLine;
+      y += mTrackHeight;
       --Pitch;
     }
   }
   else if (Track->GetAudioMode())
   {
     dc->SetFont(*DrumFont);
-    while (Pitch >= 0 && y < yEvents + hEvents)
+    while (Pitch >= 0 && y < mEventsY + mEventsHeight)
     {
       dc->DrawText(gpMidiPlayer->GetSampleName(Pitch), CanvasX + LittleBit, y);
-      y += hLine;
+      y += mTrackHeight;
       --Pitch;
     }
   }
@@ -1487,14 +1490,14 @@ void JZPianoFrame::DrawPianoRoll(wxDC* dc)
     if (VisibleKeyOn && VisibleDrumNames)
     {
       dc->SetFont(*DrumFont);
-      while (Pitch >= 0 && y < yEvents + hEvents)
+      while (Pitch >= 0 && y < mEventsY + mEventsHeight)
       {
         dc->DrawText(
           gpConfig->DrumName(Pitch + 1).first.c_str(),
           CanvasX + LittleBit,
           y);
 
-        y += hLine;
+        y += mTrackHeight;
 
         --Pitch;
       }
@@ -1502,41 +1505,41 @@ void JZPianoFrame::DrawPianoRoll(wxDC* dc)
     else if (VisibleController)
     {
       dc->SetFont(*DrumFont);
-      while (Pitch >= 0 && y < yEvents + hEvents)
+      while (Pitch >= 0 && y < mEventsY + mEventsHeight)
       {
         dc->DrawText(
           gpConfig->CtrlName(Pitch + 1).first.c_str(),
           CanvasX + LittleBit,
           y);
 
-        y += hLine;
+        y += mTrackHeight;
         --Pitch;
       }
     }
     else if (VisibleProgram)
     {
       dc->SetFont(*DrumFont);
-      while (Pitch >= 0 && y < yEvents + hEvents)
+      while (Pitch >= 0 && y < mEventsY + mEventsHeight)
       {
         dc->DrawText(
           gpConfig->VoiceName(Pitch + 1).first.c_str(),
           CanvasX + LittleBit,
           y);
 
-        y += hLine;
+        y += mTrackHeight;
         --Pitch;
       }
     }
     else if (VisibleSysex)
     {
       dc->SetFont(*DrumFont);
-      while (Pitch >= 0 && y < yEvents + hEvents)
+      while (Pitch >= 0 && y < mEventsY + mEventsHeight)
       {
         dc->DrawText(
           tSynthSysex::GetSysexGroupName(Pitch + 1),
           CanvasX + LittleBit,
           y);
-        y += hLine;
+        y += mTrackHeight;
         --Pitch;
       }
     }
@@ -1571,7 +1574,7 @@ void JZPianoFrame::DrawEvent(wxDC* dc, JZEvent* pEvent, const wxBrush* Brush, in
   if (!xoor)        
   {
     dc->SetBrush(*wxWHITE_BRUSH);
-    dc->DrawRectangle(x, y + LittleBit, length, hLine - 2 * LittleBit);
+    dc->DrawRectangle(x, y + LittleBit, length, mTrackHeight - 2 * LittleBit);
   }
 
   // show velocity as colors
@@ -1587,7 +1590,7 @@ void JZPianoFrame::DrawEvent(wxDC* dc, JZEvent* pEvent, const wxBrush* Brush, in
   }
   // end velocity colors
 
-  dc->DrawRectangle(x, y + LittleBit, length, hLine - 2 * LittleBit);
+  dc->DrawRectangle(x, y + LittleBit, length, mTrackHeight - 2 * LittleBit);
 
   if (xoor)
   {
@@ -1602,7 +1605,7 @@ void JZPianoFrame::DrawEvent(wxDC* dc, JZEvent* pEvent, const wxBrush* Brush, in
 
 void JZPianoFrame::DrawEvents(wxDC* dc, tTrack *t, int Stat, const wxBrush* Brush, int force_color)
 {
-  //dc->SetClippingRegion(xEvents, yEvents, wEvents, hEvents);
+  //dc->SetClippingRegion(mEventsX, mEventsY, mEventsWidth, mEventsHeight);
   dc->SetBrush(*Brush);
 
   tEventIterator Iterator(t);
@@ -1635,10 +1638,10 @@ void JZPianoFrame::DrawEvents(wxDC* dc, tTrack *t, int Stat, const wxBrush* Brus
       {
         int DrawLength = Length/ClocksPerPixel;
         // do clipping ourselves
-        if (x1 < xEvents)
+        if (x1 < mEventsX)
         {
-          DrawLength -= xEvents - x1;
-          x1 = xEvents;
+          DrawLength -= mEventsX - x1;
+          x1 = mEventsX;
         }
         // Always draw at least two pixels to avoid invisible (behind a
         // vertical line) or zero-length events:
@@ -1659,7 +1662,7 @@ void JZPianoFrame::DrawEvents(wxDC* dc, tTrack *t, int Stat, const wxBrush* Brus
         }
         // end velocity colors
 
-        dc->DrawRectangle(x1, y1 + LittleBit, DrawLength, hLine - 2 * LittleBit);
+        dc->DrawRectangle(x1, y1 + LittleBit, DrawLength, mTrackHeight - 2 * LittleBit);
         //shouldnt it be in drawevent? odd. 
 
         if (pEvent->IsPlayTrack())
@@ -1694,8 +1697,8 @@ void JZPianoFrame::DrawEvents(wxDC* dc, tTrack *t, int Stat, const wxBrush* Brus
           
           dc->GetTextExtent((const char*)pEvent->IsText()->GetText(), &textX, &textY); 
           dc->SetBrush(*wxWHITE_BRUSH);
-          int textlabely=CanvasY+hTop;//text labels drawn at top
-          dc->DrawRectangle(x1-textX, textlabely + LittleBit, textX, textY);//hLine - 2 * LittleBit);
+          int textlabely = CanvasY + mTopInfoHeight;//text labels drawn at top
+          dc->DrawRectangle(x1-textX, textlabely + LittleBit, textX, textY);//mTrackHeight - 2 * LittleBit);
           dc->DrawText(buf, x1-textX, textlabely + LittleBit);
         }
       }
@@ -2466,7 +2469,7 @@ void JZPianoFrame::MouseEvents(wxMouseEvent& Event)
           r.x = CanvasX + LittleBit;
           r.y = CanvasY;
           r.SetWidth(wPiano - 2 * LittleBit);
-          r.SetHeight(hTop);
+          r.SetHeight(mTopInfoHeight);
 
           tVelocCounter *VelocCounter = new tVelocCounter(this, &r, k);
           VelocCounter->Event(Event);
@@ -2502,12 +2505,12 @@ void JZPianoFrame::ShowPitch(int pitch)
     if (MouseLine >= 0) 
     {
       // Erase the previous highlight.
-      dc.DrawRectangle(xPiano, Line2y(MouseLine) + LittleBit, wPiano, hLine - 2 * LittleBit);
+      dc.DrawRectangle(xPiano, Line2y(MouseLine) + LittleBit, wPiano, mTrackHeight - 2 * LittleBit);
     }
     MouseLine = line;
 
     // Draw the new position.
-    dc.DrawRectangle(xPiano, Line2y(MouseLine) + LittleBit, wPiano, hLine - 2*LittleBit);
+    dc.DrawRectangle(xPiano, Line2y(MouseLine) + LittleBit, wPiano, mTrackHeight - 2*LittleBit);
 
     dc.SetLogicalFunction(wxCOPY);
   }
@@ -2533,13 +2536,13 @@ int JZPianoFrame::OnMouseEvent(wxMouseEvent& Event)
     int x, y;
     LogicalMousePosition(Event, &x, &y);
 
-    if (y > yEvents)        // click in event area?
+    if (y > mEventsY)        // click in event area?
     {
       if (xPiano < x && x < xPiano + wPiano)
       {
         MousePiano(Event);
       }
-      else if (xEvents < x && x < xEvents + wEvents)
+      else if (mEventsX < x && x < mEventsX + mEventsWidth)
       {
         MouseEvents(Event);
       }
@@ -2548,7 +2551,7 @@ int JZPianoFrame::OnMouseEvent(wxMouseEvent& Event)
         OnEventWinMouseEvent(Event);
       }
     }
-    else if (x > xEvents)
+    else if (x > mEventsX)
     {
       // click in top line
       int action = MousePlay.Action(Event);
@@ -2730,7 +2733,7 @@ void JZPianoFrame::SnapSelStart(wxMouseEvent &)
   {
     SnapSel->SetXSnap(0,0,0);
   }
-  SnapSel->SetYSnap(FromLine * hLine + hTop, yEvents + hEvents, hLine);
+  SnapSel->SetYSnap(FromLine * mTrackHeight + mTopInfoHeight, mEventsY + mEventsHeight, mTrackHeight);
 }
 
 
@@ -2840,7 +2843,7 @@ void JZPianoFrame::NewPlayPosition(int Clock)
     }
 
     int x = Clock2x(Clock);
-    Canvas->SetScrollPosition(x - wLeft, CanvasY);
+    Canvas->SetScrollPosition(x - mLeftInfoWidth, CanvasY);
   }
 
   if (!SnapSel->Active)        // sets clipping
@@ -2878,9 +2881,9 @@ void JZPianoFrame::DrawPlayPosition(wxDC* dc)
     dc->SetBrush(*wxBLACK_BRUSH);
     dc->SetPen(*wxBLACK_PEN);
     int x = Clock2x(PlayClock);
-    //dc->DrawRectangle(x, CanvasY, 2*LittleBit, hTop);
-    dc->DrawLine(x,  CanvasY,x,  yEvents+hEvents); //draw a line, 2 pixwels wide
-    dc->DrawLine(x+1,CanvasY,x+1,yEvents+hEvents);
+    //dc->DrawRectangle(x, CanvasY, 2*LittleBit, mTopInfoHeight);
+    dc->DrawLine(x,  CanvasY,x,  mEventsY + mEventsHeight); //draw a line, 2 pixwels wide
+    dc->DrawLine(x+1,CanvasY,x+1,mEventsY + mEventsHeight);
     dc->SetLogicalFunction(wxCOPY);
       }
 }
@@ -2892,12 +2895,12 @@ void JZPianoFrame::Redraw()
 
 int JZPianoFrame::Clock2x(int clk)
 {
-  return xEvents + (clk - FromClock) / ClocksPerPixel;
+  return mEventsX + (clk - FromClock) / ClocksPerPixel;
 }
 
 int JZPianoFrame::Line2y(int Line)
 {
-  return Line * hLine + hTop;
+  return Line * mTrackHeight + mTopInfoHeight;
 }
 
 void JZPianoFrame::ActSettingsDialog(wxCommandEvent& Event)
@@ -3048,15 +3051,17 @@ void JZPianoFrame::ZoomOut()
 
 int JZPianoFrame::x2Clock(int x)
 {
-  return (x - xEvents) * ClocksPerPixel + FromClock;
+  return (x - mEventsX) * ClocksPerPixel + FromClock;
 }
 
 int JZPianoFrame::y2Line(int y, int up)
 {
   if (up)
-    y += hLine;
-  y -= hTop;
-  return y / hLine;
+  {
+    y += mTrackHeight;
+  }
+  y -= mTopInfoHeight;
+  return y / mTrackHeight;
 }
 
 int JZPianoFrame::x2BarClock(int x, int next)
@@ -3078,7 +3083,7 @@ int JZPianoFrame::OnEventWinMouseEvent(wxMouseEvent& Event)
     int x;
     int y;
     LogicalMousePosition(Event, &x, &y);
-    if (xEvents < x && x < xEvents + wEvents && yEvents < y && y < yEvents + hEvents)
+    if (mEventsX < x && x < mEventsX + mEventsWidth && mEventsY < y && y < mEventsY + mEventsHeight)
     {
       if (Event.LeftDown())
       {
@@ -3125,13 +3130,13 @@ void JZPianoFrame::OnEventWinPaintSub(int x, int y)
   CanvasW = xc;
   CanvasH = yc;
 
-  xEvents = CanvasX + wLeft;
-  yEvents = CanvasY + hTop;
-  wEvents = CanvasW - wLeft;
-  hEvents = CanvasH - hTop;
+  mEventsX = CanvasX + mLeftInfoWidth;
+  mEventsY = CanvasY + mTopInfoHeight;
+  mEventsWidth = CanvasW - mLeftInfoWidth;
+  mEventsHeight = CanvasH - mTopInfoHeight;
 
-  FromLine = CanvasY / hLine; 
-  ToLine   = (CanvasY + CanvasH - hTop) / hLine;
+  FromLine = CanvasY / mTrackHeight; 
+  ToLine   = (CanvasY + CanvasH - mTopInfoHeight) / mTrackHeight;
   FromClock = CanvasX * ClocksPerPixel;
   ToClock = x2Clock(CanvasX + CanvasW);
 }
@@ -3139,18 +3144,22 @@ void JZPianoFrame::OnEventWinPaintSub(int x, int y)
 int JZPianoFrame::y2yLine(int y, int up)
 {
   if (up)
-    y += hLine;
-  y -= hTop;
-  y -= y % hLine;
-  y += hTop;
+  {
+    y += mTrackHeight;
+  }
+  y -= mTopInfoHeight;
+  y -= y % mTrackHeight;
+  y += mTopInfoHeight;
   return y;
 }
 
-void JZPianoFrame::GetVirtSize(int *w, int *h)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPianoFrame::GetVirtualEventSize(int& Width, int& Height)
 {
-  int clk = Song->MaxQuarters * Song->TicksPerQuarter;
-  *w = clk / ClocksPerPixel + wLeft;
-  *h = 127 * hLine + hTop;
+  int TotalClockTics = Song->MaxQuarters * Song->TicksPerQuarter;
+  Width = TotalClockTics / ClocksPerPixel + mLeftInfoWidth;
+  Height = 127 * mTrackHeight + mTopInfoHeight;
 }
 
 bool JZPianoFrame::OnCharHook(wxKeyEvent& Event)
@@ -3258,7 +3267,7 @@ void JZPianoFrame::LineText(
 void JZPianoFrame::ButtonLabelDisplay(const wxString& Text, bool IsButtonDown)
 {
   wxClientDC Dc(Canvas);
-  LineText(&Dc, 0, 0, wPiano, hTop, Text, IsButtonDown);
+  LineText(&Dc, 0, 0, wPiano, mTopInfoHeight, Text, IsButtonDown);
 }
 
 

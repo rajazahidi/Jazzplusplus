@@ -440,10 +440,10 @@ void JZTrackFrame::OnFileOpen(wxCommandEvent& Event)
     gpProject->OpenSong(FileName);
     SetTitle(FileName);
 //    NextWin->NewPosition(1, 0);
-    mpTrackWindow->SetScrollRanges();
-    mpTrackWindow->SetScrollPosition(0, 0);
+    mpTrackWindow->SetScrollRanges(0, 0);
+//    mpTrackWindow->SetScrollPosition(0, 0);
 //    NextWin->Canvas->SetScrollRanges();
-    Refresh();
+    mpTrackWindow->Refresh(false);
 //    tTrack::changed = false;
   }
 }

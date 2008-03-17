@@ -103,21 +103,21 @@ class JZEventFrame : public wxFrame
     wxFont* mpFixedFont; // remains with 12pt
     int hFixedFont;   // Height of letters
 
-    int   LittleBit;
-    int   hLine;
+    int LittleBit;
+    int mTrackHeight;
 
-    int   hTop;
-    int   wLeft;
-    int   FontSize;
-    int   ClocksPerPixel;
-    bool   UseColors;
+    int mTopInfoHeight;
+    int mLeftInfoWidth;
+    int FontSize;
+    int ClocksPerPixel;
+    bool UseColors;
 
     // Parameters changed, e.g. Song loaded
     virtual void Setup();
 
     // filled by OnPaint()
     //wxDC *dc;
-    int xEvents, yEvents, wEvents, hEvents;
+    int mEventsX, mEventsY, mEventsWidth, mEventsHeight;
     int CanvasX, CanvasY, CanvasW, CanvasH;        // canvas coords
     int FromClock, ToClock;
     int FromLine, ToLine;
@@ -164,7 +164,7 @@ class JZEventFrame : public wxFrame
     // Mixer-Dialog
     wxDialog* MixerForm;
 
-    virtual void GetVirtSize(int *w, int *h);
+    virtual void GetVirtualEventSize(int& Width, int& Height);
 
     // Edit-Menu
 

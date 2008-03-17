@@ -63,5 +63,7 @@ extern JZProject* gpProject;
 extern JZTrackFrame* gpTrackFrame;
 extern JZTrackWindow* gpTrackWindow;
 extern tHBInterface* gpHarmonyBrowser;
+extern const double gDegreesToRadians;
+extern const double gRadiansToDegrees;
 
 #endif // !defined(JZ_GLOBALS_H)

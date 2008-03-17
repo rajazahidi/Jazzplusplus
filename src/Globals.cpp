@@ -66,3 +66,6 @@ JZTrackFrame* gpTrackFrame = 0;
 JZTrackWindow* gpTrackWindow = 0;
 
 tHBInterface* gpHarmonyBrowser = 0;
+
+const double gDegreesToRadians = 0.01745329251994330212;
+const double gRadiansToDegrees = 57.2957795130823;

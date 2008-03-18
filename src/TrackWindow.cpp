@@ -301,6 +301,34 @@ void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& Event)
       Refresh(false);
     }
   }
+  else if (
+    Point.x >= mPatchX && Point.x < mPatchX + mPatchWidth &&
+    Point.y < mTopInfoHeight)
+  {
+    switch (mCounterMode)
+    {
+      case eCmProgram:
+        mCounterMode = eCmBank;
+        break;
+      case eCmBank:
+        mCounterMode = eCmVolume;
+        break;
+      case eCmVolume:
+        mCounterMode = eCmPan;
+        break;
+      case eCmPan:
+        mCounterMode = eCmReverb;
+        break;
+      case eCmReverb:
+        mCounterMode = eCmChorus;
+        break;
+      case eCmChorus:
+      default:
+        mCounterMode = eCmProgram;
+        break;
+    }
+    Refresh(false);
+  }
 }
 
 //-----------------------------------------------------------------------------

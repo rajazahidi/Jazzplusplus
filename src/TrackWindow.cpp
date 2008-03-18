@@ -42,6 +42,7 @@ using namespace std;
 BEGIN_EVENT_TABLE(JZTrackWindow, wxScrolledWindow)
   EVT_SIZE(JZTrackWindow::OnSize)
   EVT_ERASE_BACKGROUND(JZTrackWindow::OnEraseBackground)
+  EVT_LEFT_UP(JZTrackWindow::OnLeftButtonUp)
 END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
@@ -94,8 +95,7 @@ JZTrackWindow::JZTrackWindow(
     mPatchWidth(0),
     mBarCount(0),
     mCounterMode(eCmProgram),
-//    mNumberMode(eNmMidiChannel),
-    mNumberMode(eNmTrackNr),
+    mNumberMode(eNmMidiChannel),
     mpFixedFont(0),
     mFixedFontHeight(0),
     mFontSize(12),
@@ -278,6 +278,29 @@ void JZTrackWindow::OnSize(wxSizeEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackWindow::OnEraseBackground(wxEraseEvent& Event)
 {
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& Event)
+{
+  wxPoint Point = Event.GetPosition();
+
+  // Check to see if the mouse was clicked inside of the number mode
+  // indicator.
+  if (Point.x < mNumberWidth && Point.y < mTopInfoHeight)
+  {
+    if (mNumberMode == eNmTrackNr)
+    {
+      mNumberMode = eNmMidiChannel;
+      Refresh(false);
+    }
+    else
+    {
+      mNumberMode = eNmTrackNr;
+      Refresh(false);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -694,7 +717,14 @@ void JZTrackWindow::LineText(
   }
   wxColor bg = Dc.GetTextBackground();
   Dc.SetTextBackground(*mpGreyColor);
-  Dc.DrawText(pString, x + mLittleBit, y + mLittleBit);
+  int TextWidth, TextHeight;
+  Dc.GetTextExtent(pString, &TextWidth, &TextHeight);
+  int Margin = (Width - TextWidth) / 2;
+  if (Margin < mLittleBit)
+  {
+    Margin = mLittleBit;
+  }
+  Dc.DrawText(pString, x + Margin, y + mLittleBit);
   Dc.SetTextBackground(*wxWHITE);
 }
 

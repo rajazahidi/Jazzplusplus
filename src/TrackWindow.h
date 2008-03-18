@@ -95,6 +95,8 @@ class JZTrackWindow : public wxScrolledWindow
 
     void OnEraseBackground(wxEraseEvent& Event);
 
+    void OnLeftButtonUp(wxMouseEvent& Event);
+
     virtual void OnDraw(wxDC& Dc);
 
     void Draw(wxDC& Dc);

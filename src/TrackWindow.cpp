@@ -43,6 +43,7 @@ BEGIN_EVENT_TABLE(JZTrackWindow, wxScrolledWindow)
   EVT_SIZE(JZTrackWindow::OnSize)
   EVT_ERASE_BACKGROUND(JZTrackWindow::OnEraseBackground)
   EVT_LEFT_UP(JZTrackWindow::OnLeftButtonUp)
+  EVT_RIGHT_UP(JZTrackWindow::OnRightButtonUp)
 END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
@@ -302,6 +303,19 @@ void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& Event)
     }
   }
   else if (
+    Point.x >= mTrackNameX && Point.x < mTrackNameX + mTrackNameWidth &&
+    Point.y < mTopInfoHeight)
+  {
+    // Bump up the speed value one tick.
+    int SpeedBpm = gpProject->GetTrack(0)->GetDefaultSpeed();
+    ++SpeedBpm;
+    if (SpeedBpm > 0 && SpeedBpm < 300)
+    {
+      gpProject->GetTrack(0)->SetDefaultSpeed(SpeedBpm);
+    }
+    Refresh(false);
+  }
+  else if (
     Point.x >= mPatchX && Point.x < mPatchX + mPatchWidth &&
     Point.y < mTopInfoHeight)
   {
@@ -326,6 +340,27 @@ void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& Event)
       default:
         mCounterMode = eCmProgram;
         break;
+    }
+    Refresh(false);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::OnRightButtonUp(wxMouseEvent& Event)
+{
+  wxPoint Point = Event.GetPosition();
+
+  if (
+    Point.x >= mTrackNameX && Point.x < mTrackNameX + mTrackNameWidth &&
+    Point.y < mTopInfoHeight)
+  {
+    // Knock down the speed value one tick.
+    int SpeedBpm = gpProject->GetTrack(0)->GetDefaultSpeed();
+    --SpeedBpm;
+    if (SpeedBpm > 0 && SpeedBpm < 300)
+    {
+      gpProject->GetTrack(0)->SetDefaultSpeed(SpeedBpm);
     }
     Refresh(false);
   }
@@ -665,7 +700,14 @@ void JZTrackWindow::DrawSpeed(wxDC& Dc, int Value, bool Down)
   ostringstream Oss;
   Oss << "speed: " << setw(3) << Value;
 
-  LineText(Dc, mTrackNameX, -1, mTrackNameWidth, Oss.str().c_str(), mTopInfoHeight, Down);
+  LineText(
+    Dc,
+    mTrackNameX,
+    -1,
+    mTrackNameWidth,
+    Oss.str().c_str(),
+    mTopInfoHeight,
+    Down);
 }
 
 //-----------------------------------------------------------------------------

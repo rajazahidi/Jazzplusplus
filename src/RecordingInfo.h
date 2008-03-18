@@ -23,7 +23,7 @@
 #ifndef JZ_RECORDINGINFO_H
 #define JZ_RECORDINGINFO_H
 
-class tTrack;
+class JZTrack;
 
 //*****************************************************************************
 // Description:
@@ -35,7 +35,7 @@ class JZRecordingInfo
     JZRecordingInfo();
 
     // If the track pointer is not set, the code is not recording.
-    tTrack* mpTrack;
+    JZTrack* mpTrack;
 
     // This is the recording from clock.
     long mFromClock;

@@ -31,7 +31,7 @@ class JZSong;
 class JZToolBar;
 class tFilter;
 class tCtrlEditBase;
-class tTrack;
+class JZTrack;
 class JZPianoWindow;
 
 //*****************************************************************************
@@ -80,7 +80,7 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
     int mFromLines[eMaxTrackCount];
 
     int  IsVisible(JZEvent *e);
-    int  IsVisible(tTrack *t);
+    int  IsVisible(JZTrack *t);
     void VisibleDialog();
     bool VisibleKeyOn;
     bool VisiblePitch;
@@ -117,10 +117,10 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
     void SnapDlg(wxCommandEvent& Event);
 
     int TrackNr;        // aktueller Track
-    tTrack *Track;
+    JZTrack *Track;
 
     tEventArray PasteBuffer;
-    void DrawEvents(wxDC* dc, tTrack *t, int Stat, const wxBrush* Brush, int force_colors);
+    void DrawEvents(wxDC* dc, JZTrack *t, int Stat, const wxBrush* Brush, int force_colors);
     void DrawEvent(wxDC* dc, JZEvent *, const wxBrush* Brush, int xoor, int force_color=0);
     void DrawPianoRoll(wxDC* dc);
 
@@ -138,12 +138,12 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
     // Utils
     int y2Pitch(int y);
     int Pitch2y(int Pitch);
-    JZEvent *FindEvent(tTrack *t, int Clock, int Pitch);
-    void Copy(tTrack *t, JZEvent *e, int Kill);
-    void Paste(tTrack *t, int Clock, int Pitch);
+    JZEvent *FindEvent(JZTrack *t, int Clock, int Pitch);
+    void Copy(JZTrack *t, JZEvent *e, int Kill);
+    void Paste(JZTrack *t, int Clock, int Pitch);
     // SN++ Key_Aftertouch Utils
-    void paste_keys_aftertouch(tTrack *t, JZEvent *e);
-    void kill_keys_aftertouch(tTrack *t, JZEvent *e);
+    void paste_keys_aftertouch(JZTrack *t, JZEvent *e);
+    void kill_keys_aftertouch(JZTrack *t, JZEvent *e);
     int  nKeyOnEvents();
     void LogicalMousePosition(wxMouseEvent &e, int *x, int *y);
 

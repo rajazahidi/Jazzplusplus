@@ -284,7 +284,7 @@ class tSimpleEventArray : public wxObject
 
 class tUndoBuffer : public tSimpleEventArray
 {
-  friend class tTrack;
+  friend class JZTrack;
 
   public:
 
@@ -305,7 +305,7 @@ class tEventArray : public tSimpleEventArray
 {
     friend class tEventIterator;
     friend class tTrackDlg;
-    friend class tTrack;
+    friend class JZTrack;
 
   public:
 
@@ -398,14 +398,14 @@ class tEventArray : public tSimpleEventArray
 
 #define MaxUndo 20
 
-class tTrack : public tEventArray
+class JZTrack : public tEventArray
 {
   public:
 
     static bool changed;
 
-    tTrack();
-    ~tTrack() { Clear(); }
+    JZTrack();
+    ~JZTrack() { Clear(); }
 
     bool IsDrumTrack();
 

@@ -523,7 +523,7 @@ int tSampleSet::ContinueListen()
 
 
 
-void tSampleSet::AdjustAudioLength(tTrack *t, long tpm)
+void tSampleSet::AdjustAudioLength(JZTrack *t, long tpm)
 {
   if (!t->GetAudioMode() || !adjust_audio_length)
     return;
@@ -829,7 +829,7 @@ void tSampleSet::AddNote(const char *fname, long frc, long toc)
   JZSong       *song = gpProject->Song;
 #endif
   const JZRecordingInfo* info = gpProject->GetRecInfo();
-  tTrack* track = info->mpTrack;
+  JZTrack* track = info->mpTrack;
 #ifdef OBSOLETE
   song->NewUndoBuffer();
 #endif

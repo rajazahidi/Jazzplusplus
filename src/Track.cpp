@@ -1682,7 +1682,7 @@ int tEventArray::GetFirstClock()
 class tTrackDlg : public wxForm
 {
   JZTrackWindow* TrackWin;
-  tTrack *trk;
+  JZTrack *trk;
   char *TrackName;
   tNamedChoice PatchChoice;
   tNamedChoice DeviceChoice;
@@ -1693,7 +1693,7 @@ class tTrackDlg : public wxForm
   int AudioMode;
 
  public:
-  tTrackDlg::tTrackDlg(JZTrackWindow *w, tTrack *t);
+  tTrackDlg::tTrackDlg(JZTrackWindow *w, JZTrack *t);
   void EditForm(wxPanel *panel);
   virtual void OnOk();
   virtual void OnCancel();
@@ -1701,7 +1701,7 @@ class tTrackDlg : public wxForm
 };
 
 
-tTrackDlg::tTrackDlg(JZTrackWindow *w, tTrack *t)
+tTrackDlg::tTrackDlg(JZTrackWindow *w, JZTrack *t)
   : wxForm(USED_WXFORM_BUTTONS),
     PatchChoice(
       "Patch",
@@ -1903,7 +1903,7 @@ void tTrackDlg::EditForm(wxPanel *panel)
 
 #endif // OBSOLETE
 
-void tTrack::Dialog(JZTrackWindow *parent)
+void JZTrack::Dialog(JZTrackWindow *parent)
 {
 #ifdef OBSOLETE
 
@@ -1929,13 +1929,13 @@ void tTrack::Dialog(JZTrackWindow *parent)
 
 
 // ***********************************************************************
-// tTrack
+// JZTrack
 // ***********************************************************************
 
 
-bool tTrack::changed = false;
+bool JZTrack::changed = false;
 
-tTrack::tTrack()
+JZTrack::JZTrack()
   : tEventArray()
 {
   iUndo = 0;
@@ -1946,12 +1946,12 @@ tTrack::tTrack()
 }
 
 
-bool tTrack::IsDrumTrack()
+bool JZTrack::IsDrumTrack()
 {
   return Channel == gpConfig->GetValue(C_DrumChannel);
 }
 
-void tTrack::Merge(tEventArray *t)
+void JZTrack::Merge(tEventArray *t)
 {
   for (int i = 0; i < t->nEvents; i++)
   {
@@ -1961,7 +1961,7 @@ void tTrack::Merge(tEventArray *t)
 }
 
 
-void tTrack::MergeRange(tEventArray *other, int FromClock, int ToClock, int Replace)
+void JZTrack::MergeRange(tEventArray *other, int FromClock, int ToClock, int Replace)
 {
   // Erase destin
   if (Replace)
@@ -1996,7 +1996,7 @@ void tTrack::MergeRange(tEventArray *other, int FromClock, int ToClock, int Repl
 }
 
 
-void tTrack::Cleanup()
+void JZTrack::Cleanup()
 {
   // on audio tracks, adjust length of keyon events to
   // actual sample length
@@ -2007,7 +2007,7 @@ void tTrack::Cleanup()
 
 
 
-void tTrack::Undo()
+void JZTrack::Undo()
 {
   if (nUndo > 0)
   {
@@ -2035,7 +2035,7 @@ void tTrack::Undo()
   }
 }
 
-void tTrack::Redo()
+void JZTrack::Redo()
 {
   if (nRedo > 0)
   {
@@ -2065,7 +2065,7 @@ void tTrack::Redo()
 }
 
 
-void tTrack::NewUndoBuffer()
+void JZTrack::NewUndoBuffer()
 {
   nRedo = 0;
   nUndo++;
@@ -2079,7 +2079,7 @@ void tTrack::NewUndoBuffer()
 };
 
 
-void tTrack::Clear()
+void JZTrack::Clear()
 {
   for (int i = 0; i < MaxUndo; i++)
   {
@@ -2091,7 +2091,7 @@ void tTrack::Clear()
 
 // ----------------------- Copyright ------------------------------------
 
-char* tTrack::GetCopyright()
+char* JZTrack::GetCopyright()
 {
   if (Copyright)
   {
@@ -2102,7 +2102,7 @@ char* tTrack::GetCopyright()
 
 
 
-void tTrack::SetCopyright(char *str)
+void JZTrack::SetCopyright(char *str)
 {
   if (Copyright)
   {
@@ -2122,7 +2122,7 @@ void tTrack::SetCopyright(char *str)
 
 // ----------------------- Name ------------------------------------
 
-char* tTrack::GetName()
+char* JZTrack::GetName()
 {
   if (mName)
   {
@@ -2133,7 +2133,7 @@ char* tTrack::GetName()
 
 
 
-void tTrack::SetName(char *str)
+void JZTrack::SetName(char *str)
 {
   if (mName)
   {
@@ -2148,7 +2148,7 @@ void tTrack::SetName(char *str)
 
 // ------------------------  Volume ------------------------------
 
-int tTrack::GetVolume()
+int JZTrack::GetVolume()
 {
   if (Volume)
   {
@@ -2157,7 +2157,7 @@ int tTrack::GetVolume()
   return 0;
 }
 
-void tTrack::SetVolume(int Value)
+void JZTrack::SetVolume(int Value)
 {
   if (Volume)
   {
@@ -2174,7 +2174,7 @@ void tTrack::SetVolume(int Value)
 
 // ------------------------  Pan ------------------------------
 
-int tTrack::GetPan()
+int JZTrack::GetPan()
 {
   if (Pan)
   {
@@ -2183,7 +2183,7 @@ int tTrack::GetPan()
   return 0;
 }
 
-void tTrack::SetPan(int Value)
+void JZTrack::SetPan(int Value)
 {
   if (Pan)
   {
@@ -2200,7 +2200,7 @@ void tTrack::SetPan(int Value)
 
 // ------------------------  Reverb ------------------------------
 
-int tTrack::GetReverb()
+int JZTrack::GetReverb()
 {
   if (Reverb)
   {
@@ -2209,7 +2209,7 @@ int tTrack::GetReverb()
   return 0;
 }
 
-void tTrack::SetReverb(int Value)
+void JZTrack::SetReverb(int Value)
 {
   if (Reverb)
   {
@@ -2226,7 +2226,7 @@ void tTrack::SetReverb(int Value)
 
 // ------------------------  Chorus ------------------------------
 
-int tTrack::GetChorus()
+int JZTrack::GetChorus()
 {
   if (Chorus)
   {
@@ -2235,7 +2235,7 @@ int tTrack::GetChorus()
   return 0;
 }
 
-void tTrack::SetChorus(int Value)
+void JZTrack::SetChorus(int Value)
 {
   if (Chorus)
   {
@@ -2252,7 +2252,7 @@ void tTrack::SetChorus(int Value)
 
 // ------------------------  Bank ------------------------------
 
-int tTrack::GetBank()
+int JZTrack::GetBank()
 {
   if (!gpConfig->GetValue(C_UseTwoCommandBankSelect))
   {
@@ -2284,7 +2284,7 @@ int tTrack::GetBank()
   return 0;
 }
 
-void tTrack::SetBank(int Value)
+void JZTrack::SetBank(int Value)
 {
   if (mpBank)
   {
@@ -2350,7 +2350,7 @@ void tTrack::SetBank(int Value)
 
 // ------------------------  Patch ------------------------------
 
-int tTrack::GetPatch()
+int JZTrack::GetPatch()
 {
   if (mPatch)
   {
@@ -2359,7 +2359,7 @@ int tTrack::GetPatch()
   return 0;
 }
 
-void tTrack::SetPatch(int PatchNr)
+void JZTrack::SetPatch(int PatchNr)
 {
   if (mPatch)
   {
@@ -2376,7 +2376,7 @@ void tTrack::SetPatch(int PatchNr)
 
 // ------------------------  VibRate ------------------------------
 
-int tTrack::GetVibRate()
+int JZTrack::GetVibRate()
 {
   if (VibRate)
   {
@@ -2385,7 +2385,7 @@ int tTrack::GetVibRate()
   return 0;
 }
 
-void tTrack::SetVibRate(int Value)
+void JZTrack::SetVibRate(int Value)
 {
   if (VibRate)
   {
@@ -2403,7 +2403,7 @@ void tTrack::SetVibRate(int Value)
 
 // ------------------------  VibDepth ------------------------------
 
-int tTrack::GetVibDepth()
+int JZTrack::GetVibDepth()
 {
   if (VibDepth)
   {
@@ -2412,7 +2412,7 @@ int tTrack::GetVibDepth()
   return 0;
 }
 
-void tTrack::SetVibDepth(int Value)
+void JZTrack::SetVibDepth(int Value)
 {
   if (VibDepth)
   {
@@ -2429,7 +2429,7 @@ void tTrack::SetVibDepth(int Value)
 
 // ------------------------  VibDelay ------------------------------
 
-int tTrack::GetVibDelay()
+int JZTrack::GetVibDelay()
 {
   if (VibDelay)
   {
@@ -2438,7 +2438,7 @@ int tTrack::GetVibDelay()
   return 0;
 }
 
-void tTrack::SetVibDelay(int Value)
+void JZTrack::SetVibDelay(int Value)
 {
   if (VibDelay)
   {
@@ -2456,7 +2456,7 @@ void tTrack::SetVibDelay(int Value)
 
 // ------------------------  Cutoff ------------------------------
 
-int tTrack::GetCutoff()
+int JZTrack::GetCutoff()
 {
   if (Cutoff)
   {
@@ -2465,7 +2465,7 @@ int tTrack::GetCutoff()
   return 0;
 }
 
-void tTrack::SetCutoff(int Value)
+void JZTrack::SetCutoff(int Value)
 {
   if (Cutoff)
   {
@@ -2483,7 +2483,7 @@ void tTrack::SetCutoff(int Value)
 
 // ------------------------  Resonance ------------------------------
 
-int tTrack::GetResonance()
+int JZTrack::GetResonance()
 {
   if (Resonance)
   {
@@ -2492,7 +2492,7 @@ int tTrack::GetResonance()
   return 0;
 }
 
-void tTrack::SetResonance(int Value)
+void JZTrack::SetResonance(int Value)
 {
   if (Resonance)
   {
@@ -2510,7 +2510,7 @@ void tTrack::SetResonance(int Value)
 
 // ------------------------  EnvAttack ------------------------------
 
-int tTrack::GetEnvAttack()
+int JZTrack::GetEnvAttack()
 {
   if (EnvAttack)
   {
@@ -2519,7 +2519,7 @@ int tTrack::GetEnvAttack()
   return 0;
 }
 
-void tTrack::SetEnvAttack(int Value)
+void JZTrack::SetEnvAttack(int Value)
 {
   if (EnvAttack)
   {
@@ -2537,7 +2537,7 @@ void tTrack::SetEnvAttack(int Value)
 
 // ------------------------  EnvDecay ------------------------------
 
-int tTrack::GetEnvDecay()
+int JZTrack::GetEnvDecay()
 {
   if (EnvDecay)
   {
@@ -2546,7 +2546,7 @@ int tTrack::GetEnvDecay()
   return 0;
 }
 
-void tTrack::SetEnvDecay(int Value)
+void JZTrack::SetEnvDecay(int Value)
 {
   if (EnvDecay)
   {
@@ -2564,7 +2564,7 @@ void tTrack::SetEnvDecay(int Value)
 
 // ------------------------  EnvRelease ------------------------------
 
-int tTrack::GetEnvRelease()
+int JZTrack::GetEnvRelease()
 {
   if (EnvRelease)
   {
@@ -2573,7 +2573,7 @@ int tTrack::GetEnvRelease()
   return 0;
 }
 
-void tTrack::SetEnvRelease(int Value)
+void JZTrack::SetEnvRelease(int Value)
 {
   if (EnvRelease)
   {
@@ -2591,7 +2591,7 @@ void tTrack::SetEnvRelease(int Value)
 
 // ------------------------  DrumParam ------------------------------
 
-int tTrack::GetDrumParam(int pitch, int index)
+int JZTrack::GetDrumParam(int pitch, int index)
 {
   if (!DrumParams.IsEmpty())
   {
@@ -2604,7 +2604,7 @@ int tTrack::GetDrumParam(int pitch, int index)
   return 0;
 }
 
-void tTrack::SetDrumParam(int pitch, int index, int Value)
+void JZTrack::SetDrumParam(int pitch, int index, int Value)
 {
   DrumParams.DelParam(pitch, index);
   if (Value > 0)
@@ -2618,7 +2618,7 @@ void tTrack::SetDrumParam(int pitch, int index, int Value)
 
 // ------------------------  BendPitchSens ------------------------------
 
-int tTrack::GetBendPitchSens()
+int JZTrack::GetBendPitchSens()
 {
   if (BendPitchSens)
   {
@@ -2627,7 +2627,7 @@ int tTrack::GetBendPitchSens()
   return 0;
 }
 
-void tTrack::SetBendPitchSens(int Value)
+void JZTrack::SetBendPitchSens(int Value)
 {
   if (BendPitchSens)
   {
@@ -2645,7 +2645,7 @@ void tTrack::SetBendPitchSens(int Value)
 
 // ------------------------  Modulation Sysex ------------------------------
 
-int tTrack::GetModulationSysex(int msp)
+int JZTrack::GetModulationSysex(int msp)
 {
   unsigned char *valp = gpSynth->GetSysexValPtr(ModulationSettings[msp]);
 
@@ -2657,7 +2657,7 @@ int tTrack::GetModulationSysex(int msp)
   return 0;
 }
 
-void tTrack::SetModulationSysex(int msp, int Value)
+void JZTrack::SetModulationSysex(int msp, int Value)
 {
   if (ModulationSettings[msp])
   {
@@ -2677,7 +2677,7 @@ void tTrack::SetModulationSysex(int msp, int Value)
 
 // ------------------------  Bender Sysex ------------------------------
 
-int tTrack::GetBenderSysex(int bsp)
+int JZTrack::GetBenderSysex(int bsp)
 {
   unsigned char *valp = gpSynth->GetSysexValPtr(BenderSettings[bsp]);
 
@@ -2689,7 +2689,7 @@ int tTrack::GetBenderSysex(int bsp)
   return 0;
 }
 
-void tTrack::SetBenderSysex(int bsp, int Value)
+void JZTrack::SetBenderSysex(int bsp, int Value)
 {
   if (BenderSettings[bsp])
   {
@@ -2709,7 +2709,7 @@ void tTrack::SetBenderSysex(int bsp, int Value)
 
 // ------------------------  CAf Sysex ------------------------------
 
-int tTrack::GetCAfSysex(int csp)
+int JZTrack::GetCAfSysex(int csp)
 {
   unsigned char *valp = gpSynth->GetSysexValPtr(CAfSettings[csp]);
 
@@ -2721,7 +2721,7 @@ int tTrack::GetCAfSysex(int csp)
   return 0;
 }
 
-void tTrack::SetCAfSysex(int csp, int Value)
+void JZTrack::SetCAfSysex(int csp, int Value)
 {
   if (CAfSettings[csp])
   {
@@ -2741,7 +2741,7 @@ void tTrack::SetCAfSysex(int csp, int Value)
 
 // ------------------------  PAf Sysex ------------------------------
 
-int tTrack::GetPAfSysex(int psp)
+int JZTrack::GetPAfSysex(int psp)
 {
   unsigned char *valp = gpSynth->GetSysexValPtr(PAfSettings[psp]);
 
@@ -2753,7 +2753,7 @@ int tTrack::GetPAfSysex(int psp)
   return 0;
 }
 
-void tTrack::SetPAfSysex(int psp, int Value)
+void JZTrack::SetPAfSysex(int psp, int Value)
 {
   if (PAfSettings[psp])
   {
@@ -2773,7 +2773,7 @@ void tTrack::SetPAfSysex(int psp, int Value)
 
 // ------------------------  CC1 Sysex ------------------------------
 
-int tTrack::GetCC1Sysex(int csp)
+int JZTrack::GetCC1Sysex(int csp)
 {
   unsigned char *valp = gpSynth->GetSysexValPtr(CC1Settings[csp]);
 
@@ -2785,7 +2785,7 @@ int tTrack::GetCC1Sysex(int csp)
   return 0;
 }
 
-void tTrack::SetCC1Sysex(int csp, int Value)
+void JZTrack::SetCC1Sysex(int csp, int Value)
 {
   if (CC1Settings[csp])
   {
@@ -2805,7 +2805,7 @@ void tTrack::SetCC1Sysex(int csp, int Value)
 
 // ------------------------  CC2 Sysex ------------------------------
 
-int tTrack::GetCC2Sysex(int csp)
+int JZTrack::GetCC2Sysex(int csp)
 {
   unsigned char *valp = gpSynth->GetSysexValPtr(CC2Settings[csp]);
 
@@ -2817,7 +2817,7 @@ int tTrack::GetCC2Sysex(int csp)
   return 0;
 }
 
-void tTrack::SetCC2Sysex(int csp, int Value)
+void JZTrack::SetCC2Sysex(int csp, int Value)
 {
   if (CC2Settings[csp])
     Kill(CC2Settings[csp]);
@@ -2835,7 +2835,7 @@ void tTrack::SetCC2Sysex(int csp, int Value)
 
 // ------------------------  CC1ControllerNr Sysex ------------------------------
 
-int tTrack::GetCC1ControllerNr()
+int JZTrack::GetCC1ControllerNr()
 {
   unsigned char *valp = gpSynth->GetSysexValPtr(CC1ControllerNr);
 
@@ -2847,7 +2847,7 @@ int tTrack::GetCC1ControllerNr()
   return 0;
 }
 
-void tTrack::SetCC1ControllerNr(int Value)
+void JZTrack::SetCC1ControllerNr(int Value)
 {
   if (CC1ControllerNr)
   {
@@ -2867,7 +2867,7 @@ void tTrack::SetCC1ControllerNr(int Value)
 
 // ------------------------  CC2ControllerNr Sysex ------------------------------
 
-int tTrack::GetCC2ControllerNr()
+int JZTrack::GetCC2ControllerNr()
 {
   unsigned char *valp = gpSynth->GetSysexValPtr(CC2ControllerNr);
 
@@ -2879,7 +2879,7 @@ int tTrack::GetCC2ControllerNr()
   return 0;
 }
 
-void tTrack::SetCC2ControllerNr(int Value)
+void JZTrack::SetCC2ControllerNr(int Value)
 {
   if (CC2ControllerNr)
   {
@@ -2899,7 +2899,7 @@ void tTrack::SetCC2ControllerNr(int Value)
 
 // ------------------------  Reverb Type ------------------------------
 
-int tTrack::GetReverbType(int lsb)
+int JZTrack::GetReverbType(int lsb)
 {
   unsigned char *valp = gpSynth->GetSysexValPtr(ReverbType);
 
@@ -2915,7 +2915,7 @@ int tTrack::GetReverbType(int lsb)
  return 0;
 }
 
-void tTrack::SetReverbType(int Value, int lsb)
+void JZTrack::SetReverbType(int Value, int lsb)
 {
   if (ReverbType)
   {
@@ -2939,7 +2939,7 @@ void tTrack::SetReverbType(int Value, int lsb)
 
 // ------------------------  Chorus Type ------------------------------
 
-int tTrack::GetChorusType(int lsb)
+int JZTrack::GetChorusType(int lsb)
 {
   unsigned char *valp = gpSynth->GetSysexValPtr(ChorusType);
 
@@ -2956,7 +2956,7 @@ int tTrack::GetChorusType(int lsb)
   return 0;
 }
 
-void tTrack::SetChorusType(int Value, int lsb)
+void JZTrack::SetChorusType(int Value, int lsb)
 {
   if (ChorusType)
   {
@@ -2980,7 +2980,7 @@ void tTrack::SetChorusType(int Value, int lsb)
 
 // -----------------------  Equalizer Type ------------------------------
 
-int tTrack::GetEqualizerType()
+int JZTrack::GetEqualizerType()
 {
   unsigned char *valp = gpSynth->GetSysexValPtr(EqualizerType);
 
@@ -2992,7 +2992,7 @@ int tTrack::GetEqualizerType()
   return 0;
 }
 
-void tTrack::SetEqualizerType(int Value)
+void JZTrack::SetEqualizerType(int Value)
 {
   if (EqualizerType)
   {
@@ -3013,7 +3013,7 @@ void tTrack::SetEqualizerType(int Value)
 
 // ------------------------  Reverb Parameters Sysex ------------------------------
 
-int tTrack::GetRevSysex(int rsp)
+int JZTrack::GetRevSysex(int rsp)
 {
   unsigned char *valp = gpSynth->GetSysexValPtr(ReverbSettings[rsp]);
 
@@ -3025,7 +3025,7 @@ int tTrack::GetRevSysex(int rsp)
   return 0;
 }
 
-void tTrack::SetRevSysex(int rsp, int Value)
+void JZTrack::SetRevSysex(int rsp, int Value)
 {
   if (ReverbSettings[rsp])
   {
@@ -3049,7 +3049,7 @@ void tTrack::SetRevSysex(int rsp, int Value)
 
 // ------------------------  Chorus Parameters Sysex ------------------------------
 
-int tTrack::GetChoSysex(int csp)
+int JZTrack::GetChoSysex(int csp)
 {
   unsigned char *valp = gpSynth->GetSysexValPtr(ChorusSettings[csp]);
 
@@ -3061,7 +3061,7 @@ int tTrack::GetChoSysex(int csp)
   return 0;
 }
 
-void tTrack::SetChoSysex(int csp, int Value)
+void JZTrack::SetChoSysex(int csp, int Value)
 {
   if (ChorusSettings[csp])
   {
@@ -3086,7 +3086,7 @@ void tTrack::SetChoSysex(int csp, int Value)
 
 // ------------------------  Partial Reserve ------------------------------
 
-int tTrack::GetPartRsrv(int chan)
+int JZTrack::GetPartRsrv(int chan)
 {
   unsigned char *valp = gpSynth->GetSysexValPtr(PartialReserve);
 
@@ -3098,7 +3098,7 @@ int tTrack::GetPartRsrv(int chan)
   return 0;
 }
 
-void tTrack::SetPartRsrv(unsigned char *rsrv)
+void JZTrack::SetPartRsrv(unsigned char *rsrv)
 {
   if (PartialReserve)
   {
@@ -3119,7 +3119,7 @@ void tTrack::SetPartRsrv(unsigned char *rsrv)
 
 // ------------------------  Master Volume ------------------------------
 
-int tTrack::GetMasterVol()
+int JZTrack::GetMasterVol()
 {
   unsigned char *valp = gpSynth->GetSysexValPtr(MasterVol);
 
@@ -3137,7 +3137,7 @@ int tTrack::GetMasterVol()
   return 0;
 }
 
-void tTrack::SetMasterVol(int Value)
+void JZTrack::SetMasterVol(int Value)
 {
   if (MasterVol)
   {
@@ -3158,7 +3158,7 @@ void tTrack::SetMasterVol(int Value)
 
 // ------------------------  Master Pan ------------------------------
 
-int tTrack::GetMasterPan()
+int JZTrack::GetMasterPan()
 {
   unsigned char *valp = gpSynth->GetSysexValPtr(MasterPan);
 
@@ -3170,7 +3170,7 @@ int tTrack::GetMasterPan()
   return 0;
 }
 
-void tTrack::SetMasterPan(int Value)
+void JZTrack::SetMasterPan(int Value)
 {
   if (MasterPan)
   {
@@ -3190,7 +3190,7 @@ void tTrack::SetMasterPan(int Value)
 
 // ------------------------  Mode Sysex ------------------------------
 
-int tTrack::GetModeSysex(int param)
+int JZTrack::GetModeSysex(int param)
 {
    unsigned char *valp = 0;
 
@@ -3213,7 +3213,7 @@ int tTrack::GetModeSysex(int param)
    return 0;
 }
 
-void tTrack::SetModeSysex(int param, int Value)
+void JZTrack::SetModeSysex(int param, int Value)
 {
   switch (param)
   {
@@ -3257,7 +3257,7 @@ void tTrack::SetModeSysex(int param, int Value)
 
 // ------------------------  Mtc offset (Time Code Offset) ------------------------------
 
-tMtcTime* tTrack::GetMtcOffset()
+tMtcTime* JZTrack::GetMtcOffset()
 {
   if (MtcOffset)
   {
@@ -3266,7 +3266,7 @@ tMtcTime* tTrack::GetMtcOffset()
   return(new tMtcTime(0, Mtc30Ndf));
 }
 
-void tTrack::SetMtcOffset(tMtcTime* mtc)
+void JZTrack::SetMtcOffset(tMtcTime* mtc)
 {
   if (MtcOffset)
   {
@@ -3282,7 +3282,7 @@ void tTrack::SetMtcOffset(tMtcTime* mtc)
 
 // ------------------------  Speed ------------------------------
 
-int tTrack::GetDefaultSpeed()
+int JZTrack::GetDefaultSpeed()
 {
   if (Speed)
   {
@@ -3292,7 +3292,7 @@ int tTrack::GetDefaultSpeed()
 }
 
 
-void tTrack::SetDefaultSpeed(int bpm)
+void JZTrack::SetDefaultSpeed(int bpm)
 {
   JZEvent *e = new tSetTempo(0, bpm);
   if (Speed)
@@ -3304,7 +3304,7 @@ void tTrack::SetDefaultSpeed(int bpm)
   Cleanup();
 }
 
-tSetTempo *tTrack::GetCurrentTempo(int clk)
+tSetTempo *JZTrack::GetCurrentTempo(int clk)
 {
   tEventIterator Iterator(this);
   Sort();
@@ -3322,7 +3322,7 @@ tSetTempo *tTrack::GetCurrentTempo(int clk)
   return t;
 }
 
-int tTrack::GetCurrentSpeed(int clk)
+int JZTrack::GetCurrentSpeed(int clk)
 {
   tSetTempo *t = GetCurrentTempo(clk);
   if (t)
@@ -3337,7 +3337,7 @@ int tTrack::GetCurrentSpeed(int clk)
 // ------------------------- State ----------------------------------
 
 
-char *tTrack::GetStateChar()
+char *JZTrack::GetStateChar()
 {
   switch (State)
   {
@@ -3351,19 +3351,19 @@ char *tTrack::GetStateChar()
   return "?";
 }
 
-void tTrack::SetState(int NewState)
+void JZTrack::SetState(int NewState)
 {
   State = NewState % 3;
 }
 
-void tTrack::ToggleState(int Direction)
+void JZTrack::ToggleState(int Direction)
 {
   State = (State + Direction + 3) % 3;
 }
 
 // ------------------------- Channel ---------------------------
 
-void tTrack::SetChannel(int NewChannel)
+void JZTrack::SetChannel(int NewChannel)
 {
   Channel = NewChannel;
 }

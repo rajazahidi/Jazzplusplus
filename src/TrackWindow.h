@@ -28,6 +28,7 @@
 
 class JZTrackFrame;
 class JZSong;
+class JZTrack;
 class tFilter;
 class tSnapSelection;
 class wxFont;
@@ -99,6 +100,8 @@ class JZTrackWindow : public wxScrolledWindow
 
     void OnRightButtonUp(wxMouseEvent& Event);
 
+    void ToggleTrackState(const wxPoint& Point);
+
     virtual void OnDraw(wxDC& Dc);
 
     void Draw(wxDC& Dc);
@@ -140,7 +143,11 @@ class JZTrackWindow : public wxScrolledWindow
 
     int x2wBar(int x);
 
-    int Track2y(int Track);
+    int TrackIndex2y(int Track);
+
+    int y2TrackIndex(int y);
+
+    JZTrack* y2Track(int y);
 
     int x2Clock(int x);
 

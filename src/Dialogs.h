@@ -29,7 +29,7 @@ class JZPianoFrame;
 class tFilter;
 class JZSong;
 class JZEventFrame;
-class tTrack;
+class JZTrack;
 class JZEvent;
 
 class tShiftDlg : public tPropertyListDlg
@@ -250,7 +250,7 @@ class tQuantizeDlg : public tPropertyListDlg
 void EventDialog(
   JZEvent*,
   JZPianoFrame*,
-  tTrack*,
+  JZTrack*,
   long Clock,
   int Channel,
   int Pitch);

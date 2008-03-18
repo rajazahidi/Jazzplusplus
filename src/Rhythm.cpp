@@ -260,7 +260,7 @@ void tRhythm::GenInit(long frc)
 }
 
 
-void tRhythm::GenerateEvent(tTrack *track, long clock, short vel, short len)
+void tRhythm::GenerateEvent(JZTrack *track, long clock, short vel, short len)
 {
   int chan = track->Channel - 1;
 
@@ -296,7 +296,7 @@ void tRhythm::GenerateEvent(tTrack *track, long clock, short vel, short len)
 
 
 #if 0
-void tRhythm::Generate(tTrack *track, long fr_clock, long to_clock, long ticks_per_bar)
+void tRhythm::Generate(JZTrack *track, long fr_clock, long to_clock, long ticks_per_bar)
 {
   int chan   = track->Channel - 1;
   long clock = fr_clock;
@@ -404,7 +404,7 @@ void tRhythm::GenGroup(JZRndArray &out, int grp, JZBarInfo &bi, tRhythm *rhy[], 
 }
 
 
-void tRhythm::Generate(tTrack *track, JZBarInfo &bi, tRhythm *rhy[], int n_rhy)
+void tRhythm::Generate(JZTrack *track, JZBarInfo &bi, tRhythm *rhy[], int n_rhy)
 {
   JZRndArray rrg(rhythm);
 
@@ -1035,7 +1035,7 @@ void tRhythmWin::GenRhythm()
 
   long fr_clock = pFilter->FromClock;
   long to_clock = pFilter->ToClock;
-  tTrack *track = song->GetTrack(pFilter->FromTrack);
+  JZTrack *track = song->GetTrack(pFilter->FromTrack);
   song->NewUndoBuffer();
 
   // remove selection

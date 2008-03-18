@@ -730,14 +730,14 @@ class tEventDlg : public tPropertyListDlg
 {
   public:
 
-    tTrack    *Track;
+    JZTrack    *Track;
     tClockDlg ClockDlg;
     JZPianoFrame* Win;
 
     JZEvent    *Event;
     JZEvent    *Copy;
 
-    tEventDlg(JZEvent *e, JZPianoFrame* w, tTrack *t);
+    tEventDlg(JZEvent *e, JZPianoFrame* w, JZTrack *t);
     virtual void AddProperties();
     virtual bool OnClose();
     virtual void OnHelp();
@@ -745,7 +745,7 @@ class tEventDlg : public tPropertyListDlg
 };
 
 
-tEventDlg::tEventDlg(JZEvent *e, JZPianoFrame* w, tTrack *t)
+tEventDlg::tEventDlg(JZEvent *e, JZPianoFrame* w, JZTrack *t)
   : tPropertyListDlg( "Event" ),
     ClockDlg(w->Song, "Time ", e->GetClock())
 {
@@ -790,7 +790,7 @@ class tChEventDlg : public tEventDlg
 
     int Channel;
 
-    tChEventDlg(tChannelEvent *e, JZPianoFrame* w, tTrack *t)
+    tChEventDlg(tChannelEvent *e, JZPianoFrame* w, JZTrack *t)
       : tEventDlg(e, w, t)
     {
       Channel = e->Channel + 1;                // 1..16
@@ -830,14 +830,14 @@ class tKeyOnDlg : public tChEventDlg
   // SN++
   int OffVeloc;
 
-  tKeyOnDlg(tKeyOn *e, JZPianoFrame* w, tTrack *t);
+  tKeyOnDlg(tKeyOn *e, JZPianoFrame* w, JZTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tKeyOnDlg::tKeyOnDlg(tKeyOn *e, JZPianoFrame* w, tTrack *t)
+tKeyOnDlg::tKeyOnDlg(tKeyOn *e, JZPianoFrame* w, JZTrack *t)
   : tChEventDlg(e, w, t),
     PitchDlg("Pitch", e->Key)
 {
@@ -901,14 +901,14 @@ class tPitchDlg : public tChEventDlg
 
   int Value;
 
-  tPitchDlg(tPitch *e, JZPianoFrame* w, tTrack *t);
+  tPitchDlg(tPitch *e, JZPianoFrame* w, JZTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tPitchDlg::tPitchDlg(tPitch *e, JZPianoFrame* w, tTrack *t)
+tPitchDlg::tPitchDlg(tPitch *e, JZPianoFrame* w, JZTrack *t)
   : tChEventDlg(e, w, t)
 {
   Event = e;
@@ -944,14 +944,14 @@ class tControlDlg : public tChEventDlg
   int Control;
   //tNamedChoice Choice;
 
-  tControlDlg(tControl *e, JZPianoFrame* w, tTrack *t);
+  tControlDlg(tControl *e, JZPianoFrame* w, JZTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tControlDlg::tControlDlg(tControl *e, JZPianoFrame* w, tTrack *t)
+tControlDlg::tControlDlg(tControl *e, JZPianoFrame* w, JZTrack *t)
   : tChEventDlg(e, w, t)
   //,    Choice("Controller", &gpConfig->CtrlName(0), &Control)
 {
@@ -1006,14 +1006,14 @@ class tPlayTrackDlg : public tEventDlg
 
   tNamedChoice Choice;
 
-  tPlayTrackDlg(tPlayTrack *e, JZPianoFrame* w, tTrack *t);
+  tPlayTrackDlg(tPlayTrack *e, JZPianoFrame* w, JZTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tPlayTrackDlg::tPlayTrackDlg(tPlayTrack *e, JZPianoFrame* w, tTrack *t)
+tPlayTrackDlg::tPlayTrackDlg(tPlayTrack *e, JZPianoFrame* w, JZTrack *t)
   : tEventDlg(e, w, t),
     Choice("playtrack", gpConfig->GetControlNames(), &track)
 {
@@ -1065,14 +1065,14 @@ class tTextDlg : public tEventDlg
   int track;
   tNamedChoice Choice;
 
-  tTextDlg(tText *e, JZPianoFrame* w, tTrack *t);
+  tTextDlg(tText *e, JZPianoFrame* w, JZTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tTextDlg::tTextDlg(tText *e, JZPianoFrame* w, tTrack *t)
+tTextDlg::tTextDlg(tText *e, JZPianoFrame* w, JZTrack *t)
   : tEventDlg(e, w, t),
     Choice("text", gpConfig->GetControlNames(), &track)
 {
@@ -1112,14 +1112,14 @@ class tEndOfTrackDlg : public tEventDlg
 
   tNamedChoice Choice;
 
-  tEndOfTrackDlg(tEndOfTrack *e, JZPianoFrame* w, tTrack *t);
+  tEndOfTrackDlg(tEndOfTrack *e, JZPianoFrame* w, JZTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tEndOfTrackDlg::tEndOfTrackDlg(tEndOfTrack *e, JZPianoFrame* w, tTrack *t)
+tEndOfTrackDlg::tEndOfTrackDlg(tEndOfTrack *e, JZPianoFrame* w, JZTrack *t)
   : tEventDlg(e, w, t),
     Choice("End Of Track", gpConfig->GetControlNames(), &track)
 {
@@ -1149,14 +1149,14 @@ class tProgramDlg : public tEventDlg
   int Program;
   //  tNamedChoice Choice;
 
-  tProgramDlg(tProgram *e, JZPianoFrame* w, tTrack *t);
+  tProgramDlg(tProgram *e, JZPianoFrame* w, JZTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tProgramDlg::tProgramDlg(tProgram *e, JZPianoFrame* w, tTrack *t)
+tProgramDlg::tProgramDlg(tProgram *e, JZPianoFrame* w, JZTrack *t)
   : tEventDlg(e, w, t),
     Program(e->Program + 1)
   //,    Choice("Program", &gpConfig->VoiceName(0), &Program)
@@ -1194,14 +1194,14 @@ class tSetTempoDlg : public tEventDlg
 
   int Value;
 
-  tSetTempoDlg(tSetTempo *e, JZPianoFrame* w, tTrack *t);
+  tSetTempoDlg(tSetTempo *e, JZPianoFrame* w, JZTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tSetTempoDlg::tSetTempoDlg(tSetTempo *e, JZPianoFrame* w, tTrack *t)
+tSetTempoDlg::tSetTempoDlg(tSetTempo *e, JZPianoFrame* w, JZTrack *t)
   : tEventDlg(e, w, t)
 {
   Event = e;
@@ -1234,14 +1234,14 @@ class tSysexDlg : public tEventDlg
 
   char *str;
 
-  tSysexDlg(tSysEx *s, JZPianoFrame* w, tTrack *t);
+  tSysexDlg(tSysEx *s, JZPianoFrame* w, JZTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tSysexDlg::tSysexDlg(tSysEx *s, JZPianoFrame* w, tTrack *t)
+tSysexDlg::tSysexDlg(tSysEx *s, JZPianoFrame* w, JZTrack *t)
   : tEventDlg(s, w, t)
 {
   Event = s;
@@ -1452,7 +1452,7 @@ static JZEvent *CreateEventDialog(long Clock, int Channel, int Pitch)
 void EventDialog(
   JZEvent* e,
   JZPianoFrame* w,
-  tTrack* t,
+  JZTrack* t,
   long Clock,
   int Channel,
   int Pitch)

@@ -131,7 +131,7 @@ void tCtrlEditBase::SetSize(int dx, int x, int y, int w, int h)
 }
 
 
-void tCtrlEditBase::ReInit(tTrack *t, long fc, long cpp)
+void tCtrlEditBase::ReInit(JZTrack *t, long fc, long cpp)
 {
   int w, h;
   edit->GetSize(&w, &h);

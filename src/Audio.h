@@ -31,7 +31,7 @@
 #include "Project.h"
 
 class tEventArray;
-class tTrack;
+class JZTrack;
 struct tAudioBuffer;
 class tAudioBufferQueue;
 class tAudioRecordBuffer;
@@ -268,7 +268,7 @@ class tSampleSet
       return buffers[i];
     }
 
-    void AdjustAudioLength(tTrack *t, long ticks_per_minute);
+    void AdjustAudioLength(JZTrack *t, long ticks_per_minute);
 
     long Ticks2Samples(long ticks) const
     {

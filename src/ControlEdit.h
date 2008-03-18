@@ -26,7 +26,7 @@
 #include "Random.h"
 
 class JZPianoFrame;
-class tTrack;
+class JZTrack;
 class JZEvent;
 class tCtrlEditBase;
 
@@ -55,7 +55,7 @@ class tCtrlEditBase : public tArrayEditDrawBars
     tCtrlEditBase(int min, int max, JZPianoFrame *parent, char const *label, int xoff, int x, int y, int w, int h, int mode=0);
     virtual ~tCtrlEditBase();
     void SetSize(int xoff, int x, int y, int w, int h);
-    void ReInit(tTrack *track, long FromClock, long ClocksPerPixel);
+    void ReInit(JZTrack *track, long FromClock, long ClocksPerPixel);
 
 // SN++ Default = 0, 1 bedeutet der Editor arbeitet auch auf Selektionen.
 //      Dieser Patch zusammen mit dem "selectable Patch" im PianoWin
@@ -82,7 +82,7 @@ class tCtrlEditBase : public tArrayEditDrawBars
 // SN++
     int x_off;
     int ctrlmode;
-    tTrack *track;
+    JZTrack *track;
     long   from_clock;
     long   to_clock;
     long   i_max;

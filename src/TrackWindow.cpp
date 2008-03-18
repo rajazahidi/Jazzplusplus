@@ -287,61 +287,70 @@ void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& Event)
 {
   wxPoint Point = Event.GetPosition();
 
-  // Check to see if the mouse was clicked inside of the number mode
-  // indicator.
-  if (Point.x < mNumberWidth && Point.y < mTopInfoHeight)
+  // Check to see if the mouse was clicked in the top header.
+  if (Point.y < mTopInfoHeight)
   {
-    if (mNumberMode == eNmTrackNr)
+    // Check to see if the mouse was clicked inside of the number mode
+    // indicator.
+    if (Point.x < mNumberWidth && Point.y < mTopInfoHeight)
     {
-      mNumberMode = eNmMidiChannel;
+      if (mNumberMode == eNmTrackNr)
+      {
+        mNumberMode = eNmMidiChannel;
+        Refresh(false);
+      }
+      else
+      {
+        mNumberMode = eNmTrackNr;
+        Refresh(false);
+      }
+    }
+    // Check to see if the mouse was clicked inside of the track name header.
+    else if (
+      Point.x >= mTrackNameX &&
+      Point.x < mTrackNameX + mTrackNameWidth)
+    {
+      // Bump up the speed value one tick.
+      int SpeedBpm = gpProject->GetTrack(0)->GetDefaultSpeed();
+      ++SpeedBpm;
+      if (SpeedBpm > 0 && SpeedBpm < 300)
+      {
+        gpProject->GetTrack(0)->SetDefaultSpeed(SpeedBpm);
+      }
       Refresh(false);
     }
-    else
+    // Check to see if the mouse was clicked inside of the patch header.
+    else if (Point.x >= mPatchX && Point.x < mPatchX + mPatchWidth)
     {
-      mNumberMode = eNmTrackNr;
+      // Toggle the patch type.
+      switch (mCounterMode)
+      {
+        case eCmProgram:
+          mCounterMode = eCmBank;
+          break;
+        case eCmBank:
+          mCounterMode = eCmVolume;
+          break;
+        case eCmVolume:
+          mCounterMode = eCmPan;
+          break;
+        case eCmPan:
+          mCounterMode = eCmReverb;
+          break;
+        case eCmReverb:
+          mCounterMode = eCmChorus;
+          break;
+        case eCmChorus:
+        default:
+          mCounterMode = eCmProgram;
+          break;
+      }
       Refresh(false);
     }
   }
-  else if (
-    Point.x >= mTrackNameX && Point.x < mTrackNameX + mTrackNameWidth &&
-    Point.y < mTopInfoHeight)
+  else if (Point.x >= mStateX && Point.x < mStateX + mStateWidth)
   {
-    // Bump up the speed value one tick.
-    int SpeedBpm = gpProject->GetTrack(0)->GetDefaultSpeed();
-    ++SpeedBpm;
-    if (SpeedBpm > 0 && SpeedBpm < 300)
-    {
-      gpProject->GetTrack(0)->SetDefaultSpeed(SpeedBpm);
-    }
-    Refresh(false);
-  }
-  else if (
-    Point.x >= mPatchX && Point.x < mPatchX + mPatchWidth &&
-    Point.y < mTopInfoHeight)
-  {
-    switch (mCounterMode)
-    {
-      case eCmProgram:
-        mCounterMode = eCmBank;
-        break;
-      case eCmBank:
-        mCounterMode = eCmVolume;
-        break;
-      case eCmVolume:
-        mCounterMode = eCmPan;
-        break;
-      case eCmPan:
-        mCounterMode = eCmReverb;
-        break;
-      case eCmReverb:
-        mCounterMode = eCmChorus;
-        break;
-      case eCmChorus:
-      default:
-        mCounterMode = eCmProgram;
-        break;
-    }
-    Refresh(false);
+    ToggleTrackState(Point);
   }
 }
 
@@ -362,6 +371,18 @@ void JZTrackWindow::OnRightButtonUp(wxMouseEvent& Event)
     {
       gpProject->GetTrack(0)->SetDefaultSpeed(SpeedBpm);
     }
+    Refresh(false);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::ToggleTrackState(const wxPoint& Point)
+{
+  JZTrack* pTrack = y2Track(Point.y);
+  if (pTrack)
+  {
+    pTrack->ToggleState(1);
     Refresh(false);
   }
 }
@@ -550,7 +571,10 @@ void JZTrackWindow::Draw(wxDC& Dc)
   // For each track show the MIDI channel, name, state, prg.
   int TrackNumber = mFromLine;
 
-  for (int y = Track2y(TrackNumber); y < mEventsY + mEventsHeight; y += mTrackHeight)
+  for (
+    int y = TrackIndex2y(TrackNumber);
+    y < mEventsY + mEventsHeight;
+    y += mTrackHeight)
   {
     LocalDc.SetClippingRegion(
       0,
@@ -565,7 +589,7 @@ void JZTrackWindow::Draw(wxDC& Dc)
 
     LocalDc.DestroyClippingRegion();
 
-    tTrack* pTrack = gpProject->GetTrack(TrackNumber);
+    JZTrack* pTrack = gpProject->GetTrack(TrackNumber);
     if (pTrack)
     {
       LocalDc.SetClippingRegion(
@@ -650,12 +674,12 @@ void JZTrackWindow::DrawNumbers(wxDC& Dc)
   Dc.SetClippingRegion(0, mEventsY, mNumberWidth, mEventsHeight);
   for (int i = mFromLine; i < mToLine; ++i)
   {
-    tTrack* pTrack = gpProject->GetTrack(i);
+    JZTrack* pTrack = gpProject->GetTrack(i);
     if (pTrack != 0)
     {
       if (pTrack->GetAudioMode())
       {
-        LineText(Dc, 0, Track2y(i), mNumberWidth, "Au");
+        LineText(Dc, 0, TrackIndex2y(i), mNumberWidth, "Au");
       }
       else
       {
@@ -674,12 +698,12 @@ void JZTrackWindow::DrawNumbers(wxDC& Dc)
         }
         ostringstream Oss;
         Oss << setw(2) << Value;
-        LineText(Dc, 0, Track2y(i), mNumberWidth, Oss.str().c_str());
+        LineText(Dc, 0, TrackIndex2y(i), mNumberWidth, Oss.str().c_str());
       }
     }
     else
     {
-      LineText(Dc, 0, Track2y(i), mNumberWidth, "");
+      LineText(Dc, 0, TrackIndex2y(i), mNumberWidth, "");
     }
   }
   Dc.DestroyClippingRegion();
@@ -785,17 +809,21 @@ void JZTrackWindow::LineText(
     x -= 2;
     y -= 2;
   }
-  wxColor bg = Dc.GetTextBackground();
-  Dc.SetTextBackground(*mpGreyColor);
-  int TextWidth, TextHeight;
-  Dc.GetTextExtent(pString, &TextWidth, &TextHeight);
-  int Margin = (Width - TextWidth) / 2;
-  if (Margin < mLittleBit)
+
+  if (pString && strlen(pString) > 0)
   {
-    Margin = mLittleBit;
+    wxColor TextBackgroundColor = Dc.GetTextBackground();
+    Dc.SetTextBackground(*mpGreyColor);
+    int TextWidth, TextHeight;
+    Dc.GetTextExtent(pString, &TextWidth, &TextHeight);
+    int Margin = (Width - TextWidth) / 2;
+    if (Margin < mLittleBit)
+    {
+      Margin = mLittleBit;
+    }
+    Dc.DrawText(pString, x + Margin, y + mLittleBit);
+    Dc.SetTextBackground(TextBackgroundColor);
   }
-  Dc.DrawText(pString, x + Margin, y + mLittleBit);
-  Dc.SetTextBackground(*wxWHITE);
 }
 
 //-----------------------------------------------------------------------------
@@ -809,7 +837,7 @@ void JZTrackWindow::DrawCounters(wxDC& Dc)
   Dc.SetClippingRegion(mPatchX, mEventsY, mPatchWidth, mEventsHeight);
   for (i = mFromLine; i < mToLine; i++)
   {
-    tTrack* pTrack = gpProject->GetTrack(i);
+    JZTrack* pTrack = gpProject->GetTrack(i);
     if (pTrack)
     {
       int Value;
@@ -839,11 +867,11 @@ void JZTrackWindow::DrawCounters(wxDC& Dc)
       }
       ostringstream Oss;
       Oss << setw(3) << Value;
-      LineText(Dc, mPatchX, Track2y(i), mPatchWidth, Oss.str().c_str());
+      LineText(Dc, mPatchX, TrackIndex2y(i), mPatchWidth, Oss.str().c_str());
     }
     else
     {
-      LineText(Dc, mPatchX, Track2y(i), mPatchWidth, "?");
+      LineText(Dc, mPatchX, TrackIndex2y(i), mPatchWidth, "?");
     }
   }
   Dc.DestroyClippingRegion();
@@ -865,9 +893,12 @@ void JZTrackWindow::DrawEvents(wxDC& Dc)
   Dc.SetClippingRegion(mEventsX, mEventsY, mEventsWidth, mEventsHeight);
 
   int TrackNumber = mFromLine;
-  for (int y = Track2y(TrackNumber); y < mEventsY + mEventsHeight; y += mTrackHeight)
+  for (
+    int y = TrackIndex2y(TrackNumber);
+    y < mEventsY + mEventsHeight;
+    y += mTrackHeight)
   {
-    tTrack *Track = gpProject->GetTrack(TrackNumber);
+    JZTrack *Track = gpProject->GetTrack(TrackNumber);
     if (Track)
     {
       tEventIterator Iterator(Track);
@@ -1047,9 +1078,37 @@ int JZTrackWindow::x2wBar(int x)
 // Description:
 //   Convert a track index into a y-pixel location in the visible window.
 //-----------------------------------------------------------------------------
-int JZTrackWindow::Track2y(int Track)
+int JZTrackWindow::TrackIndex2y(int Track)
 {
   return Track * mTrackHeight + mTopInfoHeight - mScrolledY;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZTrackWindow::y2TrackIndex(int y)
+{
+  return (y + mScrolledY - mTopInfoHeight) / mTrackHeight;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZTrack* JZTrackWindow::y2Track(int y)
+{
+  return mpSong->GetTrack(y2TrackIndex(y));
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZTrackWindow::y2yLine(int y, int Up)
+{
+  if (Up)
+  {
+    y += mTrackHeight;
+  }
+  y -= mTopInfoHeight;
+  y -= y % mTrackHeight;
+  y += mTopInfoHeight;
+  return y;
 }
 
 //-----------------------------------------------------------------------------
@@ -1078,20 +1137,6 @@ int JZTrackWindow::x2BarClock(int x, int Next)
     BarInfo.Next();
   }
   return BarInfo.Clock;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-int JZTrackWindow::y2yLine(int y, int Up)
-{
-  if (Up)
-  {
-    y += mTrackHeight;
-  }
-  y -= mTopInfoHeight;
-  y -= y % mTrackHeight;
-  y += mTopInfoHeight;
-  return y;
 }
 
 //-----------------------------------------------------------------------------
@@ -1237,7 +1282,7 @@ void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
         LineText(
           *pDc,
           mStateX,
-          Track2y(pRecInfo.mTrackIndex),
+          TrackIndex2y(pRecInfo.mTrackIndex),
           mStateWidth,
           pRecInfo.Track->GetStateChar());
 #endif
@@ -1285,7 +1330,7 @@ void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
 //        LineText(
 //          *pDc,
 //          mStateX,
-//          Track2y(pRecInfo->mTrackIndex),
+//          TrackIndex2y(pRecInfo->mTrackIndex),
 //          mStateWidth,
 //          pRecInfo->mpTrack->GetStateChar());
 

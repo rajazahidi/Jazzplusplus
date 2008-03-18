@@ -207,7 +207,7 @@ class tPlayer : public wxTimer
     virtual const char *GetSampleName(int i) {
       return samples.GetSampleName(i);
     }
-    virtual void AdjustAudioLength(tTrack *t) {
+    virtual void AdjustAudioLength(JZTrack *t) {
       long ticks_per_minute = Song->TicksPerQuarter * Song->Speed();
       samples.AdjustAudioLength(t, ticks_per_minute);
     }
@@ -242,7 +242,7 @@ class tPlayer : public wxTimer
     virtual void OutBreak() = 0;
 
     // send event immediately ignoring clock
-    void OutNow(tTrack *t, JZEvent* pEvent)
+    void OutNow(JZTrack *t, JZEvent* pEvent)
     {
       pEvent->SetDevice(t->GetDevice());
       OutNow(pEvent);
@@ -254,7 +254,7 @@ class tPlayer : public wxTimer
       OutNow(pEvent);
     }
 
-    void OutNow(tTrack *t, tParam *r);
+    void OutNow(JZTrack *t, tParam *r);
 
     // what's played right now?
     virtual long GetRealTimeClock() = 0;

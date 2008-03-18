@@ -237,7 +237,7 @@ void tPlayer::StartPlay(long Clock, long LoopClock, int Continue)
     AudioBuffer->Clear();
   }
 
-  tTrack *t;
+  JZTrack *t;
 
   if ( !Continue )
   {
@@ -510,7 +510,7 @@ void tPlayer::StopPlay()
 
   for (ii = 0; ii < Song->nTracks; ii++)
   {
-    tTrack *Track = Song->GetTrack(ii);
+    JZTrack *Track = Song->GetTrack(ii);
     if (Track)
     {
       tEventIterator Iterator(Track);
@@ -635,7 +635,7 @@ void tPlayer::AllNotesOff(int Reset)
 
 
 
-void tPlayer::OutNow(tTrack *t, tParam *r) {
+void tPlayer::OutNow(JZTrack *t, tParam *r) {
   OutNow(t, &r->Msb);
   OutNow(t, &r->Lsb);
   OutNow(t, &r->DataMsb);

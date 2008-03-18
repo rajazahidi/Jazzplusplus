@@ -24,7 +24,7 @@
 #define JZ_HARMONYBROWSERANALYZER_H
 
 class tFilter;
-class tTrack;
+class JZTrack;
 class HBContext;
 class tKeyOn;
 class HBChord;
@@ -51,11 +51,11 @@ class HBAnalyzer
     int eighths_per_chord;
     int steps;
     tFilter* filter;
-    tTrack* track;
+    JZTrack* track;
 
-    void IterateEvents(void (HBAnalyzer::*Action)(tKeyOn *on, tTrack *t));
-    void CountEvent(tKeyOn *on, tTrack *t);
-    void TransposeEvent(tKeyOn *on, tTrack *t);
+    void IterateEvents(void (HBAnalyzer::*Action)(tKeyOn *on, JZTrack *t));
+    void CountEvent(tKeyOn *on, JZTrack *t);
+    void TransposeEvent(tKeyOn *on, JZTrack *t);
     void CreateChords();
     int NumCount(int i);
     int MaxCount(int i, const HBChord &done);

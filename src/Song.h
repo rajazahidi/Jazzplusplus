@@ -73,7 +73,7 @@ class JZSong
     int nTracks;
     int TicksPerQuarter;
 
-    tTrack mTracks[eMaxTrackCount];
+    JZTrack mTracks[eMaxTrackCount];
 
     void NewUndoBuffer();
     void Undo();
@@ -86,7 +86,7 @@ class JZSong
     void Read(tReadBase &io, const char *fname = 0);
     void Write(tWriteBase &io, const char *fname = 0);
 
-    tTrack *GetTrack(int Nr);
+    JZTrack *GetTrack(int Nr);
     int GetLastClock();
     int NumUsedTracks();        // number of used tracks
     int Speed();

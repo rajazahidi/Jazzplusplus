@@ -25,7 +25,7 @@
 
 class tFilter;
 class JZEvent;
-class tTrack;
+class JZTrack;
 class JZSong;
 class tEventArray;
 class JZRndArray;
@@ -60,8 +60,8 @@ class tCommand
 
     tCommand(tFilter *f);
     virtual void Execute(int NewUndo = 1);
-    virtual void ExecuteTrack(tTrack *t);
-    virtual void ExecuteEvent(tTrack *t, JZEvent *e);
+    virtual void ExecuteTrack(JZTrack *t);
+    virtual void ExecuteEvent(JZTrack *t, JZEvent *e);
     long Interpolate(long clk, long vmin, long vmax);
     virtual ~tCommand() {}
 };
@@ -72,7 +72,7 @@ class tCmdShift : public tCommand
   long DeltaClock;
   public:
     tCmdShift(tFilter *f, long DeltaClock);
-    virtual void ExecuteEvent(tTrack *t, JZEvent *e);
+    virtual void ExecuteEvent(JZTrack *t, JZEvent *e);
 };
 
 
@@ -82,7 +82,7 @@ class tCmdErase : public tCommand
     int LeaveSpace;
     tCmdErase(tFilter *f, int LeaveSpace = 1);
     virtual void Execute(int NewUndo = 1);
-    virtual void ExecuteEvent(tTrack *t, JZEvent *e);
+    virtual void ExecuteEvent(JZTrack *t, JZEvent *e);
 };
 
 class tCmdVelocity : public tCommand
@@ -90,7 +90,7 @@ class tCmdVelocity : public tCommand
   public:
     int FromValue, ToValue, Mode;
     tCmdVelocity(tFilter *f, int From, int To, int Mode);
-    virtual void ExecuteEvent(tTrack *t, JZEvent *e);
+    virtual void ExecuteEvent(JZTrack *t, JZEvent *e);
 };
 
 
@@ -99,7 +99,7 @@ class tCmdLength : public tCommand
   public:
     int FromValue, ToValue, Mode;
     tCmdLength(tFilter *f, int From, int To, int Mode);
-    virtual void ExecuteEvent(tTrack *t, JZEvent *e);
+    virtual void ExecuteEvent(JZTrack *t, JZEvent *e);
 };
 
 
@@ -109,7 +109,7 @@ class tCmdSeqLength : public tCommand
   double scale;
   long startClock;
     tCmdSeqLength(tFilter *f, double scale);
-    virtual void ExecuteEvent(tTrack *t, JZEvent *e);
+    virtual void ExecuteEvent(JZTrack *t, JZEvent *e);
 };
 
 
@@ -122,7 +122,7 @@ class tCmdMidiDelay : public tCommand
   int repeat;
 
     tCmdMidiDelay(tFilter *f, double scale, long clockDelay, int repeat);
-    virtual void ExecuteEvent(tTrack *t, JZEvent *e);
+    virtual void ExecuteEvent(JZTrack *t, JZEvent *e);
 };
 
 class tCmdConvertToModulation : public tCommand
@@ -130,7 +130,7 @@ class tCmdConvertToModulation : public tCommand
   public:
 
   tCmdConvertToModulation(tFilter *f);
-  virtual void ExecuteTrack(tTrack *t);
+  virtual void ExecuteTrack(JZTrack *t);
 };
 
 
@@ -144,8 +144,8 @@ class tCmdCleanup : public tCommand
     tKeyOn *prev_note[16][128];
   public:
     tCmdCleanup(tFilter *f, long limitClocks, int shortenOverlaps);
-    virtual void ExecuteTrack(tTrack *t);
-    virtual void ExecuteEvent(tTrack *t, JZEvent *e);
+    virtual void ExecuteTrack(JZTrack *t);
+    virtual void ExecuteEvent(JZTrack *t, JZEvent *e);
 };
 
 
@@ -154,7 +154,7 @@ class tCmdSearchReplace : public tCommand
   short fr, to;
   public:
     tCmdSearchReplace(tFilter *f, short fr, short to);
-    virtual void ExecuteEvent(tTrack *t, JZEvent *e);
+    virtual void ExecuteEvent(JZTrack *t, JZEvent *e);
 };
 
 
@@ -168,7 +168,7 @@ class tCmdQuantize : public tCommand
     int Delay;         // zero
     int Groove;         // zero
     tCmdQuantize(tFilter *f, long QntClocks, int groove, int delay);
-    virtual void ExecuteEvent(tTrack *t, JZEvent *e);
+    virtual void ExecuteEvent(JZTrack *t, JZEvent *e);
 };
 
 
@@ -179,7 +179,7 @@ class tCmdTranspose : public tCommand
     int FitIntoScale;
     tScale Scale;
     tCmdTranspose(tFilter *f, int Notes, int ScaleNr = 0, int FitIntoScale = 0);
-    virtual void ExecuteEvent(tTrack *t, JZEvent *e);
+    virtual void ExecuteEvent(JZTrack *t, JZEvent *e);
 };
 
 
@@ -188,7 +188,7 @@ class tCmdSetChannel : public tCommand
   public:
     int NewChannel;        // 0
     tCmdSetChannel(tFilter *f, int NewChannel);
-    virtual void ExecuteEvent(tTrack *t, JZEvent *e);
+    virtual void ExecuteEvent(JZTrack *t, JZEvent *e);
 };
 
 
@@ -197,7 +197,7 @@ class tCmdCopyToBuffer : public tCommand
   tEventArray *Buffer;
   public:
     tCmdCopyToBuffer(tFilter *f, tEventArray *Buffer);
-    virtual void ExecuteEvent(tTrack *t, JZEvent *e);
+    virtual void ExecuteEvent(JZTrack *t, JZEvent *e);
 };
 
 
@@ -214,7 +214,7 @@ class tCmdCopy : public tCommand
     long RepeatClock;        // -1L
 
     tCmdCopy(tFilter *f, long DestTrack, long DestClock);
-    virtual void ExecuteTrack(tTrack *t);
+    virtual void ExecuteTrack(JZTrack *t);
 };
 
 
@@ -223,14 +223,14 @@ class tCmdExchLeftRight : public tCommand
 {
   public:
     tCmdExchLeftRight(tFilter *f);
-    virtual void ExecuteEvent(tTrack *t, JZEvent *e);
+    virtual void ExecuteEvent(JZTrack *t, JZEvent *e);
 };
 
 class tCmdExchUpDown : public tCommand
 {
   public:
     tCmdExchUpDown(tFilter *f);
-    virtual void ExecuteTrack(tTrack *t);
+    virtual void ExecuteTrack(JZTrack *t);
 };
 
 class tCmdMapper : public tCommand
@@ -239,7 +239,7 @@ class tCmdMapper : public tCommand
     enum prop { veloc, length, key, rhythm, random, pan, modul, cc1, cc2, pitch, clock };
     tCmdMapper(tFilter *f, prop src, prop dst, JZRndArray &array, int nbars, int add);
     ~tCmdMapper();
-    virtual void ExecuteEvent(tTrack *t, JZEvent *e);
+    virtual void ExecuteEvent(JZTrack *t, JZEvent *e);
   private:
     int n_bars;
     int start_bar;

@@ -29,7 +29,7 @@
 
 #include <iostream>
 
-class tTrack;
+class JZTrack;
 class JZEventFrame;
 class JZSong;
 class JZBarInfo;
@@ -101,10 +101,10 @@ class tRhythm
     char const * GetLabel() { return label; }
     void SetLabel(char const *);
 
-    void Generate(tTrack *track, long fr_clock, long to_clock, long ticks_per_bar);
-    void Generate(tTrack *track, JZBarInfo &bi, tRhythm *rhy[], int n_rhy);
+    void Generate(JZTrack *track, long fr_clock, long to_clock, long ticks_per_bar);
+    void Generate(JZTrack *track, JZBarInfo &bi, tRhythm *rhy[], int n_rhy);
     void GenInit(long start_clock);
-    void GenerateEvent(tTrack *track, long clock, short vel, short len);
+    void GenerateEvent(JZTrack *track, long clock, short vel, short len);
 
     void write(std::ostream& os);
     void read(std::istream& is, int version);

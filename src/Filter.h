@@ -26,7 +26,7 @@
 #include "Events.h"
 
 class JZSong;
-class tTrack;
+class JZTrack;
 
 
 #define FltKeyOn        0
@@ -126,8 +126,8 @@ class tTrackIterator
   int     Reverse;
   public:
     tTrackIterator(tFilter *f, int Reverse = 0);
-    tTrack *First();
-    tTrack *Next();
+    JZTrack *First();
+    JZTrack *Next();
     int    Count() const;
 };
 

@@ -250,7 +250,7 @@ class tListen : public wxTimer
     {
     }
     void KeyOn(
-      tTrack *t,
+      JZTrack *t,
       int Pitch,
       int Channel,
       int Veloc = 64,
@@ -260,10 +260,10 @@ class tListen : public wxTimer
 
   private:
 
-    tTrack *track;
+    JZTrack *track;
 };
 
-void tListen::KeyOn(tTrack *t, int pitch, int channel, int veloc, int milli)
+void tListen::KeyOn(JZTrack *t, int pitch, int channel, int veloc, int milli)
 {
   if (!Active)
   {
@@ -1096,7 +1096,7 @@ int JZPianoFrame::IsVisible(JZEvent* pEvent)
 }
 
 
-int JZPianoFrame::IsVisible(tTrack *t)
+int JZPianoFrame::IsVisible(JZTrack *t)
 {
   if (!VisibleAllTracks)
     return t == Track;
@@ -1384,7 +1384,7 @@ void JZPianoFrame::OnPaintSub(wxDC* dc, int x, int y)
     int i;
     for (i = 0; i < Song->nTracks; i++)
     {
-      tTrack *t = Song->GetTrack(i);
+      JZTrack *t = Song->GetTrack(i);
       if (t != Track && IsVisible(t))
         DrawEvents(dc, t, StatKeyOn, wxLIGHT_GREY_BRUSH, TRUE);
     }
@@ -1603,7 +1603,7 @@ void JZPianoFrame::DrawEvent(wxDC* dc, JZEvent* pEvent, const wxBrush* Brush, in
 
 
 
-void JZPianoFrame::DrawEvents(wxDC* dc, tTrack *t, int Stat, const wxBrush* Brush, int force_color)
+void JZPianoFrame::DrawEvents(wxDC* dc, JZTrack *t, int Stat, const wxBrush* Brush, int force_color)
 {
   //dc->SetClippingRegion(mEventsX, mEventsY, mEventsWidth, mEventsHeight);
   dc->SetBrush(*Brush);
@@ -1748,7 +1748,7 @@ int JZPianoFrame::Pitch2y(int Pitch)
 }
 
 
-JZEvent *JZPianoFrame::FindEvent(tTrack *Track, int Clock, int Pitch)
+JZEvent *JZPianoFrame::FindEvent(JZTrack *Track, int Clock, int Pitch)
 // Pitch == -1: search for any pitches
 {
   tEventIterator Iterator(Track);
@@ -1774,7 +1774,7 @@ JZEvent *JZPianoFrame::FindEvent(tTrack *Track, int Clock, int Pitch)
 }
 
 
-void JZPianoFrame::kill_keys_aftertouch(tTrack *t, JZEvent* pEvent)
+void JZPianoFrame::kill_keys_aftertouch(JZTrack *t, JZEvent* pEvent)
 {
   int key,channel;
   tEventIterator iter(t);
@@ -1805,7 +1805,7 @@ void JZPianoFrame::kill_keys_aftertouch(tTrack *t, JZEvent* pEvent)
   }
 }
 
-void JZPianoFrame::paste_keys_aftertouch(tTrack *t, JZEvent* pEvent)
+void JZPianoFrame::paste_keys_aftertouch(JZTrack *t, JZEvent* pEvent)
 {
   int key,channel;
   tEventIterator iter(t);
@@ -1849,7 +1849,7 @@ int JZPianoFrame::nKeyOnEvents()
 
 
 
-void JZPianoFrame::Copy(tTrack *t, JZEvent* pEvent, int Kill)
+void JZPianoFrame::Copy(JZTrack *t, JZEvent* pEvent, int Kill)
 {
   if (!pEvent)
   {
@@ -1900,7 +1900,7 @@ void JZPianoFrame::Copy(tTrack *t, JZEvent* pEvent, int Kill)
 }
 
 
-void JZPianoFrame::Paste(tTrack *t, int Clock, int Pitch)
+void JZPianoFrame::Paste(JZTrack *t, int Clock, int Pitch)
 {
   if (PasteBuffer.nEvents == 0)
   {
@@ -2105,7 +2105,7 @@ class tKeyLengthDragger : public tMouseAction
     tKeyOn    *KeyOn;
     tKeyOn    *Copy;
     JZPianoFrame *Win;
-    tTrack    *Track;
+    JZTrack    *Track;
     wxDC      *dc;
 
   public:
@@ -2224,7 +2224,7 @@ class tPlayTrackLengthDragger : public tMouseAction
     tPlayTrack    *KeyOn;
     tPlayTrack    *Copy;
     JZPianoFrame *Win;
-    tTrack    *Track;
+    JZTrack    *Track;
     wxDC      *dc;
 
   public:
@@ -2436,7 +2436,7 @@ void JZPianoFrame::MouseEvents(wxMouseEvent& Event)
             int i;
             for (i = 0; i < Song->nTracks; i++)
             {
-              tTrack *t = Song->GetTrack(i);
+              JZTrack *t = Song->GetTrack(i);
               if (IsVisible(t) && FindEvent(t, Clock, Pitch))
               {
                 NewPosition(i, -1L);

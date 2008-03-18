@@ -121,10 +121,10 @@ int HBAnalyzer::Transpose(tFilter * f, int qbc)
 }
 
 
-void HBAnalyzer::IterateEvents(void (HBAnalyzer::*Action)(tKeyOn *on, tTrack *t))
+void HBAnalyzer::IterateEvents(void (HBAnalyzer::*Action)(tKeyOn *on, JZTrack *t))
 {
   tTrackIterator Tracks(filter);
-  tTrack *t = Tracks.First();
+  JZTrack *t = Tracks.First();
   while (t)
   {
     if (!t->IsDrumTrack())
@@ -154,7 +154,7 @@ int HBAnalyzer::Step2Clock(int step)
   return (step * (to - fr)) / steps + fr;
 }
 
-void HBAnalyzer::CountEvent(tKeyOn *on, tTrack *t)
+void HBAnalyzer::CountEvent(tKeyOn *on, JZTrack *t)
 {
   for (int i = 0; i < steps; i++)
   {
@@ -176,7 +176,7 @@ void HBAnalyzer::CountEvent(tKeyOn *on, tTrack *t)
 }
 
 
-void HBAnalyzer::TransposeEvent(tKeyOn *on, tTrack *track)
+void HBAnalyzer::TransposeEvent(tKeyOn *on, JZTrack *track)
 {
   for (int i = 0; i < steps; i++)
   {

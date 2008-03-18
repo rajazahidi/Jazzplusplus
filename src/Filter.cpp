@@ -215,7 +215,7 @@ tTrackIterator::tTrackIterator(tFilter *f, int rev)
 }
 
 
-tTrack *tTrackIterator::First()
+JZTrack *tTrackIterator::First()
 {
   if (Reverse)
     TrackNr = Filter->ToTrack;
@@ -225,7 +225,7 @@ tTrack *tTrackIterator::First()
 }
 
 
-tTrack *tTrackIterator::Next()
+JZTrack *tTrackIterator::Next()
 {
   if (Reverse)
   {

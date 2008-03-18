@@ -121,7 +121,7 @@ void JZSong::Write(tWriteBase &io, const char *fname)
 }
 
 
-tTrack *JZSong::GetTrack(int Nr)
+JZTrack *JZSong::GetTrack(int Nr)
 {
   if (Nr >= 0 && Nr < nTracks)
   {
@@ -204,7 +204,7 @@ void JZSong::MergeTracks(
 
   for (i = 0; i < nTracks; ++i)
   {
-    tTrack* pTrack = &mTracks[i];
+    JZTrack* pTrack = &mTracks[i];
     if (pTrack->State == tsSolo || (!solo && pTrack->State == tsPlay))
     {
       if (pTrack->GetAudioMode() != mode)
@@ -245,7 +245,7 @@ void JZSong::MergePlayTrackEvent(
   if(recursionDepth>100) //yes yes, you should use symbolics...
     return;
   fprintf(stderr, "playtrack %d\n",c->track);
-  tTrack* pTrack = &mTracks[c->track];//the track we want to play
+  JZTrack* pTrack = &mTracks[c->track];//the track we want to play
   tEventIterator IteratorPL(pTrack); //get an iterator of all events the playtrack is pointing to 
   JZEvent *f;
 
@@ -469,7 +469,7 @@ void JZSong::SetTicksPerQuarter(int NewTicks)
   double f = (double)NewTicks / (double)TicksPerQuarter;
   for (tt = 0; tt < nTracks; ++tt)
   {
-    tTrack* pTrack = &mTracks[tt];
+    JZTrack* pTrack = &mTracks[tt];
     for (ee = 0; ee < pTrack->nEvents; ee++)
     {
       JZEvent *e = pTrack->Events[ee];
@@ -503,7 +503,7 @@ int JZSong::SetMeterChange(int BarNr, int Numerator, int Denomiator)
 
   // evtl vorhandene TimeSignatures loeschen
 
-  tTrack* pTrack = &mTracks[0];
+  JZTrack* pTrack = &mTracks[0];
   tEventIterator Iterator(pTrack);
   JZEvent *e = Iterator.Range(FrClock, ToClock);
   while (e)
@@ -552,7 +552,7 @@ int JZSong::NumUsedTracks()
 // SN++
 void JZSong::moveTrack(int from, int to)
 {
-  tTrack* pTrack;
+  JZTrack* pTrack;
   int i;
 
   if (from == to) return;

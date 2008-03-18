@@ -396,7 +396,7 @@ void JZTrackFrame::CreateMenu()
 //-----------------------------------------------------------------------------
 bool JZTrackFrame::OnClose()
 {
-//  if (tTrack::changed)
+//  if (JZTrack::changed)
 //  {
 //    if (
 //      ::wxMessageBox(
@@ -444,7 +444,7 @@ void JZTrackFrame::OnFileOpen(wxCommandEvent& Event)
 //    mpTrackWindow->SetScrollPosition(0, 0);
 //    NextWin->Canvas->SetScrollRanges();
     mpTrackWindow->Refresh(false);
-//    tTrack::changed = false;
+//    JZTrack::changed = false;
   }
 }
 

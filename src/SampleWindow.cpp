@@ -48,9 +48,6 @@
 #define MEN_SAVEAS      6
 #define MEN_REVERT      7
 
-#define MEN_CUT         10
-#define MEN_COPY        11
-
 #define MEN_PASTE       12
 #define MEN_PASTE_MIX   15
 
@@ -69,8 +66,6 @@
 #define MEN_TRANSP_PNT  28
 #define MEN_TRANSP_SET  29
 
-#define MEN_ZOOM_IN     40
-#define MEN_ZOOM_OUT    41
 #define MEN_ACCEPT      42
 #define MEN_CANCEL      43
 #define MEN_ECHO        44
@@ -643,8 +638,8 @@ static JZToolDef tdefs[] = {
   { MEN_LOAD,     FALSE, open_xpm,    "open wave file" },
   { MEN_SAVE,     FALSE, save_xpm,    "save wave file" },
   { JZToolBar::eToolBarSeparator },
-  { MEN_ZOOM_IN,  FALSE, zoomin_xpm,  "zoom to selection" },
-  { MEN_ZOOM_OUT, FALSE, zoomout_xpm, "zoom out" },
+  { wxID_ZOOM_IN,  FALSE, zoomin_xpm,  "zoom to selection" },
+  { wxID_ZOOM_OUT, FALSE, zoomout_xpm, "zoom out" },
   { MEN_ACCEPT,   FALSE, accept_xpm,  "accept painting" },
   { MEN_CANCEL,   FALSE, cancel_xpm,  "cancel painting" },
   { JZToolBar::eToolBarSeparator },
@@ -710,8 +705,8 @@ tSampleWin::tSampleWin(wxWindow* pParent, tSampleWin **ref, tSample &sample)
   menu_bar->Append(menu,        "&File");
 
   menu = new wxMenu;
-  menu->Append(MEN_CUT,         "&Cut");
-  menu->Append(MEN_COPY,        "Co&py");
+  menu->Append(wxID_CUT,        "&Cut");
+  menu->Append(wxID_COPY,        "Co&py");
 
   menu->Append(MEN_PASTE,       "&Paste");
   menu->Append(MEN_PASTE_MIX,   "Paste &Merge");
@@ -751,8 +746,8 @@ tSampleWin::tSampleWin(wxWindow* pParent, tSampleWin **ref, tSample &sample)
   menu = new wxMenu;
   menu->Append(MEN_TRANSP_SET,   "&Pitch Painter ...");
   menu->Append(MEN_WAHSETTINGS,  "&Filter Painter ...");
-  //menu->Append(MEN_ZOOM_IN,     "Zoom &In");
-  //menu->Append(MEN_ZOOM_OUT,    "Zoom &Out");
+//  menu->Append(wxID_ZOOM_IN,     "Zoom &In");
+//  menu->Append(wxID_ZOOM_OUT,     "Zoom &Out");
   menu->Append(MEN_SETTINGS,     "&View Settings...");
   menu_bar->Append(menu,         "&Settings");
 
@@ -1109,7 +1104,7 @@ void tSampleWin::OnMenuCommand(int id)
       }
       break;
 
-    case MEN_CUT:
+    case wxID_CUT:
       {
         int fr, to;
         if (HaveSelection(fr, to, SelWarn))
@@ -1122,7 +1117,7 @@ void tSampleWin::OnMenuCommand(int id)
       }
       break;
 
-    case MEN_COPY:
+    case wxID_COPY:
       {
         int fr, to;
         if (HaveSelection(fr, to, SelAll))
@@ -1130,7 +1125,7 @@ void tSampleWin::OnMenuCommand(int id)
       }
       break;
 
-    case MEN_ZOOM_IN:
+    case wxID_ZOOM_IN:
       {
         int fr, to;
         if (HaveSelection(fr, to, SelWarn))
@@ -1138,7 +1133,7 @@ void tSampleWin::OnMenuCommand(int id)
       }
       break;
 
-    case MEN_ZOOM_OUT:
+    case wxID_ZOOM_OUT:
       SetViewPos(0, spl.GetLength());
       break;
 

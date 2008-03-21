@@ -24,6 +24,7 @@
 
 #include "TrackWindow.h"
 #include "TrackFrame.h"
+#include "Filter.h"
 #include "Project.h"
 #include "Player.h"
 #include "RecordingInfo.h"
@@ -48,12 +49,12 @@ END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-const int JZTrackWindow::mScrollLine = 50;
+const int JZTrackWindow::mScrollSize = 50;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZTrackWindow::JZTrackWindow(
-  JZTrackFrame* pParent,
+  wxFrame* pParent,
   JZSong* pSong,
   const wxPoint& Position,
   const wxSize& Size)
@@ -462,8 +463,8 @@ void JZTrackWindow::Draw(wxDC& Dc)
   GetViewStart(&mScrolledX, &mScrolledY);
 
   // Convert scrolling units into pixels.
-  mScrolledX *= mScrollLine;
-  mScrolledY *= mScrollLine;
+  mScrolledX *= mScrollSize;
+  mScrolledY *= mScrollSize;
 
   GetClientSize(&mCanvasWidth, &mCanvasHeight);
   cout
@@ -1171,10 +1172,10 @@ void JZTrackWindow::SetScrollRanges(const int& x, const int& y)
   int Width, Height;
   GetVirtualEventSize(Width, Height);
   SetScrollbars(
-    mScrollLine,
-    mScrollLine,
-    (Width + mScrollLine) / mScrollLine,
-    (Height + mScrollLine) / mScrollLine,
+    mScrollSize,
+    mScrollSize,
+    (Width + mScrollSize) / mScrollSize,
+    (Height + mScrollSize) / mScrollSize,
     x,
     y);
   EnableScrolling(false, false);
@@ -1184,8 +1185,8 @@ void JZTrackWindow::SetScrollRanges(const int& x, const int& y)
 //-----------------------------------------------------------------------------
 void JZTrackWindow::SetScrollPosition(int x, int y)
 {
-  x /= mScrollLine;
-  y /= mScrollLine;
+  x /= mScrollSize;
+  y /= mScrollSize;
   Scroll(x, y);
 }
 

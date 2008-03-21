@@ -31,6 +31,7 @@
 #include "Events.h"
 #include "Player.h"
 #include "PianoFrame.h"
+#include "PianoWindow.h"
 #include "ClockDialog.h"
 #include "KeyDialog.h"
 #include "PropertyListDialog.h"
@@ -55,7 +56,7 @@ tShiftDlg::tShiftDlg(JZEventFrame *w, tFilter *f, long unit)
 : tPropertyListDlg( "Shift events left/right" )
 {
   Filter = f;
-  Song = f->Song;
+  Song = f->mpSong;
   Unit  = unit;
   EventWin = w;
   Steps=0;
@@ -70,7 +71,10 @@ bool tShiftDlg::OnClose()
   cmd.Execute();
   EventWin->Redraw();
   if (EventWin->NextWin)
-          EventWin->NextWin->Redraw();
+  {
+    EventWin->NextWin->Redraw();
+  }
+
   //  wxForm::OnOk();
   return false;
 }
@@ -108,7 +112,7 @@ tCleanupDlg::tCleanupDlg(JZEventFrame *w, tFilter *f)
   : tPropertyListDlg( "Clean up events" )
 {
   Filter = f;
-  Song = f->Song;
+  Song = f->mpSong;
   EventWin = w;
 }
 
@@ -192,7 +196,7 @@ tSearchReplaceDlg::tSearchReplaceDlg(JZEventFrame *w, tFilter *f)
    : tPropertyListDlg("Search and replace controller types" )
 {
   Filter = f;
-  Song = f->Song;
+  Song = f->mpSong;
   EventWin = w;
 }
 
@@ -243,7 +247,7 @@ tTransposeDlg::tTransposeDlg(JZEventFrame *w, tFilter *f)
 {
   EventWin = w;
   Filter = f;
-  Song   = f->Song;
+  Song   = f->mpSong;
 }
 
 
@@ -298,7 +302,7 @@ tSetChannelDlg::tSetChannelDlg(tFilter *f)
 : tPropertyListDlg("Set MIDI Channel")
 {
   Filter = f;
-  Song = f->Song;
+  Song = f->mpSong;
 }
 
 
@@ -349,7 +353,7 @@ tVelocityDlg::tVelocityDlg(tFilter *f)
 : tPropertyListDlg( "Velocity" )
 {
   Filter = f;
-  Song = f->Song;
+  Song = f->mpSong;
 }
 
 
@@ -400,7 +404,7 @@ tLengthDlg::tLengthDlg(JZEventFrame *w, tFilter *f)
 : tPropertyListDlg("Length")
 {
   Filter = f;
-  Song = f->Song;
+  Song = f->mpSong;
   EventWin = w;
 }
 
@@ -465,7 +469,7 @@ tSeqLengthDlg::tSeqLengthDlg(JZEventFrame *w, tFilter *f)
 : tPropertyListDlg("stretch/contract by scale from start of selected sequence" )
 {
   Filter = f;
-  Song = f->Song;
+  Song = f->mpSong;
   EventWin = w;
 }
 
@@ -511,7 +515,7 @@ tMidiDelayDlg::tMidiDelayDlg(JZEventFrame *w, tFilter *f)
 : tPropertyListDlg("MIDI delay line" )
 {
   Filter = f;
-  Song = f->Song;
+  Song = f->mpSong;
   EventWin = w;
 }
 
@@ -609,12 +613,12 @@ void tDeleteDlg::AddProperties()
 // Snap
 // *************************************************************************
 
-tSnapDlg::tSnapDlg(JZPianoFrame* w, int* snapptr)
-  : tPropertyListDlg("Snap:quantize cut/paste events")
+tSnapDlg::tSnapDlg(JZPianoWindow* pPianoWindow, int* snapptr)
+  : tPropertyListDlg("Snap:quantize cut/paste events"),
+    mpPianoWindow(pPianoWindow)
 {
 //, Steps("Snap value", limitSteps, snapptr)
   //limitSteps lives in util.cpp
-   win = w;
    ptr = snapptr;
 }
 
@@ -624,7 +628,7 @@ bool tSnapDlg::OnClose()
 {
   //Steps.GetValue();
   // toggle the tool buttons
-  win->SetSnapDenom(*ptr);
+  mpPianoWindow->SetSnapDenom(*ptr);
   //tPropertyListDlg::OnClose();
   return false;
 }
@@ -666,7 +670,7 @@ tQuantizeDlg::tQuantizeDlg(JZEventFrame *w, tFilter *f)
   //, Steps("steps", gQntSteps, &gQntStep)
 {
   Filter = f;
-  Song = f->Song;
+  Song = f->mpSong;
   EventWin = w;
 }
 
@@ -732,12 +736,12 @@ class tEventDlg : public tPropertyListDlg
 
     JZTrack    *Track;
     tClockDlg ClockDlg;
-    JZPianoFrame* Win;
+    JZPianoWindow* Win;
 
     JZEvent    *Event;
     JZEvent    *Copy;
 
-    tEventDlg(JZEvent *e, JZPianoFrame* w, JZTrack *t);
+    tEventDlg(JZEvent *e, JZPianoWindow* w, JZTrack *t);
     virtual void AddProperties();
     virtual bool OnClose();
     virtual void OnHelp();
@@ -745,9 +749,9 @@ class tEventDlg : public tPropertyListDlg
 };
 
 
-tEventDlg::tEventDlg(JZEvent *e, JZPianoFrame* w, JZTrack *t)
+tEventDlg::tEventDlg(JZEvent *e, JZPianoWindow* w, JZTrack *t)
   : tPropertyListDlg( "Event" ),
-    ClockDlg(w->Song, "Time ", e->GetClock())
+    ClockDlg(w->mpSong, "Time ", e->GetClock())
 {
   Win   = w;
   Track = t;
@@ -772,7 +776,7 @@ bool tEventDlg::OnClose()
   Track->Kill(Event);
   Track->Put(Copy);
   Track->Cleanup();
-  Win->Redraw();
+  Win->Refresh();
   return tPropertyListDlg::OnClose();
 }
 
@@ -790,7 +794,7 @@ class tChEventDlg : public tEventDlg
 
     int Channel;
 
-    tChEventDlg(tChannelEvent *e, JZPianoFrame* w, JZTrack *t)
+    tChEventDlg(tChannelEvent *e, JZPianoWindow* w, JZTrack *t)
       : tEventDlg(e, w, t)
     {
       Channel = e->Channel + 1;                // 1..16
@@ -830,14 +834,14 @@ class tKeyOnDlg : public tChEventDlg
   // SN++
   int OffVeloc;
 
-  tKeyOnDlg(tKeyOn *e, JZPianoFrame* w, JZTrack *t);
+  tKeyOnDlg(tKeyOn *e, JZPianoWindow* w, JZTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tKeyOnDlg::tKeyOnDlg(tKeyOn *e, JZPianoFrame* w, JZTrack *t)
+tKeyOnDlg::tKeyOnDlg(tKeyOn *e, JZPianoWindow* w, JZTrack *t)
   : tChEventDlg(e, w, t),
     PitchDlg("Pitch", e->Key)
 {
@@ -901,14 +905,14 @@ class tPitchDlg : public tChEventDlg
 
   int Value;
 
-  tPitchDlg(tPitch *e, JZPianoFrame* w, JZTrack *t);
+  tPitchDlg(tPitch *e, JZPianoWindow* w, JZTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tPitchDlg::tPitchDlg(tPitch *e, JZPianoFrame* w, JZTrack *t)
+tPitchDlg::tPitchDlg(tPitch *e, JZPianoWindow* w, JZTrack *t)
   : tChEventDlg(e, w, t)
 {
   Event = e;
@@ -944,14 +948,14 @@ class tControlDlg : public tChEventDlg
   int Control;
   //tNamedChoice Choice;
 
-  tControlDlg(tControl *e, JZPianoFrame* w, JZTrack *t);
+  tControlDlg(tControl *e, JZPianoWindow* w, JZTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tControlDlg::tControlDlg(tControl *e, JZPianoFrame* w, JZTrack *t)
+tControlDlg::tControlDlg(tControl *e, JZPianoWindow* w, JZTrack *t)
   : tChEventDlg(e, w, t)
   //,    Choice("Controller", &gpConfig->CtrlName(0), &Control)
 {
@@ -1006,14 +1010,14 @@ class tPlayTrackDlg : public tEventDlg
 
   tNamedChoice Choice;
 
-  tPlayTrackDlg(tPlayTrack *e, JZPianoFrame* w, JZTrack *t);
+  tPlayTrackDlg(tPlayTrack *e, JZPianoWindow* w, JZTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tPlayTrackDlg::tPlayTrackDlg(tPlayTrack *e, JZPianoFrame* w, JZTrack *t)
+tPlayTrackDlg::tPlayTrackDlg(tPlayTrack *e, JZPianoWindow* w, JZTrack *t)
   : tEventDlg(e, w, t),
     Choice("playtrack", gpConfig->GetControlNames(), &track)
 {
@@ -1065,14 +1069,14 @@ class tTextDlg : public tEventDlg
   int track;
   tNamedChoice Choice;
 
-  tTextDlg(tText *e, JZPianoFrame* w, JZTrack *t);
+  tTextDlg(tText *e, JZPianoWindow* w, JZTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tTextDlg::tTextDlg(tText *e, JZPianoFrame* w, JZTrack *t)
+tTextDlg::tTextDlg(tText *e, JZPianoWindow* w, JZTrack *t)
   : tEventDlg(e, w, t),
     Choice("text", gpConfig->GetControlNames(), &track)
 {
@@ -1112,14 +1116,14 @@ class tEndOfTrackDlg : public tEventDlg
 
   tNamedChoice Choice;
 
-  tEndOfTrackDlg(tEndOfTrack *e, JZPianoFrame* w, JZTrack *t);
+  tEndOfTrackDlg(tEndOfTrack *e, JZPianoWindow* w, JZTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tEndOfTrackDlg::tEndOfTrackDlg(tEndOfTrack *e, JZPianoFrame* w, JZTrack *t)
+tEndOfTrackDlg::tEndOfTrackDlg(tEndOfTrack *e, JZPianoWindow* w, JZTrack *t)
   : tEventDlg(e, w, t),
     Choice("End Of Track", gpConfig->GetControlNames(), &track)
 {
@@ -1149,14 +1153,14 @@ class tProgramDlg : public tEventDlg
   int Program;
   //  tNamedChoice Choice;
 
-  tProgramDlg(tProgram *e, JZPianoFrame* w, JZTrack *t);
+  tProgramDlg(tProgram *e, JZPianoWindow* w, JZTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tProgramDlg::tProgramDlg(tProgram *e, JZPianoFrame* w, JZTrack *t)
+tProgramDlg::tProgramDlg(tProgram *e, JZPianoWindow* w, JZTrack *t)
   : tEventDlg(e, w, t),
     Program(e->Program + 1)
   //,    Choice("Program", &gpConfig->VoiceName(0), &Program)
@@ -1194,14 +1198,14 @@ class tSetTempoDlg : public tEventDlg
 
   int Value;
 
-  tSetTempoDlg(tSetTempo *e, JZPianoFrame* w, JZTrack *t);
+  tSetTempoDlg(tSetTempo *e, JZPianoWindow* w, JZTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tSetTempoDlg::tSetTempoDlg(tSetTempo *e, JZPianoFrame* w, JZTrack *t)
+tSetTempoDlg::tSetTempoDlg(tSetTempo *e, JZPianoWindow* w, JZTrack *t)
   : tEventDlg(e, w, t)
 {
   Event = e;
@@ -1234,14 +1238,14 @@ class tSysexDlg : public tEventDlg
 
   char *str;
 
-  tSysexDlg(tSysEx *s, JZPianoFrame* w, JZTrack *t);
+  tSysexDlg(tSysEx *s, JZPianoWindow* w, JZTrack *t);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tSysexDlg::tSysexDlg(tSysEx *s, JZPianoFrame* w, JZTrack *t)
+tSysexDlg::tSysexDlg(tSysEx *s, JZPianoWindow* w, JZTrack *t)
   : tEventDlg(s, w, t)
 {
   Event = s;
@@ -1451,7 +1455,7 @@ static JZEvent *CreateEventDialog(long Clock, int Channel, int Pitch)
 
 void EventDialog(
   JZEvent* e,
-  JZPianoFrame* w,
+  JZPianoWindow* pPianoWindow,
   JZTrack* t,
   long Clock,
   int Channel,
@@ -1473,47 +1477,47 @@ void EventDialog(
         break;
       }
       str = "Key On";
-      dlg = new tKeyOnDlg(e->IsKeyOn(), w, t);
+      dlg = new tKeyOnDlg(e->IsKeyOn(), pPianoWindow, t);
       break;
 
     case StatPitch:
       str = "Pitch Wheel";
-      dlg = new tPitchDlg(e->IsPitch(), w, t);
+      dlg = new tPitchDlg(e->IsPitch(), pPianoWindow, t);
       break;
 
     case StatControl:
       str = "Controller";
-      dlg = new tControlDlg(e->IsControl(), w, t);
+      dlg = new tControlDlg(e->IsControl(), pPianoWindow, t);
       break;
 
     case StatProgram:
       str = "Program Change";
-      dlg = new tProgramDlg(e->IsProgram(), w, t);
+      dlg = new tProgramDlg(e->IsProgram(), pPianoWindow, t);
       break;
 
     case StatSetTempo:
       str = "Set Tempo (for track 0)";
-      dlg = new tSetTempoDlg(e->IsSetTempo(), w, w->Song->GetTrack(0) );
+      dlg = new tSetTempoDlg(e->IsSetTempo(), pPianoWindow, pPianoWindow->mpSong->GetTrack(0) );
       break;
 
     case StatSysEx:
       str = "System Exclusive";
-      dlg = new tSysexDlg(e->IsSysEx(), w, t );
+      dlg = new tSysexDlg(e->IsSysEx(), pPianoWindow, t );
       break;
 
     case StatPlayTrack:
       str = "Play Track";
-      //dlg = new tPlayTrackDlg(e->IsPlayTrack(), w, t );
-      dlg = new tPlayTrackDlg(e->IsPlayTrack(), w, t );
+      //dlg = new tPlayTrackDlg(e->IsPlayTrack(), pPianoWindow, t );
+      dlg = new tPlayTrackDlg(e->IsPlayTrack(), pPianoWindow, t );
       break;
     case StatEndOfTrack:
       str = "End Of Track";
-      dlg = new tEndOfTrackDlg(e->IsEndOfTrack(), w, t );
+      dlg = new tEndOfTrackDlg(e->IsEndOfTrack(), pPianoWindow, t );
       break;
 
     case StatText:
       str = "Text";
-      dlg = new tTextDlg(e->IsText(), w, t );
+      dlg = new tTextDlg(e->IsText(), pPianoWindow, t );
       break;
 
 

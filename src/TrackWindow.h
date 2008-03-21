@@ -26,7 +26,6 @@
 #include "MouseAction.h"
 #include "Rectangle.h"
 
-class JZTrackFrame;
 class JZSong;
 class JZTrack;
 class tFilter;
@@ -65,7 +64,7 @@ class JZTrackWindow : public wxScrolledWindow
     };
 
     JZTrackWindow(
-      JZTrackFrame* pParent,
+      wxFrame* pParent,
       JZSong* pSong,
       const wxPoint& Position,
       const wxSize& Size);
@@ -159,7 +158,7 @@ class JZTrackWindow : public wxScrolledWindow
 
   private:
 
-    static const int mScrollLine;
+    static const int mScrollSize;
 
     JZSong* mpSong;
 

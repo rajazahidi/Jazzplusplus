@@ -25,7 +25,7 @@
 
 #include "PropertyListDialog.h"
 
-class JZPianoFrame;
+class JZPianoWindow;
 class tFilter;
 class JZSong;
 class JZEventFrame;
@@ -212,15 +212,20 @@ class tSnapDlg : public tPropertyListDlg
 {
   public:
 
-    tSnapDlg(JZPianoFrame *w, int* snapptr);
+    tSnapDlg(JZPianoWindow* pPianoWindow, int* snapptr);
+
     void AddProperties();
+
     //tNamedChoice Steps;
+
     bool OnClose();
+
     void OnHelp();
 
   private:
 
-    JZPianoFrame* win;
+    JZPianoWindow* mpPianoWindow;
+
     int* ptr;
 };
 
@@ -249,7 +254,7 @@ class tQuantizeDlg : public tPropertyListDlg
 
 void EventDialog(
   JZEvent*,
-  JZPianoFrame*,
+  JZPianoWindow*,
   JZTrack*,
   long Clock,
   int Channel,

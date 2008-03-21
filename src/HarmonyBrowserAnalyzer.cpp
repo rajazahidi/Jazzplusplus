@@ -31,13 +31,17 @@
 #include <cmath>
 
 HBAnalyzer::HBAnalyzer(HBContext **s, int n)
+  : seq(s),
+    max_seq(n),
+    start_clock(0),
+    stop_clock(0),
+    eighths_per_chord(1),
+    mSteps(0),
+    mpFilter(0),
+    mpTrack(0),
+    count(0),
+    delta(0)
 {
-  seq     = s;
-  max_seq = n;
-
-  count = 0;
-  delta = 0;
-  steps = 0;
 }
 
 
@@ -47,30 +51,32 @@ HBAnalyzer::~HBAnalyzer()
 }
 
 
-void HBAnalyzer::Init(tFilter *f, int epc)
+void HBAnalyzer::Init(tFilter* pFilter, int epc)
 {
   Exit();        // cleanup from previous run
 
-  filter = f;
-  start_clock = f->FromClock;
-  stop_clock = f->ToClock;
+  mpFilter = pFilter;
+  start_clock = pFilter->FromClock;
+  stop_clock = pFilter->ToClock;
   eighths_per_chord = epc;
 
   if (eighths_per_chord == 0)
-    steps = max_seq;        // map number of chords to selection
+  {
+    mSteps = max_seq;        // map number of chords to selection
+  }
   else
   {
-    JZBarInfo BarInfo(filter->Song);
+    JZBarInfo BarInfo(mpFilter->mpSong);
     BarInfo.SetClock(start_clock);
     int start_bar = BarInfo.BarNr;
     BarInfo.SetClock(stop_clock);
     int stop_bar = BarInfo.BarNr;
-    steps = (stop_bar - start_bar) * 8L / eighths_per_chord;
+    mSteps = (stop_bar - start_bar) * 8L / eighths_per_chord;
   }
 
-  count = new int* [steps];
-  delta = new int* [steps];
-  for (int i = 0; i < steps; i++)
+  count = new int* [mSteps];
+  delta = new int* [mSteps];
+  for (int i = 0; i < mSteps; i++)
   {
     count[i] = new int[12];
     delta[i] = new int[12];
@@ -85,7 +91,7 @@ void HBAnalyzer::Init(tFilter *f, int epc)
 
 void HBAnalyzer::Exit()
 {
-  for (int i = 0; i < steps; i++)
+  for (int i = 0; i < mSteps; i++)
   {
     delete [] count[i];
     delete [] delta[i];
@@ -94,26 +100,26 @@ void HBAnalyzer::Exit()
   delete [] delta;
   count = 0;
   delta = 0;
-  steps = 0;
+  mSteps = 0;
 }
 
 
-int HBAnalyzer::Analyze(tFilter *f, int qbc)
+int HBAnalyzer::Analyze(tFilter* pFilter, int qbc)
 {
-  Init(f, qbc);
-  if (steps < max_seq)
+  Init(pFilter, qbc);
+  if (mSteps < max_seq)
   {
     IterateEvents(&HBAnalyzer::CountEvent);
     CreateChords();
-    return steps;
+    return mSteps;
   }
   return 0;
 }
 
-int HBAnalyzer::Transpose(tFilter * f, int qbc)
+int HBAnalyzer::Transpose(tFilter* pFilter, int qbc)
 {
-  f->Song->NewUndoBuffer();
-  Init(f, qbc);
+  pFilter->mpSong->NewUndoBuffer();
+  Init(pFilter, qbc);
   IterateEvents(&HBAnalyzer::CountEvent);
   GenerateMapping();
   IterateEvents(&HBAnalyzer::TransposeEvent);
@@ -123,14 +129,14 @@ int HBAnalyzer::Transpose(tFilter * f, int qbc)
 
 void HBAnalyzer::IterateEvents(void (HBAnalyzer::*Action)(tKeyOn *on, JZTrack *t))
 {
-  tTrackIterator Tracks(filter);
+  tTrackIterator Tracks(mpFilter);
   JZTrack *t = Tracks.First();
   while (t)
   {
     if (!t->IsDrumTrack())
     {
       tEventIterator Events(t);
-      JZEvent *e = Events.Range(filter->FromClock, filter->ToClock);
+      JZEvent *e = Events.Range(mpFilter->FromClock, mpFilter->ToClock);
       while (e)
       {
         tKeyOn *on = e->IsKeyOn();
@@ -149,14 +155,14 @@ void HBAnalyzer::IterateEvents(void (HBAnalyzer::*Action)(tKeyOn *on, JZTrack *t
 
 int HBAnalyzer::Step2Clock(int step)
 {
-  int fr = filter->FromClock;
-  int to = filter->ToClock;
-  return (step * (to - fr)) / steps + fr;
+  int fr = mpFilter->FromClock;
+  int to = mpFilter->ToClock;
+  return (step * (to - fr)) / mSteps + fr;
 }
 
 void HBAnalyzer::CountEvent(tKeyOn *on, JZTrack *t)
 {
-  for (int i = 0; i < steps; i++)
+  for (int i = 0; i < mSteps; i++)
   {
     int start = Step2Clock(i);
     int stop  = Step2Clock(i+1);
@@ -176,9 +182,9 @@ void HBAnalyzer::CountEvent(tKeyOn *on, JZTrack *t)
 }
 
 
-void HBAnalyzer::TransposeEvent(tKeyOn *on, JZTrack *track)
+void HBAnalyzer::TransposeEvent(tKeyOn *on, JZTrack* pTrack)
 {
-  for (int i = 0; i < steps; i++)
+  for (int i = 0; i < mSteps; i++)
   {
     int start = Step2Clock(i);
     int stop  = Step2Clock(i+1);
@@ -202,8 +208,8 @@ void HBAnalyzer::TransposeEvent(tKeyOn *on, JZTrack *track)
       {
         tKeyOn *cp = (tKeyOn *)on->Copy();
         cp->Key += delta[i][on->Key % 12];
-        track->Kill(on);
-        track->Put(cp);
+        pTrack->Kill(on);
+        pTrack->Put(cp);
 
         // do not transpose again
         break;
@@ -247,7 +253,7 @@ int HBAnalyzer::MaxCount(int i, const HBChord &done)
 void HBAnalyzer::GenerateMapping()
 {
   int step;
-  for (step = 0; step < steps; step++)
+  for (step = 0; step < mSteps; step++)
   {
     int j;
 
@@ -325,7 +331,7 @@ class tChordMatrix {
 void HBAnalyzer::GenerateMapping()
 {
   int step;
-  for (step = 0; step < steps; step++)
+  for (step = 0; step < mSteps; step++)
   {
     int i, j;
 
@@ -381,8 +387,8 @@ void HBAnalyzer::GenerateMapping()
 
 void HBAnalyzer::CreateChords()
 {
-  int* pBest = new int[steps];
-  for (int i = 0; i < steps; i++)
+  int* pBest = new int[mSteps];
+  for (int i = 0; i < mSteps; i++)
   {
     pBest[i] = -1;
   }
@@ -393,7 +399,7 @@ void HBAnalyzer::CreateChords()
     const HBContext &ct = iter.Context();
     const HBChord chord = ct.Chord();
     const HBChord scale = ct.Scale();
-    for (int i = 0; i < steps; i++)
+    for (int i = 0; i < mSteps; i++)
     {
       int err = 0;
       for (int k = 0; k < 12; k++)

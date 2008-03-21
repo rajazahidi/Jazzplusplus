@@ -32,26 +32,26 @@ class HBChord;
 class HBAnalyzer
 {
   public:
+
     HBAnalyzer(HBContext **seq, int n_seq);
+
     ~HBAnalyzer();
+
     int Analyze(tFilter *f, int eighth_per_chord = 8);
+
     int Transpose(tFilter *f, int eighth_per_chord = 8);
 
     void Init(tFilter *f, int steps_per_bar);
+
     void Exit();
-    int Steps() const { return steps; }
+
+    int Steps() const;
+
     int Step2Clock(int step);
-    HBContext * GetContext(int step) const { return seq[step % max_seq]; }
+
+    HBContext* GetContext(int step) const;
 
   private:
-    HBContext **seq;
-    int max_seq;
-
-    int start_clock, stop_clock;
-    int eighths_per_chord;
-    int steps;
-    tFilter* filter;
-    JZTrack* track;
 
     void IterateEvents(void (HBAnalyzer::*Action)(tKeyOn *on, JZTrack *t));
     void CountEvent(tKeyOn *on, JZTrack *t);
@@ -61,8 +61,31 @@ class HBAnalyzer
     int MaxCount(int i, const HBChord &done);
     void GenerateMapping();
 
-    int **count;
-    int **delta;
+  private:
+
+    HBContext** seq;
+    int max_seq;
+
+    int start_clock, stop_clock;
+    int eighths_per_chord;
+    int mSteps;
+    tFilter* mpFilter;
+    JZTrack* mpTrack;
+
+    int** count;
+    int** delta;
 };
+
+inline
+int HBAnalyzer::Steps() const
+{
+  return mSteps;
+}
+
+inline
+HBContext* HBAnalyzer::GetContext(int step) const
+{
+  return seq[step % max_seq];
+}
 
 #endif // !defined(JZ_HARMONYBROWSERANALYZER_H)

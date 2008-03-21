@@ -62,7 +62,9 @@
 
 #define ID_TOOLS_HARMONY_BROWSER             wxID_HIGHEST + 25
 
-#define MEN_CLEAR                            wxID_HIGHEST + 30
-#define MEN_SETTINGS                         wxID_HIGHEST + 41
+#define ID_HELP_PIANO_WINDOW                 wxID_HIGHEST + 40
+
+#define MEN_CLEAR                            wxID_HIGHEST + 50
+#define MEN_SETTINGS                         wxID_HIGHEST + 60
 
 #endif // !defined(JZ_RESOURCES_H)

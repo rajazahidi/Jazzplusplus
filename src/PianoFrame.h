@@ -29,14 +29,13 @@
 class JZGuitarFrame;
 class JZSong;
 class JZToolBar;
-class tFilter;
 class tCtrlEditBase;
 class JZTrack;
 class JZPianoWindow;
 
 //*****************************************************************************
 //*****************************************************************************
-class JZPianoFrame : public wxFrame, public tButtonLabelInterface
+class JZPianoFrame : public wxFrame
 {
    friend class JZGuitarFrame;
 
@@ -53,8 +52,7 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
 
     void CreateToolBar();
 
-    // Overridden tButtonLabelInterface finction.
-    void ButtonLabelDisplay(const wxString& Text, bool IsButtonDown);
+    void SetToolbarButtonState(int Id);
 
     void OnMSelect(wxCommandEvent& Event);
     void OnMLength(wxCommandEvent& Event);
@@ -67,93 +65,30 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
     void OnSnap8D(wxCommandEvent& Event);
     void OnSnap16(wxCommandEvent& Event);
     void OnSnap16D(wxCommandEvent& Event);
-    int xPiano, wPiano;
 
-    int  nSnaps;
-    enum TESizes
-    {
-      MaxSnaps = 500
-    };
-
-    int xSnaps[MaxSnaps];
-
-    int mFromLines[eMaxTrackCount];
-
-    int  IsVisible(JZEvent *e);
-    int  IsVisible(JZTrack *t);
     void VisibleDialog();
-    bool VisibleKeyOn;
-    bool VisiblePitch;
-    bool VisibleController;
-    bool VisibleProgram;
-    bool VisibleTempo;
-    bool VisibleSysex;
-    bool VisiblePlayTrack;
-    bool VisibleDrumNames;
-    bool VisibleAllTracks;
-    bool VisibleHBChord;
-    bool VisibleMono;
-
-    int MouseLine;
-
-    wxFont *DrumFont;
-
-    int SnapClocks();
-    int SnapDenomiator;        // 16 for 16-tel
-    int SnapClock(int Clock, int up = 0);
 
 
     void CreateMenu();
-    void Setup();
-    void NewPosition(int TrackNr, int Clock);
-    void ShowPitch(int pitch);
-    int  Channel();        // Channel of actual track 0..15
 
-    void OnMenuCommand(int Id);
     void OnPaintSub(wxDC* dc, int x, int y);
-    void SnapSelStart(wxMouseEvent &e);
-    void SnapSelStop(wxMouseEvent &e);
 
-    void SnapDlg(wxCommandEvent& Event);
+    void OnSnapDlg(wxCommandEvent& Event);
 
-    int TrackNr;        // aktueller Track
-    JZTrack *Track;
+    // Current track.
+    int mTrackIndex;
+    JZTrack* Track;
 
-    tEventArray PasteBuffer;
-    void DrawEvents(wxDC* dc, JZTrack *t, int Stat, const wxBrush* Brush, int force_colors);
-    void DrawEvent(wxDC* dc, JZEvent *, const wxBrush* Brush, int xoor, int force_color=0);
-    void DrawPianoRoll(wxDC* dc);
-
-    int OnMouseEvent(wxMouseEvent &e);
-    bool OnKeyEvent(wxKeyEvent &e);
-    void MouseEvents(wxMouseEvent &e);
-    void MousePiano(wxMouseEvent &e);
     void MouseCutPaste(wxMouseEvent &e, bool cut);
 
-    JZGuitarFrame* GetGuitarFrame()
-    {
-      return mpGuitarFrame;
-    }
-
-    // Utils
-    int y2Pitch(int y);
-    int Pitch2y(int Pitch);
-    JZEvent *FindEvent(JZTrack *t, int Clock, int Pitch);
-    void Copy(JZTrack *t, JZEvent *e, int Kill);
-    void Paste(JZTrack *t, int Clock, int Pitch);
-    // SN++ Key_Aftertouch Utils
-    void paste_keys_aftertouch(JZTrack *t, JZEvent *e);
-    void kill_keys_aftertouch(JZTrack *t, JZEvent *e);
-    int  nKeyOnEvents();
-    void LogicalMousePosition(wxMouseEvent &e, int *x, int *y);
+    JZGuitarFrame* GetGuitarFrame();
 
     bool OnClose();
 
-    void SetSnapDenom(int value);
     void PressRadio(int id = 0);
     void SetVisibleAllTracks(bool value);
 // SN++ made public for mouse keylength dragger
-     tCtrlEditBase *CtrlEdit;
+    tCtrlEditBase* mpCtrlEdit;
     void CutOrCopy(int id);
 
     void OnFilter(wxCommandEvent& Event);
@@ -162,10 +97,10 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
     void ActCloseEvent(wxCloseEvent& Event);
     void ActClose(wxCommandEvent& Event);
     void ActHelpMouse(wxCommandEvent& Event);
-    void ActSettingsDialog(wxCommandEvent& Event);
-    void ActMidiDelayDialog(wxCommandEvent& Event);
-    void ActSequenceLengthDialog(wxCommandEvent& Event);
-    void ActVelocityDialog(wxCommandEvent& Event);
+    void OnActivateSettingsDialog(wxCommandEvent& Event);
+    void OnActivateMidiDelayDialog(wxCommandEvent& Event);
+    void OnActivateSequenceLengthDialog(wxCommandEvent& Event);
+    void OnActivateVelocityDialog(wxCommandEvent& Event);
 
     void CtrlChannelAftertouchEdit(wxCommandEvent& Event);
     void OnCtrlPolyAftertouchEdit(wxCommandEvent& Event);
@@ -193,67 +128,14 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
   public:
 
     void NewPlayPosition(int Clock);
-    void DrawPlayPosition(wxDC* dc);
     void Redraw();
-    void CreateCanvas();
-    int Clock2x(int clk);
-    int x2Clock(int x);
-    int Line2y(int Line);
-    int y2Line(int y, int up = 0);
-    int EventsSelected(const char *msg = 0);
-    void ZoomIn();
-    void ZoomOut();
-    void LineText(
-      wxDC *dc,
-      int x,
-      int y,
-      int w,
-      int h,
-      wxString str = "",
-      bool down = FALSE);
-    int x2BarClock(int x, int next);
-    int OnEventWinMouseEvent(wxMouseEvent &e);
-    void OnEventWinPaintSub(int x, int y);
-    int y2yLine(int y, int up = 0);
-    void GetVirtualEventSize(int& Width, int& Height);
-    bool OnCharHook(wxKeyEvent& e);
 
-    JZPianoWindow *Canvas;
-    tFilter* mpFilter;
+    JZPianoWindow* mpPianoWindow;
 
-    int FontSize;
-    int ClocksPerPixel;
-    JZSong* Song;
-    wxFont* mpFont;
-    wxFont* mpFixedFont;        //remains with 12pt/ bleibt bei 12pt
-    int hFixedFont;        //Height letters/ Hoehe eines Buchstaben
-    int mTopInfoHeight;
-    int mLeftInfoWidth;
-    int LittleBit;
-    int FromLine, ToLine;
-    int mTrackHeight;
-    int mEventsX, mEventsY, mEventsWidth, mEventsHeight;
-    int CanvasX, CanvasY, CanvasW, CanvasH;        // canvas coords
-    int FromClock, ToClock;
-    tSnapSelection* SnapSel;
-    bool UseColors;
-    tMouseAction *MouseAction;
-    int PlayClock;
+    int mClockTicsPerPixel;
+    JZSong* mpSong;
     wxDialog* DialogBox;
     wxDialog* MixerForm;
-
-  private:
-
-    // Next 3 statements are "Patrick Approved."
-    enum { NUM_COLORS = 24 }; // Number of colors to use for velocity
-                              // representation.
-    wxBrush color_brush[NUM_COLORS];
-    void InitColors();
-
-//    tCtrlEditBase *CtrlEdit;
-
-    tMouseMapper MousePlay;
-    tMouseMapper MouseEvnt;
 
   private:
 
@@ -262,8 +144,6 @@ class JZPianoFrame : public wxFrame, public tButtonLabelInterface
   private:
 
     JZToolBar* mpToolBar;
-
-    JZGuitarFrame* mpGuitarFrame;
 
   DECLARE_EVENT_TABLE()
 };

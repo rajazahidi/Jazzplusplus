@@ -78,7 +78,10 @@ jppResourceDialog::jppResourceDialog(wxWindow* parent, const wxString& name)
 
 jppResourceDialog::~jppResourceDialog()
 {
-  dialog->Destroy();
+  if (dialog)
+  {
+    dialog->Destroy();
+  }
   for (
     list<jppResourceElement*>::iterator iResourceElement = links.begin();
     iResourceElement != links.end();

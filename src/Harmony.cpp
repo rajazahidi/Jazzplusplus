@@ -29,6 +29,7 @@
 #include "TrackFrame.h"
 #include "TrackWindow.h"
 #include "PianoFrame.h"
+#include "PianoWindow.h"
 #include "GuitarFrame.h"
 #include "Song.h"
 #include "Filter.h"
@@ -835,7 +836,7 @@ HBMatchMarkers::HBMatchMarkers(const HBContext &ct, HBCanvas *cv)
 
   if (cnvs->mark_piano)
   {
-    tEventArray &buf = gpTrackFrame->GetPianoWindow()->PasteBuffer;
+    tEventArray &buf = gpTrackFrame->GetPianoWindow()->mPasteBuffer;
     for (int i = 0; i < buf.nEvents; i++)
     {
       tKeyOn *on = buf.Events[i]->IsKeyOn();
@@ -1011,7 +1012,7 @@ void HBCanvas::OnEvent(wxMouseEvent &e)
       player.StartPlay(context);
     }
 
-    if ((e.LeftDown() || e.MiddleDown()) ) // && context != mouse_context)
+    if (e.LeftDown() || e.MiddleDown()) // && context != mouse_context)
     {
       DrawMarkers(mouse_context, dc);
       mouse_context = context;
@@ -1021,10 +1022,10 @@ void HBCanvas::OnEvent(wxMouseEvent &e)
       // paste to PianoWin buffer
       if (!mark_piano)
       {
-        tEventArray &buf = gpTrackFrame->GetPianoWindow()->PasteBuffer;
+        tEventArray &buf = gpTrackFrame->GetPianoWindow()->mPasteBuffer;
         buf.Clear();
         player.Paste(buf);
-        gpTrackFrame->GetPianoWindow()->Redraw();
+        gpTrackFrame->GetPianoWindow()->Refresh();
       }
 
       // Show in GuitarWin

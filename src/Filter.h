@@ -64,14 +64,16 @@ class tFilter : public wxObject
     tFltEvent *FltEvents;
     bool      OtherSelected;
 
-    JZSong *Song;
+    JZSong* mpSong;
+
     int FromClock, ToClock;        // einschl .. ausschl
+
     int FromTrack, ToTrack;        // 1..n einschl .. einschl
 
     void Dialog(wxFrame *parent, int ShowEventStats = 1);
 
-    tFilter(JZSong *);
-    tFilter(tFilter *o);
+    tFilter(JZSong* pSong);
+    tFilter(tFilter* pOtherFilter);
     tFilter(tFilter const &o);
     tFilter& operator=(tFilter const &o);
     virtual ~tFilter();

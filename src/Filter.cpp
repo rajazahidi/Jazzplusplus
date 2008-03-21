@@ -35,21 +35,21 @@
 
 const tFltEvent FltEvents[nFltEvents] =
 {
-  { StatKeyOn,                "Note",         1,        0,        127},
-  { StatKeyPressure,    "Poly Aftertouch",1,    0,      127},
-  { StatControl,         "Controller",         1,        0,        127},
-  { StatProgram,         "Patch",        1,        0,        127},
-  { StatPitch,                "Pitch",         1,        -8192,        8192},
-  { StatTimeSignat,        "Meter",        1,        0,        0},
-  { StatChnPressure,    "Channel Aftertouch",1, 0,      0},
-  { StatSysEx,          "SysEx",        1,      0,      0}
+  { StatKeyOn,          "Note",               1,     0,  127},
+  { StatKeyPressure,    "Poly Aftertouch",    1,     0,  127},
+  { StatControl,        "Controller",         1,     0,  127},
+  { StatProgram,        "Patch",              1,     0,  127},
+  { StatPitch,          "Pitch",              1, -8192, 8192},
+  { StatTimeSignat,     "Meter",              1,     0,    0},
+  { StatChnPressure,    "Channel Aftertouch", 1,     0,    0},
+  { StatSysEx,          "SysEx",              1,     0,    0}
 };
 
 
 
 tFilter::tFilter(JZSong *s)
 {
-  Song = s;
+  mpSong = s;
   FltEvents = new tFltEvent [nFltEvents];
   memcpy(FltEvents, ::FltEvents, sizeof(::FltEvents));
 
@@ -84,8 +84,9 @@ tFilter& tFilter::operator=(tFilter const &o) {
   return *this;
 }
 
-void tFilter::copy(tFilter const &o) {
-  Song          = o.Song;
+void tFilter::copy(tFilter const &o)
+{
+  mpSong        = o.mpSong;
   FromClock     = o.FromClock;
   ToClock       = o.ToClock;
   FromTrack     = o.FromTrack;
@@ -191,7 +192,7 @@ void tFilter::Dialog(wxFrame *parent, int ShowEventStats)
 {
   tFilterDlg *dlg;
   //  DialogBox = new wxDialogBox(parent, "Event Filter", FALSE );
-  dlg = new tFilterDlg(this, Song,  ShowEventStats);
+  dlg = new tFilterDlg(this, mpSong, ShowEventStats);
   dlg->Create();
 //   dlg->EditForm(DialogBox, ShowEventStats);
 //   DialogBox->Fit();
@@ -210,7 +211,7 @@ void tFilter::Dialog(wxFrame *parent, int ShowEventStats)
 tTrackIterator::tTrackIterator(tFilter *f, int rev)
 {
   Filter = f;
-  Song   = Filter->Song;
+  Song   = Filter->mpSong;
   Reverse = rev;
 }
 

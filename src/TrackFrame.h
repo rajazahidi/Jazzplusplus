@@ -23,14 +23,13 @@
 #ifndef JZ_TRACKFRAME_H
 #define JZ_TRACKFRAME_H
 
-#include "EventWindow.h"
 #include "MouseAction.h"
 #include "Metronome.h"
 
 class JZSong;
 class JZToolBar;
 class JZTrackWindow;
-class JZPianoFrame;
+class JZPianoWindow;
 
 //*****************************************************************************
 //*****************************************************************************
@@ -47,7 +46,7 @@ class JZTrackFrame : public wxFrame, public tButtonLabelInterface
 
     virtual ~JZTrackFrame();
 
-    JZPianoFrame* GetPianoWindow()
+    JZPianoWindow* GetPianoWindow()
     {
       return 0;
     }
@@ -103,7 +102,7 @@ class JZTrackFrame : public wxFrame, public tButtonLabelInterface
 
     JZTrackWindow* mpTrackWindow;
 
-//    JZPianoFrame* mpPianoFrame;
+//    JZPianoWindow* mpPianoWindow;
 
     int mPreviousClock;
     bool mPreviouslyRecording;

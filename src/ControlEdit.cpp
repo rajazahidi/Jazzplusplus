@@ -23,7 +23,7 @@
 #include "WxWidgets.h"
 
 #include "ControlEdit.h"
-#include "PianoFrame.h"
+#include "PianoWindow.h"
 #include "EventWindow.h"
 #include "Song.h"
 #include "Track.h"
@@ -34,7 +34,7 @@ static int bars_state = 2;  // from ArrayEdit
 tCtrlEditBase::tCtrlEditBase(
   int min,
   int max,
-  JZPianoFrame* p,
+  JZPianoWindow* p,
   char const *label,
   int dx,
   int x,
@@ -50,7 +50,7 @@ tCtrlEditBase::tCtrlEditBase(
 }
 
 void tCtrlEditBase::Create(
-  JZPianoFrame* p,
+  JZPianoWindow* pPianoWindow,
   char const *label,
   int dx,
   int x,
@@ -59,7 +59,7 @@ void tCtrlEditBase::Create(
   int h)
 {
   x_off = dx;
-  parent = p;
+  mpPianoWindow = pPianoWindow;
   track  = 0;
   from_clock = 0;
   to_clock = 1;
@@ -67,7 +67,7 @@ void tCtrlEditBase::Create(
   clocks_per_pixel = 0;
   sticky = 1;
 
-  panel = new tCtrlPanel(this, (wxWindow*)parent, x, y, dx, h, 0, "Controller Edit");
+  panel = new tCtrlPanel(this, mpPianoWindow, x, y, dx, h, 0, "Controller Edit");
   //(void) new wxMessage(panel, (char *)label);
   //panel->NewLine();
 
@@ -94,7 +94,7 @@ void tCtrlEditBase::Create(
   // ab hier dient ctrlmode zur Unterscheidung zwischen
   // Apply und Edit.
 
-  edit = new tArrayEdit((wxFrame *)parent, array, x+dx, y, w - dx, h, 0);
+  edit = new tArrayEdit((wxFrame *)mpPianoWindow, array, x+dx, y, w - dx, h, 0);
   edit->SetLabel(label);
   edit->SetDrawBars(this);
 
@@ -240,7 +240,7 @@ void tCtrlEditBase::OnRevert()
 void tCtrlEditBase::OnApply()
 {
   wxBeginBusyCursor();
-  parent->Song->NewUndoBuffer();
+  mpPianoWindow->mpSong->NewUndoBuffer();
   // delete old events, but skip clock 0 to preserve track defaults:
   // (dirty but might work...)
   tEventIterator iter(track);
@@ -314,7 +314,7 @@ void tCtrlEditBase::OnApply()
   OnRevert();
 
   // SN+ Bug Fix Controller in Piano Fenster updaten.
-  parent->Redraw();
+  mpPianoWindow->Refresh();
 }
 
 // SN++
@@ -360,7 +360,7 @@ void tCtrlEditBase::OnEdit()
 // av: called by tArrayEdit::OnPaint
 void tCtrlEditBase::DrawBars(wxDC* dc)
 {
-  JZBarInfo BarInfo(parent->Song);
+  JZBarInfo BarInfo(mpPianoWindow->mpSong);
   BarInfo.SetClock(from_clock);
   long gclk,x;
   int  ii;
@@ -370,13 +370,13 @@ void tCtrlEditBase::DrawBars(wxDC* dc)
     while (gclk < to_clock)
     {
       gclk = BarInfo.Clock;
-      x = parent->Clock2x(gclk-from_clock);
+      x = mpPianoWindow->Clock2x(gclk-from_clock);
       edit->DrawBarLine(dc, x - x_off);
       if (bars_state == 2)
         for (ii = 0; ii < BarInfo.CountsPerBar; ii++)
         {
           gclk += BarInfo.TicksPerBar / BarInfo.CountsPerBar;
-          x = parent->Clock2x(gclk-from_clock);
+          x = mpPianoWindow->Clock2x(gclk-from_clock);
           edit->DrawBarLine(dc, x - x_off);
         }
       BarInfo.Next();
@@ -388,14 +388,14 @@ void tCtrlEditBase::DrawBars(wxDC* dc)
 // ------------------------------------------------------------------
 
 tPitchEdit::tPitchEdit(
-  JZPianoFrame* parent,
+  JZPianoWindow* pPianoWindow,
   char const *label,
   int xoff,
   int x,
   int y,
   int w,
   int h)
-  : tCtrlEditBase(-8191, 8191, parent, label, xoff, x, y, w, h)
+  : tCtrlEditBase(-8191, 8191, pPianoWindow, label, xoff, x, y, w, h)
 {
 }
 
@@ -423,14 +423,14 @@ JZEvent * tPitchEdit::NewEvent(long clock, int val)
 
 tCtrlEdit::tCtrlEdit(
   int CtrlNum,
-  JZPianoFrame* parent,
+  JZPianoWindow* pPianoWindow,
   char const *label,
   int xoff,
   int x,
   int y,
   int w,
   int h)
-  : tCtrlEditBase(0, 127, parent, label, xoff, x, y, w, h, 1)
+  : tCtrlEditBase(0, 127, pPianoWindow, label, xoff, x, y, w, h, 1)
 {
   ctrl_num = CtrlNum;
   if (ctrl_num == 10)  // panpot
@@ -466,14 +466,14 @@ JZEvent * tCtrlEdit::NewEvent(long clock, int val)
 // ------------------------------------------------------------------
 
 tVelocEdit::tVelocEdit(
-  JZPianoFrame* parent,
+  JZPianoWindow* pParent,
   char const *label,
   int xoff,
   int x,
   int y,
   int w,
   int h)
-  : tCtrlEditBase(1, 127, parent, label, xoff, x, y, w, h)
+  : tCtrlEditBase(1, 127, pParent, label, xoff, x, y, w, h)
 {
   sticky = 0;
   selectable = 1;
@@ -488,18 +488,18 @@ int tVelocEdit::IsCtrlEdit(JZEvent *e)
 {
   // SN++ Falls im PianoWin Events selektiert sind, werden nur diese
   //      Events geaendert
-  if (!parent->SnapSel->Selected)
+  if (!mpPianoWindow->mpSnapSel->Selected)
   {
-      return (e->IsKeyOn() != 0);
+    return (e->IsKeyOn() != 0);
   }
   else
   {
     if (e->IsKeyOn())
     {
       return (
-        parent->mpFilter->IsSelected(e) &&
-        (e->GetClock() >= parent->mpFilter->FromClock &&
-          e->GetClock() <= parent->mpFilter->ToClock));
+        mpPianoWindow->GetFilter()->IsSelected(e) &&
+        (e->GetClock() >= mpPianoWindow->GetFilter()->FromClock &&
+          e->GetClock() <= mpPianoWindow->GetFilter()->ToClock));
     }
   }
   return 0;
@@ -515,13 +515,14 @@ void tVelocEdit::OnApply()
   static long from_clk, to_clk;
 
   wxBeginBusyCursor();
-  parent->Song->NewUndoBuffer();
+  mpPianoWindow->mpSong->NewUndoBuffer();
 
   tEventIterator iter(track);
 
-  if (parent->SnapSel->Selected) {
-    from_clk = parent->mpFilter->FromClock;
-    to_clk   = parent->mpFilter->ToClock;
+  if (mpPianoWindow->mpSnapSel->Selected)
+  {
+    from_clk = mpPianoWindow->GetFilter()->FromClock;
+    to_clk   = mpPianoWindow->GetFilter()->ToClock;
   } else {
     from_clk = from_clock;
     to_clk   = to_clock;
@@ -532,7 +533,7 @@ void tVelocEdit::OnApply()
   while (e) {
     // SN++ Falls im PianoWin Events selektiert sind, werden nur diese
     //      Events geaendert
-    if (!parent->SnapSel->Selected || parent->mpFilter->IsSelected(e) )
+    if (!mpPianoWindow->mpSnapSel->Selected || mpPianoWindow->GetFilter()->IsSelected(e) )
   {
 
     tKeyOn *k = e->IsKeyOn();
@@ -551,14 +552,22 @@ void tVelocEdit::OnApply()
   track->Cleanup();
   wxEndBusyCursor();
   OnRevert();
+
   // SN+ for Color Darstellung
-  parent->Redraw();
+  mpPianoWindow->Refresh();
 }
 
 // ------------------------------------------------------------------
 
-tPolyAfterEdit::tPolyAfterEdit(JZPianoFrame* parent, char const *label, int xoff, int x, int y, int w, int h)
-  : tCtrlEditBase(0, 127, parent, label, xoff, x, y, w, h, 1)
+tPolyAfterEdit::tPolyAfterEdit(
+  JZPianoWindow* pPianoWindow,
+  char const *label,
+  int xoff,
+  int x,
+  int y,
+  int w,
+  int h)
+  : tCtrlEditBase(0, 127, pPianoWindow, label, xoff, x, y, w, h, 1)
 {
   sticky = 0;  // SN must be set for proper editing!
   selectable = 1;
@@ -575,15 +584,15 @@ int tPolyAfterEdit::IsCtrlEdit(JZEvent *e)
   // SN++ Falls im PianoWin Events selektiert sind, werden nur diese
   //      Events geaendert
 
-  if (!parent->SnapSel->Selected)
+  if (!mpPianoWindow->mpSnapSel->Selected)
   return e->IsKeyPressure() != 0;
   else
       if (e->IsKeyPressure())
       {
         return (
-          parent->mpFilter->IsSelected(e) &&
-          (e->GetClock() >= parent->mpFilter->FromClock &&
-          e->GetClock() <= parent->mpFilter->ToClock));
+          mpPianoWindow->GetFilter()->IsSelected(e) &&
+          (e->GetClock() >= mpPianoWindow->GetFilter()->FromClock &&
+          e->GetClock() <= mpPianoWindow->GetFilter()->ToClock));
       }
   return 0;
 }
@@ -602,20 +611,24 @@ void tPolyAfterEdit::OnApply()
   JZEvent *e;
 
   // SN++ Apply works only if some events are selected !!
-  if (!parent->SnapSel->Selected) {
+  if (!mpPianoWindow->mpSnapSel->Selected)
+  {
     OnRevert();
     return;
   }
 
   wxBeginBusyCursor();
-  parent->Song->NewUndoBuffer();
+  mpPianoWindow->mpSong->NewUndoBuffer();
 
   tEventIterator iter(track);
 
-  if (parent->SnapSel->Selected) {
-    from_clk = parent->mpFilter->FromClock;
-    to_clk   = parent->mpFilter->ToClock;
-  } else {
+  if (mpPianoWindow->mpSnapSel->Selected)
+  {
+    from_clk = mpPianoWindow->GetFilter()->FromClock;
+    to_clk   = mpPianoWindow->GetFilter()->ToClock;
+  }
+  else
+  {
     from_clk = from_clock;
     to_clk   = to_clock;
   }
@@ -626,7 +639,7 @@ void tPolyAfterEdit::OnApply()
   // SN++ Alle selektierten AfterTouch events loeschen
     e = iter.Range(from_clk, to_clk);
     while (e) {
-      if (!parent->SnapSel->Selected || parent->mpFilter->IsSelected(e) )
+      if (!mpPianoWindow->mpSnapSel->Selected || mpPianoWindow->GetFilter()->IsSelected(e) )
       {
         k = e->IsKeyPressure();
         if (k)
@@ -644,7 +657,7 @@ void tPolyAfterEdit::OnApply()
     e = iter.Range(from_clk, to_clk);
     while (e)
     {
-      if (!parent->SnapSel->Selected || parent->mpFilter->IsSelected(e) )
+      if (!mpPianoWindow->mpSnapSel->Selected || mpPianoWindow->GetFilter()->IsSelected(e) )
       {
         keyon = e->IsKeyOn();
         if (keyon)
@@ -686,7 +699,7 @@ void tPolyAfterEdit::OnApply()
     tKeyPressure *cpy;
     while (e)
     {
-      if (!parent->SnapSel->Selected || parent->mpFilter->IsSelected(e))
+      if (!mpPianoWindow->mpSnapSel->Selected || mpPianoWindow->GetFilter()->IsSelected(e))
       {
         if(e->IsKeyPressure())
         {
@@ -707,20 +720,20 @@ void tPolyAfterEdit::OnApply()
   wxEndBusyCursor();
   OnRevert();
   // SN+ for Color Darstellung
-  parent->Redraw();
+  mpPianoWindow->Refresh();
 }
 
 // ----------------------------------------------------------------------
 
 tChannelAfterEdit::tChannelAfterEdit(
-  JZPianoFrame* parent,
+  JZPianoWindow* pPianoWindow,
   char const *label,
   int xoff,
   int x,
   int y,
   int w,
   int h)
-  : tCtrlEditBase(0, 127, parent, label, xoff, x, y, w, h, 1)
+  : tCtrlEditBase(0, 127, pPianoWindow, label, xoff, x, y, w, h, 1)
 {
 }
 
@@ -755,7 +768,7 @@ void tChannelAfterEdit::UpDate()
 void tChannelAfterEdit::OnApply()
 {
   wxBeginBusyCursor();
-  parent->Song->NewUndoBuffer();
+  mpPianoWindow->mpSong->NewUndoBuffer();
 
   // delete old events, but skip clock 0 to preserve track defaults:
   // (dirty but might work...)
@@ -839,14 +852,14 @@ void tChannelAfterEdit::OnApply()
 tTempoEdit::tTempoEdit(
   int min,
   int max,
-  JZPianoFrame* parent,
+  JZPianoWindow* pPianoWindow,
   char const *label,
   int xoff,
   int x,
   int y,
   int w,
   int h)
-  : tCtrlEditBase(min, max, parent, label, xoff, x, y, w, h)
+  : tCtrlEditBase(min, max, pPianoWindow, label, xoff, x, y, w, h)
 {
 }
 

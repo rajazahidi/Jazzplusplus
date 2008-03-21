@@ -25,7 +25,7 @@
 
 #include "Random.h"
 
-class JZPianoFrame;
+class JZPianoWindow;
 class JZTrack;
 class JZEvent;
 class tCtrlEditBase;
@@ -36,10 +36,16 @@ class tCtrlPanel : public wxPanel
 {
   public:
   friend class tCtrlEditBase;
-    tCtrlPanel(tCtrlEditBase *e, wxWindow *parent,
-              int x=-1, int y=-1, int width=-1, int height=-1, long style=0,
-              char *name = "panel")
-      : wxPanel(parent, x, y, width, height, style, name)
+    tCtrlPanel(
+      tCtrlEditBase* e,
+      wxWindow* pParent,
+      int x=-1,
+      int y=-1,
+      int width=-1,
+      int height=-1,
+      long style=0,
+      char *name = "panel")
+      : wxPanel(pParent, x, y, width, height, style, name)
     {
       edit = e;
     }
@@ -52,22 +58,41 @@ class tCtrlPanel : public wxPanel
 class tCtrlEditBase : public tArrayEditDrawBars
 {
   public:
-    tCtrlEditBase(int min, int max, JZPianoFrame *parent, char const *label, int xoff, int x, int y, int w, int h, int mode=0);
+
+    tCtrlEditBase(
+      int min,
+      int max,
+      JZPianoWindow* pPianoWindow,
+      char const *label,
+      int xoff,
+      int x,
+      int y,
+      int w,
+      int h,
+      int mode = 0);
+
     virtual ~tCtrlEditBase();
+
     void SetSize(int xoff, int x, int y, int w, int h);
+
     void ReInit(JZTrack *track, long FromClock, long ClocksPerPixel);
 
 // SN++ Default = 0, 1 bedeutet der Editor arbeitet auch auf Selektionen.
 //      Dieser Patch zusammen mit dem "selectable Patch" im PianoWin
 //      ist for VelocEdit und AftertouchEdit Updates.
     int selectable;
+
     virtual void UpDate();
-//
+
   protected:
+
     virtual int Missing()  = 0;
+
     virtual int IsCtrlEdit(JZEvent *e)  = 0;
-    virtual int GetValue(JZEvent *e)  = 0;
-    virtual JZEvent * NewEvent(long clock, int val) { return 0; }
+
+    virtual int GetValue(JZEvent *e) = 0;
+
+    virtual JZEvent* NewEvent(long clock, int val) { return 0; }
 
     virtual void OnApply();
     virtual void OnRevert();
@@ -90,12 +115,12 @@ class tCtrlEditBase : public tArrayEditDrawBars
     JZRndArray  array;
 
     tArrayEdit* edit;
-    JZPianoFrame* parent;
+    JZPianoWindow* mpPianoWindow;
     tCtrlPanel* panel;
 
   private:
 
-    void Create(JZPianoFrame* p, char const *label, int dx, int x, int y, int w, int h);
+    void Create(JZPianoWindow* p, char const *label, int dx, int x, int y, int w, int h);
 
     static void Apply(wxButton &but, wxCommandEvent& event);
     static void Revert(wxButton &but, wxCommandEvent& event);
@@ -108,7 +133,7 @@ class tCtrlEditBase : public tArrayEditDrawBars
 class tPitchEdit : public tCtrlEditBase
 {
   public:
-    tPitchEdit(JZPianoFrame* parent, char const *label, int xoff, int x, int y, int w, int h);
+    tPitchEdit(JZPianoWindow* pPianoWindow, char const *label, int xoff, int x, int y, int w, int h);
   protected:
     virtual int Missing();
     virtual int IsCtrlEdit(JZEvent *e);
@@ -120,7 +145,7 @@ class tPitchEdit : public tCtrlEditBase
 class tPolyAfterEdit : public tCtrlEditBase
 {
   public:
-    tPolyAfterEdit(JZPianoFrame* parent, char const *label, int xoff, int x, int y, int w, int h);
+    tPolyAfterEdit(JZPianoWindow* pPianoWindow, char const *label, int xoff, int x, int y, int w, int h);
   protected:
     virtual int Missing();
     virtual int IsCtrlEdit(JZEvent *e);
@@ -132,7 +157,7 @@ class tPolyAfterEdit : public tCtrlEditBase
 class tChannelAfterEdit : public tCtrlEditBase
 {
   public:
-    tChannelAfterEdit(JZPianoFrame* parent, char const *label, int xoff, int x, int y, int w, int h);
+    tChannelAfterEdit(JZPianoWindow* pPianoWindow, char const *label, int xoff, int x, int y, int w, int h);
   protected:
     virtual int Missing();
     virtual int IsCtrlEdit(JZEvent *e);
@@ -145,7 +170,7 @@ class tChannelAfterEdit : public tCtrlEditBase
 class tCtrlEdit : public tCtrlEditBase
 {
   public:
-    tCtrlEdit(int CtrlNum, JZPianoFrame* parent, char const *label, int xoff, int x, int y, int w, int h);
+    tCtrlEdit(int CtrlNum, JZPianoWindow* pPianoWindow, char const *label, int xoff, int x, int y, int w, int h);
   protected:
     virtual int Missing();
     virtual int IsCtrlEdit(JZEvent *e);
@@ -160,7 +185,7 @@ class tVelocEdit : public tCtrlEditBase
   public:
 
     tVelocEdit(
-      JZPianoFrame* parent,
+      JZPianoWindow* pPianoWindow,
       char const* label,
       int xoff,
       int x,
@@ -183,7 +208,7 @@ class tTempoEdit : public tCtrlEditBase
     tTempoEdit(
       int min,
       int max,
-      JZPianoFrame* parent,
+      JZPianoWindow* pPianoWindow,
       char const *label,
       int xoff,
       int x,

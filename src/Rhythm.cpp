@@ -29,7 +29,7 @@
 #include "Globals.h"
 #include "Harmony.h"
 #include "TrackFrame.h"
-#include "PianoFrame.h"
+#include "PianoWindow.h"
 #include "ToolBar.h"
 #include "DeprecatedStringUtils.h"
 #include "FileSelector.h"
@@ -908,7 +908,7 @@ void tRhythmWin::AddInstrumentDlg()
       r->n_keys = 0;
       r->mode   = keys[i];
       tEventArray events;
-      tCmdCopyToBuffer cmd(gpTrackFrame->GetPianoWindow()->mpFilter, &events);
+      tCmdCopyToBuffer cmd(gpTrackFrame->GetPianoWindow()->GetFilter(), &events);
       cmd.Execute(0);   // no UNDO
 
       for (int ii = 0; ii < events.nEvents; ii++)

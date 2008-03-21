@@ -39,7 +39,6 @@ using namespace std;
 // ************************************************************************
 
 #define ScLine 50L
-#define ScPage 8L
 
 
 //notice, there is a conflict between this and the subclass event tables that i dont know how to resolv
@@ -629,9 +628,9 @@ void JZEventFrame::NewPlayPosition(int Clock)
     }
   }
   if (NextWin)
+  {
     NextWin->NewPlayPosition(Clock);
-
-
+  }
 }
 
 /** draw the "play position", by placing a vertical line where the "play clock" is */
@@ -651,10 +650,10 @@ void JZEventFrame::DrawPlayPosition(wxDC* dc)
     dc->DrawLine(x + 1, CanvasY, x + 1, mEventsY + mEventsHeight);
     dc->SetLogicalFunction(wxCOPY);
   }
-  if (NextWin)
-  {
-    NextWin->DrawPlayPosition(dc);
-  }
+//OLD  if (NextWin)
+//OLD  {
+//OLD    NextWin->DrawPlayPosition(dc);
+//OLD  }
 }
 
 // **************************************************************************

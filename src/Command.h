@@ -54,16 +54,24 @@ class tScale
 class tCommand
 {
   public:
-    tFilter *Filter;
-    JZSong   *Song;
-    int      Reverse;
 
-    tCommand(tFilter *f);
+    tCommand(tFilter* pFilter);
+
+    virtual ~tCommand();
+
     virtual void Execute(int NewUndo = 1);
-    virtual void ExecuteTrack(JZTrack *t);
-    virtual void ExecuteEvent(JZTrack *t, JZEvent *e);
-    long Interpolate(long clk, long vmin, long vmax);
-    virtual ~tCommand() {}
+
+    virtual void ExecuteTrack(JZTrack* pTrack);
+
+    virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
+
+    int Interpolate(int Clock, int vmin, int vmax);
+
+  public:
+
+    tFilter* mpFilter;
+    JZSong* mpSong;
+    int mReverse;
 };
 
 
@@ -194,10 +202,15 @@ class tCmdSetChannel : public tCommand
 
 class tCmdCopyToBuffer : public tCommand
 {
-  tEventArray *Buffer;
   public:
-    tCmdCopyToBuffer(tFilter *f, tEventArray *Buffer);
+
+    tCmdCopyToBuffer(tFilter* pFilter, tEventArray *Buffer);
+
     virtual void ExecuteEvent(JZTrack *t, JZEvent *e);
+
+  private:
+
+    tEventArray* mpBuffer;
 };
 
 

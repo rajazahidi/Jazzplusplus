@@ -34,37 +34,119 @@
 
 using namespace std;
 
-// ************************************************************************
-// tSelectedEvents
-// ************************************************************************
+//*****************************************************************************
+// tCommand
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+tCommand::tCommand(tFilter* pFilter)
+  : mpFilter(pFilter),
+    mpSong(pFilter->mpSong),
+    mReverse(0)
+{
+}
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+tCommand::~tCommand()
+{
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void tCommand::Execute(int NewUndo)
+{
+  wxBeginBusyCursor();
+  if (NewUndo)
+  {
+    mpSong->NewUndoBuffer();
+  }
+  tTrackIterator Tracks(mpFilter, mReverse);
+  JZTrack* pTrack = Tracks.First();
+  while (pTrack)
+  {
+    ExecuteTrack(pTrack);
+    pTrack = Tracks.Next();
+  }
+  wxEndBusyCursor();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void tCommand::ExecuteTrack(JZTrack* pTrack)
+{
+  tEventIterator Iterator(pTrack);
+  JZEvent* pEvent = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
+  while (pEvent)
+  {
+    if (mpFilter->IsSelected(pEvent))
+    {
+      ExecuteEvent(pTrack, pEvent);
+    }
+    pEvent = Iterator.Next();
+  }
+  pTrack->Cleanup();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void tCommand::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
+{
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int tCommand::Interpolate(int Clock, int vmin, int vmax)
+{
+  int ClockMin = mpFilter->FromClock;
+  int ClockMax = mpFilter->ToClock;
+  return (Clock - ClockMin) * (vmax - vmin) / (ClockMax - ClockMin) + vmin;
+}
+
+//*****************************************************************************
+// tSelectedEvents
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 class tSelectedKeys : public tCommand
 {
   public:
+
+    tSelectedKeys(tFilter* pFilter);
+
+    void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
+
+  public:
+
     long Keys[128];
-  tSelectedKeys(tFilter *f);
-  void ExecuteEvent(JZTrack *t, JZEvent *e);
 };
 
-tSelectedKeys::tSelectedKeys(tFilter *f)
-  : tCommand(f)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+tSelectedKeys::tSelectedKeys(tFilter* pFilter)
+  : tCommand(pFilter)
 {
   int i;
-  for (i = 0; i <  128; i++)
+  for (i = 0; i <  128; ++i)
+  {
     Keys[i] = 0;
+  }
 }
 
-void tSelectedKeys::ExecuteEvent(JZTrack *t, JZEvent *e)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void tSelectedKeys::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tKeyOn *k = e->IsKeyOn();
-  if (k)
-    Keys[ k->Key ] += k->Length;
+  tKeyOn* pKey = pEvent->IsKeyOn();
+  if (pKey)
+  {
+    Keys[pKey->Key] += pKey->Length;
+  }
 }
 
-// ************************************************************************
+//*****************************************************************************
 // tScale
-// ************************************************************************
-
+//*****************************************************************************
                             //  c     d     e  f     g    a      b
 static const int CMajor[12] = { 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
 
@@ -203,58 +285,6 @@ int tScale::FitInto(int Key)
   return Key;
 }
 
-// ************************************************************************
-// tCommand
-// ************************************************************************
-
-tCommand::tCommand(tFilter *f)
-{
-  Filter = f;
-  Song = f->Song;
-  Reverse = 0;
-}
-
-void tCommand::Execute(int NewUndo)
-{
-  wxBeginBusyCursor();
-  if (NewUndo)
-    Song->NewUndoBuffer();
-  tTrackIterator Tracks(Filter, Reverse);
-  JZTrack *t = Tracks.First();
-  while (t)
-  {
-    ExecuteTrack(t);
-    t = Tracks.Next();
-  }
-  wxEndBusyCursor();
-}
-
-
-void tCommand::ExecuteTrack(JZTrack *t)
-{
-  tEventIterator Iterator(t);
-  JZEvent *e = Iterator.Range(Filter->FromClock, Filter->ToClock);
-  while (e)
-  {
-    if (Filter->IsSelected(e))
-      ExecuteEvent(t, e);
-    e = Iterator.Next();
-  }
-  t->Cleanup();
-}
-
-
-void tCommand::ExecuteEvent(JZTrack *t, JZEvent *e)
-{
-}
-
-long tCommand::Interpolate(long clk, long vmin, long vmax)
-{
-  long cmin = Filter->FromClock;
-  long cmax = Filter->ToClock;
-  return (clk - cmin) * (vmax - vmin) / (cmax - cmin) + vmin;
-}
-
 // ***********************************************************************
 // tCmdShift
 // ***********************************************************************
@@ -288,10 +318,10 @@ void tCmdErase::Execute(int NewUndo)
   tCommand::Execute(NewUndo);
   if (!LeaveSpace)
   {
-    tFilter f(Filter);
-    f.FromClock = Filter->ToClock;
-    f.ToClock   = Song->GetLastClock() + 1;
-    long DeltaClock = Filter->FromClock - Filter->ToClock;
+    tFilter f(mpFilter);
+    f.FromClock = mpFilter->ToClock;
+    f.ToClock   = mpSong->GetLastClock() + 1;
+    long DeltaClock = mpFilter->FromClock - mpFilter->ToClock;
     tCmdShift shift(&f, DeltaClock);
     shift.Execute(0);
   }
@@ -353,7 +383,7 @@ void tCmdQuantize::ExecuteEvent(JZTrack *t, JZEvent *e)
 tCmdTranspose::tCmdTranspose(tFilter *f, int notes, int ScaleNr, int fit)
   : tCommand(f)
 {
-  Scale.Init(ScaleNr, Filter);
+  Scale.Init(ScaleNr, mpFilter);
   Notes = notes;
   FitIntoScale = fit;
 }
@@ -542,7 +572,7 @@ void tCmdConvertToModulation::ExecuteTrack(JZTrack *t)
   //convert all note-on messages to a pitch bend/volume controller pair, velocity -> volume
   //make a volume off controller at the end of the current event
   tEventIterator Iterator(t);
-  JZEvent *e = Iterator.Range(Filter->FromClock, Filter->ToClock);
+  JZEvent *e = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
   long startclock=-1;
   long endclock=-1;
   unsigned char channel=0;
@@ -568,7 +598,7 @@ void tCmdConvertToModulation::ExecuteTrack(JZTrack *t)
   long startkey=0;
   while (e)
   {
-    if (Filter->IsSelected(e) && e->IsKeyOn())
+    if (mpFilter->IsSelected(e) && e->IsKeyOn())
       {
         if (startclock == -1)
         {
@@ -707,15 +737,17 @@ void tCmdSearchReplace::ExecuteEvent(JZTrack *t, JZEvent *e)
 // tCmdCopyToBuffer
 // ************************************************************************
 
-tCmdCopyToBuffer::tCmdCopyToBuffer(tFilter *f, tEventArray *buf)
-  : tCommand(f)
+tCmdCopyToBuffer::tCmdCopyToBuffer(
+  tFilter* pFilter,
+  tEventArray* pBuffer)
+  : tCommand(pFilter)
 {
-  Buffer = buf;
+  mpBuffer = pBuffer;
 }
 
-void tCmdCopyToBuffer::ExecuteEvent(JZTrack *t, JZEvent *e)
+void tCmdCopyToBuffer::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  Buffer->Put(e->Copy());
+  mpBuffer->Put(pEvent->Copy());
 }
 
 // **********************************************************************
@@ -735,9 +767,9 @@ tCmdCopy::tCmdCopy(tFilter *f, long dt, long dc)
   InsertSpace = 0;        // no
   RepeatClock = -1;        // -1L
 
-  Reverse = DestTrack > Filter->FromTrack;
-  if (Reverse)
-    DestTrack += Filter->ToTrack - Filter->FromTrack; // ToTrack inclusive
+  mReverse = DestTrack > mpFilter->FromTrack;
+  if (mReverse)
+    DestTrack += mpFilter->ToTrack - mpFilter->FromTrack; // ToTrack inclusive
 }
 
 
@@ -750,19 +782,23 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
   StartClock = DestClock;
 
   if (RepeatClock < 0)
-    StopClock = StartClock + Filter->ToClock - Filter->FromClock;
+    StopClock = StartClock + mpFilter->ToClock - mpFilter->FromClock;
   else
     StopClock = RepeatClock;
 
-  d = Song->GetTrack(DestTrack);
+  d = mpSong->GetTrack(DestTrack);
 
-  if (Reverse)
+  if (mReverse)
   {
     if (DestTrack)
-      -- DestTrack;
+    {
+      --DestTrack;
+    }
   }
   else
-    ++ DestTrack;
+  {
+    ++DestTrack;
+  }
 
   if (s && d)
   {
@@ -771,15 +807,15 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
     tEventArray tmp;
     {
       tEventIterator Iterator(s);
-      long  DeltaClock = StartClock - Filter->FromClock;
-      JZEvent *e = Iterator.Range(Filter->FromClock, Filter->ToClock);
+      long  DeltaClock = StartClock - mpFilter->FromClock;
+      JZEvent *e = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
       while (e)
       {
         long NewClock = e->GetClock() + DeltaClock;
         if (NewClock >= StopClock)
           break;
 
-        if (Filter->IsSelected(e))
+        if (mpFilter->IsSelected(e))
         {
           JZEvent* cpy = e->Copy();
           cpy->SetClock(NewClock);
@@ -790,7 +826,7 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
         if (!e)
         {
           e = Iterator.First();
-          DeltaClock += Filter->ToClock - Filter->FromClock;
+          DeltaClock += mpFilter->ToClock - mpFilter->FromClock;
         }
       }
     }
@@ -804,7 +840,7 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
       long DeltaClock = StopClock - StartClock;
       while (e)
       {
-        if (Filter->IsSelected(e))
+        if (mpFilter->IsSelected(e))
         {
           JZEvent *c = e->Copy();
           c->SetClock(c->GetClock() + DeltaClock);
@@ -821,10 +857,10 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
     if (EraseSource)
     {
       tEventIterator Iterator(s);
-      JZEvent *e = Iterator.Range(Filter->FromClock, Filter->ToClock);
+      JZEvent *e = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
       while (e)
       {
-        if (Filter->IsSelected(e))
+        if (mpFilter->IsSelected(e))
           s->Kill(e);
         e = Iterator.Next();
       }
@@ -839,7 +875,7 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
       JZEvent *e = Iterator.Range(StartClock, StopClock);
       while (e)
       {
-        if (Filter->IsSelected(e))
+        if (mpFilter->IsSelected(e))
           d->Kill(e);
         e = Iterator.Next();
       }
@@ -867,7 +903,7 @@ void tCmdExchLeftRight::ExecuteEvent(JZTrack *t, JZEvent *e)
   if (e->IsKeyOn())
   {
     tKeyOn *k = (tKeyOn *)e->Copy();
-    k->SetClock(Filter->FromClock + Filter->ToClock - k->GetClock());
+    k->SetClock(mpFilter->FromClock + mpFilter->ToClock - k->GetClock());
     t->Kill(e);
     t->Put(k);
   }
@@ -895,10 +931,10 @@ void tCmdExchUpDown::ExecuteTrack(JZTrack *t)
     Keys[i] = 0;
 
   tEventIterator Iterator(t);
-  e = Iterator.Range(Filter->FromClock, Filter->ToClock);
+  e = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
   while (e)
   {
-    if (Filter->IsSelected(e) && e->IsKeyOn())
+    if (mpFilter->IsSelected(e) && e->IsKeyOn())
     {
       tKeyOn *k = (tKeyOn *)e;
       Keys[k->Key] = 1;
@@ -908,10 +944,10 @@ void tCmdExchUpDown::ExecuteTrack(JZTrack *t)
 
   // reverse Key's
 
-  e = Iterator.Range(Filter->FromClock, Filter->ToClock);
+  e = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
   while(e)
   {
-    if (Filter->IsSelected(e) && e->IsKeyOn())
+    if (mpFilter->IsSelected(e) && e->IsKeyOn())
     {
       tKeyOn *k = (tKeyOn *)e->Copy();
       int n_th = 0;
@@ -944,8 +980,8 @@ tCmdMapper::tCmdMapper(tFilter *f, prop src, prop dst, JZRndArray &arr, int nb, 
   source          = src;
   destin          = dst;
   add             = ad;
-  binfo           = new JZBarInfo(Song);
-  binfo->SetClock(Filter->FromClock);
+  binfo           = new JZBarInfo(mpSong);
+  binfo->SetClock(mpFilter->FromClock);
   start_bar       = binfo->BarNr;
 }
 

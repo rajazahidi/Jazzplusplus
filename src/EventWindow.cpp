@@ -939,11 +939,11 @@ void JZEventFrame::MenMeterChange()
 void JZEventFrame::ZoomIn()
 {
 
-  if (ClocksPerPixel >= 2)
-  {
-    ClocksPerPixel /= 2;
-    int x = CanvasX * 2;
-    int y = CanvasY;
+//  if (ClocksPerPixel >= 2)
+//  {
+//    ClocksPerPixel /= 2;
+//    int x = CanvasX * 2;
+//    int y = CanvasY;
 
 //    wxDC* dc=new wxClientDC(Canvas);
 //    JZEventFrame::OnPaintSub(dc, x, y);
@@ -952,18 +952,18 @@ void JZEventFrame::ZoomIn()
 //    if (x == 0)
 //      Redraw();
 
-  }
+//  }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZEventFrame::ZoomOut()
 {
-  if (ClocksPerPixel <= 120)
-  {
-    ClocksPerPixel *= 2;
-    int x = CanvasX / 2;
-    int y = CanvasY;
+//  if (ClocksPerPixel <= 120)
+//  {
+//    ClocksPerPixel *= 2;
+//    int x = CanvasX / 2;
+//    int y = CanvasY;
 
     //wxDC* dc=new wxClientDC(Canvas);
     //JZEventFrame::OnPaintSub(dc, x, y);
@@ -971,5 +971,5 @@ void JZEventFrame::ZoomOut()
 //    Canvas->SetScrollPosition(x, y);
     //if (x == 0)
     //  Redraw();
-  }
+//  }
 }

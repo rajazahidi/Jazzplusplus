@@ -399,9 +399,8 @@ void JZTrackWindow::ZoomIn()
     int y = mScrolledY;
 
     SetScrollRanges(x, y);
-//    SetScrollPosition(x, y);
 
-    Refresh(false);
+//    Refresh(false);
   }
 }
 
@@ -416,7 +415,6 @@ void JZTrackWindow::ZoomOut()
     int y = mScrolledY;
 
     SetScrollRanges(x, y);
-//    SetScrollPosition(x, y);
 
     Refresh(false);
   }
@@ -467,10 +465,10 @@ void JZTrackWindow::Draw(wxDC& Dc)
   mScrolledY *= mScrollSize;
 
   GetClientSize(&mCanvasWidth, &mCanvasHeight);
-  cout
-    << "mCanvasWidth: " << mCanvasWidth
-    << "   mCanvasHeight: " << mCanvasHeight
-    << endl;
+//DEBUG  cout
+//DEBUG    << "mCanvasWidth: " << mCanvasWidth
+//DEBUG    << "   mCanvasHeight: " << mCanvasHeight
+//DEBUG    << endl;
 
   mEventsX = mLeftInfoWidth;
   mEventsY = mTopInfoHeight;
@@ -506,17 +504,17 @@ void JZTrackWindow::Draw(wxDC& Dc)
   {
     JZBarInfo BarInfo(mpSong);
 
-    cout
-      << "mCanvasWidth - mLeftInfoWidth: " << mCanvasWidth - mLeftInfoWidth << '\n'
-      << "BarInfo.TicksPerBar            " << BarInfo.TicksPerBar << '\n'
-      << "From Clock:                    " << mFromClock << '\n'
-      << "To Clock:                      " << mToClock << '\n'
-      << "Clocks/Pixel:                  " << mClocksPerPixel << '\n'
-      << "From Measure:                  " << mFromClock / BarInfo.TicksPerBar << '\n'
-      << "To Measure:                    " << mToClock / BarInfo.TicksPerBar
-//      << "From X:                        " << mFromClock << '\n'
-//      << "To X:                          " << mToClock << '\n'
-      << endl;
+//DEBUG    cout
+//DEBUG      << "mCanvasWidth - mLeftInfoWidth: " << mCanvasWidth - mLeftInfoWidth << '\n'
+//DEBUG      << "BarInfo.TicksPerBar            " << BarInfo.TicksPerBar << '\n'
+//DEBUG      << "From Clock:                    " << mFromClock << '\n'
+//DEBUG      << "To Clock:                      " << mToClock << '\n'
+//DEBUG      << "Clocks/Pixel:                  " << mClocksPerPixel << '\n'
+//DEBUG      << "From Measure:                  " << mFromClock / BarInfo.TicksPerBar << '\n'
+//DEBUG      << "To Measure:                    " << mToClock / BarInfo.TicksPerBar
+////DEBUG      << "From X:                        " << mFromClock << '\n'
+////DEBUG      << "To X:                          " << mToClock << '\n'
+//DEBUG      << endl;
 
 
     BarInfo.SetClock(mFromClock);
@@ -1171,6 +1169,14 @@ void JZTrackWindow::SetScrollRanges(const int& x, const int& y)
 {
   int Width, Height;
   GetVirtualEventSize(Width, Height);
+  cout
+    << mScrollSize
+    << ' ' << mScrollSize
+    << ' ' << (Width + mScrollSize) / mScrollSize
+    << ' ' << (Height + mScrollSize) / mScrollSize
+    << ' ' << x
+    << ' ' << y
+    << endl;
   SetScrollbars(
     mScrollSize,
     mScrollSize,

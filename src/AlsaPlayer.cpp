@@ -46,6 +46,8 @@
 
 using namespace std;
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tAlsaPlayer::tAlsaPlayer(JZSong *song)
   : JZPlayer(song)
 {
@@ -87,10 +89,10 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
     << ':' << static_cast<int>(self.port)
     << endl;
 
-  // allocate a queue
+  // Allocate a queue.
   queue = snd_seq_alloc_named_queue(handle, "Jazz++");
 
-  // register my name
+  // Register the name of this application.
   set_client_info(handle, "The JAZZ++ Midi Sequencer");
 
   // scan input addressess
@@ -102,7 +104,7 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
   inp_dev = gpConfig->GetValue(C_AlsaInputDevice);
   if (inp_dev < 0)
   {
-    cout<<"invalid input device, so selecting one"<<endl;
+    cout << "invalid input device, so selecting one" << endl;
     inp_dev = select_list(iaddr, "Input Device", inp_dev);
     cout << "Input device is: " << inp_dev << endl;
     gpConfig->Put(C_AlsaInputDevice, inp_dev);
@@ -110,14 +112,18 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
   outp_dev = gpConfig->GetValue(C_AlsaOutputDevice);
   if (outp_dev < 0)
   {
-    cout<<"invalid output device, so selecting one"<<endl;
+    cout << "invalid output device, so selecting one" << endl;
     outp_dev = select_list(oaddr, "Output Device", outp_dev);
   }
 
   if (inp_dev >= 0)
+  {
     subscribe_inp(inp_dev);
+  }
   if (outp_dev >= 0)
+  {
     subscribe_out(outp_dev);
+  }
 
   set_pool_sizes();
 
@@ -131,29 +137,35 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
       gpConfig->GetValue(C_ThruInput),
       gpConfig->GetValue(C_ThruOutput));
   }
-
 }
 
-
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tAlsaPlayer::clear_input_queue()
 {
   snd_seq_drop_input(handle);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tAlsaPlayer::set_pool_sizes()
 {
   if (snd_seq_set_client_pool_output(handle, 2000) < 0)
+  {
     perror("set pool output");
+  }
   if (snd_seq_set_client_pool_input(handle, 2000) < 0)
+  {
     perror("set pool input");
+  }
   if (snd_seq_set_client_pool_output_room(handle, 1000) < 0)
+  {
     perror("set pool output room");
+  }
 }
 
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tAlsaPlayer::SetSoftThru(int on, int idev, int odev)
 {
   if (idev != ithru || odev != othru)
@@ -162,7 +174,6 @@ void tAlsaPlayer::SetSoftThru(int on, int idev, int odev)
     othru = odev;
 
     thru->Stop();
-
   }
   if (on && !thru->IsRunning())
   {
@@ -170,26 +181,34 @@ void tAlsaPlayer::SetSoftThru(int on, int idev, int odev)
     thru->SetDestin(oaddr[othru].client, oaddr[othru].port);
 
     thru->Start();
-
   }
   else if (!on && thru->IsRunning())
   {
-
     thru->Stop();
-
   }
 }
 
-// connect output addrs/queue with my client/oport
+//-----------------------------------------------------------------------------
+// Description:
+//   Connect output addrs/queue with my client/oport.
+//-----------------------------------------------------------------------------
 void tAlsaPlayer::subscribe_out(int outp)
 {
-  if (snd_seq_connect_to(handle, self.port, oaddr[outp].client, oaddr[outp].port) < 0)
+  if (
+    snd_seq_connect_to(
+      handle,
+      self.port,
+      oaddr[outp].client,
+      oaddr[outp].port) < 0)
   {
     perror("subscribe output");
   }
 }
 
-// connect input addrs/queue with my client/iport
+//-----------------------------------------------------------------------------
+// Description:
+//   Connect input addrs/queue with my client/iport
+//-----------------------------------------------------------------------------
 void tAlsaPlayer::subscribe_inp(int inp)
 {
   snd_seq_port_subscribe_t *subs;
@@ -204,34 +223,57 @@ void tAlsaPlayer::subscribe_inp(int inp)
   }
 }
 
-// disconnect output addrs/queue with my client/oport
-void tAlsaPlayer::unsubscribe_out(int outp) {
-  if (snd_seq_disconnect_to(handle, self.port, oaddr[outp].client, oaddr[outp].port) < 0) {
+//-----------------------------------------------------------------------------
+// Description:
+//   Disconnect output addrs/queue with my client/oport.
+//-----------------------------------------------------------------------------
+void tAlsaPlayer::unsubscribe_out(int outp)
+{
+  if (
+    snd_seq_disconnect_to(
+      handle,
+      self.port,
+      oaddr[outp].client,
+      oaddr[outp].port) < 0)
+  {
     perror("unsubscribe output");
   }
 }
 
-// connect input addrs/queue with my client/iport
-void tAlsaPlayer::unsubscribe_inp(int inp) {
+//-----------------------------------------------------------------------------
+// Description:
+//   Connect input addrs/queue with my client/iport
+//-----------------------------------------------------------------------------
+void tAlsaPlayer::unsubscribe_inp(int inp)
+{
   snd_seq_port_subscribe_t *subs;
   snd_seq_port_subscribe_alloca(&subs);
   snd_seq_port_subscribe_set_time_update(subs, 1);
   snd_seq_port_subscribe_set_queue(subs, queue);
   snd_seq_port_subscribe_set_sender(subs, &iaddr[inp]);
   snd_seq_port_subscribe_set_dest(subs, &self);
-  if (snd_seq_unsubscribe_port(handle, subs) < 0) {
+  if (snd_seq_unsubscribe_port(handle, subs) < 0)
+  {
     perror("unsubscribe input");
   }
 }
 
-// set the name of this client
-void tAlsaPlayer::set_client_info(snd_seq_t *handle, const char *name) {
-  if (snd_seq_set_client_name(handle, (char *)name) < 0) {
+//-----------------------------------------------------------------------------
+// Description:
+//   Set the name of this client.
+//-----------------------------------------------------------------------------
+void tAlsaPlayer::set_client_info(snd_seq_t *handle, const char *name)
+{
+  if (snd_seq_set_client_name(handle, (char *)name) < 0)
+  {
     perror("ioctl");
   }
 }
 
-// create a new port
+//-----------------------------------------------------------------------------
+// Description:
+//   Create a new port.
+//-----------------------------------------------------------------------------
 int tAlsaPlayer::create_port(snd_seq_t *handle, const char *name)
 {
   return snd_seq_create_simple_port(
@@ -244,21 +286,28 @@ int tAlsaPlayer::create_port(snd_seq_t *handle, const char *name)
       SND_SEQ_PORT_TYPE_MIDI_GENERIC);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tAlsaPlayer::Installed()
 {
   return installed;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tAlsaPlayer::~tAlsaPlayer()
 {
   if (thru)
+  {
     delete thru;
+  }
   snd_seq_close(handle);
 }
 
+//-----------------------------------------------------------------------------
 // 0 = event successfully sent to driver
 // 1 = try again later
+//-----------------------------------------------------------------------------
 int tAlsaPlayer::OutEvent(JZEvent *e, int now)
 {
   int rc = 0;
@@ -369,15 +418,18 @@ int tAlsaPlayer::OutEvent(JZEvent *e, int now)
   return rc < 0 ? 1 : 0;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tAlsaPlayer::OutBreak()
 {
   OutBreak(OutClock);
 }
 
-/** "echos" are used to synchronize.
-they are supposed to be read later by the Notify call chain
- */
+//-----------------------------------------------------------------------------
+// Description:
+//   "echos" are used to synchronize.  They are supposed to be read later by
+// the Notify call chain.
+//-----------------------------------------------------------------------------
 int tAlsaPlayer::compose_echo(int clock, unsigned int arg)
 {
   snd_seq_event_t ev;
@@ -385,28 +437,34 @@ int tAlsaPlayer::compose_echo(int clock, unsigned int arg)
   ev.source = self;
   ev.dest = self;
   snd_seq_ev_schedule_tick(&ev, queue, 0, clock);
-  cout<<"scheduling echo for "<<clock<<endl;
+  cout << "scheduling echo for " << clock << endl;
   snd_seq_ev_set_fixed(&ev);
   ev.type = SND_SEQ_EVENT_ECHO;
   ev.data.raw32.d[0] = arg;
   return write(&ev);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tAlsaPlayer::OutBreak(long clock)
 {
-
-  while (echo_clock + 48 < clock) {
+  while (echo_clock + 48 < clock)
+  {
     echo_clock += 48;
     if (compose_echo(echo_clock, 0) < 0)
+    {
       break;
+    }
   }
 
   flush_output();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tAlsaPlayer::StartPlay(long clock, long loopClock, int cont)
 {
-  cout<<"tAlsaPlayer::StartPlay"<<endl;
+  cout << "tAlsaPlayer::StartPlay" << endl;
   recd_clock = clock;
   echo_clock = clock;
   play_clock = clock;
@@ -414,12 +472,14 @@ void tAlsaPlayer::StartPlay(long clock, long loopClock, int cont)
   start_timer(clock);
   JZPlayer::StartPlay(clock, loopClock, cont);
   Notify();
-  //flush_output();
+//  flush_output();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tAlsaPlayer::ResetPlay(long clock)
 {
-  /* purge queues */
+  // Purge queues.
   snd_seq_drop_output_buffer(handle);
   snd_seq_drop_output(handle);
 
@@ -430,11 +490,11 @@ void tAlsaPlayer::ResetPlay(long clock)
 #define DELTACLOCK 960
 #define ADVANCE_PLAY 480
 
-/** notify is periodically called by the timer.
-
-it will output events to the output buffer, and update play_clock and recd_clock
- */
-
+//-----------------------------------------------------------------------------
+// Description:
+//   Notify is periodically called by the timer.  It will output events to the
+// output buffer, and update play_clock and recd_clock
+//-----------------------------------------------------------------------------
 void tAlsaPlayer::Notify()
 {
   // called by timer
@@ -462,13 +522,27 @@ void tAlsaPlayer::Notify()
       PlayLoop->PrepareOutput(AudioBuffer, Song, Now, OutClock, 1);
     }
     mPlayBuffer.Length2Keyoff();
-  } else {
+  }
+  else
+  {
     // time to put more events
-    if ( Now >= (OutClock - ADVANCE_PLAY) )
+    if (Now >= (OutClock - ADVANCE_PLAY))
     {
-      PlayLoop->PrepareOutput(&mPlayBuffer, Song, OutClock, Now + DELTACLOCK, 0);
+      PlayLoop->PrepareOutput(
+        &mPlayBuffer,
+        Song,
+        OutClock,
+        Now + DELTACLOCK,
+        0);
       if (AudioBuffer)
-        PlayLoop->PrepareOutput(AudioBuffer, Song, OutClock, Now + DELTACLOCK, 1);
+      {
+        PlayLoop->PrepareOutput(
+          AudioBuffer,
+          Song,
+          OutClock,
+          Now + DELTACLOCK,
+          1);
+      }
       OutClock = Now + DELTACLOCK;
       mPlayBuffer.Length2Keyoff();
     }
@@ -485,7 +559,9 @@ void tAlsaPlayer::Notify()
   }
 }
 
-void tAlsaPlayer::set_event_header(snd_seq_event_t *ev, long clock,int type)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void tAlsaPlayer::set_event_header(snd_seq_event_t *ev, long clock, int type)
 {
   memset(ev, 0, sizeof(*ev));
   snd_seq_ev_set_source(ev, self.port);
@@ -495,7 +571,13 @@ void tAlsaPlayer::set_event_header(snd_seq_event_t *ev, long clock,int type)
   ev->type = type;
 }
 
-void tAlsaPlayer::set_event_header(snd_seq_event_t *ev, long clock, int len, void *ptr)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void tAlsaPlayer::set_event_header(
+  snd_seq_event_t *ev,
+  long clock,
+  int len,
+  void *ptr)
 {
   memset(ev, 0, sizeof(*ev));
   snd_seq_ev_set_source(ev, self.port);
@@ -504,7 +586,10 @@ void tAlsaPlayer::set_event_header(snd_seq_event_t *ev, long clock, int len, voi
   snd_seq_ev_set_variable(ev, len, ptr);
 }
 
-/** init the alsa timer  */
+//-----------------------------------------------------------------------------
+// Description:
+//   Initialize the alsa timer.
+//-----------------------------------------------------------------------------
 int tAlsaPlayer::start_timer(long clock)
 {
   int time_base = Song->TicksPerQuarter;
@@ -514,7 +599,10 @@ int tAlsaPlayer::start_timer(long clock)
   return 0;
 }
 
-/** set initial tempo */
+//-----------------------------------------------------------------------------
+// Description:
+//   Set initial tempo.
+//-----------------------------------------------------------------------------
 void tAlsaPlayer::init_queue_tempo(int time_base, int bpm)
 {
   snd_seq_queue_tempo_t *qtempo;
@@ -522,13 +610,16 @@ void tAlsaPlayer::init_queue_tempo(int time_base, int bpm)
   snd_seq_queue_tempo_set_ppq(qtempo, time_base);
   snd_seq_queue_tempo_set_tempo(qtempo, 60*1000000/bpm);
   if (snd_seq_set_queue_tempo(handle, queue, qtempo) < 0)
+  {
     perror("set_queue_tempo");
+  }
 }
 
-
-/** immediately start the alsa queue timer.
-do this by sending an "start" event to the queue
-*/
+//-----------------------------------------------------------------------------
+// Description:
+//   Immediately start the alsa queue timer.  Do this by sending an "start"
+// event to the queue.
+//-----------------------------------------------------------------------------
 void tAlsaPlayer::start_queue_timer(long clock)
 {
   stop_queue_timer(); // to be sure
@@ -538,20 +629,30 @@ void tAlsaPlayer::start_queue_timer(long clock)
   snd_seq_ev_set_source(&ev, self.port);
   snd_seq_ev_set_direct(&ev);
   snd_seq_ev_set_queue_pos_tick(&ev, queue, clock);
-  int rv=0;
-  rv=write(&ev, 1);
-  if(rv<0)
-    cout<<"tAlsaPlayer::start_queue_timer write failed"<<endl;
+  int rv = 0;
+  rv = write(&ev, 1);
+  if (rv < 0)
+  {
+    cout << "tAlsaPlayer::start_queue_timer write failed" << endl;
+  }
   snd_seq_ev_set_queue_continue(&ev, queue);
-  rv=write(&ev, 1);
-  if(rv<0)
-    cout<<"tAlsaPlayer::start_queue_timer write failed"<<endl;
+  rv = write(&ev, 1);
+  if (rv < 0)
+  {
+    cout << "tAlsaPlayer::start_queue_timer write failed" << endl;
+  }
 
-  cout<<"tAlsaPlayer::start_queue_timer added trial-and-terror start_queue"<<endl;
+  cout
+    << "tAlsaPlayer::start_queue_timer added trial-and-terror start_queue"
+    << endl;
+
   snd_seq_start_queue(handle, queue, NULL);
 }
 
-/** immediately stop the timer, by sending a stop event to the alsa queue*/
+//-----------------------------------------------------------------------------
+// Description:
+//   Immediately stop the timer, by sending a stop event to the alsa queue.
+//-----------------------------------------------------------------------------
 void tAlsaPlayer::stop_queue_timer()
 {
   snd_seq_event_t ev;
@@ -562,32 +663,52 @@ void tAlsaPlayer::stop_queue_timer()
   write(&ev, 1);
 }
 
-/** write an event to the queue, return < 0 on failure */
-int tAlsaPlayer::write(snd_seq_event_t *ev, int now) {
-  if (now) {
+//-----------------------------------------------------------------------------
+// Description:
+//   Write an event to the queue.
+//
+// Returns:
+//   int:
+//     returns a negative value on failure.
+//-----------------------------------------------------------------------------
+int tAlsaPlayer::write(snd_seq_event_t *ev, int now)
+{
+  if (now)
+  {
     snd_seq_ev_set_direct(ev);
     return snd_seq_event_output_direct(handle, ev);
   }
-  int rc = snd_seq_event_output(handle, ev) ;
-  if (rc < 0 && rc != -EAGAIN) {
+  int rc = snd_seq_event_output(handle, ev);
+  if (rc < 0 && rc != -EAGAIN)
+  {
     snd_seq_extract_output(handle, NULL); // remove the error event
   }
   return rc;
 }
 
-void tAlsaPlayer::flush_output() {
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void tAlsaPlayer::flush_output()
+{
   snd_seq_drain_output(handle);
 }
 
-int tAlsaPlayer::set_blocking_mode(int enable) {
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int tAlsaPlayer::set_blocking_mode(int enable)
+{
   int rc;
 
   if ((rc = snd_seq_nonblock(handle, !enable)) < 0)
+  {
     perror("blocking mode");
+  }
 
   return rc;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tAlsaPlayer::StopPlay()
 {
   JZPlayer::StopPlay();
@@ -599,55 +720,93 @@ void tAlsaPlayer::StopPlay()
   RecdBuffer.Keyoff2Length();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tAlsaPlayer::StartAudio()
 {
 }
 
-/** called from GetRealTimeClock.
-parses events in the queu.
-
-   sets  recd_clock, from event timestamps
- */
-void tAlsaPlayer::recd_event(snd_seq_event_t *ev)
+//-----------------------------------------------------------------------------
+// Description:
+//   Called from GetRealTimeClock.  Parses events in the queue.  Sets
+// recd_clock, from event time stamps.
+//-----------------------------------------------------------------------------
+void tAlsaPlayer::recd_event(snd_seq_event_t* ev)
 {
-  JZEvent *e = 0;
-  cout << "tAlsaPlayer::recd_event got "<<(int)ev->type<<" (echo is "<<SND_SEQ_EVENT_ECHO<<") "<<endl;
+  JZEvent* pEvent = 0;
+
+  cout
+    << "tAlsaPlayer::recd_event got " << (int)ev->type
+    << " (echo is " << SND_SEQ_EVENT_ECHO << ')'
+    << endl;
+
   switch (ev->type)
   {
-
     case SND_SEQ_EVENT_NOTEON:
       if (ev->data.note.velocity > 0)
-        e = new tKeyOn(0, ev->data.note.channel, ev->data.note.note, ev->data.note.velocity);
+      {
+        pEvent = new tKeyOn(
+          0,
+          ev->data.note.channel,
+          ev->data.note.note,
+          ev->data.note.velocity);
+      }
       else
-        e = new tKeyOff(0, ev->data.note.channel, ev->data.note.note, 0);
+      {
+        pEvent = new tKeyOff(0, ev->data.note.channel, ev->data.note.note, 0);
+      }
       break;
 
     case SND_SEQ_EVENT_NOTEOFF:
-      e = new tKeyOff(0, ev->data.note.channel, ev->data.note.note, ev->data.note.velocity);
+      pEvent = new tKeyOff(
+        0,
+        ev->data.note.channel,
+        ev->data.note.note,
+        ev->data.note.velocity);
       break;
 
     case SND_SEQ_EVENT_PGMCHANGE:
-      e = new tProgram(0, ev->data.control.channel, ev->data.control.value);
+      pEvent = new tProgram(
+        0,
+        ev->data.control.channel,
+        ev->data.control.value);
       break;
 
     case SND_SEQ_EVENT_KEYPRESS:
-      e = new tKeyPressure(0, ev->data.note.channel, ev->data.note.note, ev->data.note.velocity);
+      pEvent = new tKeyPressure(
+        0,
+        ev->data.note.channel,
+        ev->data.note.note,
+        ev->data.note.velocity);
       break;
 
     case SND_SEQ_EVENT_CHANPRESS:
-      e = new tChnPressure(0, ev->data.control.channel, ev->data.control.value);
+      pEvent = new tChnPressure(
+        0,
+        ev->data.control.channel,
+        ev->data.control.value);
       break;
 
     case SND_SEQ_EVENT_CONTROLLER:
-      e = new tControl(0, ev->data.control.channel, ev->data.control.param, ev->data.control.value);
+      pEvent = new tControl(
+        0,
+        ev->data.control.channel,
+        ev->data.control.param,
+        ev->data.control.value);
       break;
 
     case SND_SEQ_EVENT_PITCHBEND:
-      e = new tPitch(0, ev->data.control.channel, ev->data.control.value);
+      pEvent = new tPitch(
+        0,
+        ev->data.control.channel,
+        ev->data.control.value);
       break;
 
     case SND_SEQ_EVENT_SYSEX:
-      e = new tSysEx(0, ((unsigned char *)ev->data.ext.ptr) + 1, ev->data.ext.len - 1);
+      pEvent = new tSysEx(
+        0,
+        ((unsigned char *)ev->data.ext.ptr) + 1,
+        ev->data.ext.len - 1);
       break;
 
     case SND_SEQ_EVENT_ECHO:
@@ -658,24 +817,27 @@ void tAlsaPlayer::recd_event(snd_seq_event_t *ev)
       else
       {
         recd_clock = ev->time.tick;
-        cout<<"recd_clock now:"<<recd_clock<<endl;
+        cout << "recd_clock now: " << recd_clock << endl;
       }
       break;
 
   }
-  if (e)
+
+  if (pEvent)
   {
-    // Not all events are to be recorded.  Only those filtered out and put into
-    // the event.
-    e->SetClock(PlayLoop->Ext2IntClock(ev->time.tick));
-    RecdBuffer.Put(e);
+    // Not all events are to be recorded.  Only those filtered out and put
+    // into the event.
+    pEvent->SetClock(PlayLoop->Ext2IntClock(ev->time.tick));
+    RecdBuffer.Put(pEvent);
   }
 }
 
-/** called periodically from Notify
-it calculates the rt clock by looking at timestamps on events in the queue, and also updates the display, so the name is
-not well chosen.
- */
+//-----------------------------------------------------------------------------
+// Description:
+//   Called periodically from Notify.  Calculates the real time clock by
+// looking at time stamps on events in the queue, and also updates the
+// display, so the name is not well chosen.
+//-----------------------------------------------------------------------------
 long tAlsaPlayer::GetRealTimeClock()
 {
   // input recorded events (including my echo events)
@@ -693,8 +855,10 @@ long tAlsaPlayer::GetRealTimeClock()
   return recd_clock;
 }
 
-
-/** this function goes through each client, and each port on each client*/
+//-----------------------------------------------------------------------------
+// Description:
+//   This function goes through each client, and each port on each client.
+//-----------------------------------------------------------------------------
 void tAlsaPlayer::scan_clients(
   tAlsaDeviceList& DeviceList,
   unsigned DeviceCapabilities)
@@ -712,7 +876,9 @@ void tAlsaPlayer::scan_clients(
   {
     int c = snd_seq_client_info_get_client(cinfo);
     if (c == self.client)
+    {
       continue;
+    }
     snd_seq_port_info_set_client(pinfo, c);
     snd_seq_port_info_set_port(pinfo, -1);
     while (snd_seq_query_next_port(handle, pinfo) >= 0)
@@ -732,27 +898,41 @@ void tAlsaPlayer::scan_clients(
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tAlsaPlayer::FindMidiDevice()
 {
   if (inp_dev != -1)
+  {
     unsubscribe_inp(inp_dev);
+  }
   inp_dev = select_list(iaddr, "Input MIDI device", inp_dev);
   gpConfig->Put(C_AlsaInputDevice, inp_dev);
   if (inp_dev != -1)
+  {
     subscribe_inp(inp_dev);
+  }
 
   if (outp_dev != -1)
+  {
     unsubscribe_out(outp_dev);
+  }
   outp_dev = select_list(oaddr, "Output MIDI device", outp_dev);
   gpConfig->Put(C_AlsaOutputDevice, outp_dev);
   if (outp_dev != -1)
+  {
     subscribe_out(outp_dev);
+  }
   return 0;
 }
 
-int tAlsaPlayer::select_list(tAlsaDeviceList &list, char *title, int def_device)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int tAlsaPlayer::select_list(
+  tAlsaDeviceList& list,
+  char* title,
+  int def_device)
 {
-
   if (list.GetCount() > 0)
   {
     int ndevs = list.GetCount();
@@ -779,7 +959,6 @@ int tAlsaPlayer::select_list(tAlsaDeviceList &list, char *title, int def_device)
     }
 
     return k;
-
   }
   else
   {
@@ -788,7 +967,8 @@ int tAlsaPlayer::select_list(tAlsaDeviceList &list, char *title, int def_device)
   }
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tAlsaDeviceList::print(const char *msg)
 {
   cout << msg << endl;
@@ -799,10 +979,14 @@ void tAlsaDeviceList::print(const char *msg)
     ++iSound)
   {
     const snd_seq_addr_t& a = *iSound;
-    cout << GetName(i++) << " = " << (int)a.client << ":" << (int)a.port << endl;
+    cout
+      << GetName(i++) << " = " << (int)a.client << ":" << (int)a.port
+      << endl;
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 unsigned tAlsaDeviceList::add(const char* pName, const snd_seq_addr_t& a)
 {
   mDeviceNames.push_back(pName);
@@ -810,6 +994,8 @@ unsigned tAlsaDeviceList::add(const char* pName, const snd_seq_addr_t& a)
   return addr.size();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 snd_seq_addr_t& tAlsaDeviceList::operator[](unsigned i)
 {
   if (i >= addr.size())

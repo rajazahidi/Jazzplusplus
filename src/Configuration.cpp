@@ -649,12 +649,12 @@ void tConfig::LoadConfig(const wxString& FileName)
           {
             // include file
             wxString pathname = FindFile(StrValue(entry));
-            cout << "include "<< entry<<endl;
+            cout << "include " << entry << endl;
             IncLevel++;
             assert(IncLevel < MaxIncs);
             if (pathname)
             {
-              FdArr[IncLevel] = fopen(pathname,"r");
+              FdArr[IncLevel] = fopen(pathname, "r");
             }
             else
             {

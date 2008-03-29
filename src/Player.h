@@ -145,7 +145,7 @@ class tDeviceList
     tDeviceList& operator = (const tDeviceList &);
 };
 
-class tPlayer : public wxTimer
+class JZPlayer : public wxTimer
 {
   protected:
 
@@ -229,8 +229,8 @@ class tPlayer : public wxTimer
     tSampleSet samples;
 
   public:
-    tPlayer(JZSong *song);
-    virtual ~tPlayer();
+    JZPlayer(JZSong *song);
+    virtual ~JZPlayer();
 
     void Notify();
 
@@ -451,7 +451,7 @@ class tBuffer : public tWriteBase
 #define ACTIVE_TRACKS 7
 #define ACTIVE_TRACKS_MASK 0x7f
 
-class tMpuPlayer : public tPlayer
+class tMpuPlayer : public JZPlayer
 {
     int  dev;
     tBuffer PlyBytes;
@@ -495,12 +495,12 @@ class tMpuPlayer : public tPlayer
 
 // ------------------------------ null-driver -------------------------------
 
-class tNullPlayer : public tPlayer
+class tNullPlayer : public JZPlayer
 {
   public:
 
     tNullPlayer(JZSong* pSong)
-      : tPlayer(pSong)
+      : JZPlayer(pSong)
     {
     }
 
@@ -565,7 +565,7 @@ class tOSSThru : public wxTimer
 
 
 
-class tSeq2Player : public tPlayer
+class tSeq2Player : public JZPlayer
 {
   public:
     friend class tOSSThru;

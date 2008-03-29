@@ -187,10 +187,10 @@ void tPlayLoop::PrepareOutput(
   }
 }
 
-// ------------------------- tPlayer ---------------------
+// ------------------------- JZPlayer ---------------------
 
 
-tPlayer::tPlayer(JZSong *song)
+JZPlayer::JZPlayer(JZSong *song)
   : samples( song->TicksPerQuarter * song->Speed() )
 {
   DummyDeviceList.Add("default");
@@ -203,20 +203,22 @@ tPlayer::tPlayer(JZSong *song)
   rec_info = 0;
 }
 
-tPlayer::~tPlayer()
+JZPlayer::~JZPlayer()
 {
   delete PlayLoop;
 }
 
 
-void tPlayer::ShowError()
+void JZPlayer::ShowError()
 {
   wxMessageBox("could not install driver", "Error", wxOK);
 }
 
-void tPlayer::StartPlay(long Clock, long LoopClock, int Continue)
+void JZPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 {
-  cout<< "tPlayer::StartPlay" << endl;
+#ifdef DEBUG_PLAYER_STARTPLAY
+  cout << "JZPlayer::StartPlay" << endl;
+#endif // DEBUG_PLAYER_STARTPLAY
 
   int i;
 
@@ -496,7 +498,7 @@ void tPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 }
 
 
-void tPlayer::StopPlay()
+void JZPlayer::StopPlay()
 {
   // Stop the wxTimer.
   Stop();
@@ -536,11 +538,14 @@ void tPlayer::StopPlay()
 }
 
 
-void tPlayer::Notify()
+void JZPlayer::Notify()
 {
   // called by timer
   long Now = GetRealTimeClock();
-  cout << "tPlayer::Notify " << Now << endl;
+
+#ifdef DEBUG_PLAYER_NOTIFY
+  cout << "JZPlayer::Notify " << Now << endl;
+#endif // DEBUG_PLAYER_NOTIFY
   if (Now < 0)
   {
     return;
@@ -549,7 +554,9 @@ void tPlayer::Notify()
   // time to put more events
   if (Now >= (OutClock - ADVANCE_PLAY))
   {
+#ifdef DEBUG_PLAYER_NOTIFY
     cout << "*** Notify: more events to playbuffer" << endl;
+#endif // DEBUG_PLAYER_NOTIFY
 
     PlayLoop->PrepareOutput(&mPlayBuffer, Song, OutClock, Now + DELTACLOCK, 0);
     if (AudioBuffer)
@@ -578,7 +585,7 @@ void tPlayer::Notify()
 }
 
 
-void tPlayer::FlushToDevice()
+void JZPlayer::FlushToDevice()
 // try to send all events up to OutClock to device
 {
   int BufferFull = 0;
@@ -602,7 +609,7 @@ void tPlayer::FlushToDevice()
 }
 
 
-void tPlayer::AllNotesOff(int Reset)
+void JZPlayer::AllNotesOff(int Reset)
 {
   tControl NoteOff(0, 0, 0x78, 0);
   tPitch   Pitch  (0, 0, 0);
@@ -635,7 +642,8 @@ void tPlayer::AllNotesOff(int Reset)
 
 
 
-void tPlayer::OutNow(JZTrack *t, tParam *r) {
+void JZPlayer::OutNow(JZTrack *t, tParam *r)
+{
   OutNow(t, &r->Msb);
   OutNow(t, &r->Lsb);
   OutNow(t, &r->DataMsb);
@@ -650,7 +658,7 @@ void tPlayer::OutNow(JZTrack *t, tParam *r) {
 #ifdef DEV_MPU401
 
 tMpuPlayer::tMpuPlayer(JZSong *song)
-  : tPlayer(song)
+  : JZPlayer(song)
 {
         poll_millisec = 25;
         midinethost = getenv("MIDINETHOST");
@@ -778,7 +786,7 @@ void tMpuPlayer::StartPlay(long IntClock, long LoopClock, int Continue)
   write_ack_mpu(timebase, 2);
 
   OutOfBandEvents.Clear();
-  tPlayer::StartPlay(IntClock, LoopClock, Continue);
+  JZPlayer::StartPlay(IntClock, LoopClock, Continue);
 
   // Supress realtime messages to MIDI Out port?
   if (!Config(C_RealTimeOut)) {
@@ -815,7 +823,7 @@ void tMpuPlayer::StartPlay(long IntClock, long LoopClock, int Continue)
   }
   write_ack_mpu(clocksource, 2);
 
-  tPlayer::Notify();
+  JZPlayer::Notify();
 
   // Start play
   write_ack_mpu( play, playsize );
@@ -827,7 +835,7 @@ void tMpuPlayer::StartPlay(long IntClock, long LoopClock, int Continue)
 void tMpuPlayer::StopPlay()
 {
   static const char stop = RES;
-  tPlayer::StopPlay();
+  JZPlayer::StopPlay();
   // Reset mpu
   write_ack_mpu( &stop, 1);
   PlyBytes.Clear();
@@ -1378,7 +1386,7 @@ void tOSSThru::Notify()
 
 
 tSeq2Player::tSeq2Player(JZSong *song)
-  : tPlayer(song)
+  : JZPlayer(song)
 {
   // got to poll fast for midi thru
   poll_millisec = 10;
@@ -1734,7 +1742,7 @@ void tSeq2Player::StartPlay(long Clock, long LoopClock, int Continue)
   // send initial program changes, controller etc
   SEQ_START_TIMER();
   seqbuf_dump();
-  tPlayer::StartPlay(Clock, LoopClock, Continue);
+  JZPlayer::StartPlay(Clock, LoopClock, Continue);
   seqbuf_dump();
   ioctl(seqfd, SNDCTL_SEQ_SYNC);
   SEQ_STOP_TIMER();
@@ -1751,7 +1759,7 @@ void tSeq2Player::StartPlay(long Clock, long LoopClock, int Continue)
   // start play
   SEQ_START_TIMER();
   StartAudio();
-  tPlayer::Notify();
+  JZPlayer::Notify();
   seqbuf_dump();
 }
 
@@ -1764,7 +1772,7 @@ void tSeq2Player::StopPlay()
   ioctl(seqfd, SNDCTL_SEQ_RESET, 0);
 
   SEQ_START_TIMER();
-  tPlayer::StopPlay();
+  JZPlayer::StopPlay();
   AllNotesOff();
   SEQ_STOP_TIMER();
   seqbuf_dump();

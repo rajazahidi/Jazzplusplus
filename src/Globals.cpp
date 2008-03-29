@@ -39,7 +39,7 @@ JZSong* gpSong = 0;
 
 JZSynth* gpSynth = 0;
 
-tPlayer* gpMidiPlayer = 0;
+JZPlayer* gpMidiPlayer = 0;
 
 tHelp* HelpInstance = 0;
 

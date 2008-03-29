@@ -47,7 +47,7 @@
 using namespace std;
 
 tAlsaPlayer::tAlsaPlayer(JZSong *song)
-  : tPlayer(song)
+  : JZPlayer(song)
 {
   ithru = othru = 0;
 
@@ -74,7 +74,7 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
   snd_seq_poll_descriptors(handle, &pfds, 1, POLLIN|POLLOUT);
 
   //JAVE seqfd doesnt seem to be used for anything, not here nor in the base
-  // class tPlayer(but heavily in tSeq2Player)
+  // class JZPlayer(but heavily in tSeq2Player)
 //  seqfd = pfds.fd;
 
   // create my input/output port
@@ -412,7 +412,7 @@ void tAlsaPlayer::StartPlay(long clock, long loopClock, int cont)
   play_clock = clock;
   flush_output();
   start_timer(clock);
-  tPlayer::StartPlay(clock, loopClock, cont);
+  JZPlayer::StartPlay(clock, loopClock, cont);
   Notify();
   //flush_output();
 }
@@ -590,7 +590,7 @@ int tAlsaPlayer::set_blocking_mode(int enable) {
 
 void tAlsaPlayer::StopPlay()
 {
-  tPlayer::StopPlay();
+  JZPlayer::StopPlay();
   ResetPlay(0);
   flush_output();
   stop_queue_timer();

@@ -23,7 +23,7 @@
 #ifndef JZ_PROJECT_H
 #define JZ_PROJECT_H
 
-class tPlayer;
+class JZPlayer;
 class JZSynth;
 class tFilter;
 
@@ -135,7 +135,7 @@ class JZProject : public JZSong
     // Sets RecInfo, JZProject takes ownership of this object
     void SetRecInfo(JZRecordingInfo* pRecInfo);
 
-    tPlayer* GetPlayer()
+    JZPlayer* GetPlayer()
     {
       return mpMidiPlayer;
     }
@@ -152,7 +152,7 @@ class JZProject : public JZSong
 
     tConfig* mpConfig;
 
-    tPlayer* mpMidiPlayer;
+    JZPlayer* mpMidiPlayer;
 
     JZSynth* mpSynth;
 

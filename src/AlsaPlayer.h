@@ -40,7 +40,7 @@ class tAlsaDeviceList : public tDeviceList
 
 
 
-class tAlsaPlayer : public tPlayer
+class tAlsaPlayer : public JZPlayer
 {
   friend class tAlsaThru;
   public:

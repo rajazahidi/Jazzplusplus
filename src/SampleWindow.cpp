@@ -202,7 +202,7 @@ class tSmplWinSettingsForm : public wxForm
 class tSamplePlayPosition : public wxTimer
 {
   public:
-    tSamplePlayPosition(tSampleCnvs &c, tPlayer *p, tSample &s)
+    tSamplePlayPosition(tSampleCnvs &c, JZPlayer *p, tSample &s)
       : cnvs(c), player(p), spl(s)
     {
       visible = FALSE;
@@ -263,7 +263,7 @@ class tSamplePlayPosition : public wxTimer
 
   private:
     tSampleCnvs &cnvs;
-    tPlayer *player;
+    JZPlayer *player;
     tSample &spl;
     bool visible;
   int x;

@@ -32,7 +32,7 @@
 class tConfig;
 class JZSong;
 class JZSynth;
-class tPlayer;
+class JZPlayer;
 class tHelp;
 class JZProject;
 class JZTrackFrame;
@@ -49,7 +49,7 @@ extern tConfig* gpConfig;
 extern std::string gpStartUpSong;
 extern JZSong* gpSong;
 extern JZSynth* gpSynth;
-extern tPlayer* gpMidiPlayer;
+extern JZPlayer* gpMidiPlayer;
 extern tHelp* HelpInstance;
 extern std::vector<std::pair<std::string, int> > gLimitSteps;
 extern std::vector<std::pair<std::string, int> > gModes;

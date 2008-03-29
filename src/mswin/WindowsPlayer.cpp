@@ -46,7 +46,7 @@ using namespace std;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 tWinPlayer::tWinPlayer(JZSong* pSong)
-  : tPlayer(pSong)
+  : JZPlayer(pSong)
 {
   poll_millisec = 25;
   timer_installed = FALSE;
@@ -631,7 +631,7 @@ void tWinPlayer::StartPlay(long Clock, long LoopClock, int Continue)
   OutOfBandEvents.Clear();
   gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(Clock));
   state->playing = TRUE;  // allow for SetTempo in OutNow()
-  tPlayer::StartPlay(Clock, LoopClock, Continue);
+  JZPlayer::StartPlay(Clock, LoopClock, Continue);
 
   if (gpConfig->GetValue(C_RealTimeOut))
   {
@@ -700,7 +700,7 @@ void tWinPlayer::StopPlay()
 {
   wxBeginBusyCursor();
   state->playing = FALSE;
-  tPlayer::StopPlay();
+  JZPlayer::StopPlay();
   if (gpConfig->GetValue(C_RealTimeOut))
   {
     tStopPlay *e = new tStopPlay(0);

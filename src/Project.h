@@ -95,11 +95,22 @@ class JZProject : public JZSong
     //   Set the pattern file name.
     void SetPattern(const wxString& PatternFileName);
 
-    // Open the Song
+    // Description:
+    //   Open a MIDI file.
+    //
+    // Inputs:
+    //   const wxString& SongFileName:
+    //     Song path and file name.
     void OpenSong(const wxString& SongFileName);
 
-    // Save the song
-    void Save(wxString newsong);
+    // Description:
+    //   Save a MIDI file.  This function will overwrite the file if it
+    // already exists!
+    //
+    // Inputs:
+    //   const wxString& SongFileName:
+    //     Song path and file name.
+    void Save(const wxString& SongFileName);
 
     // Here is the new play interface.  For now it just acts as a layer
     // between the Project and the GUI.

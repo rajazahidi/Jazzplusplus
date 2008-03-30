@@ -497,26 +497,34 @@ void JZProject::SetPattern(const wxString& PatternFileName)
 
 //-----------------------------------------------------------------------------
 // Description:
-//   Open a midi file.  Pass it a wxString containing the path to the file.
+//   Open a MIDI file.
+//
+// Inputs:
+//   const wxString& SongFileName:
+//     Song path and file name.
 //-----------------------------------------------------------------------------
 void JZProject::OpenSong(const wxString& SongFileName)
 {
-  tStdRead io;
+  tStdRead Io;
   Clear();
-  Read(io, SongFileName);
+  Read(Io, SongFileName);
   mpConfig->Put(C_StartUpSong, SongFileName.c_str());
 }
 
-/**
- *
- *  Save a midi file.  Pass it a wxString containing the path to the file.
- *  Save will overwrite the file if it is already there!
- *
- */
-void JZProject::Save(wxString newsong)
+//-----------------------------------------------------------------------------
+// Description:
+//   Save a MIDI file.  This function will overwrite the file if it already
+// exists!
+//
+// Inputs:
+//   const wxString& SongFileName:
+//     Song path and file name.
+//-----------------------------------------------------------------------------
+void JZProject::Save(const wxString& SongFileName)
 {
-    tStdWrite io;
-    Write(io, newsong);
+  tStdWrite Io;
+  Write(Io, SongFileName);
+  mpConfig->Put(C_StartUpSong, SongFileName.c_str());
 }
 
 //-----------------------------------------------------------------------------

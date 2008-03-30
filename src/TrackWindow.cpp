@@ -1169,6 +1169,7 @@ void JZTrackWindow::SetScrollRanges(const int& x, const int& y)
 {
   int Width, Height;
   GetVirtualEventSize(Width, Height);
+#ifdef DEBUG_TRACK_WINDOW_SCROLL
   cout
     << mScrollSize
     << ' ' << mScrollSize
@@ -1177,6 +1178,7 @@ void JZTrackWindow::SetScrollRanges(const int& x, const int& y)
     << ' ' << x
     << ' ' << y
     << endl;
+#endif // DEBUG_TRACK_WINDOW_SCROLL
   SetScrollbars(
     mScrollSize,
     mScrollSize,
@@ -1238,7 +1240,7 @@ void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
         break;
 
       case ePlayLoopButton:
-        if (!EventsSelected("please select loop range first"))
+        if (!EventsSelected("Please select loop range first."))
         {
           return;
         }
@@ -1247,7 +1249,7 @@ void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
         break;
 
       case eRecordButton:
-        if (!EventsSelected("please select record track/bar first"))
+        if (!EventsSelected("Please select record track/bar first."))
         {
           return;
         }

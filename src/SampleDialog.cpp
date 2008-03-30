@@ -42,7 +42,8 @@
 using namespace std;
 
 tCommandPainter::tCommandPainter(tSampleWin &w, tPaintableCommand &c)
-  : win(w), cmd(c)
+  : win(w),
+    cmd(c)
 {
   c.Initialize();
   win.ClearSelection();
@@ -415,10 +416,16 @@ std::istream& operator >> (std::istream& is, tAddSynth &a)
 }
 
 
-int  tSynthDlg::geo[4] = { 50, 80, 800, 400 };
-int  tSynthDlg::num_synths = 1;
-int  tSynthDlg::midi_key   = 30;
-int  tSynthDlg::duration   = 50;
+int tSynthDlg::geo[4] =
+{
+  50,
+  80,
+  800,
+  400
+};
+int tSynthDlg::num_synths = 1;
+int tSynthDlg::midi_key   = 30;
+int tSynthDlg::duration   = 50;
 
 bool tSynthDlg::fft_enable = 1;
 bool tSynthDlg::vol_enable = 1;
@@ -441,13 +448,13 @@ static const int SYN_PLAY = 6;
 #include "Bitmaps/play.xpm"
 
 static JZToolDef syn_tdefs[] = {
-  { SYN_LOAD, FALSE, open_xpm,   "open synth settings" },
-  { SYN_SAVE, FALSE, save_xpm,   "save synth settings" },
+  { SYN_LOAD, false, open_xpm,   "open synth settings" },
+  { SYN_SAVE, false, save_xpm,   "save synth settings" },
   { JZToolBar::eToolBarSeparator },
-  { SYN_GEN,  FALSE, rrggen_xpm, "generate sound" },
-  { SYN_PLAY, FALSE, play_xpm,   "play sound" },
+  { SYN_GEN,  false, rrggen_xpm, "generate sound" },
+  { SYN_PLAY, false, play_xpm,   "play sound" },
   { JZToolBar::eToolBarSeparator },
-  { SYN_HELP, FALSE, help_xpm,   "help" },
+  { SYN_HELP, false, help_xpm,   "help" },
   { JZToolBar::eToolBarEnd }
 };
 
@@ -468,45 +475,94 @@ tSynthDlg::~tSynthDlg()
   delete [] default_filename;
 }
 
-ostream & operator << (ostream &os, tSynthDlg const &a)
+ostream& operator << (ostream& Os, tSynthDlg const &a)
 {
-  int i;
-  os << 1000 << endl;
-  os << (int)a.num_synths << " ";
-  os << (int)a.midi_key   << " ";
-  os << (int)a.duration   << " ";
-  os << (int)a.vol_enable << " ";
-  os << (int)a.pan_enable << " ";
-  os << (int)a.frq_enable << " ";
-  os << (int)a.fft_enable << " ";
-  os << (int)a.noise_enable << " ";
-  os << endl;
-  for (i = 0; i < a.num_synths; i++)
-    os << *a.synths[i] << endl;
-  return os;
+  Os << 1000 << '\n';
+  Os << a.num_synths << ' ';
+  Os << a.midi_key << ' ';
+  Os << a.duration << ' ';
+  Os << (int)a.vol_enable << ' ';
+  Os << (int)a.pan_enable << ' ';
+  Os << (int)a.frq_enable << ' ';
+  Os << (int)a.fft_enable << ' ';
+  Os << (int)a.noise_enable << ' ';
+  Os << '\n';
+  for (int i = 0; i < a.num_synths; i++)
+  {
+    Os << *a.synths[i] << endl;
+  }
+  return Os;
 }
 
 
-istream & operator >> (istream &is, tSynthDlg &a)
+istream& operator >> (istream& Is, tSynthDlg &a)
 {
-  int i, version;
-  is >> version;
-  if (version != 1000) {
+  int Version;
+  Is >> Version;
+  if (Version != 1000)
+  {
     wxMessageBox("Wrong file format!", "Error", wxOK);
-    return is;
+    return Is;
   }
-  is >> i; a.num_synths = i;
-  is >> i; a.midi_key = i;
-  is >> i; a.duration = i;
-  is >> i; a.vol_enable = i;
-  is >> i; a.pan_enable = i;
-  is >> i; a.frq_enable = i;
-  is >> i; a.fft_enable = i;
-  is >> i; a.noise_enable = i;
+
+  Is >> a.num_synths;
+  Is >> a.midi_key;
+  Is >> a.duration;
+
+  int i;
+  Is >> i;
+  if (i)
+  {
+    a.vol_enable = true;
+  }
+  else
+  {
+    a.vol_enable = false;
+  }
+
+  Is >> i;
+  if (i)
+  {
+    a.pan_enable = true;
+  }
+  else
+  {
+    a.pan_enable = false;
+  }
+
+  Is >> i;
+  if (i)
+  {
+    a.frq_enable = true;
+  }
+  else
+  {
+    a.frq_enable = false;
+  }
+
+  Is >> i;
+  if (i)
+  {
+    a.fft_enable = true;
+  }
+  else
+  {
+    a.fft_enable = false;
+  }
+
+  Is >> i;
+  if (i)
+  {
+    a.noise_enable = true;
+  }
+  else
+  {
+    a.noise_enable = false;
+  }
 
   for (i = 0; i < a.num_synths; ++i)
   {
-    is >> *a.synths[i];
+    Is >> *a.synths[i];
   }
 
   a.num_synths_slider->SetValue(a.num_synths);
@@ -518,7 +574,7 @@ istream & operator >> (istream &is, tSynthDlg &a)
   a.chk_fft->SetValue(a.fft_enable);
   a.chk_noise->SetValue(a.noise_enable);
 
-  return is;
+  return Is;
 }
 
 
@@ -629,61 +685,77 @@ void tSynthDlg::SetupEdits()
   if (vol_enable) sliders_per_row ++;
   if (pan_enable) sliders_per_row ++;
   if (frq_enable) sliders_per_row ++;
-  if (sliders_per_row == 0) {
+  if (sliders_per_row == 0)
+  {
     sliders_per_row = 1;
     fft_enable = 1;
-    chk_fft->SetValue(TRUE);
+    chk_fft->SetValue(true);
   }
 
   n_sliders = num_synths * sliders_per_row;
 
-  for (i = 0, k = 0; i < num_synths; i++) {
+  for (i = 0, k = 0; i < num_synths; i++)
+  {
     tAddSynth &s = *synths[i];
-    if (fft_enable) {
+    if (fft_enable)
+    {
       sliders[k++] = s.fft.edit;
-      s.fft.Show(TRUE);
+      s.fft.Show(true);
     }
     else
-      s.fft.Show(FALSE);
+    {
+      s.fft.Show(false);
+    }
 
-    if (vol_enable) {
+    if (vol_enable)
+    {
       sliders[k++] = s.vol.edit;
-      s.vol.Show(TRUE);
+      s.vol.Show(true);
     }
     else
-      s.vol.Show(FALSE);
+    {
+      s.vol.Show(false);
+    }
 
-    if (pan_enable) {
+    if (pan_enable)
+    {
       sliders[k++] = s.pan.edit;
-      s.pan.Show(TRUE);
+      s.pan.Show(true);
     }
     else
-      s.pan.Show(FALSE);
+    {
+      s.pan.Show(false);
+    }
 
-    if (frq_enable) {
+    if (frq_enable)
+    {
       sliders[k++] = s.frq.edit;
-      s.frq.Show(TRUE);
+      s.frq.Show(true);
     }
     else
-      s.frq.Show(FALSE);
-
+    {
+      s.frq.Show(false);
+    }
   }
 
-  for (; i < MAXSYNTHS; i++) {
+  for (; i < MAXSYNTHS; i++)
+  {
     tAddSynth &s = *synths[i];
-    s.fft.Show(FALSE);
-    s.vol.Show(FALSE);
-    s.pan.Show(FALSE);
-    s.frq.Show(FALSE);
+    s.fft.Show(false);
+    s.vol.Show(false);
+    s.pan.Show(false);
+    s.frq.Show(false);
   }
 
-  if (noise_enable) {
+  if (noise_enable)
+  {
     synths[0]->fft.edit->SetLabel("noise filter");
-    synths[0]->frq.edit->Enable(FALSE);
+    synths[0]->frq.edit->Enable(false);
   }
-  else {
+  else
+  {
     synths[0]->fft.edit->SetLabel("harmonics");
-    synths[0]->frq.edit->Enable(TRUE);
+    synths[0]->frq.edit->Enable(true);
   }
 }
 
@@ -695,7 +767,8 @@ void tSynthDlg::OnItem(wxItem& item, wxCommandEvent& event)
   int resize = 0;
 
 #if 0
-  if (&item == action) {
+  if (&item == action)
+  {
     wxBeginBusyCursor();
     Action();
     wxEndBusyCursor();
@@ -728,7 +801,8 @@ void tSynthDlg::OnItem(wxItem& item, wxCommandEvent& event)
   }
   else if (&item == num_synths_slider) {
     int n = num_synths_slider->GetValue();
-    if (n != num_synths) { // avoid flashing
+    if (n != num_synths)
+    { // avoid flashing
       num_synths = n;
       resize = 1;
     }
@@ -853,7 +927,7 @@ void tReverbForm::OnOk()
 int tEchoForm::num_echos   = 3;
 int tEchoForm::delay       = 50;  // millisec
 int tEchoForm::ampl        = 25;  // percent
-bool tEchoForm::rand       = FALSE;
+bool tEchoForm::rand       = false;
 
 
 tEchoForm::tEchoForm(tSampleWin &w)
@@ -1113,7 +1187,7 @@ void tSplFilterForm::OnOk()
 // -------------------------------------------------------------------------
 
 tWahSettingsForm::tWahSettingsForm(tSampleWin &win, tWahWah &w)
-  : tSplFilterForm(win, TRUE),
+  : tSplFilterForm(win, true),
     wah(w)
 {
   type = (int)wah.filter_type;

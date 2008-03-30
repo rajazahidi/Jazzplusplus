@@ -46,7 +46,7 @@ using namespace std;
 //*****************************************************************************
 wxString FindFile(const wxString& FileName)
 {
-  if (wxFileExists(FileName))
+  if (::wxFileExists(FileName))
   {
     cout << "imediate hit " << FileName << endl;
     return FileName;

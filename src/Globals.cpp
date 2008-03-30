@@ -31,8 +31,6 @@
 
 using namespace std;
 
-string gpStartUpSong;
-
 tConfig* gpConfig = 0;
 
 JZSong* gpSong = 0;

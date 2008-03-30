@@ -294,28 +294,25 @@ JZProject::JZProject()
     }
   }
 
-
   // Attempt to load the song given on command line or the file specified in
   // the configuration file.
+  string StartUpSong;
   opt = GetOptionIndex( "-f" ) + 1;
   if (opt && (wxTheApp->argc > opt))
   {
-    gpStartUpSong = wxTheApp->argv[opt];
+    StartUpSong = wxTheApp->argv[opt];
   }
   else
   {
-    gpStartUpSong = mpConfig->StrValue(C_StartUpSong);
+    StartUpSong = mpConfig->StrValue(C_StartUpSong);
   }
-  FILE* fd = fopen(gpStartUpSong.c_str(), "r");
-  if (fd)
+
+  FILE* pFd = fopen(StartUpSong.c_str(), "r");
+  if (pFd)
   {
-    fclose(fd);
+    fclose(pFd);
     JZStandardRead Io;
-    Read(Io, gpStartUpSong.c_str());
-//    if (gpStartUpSong == string("jazz.mid"))
-//    {
-//      lasts = gpStartUpSong;
-//    }
+    Read(Io, StartUpSong.c_str());
   }
 }
 

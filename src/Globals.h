@@ -46,7 +46,6 @@ enum TESizes
 };
 
 extern tConfig* gpConfig;
-extern std::string gpStartUpSong;
 extern JZSong* gpSong;
 extern JZSynth* gpSynth;
 extern JZPlayer* gpMidiPlayer;

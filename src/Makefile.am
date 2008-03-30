@@ -7,6 +7,7 @@ AboutDialog.cpp \
 AlsaDriver.cpp \
 AlsaPlayer.cpp \
 AlsaThru.cpp \
+AsciiMidiFile.cpp \
 Audio.cpp \
 AudioDriver.cpp \
 ClockDialog.cpp \
@@ -80,6 +81,7 @@ AboutDialog.h \
 AlsaDriver.h \
 AlsaPlayer.h \
 AlsaThru.h \
+AsciiMidiFile.h \
 Audio.h \
 AudioDriver.h \
 ClockDialog.h \

@@ -384,21 +384,18 @@ void JZProject::ReadConfiguration()
     Is.open(ConfFileNameAndPath.c_str());
     if (!Is)
     {
-      Is.close();
-      Is.clear();
-    }
-    else
-    {
       wxMessageBox(
         "Could not find configuration file.",
         "Warning",
         wxOK);
     }
+    Is.close();
+    Is.clear();
   }
 
   cout
     << "JZProject::ReadConfiguration() ConfFileNameAndPath:" << '\n'
-    << '"' << ConfFileNameAndPath << '"'
+    << "  \"" << ConfFileNameAndPath << '"'
     << endl;
 
   if (!ConfFileNameAndPath.IsEmpty())

@@ -175,7 +175,6 @@ void JZTrackFrame::CreateToolBar()
     { wxID_REDO,          false, redo_xpm,    "redo"},
     { wxID_RESET,         false, panic_xpm,   "all notes off"},
     { wxID_HELP_CONTENTS, false, help_xpm,    "help" },
-    { wxID_ABOUT,         false, help_xpm,    "about" },
     { JZToolBar::eToolBarEnd }
   };
 

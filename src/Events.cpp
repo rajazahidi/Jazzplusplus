@@ -156,7 +156,7 @@ void JZWriteBase::Close()
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tGetMidiBytes::Write(JZEvent* pEvent, unsigned char* pString, int Length)
+int tGetMidiBytes::Write(JZEvent* pEvent, unsigned char* pData, int Length)
 {
   int Stat = pEvent->Stat;
 
@@ -175,7 +175,7 @@ int tGetMidiBytes::Write(JZEvent* pEvent, unsigned char* pString, int Length)
       Buffer[nBytes++] = Stat | ((tChannelEvent *)pEvent)->Channel;
       while(Length--)
       {
-        Buffer[nBytes++] = *pString++;
+        Buffer[nBytes++] = *pData++;
       }
       return 0;
 

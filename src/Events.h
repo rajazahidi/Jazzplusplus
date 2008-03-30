@@ -114,7 +114,7 @@ class JZWriteBase
 
     virtual int Write(
       JZEvent* pEvent,
-      unsigned char* pString,
+      unsigned char* pData,
       int Length) = 0;
 
     virtual void NextTrack();

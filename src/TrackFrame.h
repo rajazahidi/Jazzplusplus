@@ -78,6 +78,8 @@ class JZTrackFrame : public wxFrame, public tButtonLabelInterface
 
     void OnPlay(wxCommandEvent& Event);
 
+    void OnPlayLoop(wxCommandEvent& Event);
+
     void OnPianoWindow(wxCommandEvent& Event);
 
     void OnToolsHarmonyBrowser(wxCommandEvent& Event);

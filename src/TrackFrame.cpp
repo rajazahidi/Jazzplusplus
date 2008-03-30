@@ -76,6 +76,8 @@ BEGIN_EVENT_TABLE(JZTrackFrame, wxFrame)
 
   EVT_MENU(ID_PLAY, JZTrackFrame::OnPlay)
 
+  EVT_MENU(ID_PLAY_LOOP, JZTrackFrame::OnPlayLoop)
+
   EVT_MENU(ID_PIANOWIN, JZTrackFrame::OnPianoWindow)
 
   EVT_MENU(ID_METRONOME_ON, JZTrackFrame::OnMetroOn)
@@ -463,9 +465,16 @@ void JZTrackFrame::OnFileExit(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnPlay(wxCommandEvent& Event)
 {
-  cout << "JZTrackFrame::OnPlay" << endl;
   wxMouseEvent MouseEvent;
   MousePlay(MouseEvent, ePlayButton);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnPlayLoop(wxCommandEvent& Event)
+{
+  wxMouseEvent MouseEvent;
+  MousePlay(MouseEvent, ePlayLoopButton);
 }
 
 //-----------------------------------------------------------------------------
@@ -547,8 +556,6 @@ void JZTrackFrame::OnHelpAbout(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackFrame::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
 {
-  cout << "JZTrackFrame::MousePlay" << endl;
-
   mpTrackWindow->MousePlay(Event, Mode);
 
 /*
@@ -585,7 +592,6 @@ void JZTrackFrame::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
         break;
 
       case ePlayButton:
-        cout << "JZTrackFrame::PlayButton" << endl;
         gpProject->SetLoop(false);
         gpProject->SetRecord(false);
         break;
@@ -665,15 +671,10 @@ void JZTrackFrame::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
       loop_clock = mpFilter->ToClock;
     }
 
-    // GO!
-    cout << "Go!" << endl;
-
     //if (pRecInfo->Track)  // recording?
       //gpProject->Midi->SetRecordInfo(pRecInfo);
     //else
       //gpProject->Midi->SetRecordInfo(0);
-
-    cout << "Midi->StartPlay" << endl;
 
     gpProject->mStartTime = mPreviousClock;
     gpProject->mStopTime = loop_clock;

@@ -114,7 +114,8 @@ void tConfigEntry::SetStrValue(const char* pStringValue)
 
 
 tConfig::tConfig()
-  : mDrumNames(),
+  : mFileName(),
+    mDrumNames(),
     mDrumSets(),
     mCtrlNames(),
     mVoiceNames(),
@@ -336,16 +337,27 @@ int tConfig::Check(const char* pName) const
   return -1;
 }
 
-//   Return the Jazz++ configuration file name, normally jazz.cfg.
-// Search in the path provided by FindFile()
-wxString tConfig::File()
+//-----------------------------------------------------------------------------
+// Description:
+//   Return the Jazz++ configuration file name, normally jazz.cfg.  If the
+// value has not been set by an earlier call to LoadConfig, attempt to find
+// the file using FindFile().
+//-----------------------------------------------------------------------------
+wxString tConfig::GetFileName()
 {
-  wxString FileName = FindFile("jazz.cfg");
-  if (FileName.IsEmpty())
+  if (!mFileName.empty())
   {
-    FileName = FindFile(".jazz");
+    return mFileName;
   }
-  return FileName;
+
+  mFileName = FindFile("jazz.cfg");
+
+  if (mFileName.empty())
+  {
+    mFileName = FindFile(".jazz");
+  }
+
+  return mFileName;
 }
 
 int tConfig::Load(char* buf)
@@ -418,7 +430,7 @@ bool tConfig::Get(int entry, char *value)
 {
    assert((entry >= 0) && (entry < NumConfigNames));
 
-   wxString FileName = File();
+   wxString FileName = GetFileName();
    if (FileName.IsEmpty())
    {
      return false;
@@ -458,15 +470,17 @@ bool tConfig::Get(int entry, long &value)
   return false;
 }
 
+//-----------------------------------------------------------------------------
 // Description:
 //   Write a configuration entry by making a temp file, and copying all
 // entries to there.  If the name/value pair is found, replace it, otherwise
 // write it.  Finally copy the temp file over the old configuration file.
+//-----------------------------------------------------------------------------
 bool tConfig::Put(int Index, const char *value)
 {
   assert((Index >= 0) && (Index < NumConfigNames));
 
-  wxString FileName = File();
+  wxString FileName = GetFileName();
   if (FileName.IsEmpty())
   {
     return false;
@@ -539,9 +553,16 @@ bool tConfig::Put(int Index, int Value)
 //-----------------------------------------------------------------------------
 void tConfig::LoadConfig(const wxString& FileName)
 {
+  if (!::wxFileExists(FileName))
+  {
+    return;
+  }
+
+  mFileName = FileName;
+
   wxString OriginalCurrentWorkingDirectory = ::wxGetCwd();
 
-  wxFileName FileNameObject(FileName);
+  wxFileName FileNameObject(mFileName);
 
   wxString Path = FileNameObject.GetPath();
   ::wxSetWorkingDirectory(Path);
@@ -562,10 +583,12 @@ void tConfig::LoadConfig(const wxString& FileName)
     FdArr[i] = NULL;
   }
 
-  cout << "tConfig::LoadConfig \"" << FileName << '"' << endl;
+  cout
+    << "tConfig::LoadConfig:" << '\n'
+    << "  \"" << mFileName << '"'
+    << endl;
 
-  FdArr[IncLevel] = fopen(FileName.c_str(), "r");
-  cout << FileName << endl;
+  FdArr[IncLevel] = fopen(mFileName.c_str(), "r");
   if (FdArr[IncLevel] == NULL)
   {
     wxMessageBox(

@@ -33,26 +33,3 @@
 
 // Do not support /dev/sequencer2 on Windows.
 #undef DEV_SEQUENCER2
-
-#define JAZZ_DATADIR "."
-
-// Name of package.
-#define PACKAGE "Jazz++"
-
-// Define to the address where bug reports for this package should be sent.
-#define PACKAGE_BUGREPORT "pstieber@verizon.net"
-
-// Define to the full name of this package.
-#define PACKAGE_NAME "jazzplusplus"
-
-// Define to the full name and version of this package.
-#define PACKAGE_STRING "jazzplusplus 4.1.9"
-
-// Define to the one symbol short name of this package.
-#define PACKAGE_TARNAME "Jazz++"
-
-// Define to the version of this package.
-#define PACKAGE_VERSION "4.1.9"
-
-// Version number of package.
-#define VERSION "4.1.9"

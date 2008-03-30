@@ -341,7 +341,7 @@ int tConfig::Check(const char* pName) const
 wxString tConfig::File()
 {
   wxString FileName = FindFile("jazz.cfg");
-  if(FileName.IsEmpty())
+  if (FileName.IsEmpty())
   {
     FileName = FindFile(".jazz");
   }

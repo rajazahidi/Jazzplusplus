@@ -26,7 +26,6 @@
 #include "ToolBar.h"
 
 class wxObject;
-class JZEventFrame;
 class HBAnalyzer;
 class HBCanvas;
 class tGenMelody;

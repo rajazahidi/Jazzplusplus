@@ -295,8 +295,8 @@ JZProject::JZProject()
   }
 
 
-  // Attempt to load the song given on commandline or load "jazz.mid".
-  cout << "load song" << endl;
+  // Attempt to load the song given on command line or the file specified in
+  // the configuration file.
   opt = GetOptionIndex( "-f" ) + 1;
   if (opt && (wxTheApp->argc > opt))
   {
@@ -306,7 +306,7 @@ JZProject::JZProject()
   {
     gpStartUpSong = mpConfig->StrValue(C_StartUpSong);
   }
-  FILE *fd = fopen(gpStartUpSong.c_str(), "r");
+  FILE* fd = fopen(gpStartUpSong.c_str(), "r");
   if (fd)
   {
     fclose(fd);
@@ -317,11 +317,6 @@ JZProject::JZProject()
 //      lasts = gpStartUpSong;
 //    }
   }
-
-
-
-
-
 }
 
 //-----------------------------------------------------------------------------
@@ -500,16 +495,16 @@ void JZProject::SetPattern(const wxString& PatternFileName)
   mPatternFileName = PatternFileName;
 }
 
-/**
- *
- *  Open a midi file.  Pass it a wxString containing the path to the file.
- *
- */
+//-----------------------------------------------------------------------------
+// Description:
+//   Open a midi file.  Pass it a wxString containing the path to the file.
+//-----------------------------------------------------------------------------
 void JZProject::OpenSong(const wxString& SongFileName)
 {
   tStdRead io;
   Clear();
   Read(io, SongFileName);
+  mpConfig->Put(C_StartUpSong, SongFileName.c_str());
 }
 
 /**

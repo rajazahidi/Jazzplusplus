@@ -35,22 +35,24 @@
 
 using namespace std;
 
-// ----------------------------------------------------------------------
-// StdFile-Util
-// ----------------------------------------------------------------------
-
 #ifdef sparc
 
+//*****************************************************************************
+//*****************************************************************************
 static void SwapW(void *p)
 {
 }
 
+//*****************************************************************************
+//*****************************************************************************
 static void SwapL(void *p)
 {
 }
 
 #else
 
+//*****************************************************************************
+//*****************************************************************************
 static void SwapW(void* p)
 {
   char *cp = (char *)p;
@@ -59,7 +61,8 @@ static void SwapW(void* p)
   cp[1] = tmp;
 }
 
-
+//*****************************************************************************
+//*****************************************************************************
 static void SwapL(void* p)
 {
   short tmp, *sp = (short *)p;
@@ -72,11 +75,50 @@ static void SwapL(void* p)
 
 #endif
 
-// --------------------------------------------------------------
-// StdChunk
-// --------------------------------------------------------------
+//*****************************************************************************
+//*****************************************************************************
+class JZStandardChunk
+{
+  public:
 
-tStdChunk::tStdChunk()
+    JZStandardChunk();
+
+    ~JZStandardChunk();
+
+    int IsEof();            // Only after Load, Save never has Eof.
+
+    void Load(FILE* fd);
+
+    void Save(FILE* fd);    // Depends on EndOfTrack
+
+    void Put(JZEvent* pEvent, unsigned char* pData, int Length);
+
+    // A return value of NULL indicates we are at the end of the track.
+    JZEvent* Get();
+
+    void Rewind();
+
+  private:
+
+    long Size;             // Size of base
+    long nRead;            // Number of bytes read from the file
+    unsigned char* mpBase; // Buffer for data.
+    unsigned char* cp;     // Aktueller Schreib/Lese pointer
+    long Clock;            // Absolute Clock
+    int EofSeen;           // endoftrack meta-event read
+    int RunningStatus;
+
+    void Resize(int SizeNeeded);
+    void PutVar(unsigned long val);
+    unsigned long GetVar();
+};
+
+//*****************************************************************************
+// StdChunk
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZStandardChunk::JZStandardChunk()
   : mpBase(0)
 {
   Size = 128;
@@ -85,12 +127,16 @@ tStdChunk::tStdChunk()
   Rewind();
 }
 
-tStdChunk::~tStdChunk()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZStandardChunk::~JZStandardChunk()
 {
   delete [] mpBase;
 }
 
-void tStdChunk::Rewind()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZStandardChunk::Rewind()
 {
   RunningStatus = 0;
   cp = mpBase;
@@ -98,14 +144,17 @@ void tStdChunk::Rewind()
   Clock = 0;
 }
 
-
-inline void tStdChunk::Resize(int Needed)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+void JZStandardChunk::Resize(int Needed)
 {
   long Used = cp - mpBase;
   long i, n = Size;
   if (Size - Used < Needed)
   {
-    do {
+    do
+    {
       Size *= 2;
       //mpBase = (unsigned char *)realloc(mpBase, Size);
     } while (Size - Used < Needed);
@@ -120,14 +169,17 @@ inline void tStdChunk::Resize(int Needed)
   }
 }
 
-
-inline int tStdChunk::IsEof()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZStandardChunk::IsEof()
 {
   return EofSeen || ((cp - mpBase) >= nRead);
 }
 
-
-void tStdChunk::PutVar(unsigned long val)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZStandardChunk::PutVar(unsigned long val)
 {
   unsigned long buf;
   buf = val & 0x7f;
@@ -148,8 +200,9 @@ void tStdChunk::PutVar(unsigned long val)
   }
 }
 
-
-unsigned long tStdChunk::GetVar()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+unsigned long JZStandardChunk::GetVar()
 {
   unsigned long val;
   char c;
@@ -163,38 +216,40 @@ unsigned long tStdChunk::GetVar()
   return val;
 }
 
-
-
-void tStdChunk::Put(JZEvent *e, unsigned char* Data, int Length)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZStandardChunk::Put(JZEvent* pEvent, unsigned char* Data, int Length)
 {
   unsigned char Stat;
   long  dif;
 
   Resize(Length + 20);
-  dif = e->GetClock() - Clock;
+  dif = pEvent->GetClock() - Clock;
   PutVar(dif);
   Clock += dif;
 
 #if 0
-printfxxo("%02X %02X   ", e->Clock, dif);
-if (e->Stat != 0x90)
-{
-   int i;
-   printf("%02X ", e->Stat);
-   for (i = 0; i < Length; i++)
-     printf("%02X ", Data[i]);
-   putchar('\n');
-}
+  printfxxo("%02X %02X   ", pEvent->Clock, dif);
+  if (pEvent->Stat != 0x90)
+  {
+    int i;
+    printf("%02X ", pEvent->Stat);
+    for (i = 0; i < Length; i++)
+    {
+      printf("%02X ", Data[i]);
+    }
+    putchar('\n');
+  }
 #endif
 
-  switch (e->Stat)
+  switch (pEvent->Stat)
   {
     // KeyOff -> KeyOn mit Vel=0. Gives better Runningstatus!
     case StatKeyOff:
       // SN-- only if KeyOff veloc is zero
-      if (!e->IsKeyOff()->OffVeloc)
+      if (!pEvent->IsKeyOff()->OffVeloc)
       {
-        Stat = StatKeyOn | e->IsChannelEvent()->Channel;
+        Stat = StatKeyOn | pEvent->IsChannelEvent()->Channel;
         if (Stat != RunningStatus)
         {
           RunningStatus = Stat;
@@ -205,7 +260,7 @@ if (e->Stat != 0x90)
       }
       else
       {
-        Stat = StatKeyOff | e->IsChannelEvent()->Channel;
+        Stat = StatKeyOff | pEvent->IsChannelEvent()->Channel;
         if (Stat != RunningStatus)
         {
           RunningStatus = Stat;
@@ -226,7 +281,7 @@ if (e->Stat != 0x90)
     // SN++
     case StatChnPressure:
 
-      Stat = e->Stat | e->IsChannelEvent()->Channel;
+      Stat = pEvent->Stat | pEvent->IsChannelEvent()->Channel;
       if (Stat != RunningStatus)
       {
         RunningStatus = Stat;
@@ -268,14 +323,14 @@ if (e->Stat != 0x90)
 if (1)
 {
    int i;
-   printf("%02X ", e->Stat);
+   printf("%02X ", pEvent->Stat);
    for (i = 0; i < Length; i++)
      printf("%02X ", Data[i]);
    putchar('\n');
 }
 #endif
 
-      Stat = e->Stat;
+      Stat = pEvent->Stat;
       RunningStatus = 0;
       *cp++ = 0xff;
       *cp++ = Stat;
@@ -288,15 +343,14 @@ if (1)
   }
 }
 
-
-
-
-JZEvent* tStdChunk::Get()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZEvent* JZStandardChunk::Get()
 {
   int len;
   unsigned char Stat;
   unsigned char Channel;
-  JZEvent *e = 0;
+  JZEvent* pEvent = 0;
 
   while (!IsEof())
   {
@@ -307,10 +361,10 @@ JZEvent* tStdChunk::Get()
       case StatSysEx:          // Sysex
         ++ cp;
         len = GetVar();
-        e = new tSysEx(Clock, cp, len);
+        pEvent = new tSysEx(Clock, cp, len);
         cp += len;
         //RunningStatus = 0;
-        return e;
+        return pEvent;
 
       case 0xff:                // Meta-Event
         ++cp;
@@ -327,75 +381,75 @@ if (1)
         {
           case StatText:        // Text-Event
             len = GetVar();
-            e = new tText(Clock, cp, len);
+            pEvent = new tText(Clock, cp, len);
             cp += len;
-            return e;
+            return pEvent;
 
           case StatTrackName:        // Track-Name
             len = GetVar();
-            e = new tTrackName(Clock, cp, len);
+            pEvent = new tTrackName(Clock, cp, len);
             cp += len;
-            return e;
+            return pEvent;
 
           case StatPlayTrack:        // JAVE playtrack event
             len = GetVar();
             fprintf(stderr, "reading playtrack event\n");
-            e = new tPlayTrack(Clock, cp, len);
+            pEvent = new tPlayTrack(Clock, cp, len);
             cp += len;
-            return e;
+            return pEvent;
 
           case StatJazzMeta:        // Jazz Meta Event
             len = GetVar();
             if (memcmp(cp, "JAZ2", 4) == 0)
-              e = new tJazzMeta(Clock, cp, len);
+              pEvent = new tJazzMeta(Clock, cp, len);
             else
-              e = new tMetaEvent(Clock, Stat, cp, len);
+              pEvent = new tMetaEvent(Clock, Stat, cp, len);
             cp += len;
-            return e;
+            return pEvent;
 
           case StatCopyright:        // Copyright notice
             len = GetVar();
-            e = new tCopyright(Clock, cp, len);
+            pEvent = new tCopyright(Clock, cp, len);
             cp += len;
-            return e;
+            return pEvent;
 
           case StatMarker:
             len = GetVar();
-            e = new tMarker(Clock, cp, len);
+            pEvent = new tMarker(Clock, cp, len);
             cp += len;
-            return e;
+            return pEvent;
 
           case StatEndOfTrack:
             EofSeen = 1;
             cp += GetVar();
-            e = new tEndOfTrack(Clock); //JAVE return an explicit event rather than 0
-            return e;
+            pEvent = new tEndOfTrack(Clock); //JAVE return an explicit event rather than 0
+            return pEvent;
             //return 0;                // EOF
 
           case StatSetTempo:
             len = GetVar();
-            e = new tSetTempo(Clock, cp[0], cp[1], cp[2]);
+            pEvent = new tSetTempo(Clock, cp[0], cp[1], cp[2]);
             cp += len;
-            return e;
+            return pEvent;
 
           case StatTimeSignat:
             len = GetVar();
-            e = new tTimeSignat(Clock, cp[0], cp[1], cp[2], cp[3]);
+            pEvent = new tTimeSignat(Clock, cp[0], cp[1], cp[2], cp[3]);
             cp += len;
-            return e;
+            return pEvent;
 
           case StatMtcOffset:                // MtcOffset
             len = GetVar();
-            e = new tMtcOffset(Clock, cp, len);
+            pEvent = new tMtcOffset(Clock, cp, len);
             cp += len;
             RunningStatus = 0;
-            return e;
+            return pEvent;
 
           default:                // Text und andere ignorieren
             len = GetVar();
-            e = new tMetaEvent(Clock, Stat, cp, len);
+            pEvent = new tMetaEvent(Clock, Stat, cp, len);
             cp += len;
-            return e;
+            return pEvent;
         }
         break;
 
@@ -409,43 +463,43 @@ if (1)
       switch(Stat)
       {
         case StatKeyOff:  // SN++ added off veloc
-          e = new tKeyOff(Clock, Channel, cp[0],cp[1]);
+          pEvent = new tKeyOff(Clock, Channel, cp[0],cp[1]);
           cp += 2;
-          return e;
+          return pEvent;
 
         case StatKeyOn:
           if (cp[1])
-            e = new tKeyOn(Clock, Channel, cp[0], cp[1]);
+            pEvent = new tKeyOn(Clock, Channel, cp[0], cp[1]);
           else
-            e = new tKeyOff(Clock, Channel, cp[0]);
+            pEvent = new tKeyOff(Clock, Channel, cp[0]);
           cp += 2;
-          return e;
+          return pEvent;
 
         case StatKeyPressure:
 // SN++ Aftertouch
-          e = new tKeyPressure(Clock, Channel, cp[0], cp[1]);
+          pEvent = new tKeyPressure(Clock, Channel, cp[0], cp[1]);
           cp += 2;
-          return e;
+          return pEvent;
 
         case StatControl:
-          e = new tControl(Clock, Channel, cp[0], cp[1]);
+          pEvent = new tControl(Clock, Channel, cp[0], cp[1]);
           cp += 2;
-          return e;
+          return pEvent;
 
         case StatPitch:
-          e = new tPitch(Clock, Channel, cp[0], cp[1]);
+          pEvent = new tPitch(Clock, Channel, cp[0], cp[1]);
           cp += 2;
-          return e;
+          return pEvent;
 
         case StatProgram:
-          e = new tProgram(Clock, Channel, cp[0]);
+          pEvent = new tProgram(Clock, Channel, cp[0]);
           cp += 1;
-          return e;
+          return pEvent;
 
         case StatChnPressure:
-          e = new tChnPressure(Clock, Channel, cp[0]);
+          pEvent = new tChnPressure(Clock, Channel, cp[0]);
           cp += 1;
-          return e;
+          return pEvent;
 
         default:
         {
@@ -460,25 +514,24 @@ if (1)
   return 0; // eof
 }
 
-
-// -------------------------------------------------------------------
-
-
-void tStdChunk::Load(FILE *fd)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZStandardChunk::Load(FILE* pFd)
 {
   char Type[4];
   int Size;
 
-  fread(Type, 4, 1, fd);
-  fread(&Size, 4, 1, fd);
+  fread(Type, 4, 1, pFd);
+  fread(&Size, 4, 1, pFd);
   SwapL(&Size);
   Resize(Size);
-  fread(mpBase, Size, 1, fd);
+  fread(mpBase, Size, 1, pFd);
   nRead = Size;
 }
 
-
-void tStdChunk::Save(FILE *fd)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZStandardChunk::Save(FILE* pFd)
 {
   int Size, hSize;
 
@@ -487,54 +540,63 @@ void tStdChunk::Save(FILE *fd)
   *cp++ = 0xff;
   *cp++ = 0x2f;
   *cp++ = 0x00;
-  fwrite("MTrk", 4, 1, fd);
+  fwrite("MTrk", 4, 1, pFd);
   Size = hSize = cp - mpBase;
   SwapL(&hSize);
-  fwrite(&hSize, 4, 1, fd);
-  fwrite(mpBase, Size, 1, fd);
+  fwrite(&hSize, 4, 1, pFd);
+  fwrite(mpBase, Size, 1, pFd);
 }
 
-// ----------------------------------------------------------------------
-
-struct tFileHeader
+//*****************************************************************************
+//*****************************************************************************
+struct JZFileHeader
 {
   short Format;
-  short nTracks;
+  short mTrackCount;
   short Unit;
 
   void Swap();
 };
 
-void tFileHeader::Swap()
+//*****************************************************************************
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZFileHeader::Swap()
 {
   SwapW(&Format);
-  SwapW(&nTracks);
+  SwapW(&mTrackCount);
   SwapW(&Unit);
 }
 
-// ---------------------------- ReadStd -----------------------------
-
-
-tStdRead::tStdRead()
-  : tReadBase(),
+//*****************************************************************************
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZStandardRead::JZStandardRead()
+  : JZReadBase(),
     mpTracks(0),
-    TrackNr(0)
+    mTrackIndex(0)
 {
 }
 
-tStdRead::~tStdRead()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZStandardRead::~JZStandardRead()
 {
   delete [] mpTracks;
 }
 
-int tStdRead::Open(const char* pFileName)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZStandardRead::Open(const char* pFileName)
 {
-  tFileHeader h;
+  JZFileHeader FileHeader;
   int hSize;
   int i;
   char Type[4];
 
-  if (!tReadBase::Open(pFileName))
+  if (!JZReadBase::Open(pFileName))
   {
     ostringstream Oss;
     Oss << "Can't open " << pFileName;
@@ -542,7 +604,7 @@ int tStdRead::Open(const char* pFileName)
     return 0;
   }
 
-  fread(Type, 4, 1, fd);
+  fread(Type, 4, 1, mpFd);
 
   if (strncmp("MThd", Type, 4) != 0)
   {
@@ -550,105 +612,126 @@ int tStdRead::Open(const char* pFileName)
     return 0;
   }
 
-  fread(&hSize, 4, 1, fd);
+  fread(&hSize, 4, 1, mpFd);
   SwapL(&hSize);
-  assert (hSize == sizeof(h));
+  assert (hSize == sizeof(FileHeader));
 
-  fread(&h, 6, 1, fd);
-  h.Swap();
-  nTracks = h.nTracks;
-  TicksPerQuarter = h.Unit;
+  fread(&FileHeader, 6, 1, mpFd);
+  FileHeader.Swap();
+  mTrackCount = FileHeader.mTrackCount;
+  mTicksPerQuarter = FileHeader.Unit;
 
-  mpTracks = new tStdChunk [nTracks];
-  for (i = 0; i < nTracks; i++)
+  mpTracks = new JZStandardChunk [mTrackCount];
+  for (i = 0; i < mTrackCount; i++)
   {
-    mpTracks[i].Load(fd);
+    mpTracks[i].Load(mpFd);
   }
 
-  TrackNr = -1;
+  mTrackIndex = -1;
 
-  return nTracks;
+  return mTrackCount;
 }
 
-void tStdRead::Close()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZStandardRead::Close()
 {
-  tReadBase::Close();
+  JZReadBase::Close();
 }
 
-JZEvent *tStdRead::Read()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZEvent* JZStandardRead::Read()
 {
-  assert(TrackNr >= 0 && TrackNr < nTracks);
-  return mpTracks[TrackNr].Get();
+  assert(mTrackIndex >= 0 && mTrackIndex < mTrackCount);
+  return mpTracks[mTrackIndex].Get();
 }
 
-int tStdRead::NextTrack()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZStandardRead::NextTrack()
 {
-  ++TrackNr;
-  return TrackNr < nTracks;
+  ++mTrackIndex;
+  return mTrackIndex < mTrackCount;
 }
 
-
-// ------------------------------ tWriteStd ---------------------------------
-
-tStdWrite::tStdWrite()
-  : tWriteBase(),
+//*****************************************************************************
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZStandardWrite::JZStandardWrite()
+  : JZWriteBase(),
     mpTracks(0),
-    TrackNr(0),
-    nTracks(0),
-    TicksPerQuarter(0)
+    mTrackIndex(0),
+    mTrackCount(0),
+    mTicksPerQuarter(0)
 {
 }
 
-tStdWrite::~tStdWrite()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZStandardWrite::~JZStandardWrite()
 {
   delete [] mpTracks;
 }
 
-int tStdWrite::Open(char* pFileName, int ntracks, int timebase)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZStandardWrite::Open(
+  const char* pFileName,
+  int TrackCount,
+  int TicksPerQuarter)
 {
-  if (!tWriteBase::Open(pFileName, ntracks, timebase))
+  if (!JZWriteBase::Open(pFileName, TrackCount, TicksPerQuarter))
   {
     return 0;
   }
-  nTracks = ntracks;
-  TicksPerQuarter = timebase;
-  mpTracks = new tStdChunk [ntracks];
-  TrackNr = -1;
-  return nTracks;
+
+  mTrackCount = TrackCount;
+  mTicksPerQuarter = TicksPerQuarter;
+  mpTracks = new JZStandardChunk [TrackCount];
+  mTrackIndex = -1;
+  return mTrackCount;
 }
 
-void tStdWrite::Close()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZStandardWrite::Close()
 {
   long Size;
-  tFileHeader h;
+  JZFileHeader FileHeader;
   int i;
 
-  fwrite("MThd", 4, 1, fd);
+  fwrite("MThd", 4, 1, mpFd);
   Size = 6;
   SwapL(&Size);
-  fwrite(&Size, 4, 1, fd);
-  h.Unit = TicksPerQuarter;
-  h.Format = 1;
-  h.nTracks = nTracks;
-  h.Swap();
-  fwrite(&h, 6, 1, fd);
+  fwrite(&Size, 4, 1, mpFd);
+  FileHeader.Unit = mTicksPerQuarter;
+  FileHeader.Format = 1;
+  FileHeader.mTrackCount = mTrackCount;
+  FileHeader.Swap();
+  fwrite(&FileHeader, 6, 1, mpFd);
 
-  for (i = 0; i < nTracks; i++)
+  for (i = 0; i < mTrackCount; i++)
   {
-    mpTracks[i].Save(fd);
+    mpTracks[i].Save(mpFd);
   }
 
-  tWriteBase::Close();
+  JZWriteBase::Close();
 }
 
-void tStdWrite::NextTrack()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZStandardWrite::NextTrack()
 {
-  ++TrackNr;
+  ++mTrackIndex;
 }
 
-int tStdWrite::Write(JZEvent *e, unsigned char* data, int len)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZStandardWrite::Write(JZEvent* pEvent, unsigned char* pString, int Length)
 {
-  assert(TrackNr >= 0 && TrackNr < nTracks);
-  mpTracks[TrackNr].Put(e, data, len);
+  assert(mTrackIndex >= 0 && mTrackIndex < mTrackCount);
+  mpTracks[mTrackIndex].Put(pEvent, pString, Length);
   return 0;
 }

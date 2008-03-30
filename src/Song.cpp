@@ -61,7 +61,7 @@ int JZSong::Speed()
   return mTracks[0].GetDefaultSpeed();
 }
 
-void JZSong::Read(tReadBase& Io, const char* pFileName)
+void JZSong::Read(JZReadBase& Io, const char* pFileName)
 {
   int i;
   wxBeginBusyCursor();
@@ -75,7 +75,7 @@ void JZSong::Read(tReadBase& Io, const char* pFileName)
     mTracks[i].Read(Io);
   }
   Io.Close();
-  TicksPerQuarter = Io.TicksPerQuarter;
+  TicksPerQuarter = Io.GetTicksPerQuarter();
 
   if (TicksPerQuarter < 48)
   {
@@ -97,7 +97,7 @@ void JZSong::Read(tReadBase& Io, const char* pFileName)
 }
 
 
-void JZSong::Write(tWriteBase& Io, const char* pFileName)
+void JZSong::Write(JZWriteBase& Io, const char* pFileName)
 {
   // Make sure track 0 has a synth reset
   if (!mTracks[0].Reset)

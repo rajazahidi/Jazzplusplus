@@ -83,8 +83,8 @@ class JZSong
     virtual ~JZSong();
 
     void Clear();
-    void Read(tReadBase& Io, const char* pFileName = 0);
-    void Write(tWriteBase& Io, const char* pFileName = 0);
+    void Read(JZReadBase& Io, const char* pFileName = 0);
+    void Write(JZWriteBase& Io, const char* pFileName = 0);
 
     JZTrack *GetTrack(int Nr);
     int GetLastClock();

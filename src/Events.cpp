@@ -41,16 +41,31 @@ using namespace std;
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tReadBase::Open(const char* pFileName)
+JZReadBase::JZReadBase()
+  : mTicksPerQuarter(0),
+    mTrackCount(0),
+    mpFd(NULL)
+{
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZReadBase::~JZReadBase()
+{
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZReadBase::Open(const char* pFileName)
 {
   if (pFileName == NULL)
   {
-    fd = stdin;
+    mpFd = stdin;
   }
   else
   {
-    fd = fopen(pFileName, "rb");
-    if (fd == NULL)
+    mpFd = fopen(pFileName, "rb");
+    if (mpFd == NULL)
     {
       ostringstream Oss;
       Oss << "Error opening file " << pFileName;
@@ -63,11 +78,11 @@ int tReadBase::Open(const char* pFileName)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tReadBase::Close()
+void JZReadBase::Close()
 {
-  if (fd != stdin)
+  if (mpFd != stdin)
   {
-    fclose(fd);
+    fclose(mpFd);
   }
 }
 
@@ -75,11 +90,27 @@ void tReadBase::Close()
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tWriteBase::Open(const char* pFileName, int nTracks, int TicksPerQuarter)
+JZWriteBase::JZWriteBase()
+  : mpFd(NULL)
+{
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZWriteBase::~JZWriteBase()
+{
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZWriteBase::Open(
+  const char* pFileName,
+  int TrackCount,
+  int TicksPerQuarter)
 {
   if (pFileName == NULL)
   {
-    fd = stdout;
+    mpFd = stdout;
   }
   else
   {
@@ -98,8 +129,8 @@ int tWriteBase::Open(const char* pFileName, int nTracks, int TicksPerQuarter)
       delete syscmd;
     }
 #endif
-    fd = fopen(pFileName, "wb");
-    if (fd == NULL)
+    mpFd = fopen(pFileName, "wb");
+    if (mpFd == NULL)
     {
       ostringstream Oss;
       Oss << "Error opening file " << pFileName;
@@ -107,16 +138,16 @@ int tWriteBase::Open(const char* pFileName, int nTracks, int TicksPerQuarter)
       return 0;
     }
   }
-  return nTracks;
+  return TrackCount;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWriteBase::Close()
+void JZWriteBase::Close()
 {
-  if (fd != stdout)
+  if (mpFd != stdout)
   {
-    fclose(fd);
+    fclose(mpFd);
   }
 }
 

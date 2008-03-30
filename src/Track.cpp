@@ -35,9 +35,9 @@
 #include <cstdlib>
 #include <assert.h>
 
-int tParam::Write(tWriteBase& io)
+int tParam::Write(JZWriteBase& Io)
 {
-  return(Msb.Write(io) + Lsb.Write(io) + DataMsb.Write(io));
+  return Msb.Write(Io) + Lsb.Write(Io) + DataMsb.Write(Io);
 }
 
 void tParam::SetCha(unsigned char cha)
@@ -1271,69 +1271,69 @@ void tEventArray::Keyoff2Length()
 #endif
 
 
-void tEventArray::Write(tWriteBase &io)
+void tEventArray::Write(JZWriteBase& Io)
 {
   JZEvent *e;
   int WrittenBefore;
 
   Length2Keyoff();
-  io.NextTrack();
+  Io.NextTrack();
 
   // Write copyright notice first (according to spec):
   if (Copyright)
   {
-    Copyright->Write(io);
+    Copyright->Write(Io);
   }
 
   // Write MTC offset before any transmittable events (spec)
   if (MtcOffset)
   {
-    MtcOffset->Write(io);
+    MtcOffset->Write(Io);
   }
 
   // Synth reset
   if (Reset)
   {
-    Reset->Write(io);
+    Reset->Write(Io);
   }
 
   // Rpn / Nrpn:
   // All these must be written in order (three tControl's in a row)
   if (VibRate)
   {
-    VibRate->Write(io);
+    VibRate->Write(Io);
   }
   if (VibDepth)
   {
-    VibDepth->Write(io);
+    VibDepth->Write(Io);
   }
   if (VibDelay)
   {
-    VibDelay->Write(io);
+    VibDelay->Write(Io);
   }
   if (Cutoff)
   {
-    Cutoff->Write(io);
+    Cutoff->Write(Io);
   }
   if (Resonance)
   {
-    Resonance->Write(io);
+    Resonance->Write(Io);
   }
   if (EnvAttack)
   {
-    EnvAttack->Write(io);
+    EnvAttack->Write(Io);
   }
   if (EnvDecay)
   {
-    EnvDecay->Write(io);
+    EnvDecay->Write(Io);
   }
   if (EnvRelease)
   {
-    EnvRelease->Write(io);
+    EnvRelease->Write(Io);
   }
   if (BendPitchSens)
   {
-    BendPitchSens->Write(io);
+    BendPitchSens->Write(Io);
   }
 
   tDrumInstrumentParameter *dpar = DrumParams.FirstElem();
@@ -1344,7 +1344,7 @@ void tEventArray::Write(tWriteBase &io)
     {
       if (dpar->Get(index))
       {
-        dpar->Get(index)->Write(io);
+        dpar->Get(index)->Write(Io);
       }
     }
     dpar = DrumParams.NextElem(dpar);
@@ -1353,17 +1353,17 @@ void tEventArray::Write(tWriteBase &io)
   // mpBank: Must be sure bank is written before program:
   if (mpBank)
   {
-    mpBank->Write(io);
+    mpBank->Write(Io);
   }
 
   if (mpBank2)
   {
-    mpBank2->Write(io);
+    mpBank2->Write(Io);
   }
 
   if (mPatch)
   {
-    mPatch->Write(io);
+    mPatch->Write(Io);
   }
 
   // write jazz track info
@@ -1372,7 +1372,7 @@ void tEventArray::Write(tWriteBase &io)
   jazz->SetTrackState(State);
   jazz->SetTrackDevice(Device);
   jazz->SetIntroLength(gpSong->GetIntroLength());
-  jazz->Write(io);
+  jazz->Write(Io);
 
   for (int i = 0; i < nEvents; i++)
   {
@@ -1416,15 +1416,13 @@ void tEventArray::Write(tWriteBase &io)
     }
     if (!WrittenBefore)
     {
-      e->Write(io);
+      e->Write(Io);
     }
   }
   Keyoff2Length();
 }
 
-
-
-void tEventArray::Read(tReadBase &io)
+void tEventArray::Read(JZReadBase& Io)
 {
   JZEvent *e;
   Channel = 0;
@@ -1436,8 +1434,8 @@ void tEventArray::Read(tReadBase &io)
 
   bool NeedToDelete;
 
-  io.NextTrack();
-  while ((e = io.Read()) != 0)
+  Io.NextTrack();
+  while ((e = Io.Read()) != 0)
   {
     NeedToDelete = false;
     SpecialEvent = 0;

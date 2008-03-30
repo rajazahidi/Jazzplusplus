@@ -310,8 +310,8 @@ JZProject::JZProject()
   if (fd)
   {
     fclose(fd);
-    tStdRead io;
-    Read(io, gpStartUpSong.c_str());
+    JZStandardRead Io;
+    Read(Io, gpStartUpSong.c_str());
 //    if (gpStartUpSong == string("jazz.mid"))
 //    {
 //      lasts = gpStartUpSong;
@@ -505,7 +505,7 @@ void JZProject::SetPattern(const wxString& PatternFileName)
 //-----------------------------------------------------------------------------
 void JZProject::OpenSong(const wxString& SongFileName)
 {
-  tStdRead Io;
+  JZStandardRead Io;
   Clear();
   Read(Io, SongFileName);
   mpConfig->Put(C_StartUpSong, SongFileName.c_str());
@@ -522,7 +522,7 @@ void JZProject::OpenSong(const wxString& SongFileName)
 //-----------------------------------------------------------------------------
 void JZProject::Save(const wxString& SongFileName)
 {
-  tStdWrite Io;
+  JZStandardWrite Io;
   Write(Io, SongFileName);
   mpConfig->Put(C_StartUpSong, SongFileName.c_str());
 }

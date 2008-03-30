@@ -28,84 +28,63 @@
 #include <stdio.h>
 
 class JZEvent;
-class tStdChunk
+class JZStandardChunk;
+
+//*****************************************************************************
+//*****************************************************************************
+class JZStandardRead : public JZReadBase
 {
   public:
 
-    tStdChunk();
+    JZStandardRead();
 
-    ~tStdChunk();
-
-    int IsEof();            // Only after Load, Save never has Eof.
-
-    void Load(FILE* fd);
-
-    void Save(FILE* fd);    // Depends on EndOfTrack
-
-    void Put(JZEvent* pEvent, unsigned char* pData, int Length);
-
-    // A return value of NULL indicates we are at the end of the track.
-    JZEvent* Get();
-
-    void Rewind();
-
-  private:
-
-    long Size;             // Size of base
-    long nRead;            // Number of bytes read from the file
-    unsigned char* mpBase; // Buffer for data.
-    unsigned char* cp;     // Aktueller Schreib/Lese pointer
-    long Clock;            // Absolute Clock
-    int EofSeen;           // endoftrack meta-event read
-    int RunningStatus;
-
-    void Resize(int SizeNeeded);
-    void PutVar(unsigned long val);
-    unsigned long GetVar();
-};
-
-
-class tStdRead : public tReadBase
-{
-  public:
-
-    tStdRead();
-
-    virtual ~tStdRead();
+    virtual ~JZStandardRead();
 
     virtual int Open(const char* pFileName);
+
     virtual void Close();
 
     virtual JZEvent* Read();
+
     virtual int NextTrack();
 
   private:
 
-    tStdChunk* mpTracks;
-    int TrackNr;
+    JZStandardChunk* mpTracks;
+
+    int mTrackIndex;
 };
 
-
-
-class tStdWrite : public tWriteBase
+//*****************************************************************************
+//*****************************************************************************
+class JZStandardWrite : public JZWriteBase
 {
   public:
 
-    tStdWrite();
+    JZStandardWrite();
 
-    virtual ~tStdWrite();
+    virtual ~JZStandardWrite();
 
-    virtual int Open(char* pFileName, int nTracks, int TicksPerQuarter);
+    virtual int Open(
+      const char* pFileName,
+      int TrackCount,
+      int TicksPerQuarter);
+
     virtual void Close();
-    virtual int Write(JZEvent* Event, unsigned char *s, int len);
+
+    virtual int Write(JZEvent* Event, unsigned char* pString, int Length);
+
     virtual void NextTrack();
 
   private:
 
-    tStdChunk* mpTracks;
-    int TrackNr;
-    int nTracks;
-    int TicksPerQuarter;
+    JZStandardChunk* mpTracks;
+
+    int mTrackIndex;
+
+    int mTrackCount;
+
+    int mTicksPerQuarter;
 };
 
 #endif // !defined(JZ_STANDARDFILE_H)

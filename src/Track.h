@@ -68,7 +68,7 @@ class tParam
     {
     }
 
-    virtual int Write(tWriteBase &io);
+    virtual int Write(JZWriteBase& Io);
     virtual void SetCha( unsigned char cha );
     virtual int GetVal()
     {
@@ -375,8 +375,8 @@ class tEventArray : public tSimpleEventArray
     tEventArray();
     virtual ~tEventArray();
 
-    void Read(tReadBase &io);
-    void Write(tWriteBase &io);
+    void Read(JZReadBase& Io);
+    void Write(JZWriteBase& Io);
 
     int GetLastClock();
     int IsEmpty();
@@ -386,8 +386,15 @@ class tEventArray : public tSimpleEventArray
 
   public:
 
-    int GetAudioMode() const { return audio_mode; }
-    void SetAudioMode(int x) { audio_mode = x; }
+    int GetAudioMode() const
+    {
+      return audio_mode;
+    }
+
+    void SetAudioMode(int x)
+    {
+      audio_mode = x;
+    }
 
   protected:
 

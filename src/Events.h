@@ -33,23 +33,19 @@ class JZEvent;
 //   - Ascii-File
 //   - Midi-Port
 //*****************************************************************************
-
-class tReadBase
+class JZReadBase
 {
   public:
 
-    virtual ~tReadBase()
-    {
-    }
+    JZReadBase();
 
-    // Ths value is known after a call to Open.
-    int TicksPerQuarter;
-
-    int nTracks;
+    virtual ~JZReadBase();
 
     virtual int Open(const char* pFileName);
 
     virtual void Close();
+
+    int GetTicksPerQuarter() const;
 
     virtual JZEvent* Read() = 0;
 
@@ -57,88 +53,162 @@ class tReadBase
 
   protected:
 
-    FILE* fd;
+    // Ths value is known after a call to Open.
+    int mTicksPerQuarter;
+
+    int mTrackCount;
+
+    FILE* mpFd;
 };
 
+//*****************************************************************************
+// Description:
+//   These are the read base class inline member functions.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZReadBase::GetTicksPerQuarter() const
+{
+  return mTicksPerQuarter;
+}
 
-class tWriteBase
+//*****************************************************************************
+//*****************************************************************************
+class JZWriteBase
 {
   public:
 
-    virtual ~tWriteBase()
-    {
-    }
+    JZWriteBase();
 
-    virtual int Open(const char* pFileName, int nTracks, int TicksPerQuarter);
+    virtual ~JZWriteBase();
+
+    virtual int Open(
+      const char* pFileName,
+      int TrackCount,
+      int TicksPerQuarter);
 
     virtual void Close();
 
-    virtual int Write(JZEvent* pEvent)
-    {
-      return Write(pEvent, 0, 0);
-    }
+    virtual int Write(JZEvent* pEvent);
 
-    virtual int Write(JZEvent* pEvent, unsigned char Character)
-    {
-      return Write(pEvent, &Character, 1);
-    }
+    virtual int Write(JZEvent* pEvent, unsigned char Character);
 
     virtual int Write(
       JZEvent* pEvent,
       unsigned char Character1,
-      unsigned char Character2)
-    {
-      unsigned char Array[2];
-      Array[0] = Character1;
-      Array[1] = Character2;
-      return Write(pEvent, Array, 2);
-    }
+      unsigned char Character2);
 
     virtual int Write(
       JZEvent* pEvent,
       unsigned char Character1,
       unsigned char Character2,
-      unsigned char Character3)
-    {
-      unsigned char Array[3];
-      Array[0] = Character1;
-      Array[1] = Character2;
-      Array[2] = Character3;
-      return Write(pEvent, Array, 3);
-    }
+      unsigned char Character3);
 
     virtual int Write(
       JZEvent* pEvent,
       unsigned char Character1,
       unsigned char Character2,
       unsigned char Character3,
-      unsigned char Character4)
-    {
-      unsigned char Array[4];
-      Array[0] = Character1;
-      Array[1] = Character2;
-      Array[2] = Character3;
-      Array[3] = Character4;
-      return Write(pEvent, Array, 4);
-    }
+      unsigned char Character4);
 
-    virtual int Write(JZEvent* pEvent, unsigned char* pString, int Length) = 0;
+    virtual int Write(
+      JZEvent* pEvent,
+      unsigned char* pString,
+      int Length) = 0;
 
-    virtual void NextTrack()
-    {
-    }
+    virtual void NextTrack();
 
   protected:
 
-    FILE* fd;
+    FILE* mpFd;
 };
 
+//*****************************************************************************
+// Description:
+//   These are the write base class inline member functions.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZWriteBase::Write(JZEvent* pEvent)
+{
+  return Write(pEvent, 0, 0);
+}
 
-// --------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZWriteBase::Write(JZEvent* pEvent, unsigned char Character)
+{
+  return Write(pEvent, &Character, 1);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZWriteBase::Write(
+  JZEvent* pEvent,
+  unsigned char Character1,
+  unsigned char Character2)
+{
+  unsigned char Array[2];
+
+  Array[0] = Character1;
+  Array[1] = Character2;
+
+  return Write(pEvent, Array, 2);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZWriteBase::Write(
+  JZEvent* pEvent,
+  unsigned char Character1,
+  unsigned char Character2,
+  unsigned char Character3)
+{
+  unsigned char Array[3];
+
+  Array[0] = Character1;
+  Array[1] = Character2;
+  Array[2] = Character3;
+
+  return Write(pEvent, Array, 3);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZWriteBase::Write(
+  JZEvent* pEvent,
+  unsigned char Character1,
+  unsigned char Character2,
+  unsigned char Character3,
+  unsigned char Character4)
+{
+  unsigned char Array[4];
+
+  Array[0] = Character1;
+  Array[1] = Character2;
+  Array[2] = Character3;
+  Array[3] = Character4;
+
+  return Write(pEvent, Array, 4);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+void JZWriteBase::NextTrack()
+{
+}
+
+//*****************************************************************************
 // tGetMidiBytes
-// --------------------------------------------------------------------------
-
-class tGetMidiBytes : public tWriteBase
+//*****************************************************************************
+class tGetMidiBytes : public JZWriteBase
 {
   public:
 
@@ -348,7 +418,7 @@ class JZEvent
     virtual tEndOfTrack*  IsEndOfTrack()  { edb(); return 0; }
     virtual tChnPressure* IsChnPressure() { edb(); return 0; }
 
-    virtual int Write(tWriteBase& io)
+    virtual int Write(JZWriteBase& io)
     {
       edb();
       return io.Write(this);
@@ -470,7 +540,7 @@ class tKeyOn : public tChannelEvent
       OffVeloc  = 0;
     }
 
-    virtual int Write(tWriteBase &io)
+    virtual int Write(JZWriteBase &io)
     {
       edb(); return io.Write(this, Key, Veloc);
     }
@@ -500,7 +570,7 @@ class tKeyOff : public tChannelEvent
       OffVeloc = veloc;
     }
 
-    virtual int Write(tWriteBase &io)
+    virtual int Write(JZWriteBase &io)
     {
       edb(); return io.Write(this, Key, OffVeloc);
     }
@@ -528,7 +598,7 @@ class tPitch : public tChannelEvent
       Value  = val;
     }
 
-    virtual int Write(tWriteBase &io)
+    virtual int Write(JZWriteBase &io)
     {
       int v = Value + 8192;
       edb(); return io.Write(this, (unsigned char)(v & 0x7F), (unsigned char)(v >> 7));
@@ -559,7 +629,7 @@ class tControl : public tChannelEvent
       Value   = val;
     }
 
-    virtual int Write(tWriteBase &io)
+    virtual int Write(JZWriteBase &io)
     {
       edb(); return io.Write(this, Control, Value);
     }
@@ -584,7 +654,7 @@ class tProgram : public tChannelEvent
       Program = prg;
     }
 
-    virtual int Write(tWriteBase &io)
+    virtual int Write(JZWriteBase &io)
     {
       edb(); return io.Write(this, Program);
     }
@@ -621,7 +691,7 @@ class tMetaEvent : public JZEvent
       delete [] Data;
     }
 
-    virtual int Write(tWriteBase &io)
+    virtual int Write(JZWriteBase &io)
     {
       edb(); return io.Write(this, Data, Length);
     }
@@ -931,7 +1001,7 @@ class tPlayTrack : public tMetaEvent
         this->eventlength=eventlength;  
       } 
 
-    virtual int Write(tWriteBase &io)
+    virtual int Write(JZWriteBase &io)
 
     {
       Data = new unsigned char [Length + 1];
@@ -997,7 +1067,7 @@ class tSetTempo : public JZEvent
 
     virtual int   GetPitch()          { edb(); return GetBPM() / 2; }
 
-    virtual int Write(tWriteBase &io)
+    virtual int Write(JZWriteBase &io)
     {
       edb(); return io.Write(this, (char)(uSec >> 16), (char)(uSec >> 8), (char)uSec);
     }
@@ -1042,7 +1112,7 @@ class tTimeSignat : public JZEvent
       Quarter     = Character4;
     }
 
-    virtual int Write(tWriteBase &io)
+    virtual int Write(JZWriteBase &io)
     {
       edb(); return io.Write(this, Numerator, Denomiator, Clocks, Quarter);
     }
@@ -1068,7 +1138,7 @@ class tEndOfTrack : public JZEvent
     {
     }
 
-    virtual int Write(tWriteBase &io)
+    virtual int Write(JZWriteBase &io)
     {
       edb(); return io.Write(this);
     }
@@ -1092,7 +1162,7 @@ class tKeySignat : public JZEvent
       Minor  = Character2;
     }
 
-    virtual int Write(tWriteBase &io)
+    virtual int Write(JZWriteBase &io)
     {
       edb(); return io.Write(this, Sharps, Minor);
     }
@@ -1114,7 +1184,7 @@ class tKeyPressure: public tChannelEvent
       Key = key;
     }
 
-    virtual int Write(tWriteBase &io)
+    virtual int Write(JZWriteBase &io)
     {
       edb(); return io.Write(this, Key, Value);
     }
@@ -1139,7 +1209,7 @@ class tChnPressure : public tChannelEvent
       Value = val;
     }
 
-    virtual int Write(tWriteBase &io)
+    virtual int Write(JZWriteBase &io)
     {
       edb(); return io.Write(this, Value);
     }

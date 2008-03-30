@@ -72,6 +72,8 @@ BEGIN_EVENT_TABLE(JZTrackFrame, wxFrame)
 
   EVT_MENU(wxID_OPEN, JZTrackFrame::OnFileOpen)
 
+  EVT_MENU(wxID_SAVEAS, JZTrackFrame::OnFileSaveAs)
+
   EVT_MENU(wxID_EXIT, JZTrackFrame::OnFileExit)
 
   EVT_MENU(ID_PLAY, JZTrackFrame::OnPlay)
@@ -447,6 +449,27 @@ void JZTrackFrame::OnFileOpen(wxCommandEvent& Event)
 //    NextWin->Canvas->SetScrollRanges();
     mpTrackWindow->Refresh(false);
 //    JZTrack::changed = false;
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnFileSaveAs(wxCommandEvent& Event)
+{
+  // wxFD_OVERWRITE_PROMPT - For save dialog only: prompt for a confirmation
+  // if a file will be overwritten.
+  wxFileDialog SaveAsDialog(
+    0,
+    "Save MIDI File",
+    "",
+    "",
+    "*.mid",
+    wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+  if (SaveAsDialog.ShowModal() == wxID_OK)
+  {
+    wxString FileName = SaveAsDialog.GetPath();
+    gpProject->Save(FileName);
+    SetTitle(FileName);
   }
 }
 

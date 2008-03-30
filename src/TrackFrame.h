@@ -70,6 +70,8 @@ class JZTrackFrame : public wxFrame, public tButtonLabelInterface
 
     void OnFileOpen(wxCommandEvent& Event);
 
+    void OnFileSaveAs(wxCommandEvent& Event);
+
     void OnFileExit(wxCommandEvent& Event);
 
     void OnZoomIn(wxCommandEvent& Event);

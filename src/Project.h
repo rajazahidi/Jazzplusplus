@@ -25,7 +25,7 @@
 
 class JZPlayer;
 class JZSynth;
-class tFilter;
+class JZFilter;
 
 #include "Song.h"
 #include "Metronome.h"
@@ -65,7 +65,7 @@ class JZProject : public JZSong
     bool mRecord;
 
     // Not yet sure what this does
-    tFilter *Filter;
+    JZFilter* Filter;
 
     // Stores metrome information
     tMetronomeInfo mMetronomeInfo;

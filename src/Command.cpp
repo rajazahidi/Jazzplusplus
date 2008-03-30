@@ -39,7 +39,7 @@ using namespace std;
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tCommand::tCommand(tFilter* pFilter)
+tCommand::tCommand(JZFilter* pFilter)
   : mpFilter(pFilter),
     mpSong(pFilter->mpSong),
     mReverse(0)
@@ -112,7 +112,7 @@ class tSelectedKeys : public tCommand
 {
   public:
 
-    tSelectedKeys(tFilter* pFilter);
+    tSelectedKeys(JZFilter* pFilter);
 
     void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 
@@ -123,7 +123,7 @@ class tSelectedKeys : public tCommand
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tSelectedKeys::tSelectedKeys(tFilter* pFilter)
+tSelectedKeys::tSelectedKeys(JZFilter* pFilter)
   : tCommand(pFilter)
 {
   int i;
@@ -150,7 +150,7 @@ void tSelectedKeys::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
                             //  c     d     e  f     g    a      b
 static const int CMajor[12] = { 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
 
-void tScale::Init(int ScaleNr, tFilter *f)
+void tScale::Init(int ScaleNr, JZFilter *f)
 {
   int i;
 
@@ -190,7 +190,7 @@ void tScale::Init(int ScaleNr, tFilter *f)
 }
 
 
-int tScale::Analyze(tFilter *f)
+int tScale::Analyze(JZFilter *f)
 {
   long keys[12];
   for (int i = 0; i < 12; i++)
@@ -289,7 +289,7 @@ int tScale::FitInto(int Key)
 // tCmdShift
 // ***********************************************************************
 
-tCmdShift::tCmdShift(tFilter *f, long dclk)
+tCmdShift::tCmdShift(JZFilter *f, long dclk)
   : tCommand(f)
 {
   DeltaClock = dclk;
@@ -307,7 +307,7 @@ void tCmdShift::ExecuteEvent(JZTrack *t, JZEvent *e)
 // tCmdErase
 // ************************************************************************
 
-tCmdErase::tCmdErase(tFilter *f, int lvsp)
+tCmdErase::tCmdErase(JZFilter *f, int lvsp)
   : tCommand(f)
 {
   LeaveSpace = lvsp;
@@ -318,7 +318,7 @@ void tCmdErase::Execute(int NewUndo)
   tCommand::Execute(NewUndo);
   if (!LeaveSpace)
   {
-    tFilter f(mpFilter);
+    JZFilter f(mpFilter);
     f.FromClock = mpFilter->ToClock;
     f.ToClock   = mpSong->GetLastClock() + 1;
     long DeltaClock = mpFilter->FromClock - mpFilter->ToClock;
@@ -336,7 +336,7 @@ void tCmdErase::ExecuteEvent(JZTrack *t, JZEvent *e)
 // tCmdQuantize
 // ************************************************************************
 
-tCmdQuantize::tCmdQuantize(tFilter *f, long clks, int grov, int dly)
+tCmdQuantize::tCmdQuantize(JZFilter *f, long clks, int grov, int dly)
   : tCommand(f)
 {
   QntClocks = clks;
@@ -380,7 +380,7 @@ void tCmdQuantize::ExecuteEvent(JZTrack *t, JZEvent *e)
 // tCmdTranspose
 // ************************************************************************
 
-tCmdTranspose::tCmdTranspose(tFilter *f, int notes, int ScaleNr, int fit)
+tCmdTranspose::tCmdTranspose(JZFilter *f, int notes, int ScaleNr, int fit)
   : tCommand(f)
 {
   Scale.Init(ScaleNr, mpFilter);
@@ -426,7 +426,7 @@ void tCmdTranspose::ExecuteEvent(JZTrack *t, JZEvent *e)
 // tCmdSetChannel
 // ************************************************************************
 
-tCmdSetChannel::tCmdSetChannel(tFilter *f, int chan)
+tCmdSetChannel::tCmdSetChannel(JZFilter *f, int chan)
   : tCommand(f)
 {
   NewChannel = chan;
@@ -449,7 +449,7 @@ void tCmdSetChannel::ExecuteEvent(JZTrack *t, JZEvent *e)
 // tCmdVelocity
 // ************************************************************************
 
-tCmdVelocity::tCmdVelocity(tFilter *f, int from, int to, int m)
+tCmdVelocity::tCmdVelocity(JZFilter *f, int from, int to, int m)
   : tCommand(f)
 {
   FromValue = from;
@@ -484,7 +484,7 @@ void tCmdVelocity::ExecuteEvent(JZTrack *t, JZEvent *e)
 // tCmdLength
 // ************************************************************************
 
-tCmdLength::tCmdLength(tFilter *f, int from, int to, int m)
+tCmdLength::tCmdLength(JZFilter *f, int from, int to, int m)
   : tCommand(f)
 {
   FromValue = from;
@@ -524,7 +524,7 @@ void tCmdLength::ExecuteEvent(JZTrack *t, JZEvent *e)
 //   by factor "scale" from starting point "startClock"
 // ************************************************************************
 
-tCmdSeqLength::tCmdSeqLength(tFilter *f, double scale)
+tCmdSeqLength::tCmdSeqLength(JZFilter *f, double scale)
   : tCommand(f)
 {
   this->scale=scale;
@@ -559,7 +559,7 @@ void tCmdSeqLength::ExecuteEvent(JZTrack *t, JZEvent *e)
 // to a pitch bend/volume control sequence instead
 // ************************************************************************
 
-tCmdConvertToModulation::tCmdConvertToModulation(tFilter *f)
+tCmdConvertToModulation::tCmdConvertToModulation(JZFilter *f)
   : tCommand(f)
 {
 }
@@ -639,7 +639,7 @@ void tCmdConvertToModulation::ExecuteTrack(JZTrack *t)
 //    JAVE this is a simple midi delay line
 // ************************************************************************
 
-tCmdMidiDelay::tCmdMidiDelay(tFilter *f, double scale,  long clockDelay, int repeat)
+tCmdMidiDelay::tCmdMidiDelay(JZFilter *f, double scale,  long clockDelay, int repeat)
   : tCommand(f)
 {
   this->scale=scale;
@@ -669,7 +669,7 @@ void tCmdMidiDelay::ExecuteEvent(JZTrack *t, JZEvent *e)
 // tCmdCleanup
 // ************************************************************************
 
-tCmdCleanup::tCmdCleanup(tFilter *f, long clks, int so)
+tCmdCleanup::tCmdCleanup(JZFilter *f, long clks, int so)
   : tCommand(f)
 {
   lengthLimit = clks;
@@ -711,7 +711,7 @@ void tCmdCleanup::ExecuteEvent(JZTrack *t, JZEvent *e)
 // tCmdSearchReplace
 // ************************************************************************
 
-tCmdSearchReplace::tCmdSearchReplace(tFilter *f, short sf, short st)
+tCmdSearchReplace::tCmdSearchReplace(JZFilter *f, short sf, short st)
   : tCommand(f)
 {
   fr = sf;
@@ -738,7 +738,7 @@ void tCmdSearchReplace::ExecuteEvent(JZTrack *t, JZEvent *e)
 // ************************************************************************
 
 tCmdCopyToBuffer::tCmdCopyToBuffer(
-  tFilter* pFilter,
+  JZFilter* pFilter,
   tEventArray* pBuffer)
   : tCommand(pFilter)
 {
@@ -756,7 +756,7 @@ void tCmdCopyToBuffer::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 
 
 
-tCmdCopy::tCmdCopy(tFilter *f, long dt, long dc)
+tCmdCopy::tCmdCopy(JZFilter *f, long dt, long dc)
   : tCommand(f)
 {
   DestTrack = dt;
@@ -893,7 +893,7 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
 // tCmdExchLeftRight
 // ************************************************************************
 
-tCmdExchLeftRight::tCmdExchLeftRight(tFilter *f)
+tCmdExchLeftRight::tCmdExchLeftRight(JZFilter *f)
   : tCommand(f)
 {
 }
@@ -914,7 +914,7 @@ void tCmdExchLeftRight::ExecuteEvent(JZTrack *t, JZEvent *e)
 // tCmdExchUpDown
 // ************************************************************************
 
-tCmdExchUpDown::tCmdExchUpDown(tFilter *f)
+tCmdExchUpDown::tCmdExchUpDown(JZFilter *f)
   : tCommand(f)
 {
 }
@@ -972,7 +972,7 @@ void tCmdExchUpDown::ExecuteTrack(JZTrack *t)
 // ************************************************************************
 
 //enum prop { veloc, length, key, rhythm, random, pan, modul, cc1, cc2, pitch, clock };
-tCmdMapper::tCmdMapper(tFilter *f, prop src, prop dst, JZRndArray &arr, int nb, int ad)
+tCmdMapper::tCmdMapper(JZFilter *f, prop src, prop dst, JZRndArray &arr, int nb, int ad)
   : tCommand(f),
     array(arr)
 {

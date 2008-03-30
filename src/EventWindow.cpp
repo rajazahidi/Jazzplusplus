@@ -190,7 +190,7 @@ JZEventFrame::JZEventFrame(
 #endif
   mpGreyBrush = new wxBrush(*mpGreyColor, wxSOLID);
 
-  mpFilter = new tFilter(Song);
+  mpFilter = new JZFilter(Song);
 }
 
 

@@ -601,7 +601,7 @@ JZPianoWindow::JZPianoWindow(
 {
   InitColors();
 
-  mpFilter = new tFilter(mpSong);
+  mpFilter = new JZFilter(mpSong);
 
   mpTrack = mpSong->GetTrack(mTrackIndex);
 

@@ -51,7 +51,7 @@ HBAnalyzer::~HBAnalyzer()
 }
 
 
-void HBAnalyzer::Init(tFilter* pFilter, int epc)
+void HBAnalyzer::Init(JZFilter* pFilter, int epc)
 {
   Exit();        // cleanup from previous run
 
@@ -104,7 +104,7 @@ void HBAnalyzer::Exit()
 }
 
 
-int HBAnalyzer::Analyze(tFilter* pFilter, int qbc)
+int HBAnalyzer::Analyze(JZFilter* pFilter, int qbc)
 {
   Init(pFilter, qbc);
   if (mSteps < max_seq)
@@ -116,7 +116,7 @@ int HBAnalyzer::Analyze(tFilter* pFilter, int qbc)
   return 0;
 }
 
-int HBAnalyzer::Transpose(tFilter* pFilter, int qbc)
+int HBAnalyzer::Transpose(JZFilter* pFilter, int qbc)
 {
   pFilter->mpSong->NewUndoBuffer();
   Init(pFilter, qbc);

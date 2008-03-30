@@ -87,7 +87,7 @@ class JZEventFrame : public wxFrame
 
     JZSong* Song;
 
-    tFilter* mpFilter;
+    JZFilter* mpFilter;
 
     JZPianoFrame* NextWin;
 

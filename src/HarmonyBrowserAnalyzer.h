@@ -23,7 +23,7 @@
 #ifndef JZ_HARMONYBROWSERANALYZER_H
 #define JZ_HARMONYBROWSERANALYZER_H
 
-class tFilter;
+class JZFilter;
 class JZTrack;
 class HBContext;
 class tKeyOn;
@@ -37,11 +37,11 @@ class HBAnalyzer
 
     ~HBAnalyzer();
 
-    int Analyze(tFilter *f, int eighth_per_chord = 8);
+    int Analyze(JZFilter *f, int eighth_per_chord = 8);
 
-    int Transpose(tFilter *f, int eighth_per_chord = 8);
+    int Transpose(JZFilter *f, int eighth_per_chord = 8);
 
-    void Init(tFilter *f, int steps_per_bar);
+    void Init(JZFilter *f, int steps_per_bar);
 
     void Exit();
 
@@ -69,7 +69,7 @@ class HBAnalyzer
     int start_clock, stop_clock;
     int eighths_per_chord;
     int mSteps;
-    tFilter* mpFilter;
+    JZFilter* mpFilter;
     JZTrack* mpTrack;
 
     int** count;

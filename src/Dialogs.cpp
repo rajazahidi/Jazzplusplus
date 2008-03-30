@@ -52,7 +52,7 @@ using namespace std;
 
 //long tShiftDlg::Steps = 0;
 
-tShiftDlg::tShiftDlg(JZEventFrame *w, tFilter *f, long unit)
+tShiftDlg::tShiftDlg(JZEventFrame *w, JZFilter *f, long unit)
 : tPropertyListDlg( "Shift events left/right" )
 {
   Filter = f;
@@ -108,7 +108,7 @@ bool tCleanupDlg::shortenOverlaps = 1;
 
 
 
-tCleanupDlg::tCleanupDlg(JZEventFrame *w, tFilter *f)
+tCleanupDlg::tCleanupDlg(JZEventFrame *w, JZFilter *f)
   : tPropertyListDlg( "Clean up events" )
 {
   Filter = f;
@@ -192,7 +192,7 @@ void tCleanupDlg::AddProperties()
 int tSearchReplaceDlg::frCtrl = 1;
 int tSearchReplaceDlg::toCtrl = 1;
 
-tSearchReplaceDlg::tSearchReplaceDlg(JZEventFrame *w, tFilter *f)
+tSearchReplaceDlg::tSearchReplaceDlg(JZEventFrame *w, JZFilter *f)
    : tPropertyListDlg("Search and replace controller types" )
 {
   Filter = f;
@@ -242,7 +242,7 @@ int tTransposeDlg::Notes = 0;
 int tTransposeDlg::Scale = gScaleChromatic;
 bool tTransposeDlg::FitIntoScale = 0;
 
-tTransposeDlg::tTransposeDlg(JZEventFrame *w, tFilter *f)
+tTransposeDlg::tTransposeDlg(JZEventFrame *w, JZFilter *f)
   : tPropertyListDlg("Transpose")
 {
   EventWin = w;
@@ -298,7 +298,7 @@ void tTransposeDlg::AddProperties()
 
 int tSetChannelDlg::NewChannel = 1;
 
-tSetChannelDlg::tSetChannelDlg(tFilter *f)
+tSetChannelDlg::tSetChannelDlg(JZFilter *f)
 : tPropertyListDlg("Set MIDI Channel")
 {
   Filter = f;
@@ -349,7 +349,7 @@ int tVelocityDlg::ToValue = 0;
 int tVelocityDlg::Mode = 0;
 
 
-tVelocityDlg::tVelocityDlg(tFilter *f)
+tVelocityDlg::tVelocityDlg(JZFilter *f)
 : tPropertyListDlg( "Velocity" )
 {
   Filter = f;
@@ -400,7 +400,7 @@ int tLengthDlg::ToValue = 0;
 
 int tLengthDlg::Mode;
 
-tLengthDlg::tLengthDlg(JZEventFrame *w, tFilter *f)
+tLengthDlg::tLengthDlg(JZEventFrame *w, JZFilter *f)
 : tPropertyListDlg("Length")
 {
   Filter = f;
@@ -465,7 +465,7 @@ double tSeqLengthDlg::scale = 1.0;
 
 
 
-tSeqLengthDlg::tSeqLengthDlg(JZEventFrame *w, tFilter *f)
+tSeqLengthDlg::tSeqLengthDlg(JZEventFrame *w, JZFilter *f)
 : tPropertyListDlg("stretch/contract by scale from start of selected sequence" )
 {
   Filter = f;
@@ -511,7 +511,7 @@ double tMidiDelayDlg::scale = 0.5;
 long tMidiDelayDlg::clockDelay = 10;
 int tMidiDelayDlg::repeat = 6;
 
-tMidiDelayDlg::tMidiDelayDlg(JZEventFrame *w, tFilter *f)
+tMidiDelayDlg::tMidiDelayDlg(JZEventFrame *w, JZFilter *f)
 : tPropertyListDlg("MIDI delay line" )
 {
   Filter = f;
@@ -572,7 +572,7 @@ void tMidiDelayDlg::AddProperties()
 
 bool tDeleteDlg::LeaveSpace = 1;
 
-tDeleteDlg::tDeleteDlg(JZEventFrame *w, tFilter *f)
+tDeleteDlg::tDeleteDlg(JZEventFrame *w, JZFilter *f)
 : tPropertyListDlg("Delete" )
 {
   Filter = f;
@@ -665,7 +665,7 @@ int tQuantizeDlg::QntStep = 16;
 int tQuantizeDlg::Delay = 0;
 int tQuantizeDlg::Groove = 0;
 
-tQuantizeDlg::tQuantizeDlg(JZEventFrame *w, tFilter *f)
+tQuantizeDlg::tQuantizeDlg(JZEventFrame *w, JZFilter *f)
    : tPropertyListDlg("Quantize" )
   //, Steps("steps", gQntSteps, &gQntStep)
 {

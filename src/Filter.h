@@ -53,11 +53,11 @@ class tFltEvent
 
 
 
-class tFilter : public wxObject
+class JZFilter : public wxObject
 {
     friend class tFilterDlg;
     wxDialog *DialogBox;
-    void copy(tFilter const &o);
+    void copy(JZFilter const &o);
 
   public:
 
@@ -72,11 +72,11 @@ class tFilter : public wxObject
 
     void Dialog(wxFrame *parent, int ShowEventStats = 1);
 
-    tFilter(JZSong* pSong);
-    tFilter(tFilter* pOtherFilter);
-    tFilter(tFilter const &o);
-    tFilter& operator=(tFilter const &o);
-    virtual ~tFilter();
+    JZFilter(JZSong* pSong);
+    JZFilter(JZFilter* pOtherFilter);
+    JZFilter(JZFilter const &o);
+    JZFilter& operator=(JZFilter const &o);
+    virtual ~JZFilter();
 
     int IsSelected(JZEvent *e)
     {
@@ -109,7 +109,7 @@ class tFilter : public wxObject
 };
 
 
-// extern tFilter *GlobalFilter;
+// extern JZFilter *GlobalFilter;
 
 // void GlobalFilterDlg(wxButton& but, wxMouseEvent& event);
 // void GlobalFilterDlgNoStats(wxButton& but, wxMouseEvent& event);
@@ -122,12 +122,12 @@ class tFilter : public wxObject
 
 class tTrackIterator
 {
-  tFilter *Filter;
+  JZFilter *Filter;
   JZSong   *Song;
   int     TrackNr;
   int     Reverse;
   public:
-    tTrackIterator(tFilter *f, int Reverse = 0);
+    tTrackIterator(JZFilter *f, int Reverse = 0);
     JZTrack *First();
     JZTrack *Next();
     int    Count() const;

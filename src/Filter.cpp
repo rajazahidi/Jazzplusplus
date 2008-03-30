@@ -47,7 +47,7 @@ const tFltEvent FltEvents[nFltEvents] =
 
 
 
-tFilter::tFilter(JZSong *s)
+JZFilter::JZFilter(JZSong *s)
 {
   mpSong = s;
   FltEvents = new tFltEvent [nFltEvents];
@@ -67,24 +67,24 @@ tFilter::tFilter(JZSong *s)
 }
 
 
-tFilter::tFilter(tFilter *f)
+JZFilter::JZFilter(JZFilter *f)
 {
   copy (*f);
 }
 
 
-tFilter::tFilter(tFilter const &o) {
+JZFilter::JZFilter(JZFilter const &o) {
   copy(o);
 }
 
 
-tFilter& tFilter::operator=(tFilter const &o) {
+JZFilter& JZFilter::operator=(JZFilter const &o) {
   delete FltEvents;
   copy(o);
   return *this;
 }
 
-void tFilter::copy(tFilter const &o)
+void JZFilter::copy(JZFilter const &o)
 {
   mpSong        = o.mpSong;
   FromClock     = o.FromClock;
@@ -98,7 +98,7 @@ void tFilter::copy(tFilter const &o)
 }
 
 
-tFilter::~tFilter()
+JZFilter::~JZFilter()
 {
   delete FltEvents;
 }
@@ -112,11 +112,11 @@ tFilter::~tFilter()
 
 class tFilterDlg : public tPropertyListDlg
 {
-  tFilter *Filter;
+  JZFilter *Filter;
   tClockDlg FromClockDlg, ToClockDlg;
 
  public:
-  tFilterDlg(tFilter *f, JZSong *s, int ShowEventStats);
+  tFilterDlg(JZFilter *f, JZSong *s, int ShowEventStats);
   void AddProperties();
   bool OnClose();
   void OnHelp();
@@ -124,7 +124,7 @@ class tFilterDlg : public tPropertyListDlg
 };
 
 
-tFilterDlg::tFilterDlg(tFilter *f, JZSong *Song, int ShowEventStats)
+tFilterDlg::tFilterDlg(JZFilter *f, JZSong *Song, int ShowEventStats)
   : tPropertyListDlg("Filter"),
     FromClockDlg(Song, "From Time: ", f->FromClock),
     ToClockDlg(Song, "To Time: ", f->ToClock)
@@ -188,7 +188,7 @@ void tFilterDlg::OnHelp()
 
 
 
-void tFilter::Dialog(wxFrame *parent, int ShowEventStats)
+void JZFilter::Dialog(wxFrame *parent, int ShowEventStats)
 {
   tFilterDlg *dlg;
   //  DialogBox = new wxDialogBox(parent, "Event Filter", FALSE );
@@ -208,7 +208,7 @@ void tFilter::Dialog(wxFrame *parent, int ShowEventStats)
 
 
 
-tTrackIterator::tTrackIterator(tFilter *f, int rev)
+tTrackIterator::tTrackIterator(JZFilter *f, int rev)
 {
   Filter = f;
   Song   = Filter->mpSong;

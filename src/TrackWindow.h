@@ -28,7 +28,7 @@
 
 class JZSong;
 class JZTrack;
-class tFilter;
+class JZFilter;
 class tSnapSelection;
 class wxFont;
 
@@ -54,7 +54,7 @@ class JZTrackWindow : public wxScrolledWindow
 {
   public:
 
-    tFilter* mpFilter;
+    JZFilter* mpFilter;
 
     tSnapSelection* mpSnapSel;
 

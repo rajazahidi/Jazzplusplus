@@ -26,7 +26,7 @@
 #include "PropertyListDialog.h"
 
 class JZPianoWindow;
-class tFilter;
+class JZFilter;
 class JZSong;
 class JZEventFrame;
 class JZTrack;
@@ -38,11 +38,11 @@ class tShiftDlg : public tPropertyListDlg
   long  Steps;        // 0 was static
   long Unit;
   
-  tFilter* Filter;
+  JZFilter* Filter;
   JZSong* Song;
   JZEventFrame* EventWin;
   
-  tShiftDlg(JZEventFrame *w, tFilter *f, long Unit);
+  tShiftDlg(JZEventFrame *w, JZFilter *f, long Unit);
   void AddProperties();
   bool OnClose();
   void OnHelp();
@@ -55,11 +55,11 @@ class tCleanupDlg : public tPropertyListDlg
     static int lowLimit;          // 1/32
     static bool shortenOverlaps;
 
-    tFilter *Filter;
+    JZFilter *Filter;
     JZSong   *Song;
     JZEventFrame *EventWin;
 
-    tCleanupDlg(JZEventFrame *w, tFilter *f);
+    tCleanupDlg(JZEventFrame *w, JZFilter *f);
     void AddProperties();
     //tNamedChoice Steps;
     bool OnClose();
@@ -75,11 +75,11 @@ class tSearchReplaceDlg : public tPropertyListDlg
 /*     tNamedChoice frList; */
 /*     tNamedChoice toList; */
 
-    tFilter *Filter;
+    JZFilter *Filter;
     JZSong   *Song;
     JZEventFrame *EventWin;
 
-    tSearchReplaceDlg(JZEventFrame *w, tFilter *f);
+    tSearchReplaceDlg(JZEventFrame *w, JZFilter *f);
     void AddProperties();
     bool OnClose();
     void OnHelp();
@@ -95,11 +95,11 @@ class tTransposeDlg : public tPropertyListDlg
     static int Scale;
 
     JZEventFrame *EventWin;
-    tFilter *Filter;
+    JZFilter *Filter;
     JZSong   *Song;
 
     //tNamedChoice ScaleDlg;
-    tTransposeDlg(JZEventFrame *w, tFilter *f);
+    tTransposeDlg(JZEventFrame *w, JZFilter *f);
     void AddProperties();
     bool OnClose();
     void OnHelp();
@@ -112,10 +112,10 @@ class tSetChannelDlg : public tPropertyListDlg
 
     static int  NewChannel;        // 0
 
-    tFilter *Filter;
+    JZFilter *Filter;
     JZSong   *Song;
 
-    tSetChannelDlg(tFilter *f);
+    tSetChannelDlg(JZFilter *f);
     void AddProperties();
     bool OnClose();
     void OnHelp();
@@ -129,10 +129,10 @@ class tVelocityDlg : public tPropertyListDlg
     static int FromValue, ToValue, Mode;
     static char *mode_str;
 
-    tFilter *Filter;
+    JZFilter *Filter;
     JZSong   *Song;
 
-    tVelocityDlg(tFilter *f);
+    tVelocityDlg(JZFilter *f);
     void AddProperties();
     bool OnClose();
     void OnHelp();
@@ -146,11 +146,11 @@ class tLengthDlg : public tPropertyListDlg
     static int FromValue, ToValue, Mode;
     static char *mode_str;
 
-    tFilter   *Filter;
+    JZFilter   *Filter;
     JZSong     *Song;
     JZEventFrame *EventWin;
 
-    tLengthDlg(JZEventFrame *win, tFilter *f);
+    tLengthDlg(JZEventFrame *win, JZFilter *f);
     void AddProperties();
     bool OnClose();
     void OnHelp();
@@ -164,11 +164,11 @@ class tSeqLengthDlg : public tPropertyListDlg
 
     static double scale;
 
-    tFilter   *Filter;
+    JZFilter   *Filter;
     JZSong     *Song;
     JZEventFrame *EventWin;
 
-    tSeqLengthDlg(JZEventFrame *win, tFilter *f);
+    tSeqLengthDlg(JZEventFrame *win, JZFilter *f);
     void AddProperties();
     bool OnClose();
     void OnHelp();
@@ -183,11 +183,11 @@ class tMidiDelayDlg : public tPropertyListDlg
     static long clockDelay;
     static int repeat;
 
-    tFilter   *Filter;
+    JZFilter   *Filter;
     JZSong     *Song;
     JZEventFrame *EventWin;
 
-    tMidiDelayDlg(JZEventFrame *win, tFilter *f);
+    tMidiDelayDlg(JZEventFrame *win, JZFilter *f);
     void AddProperties();
     bool OnClose();
     void OnHelp();
@@ -195,13 +195,13 @@ class tMidiDelayDlg : public tPropertyListDlg
 
 class tDeleteDlg : public tPropertyListDlg
 {
-  tFilter *Filter;
+  JZFilter *Filter;
   JZEventFrame *EventWin;
 
  public:
   static bool LeaveSpace;        // 1
 
-  tDeleteDlg(JZEventFrame *w, tFilter *f);
+  tDeleteDlg(JZEventFrame *w, JZFilter *f);
   void AddProperties();
   bool OnClose();
   void OnHelp();
@@ -239,13 +239,13 @@ class tQuantizeDlg : public tPropertyListDlg
     static int  Groove;     // -x .. +x
     static int  Delay;      // -x .. +x
 
-    tFilter *Filter;
+    JZFilter *Filter;
     JZSong   *Song;
     JZEventFrame *EventWin;
 
     long Quantize(long);
 
-    tQuantizeDlg(JZEventFrame *w, tFilter *f);
+    tQuantizeDlg(JZEventFrame *w, JZFilter *f);
     void AddProperties();
     //tNamedChoice Steps;
     bool OnClose();

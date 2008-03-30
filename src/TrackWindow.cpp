@@ -117,7 +117,7 @@ JZTrackWindow::JZTrackWindow(
 
   mpSnapSel = new tSnapSelection(this);
 
-  mpFilter = new tFilter(mpSong);
+  mpFilter = new JZFilter(mpSong);
 
   SetBackgroundColour(*wxWHITE);
 

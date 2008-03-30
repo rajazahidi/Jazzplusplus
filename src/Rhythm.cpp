@@ -1025,7 +1025,7 @@ void tRhythmWin::GenRhythm()
   if (!event_win->EventsSelected("please mark destination track in trackwin"))
     return;
 
-  tFilter* pFilter = event_win->mpFilter;
+  JZFilter* pFilter = event_win->mpFilter;
 
   if (pFilter->FromTrack != pFilter->ToTrack)
   {

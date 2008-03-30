@@ -31,7 +31,7 @@ class JZPianoFrame;
 class JZSong;
 class JZTrack;
 class JZEvent;
-class tFilter;
+class JZFilter;
 class tCtrlEditBase;
 class tSnapSelection;
 class JZGuitarFrame;
@@ -76,7 +76,7 @@ class JZPianoWindow : public wxScrolledWindow, public tButtonLabelInterface
 
     virtual ~JZPianoWindow();
 
-    tFilter* GetFilter();
+    JZFilter* GetFilter();
 
     void CreateGuitarWindow();
 
@@ -321,7 +321,7 @@ class JZPianoWindow : public wxScrolledWindow, public tButtonLabelInterface
 
     int mTrackIndex;
 
-    tFilter* mpFilter;
+    JZFilter* mpFilter;
 
     tCtrlEditBase* mpCtrlEdit;
 
@@ -379,7 +379,7 @@ class JZPianoWindow : public wxScrolledWindow, public tButtonLabelInterface
 };
 
 inline
-tFilter* JZPianoWindow::GetFilter()
+JZFilter* JZPianoWindow::GetFilter()
 {
   return mpFilter;
 }

@@ -23,6 +23,23 @@
 #ifndef JZ_FINDFILE_H
 #define JZ_FINDFILE_H
 
-wxString FindFile(const char* pFileName);
+//*****************************************************************************
+// Description:
+//   This function attempts to find a file.  It checks for the existence of
+// the file by
+//
+// 1. using the passed file name
+// 2. appending the passed file name to the path specified by the HOME
+//    environment variable, if it exists 
+// 3. appending the passed file name to the path specified by the JAZZ
+//    environment variable, if it exists 
+// 4. appending the passed file name to the location of the jazz executable
+//
+// Returns:
+//   wxString:
+//     A complete path and file name for the found file or wxEmptyString if
+//     the file was not found.
+//*****************************************************************************
+wxString FindFile(const wxString& pFileName);
 
 #endif // !defined(JZ_FINDFILE_H)

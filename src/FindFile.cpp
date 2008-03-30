@@ -21,6 +21,7 @@
 //*****************************************************************************
 
 #include "WxWidgets.h"
+#include <wx/filename.h>
 
 #include <iostream>
 
@@ -28,65 +29,64 @@ using namespace std;
 
 //*****************************************************************************
 // Description:
-//   Find a file, looking in
-// 1. where the HOME environment var is pointing 
-// 2. where the JAZZ environment var is pointing
-// 3. where the jazz executable was started
+//   This function attempts to find a file.  It checks for the existence of
+// the file by
 //
-// This function was converted to use wxString instead of char* because it is
-// safe to return localy allocated wxStrings because of reference counting.
+// 1. using the passed file name
+// 2. appending the passed file name to the path specified by the HOME
+//    environment variable, if it exists 
+// 3. appending the passed file name to the path specified by the JAZZ
+//    environment variable, if it exists 
+// 4. appending the passed file name to the location of the jazz executable
+//
+// Returns:
+//   wxString:
+//     A complete path and file name for the found file or wxEmptyString if
+//     the file was not found.
 //*****************************************************************************
-wxString FindFile(const char* pFileName)
+wxString FindFile(const wxString& FileName)
 {
-  wxString buf;
-
-  if (wxFileExists((char *)pFileName))
+  if (wxFileExists(FileName))
   {
-    cout << "imediate hit " << pFileName << endl;
-    return pFileName;
+    cout << "imediate hit " << FileName << endl;
+    return FileName;
   }
 
-  wxString home;
+  wxString FoundFileName;
+
+  wxString Home;
   if (getenv("HOME") != 0)
   {
-    home = getenv("HOME");
-    buf << home << "/" << pFileName;
-    cout << "home " << buf <<endl;
-    if (wxFileExists(buf))
+    Home = getenv("HOME");
+    FoundFileName << Home << wxFileName::GetPathSeparator() << FileName;
+    if (wxFileExists(FoundFileName))
     {
-      return buf;
-    }
-  }
-  if (getenv("HOME") != 0)
-  {
-    buf = "";
-    home = getenv("JAZZ");
-    buf << home << "/" << pFileName;
-    cout << "jazz " << buf <<endl;
-    if (wxFileExists(buf))
-    {
-      return buf;
+      cout << "home " << FoundFileName << endl;
+      return FoundFileName;
     }
   }
 
-  // look where the executable was started
-  home = wxPathOnly((const char *)wxTheApp->argv[0]);
-  buf = "";
-  buf << home << "/" << pFileName;
-  cout <<"startup " << buf <<endl;
-  if (wxFileExists(buf))
+  if (getenv("JAZZ") != 0)
   {
-    return buf;
+    FoundFileName = "";
+    Home = getenv("JAZZ");
+    FoundFileName << Home << wxFileName::GetPathSeparator() << FileName;
+    if (wxFileExists(FoundFileName))
+    {
+      cout << "jazz " << FoundFileName <<endl;
+      return FoundFileName;
+    }
   }
 
-  // look in the compiled-in path
-//  buf = "";
-//  buf << JAZZ_DATADIR << "/" << pFileName;
-//  cout << "compiled in path " << buf << "  " << wxFileExists(buf) << endl;
-//  if (wxFileExists(buf))
-//  {
-//    return buf;
-//  }
-  
+  // Look where the executable was started.
+  FoundFileName = "";
+  Home = wxPathOnly((const char *)wxTheApp->argv[0]);
+  FoundFileName << Home << wxFileName::GetPathSeparator() << FileName;
+  if (wxFileExists(FoundFileName))
+  {
+    cout << "startup " << FoundFileName << endl;
+    return FoundFileName;
+  }
+
   return wxEmptyString;
 }

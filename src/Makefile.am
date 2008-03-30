@@ -152,7 +152,7 @@ TrackWindow.h \
 WxWidgets.h
 
 # This directive defines the Jazz++ data directory.  This may be a hack, but
-# other programs uyse similar techniques.
+# other programs use similar techniques.
 # The automake info file suggests using INCLUDES for this purpose
 # and i cant even get it to expand the pkgdatadir, aargh
 INCLUDES= -DJAZZ_DATADIR=\"@datadir@/@PACKAGE@\"

@@ -29,23 +29,25 @@ class JZPianoWindow;
 class JZFilter;
 class JZSong;
 class JZEventFrame;
+class JZEventWindow;
 class JZTrack;
 class JZEvent;
 
 class tShiftDlg : public tPropertyListDlg
 {
- public:
-  long  Steps;        // 0 was static
-  long Unit;
+  public:
+
+    long mSteps;        // 0 was static
+    long mUnit;
   
-  JZFilter* Filter;
-  JZSong* Song;
-  JZEventFrame* EventWin;
+    JZEventFrame* mpEventWindow;
+    JZFilter* mpFilter;
+    JZSong* mpSong;
   
-  tShiftDlg(JZEventFrame *w, JZFilter *f, long Unit);
-  void AddProperties();
-  bool OnClose();
-  void OnHelp();
+    tShiftDlg(JZEventFrame* pEventWindow, JZFilter* pFilter, long Unit);
+    void AddProperties();
+    bool OnClose();
+    void OnHelp();
 };
 
 class tCleanupDlg : public tPropertyListDlg
@@ -57,7 +59,7 @@ class tCleanupDlg : public tPropertyListDlg
 
     JZFilter *Filter;
     JZSong   *Song;
-    JZEventFrame *EventWin;
+    JZEventFrame* mpEventWindow;
 
     tCleanupDlg(JZEventFrame *w, JZFilter *f);
     void AddProperties();
@@ -77,7 +79,7 @@ class tSearchReplaceDlg : public tPropertyListDlg
 
     JZFilter *Filter;
     JZSong   *Song;
-    JZEventFrame *EventWin;
+    JZEventFrame* mpEventWindow;
 
     tSearchReplaceDlg(JZEventFrame *w, JZFilter *f);
     void AddProperties();
@@ -94,7 +96,7 @@ class tTransposeDlg : public tPropertyListDlg
     static bool FitIntoScale;
     static int Scale;
 
-    JZEventFrame *EventWin;
+    JZEventFrame* mpEventWindow;
     JZFilter *Filter;
     JZSong   *Song;
 
@@ -148,7 +150,7 @@ class tLengthDlg : public tPropertyListDlg
 
     JZFilter   *Filter;
     JZSong     *Song;
-    JZEventFrame *EventWin;
+    JZEventFrame* mpEventWindow;
 
     tLengthDlg(JZEventFrame *win, JZFilter *f);
     void AddProperties();
@@ -166,7 +168,7 @@ class tSeqLengthDlg : public tPropertyListDlg
 
     JZFilter   *Filter;
     JZSong     *Song;
-    JZEventFrame *EventWin;
+    JZEventFrame* mpEventWindow;
 
     tSeqLengthDlg(JZEventFrame *win, JZFilter *f);
     void AddProperties();
@@ -185,7 +187,7 @@ class tMidiDelayDlg : public tPropertyListDlg
 
     JZFilter   *Filter;
     JZSong     *Song;
-    JZEventFrame *EventWin;
+    JZEventFrame* mpEventWindow;
 
     tMidiDelayDlg(JZEventFrame *win, JZFilter *f);
     void AddProperties();
@@ -196,7 +198,7 @@ class tMidiDelayDlg : public tPropertyListDlg
 class tDeleteDlg : public tPropertyListDlg
 {
   JZFilter *Filter;
-  JZEventFrame *EventWin;
+  JZEventFrame* mpEventWindow;
 
  public:
   static bool LeaveSpace;        // 1
@@ -241,7 +243,7 @@ class tQuantizeDlg : public tPropertyListDlg
 
     JZFilter *Filter;
     JZSong   *Song;
-    JZEventFrame *EventWin;
+    JZEventFrame* mpEventWindow;
 
     long Quantize(long);
 

@@ -48,53 +48,50 @@ using namespace std;
 // **************************************************************************
 // Shift
 // *************************************************************************
-
-
-//long tShiftDlg::Steps = 0;
-
-tShiftDlg::tShiftDlg(JZEventFrame *w, JZFilter *f, long unit)
-: tPropertyListDlg( "Shift events left/right" )
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+tShiftDlg::tShiftDlg(JZEventFrame* pEventWindow, JZFilter* pFilter, long unit)
+  : tPropertyListDlg("Shift events left/right"),
+    mSteps(0),
+    mUnit(unit),
+    mpEventWindow(pEventWindow),
+    mpFilter(pFilter),
+    mpSong(pFilter->mpSong)
 {
-  Filter = f;
-  Song = f->mpSong;
-  Unit  = unit;
-  EventWin = w;
-  Steps=0;
 }
 
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 bool tShiftDlg::OnClose()
 {
-  cout << "tShiftDlg::OnClose "<<Steps<<endl;
-  tCmdShift cmd(Filter, Steps * Unit);
+  cout << "tShiftDlg::OnClose " << mSteps << endl;
+  tCmdShift cmd(mpFilter, mSteps * mUnit);
   cmd.Execute();
-  EventWin->Redraw();
-  if (EventWin->NextWin)
+  mpEventWindow->Refresh();
+  if (mpEventWindow->NextWin)
   {
-    EventWin->NextWin->Redraw();
+    mpEventWindow->NextWin->Refresh();
   }
 
   //  wxForm::OnOk();
   return false;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tShiftDlg::OnHelp()
 {
   gpHelpInstance->ShowTopic("Shift");
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tShiftDlg::AddProperties()
 {
-
 //send wxPropertyValue REFERENCE not POINTER
-  sheet->AddProperty(new wxProperty("Snaps",  wxPropertyValue(&Steps), "integer", new wxIntegerListValidator(-16, 16)));
-  sheet->AddProperty(new wxProperty("clocks per snap",  (long)Unit, "integer"));//informational only
-
+  sheet->AddProperty(new wxProperty("Snaps",  wxPropertyValue(&mSteps), "integer", new wxIntegerListValidator(-16, 16)));
+  sheet->AddProperty(new wxProperty("clocks per snap",  (long)mUnit, "integer"));//informational only
 }
-
 
 
 
@@ -113,7 +110,7 @@ tCleanupDlg::tCleanupDlg(JZEventFrame *w, JZFilter *f)
 {
   Filter = f;
   Song = f->mpSong;
-  EventWin = w;
+  mpEventWindow = w;
 }
 
 
@@ -126,10 +123,10 @@ bool tCleanupDlg::OnClose()
     << endl;
   tCmdCleanup cln(Filter, limit, shortenOverlaps);
   cln.Execute();
-  EventWin->Redraw();
-  if (EventWin->NextWin)
+  mpEventWindow->Refresh();
+  if (mpEventWindow->NextWin)
   {
-    EventWin->NextWin->Redraw();
+    mpEventWindow->NextWin->Refresh();
   }
 
   //wxForm::OnOk();
@@ -197,16 +194,18 @@ tSearchReplaceDlg::tSearchReplaceDlg(JZEventFrame *w, JZFilter *f)
 {
   Filter = f;
   Song = f->mpSong;
-  EventWin = w;
+  mpEventWindow = w;
 }
 
 bool tSearchReplaceDlg::OnClose()
 {
   tCmdSearchReplace sr(Filter, frCtrl - 1, toCtrl-1);
   sr.Execute();
-  EventWin->Redraw();
-  if (EventWin->NextWin)
-    EventWin->NextWin->Redraw();
+  mpEventWindow->Refresh();
+  if (mpEventWindow->NextWin)
+  {
+    mpEventWindow->NextWin->Refresh();
+  }
 
   return false;
 }
@@ -245,7 +244,7 @@ bool tTransposeDlg::FitIntoScale = 0;
 tTransposeDlg::tTransposeDlg(JZEventFrame *w, JZFilter *f)
   : tPropertyListDlg("Transpose")
 {
-  EventWin = w;
+  mpEventWindow = w;
   Filter = f;
   Song   = f->mpSong;
 }
@@ -255,13 +254,13 @@ bool tTransposeDlg::OnClose()
 {
   tCmdTranspose trn(Filter, Notes, Scale, FitIntoScale);
   trn.Execute();
-  if (EventWin->NextWin)
+  if (mpEventWindow->NextWin)
   {
-    EventWin->NextWin->Redraw();
+    mpEventWindow->NextWin->Refresh();
   }
   else
   {
-    EventWin->Redraw();
+    mpEventWindow->Refresh();
   }
 
   return false;
@@ -405,7 +404,7 @@ tLengthDlg::tLengthDlg(JZEventFrame *w, JZFilter *f)
 {
   Filter = f;
   Song = f->mpSong;
-  EventWin = w;
+  mpEventWindow = w;
 }
 
 
@@ -414,10 +413,10 @@ bool tLengthDlg::OnClose()
   tCmdLength cmd(Filter, FromValue, ToValue, Mode);
   cmd.Execute();
 
-  EventWin->Redraw();
-  if (EventWin->NextWin)
+  mpEventWindow->Refresh();
+  if (mpEventWindow->NextWin)
   {
-    EventWin->NextWin->Redraw();
+    mpEventWindow->NextWin->Refresh();
   }
 
   //tPropertyListDlg::OnClose();
@@ -470,7 +469,7 @@ tSeqLengthDlg::tSeqLengthDlg(JZEventFrame *w, JZFilter *f)
 {
   Filter = f;
   Song = f->mpSong;
-  EventWin = w;
+  mpEventWindow = w;
 }
 
 
@@ -478,11 +477,12 @@ bool tSeqLengthDlg::OnClose()
 {
   tCmdSeqLength cmd(Filter, scale);
   cmd.Execute();
-  EventWin->Redraw();
-  if (EventWin->NextWin)
+  mpEventWindow->Refresh();
+  if (mpEventWindow->NextWin)
   {
-    EventWin->NextWin->Redraw();
+    mpEventWindow->NextWin->Refresh();
   }
+
   //tPropertyListDlg::OnClose();
   return false;
 }
@@ -516,7 +516,7 @@ tMidiDelayDlg::tMidiDelayDlg(JZEventFrame *w, JZFilter *f)
 {
   Filter = f;
   Song = f->mpSong;
-  EventWin = w;
+  mpEventWindow = w;
 }
 
 
@@ -525,9 +525,12 @@ bool tMidiDelayDlg::OnClose()
 
   tCmdMidiDelay cmd(Filter, scale,clockDelay,repeat);
   cmd.Execute();
-  EventWin->Redraw();
-  if (EventWin->NextWin)
-          EventWin->NextWin->Redraw();
+  mpEventWindow->Refresh();
+  if (mpEventWindow->NextWin)
+  {
+    mpEventWindow->NextWin->Refresh();
+  }
+
   //tPropertyListDlg::OnClose();
   return false;
 }
@@ -576,7 +579,7 @@ tDeleteDlg::tDeleteDlg(JZEventFrame *w, JZFilter *f)
 : tPropertyListDlg("Delete" )
 {
   Filter = f;
-  EventWin = w;
+  mpEventWindow = w;
 }
 
 
@@ -584,10 +587,10 @@ bool tDeleteDlg::OnClose()
 {
   tCmdErase cmd(Filter, LeaveSpace);
   cmd.Execute();
-  EventWin->Redraw();
-  if (EventWin->NextWin)
+  mpEventWindow->Refresh();
+  if (mpEventWindow->NextWin)
   {
-    EventWin->NextWin->Redraw();
+    mpEventWindow->NextWin->Refresh();
   }
 
 //  tPropertyListDlg::OnClose();
@@ -671,7 +674,7 @@ tQuantizeDlg::tQuantizeDlg(JZEventFrame *w, JZFilter *f)
 {
   Filter = f;
   Song = f->mpSong;
-  EventWin = w;
+  mpEventWindow = w;
 }
 
 
@@ -684,16 +687,19 @@ bool tQuantizeDlg::OnClose()
   qnt.NoteStart = NoteStart;
   qnt.NoteLength = NoteLength;
   qnt.Execute();
-  EventWin->Redraw();
-  if (EventWin->NextWin)
-          EventWin->NextWin->Redraw();
+  mpEventWindow->Refresh();
+  if (mpEventWindow->NextWin)
+  {
+    mpEventWindow->NextWin->Refresh();
+  }
+
   //tPropertyListDlg::OnClose();
   return false;
 }
 
 void tQuantizeDlg::OnHelp()
 {
-  if (EventWin->NextWin)
+  if (mpEventWindow->NextWin)
   {
     gpHelpInstance->ShowTopic("Quantize");
   }
@@ -751,7 +757,7 @@ class tEventDlg : public tPropertyListDlg
 
 tEventDlg::tEventDlg(JZEvent *e, JZPianoWindow* w, JZTrack *t)
   : tPropertyListDlg( "Event" ),
-    ClockDlg(w->mpSong, "Time ", e->GetClock())
+    ClockDlg(w->GetSong(), "Time ", e->GetClock())
 {
   Win   = w;
   Track = t;
@@ -1497,7 +1503,7 @@ void EventDialog(
 
     case StatSetTempo:
       str = "Set Tempo (for track 0)";
-      dlg = new tSetTempoDlg(e->IsSetTempo(), pPianoWindow, pPianoWindow->mpSong->GetTrack(0) );
+      dlg = new tSetTempoDlg(e->IsSetTempo(), pPianoWindow, pPianoWindow->GetSong()->GetTrack(0) );
       break;
 
     case StatSysEx:

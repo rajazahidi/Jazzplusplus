@@ -124,7 +124,6 @@ class JZPianoFrame : public wxFrame
     void OnVisibleAllTracks(wxCommandEvent& Event);
     void OnReset(wxCommandEvent& Event);
 
-  // Functions slurped from JZEventFrame
   public:
 
     void NewPlayPosition(int Clock);

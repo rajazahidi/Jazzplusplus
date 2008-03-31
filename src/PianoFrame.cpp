@@ -742,10 +742,6 @@ void JZPianoFrame::SetVisibleAllTracks(bool Value)
   mpPianoWindow->SetVisibleAllTracks(Value);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Function slurped from JZEventFrame
-///////////////////////////////////////////////////////////////////////////////
-
 void JZPianoFrame::NewPlayPosition(int Clock)
 {
   mpPianoWindow->NewPlayPosition(Clock);

@@ -492,7 +492,7 @@ void tRhythm::Generate(JZTrack *track, JZBarInfo &bi, tRhythm *rhy[], int n_rhy)
 //#include "Bitmaps/rrggen.xpm"
 //#include "Bitmaps/help.xpm"
 
-tRhythmWin::tRhythmWin(JZEventFrame *e, JZSong *s)
+tRhythmWin::tRhythmWin(JZEventWindow* pEventWindow, JZSong* pSong)
   : wxFrame(
       0,
       wxID_ANY,
@@ -501,11 +501,11 @@ tRhythmWin::tRhythmWin(JZEventFrame *e, JZSong *s)
         gpConfig->GetValue(C_RhythmXpos),
         gpConfig->GetValue(C_RhythmYpos)),
       wxSize(640, 580)),
-    edit(0)
+    edit(0),
+    mpEventWindow(pEventWindow),
+    mpSong(pSong)
 {
 #ifdef OBSOLETE
-  event_win        = e;
-  song             = s;
   in_create        = 1;
   n_instruments    = 0;
   act_instrument   = -1;
@@ -1022,10 +1022,14 @@ void tRhythmWin::Generate(wxButton &but, wxCommandEvent& event)
 
 void tRhythmWin::GenRhythm()
 {
-  if (!event_win->EventsSelected("please mark destination track in trackwin"))
+  if (
+    !mpEventWindow->EventsSelected(
+      "Please mark the destination track in the track window"))
+  {
     return;
+  }
 
-  JZFilter* pFilter = event_win->mpFilter;
+  JZFilter* pFilter = mpEventWindow->mpFilter;
 
   if (pFilter->FromTrack != pFilter->ToTrack)
   {
@@ -1035,8 +1039,8 @@ void tRhythmWin::GenRhythm()
 
   long fr_clock = pFilter->FromClock;
   long to_clock = pFilter->ToClock;
-  JZTrack *track = song->GetTrack(pFilter->FromTrack);
-  song->NewUndoBuffer();
+  JZTrack *track = mpSong->GetTrack(pFilter->FromTrack);
+  mpSong->NewUndoBuffer();
 
   // remove selection
   //if (wxMessageBox("Erase destination before generating?", "Replace", wxYES_NO) == wxYES)
@@ -1048,7 +1052,7 @@ void tRhythmWin::GenRhythm()
   for (int i = 0; i < n_instruments; i++)
     instruments[i]->GenInit(fr_clock);
 
-  JZBarInfo bar_info(song);
+  JZBarInfo bar_info(mpSong);
   bar_info.SetClock(fr_clock);
 
   // for (int i = 0; i < n_instruments; i++)
@@ -1063,7 +1067,7 @@ void tRhythmWin::GenRhythm()
 
   track->Cleanup();
 
-  event_win->Redraw();
+  mpEventWindow->Refresh();
 }
 
 

@@ -23,6 +23,7 @@
 #ifndef JZ_PIANOWINDOW_H
 #define JZ_PIANOWINDOW_H
 
+#include "EventWindow.h"
 #include "MouseAction.h"
 #include "Track.h"
 #include "Globals.h"
@@ -36,10 +37,8 @@ class tCtrlEditBase;
 class tSnapSelection;
 class JZGuitarFrame;
 
-// -------------------------------------------------------------------------
-// MousePiano
-// -------------------------------------------------------------------------
-
+//*****************************************************************************
+//*****************************************************************************
 class JZListen : public wxTimer
 {
   public:
@@ -63,7 +62,9 @@ class JZListen : public wxTimer
     JZTrack* mpTrack;
 };
 
-class JZPianoWindow : public wxScrolledWindow, public tButtonLabelInterface
+//*****************************************************************************
+//*****************************************************************************
+class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 {
   public:
 
@@ -71,8 +72,7 @@ class JZPianoWindow : public wxScrolledWindow, public tButtonLabelInterface
       JZPianoFrame* pFrame,
       JZSong* pSong,
       const wxPoint& Position = wxDefaultPosition,
-      const wxSize& Size = wxDefaultSize,
-      long WindowStyle = 0);
+      const wxSize& Size = wxDefaultSize);
 
     virtual ~JZPianoWindow();
 
@@ -201,8 +201,6 @@ class JZPianoWindow : public wxScrolledWindow, public tButtonLabelInterface
 
   public:
 
-    JZSong* mpSong;
-
     int mFromLines[eMaxTrackCount];
 
     int mPlayClock;
@@ -220,11 +218,7 @@ class JZPianoWindow : public wxScrolledWindow, public tButtonLabelInterface
 
     tEventArray mPasteBuffer;
 
-    tSnapSelection* mpSnapSel;
-
   public:
-
-    void SetScrollPosition(int x, int y);
 
     void SetScrollRanges(const int& x, const int& y);
 
@@ -313,15 +307,11 @@ class JZPianoWindow : public wxScrolledWindow, public tButtonLabelInterface
 
   private:
 
-    static const int mScrollSize;
-
     static JZListen mListen;
 
     JZTrack* mpTrack;
 
     int mTrackIndex;
-
-    JZFilter* mpFilter;
 
     tCtrlEditBase* mpCtrlEdit;
 

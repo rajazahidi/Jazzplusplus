@@ -30,7 +30,7 @@
 #include <iostream>
 
 class JZTrack;
-class JZEventFrame;
+class JZEventWindow;
 class JZSong;
 class JZBarInfo;
 
@@ -113,6 +113,24 @@ class tRhythm
 
 class tRhythmWin : public wxFrame
 {
+  public:
+
+    tRhythmWin(JZEventWindow* pEventWindow, JZSong* pSong);
+
+    virtual ~tRhythmWin();
+
+    virtual void OnMenuCommand(int id);
+
+    virtual void OnSize(int w, int h);
+
+    void OnPaint();
+
+    void GenRhythm();
+
+    bool OnClose();
+
+  private:
+
     friend std::ostream& operator << (std::ostream& os, tRhythmWin const &a);
     friend std::istream& operator >> (std::istream& is, tRhythmWin &a);
 
@@ -164,8 +182,8 @@ class tRhythmWin : public wxFrame
     void AddInstrument(tRhythm *r);
     void DelInstrument();
 
-    JZEventFrame *event_win;
-    JZSong     *song;
+    JZEventWindow* mpEventWindow;
+    JZSong* mpSong;
 
     void RndEnable();
 
@@ -178,15 +196,6 @@ class tRhythmWin : public wxFrame
     void DownInstrument();
     void InitInstrumentList();
 
-  public:
-
-    virtual void OnMenuCommand(int id);
-    virtual void OnSize(int w, int h);
-    tRhythmWin(JZEventFrame *parent, JZSong *song);
-    virtual ~tRhythmWin();
-    void OnPaint();
-    void GenRhythm();
-    bool OnClose();
 };
 
 extern tRhythmWin *rhythm_win;

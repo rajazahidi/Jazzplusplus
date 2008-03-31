@@ -29,6 +29,8 @@
 
 #include "Rectangle.h"
 
+class JZEventWindow;
+
 enum TEMousePlayMode
 {
   eMouse,
@@ -38,9 +40,12 @@ enum TEMousePlayMode
   eRecordButton
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tMouseMapper
 {
   public:
+
     // actions
     // 0..2 = left/middle/right down
     // 3..5 = left/middle/right down + shift
@@ -50,57 +55,96 @@ class tMouseMapper
     tMouseMapper(const int actions[12]);
     tMouseMapper();
 
-    enum Button { Left, Middle, Right };
-    void SetAction(int code, Button but = Left, bool shift = FALSE, bool ctrl = FALSE);
-    int Action(wxMouseEvent &);
-    void SetLeftAction(int id = 0) { left_action = id; }
+    enum Button
+    {
+      Left,
+      Middle,
+      Right
+    };
+
+    void SetAction(
+      int code,
+      Button but = Left,
+      bool shift = false,
+      bool ctrl = false);
+
+    int Action(wxMouseEvent&);
+
+    void SetLeftAction(int id = 0)
+    {
+      left_action = id;
+    }
 
   private:
+
     int actions[12];
+
     int left_action;
 };
 
-/**
-base class for mouse actions. the classes are instantiated in the mousehandler of eventwin, for example, to keep state during mouse operations, like drag and drop and so on.
-
-the event() finction is used to determine what to do with an incoming event(normally, if the event is a drag event call the drag function of the class, and so on)
-*/
+//*****************************************************************************
+// Description:
+//   This is a base class for mouse actions.  The classes are instantiated in
+// the mouse handler of the event window, for example, to keep state during
+// mouse operations, like drag and drop and so on.
+//   The Event() function is used to determine what to do with an incoming
+// event.  Normally, if the event is a drag event, call the drag function of
+// the class, and so on.
+//*****************************************************************************
 class tMouseAction
 {
   public:
+
     virtual ~tMouseAction()                     {}
-    virtual int Dragging(wxMouseEvent &)         { return 0; };
-    virtual int LeftDown(wxMouseEvent &)         { return 0; };
-    virtual int LeftUp(wxMouseEvent &)                 { return 0; };
-    virtual int RightDown(wxMouseEvent &)         { return 0; };
-    virtual int RightUp(wxMouseEvent &)         { return 0; };
-    virtual int MiddleDown(wxMouseEvent &)         { return 0; };
-    virtual int MiddleUp(wxMouseEvent &)         { return 0; };
-    virtual int Event(wxMouseEvent &e)
+    virtual int Dragging(wxMouseEvent &)        { return 0; }
+    virtual int LeftDown(wxMouseEvent &)        { return 0; }
+    virtual int LeftUp(wxMouseEvent &)          { return 0; }
+    virtual int RightDown(wxMouseEvent &)       { return 0; }
+    virtual int RightUp(wxMouseEvent &)         { return 0; }
+    virtual int MiddleDown(wxMouseEvent &)      { return 0; }
+    virtual int MiddleUp(wxMouseEvent &)        { return 0; }
+    virtual int Event(wxMouseEvent& MouseEvent)
     {
-      if (e.Dragging())                return Dragging(e);
-      else if (e.LeftDown())        return LeftDown(e);
-      else if (e.LeftUp())        return LeftUp(e);
-      else if (e.MiddleDown())        return MiddleDown(e);
-      else if (e.MiddleUp())        return MiddleUp(e);
-      else if (e.RightDown())        return RightDown(e);
-      else if (e.RightUp())        return RightUp(e);
+      if (MouseEvent.Dragging())
+      {
+        return Dragging(MouseEvent);
+      }
+      else if (MouseEvent.LeftDown())
+      {
+        return LeftDown(MouseEvent);
+      }
+      else if (MouseEvent.LeftUp())
+      {
+        return LeftUp(MouseEvent);
+      }
+      else if (MouseEvent.MiddleDown())
+      {
+        return MiddleDown(MouseEvent);
+      }
+      else if (MouseEvent.MiddleUp())
+      {
+        return MiddleUp(MouseEvent);
+      }
+      else if (MouseEvent.RightDown())
+      {
+        return RightDown(MouseEvent);
+      }
+      else if (MouseEvent.RightUp())
+      {
+        return RightUp(MouseEvent);
+      }
       return 0;
     }
 };
 
 
-/**
- Selection -    draw a rectangle with the mouse, selecting events
-
- this class needs to draw in the window, thus it needs acess to the device context of the
-window.  This was  by storing a wxCanvas pointer in wxwin168, but wxCanvas is gone in wxwin2.
-on the other hand we can now draw in all windows.
-
-
-*/
-
-
+//*****************************************************************************
+// Description:
+// Selection -    draw a rectangle with the mouse, selecting events
+//   This class needs to draw in the window, thus it needs access to the
+// device context of the window.  This was  by storing a wxCanvas pointer
+// in wxwin168, but wxCanvas is gone in wxwin2.
+//*****************************************************************************
 class tSelection : public tMouseAction
 {
   public:
@@ -125,30 +169,31 @@ class tSelection : public tMouseAction
   private:
 
     wxScrolledWindow* win;
+
     //  wxCanvas *Canvas;
     wxBrush* mpBackgroundBrush;
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tSnapSelection : public tSelection
 {
-protected:
-  int  *xCoords, nxCoords;
-  int  *yCoords, nyCoords;
-  int  xMin, xMax, xStep, yMin, yMax, yStep;
+  public:
+    tSnapSelection(wxScrolledWindow *c);
+    virtual void Snap(float &x, float &y, int up);
+    void SetXSnap(int ny, int *cx);
+    void SetYSnap(int ny, int *cy);
+    void SetXSnap(int xMin, int xMax, int xStep);
+    void SetYSnap(int yMin, int yMax, int yStep);
 
-public:
-  tSnapSelection(wxScrolledWindow *c);
-  virtual void Snap(float &x, float &y, int up);
-  void SetXSnap(int ny, int *cx);
-  void SetYSnap(int ny, int *cy);
-  void SetXSnap(int xMin, int xMax, int xStep);
-  void SetYSnap(int yMin, int yMax, int yStep);
+  protected:
+    int *xCoords, nxCoords;
+    int *yCoords, nyCoords;
+    int xMin, xMax, xStep, yMin, yMax, yStep;
 };
 
 
-class JZEventFrame;
-
-
+//*****************************************************************************
 /**
   tButtonLabelInterface
 
@@ -158,6 +203,7 @@ class JZEventFrame;
   indicates if the text should be displayed in a depressed button or a normal
   button.
 */
+//*****************************************************************************
 class tButtonLabelInterface
 {
   public:
@@ -172,10 +218,12 @@ class tButtonLabelInterface
 };
 
 
+//*****************************************************************************
 /**
   MouseCounter - let you enter numbers with left/right mouse button
 
 */
+//*****************************************************************************
 class tMouseCounter : public wxTimer, public tMouseAction
 {
     int Min, Max, Delta;
@@ -196,10 +244,9 @@ class tMouseCounter : public wxTimer, public tMouseAction
 };
 
 
-// -------------------------------------------------------------------------
+//*****************************************************************************
 // tMarkDestin - mark destination of some operation
-// -------------------------------------------------------------------------
-
+//*****************************************************************************
 class tMarkDestin : public tMouseAction
 {
   wxScrolledWindow *Canvas;
@@ -215,23 +262,38 @@ public:
   tMarkDestin(wxScrolledWindow *canvas, wxFrame *frame, int left);
 };
 
-// -------------------------------------------------------------------------
+//*****************************************************************************
 // tMouseButton - simulate a 3D button
-// -------------------------------------------------------------------------
-
+//*****************************************************************************
 class tMouseButton : public tMouseAction
 {
   public:
-    tMouseButton(JZEventFrame *win, JZRectangle *r, const char *down, const char *up = 0);
+
+    tMouseButton(
+      JZEventWindow* pEventWindow,
+      JZRectangle* pRectangle,
+      const char* pDownString,
+      const char* upUpString = 0);
+
     virtual ~tMouseButton();
-    virtual int Event(wxMouseEvent &e);
+
+    virtual int Event(wxMouseEvent& MouseEvent);
+
   protected:
-    virtual void Action() {}
+
+    virtual void Action()
+    {
+    }
+
   private:
-    JZEventFrame *win;
-    JZRectangle r;
-    const char *down;
-    const char *up;
+
+    JZEventWindow* mpEventWindow;
+
+    JZRectangle mRectangle;
+
+    wxString mDownString;
+
+    wxString mUpString;
 };
 
 #endif // !defined(JZ_MOUSEACTION_H)

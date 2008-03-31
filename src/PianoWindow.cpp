@@ -223,7 +223,7 @@ tKeyLengthDragger::tKeyLengthDragger(tKeyOn *k, JZPianoWindow *w)
   Win   = w;
 
   // SN++ BUG FIX: undo/redo
-  Win->mpSong->NewUndoBuffer();
+  Win->GetSong()->NewUndoBuffer();
 
   wxClientDC Dc(Win);
 
@@ -336,7 +336,7 @@ tPlayTrackLengthDragger::tPlayTrackLengthDragger(tPlayTrack *k, JZPianoWindow *w
   Win   = w;
 
   // SN++ BUG FIX: undo/redo
-  Win->mpSong->NewUndoBuffer();
+  Win->GetSong()->NewUndoBuffer();
   //
   wxClientDC Dc(Win);
   Win->PrepareDC(Dc);
@@ -412,7 +412,7 @@ class tVelocCounter : public tMouseCounter
       mpKeyOn = pEvent;
 
       // SN++ BUG FIX: undo/redo
-      Win->mpSong->NewUndoBuffer();
+      Win->GetSong()->NewUndoBuffer();
       //
       wxClientDC Dc(Win);
       Dc.SetFont(*(Win->GetFixedFont()));
@@ -528,17 +528,13 @@ const int evnt_actions[12] =
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-BEGIN_EVENT_TABLE(JZPianoWindow, wxScrolledWindow)
+BEGIN_EVENT_TABLE(JZPianoWindow, JZEventWindow)
 
   EVT_SIZE(JZPianoWindow::OnSize) 
 
   EVT_MOUSE_EVENTS(JZPianoWindow::OnMouseEvent)
 
 END_EVENT_TABLE()
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-const int JZPianoWindow::mScrollSize = 50;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -550,18 +546,14 @@ JZPianoWindow::JZPianoWindow(
   JZPianoFrame* pPianoFrame,
   JZSong* pSong,
   const wxPoint& Position,
-  const wxSize& Size,
-  long WindowStyle)
-  : wxScrolledWindow(pPianoFrame, wxID_ANY, Position, Size, WindowStyle),
+  const wxSize& Size)
+  : JZEventWindow(pPianoFrame, pSong, Position, Size),
     mpPianoFrame(pPianoFrame),
-    mpSong(pSong),
     mPlayClock(-1),
     mSnapCount(0),
     mpMouseAction(0),
-    mpSnapSel(0),
     mpTrack(0),
     mTrackIndex(0),
-    mpFilter(0),
     mpCtrlEdit(0),
     mMousePlay(play_actions),
     mMouseEvent(evnt_actions),
@@ -601,13 +593,9 @@ JZPianoWindow::JZPianoWindow(
 {
   InitColors();
 
-  mpFilter = new JZFilter(mpSong);
-
   mpTrack = mpSong->GetTrack(mTrackIndex);
 
   mFontSize = mPianoFontSizes[1]; // Must be an entry in the array.
-
-  mpSnapSel = new tSnapSelection(this);
 
   for (int i = 0; i < eMaxTrackCount; i++)
   {
@@ -627,7 +615,6 @@ JZPianoWindow::~JZPianoWindow()
   delete mpFont;
   delete mpFixedFont;
   delete mpDrumFont;
-  delete mpSnapSel;
   delete mpGuitarFrame;
 }
 
@@ -651,21 +638,16 @@ void JZPianoWindow::InitColors()
 //-----------------------------------------------------------------------------
 void JZPianoWindow::Setup()
 {
-  // This section is from JZEventFrame::Setup()
-
-  int Width, Height;
-
   wxClientDC Dc(this);
 
   Dc.SetFont(wxNullFont);
 
   delete mpFixedFont;
   mpFixedFont = new wxFont(12, wxSWISS, wxNORMAL, wxNORMAL);
-
   Dc.SetFont(*mpFixedFont);
-  Dc.GetTextExtent("M", &Width, &Height);
-  mFixedFontHeight = Height;
-  mTopInfoHeight = mFixedFontHeight + 2 * mLittleBit;
+
+  int Width, Height;
+  Dc.GetTextExtent("M", &Width, &mFixedFontHeight);
 
   delete mpFont;
   mpFont = new wxFont(mFontSize, wxSWISS, wxNORMAL, wxNORMAL);
@@ -674,8 +656,10 @@ void JZPianoWindow::Setup()
   Dc.GetTextExtent("M", &Width, &Height);
   mLittleBit = Width / 2;
 
+  mTopInfoHeight = mFixedFontHeight + 2 * mLittleBit;
+
   Dc.GetTextExtent("HXWjgi", &Width, &Height);
-  mTrackHeight = Height + mLittleBit;
+  mTrackHeight = Height + 2 * mLittleBit;
 
   delete mpDrumFont;
   mpDrumFont = new wxFont(mFontSize + 3, wxSWISS, wxNORMAL, wxNORMAL);
@@ -1114,15 +1098,6 @@ void JZPianoWindow::SetScrollRanges(const int& x, const int& y)
     x,
     y);
   EnableScrolling(false, false);
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZPianoWindow::SetScrollPosition(int x, int y)
-{
-  x /= mScrollSize;
-  y /= mScrollSize;
-  Scroll(x, y);
 }
 
 //-----------------------------------------------------------------------------
@@ -1587,7 +1562,6 @@ void JZPianoWindow::OnMouseEvent(wxMouseEvent& Event)
 // ------------------------------------------------------------------------
 // Snapper
 // ------------------------------------------------------------------------
-
 void JZPianoWindow::SnapSelStop(wxMouseEvent& Event)
 {
   if (mpSnapSel->Selected)

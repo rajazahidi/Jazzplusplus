@@ -23,6 +23,7 @@
 #ifndef JZ_TRACKWINDOW_H
 #define JZ_TRACKWINDOW_H
 
+#include "EventWindow.h"
 #include "MouseAction.h"
 #include "Rectangle.h"
 
@@ -50,13 +51,11 @@ enum TENumberModes
   eNmModes
 };
 
-class JZTrackWindow : public wxScrolledWindow
+//*****************************************************************************
+//*****************************************************************************
+class JZTrackWindow : public JZEventWindow
 {
   public:
-
-    JZFilter* mpFilter;
-
-    tSnapSelection* mpSnapSel;
 
     enum TELimits
     {
@@ -85,8 +84,6 @@ class JZTrackWindow : public wxScrolledWindow
 
     void SetScrollRanges(const int& x, const int& y);
 
-    void SetScrollPosition(int x, int y);
-
   private:
 
     void GetVirtualEventSize(int& Width, int& Height) const;
@@ -94,6 +91,8 @@ class JZTrackWindow : public wxScrolledWindow
     void OnSize(wxSizeEvent& Event);
 
     void OnEraseBackground(wxEraseEvent& Event);
+
+    void OnLeftButtonDown(wxMouseEvent& Event);
 
     void OnLeftButtonUp(wxMouseEvent& Event);
 
@@ -132,6 +131,10 @@ class JZTrackWindow : public wxScrolledWindow
 
     const char* GetNumberString() const;
 
+    void SnapSelectionStart(wxMouseEvent& Event);
+
+    void SnapSelectionStop(wxMouseEvent& Event);
+
     // Was the VLine macro
     void DrawVerticalLine(wxDC& Dc, int XPosition) const;
 
@@ -154,24 +157,12 @@ class JZTrackWindow : public wxScrolledWindow
 
     int x2BarClock(int x, int Next = 0);
 
-    int y2yLine(int y, int Up = 0);
-
   private:
 
-    static const int mScrollSize;
-
-    JZSong* mpSong;
-
-    wxColor* mpGreyColor;
-    wxBrush* mpGreyBrush;
-
-    int mTrackHeight;
-    int mTopInfoHeight;
     int mLeftInfoWidth;
     int mClocksPerPixel;
     int mPlayClock;
     bool mUseColors;
-    int mLittleBit;
     int mEventsX, mEventsY, mEventsWidth, mEventsHeight;
     int mScrolledX, mScrolledY;
     int mCanvasWidth, mCanvasHeight;

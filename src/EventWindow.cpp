@@ -34,113 +34,247 @@
 using namespace std;
 
 
-// ************************************************************************
-// tCanvas
-// ************************************************************************
+//*****************************************************************************
+// Description:
+//   This is the event window class definition.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//BEGIN_EVENT_TABLE(JZEventWindow, wxScrolledWindow)
+//END_EVENT_TABLE()
 
-#define ScLine 50L
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+const int JZEventWindow::mScrollSize = 50;
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZEventWindow::JZEventWindow(
+  wxFrame* pParent,
+  JZSong* pSong,
+  const wxPoint& Position,
+  const wxSize& Size)
+  : wxScrolledWindow(
+      pParent,
+      wxID_ANY,
+      Position,
+      Size,
+      wxHSCROLL | wxVSCROLL | wxNO_FULL_REPAINT_ON_RESIZE),
+    mpSnapSel(0),
+    mpFilter(0),
+    mpSong(pSong),
+    mpGreyColor(0),
+    mpGreyBrush(0),
+    mTopInfoHeight(40),
+    mTrackHeight(10),
+    mLittleBit(2)
+{
+  mpSnapSel = new tSnapSelection(this);
 
-//notice, there is a conflict between this and the subclass event tables that i dont know how to resolv
-BEGIN_EVENT_TABLE(JZEventFrame, wxFrame)
-  EVT_SIZE(JZEventFrame::OnSize)
-END_EVENT_TABLE()
+  mpFilter = new JZFilter(mpSong);
 
+#ifdef __WXMSW__
+  mpGreyColor = new wxColor(192, 192, 192);
+#else
+  mpGreyColor = new wxColor(220, 220, 220);
+#endif
 
-//tCanvas::tCanvas(JZEventFrame *frame, int x, int y, int w, int h, int style)
-//  : wxScrolledWindow(frame, -1, wxPoint(x, y), wxSize(w, h), style)
+  mpGreyBrush = new wxBrush(*mpGreyColor, wxSOLID);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZEventWindow::~JZEventWindow()
+{
+  delete mpSnapSel;
+  delete mpFilter;
+  delete mpGreyColor;
+  delete mpGreyBrush;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZEventWindow::EventsSelected(const wxString& Message) const
+{
+  if (!mpSnapSel->Selected)
+  {
+    wxMessageBox(Message, "Error", wxOK);
+    return 0;
+  }
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//void JZEventWindow::SetScrollRanges()
 //{
-//  EventWin = frame;
+//  int Width, Height;
+//  GetVirtualEventSize(Width, Height);
+//  SetScrollbars(
+//    mScrollSize,
+//    mScrollSize,
+//    Width / mScrollSize,
+//    Height / mScrollSize);
+//  EnableScrolling(false, false);
 //}
 
-/**
-JAVE seems to want to clip the paint area
-calls the subclass paint routine
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZEventWindow::SetScrollPosition(int x, int y)
+{
+  x /= mScrollSize;
+  y /= mScrollSize;
+  Scroll(x, y);
+}
 
-onpaint seems never to get called
-*/
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZEventWindow::y2yLine(int y, int Up)
+{
+  if (Up)
+  {
+    y += mTrackHeight;
+  }
+  y -= mTopInfoHeight;
+  y -= y % mTrackHeight;
+  y += mTopInfoHeight;
+  return y;
+}
 
-//void tCanvas::OnDraw(wxDC& dc)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZEventWindow::LineText(
+  wxDC& Dc,
+  int x,
+  int y,
+  int Width,
+  const char* pString,
+  int Height,
+  bool Down)
+{
+  if (Height <= 0)
+  {
+    Height = mTrackHeight;
+    y = y2yLine(y);
+  }
+  if (Width && Height)
+  {
+    Dc.SetBrush(*mpGreyBrush);
+    Dc.SetPen(*wxGREY_PEN);
+#ifdef __WXMSW__
+    Dc.DrawRectangle(x, y, Width + 1, Height + 1);
+#else
+    Dc.DrawRectangle(x, y, Width, Height);
+#endif
+    x += 1;
+    y += 1;
+    Width -= 2;
+    Height -= 2;
+    if (Down)
+    {
+      Dc.SetPen(*wxBLACK_PEN);
+      Dc.DrawLine(x, y, x + Width, y);
+      Dc.DrawLine(x, y, x,         y + Height);
+      Dc.SetPen(*wxWHITE_PEN);
+      Dc.DrawLine(x + Width, y,          x + Width, y + Height);
+      Dc.DrawLine(x,         y + Height, x + Width, y + Height);
+    }
+    else
+    {
+      Dc.SetPen(*wxWHITE_PEN);
+      Dc.DrawLine(x, y, x + Width, y);
+      Dc.DrawLine(x, y, x,         y + Height);
+      Dc.SetPen(*wxBLACK_PEN);
+      Dc.DrawLine(x + Width, y,          x + Width, y + Height);
+      Dc.DrawLine(x,         y + Height, x + Width, y + Height);
+    }
+    Dc.SetPen(*wxBLACK_PEN);
+    x -= 2;
+    y -= 2;
+  }
+
+  if (pString && strlen(pString) > 0)
+  {
+    wxColor TextBackgroundColor = Dc.GetTextBackground();
+    Dc.SetTextBackground(*mpGreyColor);
+    int TextWidth, TextHeight;
+    Dc.GetTextExtent(pString, &TextWidth, &TextHeight);
+    int Margin = (Width - TextWidth) / 2;
+    if (Margin < mLittleBit)
+    {
+      Margin = mLittleBit;
+    }
+    Dc.DrawText(pString, x + Margin, y + mLittleBit);
+    Dc.SetTextBackground(TextBackgroundColor);
+  }
+}
+
+//-----------------------------------------------------------------------------
+// JAVE seems to want to clip the paint area
+// calls the subclass paint routine
+//
+// OnPaint seems never to get called
+//-----------------------------------------------------------------------------
+//void JZEventWindow::OnDraw(wxDC& Dc)
 //{
 //  //onpaint never seems to get called, but ondraw does get called
 //  int x = 0, y = 0;
 //  GetViewStart(&x, &y);
-//  EventWin->OnPaintSub(&dc, x * ScLine, y * ScLine);  
-//  cout << "tCanvas::OnDraw\n";
+//  EventWin->OnPaintSub(Dc, x * mScrollSize, y * mScrollSize);  
+//  cout << "JZEventWindow::OnDraw << endl;
 //}
 
-//the canvas sends events to the subclassed window, i (might)filter the events a bit so as not get all mouse move events
-//BEGIN_EVENT_TABLE(tCanvas, wxScrolledWindow)
-//   EVT_MOUSE_EVENTS(tCanvas::OnMouseEvent)
-////   EVT_LEFT_DOWN(tCanvas::OnMouseEvent)
-////   EVT_LEFT_UP(tCanvas::OnMouseEvent)
-////   EVT_RIGHT_DOWN(tCanvas::OnMouseEvent)
-////   EVT_RIGHT_UP(tCanvas::OnMouseEvent)
-//END_EVENT_TABLE()
-
-  /**
-     this mouse handler delegates to the subclased eventwin
-   */
-//void tCanvas::OnMouseEvent(wxMouseEvent &e)
+//-----------------------------------------------------------------------------
+//   This mouse handler delegates to the subclased event window.
+//-----------------------------------------------------------------------------
+//void JZEventWindow::OnMouseEvent(wxMouseEvent& MouseEvent)
 //{
-//  EventWin->OnMouseEvent(e);
+//  EventWin->OnMouseEvent(MouseEvent);
 //}
 
-/**
-probably never called in wx2
-*/
-// void tCanvas::OnEvent(wxMouseEvent &e)
+// JAVE the OnChar method seems to be gone in wxwin232, but its documented, so
+// I don't know what happened.  The OnCharHook should do the same thing
+// basically.  It was there from the start.  OnChar seemd redundant.
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// void JZEventWindow::OnChar(wxKeyEvent& KeyEvent)
 // {
-//   EventWin->OnMouseEvent(e);
+//   if (!EventWin->OnKeyEvent(KeyEvent))
+//   {
+//     wxWindow::OnChar(KeyEvent);
+//   }
 // }
 
-//JAVE the OnChar method seems to be gone in wxwin232, but its documented, so i dont know whats happened
-//the OnCharHook should do the same thing basically(it was there from the start. OnChar seemd redundant)
-
-// void tCanvas::OnChar(wxKeyEvent &e)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// void JZEventFrame::OnChar(wxKeyEvent& KeyEvent)
 // {
-//   if (!EventWin->OnKeyEvent(e))
-//     wxWindow::OnChar(e);
+//   if (!OnKeyEvent(KeyEvent))
+//   {
+//     wxFrame::OnChar(KeyEvent);
+//   }
 // }
 
-// void JZEventFrame::OnChar(wxKeyEvent& e)
-// {
-//   if (!OnKeyEvent(e))
-//     wxFrame::OnChar(e);
-// }
-
-//bool tCanvas::OnCharHook(wxKeyEvent& e)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//bool JZEventWindow::OnCharHook(wxKeyEvent& KeyEvent)
 //{
-//  return EventWin->OnKeyEvent(e);
+//  return EventWin->OnKeyEvent(KeyEvent);
 //}
 
-bool JZEventFrame::OnCharHook(wxKeyEvent& e)
-{
-  return OnKeyEvent(e);
-}
+//*****************************************************************************
+// Description:
+//   This is the event frame class definition.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+BEGIN_EVENT_TABLE(JZEventFrame, wxFrame)
+  EVT_SIZE(JZEventFrame::OnSize)
+END_EVENT_TABLE()
 
-
-//void tCanvas::SetScrollRanges()
-//{
-//  int Width, Height;
-//  EventWin->GetVirtualEventSize(Width, Height);
-//  SetScrollbars(ScLine, ScLine, Width / ScLine, Height / ScLine);
-//  EnableScrolling(false, false);
-//}
-
-//void tCanvas::SetScrollPosition(int x, int y)
-//{
-//  x /= ScLine;
-//  y /= ScLine;
-//  Scroll(x, y);
-//}
-
-
-// ************************************************************************
-// JZEventFrame
-// ************************************************************************
-
-// default is 640x442
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZEventFrame::JZEventFrame(
   wxWindow* pParent,
   const wxString& Title,
@@ -151,7 +285,7 @@ JZEventFrame::JZEventFrame(
     Song(pSong),
     mpFilter(0),
     NextWin(0),
-//    Canvas(0),
+//    mpEventWindow(0),
     mpFont(0),
     mpFixedFont(0),
     hFixedFont(0),
@@ -196,7 +330,6 @@ JZEventFrame::JZEventFrame(
 
 JZEventFrame::~JZEventFrame()
 {
-//  delete Canvas;
   delete SnapSel;
 
   delete mpGreyColor;
@@ -219,13 +352,6 @@ JZEventFrame::~JZEventFrame()
 
 void JZEventFrame::CreateMenu()
 {
-#if 0
-  wxMenu *menu = new wxMenu;
-  menu->Append(999, "&MenuItem");
-  wxMenuBar *menu_bar = new wxMenuBar;
-  menu_bar->Append(menu, "&Debug");
-  SetMenuBar(menu_bar);
-#endif
 }
 
 
@@ -236,10 +362,10 @@ size it to the client area of the frame(frame size minus toolbar and menus )
 */
 //void JZEventFrame::CreateCanvas()
 //{
-//  cout << "createcanvas\n"; 
-//  int w, h;
-//  GetClientSize(&w, &h);
-//  Canvas = new tCanvas(this, 0, 0, w, h);
+//  cout << "CreateCanvas" << endl; 
+//  int Width, Height;
+//  GetClientSize(&Width, &Height);
+//  mpEventWindow = new JZEventWindow(this, 0, 0, Width, Height);
 //}
 
 /**
@@ -251,40 +377,38 @@ void JZEventFrame::Create()
   CreateMenu();
 
 //  CreateCanvas();
-//  SnapSel = new tSnapSelection(Canvas);
+//  SnapSel = new tSnapSelection(mpEventWindow);
 
 
   Setup();
-//  Canvas->SetScrollRanges();
-//  Canvas->SetScrollPosition(0,0);//this wasnt here before wx2, why?
+//  mpEventWindow->SetScrollRanges();
+//  mpEventWindow->SetScrollPosition(0, 0); //this wasnt here before wx2, why?
 }
 
 
-/**initialize the constants used in drawing*/
+// Initialize the constants used in drawing.
 void JZEventFrame::Setup()
 {
 /*
   int x, y;
 
-  wxDC* dc = new wxClientDC(Canvas);
-  //dc is from Canvas
-  dc->SetFont(wxNullFont);
+  wxClientDC Dc(mpEventWindow);
+  Dc.SetFont(wxNullFont);
   delete mpFixedFont;
   mpFixedFont = new wxFont(12, wxSWISS, wxNORMAL, wxNORMAL);
-  dc->SetFont(*mpFixedFont);
-  dc->GetTextExtent("M", &x, &y);
+  Dc.SetFont(*mpFixedFont);
+  Dc.GetTextExtent("M", &x, &y);
   hFixedFont = (int)y;
 
   delete mpFont;
   mpFont = new wxFont(FontSize, wxSWISS, wxNORMAL, wxNORMAL);
-  dc->SetFont(*mpFont);
+  Dc.SetFont(*mpFont);
 
-  dc->GetTextExtent("M", &x, &y);
+  Dc.GetTextExtent("M", &x, &y);
   LittleBit = (int)(x/2);
 
-  dc->GetTextExtent("HXWjgi", &x, &y);
+  Dc.GetTextExtent("HXWjgi", &x, &y);
   mTrackHeight = (int)y + LittleBit;
-  delete dc;
 */
 }
 
@@ -295,49 +419,55 @@ they dont overlap
 */
 void JZEventFrame::OnSize(wxSizeEvent& Event)
 {
-   //   wxFrame::OnSize(Event);
+//  wxFrame::OnSize(Event);
 
-   //the below code is from the toolbar sample, the layoutchidlren function
-    wxSize size = GetClientSize();
+  // The code below is from the toolbar sample, the layoutchidlren function
+  wxSize size = GetClientSize();
 
-    int offset;
-//     if ( mpToolBar )
-//     {
-//         mpToolBar->SetSize(-1, size.y);
-//         mpToolBar->Move(0, 0);
+  int offset;
+//  if (mpToolBar)
+//  {
+//    mpToolBar->SetSize(-1, size.y);
+//    mpToolBar->Move(0, 0);
+//
+//    offset = mpToolBar->GetSize().x;
+//  }
+//  else
+//  {
+//    offset = 0;
+//  }
 
-//         offset = mpToolBar->GetSize().x;
-//     }
-//     else
-//     {
-//         offset = 0;
-//     }
+    // The step below should set the offset of the mpEventWindow
+    // m_textWindow->SetSize(offset, 0, size.x - offset, size.y);
 
-    //the step below should set the offset of the Canvas
-    //m_textWindow->SetSize(offset, 0, size.x - offset, size.y);
+//  float maxToolBarWidth  = 0.0;
+//  float maxToolBarHeight = 0.0;
+//  if (mpToolBar)
+//  {
+//    mpToolBar->GetMaxSize(&maxToolBarWidth, &maxToolBarHeight);
+//  }
 
+  offset = mpToolBar->GetSize().y; //get the height of the toolbar
+
+  int frameWidth, frameHeight;
+  GetClientSize(&frameWidth, &frameHeight);
     
-
-//     float maxToolBarWidth  = 0.0;
-//     float maxToolBarHeight = 0.0;
-//     if (mpToolBar)
-//       mpToolBar->GetMaxSize(&maxToolBarWidth, &maxToolBarHeight);
-
-    offset = mpToolBar->GetSize().y; //get the height of the toolbar
-
-    int frameWidth, frameHeight;
-    GetClientSize(&frameWidth, &frameHeight);
-    
-//     if (Canvas)
-//       //       Canvas->SetSize(0, (int)offset, (int)frameWidth, (int)(frameHeight - offset));
-//       Canvas->SetSize(0, (int)0, (int)frameWidth, (int)(frameHeight));
+//     if (mpEventWindow)
+//       //       mpEventWindow->SetSize(0, (int)offset, (int)frameWidth, (int)(frameHeight - offset));
+//       mpEventWindow->SetSize(0, (int)0, (int)frameWidth, (int)(frameHeight));
 // //   if (mpToolBar)
 // //     mpToolBar->SetSize(0, 0, (int)frameWidth, (int)maxToolBarHeight);
 
-    cout<<"JZEventFrame::OnSize "<<frameWidth<<" "<<frameHeight<<"\n";
+  cout
+    << "JZEventFrame::OnSize " << frameWidth<< 'x' << frameHeight << endl;
+}
 
-
- }
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZEventFrame::OnCharHook(wxKeyEvent& e)
+{
+  return OnKeyEvent(e);
+}
 
 // *******************************************************************
 // Coord-Functions
@@ -396,6 +526,7 @@ int JZEventFrame::Line2y(int Line)
   return Line * mTrackHeight + mTopInfoHeight;
 }
 
+/*
 void JZEventFrame::LineText(wxDC *dc, int x, int y, int w, const char *str, int h, bool down)
 {
   if (h <= 0)
@@ -417,7 +548,8 @@ void JZEventFrame::LineText(wxDC *dc, int x, int y, int w, const char *str, int 
     y += 1;
     w -= 2;
     h -= 2;
-    if (down) {
+    if (down)
+    {
       dc->SetPen(*wxBLACK_PEN);
       dc->DrawLine(x, y, x+w, y);
       dc->DrawLine(x, y, x, y+h);
@@ -425,7 +557,8 @@ void JZEventFrame::LineText(wxDC *dc, int x, int y, int w, const char *str, int 
       dc->DrawLine(x+w, y, x+w, y+h);
       dc->DrawLine(x, y+h, x+w, y+h);
     }
-    else {
+    else
+    {
       dc->SetPen(*wxWHITE_PEN);
       dc->DrawLine(x, y, x+w, y);
       dc->DrawLine(x, y, x, y+h);
@@ -441,7 +574,7 @@ void JZEventFrame::LineText(wxDC *dc, int x, int y, int w, const char *str, int 
   dc->DrawText((char *)str, x + LittleBit, y + LittleBit);
   dc->SetTextBackground(*wxWHITE);
 }
-
+*/
 
 // *******************************************************************
 // Painting behavior
@@ -452,13 +585,13 @@ void JZEventFrame::Redraw()
 //   wxDC* dc=new wxClientDC(this);
 //   wxPaintEvent e;
 //   cout<<"FIXME JZEventFrame::Redraw"<<endl;
-//   Canvas->OnDraw(*dc); //this will in turn call the eventwin onpaintsub
+//   mpEventWindow->OnDraw(*dc); //this will in turn call the eventwin onpaintsub
 //   //the problem is that onpaint no longer tkes no argument, and is supposed to be called from the framework only, so it should be split
 //   delete dc;
 
 
 
-//  Canvas->Refresh();
+//  mpEventWindow->Refresh();
 
 }
 
@@ -468,7 +601,7 @@ void JZEventFrame::Redraw()
 
    it doesnt do any real drawing, instead it sets up some member vars, to be used by other parts of the class
 
-   it is now normally called from OnDraw in the Canvas class,and also overridden in the subclass.
+   it is now normally called from OnDraw in the mpEventWindow class,and also overridden in the subclass.
    so this one here just sets up  constants
 
 
@@ -603,7 +736,7 @@ void JZEventFrame::NewPlayPosition(int Clock)
     if (Clock > FromClock && ToClock >= Song->MaxQuarters * Song->TicksPerQuarter)
       return;
 //    int x = Clock2x(Clock);
-//    Canvas->SetScrollPosition(x - mLeftInfoWidth, CanvasY);
+//    mpEventWindow->SetScrollPosition(x - mLeftInfoWidth, CanvasY);
   }
 
   if (!SnapSel->Active)        // sets clipping
@@ -618,13 +751,13 @@ void JZEventFrame::NewPlayPosition(int Clock)
 //      invalidateRect.width=3;
 //      invalidateRect.height= 100000000;
 //      //DrawPlayPosition();
-//      Canvas->Refresh(TRUE,&invalidateRect);
+//      mpEventWindow->Refresh(TRUE,&invalidateRect);
 
 //      invalidateRect.x=Clock2x(PlayClock)-1;
-//      Canvas->Refresh(TRUE,&invalidateRect);
+//      mpEventWindow->Refresh(TRUE,&invalidateRect);
         //DrawPlayPosition();
 
-//      Canvas->Refresh();
+//      mpEventWindow->Refresh();
     }
   }
   if (NextWin)
@@ -945,10 +1078,10 @@ void JZEventFrame::ZoomIn()
 //    int x = CanvasX * 2;
 //    int y = CanvasY;
 
-//    wxDC* dc=new wxClientDC(Canvas);
+//    wxDC* dc=new wxClientDC(mpEventWindow);
 //    JZEventFrame::OnPaintSub(dc, x, y);
-//    Canvas->SetScrollRanges();
-//    Canvas->SetScrollPosition(x, y);
+//    mpEventWindow->SetScrollRanges();
+//    mpEventWindow->SetScrollPosition(x, y);
 //    if (x == 0)
 //      Redraw();
 
@@ -965,10 +1098,10 @@ void JZEventFrame::ZoomOut()
 //    int x = CanvasX / 2;
 //    int y = CanvasY;
 
-    //wxDC* dc=new wxClientDC(Canvas);
-    //JZEventFrame::OnPaintSub(dc, x, y);
-//    Canvas->SetScrollRanges();
-//    Canvas->SetScrollPosition(x, y);
+    //wxClientDC Dc(mpEventWindow);
+    //JZEventFrame::OnPaintSub(Dc, x, y);
+//    mpEventWindow->SetScrollRanges();
+//    mpEventWindow->SetScrollPosition(x, y);
     //if (x == 0)
     //  Redraw();
 //  }

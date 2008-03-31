@@ -31,45 +31,99 @@ class JZSong;
 class JZToolBar;
 class JZPianoFrame;
 
-/**
-JAVE i dont get the meaning of this class
-it seems to just fork out the method calls to its delegate, EventWin
-*/
-/*
-class tCanvas: public wxScrolledWindow
+//*****************************************************************************
+// Description:
+//   This class is derived from a wxWidgets scrolled window, and acts as the
+// common base class for JZTrackWindow and JSPianoWindow.
+//*****************************************************************************
+class JZEventWindow : public wxScrolledWindow
 {
   public:
-    JZEventFrame *EventWin;
-    tCanvas(JZEventFrame *frame, int x, int y, int w, int h, int style = 0);
-    void OnPaint(wxPaintEvent& event);
-    //    void OnEvent(wxMouseEvent& event);
-    void OnMouseEvent(wxMouseEvent& event);
-    void OnChar(wxKeyEvent& event);
-    bool OnCharHook(wxKeyEvent& event);
-    void SetScrollRanges();
+
+    tSnapSelection* mpSnapSel;
+
+    JZFilter* mpFilter;
+
+    JZEventWindow(
+      wxFrame* pParent,
+      JZSong* pSong,
+      const wxPoint& Position = wxDefaultPosition,
+      const wxSize& Size = wxDefaultSize);
+
+    virtual ~JZEventWindow();
+
+    // WARNING: non-constant access.
+    JZSong* GetSong() const;
+
+    int EventsSelected(const wxString& Message) const;
+
+    void LineText(
+      wxDC& Dc,
+      int x,
+      int y,
+      int Width,
+      const char* pString,
+      int Height = -1,
+      bool Down = false);
+
+//    void SetScrollRanges();
+
     void SetScrollPosition(int x, int y);
-    void OnDraw(wxDC& dc);
-    DECLARE_EVENT_TABLE()
+
+  protected:
+
+//    void OnPaint(wxPaintEvent& Event);
+//    void OnMouseEvent(wxMouseEvent& Event);
+//    void OnChar(wxKeyEvent& Event);
+//    bool OnCharHook(wxKeyEvent& Event);
+//    void OnDraw(wxDC& Dc);
+
+    int y2yLine(int y, int Up = 0);
+
+  protected:
+
+    static const int mScrollSize;
+
+    JZSong* mpSong;
+
+//    JZEventFrame* mpEventFrame;
+
+    wxColor* mpGreyColor;
+    wxBrush* mpGreyBrush;
+
+    int mTopInfoHeight;
+    int mTrackHeight;
+    int mLittleBit;
+
+
+//  DECLARE_EVENT_TABLE()
 };
-*/
 
+//*****************************************************************************
+// Description:
+//   These are the event window inline member functions.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+// WARNING: non-constant access.
+//-----------------------------------------------------------------------------
+inline
+JZSong* JZEventWindow::GetSong() const
+{
+  return mpSong;
+}
 
-/**
- * JZEventFrame
- *
- * A window with Panel, Canvas, Scrollbars, Menus,
- * common baseclass for TrackWin and PianoWin.
- *
- *Panel, menu is administered by derived class
- * Funktionen
- *   - Settings dialog
- *   - Selection via Snapsel
- */
-
-
+//*****************************************************************************
+// Description:
+//   A frame window that containes a scrolled event window.  Acts as the
+// common base class for JZTrackFrame and JSPianoFrame.
+//
+// The panel and menu are administered by derived classes.
+// Functionality:
+//   - Settings dialog
+//   - Selection via Snapsel
+//*****************************************************************************
 class JZEventFrame : public wxFrame
 {
-
   public:
 
     bool OnCharHook(wxKeyEvent& event);
@@ -96,7 +150,7 @@ class JZEventFrame : public wxFrame
     virtual void Create();
     virtual void CreateMenu();
     void CreateCanvas();
-//    tCanvas* Canvas;
+//    JZEventWindow* mpEventWindow;
 
     // Setup()
     wxFont* mpFont;
@@ -132,7 +186,7 @@ class JZEventFrame : public wxFrame
     int y2Line(int y, int up = 0);
     int y2yLine(int y, int up = 0);
     int Line2y(int line);
-    void LineText(wxDC *dc, int x, int y, int w, const char *str, int h = -1, bool down = FALSE);
+//    void LineText(wxDC *dc, int x, int y, int w, const char *str, int h = -1, bool down = false);
     int x2Clock(int x);
     int Clock2x(int clk);
     int x2BarClock(int x, int Next = 0);

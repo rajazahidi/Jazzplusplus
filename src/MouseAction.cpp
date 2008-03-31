@@ -22,10 +22,8 @@
 
 #include "WxWidgets.h"
 
-//#include "config.h"
 #include "MouseAction.h"
 #include "EventWindow.h"
-#include "DeprecatedStringUtils.h"
 
 using namespace std;
 
@@ -520,42 +518,75 @@ int tMarkDestin::LeftDown(wxMouseEvent &e)
   return 1;
 }
 
-// -------------------------------------------------------------------------
+//*****************************************************************************
 // tMouseButton - simulate a 3D button
-// -------------------------------------------------------------------------
-
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tMouseButton::tMouseButton(
-  JZEventFrame *win,
-  JZRectangle* r,
-  const char *down,
-  const char *up)
+  JZEventWindow* pEventWindow,
+  JZRectangle* pRectangle,
+  const char* pDownString,
+  const char* pUpString)
+  : mpEventWindow(pEventWindow),
+    mRectangle(*pRectangle),
+    mDownString(),
+    mUpString()
 {
-  this->win = win;
-  this->r   = *r;
-  if (up == 0)
-    up = down;
-  this->down = copystring(down);
-  this->up   = copystring(up);
-  wxDC* dc=new wxClientDC(win);
-  win->LineText(dc, r->x, r->y, r->width, (char *)down, r->height, TRUE);
+  if (pDownString)
+  {
+    mDownString = pDownString;
+  }
+
+  if (pUpString)
+  {
+    mUpString = pUpString;
+  }
+  else
+  {
+    mUpString = mDownString;
+  }
+
+  wxClientDC Dc(mpEventWindow);
+
+  mpEventWindow->LineText(
+    Dc,
+    mRectangle.x,
+    mRectangle.y,
+    mRectangle.GetWidth(),
+    mDownString.c_str(),
+    mRectangle.GetHeight(),
+    true);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tMouseButton::~tMouseButton()
 {
-  delete [] (char *)up;  // msvc is buggy!
-  delete [] (char *)down;
 }
 
-int tMouseButton::Event(wxMouseEvent &e)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int tMouseButton::Event(wxMouseEvent& MouseEvent)
 {
-  if (e.ButtonUp())
+  if (MouseEvent.ButtonUp())
   {
     Action();
-    wxDC* dc=new wxClientDC(win);
-    win->LineText(dc, r.x, r.y, r.width, (char *)up, r.height, false);
+
+    wxClientDC Dc(mpEventWindow);
+
+    mpEventWindow->LineText(
+      Dc,
+      mRectangle.x,
+      mRectangle.y,
+      mRectangle.GetWidth(),
+      mUpString.c_str(),
+      mRectangle.GetHeight(),
+      false);
+
     delete this;
+
     return 1;
   }
   return 0;
 }
-

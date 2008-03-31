@@ -240,7 +240,7 @@ void tCtrlEditBase::OnRevert()
 void tCtrlEditBase::OnApply()
 {
   wxBeginBusyCursor();
-  mpPianoWindow->mpSong->NewUndoBuffer();
+  mpPianoWindow->GetSong()->NewUndoBuffer();
   // delete old events, but skip clock 0 to preserve track defaults:
   // (dirty but might work...)
   tEventIterator iter(track);
@@ -360,7 +360,7 @@ void tCtrlEditBase::OnEdit()
 // av: called by tArrayEdit::OnPaint
 void tCtrlEditBase::DrawBars(wxDC* dc)
 {
-  JZBarInfo BarInfo(mpPianoWindow->mpSong);
+  JZBarInfo BarInfo(mpPianoWindow->GetSong());
   BarInfo.SetClock(from_clock);
   long gclk,x;
   int  ii;
@@ -515,7 +515,7 @@ void tVelocEdit::OnApply()
   static long from_clk, to_clk;
 
   wxBeginBusyCursor();
-  mpPianoWindow->mpSong->NewUndoBuffer();
+  mpPianoWindow->GetSong()->NewUndoBuffer();
 
   tEventIterator iter(track);
 
@@ -618,7 +618,7 @@ void tPolyAfterEdit::OnApply()
   }
 
   wxBeginBusyCursor();
-  mpPianoWindow->mpSong->NewUndoBuffer();
+  mpPianoWindow->GetSong()->NewUndoBuffer();
 
   tEventIterator iter(track);
 
@@ -768,7 +768,7 @@ void tChannelAfterEdit::UpDate()
 void tChannelAfterEdit::OnApply()
 {
   wxBeginBusyCursor();
-  mpPianoWindow->mpSong->NewUndoBuffer();
+  mpPianoWindow->GetSong()->NewUndoBuffer();
 
   // delete old events, but skip clock 0 to preserve track defaults:
   // (dirty but might work...)

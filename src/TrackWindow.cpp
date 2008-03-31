@@ -40,16 +40,19 @@ using namespace std;
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-BEGIN_EVENT_TABLE(JZTrackWindow, wxScrolledWindow)
-  EVT_SIZE(JZTrackWindow::OnSize)
-  EVT_ERASE_BACKGROUND(JZTrackWindow::OnEraseBackground)
-  EVT_LEFT_UP(JZTrackWindow::OnLeftButtonUp)
-  EVT_RIGHT_UP(JZTrackWindow::OnRightButtonUp)
-END_EVENT_TABLE()
+BEGIN_EVENT_TABLE(JZTrackWindow, JZEventWindow)
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-const int JZTrackWindow::mScrollSize = 50;
+  EVT_SIZE(JZTrackWindow::OnSize)
+
+  EVT_ERASE_BACKGROUND(JZTrackWindow::OnEraseBackground)
+
+  EVT_LEFT_DOWN(JZTrackWindow::OnLeftButtonDown)
+
+  EVT_LEFT_UP(JZTrackWindow::OnLeftButtonUp)
+
+  EVT_RIGHT_UP(JZTrackWindow::OnRightButtonUp)
+
+END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -58,24 +61,11 @@ JZTrackWindow::JZTrackWindow(
   JZSong* pSong,
   const wxPoint& Position,
   const wxSize& Size)
-  : wxScrolledWindow(
-      pParent,
-      wxID_ANY,
-      Position,
-      Size,
-      wxHSCROLL | wxVSCROLL | wxNO_FULL_REPAINT_ON_RESIZE),
-    mpFilter(0),
-    mpSnapSel(0),
-    mpSong(pSong),
-    mpGreyColor(0),
-    mpGreyBrush(0),
-    mTrackHeight(10),
-    mTopInfoHeight(40),
+  : JZEventWindow(pParent, pSong, Position, Size),
     mLeftInfoWidth(100),
     mClocksPerPixel(36),
     mPlayClock(-1),
     mUseColors(true),
-    mLittleBit(2),
     mEventsX(),
     mEventsY(),
     mEventsWidth(),
@@ -107,18 +97,6 @@ JZTrackWindow::JZTrackWindow(
     mDrawing(false),
     mpFrameBuffer(0)
 {
-#ifdef __WXMSW__
-  mpGreyColor = new wxColor(192, 192, 192);
-#else
-  mpGreyColor = new wxColor(220, 220, 220);
-#endif
-
-  mpGreyBrush = new wxBrush(*mpGreyColor, wxSOLID);
-
-  mpSnapSel = new tSnapSelection(this);
-
-  mpFilter = new JZFilter(mpSong);
-
   SetBackgroundColour(*wxWHITE);
 
   mpFrameBuffer = new wxBitmap;
@@ -128,12 +106,8 @@ JZTrackWindow::JZTrackWindow(
 //-----------------------------------------------------------------------------
 JZTrackWindow::~JZTrackWindow()
 {
-  delete mpGreyColor;
-  delete mpGreyBrush;
   delete mpFixedFont;
   delete mpFont;
-  delete mpSnapSel;
-  delete mpFilter;
   delete mpFrameBuffer;
 }
 
@@ -159,10 +133,10 @@ void JZTrackWindow::Create()
   Dc.GetTextExtent("M", &Width, &Height);
   mLittleBit = Width / 2;
 
+  mTopInfoHeight = mFixedFontHeight + 2 * mLittleBit;
+
   Dc.GetTextExtent("HXWjgi", &Width, &Height);
   mTrackHeight = Height + 2 * mLittleBit;
-
-  mTopInfoHeight = mFixedFontHeight + 2 * mLittleBit;
 
   Dc.GetTextExtent("999", &Width, &Height);
   mNumberWidth = Width + 2 * mLittleBit;
@@ -284,6 +258,20 @@ void JZTrackWindow::OnEraseBackground(wxEraseEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void JZTrackWindow::OnLeftButtonDown(wxMouseEvent& Event)
+{
+  wxPoint Point = Event.GetPosition();
+
+  if (
+    Point.x >= mEventsX && Point.x < mEventsX + mEventsWidth &&
+    Point.y >= mEventsY && Point.y < mEventsY + mEventsHeight)
+  {
+    SnapSelectionStart(Event);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& Event)
 {
   wxPoint Point = Event.GetPosition();
@@ -352,6 +340,12 @@ void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& Event)
   else if (Point.x >= mStateX && Point.x < mStateX + mStateWidth)
   {
     ToggleTrackState(Point);
+  }
+  else if (
+    Point.x >= mEventsX && Point.x < mEventsX + mEventsWidth &&
+    Point.y >= mEventsY && Point.y < mEventsY + mEventsHeight)
+  {
+    SnapSelectionStop(Event);
   }
 }
 
@@ -1098,20 +1092,6 @@ JZTrack* JZTrackWindow::y2Track(int y)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZTrackWindow::y2yLine(int y, int Up)
-{
-  if (Up)
-  {
-    y += mTrackHeight;
-  }
-  y -= mTopInfoHeight;
-  y -= y % mTrackHeight;
-  y += mTopInfoHeight;
-  return y;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 int JZTrackWindow::x2Clock(int x)
 {
   return (x - mEventsX) * mClocksPerPixel + mFromClock;
@@ -1187,15 +1167,6 @@ void JZTrackWindow::SetScrollRanges(const int& x, const int& y)
     x,
     y);
   EnableScrolling(false, false);
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZTrackWindow::SetScrollPosition(int x, int y)
-{
-  x /= mScrollSize;
-  y /= mScrollSize;
-  Scroll(x, y);
 }
 
 //-----------------------------------------------------------------------------
@@ -1365,5 +1336,32 @@ void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
         }
       }
     }
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::SnapSelectionStart(wxMouseEvent& Event)
+{
+  mpSnapSel->SetXSnap(mBarCount, mBarX);
+  mpSnapSel->SetYSnap(
+    TrackIndex2y(mFromLine),
+    mEventsY + mEventsHeight,
+    mTrackHeight);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::SnapSelectionStop(wxMouseEvent& Event)
+{
+  if (mpSnapSel->Selected)
+  {
+    mpFilter->FromTrack = y2TrackIndex(mpSnapSel->r.y);
+    mpFilter->ToTrack   = y2TrackIndex(
+      mpSnapSel->r.y + mpSnapSel->r.GetHeight() - 1);
+    mpFilter->FromClock = x2BarClock(mpSnapSel->r.x + 1);
+    mpFilter->ToClock = x2BarClock(
+      mpSnapSel->r.x + mpSnapSel->r.GetWidth() + 1);
+//    NextWin->NewPosition(mpFilter->FromTrack, mpFilter->FromClock);
   }
 }

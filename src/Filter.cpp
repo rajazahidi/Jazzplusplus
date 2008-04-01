@@ -113,7 +113,7 @@ JZFilter::~JZFilter()
 class tFilterDlg : public tPropertyListDlg
 {
   JZFilter *Filter;
-  tClockDlg FromClockDlg, ToClockDlg;
+  JZClockDialog FromClockDlg, ToClockDlg;
 
  public:
   tFilterDlg(JZFilter *f, JZSong *s, int ShowEventStats);

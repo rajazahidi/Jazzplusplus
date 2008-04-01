@@ -29,28 +29,40 @@
 #include "DeprecatedWx/proplist.h"
 
 //*****************************************************************************
-// tClockDlg
+// Description:
+//   This is the clock dialog class declaration.
 //*****************************************************************************
-tClockDlg::tClockDlg(JZSong *s, char *t, long c)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZClockDialog::JZClockDialog(JZSong* pSong, char* pTitle, int Clock)
 {
-  char buf[500];
-  s->Clock2String(c, buf);
-  String = copystring(buf);
-  Title = t;
-  Song = s;
+  char Buffer[500];
+  pSong->Clock2String(Clock, Buffer);
+  mpString = copystring(Buffer);
+  mpTitle = pTitle;
+  mpSong = pSong;
 }
 
-tClockDlg::~tClockDlg()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZClockDialog::~JZClockDialog()
 {
-  delete String;
+  delete mpString;
 }
 
-wxProperty* tClockDlg::mkProperty()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+wxProperty* JZClockDialog::mkProperty()
 {
-  return new wxProperty(Title, wxPropertyValue((char**)&String), "string"); 
+  return new wxProperty(
+    mpTitle,
+    wxPropertyValue((char**)&mpString),
+    "string"); 
 }
 
-long tClockDlg::GetClock()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZClockDialog::GetClock()
 {
-  return Song->String2Clock(String);
+  return mpSong->String2Clock(mpString);
 }

@@ -26,18 +26,29 @@
 class JZSong;
 class wxProperty;
 
-class tClockDlg
+//*****************************************************************************
+//*****************************************************************************
+class JZClockDialog
 {
-  char *String;
-  char *Title;
-  JZSong *Song;
-
   public:
-    tClockDlg(JZSong *s, char *title, long clk);
-    ~tClockDlg();
-  //wxFormItem *mkFormItem(int w);
+
+    JZClockDialog(JZSong* pSong, char* pTitle, int Clock);
+
+    ~JZClockDialog();
+
+//    wxFormItem *mkFormItem(int w);
+
     wxProperty* mkProperty();
-    long GetClock();
+
+    int GetClock();
+
+  private:
+
+    char* mpString;
+
+    char* mpTitle;
+
+    JZSong* mpSong;
 };
 
 #endif // !defined(JZ_CLOCKDIALOG_H)

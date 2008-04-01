@@ -741,7 +741,7 @@ class tEventDlg : public tPropertyListDlg
   public:
 
     JZTrack    *Track;
-    tClockDlg ClockDlg;
+    JZClockDialog ClockDlg;
     JZPianoWindow* Win;
 
     JZEvent    *Event;

@@ -228,6 +228,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\AsciiMidiFile.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\AsciiMidiFile.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Audio.cpp"
 				>
 			</File>

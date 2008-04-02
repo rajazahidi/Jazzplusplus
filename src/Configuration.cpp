@@ -706,46 +706,65 @@ void tConfig::LoadConfig(const wxString& FileName)
       // Voice names
       if (pVector == &mVoiceNames)
       {
-        assert(0 <= VoiceIndex && VoiceIndex < mVoiceNames.size());
-
-        long val;
-        sscanf(buf, " %ld %n", &val, &j);
-        if (gpConfig->GetValue(C_UseTwoCommandBankSelect))
+        if (VoiceIndex >= 0 && VoiceIndex < mVoiceNames.size())
         {
-          assert(0 <= val && val <= 65536);
+          int Value;
+          sscanf(buf, " %d %n", &Value, &j);
+
+          if (gpConfig->GetValue(C_UseTwoCommandBankSelect))
+          {
+            assert(0 <= Value && Value <= 65536);
+          }
+          else
+          {
+            assert(0 <= Value && Value <= 32639);
+          }
+
+          mVoiceNames[VoiceIndex + 1].second = Value + 1;
+
+          // Remove the off \n.
+          buf[strlen(buf) - 1] = 0;
+
+          mVoiceNames[VoiceIndex + 1].first = buf + j;
+
+          ++VoiceIndex;
         }
         else
         {
-          assert(0 <= val && val <= 32639);
+          cout
+            << "Voice index \"" << VoiceIndex << "\" out of range."
+            << endl;
         }
-        mVoiceNames[VoiceIndex + 1].second = val + 1;
-
-        buf[strlen(buf) - 1] = 0;        // cut off \n
-        mVoiceNames[VoiceIndex + 1].first = buf + j;
-
-        ++VoiceIndex;
       }
 
       // Drumset names
       else if (pVector == &mDrumSets)
       {
-        long val;
-        assert(0 <= DrumsetIndex && DrumsetIndex < 129);
-        sscanf(buf, " %ld %n", &val, &j);
-        if (gpConfig->GetValue(C_UseTwoCommandBankSelect))
+        if (DrumsetIndex >= 0 && DrumsetIndex < 129)
         {
-          assert(0 <= val && val <= 65536);
+          int Value;
+          sscanf(buf, " %d %n", &Value, &j);
+          if (gpConfig->GetValue(C_UseTwoCommandBankSelect))
+          {
+            assert(0 <= Value && Value <= 65536);
+          }
+          else
+          {
+            assert(0 <= Value && Value <= 32639);
+          }
+          mDrumSets[DrumsetIndex + 1].second = Value + 1;
+
+          buf[strlen(buf) - 1] = 0;        // cut off \n
+          mDrumSets[DrumsetIndex + 1].first = buf + j;
+
+          ++DrumsetIndex;
         }
         else
         {
-          assert(0 <= val && val <= 32639);
+          cout
+            << "Drumset index \"" << DrumsetIndex << "\" out of range."
+            << endl;
         }
-        mDrumSets[DrumsetIndex + 1].second = val + 1;
-
-        buf[strlen(buf) - 1] = 0;        // cut off \n
-        mDrumSets[DrumsetIndex + 1].first = buf + j;
-
-        ++DrumsetIndex;
       }
 
       // Controller names.

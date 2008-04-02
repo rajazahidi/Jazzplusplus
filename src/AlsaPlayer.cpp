@@ -930,7 +930,7 @@ int tAlsaPlayer::FindMidiDevice()
 //-----------------------------------------------------------------------------
 int tAlsaPlayer::select_list(
   tAlsaDeviceList& list,
-  char* title,
+  const char* title,
   int def_device)
 {
   if (list.GetCount() > 0)

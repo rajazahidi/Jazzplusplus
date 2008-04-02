@@ -90,7 +90,7 @@ class tAlsaPlayer : public JZPlayer
     void scan_clients(
       tAlsaDeviceList& Devicelist,
       unsigned DeviceCapabilities);
-    int select_list(tAlsaDeviceList &list, char *title, int def_device);
+    int select_list(tAlsaDeviceList &list, const char *title, int def_device);
     int  start_timer(long clock);
     int write(snd_seq_event_t *ev) { return write(ev, 0); } // 0 == ok
     int write(snd_seq_event_t *ev, int now); // 0 == ok

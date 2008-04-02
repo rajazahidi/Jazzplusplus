@@ -23,6 +23,7 @@
 #include "WxWidgets.h"
 #include <wx/config.h>
 #include <wx/filename.h>
+#include <wx/file.h>
 
 #include "Project.h"
 #include "RecordingInfo.h"
@@ -360,39 +361,28 @@ void JZProject::ReadConfiguration()
   wxString ConfFileNameAndPath = ConfFilePath + mConfFileName;
 
   // Test for the existence of the Jazz++ configuration file.
-  ifstream Is;
-  Is.open(ConfFileNameAndPath.c_str());
-  if (!Is)
+  if (!::wxFileExists(ConfFileNameAndPath))
   {
-    // Close and clear the stream.
-    Is.close();
-    Is.clear();
-
     // Return a valid path to the data.
     FindAndRegisterConfFilePath(ConfFilePath);
     ConfFileNameAndPath = ConfFilePath + mConfFileName;
 
     // Try one more time.
-    Is.open(ConfFileNameAndPath.c_str());
-    if (!Is)
+    if (!::wxFileExists(ConfFileNameAndPath))
     {
-      wxMessageBox(
-        "Could not find configuration file.",
-        "Warning",
-        wxOK);
+      ConfFileNameAndPath.clear();
     }
-    Is.close();
-    Is.clear();
   }
-
-  cout
-    << "JZProject::ReadConfiguration() ConfFileNameAndPath:" << '\n'
-    << "  \"" << ConfFileNameAndPath << '"'
-    << endl;
 
   if (!ConfFileNameAndPath.IsEmpty())
   {
+    cout
+      << "JZProject::ReadConfiguration() ConfFileNameAndPath:" << '\n'
+      << "  \"" << ConfFileNameAndPath << '"'
+      << endl;
+
     mpConfig->LoadConfig(ConfFileNameAndPath);
+
     DEBUG(
       if (BankTable != (tDoubleCommand *) NULL)
       {

@@ -216,7 +216,7 @@ JZProject::JZProject()
     if (!mpMidiPlayer->Installed())
     {
       cerr
-        << "Could not connect to midinet server at host \"
+        << "Could not connect to midinet server at host \""
         << %midinethost << "\"\n"
         << "Jazz will start with no play/record ability."
         << endl;

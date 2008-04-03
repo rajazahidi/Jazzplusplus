@@ -1,5 +1,5 @@
 /* XPM */
-static char *cutpaste_xpm[] = {
+static const char *cutpaste_xpm[] = {
 /* width height ncolors chars_per_pixel */
 "20 19 5 1",
 /* colors */

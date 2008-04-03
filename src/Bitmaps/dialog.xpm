@@ -1,5 +1,5 @@
 /* XPM */
-static char *dialog_xpm[] = {
+static const char *dialog_xpm[] = {
 /* width height ncolors chars_per_pixel */
 "20 19 4 1",
 /* colors */

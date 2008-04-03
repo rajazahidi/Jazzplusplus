@@ -1,5 +1,5 @@
 /* XPM */
-static char *note8_xpm[] = {
+static const char *note8_xpm[] = {
 /* width height ncolors chars_per_pixel */
 "20 19 4 1",
 /* colors */

@@ -1,5 +1,5 @@
 /* XPM */
-static char* JazzLogo_xpm[] = {
+static const char* JazzLogo_xpm[] = {
 /* width height ncolors chars_per_pixel */
 "450 67 127 2",
 /* colors */

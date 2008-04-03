@@ -1,5 +1,5 @@
 /* XPM */
-static char *transpos_xpm[] = {
+static const char *transpos_xpm[] = {
 /* width height ncolors chars_per_pixel */
 "20 19 5 1",
 /* colors */

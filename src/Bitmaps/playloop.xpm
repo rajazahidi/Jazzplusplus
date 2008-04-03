@@ -1,5 +1,5 @@
 /* XPM */
-static char *playloop_xpm[] = {
+static const char *playloop_xpm[] = {
 /* width height ncolors chars_per_pixel */
 "20 19 5 1",
 /* colors */

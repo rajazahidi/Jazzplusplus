@@ -1,5 +1,5 @@
 /* XPM */
-static char *rrgup_xpm[] = {
+static const char *rrgup_xpm[] = {
 /* width height ncolors chars_per_pixel */
 "20 19 4 1",
 /* colors */

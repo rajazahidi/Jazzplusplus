@@ -198,7 +198,17 @@ void tEqualizer::Action()
 #define CV_SINE1  5
 #define CV_SINE2  6
 
-static char *cv_strings[] = { "Linear", "Expo 1", "Expo 2", "Expo 3", "Expo 4", "Sine 1", "Sine 2", 0 };
+static const char* cv_strings[] =
+{
+  "Linear",
+  "Expo 1",
+  "Expo 2",
+  "Expo 3",
+  "Expo 4",
+  "Sine 1",
+  "Sine 2",
+  0
+};
 
 int tDistortion::geo[4] = { 50, 80, 300, 320 };
 
@@ -221,9 +231,11 @@ void tDistortion::AddItems()
   action = new wxButton(panel, wxID_ANY, "Ok");      //(wxFunction)ItemCallback,
   cancel = new wxButton(panel, wxID_ANY, "Cancel");  //(wxFunction)ItemCallback,
   curve  = new wxChoice(panel, wxID_ANY);//, "Presets"); //(wxFunction)ItemCallback,
-  char **s = cv_strings;
+  const char **s = cv_strings;
   while (*s)
+  {
     curve->Append(*s++);
+  }
 }
 
 void tDistortion::AddEdits()

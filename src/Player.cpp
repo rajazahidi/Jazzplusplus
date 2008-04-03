@@ -1455,56 +1455,69 @@ tSeq2Player::~tSeq2Player()
  }
 
 
- int tSeq2Player::FindMidiDevice()
- {
-   struct synth_info si;
-   int i, nrsynths, ninp;
+int tSeq2Player::FindMidiDevice()
+{
+  struct synth_info si;
+  int i, nrsynths, ninp;
 
-   if (ioctl(seqfd, SNDCTL_SEQ_NRSYNTHS, &nrsynths) == -1) {
-     perror("SNDCTL_SEQ_NRSYNTHS");
-     return -1;
-   }
+  if (ioctl(seqfd, SNDCTL_SEQ_NRSYNTHS, &nrsynths) == -1)
+  {
+    perror("SNDCTL_SEQ_NRSYNTHS");
+    return -1;
+  }
 
-   wxString *devs = new wxString[nrsynths];
+  wxString *devs = new wxString[nrsynths];
 
-   ninp = 0;
-   for (i = 0; i < nrsynths; i++) {
-     si.device = i;
-     if (ioctl(seqfd, SNDCTL_SYNTH_INFO, &si) == -1) {
-       perror("SNDCTL_SYNTH_INFO");
-       return -1;
-     }
-     //if (si.synth_type == SYNTH_TYPE_MIDI || si.synth_type == SYNTH_TYPE_SAMPLE)
-     {
-         devs[ninp] = si.name;
-         ninp++;
-     }
-   }
+  ninp = 0;
+  for (i = 0; i < nrsynths; i++)
+  {
+    si.device = i;
+    if (ioctl(seqfd, SNDCTL_SYNTH_INFO, &si) == -1)
+    {
+      perror("SNDCTL_SYNTH_INFO");
+      return -1;
+    }
+ //    if (si.synth_type == SYNTH_TYPE_MIDI || si.synth_type == SYNTH_TYPE_SAMPLE)
+    {
+      devs[ninp] = si.name;
+      ninp++;
+    }
+  }
 
-   if (ninp > 0) {
-     char *title = "MIDI Device";
-     wxSingleChoiceDialog *dialog = new wxSingleChoiceDialog(gpTrackWindow,
-                                                             title,
-                                                             title,
-                                                             ninp,
-                                                             devs);
-     if(mididev != -1) dialog->SetSelection(mididev);
+  if (ninp > 0)
+  {
+    const char* pTitle = "MIDI Device";
+    wxSingleChoiceDialog *dialog = new wxSingleChoiceDialog(
+      gpTrackWindow,
+      pTitle,
+      pTitle,
+      ninp,
+      devs);
 
-     int res = dialog->ShowModal();
-     int k = dialog->GetSelection();
-     dialog->Destroy();
+    if (mididev != -1)
+    {
+      dialog->SetSelection(mididev);
+    }
 
-     delete [] devs;
+    int res = dialog->ShowModal();
+    int k = dialog->GetSelection();
+    dialog->Destroy();
 
-     if(res == wxCANCEL) k = -1;
+    delete [] devs;
 
-     return k;
+    if (res == wxCANCEL)
+    {
+      k = -1;
+    }
 
-   } else {
-     delete [] devs;
-     cerr << "no midi device found!\n";
-     return -1;
-   }
+    return k;
+  }
+  else
+  {
+    delete [] devs;
+    cerr << "no midi device found!\n";
+    return -1;
+  }
 }
 
 void tSeq2Player::SetSoftThru(int on, int idummy, int odummy)

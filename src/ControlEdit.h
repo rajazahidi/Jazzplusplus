@@ -35,7 +35,9 @@ class tCtrlEditBase;
 class tCtrlPanel : public wxPanel
 {
   public:
-  friend class tCtrlEditBase;
+
+    friend class tCtrlEditBase;
+
     tCtrlPanel(
       tCtrlEditBase* e,
       wxWindow* pParent,
@@ -44,11 +46,12 @@ class tCtrlPanel : public wxPanel
       int width=-1,
       int height=-1,
       long style=0,
-      char *name = "panel")
-      : wxPanel(pParent, x, y, width, height, style, name)
+      const char* pName = "panel")
+      : wxPanel(pParent, x, y, width, height, style, pName)
     {
       edit = e;
     }
+
     tCtrlEditBase *edit;
 };
 

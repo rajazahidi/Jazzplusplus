@@ -27,12 +27,9 @@ class wxProperty;
 
 class tKeyDlg
 {
-    char *String;
-    char *Title;
-
   public:
 
-    tKeyDlg(char *title, int Key);
+    tKeyDlg(const char* pTitle, int Key);
 
     ~tKeyDlg();
 
@@ -41,6 +38,12 @@ class tKeyDlg
     wxProperty* mkProperty();
 
     int GetKey();
+
+  private:
+
+    char* mpString;
+
+    const char* mpTitle;
 };
 
 #endif // !defined(JZ_KEYDIALOG_H)

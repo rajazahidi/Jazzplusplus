@@ -1473,7 +1473,7 @@ void EventDialog(
     return;
 
   tEventDlg *dlg = 0;
-  char *str = 0;
+  const char* str = 0;
   switch (e->Stat)
   {
     case StatKeyOn:

@@ -26,7 +26,7 @@
 
 void Key2Str(int Key, char* pString)
 {
-  static char* pNames[] =
+  static const char* pNames[] =
   {
     "C",
     "C#",
@@ -48,8 +48,8 @@ void Key2Str(int Key, char* pString)
 
 int Str2Key(const char *pString)
 {
-  static char sKey[] = "cCdDeEfFgGaAbB";
-  static int  nKey[] =
+  static const char sKey[] = "cCdDeEfFgGaAbB";
+  static int nKey[] =
   {
     0,
     0,

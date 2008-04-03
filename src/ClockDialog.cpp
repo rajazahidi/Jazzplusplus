@@ -34,7 +34,7 @@
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZClockDialog::JZClockDialog(JZSong* pSong, char* pTitle, int Clock)
+JZClockDialog::JZClockDialog(JZSong* pSong, const char* pTitle, int Clock)
 {
   char Buffer[500];
   pSong->Clock2String(Clock, Buffer);

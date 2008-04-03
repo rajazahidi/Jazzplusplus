@@ -45,7 +45,7 @@ class tFltEvent
 {
   public:
     int  Stat;
-    char *Name;
+    const char* Name;
     bool Selected;
     int MinValue, MaxValue;
     int FromValue, ToValue;

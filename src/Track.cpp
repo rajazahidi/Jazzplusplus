@@ -2089,11 +2089,11 @@ void JZTrack::Clear()
 
 // ----------------------- Copyright ------------------------------------
 
-char* JZTrack::GetCopyright()
+const char* JZTrack::GetCopyright()
 {
   if (Copyright)
   {
-    return (char *)Copyright->Data;
+    return (const char *)Copyright->Data;
   }
   return "";
 }
@@ -2120,11 +2120,11 @@ void JZTrack::SetCopyright(char *str)
 
 // ----------------------- Name ------------------------------------
 
-char* JZTrack::GetName()
+const char* JZTrack::GetName()
 {
   if (mName)
   {
-    return (char *)mName->Data;
+    return (const char*)mName->Data;
   }
   return "";
 }
@@ -3335,7 +3335,7 @@ int JZTrack::GetCurrentSpeed(int clk)
 // ------------------------- State ----------------------------------
 
 
-char *JZTrack::GetStateChar()
+const char* JZTrack::GetStateChar()
 {
   switch (State)
   {

@@ -32,7 +32,7 @@ class JZClockDialog
 {
   public:
 
-    JZClockDialog(JZSong* pSong, char* pTitle, int Clock);
+    JZClockDialog(JZSong* pSong, const char* pTitle, int Clock);
 
     ~JZClockDialog();
 
@@ -46,7 +46,7 @@ class JZClockDialog
 
     char* mpString;
 
-    char* mpTitle;
+    const char* mpTitle;
 
     JZSong* mpSong;
 };

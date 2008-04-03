@@ -440,20 +440,24 @@ class JZTrack : public tEventArray
     }
 
     void Merge(tEventArray *other);
-    void MergeRange(tEventArray *other, int FromClock, int ToClock, int Replace = 0);
+    void MergeRange(
+      tEventArray *other,
+      int FromClock,
+      int ToClock,
+      int Replace = 0);
     void Undo();
     void Redo();
     void NewUndoBuffer();
     void Clear();
     void Cleanup();
 
-    char *GetName();
+    const char* GetName();
     void SetName(char *Name);
 
-    char *GetCopyright();
+    const char* GetCopyright();
     void SetCopyright(char *Copyright);
 
-    char *GetStateChar();
+    const char* GetStateChar();
     void SetState(int NewState);
     void ToggleState(int Direction);   // +1 = next, -1 = prev
 

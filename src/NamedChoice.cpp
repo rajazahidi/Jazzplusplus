@@ -30,7 +30,7 @@
 using namespace std;
 
 tNamedChoice::tNamedChoice(
-  char* pTitle,
+  const char* pTitle,
   const std::vector<std::pair<std::string, int> >& Pairs,
   int* pResult)
   : //mpTitle(pTitle),
@@ -56,8 +56,15 @@ wxFormItem *tNamedChoice::mkFormItem(int w, int h)
       list->Append((wxObject *)copystring(mpValues[i].Name));
 
   wxFormItemConstraint *constraint = wxMakeConstraintStrings(list);
-  return wxMakeFormString(mpTitle, &mpSelection, wxFORM_SINGLE_LIST, new wxList(constraint, 0),
-    0, 0, w, h);
+  return wxMakeFormString(
+     mpTitle,
+     &mpSelection,
+     wxFORM_SINGLE_LIST,
+     new wxList(constraint, 0),
+     0,
+     0,
+     w,
+     h);
 }
 #endif
 

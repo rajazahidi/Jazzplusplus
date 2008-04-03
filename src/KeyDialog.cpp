@@ -27,33 +27,34 @@
 #include "DeprecatedStringUtils.h"
 #include "DeprecatedWx/proplist.h"
 
-tKeyDlg::tKeyDlg(char *t, int Key)
+tKeyDlg::tKeyDlg(const char* pTitle, int Key)
 {
   char buf[50];
   Key2Str(Key, buf);
-  String = copystring(buf);
-  Title = t;
+  mpString = copystring(buf);
+  mpTitle = pTitle;
 }
 
 
 tKeyDlg::~tKeyDlg()
 {
-  delete String;
+  delete mpString;
 }
 
 #ifdef OBSOLETE
 wxFormItem *tKeyDlg::mkFormItem(int w)
 {
-  return wxMakeFormString(Title, &String, wxFORM_DEFAULT,0,0,0,w);
+  return wxMakeFormString(mpTitle, &mpString, wxFORM_DEFAULT, 0, 0, 0, w);
 }
 #endif
 
-wxProperty* tKeyDlg::mkProperty(){
-  return new wxProperty(Title, wxPropertyValue((char**)&String), "string"); 
+wxProperty* tKeyDlg::mkProperty()
+{
+  return new wxProperty(mpTitle, wxPropertyValue((char**)&mpString), "string"); 
 }
 
 int tKeyDlg::GetKey()
 {
-  return Str2Key(String);
+  return Str2Key(mpString);
 }
 

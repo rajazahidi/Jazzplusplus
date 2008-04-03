@@ -37,7 +37,7 @@ class tNamedChoice : public wxObject
   public:
 
     tNamedChoice(
-      char* pTitle,
+      const char* pTitle,
       const std::vector<std::pair<std::string, int> >& Pairs,
       int* pResult);
 

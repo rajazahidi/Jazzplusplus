@@ -16,6 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "WxWidgets.h"
+
 #include <wx/fs_zip.h>
 #include <wx/xrc/xmlres.h>
 

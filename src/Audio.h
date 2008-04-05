@@ -23,10 +23,6 @@
 #ifndef JZ_AUDIO_H
 #define JZ_AUDIO_H
 
-#include "WxWidgets.h"
-
-//#include "config.h"
-
 #include "DynamicArray.h"
 #include "Project.h"
 
@@ -84,75 +80,95 @@ class tSampleVoice;
 #define WAVEHDR void
 #endif
 
-struct tAudioBuffer {
+struct tAudioBuffer
+{
+  // This is a Microsoft Windows for mswin wavehdr
+  WAVEHDR* hdr;
+  short* data;
 
-  WAVEHDR *hdr;   // for mswin wavehdr
-  short   *data;
-
-  tAudioBuffer(int dummy) {
+  tAudioBuffer(int dummy)
+  {
     hdr  = 0;
     data = new short [BUFSHORTS];
     // in case recording stops inside a buffer
     memset(data, 0, BUFBYTES);
   }
 
-  ~tAudioBuffer() {
+  ~tAudioBuffer()
+  {
     delete [] data;
   }
 
-  void Clear() {
+  void Clear()
+  {
     memset(data, 0, BUFBYTES);
   }
 
-  short *Data() {
+  short* Data()
+  {
     return data;
   }
-
-
 };
 
 
 DECLARE_ARRAY(tAudioBufferArray, tAudioBuffer*)
 
 
-class tAudioBufferQueue {
+class tAudioBufferQueue
+{
   public:
-    tAudioBufferQueue() {
+
+    tAudioBufferQueue()
+    {
       Clear();
     }
 
-    ~tAudioBufferQueue() {
+    ~tAudioBufferQueue()
+    {
     }
 
-    void Clear() {
+    void Clear()
+    {
       written = read = 0;
       for (int i = 0; i < BUFCOUNT; i++)
+      {
         array[i] = 0;
+      }
     }
 
-    int  Count() const {
+    int  Count() const
+    {
       return written - read;
     }
 
-    int  Empty() const {
+    int  Empty() const
+    {
       return written == read;
     }
 
-    void Put(tAudioBuffer *buf) {
+    void Put(tAudioBuffer *buf)
+    {
       array[written++ % BUFCOUNT] = buf;
     }
 
-    tAudioBuffer *Get() {
+    tAudioBuffer* Get()
+    {
       if (written == read)
+      {
         return 0;
+      }
       return(array[read++ % BUFCOUNT]);
     }
-    void UnGet(tAudioBuffer *buf) {
+
+    void UnGet(tAudioBuffer* buf)
+    {
       array[ --read % BUFCOUNT ] = buf;
     }
 
   private:
-    tAudioBuffer *array[BUFCOUNT];
+
+    tAudioBuffer* array[BUFCOUNT];
+
     int read, written;
 };
 
@@ -162,24 +178,32 @@ class tAudioRecordBuffer
 {
   friend class tSampleSet;
   friend class tWinAudioPlayer;
+
   public:
-    tAudioRecordBuffer() {
+
+    tAudioRecordBuffer()
+    {
       num_buffers = 0;
     }
-    ~tAudioRecordBuffer() {
+
+    ~tAudioRecordBuffer()
+    {
       Clear();
     }
 
     void Clear();
     tAudioBuffer * RequestBuffer();
-    void UndoRequest() {
+    void UndoRequest()
+    {
       num_buffers--;
     }
-    void ResetBufferSize(int size) {
+    void ResetBufferSize(int size)
+    {
       bufbytes = size;
     }
 
   private:
+
     tAudioBufferArray buffers;
     int num_buffers;
     int bufbytes;
@@ -207,7 +231,9 @@ class tSampleSet
   public:
 
     tSampleSet(long ticks_per_minute);
+
     virtual ~tSampleSet();
+
     int Load(const wxString& FileName);
 
     // load jazz.spl
@@ -272,8 +298,10 @@ class tSampleSet
 
     long Ticks2Samples(long ticks) const
     {
-      long spl = (long)((double)ticks * 60.0 * speed * channels / (double)ticks_per_minute);
-      // align to first channel
+      long spl =
+        (long)(60.0 * ticks * speed * channels / (double)ticks_per_minute);
+
+      // Align to the first channel.
       return spl & -channels;
     }
 
@@ -285,7 +313,7 @@ class tSampleSet
     // time in millisec
     long Ticks2Time(long ticks) const
     {
-      return (long)((double)ticks * 60000.0 / ticks_per_minute);
+      return (long)(60000.0 * ticks / ticks_per_minute);
     }
 
     long Time2Ticks(long time) const
@@ -295,7 +323,7 @@ class tSampleSet
 
     long Samples2Time(long samples) const
     {
-      return (long)(1000.0 * (double)samples / speed / channels);
+      return (long)(1000.0 * samples / speed / channels);
     }
 
     long Time2Samples(long time) const
@@ -304,17 +332,28 @@ class tSampleSet
     }
 
     virtual const char *GetSampleName(int i);
+
     int OnMenuCommand(int id);
+
     void StartPlay(long clock);
+
     void StopPlay();
 
     // returns number of buffers prepared. Output starts at offs.
     int PrepareListen(int key, long fr_smpl = -1, long to_smpl = -1);
+
     int PrepareListen(tSample *spl, long fr_smpl = -1, long to_smpl = -1);
+
     int ContinueListen(); // return number of buffers
 
     void SaveRecordingDlg(long frc, long toc, tAudioRecordBuffer &buf);
-    void SaveWave(const char *fname, long frc, long toc, tAudioRecordBuffer &buf);
+
+    void SaveWave(
+      const char *fname,
+      long frc,
+      long toc,
+      tAudioRecordBuffer &buf);
+
     void AddNote(const char *fname, long frc, long toc);
 
     void RefreshDialogs();
@@ -380,7 +419,7 @@ class tSampleSet
     int dirty;  // needs reloading
 
     // to communicate between PrepareListen and ContinueListen
-    tSample  *listen_sample;
+    tSample* listen_sample;
 };
 
 #endif // !defined(JZ_AUDIO_H)

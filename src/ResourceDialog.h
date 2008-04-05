@@ -23,8 +23,6 @@
 #ifndef JZ_RESOURCEDIALOG_H
 #define JZ_RESOURCEDIALOG_H
 
-#include "WxWidgets.h"
-
 #include <list>
 
 /// Used by jppResourceDialog to store "Attach" entries.
@@ -35,7 +33,8 @@
     fields should all be set to zero, except the one that needs to be filled.
     The constructor will set all the fields to zero. */
 
-class jppResourceElement {
+class jppResourceElement
+{
  public:
   /// ID of the widget in the XRC resource.
   wxString resource;

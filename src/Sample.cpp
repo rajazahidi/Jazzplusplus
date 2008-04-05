@@ -20,7 +20,8 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-//#include "config.h"
+#include "WxWidgets.h"
+
 #include "Sample.h"
 #include "Audio.h"
 #include "Random.h"

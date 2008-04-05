@@ -205,9 +205,7 @@ JZPlayer::JZPlayer(JZSong *song)
 
 JZPlayer::~JZPlayer()
 {
-  cout << "JZPlayer delete start..." << endl;
   delete PlayLoop;
-  cout << "JZPlayer delete end..." << endl;
 }
 
 

@@ -27,7 +27,7 @@
 // in oss/free (from kernel 2.0.29) the following is not implemented
 // but this works for oss/linux for 2.0.29
 // #ifndef SNDCTL_SEQ_GETTIME
-// #define SNDCTL_SEQ_GETTIME		_IOR ('Q',19, int)
+// #define SNDCTL_SEQ_GETTIME  _IOR ('Q',19, int)
 // #endif
 
 #include <sys/time.h>
@@ -43,52 +43,83 @@ class tAudioListener;
 class tAudioPlayer : public tSeq2Player
 {
   friend class tAudioListener;
+
   public:
+
     tAudioPlayer(JZSong *song);
+
     virtual ~tAudioPlayer();
+
     int LoadSamples(const char *filename);
+
     virtual void Notify();
+
     virtual void StartPlay(long Clock, long LoopClock = 0, int Continue = 0);
+
     virtual void StopPlay();
+
     virtual void StartAudio();
-    virtual int Installed() { return installed && tSeq2Player::Installed(); }
-    virtual int GetAudioEnabled() const { return audio_enabled; }
-    virtual void SetAudioEnabled(int x) { audio_enabled = x; }
-    virtual void ListenAudio(int key, int start_stop_mode = 1);
-    virtual void ListenAudio(tSample &spl, long fr_smpl, long to_smpl);
-    virtual bool IsListening() const {
-      return listener != 0;
+
+    virtual int Installed()
+    {
+      return installed && tSeq2Player::Installed();
     }
+
+    virtual int GetAudioEnabled() const
+    {
+      return audio_enabled;
+    }
+
+    virtual void SetAudioEnabled(int x)
+    {
+      audio_enabled = x;
+    }
+
+    virtual void ListenAudio(int key, int start_stop_mode = 1);
+
+    virtual void ListenAudio(tSample &spl, long fr_smpl, long to_smpl);
+
+    virtual bool IsListening() const
+    {
+      return mpListener != 0;
+    }
+
     virtual long GetListenerPlayPosition();
 
     // for recording
     int RecordMode() const;
-    int PlaybackMode() const {
-      return !RecordMode() || can_duplex;
+
+    int PlaybackMode() const
+    {
+      return !RecordMode() || mCanDuplex;
     }
 
   private:
-    int can_duplex;	// TRUE = can do full duplex record/play
+
+    // If true can do full duplex record/play.
+    int mCanDuplex;
 
     int WriteSamples();
     void ReadSamples();
     void MidiSync();
     void OpenDsp();
-    void CloseDsp(int reset);
+
+    void CloseDsp(bool Reset);
 
     int dev;
     int installed;
 
     long midi_clock;
     long audio_bytes;
-    int  midi_speed;  // start speed in bpm
-    int  curr_speed;  // actual speed in bpm
-    int  audio_enabled; // 0 means midi only
+    int midi_speed;  // start speed in bpm
+    int curr_speed;  // actual speed in bpm
+    int audio_enabled; // 0 means midi only
 
-    tAudioListener *listener;
+    tAudioListener* mpListener;
     tAudioRecordBuffer recbuffers;
 
-    int force_read;	// needed by buggy audio driver ...
+    // Needed by buggy audio driver ...
+    int force_read;
 };
 
 #endif // !define(JZ_AUDIODRIVER_H)

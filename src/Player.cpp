@@ -191,7 +191,7 @@ void tPlayLoop::PrepareOutput(
 
 
 JZPlayer::JZPlayer(JZSong *song)
-  : samples( song->TicksPerQuarter * song->Speed() )
+  : mSamples(song->TicksPerQuarter * song->Speed())
 {
   DummyDeviceList.Add("default");
   poll_millisec = 200;  // default

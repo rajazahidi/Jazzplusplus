@@ -45,89 +45,100 @@
 
 using namespace std;
 
-#define snd_pcm_write(pcm,data,size) snd_pcm_writei(pcm,data,size)
-#define snd_pcm_read(pcm,data,size) snd_pcm_readi(pcm,data,size)
-
 #define MAX_FRAGS  16  // enough large?
-
-
 
 class tAlsaAudioListener : public wxTimer
 {
   public:
-    tAlsaAudioListener(tAlsaAudioPlayer *p, int key)
+
+    tAlsaAudioListener(tAlsaAudioPlayer* pPlayer, int key)
+      : wxTimer(),
+        mpPlayer(pPlayer),
     {
-      hard_exit = TRUE;
-      player = p;
-      player->listener = this;
-      player->rec_info = 0;  // not recording!
-      player->running_mode = 0;
-    
+      mHardExit = TRUE;
+      mpPlayer->mpListener = this;
+      mpPlayer->rec_info = 0;  // not recording!
+      mpPlayer->running_mode = 0;
+
       // SYNC seems not to work?? so add 8 more silent buffers
       // to hear the end of the sample too.
-      player->OpenDsp(tAlsaAudioPlayer::PLAYBACK, 0);
-      count = 8 + player->samples.PrepareListen(key);
+      mpPlayer->OpenDsp(tAlsaAudioPlayer::PLAYBACK, 0);
+      mCount = 8 + mpPlayer->mSamples.PrepareListen(key);
       Start(20);
     }
 
-    tAlsaAudioListener(tAlsaAudioPlayer *p, tSample &spl, long fr_smpl, long to_smpl)
+    tAlsaAudioListener(
+      tAlsaAudioPlayer* pPlayer,
+      tSample& spl,
+      long fr_smpl,
+      long to_smpl)
+      : wxTimer(),
+        mpPlayer(pPlayer),
     {
-      hard_exit = TRUE;
-      player = p;
-      player->listener = this;
-      player->rec_info = 0;  // not recording!
-      player->running_mode = 0;
+      mHardExit = TRUE;
+      mpPlayer->mpListener = this;
+      mpPlayer->rec_info = 0;  // not recording!
+      mpPlayer->running_mode = 0;
 
-      player->OpenDsp(tAlsaAudioPlayer::PLAYBACK, 0);
-      player->samples.ResetBufferSize(player->frag_byte_size[tAlsaAudioPlayer::PLAYBACK]);
-      count = 8 + player->samples.PrepareListen(&spl, fr_smpl, to_smpl);
+      mpPlayer->OpenDsp(tAlsaAudioPlayer::PLAYBACK, 0);
+
+      mpPlayer->mSamples.ResetBufferSize(
+        mpPlayer->frag_byte_size[tAlsaAudioPlayer::PLAYBACK]);
+
+      mCount = 8 + mpPlayer->mSamples.PrepareListen(&spl, fr_smpl, to_smpl);
+
       Start(20);
     }
 
     ~tAlsaAudioListener()
     {
       Stop();
-      player->CloseDsp(hard_exit);
-      player->listener = 0;
+      mpPlayer->CloseDsp(mHardExit);
+      mpPlayer->mpListener = 0;
     }
 
     virtual void Notify()
     {
-      count -= player->WriteSamples();
-      count += player->samples.ContinueListen();
-      if (count <= 0)
+      mCount -= mpPlayer->WriteSamples();
+      mCount += mpPlayer->mSamples.ContinueListen();
+      if (mCount <= 0)
       {
-        hard_exit = FALSE;
+        mHardExit = FALSE;
         delete this;
       }
     }
 
     long GetPlayPosition()
     {
-      return player->GetCurrentPosition(tAlsaAudioPlayer::PLAYBACK);
+      return mpPlayer->GetCurrentPosition(tAlsaAudioPlayer::PLAYBACK);
     }
 
   private:
-    tAlsaAudioPlayer *player;
-    int count;
-    int hard_exit;
+
+    tAlsaAudioPlayer* mpPlayer;
+
+    int mCount;
+
+    int mHardExit;
 };
 
 
-tAlsaAudioPlayer::tAlsaAudioPlayer(JZSong *song)
-  : tAlsaPlayer(song)
+tAlsaAudioPlayer::tAlsaAudioPlayer(JZSong* pSong)
+  : tAlsaPlayer(pSong)
 {
   AudioBuffer   = new tEventArray();
   installed     = 0;
   audio_enabled = 0;
-  listener      = 0;
-  can_duplex    = 0;    // no duplex yet.
+  mpListener    = 0;
+  mCanDuplex    = 0;    // no duplex yet.
   pcm[PLAYBACK] = NULL;
   pcm[CAPTURE] = NULL;
 
   dev[PLAYBACK] = gpConfig->StrValue(C_AlsaAudioOutputDevice);
   dev[CAPTURE] = gpConfig->StrValue(C_AlsaAudioInputDevice);
-  can_duplex = 1; /* FIXME */
+
+  // FIXME
+  mCanDuplex = 1;
   installed = 1;
   audio_enabled = 1;
 }
@@ -135,7 +146,7 @@ tAlsaAudioPlayer::tAlsaAudioPlayer(JZSong *song)
 
 tAlsaAudioPlayer::~tAlsaAudioPlayer()
 {
-  delete listener;
+  delete mpListener;
   delete AudioBuffer;
   if (pcm[PLAYBACK])
   {
@@ -152,7 +163,7 @@ tAlsaAudioPlayer::~tAlsaAudioPlayer()
 
 int tAlsaAudioPlayer::LoadSamples(const char *filename)
 {
-  return samples.Load(filename);
+  return mSamples.Load(filename);
 }
 
 int tAlsaAudioPlayer::RecordMode() const
@@ -167,8 +178,8 @@ int tAlsaAudioPlayer::PlayBackMode() const
 
 void tAlsaAudioPlayer::StartPlay(long clock, long loopClock, int cont)
 {
-  delete listener;
-  samples.StartPlay(clock);
+  delete mpListener;
+  mSamples.StartPlay(clock);
 
   tAlsaPlayer::StartPlay(clock, loopClock, cont);
   if (!audio_enabled)
@@ -177,7 +188,7 @@ void tAlsaAudioPlayer::StartPlay(long clock, long loopClock, int cont)
   }
 
   long ticks_per_minute = Song->TicksPerQuarter * Song->Speed();
-  samples.ResetBuffers(AudioBuffer, clock, ticks_per_minute);
+  mSamples.ResetBuffers(AudioBuffer, clock, ticks_per_minute);
   last_scount = 0;
   cur_pos = 0;
   audio_clock_offset = clock;
@@ -191,11 +202,11 @@ void tAlsaAudioPlayer::StartPlay(long clock, long loopClock, int cont)
     recbuffers.ResetBufferSize(frag_byte_size[CAPTURE]);
   }
 
-  if (dev[CAPTURE] != dev[PLAYBACK] || can_duplex || running_mode == 0)
+  if (dev[CAPTURE] != dev[PLAYBACK] || mCanDuplex || running_mode == 0)
   {
     OpenDsp(PLAYBACK, 1);
-    samples.ResetBufferSize(frag_byte_size[PLAYBACK]);
-    samples.FillBuffers(OutClock);
+    mSamples.ResetBufferSize(frag_byte_size[PLAYBACK]);
+    mSamples.FillBuffers(OutClock);
   }
 
   if (running_mode == 0)
@@ -216,31 +227,42 @@ void tAlsaAudioPlayer::StartPlay(long clock, long loopClock, int cont)
 void tAlsaAudioPlayer::StartAudio()
 {
   if (pcm[PLAYBACK])
+  {
     snd_pcm_start(pcm[PLAYBACK]);
+  }
   if (pcm[CAPTURE])
+  {
     snd_pcm_start(pcm[CAPTURE]);
+  }
 }
 
 
 void tAlsaAudioPlayer::OpenDsp(int mode, int sync_mode)
 {
   if (!audio_enabled)
+  {
     return;
+  }
 
   unsigned int channels;
   snd_pcm_format_t format;
   snd_pcm_uframes_t buffer_size, period_size;
 
   frame_shift[mode] = 0;
-  if (samples.BitsPerSample() == 8)
+  if (mSamples.BitsPerSample() == 8)
+  {
     format = SND_PCM_FORMAT_U8;
-  else {
+  }
+  else
+  {
     format = SND_PCM_FORMAT_S16_LE;
     frame_shift[mode]++;
   }
-  channels =  samples.GetChannels();
+  channels =  mSamples.GetChannels();
   if (channels > 1)
+  {
     frame_shift[mode]++;
+  }
 
   snd_pcm_stream_t stream = (mode == PLAYBACK) ?
     SND_PCM_STREAM_PLAYBACK : SND_PCM_STREAM_CAPTURE;
@@ -269,20 +291,22 @@ void tAlsaAudioPlayer::OpenDsp(int mode, int sync_mode)
     perror("cannot set audio channels");
     goto __error;
   }
-  if (snd_pcm_hw_params_set_rate(pcm[mode], hw, samples.GetSpeed(), 0) < 0)
+  if (snd_pcm_hw_params_set_rate(pcm[mode], hw, mSamples.GetSpeed(), 0) < 0)
   {
-    cerr  << "cannot set audio rate: " << samples.GetSpeed() << endl;
+    cerr  << "cannot set audio rate: " << mSamples.GetSpeed() << endl;
     goto __error;
   }
 
   period_size = FRAGBYTES >> frame_shift[mode];
-  if ((period_size = snd_pcm_hw_params_set_period_size_near(pcm[mode], hw, &period_size, 0)) < 0)
+  if (
+    (period_size = snd_pcm_hw_params_set_period_size_near(pcm[mode], hw, &period_size, 0)) < 0)
   {
     perror("cannot set audio period");
     goto __error;
   }
   buffer_size = period_size * MAX_FRAGS;
-  if ((buffer_size = snd_pcm_hw_params_set_buffer_size_near(pcm[mode], hw, &buffer_size)) < 0)
+  if (
+    (buffer_size = snd_pcm_hw_params_set_buffer_size_near(pcm[mode], hw, &buffer_size)) < 0)
   {
     perror("cannot set audio buffer");
     goto __error;
@@ -302,9 +326,14 @@ void tAlsaAudioPlayer::OpenDsp(int mode, int sync_mode)
   snd_pcm_sw_params_alloca(&sw);
   snd_pcm_sw_params_current(pcm[mode], sw);
   if (sync_mode)
-    snd_pcm_sw_params_set_start_threshold(pcm[mode], sw, 0x7fffffff); /* FIXME */
+  {
+    // FIXME
+    snd_pcm_sw_params_set_start_threshold(pcm[mode], sw, 0x7fffffff);
+  }
   else
+  {
     snd_pcm_sw_params_set_start_threshold(pcm[mode], sw, 1);
+  }
   if (snd_pcm_sw_params(pcm[mode], sw) < 0)
   {
     perror("snd_pcm_sw_params");
@@ -323,41 +352,47 @@ __error:
 }
 
 
-void tAlsaAudioPlayer::CloseDsp(int reset)
+void tAlsaAudioPlayer::CloseDsp(bool Reset)
 {
   if (pcm)
   {
-    if (reset)
+    if (Reset)
     {
       if (pcm[PLAYBACK])
       {
         if (snd_pcm_drop(pcm[PLAYBACK]) < 0)
+        {
           perror("playback drop");
+        }
       }
     }
     else
     {
       if (pcm[PLAYBACK])
       {
-        if (snd_pcm_drain(pcm[PLAYBACK]) < 0 )
+        if (snd_pcm_drain(pcm[PLAYBACK]) < 0)
+        {
           perror("playback drain");
+        }
       }
       if (pcm[CAPTURE])
       {
-        if (snd_pcm_drain(pcm[CAPTURE]) < 0 )
+        if (snd_pcm_drain(pcm[CAPTURE]) < 0)
+        {
           perror("capture drain");
+        }
       }
     }
     if (pcm[PLAYBACK])
     {
       snd_pcm_close(pcm[PLAYBACK]);
       pcm[PLAYBACK] = NULL;
-    } 
+    }
     if (pcm[CAPTURE])
     {
       snd_pcm_close(pcm[CAPTURE]);
       pcm[CAPTURE] = NULL;
-    } 
+    }
   }
 }
 
@@ -368,15 +403,22 @@ void tAlsaAudioPlayer::Notify()
     if (pcm[PLAYBACK])
     {
       WriteSamples();
-      // here it may hang when swapping in pages
-      samples.FillBuffers(OutClock);
+
+      // The code may hang here when swapping in pages.
+      mSamples.FillBuffers(OutClock);
+
       WriteSamples();
     }
-    if (pcm[CAPTURE])
-      ReadSamples();
 
-    if (pcm[PLAYBACK] && samples.softsync)
+    if (pcm[CAPTURE])
+    {
+      ReadSamples();
+    }
+
+    if (pcm[PLAYBACK] && mSamples.softsync)
+    {
       MidiSync();
+    }
   }
   tAlsaPlayer::Notify();
 }
@@ -398,7 +440,9 @@ int tAlsaAudioPlayer::GetFreeSpace(int mode)
 int tAlsaAudioPlayer::WriteSamples()
 {
   if (!audio_enabled || pcm[PLAYBACK] == NULL)
+  {
     return 0;
+  }
 
   int blocks_written = 0;
   int room;
@@ -407,11 +451,19 @@ int tAlsaAudioPlayer::WriteSamples()
 
   for (; room > frag_size[PLAYBACK]; room -= frag_size[PLAYBACK])
   {
-    tAudioBuffer *buf = samples.full_buffers.Get();
+    tAudioBuffer *buf = mSamples.full_buffers.Get();
     if (buf == 0)
+    {
       break;
-    ssize_t written = snd_pcm_writei(pcm[PLAYBACK], buf->Data(), frag_size[PLAYBACK]);
-    if (written < 0) {
+    }
+
+    ssize_t written = snd_pcm_writei(
+      pcm[PLAYBACK],
+      buf->Data(),
+      frag_size[PLAYBACK]);
+
+    if (written < 0)
+    {
       if (written == -EPIPE)
       {
         cerr << "xrun!!" << endl;
@@ -423,9 +475,11 @@ int tAlsaAudioPlayer::WriteSamples()
       }
     }
     if (written > 0)
+    {
       cur_scount += written;
+    }
     blocks_written++;
-    samples.free_buffers.Put(buf);
+    mSamples.free_buffers.Put(buf);
   }
 
   return blocks_written;
@@ -435,14 +489,16 @@ int tAlsaAudioPlayer::WriteSamples()
 void tAlsaAudioPlayer::ReadSamples()
 {
   if (!audio_enabled || pcm[CAPTURE] == NULL)
+  {
     return;
+  }
 
   int room = GetFreeSpace(CAPTURE);
 
   for (; room > frag_size[CAPTURE]; room -= frag_size[CAPTURE])
   {
     short *b = recbuffers.RequestBuffer()->data;
-    if (snd_pcm_read(pcm[CAPTURE], b, frag_size[CAPTURE]) !=
+    if (snd_pcm_readi(pcm[CAPTURE], b, frag_size[CAPTURE]) !=
         frag_size[CAPTURE])
     {
       recbuffers.UndoRequest();
@@ -459,7 +515,7 @@ void tAlsaAudioPlayer::ResetPlay(long clock)
   {
     snd_pcm_drop(pcm[PLAYBACK]);
     //long ticks_per_minute = Song->TicksPerQuarter * Song->Speed();
-    //samples.ResetBuffers(AudioBuffer, clock, ticks_per_minute);
+    //mSamples.ResetBuffers(AudioBuffer, clock, ticks_per_minute);
   }
   audio_clock_offset = clock;
   cur_pos = 0;
@@ -473,15 +529,23 @@ long tAlsaAudioPlayer::GetCurrentPosition(int mode)
 void tAlsaAudioPlayer::MidiSync()
 {
   if (!audio_enabled)
+  {
     return;
+  }
 
   int mode;
   if (pcm[PLAYBACK])
+  {
     mode = PLAYBACK;
+  }
   else if (pcm[CAPTURE])
+  {
     mode = CAPTURE;
+  }
   else
+  {
     return; // disabled
+  }
 
   long scount = GetCurrentPosition(mode);
 
@@ -499,12 +563,17 @@ void tAlsaAudioPlayer::MidiSync()
     qtick = snd_seq_queue_status_get_tick_time(status);
     int samplediff;
     if (scount < last_scount)
+    {
       samplediff = frame_boundary[mode] - (last_scount - scount);
+    }
     else
+    {
       samplediff = scount - last_scount;
+    }
     last_scount = scount;
     cur_pos += samplediff;
-    long audio_clock = (long)samples.Samples2Ticks(cur_pos) + audio_clock_offset;
+    long audio_clock =
+      (long)mSamples.Samples2Ticks(cur_pos) + audio_clock_offset;
     int delta_clock = audio_clock - qtick;
     int new_speed = midi_speed + delta_clock;
 
@@ -527,26 +596,24 @@ void tAlsaAudioPlayer::MidiSync()
       snd_seq_ev_set_subs(&ev);
       snd_seq_ev_set_direct(&ev);
       snd_seq_ev_set_fixed(&ev);
-      int us  = (int)( 60.0E6 / (double)new_speed );
+      int us  = (int)(60.0E6 / new_speed);
       snd_seq_ev_set_queue_tempo(&ev, queue, us);
       write(&ev, 1);
       curr_speed = new_speed;
-      // xview has reentrancy problems!!
-      // gpTrackWindow->DrawSpeed(curr_speed);
     }
   }
 }
 
 void tAlsaAudioPlayer::StopPlay()
 {
-  samples.StopPlay();
+  mSamples.StopPlay();
   tAlsaPlayer::StopPlay();
   if (!audio_enabled)
   {
     return;
   }
 
-  CloseDsp(TRUE);
+  CloseDsp(true);
   if (RecordMode())
   {
     long frc = rec_info->mFromClock;
@@ -559,53 +626,67 @@ void tAlsaAudioPlayer::StopPlay()
     {
       toc = recd_clock;
     }
-    samples.SaveRecordingDlg(frc, toc, recbuffers);
+    mSamples.SaveRecordingDlg(frc, toc, recbuffers);
   }
   recbuffers.Clear();
-  // xview has reentrancy problems!!
-  // gpTrackWindow->DrawSpeed(midi_speed);
 }
 
 void tAlsaAudioPlayer::ListenAudio(int key, int start_stop_mode)
 {
   if (!audio_enabled)
-    return;
-
-  // when already listening then stop listening
-  if (listener)
   {
-    delete listener;
-    listener = 0;
+    return;
+  }
+
+  // If already listening then stop listening.
+  if (mpListener)
+  {
+    delete mpListener;
+    mpListener = 0;
     if (start_stop_mode)
+    {
       return;
+    }
   }
   if (key < 0)
+  {
     return;
+  }
 
   if (pcm[PLAYBACK])  // device busy (playing)
+  {
     return;
-  listener = new tAlsaAudioListener(this, key);
+  }
+
+  mpListener = new tAlsaAudioListener(this, key);
 }
 
-void tAlsaAudioPlayer::ListenAudio(tSample &spl, long fr_smpl, long to_smpl)
+void tAlsaAudioPlayer::ListenAudio(tSample& spl, long fr_smpl, long to_smpl)
 {
   if (!audio_enabled)
-    return;
-
-  // when already listening then stop listening
-  if (listener)
   {
-    delete listener;
-    listener = 0;
-  }
-  if (pcm[PLAYBACK])  // device busy (playing)
     return;
-  listener = new tAlsaAudioListener(this, spl, fr_smpl, to_smpl);
+  }
+
+  // If already listening then stop listening.
+  if (mpListener)
+  {
+    delete mpListener;
+    mpListener = 0;
+  }
+
+  if (pcm[PLAYBACK])  // device busy (playing)
+  {
+    return;
+  }
+  mpListener = new tAlsaAudioListener(this, spl, fr_smpl, to_smpl);
 }
 
 long tAlsaAudioPlayer::GetListenerPlayPosition()
 {
-  if (!listener)
+  if (!mpListener)
+  {
     return -1L;
-  return listener->GetPlayPosition();
+  }
+  return mpListener->GetPlayPosition();
 }

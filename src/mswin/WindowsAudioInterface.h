@@ -35,77 +35,125 @@ class tSample;
 class tWinAudioPlayer : public tWinIntPlayer
 {
   friend class tAudioListener;
+
   public:
-    tWinAudioPlayer(JZSong *song);
+
+    enum TEErrorCode
+    {
+      NoError,
+      ErrOutOpen,
+      ErrOutPrepare,
+      ErrOutUnprepare,
+      ErrInpOpen,
+      ErrInpPrepare,
+      ErrInpUnprepare,
+      ErrCapGet,
+      ErrCapSync
+    };
+
+    tWinAudioPlayer(JZSong* pSong);
+
     virtual ~tWinAudioPlayer();
+
     int LoadSamples(const char *filename);
+
     virtual void Notify();
+
     virtual void StartPlay(long Clock, long LoopClock = 0, int Continue = 0);
+
     virtual void StopPlay();
+
     virtual void StartAudio();   // called async by driver
-    virtual int Installed() { return installed && tWinIntPlayer::Installed(); }
-    virtual int GetAudioEnabled() const { return audio_enabled; }
-    virtual void SetAudioEnabled(int x) { audio_enabled = x; }
+
+    virtual int Installed()
+    {
+      return installed && tWinIntPlayer::Installed();
+    }
+
+    virtual int GetAudioEnabled() const
+    {
+      return audio_enabled;
+    }
+
+    virtual void SetAudioEnabled(int x)
+    {
+      audio_enabled = x;
+    }
+
     virtual void ListenAudio(int key, int start_stop_mode = 1);
+
     virtual void ListenAudio(tSample &spl, long fr_smpl, long to_smpl);
+
     virtual long GetListenerPlayPosition();
 
-    virtual bool IsListening() const {
-      return listener != 0;
+    virtual bool IsListening() const
+    {
+      return mpListener != 0;
     }
 
     // for recording
     int RecordMode() const;
-    int PlaybackMode() const {
-      return !RecordMode() || can_duplex;
+
+    int PlaybackMode() const
+    {
+      return !RecordMode() || mCanDuplex;
     }
 
-    enum ErrorCode {
-      NoError,
-      ErrOutOpen, ErrOutPrepare, ErrOutUnprepare,
-      ErrInpOpen, ErrInpPrepare, ErrInpUnprepare,
-      ErrCapGet, ErrCapSync
-    };
-    ErrorCode GetError() {
-      return error;
+    TEErrorCode GetError()
+    {
+      return mErrorCode;
     }
+
     virtual void ShowError();
 
   private:
-    ErrorCode error;
 
-    int can_duplex;        // TRUE = can do full duplex record/play
-    int can_sync;       // TRUE = can determine exact output play position
+    // ms specific
+    friend void FAR PASCAL audioInterrupt(
+      HWAVEOUT,
+      UINT,
+      DWORD,
+      DWORD,
+      DWORD);
 
-    int  OpenDsp();    // 0 = ok
-    int  CloseDsp();   // 0 = ok
+    // Description:
+    //   Send the sample set to driver.
+    void WriteBuffers();
 
-    int  installed;
-    int  audio_enabled;   // 0 means midi only
+    void AudioCallback(UINT msg);
+
+    TEErrorCode mErrorCode;
+
+    // Indicates if full duplex record/play is possible.
+    bool mCanDuplex;
+
+    // Indicates if the  exact output play position can be determined.
+    bool mCanSynchronize;
+
+    int OpenDsp();    // 0 = ok
+    int CloseDsp();   // 0 = ok
+
+    int installed;
+    int audio_enabled;   // 0 means midi only
     long blocks_played;   // # of blocks written to device
-    int  play_buffers_needed;  // driver requests more output buffers
+    int play_buffers_needed;  // driver requests more output buffers
 
     long start_clock;     // when did play start
     long start_time;      // play start time (not altered by SetTempo)
-    tAudioListener *listener;
+    tAudioListener* mpListener;
 
-    // ms specific
-    friend void FAR PASCAL audioInterrupt(HWAVEOUT, UINT, DWORD, DWORD, DWORD);
     HWAVEOUT hout;
     HWAVEIN hinp;
-    void WriteBuffers();   // send samples.full_buffers to driver
-    void AudioCallback(UINT msg);
-    int  hout_open;        // true = playback device opended successful
-    int  hinp_open;        // true = recording device opended successful
+    int hout_open;        // true = playback device opended successful
+    int hinp_open;        // true = recording device opended successful
 
     tAudioRecordBuffer recbuffers;
-    int  record_buffers_needed;  // driver needs more buffers
+    int record_buffers_needed;  // driver needs more buffers
 
     // a semaphor for thread synchronization. Since Notify() and
     // the audio callback are not time critical, its safe to
     // let them wait for each other.
     CRITICAL_SECTION mutex;
-
 };
 
 #endif // !defined(JZ_WINDOWSAUDIOINTERFACE_H)

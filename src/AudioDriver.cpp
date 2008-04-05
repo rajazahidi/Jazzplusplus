@@ -34,63 +34,83 @@
 
 #include <fcntl.h>
 
-
 #define AUDIO_DEVICE "/dev/dsp"
 
 class tAudioListener : public wxTimer
 {
   public:
-    tAudioListener(tAudioPlayer *p, int key) {
-      hard_exit = TRUE;
-      player = p;
-      player->listener = this;
-      player->rec_info = 0;  // not recording!
+
+    tAudioListener(tAudioPlayer* pPlayer, int key)
+      : wxTimer(),
+        mpPlayer(pPlayer),
+        mCount(0),
+        mHardExit(true)
+    {
+      mpPlayer->mpListener = this;
+
+      mpPlayer->rec_info = 0;  // not recording!
 
       // SYNC seems not to work?? so add 8 more silent buffers
       // to hear the end of the sample too.
-      count = 8 + player->samples.PrepareListen(key);
-      player->OpenDsp();
+      mCount = 8 + mpPlayer->samples.PrepareListen(key);
+      mpPlayer->OpenDsp();
       Start(20);
     }
 
-    tAudioListener(tAudioPlayer *p, tSample &spl, long fr_smpl, long to_smpl) {
-      hard_exit = TRUE;
-      player = p;
-      player->listener = this;
-      player->rec_info = 0;  // not recording!
+    tAudioListener(
+      tAudioPlayer* pPlayer,
+      tSample& spl,
+      long fr_smpl,
+      long to_smpl)
+      : wxTimer(),
+        mpPlayer(pPlayer),
+        mCount(0),
+        mHardExit(true),
+    {
+      mpPlayer = p;
+      mpPlayer->mpListener = this;
+      mpPlayer->rec_info = 0;  // not recording!
 
-      count = 8 + player->samples.PrepareListen(&spl, fr_smpl, to_smpl);
-      player->OpenDsp();
+      mCount = 8 + mpPlayer->samples.PrepareListen(&spl, fr_smpl, to_smpl);
+      mpPlayer->OpenDsp();
       Start(20);
     }
 
-    ~tAudioListener() {
+    ~tAudioListener()
+    {
       Stop();
-      player->CloseDsp(hard_exit);
-      player->listener = 0;
+      mpPlayer->CloseDsp(mHardExit);
+      mpPlayer->mpListener = 0;
     }
 
-    virtual void Notify() {
-      count -= player->WriteSamples();
-      count += player->samples.ContinueListen();
-      if (count <= 0)
+    virtual void Notify()
+    {
+      mCount -= mpPlayer->WriteSamples();
+      mCount += mpPlayer->samples.ContinueListen();
+      if (mCount <= 0)
       {
-        hard_exit = FALSE;
+        mHardExit = false;
         delete this;
       }
     }
 
-    long GetPlayPosition() {
+    long GetPlayPosition()
+    {
       count_info cinfo;
-      if (ioctl(player->dev, SNDCTL_DSP_GETOPTR, &cinfo) == -1)
+      if (ioctl(mpPlayer->dev, SNDCTL_DSP_GETOPTR, &cinfo) == -1)
+      {
 	perror("SNDCTL_DSP_GETOPTR");
+      }
       return (cinfo.bytes - cinfo.ptr) / sizeof(short);
     }
 
   private:
-    tAudioPlayer *player;
-    int count;
-    int hard_exit;
+
+    tAudioPlayer* mpPlayer;
+
+    int mCount;
+
+    int mHardExit;
 };
 
 
@@ -99,41 +119,55 @@ tAudioPlayer::tAudioPlayer(JZSong *song)
   : tSeq2Player(song)
 {
   long dummy = 0;
-  AudioBuffer   = new tEventArray();
-  installed     = 0;
+  AudioBuffer = new tEventArray();
+  installed = 0;
   dummy = gpConfig->GetValue(C_EnableAudio);
   audio_enabled = dummy;
-  listener      = 0;
-  can_duplex    = 0;    // no duplex yet.
-  dev           = -1;
+  mpListener = 0;
+  mCanDuplex = 0;    // no duplex yet.
+  dev = -1;
 
   // check for device
   dev = open(AUDIO_DEVICE, O_WRONLY, 0);
-  if (dev >= 0) {
+  if (dev >= 0)
+  {
     // check device caps
     int caps;
     ioctl(dev, SNDCTL_DSP_GETCAPS, &caps);
     if (caps & DSP_CAP_REALTIME)
+    {
       ; // fprintf(stderr, AUDIO " supports REALTIME, good!\n");
+    }
+
     if (caps & DSP_CAP_DUPLEX)
-      can_duplex = 1;	// good soundcard!
+    {
+      mCanDuplex = 1;	// good soundcard!
+    }
+
     if (!(caps & DSP_CAP_TRIGGER))
-      fprintf(stderr, "no CAP_TRIGGER support!\n");
+    {
+      cerr << "no CAP_TRIGGER support!" << endl;
+    }
     else
+    {
       installed = 1;
+    }
+
     close(dev);
   }
   else
+  {
     perror(AUDIO_DEVICE);
+  }
+
   dev = -1;  // closed
   audio_enabled = audio_enabled && installed;
-
 }
 
 
 tAudioPlayer::~tAudioPlayer()
 {
-  delete listener;
+  delete mpListener;
   delete AudioBuffer;
   if (dev >= 0)
     close(dev);
@@ -153,12 +187,16 @@ int tAudioPlayer::RecordMode() const
 void tAudioPlayer::StartAudio()
 {
   if (!audio_enabled)
+  {
     return;
+  }
 
   long ticks_per_minute = Song->TicksPerQuarter * Song->Speed();
   samples.ResetBuffers(AudioBuffer, start_clock, ticks_per_minute);
   if (PlaybackMode())
+  {
     samples.FillBuffers(OutClock);
+  }
 
   audio_bytes = 0;
   midi_clock  = 0;
@@ -191,9 +229,11 @@ void tAudioPlayer::OpenDsp()
   int tmp;
 
   if (!audio_enabled)
+  {
     return;
+  }
 
-  can_duplex = gpConfig->GetValue(C_DuplexAudio);
+  mCanDuplex = gpConfig->GetValue(C_DuplexAudio);
 
   // linux driver seems to need some real free memory, which sometimes
   // is not available when operating with big samples. So allocate
@@ -207,61 +247,91 @@ void tAudioPlayer::OpenDsp()
   }
 
   int mode = 0;
-  if (can_duplex)
+  if (mCanDuplex)
+  {
     mode = O_RDWR;
+  }
   else if (RecordMode())
+  {
     mode = O_RDONLY;
+  }
   else
+  {
     mode = O_WRONLY;
+  }
 
   dev = open(AUDIO_DEVICE, mode, 0);
-  if (dev < 0) {
+  if (dev < 0)
+  {
     perror(AUDIO_DEVICE);
     audio_enabled = 0;
     return;
   }
 
-  if (can_duplex)
+  if (mCanDuplex)
+  {
     ioctl(dev, SNDCTL_DSP_SETDUPLEX, 0);
+  }
 
   tmp = 0xffff0000 | FRAGBITS;
-  if (ioctl(dev, SNDCTL_DSP_SETFRAGMENT, &tmp)==-1)
+  if (ioctl(dev, SNDCTL_DSP_SETFRAGMENT, &tmp) == -1)
+  {
     perror("ioctl DSP_SETFRAGMENT");
+  }
 
   tmp = samples.BitsPerSample();
   ioctl(dev, SNDCTL_DSP_SAMPLESIZE, &tmp);
   if (tmp != samples.BitsPerSample())
-    fprintf(stderr, "Unable to set the sample size\n");
+  {
+    cerr << "Unable to set the sample size" << endl;
+  }
 
   tmp = (samples.GetChannels() == 1) ? 0 : 1;
-  if (ioctl (dev, SNDCTL_DSP_STEREO, &tmp)==-1)
-    fprintf (stderr, "Unable to set mono/stereo\n");
+  if (ioctl (dev, SNDCTL_DSP_STEREO, &tmp) == -1)
+  {
+    cerr << "Unable to set mono/stereo" << endl;
+  }
 
   tmp = samples.GetSpeed();
   if (ioctl (dev, SNDCTL_DSP_SPEED, &tmp) == -1)
+  {
     perror("ioctl DSP_SPEED");
+  }
 
-  // check if fragsize was ok
-  ioctl (dev, SNDCTL_DSP_GETBLKSIZE, &tmp);
+  // Check to see if the fragment size was OK.
+  ioctl(dev, SNDCTL_DSP_GETBLKSIZE, &tmp);
   if (tmp < 1)
-    perror ("GETBLKSIZE");
+  {
+    perror("GETBLKSIZE");
+  }
   else if (tmp != FRAGBYTES)
-    fprintf(stderr, "Unable to verify FRAGMENT %d, fbytes = %d, fshorts = %d\n", tmp, FRAGBYTES, FRAGSHORTS);
+  {
+    cerr
+      << "Unable to verify FRAGMENT " << tmp
+      << ", fbytes = " << FRAGBYTES
+      << ", fshorts = " << FRAGSHORTS
+      << endl;
+  }
 }
 
 
-void tAudioPlayer::CloseDsp(int reset)
+void tAudioPlayer::CloseDsp(bool Reset)
 {
   if (dev >= 0)
   {
-    if (reset)
+    if (Reset)
     {
       if (ioctl(dev,  SNDCTL_DSP_RESET, 0) == -1)
+      {
 	perror("SNDCTL_DSP_RESET");
+      }
     }
-    else {
+    else
+    {
       if (ioctl (dev, SNDCTL_DSP_SYNC, NULL) < 0)
+      {
         perror("SNDCTL_DSP_SYNC");
+      }
     }
     close(dev);
     dev = -1;
@@ -271,18 +341,26 @@ void tAudioPlayer::CloseDsp(int reset)
 
 void tAudioPlayer::Notify()
 {
-  if (audio_enabled) {
-    if (PlaybackMode()) {
+  if (audio_enabled)
+  {
+    if (PlaybackMode())
+    {
       WriteSamples();
+
       // here it may hang when swapping in pages
       samples.FillBuffers(OutClock);
+
       WriteSamples();
     }
     if (RecordMode())
+    {
       ReadSamples();
+    }
 
     if (samples.softsync)
+    {
       MidiSync();
+    }
   }
   tSeq2Player::Notify();
 }
@@ -291,25 +369,34 @@ void tAudioPlayer::Notify()
 int tAudioPlayer::WriteSamples()
 {
   if (!audio_enabled)
+  {
     return 0;
+  }
 
   int blocks_written = 0;
 
   // number of blocks to be written
   audio_buf_info info;
   if (ioctl(dev, SNDCTL_DSP_GETOSPACE, &info) == -1)
+  {
     perror("SNDCTL_DSP_GETOSPACE");
+  }
 
   // todo: this is a bug in the audiodriver in newer kernels (2.1.28)
   // and the oss/linux for 2.0.29 it should be
-  // for (int i = 0; i < info.fragments; i++) {
+  // for (int i = 0; i < info.fragments; i++)
 
-  for (int i = 0; i < info.fragments - 1; i++) {
+  for (int i = 0; i < info.fragments - 1; i++)
+  {
     tAudioBuffer *buf = samples.full_buffers.Get();
     if (buf == 0)
+    {
       break;
+    }
     if (write(dev, buf->Data(), BUFBYTES) != BUFBYTES)
+    {
       perror("write");
+    }
     blocks_written ++;
     samples.free_buffers.Put(buf);
   }
@@ -322,21 +409,29 @@ void tAudioPlayer::ReadSamples()
 {
   audio_buf_info info;
   if (ioctl(dev, SNDCTL_DSP_GETISPACE, &info) == -1)
+  {
     perror("SNDCTL_DSP_GETISPACE");
+  }
 
   // a oss bug: if read is not called, there will be
   // no recording. probably recording does NOT start
   // exactly in sync with midi - but who knows.
   if (force_read && !info.fragments)
+  {
     info.fragments = 1;
+  }
   force_read = 0;
 
-  for (int i = 0; i < info.fragments; i++) {
+  for (int i = 0; i < info.fragments; i++)
+  {
     short *b = recbuffers.RequestBuffer()->data;
-    if (read(dev, b, BUFBYTES) != BUFBYTES) {
+    if (read(dev, b, BUFBYTES) != BUFBYTES)
+    {
       // oss bug? It send EINTR?? on first read..
       if (errno != EINTR && errno != EAGAIN)
+      {
 	perror("read");
+      }
       recbuffers.UndoRequest();
       break;
     }
@@ -347,21 +442,27 @@ void tAudioPlayer::ReadSamples()
 
 void tAudioPlayer::MidiSync()
 {
-  // OSS is buggy! In Win32 SDK you read the docs, hack away and
-  // everything works. In OSS, there are no docs and if it works
+  // OSS is buggy!  In Win32 SDK you read the docs, hack away and
+  // everything works.  In OSS, there are no docs and if it works
   // with kernel x it wont with kernel y.
 
   if (!audio_enabled)
+  {
     return;
+  }
 
   int command = SNDCTL_DSP_GETOPTR;
   if (!PlaybackMode())
+  {
     command = SNDCTL_DSP_GETIPTR;
+  }
 
   // get realtime info for audio/midi sync
   count_info cinfo;
   if (ioctl(dev, command, &cinfo) == -1)
+  {
     perror("SNDCTL_DSP_GETOPTR");
+  }
 
   // search for SNDCTL_DSP_GETOPTR in linux/drivers/sound/dmabuf
   // before trying to understand the next line
@@ -370,12 +471,16 @@ void tAudioPlayer::MidiSync()
   {
     // driver has processed some bytes or whole fragment
     if (ioctl(seqfd, SNDCTL_SEQ_GETTIME, &midi_clock) < 0)
-      perror("ioctl SNDCTL_SEQ_GETTIME failed - please get a newer kernel (2.1.28 or up)");
+    {
+      perror(
+        "ioctl SNDCTL_SEQ_GETTIME failed - "
+        "please get a newer kernel (2.1.28 or up)");
+    }
     audio_bytes = new_bytes;
 
     // OSS bug?: mpu401 does not like speed changes too often
-    long audio_clock = (long)samples.Samples2Ticks(audio_bytes/2);
-    int  delta_clock = audio_clock - midi_clock;
+    long audio_clock = (long)samples.Samples2Ticks(audio_bytes / 2);
+    int delta_clock = audio_clock - midi_clock;
     int new_speed = midi_speed + delta_clock;
 
     // limit speed changes to some reasonable values
@@ -392,20 +497,21 @@ void tAudioPlayer::MidiSync()
     if (new_speed != curr_speed)
     {
       if (ioctl(seqfd, SNDCTL_TMR_TEMPO, &new_speed) < 0)
-        // this sometimes happens with mpu-401 timer
+      {
+        // Sometimes this happens with mpu-401 timer.
 	; // perror("SNDCTL_TMR_TEMPO");
+      }
       else
+      {
 	curr_speed = new_speed;
-      // xview has reentrancy problems!!
-      // gpTrackWindow->DrawSpeed(curr_speed);
+      }
     }
-
   }
 }
 
 void tAudioPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 {
-  delete listener;
+  delete mpListener;
   samples.StartPlay(Clock);
   tSeq2Player::StartPlay(Clock, LoopClock, Continue);
 }
@@ -415,21 +521,26 @@ void tAudioPlayer::StopPlay()
   samples.StopPlay();
   tSeq2Player::StopPlay();
   if (!audio_enabled)
+  {
     return;
-  CloseDsp(TRUE);
+  }
+
+  CloseDsp(true);
   if (RecordMode())
   {
     long frc = rec_info->mFromClock;
     if (frc < start_clock)
+    {
       frc = start_clock;
+    }
     long toc = rec_info->mToClock;
     if (toc > recd_clock)
+    {
       toc = recd_clock;
+    }
     samples.SaveRecordingDlg(frc, toc, recbuffers);
   }
   recbuffers.Clear();
-  // xview has reentrancy problems!!
-  // gpTrackWindow->DrawSpeed(midi_speed);
 }
 
 
@@ -437,42 +548,58 @@ void tAudioPlayer::StopPlay()
 void tAudioPlayer::ListenAudio(int key, int start_stop_mode)
 {
   if (!audio_enabled)
+  {
     return;
+  }
 
   // when already listening then stop listening
-  if (listener)
+  if (mpListener)
   {
-    delete listener;
-    listener = 0;
+    delete mpListener;
+    mpListener = 0;
     if (start_stop_mode)
+    {
       return;
+    }
   }
   if (key < 0)
+  {
     return;
+  }
 
   if (dev >= 0)  // device busy (playing)
+  {
     return;
-  listener = new tAudioListener(this, key);
+  }
+
+  mpListener = new tAudioListener(this, key);
 }
 
 void tAudioPlayer::ListenAudio(tSample &spl, long fr_smpl, long to_smpl)
 {
   if (!audio_enabled)
+  {
     return;
+  }
 
   // when already listening then stop listening
-  if (listener)
-    delete listener;
+  if (mpListener)
+  {
+    delete mpListener;
+  }
+
   if (dev >= 0)  // device busy (playing)
+  {
     return;
-  listener = new tAudioListener(this, spl, fr_smpl, to_smpl);
+  }
+  mpListener = new tAudioListener(this, spl, fr_smpl, to_smpl);
 }
 
-long tAudioPlayer::GetListenerPlayPosition() {
-  if (!listener)
+long tAudioPlayer::GetListenerPlayPosition()
+{
+  if (!mpListener)
+  {
     return -1L;
-  return listener->GetPlayPosition();
+  }
+  return mpListener->GetPlayPosition();
 }
-
-
-

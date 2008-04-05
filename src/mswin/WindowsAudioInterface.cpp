@@ -42,63 +42,83 @@
 #define LeaveCriticalSection(a)
 #define DeleteCriticalSection(a)
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 class tAudioListener : public wxTimer
 {
   // play a sample from piano roll
 
   public:
 
-    tAudioListener(tWinAudioPlayer *p, int key)
+    tAudioListener(tWinAudioPlayer* pPlayer, int key)
+      : wxTimer(),
+        mpPlayer(pPlayer),
+        mCount(0),
+        mHardExit(true),
+        mChannels(0)
     {
-      hard_exit = TRUE;
-      player = p;
-      player->listener = this;
-      player->rec_info = 0;         // not recording!
-      channels = player->samples.GetChannels();
+      mpPlayer->mpListener = this;
 
-      count = player->samples.PrepareListen(key);
-      player->OpenDsp();
-      player->StartAudio();
+      // Indicate that we are not recording!
+      mpPlayer->rec_info = 0;
+
+      mChannels = mpPlayer->mSamples.GetChannels();
+
+      mCount = mpPlayer->mSamples.PrepareListen(key);
+
+      mpPlayer->OpenDsp();
+
+      mpPlayer->StartAudio();
+
       Start(200);
     }
 
     tAudioListener(
-      tWinAudioPlayer *p,
-      tSample &spl,
+      tWinAudioPlayer* pPlayer,
+      tSample& spl,
       long fr_smpl,
       long to_smpl)
+      : wxTimer(),
+        mpPlayer(pPlayer),
+        mCount(0),
+        mHardExit(true),
+        mChannels(0)
     {
-      hard_exit = TRUE;
-      player = p;
-      player->listener = this;
-      player->rec_info = 0;  // not recording!
-      channels = player->samples.GetChannels();
+      mpPlayer->mpListener = this;
 
-      count = player->samples.PrepareListen(&spl, fr_smpl, to_smpl);
-      player->OpenDsp();
-      player->StartAudio();
+      // Indicate that we are not recording!
+      mpPlayer->rec_info = 0;
+
+      mChannels = mpPlayer->mSamples.GetChannels();
+
+      mCount = mpPlayer->mSamples.PrepareListen(&spl, fr_smpl, to_smpl);
+
+      mpPlayer->OpenDsp();
+
+      mpPlayer->StartAudio();
+
       Start(200);
     }
 
     ~tAudioListener()
     {
       Stop();
-      // todo: if !hard_exit flush outstanding buffers to device
+
+      // todo: if !mHardExit flush outstanding buffers to device
       // before closing
-      player->CloseDsp();
-      player->listener = 0;
+      mpPlayer->CloseDsp();
+      mpPlayer->mpListener = 0;
     }
 
     virtual void Notify()
     {
-      EnterCriticalSection(&player->mutex);
-      count += player->samples.ContinueListen();
-      player->WriteBuffers();
-      LeaveCriticalSection(&player->mutex);
-      if (player->blocks_played >= count)
+      EnterCriticalSection(&mpPlayer->mutex);
+      mCount += mpPlayer->mSamples.ContinueListen();
+      mpPlayer->WriteBuffers();
+      LeaveCriticalSection(&mpPlayer->mutex);
+      if (mpPlayer->blocks_played >= mCount)
       {
-        hard_exit = FALSE;
+        mHardExit = false;
         delete this;
       }
     }
@@ -107,21 +127,29 @@ class tAudioListener : public wxTimer
     {
       MMTIME mmtime;
       mmtime.wType = TIME_SAMPLES;
-      waveOutGetPosition(player->hout, &mmtime, sizeof(mmtime));
-      return mmtime.u.sample * channels;
+      waveOutGetPosition(mpPlayer->hout, &mmtime, sizeof(mmtime));
+      return mmtime.u.sample * mChannels;
     }
 
   private:
-    tWinAudioPlayer *player;
-    long count;
-    int hard_exit;
-    long channels;
+
+    tWinAudioPlayer* mpPlayer;
+
+    long mCount;
+
+    bool mHardExit;
+
+    long mChannels;
 };
 
-
-
-tWinAudioPlayer::tWinAudioPlayer(JZSong *song)
-  : tWinIntPlayer(song)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+tWinAudioPlayer::tWinAudioPlayer(JZSong* pSong)
+  : tWinIntPlayer(pSong),
+    mErrorCode(NoError),
+    mCanDuplex(false),
+    mCanSynchronize(true),
+    mpListener(0)
 {
   state->audio_player = this;
 
@@ -132,15 +160,12 @@ tWinAudioPlayer::tWinAudioPlayer(JZSong *song)
   installed     = 0;
   dummy = gpConfig->GetValue(C_EnableAudio);
   audio_enabled = dummy;
-  listener      = 0;
   hout_open     = 0;
   hinp_open     = 0;
 
   // check for device
   installed = 0;
-  can_duplex = (gpConfig->GetValue(C_DuplexAudio) != 0);
-  error = NoError;
-  can_sync = 1;
+  mCanDuplex = (gpConfig->GetValue(C_DuplexAudio) != 0);
 
   if (OpenDsp() == 0)
   {
@@ -149,99 +174,109 @@ tWinAudioPlayer::tWinAudioPlayer(JZSong *song)
     MMRESULT res = waveOutGetDevCaps((UINT)hout, &ocaps, sizeof(ocaps));
     if (res != MMSYSERR_NOERROR)
     {
-      error = ErrCapGet;
+      mErrorCode = ErrCapGet;
     }
     else if (!(ocaps.dwSupport & WAVECAPS_SAMPLEACCURATE))
     {
-      // not a real error
-      wxMessageBox("your soundcard does not support audio/midi sync", "Warning", wxOK);
-      can_sync = 0;
+      // This is not an error; just a warning.
+      wxMessageBox(
+        "Your soundcard does not support audio/midi sync",
+        "Warning",
+        wxOK);
+      mCanSynchronize = false;
     }
 
-    if (!error && CloseDsp() == 0)
+    if (!mErrorCode && CloseDsp() == 0)
+    {
       installed = 1;
+    }
   }
   recbuffers.Clear();
   audio_enabled = (audio_enabled && installed);
-
 }
 
-
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tWinAudioPlayer::~tWinAudioPlayer()
 {
-  delete listener;
+  delete mpListener;
   delete AudioBuffer;
-  // close device if open
+
+  // Close the device if it is open.
   CloseDsp();
-  // release semaphor
+
+  // Release the semaphor.
   DeleteCriticalSection(&mutex);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tWinAudioPlayer::ShowError()
 {
-  const char *msg = 0;
-  switch (error)
+  const char* pMessage = 0;
+  switch (mErrorCode)
   {
     case ErrOutOpen:
-      msg = "Cannot open audio output device";
+      pMessage = "Cannot open audio output device";
       break;
     case ErrOutPrepare:
-      msg = "Cannot prepare audio output headers";
+      pMessage = "Cannot prepare audio output headers";
       break;
     case ErrOutUnprepare:
-      msg = "Cannot unprepare audio output headers";
+      pMessage = "Cannot unprepare audio output headers";
       break;
     case ErrInpOpen:
-      msg = "Cannot open audio input device";
+      pMessage = "Cannot open audio input device";
       break;
     case ErrInpPrepare:
-      msg = "Cannot prepare audio input headers";
+      pMessage = "Cannot prepare audio input headers";
       break;
     case ErrInpUnprepare:
-      msg = "Cannot unprepare audio input headers";
+      pMessage = "Cannot unprepare audio input headers";
       break;
     case ErrCapGet:
-      msg = "Unable to get audio device capbabilities";
+      pMessage = "Unable to get audio device capbabilities";
       break;
     case ErrCapSync:
-      msg = "Your soundcard does not support audio/midi sync";
+      pMessage = "Your soundcard does not support audio/midi sync";
       break;
   }
-  if (msg)
-    wxMessageBox((char *)msg, "Error", wxOK);
+  if (pMessage)
+  {
+    wxMessageBox(pMessage, "Error", wxOK);
+  }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tWinAudioPlayer::LoadSamples(const char *filename)
 {
-  return samples.Load(filename);
+  return mSamples.Load(filename);
 }
 
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tWinAudioPlayer::OpenDsp()
 {
   int i;
   MMRESULT res;
 
-  error = NoError;  // everything ok for now.
+  mErrorCode = NoError;  // everything ok for now.
 
   if (!audio_enabled)
   {
     return 0;
   }
 
-  can_duplex = (gpConfig->GetValue(C_DuplexAudio) != 0);
+  mCanDuplex = (gpConfig->GetValue(C_DuplexAudio) != 0);
 
   // specify the data format
   WAVEFORMATEX fmt;
   memset(&fmt, 0, sizeof(fmt));
   fmt.wFormatTag      = WAVE_FORMAT_PCM;
-  fmt.nChannels       = samples.GetChannels();
-  fmt.nSamplesPerSec  = samples.GetSpeed();
-  fmt.nBlockAlign     = samples.GetChannels() * sizeof(short);
+  fmt.nChannels       = mSamples.GetChannels();
+  fmt.nSamplesPerSec  = mSamples.GetSpeed();
+  fmt.nBlockAlign     = mSamples.GetChannels() * sizeof(short);
   fmt.nAvgBytesPerSec = fmt.nBlockAlign * fmt.nSamplesPerSec;
   fmt.wBitsPerSample  = 16;
   fmt.cbSize          = 0;
@@ -264,14 +299,14 @@ int tWinAudioPlayer::OpenDsp()
 
     if (res != MMSYSERR_NOERROR)
     {
-      error = ErrOutOpen;
+      mErrorCode = ErrOutOpen;
       return 1;
     }
 
     // prepare headers
     for (i = 0; i < BUFCOUNT; i++)
     {
-      tAudioBuffer *buf = samples.GetBuffer(i);
+      tAudioBuffer *buf = mSamples.GetBuffer(i);
       WAVEHDR *hdr = new WAVEHDR;
       memset(hdr, 0, sizeof(WAVEHDR));
       buf->hdr = hdr;
@@ -282,7 +317,7 @@ int tWinAudioPlayer::OpenDsp()
       res = waveOutPrepareHeader(hout, hdr, sizeof(WAVEHDR));
       if (res != MMSYSERR_NOERROR)
       {
-        error = ErrOutPrepare;
+        mErrorCode = ErrOutPrepare;
         return 1;
       }
     }
@@ -297,7 +332,7 @@ int tWinAudioPlayer::OpenDsp()
     res = waveInOpen(&hinp, WAVE_MAPPER, &fmt, (DWORD)audioInterrupt, (DWORD)this, CALLBACK_FUNCTION);
     if (res != MMSYSERR_NOERROR)
     {
-      error = ErrInpOpen;
+      mErrorCode = ErrInpOpen;
       return 1;
     }
 
@@ -321,7 +356,7 @@ int tWinAudioPlayer::OpenDsp()
       res = waveInAddBuffer(hinp, hdr, sizeof(WAVEHDR));
       if (res != MMSYSERR_NOERROR)
       {
-        error = ErrInpPrepare;
+        mErrorCode = ErrInpPrepare;
         return 1;
       }
     }
@@ -332,16 +367,14 @@ int tWinAudioPlayer::OpenDsp()
   return 0;
 }
 
-
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tWinAudioPlayer::CloseDsp()
 {
   // todo: close the device immediately if open
 
   int i;
   MMRESULT res;
-
 
   if (hout_open)
   {
@@ -353,13 +386,13 @@ int tWinAudioPlayer::CloseDsp()
     // unprepare headers
     for (i = 0; i < BUFCOUNT; i++)
     {
-      tAudioBuffer *buf = samples.GetBuffer(i);
+      tAudioBuffer *buf = mSamples.GetBuffer(i);
       WAVEHDR *hdr = (WAVEHDR *)buf->hdr;
 
       res = waveOutUnprepareHeader(hout, hdr, sizeof(WAVEHDR));
       if (res != MMSYSERR_NOERROR)
       {
-        error = ErrOutUnprepare;
+        mErrorCode = ErrOutUnprepare;
         return 1;
       }
       delete hdr;
@@ -384,7 +417,7 @@ int tWinAudioPlayer::CloseDsp()
       res = waveInUnprepareHeader(hinp, (WAVEHDR *)buf->hdr, sizeof(WAVEHDR));
       if (res != MMSYSERR_NOERROR)
       {
-        error = ErrInpUnprepare;
+        mErrorCode = ErrInpUnprepare;
         return 1;
       }
       delete buf->hdr;
@@ -397,16 +430,23 @@ int tWinAudioPlayer::CloseDsp()
   return 0;
 }
 
-
-void FAR PASCAL audioInterrupt(HWAVEOUT hout, UINT wMsg, DWORD dwUser, DWORD dw1, DWORD dw2)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void FAR PASCAL audioInterrupt(
+  HWAVEOUT hout,
+  UINT wMsg,
+  DWORD dwUser,
+  DWORD dw1,
+  DWORD dw2)
 {
   if (wMsg == MM_WOM_DONE || wMsg == MM_WIM_DATA)
+  {
     ((tWinAudioPlayer *)dwUser)->AudioCallback(wMsg);
+  }
 }
 
-
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tWinAudioPlayer::AudioCallback(UINT wMsg)
 {
   // async called by driver when the driver has processed a buffer completely
@@ -416,8 +456,8 @@ void tWinAudioPlayer::AudioCallback(UINT wMsg)
   {
     blocks_played ++;
     play_buffers_needed ++;
-    tAudioBuffer *buf = samples.driv_buffers.Get();
-    samples.free_buffers.Put(buf);
+    tAudioBuffer *buf = mSamples.driv_buffers.Get();
+    mSamples.free_buffers.Put(buf);
   }
   if (hinp_open && wMsg == MM_WIM_DATA)
   {
@@ -426,10 +466,8 @@ void tWinAudioPlayer::AudioCallback(UINT wMsg)
   LeaveCriticalSection(&mutex);
 }
 
-
-
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tWinAudioPlayer::StartAudio()
 {
   // async called by driver to start audio in sync with midi
@@ -445,30 +483,37 @@ void tWinAudioPlayer::StartAudio()
   }
 }
 
-
+//-----------------------------------------------------------------------------
+// Description:
+//   Send the sample set to driver.
+//-----------------------------------------------------------------------------
 void tWinAudioPlayer::WriteBuffers()
 {
   if (audio_enabled && hout_open)
   {
-    tAudioBuffer *buf;
-    while ((buf = samples.full_buffers.Get()) != 0)
+    tAudioBuffer* pAudioBuffer;
+    while ((pAudioBuffer = mSamples.full_buffers.Get()) != 0)
     {
-      if (waveOutWrite(hout, buf->hdr, sizeof(WAVEHDR)) == MMSYSERR_NOERROR)
+      if (
+        waveOutWrite(
+          hout,
+          pAudioBuffer->hdr,
+          sizeof(WAVEHDR)) == MMSYSERR_NOERROR)
       {
-        samples.driv_buffers.Put(buf);
-        -- play_buffers_needed;
+        mSamples.driv_buffers.Put(pAudioBuffer);
+        --play_buffers_needed;
       }
       else
       {
-        samples.full_buffers.UnGet(buf);
+        mSamples.full_buffers.UnGet(pAudioBuffer);
         break;
       }
     }
   }
 }
 
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tWinAudioPlayer::Notify()
 {
   if (audio_enabled)
@@ -477,12 +522,14 @@ void tWinAudioPlayer::Notify()
 
     if (hout_open)
     {
-      samples.FillBuffers(OutClock);
+      mSamples.FillBuffers(OutClock);
       if (play_buffers_needed > 0)  // dont trigger start play by accident
+      {
         WriteBuffers();
+      }
 
       // midi time correction
-      if (can_sync && samples.softsync)
+      if (mCanSynchronize && mSamples.softsync)
       {
         MMTIME mmtime;
         MMRESULT res;
@@ -490,11 +537,14 @@ void tWinAudioPlayer::Notify()
         res = waveOutGetPosition(hout, &mmtime, sizeof(mmtime));
         if (res == MMSYSERR_NOERROR && mmtime.wType == TIME_SAMPLES)
         {
-          long time_now          = (long)timeGetTime();
-          long audio_now         = (long)((double)start_time + (double)mmtime.u.sample * 1000.0 / (double)samples.speed);
+          long time_now = (long)timeGetTime();
+          long audio_now =
+            (long)((double)start_time + 1000.0 * mmtime.u.sample / mSamples.speed);
+
           // low pass filter for time-correction (not really necessary)
           const long low = 50;
-          state->time_correction = (low * state->time_correction + (100 - low) * (audio_now - time_now) ) / 100L;
+          state->time_correction =
+            (low * state->time_correction + (100 - low) * (audio_now - time_now) ) / 100L;
         }
       }
     }
@@ -512,9 +562,9 @@ void tWinAudioPlayer::Notify()
         tAudioBuffer *buf = recbuffers.RequestBuffer();
         buf->hdr = hdr;
 
-        hdr->lpData           = (LPSTR)buf->data;
-        hdr->dwBufferLength   = BUFBYTES;          // length, in bytes, of the buffer
-        hdr->dwFlags          = 0;                 // see below
+        hdr->lpData         = (LPSTR)buf->data;
+        hdr->dwBufferLength = BUFBYTES;          // length, in bytes, of the buffer
+        hdr->dwFlags        = 0;
 
         if (waveInPrepareHeader(hinp, hdr, sizeof(WAVEHDR)) == MMSYSERR_NOERROR)
         {
@@ -522,10 +572,12 @@ void tWinAudioPlayer::Notify()
           record_buffers_needed --;
         }
         else
+        {
           break;
+        }
       }
 
-      if (can_sync && samples.softsync && !hout_open)
+      if (mCanSynchronize && mSamples.softsync && !hout_open)
       {
         // midi time correction
         MMTIME mmtime;
@@ -534,8 +586,9 @@ void tWinAudioPlayer::Notify()
         res = waveInGetPosition(hinp, &mmtime, sizeof(mmtime));
         if (res == MMSYSERR_NOERROR && mmtime.wType == TIME_SAMPLES)
         {
-          long time_now          = (long)timeGetTime();
-          long audio_now         = (long)((double)state->start_time + (double)mmtime.u.sample * 1000.0 / (double)samples.speed);
+          long time_now  = (long)timeGetTime();
+          long audio_now =
+            (long)((double)state->start_time + 1000.0 * mmtime.u.sample / mSamples.speed);
           // low pass filter for time-correction (not really necessary)
           const long low = 50;
           state->time_correction = (low * state->time_correction + (100 - low) * (audio_now - time_now) ) / 100L;
@@ -549,34 +602,34 @@ void tWinAudioPlayer::Notify()
   tWinIntPlayer::Notify();
 }
 
-
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tWinAudioPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 {
-  samples.StartPlay(Clock);
+  mSamples.StartPlay(Clock);
   tWinIntPlayer::StartPlay(Clock, LoopClock, Continue);
 
   if (!audio_enabled)
     return;
 
-  delete listener;
+  delete mpListener;
 
   start_clock = Clock;
   start_time = state->start_time;
 
-  samples.ResetBuffers(AudioBuffer, start_clock, state->ticks_per_minute);
-  samples.FillBuffers(OutClock);
+  mSamples.ResetBuffers(AudioBuffer, start_clock, state->ticks_per_minute);
+  mSamples.FillBuffers(OutClock);
 
   OpenDsp();
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tWinAudioPlayer::StopPlay()
 {
   tWinIntPlayer::StopPlay();
   CloseDsp();
-  samples.StopPlay();
+  mSamples.StopPlay();
   if (RecordMode())
   {
     long frc = rec_info->mFromClock;
@@ -586,33 +639,44 @@ void tWinAudioPlayer::StopPlay()
     long play_clock = Time2Clock(state->play_time);
     if (toc > play_clock)
       toc = play_clock;
-    samples.SaveRecordingDlg(frc, toc, recbuffers);
+    mSamples.SaveRecordingDlg(frc, toc, recbuffers);
   }
   recbuffers.Clear();
 }
 
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tWinAudioPlayer::ListenAudio(int key, int start_stop_mode)
 {
   if (!audio_enabled)
-    return;
-
-  // play audio file from piano roll
-  if (Playing)
-    return;
-  // when already listening then stop listening
-  if (listener)
   {
-    delete listener;
+    return;
+  }
+
+  // Play the audio file from the piano roll.
+  if (Playing)
+  {
+    return;
+  }
+
+  // If already listening then stop listening.
+  if (mpListener)
+  {
+    delete mpListener;
     if (start_stop_mode)
+    {
       return;
+    }
   }
   if (key < 0)
+  {
     return;
-  listener = new tAudioListener(this, key);
+  }
+  mpListener = new tAudioListener(this, key);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tWinAudioPlayer::ListenAudio(tSample &spl, long fr_smpl, long to_smpl)
 {
   if (!audio_enabled)
@@ -621,21 +685,27 @@ void tWinAudioPlayer::ListenAudio(tSample &spl, long fr_smpl, long to_smpl)
   if (Playing)
     return;
   // when already listening then stop listening
-  if (listener)
-    delete listener;
-  listener = new tAudioListener(this, spl, fr_smpl, to_smpl);
+  if (mpListener)
+  {
+    delete mpListener;
+  }
+  mpListener = new tAudioListener(this, spl, fr_smpl, to_smpl);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 long tWinAudioPlayer::GetListenerPlayPosition()
 {
-  if (!listener)
+  if (!mpListener)
+  {
     return -1L;
-  return listener->GetPlayPosition();
+  }
+  return mpListener->GetPlayPosition();
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tWinAudioPlayer::RecordMode() const
 {
   return rec_info != 0 && rec_info->mpTrack->GetAudioMode();
 }
-

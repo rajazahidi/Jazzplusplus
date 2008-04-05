@@ -48,30 +48,38 @@ class tAlsaAudioPlayer : public tAlsaPlayer
     virtual void SetAudioEnabled(int x) { audio_enabled = x; }
     virtual void ListenAudio(int key, int start_stop_mode = 1);
     virtual void ListenAudio(tSample &spl, long fr_smpl, long to_smpl);
-    virtual bool IsListening() const {
-      return listener != 0;
+    virtual bool IsListening() const
+    {
+      return mpListener != 0;
     }
     virtual long GetListenerPlayPosition();
     virtual void StartAudio();
     virtual void ResetPlay(long clock);
 
-    enum { PLAYBACK = 0, CAPTURE };
+    enum
+    {
+      PLAYBACK = 0,
+      CAPTURE
+    };
 
     // for recording
     int RecordMode() const;
     int PlayBackMode() const;
 
   private:
-    int can_duplex;	// TRUE = can do full duplex record/play
 
     int WriteSamples();
     void ReadSamples();
     void MidiSync();
     void OpenDsp(int mode, int sync_mode);
-    void CloseDsp(int reset);
+
+    void CloseDsp(bool Reset);
 
     long GetCurrentPosition(int mode);
     int GetFreeSpace(int mode);
+
+    // If true can do full duplex record/play.
+    int mCanDuplex;
 
     snd_pcm_t *pcm[2];
     int installed;
@@ -92,7 +100,7 @@ class tAlsaAudioPlayer : public tAlsaPlayer
     int frame_shift[2];
     long frame_boundary[2];
 
-    tAlsaAudioListener *listener;
+    tAlsaAudioListener* mpListener;
     tAudioRecordBuffer recbuffers;
 };
 

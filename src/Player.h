@@ -36,6 +36,8 @@
 #include <sys/types.h>
 #include <time.h>
 
+class JZRecordingInfo;
+
 
 // audio-menu
 #define MEN_AUDIO_LOAD     200
@@ -65,7 +67,7 @@ class tPlayLoop
     long Int2ExtClock(long Clock);
 
     void PrepareOutput(
-      tEventArray *buf,
+      tEventArray* buf,
       JZSong* pSong,
       long ExtFr,
       long ExtTo,
@@ -74,13 +76,17 @@ class tPlayLoop
   private:
 
     long mStartClock;
+
     long mStopClock;
 };
 
-enum tClockSource { CsInt = 0, CsFsk, CsMidi, CsMtc };
-
-class JZRecordingInfo;
-
+enum tClockSource
+{
+  CsInt = 0,
+  CsFsk,
+  CsMidi,
+  CsMtc
+};
 
 class tDeviceList
 {
@@ -197,22 +203,29 @@ class JZPlayer : public wxTimer
     virtual void ListenAudio(tSample &spl, long fr_smpl, long to_smpl) {}
     virtual bool IsListening() const { return 0; }
 
-    virtual int OnMenuCommand(int id) {
+    virtual int OnMenuCommand(int id)
+    {
       if (Playing)
       {
         return 0;
       }
-      return samples.OnMenuCommand(id);
+      return mSamples.OnMenuCommand(id);
     }
-    virtual const char *GetSampleName(int i) {
-      return samples.GetSampleName(i);
+
+    virtual const char *GetSampleName(int i)
+    {
+      return mSamples.GetSampleName(i);
     }
-    virtual void AdjustAudioLength(JZTrack *t) {
+
+    virtual void AdjustAudioLength(JZTrack *t)
+    {
       long ticks_per_minute = Song->TicksPerQuarter * Song->Speed();
-      samples.AdjustAudioLength(t, ticks_per_minute);
+      mSamples.AdjustAudioLength(t, ticks_per_minute);
     }
-    void EditSample(int key) {
-      samples.Edit(key);
+
+    void EditSample(int key)
+    {
+      mSamples.Edit(key);
     }
 
     virtual long GetListenerPlayPosition()
@@ -222,14 +235,17 @@ class JZPlayer : public wxTimer
 
     void LoadDefaultSettings()
     {
-      samples.LoadDefaultSettings();
+      mSamples.LoadDefaultSettings();
     }
 
   protected:
-    tSampleSet samples;
+
+    tSampleSet mSamples;
 
   public:
+
     JZPlayer(JZSong *song);
+
     virtual ~JZPlayer();
 
     void Notify();

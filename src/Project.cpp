@@ -325,6 +325,7 @@ JZProject::~JZProject()
   delete mpSynth;
   delete mpRecInfo;
   delete mpConfig;
+  cout << "Done Deleting the project." << endl;
 }
 
 //-----------------------------------------------------------------------------

@@ -301,7 +301,8 @@ tAlsaPlayer::~tAlsaPlayer()
   {
     delete thru;
   }
-  snd_seq_close(handle);
+  // The following call caused an unkillable process on Mandriva 2008.0.
+//  snd_seq_close(handle);
 }
 
 //-----------------------------------------------------------------------------
@@ -437,7 +438,6 @@ int tAlsaPlayer::compose_echo(int clock, unsigned int arg)
   ev.source = self;
   ev.dest = self;
   snd_seq_ev_schedule_tick(&ev, queue, 0, clock);
-  cout << "scheduling echo for " << clock << endl;
   snd_seq_ev_set_fixed(&ev);
   ev.type = SND_SEQ_EVENT_ECHO;
   ev.data.raw32.d[0] = arg;
@@ -464,7 +464,6 @@ void tAlsaPlayer::OutBreak(long clock)
 //-----------------------------------------------------------------------------
 void tAlsaPlayer::StartPlay(long clock, long loopClock, int cont)
 {
-  cout << "tAlsaPlayer::StartPlay" << endl;
   recd_clock = clock;
   echo_clock = clock;
   play_clock = clock;

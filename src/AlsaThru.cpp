@@ -62,8 +62,10 @@ tAlsaThru::tAlsaThru()
 
 tAlsaThru::~tAlsaThru()
 {
-  if (running)
-    Stop();
+  // Calling Stop() caused the creation of an unkillable process on Mandriva
+  // 2008.0.
+//  if (running)
+//    Stop();
 }
 
 
@@ -124,7 +126,8 @@ void tAlsaThru::Start()
 // disconnect midi-thru
 void tAlsaThru::Stop()
 {
-  if (running) {
+  if (running)
+  {
     initialize();
     disconnect(source, destin);
     running = 0;

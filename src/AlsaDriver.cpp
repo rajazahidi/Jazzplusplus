@@ -135,7 +135,6 @@ tAlsaAudioPlayer::tAlsaAudioPlayer(JZSong *song)
 
 tAlsaAudioPlayer::~tAlsaAudioPlayer()
 {
-  cout << "Deleting ALSA audio driver start..." << endl;
   delete listener;
   delete AudioBuffer;
   if (pcm[PLAYBACK])
@@ -148,7 +147,6 @@ tAlsaAudioPlayer::~tAlsaAudioPlayer()
     snd_pcm_close(pcm[CAPTURE]);
     pcm[CAPTURE] = NULL;
   }
-  cout << "Done." << endl;
 }
 
 

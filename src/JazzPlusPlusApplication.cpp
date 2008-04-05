@@ -47,10 +47,6 @@
 
 #endif
 
-#include <iostream>
-
-using namespace std;
-
 //*****************************************************************************
 // Description:
 //   This is the JazzPlusPlus application class definition.
@@ -108,7 +104,6 @@ JZJazzPlusPlusApplication::JZJazzPlusPlusApplication()
 //-----------------------------------------------------------------------------
 JZJazzPlusPlusApplication::~JZJazzPlusPlusApplication()
 {
-  cout << "In the application desstructor" << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -172,7 +167,6 @@ int JZJazzPlusPlusApplication::OnExit()
   // Prevent reported leaks from the configuration class.
   delete wxConfigBase::Set(0);
 
-  cout << "Done in OnExit" << endl;
   return 0;
 }
 

@@ -170,19 +170,24 @@ JZProject::JZProject()
     mpMidiPlayer = new tAudioPlayer(this);
     if (!mpMidiPlayer->Installed())
     {
+      cerr << "tAudioPlayer didn't install." << endl;
+
       delete mpMidiPlayer;
       mpMidiPlayer = new tSeq2Player(this);
     }
     if (!mpMidiPlayer->Installed())
     {
+      cerr << "tSeq2Player didn't install." << endl;
+
       perror("/dev/music");
-      cerr
-        << "(dev_sequencer2)Jazz will start with no play/record ability."
-        << endl;
+
+      cerr << "Jazz will start with no play/record ability." << endl;
+      delete mpMidiPlayer;
       mpMidiPlayer = new tNullPlayer(this);
     }
 #else
-    cerr << "This programm lacks OSS driver support" << endl;
+    cerr << "This programm lacks OSS driver support." << endl;
+    cerr << "Jazz will start with no play/record ability." << endl;
     mpMidiPlayer = new tNullPlayer(this);
 #endif // DEV_SEQUENCER2
   }
@@ -192,20 +197,25 @@ JZProject::JZProject()
     mpMidiPlayer = new tAlsaAudioPlayer(this);
     if (!mpMidiPlayer->Installed())
     {
+      cerr << "tAlsaAudioPlayer didn't install." << endl;
+
       delete mpMidiPlayer;
-      cout << "creating alsa player" << endl;
       mpMidiPlayer = new tAlsaPlayer(this);
     }
     if (!mpMidiPlayer->Installed())
     {
+      cerr << "tAlsaPlayer didn't install." << endl;
+
       cerr
         << "Could not install alsa driver." << '\n'
         << "Jazz will start with no play/record ability."
         << endl;
+      delete mpMidiPlayer;
       mpMidiPlayer = new tNullPlayer(this);
     }
 #else
     cerr << "This programm lacks ALSA driver support" << endl;
+    cerr << "Jazz will start with no play/record ability." << endl;
     mpMidiPlayer = new tNullPlayer(this);
 #endif
   }
@@ -215,15 +225,19 @@ JZProject::JZProject()
     mpMidiPlayer = new tMpuPlayer(this);
     if (!mpMidiPlayer->Installed())
     {
+      cerr << "tMpuPlayer didn't install." << endl;
+
       cerr
         << "Could not connect to midinet server at host \""
         << %midinethost << "\"\n"
         << "Jazz will start with no play/record ability."
         << endl;
+      delete mpMidiPlayer;
       mpMidiPlayer = new tNullPlayer(this);
     }
 #else
     cerr << "This programm lacks JAZZ/MPU401 driver support" << endl;
+    cerr << "Jazz will start with no play/record ability." << endl;
     mpMidiPlayer = new tNullPlayer(this);
 #endif
   }
@@ -325,7 +339,6 @@ JZProject::~JZProject()
   delete mpSynth;
   delete mpRecInfo;
   delete mpConfig;
-  cout << "Done Deleting the project." << endl;
 }
 
 //-----------------------------------------------------------------------------

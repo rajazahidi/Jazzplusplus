@@ -54,8 +54,8 @@ class tAlsaAudioListener : public wxTimer
     tAlsaAudioListener(tAlsaAudioPlayer* pPlayer, int key)
       : wxTimer(),
         mpPlayer(pPlayer),
+        mHardExit(true)
     {
-      mHardExit = TRUE;
       mpPlayer->mpListener = this;
       mpPlayer->rec_info = 0;  // not recording!
       mpPlayer->running_mode = 0;
@@ -74,8 +74,8 @@ class tAlsaAudioListener : public wxTimer
       long to_smpl)
       : wxTimer(),
         mpPlayer(pPlayer),
+        mHardExit(true)
     {
-      mHardExit = TRUE;
       mpPlayer->mpListener = this;
       mpPlayer->rec_info = 0;  // not recording!
       mpPlayer->running_mode = 0;
@@ -103,7 +103,7 @@ class tAlsaAudioListener : public wxTimer
       mCount += mpPlayer->mSamples.ContinueListen();
       if (mCount <= 0)
       {
-        mHardExit = FALSE;
+        mHardExit = false;
         delete this;
       }
     }
@@ -119,7 +119,7 @@ class tAlsaAudioListener : public wxTimer
 
     int mCount;
 
-    int mHardExit;
+    bool mHardExit;
 };
 
 

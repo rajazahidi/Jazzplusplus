@@ -27,12 +27,15 @@
 #include "Configuration.h"
 #include "Globals.h"
 
+#include <iostream>
 #include <unistd.h>
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <sys/ioctl.h>
 #include <errno.h>
 
 #include <fcntl.h>
+
+using namespace std;
 
 #define AUDIO_DEVICE "/dev/dsp"
 
@@ -52,7 +55,7 @@ class tAudioListener : public wxTimer
 
       // SYNC seems not to work?? so add 8 more silent buffers
       // to hear the end of the sample too.
-      mCount = 8 + mpPlayer->samples.PrepareListen(key);
+      mCount = 8 + mpPlayer->mSamples.PrepareListen(key);
       mpPlayer->OpenDsp();
       Start(20);
     }
@@ -65,13 +68,12 @@ class tAudioListener : public wxTimer
       : wxTimer(),
         mpPlayer(pPlayer),
         mCount(0),
-        mHardExit(true),
+        mHardExit(true)
     {
-      mpPlayer = p;
       mpPlayer->mpListener = this;
       mpPlayer->rec_info = 0;  // not recording!
 
-      mCount = 8 + mpPlayer->samples.PrepareListen(&spl, fr_smpl, to_smpl);
+      mCount = 8 + mpPlayer->mSamples.PrepareListen(&spl, fr_smpl, to_smpl);
       mpPlayer->OpenDsp();
       Start(20);
     }
@@ -86,7 +88,7 @@ class tAudioListener : public wxTimer
     virtual void Notify()
     {
       mCount -= mpPlayer->WriteSamples();
-      mCount += mpPlayer->samples.ContinueListen();
+      mCount += mpPlayer->mSamples.ContinueListen();
       if (mCount <= 0)
       {
         mHardExit = false;
@@ -176,7 +178,7 @@ tAudioPlayer::~tAudioPlayer()
 
 int tAudioPlayer::LoadSamples(const char *filename)
 {
-  return samples.Load(filename);
+  return mSamples.Load(filename);
 }
 
 int tAudioPlayer::RecordMode() const
@@ -192,10 +194,10 @@ void tAudioPlayer::StartAudio()
   }
 
   long ticks_per_minute = Song->TicksPerQuarter * Song->Speed();
-  samples.ResetBuffers(AudioBuffer, start_clock, ticks_per_minute);
+  mSamples.ResetBuffers(AudioBuffer, start_clock, ticks_per_minute);
   if (PlaybackMode())
   {
-    samples.FillBuffers(OutClock);
+    mSamples.FillBuffers(OutClock);
   }
 
   audio_bytes = 0;
@@ -279,20 +281,20 @@ void tAudioPlayer::OpenDsp()
     perror("ioctl DSP_SETFRAGMENT");
   }
 
-  tmp = samples.BitsPerSample();
+  tmp = mSamples.BitsPerSample();
   ioctl(dev, SNDCTL_DSP_SAMPLESIZE, &tmp);
-  if (tmp != samples.BitsPerSample())
+  if (tmp != mSamples.BitsPerSample())
   {
     cerr << "Unable to set the sample size" << endl;
   }
 
-  tmp = (samples.GetChannels() == 1) ? 0 : 1;
+  tmp = (mSamples.GetChannels() == 1) ? 0 : 1;
   if (ioctl (dev, SNDCTL_DSP_STEREO, &tmp) == -1)
   {
     cerr << "Unable to set mono/stereo" << endl;
   }
 
-  tmp = samples.GetSpeed();
+  tmp = mSamples.GetSpeed();
   if (ioctl (dev, SNDCTL_DSP_SPEED, &tmp) == -1)
   {
     perror("ioctl DSP_SPEED");
@@ -348,7 +350,7 @@ void tAudioPlayer::Notify()
       WriteSamples();
 
       // here it may hang when swapping in pages
-      samples.FillBuffers(OutClock);
+      mSamples.FillBuffers(OutClock);
 
       WriteSamples();
     }
@@ -357,7 +359,7 @@ void tAudioPlayer::Notify()
       ReadSamples();
     }
 
-    if (samples.softsync)
+    if (mSamples.softsync)
     {
       MidiSync();
     }
@@ -388,7 +390,7 @@ int tAudioPlayer::WriteSamples()
 
   for (int i = 0; i < info.fragments - 1; i++)
   {
-    tAudioBuffer *buf = samples.full_buffers.Get();
+    tAudioBuffer *buf = mSamples.full_buffers.Get();
     if (buf == 0)
     {
       break;
@@ -398,7 +400,7 @@ int tAudioPlayer::WriteSamples()
       perror("write");
     }
     blocks_written ++;
-    samples.free_buffers.Put(buf);
+    mSamples.free_buffers.Put(buf);
   }
 
   return blocks_written;
@@ -479,7 +481,7 @@ void tAudioPlayer::MidiSync()
     audio_bytes = new_bytes;
 
     // OSS bug?: mpu401 does not like speed changes too often
-    long audio_clock = (long)samples.Samples2Ticks(audio_bytes / 2);
+    long audio_clock = (long)mSamples.Samples2Ticks(audio_bytes / 2);
     int delta_clock = audio_clock - midi_clock;
     int new_speed = midi_speed + delta_clock;
 
@@ -512,13 +514,13 @@ void tAudioPlayer::MidiSync()
 void tAudioPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 {
   delete mpListener;
-  samples.StartPlay(Clock);
+  mSamples.StartPlay(Clock);
   tSeq2Player::StartPlay(Clock, LoopClock, Continue);
 }
 
 void tAudioPlayer::StopPlay()
 {
-  samples.StopPlay();
+  mSamples.StopPlay();
   tSeq2Player::StopPlay();
   if (!audio_enabled)
   {
@@ -538,7 +540,7 @@ void tAudioPlayer::StopPlay()
     {
       toc = recd_clock;
     }
-    samples.SaveRecordingDlg(frc, toc, recbuffers);
+    mSamples.SaveRecordingDlg(frc, toc, recbuffers);
   }
   recbuffers.Clear();
 }

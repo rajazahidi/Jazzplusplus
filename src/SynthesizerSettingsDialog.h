@@ -21,6 +21,8 @@
 #ifndef JZ_SYNTHESIZERSETTINGDIALOG_H
 #define JZ_SYNTHESIZERSETTINGDIALOG_H
 
+#include <string>
+
 //*****************************************************************************
 //*****************************************************************************
 class JZSynthesizerDialog : public wxDialog
@@ -31,9 +33,21 @@ class JZSynthesizerDialog : public wxDialog
 
   private:
 
+    virtual bool TransferDataToWindow();
+
+    virtual bool TransferDataFromWindow();
+
+    void OnHelp(wxCommandEvent& Event);
+
+  private:
+
+    std::string mOldSynthTypeName;
+
     wxListBox* mpSynthesizerListbox;
 
     wxListBox* mpStartListbox;
+
+  DECLARE_EVENT_TABLE();
 };
 
 #endif // !defined(JZ_SYNTHESIZERSETTINGDIALOG_H)

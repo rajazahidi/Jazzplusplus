@@ -30,6 +30,14 @@ using namespace std;
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+BEGIN_EVENT_TABLE(JZSynthesizerDialog, wxDialog)
+
+  EVT_BUTTON(wxID_HELP, JZSynthesizerDialog::OnHelp)
+
+END_EVENT_TABLE()
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZSynthesizerDialog::JZSynthesizerDialog(wxWindow* pParent)
   : wxDialog(pParent, wxID_ANY, wxString("Synthesizer Settings")),
     mpSynthesizerListbox(0),
@@ -37,28 +45,20 @@ JZSynthesizerDialog::JZSynthesizerDialog(wxWindow* pParent)
 {
   mpSynthesizerListbox = new wxListBox(this, wxID_ANY);
 
-  int Selection = 0;
-  int Index = 0;
   for (
-    vector<pair<string, int> >::const_iterator iPair = gSynthesizerTypes.begin();
+    vector<pair<string, int> >::const_iterator iPair =
+      gSynthesizerTypes.begin();
     iPair != gSynthesizerTypes.end();
-    ++iPair, ++Index)
+    ++iPair)
   {
     mpSynthesizerListbox->Append(iPair->first.c_str());
-    if (strcmp(iPair->first.c_str(), gpConfig->StrValue(C_SynthType)) == 0)
-    {
-      Selection = Index;
-    }
   }
-  mpSynthesizerListbox->SetSelection(Selection);
 
   mpStartListbox = new wxListBox(this, wxID_ANY);
 
   mpStartListbox->Append("Never");
   mpStartListbox->Append("Song Start");
   mpStartListbox->Append("Start Play");
-
-  mpStartListbox->SetSelection(gpConfig->GetValue(C_SendSynthReset));
 
   wxButton* pOkButton = new wxButton(this, wxID_OK, "&OK");
   wxButton* pCancelButton = new wxButton(this, wxID_CANCEL, "Cancel");
@@ -102,4 +102,65 @@ JZSynthesizerDialog::JZSynthesizerDialog(wxWindow* pParent)
 
   pTopSizer->SetSizeHints(this);
   pTopSizer->Fit(this);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZSynthesizerDialog::TransferDataToWindow()
+{
+  int Selection(0), Index(0);
+  for (
+    vector<pair<string, int> >::const_iterator iPair =
+      gSynthesizerTypes.begin();
+    iPair != gSynthesizerTypes.end();
+    ++iPair, ++Index)
+  {
+    if (strcmp(iPair->first.c_str(), gpConfig->StrValue(C_SynthType)) == 0)
+    {
+      mOldSynthTypeName = iPair->first;
+      Selection = Index;
+    }
+  }
+  mpSynthesizerListbox->SetSelection(Selection);
+
+  mpStartListbox->SetSelection(gpConfig->GetValue(C_SendSynthReset));
+
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZSynthesizerDialog::TransferDataFromWindow()
+{
+  string SynthTypeName(mOldSynthTypeName);
+  wxString SelectionString = mpSynthesizerListbox->GetStringSelection();
+  if (!SelectionString.empty())
+  {
+    SynthTypeName = SelectionString;
+  }
+
+  int Selection = mpStartListbox->GetSelection();
+  if (Selection != wxNOT_FOUND)
+  {
+    gpConfig->Put(C_SendSynthReset, Selection);
+  }
+
+  if (mOldSynthTypeName != SynthTypeName)
+  {
+    gpConfig->Put(C_SynthType, SynthTypeName.c_str());
+
+    ::wxMessageBox(
+      "Restart jazz for the synthesizer type change to take effect",
+      "Info",
+      wxOK);
+  }
+
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZSynthesizerDialog::OnHelp(wxCommandEvent& Event)
+{
+//  gpHelpInstance->ShowTopic("Synthesizer Type Settings");
 }

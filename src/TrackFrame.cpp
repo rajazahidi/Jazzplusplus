@@ -82,7 +82,7 @@ BEGIN_EVENT_TABLE(JZTrackFrame, wxFrame)
 
   EVT_MENU(ID_PIANOWIN, JZTrackFrame::OnPianoWindow)
 
-  EVT_MENU(ID_METRONOME_ON, JZTrackFrame::OnMetroOn)
+  EVT_MENU(ID_METRONOME_TOGGLE, JZTrackFrame::OnMetroOn)
 
   EVT_MENU(wxID_ZOOM_IN, JZTrackFrame::OnZoomIn)
 
@@ -134,11 +134,6 @@ JZTrackFrame::JZTrackFrame(
 //    "Piano",
 //    wxDefaultPosition,
 //    wxSize(640, 480));
-
-  MetronomeInfo.IsAccented = gpConfig->GetValue(C_MetroIsAccented);
-  MetronomeInfo.Veloc = gpConfig->GetValue(C_MetroVelocity);
-  MetronomeInfo.KeyNorm = gpConfig->GetValue(C_MetroNormalClick);
-  MetronomeInfo.KeyAcc = gpConfig->GetValue(C_MetroAccentedClick);
 }
 
 //-----------------------------------------------------------------------------
@@ -164,10 +159,10 @@ void JZTrackFrame::CreateToolBar()
     { ID_MIXER,       false, mixer_xpm,    "mixer" },
     { ID_PIANOWIN,    false, pianowin_xpm, "show piano window" },
     { JZToolBar::eToolBarSeparator },
-    { ID_PLAY,      false, play_xpm,     "start play"},
-    { ID_PLAY_LOOP, false, playloop_xpm, "loop play"},
-    { ID_RECORD,    false, record_xpm,   "record"},
-    { ID_METRONOME, true,  metro_xpm,    "metronome" },
+    { ID_PLAY,             false, play_xpm,     "start play"},
+    { ID_PLAY_LOOP,        false, playloop_xpm, "loop play"},
+    { ID_RECORD,           false, record_xpm,   "record"},
+    { ID_METRONOME_TOGGLE, true, metro_xpm,    "metronome" },
     { JZToolBar::eToolBarSeparator },
     { wxID_ZOOM_IN,       false, zoomin_xpm,  "zoom in" },
     { wxID_ZOOM_OUT,      false, zoomout_xpm, "zoom out"},
@@ -517,7 +512,7 @@ void JZTrackFrame::OnPianoWindow(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnMetroOn(wxCommandEvent& Event)
 {
-  MetronomeInfo.IsOn = !MetronomeInfo.IsOn;
+  gpProject->ToggleMetronome();
 }
 
 //-----------------------------------------------------------------------------

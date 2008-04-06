@@ -141,10 +141,7 @@ JZProject::JZProject()
 
   mNumBars = 0;
 
-  mMetronomeInfo.IsAccented = mpConfig->GetValue(C_MetroIsAccented);
-  mMetronomeInfo.Veloc = mpConfig->GetValue(C_MetroVelocity);
-  mMetronomeInfo.KeyNorm = mpConfig->GetValue(C_MetroNormalClick);
-  mMetronomeInfo.KeyAcc = mpConfig->GetValue(C_MetroAccentedClick);
+  mMetronomeInfo.ReadFromConfiguration();
 
   if (mpConfig->StrValue(C_SynthType))
   {
@@ -581,10 +578,30 @@ void JZProject::SetLoopClock(int newclock)
 }
 
 //-----------------------------------------------------------------------------
+// Description:
+//   Returns a constant reference to the metronome.
 //-----------------------------------------------------------------------------
-tMetronomeInfo JZProject::GetMetronome()
+const JZMetronomeInfo& JZProject::GetMetronomeInfo()
 {
   return mMetronomeInfo;
+}
+
+//-----------------------------------------------------------------------------
+// Description:
+//   Toggles the "is on" state of the metronome.
+//-----------------------------------------------------------------------------
+void JZProject::ToggleMetronome()
+{
+  mMetronomeInfo.ToggleIsOn();
+}
+
+//-----------------------------------------------------------------------------
+// Description:
+//   Returns the "is on" state of the metronome.
+//-----------------------------------------------------------------------------
+bool JZProject::IsMetronomeOn() const
+{
+  return mMetronomeInfo.IsOn();
 }
 
 //-----------------------------------------------------------------------------

@@ -27,31 +27,45 @@
 #include "Globals.h"
 #include "Events.h"
 
-tMetronomeInfo::tMetronomeInfo()
-  : KeyAcc(36),
-    KeyNorm(37),
-    Veloc(127),
-    IsOn(0),
-    IsAccented(1)
+JZMetronomeInfo::JZMetronomeInfo()
+  : mKeyNormal(37),
+    mKeyAccented(36),
+    mVelocity(127),
+    mIsOn(false),
+    mIsAccented(true)
 {
 }
 
-tKeyOn* tMetronomeInfo::Normal(int clock)
+void JZMetronomeInfo::ReadFromConfiguration()
+{
+  mIsAccented = (gpConfig->GetValue(C_MetroIsAccented) != 0);
+  mVelocity = gpConfig->GetValue(C_MetroVelocity);
+  mKeyNormal = gpConfig->GetValue(C_MetroNormalClick);
+  mKeyAccented = gpConfig->GetValue(C_MetroAccentedClick);
+}
+
+void JZMetronomeInfo::ToggleIsOn()
+{
+  mIsOn = !mIsOn;
+}
+
+tKeyOn* JZMetronomeInfo::CreateNormalEvent(int Clock) const
 {
   return new tKeyOn(
-    clock,
+    Clock,
     gpConfig->GetValue(C_DrumChannel) - 1,
-    KeyNorm,
-    Veloc,
+    mKeyNormal,
+    mVelocity,
     15);
 }
 
-tKeyOn* tMetronomeInfo::Accented(int clock)
+tKeyOn* JZMetronomeInfo::CreateAccentedEvent(int Clock) const
 {
   return new tKeyOn(
-    clock,
+    Clock,
     gpConfig->GetValue(C_DrumChannel) - 1,
-    KeyAcc,
-    Veloc,
+    mKeyAccented,
+    mVelocity,
     15);
 }
+

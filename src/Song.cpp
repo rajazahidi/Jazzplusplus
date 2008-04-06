@@ -181,15 +181,17 @@ void JZSong::MergeTracks(
   int FrClock,
   int ToClock,
   tEventArray *Destin,
-  tMetronomeInfo *MetronomeInfo,
+  const JZMetronomeInfo& MetronomeInfo,
   int delta,
   int mode)
 {
   int i;
 
   // Make metronome
-  if (MetronomeInfo->IsOn)
-    MakeMetronome( FrClock, ToClock, Destin, MetronomeInfo, delta );
+  if (MetronomeInfo.IsOn())
+  {
+    MakeMetronome(FrClock, ToClock, Destin, MetronomeInfo, delta);
+  }
 
   // Find Solo-Tracks
   int solo = 0;
@@ -305,7 +307,7 @@ void JZSong::MakeMetronome(
   int FrClock,
   int ToClock,
   tEventArray *Destin,
-  tMetronomeInfo *MetronomeInfo,
+  const JZMetronomeInfo& MetronomeInfo,
   int delta)
 {
   JZBarInfo BarInfo( this );
@@ -329,13 +331,13 @@ void JZSong::MakeMetronome(
     }
 
     // Insert normal click always
-    Destin->Put( MetronomeInfo->Normal(clk + delta) );
+    Destin->Put(MetronomeInfo.CreateNormalEvent(clk + delta));
 
     //  On a bar?
-    if ( (count == 1) && (MetronomeInfo->IsAccented) )
+    if (count == 1 && MetronomeInfo.IsAccented())
     {
       // Insert accented click also
-      Destin->Put( MetronomeInfo->Accented(clk + delta) );
+      Destin->Put(MetronomeInfo.CreateAccentedEvent(clk + delta));
     }
 
     clk += BarInfo.TicksPerBar / BarInfo.CountsPerBar;

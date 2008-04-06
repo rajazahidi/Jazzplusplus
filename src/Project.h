@@ -67,11 +67,17 @@ class JZProject : public JZSong
     // Not yet sure what this does
     JZFilter* Filter;
 
-    // Stores metrome information
-    tMetronomeInfo mMetronomeInfo;
+    // Description:
+    //   Returns a constant reference to the metronome.
+    const JZMetronomeInfo& GetMetronomeInfo();
 
-    // Returns the internal pointer to the metronome
-    tMetronomeInfo GetMetronome();
+    // Description:
+    //   Toggles the "is on" state of the metronome.
+    void ToggleMetronome();
+
+    // Description:
+    //   Returns the "is on" state of the metronome.
+    bool IsMetronomeOn() const;
 
     // Number of bars
     int mNumBars;
@@ -168,6 +174,9 @@ class JZProject : public JZSong
     JZSynth* mpSynth;
 
     JZRecordingInfo* mpRecInfo;
+
+    // Stores metronome information.
+    JZMetronomeInfo mMetronomeInfo;
 
     bool mChanged;
 

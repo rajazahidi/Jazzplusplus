@@ -27,7 +27,7 @@
 #include "Configuration.h"
 #include "Globals.h"
 
-class tMetronomeInfo;
+class JZMetronomeInfo;
 class JZSong;
 
 class JZBarInfo
@@ -64,7 +64,7 @@ class JZSong
     int FrClock,
     int ToClock,
     tEventArray *Destin,
-    tMetronomeInfo* MetronomeInfo,
+    const JZMetronomeInfo& MetronomeInfo,
     int delta = 0);
 
   public:
@@ -103,7 +103,7 @@ class JZSong
       int FrClock,
       int ToClock,
       tEventArray *Destin,
-      tMetronomeInfo* MetronomeInfo,
+      const JZMetronomeInfo& MetronomeInfo,
       int DeltaClock = 0,
       int mode = 0);
 

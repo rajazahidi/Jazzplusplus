@@ -54,8 +54,6 @@ class JZTrackFrame : public wxFrame, public tButtonLabelInterface
     // Overridden tButtonLabelInterface finction.
     virtual void ButtonLabelDisplay(const wxString& Text, bool IsButtonDown);
 
-    tMetronomeInfo MetronomeInfo;
-
   private:
 
     void OnMetroOn(wxCommandEvent& Event);

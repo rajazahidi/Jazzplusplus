@@ -25,21 +25,49 @@
 
 class tKeyOn;
 
-class tMetronomeInfo
+//*****************************************************************************
+//*****************************************************************************
+class JZMetronomeInfo
 {
   public:
 
-    tMetronomeInfo();
+    JZMetronomeInfo();
 
-    tKeyOn* Normal(int clock);
+    void ReadFromConfiguration();
 
-    tKeyOn* Accented(int clock);
+    bool IsOn() const;
 
-    unsigned char KeyAcc;
-    unsigned char KeyNorm;
-    unsigned char Veloc;
-    int IsOn;
-    int IsAccented;
+    bool IsAccented() const;
+
+    void ToggleIsOn();
+
+    tKeyOn* CreateNormalEvent(int Clock) const;
+
+    tKeyOn* CreateAccentedEvent(int Clock) const;
+
+  private:
+
+    unsigned char mKeyNormal;
+
+    unsigned char mKeyAccented;
+
+    unsigned char mVelocity;
+
+    bool mIsOn;
+
+    bool mIsAccented;
 };
+
+inline
+bool JZMetronomeInfo::IsOn() const
+{
+  return mIsOn;
+}
+
+inline
+bool JZMetronomeInfo::IsAccented() const
+{
+  return mIsAccented;
+}
 
 #endif // !defined(JZ_METRONOME_H)

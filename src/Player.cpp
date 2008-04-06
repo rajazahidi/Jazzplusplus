@@ -166,7 +166,7 @@ void tPlayLoop::PrepareOutput(
       From,
       mStopClock,
       buf,
-      &gpProject->mMetronomeInfo,
+      gpProject->GetMetronomeInfo(),
       Delta,
       Mode);
 
@@ -181,7 +181,7 @@ void tPlayLoop::PrepareOutput(
       From,
       From + Size,
       buf,
-      &gpProject->mMetronomeInfo,
+      gpProject->GetMetronomeInfo(),
       Delta,
       Mode);
   }

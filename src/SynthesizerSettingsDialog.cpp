@@ -1,7 +1,7 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// Copyright (C) 2008 Peter J. Stieber
+// Copyright (C) 2008 Peter J. Stieber, all rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@
 #include "SynthesizerSettingsDialog.h"
 #include "Configuration.h"
 #include "Globals.h"
-#include "Knob.h"
 
 using namespace std;
 
@@ -36,8 +35,6 @@ JZSynthesizerDialog::JZSynthesizerDialog(wxWindow* pParent)
     mpSynthesizerListbox(0),
     mpStartListbox(0)
 {
-  JZKnob* pKnob = new JZKnob(this, wxID_ANY, 100, 0, 128);
-
   mpSynthesizerListbox = new wxListBox(this, wxID_ANY);
 
   int Selection = 0;
@@ -74,8 +71,6 @@ JZSynthesizerDialog::JZSynthesizerDialog(wxWindow* pParent)
 
   wxBoxSizer* pLeftSizer = new wxBoxSizer(wxVERTICAL);
   wxBoxSizer* pRightSizer = new wxBoxSizer(wxVERTICAL);
-
-  pLeftSizer->Add(pKnob, 0, wxALL, 2);
 
   pLeftSizer->Add(
     new wxStaticText(this, wxID_ANY, "Synthesizer Type"),

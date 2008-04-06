@@ -1,7 +1,7 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Copyright (C) 2008 Peter J. Stieber, all rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -36,4 +36,4 @@ class JZSynthesizerDialog : public wxDialog
     wxListBox* mpStartListbox;
 };
 
-#endif // !defined()
+#endif // !defined(JZ_SYNTHESIZERSETTINGDIALOG_H)

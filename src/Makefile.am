@@ -18,6 +18,7 @@ DeprecatedStringUtils.cpp \
 DeprecatedWx/prop.cpp \
 DeprecatedWx/propform.cpp \
 DeprecatedWx/proplist.cpp \
+Dialogs/MetronomeSettingsDialog.cpp \
 Dialogs.cpp \
 DynamicArray.cpp \
 ErrorMessage.cpp \
@@ -92,6 +93,7 @@ DeprecatedWx/prop.h \
 DeprecatedWx/propform.h \
 DeprecatedWx/proplist.h \
 DeprecatedStringUtils.h \
+Dialogs/MetronomeSettingsDialog.cpp \
 Dialogs.h \
 DynamicArray.h \
 ErrorMessage.h \

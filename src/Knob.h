@@ -21,6 +21,60 @@
 #ifndef JZ_KNOB_H
 #define JZ_KNOB_H
 
+class JZKnobEvent;
+class JZKnob;
+
+//*****************************************************************************
+// Description:
+//   Declare knob control event types and macros for handling them.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+// Description:
+//   The second argument to DECLARE_EVENT_TYPE is unused.  wxWidgets assigns a
+// unique evant ID at run time.
+//-----------------------------------------------------------------------------
+BEGIN_DECLARE_EVENT_TYPES()
+  DECLARE_EVENT_TYPE(wxEVT_KNOB_CHANGED, 1)
+END_DECLARE_EVENT_TYPES()
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+typedef void (wxEvtHandler::*wxKnobEventFunction)(JZKnobEvent&);
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+#define EVT_KNOB_CHANGED(Id, Function) \
+  DECLARE_EVENT_TABLE_ENTRY( \
+    wxEVT_KNOB_CHANGED, \
+    Id, \
+    -1, \
+    (wxObjectEventFunction) (wxEventFunction) (wxCommandEventFunction) \
+      (wxKnobEventFunction)& Function, \
+    (wxObject *) NULL),
+
+//*****************************************************************************
+// Description:
+//   This is the knob control event class declaration.
+//*****************************************************************************
+class JZKnobEvent : public wxCommandEvent
+{
+  public:
+
+    JZKnobEvent();
+
+    JZKnobEvent(JZKnob* pKnobCtrl, wxEventType Type);
+
+    JZKnobEvent(JZKnob* pKnobCtrl, int Value, wxEventType Type);
+
+    int GetValue() const;
+
+  private:
+
+    int mValue;
+
+  DECLARE_DYNAMIC_CLASS(JZKnobEvent)
+};
+
 //*****************************************************************************
 // Description:
 //   This is the knob class declaration.  This is a custom control that looks
@@ -79,6 +133,8 @@ class JZKnob : public wxControl
 
     int SetValue(int Value);
 
+    int SetValueWithEvent(int Value);
+
   private:
 
     void GetCenter(int& x, int& y) const;
@@ -93,9 +149,9 @@ class JZKnob : public wxControl
 
   private:
 
-    int mMin;
+    int mMinValue;
 
-    int mMax;
+    int mMaxValue;
 
     int mSetting;
 
@@ -110,6 +166,18 @@ class JZKnob : public wxControl
 
 //*****************************************************************************
 // Description:
+//   These are the knob control event inline member functions.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZKnobEvent::GetValue() const
+{
+  return mValue;
+}
+
+//*****************************************************************************
+// Description:
 //   These are the knob inline member functions.
 //*****************************************************************************
 //-----------------------------------------------------------------------------
@@ -117,7 +185,7 @@ class JZKnob : public wxControl
 inline
 int JZKnob::GetMin() const
 {
-  return mMin;
+  return mMinValue;
 }
 
 //-----------------------------------------------------------------------------
@@ -125,7 +193,7 @@ int JZKnob::GetMin() const
 inline
 int JZKnob::GetMax() const
 {
-  return mMax;
+  return mMaxValue;
 }
 
 //-----------------------------------------------------------------------------

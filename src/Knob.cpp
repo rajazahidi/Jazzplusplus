@@ -29,6 +29,47 @@
 
 //*****************************************************************************
 // Description:
+//   This is the knob control event class definition.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+// Define the knob control event types.
+// I think the following insures the event IDs are unique.
+//-----------------------------------------------------------------------------
+DEFINE_EVENT_TYPE(wxEVT_KNOB_CHANGED)
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+IMPLEMENT_DYNAMIC_CLASS(JZKnobEvent, wxCommandEvent)
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZKnobEvent::JZKnobEvent()
+  : wxCommandEvent(),
+    mValue(0)
+{
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZKnobEvent::JZKnobEvent(
+  JZKnob* pKnobCtrl,
+  wxEventType Type)
+  : wxCommandEvent(Type, pKnobCtrl->GetId()),
+    mValue(0)
+{
+  mValue = pKnobCtrl->GetValue();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZKnobEvent::JZKnobEvent(JZKnob* pKnobCtrl, int Value, wxEventType Type)
+  : wxCommandEvent(Type, pKnobCtrl->GetId()),
+    mValue(Value)
+{
+}
+
+//*****************************************************************************
+// Description:
 //   This is the knob class definition.
 //*****************************************************************************
 //-----------------------------------------------------------------------------
@@ -109,8 +150,8 @@ void JZKnob::Create(
 
   SetInitialSize(Size);
 
-  mMin = MinValue;
-  mMax = MaxValue;
+  mMinValue = MinValue;
+  mMaxValue = MaxValue;
   Range %= 360;
   MinAngle %= 360;
   mMaxAngle = (MinAngle + 360 - Range) % 360;
@@ -125,9 +166,9 @@ void JZKnob::SetRange(int MinValue, int MaxValue)
 {
   if (MinValue < MaxValue)
   {
-    mMin = MinValue;
-    mMax = MaxValue;
-    SetValue(mSetting);
+    mMinValue = MinValue;
+    mMaxValue = MaxValue;
+    SetValueWithEvent(mSetting);
   }
 }
 
@@ -135,13 +176,13 @@ void JZKnob::SetRange(int MinValue, int MaxValue)
 //-----------------------------------------------------------------------------
 int JZKnob::SetValue(int Value)
 {
-  if (Value < mMin)
+  if (Value < mMinValue)
   {
-    Value = mMin;
+    Value = mMinValue;
   }
-  if (Value > mMax)
+  if (Value > mMaxValue)
   {
-    Value = mMax;
+    Value = mMaxValue;
   }
 
   if (Value != mSetting)
@@ -151,6 +192,19 @@ int JZKnob::SetValue(int Value)
     Update();
   }
   return mSetting;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZKnob::SetValueWithEvent(int Value)
+{
+  int ActualValue = SetValue(Value);
+
+  JZKnobEvent Event(this, ActualValue, wxEVT_KNOB_CHANGED);
+  Event.SetEventObject(this);
+  GetEventHandler()->ProcessEvent(Event);
+
+  return ActualValue;
 }
 
 //-----------------------------------------------------------------------------
@@ -181,7 +235,8 @@ void JZKnob::OnPaint(wxPaintEvent& Event)
   wxSize Size = GetSize();
 
   double Theta = gDegreesToRadians *
-    (mMaxAngle + (((double)mMax - mSetting) / (mMax - mMin)) * mRange);
+    (mMaxAngle +
+      (((double)mMaxValue - mSetting) / (mMaxValue - mMinValue)) * mRange);
 
   double DeltaX = cos(Theta);
 
@@ -241,14 +296,14 @@ void JZKnob::OnMouse(wxMouseEvent& Event)
 
   if (Event.GetWheelRotation() < 0)
   {
-    SetValue(GetValue() - 1);
+    SetValueWithEvent(GetValue() - 1);
     Event.Skip();
     return;
   }
 
   if (Event.GetWheelRotation() > 0)
   {
-    SetValue(GetValue() + 1);
+    SetValueWithEvent(GetValue() + 1);
     Event.Skip();
     return;
   }
@@ -278,9 +333,10 @@ void JZKnob::OnMouse(wxMouseEvent& Event)
   {
     return;
   }
-  int NewValue = int(mMax - (DeltaTheta / mRange) * (mMax - mMin));
+  int NewValue = int(
+    mMaxValue - (DeltaTheta / mRange) * (mMaxValue - mMinValue));
 
-  SetValue(NewValue);
+  SetValueWithEvent(NewValue);
   if (Event.Dragging() || Event.ButtonUp())
   {
     if (Event.ButtonUp())

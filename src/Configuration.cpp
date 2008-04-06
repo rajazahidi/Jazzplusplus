@@ -183,19 +183,25 @@ tConfig::tConfig()
   Names[C_PartsColumnsMax] = new tConfigEntry(".parts_columns_max", 4);
 
   // Draw tracknames on the right too?
-  Names[C_PartsTracknamesRight] = new tConfigEntry(".parts_tracknames_right", 1);
+  Names[C_PartsTracknamesRight] = new tConfigEntry(
+    ".parts_tracknames_right",
+    1);
 
   // Maximum number of voice names in .jazz
   Names[C_MaxVoiceNames] = new tConfigEntry(".max_voice_names", 317);
 
   // Use two-command bank select?
-  Names[C_UseTwoCommandBankSelect] = new tConfigEntry(".use_two_command_bank_select", 0);
+  Names[C_UseTwoCommandBankSelect] = new tConfigEntry(
+    ".use_two_command_bank_select",
+    0);
 
   // Metronome settings
   Names[C_MetroIsAccented] = new tConfigEntry(".metronome_is_accented", 1);
   Names[C_MetroVelocity] = new tConfigEntry(".metronome_velocity", 127);
   Names[C_MetroNormalClick] = new tConfigEntry(".metronome_normal_click", 37);
-  Names[C_MetroAccentedClick] = new tConfigEntry(".metronome_accented_click", 36);
+  Names[C_MetroAccentedClick] = new tConfigEntry(
+    ".metronome_accented_click",
+    36);
 
   // Window geometry settings.
   Names[C_TrackWinXpos] = new tConfigEntry(".trackwin_xpos", 10);
@@ -232,7 +238,7 @@ tConfig::tConfig()
   Names[C_SendSynthReset] = new tConfigEntry(".send_synth_reset", 1);
 
   // Current include file
-  Names[C_Include] = new tConfigEntry(".include","");
+  Names[C_Include] = new tConfigEntry(".include", "");
 
   // Entries with empty values
   Names[C_BankTable] = new tConfigEntry(".bank_table");
@@ -249,8 +255,8 @@ tConfig::tConfig()
   Names[C_ThruInput] = new tConfigEntry(".thru_input", 0);
   Names[C_ThruOutput] = new tConfigEntry(".thru_output", 0);
 
-  //enable/disable welcome
-  Names[C_EnableWelcome] = new tConfigEntry(".enable_welcome",1);
+  // Enable/disable splash dialog.
+  Names[C_EnableWelcome] = new tConfigEntry(".enable_welcome", 1);
 
   // Other initialization
 

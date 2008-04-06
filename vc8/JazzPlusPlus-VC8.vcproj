@@ -733,14 +733,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\SynthesizerSettingsDialog.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\SynthesizerSettingsDialog.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\ToolBar.cpp"
 				>
 			</File>
@@ -827,6 +819,14 @@
 			</File>
 			<File
 				RelativePath="..\src\Dialogs\MetronomeSettingsDialog.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\SynthesizerSettingsDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\SynthesizerSettingsDialog.h"
 				>
 			</File>
 		</Filter>

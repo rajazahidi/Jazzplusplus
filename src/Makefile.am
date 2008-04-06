@@ -19,6 +19,7 @@ DeprecatedWx/prop.cpp \
 DeprecatedWx/propform.cpp \
 DeprecatedWx/proplist.cpp \
 Dialogs/MetronomeSettingsDialog.cpp \
+Dialogs/SynthesizerSettingsDialog.cpp \
 Dialogs.cpp \
 DynamicArray.cpp \
 ErrorMessage.cpp \
@@ -71,7 +72,6 @@ Song.cpp \
 StandardFile.cpp \
 StringReadWrite.cpp \
 Synth.cpp \
-SynthesizerSettingsDialog.cpp \
 ToolBar.cpp \
 Track.cpp \
 TrackFrame.cpp \
@@ -94,6 +94,7 @@ DeprecatedWx/propform.h \
 DeprecatedWx/proplist.h \
 DeprecatedStringUtils.h \
 Dialogs/MetronomeSettingsDialog.cpp \
+Dialogs/SynthesizerSettingsDialog.h \
 Dialogs.h \
 DynamicArray.h \
 ErrorMessage.h \
@@ -148,7 +149,6 @@ Song.h \
 StandardFile.h \
 StringReadWrite.h \
 Synth.h \
-SynthesizerSettingsDialog.h \
 ToolBar.h \
 TrackFrame.h \
 Track.h \

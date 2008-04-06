@@ -21,8 +21,8 @@
 #include "WxWidgets.h"
 
 #include "SynthesizerSettingsDialog.h"
-#include "Configuration.h"
-#include "Globals.h"
+#include "../Configuration.h"
+#include "../Globals.h"
 
 using namespace std;
 

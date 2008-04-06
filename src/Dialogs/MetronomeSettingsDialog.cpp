@@ -28,7 +28,7 @@
 #include "../Knob.h"
 #include "../Resources.h"
 
-#include <vector>
+#include <iostream>
 #include <sstream>
 
 using namespace std;
@@ -41,6 +41,8 @@ BEGIN_EVENT_TABLE(JZMetronomeSettingsDialog, wxDialog)
 
   EVT_KNOB_CHANGED(IDC_KB_VOLUME, JZMetronomeSettingsDialog::OnVolumeChange)
 
+  EVT_BUTTON(wxID_HELP, JZMetronomeSettingsDialog::OnHelp)
+
 END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
@@ -50,12 +52,42 @@ JZMetronomeSettingsDialog::JZMetronomeSettingsDialog(
   JZMetronomeInfo& MetronomeInfo)
   : wxDialog(pParent, wxID_ANY, wxString("Metronome Settings")),
     mMetronomeInfo(MetronomeInfo),
+    mIndexToName(),
+    mIndexToPitch(),
+    mPitchToIndex(),
+    mKeyNormalName(),
+    mKeyAccentedName(),
     mpVelocityKnob(0),
     mpVelocityValue(0),
     mpAccentedCheckBox(0),
     mpNormalListbox(0),
     mpAccentedListbox(0)
 {
+  int Index = 0;
+  const vector<pair<string, int> >& DrumNames = gpConfig->GetDrumNames();
+  for (
+    vector<pair<string, int> >::const_iterator iDrumName = DrumNames.begin();
+    iDrumName != DrumNames.end();
+    ++iDrumName)
+  {
+    const string& DrumName = iDrumName->first;
+    const int& Value = iDrumName->second;
+
+    if (!DrumName.empty())
+    {
+      mIndexToName.push_back(DrumName);
+      mIndexToPitch.push_back(Value - 1);
+      mPitchToIndex.insert(make_pair(Value - 1, Index++));
+    }
+  }
+
+  mKeyNormalName =
+    mIndexToName[mPitchToIndex[mMetronomeInfo.GetKeyNormal()]];
+
+
+  mKeyAccentedName =
+    mIndexToName[mPitchToIndex[mMetronomeInfo.GetKeyAccented()]];
+
   mpVelocityKnob = new JZKnob(this, IDC_KB_VOLUME, 100, 0, 127);
 
   mpVelocityValue = new wxStaticText(this, wxID_ANY, "127");
@@ -64,28 +96,17 @@ JZMetronomeSettingsDialog::JZMetronomeSettingsDialog(
 
   mpNormalListbox = new wxListBox(this, wxID_ANY);
 
-  int Selection = 0;
-  int Index = 0;
-  for (
-    vector<pair<string, int> >::const_iterator iPair = gSynthesizerTypes.begin();
-    iPair != gSynthesizerTypes.end();
-    ++iPair, ++Index)
-  {
-    mpNormalListbox->Append(iPair->first.c_str());
-    if (strcmp(iPair->first.c_str(), gpConfig->StrValue(C_SynthType)) == 0)
-    {
-      Selection = Index;
-    }
-  }
-  mpNormalListbox->SetSelection(Selection);
-
   mpAccentedListbox = new wxListBox(this, wxID_ANY);
 
-  mpAccentedListbox->Append("Never");
-  mpAccentedListbox->Append("Song Start");
-  mpAccentedListbox->Append("Start Play");
-
-  mpAccentedListbox->SetSelection(gpConfig->GetValue(C_SendSynthReset));
+  for (
+    vector<string>::const_iterator iName = mIndexToName.begin();
+    iName != mIndexToName.end();
+     ++iName)
+  {
+    const string& DrumName = *iName;
+    mpNormalListbox->Append(DrumName.c_str());
+    mpAccentedListbox->Append(DrumName.c_str());
+  }
 
   wxButton* pOkButton = new wxButton(this, wxID_OK, "&OK");
   wxButton* pCancelButton = new wxButton(this, wxID_CANCEL, "Cancel");
@@ -149,6 +170,41 @@ bool JZMetronomeSettingsDialog::TransferDataToWindow()
 {
   mpVelocityKnob->SetValueWithEvent(mMetronomeInfo.GetVelocity());
   mpAccentedCheckBox->SetValue(mMetronomeInfo.IsAccented());
+
+  int Selection, Index;
+
+  Selection = 0;
+  Index = 0;
+  for (
+    vector<string>::const_iterator iName = mIndexToName.begin();
+    iName != mIndexToName.end();
+    ++iName, ++Index)
+  {
+    const string& DrumName = *iName;
+    if (DrumName == mKeyNormalName)
+    {
+      Selection = Index;
+      break;
+    }
+  }
+  mpNormalListbox->SetSelection(Selection);
+
+  Selection = 0;
+  Index = 0;
+  for (
+    vector<string>::const_iterator iName = mIndexToName.begin();
+    iName != mIndexToName.end();
+    ++iName, ++Index)
+  {
+    const string& DrumName = *iName;
+    if (DrumName == mKeyAccentedName)
+    {
+      Selection = Index;
+      break;
+    }
+  }
+  mpAccentedListbox->SetSelection(Selection);
+
   return true;
 }
 
@@ -159,6 +215,21 @@ bool JZMetronomeSettingsDialog::TransferDataFromWindow()
   mMetronomeInfo.SetVelocity(static_cast<unsigned char>(
     mpVelocityKnob->GetValue()));
   mMetronomeInfo.SetIsAccented(mpAccentedCheckBox->GetValue());
+
+  int Selection;
+
+  Selection = mpNormalListbox->GetSelection();
+  if (Selection != wxNOT_FOUND)
+  {
+    mMetronomeInfo.SetKeyNormal(mIndexToPitch[Selection]);
+  }
+
+  Selection = mpAccentedListbox->GetSelection();
+  if (Selection != wxNOT_FOUND)
+  {
+    mMetronomeInfo.SetKeyAccented(mIndexToPitch[Selection]);
+  }
+
   return true;
 }
 
@@ -170,4 +241,11 @@ void JZMetronomeSettingsDialog::OnVolumeChange(JZKnobEvent& Event)
   ostringstream Oss;
   Oss << Value;
   mpVelocityValue->SetLabel(Oss.str().c_str());
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZMetronomeSettingsDialog::OnHelp(wxCommandEvent& Event)
+{
+//  gpHelpInstance->ShowTopic("Metronome Settings");
 }

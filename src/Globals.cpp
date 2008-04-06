@@ -39,7 +39,7 @@ JZSynth* gpSynth = 0;
 
 JZPlayer* gpMidiPlayer = 0;
 
-tHelp* HelpInstance = 0;
+JZHelp* gpHelpInstance = 0;
 
 vector<pair<string, int> > gLimitSteps;
 

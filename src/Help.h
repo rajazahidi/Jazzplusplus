@@ -25,14 +25,18 @@
 
 class wxHtmlHelpController;
 
-// a wrapper around the wx help classes.
-class tHelp
+//*****************************************************************************
+// Description:
+//   This is the help class definition.  This class implements a wrapper
+// around the wxWidgets help classes.
+//*****************************************************************************
+class JZHelp
 {
   public:
 
-    tHelp(const char* pHelpFleName);
+    JZHelp(const char* pHelpFleName);
 
-    ~tHelp();
+    ~JZHelp();
 
     void ShowTopic(const char* pTopic);
 
@@ -44,7 +48,5 @@ class tHelp
 
     wxString mHelpFile;
 };
-
-extern tHelp* gpHelpInstance;
 
 #endif // !defined(JZ_HELP_H)

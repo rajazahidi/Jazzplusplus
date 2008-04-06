@@ -115,6 +115,20 @@ tKeyOn* JZMetronomeInfo::CreateAccentedEvent(int Clock) const
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void JZMetronomeInfo::SetKeyNormal(unsigned char KeyNormal)
+{
+  mKeyNormal = KeyNormal;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZMetronomeInfo::SetKeyAccented(unsigned char KeyAccented)
+{
+  mKeyAccented = KeyAccented;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZMetronomeInfo::SetVelocity(unsigned char Velocity)
 {
   mVelocity = Velocity;

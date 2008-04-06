@@ -113,7 +113,7 @@ void JZGuitarFrame::OnSettings(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZGuitarFrame::OnHelp(wxCommandEvent& event)
 {
-//  HelpInstance->ShowTopic("Guitar board");
+//  gpHelpInstance->ShowTopic("Guitar board");
 }
 
 //-----------------------------------------------------------------------------

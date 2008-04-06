@@ -41,6 +41,14 @@ class JZMetronomeInfo
 
     void ReadFromConfiguration();
 
+    unsigned char GetKeyNormal() const;
+
+    void SetKeyNormal(unsigned char KeyNormal);
+
+    unsigned char GetKeyAccented() const;
+
+    void SetKeyAccented(unsigned char KeyAccented);
+
     unsigned char GetVelocity() const;
 
     void SetVelocity(unsigned char Velocity);
@@ -69,6 +77,18 @@ class JZMetronomeInfo
 
     bool mIsAccented;
 };
+
+inline
+unsigned char JZMetronomeInfo::GetKeyNormal() const
+{
+  return mKeyNormal;
+}
+
+inline
+unsigned char JZMetronomeInfo::GetKeyAccented() const
+{
+  return mKeyAccented;
+}
 
 inline
 unsigned char JZMetronomeInfo::GetVelocity() const

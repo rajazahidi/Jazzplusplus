@@ -25,6 +25,10 @@ class JZMetronomeInfo;
 class JZKnob;
 class JZKnobEvent;
 
+#include <vector>
+#include <string>
+#include <map>
+
 //*****************************************************************************
 //*****************************************************************************
 class JZMetronomeSettingsDialog : public wxDialog
@@ -43,9 +47,21 @@ class JZMetronomeSettingsDialog : public wxDialog
 
     void OnVolumeChange(JZKnobEvent& Event);
 
+    void OnHelp(wxCommandEvent& Event);
+
   private:
 
     JZMetronomeInfo& mMetronomeInfo;
+
+    std::vector<std::string> mIndexToName;
+
+    std::vector<int> mIndexToPitch;
+
+    std::map<int, int> mPitchToIndex;
+
+    std::string mKeyNormalName;
+
+    std::string mKeyAccentedName;
 
     JZKnob* mpVelocityKnob;
 

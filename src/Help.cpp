@@ -25,36 +25,46 @@
 #include "wx/html/helpctrl.h"
 
 #include "Help.h"
+#include "Globals.h"
 
 #include <iostream>
 
 using namespace std;
 
-tHelp* gpHelpInstance = 0;
-
-tHelp::tHelp(const char* pHelpFleName)
+//*****************************************************************************
+// Description:
+//   This is the help class definition.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZHelp::JZHelp(const char* pHelpFleName)
   : mpHelp(0),
     mHelpFile(pHelpFleName)
 {
   mpHelp = new wxHtmlHelpController();
   mpHelp->Initialize(mHelpFile);
-  cout << "tHelp::tHelp " << mHelpFile << endl;
+  cout << "JZHelp::JZHelp " << mHelpFile << endl;
 }
 
-tHelp::~tHelp()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZHelp::~JZHelp()
 {
   delete mpHelp;
 }
 
-void tHelp::ShowTopic(const char* pTopic)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZHelp::ShowTopic(const char* pTopic)
 {
   mpHelp->LoadFile(mHelpFile.c_str());
   mpHelp->KeywordSearch(pTopic);
 }
 
-void tHelp::DisplayContents()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZHelp::DisplayContents()
 {
   mpHelp->LoadFile(mHelpFile.c_str());
   mpHelp->DisplayContents();
 }
-

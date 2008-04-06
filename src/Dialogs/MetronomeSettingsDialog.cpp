@@ -23,7 +23,11 @@
 #include "MetronomeSettingsDialog.h"
 
 #include "../Metronome.h"
+#include "../Configuration.h"
+#include "../Globals.h"
 #include "../Knob.h"
+
+#include <vector>
 
 using namespace std;
 
@@ -31,8 +35,11 @@ using namespace std;
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZMetronomeSettingsDialog::JZMetronomeSettingsDialog(wxWindow* pParent)
+JZMetronomeSettingsDialog::JZMetronomeSettingsDialog(
+  wxWindow* pParent,
+  JZMetronomeInfo& MetronomeInfo)
   : wxDialog(pParent, wxID_ANY, wxString("Metronome Settings")),
+    mMetronomeInfo(MetronomeInfo),
     mpSynthesizerListbox(0),
     mpStartListbox(0)
 {

@@ -69,7 +69,11 @@ class JZProject : public JZSong
 
     // Description:
     //   Returns a constant reference to the metronome.
-    const JZMetronomeInfo& GetMetronomeInfo();
+    const JZMetronomeInfo& GetMetronomeInfo() const;
+
+    // Description:
+    //   Sets the metronome data.
+    void SetMetronomeInfo(const JZMetronomeInfo& MetronomeInfo);
 
     // Description:
     //   Toggles the "is on" state of the metronome.

@@ -550,8 +550,10 @@ void JZTrackFrame::OnSettingsMetronome(wxCommandEvent& Event)
     this,
     MetronomeInfo);
   if (
-    MetronomeSettingsDialog.ShowModal() == wxID_OK)
+    MetronomeSettingsDialog.ShowModal() == wxID_OK &&
+    MetronomeInfo != gpProject->GetMetronomeInfo())
   {
+    gpProject->SetMetronomeInfo(MetronomeInfo);
   }
 }
 

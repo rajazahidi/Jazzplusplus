@@ -37,6 +37,10 @@ class JZMetronomeSettingsDialog : public wxDialog
 
   private:
 
+    virtual bool TransferDataToWindow();
+
+    virtual bool TransferDataFromWindow();
+
     void OnVolumeChange(JZKnobEvent& Event);
 
   private:

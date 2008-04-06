@@ -27,6 +27,8 @@
 #include "Globals.h"
 #include "Events.h"
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZMetronomeInfo::JZMetronomeInfo()
   : mKeyNormal(37),
     mKeyAccented(36),
@@ -36,6 +38,42 @@ JZMetronomeInfo::JZMetronomeInfo()
 {
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZMetronomeInfo& JZMetronomeInfo::operator = (const JZMetronomeInfo& Rhs)
+{
+  if (this != &Rhs)
+  {
+    mKeyNormal = Rhs.mKeyNormal;
+    mKeyAccented = Rhs.mKeyAccented;
+    mVelocity = Rhs.mVelocity;
+    mIsOn = Rhs.mIsOn;
+    mIsAccented = Rhs.mIsAccented;
+  }
+  return *this;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZMetronomeInfo::operator == (const JZMetronomeInfo& Rhs) const
+{
+  return
+    mKeyNormal == Rhs.mKeyNormal &&
+    mKeyAccented == Rhs.mKeyAccented &&
+    mVelocity == Rhs.mVelocity &&
+    mIsOn == Rhs.mIsOn &&
+    mIsAccented == Rhs.mIsAccented;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZMetronomeInfo::operator != (const JZMetronomeInfo& Rhs) const
+{
+  return !operator == (Rhs);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZMetronomeInfo::ReadFromConfiguration()
 {
   mIsAccented = (gpConfig->GetValue(C_MetroIsAccented) != 0);
@@ -44,11 +82,15 @@ void JZMetronomeInfo::ReadFromConfiguration()
   mKeyAccented = gpConfig->GetValue(C_MetroAccentedClick);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZMetronomeInfo::ToggleIsOn()
 {
   mIsOn = !mIsOn;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tKeyOn* JZMetronomeInfo::CreateNormalEvent(int Clock) const
 {
   return new tKeyOn(
@@ -59,6 +101,8 @@ tKeyOn* JZMetronomeInfo::CreateNormalEvent(int Clock) const
     15);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tKeyOn* JZMetronomeInfo::CreateAccentedEvent(int Clock) const
 {
   return new tKeyOn(
@@ -69,3 +113,16 @@ tKeyOn* JZMetronomeInfo::CreateAccentedEvent(int Clock) const
     15);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZMetronomeInfo::SetVelocity(unsigned char Velocity)
+{
+  mVelocity = Velocity;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZMetronomeInfo::SetIsAccented(bool IsAccented)
+{
+  mIsAccented = IsAccented;
+}

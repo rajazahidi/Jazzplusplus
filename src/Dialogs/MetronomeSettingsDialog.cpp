@@ -145,6 +145,25 @@ JZMetronomeSettingsDialog::JZMetronomeSettingsDialog(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+bool JZMetronomeSettingsDialog::TransferDataToWindow()
+{
+  mpVelocityKnob->SetValueWithEvent(mMetronomeInfo.GetVelocity());
+  mpAccentedCheckBox->SetValue(mMetronomeInfo.IsAccented());
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZMetronomeSettingsDialog::TransferDataFromWindow()
+{
+  mMetronomeInfo.SetVelocity(static_cast<unsigned char>(
+    mpVelocityKnob->GetValue()));
+  mMetronomeInfo.SetIsAccented(mpAccentedCheckBox->GetValue());
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZMetronomeSettingsDialog::OnVolumeChange(JZKnobEvent& Event)
 {
   int Value = Event.GetValue();

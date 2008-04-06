@@ -581,9 +581,18 @@ void JZProject::SetLoopClock(int newclock)
 // Description:
 //   Returns a constant reference to the metronome.
 //-----------------------------------------------------------------------------
-const JZMetronomeInfo& JZProject::GetMetronomeInfo()
+const JZMetronomeInfo& JZProject::GetMetronomeInfo() const
 {
   return mMetronomeInfo;
+}
+
+//-----------------------------------------------------------------------------
+// Description:
+//   Sets the metronome data.
+//-----------------------------------------------------------------------------
+void JZProject::SetMetronomeInfo(const JZMetronomeInfo& MetronomeInfo)
+{
+  mMetronomeInfo = MetronomeInfo;
 }
 
 //-----------------------------------------------------------------------------

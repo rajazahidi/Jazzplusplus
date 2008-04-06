@@ -33,11 +33,23 @@ class JZMetronomeInfo
 
     JZMetronomeInfo();
 
+    JZMetronomeInfo& operator = (const JZMetronomeInfo& Rhs);
+
+    bool operator == (const JZMetronomeInfo& Rhs) const;
+
+    bool operator != (const JZMetronomeInfo& Rhs) const;
+
     void ReadFromConfiguration();
+
+    unsigned char GetVelocity() const;
+
+    void SetVelocity(unsigned char Velocity);
 
     bool IsOn() const;
 
     bool IsAccented() const;
+
+    void SetIsAccented(bool IsAccented);
 
     void ToggleIsOn();
 
@@ -57,6 +69,12 @@ class JZMetronomeInfo
 
     bool mIsAccented;
 };
+
+inline
+unsigned char JZMetronomeInfo::GetVelocity() const
+{
+  return mVelocity;
+}
 
 inline
 bool JZMetronomeInfo::IsOn() const

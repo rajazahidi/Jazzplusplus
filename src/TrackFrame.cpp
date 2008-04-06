@@ -35,6 +35,7 @@
 #include "Globals.h"
 #include "Configuration.h"
 #include "Harmony.h"
+#include "Dialogs/MetronomeSettingsDialog.h"
 #include "SynthesizerSettingsDialog.h"
 #include "AboutDialog.h"
 
@@ -89,6 +90,8 @@ BEGIN_EVENT_TABLE(JZTrackFrame, wxFrame)
   EVT_MENU(wxID_ZOOM_OUT, JZTrackFrame::OnZoomOut)
 
   EVT_MENU(ID_TOOLS_HARMONY_BROWSER, JZTrackFrame::OnToolsHarmonyBrowser)
+
+  EVT_MENU(ID_SETTINGS_METRONOME, JZTrackFrame::OnSettingsMetronome)
 
   EVT_MENU(ID_SETTINGS_SYNTH, JZTrackFrame::OnSettingsSynthesizerType)
 
@@ -324,7 +327,9 @@ void JZTrackFrame::CreateMenu()
   pSettingMenu->Append(MEN_FILTER,    "&Filter...");
   pSettingMenu->Append(MEN_TWSETTING, "&Window...");
   pSettingMenu->Append(MEN_SONG,      "&Song...");
-  pSettingMenu->Append(MEN_METRONOME, "&Metronome...");
+#endif
+  pSettingMenu->Append(ID_SETTINGS_METRONOME, "&Metronome...");
+#if 0
   pSettingMenu->Append(MEN_EFFECTS,   "&Effects...");
   pSettingMenu->Append(MEN_TIMING,    "&Timing...");
   pSettingMenu->Append(MEN_MIDI_THRU, "&Midi Thru...");
@@ -534,6 +539,20 @@ void JZTrackFrame::OnZoomOut(wxCommandEvent& Event)
 void JZTrackFrame::OnToolsHarmonyBrowser(wxCommandEvent& Event)
 {
   CreateHarmonyBrowser(this);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnSettingsMetronome(wxCommandEvent& Event)
+{
+  JZMetronomeInfo MetronomeInfo = gpProject->GetMetronomeInfo();
+  JZMetronomeSettingsDialog MetronomeSettingsDialog(
+    this,
+    MetronomeInfo);
+  if (
+    MetronomeSettingsDialog.ShowModal() == wxID_OK)
+  {
+  }
 }
 
 //-----------------------------------------------------------------------------

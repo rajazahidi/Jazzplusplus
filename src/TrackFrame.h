@@ -84,6 +84,8 @@ class JZTrackFrame : public wxFrame, public tButtonLabelInterface
 
     void OnToolsHarmonyBrowser(wxCommandEvent& Event);
 
+    void OnSettingsMetronome(wxCommandEvent& Event);
+
     void OnSettingsSynthesizerType(wxCommandEvent& Event);
 
     void OnHelpContents(wxCommandEvent& Event);

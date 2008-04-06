@@ -817,6 +817,18 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="Dialog Source Files"
+			>
+			<File
+				RelativePath="..\src\Dialogs\MetronomeSettingsDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\MetronomeSettingsDialog.h"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

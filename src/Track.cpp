@@ -497,7 +497,7 @@ void tSimpleEventArray::RemoveEOT()
       ++j;
       --newnEvents;
     }
- 
+
     JZEvent* item;
     if (j <= MaxEvents)
     {
@@ -524,7 +524,7 @@ void tSimpleEventArray::Put(JZEvent* e)
     Resize();
   }
   Events[nEvents++] = e;
-  
+
 #ifdef E_DBUG
   {
     for (int i = 0; i < nEvents; i++)

@@ -76,7 +76,7 @@ class tAlsaPlayer : public JZPlayer
     int inp_dev, outp_dev; // input/output device index
     int sync_in, sync_in_dev, sync_in_mtcType;
     int sync_out, sync_out_dev, sync_out_mtcType;
- 
+
     int installed;
 
     static int create_port(snd_seq_t *handle, const char *name);

@@ -535,7 +535,7 @@ tCmdSeqLength::tCmdSeqLength(JZFilter *f, double scale)
  */
 void tCmdSeqLength::ExecuteEvent(JZTrack *t, JZEvent *e)
 {
-  //make a copy of the current event 
+  // Make a copy of the current event.
   JZEvent *k;
   k = (tKeyOn *)e->Copy();
 
@@ -548,7 +548,6 @@ void tCmdSeqLength::ExecuteEvent(JZTrack *t, JZEvent *e)
   k->SetClock((long int)(((k->GetClock()-startClock)*scale) + startClock ) );
   t->Kill(e);
   t->Put(k);
-  
 }
 
 
@@ -593,7 +592,7 @@ void tCmdConvertToModulation::ExecuteTrack(JZTrack *t)
     0x37ff,
     0x3fff
   };
-  
+
   long startvelocity=0;
   long startkey=0;
   while (e)
@@ -651,16 +650,17 @@ void tCmdMidiDelay::ExecuteEvent(JZTrack *t, JZEvent *e)
 {
   tKeyOn *k;
 
-  for(int i=1; i< repeat; i++)
+  for (int i = 1; i < repeat; ++i)
   {
-    if(e->IsKeyOn()){ //only echo note events
+    if (e->IsKeyOn())
+    {
+      //only echo note events
       k = (tKeyOn *)e->Copy();
-      k->SetClock(k->GetClock()+ clockDelay*i  );
-        k->Veloc=(unsigned char)(pow(scale,i)*k->Veloc);
-        t->Put(k);
-      }
+      k->SetClock(k->GetClock()+ clockDelay * i);
+      k->Veloc = (unsigned char)(pow(scale, i) * k->Veloc);
+      t->Put(k);
     }
-  
+  }
 }
 
 

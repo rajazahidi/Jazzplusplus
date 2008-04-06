@@ -138,7 +138,7 @@ if (!inetd) {
 		printerror("bind");
       		exit(1);
 	}
- 
+
 	/* Issue listen-command */
 	if (listen(sd1,5) < 0) {
 		printerror("listen");
@@ -149,7 +149,7 @@ if (!inetd) {
 	/* (hangs until call arrives) */
 	fprintf(stderr,"Start accepting\n");
 	tcp_sd = accept(sd1,(struct sockaddr*) remote_tcp_addr_ptr,addlen_ptr);
-  
+
 	if (tcp_sd < 0) {
 		printerror("accept");
     		exit(1);

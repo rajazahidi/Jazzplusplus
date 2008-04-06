@@ -39,11 +39,11 @@ class tShiftDlg : public tPropertyListDlg
 
     long mSteps;        // 0 was static
     long mUnit;
-  
+
     JZEventFrame* mpEventWindow;
     JZFilter* mpFilter;
     JZSong* mpSong;
-  
+
     tShiftDlg(JZEventFrame* pEventWindow, JZFilter* pFilter, long Unit);
     void AddProperties();
     bool OnClose();

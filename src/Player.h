@@ -299,7 +299,7 @@ class JZPlayer : public wxTimer
   protected:
 
     virtual void OutNow(JZEvent* pEvent) = 0;
-    
+
   private:
 
     tDeviceList DummyDeviceList;

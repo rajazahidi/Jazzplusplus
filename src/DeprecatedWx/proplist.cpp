@@ -1811,7 +1811,7 @@ void wxPropertyStringListEditorDialog::OnDelete(wxCommandEvent& event)
     if (sel == wxNOT_FOUND)
         return;
 
-  wxStringList::compatibility_iterator* node = 
+  wxStringList::compatibility_iterator* node =
     (wxStringList::compatibility_iterator*)
       m_listBox->wxListBox::GetClientData(sel);
     if (!node)

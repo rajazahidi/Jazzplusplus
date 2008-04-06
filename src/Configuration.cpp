@@ -94,12 +94,12 @@ tConfigEntry::tConfigEntry(const char* pName)
 tConfigEntry::~tConfigEntry()
 {
   delete [] Name;
-  delete [] StrValue; 
+  delete [] StrValue;
 }
 
 void tConfigEntry::SetStrValue(const char* pStringValue)
 {
-  delete [] StrValue; 
+  delete [] StrValue;
   if (pStringValue)
   {
     StrValue = new char[strlen(pStringValue) + 1];

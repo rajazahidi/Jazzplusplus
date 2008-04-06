@@ -95,7 +95,7 @@ tDeviceList::~tDeviceList()
 //  for (int i = 0; i < count; i++)
 //    delete [] names[i];
 }
-  
+
 //tNamedValue *tDeviceList::AsNamedValue()
 //{
 //  tNamedValue *nv = new tNamedValue[count + 1];

@@ -245,7 +245,7 @@ class tSampleSet
 
     void Edit(int key);
 
-    int GetSpeed() const 
+    int GetSpeed() const
     {
       return speed;
     }

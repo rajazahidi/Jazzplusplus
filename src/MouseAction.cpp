@@ -192,8 +192,8 @@ int tSelection::Dragging(wxMouseEvent &e)
     r2 = r;
     r2.SetNormal();
 
-    win->Refresh(TRUE, &r1); 
-    win->Refresh(TRUE, &r2); 
+    win->Refresh(TRUE, &r1);
+    win->Refresh(TRUE, &r2);
   }
   //invalidate both old and new rect
 
@@ -241,7 +241,7 @@ void tSelection::Draw(wxDC& Dc)
 
     Dc.SetLogicalFunction(wxXOR);
     Dc.SetBrush(*mpBackgroundBrush);
-    
+
     rr.SetNormal();
     if (rr.width && rr.height)
     {

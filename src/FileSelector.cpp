@@ -58,10 +58,10 @@ wxString add_default_ext(const wxString fn, const wxString ext)
 //     This is the file name.
 //*****************************************************************************
 wxString file_selector(
-  wxString deffile, 
-  const wxString title, 
-  bool save, 
-  bool changed, 
+  wxString deffile,
+  const wxString title,
+  bool save,
+  bool changed,
   const wxString ext)
 {
    wxString s;
@@ -69,10 +69,12 @@ wxString file_selector(
    wxString path;
 
    if (save)
+   {
      file = wxFileNameFromPath(deffile);
-   
+   }
+
    path = wxPathOnly(deffile);
-   
+
    int flags = save ? wxFD_SAVE : wxFD_OPEN;
    s = wxFileSelector(title, path, file, 0, ext, flags);
 

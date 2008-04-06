@@ -7,7 +7,7 @@
 #define		FALSE		0
 #define		TRUE		1
 
-enum sections 
+enum sections
 {
 	none,
 	patchNames,
@@ -16,7 +16,7 @@ enum sections
 	instrumentDefinitions
 };
 
-void trimend(char *t) 
+void trimend(char *t)
 {
 	char *x = t + strlen(t) - 1;
 
@@ -27,7 +27,7 @@ void trimend(char *t)
 	}
 }
 
-int countPatches(char *fname) 
+int countPatches(char *fname)
 {
 	FILE *f = fopen(fname, "r");
 
@@ -38,11 +38,11 @@ int countPatches(char *fname)
 	bzero(t, 80);
 
 	fgets(t, 79, f); trimend(t);
-	while (!feof(f)) 
+	while (!feof(f))
 	{
-		if (strncmp(t, ".Patch Names", 12) == 0) 
+		if (strncmp(t, ".Patch Names", 12) == 0)
 			patches = TRUE;
-		else if (t[0] == '.') 
+		else if (t[0] == '.')
 			patches = FALSE;
 		else if (patches && isdigit(t[0]))
 			ret++;
@@ -54,9 +54,9 @@ int countPatches(char *fname)
 	return ret;
 }
 
-int main(int argc, char *argv[]) 
+int main(int argc, char *argv[])
 {
-	if (argc != 2) 
+	if (argc != 2)
 	{
 		cerr << "Usage: " << argv[0] << " cakewalkfile.ins\n";
 		exit(-1);
@@ -76,26 +76,26 @@ int main(int argc, char *argv[])
 	int numpatches = countPatches(argv[1]);
 
 	fgets(t, 255, inf); trimend(t);
-	while (!feof(inf)) 
+	while (!feof(inf))
 	{
-		if (t[0] == ';') 
+		if (t[0] == ';')
 		{	// Comment line, change first character only
 			t[0] = '#';
 			fprintf(outf, "%s\n", t);
 		}
-		else if (strlen(t) == 1) 
+		else if (strlen(t) == 1)
 		{	// Blank line, don't change at all
 			fprintf(outf, "\n");
-		} 
+		}
   		else if (t[0] == '[')
 		{	
 			switch (currentSection)
 			{
 				case (patchNames):
 					// New bank
-					if (b_programs != 0) 
+					if (b_programs != 0)
 					{
-						cout << "\no Processed " << b_programs 
+						cout << "\no Processed " << b_programs
 							<< " programs.\n\n";
 					}
 					cout << "o Reading bank " << t << " (#" << ++bank
@@ -106,15 +106,15 @@ int main(int argc, char *argv[])
 					break;
 			}
 		}
-		else if (strncmp(t, ".Patch Names", 12) == 0) 
+		else if (strncmp(t, ".Patch Names", 12) == 0)
 		{	// Patch names directive
-			fprintf(outf, ".max_voice_names %d\n", 
+			fprintf(outf, ".max_voice_names %d\n",
 				numpatches);
 			fprintf(outf, ".voicenames\n");
 			currentSection = patchNames;
 		}
 		else if (strncmp(t, ".Note Names", 11) == 0)
-		{	// Note names section 
+		{	// Note names section
 			fprintf(outf, ".drumnames\n");
 
 			currentSection = noteNames;
@@ -134,16 +134,16 @@ int main(int argc, char *argv[])
 			char *tok;
 			int patchnum, controllernumber, notenum;
 
-			switch (currentSection) 
+			switch (currentSection)
 			{
 				case (patchNames):	
 					tok = strtok(t, "=\n");
 					patchnum = atoi(tok);
 					tok = strtok(NULL, "=\n");
 					fprintf(outf, "%d %s %d %s\n",
-						(bank * 256 + patchnum), 
+						(bank * 256 + patchnum),
 						bankname, patchnum, tok);
-					printf("o \t%d %s\n", patchnum, tok); 
+					printf("o \t%d %s\n", patchnum, tok);
 					b_programs++; t_programs++;
 					break;
 				case (controllerNames):

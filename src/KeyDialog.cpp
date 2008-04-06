@@ -50,7 +50,7 @@ wxFormItem *tKeyDlg::mkFormItem(int w)
 
 wxProperty* tKeyDlg::mkProperty()
 {
-  return new wxProperty(mpTitle, wxPropertyValue((char**)&mpString), "string"); 
+  return new wxProperty(mpTitle, wxPropertyValue((char**)&mpString), "string");
 }
 
 int tKeyDlg::GetKey()

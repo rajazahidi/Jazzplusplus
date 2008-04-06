@@ -593,9 +593,9 @@ void tSample::TransposeSemis(float semis)
 {
   /* PAT - The following error prompted the addition of the casts to double.
      sample.cpp: In member function `void tSample::TransposeSemis(float)':
-                 choosing `double pow(double, double)' over `float 
+                 choosing `double pow(double, double)' over `float
                  std::pow(float, float)'
-                 because worst conversion for the former is better than worst 
+                 because worst conversion for the former is better than worst
                  conversion for the latter
   */
   float f = (double)pow((double)FSEMI, (double)semis);

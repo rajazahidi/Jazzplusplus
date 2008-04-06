@@ -34,7 +34,9 @@ class tGenMelody;
 class tHBInterface
 {
   public:
-    virtual ~tHBInterface()        {}
+    virtual ~tHBInterface()
+    {
+    }
     virtual int SeqDefined() = 0;        // true = yes
 
     // return number of keys in out

@@ -58,7 +58,7 @@ void jppResourceDialog::LoadResource(const wxString& xrcfile)
     wxXmlResource::Get()->InitAllHandlers();
     initialized = true;
   }
-  
+
   wxXmlResource::Get()->Load(xrcfile);
 }
 
@@ -196,7 +196,7 @@ int jppResourceDialog::ShowModal()
     ++iResourceElement)
   {
     jppResourceElement* pResourceElement = *iResourceElement;
-  
+
     wxWindow* win = wxWindow::FindWindowByName(
       pResourceElement->resource, dialog);
 
@@ -290,7 +290,7 @@ bool jppResourceDialog::LoadData(jppResourceElement *pResourceElement, wxWindow 
         {
           if (value == pResourceElement->longarr[i]) break;
         }
-        
+
         if (i == pResourceElement->longarr.GetCount())
         {
           // We couldn't find the value in the list.
@@ -313,7 +313,7 @@ bool jppResourceDialog::LoadData(jppResourceElement *pResourceElement, wxWindow 
       ((wxSlider*)win)->SetValue((int)value);
     }
   }
-  
+
   if (!used)
   {
     wxMessageBox("Unable to locate a mapping for this widget:\n"

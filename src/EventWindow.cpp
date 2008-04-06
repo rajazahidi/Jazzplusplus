@@ -220,7 +220,7 @@ void JZEventWindow::LineText(
 //  //onpaint never seems to get called, but ondraw does get called
 //  int x = 0, y = 0;
 //  GetViewStart(&x, &y);
-//  EventWin->OnPaintSub(Dc, x * mScrollSize, y * mScrollSize);  
+//  EventWin->OnPaintSub(Dc, x * mScrollSize, y * mScrollSize);
 //  cout << "JZEventWindow::OnDraw << endl;
 //}
 
@@ -362,7 +362,7 @@ size it to the client area of the frame(frame size minus toolbar and menus )
 */
 //void JZEventFrame::CreateCanvas()
 //{
-//  cout << "CreateCanvas" << endl; 
+//  cout << "CreateCanvas" << endl;
 //  int Width, Height;
 //  GetClientSize(&Width, &Height);
 //  mpEventWindow = new JZEventWindow(this, 0, 0, Width, Height);
@@ -414,7 +414,7 @@ void JZEventFrame::Setup()
 
 
 /**
-this onsize handler is supposed to take care of handling of the resizing the two subwindows sizes to 
+this onsize handler is supposed to take care of handling of the resizing the two subwindows sizes to
 they dont overlap
 */
 void JZEventFrame::OnSize(wxSizeEvent& Event)
@@ -451,7 +451,7 @@ void JZEventFrame::OnSize(wxSizeEvent& Event)
 
   int frameWidth, frameHeight;
   GetClientSize(&frameWidth, &frameHeight);
-    
+
 //     if (mpEventWindow)
 //       //       mpEventWindow->SetSize(0, (int)offset, (int)frameWidth, (int)(frameHeight - offset));
 //       mpEventWindow->SetSize(0, (int)0, (int)frameWidth, (int)(frameHeight));
@@ -607,7 +607,7 @@ void JZEventFrame::Redraw()
 
    dc is the device context to draw in, normally generated from the framework from ondraw
    x and y is the coordinates of the start of the view
-   
+
 */
 void JZEventFrame::OnPaintSub(wxDC *dc, int x, int y)
 {
@@ -625,7 +625,7 @@ void JZEventFrame::OnPaintSub(wxDC *dc, int x, int y)
   mEventsWidth = CanvasW - mLeftInfoWidth;
   mEventsHeight = CanvasH - mTopInfoHeight;
 
-  FromLine = CanvasY / mTrackHeight; 
+  FromLine = CanvasY / mTrackHeight;
   ToLine   = (CanvasY + CanvasH - mTopInfoHeight) / mTrackHeight;
   FromClock = CanvasX * ClocksPerPixel;
   ToClock = x2Clock(CanvasX + CanvasW);

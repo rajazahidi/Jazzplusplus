@@ -649,13 +649,13 @@ void tSynthDlg::AddItems()
   //cancel = new wxButton(panel, (wxFunction)ItemCallback, "Close");
   //panel->NewLine();
   chk_fft = new wxCheckBox(panel, -1, "Harmonics"); //    (wxFunction)ItemCallback,
-  chk_fft->SetValue(fft_enable);                                                    
+  chk_fft->SetValue(fft_enable);
   chk_vol = new wxCheckBox(panel, -1, "Envelope");  //          (wxFunction)ItemCallback,
-  chk_vol->SetValue(vol_enable);                                                    
+  chk_vol->SetValue(vol_enable);
   chk_pan = new wxCheckBox(panel, -1, "Panpot");    //          (wxFunction)ItemCallback,
-  chk_pan->SetValue(pan_enable);                                                    
+  chk_pan->SetValue(pan_enable);
   chk_frq = new wxCheckBox(panel, -1, "Pitch");     //          (wxFunction)ItemCallback,
-  chk_frq->SetValue(frq_enable);                                                    
+  chk_frq->SetValue(frq_enable);
   chk_noise = new wxCheckBox(panel, -1, "Noise");     //  (wxFunction)ItemCallback,
   chk_noise->SetValue(noise_enable);
 #ifdef OBSOLETE

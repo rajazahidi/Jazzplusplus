@@ -50,8 +50,8 @@
 #include "AlsaPlayer.h"
 
 /*
-** midi thru for alsa. it creates a new process (because threads dont work 
-** with wxwin) that copies from input to output. 
+** midi thru for alsa. it creates a new process (because threads dont work
+** with wxwin) that copies from input to output.
 */
 
 tAlsaThru::tAlsaThru()
@@ -158,7 +158,7 @@ void tAlsaThru::loop()
 
 // thread version
 
-void tAlsaThru::stopworker(int sig) 
+void tAlsaThru::stopworker(int sig)
 {
   running = 0;
   snd_seq_close(handle);
@@ -176,7 +176,7 @@ void * tAlsaThru::startworker(void *p)
   return 0;
 }
 
-void tAlsaThru::Start() 
+void tAlsaThru::Start()
 {
   if (!running)
     pthread_create(&worker, (void *)0, startworker, (void *)this);
@@ -185,7 +185,7 @@ void tAlsaThru::Start()
 void tAlsaThru::Stop()
 {
   if (running)
-    pthread_kill(worker, SIGHUP); 
+    pthread_kill(worker, SIGHUP);
 }
 
 
@@ -196,13 +196,13 @@ void tAlsaThru::Stop()
 
 static snd_seq_t *static_handle;  // ugly!!
 
-void tAlsaThru::stopworker(int sig) 
+void tAlsaThru::stopworker(int sig)
 {
   snd_seq_close(static_handle);
   exit(0);
 }
 
-void tAlsaThru::Start() 
+void tAlsaThru::Start()
 {
   if (!running) {
     worker = fork();

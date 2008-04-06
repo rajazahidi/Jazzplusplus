@@ -635,7 +635,7 @@ void JZTrackWindow::Draw(wxDC& Dc)
 
   // Draw the selection box.
   mpSnapSel->Draw(LocalDc, mEventsX, mEventsY, mEventsWidth, mEventsHeight);
-  
+
 //  LocalDc.SetClippingRegion(0, 0, mCanvasWidth, mCanvasHeight);
   Dc.Blit(
     mScrolledX,

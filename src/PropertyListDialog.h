@@ -109,7 +109,7 @@ class tNamedValueListValidator : public wxStringListValidator
     int MapName2Value(const char* pSelection);
 
     wxString MapValue2Name(int Value);
-  
+
     virtual bool OnSelect(
       bool Select,
       wxProperty* pProperty,

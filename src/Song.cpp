@@ -248,15 +248,15 @@ void JZSong::MergePlayTrackEvent(
     return;
   fprintf(stderr, "playtrack %d\n",c->track);
   JZTrack* pTrack = &mTracks[c->track];//the track we want to play
-  tEventIterator IteratorPL(pTrack); //get an iterator of all events the playtrack is pointing to 
+  tEventIterator IteratorPL(pTrack); //get an iterator of all events the playtrack is pointing to
   JZEvent *f;
 
   //FIXME this is just to test the idea, it would be good to modify getlastclock instead i think
   //find an EOT event, otherwise default to the last clock(should be + length of the last event as well)
   int loopLength = 0;
-  tEventIterator IteratorEOT(pTrack); //get an iterator of all events the playtrack is pointing to 
+  tEventIterator IteratorEOT(pTrack); //get an iterator of all events the playtrack is pointing to
   f = IteratorEOT.Range(0, pTrack->GetLastClock());
-  loopLength = pTrack->GetLastClock(); 
+  loopLength = pTrack->GetLastClock();
   while(f)
   {
     if (f->IsEndOfTrack())
@@ -280,8 +280,8 @@ void JZSong::MergePlayTrackEvent(
   // start of those to the beginning of the loop, and shorten the length.
   // There would still be a problem with playtracks not even bar length.
   while(loopOffset < c->eventlength)
-  { 
-    f = IteratorPL.Range(0, (c->eventlength-loopOffset));  //no more events then the length of the playtrack! and ensure last iteration is no longer than what is left 
+  {
+    f = IteratorPL.Range(0, (c->eventlength-loopOffset));  //no more events then the length of the playtrack! and ensure last iteration is no longer than what is left
     while (f)
     {
       JZEvent *d = f->Copy();

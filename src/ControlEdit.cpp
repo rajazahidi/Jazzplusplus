@@ -100,10 +100,9 @@ void tCtrlEditBase::Create(
 
   panel->SetAutoLayout( TRUE );     // tell dialog to use sizer
   panel->SetSizer( topsizer );      // actually set the sizer
-  
- topsizer->Fit( panel );            // set size to minimum size as calculated by the sizer
- topsizer->SetSizeHints( panel );   // set size hints to honour mininum size
 
+  topsizer->Fit( panel );            // set size to minimum size as calculated by the sizer
+  topsizer->SetSizeHints( panel );   // set size hints to honour mininum size
 }
 
 

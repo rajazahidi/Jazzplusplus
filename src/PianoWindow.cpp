@@ -368,7 +368,7 @@ int tPlayTrackLengthDragger::Dragging(wxMouseEvent& Event)
   int  Length = Clock - Copy->GetClock();
   if (Length <= 0)
     Length = 1;
-  Copy->eventlength = Length; 
+  Copy->eventlength = Length;
 
   Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 1, 1);
   return 0;
@@ -530,7 +530,7 @@ const int evnt_actions[12] =
 //-----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(JZPianoWindow, JZEventWindow)
 
-  EVT_SIZE(JZPianoWindow::OnSize) 
+  EVT_SIZE(JZPianoWindow::OnSize)
 
   EVT_MOUSE_EVENTS(JZPianoWindow::OnMouseEvent)
 
@@ -628,7 +628,7 @@ void JZPianoWindow::InitColors()
   int c;
   for (int i = 0; i < NUM_COLORS; ++i)
   {
-    c = 256 * i / NUM_COLORS; 
+    c = 256 * i / NUM_COLORS;
     mpColorBrush[i].SetColour(c, 0, 127 - c / 2);
     mpColorBrush[i].SetStyle(wxSOLID);
   }
@@ -679,7 +679,7 @@ void JZPianoWindow::OnDraw(wxDC& Dc)
   // OnPaint never seems to get called, but OnDraw does get called.
   int x = 0, y = 0;
   GetViewStart(&x, &y);
-  OnPaintSub(Dc, x * mScrollSize, y * mScrollSize);  
+  OnPaintSub(Dc, x * mScrollSize, y * mScrollSize);
 }
 
 //-----------------------------------------------------------------------------
@@ -914,7 +914,7 @@ void JZPianoWindow::OnPaintSub(wxDC& Dc, int x, int y)
     DrawEvents(Dc, mpTrack, StatSysEx, wxGREEN_BRUSH, FALSE);
   if (mVisiblePlayTrack)
     DrawEvents(Dc, mpTrack, StatPlayTrack, wxLIGHT_GREY_BRUSH, FALSE);
-  
+
   DrawEvents(Dc, mpTrack, StatEndOfTrack, wxRED_BRUSH, FALSE);
   DrawEvents(Dc, mpTrack, StatText, wxBLACK_BRUSH, FALSE);
 
@@ -962,7 +962,7 @@ void JZPianoWindow::OnEventWinPaintSub(int x, int y)
   mEventsWidth = mCanvasWidth - mLeftInfoWidth;
   mEventsHeight = mCanvasHeight - mTopInfoHeight;
 
-  mFromLine = mCanvasY / mTrackHeight; 
+  mFromLine = mCanvasY / mTrackHeight;
   mToLine = (mCanvasY + mCanvasHeight - mTopInfoHeight) / mTrackHeight;
   mFromClock = mCanvasX * mClockTicsPerPixel;
   mToClock = x2Clock(mCanvasX + mCanvasWidth);
@@ -1275,7 +1275,7 @@ void JZPianoWindow::DrawEvent(
   }
   int x = Clock2x(pEvent->GetClock());
   int y = Pitch2y(pEvent->GetPitch());
-  if (!xoor)        
+  if (!xoor)
   {
     Dc.SetBrush(*wxWHITE_BRUSH);
     Dc.DrawRectangle(x, y + mLittleBit, length, mTrackHeight - 2 * mLittleBit);
@@ -1369,17 +1369,17 @@ void JZPianoWindow::DrawEvents(
         // end velocity colors
 
         Dc.DrawRectangle(x1, y1 + mLittleBit, DrawLength, mTrackHeight - 2 * mLittleBit);
-        //shouldnt it be in drawevent? odd. 
+        //shouldnt it be in drawevent? odd.
 
         if (pEvent->IsPlayTrack())
         {
           Dc.SetPen(*wxBLACK_PEN);
           ostringstream Oss;
-          Oss << "Track:" << pEvent->IsPlayTrack()->track; 
+          Oss << "Track:" << pEvent->IsPlayTrack()->track;
           Dc.DrawText(Oss.str().c_str(), x1, y1 + mLittleBit);
         }
       }
-      
+
       if (Clock + Length >= mFromClock)
       {
         //thesse events are always visible in vertical
@@ -1388,10 +1388,10 @@ void JZPianoWindow::DrawEvents(
           Dc.SetPen(*wxRED_PEN);
           Dc.VLine(x1); //draw a vertical bar
           Dc.SetPen(*wxBLACK_PEN);
-          sprintf(buf, "EOT"); 
+          sprintf(buf, "EOT");
           Dc.DrawText(buf, x1, y1 + mLittleBit);
         }
-        
+
         if (pEvent->IsText())
         {
           Dc.SetPen(*wxGREEN_PEN);
@@ -1400,8 +1400,8 @@ void JZPianoWindow::DrawEvents(
           sprintf(buf, (const char*)pEvent->IsText()->GetText());
           int textX;
           int textY;
-          
-          Dc.GetTextExtent((const char*)pEvent->IsText()->GetText(), &textX, &textY); 
+
+          Dc.GetTextExtent((const char*)pEvent->IsText()->GetText(), &textX, &textY);
           Dc.SetBrush(*wxWHITE_BRUSH);
           int textlabely = mCanvasY + mTopInfoHeight;//text labels drawn at top
           Dc.DrawRectangle(x1-textX, textlabely + mLittleBit, textX, textY);//mTrackHeight - 2 * mLittleBit);
@@ -1814,7 +1814,7 @@ void JZPianoWindow::ShowPitch(int Pitch)
     Dc.SetLogicalFunction(wxXOR);
 
     Dc.SetBrush(*wxBLUE_BRUSH);
-    if (mMouseLine >= 0) 
+    if (mMouseLine >= 0)
     {
       // Erase the previous highlight.
       Dc.DrawRectangle(
@@ -2299,7 +2299,7 @@ void JZPianoWindow::CtrlChannelAftertouchEdit()
     CtrlH(Height));
 
   mpCtrlEdit->ReInit(mpTrack, mFromClock, mClockTicsPerPixel);
-  Refresh();  
+  Refresh();
 }
 
 void JZPianoWindow::CtrlPolyAftertouchEdit()
@@ -2319,14 +2319,14 @@ void JZPianoWindow::CtrlPolyAftertouchEdit()
     CtrlH(Height));
 
   mpCtrlEdit->ReInit(mpTrack, mFromClock, mClockTicsPerPixel);
-  Refresh();  
+  Refresh();
 }
 
 void JZPianoWindow::CtrlNone()
 {
   delete mpCtrlEdit;
   mpCtrlEdit = 0;
-  Refresh();  
+  Refresh();
 }
 
 void JZPianoWindow::CtrlTempo()
@@ -2388,7 +2388,7 @@ void JZPianoWindow::CtrlTempo()
     CtrlH(Height));
 
   mpCtrlEdit->ReInit(mpTrack, mFromClock, mClockTicsPerPixel);
-  Refresh();  
+  Refresh();
 }
 
 void JZPianoWindow::EditFilter()
@@ -2418,7 +2418,7 @@ void JZPianoWindow::SelectController()
 
     mpCtrlEdit->ReInit(mpTrack, mFromClock, mClockTicsPerPixel);
     Refresh();
-  }  
+  }
 }
 
 void JZPianoWindow::CtrlModulation()
@@ -2439,7 +2439,7 @@ void JZPianoWindow::CtrlModulation()
     CtrlH(Height));
 
   mpCtrlEdit->ReInit(mpTrack, mFromClock, mClockTicsPerPixel);
-  Refresh();  
+  Refresh();
 }
 
 void JZPianoWindow::CtrlPitch()
@@ -2457,9 +2457,9 @@ void JZPianoWindow::CtrlPitch()
     CtrlY(Height),
     mCanvasWidth,
     CtrlH(Height));
-  
+
   mpCtrlEdit->ReInit(mpTrack, mFromClock, mClockTicsPerPixel);
-  Refresh();  
+  Refresh();
 }
 
 void JZPianoWindow::Redo()
@@ -2468,18 +2468,18 @@ void JZPianoWindow::Redo()
   Refresh();
   if (mpCtrlEdit && mpTrack >= 0)
   {
-    mpCtrlEdit->ReInit(mpTrack, mFromClock, mClockTicsPerPixel);  
+    mpCtrlEdit->ReInit(mpTrack, mFromClock, mClockTicsPerPixel);
   }
 }
 
-// Undo actions 
+// Undo actions
 void JZPianoWindow::Undo()
 {
   mpSong->Undo();
   Refresh();
   if (mpCtrlEdit && mpTrack >= 0)
   {
-    mpCtrlEdit->ReInit(mpTrack, mFromClock, mClockTicsPerPixel);  
+    mpCtrlEdit->ReInit(mpTrack, mFromClock, mClockTicsPerPixel);
   }
 }
 
@@ -2502,7 +2502,7 @@ void JZPianoWindow::ExchangeUpDown()
     tCmdExchUpDown cmd(mpFilter);
     cmd.Execute(1);
     Refresh();
-  }  
+  }
 }
 
 // Flip events left to right.
@@ -2513,7 +2513,7 @@ void JZPianoWindow::ExchangeLeftRight()
     tCmdExchLeftRight cmd(mpFilter);
     cmd.Execute(1);
     Refresh();
-  }  
+  }
 }
 
 // Shift events snapclock clocks to left.
@@ -2561,7 +2561,7 @@ void JZPianoWindow::CutOrCopy(int Id)
       mpGuitarFrame->Update();
 //      mpGuitarFrame->Redraw();
     }
-  }  
+  }
 }
 
 void JZPianoWindow::Erase()
@@ -2571,14 +2571,14 @@ void JZPianoWindow::Erase()
     tCmdErase cmd(mpFilter);
     cmd.Execute(1);        // with UNDO
     Refresh();
-  }  
+  }
 }
 
 void JZPianoWindow::ToggleVisibleAllTracks()
 {
   mVisibleAllTracks = !mVisibleAllTracks;
 
-  Refresh();  
+  Refresh();
 }
 
 void JZPianoWindow::MSelect()
@@ -2798,7 +2798,7 @@ void JZPianoWindow::SetVisibleAllTracks(bool Value)
 void JZPianoWindow::ActivateSettingsDialog()
 {
   jppResourceDialog Dialog(this, "windowSettings");
-  
+
   Dialog.Attach("use_colours", &mUseColors);
   Dialog.Attach("font_size", &mFontSize, mPianoFontSizes);
 
@@ -2824,7 +2824,7 @@ void JZPianoWindow::ActivateMidiDelayDialog()
   int repeat = 6;
 
   jppResourceDialog dialog(this, "midiDelay");
-  
+
   dialog.Attach("scale", &scale);
   dialog.Attach("clockDelay", &clockDelay);
   dialog.Attach("repeat", &repeat);
@@ -2849,9 +2849,9 @@ void JZPianoWindow::ActivateSequenceLengthDialog()
   int scale = 100; //in percent
 
   jppResourceDialog dialog(this, "sequenceLength");
-  
+
   dialog.Attach("scale", &scale);
-  
+
   if (dialog.ShowModal() == wxID_OK)
   {
     //execute the command

@@ -332,7 +332,7 @@ JZProject::JZProject()
 //-----------------------------------------------------------------------------
 JZProject::~JZProject()
 {
-  delete mpMidiPlayer; 
+  delete mpMidiPlayer;
   delete mpSynth;
   delete mpRecInfo;
   delete mpConfig;

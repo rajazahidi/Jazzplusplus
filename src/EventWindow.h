@@ -241,7 +241,7 @@ class JZEventFrame : public wxFrame
 
     void ZoomIn();
     void ZoomOut();
-    
+
   protected:
 
     JZToolBar* mpToolBar;

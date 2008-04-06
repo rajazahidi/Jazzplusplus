@@ -30,9 +30,9 @@
 //
 // 1. using the passed file name
 // 2. appending the passed file name to the path specified by the HOME
-//    environment variable, if it exists 
+//    environment variable, if it exists
 // 3. appending the passed file name to the path specified by the JAZZ
-//    environment variable, if it exists 
+//    environment variable, if it exists
 // 4. appending the passed file name to the location of the jazz executable
 //
 // Returns:

@@ -83,7 +83,7 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
 
 //  wxString Paragraph2String = "Jazz++ is a MIDI sequencer program.";
 
-  wxString HtmlString = 
+  wxString HtmlString =
     "<html>"
     "<head><META http-equiv=\"Content-Type\" content=\"text/html; charset=" +
     LocaleString + "\"></head>"

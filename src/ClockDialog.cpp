@@ -57,7 +57,7 @@ wxProperty* JZClockDialog::mkProperty()
   return new wxProperty(
     mpTitle,
     wxPropertyValue((char**)&mpString),
-    "string"); 
+    "string");
 }
 
 //-----------------------------------------------------------------------------

@@ -163,9 +163,9 @@ BEGIN_EVENT_TABLE(JZPianoFrame, wxFrame)
   EVT_MENU(ID_SNAP_16, JZPianoFrame::OnSnap16)
   EVT_MENU(ID_SNAP_16D, JZPianoFrame::OnSnap16D)
 
-  EVT_MENU(ID_SELECT, JZPianoFrame::OnMSelect) 
-  EVT_MENU(ID_CHANGE_LENGTH, JZPianoFrame::OnMLength) 
-  EVT_MENU(ID_EVENT_DIALOG, JZPianoFrame::OnMDialog) 
+  EVT_MENU(ID_SELECT, JZPianoFrame::OnMSelect)
+  EVT_MENU(ID_CHANGE_LENGTH, JZPianoFrame::OnMLength)
+  EVT_MENU(ID_EVENT_DIALOG, JZPianoFrame::OnMDialog)
   EVT_MENU(ID_CUT_PASTE_EVENTS, JZPianoFrame::OnMCutPaste)
   EVT_MENU(MEN_GUITAR, JZPianoFrame::OnGuitar)
 
@@ -266,7 +266,7 @@ JZPianoFrame::~JZPianoFrame()
   delete mpPianoWindow;
 
   delete MixerForm;
-  
+
   delete mpToolBar;
 }
 
@@ -437,7 +437,7 @@ void JZPianoFrame::OnRedo(wxCommandEvent& Event)
   mpPianoWindow->Redo();
 }
 
-// Undo actions 
+// Undo actions
 void JZPianoFrame::OnUndo(wxCommandEvent& Event)
 {
   mpPianoWindow->Undo();

@@ -734,7 +734,7 @@ class tJazzMeta : public tMetaEvent
     void SetTrackState(char c) {
       Data[6] = c;
     }
-    
+
     // Data[7] is unused
 
     unsigned char GetTrackDevice() const {
@@ -963,12 +963,12 @@ class tMarker : public tMetaEvent
     }
 };
 
-/* the meaning of this event is to be able to reference a track and have that play the instant
-the event is executed. you can also transpose the referenced track and loop it for the duration
-of the playtrack event. this makes it possible to compose in a structured fashion.
-
-ececution of the events takes place in song.cpp. 
-*/
+// the meaning of this event is to be able to reference a track and have that
+// play the instant the event is executed.  You can also transpose the
+// referenced track and loop it for the duration of the playtrack event.  This
+// makes it possible to compose in a structured fashion.
+//
+// Execution of the events takes place in song.cpp.
 class tPlayTrack : public tMetaEvent
 {
   public:
@@ -977,12 +977,12 @@ class tPlayTrack : public tMetaEvent
   int eventlength; //the length of the event, confusing with the Length field of tMetaEvent, that seems to be for serialization
 
   virtual int   GetLength()                { edb(); return eventlength; }
-  
+
   tPlayTrack(int clk, unsigned char *chardat, unsigned short len)
     : tMetaEvent(clk, StatPlayTrack, chardat, len)
     {
       int *dat = (int *)chardat;
-      //fill in the fields from the data 
+      //fill in the fields from the data
       track=0;
       transpose=0;
       eventlength=0;
@@ -992,14 +992,14 @@ class tPlayTrack : public tMetaEvent
         eventlength=dat[2];
       }
     }
-  
-    tPlayTrack(int clk, int track, int transpose, int eventlength) 
-      : tMetaEvent(clk, StatPlayTrack, 0, 0) 
-      { 
-        this->track=track; 
-        this->transpose=transpose;  
-        this->eventlength=eventlength;  
-      } 
+
+    tPlayTrack(int clk, int track, int transpose, int eventlength)
+      : tMetaEvent(clk, StatPlayTrack, 0, 0)
+      {
+        this->track=track;
+        this->transpose=transpose;
+        this->eventlength=eventlength;
+      }
 
     virtual int Write(JZWriteBase &io)
 
@@ -1010,7 +1010,7 @@ class tPlayTrack : public tMetaEvent
       dat[1]=transpose;
       dat[2]=eventlength;
       Length=sizeof(int)*3;
-      edb(); 
+      edb();
 
       Data[Length] = 0;
       return io.Write(this, Data, Length);
@@ -1022,7 +1022,7 @@ class tPlayTrack : public tMetaEvent
     edb();
     return new tPlayTrack(mClock, track, transpose, eventlength);
   }
-  
+
   //this event has no real "pitch" but the rest of jazz use the pitch, in the pianowin editor pitch is the y coord of the event
   virtual int   GetPitch(){
     return track;

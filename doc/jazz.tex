@@ -120,7 +120,7 @@ manual.
 
 \section{Copyright}\label{copyright}
 
-The JAZZ++ MIDI Sequencer is copyright (C) 1994-2000 Andreas Voss and 
+The JAZZ++ MIDI Sequencer is copyright (C) 1994-2000 Andreas Voss and
 Per Sigmond, all rights reserved.
 
 JAZZ++ program is free software; you can redistribute it and/or modify
@@ -1527,8 +1527,8 @@ JAZZ++ translates the selected events into a text form. You can edit this
 text in the Event List Editor and finally convert it back to midi events.
 
 The Event List Editor allows to filter events. The Editor will show only those
-events that are currently enabled in the \helpref{Filter Dialog}{midifilter} 
-in the Settings menu. As we already know, changing the filter settings 
+events that are currently enabled in the \helpref{Filter Dialog}{midifilter}
+in the Settings menu. As we already know, changing the filter settings
 affects most of the other edit functions too, e.g erase will erase only
 those events, that are enabled in the Filter Dialog.
 
@@ -1536,7 +1536,7 @@ The Event List Editor recognizes the following events:
 
 \begin{itemize}
 \item {\tt 1:2:030 key 1 4C 90 200}\\
-      A note event. 1:2:030 is the timing information, it means bar 1, 
+      A note event. 1:2:030 is the timing information, it means bar 1,
       beat 2 plus 30 ticks. The string key indicates that this line
       corresponds to a note on event. The following 1 is the midi channel
       (numbered from 1 to 16), 4C is the octave and pitch, 90
@@ -1559,7 +1559,7 @@ The Event List Editor recognizes the following events:
         A pitchbend event, valid values are in -8191 .. 8191
 
 \item {\tt 1:2:030 sys f0 11 22 33 44 f7}\\
-        A system exclusive message, hex values including the start- 
+        A system exclusive message, hex values including the start-
         (f0) and stop- (f7) byte.
 
 \item {\tt 1:2:030 txt here is some text}\\

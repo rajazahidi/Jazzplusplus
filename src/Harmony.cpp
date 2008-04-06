@@ -355,12 +355,12 @@ void HBPlayer::SettingsDialog(wxFrame *parent)
 #ifdef OBSOLETE
   wxDialogBox *panel = new wxDialogBox(parent, "MIDI settings", FALSE );
   tHBPlayerForm      *form  = new tHBPlayerForm;
-  
+
   form->Add(wxMakeFormMessage("Note Length for paste into piano window"));
   form->Add(wxMakeFormNewLine());
   form->Add(wxMakeFormShort("Length", &note_length, wxFORM_DEFAULT, new wxList(wxMakeConstraintRange(10.0, 120.0), 0)));
   form->Add(wxMakeFormNewLine());
-  
+
   panel->SetLabelPosition(wxHORIZONTAL);
 
   form->Add(wxMakeFormBool("Bass enable", &bass_enabled));
@@ -432,7 +432,11 @@ class HBCanvas : public wxScrolledWindow
     void TransposeSelection();
 
     HBPlayer player;
-    enum {SEQMAX = 256};
+
+    enum
+    {
+      SEQMAX = 256
+    };
 
     HBAnalyzer * getAnalyzer();
 
@@ -1358,7 +1362,7 @@ HBContextDlg::HBContextDlg(HBCanvas *c, wxFrame *parent, HBContext *pct)
   wxString* snames = new wxString[n_scale_names];
   for (i = 0; i < n_scale_names; i++)
     snames[i] = (char *)scale_names[i].name;
-  scale_lst = new wxListBox(this, -1, wxPoint(200, y), wxSize(300, 200), n_scale_names, snames, wxLB_SINGLE| wxLB_NEEDED_SB);//"Scales",  
+  scale_lst = new wxListBox(this, -1, wxPoint(200, y), wxSize(300, 200), n_scale_names, snames, wxLB_SINGLE| wxLB_NEEDED_SB);//"Scales",
   delete [] snames;
 
   // thats it

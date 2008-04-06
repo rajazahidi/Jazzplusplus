@@ -83,7 +83,7 @@ tSliderWin::~tSliderWin()
 
 
 BEGIN_EVENT_TABLE(tSliderWin, wxFrame)
-  EVT_SIZE(tSliderWin::OnSize) 
+  EVT_SIZE(tSliderWin::OnSize)
 END_EVENT_TABLE()
 
   /**called from the event table whenever the window is resized

@@ -143,7 +143,7 @@ if (state == done) {
    written to the midi device.
    On play/record stop JAZZ will send one byte through the TCP-connection
    as a command and will wait for the function to send the recorded midi data
-   through the TCP-connection. This will be caught by the select-statement. 
+   through the TCP-connection. This will be caught by the select-statement.
    After sending the record buffer the function will clear the buffer and
    allocate a new one.
 
@@ -210,7 +210,7 @@ for (;;) {
 		for (k = 0; k < filebytes; k++) {
 			ch = filebuf[k];
 			if (ch == 0xff) continue;
-			/* I sometimes get these 0xff bytes, 
+			/* I sometimes get these 0xff bytes,
 			   don't know why but they are of no use */
 
 			/* clock-to-host received ? */

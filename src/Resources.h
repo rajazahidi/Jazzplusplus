@@ -67,4 +67,6 @@
 #define MEN_CLEAR                            wxID_HIGHEST + 110
 #define MEN_SETTINGS                         wxID_HIGHEST + 120
 
+#define IDC_KB_VOLUME                        wxID_HIGHEST + 1000
+
 #endif // !defined(JZ_RESOURCES_H)

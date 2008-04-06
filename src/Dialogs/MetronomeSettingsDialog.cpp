@@ -26,8 +26,10 @@
 #include "../Configuration.h"
 #include "../Globals.h"
 #include "../Knob.h"
+#include "../Resources.h"
 
 #include <vector>
+#include <sstream>
 
 using namespace std;
 
@@ -35,17 +37,32 @@ using namespace std;
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+BEGIN_EVENT_TABLE(JZMetronomeSettingsDialog, wxDialog)
+
+  EVT_KNOB_CHANGED(IDC_KB_VOLUME, JZMetronomeSettingsDialog::OnVolumeChange)
+
+END_EVENT_TABLE()
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZMetronomeSettingsDialog::JZMetronomeSettingsDialog(
   wxWindow* pParent,
   JZMetronomeInfo& MetronomeInfo)
   : wxDialog(pParent, wxID_ANY, wxString("Metronome Settings")),
     mMetronomeInfo(MetronomeInfo),
-    mpSynthesizerListbox(0),
-    mpStartListbox(0)
+    mpVelocityKnob(0),
+    mpVelocityValue(0),
+    mpAccentedCheckBox(0),
+    mpNormalListbox(0),
+    mpAccentedListbox(0)
 {
-  JZKnob* pKnob = new JZKnob(this, wxID_ANY, 100, 0, 128);
+  mpVelocityKnob = new JZKnob(this, IDC_KB_VOLUME, 100, 0, 127);
 
-  mpSynthesizerListbox = new wxListBox(this, wxID_ANY);
+  mpVelocityValue = new wxStaticText(this, wxID_ANY, "127");
+
+  mpAccentedCheckBox = new wxCheckBox(this, wxID_ANY, "Use Accented Click");
+
+  mpNormalListbox = new wxListBox(this, wxID_ANY);
 
   int Selection = 0;
   int Index = 0;
@@ -54,21 +71,21 @@ JZMetronomeSettingsDialog::JZMetronomeSettingsDialog(
     iPair != gSynthesizerTypes.end();
     ++iPair, ++Index)
   {
-    mpSynthesizerListbox->Append(iPair->first.c_str());
+    mpNormalListbox->Append(iPair->first.c_str());
     if (strcmp(iPair->first.c_str(), gpConfig->StrValue(C_SynthType)) == 0)
     {
       Selection = Index;
     }
   }
-  mpSynthesizerListbox->SetSelection(Selection);
+  mpNormalListbox->SetSelection(Selection);
 
-  mpStartListbox = new wxListBox(this, wxID_ANY);
+  mpAccentedListbox = new wxListBox(this, wxID_ANY);
 
-  mpStartListbox->Append("Never");
-  mpStartListbox->Append("Song Start");
-  mpStartListbox->Append("Start Play");
+  mpAccentedListbox->Append("Never");
+  mpAccentedListbox->Append("Song Start");
+  mpAccentedListbox->Append("Start Play");
 
-  mpStartListbox->SetSelection(gpConfig->GetValue(C_SendSynthReset));
+  mpAccentedListbox->SetSelection(gpConfig->GetValue(C_SendSynthReset));
 
   wxButton* pOkButton = new wxButton(this, wxID_OK, "&OK");
   wxButton* pCancelButton = new wxButton(this, wxID_CANCEL, "Cancel");
@@ -79,24 +96,34 @@ JZMetronomeSettingsDialog::JZMetronomeSettingsDialog(
   wxBoxSizer* pListControlSizer = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer* pButtonSizer = new wxBoxSizer(wxHORIZONTAL);
 
+  pTopSizer->Add(
+    new wxStaticText(this, wxID_ANY, "Velocity"),
+    0,
+    wxCENTER | wxALL,
+    2);
+
+  pTopSizer->Add(mpVelocityKnob, 0, wxCENTER | wxALL, 2);
+
+  pTopSizer->Add(mpVelocityValue, 0, wxCENTER | wxALL, 2);
+
+  pTopSizer->Add(mpAccentedCheckBox, 0, wxCENTER | wxALL, 2);
+
   wxBoxSizer* pLeftSizer = new wxBoxSizer(wxVERTICAL);
   wxBoxSizer* pRightSizer = new wxBoxSizer(wxVERTICAL);
 
-  pLeftSizer->Add(pKnob, 0, wxALL, 2);
-
   pLeftSizer->Add(
-    new wxStaticText(this, wxID_ANY, "Synthesizer Type"),
+    new wxStaticText(this, wxID_ANY, "Normal Click"),
     0,
     wxALL,
     2);
-  pLeftSizer->Add(mpSynthesizerListbox, 0, wxGROW | wxALL, 2);
+  pLeftSizer->Add(mpNormalListbox, 0, wxGROW | wxALL, 2);
 
   pRightSizer->Add(
-    new wxStaticText(this, wxID_ANY, "Send MIDI Reset"),
+    new wxStaticText(this, wxID_ANY, "Accented Click:"),
     0,
     wxALL,
     2);
-  pRightSizer->Add(mpStartListbox, 0, wxALL, 2);
+  pRightSizer->Add(mpAccentedListbox, 0, wxALL, 2);
 
   pListControlSizer->Add(pLeftSizer, 0, wxALL, 3);
   pListControlSizer->Add(pRightSizer, 0, wxALL, 3);
@@ -114,4 +141,14 @@ JZMetronomeSettingsDialog::JZMetronomeSettingsDialog(
 
   pTopSizer->SetSizeHints(this);
   pTopSizer->Fit(this);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZMetronomeSettingsDialog::OnVolumeChange(JZKnobEvent& Event)
+{
+  int Value = Event.GetValue();
+  ostringstream Oss;
+  Oss << Value;
+  mpVelocityValue->SetLabel(Oss.str().c_str());
 }

@@ -22,6 +22,8 @@
 #define JZ_METRONOMESETTINGDIALOG_H
 
 class JZMetronomeInfo;
+class JZKnob;
+class JZKnobEvent;
 
 //*****************************************************************************
 //*****************************************************************************
@@ -35,11 +37,23 @@ class JZMetronomeSettingsDialog : public wxDialog
 
   private:
 
+    void OnVolumeChange(JZKnobEvent& Event);
+
+  private:
+
     JZMetronomeInfo& mMetronomeInfo;
 
-    wxListBox* mpSynthesizerListbox;
+    JZKnob* mpVelocityKnob;
 
-    wxListBox* mpStartListbox;
+    wxStaticText* mpVelocityValue;
+
+    wxCheckBox* mpAccentedCheckBox;
+
+    wxListBox* mpNormalListbox;
+
+    wxListBox* mpAccentedListbox;
+
+  DECLARE_EVENT_TABLE();
 };
 
 #endif // !defined(JZ_METRONOMESETTINGDIALOG_H)

@@ -36,7 +36,7 @@
 #include "Configuration.h"
 #include "Harmony.h"
 #include "Dialogs/MetronomeSettingsDialog.h"
-#include "SynthesizerSettingsDialog.h"
+#include "Dialogs/SynthesizerSettingsDialog.h"
 #include "AboutDialog.h"
 
 // These are the tool bar icons.

@@ -190,7 +190,7 @@ void JZTrackFrame::CreateMenu()
   mpFileMenu->Append(wxID_OPEN, "&Open...");
   mpFileMenu->Append(wxID_CLOSE, "&Close");
   mpFileMenu->Append(wxID_SAVE, "&Save Project");
-  mpFileMenu->Append(wxID_SAVEAS, "Save Project &as...");
+  mpFileMenu->Append(wxID_SAVEAS, "Save Project &As...");
 
   mpFileMenu->AppendSeparator();
 

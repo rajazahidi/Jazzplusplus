@@ -40,17 +40,18 @@ class tHBInterface
     {
     }
 
-    virtual int SeqDefined() = 0;        // true = yes
+    // true = yes
+    virtual bool IsSequenceDefined() = 0;
 
     // Return number of keys in out
 
-    virtual int GetChordKeys(int *out, int step, int n_steps) = 0;
+    virtual int GetChordKeys(int* out, int step, int n_steps) = 0;
 
-    virtual int GetBassKeys(int *out, int step, int n_steps) = 0;
+    virtual int GetBassKeys(int* out, int step, int n_steps) = 0;
 
-    virtual int GetSelectedChord(int *out) = 0; // returns # keys
+    virtual int GetSelectedChord(int* out) = 0; // returns # keys
 
-    virtual int GetSelectedScale(int *out) = 0; // returns # keys
+    virtual int GetSelectedScale(int* out) = 0; // returns # keys
 
     virtual HBAnalyzer* GetAnalyzer() = 0;
 
@@ -67,7 +68,7 @@ class HBFrame : public wxFrame, public tHBInterface
 
     ~HBFrame();
 
-    int SeqDefined();
+    bool IsSequenceDefined();
 
     int GetChordKeys(int* out, int step, int n_steps);
 
@@ -85,11 +86,13 @@ class HBFrame : public wxFrame, public tHBInterface
 
   protected:
 
-    virtual void OnMenuCommand(int id);
+    void OnToolBarSelect(wxCommandEvent& Event);
 
     void OnFileLoad(wxCommandEvent& Event);
 
     void OnFileSaveAs(wxCommandEvent& Event);
+
+    void OnSettingsChord(wxCommandEvent& Event);
 
     void OnSettingsMidi(wxCommandEvent& Event);
 
@@ -103,11 +106,17 @@ class HBFrame : public wxFrame, public tHBInterface
 
   private:
 
-    HBCanvas* mpHbWindow;
     int SeqSelected();
+
+  private:
+
+    HBCanvas* mpHbWindow;
+
     JZToolBar* mpToolBar;
+
     tGenMelody* genmeldy;
-    DECLARE_EVENT_TABLE()
+
+  DECLARE_EVENT_TABLE()
 };
 
 extern void CreateHarmonyBrowser();

@@ -69,7 +69,6 @@ using namespace std;
 #define MEN_ANALYZE     24
 #define MEN_IONSCALE    25
 #define MEN_SETTINGS    26
-#define MEN_LOAD        27
 
 
 #include "Bitmaps/open.xpm"
@@ -96,7 +95,7 @@ using namespace std;
 
 static JZToolDef tdefs[] =
 {
-  { MEN_LOAD,      false, open_xpm,     "open harmony file" },
+  { wxID_OPEN,     false, open_xpm,     "open harmony file" },
   { wxID_SAVEAS,   false, save_xpm,     "save harmony file" },
   { JZToolBar::eToolBarSeparator },
   { MEN_MAJSCALE,  true,  majscale_xpm, "major scale" },
@@ -151,7 +150,7 @@ class HBPlayer : public wxTimer
 
     const HBContext& Context()
     {
-      return context;
+      return mContext;
     }
 
     virtual void Notify();
@@ -164,7 +163,7 @@ class HBPlayer : public wxTimer
 
   private:
 
-    HBContext context;
+    HBContext mContext;
 
     static int bass_channel, bass_veloc;
 
@@ -217,10 +216,10 @@ HBPlayer::HBPlayer()
 }
 
 
-int HBPlayer::GetChordKeys(int *out, const HBContext &context)
+int HBPlayer::GetChordKeys(int *out, const HBContext& Context)
 {
   // build chord keys
-  HBChord chord = context.Chord();
+  HBChord chord = Context.Chord();
   int key = chord.Iter(chord_pitch - 1);
   int n   = chord.Count();
   for (int i = 0; i < n; i++)
@@ -232,10 +231,10 @@ int HBPlayer::GetChordKeys(int *out, const HBContext &context)
 }
 
 
-int HBPlayer::GetBassKey(const HBContext &context)
+int HBPlayer::GetBassKey(const HBContext& Context)
 {
   // build bass note
-  int key = context.ChordKey() + bass_pitch - bass_pitch % 12;
+  int key = Context.ChordKey() + bass_pitch - bass_pitch % 12;
   if (key < bass_pitch)
   {
     key += 12;
@@ -244,10 +243,10 @@ int HBPlayer::GetBassKey(const HBContext &context)
 }
 
 
-int HBPlayer::GetMeldyKeys(int *out, const HBContext &context)
+int HBPlayer::GetMeldyKeys(int *out, const HBContext &Context)
 {
   // build melody keys
-  HBChord scale = context.Scale();
+  HBChord scale = Context.Scale();
   int n = scale.Count();
 
   int key = scale.Iter(meldy_pitch);
@@ -279,7 +278,7 @@ void HBPlayer::Paste(tEventArray &arr)
 }
 
 
-void HBPlayer::StartPlay(const HBContext &ct)
+void HBPlayer::StartPlay(const HBContext& Context)
 {
   int i;
 
@@ -290,11 +289,11 @@ void HBPlayer::StartPlay(const HBContext &ct)
     StopPlay();
   }
   playing = 1;
-  context = ct;
+  mContext = Context;
 
-  bass_key = GetBassKey(context);
-  n_chord_keys = GetChordKeys(chord_keys, context);
-  n_meldy_keys = GetMeldyKeys(meldy_keys, context);
+  bass_key = GetBassKey(mContext);
+  n_chord_keys = GetChordKeys(chord_keys, mContext);
+  n_meldy_keys = GetMeldyKeys(meldy_keys, mContext);
 
   // Generate KeyOn's
   if (mBassEnabled)
@@ -454,11 +453,11 @@ class HBCanvas : public wxScrolledWindow
 
     virtual void OnDraw(wxDC& Dc);
 
-    void DrawMarkers(wxDC& Dc, const HBContext &c);
+    void DrawMarkers(wxDC& Dc, const HBContext& Context);
 
     void ClearSeq();
 
-    int SeqDefined()
+    bool IsSequenceDefined()
     {
       return mSequenceCount > 0;
     }
@@ -479,7 +478,7 @@ class HBCanvas : public wxScrolledWindow
 
     void FileSaveAs();
 
-    void OnMenuCommand(int id, wxToolBar *mpToolBar);
+    void MenuCommand(int MenuId, wxToolBar *mpToolBar);
 
     void TransposeSelection();
 
@@ -496,11 +495,11 @@ class HBCanvas : public wxScrolledWindow
 
     static const int ScFa;
 
-    void ChordRect(JZRectangle& Rectangle, const HBContext &ct);
+    void ChordRect(JZRectangle& Rectangle, const HBContext& Context);
 
-    void DrawChord(wxDC& Dc, const HBContext &ct);
+    void DrawChord(wxDC& Dc, const HBContext& Context);
 
-    void UnDrawChord(wxDC& Dc, const HBContext &ct);
+    void UnDrawChord(wxDC& Dc, const HBContext& Context);
 
     bool Find(float x, float y, HBContext &out);
 
@@ -508,13 +507,13 @@ class HBCanvas : public wxScrolledWindow
 
     virtual void OnMouseEvent(wxMouseEvent& MouseEvent);
 
-    void SetMarker(int id, wxToolBar *mpToolBar);
+    void SetMarker(int MenuId, wxToolBar* pToolBar);
 
-    void SetScaleType(int menu_id, tScaleType st, wxToolBar *tb);
+    void SetScaleType(int MenuId, tScaleType ScaleType, wxToolBar* pToolBar);
 
   private:
 
-    static tScaleType scale_type;
+    static tScaleType mScaleType;
 
     static int transpose_res;
 
@@ -524,7 +523,7 @@ class HBCanvas : public wxScrolledWindow
 
     int mMargin;
 
-    HBContext* seq[SEQMAX];
+    HBContext* mSequence[SEQMAX];
 
     int mSequenceCount;
 
@@ -532,38 +531,38 @@ class HBCanvas : public wxScrolledWindow
 
     bool mHasChanged;
 
-    HBContext mouse_context;
+    HBContext mMouseContext;
 
     bool mHaunschildLayout;
 
-    bool mark_4_common;
+    bool mMark4Common;
 
-    bool mark_3_common;
+    bool mMark3Common;
 
-    bool mark_2_common;
+    bool mMark2Common;
 
-    bool mark_1_common;
+    bool mMark1Common;
 
-    bool mark_b_common;
+    bool mMarkBCommon;
 
-    bool mark_0_common;
+    bool mMark0Common;
 
-    bool mark_1_semi;
+    bool mMark1Semi;
 
-    bool mark_251;
+    bool mMark251;
 
-    bool mark_tritone;
+    bool mMarkTritone;
 
-    bool mark_piano;
+    bool mMarkPiano;
 
-    int active_marker;
+    int mActiveMarker;
 
   DECLARE_EVENT_TABLE()
 };
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tScaleType HBCanvas::scale_type = Major;
+tScaleType HBCanvas::mScaleType = Major;
 const int HBCanvas::ScFa = 50;
 int HBCanvas::transpose_res = 8;
 int HBCanvas::analyze_res = 8;
@@ -581,25 +580,24 @@ END_EVENT_TABLE()
 HBCanvas::HBCanvas(wxFrame* pParent, int x, int y, int w, int h)
   : wxScrolledWindow(pParent, wxID_ANY, wxPoint(x, y), wxSize(w, h))
 {
-//  parent = pParent;
   mSequenceCount  = 0;
 
-  active_marker = 0;
+  mActiveMarker = 0;
   mHaunschildLayout = false;
-  mark_4_common = 0;
-  mark_3_common = 0;
-  mark_2_common = 0;
-  mark_1_common = 0;
-  mark_b_common = 0;
-  mark_0_common = 0;
-  mark_1_semi = 0;
-  mark_251 = 0;
-  mark_tritone = 0;
-  mark_piano = 0;
+  mMark4Common = false;
+  mMark3Common = false;
+  mMark2Common = false;
+  mMark1Common = false;
+  mMarkBCommon = false;
+  mMark0Common = false;
+  mMark1Semi = false;
+  mMark251 = false;
+  mMarkTritone = false;
+  mMarkPiano = false;
 
   for (int i = 0; i < SEQMAX; i++)
   {
-    seq[i] = new HBContext();
+    mSequence[i] = new HBContext();
   }
 
   wxClientDC Dc(this);
@@ -635,7 +633,7 @@ HBCanvas::~HBCanvas()
   }
   for (int i = 0; i < SEQMAX; i++)
   {
-    delete seq[i];
+    delete mSequence[i];
   }
 }
 
@@ -648,7 +646,7 @@ ostream & operator << (ostream& Os, HBCanvas const &a)
   Os << a.mSequenceCount << endl;
   for (i = 0; i < a.mSequenceCount; i++)
   {
-    Os << *a.seq[i];
+    Os << *a.mSequence[i];
   }
   return Os;
 }
@@ -667,7 +665,7 @@ istream& operator >> (istream& Is, HBCanvas &a)
   Is >> a.mSequenceCount;
   for (i = 0; i < a.mSequenceCount; i++)
   {
-    Is >> *a.seq[i];
+    Is >> *a.mSequence[i];
   }
   a.Refresh();
   return Is;
@@ -675,46 +673,66 @@ istream& operator >> (istream& Is, HBCanvas &a)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBCanvas::SetMarker(int id, wxToolBar *mpToolBar)
+void HBCanvas::SetMarker(int MenuId, wxToolBar* pToolBar)
 {
-  if (id != active_marker)
+  if (MenuId != mActiveMarker)
   {
-    if (active_marker && mpToolBar->GetToolState(active_marker))
+    if (mActiveMarker && pToolBar->GetToolState(mActiveMarker))
     {
-      mpToolBar->ToggleTool(active_marker, false);
+      pToolBar->ToggleTool(mActiveMarker, false);
     }
-    mpToolBar->ToggleTool(id, true);
-    active_marker = id;
+    pToolBar->ToggleTool(MenuId, true);
+    mActiveMarker = MenuId;
   }
 
-  mark_4_common = 0;
-  mark_3_common = 0;
-  mark_2_common = 0;
-  mark_1_common = 0;
-  mark_b_common = 0;
-  mark_0_common = 0;
-  mark_1_semi = 0;
-  mark_251 = 0;
-  mark_tritone = 0;
-  mark_piano = 0;
+  mMark4Common = false;
+  mMark3Common = false;
+  mMark2Common = false;
+  mMark1Common = false;
+  mMarkBCommon = false;
+  mMark0Common = false;
+  mMark1Semi = false;
+  mMark251 = false;
+  mMarkTritone = false;
+  mMarkPiano = false;
 
-  switch (id)
+  switch (MenuId)
   {
-    case MEN_EQ4:        mark_4_common = 1; break;
-    case MEN_EQ3:        mark_3_common = 1; break;
-    case MEN_EQ2:        mark_2_common = 1; break;
-    case MEN_EQ1:        mark_1_common = 1; break;
-    case MEN_EQB:        mark_b_common = 1; break;
-    case MEN_EQH:        mark_1_semi = 1; break;
-    case MEN_EQ0:        mark_0_common = 1; break;
-    case MEN_251:         mark_251 = 1; break;
-    case MEN_TRITONE:        mark_tritone = 1; break;
-    case MEN_PIANO:        mark_piano = 1; break;
+    case MEN_EQ4:
+      mMark4Common = true;
+      break;
+    case MEN_EQ3:
+      mMark3Common = true;
+      break;
+    case MEN_EQ2:
+      mMark2Common = true;
+      break;
+    case MEN_EQ1:
+      mMark1Common = true;
+      break;
+    case MEN_EQB:
+      mMarkBCommon = true;
+      break;
+    case MEN_EQH:
+      mMark1Semi = true;
+      break;
+    case MEN_EQ0:
+      mMark0Common = true;
+      break;
+    case MEN_251:
+      mMark251 = true;
+      break;
+    case MEN_TRITONE:
+      mMarkTritone = true;
+      break;
+    case MEN_PIANO:
+      mMarkPiano = true;
+      break;
   }
 
-  if (id > 0 && !mpToolBar->GetToolState(id))
+  if (MenuId > 0 && !pToolBar->GetToolState(MenuId))
   {
-    mpToolBar->ToggleTool(id, true);
+    pToolBar->ToggleTool(MenuId, true);
   }
 
   Refresh();
@@ -729,21 +747,21 @@ int HBCanvas::GetChordKeys(int *out, int step, int n_steps)
     return 0;
   }
   int i = step * mSequenceCount / n_steps;
-  return player.GetChordKeys(out, *seq[i]);
+  return player.GetChordKeys(out, *mSequence[i]);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 int HBCanvas::GetSelectedChord(int *out)
 {
-  return player.GetChordKeys(out, mouse_context);
+  return player.GetChordKeys(out, mMouseContext);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 int HBCanvas::GetSelectedScale(int *out)
 {
-  return player.GetMeldyKeys(out, mouse_context);
+  return player.GetMeldyKeys(out, mMouseContext);
 }
 
 //-----------------------------------------------------------------------------
@@ -755,29 +773,30 @@ int HBCanvas::GetBassKeys(int *out, int step, int n_steps)
     return 0;
   }
   int i = step * mSequenceCount / n_steps;
-  out[0] = player.GetBassKey(*seq[i]);
+  out[0] = player.GetBassKey(*mSequence[i]);
   return 1;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBCanvas::ChordRect(JZRectangle& Rectangle, const HBContext &ct)
+void HBCanvas::ChordRect(JZRectangle& Rectangle, const HBContext& Context)
 {
-  if (ct.SeqNr())
+  if (Context.SeqNr())
   {
-    Rectangle.x = (int)(mChordX + (ct.SeqNr() - 1) % 8 * mChordWidth);
-    Rectangle.y = (int)(mChordHeight * ((ct.SeqNr() -1) / 8 + 0.5));
+    Rectangle.x = (int)(mChordX + (Context.SeqNr() - 1) % 8 * mChordWidth);
+    Rectangle.y = (int)(mChordHeight * ((Context.SeqNr() -1) / 8 + 0.5));
   }
   else if (!mHaunschildLayout)
   {
-    Rectangle.x = (int)(mChordX + ct.ChordNr() * mChordWidth);
-    Rectangle.y = (int)(mChordY + ct.ScaleNr() * mChordHeight);
+    Rectangle.x = (int)(mChordX + Context.ChordNr() * mChordWidth);
+    Rectangle.y = (int)(mChordY + Context.ScaleNr() * mChordHeight);
   }
   else
   {
     Rectangle.x = (int)(
-      mChordX + (5 * ct.ChordNr() % 7 + 5 * ct.ScaleNr() % 12) % 7 * mChordWidth);
-    Rectangle.y = (int)(mChordY + (5 * ct.ScaleNr() % 12) * mChordHeight);
+      mChordX + (5 * Context.ChordNr() % 7 +
+      5 * Context.ScaleNr() % 12) % 7 * mChordWidth);
+    Rectangle.y = (int)(mChordY + (5 * Context.ScaleNr() % 12) * mChordHeight);
   }
 
   Rectangle.x += mMargin;
@@ -788,11 +807,11 @@ void HBCanvas::ChordRect(JZRectangle& Rectangle, const HBContext &ct)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBCanvas::DrawChord(wxDC& Dc, const HBContext &ct)
+void HBCanvas::DrawChord(wxDC& Dc, const HBContext& Context)
 {
   // Draw the surrounding box.
   JZRectangle Rectangle;
-  ChordRect(Rectangle, ct);
+  ChordRect(Rectangle, Context);
 
   Dc.DrawRectangle(
     Rectangle.x,
@@ -801,7 +820,7 @@ void HBCanvas::DrawChord(wxDC& Dc, const HBContext &ct)
     Rectangle.height);
 
   int w, h;
-  const char* pName = ct.ChordName();
+  const char* pName = Context.ChordName();
   Dc.GetTextExtent(pName, &w, &h);
   Dc.DrawText(
     pName,
@@ -811,11 +830,11 @@ void HBCanvas::DrawChord(wxDC& Dc, const HBContext &ct)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBCanvas::UnDrawChord(wxDC& Dc, const HBContext& ct)
+void HBCanvas::UnDrawChord(wxDC& Dc, const HBContext& Context)
 {
   // draw surrounding box
   JZRectangle Rectangle;
-  ChordRect(Rectangle, ct);
+  ChordRect(Rectangle, Context);
 
   Dc.SetPen(*wxWHITE_PEN);
   Dc.DrawRectangle(
@@ -837,44 +856,52 @@ void HBCanvas::OnDraw(wxDC& Dc)
   Dc.DrawText("Seq", 5, 5);
 
   mChordY =
-    (mSequenceCount / 8 + 1) * mChordHeight + (mSequenceCount % 8 ? mChordHeight : 0) +
+    (mSequenceCount / 8 + 1) * mChordHeight +
+    (mSequenceCount % 8 ? mChordHeight : 0) +
     mChordHeight;
 
   HBContextIterator iter;
-  iter.SetSequence(seq, mSequenceCount);
-  iter.SetScaleType(scale_type);
+  iter.SetSequence(mSequence, mSequenceCount);
+  iter.SetScaleType(mScaleType);
   while (iter())
   {
-    const HBContext &ct = iter.Context();
-    DrawChord(Dc, ct);
-    if (ct.ChordNr() == 0 && ct.SeqNr() == 0)
+    const HBContext& Context = iter.Context();
+    DrawChord(Dc, Context);
+    if (Context.ChordNr() == 0 && Context.SeqNr() == 0)
     {
       JZRectangle Rectangle;
-      ChordRect(Rectangle, ct);
-      Dc.DrawText(ct.ScaleName(), 5, Rectangle.y);
+      ChordRect(Rectangle, Context);
+      Dc.DrawText(Context.ScaleName(), 5, Rectangle.y);
     }
   }
-  DrawMarkers(Dc, mouse_context);
-
+  DrawMarkers(Dc, mMouseContext);
+/*
   if (!mHaunschildLayout)
   {
     for (int j = 0; j < 7; j++)
     {
-      HBContext ct(0, j, scale_type);
+      HBContext Context(0, j, mScaleType);
       JZRectangle Rectangle;
-      ChordRect(Rectangle, ct);
+      ChordRect(Rectangle, Context);
       Rectangle.y -= (int)mChordHeight;
       int w, h;
 
-      const char *name = ct.ChordNrName();
-      Dc.GetTextExtent(name, &w, &h);
-      Dc.DrawText((char *)name, Rectangle.x + (Rectangle.width - w)/2, Rectangle.y + (Rectangle.height - h)/2);
+      const char* pName = Context.ChordNrName();
+      Dc.GetTextExtent(pName, &w, &h);
+      Dc.DrawText(
+        pName,
+        Rectangle.x + (Rectangle.width - w) / 2,
+        Rectangle.y + (Rectangle.height - h) / 2);
 
-      const char *type = ct.ContextName();
-      Dc.GetTextExtent(type, &w, &h);
-      Dc.DrawText((char *)type, Rectangle.x + (Rectangle.width - w)/2, Rectangle.y + (Rectangle.height - h)/2 - h);
+      const char* pType = Context.ContextName();
+      Dc.GetTextExtent(pType, &w, &h);
+      Dc.DrawText(
+        pType,
+        Rectangle.x + (Rectangle.width - w) / 2,
+        Rectangle.y + (Rectangle.height - h) / 2 - h);
     }
   }
+ */
 }
 
 // -----------------------------------------------------------------------------
@@ -941,7 +968,7 @@ class HBMatchMarkers : public HBMatch
 {
   public:
 
-    HBMatchMarkers(const HBContext &ct, HBCanvas *cv);
+    HBMatchMarkers(const HBContext& Context, HBCanvas *cv);
 
     virtual bool operator()(const HBContext &);
 
@@ -954,7 +981,7 @@ class HBMatchMarkers : public HBMatch
   private:
 
     HBCanvas* mpHbWindow;
-    HBContext context;
+    HBContext mContext;
     HBChord   chord;
     HBChord   scale;
     int       n_chord;
@@ -968,27 +995,27 @@ class HBMatchMarkers : public HBMatch
 };
 
 
-HBMatchMarkers::HBMatchMarkers(const HBContext &ct, HBCanvas *cv)
-  : context(ct)
+HBMatchMarkers::HBMatchMarkers(const HBContext& Context, HBCanvas *cv)
+  : mContext(Context)
 {
   mpHbWindow      = cv;
-  chord     = context.Chord();
+  chord     = mContext.Chord();
   n_chord   = chord.Count();
-  chord_key = context.ChordKey();
-  scale     = context.Scale();
+  chord_key = mContext.ChordKey();
+  scale     = mContext.Scale();
 
   msg[0] = 0;
   msg[2] = 0;
 
   {
     // 251-move
-    HBContext tmp(ct.ScaleNr(), ct.ChordNr() + 3, ct.ScaleType());
+    HBContext tmp(Context.ScaleNr(), Context.ChordNr() + 3, Context.ScaleType());
     key251 = tmp.ChordKey();
   }
 
   tritone = (chord_key + 6) % 12;
 
-  if (mpHbWindow->mark_piano)
+  if (mpHbWindow->mMarkPiano && gpTrackFrame->GetPianoWindow())
   {
     tEventArray &buf = gpTrackFrame->GetPianoWindow()->mPasteBuffer;
     for (int i = 0; i < buf.nEvents; i++)
@@ -1014,37 +1041,37 @@ bool HBMatchMarkers::operator()(const HBContext &o_context)
   msg[0] = 0;
   msg[2] = 0;
 
-  if (mpHbWindow->mark_piano && o_chord.Contains(piano))
+  if (mpHbWindow->mMarkPiano && o_chord.Contains(piano))
   {
     strcat(msg, ", P");
   }
 
-  if (mpHbWindow->mark_4_common && o_chord == chord)
+  if (mpHbWindow->mMark4Common && o_chord == chord)
   {
     strcat(msg, ", =4");
   }
 
-  if (mpHbWindow->mark_3_common && n_common == 3)
+  if (mpHbWindow->mMark3Common && n_common == 3)
   {
     strcat(msg, ", =3");
   }
 
-  if (mpHbWindow->mark_2_common && n_common == 2)
+  if (mpHbWindow->mMark2Common && n_common == 2)
   {
     strcat(msg, ", =2");
   }
 
-  if (mpHbWindow->mark_1_common && n_common == 1)
+  if (mpHbWindow->mMark1Common && n_common == 1)
   {
     strcat(msg, ", =1");
   }
 
-  if (mpHbWindow->mark_0_common && n_common == 0)
+  if (mpHbWindow->mMark0Common && n_common == 0)
   {
     strcat(msg, ", =0");
   }
 
-  if (mpHbWindow->mark_1_semi && n_common == n_chord - 1)
+  if (mpHbWindow->mMark1Semi && n_common == n_chord - 1)
   {
     HBChord delta = chord ^ o_chord;
     int key = delta.Iter(0);
@@ -1054,17 +1081,17 @@ bool HBMatchMarkers::operator()(const HBContext &o_context)
     }
   }
 
-  if (mpHbWindow->mark_251 && key251 == o_chord_key)
+  if (mpHbWindow->mMark251 && key251 == o_chord_key)
   {
     strcat(msg, ", 251");
   }
 
-  if (mpHbWindow->mark_b_common && chord_key == o_chord_key)
+  if (mpHbWindow->mMarkBCommon && chord_key == o_chord_key)
   {
     strcat(msg, ", =B");
   }
 
-  if (mpHbWindow->mark_tritone && o_chord_key == tritone)
+  if (mpHbWindow->mMarkTritone && o_chord_key == tritone)
   {
     strcat(msg, ", =T");
   }
@@ -1072,15 +1099,15 @@ bool HBMatchMarkers::operator()(const HBContext &o_context)
   return msg[2] ? 1 : 0;
 }
 
-void HBCanvas::DrawMarkers(wxDC& Dc, const HBContext& ct)
+void HBCanvas::DrawMarkers(wxDC& Dc, const HBContext& Context)
 {
   JZRectangle Rectangle;
   Dc.SetLogicalFunction(wxXOR);
   Dc.SetBrush(*wxTRANSPARENT_BRUSH);
-  HBMatchMarkers match(ct, this);
+  HBMatchMarkers match(Context, this);
   HBContextIterator iter(match);
-  iter.SetSequence(seq, mSequenceCount);
-  iter.SetScaleType(scale_type);
+  iter.SetSequence(mSequence, mSequenceCount);
+  iter.SetScaleType(mScaleType);
   while (iter())
   {
     ChordRect(Rectangle, iter.Context());
@@ -1095,19 +1122,19 @@ void HBCanvas::DrawMarkers(wxDC& Dc, const HBContext& ct)
       Rectangle.height);
   }
 
-  // invert actual chord
-  if (ct.ScaleType() == scale_type)
+  // Invert the actual chord.
+  if (Context.ScaleType() == mScaleType)
   {
     Dc.SetBrush(*wxBLACK_BRUSH);
-    ChordRect(Rectangle, ct);
+    ChordRect(Rectangle, Context);
     Dc.DrawRectangle(
       Rectangle.x,
       Rectangle.y,
       Rectangle.width,
       Rectangle.height);
-    if (ct.SeqNr() > 0)
+    if (Context.SeqNr() > 0)
     {
-      HBContext c(ct);
+      HBContext c(Context);
       c.SetSeqNr(0);
       ChordRect(Rectangle, c);
       Dc.DrawRectangle(
@@ -1117,6 +1144,7 @@ void HBCanvas::DrawMarkers(wxDC& Dc, const HBContext& ct)
         Rectangle.height);
     }
   }
+
   Dc.SetLogicalFunction(wxCOPY);
   Dc.SetBrush(*wxWHITE_BRUSH);
 }
@@ -1124,8 +1152,8 @@ void HBCanvas::DrawMarkers(wxDC& Dc, const HBContext& ct)
 bool HBCanvas::Find(float x, float y, HBContext &out)
 {
   HBContextIterator iter;
-  iter.SetSequence(seq, mSequenceCount);
-  iter.SetScaleType(scale_type);
+  iter.SetSequence(mSequence, mSequenceCount);
+  iter.SetScaleType(mScaleType);
   while (iter())
   {
     JZRectangle Rectangle;
@@ -1143,7 +1171,7 @@ bool HBCanvas::Find(float x, float y, HBContext &out)
 void HBCanvas::ClearSeq()
 {
   mSequenceCount = 0;
-  mouse_context.SetSeqNr(0);
+  mMouseContext.SetSeqNr(0);
   Refresh();
 }
 
@@ -1156,65 +1184,66 @@ void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
 
   Dc.SetFont(*wxSMALL_FONT);
 
-  HBContext context;
+  HBContext Context;
   int x, y;
   MouseEvent.GetPosition(&x, &y);
-  if (Find(x, y, context))
+  if (Find(x, y, Context))
   {
     if (MouseEvent.ButtonDown())
     {
-      player.StartPlay(context);
+      player.StartPlay(Context);
       if (
-        MouseEvent.LeftDown() &&
-        MouseEvent.ShiftDown() ||
+        (MouseEvent.LeftDown() && MouseEvent.ShiftDown()) ||
         MouseEvent.MiddleDown())
       {
-        if (context.SeqNr())
+        if (Context.SeqNr())
         {
-          // remove a chord
-          if (context.SeqNr() == mSequenceCount)
+          // Remove a chord.
+          if (Context.SeqNr() == mSequenceCount)
           {
-            // remove markers first
-            if (mouse_context.SeqNr() == mSequenceCount)
+            // Remove markers first.
+            if (mMouseContext.SeqNr() == mSequenceCount)
             {
-              DrawMarkers(Dc, mouse_context);
-              mouse_context.SetSeqNr(0);
-              DrawMarkers(Dc, mouse_context);
+              DrawMarkers(Dc, mMouseContext);
+              mMouseContext.SetSeqNr(0);
+              DrawMarkers(Dc, mMouseContext);
             }
             --mSequenceCount;
-            UnDrawChord(Dc, context);
-            context.SetSeqNr(0);
+            UnDrawChord(Dc, Context);
+            Context.SetSeqNr(0);
             Refresh();
           }
         }
         else if (mSequenceCount < SEQMAX)
         {
-          // add a chord
-          context.SetSeqNr(mSequenceCount + 1);
-          *seq[mSequenceCount++] = context;
-          DrawMarkers(Dc, mouse_context);
-          DrawChord(Dc, context);
-          DrawMarkers(Dc, mouse_context);
+          // Add a chord.
+          Context.SetSeqNr(mSequenceCount + 1);
+          *mSequence[mSequenceCount++] = Context;
+          DrawMarkers(Dc, mMouseContext);
+          DrawChord(Dc, Context);
+          DrawMarkers(Dc, mMouseContext);
           Refresh();
         }
       }
     }
     else if (
-      MouseEvent.Dragging() && player.IsPlaying() && context != player.Context())
+      MouseEvent.Dragging() &&
+      player.IsPlaying() &&
+      Context != player.Context())
     {
       player.StopPlay();
-      player.StartPlay(context);
+      player.StartPlay(Context);
     }
 
-    if (MouseEvent.LeftDown() || MouseEvent.MiddleDown()) // && context != mouse_context)
+    if (MouseEvent.LeftDown() || MouseEvent.MiddleDown()) // && Context != mMouseContext)
     {
-      DrawMarkers(Dc, mouse_context);
-      mouse_context = context;
-      //mouse_context.SetSeqNr(0);
-      DrawMarkers(Dc, mouse_context);
+      DrawMarkers(Dc, mMouseContext);
+      mMouseContext = Context;
+//      mMouseContext.SetSeqNr(0);
+      DrawMarkers(Dc, mMouseContext);
 
       // paste to PianoWin buffer
-      if (!mark_piano && gpTrackFrame->GetPianoWindow())
+      if (!mMarkPiano && gpTrackFrame->GetPianoWindow())
       {
         tEventArray &buf = gpTrackFrame->GetPianoWindow()->mPasteBuffer;
         buf.Clear();
@@ -1225,13 +1254,14 @@ void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
       if (gpTrackFrame->GetPianoWindow())
       {
         // Show in GuitarWin
-        JZGuitarFrame* guitar = gpTrackFrame->GetPianoWindow()->GetGuitarFrame();
-        if (guitar)
+        JZGuitarFrame* pGuitarFrame =
+          gpTrackFrame->GetPianoWindow()->GetGuitarFrame();
+        if (pGuitarFrame)
         {
           // Remove actual pianowin/mouse position
-          guitar->ShowPitch(0);
-//          guitar->Redraw();
-          guitar->Update();
+          pGuitarFrame->ShowPitch(0);
+//          pGuitarFrame->Redraw();
+          pGuitarFrame->Update();
         }
       }
     }
@@ -1243,21 +1273,24 @@ void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
 }
 
 
-void HBCanvas::SetScaleType(int menu_id, tScaleType st, wxToolBar *tb)
+void HBCanvas::SetScaleType(
+  int MenuId,
+  tScaleType ScaleType,
+  wxToolBar* pToolBar)
 {
-  scale_type = st;
-  tb->ToggleTool(MEN_MAJSCALE, false);
-  tb->ToggleTool(MEN_HARSCALE, false);
-  tb->ToggleTool(MEN_MELSCALE, false);
-  tb->ToggleTool(MEN_IONSCALE, false);
-  tb->ToggleTool(menu_id, true);
+  mScaleType = ScaleType;
+  pToolBar->ToggleTool(MEN_MAJSCALE, false);
+  pToolBar->ToggleTool(MEN_HARSCALE, false);
+  pToolBar->ToggleTool(MEN_MELSCALE, false);
+  pToolBar->ToggleTool(MEN_IONSCALE, false);
+  pToolBar->ToggleTool(MenuId, true);
   Refresh();
 }
 
 
 void HBCanvas::TransposeSelection()
 {
-  if (!SeqDefined())
+  if (!IsSequenceDefined())
   {
     wxMessageBox("define a chord sequence first", "error", wxOK);
     return;
@@ -1265,7 +1298,7 @@ void HBCanvas::TransposeSelection()
   if (gpTrackWindow->EventsSelected("please select destination range in track window"))
   {
     wxBeginBusyCursor();
-    HBAnalyzer analyzer(seq, mSequenceCount);
+    HBAnalyzer analyzer(mSequence, mSequenceCount);
     analyzer.Transpose(gpTrackWindow->mpFilter, transpose_res);
     wxEndBusyCursor();
   }
@@ -1303,31 +1336,31 @@ void HBCanvas::FileSaveAs()
   }
 }
 
-void HBCanvas::OnMenuCommand(int id, wxToolBar *mpToolBar)
+void HBCanvas::MenuCommand(int MenuId, wxToolBar* pToolBar)
 {
-  switch (id)
+  switch (MenuId)
   {
     case MEN_MAJSCALE:
-      SetScaleType(id, Major, mpToolBar);
+      SetScaleType(MenuId, Major, pToolBar);
       break;
 
     case MEN_HARSCALE:
-      SetScaleType(id, Harmon, mpToolBar);
+      SetScaleType(MenuId, Harmon, pToolBar);
       break;
 
     case MEN_MELSCALE:
-      SetScaleType(id, Melod, mpToolBar);
+      SetScaleType(MenuId, Melod, pToolBar);
       break;
 
     case MEN_IONSCALE:
-      SetScaleType(id, Ionb13, mpToolBar);
+      SetScaleType(MenuId, Ionb13, pToolBar);
       break;
 
     case MEN_ANALYZE:
       if (gpTrackWindow->EventsSelected("please select source range in track window"))
       {
         wxBeginBusyCursor();
-        HBAnalyzer analyzer(seq, (int)SEQMAX);
+        HBAnalyzer analyzer(mSequence, (int)SEQMAX);
         mSequenceCount = analyzer.Analyze(gpTrackWindow->mpFilter, analyze_res);
         Refresh();
         wxEndBusyCursor();
@@ -1343,9 +1376,8 @@ void HBCanvas::OnMenuCommand(int id, wxToolBar *mpToolBar)
       break;
 
     default:
-      SetMarker(id, mpToolBar);
+      SetMarker(MenuId, pToolBar);
       break;
-
   }
 }
 
@@ -1354,7 +1386,7 @@ HBAnalyzer * HBCanvas::GetAnalyzer()
 {
   if (mSequenceCount > 0 && gpTrackWindow->mpSnapSel->Selected)
   {
-    HBAnalyzer *analyzer = new HBAnalyzer(seq, mSequenceCount);
+    HBAnalyzer *analyzer = new HBAnalyzer(mSequence, mSequenceCount);
     analyzer->Init(gpTrackWindow->mpFilter, transpose_res);
     return analyzer;
   }
@@ -1367,7 +1399,7 @@ HBAnalyzer * HBCanvas::GetAnalyzer()
 
 struct tNamedChord
 {
-  const char *name;
+  const char* mpName;
   int bits;
 };
 
@@ -1375,69 +1407,70 @@ const int n_chord_names = 12;
 const int n_scale_names = 45;
 
 
-tNamedChord chord_names[n_chord_names] = {
-  { " j7",        0x891},
-  { " m7",        0x489},
-  { " 7",        0x491},
-  { " m75-",        0x449},
-  { " mj7",        0x889},
-  { " j75+",        0x911},
-  { " dim",        0x249},
-  { " sus4",        0xa1},
+tNamedChord chord_names[n_chord_names] =
+{
+  { " j7",           0x891},
+  { " m7",           0x489},
+  { " 7",            0x491},
+  { " m75-",         0x449},
+  { " mj7",          0x889},
+  { " j75+",         0x911},
+  { " dim",          0x249},
+  { " sus4",         0xa1},
   { " 7sus4",        0x4a1},
-  { " j7sus4",        0x8a1},
-  { " alt (79+13-)",        0x519},
-  { " 75-",        0x451},
+  { " j7sus4",       0x8a1},
+  { " alt (79+13-)", 0x519},
+  { " 75-",          0x451},
 };
 
-tNamedChord scale_names[n_scale_names] = {
-  { "***** major scales *****",                0x0},
-  { "maj I   (ionic)",                        0xab5},
-  { "maj IV  (lydic)",                        0xad5},
-  { "har III (ion #5)",                        0xb35},
-  { "har VI  (lyd #9)",                        0xad9},
-  { "mel III (lyd #5)",                        0xb55},
-  { "augmented",                        0x333},
-  { "hj I    (ionic b13)",                0x9b5},
-  { "***** minor scales *****",                0x0},
-  { "minor penta",                        0x4a9},
-  { "maj VI   (aeolic)",                0x5ad},
-  { "maj II   (doric)",                        0x6ad},
-  { "mel II   (doric b9)",                0x6ab},
-  { "maj III  (phrygic)",                0x5ab},
-  { "japan penta",                        0x4a3},
-  { "har IV   (dor #11)",                0x6cd},
-  { "har I    (harmonic minor)",        0x9ad},
-  { "mel I    (melodic minor)",                0xaad},
-  { "gipsy",                                0x9cd},
-  { "hj IV    (melodic #11)",                0xacd},
-  { "***** dominant scales *****",        0x0},
-  { "major penta",                        0x295},
-  { "ind. penta",                        0x4b1},
-  { "maj V (mixolyd)",                        0x6b5},
-  { "har V (har dominant)",                0x5b3},
-  { "mel IV (mixo #11)",                0x6d5},
-  { "mixo #11b9",                        0x6d3},
-  { "mel V (mixo b13)",                        0x5b5},
-  { "hj V  (mixo b9)",                        0x6b3},
-  { "full",                                0x555},
-  { "hj III (har alt)",                        0x59b},
-  { "mel VII (alt)",                        0x55b},
-  { "half/full",                        0x6db},
-  { "***** semi dimin *****",                0x0},
-  { "maj VII (locr)",                        0x56b},
-  { "mel VI  (locr 9)",                        0x56d},
-  { "har II  (locr 13)",                0x66b},
-  { "hj II   (doric b5)",                0x66d},
-  { "***** dimin *****",                0x0},
-  { "har VII (har dim)",                0x35b},
-  { "full/half",                        0xa6d},
-  { "hj VII  (locr dim)",                0x36b},
-  { "***** blues scales *****",                0x0},
-  { "minor penta b5",                        0x4e9},
-  { "blues scale",                        0x4f9},
+tNamedChord scale_names[n_scale_names] =
+{
+  { "***** major scales *****",       0x0},
+  { "maj I   (ionic)",                0xab5},
+  { "maj IV  (lydic)",                0xad5},
+  { "har III (ion #5)",               0xb35},
+  { "har VI  (lyd #9)",               0xad9},
+  { "mel III (lyd #5)",               0xb55},
+  { "augmented",                      0x333},
+  { "hj I    (ionic b13)",            0x9b5},
+  { "***** minor scales *****",       0x0},
+  { "minor penta",                    0x4a9},
+  { "maj VI   (aeolic)",              0x5ad},
+  { "maj II   (doric)",               0x6ad},
+  { "mel II   (doric b9)",            0x6ab},
+  { "maj III  (phrygic)",             0x5ab},
+  { "japan penta",                    0x4a3},
+  { "har IV   (dor #11)",             0x6cd},
+  { "har I    (harmonic minor)",      0x9ad},
+  { "mel I    (melodic minor)",       0xaad},
+  { "gipsy",                          0x9cd},
+  { "hj IV    (melodic #11)",         0xacd},
+  { "***** dominant scales *****",    0x0},
+  { "major penta",                    0x295},
+  { "ind. penta",                     0x4b1},
+  { "maj V (mixolyd)",                0x6b5},
+  { "har V (har dominant)",           0x5b3},
+  { "mel IV (mixo #11)",              0x6d5},
+  { "mixo #11b9",                     0x6d3},
+  { "mel V (mixo b13)",               0x5b5},
+  { "hj V  (mixo b9)",                0x6b3},
+  { "full",                           0x555},
+  { "hj III (har alt)",               0x59b},
+  { "mel VII (alt)",                  0x55b},
+  { "half/full",                      0x6db},
+  { "***** semi dimin *****",         0x0},
+  { "maj VII (locr)",                 0x56b},
+  { "mel VI  (locr 9)",               0x56d},
+  { "har II  (locr 13)",              0x66b},
+  { "hj II   (doric b5)",             0x66d},
+  { "***** dimin *****",              0x0},
+  { "har VII (har dim)",              0x35b},
+  { "full/half",                      0xa6d},
+  { "hj VII  (locr dim)",             0x36b},
+  { "***** blues scales *****",       0x0},
+  { "minor penta b5",                 0x4e9},
+  { "blues scale",                    0x4f9},
 };
-
 
 class HBContextDlg : public wxDialog
 {
@@ -1493,7 +1526,7 @@ class HBContextDlg : public wxDialog
 
 
 HBContextDlg::HBContextDlg(HBCanvas *c, wxFrame *parent, HBContext *pct)
-  : wxDialog(parent, -1, "Edit chord/scale" )
+  : wxDialog(parent, wxID_ANY, "Edit chord/scale" )
 {
   int i;
 
@@ -1561,7 +1594,7 @@ HBContextDlg::HBContextDlg(HBCanvas *c, wxFrame *parent, HBContext *pct)
 
   for (i = 0; i < n_chord_names; i++)
   {
-    cnames[i] = (char *)chord_names[i].name;
+    cnames[i] = (char *)chord_names[i].mpName;
   }
 
   chord_lst = new wxListBox(this, -1,   wxPoint(10, y), wxSize(100, 200), n_chord_names, cnames, wxLB_SINGLE| wxLB_NEEDED_SB);//"Chords"
@@ -1571,7 +1604,7 @@ HBContextDlg::HBContextDlg(HBCanvas *c, wxFrame *parent, HBContext *pct)
   wxString* snames = new wxString[n_scale_names];
   for (i = 0; i < n_scale_names; i++)
   {
-    snames[i] = (char *)scale_names[i].name;
+    snames[i] = (char *)scale_names[i].mpName;
   }
   scale_lst = new wxListBox(
     this,
@@ -1683,10 +1716,10 @@ void HBContextDlg::OnPlayButton()
   }
   else
   {
-    HBContext ct(*pcontext);
-    *ct.PChord() = chord;
-    *ct.PScale() = scale;
-    player.StartPlay(ct);
+    HBContext Context(*pcontext);
+    *Context.PChord() = chord;
+    *Context.PScale() = scale;
+    player.StartPlay(Context);
     play_but->SetLabel("stop");
   }
 }
@@ -1702,10 +1735,10 @@ void HBContextDlg::RestartPlayer()
   if (player.IsPlaying())
   {
     player.StopPlay();
-    HBContext ct(*pcontext);
-    *ct.PChord() = chord;
-    *ct.PScale() = scale;
-    player.StartPlay(ct);
+    HBContext Context(*pcontext);
+    *Context.PChord() = chord;
+    *Context.PScale() = scale;
+    player.StartPlay(Context);
   }
 }
 
@@ -1772,11 +1805,26 @@ void HBContextDlg::OnScaleList()
 //-----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(HBFrame, wxFrame)
 
-//  EVT_SIZE(HBFrame::OnSize)
+  EVT_MENU(MEN_MAJSCALE, HBFrame::OnToolBarSelect)
+  EVT_MENU(MEN_HARSCALE, HBFrame::OnToolBarSelect)
+  EVT_MENU(MEN_MELSCALE, HBFrame::OnToolBarSelect)
+  EVT_MENU(MEN_IONSCALE, HBFrame::OnToolBarSelect)
+  EVT_MENU(MEN_EQ4, HBFrame::OnToolBarSelect)
+  EVT_MENU(MEN_EQ3, HBFrame::OnToolBarSelect)
+  EVT_MENU(MEN_EQ2, HBFrame::OnToolBarSelect)
+  EVT_MENU(MEN_EQ1, HBFrame::OnToolBarSelect)
+  EVT_MENU(MEN_EQ0, HBFrame::OnToolBarSelect)
+  EVT_MENU(MEN_EQH, HBFrame::OnToolBarSelect)
+  EVT_MENU(MEN_251, HBFrame::OnToolBarSelect)
+  EVT_MENU(MEN_EQB, HBFrame::OnToolBarSelect)
+  EVT_MENU(MEN_TRITONE, HBFrame::OnToolBarSelect)
+  EVT_MENU(MEN_PIANO, HBFrame::OnToolBarSelect)
 
-  EVT_MENU(MEN_LOAD, HBFrame::OnFileLoad)
+  EVT_MENU(wxID_OPEN, HBFrame::OnFileLoad)
 
   EVT_MENU(wxID_SAVEAS, HBFrame::OnFileSaveAs)
+
+  EVT_MENU(MEN_EDIT, HBFrame::OnSettingsChord)
 
   EVT_MENU(MEN_MIDI, HBFrame::OnSettingsMidi)
 
@@ -1787,6 +1835,10 @@ BEGIN_EVENT_TABLE(HBFrame, wxFrame)
   EVT_MENU(MEN_MOUSE, HBFrame::OnMouseHelp)
 
   EVT_MENU(MEN_HELP, HBFrame::OnHelp)
+
+//  EVT_MENU(MEN_ANALYZE, 
+//  EVT_MENU(MEN_TRANSPOSE, 
+//  EVT_MENU(MEN_SETTINGS, 
 
 END_EVENT_TABLE()
 
@@ -1808,7 +1860,7 @@ HBFrame::HBFrame()
   mpToolBar = new JZToolBar(this, tdefs);
 
   wxMenu* pFileMenu = new wxMenu;
-  pFileMenu->Append(MEN_LOAD, "&Load...");
+  pFileMenu->Append(wxID_OPEN, "&Load...");
   pFileMenu->Append(wxID_SAVEAS, "Save &As...");
   pFileMenu->Append(wxID_CLOSE, "&Close");
 
@@ -1886,16 +1938,18 @@ bool HBFrame::OnClose()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int HBFrame::SeqDefined()
+bool HBFrame::IsSequenceDefined()
 {
-  return mpHbWindow->SeqDefined();
+  return mpHbWindow->IsSequenceDefined();
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 int HBFrame::SeqSelected()
 {
-  if (mpHbWindow->mSequenceCount == 0 || mpHbWindow->mouse_context.SeqNr() == 0)
+  if (
+    mpHbWindow->mSequenceCount == 0 ||
+    mpHbWindow->mMouseContext.SeqNr() == 0)
   {
     wxMessageBox("Select a chord from sequence first", "Error", wxOK);
     return 0;
@@ -1905,60 +1959,53 @@ int HBFrame::SeqSelected()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int HBFrame::GetChordKeys(int *out, int step, int n_steps)
+int HBFrame::GetChordKeys(int* out, int step, int n_steps)
 {
   return mpHbWindow->GetChordKeys(out, step, n_steps);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int HBFrame::GetSelectedChord(int *out)
+int HBFrame::GetSelectedChord(int* out)
 {
   return mpHbWindow->GetSelectedChord(out);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int HBFrame::GetSelectedScale(int *out)
+int HBFrame::GetSelectedScale(int* out)
 {
   return mpHbWindow->GetSelectedScale(out);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int HBFrame::GetBassKeys(int *out, int step, int n_steps)
+int HBFrame::GetBassKeys(int* out, int step, int n_steps)
 {
   return mpHbWindow->GetBassKeys(out, step, n_steps);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnMenuCommand(int id)
+void HBFrame::OnToolBarSelect(wxCommandEvent& Event)
 {
-  switch(id)
+  mpHbWindow->MenuCommand(
+    Event.GetId(),
+    mpToolBar->GetDelegateToolBar());
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBFrame::OnSettingsChord(wxCommandEvent& Event)
+{
+  if (!SeqSelected())
   {
-
-    case MEN_EDIT:
-      {
-        if (!SeqSelected())
-        {
-          return;
-        }
-      }
-      (void) new HBContextDlg(
-        mpHbWindow,
-        this,
-        mpHbWindow->seq[mpHbWindow->mouse_context.SeqNr() - 1]);
-      break;
-
-    case wxID_CLOSE:
-      Destroy();
-      break;
-
-    default:
-      mpHbWindow->OnMenuCommand(id, mpToolBar->GetDelegateToolBar());
-      break;
+    return;
   }
+  (void) new HBContextDlg(
+    mpHbWindow,
+    this,
+    mpHbWindow->mSequence[mpHbWindow->mMouseContext.SeqNr() - 1]);
 }
 
 //-----------------------------------------------------------------------------

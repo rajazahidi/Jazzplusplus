@@ -698,9 +698,9 @@ tSampleWin::tSampleWin(wxWindow* pParent, tSampleWin **ref, tSample &sample)
   wxMenuBar *menu_bar = new wxMenuBar;
   wxMenu    *menu = new wxMenu;
   menu->Append(MEN_REVERT,      "&Revert to Saved");
-  menu->Append(MEN_LOAD,        "&Load ...");
-  menu->Append(MEN_SAVE,        "&Save");
-  menu->Append(MEN_SAVEAS,      "&Save as ...");
+  menu->Append(MEN_LOAD,        "&Load...");
+  menu->Append(wxID_SAVE,       "&Save");
+  menu->Append(wxID_SAVEAS,     "&Save As...");
   menu->Append(MEN_CLOSE,       "&Close");
   menu_bar->Append(menu,        "&File");
 

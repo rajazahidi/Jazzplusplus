@@ -383,7 +383,7 @@ class tHBPlayerForm : public wxForm
 void HBPlayer::SettingsDialog(wxFrame *parent)
 {
 #ifdef OBSOLETE
-  wxDialogBox *panel = new wxDialogBox(parent, "MIDI settings", FALSE );
+  wxDialogBox *panel = new wxDialogBox(pParent, "MIDI settings", FALSE );
   tHBPlayerForm      *form  = new tHBPlayerForm;
 
   form->Add(wxMakeFormMessage("Note Length for paste into piano window"));
@@ -432,10 +432,9 @@ void HBPlayer::SettingsDialog(wxFrame *parent)
 }
 
 //*****************************************************************************
-// HBCanvas
+// Description:
+//   This is the harmony browser window.
 //*****************************************************************************
-
-/** painting component for the harmony browser*/
 class HBCanvas : public wxScrolledWindow
 {
     friend class HBSettingsDlg;
@@ -446,21 +445,33 @@ class HBCanvas : public wxScrolledWindow
 
   public:
 
-    HBCanvas(wxFrame *parent, int x, int y, int w, int h);
+    HBCanvas(wxFrame* pParent, int x, int y, int w, int h);
+
     virtual ~HBCanvas();
-    virtual void OnDraw(wxDC& dc);
-    void DrawMarkers(const HBContext &c, wxDC* dc);
+
+    virtual void OnDraw(wxDC& Dc);
+
+    void DrawMarkers(wxDC& Dc, const HBContext &c);
 
     void ClearSeq();
 
-    int SeqDefined()        { return n_seq > 0; }
+    int SeqDefined()
+    {
+      return n_seq > 0;
+    }
+
     int GetChordKeys(int *out, int step, int n_steps);
+
     int GetSelectedChord(int *out);
+
     int GetSelectedScale(int *out);
+
     int GetBassKeys(int *out, int step, int n_steps);
-    void SettingsDialog(wxFrame *parent);
+
+    void SettingsDialog();
 
     void OnMenuCommand(int id, wxToolBar *mpToolBar);
+
     void TransposeSelection();
 
     HBPlayer player;
@@ -470,53 +481,75 @@ class HBCanvas : public wxScrolledWindow
       SEQMAX = 256
     };
 
-    HBAnalyzer * getAnalyzer();
+    HBAnalyzer* getAnalyzer();
 
   protected:
 
     static const int ScFa;
-    void ChordRect(JZRectangle &r, const HBContext &ct);
-    void DrawChord(const HBContext &ct);
-    void UnDrawChord(const HBContext &ct);
+
+    void ChordRect(JZRectangle& Rectangle, const HBContext &ct);
+
+    void DrawChord(wxDC& Dc, const HBContext &ct);
+
+    void UnDrawChord(wxDC& Dc, const HBContext &ct);
+
     bool Find(float x, float y, HBContext &out);
 
   private:
 
     virtual void OnMouseEvent(wxMouseEvent& MouseEvent);
 
+    void SetMarker(int id, wxToolBar *mpToolBar);
+
+    void SetScaleType(int menu_id, tScaleType st, wxToolBar *tb);
+
   private:
 
-    float xchord, ychord, wchord, hchord;
-    float ofs;
-    wxFrame *parent;
+    static tScaleType scale_type;
 
-    HBContext *seq[SEQMAX];
+    static int transpose_res;
+
+    static int analyze_res;
+
+    float xchord, ychord, wchord, hchord;
+
+    float ofs;
+
+//    wxFrame* parent;
+
+    HBContext* seq[SEQMAX];
+
     int n_seq;
 
-    char *default_filename;
+    char* default_filename;
+
     bool has_changed;
 
     HBContext mouse_context;
 
     bool haunschild_layout;
+
     bool mark_4_common;
+
     bool mark_3_common;
+
     bool mark_2_common;
+
     bool mark_1_common;
+
     bool mark_b_common;
+
     bool mark_0_common;
+
     bool mark_1_semi;
+
     bool mark_251;
+
     bool mark_tritone;
+
     bool mark_piano;
-    void SetMarker(int id, wxToolBar *mpToolBar);
+
     int  active_marker;
-
-    static int  transpose_res;
-    static int  analyze_res;
-
-    static tScaleType scale_type;
-    void SetScaleType(int menu_id, tScaleType st, wxToolBar *tb);
 
   DECLARE_EVENT_TABLE()
 };
@@ -534,10 +567,12 @@ BEGIN_EVENT_TABLE(HBCanvas, wxScrolledWindow)
 
 END_EVENT_TABLE()
 
-HBCanvas::HBCanvas(wxFrame *p, int x, int y, int w, int h)
-  : wxScrolledWindow(p, -1, wxPoint(x, y), wxSize(w, h))
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+HBCanvas::HBCanvas(wxFrame* pParent, int x, int y, int w, int h)
+  : wxScrolledWindow(pParent, wxID_ANY, wxPoint(x, y), wxSize(w, h))
 {
-  parent = p;
+//  parent = pParent;
   n_seq  = 0;
 
   active_marker = 0;
@@ -688,66 +723,70 @@ int HBCanvas::GetBassKeys(int *out, int step, int n_steps)
 }
 
 
-void HBCanvas::ChordRect(JZRectangle &r, const HBContext &ct)
+void HBCanvas::ChordRect(JZRectangle& Rectangle, const HBContext &ct)
 {
   if (ct.SeqNr())
   {
-    r.x = (int)(xchord + (ct.SeqNr() - 1) % 8 * wchord);
-    r.y = (int)(hchord * ((ct.SeqNr() -1) / 8 + 0.5));
+    Rectangle.x = (int)(xchord + (ct.SeqNr() - 1) % 8 * wchord);
+    Rectangle.y = (int)(hchord * ((ct.SeqNr() -1) / 8 + 0.5));
   }
   else if (!haunschild_layout)
   {
-    r.x = (int)(xchord + ct.ChordNr() * wchord);
-    r.y = (int)(ychord + ct.ScaleNr() * hchord);
+    Rectangle.x = (int)(xchord + ct.ChordNr() * wchord);
+    Rectangle.y = (int)(ychord + ct.ScaleNr() * hchord);
   }
   else
   {
-    r.x = (int)(xchord + (5 * ct.ChordNr() % 7 + 5 * ct.ScaleNr() % 12) % 7 * wchord);
-    r.y = (int)(ychord + (5 * ct.ScaleNr() % 12) * hchord);
+    Rectangle.x = (int)(xchord + (5 * ct.ChordNr() % 7 + 5 * ct.ScaleNr() % 12) % 7 * wchord);
+    Rectangle.y = (int)(ychord + (5 * ct.ScaleNr() % 12) * hchord);
   }
 
-  r.x += (int)ofs;
-  r.y -= (int)ofs;
-  r.width =  (int)(wchord - 2 * ofs);
-  r.height =  (int)(hchord - 2 * ofs);
+  Rectangle.x += (int)ofs;
+  Rectangle.y -= (int)ofs;
+  Rectangle.width =  (int)(wchord - 2 * ofs);
+  Rectangle.height =  (int)(hchord - 2 * ofs);
 }
 
 
-void HBCanvas::DrawChord(const HBContext &ct)
+void HBCanvas::DrawChord(wxDC& Dc, const HBContext &ct)
 {
-  // draw surrounding box
-  JZRectangle r;
-  ChordRect(r, ct);
-  wxDC *dc = new wxClientDC(this);//GetDC();
-  dc->DrawRectangle(r.x, r.y, r.width, r.height);
+  // Draw the surrounding box.
+  JZRectangle Rectangle;
+  ChordRect(Rectangle, ct);
+
+  Dc.DrawRectangle(
+    Rectangle.x,
+    Rectangle.y,
+    Rectangle.width,
+    Rectangle.height);
 
   int w, h;
-  const char *name = ct.ChordName();
-  dc->GetTextExtent(name, &w, &h);
-  dc->DrawText((char *)name, r.x + (r.width - w)/2, r.y + (r.height - h)/2);
-  delete dc;
+  const char* pName = ct.ChordName();
+  Dc.GetTextExtent(pName, &w, &h);
+  Dc.DrawText(pName, Rectangle.x + (Rectangle.width - w)/2, Rectangle.y + (Rectangle.height - h)/2);
 }
 
 
-void HBCanvas::UnDrawChord(const HBContext &ct)
+void HBCanvas::UnDrawChord(wxDC& Dc, const HBContext& ct)
 {
   // draw surrounding box
-  JZRectangle r;
-  ChordRect(r, ct);
+  JZRectangle Rectangle;
+  ChordRect(Rectangle, ct);
 
-  wxDC *dc = new wxClientDC(this);//GetDC();
-  dc->SetPen(*wxWHITE_PEN);
-  dc->DrawRectangle(r.x, r.y, r.width, r.height);
-  dc->SetPen(*wxBLACK_PEN);
-  delete dc;
+  Dc.SetPen(*wxWHITE_PEN);
+  Dc.DrawRectangle(
+    Rectangle.x,
+    Rectangle.y,
+    Rectangle.width,
+    Rectangle.height);
+  Dc.SetPen(*wxBLACK_PEN);
 }
 
 
-void HBCanvas::OnDraw(wxDC& dcref)
+void HBCanvas::OnDraw(wxDC& Dc)
 {
-  wxDC *dc = &dcref; //im just lazy, didnt want to change old code
-  dc->Clear();
-  dc->DrawText("Seq", 5, 5);
+  Dc.Clear();
+  Dc.DrawText("Seq", 5, 5);
 
   ychord = (n_seq/8 + 1) * hchord + (n_seq % 8 ? hchord : 0) + hchord;
 
@@ -757,33 +796,33 @@ void HBCanvas::OnDraw(wxDC& dcref)
   while (iter())
   {
     const HBContext &ct = iter.Context();
-    DrawChord(ct);
+    DrawChord(Dc, ct);
     if (ct.ChordNr() == 0 && ct.SeqNr() == 0)
     {
-      JZRectangle r;
-      ChordRect(r, ct);
-      dc->DrawText((char *)ct.ScaleName(), 5, r.y);
+      JZRectangle Rectangle;
+      ChordRect(Rectangle, ct);
+      Dc.DrawText(ct.ScaleName(), 5, Rectangle.y);
     }
   }
-  DrawMarkers(mouse_context, dc);
+  DrawMarkers(Dc, mouse_context);
 
   if (!haunschild_layout)
   {
     for (int j = 0; j < 7; j++)
     {
       HBContext ct(0, j, scale_type);
-      JZRectangle r;
-      ChordRect(r, ct);
-      r.y -= (int)hchord;
+      JZRectangle Rectangle;
+      ChordRect(Rectangle, ct);
+      Rectangle.y -= (int)hchord;
       int w, h;
 
       const char *name = ct.ChordNrName();
-      dc->GetTextExtent(name, &w, &h);
-      dc->DrawText((char *)name, r.x + (r.width - w)/2, r.y + (r.height - h)/2);
+      Dc.GetTextExtent(name, &w, &h);
+      Dc.DrawText((char *)name, Rectangle.x + (Rectangle.width - w)/2, Rectangle.y + (Rectangle.height - h)/2);
 
       const char *type = ct.ContextName();
-      dc->GetTextExtent(type, &w, &h);
-      dc->DrawText((char *)type, r.x + (r.width - w)/2, r.y + (r.height - h)/2 - h);
+      Dc.GetTextExtent(type, &w, &h);
+      Dc.DrawText((char *)type, Rectangle.x + (Rectangle.width - w)/2, Rectangle.y + (Rectangle.height - h)/2 - h);
     }
   }
 
@@ -814,10 +853,10 @@ void HBSettingsForm::OnHelp()
 
 #endif
 
-void HBCanvas::SettingsDialog(wxFrame *parent)
+void HBCanvas::SettingsDialog()
 {
 #ifdef OBSOLETE
-  wxDialogBox *panel = new wxDialogBox(parent, "settings", FALSE );
+  wxDialogBox *panel = new wxDialogBox(this, "settings", FALSE );
   wxForm      *form  = new HBSettingsForm(this);
 
   panel->SetLabelPosition(wxHORIZONTAL);
@@ -947,42 +986,41 @@ bool HBMatchMarkers::operator()(const HBContext &o_context)
   return msg[2] ? 1 : 0;
 }
 
-void HBCanvas::DrawMarkers(const HBContext &ct, wxDC* dc)
+void HBCanvas::DrawMarkers(wxDC& Dc, const HBContext &ct)
 {
-  JZRectangle r;
-  //wxDC *dc = GetDC();
-  dc->SetLogicalFunction(wxXOR);
-  dc->SetBrush(*wxTRANSPARENT_BRUSH);
+  JZRectangle Rectangle;
+  Dc.SetLogicalFunction(wxXOR);
+  Dc.SetBrush(*wxTRANSPARENT_BRUSH);
   HBMatchMarkers match(ct, this);
   HBContextIterator iter(match);
   iter.SetSequence(seq, n_seq);
   iter.SetScaleType(scale_type);
   while (iter())
   {
-    ChordRect(r, iter.Context());
-    r.x += 3;
-    r.y += 3;
-    r.width -= 6;
-    r.height -= 6;
-    dc->DrawRectangle(r.x, r.y, r.width, r.height);
+    ChordRect(Rectangle, iter.Context());
+    Rectangle.x += 3;
+    Rectangle.y += 3;
+    Rectangle.width -= 6;
+    Rectangle.height -= 6;
+    Dc.DrawRectangle(Rectangle.x, Rectangle.y, Rectangle.width, Rectangle.height);
   }
 
   // invert actual chord
   if (ct.ScaleType() == scale_type)
   {
-    dc->SetBrush(*wxBLACK_BRUSH);
-    ChordRect(r, ct);
-    dc->DrawRectangle(r.x, r.y, r.width, r.height);
+    Dc.SetBrush(*wxBLACK_BRUSH);
+    ChordRect(Rectangle, ct);
+    Dc.DrawRectangle(Rectangle.x, Rectangle.y, Rectangle.width, Rectangle.height);
     if (ct.SeqNr() > 0)
     {
       HBContext c(ct);
       c.SetSeqNr(0);
-      ChordRect(r, c);
-      dc->DrawRectangle(r.x, r.y, r.width, r.height);
+      ChordRect(Rectangle, c);
+      Dc.DrawRectangle(Rectangle.x, Rectangle.y, Rectangle.width, Rectangle.height);
     }
   }
-  dc->SetLogicalFunction(wxCOPY);
-  dc->SetBrush(*wxWHITE_BRUSH);
+  Dc.SetLogicalFunction(wxCOPY);
+  Dc.SetBrush(*wxWHITE_BRUSH);
 }
 
 bool HBCanvas::Find(float x, float y, HBContext &out)
@@ -992,9 +1030,9 @@ bool HBCanvas::Find(float x, float y, HBContext &out)
   iter.SetScaleType(scale_type);
   while (iter())
   {
-    JZRectangle r;
-    ChordRect(r, iter.Context());
-    if (r.IsInside((int)x, (int)y))
+    JZRectangle Rectangle;
+    ChordRect(Rectangle, iter.Context());
+    if (Rectangle.IsInside((int)x, (int)y))
     {
       out = iter.Context();
       return TRUE;
@@ -1014,7 +1052,9 @@ void HBCanvas::ClearSeq()
 
 void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
 {
-  wxDC* dc= new wxClientDC(this);
+  wxClientDC Dc(this);
+  DoPrepareDC(Dc);
+
   HBContext context;
   int x, y;
   MouseEvent.GetPosition(&x, &y);
@@ -1036,12 +1076,12 @@ void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
             // remove markers first
             if (mouse_context.SeqNr() == n_seq)
             {
-              DrawMarkers(mouse_context, dc);
+              DrawMarkers(Dc, mouse_context);
               mouse_context.SetSeqNr(0);
-              DrawMarkers(mouse_context, dc);
+              DrawMarkers(Dc, mouse_context);
             }
             -- n_seq;
-            UnDrawChord(context);
+            UnDrawChord(Dc, context);
             context.SetSeqNr(0);
             Refresh();
           }
@@ -1051,9 +1091,9 @@ void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
           // add a chord
           context.SetSeqNr(n_seq + 1);
           *seq[n_seq ++] = context;
-          DrawMarkers(mouse_context, dc);
-          DrawChord(context);
-          DrawMarkers(mouse_context, dc);
+          DrawMarkers(Dc, mouse_context);
+          DrawChord(Dc, context);
+          DrawMarkers(Dc, mouse_context);
           Refresh();
         }
       }
@@ -1067,10 +1107,10 @@ void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
 
     if (MouseEvent.LeftDown() || MouseEvent.MiddleDown()) // && context != mouse_context)
     {
-      DrawMarkers(mouse_context, dc);
+      DrawMarkers(Dc, mouse_context);
       mouse_context = context;
       //mouse_context.SetSeqNr(0);
-      DrawMarkers(mouse_context, dc);
+      DrawMarkers(Dc, mouse_context);
 
       // paste to PianoWin buffer
       if (!mark_piano && gpTrackFrame->GetPianoWindow())
@@ -1099,7 +1139,6 @@ void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
   {
     player.StopPlay();
   }
-  delete dc;
 }
 
 
@@ -1204,7 +1243,7 @@ void HBCanvas::OnMenuCommand(int id, wxToolBar *mpToolBar)
       break;
 
     case MEN_SETTINGS:
-      SettingsDialog(parent);
+      SettingsDialog();
       break;
 
     default:

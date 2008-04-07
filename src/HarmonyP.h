@@ -258,60 +258,122 @@ class HBContext
   public:
 
     HBContext(int sn, int cn = 0, tScaleType st = Major);
+
     HBContext();
-    HBChord *PScale()                                 { return &scale; }
-    HBChord Scale() const                        { return scale; }
-    HBChord *PChord()                                { return &chord; }
-    HBChord Chord() const                        { return chord; }
-    int ScaleKey() const                        { return scale_nr; }
-    int ChordKey() const                        { return chord_key; }
 
-    int ChordNr() const                                { return chord_nr; }
-    int ScaleNr() const                                { return scale_nr; }
-    tScaleType ScaleType() const                { return scale_type; }
-    int SeqNr() const                                { return seq_nr; }
-    void SetSeqNr(int n = 0)                        { seq_nr = n; }
+    HBChord *PScale()
+    {
+      return &scale;
+    }
 
-    const char * ChordName() const;                // "Dm75-"
-    const char * ChordNrName() const;                // "IV"
-    const char * ContextName() const                // "mixo#11"
+    HBChord Scale() const
+    {
+      return scale;
+    }
+
+    HBChord *PChord()
+    {
+      return &chord;
+    }
+
+    HBChord Chord() const
+    {
+      return chord;
+    }
+
+    int ScaleKey() const
+    {
+      return scale_nr;
+    }
+
+    int ChordKey() const
+    {
+      return chord_key;
+    }
+
+    int ChordNr() const
+    {
+      return chord_nr;
+    }
+
+    int ScaleNr() const
+    {
+      return scale_nr;
+    }
+
+    tScaleType ScaleType() const
+    {
+      return scale_type;
+    }
+
+    int SeqNr() const
+    {
+      return seq_nr;
+    }
+
+    void SetSeqNr(int n = 0)
+    {
+      seq_nr = n;
+    }
+
+    const char* ChordName() const;                // "Dm75-"
+
+    const char* ChordNrName() const;              // "IV"
+
+    const char* ContextName() const               // "mixo#11"
     {
       return context_names[scale_type][chord_nr];
     }
-    const char * ScaleName() const;                // "C#"
-    const char * ScaleTypeName() const;                // "major"
 
-    int operator == (const HBContext &o) const
+    const char* ScaleName() const;                // "C#"
+
+    const char* ScaleTypeName() const;            // "major"
+
+    int operator == (const HBContext& Rhs) const
     {
-      return scale_type == o.scale_type &&
-             scale_nr   == o.scale_nr &&
-             chord_nr   == o.chord_nr;
+      return
+        scale_type == Rhs.scale_type &&
+        scale_nr   == Rhs.scale_nr &&
+        chord_nr   == Rhs.chord_nr;
     }
-    int operator != (const HBContext &o) const        { return !operator==(o); }
+
+    int operator != (const HBContext& Rhs) const
+    {
+      return !operator == (Rhs);
+    }
 
   private:
+
     void Initialize();
+
     HBChord MakeScale() const;
+
     HBChord MakeChord() const;
+
     int MakeChordKey() const;
 
     tScaleType scale_type;
+
     int scale_nr;
+
     int chord_nr;
+
     int seq_nr;
 
     HBChord chord;
+
     HBChord scale;
+
     int chord_key;
 
 #if NAME_TABLE
     static const char *const chord_names[nScaleTypes][7];
 #endif
 
-    static const char *const chord_nr_names[7];
-    static const char *const scale_type_names[nScaleTypes];
+    static const char* const chord_nr_names[7];
+    static const char* const scale_type_names[nScaleTypes];
     static const int         flat_keys[12];
-    static const char *const context_names[nScaleTypes][7];
+    static const char* const context_names[nScaleTypes][7];
 };
 
 
@@ -353,21 +415,46 @@ class HBMatchContains : public HBMatch
 class HBContextIterator
 {
   public:
+
     HBContextIterator();
+
     HBContextIterator(HBMatch &);
-    void SetSequence(HBContext *s[], int n)        { seq = s; n_seq = n; }
-    void SetScaleType(tScaleType st)            { scale_type = st; }
+
+    void SetSequence(HBContext *s[], int n)
+    {
+      seq = s;
+      n_seq = n;
+    }
+
+    void SetScaleType(tScaleType st)
+    {
+      scale_type = st;
+    }
+
     bool operator()();
-    const HBContext *operator->() const        { return &context; }
-    const HBContext &Context() const        { return context; }
+
+    const HBContext *operator->() const
+    {
+      return &context;
+    }
+
+    const HBContext& Context() const
+    {
+      return context;
+    }
 
   private:
+
     HBContext context;
-    HBMatch &match;
+
+    HBMatch& match;
+
     HBMatch def_match;
 
-    HBContext **seq;
+    HBContext** seq;
+
     int i_seq, n_seq;
+
     tScaleType scale_type;
 };
 

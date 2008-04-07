@@ -265,14 +265,51 @@ const char *const HBContext::chord_nr_names[7] =
 
 const char *const HBContext::context_names[nScaleTypes][7] =
 {
-  { "ion", "dor", "phry", "lyd", "mixo", "aeol", "locr"},
-  { "harm", "locr 13", "ion #5", "dor #11", "HM5", "lyd #9", "har dim"},
-  { "melod", "dor b9", "lyd #5", "mixo #11", "mixo b13", "locr 9", "superlocr"},
-  { "ion b13", "dor b5", "harm alt", "melod #11", "mixo b9", "lyd #9#5", "locr dim"},
+  {
+    "ion",
+    "dor",
+    "phry",
+    "lyd",
+    "mixo",
+    "aeol",
+    "locr"
+  },
+  {
+    "harm",
+    "locr 13",
+    "ion #5",
+    "dor #11",
+    "HM5",
+    "lyd #9",
+    "har dim"
+  },
+  {
+    "melod",
+    "dor b9",
+    "lyd #5",
+    "mixo #11",
+    "mixo b13",
+    "locr 9",
+    "superlocr"
+  },
+  {
+    "ion b13",
+    "dor b5",
+    "harm alt",
+    "melod #11",
+    "mixo b9",
+    "lyd #9#5",
+    "locr dim"
+  },
 };
 
-const char *const HBContext::scale_type_names[nScaleTypes] =
-  { "J", "HM", "MM", "HJ" };
+const char* const HBContext::scale_type_names[nScaleTypes] =
+{
+  "J",
+  "HM",
+  "MM",
+  "HJ"
+};
 
 
 HBContext::HBContext(int sn, int cn, tScaleType st)
@@ -367,12 +404,16 @@ HBChord HBContext::MakeChord() const
   HBChord chord;
   int key = scale_nr;
   for (i = 0; i < chord_nr; i++)
+  {
     key = scale.Iter(key);
+  }
   chord += key;
   for (i = 1; i < 4; i++)
   {
     for (j = 0; j < 2; j++)
+    {
       key = scale.Iter(key);
+    }
     chord += key;
   }
   return chord;
@@ -383,7 +424,9 @@ int HBContext::MakeChordKey() const
 {
   int key = scale_nr;
   for (int i = 0; i < chord_nr; i++)
+  {
     key = scale.Iter(key);
+  }
   return key % 12;
 }
 

@@ -435,7 +435,41 @@ void HBPlayer::SettingsDialog(wxFrame *parent)
 
 //*****************************************************************************
 // Description:
-//   This is the harmony browser window.
+//   This is the harmony browser match markers class declaration.
+//*****************************************************************************
+class HBMatchMarkers : public HBMatch
+{
+  public:
+
+    HBMatchMarkers(const HBContext& Context, HBCanvas *cv);
+
+    virtual bool operator()(const HBContext &);
+
+    const char * GetText()
+    {
+      // + 2 for ", "
+      return msg + 2;
+    }
+
+  private:
+
+    HBCanvas* mpHbWindow;
+    HBContext mContext;
+    HBChord   chord;
+    HBChord   scale;
+    int       n_chord;
+    int       chord_key;
+
+    int       tritone;
+    HBChord   piano;
+    int       key251;
+
+    char      msg[100];
+};
+
+//*****************************************************************************
+// Description:
+//   This is the harmony browser window class declaration.
 //*****************************************************************************
 class HBCanvas : public wxScrolledWindow
 {
@@ -455,7 +489,7 @@ class HBCanvas : public wxScrolledWindow
 
     void DrawMarkers(wxDC& Dc, const HBContext& Context);
 
-    void ClearSeq();
+    void ClearSequence();
 
     bool IsSequenceDefined()
     {
@@ -560,6 +594,122 @@ class HBCanvas : public wxScrolledWindow
   DECLARE_EVENT_TABLE()
 };
 
+//*****************************************************************************
+// Description:
+//   This is the harmony browser match markers class definition.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+HBMatchMarkers::HBMatchMarkers(const HBContext& Context, HBCanvas* cv)
+  : HBMatch(),
+    mpHbWindow(cv),
+    mContext(Context),
+    chord(mContext.Chord()),
+    scale(mContext.Scale()),
+    n_chord(chord.Count()),
+    chord_key(mContext.ChordKey()),
+    tritone((chord_key + 6) % 12)
+{
+  msg[0] = 0;
+  msg[2] = 0;
+
+  {
+    // 251-move
+    HBContext tmp(Context.ScaleNr(), Context.ChordNr() + 3, Context.ScaleType());
+    key251 = tmp.ChordKey();
+  }
+
+  tritone = (chord_key + 6) % 12;
+
+  if (mpHbWindow->mMarkPiano && gpTrackFrame->GetPianoWindow())
+  {
+    tEventArray &buf = gpTrackFrame->GetPianoWindow()->mPasteBuffer;
+    for (int i = 0; i < buf.nEvents; i++)
+    {
+      tKeyOn *on = buf.Events[i]->IsKeyOn();
+      if (on)
+      {
+        piano += on->Key;
+      }
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool HBMatchMarkers::operator()(const HBContext &o_context)
+{
+  HBChord o_chord = o_context.Chord();
+  int     o_chord_key = o_context.ChordKey();
+
+  HBChord common = (chord & o_chord);
+  int n_common = common.Count();
+
+  msg[0] = 0;
+  msg[2] = 0;
+
+  if (mpHbWindow->mMarkPiano && o_chord.Contains(piano))
+  {
+    strcat(msg, ", P");
+  }
+
+  if (mpHbWindow->mMark4Common && o_chord == chord)
+  {
+    strcat(msg, ", =4");
+  }
+
+  if (mpHbWindow->mMark3Common && n_common == 3)
+  {
+    strcat(msg, ", =3");
+  }
+
+  if (mpHbWindow->mMark2Common && n_common == 2)
+  {
+    strcat(msg, ", =2");
+  }
+
+  if (mpHbWindow->mMark1Common && n_common == 1)
+  {
+    strcat(msg, ", =1");
+  }
+
+  if (mpHbWindow->mMark0Common && n_common == 0)
+  {
+    strcat(msg, ", =0");
+  }
+
+  if (mpHbWindow->mMark1Semi && n_common == n_chord - 1)
+  {
+    HBChord delta = chord ^ o_chord;
+    int key = delta.Iter(0);
+    if (delta.Contains(key + 1) || delta.Contains(key - 1))
+    {
+      strcat(msg, ", 1/2");
+    }
+  }
+
+  if (mpHbWindow->mMark251 && key251 == o_chord_key)
+  {
+    strcat(msg, ", 251");
+  }
+
+  if (mpHbWindow->mMarkBCommon && chord_key == o_chord_key)
+  {
+    strcat(msg, ", =B");
+  }
+
+  if (mpHbWindow->mMarkTritone && o_chord_key == tritone)
+  {
+    strcat(msg, ", =T");
+  }
+
+  return msg[2] ? 1 : 0;
+}
+
+//*****************************************************************************
+// Description:
+//   This is the harmony browser window class definition.
+//*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 tScaleType HBCanvas::mScaleType = Major;
@@ -819,13 +969,14 @@ void HBCanvas::DrawChord(wxDC& Dc, const HBContext& Context)
     Rectangle.width,
     Rectangle.height);
 
-  int w, h;
   const char* pName = Context.ChordName();
-  Dc.GetTextExtent(pName, &w, &h);
+
+  int TextWidth, TextHeight;
+  Dc.GetTextExtent(pName, &TextWidth, &TextHeight);
   Dc.DrawText(
     pName,
-    Rectangle.x + (Rectangle.width - w) / 2,
-    Rectangle.y + (Rectangle.height - h) / 2);
+    Rectangle.x + (Rectangle.width - TextWidth) / 2,
+    Rectangle.y + (Rectangle.height - TextHeight) / 2);
 }
 
 //-----------------------------------------------------------------------------
@@ -874,40 +1025,43 @@ void HBCanvas::OnDraw(wxDC& Dc)
       Dc.DrawText(Context.ScaleName(), 5, Rectangle.y);
     }
   }
+
   DrawMarkers(Dc, mMouseContext);
 
   if (!mHaunschildLayout)
   {
-    for (int j = 0; j < 7; j++)
+    int TextWidth, TextHeight;
+    for (int j = 0; j < 7; ++j)
     {
       HBContext Context(0, j, mScaleType);
+
       JZRectangle Rectangle;
       ChordRect(Rectangle, Context);
       Rectangle.y -= (int)mChordHeight;
-      int w, h;
 
       const char* pName = Context.ChordNrName();
-      Dc.GetTextExtent(pName, &w, &h);
+
+      Dc.GetTextExtent(pName, &TextWidth, &TextHeight);
       Dc.DrawText(
         pName,
-        Rectangle.x + (Rectangle.width - w) / 2,
-        Rectangle.y + (Rectangle.height - h) / 2);
+        Rectangle.x + (Rectangle.width - TextWidth) / 2,
+        Rectangle.y + (Rectangle.height - TextHeight) / 2);
 
       const char* pType = Context.ContextName();
-      Dc.GetTextExtent(pType, &w, &h);
+
+      Dc.GetTextExtent(pType, &TextWidth, &TextHeight);
       Dc.DrawText(
         pType,
-        Rectangle.x + (Rectangle.width - w) / 2,
-        Rectangle.y + (Rectangle.height - h) / 2 - h);
+        Rectangle.x + (Rectangle.width - TextWidth) / 2,
+        Rectangle.y + (Rectangle.height - TextHeight) / 2 - TextHeight);
     }
   }
 }
 
-// -----------------------------------------------------------------------------
-// HBSettingsForm
-// -----------------------------------------------------------------------------
-
 #ifdef OBSOLETE
+//*****************************************************************************
+// HBSettingsForm
+//*****************************************************************************
 class HBSettingsForm : public wxForm
 {
   public:
@@ -948,160 +1102,10 @@ void HBCanvas::SettingsDialog()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBCanvas::ToggleHaunschildLayout()
-{
-  mHaunschildLayout = !mHaunschildLayout;
-  Refresh();
-}
-
-
-
-
-
-
-
-//*****************************************************************************
-// HBMatchMarkers
-//*****************************************************************************
-class HBMatchMarkers : public HBMatch
-{
-  public:
-
-    HBMatchMarkers(const HBContext& Context, HBCanvas *cv);
-
-    virtual bool operator()(const HBContext &);
-
-    const char * GetText()
-    {
-      // + 2 for ", "
-      return msg + 2;
-    }
-
-  private:
-
-    HBCanvas* mpHbWindow;
-    HBContext mContext;
-    HBChord   chord;
-    HBChord   scale;
-    int       n_chord;
-    int       chord_key;
-
-    int       tritone;
-    HBChord   piano;
-    int       key251;
-
-    char      msg[100];
-};
-
-
-HBMatchMarkers::HBMatchMarkers(const HBContext& Context, HBCanvas *cv)
-  : mContext(Context)
-{
-  mpHbWindow      = cv;
-  chord     = mContext.Chord();
-  n_chord   = chord.Count();
-  chord_key = mContext.ChordKey();
-  scale     = mContext.Scale();
-
-  msg[0] = 0;
-  msg[2] = 0;
-
-  {
-    // 251-move
-    HBContext tmp(Context.ScaleNr(), Context.ChordNr() + 3, Context.ScaleType());
-    key251 = tmp.ChordKey();
-  }
-
-  tritone = (chord_key + 6) % 12;
-
-  if (mpHbWindow->mMarkPiano && gpTrackFrame->GetPianoWindow())
-  {
-    tEventArray &buf = gpTrackFrame->GetPianoWindow()->mPasteBuffer;
-    for (int i = 0; i < buf.nEvents; i++)
-    {
-      tKeyOn *on = buf.Events[i]->IsKeyOn();
-      if (on)
-      {
-        piano += on->Key;
-      }
-    }
-  }
-}
-
-
-bool HBMatchMarkers::operator()(const HBContext &o_context)
-{
-  HBChord o_chord = o_context.Chord();
-  int     o_chord_key = o_context.ChordKey();
-
-  HBChord common = (chord & o_chord);
-  int n_common = common.Count();
-
-  msg[0] = 0;
-  msg[2] = 0;
-
-  if (mpHbWindow->mMarkPiano && o_chord.Contains(piano))
-  {
-    strcat(msg, ", P");
-  }
-
-  if (mpHbWindow->mMark4Common && o_chord == chord)
-  {
-    strcat(msg, ", =4");
-  }
-
-  if (mpHbWindow->mMark3Common && n_common == 3)
-  {
-    strcat(msg, ", =3");
-  }
-
-  if (mpHbWindow->mMark2Common && n_common == 2)
-  {
-    strcat(msg, ", =2");
-  }
-
-  if (mpHbWindow->mMark1Common && n_common == 1)
-  {
-    strcat(msg, ", =1");
-  }
-
-  if (mpHbWindow->mMark0Common && n_common == 0)
-  {
-    strcat(msg, ", =0");
-  }
-
-  if (mpHbWindow->mMark1Semi && n_common == n_chord - 1)
-  {
-    HBChord delta = chord ^ o_chord;
-    int key = delta.Iter(0);
-    if (delta.Contains(key + 1) || delta.Contains(key - 1))
-    {
-      strcat(msg, ", 1/2");
-    }
-  }
-
-  if (mpHbWindow->mMark251 && key251 == o_chord_key)
-  {
-    strcat(msg, ", 251");
-  }
-
-  if (mpHbWindow->mMarkBCommon && chord_key == o_chord_key)
-  {
-    strcat(msg, ", =B");
-  }
-
-  if (mpHbWindow->mMarkTritone && o_chord_key == tritone)
-  {
-    strcat(msg, ", =T");
-  }
-
-  return msg[2] ? 1 : 0;
-}
-
 void HBCanvas::DrawMarkers(wxDC& Dc, const HBContext& Context)
 {
   JZRectangle Rectangle;
-  Dc.SetLogicalFunction(wxXOR);
+  Dc.SetLogicalFunction(wxINVERT);
   Dc.SetBrush(*wxTRANSPARENT_BRUSH);
   HBMatchMarkers match(Context, this);
   HBContextIterator iter(match);
@@ -1148,6 +1152,8 @@ void HBCanvas::DrawMarkers(wxDC& Dc, const HBContext& Context)
   Dc.SetBrush(*wxWHITE_BRUSH);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 bool HBCanvas::Find(float x, float y, HBContext &out)
 {
   HBContextIterator iter;
@@ -1166,15 +1172,25 @@ bool HBCanvas::Find(float x, float y, HBContext &out)
   return false;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBCanvas::ToggleHaunschildLayout()
+{
+  mHaunschildLayout = !mHaunschildLayout;
+  Refresh();
+}
 
-void HBCanvas::ClearSeq()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBCanvas::ClearSequence()
 {
   mSequenceCount = 0;
   mMouseContext.SetSeqNr(0);
   Refresh();
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
 {
   wxClientDC Dc(this);
@@ -1271,7 +1287,8 @@ void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
   }
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void HBCanvas::SetScaleType(
   int MenuId,
   tScaleType ScaleType,
@@ -1286,7 +1303,8 @@ void HBCanvas::SetScaleType(
   Refresh();
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void HBCanvas::TransposeSelection()
 {
   if (!IsSequenceDefined())
@@ -1303,6 +1321,8 @@ void HBCanvas::TransposeSelection()
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void HBCanvas::FileLoad()
 {
   wxString FileName = file_selector(
@@ -1319,6 +1339,8 @@ void HBCanvas::FileLoad()
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void HBCanvas::FileSaveAs()
 {
   wxString FileName = file_selector(
@@ -1335,6 +1357,8 @@ void HBCanvas::FileSaveAs()
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void HBCanvas::MenuCommand(int MenuId, wxToolBar* pToolBar)
 {
   switch (MenuId)
@@ -1380,7 +1404,8 @@ void HBCanvas::MenuCommand(int MenuId, wxToolBar* pToolBar)
   }
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 HBAnalyzer * HBCanvas::GetAnalyzer()
 {
   if (mSequenceCount > 0 && gpTrackWindow->mpSnapSel->Selected)
@@ -1391,6 +1416,13 @@ HBAnalyzer * HBCanvas::GetAnalyzer()
   }
   return 0;
 }
+
+
+
+
+
+
+
 
 // ---------------------------------------------------------
 // HBContextDlg
@@ -2039,7 +2071,7 @@ void HBFrame::OnFileSaveAs(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void HBFrame::OnActionClearSequence(wxCommandEvent& Event)
 {
-  mpHbWindow->ClearSeq();
+  mpHbWindow->ClearSequence();
 }
 
 //-----------------------------------------------------------------------------

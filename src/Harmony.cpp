@@ -875,7 +875,7 @@ void HBCanvas::OnDraw(wxDC& Dc)
     }
   }
   DrawMarkers(Dc, mMouseContext);
-/*
+
   if (!mHaunschildLayout)
   {
     for (int j = 0; j < 7; j++)
@@ -901,7 +901,6 @@ void HBCanvas::OnDraw(wxDC& Dc)
         Rectangle.y + (Rectangle.height - h) / 2 - h);
     }
   }
- */
 }
 
 // -----------------------------------------------------------------------------

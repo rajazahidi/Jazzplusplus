@@ -44,7 +44,6 @@
 
 using namespace std;
 
-#define MEN_CLOSE       1
 #define MEN_MIDI        2
 #define MEN_TRANSPOSE   4
 #define MEN_CLEARSEQ    6
@@ -71,7 +70,6 @@ using namespace std;
 #define MEN_IONSCALE    25
 #define MEN_SETTINGS    26
 #define MEN_LOAD        27
-#define MEN_SAVE        28
 
 
 #include "Bitmaps/open.xpm"
@@ -99,7 +97,7 @@ using namespace std;
 static JZToolDef tdefs[] =
 {
   { MEN_LOAD,      false, open_xpm,     "open harmony file" },
-  { MEN_SAVE,      false, save_xpm,     "save harmony file" },
+  { wxID_SAVEAS,   false, save_xpm,     "save harmony file" },
   { JZToolBar::eToolBarSeparator },
   { MEN_MAJSCALE,  true,  majscale_xpm, "major scale" },
   { MEN_HARSCALE,  true,  harscale_xpm, "harmonic scale" },
@@ -479,6 +477,8 @@ class HBCanvas : public wxScrolledWindow
 
     void FileLoad();
 
+    void FileSaveAs();
+
     void OnMenuCommand(int id, wxToolBar *mpToolBar);
 
     void TransposeSelection();
@@ -522,9 +522,7 @@ class HBCanvas : public wxScrolledWindow
 
     float mChordX, mChordY, mChordWidth, mChordHeight;
 
-    float ofs;
-
-//    wxFrame* parent;
+    int mMargin;
 
     HBContext* seq[SEQMAX];
 
@@ -532,7 +530,7 @@ class HBCanvas : public wxScrolledWindow
 
     std::string mDefaultFileName;
 
-    bool has_changed;
+    bool mHasChanged;
 
     HBContext mouse_context;
 
@@ -614,10 +612,15 @@ HBCanvas::HBCanvas(wxFrame* pParent, int x, int y, int w, int h)
   mChordHeight = 2.5 * TextHeight;
   mChordX = 50;
   mChordY = 4 * mChordHeight;
-  ofs    = TextHeight / 4;
+  mMargin = TextHeight / 4;
+  if (mMargin <= 0)
+  {
+    mMargin = 1;
+  }
+
 
   mDefaultFileName = "noname.har";
-  has_changed      = false;
+  mHasChanged      = false;
 
   SetScrollbars(0, (int)(mChordHeight + 0.5), 0, 12 + SEQMAX / 8 + 2, 0, 0);
 }
@@ -777,10 +780,10 @@ void HBCanvas::ChordRect(JZRectangle& Rectangle, const HBContext &ct)
     Rectangle.y = (int)(mChordY + (5 * ct.ScaleNr() % 12) * mChordHeight);
   }
 
-  Rectangle.x += (int)ofs;
-  Rectangle.y -= (int)ofs;
-  Rectangle.width =  (int)(mChordWidth - 2 * ofs);
-  Rectangle.height =  (int)(mChordHeight - 2 * ofs);
+  Rectangle.x += mMargin;
+  Rectangle.y -= mMargin;
+  Rectangle.width =  (int)(mChordWidth - 2 * mMargin);
+  Rectangle.height =  (int)(mChordHeight - 2 * mMargin);
 }
 
 //-----------------------------------------------------------------------------
@@ -1274,33 +1277,36 @@ void HBCanvas::FileLoad()
     mDefaultFileName.c_str(),
     "Load Harmonies",
     false,
-    has_changed,
+    mHasChanged,
     "*.har");
 
-  ifstream Is(FileName.c_str());
-  Is >> *this;
+  if (!FileName.empty())
+  {
+    ifstream Is(FileName.c_str());
+    Is >> *this;
+  }
+}
+
+void HBCanvas::FileSaveAs()
+{
+  wxString FileName = file_selector(
+    mDefaultFileName.c_str(),
+    "Save Harmonies",
+    true,
+    mHasChanged,
+    "*.har");
+
+  if (!FileName.empty())
+  {
+    ofstream os(FileName.c_str());
+    os << *this;
+  }
 }
 
 void HBCanvas::OnMenuCommand(int id, wxToolBar *mpToolBar)
 {
   switch (id)
   {
-    case MEN_SAVE:
-      {
-        wxString fname = file_selector(
-          mDefaultFileName.c_str(),
-          "Save Harmonies",
-          true,
-          has_changed,
-          "*.har");
-        if (fname)
-        {
-          ofstream os(fname);
-          os << *this;
-        }
-      }
-      break;
-
     case MEN_MAJSCALE:
       SetScaleType(id, Major, mpToolBar);
       break;
@@ -1770,6 +1776,8 @@ BEGIN_EVENT_TABLE(HBFrame, wxFrame)
 
   EVT_MENU(MEN_LOAD, HBFrame::OnFileLoad)
 
+  EVT_MENU(wxID_SAVEAS, HBFrame::OnFileSaveAs)
+
   EVT_MENU(MEN_MIDI, HBFrame::OnSettingsMidi)
 
   EVT_MENU(MEN_HAUNSCH, HBFrame::OnSettingsHaunschild)
@@ -1801,8 +1809,8 @@ HBFrame::HBFrame()
 
   wxMenu* pFileMenu = new wxMenu;
   pFileMenu->Append(MEN_LOAD, "&Load...");
-  pFileMenu->Append(MEN_SAVE, "&Save");
-  pFileMenu->Append(MEN_CLOSE, "&Close");
+  pFileMenu->Append(wxID_SAVEAS, "Save &As...");
+  pFileMenu->Append(wxID_CLOSE, "&Close");
 
   wxMenu* pSettingsMenu = new wxMenu;
   pSettingsMenu->Append(MEN_EDIT, "&Chord");
@@ -1943,8 +1951,7 @@ void HBFrame::OnMenuCommand(int id)
         mpHbWindow->seq[mpHbWindow->mouse_context.SeqNr() - 1]);
       break;
 
-    case MEN_CLOSE:
-//      DELETE_THIS();
+    case wxID_CLOSE:
       Destroy();
       break;
 
@@ -1973,6 +1980,13 @@ void HBFrame::OnSettingsHaunschild(wxCommandEvent& Event)
 void HBFrame::OnFileLoad(wxCommandEvent& Event)
 {
   mpHbWindow->FileLoad();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBFrame::OnFileSaveAs(wxCommandEvent& Event)
+{
+  mpHbWindow->FileSaveAs();
 }
 
 //-----------------------------------------------------------------------------

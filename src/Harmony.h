@@ -69,13 +69,13 @@ class HBFrame : public wxFrame, public tHBInterface
 
     int SeqDefined();
 
-    int GetChordKeys(int *out, int step, int n_steps);
+    int GetChordKeys(int* out, int step, int n_steps);
 
-    int GetSelectedChord(int *out);
+    int GetSelectedChord(int* out);
 
-    int GetSelectedScale(int *out);
+    int GetSelectedScale(int* out);
 
-    int GetBassKeys(int *out, int step, int n_steps);
+    int GetBassKeys(int* out, int step, int n_steps);
 
     HBAnalyzer* GetAnalyzer();
 
@@ -88,6 +88,8 @@ class HBFrame : public wxFrame, public tHBInterface
     virtual void OnMenuCommand(int id);
 
     void OnFileLoad(wxCommandEvent& Event);
+
+    void OnFileSaveAs(wxCommandEvent& Event);
 
     void OnSettingsMidi(wxCommandEvent& Event);
 

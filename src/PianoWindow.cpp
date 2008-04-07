@@ -811,8 +811,8 @@ void JZPianoWindow::OnPaintSub(wxDC& Dc, int x, int y)
   // Draw chords from harmony-browser.
   if (mVisibleHBChord && gpHarmonyBrowser && !mpTrack->IsDrumTrack())
   {
-    HBAnalyzer *an = gpHarmonyBrowser->getAnalyzer();
-    if (an != 0)
+    HBAnalyzer* pAnalyzer = gpHarmonyBrowser->GetAnalyzer();
+    if (pAnalyzer != 0)
     {
       wxBrush cbrush = *wxBLUE_BRUSH;
       wxBrush sbrush = *wxBLUE_BRUSH;
@@ -828,15 +828,15 @@ void JZPianoWindow::OnPaintSub(wxDC& Dc, int x, int y)
       Dc.SetLogicalFunction(wxXOR);
       Dc.SetPen(*wxTRANSPARENT_PEN);
 
-      int steps = an->Steps();
+      int steps = pAnalyzer->Steps();
       for (int step = 0; step < steps; step ++)
       {
-        int start = an->Step2Clock(step);
-        int stop  = an->Step2Clock(step + 1);
+        int start = pAnalyzer->Step2Clock(step);
+        int stop  = pAnalyzer->Step2Clock(step + 1);
         if (stop > mFromClock && start < mToClock)
         {
           // this chord is visible
-          HBContext *context = an->GetContext(step);
+          HBContext *context = pAnalyzer->GetContext(step);
           HBChord chord = context->Chord();
           HBChord scale = context->Scale();
 
@@ -881,8 +881,6 @@ void JZPianoWindow::OnPaintSub(wxDC& Dc, int x, int y)
       Dc.SetLogicalFunction(wxCOPY);
       Dc.SetPen(*wxBLACK_PEN);
       Dc.SetBrush(*wxBLACK_BRUSH);
-
-      //delete an; PORTING
     }
   }
   /////////end draw choords
@@ -2026,7 +2024,7 @@ void JZPianoWindow::LogicalMousePosition(
 }
 
 //-----------------------------------------------------------------------------
-// This is an an event handler for tMouseCounter.
+// This is an event handler for tMouseCounter.
 //-----------------------------------------------------------------------------
 void JZPianoWindow::ButtonLabelDisplay(const wxString& Text, bool IsButtonDown)
 {

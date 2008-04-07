@@ -538,7 +538,7 @@ void JZTrackFrame::OnZoomOut(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnToolsHarmonyBrowser(wxCommandEvent& Event)
 {
-  CreateHarmonyBrowser(this);
+  CreateHarmonyBrowser();
 }
 
 //-----------------------------------------------------------------------------

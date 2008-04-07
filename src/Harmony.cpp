@@ -22,7 +22,6 @@
 
 #include "WxWidgets.h"
 
-//#include "config.h"
 #include "Harmony.h"
 #include "HarmonyP.h"
 #include "Player.h"
@@ -45,32 +44,32 @@
 
 using namespace std;
 
-#define MEN_CLOSE        1
-#define MEN_MIDI             2
-#define MEN_TRANSPOSE        4
-#define MEN_CLEARSEQ        6
+#define MEN_CLOSE       1
+#define MEN_MIDI        2
+#define MEN_TRANSPOSE   4
+#define MEN_CLEARSEQ    6
 #define MEN_EDIT        7
-#define MEN_MOUSE        8
+#define MEN_MOUSE       8
 #define MEN_HELP        9
 
-#define MEN_MAJSCALE        10
-#define MEN_HARSCALE        11
-#define MEN_MELSCALE        12
+#define MEN_MAJSCALE    10
+#define MEN_HARSCALE    11
+#define MEN_MELSCALE    12
 
-#define MEN_EQ4                13
-#define MEN_EQ3                14
-#define MEN_EQ2                15
-#define MEN_EQ1                16
-#define MEN_EQH                17
-#define MEN_EQ0                18
-#define MEN_251                19
-#define MEN_TRITONE        20
-#define MEN_PIANO        21
-#define MEN_EQB                22
-#define MEN_HAUNSCH        23
-#define MEN_ANALYZE        24
-#define MEN_IONSCALE        25
-#define MEN_SETTINGS        26
+#define MEN_EQ4         13
+#define MEN_EQ3         14
+#define MEN_EQ2         15
+#define MEN_EQ1         16
+#define MEN_EQH         17
+#define MEN_EQ0         18
+#define MEN_251         19
+#define MEN_TRITONE     20
+#define MEN_PIANO       21
+#define MEN_EQB         22
+#define MEN_HAUNSCH     23
+#define MEN_ANALYZE     24
+#define MEN_IONSCALE    25
+#define MEN_SETTINGS    26
 #define MEN_LOAD        27
 #define MEN_SAVE        28
 
@@ -99,30 +98,30 @@ using namespace std;
 
 static JZToolDef tdefs[] =
 {
-  { MEN_LOAD,      FALSE, open_xpm,     "open harmony file" },
-  { MEN_SAVE,      FALSE, save_xpm,     "save harmony file" },
+  { MEN_LOAD,      false, open_xpm,     "open harmony file" },
+  { MEN_SAVE,      false, save_xpm,     "save harmony file" },
   { JZToolBar::eToolBarSeparator },
-  { MEN_MAJSCALE,  TRUE,  majscale_xpm, "major scale" },
-  { MEN_HARSCALE,  TRUE,  harscale_xpm, "harmonic scale" },
-  { MEN_MELSCALE,  TRUE,  melscale_xpm, "melodic scale" },
-  { MEN_IONSCALE,  TRUE,  ionscale_xpm, "ionic b13 scale" },
+  { MEN_MAJSCALE,  true,  majscale_xpm, "major scale" },
+  { MEN_HARSCALE,  true,  harscale_xpm, "harmonic scale" },
+  { MEN_MELSCALE,  true,  melscale_xpm, "melodic scale" },
+  { MEN_IONSCALE,  true,  ionscale_xpm, "ionic b13 scale" },
   { JZToolBar::eToolBarSeparator },
-  { MEN_EQ4,       TRUE,  same4_xpm,    "4 common notes" },
-  { MEN_EQ3,       TRUE,  same3_xpm,    "3 common notes" },
-  { MEN_EQ2,       TRUE,  same2_xpm,    "2 common notes" },
-  { MEN_EQ1,       TRUE,  same1_xpm,    "1 common note" },
-  { MEN_EQ0,       TRUE,  same0_xpm,    "0 common notes" },
-  { MEN_EQH,       TRUE,  sameh_xpm,    "one half note difference" },
-  { MEN_251,       TRUE,  std251_xpm,   "next in 2-5-1 move" },
-  { MEN_EQB,       TRUE,  sameb_xpm,    "same base note" },
-  { MEN_TRITONE,   TRUE,  tritone_xpm,  "tritone substitute" },
-  { MEN_PIANO,     TRUE,  piano_xpm,    "pianowin copy buffer" },
+  { MEN_EQ4,       true,  same4_xpm,    "4 common notes" },
+  { MEN_EQ3,       true,  same3_xpm,    "3 common notes" },
+  { MEN_EQ2,       true,  same2_xpm,    "2 common notes" },
+  { MEN_EQ1,       true,  same1_xpm,    "1 common note" },
+  { MEN_EQ0,       true,  same0_xpm,    "0 common notes" },
+  { MEN_EQH,       true,  sameh_xpm,    "one half note difference" },
+  { MEN_251,       true,  std251_xpm,   "next in 2-5-1 move" },
+  { MEN_EQB,       true,  sameb_xpm,    "same base note" },
+  { MEN_TRITONE,   true,  tritone_xpm,  "tritone substitute" },
+  { MEN_PIANO,     true,  piano_xpm,    "pianowin copy buffer" },
   { JZToolBar::eToolBarSeparator },
-  { MEN_HAUNSCH,   TRUE,  haunsch_xpm,  "haunschild layout" },
+  { MEN_HAUNSCH,   true,  haunsch_xpm,  "haunschild layout" },
   { JZToolBar::eToolBarSeparator },
-  { MEN_TRANSPOSE, FALSE, transpos_xpm, "transpose trackwin selection" },
-  { MEN_ANALYZE,   FALSE, analyze_xpm,  "analyze trackwin selection" },
-  { MEN_CLEARSEQ,  FALSE, delchord_xpm, "clear harmonies" },
+  { MEN_TRANSPOSE, false, transpos_xpm, "transpose trackwin selection" },
+  { MEN_ANALYZE,   false, analyze_xpm,  "analyze trackwin selection" },
+  { MEN_CLEARSEQ,  false, delchord_xpm, "clear harmonies" },
   { JZToolBar::eToolBarEnd }
 };
 
@@ -175,7 +174,7 @@ class HBPlayer : public wxTimer
 
     static int meldy_channel, meldy_veloc;
 
-    static bool mBassEnabled, mChordEnabled, meldy_enabled;
+    static bool mBassEnabled, mChordEnabled, mMeldyEnabled;
 
     static int bass_pitch, chord_pitch, meldy_pitch;
 
@@ -203,11 +202,11 @@ int HBPlayer::chord_channel  = 2;
 int HBPlayer::chord_veloc    = 90;
 int HBPlayer::chord_pitch    = 60;
 
-bool HBPlayer::meldy_enabled = 0;
-int HBPlayer::meldy_channel = 3;
-int HBPlayer::meldy_veloc   = 90;
-int HBPlayer::meldy_pitch   = 70;
-int HBPlayer::meldy_speed   = 100;
+bool HBPlayer::mMeldyEnabled = false;
+int HBPlayer::meldy_channel  = 3;
+int HBPlayer::meldy_veloc    = 90;
+int HBPlayer::meldy_pitch    = 70;
+int HBPlayer::meldy_speed    = 100;
 
 
 HBPlayer::HBPlayer()
@@ -240,7 +239,9 @@ int HBPlayer::GetBassKey(const HBContext &context)
   // build bass note
   int key = context.ChordKey() + bass_pitch - bass_pitch % 12;
   if (key < bass_pitch)
+  {
     key += 12;
+  }
   return key;
 }
 
@@ -287,7 +288,9 @@ void HBPlayer::StartPlay(const HBContext &ct)
   device = gpSong->GetTrack(0)->GetDevice();
 
   if (playing)
+  {
     StopPlay();
+  }
   playing = 1;
   context = ct;
 
@@ -318,7 +321,7 @@ void HBPlayer::StartPlay(const HBContext &ct)
 
 void HBPlayer::Notify()
 {
-  if (meldy_enabled)
+  if (mMeldyEnabled)
   {
     tKeyOff of(0, meldy_channel - 1, meldy_keys[meldy_index]);
     gpMidiPlayer->OutNow(device, &of);
@@ -332,7 +335,9 @@ void HBPlayer::Notify()
 void HBPlayer::StopPlay()
 {
   if (!playing)
+  {
     return;
+  }
   Stop();
   playing = 0;
 
@@ -354,7 +359,7 @@ void HBPlayer::StopPlay()
     }
   }
 
-  if (meldy_enabled)
+  if (mMeldyEnabled)
   {
     for (i = 0; i < n_meldy_keys; i++)
     {
@@ -383,7 +388,7 @@ class tHBPlayerForm : public wxForm
 void HBPlayer::SettingsDialog(wxFrame *parent)
 {
 #ifdef OBSOLETE
-  wxDialogBox *panel = new wxDialogBox(pParent, "MIDI settings", FALSE );
+  wxDialogBox *panel = new wxDialogBox(pParent, "MIDI settings", false );
   tHBPlayerForm      *form  = new tHBPlayerForm;
 
   form->Add(wxMakeFormMessage("Note Length for paste into piano window"));
@@ -412,7 +417,7 @@ void HBPlayer::SettingsDialog(wxFrame *parent)
   form->Add(wxMakeFormNewLine());
 
 #if 0
-  form->Add(wxMakeFormBool("Scale enable", &meldy_enabled));
+  form->Add(wxMakeFormBool("Scale enable", &mMeldyEnabled));
   form->Add(wxMakeFormNewLine());
   form->Add(wxMakeFormShort("Channel", &meldy_channel, wxFORM_DEFAULT, new wxList(wxMakeConstraintRange(1.0, 16.0), 0)));
   form->Add(wxMakeFormNewLine());
@@ -427,7 +432,7 @@ void HBPlayer::SettingsDialog(wxFrame *parent)
   form->AssociatePanel(panel);
   panel->Fit();
 
-  panel->Show(TRUE);
+  panel->Show(true);
 #endif
 }
 
@@ -457,7 +462,7 @@ class HBCanvas : public wxScrolledWindow
 
     int SeqDefined()
     {
-      return n_seq > 0;
+      return mSequenceCount > 0;
     }
 
     int GetChordKeys(int *out, int step, int n_steps);
@@ -470,6 +475,10 @@ class HBCanvas : public wxScrolledWindow
 
     void SettingsDialog();
 
+    void ToggleHaunschildLayout();
+
+    void FileLoad();
+
     void OnMenuCommand(int id, wxToolBar *mpToolBar);
 
     void TransposeSelection();
@@ -481,7 +490,7 @@ class HBCanvas : public wxScrolledWindow
       SEQMAX = 256
     };
 
-    HBAnalyzer* getAnalyzer();
+    HBAnalyzer* GetAnalyzer();
 
   protected:
 
@@ -511,7 +520,7 @@ class HBCanvas : public wxScrolledWindow
 
     static int analyze_res;
 
-    float xchord, ychord, wchord, hchord;
+    float mChordX, mChordY, mChordWidth, mChordHeight;
 
     float ofs;
 
@@ -519,15 +528,15 @@ class HBCanvas : public wxScrolledWindow
 
     HBContext* seq[SEQMAX];
 
-    int n_seq;
+    int mSequenceCount;
 
-    char* default_filename;
+    std::string mDefaultFileName;
 
     bool has_changed;
 
     HBContext mouse_context;
 
-    bool haunschild_layout;
+    bool mHaunschildLayout;
 
     bool mark_4_common;
 
@@ -549,11 +558,13 @@ class HBCanvas : public wxScrolledWindow
 
     bool mark_piano;
 
-    int  active_marker;
+    int active_marker;
 
   DECLARE_EVENT_TABLE()
 };
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tScaleType HBCanvas::scale_type = Major;
 const int HBCanvas::ScFa = 50;
 int HBCanvas::transpose_res = 8;
@@ -573,10 +584,10 @@ HBCanvas::HBCanvas(wxFrame* pParent, int x, int y, int w, int h)
   : wxScrolledWindow(pParent, wxID_ANY, wxPoint(x, y), wxSize(w, h))
 {
 //  parent = pParent;
-  n_seq  = 0;
+  mSequenceCount  = 0;
 
   active_marker = 0;
-  haunschild_layout = 0;
+  mHaunschildLayout = false;
   mark_4_common = 0;
   mark_3_common = 0;
   mark_2_common = 0;
@@ -589,72 +600,87 @@ HBCanvas::HBCanvas(wxFrame* pParent, int x, int y, int w, int h)
   mark_piano = 0;
 
   for (int i = 0; i < SEQMAX; i++)
+  {
     seq[i] = new HBContext();
+  }
 
-  wxDC *dc = new wxClientDC(this);//GetDC();
+  wxClientDC Dc(this);
 
-  dc->SetFont(*wxSMALL_FONT);
-  int tw, th;
-  dc->GetTextExtent("xD#j75+9-x", &tw, &th);
+  Dc.SetFont(*wxSMALL_FONT);
+  int TextWidth, TextHeight;
+  Dc.GetTextExtent("xD#j75+9-x", &TextWidth, &TextHeight);
 
-  delete dc;
+  mChordWidth = 1.2 * TextWidth;
+  mChordHeight = 2.5 * TextHeight;
+  mChordX = 50;
+  mChordY = 4 * mChordHeight;
+  ofs    = TextHeight / 4;
 
-  wchord = 1.2 * tw;
-  hchord = 2.5 * th;
-  xchord = 50;
-  ychord = 4 * hchord;
-  ofs    = th/4;
-
-  default_filename = copystring("noname.har");
+  mDefaultFileName = "noname.har";
   has_changed      = false;
 
-  SetScrollbars(0, (int)(hchord + 0.5), 0, 12 + SEQMAX/8 + 2, 0, 4);
+  SetScrollbars(0, (int)(mChordHeight + 0.5), 0, 12 + SEQMAX / 8 + 2, 0, 0);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 HBCanvas::~HBCanvas()
 {
   if (player.IsPlaying())
+  {
     player.StopPlay();
+  }
   for (int i = 0; i < SEQMAX; i++)
+  {
     delete seq[i];
+  }
 }
 
-
-inline ostream & operator << (ostream &os, HBCanvas const &a)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+ostream & operator << (ostream& Os, HBCanvas const &a)
 {
   int i;
-  os << 1 << endl;
-  os << a.n_seq << endl;
-  for (i = 0; i < a.n_seq; i++)
-    os << *a.seq[i];
-  return os;
+  Os << 1 << endl;
+  Os << a.mSequenceCount << endl;
+  for (i = 0; i < a.mSequenceCount; i++)
+  {
+    Os << *a.seq[i];
+  }
+  return Os;
 }
 
-
-inline istream & operator >> (istream &is, HBCanvas &a)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+istream& operator >> (istream& Is, HBCanvas &a)
 {
   int i, version;
-  is >> version;
-  if (version != 1) {
+  Is >> version;
+  if (version != 1)
+  {
     wxMessageBox("Wrong file format!", "Error", wxOK);
-    return is;
+    return Is;
   }
-  is >> a.n_seq;
-  for (i = 0; i < a.n_seq; i++)
-    is >> *a.seq[i];
+  Is >> a.mSequenceCount;
+  for (i = 0; i < a.mSequenceCount; i++)
+  {
+    Is >> *a.seq[i];
+  }
   a.Refresh();
-  return is;
+  return Is;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void HBCanvas::SetMarker(int id, wxToolBar *mpToolBar)
 {
   if (id != active_marker)
   {
     if (active_marker && mpToolBar->GetToolState(active_marker))
-      mpToolBar->ToggleTool(active_marker, FALSE);
-    mpToolBar->ToggleTool(id, TRUE);
+    {
+      mpToolBar->ToggleTool(active_marker, false);
+    }
+    mpToolBar->ToggleTool(id, true);
     active_marker = id;
   }
 
@@ -683,71 +709,82 @@ void HBCanvas::SetMarker(int id, wxToolBar *mpToolBar)
     case MEN_PIANO:        mark_piano = 1; break;
   }
 
-#ifndef wx_xt
   if (id > 0 && !mpToolBar->GetToolState(id))
-    mpToolBar->ToggleTool(id, TRUE);
-#endif
+  {
+    mpToolBar->ToggleTool(id, true);
+  }
 
   Refresh();
-
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int HBCanvas::GetChordKeys(int *out, int step, int n_steps)
 {
-  if (n_seq == 0)
+  if (mSequenceCount == 0)
+  {
     return 0;
-  int i = step * n_seq / n_steps;
+  }
+  int i = step * mSequenceCount / n_steps;
   return player.GetChordKeys(out, *seq[i]);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int HBCanvas::GetSelectedChord(int *out)
 {
   return player.GetChordKeys(out, mouse_context);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int HBCanvas::GetSelectedScale(int *out)
 {
   return player.GetMeldyKeys(out, mouse_context);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int HBCanvas::GetBassKeys(int *out, int step, int n_steps)
 {
-  if (n_seq == 0)
+  if (mSequenceCount == 0)
+  {
     return 0;
-  int i = step * n_seq / n_steps;
+  }
+  int i = step * mSequenceCount / n_steps;
   out[0] = player.GetBassKey(*seq[i]);
   return 1;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void HBCanvas::ChordRect(JZRectangle& Rectangle, const HBContext &ct)
 {
   if (ct.SeqNr())
   {
-    Rectangle.x = (int)(xchord + (ct.SeqNr() - 1) % 8 * wchord);
-    Rectangle.y = (int)(hchord * ((ct.SeqNr() -1) / 8 + 0.5));
+    Rectangle.x = (int)(mChordX + (ct.SeqNr() - 1) % 8 * mChordWidth);
+    Rectangle.y = (int)(mChordHeight * ((ct.SeqNr() -1) / 8 + 0.5));
   }
-  else if (!haunschild_layout)
+  else if (!mHaunschildLayout)
   {
-    Rectangle.x = (int)(xchord + ct.ChordNr() * wchord);
-    Rectangle.y = (int)(ychord + ct.ScaleNr() * hchord);
+    Rectangle.x = (int)(mChordX + ct.ChordNr() * mChordWidth);
+    Rectangle.y = (int)(mChordY + ct.ScaleNr() * mChordHeight);
   }
   else
   {
-    Rectangle.x = (int)(xchord + (5 * ct.ChordNr() % 7 + 5 * ct.ScaleNr() % 12) % 7 * wchord);
-    Rectangle.y = (int)(ychord + (5 * ct.ScaleNr() % 12) * hchord);
+    Rectangle.x = (int)(
+      mChordX + (5 * ct.ChordNr() % 7 + 5 * ct.ScaleNr() % 12) % 7 * mChordWidth);
+    Rectangle.y = (int)(mChordY + (5 * ct.ScaleNr() % 12) * mChordHeight);
   }
 
   Rectangle.x += (int)ofs;
   Rectangle.y -= (int)ofs;
-  Rectangle.width =  (int)(wchord - 2 * ofs);
-  Rectangle.height =  (int)(hchord - 2 * ofs);
+  Rectangle.width =  (int)(mChordWidth - 2 * ofs);
+  Rectangle.height =  (int)(mChordHeight - 2 * ofs);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void HBCanvas::DrawChord(wxDC& Dc, const HBContext &ct)
 {
   // Draw the surrounding box.
@@ -763,10 +800,14 @@ void HBCanvas::DrawChord(wxDC& Dc, const HBContext &ct)
   int w, h;
   const char* pName = ct.ChordName();
   Dc.GetTextExtent(pName, &w, &h);
-  Dc.DrawText(pName, Rectangle.x + (Rectangle.width - w)/2, Rectangle.y + (Rectangle.height - h)/2);
+  Dc.DrawText(
+    pName,
+    Rectangle.x + (Rectangle.width - w) / 2,
+    Rectangle.y + (Rectangle.height - h) / 2);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void HBCanvas::UnDrawChord(wxDC& Dc, const HBContext& ct)
 {
   // draw surrounding box
@@ -782,16 +823,22 @@ void HBCanvas::UnDrawChord(wxDC& Dc, const HBContext& ct)
   Dc.SetPen(*wxBLACK_PEN);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void HBCanvas::OnDraw(wxDC& Dc)
 {
   Dc.Clear();
+
+  Dc.SetFont(*wxSMALL_FONT);
+
   Dc.DrawText("Seq", 5, 5);
 
-  ychord = (n_seq/8 + 1) * hchord + (n_seq % 8 ? hchord : 0) + hchord;
+  mChordY =
+    (mSequenceCount / 8 + 1) * mChordHeight + (mSequenceCount % 8 ? mChordHeight : 0) +
+    mChordHeight;
 
   HBContextIterator iter;
-  iter.SetSequence(seq, n_seq);
+  iter.SetSequence(seq, mSequenceCount);
   iter.SetScaleType(scale_type);
   while (iter())
   {
@@ -806,14 +853,14 @@ void HBCanvas::OnDraw(wxDC& Dc)
   }
   DrawMarkers(Dc, mouse_context);
 
-  if (!haunschild_layout)
+  if (!mHaunschildLayout)
   {
     for (int j = 0; j < 7; j++)
     {
       HBContext ct(0, j, scale_type);
       JZRectangle Rectangle;
       ChordRect(Rectangle, ct);
-      Rectangle.y -= (int)hchord;
+      Rectangle.y -= (int)mChordHeight;
       int w, h;
 
       const char *name = ct.ChordNrName();
@@ -825,7 +872,6 @@ void HBCanvas::OnDraw(wxDC& Dc)
       Dc.DrawText((char *)type, Rectangle.x + (Rectangle.width - w)/2, Rectangle.y + (Rectangle.height - h)/2 - h);
     }
   }
-
 }
 
 // -----------------------------------------------------------------------------
@@ -833,30 +879,25 @@ void HBCanvas::OnDraw(wxDC& Dc)
 // -----------------------------------------------------------------------------
 
 #ifdef OBSOLETE
-
 class HBSettingsForm : public wxForm
 {
   public:
     HBSettingsForm(HBCanvas *c)
         : wxForm( USED_WXFORM_BUTTONS )
-    { cnvs = c; }
-    virtual void OnOk() { cnvs->OnPaint(); wxForm::OnOk(); }
+    { mpHbWindow = c; }
+    virtual void OnOk() { mpHbWindow->OnPaint(); wxForm::OnOk(); }
     virtual void OnHelp();
   private:
-    HBCanvas *cnvs;
+    HBCanvas *mpHbWindow;
 };
-
-void HBSettingsForm::OnHelp()
-{
-  gpHelpInstance->ShowTopic("Harmony browser");
-}
-
 #endif
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void HBCanvas::SettingsDialog()
 {
 #ifdef OBSOLETE
-  wxDialogBox *panel = new wxDialogBox(this, "settings", FALSE );
+  wxDialogBox *panel = new wxDialogBox(this, "settings", false );
   wxForm      *form  = new HBSettingsForm(this);
 
   panel->SetLabelPosition(wxHORIZONTAL);
@@ -872,23 +913,44 @@ void HBCanvas::SettingsDialog()
 
   form->AssociatePanel(panel);
   panel->Fit();
-  panel->Show(TRUE);
+  panel->Show(true);
 #endif
 }
 
-// -----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBCanvas::ToggleHaunschildLayout()
+{
+  mHaunschildLayout = !mHaunschildLayout;
+  Refresh();
+}
+
+
+
+
+
+
+
+//*****************************************************************************
 // HBMatchMarkers
-// -----------------------------------------------------------------------------
-
-
+//*****************************************************************************
 class HBMatchMarkers : public HBMatch
 {
   public:
+
     HBMatchMarkers(const HBContext &ct, HBCanvas *cv);
+
     virtual bool operator()(const HBContext &);
-    const char * GetText() { return msg + 2; }        // + 2 for ", "
+
+    const char * GetText()
+    {
+      // + 2 for ", "
+      return msg + 2;
+    }
+
   private:
-    HBCanvas  *cnvs;
+
+    HBCanvas* mpHbWindow;
     HBContext context;
     HBChord   chord;
     HBChord   scale;
@@ -906,7 +968,7 @@ class HBMatchMarkers : public HBMatch
 HBMatchMarkers::HBMatchMarkers(const HBContext &ct, HBCanvas *cv)
   : context(ct)
 {
-  cnvs      = cv;
+  mpHbWindow      = cv;
   chord     = context.Chord();
   n_chord   = chord.Count();
   chord_key = context.ChordKey();
@@ -923,14 +985,16 @@ HBMatchMarkers::HBMatchMarkers(const HBContext &ct, HBCanvas *cv)
 
   tritone = (chord_key + 6) % 12;
 
-  if (cnvs->mark_piano)
+  if (mpHbWindow->mark_piano)
   {
     tEventArray &buf = gpTrackFrame->GetPianoWindow()->mPasteBuffer;
     for (int i = 0; i < buf.nEvents; i++)
     {
       tKeyOn *on = buf.Events[i]->IsKeyOn();
       if (on)
+      {
         piano += on->Key;
+      }
     }
   }
 }
@@ -947,53 +1011,72 @@ bool HBMatchMarkers::operator()(const HBContext &o_context)
   msg[0] = 0;
   msg[2] = 0;
 
-  if (cnvs->mark_piano && o_chord.Contains(piano))
+  if (mpHbWindow->mark_piano && o_chord.Contains(piano))
+  {
     strcat(msg, ", P");
+  }
 
-  if (cnvs->mark_4_common && o_chord == chord)
+  if (mpHbWindow->mark_4_common && o_chord == chord)
+  {
     strcat(msg, ", =4");
+  }
 
-  if (cnvs->mark_3_common && n_common == 3)
+  if (mpHbWindow->mark_3_common && n_common == 3)
+  {
     strcat(msg, ", =3");
+  }
 
-  if (cnvs->mark_2_common && n_common == 2)
+  if (mpHbWindow->mark_2_common && n_common == 2)
+  {
     strcat(msg, ", =2");
+  }
 
-  if (cnvs->mark_1_common && n_common == 1)
+  if (mpHbWindow->mark_1_common && n_common == 1)
+  {
     strcat(msg, ", =1");
+  }
 
-  if (cnvs->mark_0_common && n_common == 0)
+  if (mpHbWindow->mark_0_common && n_common == 0)
+  {
     strcat(msg, ", =0");
+  }
 
-  if (cnvs->mark_1_semi && n_common == n_chord - 1)
+  if (mpHbWindow->mark_1_semi && n_common == n_chord - 1)
   {
     HBChord delta = chord ^ o_chord;
     int key = delta.Iter(0);
     if (delta.Contains(key + 1) || delta.Contains(key - 1))
+    {
       strcat(msg, ", 1/2");
+    }
   }
 
-  if (cnvs->mark_251 && key251 == o_chord_key)
+  if (mpHbWindow->mark_251 && key251 == o_chord_key)
+  {
     strcat(msg, ", 251");
+  }
 
-  if (cnvs->mark_b_common && chord_key == o_chord_key)
+  if (mpHbWindow->mark_b_common && chord_key == o_chord_key)
+  {
     strcat(msg, ", =B");
+  }
 
-  if (cnvs->mark_tritone && o_chord_key == tritone)
+  if (mpHbWindow->mark_tritone && o_chord_key == tritone)
+  {
     strcat(msg, ", =T");
-
+  }
 
   return msg[2] ? 1 : 0;
 }
 
-void HBCanvas::DrawMarkers(wxDC& Dc, const HBContext &ct)
+void HBCanvas::DrawMarkers(wxDC& Dc, const HBContext& ct)
 {
   JZRectangle Rectangle;
   Dc.SetLogicalFunction(wxXOR);
   Dc.SetBrush(*wxTRANSPARENT_BRUSH);
   HBMatchMarkers match(ct, this);
   HBContextIterator iter(match);
-  iter.SetSequence(seq, n_seq);
+  iter.SetSequence(seq, mSequenceCount);
   iter.SetScaleType(scale_type);
   while (iter())
   {
@@ -1002,7 +1085,11 @@ void HBCanvas::DrawMarkers(wxDC& Dc, const HBContext &ct)
     Rectangle.y += 3;
     Rectangle.width -= 6;
     Rectangle.height -= 6;
-    Dc.DrawRectangle(Rectangle.x, Rectangle.y, Rectangle.width, Rectangle.height);
+    Dc.DrawRectangle(
+      Rectangle.x,
+      Rectangle.y,
+      Rectangle.width,
+      Rectangle.height);
   }
 
   // invert actual chord
@@ -1010,13 +1097,21 @@ void HBCanvas::DrawMarkers(wxDC& Dc, const HBContext &ct)
   {
     Dc.SetBrush(*wxBLACK_BRUSH);
     ChordRect(Rectangle, ct);
-    Dc.DrawRectangle(Rectangle.x, Rectangle.y, Rectangle.width, Rectangle.height);
+    Dc.DrawRectangle(
+      Rectangle.x,
+      Rectangle.y,
+      Rectangle.width,
+      Rectangle.height);
     if (ct.SeqNr() > 0)
     {
       HBContext c(ct);
       c.SetSeqNr(0);
       ChordRect(Rectangle, c);
-      Dc.DrawRectangle(Rectangle.x, Rectangle.y, Rectangle.width, Rectangle.height);
+      Dc.DrawRectangle(
+        Rectangle.x,
+        Rectangle.y,
+        Rectangle.width,
+        Rectangle.height);
     }
   }
   Dc.SetLogicalFunction(wxCOPY);
@@ -1026,7 +1121,7 @@ void HBCanvas::DrawMarkers(wxDC& Dc, const HBContext &ct)
 bool HBCanvas::Find(float x, float y, HBContext &out)
 {
   HBContextIterator iter;
-  iter.SetSequence(seq, n_seq);
+  iter.SetSequence(seq, mSequenceCount);
   iter.SetScaleType(scale_type);
   while (iter())
   {
@@ -1035,16 +1130,16 @@ bool HBCanvas::Find(float x, float y, HBContext &out)
     if (Rectangle.IsInside((int)x, (int)y))
     {
       out = iter.Context();
-      return TRUE;
+      return true;
     }
   }
-  return FALSE;
+  return false;
 }
 
 
 void HBCanvas::ClearSeq()
 {
-  n_seq = 0;
+  mSequenceCount = 0;
   mouse_context.SetSeqNr(0);
   Refresh();
 }
@@ -1053,7 +1148,10 @@ void HBCanvas::ClearSeq()
 void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
 {
   wxClientDC Dc(this);
+
   DoPrepareDC(Dc);
+
+  Dc.SetFont(*wxSMALL_FONT);
 
   HBContext context;
   int x, y;
@@ -1071,26 +1169,26 @@ void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
         if (context.SeqNr())
         {
           // remove a chord
-          if (context.SeqNr() == n_seq)
+          if (context.SeqNr() == mSequenceCount)
           {
             // remove markers first
-            if (mouse_context.SeqNr() == n_seq)
+            if (mouse_context.SeqNr() == mSequenceCount)
             {
               DrawMarkers(Dc, mouse_context);
               mouse_context.SetSeqNr(0);
               DrawMarkers(Dc, mouse_context);
             }
-            -- n_seq;
+            --mSequenceCount;
             UnDrawChord(Dc, context);
             context.SetSeqNr(0);
             Refresh();
           }
         }
-        else if (n_seq < SEQMAX)
+        else if (mSequenceCount < SEQMAX)
         {
           // add a chord
-          context.SetSeqNr(n_seq + 1);
-          *seq[n_seq ++] = context;
+          context.SetSeqNr(mSequenceCount + 1);
+          *seq[mSequenceCount++] = context;
           DrawMarkers(Dc, mouse_context);
           DrawChord(Dc, context);
           DrawMarkers(Dc, mouse_context);
@@ -1145,11 +1243,11 @@ void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
 void HBCanvas::SetScaleType(int menu_id, tScaleType st, wxToolBar *tb)
 {
   scale_type = st;
-  tb->ToggleTool(MEN_MAJSCALE, FALSE);
-  tb->ToggleTool(MEN_HARSCALE, FALSE);
-  tb->ToggleTool(MEN_MELSCALE, FALSE);
-  tb->ToggleTool(MEN_IONSCALE, FALSE);
-  tb->ToggleTool(menu_id, TRUE);
+  tb->ToggleTool(MEN_MAJSCALE, false);
+  tb->ToggleTool(MEN_HARSCALE, false);
+  tb->ToggleTool(MEN_MELSCALE, false);
+  tb->ToggleTool(MEN_IONSCALE, false);
+  tb->ToggleTool(menu_id, true);
   Refresh();
 }
 
@@ -1164,36 +1262,33 @@ void HBCanvas::TransposeSelection()
   if (gpTrackWindow->EventsSelected("please select destination range in track window"))
   {
     wxBeginBusyCursor();
-    HBAnalyzer analyzer(seq, n_seq);
+    HBAnalyzer analyzer(seq, mSequenceCount);
     analyzer.Transpose(gpTrackWindow->mpFilter, transpose_res);
     wxEndBusyCursor();
   }
+}
+
+void HBCanvas::FileLoad()
+{
+  wxString FileName = file_selector(
+    mDefaultFileName.c_str(),
+    "Load Harmonies",
+    false,
+    has_changed,
+    "*.har");
+
+  ifstream Is(FileName.c_str());
+  Is >> *this;
 }
 
 void HBCanvas::OnMenuCommand(int id, wxToolBar *mpToolBar)
 {
   switch (id)
   {
-    case MEN_LOAD:
-      {
-        wxString fname = file_selector(
-          default_filename,
-          "Load Harmonies",
-          false,
-          has_changed,
-          "*.har");
-        if (fname)
-        {
-          ifstream is(fname);
-          is >> *this;
-        }
-      }
-      break;
-
     case MEN_SAVE:
       {
         wxString fname = file_selector(
-          default_filename,
+          mDefaultFileName.c_str(),
           "Save Harmonies",
           true,
           has_changed,
@@ -1222,17 +1317,12 @@ void HBCanvas::OnMenuCommand(int id, wxToolBar *mpToolBar)
       SetScaleType(id, Ionb13, mpToolBar);
       break;
 
-    case MEN_HAUNSCH:
-      haunschild_layout = !haunschild_layout;
-      Refresh();
-      break;
-
     case MEN_ANALYZE:
       if (gpTrackWindow->EventsSelected("please select source range in track window"))
       {
         wxBeginBusyCursor();
         HBAnalyzer analyzer(seq, (int)SEQMAX);
-        n_seq = analyzer.Analyze(gpTrackWindow->mpFilter, analyze_res);
+        mSequenceCount = analyzer.Analyze(gpTrackWindow->mpFilter, analyze_res);
         Refresh();
         wxEndBusyCursor();
       }
@@ -1254,11 +1344,11 @@ void HBCanvas::OnMenuCommand(int id, wxToolBar *mpToolBar)
 }
 
 
-HBAnalyzer * HBCanvas::getAnalyzer()
+HBAnalyzer * HBCanvas::GetAnalyzer()
 {
-  if (n_seq > 0 && gpTrackWindow->mpSnapSel->Selected)
+  if (mSequenceCount > 0 && gpTrackWindow->mpSnapSel->Selected)
   {
-    HBAnalyzer *analyzer = new HBAnalyzer(seq, n_seq);
+    HBAnalyzer *analyzer = new HBAnalyzer(seq, mSequenceCount);
     analyzer->Init(gpTrackWindow->mpFilter, transpose_res);
     return analyzer;
   }
@@ -1371,7 +1461,7 @@ class HBContextDlg : public wxDialog
 
   private:
 
-    HBCanvas   *cnvs;
+    HBCanvas*   mpHbWindow;
     wxCheckBox *chord_chk[12];
     wxCheckBox *scale_chk[12];
     wxListBox  *chord_lst;
@@ -1401,7 +1491,7 @@ HBContextDlg::HBContextDlg(HBCanvas *c, wxFrame *parent, HBContext *pct)
 {
   int i;
 
-  cnvs = c;
+  mpHbWindow = c;
   pcontext = pct;
   chord = pcontext->Chord();
   scale = pcontext->Scale();
@@ -1427,15 +1517,32 @@ HBContextDlg::HBContextDlg(HBCanvas *c, wxFrame *parent, HBContext *pct)
   int h = 40;
   int y = 80;
 
-  const char *notename[12] = { "1", 0, "9", 0, "3", "11", 0, "5", 0, "13", 0, "7" };
+  const char* notename[12] =
+  {
+    "1",
+    0,
+    "9",
+    0,
+    "3",
+    "11",
+    0,
+    "5",
+    0,
+    "13",
+    0,
+    "7"
+  };
+
   for (i = 0; i < 12; i++)
   {
     int x = w * i + 10;
-    chord_chk[i] = new wxCheckBox(this, -1,  " ", wxPoint(x, y+1*h));//(wxFunction)ChordCheck,
-    scale_chk[i] = new wxCheckBox(this, -1,  " ", wxPoint(x, y+2*h));//(wxFunction)ScaleCheck,
+    chord_chk[i] = new wxCheckBox(this, wxID_ANY,  " ", wxPoint(x, y+1*h));//(wxFunction)ChordCheck,
+    scale_chk[i] = new wxCheckBox(this, wxID_ANY,  " ", wxPoint(x, y+2*h));//(wxFunction)ScaleCheck,
     if (notename[i])
-      (void) new wxStaticText(this, -1, (char *)notename[i], wxPoint(x, y+3*h));
-    (void) new wxStaticText(this, -1, (char *)HBChord::ScaleName(i + chord_key), wxPoint(x, y+0*h));
+    {
+      (void) new wxStaticText(this, wxID_ANY, (char *)notename[i], wxPoint(x, y+3*h));
+    }
+    (void) new wxStaticText(this, wxID_ANY, (char *)HBChord::ScaleName(i + chord_key), wxPoint(x, y+0*h));
   }
   y += 4*h;
 
@@ -1447,7 +1554,9 @@ HBContextDlg::HBContextDlg(HBCanvas *c, wxFrame *parent, HBContext *pct)
   wxString* cnames = new wxString[n_chord_names];
 
   for (i = 0; i < n_chord_names; i++)
+  {
     cnames[i] = (char *)chord_names[i].name;
+  }
 
   chord_lst = new wxListBox(this, -1,   wxPoint(10, y), wxSize(100, 200), n_chord_names, cnames, wxLB_SINGLE| wxLB_NEEDED_SB);//"Chords"
 
@@ -1455,20 +1564,32 @@ HBContextDlg::HBContextDlg(HBCanvas *c, wxFrame *parent, HBContext *pct)
 
   wxString* snames = new wxString[n_scale_names];
   for (i = 0; i < n_scale_names; i++)
+  {
     snames[i] = (char *)scale_names[i].name;
-  scale_lst = new wxListBox(this, -1, wxPoint(200, y), wxSize(300, 200), n_scale_names, snames, wxLB_SINGLE| wxLB_NEEDED_SB);//"Scales",
+  }
+  scale_lst = new wxListBox(
+    this,
+    wxID_ANY,
+    wxPoint(200, y),
+    wxSize(300, 200),
+    n_scale_names,
+    snames,
+    wxLB_SINGLE | wxLB_NEEDED_SB);//"Scales",
+
   delete [] snames;
 
   // thats it
   Fit();
-  Show(TRUE);
+  Show(true);
   ShowValues();
 }
 
 HBContextDlg::~HBContextDlg()
 {
   if (player.IsPlaying())
+  {
     player.StopPlay();
+  }
 }
 
 
@@ -1526,13 +1647,17 @@ void HBContextDlg::OnOkButton()
   for (int i = 0; i < 12; i++)
   {
     if (chord_chk[i]->GetValue())
+    {
       chord += ChordKey(i);
+    }
     if (scale_chk[i]->GetValue())
+    {
       scale += ScaleKey(i);
+    }
   }
   *pcontext->PChord() = chord;
   *pcontext->PScale() = scale;
-  cnvs->Refresh();
+  mpHbWindow->Refresh();
 //  DELETE_THIS();
   Destroy();
 }
@@ -1585,7 +1710,9 @@ void HBContextDlg::OnChordCheck()
   for (int i = 0; i < 12; i++)
   {
     if (chord_chk[i]->GetValue())
+    {
       chord += ChordKey(i);
+    }
   }
   chord.Name(buf, ChordKey());
   chord_msg->SetLabel(buf);
@@ -1599,7 +1726,9 @@ void HBContextDlg::OnScaleCheck()
   for (int i = 0; i < 12; i++)
   {
     if (scale_chk[i]->GetValue())
+    {
       scale += ScaleKey(i);
+    }
   }
   RestartPlayer();
 }
@@ -1631,106 +1760,31 @@ void HBContextDlg::OnScaleList()
   }
 }
 
-// ------------------- HBFrame ---------------------------
+//*****************************************************************************
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+BEGIN_EVENT_TABLE(HBFrame, wxFrame)
 
-HBFrame::~HBFrame()
-{
-  int XPixel, YPixel;
-  GetPosition(&XPixel, &YPixel);
-  gpConfig->Put(C_HarmonyXpos, XPixel);
-  gpConfig->Put(C_HarmonyYpos, YPixel);
-  delete mpToolBar;
-  delete cnvs;
-  gpHarmonyBrowser = 0;
-}
+//  EVT_SIZE(HBFrame::OnSize)
 
-bool HBFrame::OnClose()
-{
-  return true;
-}
+  EVT_MENU(MEN_LOAD, HBFrame::OnFileLoad)
 
-int HBFrame::SeqDefined()
-{
-  return cnvs->SeqDefined();
-}
+  EVT_MENU(MEN_MIDI, HBFrame::OnSettingsMidi)
 
+  EVT_MENU(MEN_HAUNSCH, HBFrame::OnSettingsHaunschild)
 
-int HBFrame::SeqSelected()
-{
-  if (cnvs->n_seq == 0 || cnvs->mouse_context.SeqNr() == 0)
-  {
-    wxMessageBox("select a chord from sequence first", "error", wxOK);
-    return 0;
-  }
-  return 1;
-}
+  EVT_MENU(MEN_CLEARSEQ, HBFrame::OnActionClearSequence)
 
+  EVT_MENU(MEN_MOUSE, HBFrame::OnMouseHelp)
 
-int HBFrame::GetChordKeys(int *out, int step, int n_steps)
-{
-  return cnvs->GetChordKeys(out, step, n_steps);
-}
+  EVT_MENU(MEN_HELP, HBFrame::OnHelp)
 
-int HBFrame::GetSelectedChord(int *out)
-{
-  return cnvs->GetSelectedChord(out);
-}
+END_EVENT_TABLE()
 
-int HBFrame::GetSelectedScale(int *out)
-{
-  return cnvs->GetSelectedScale(out);
-}
-
-int HBFrame::GetBassKeys(int *out, int step, int n_steps)
-{
-  return cnvs->GetBassKeys(out, step, n_steps);
-}
-
-
-void HBFrame::OnMenuCommand(int id)
-{
-  switch(id)
-  {
-    case MEN_HELP:
-        gpHelpInstance->ShowTopic("Harmony browser");
-        break;
-
-    case MEN_MOUSE:
-        wxMessageBox("left: select chord\n"
-                      "  +shift: put chord into sequence\n"
-                      "middle: same as left+shift\n"
-                      "right: play chord\n", "Mousebuttons", wxOK);
-        break;
-
-    case MEN_MIDI:
-      cnvs->player.SettingsDialog(this);
-      break;
-
-    case MEN_CLEARSEQ:
-      cnvs->ClearSeq();
-      break;
-
-    case MEN_EDIT:
-      {
-        if (!SeqSelected())
-          return;
-      }
-      (void) new HBContextDlg(cnvs, this, cnvs->seq[cnvs->mouse_context.SeqNr() - 1]);
-      break;
-
-    case MEN_CLOSE:
-//      DELETE_THIS();
-      Destroy();
-      break;
-
-    default:
-      cnvs->OnMenuCommand(id, mpToolBar->GetDelegateToolBar());
-      break;
-  }
-}
-
-
-HBFrame::HBFrame(wxFrame *parent)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+HBFrame::HBFrame()
   : wxFrame(
       0,
       wxID_ANY,
@@ -1740,124 +1794,231 @@ HBFrame::HBFrame(wxFrame *parent)
         gpConfig->GetValue(C_HarmonyYpos)),
       wxSize(660, 530))
 {
-  int w, h;
-  cnvs = 0;
+  mpHbWindow = 0;
   genmeldy = 0;
 
   mpToolBar = new JZToolBar(this, tdefs);
 
-  wxMenuBar *menu_bar = new wxMenuBar;
-  wxMenu    *menu;
-  /*
-  wxMenu    *menu = new wxMenu;
-  menu->Append(MEN_EDIT,        "&Edit chord");
-  menu->Append(MEN_SETTINGS,        "Se&ttings");
-  menu->Append(MEN_MIDI,        "&Midi");
-  menu->Append(MEN_HELP,        "&Help");
-  menu->Append(MEN_MOUSE,        "Help &mouse");
-  menu->Append(MEN_LOAD,        "&Load");
-  menu->Append(MEN_SAVE,        "&Save");
-  menu->Append(MEN_CLOSE,        "Cl&ose");
-  menu_bar->Append(menu,        "&Menu");
-  */
+  wxMenu* pFileMenu = new wxMenu;
+  pFileMenu->Append(MEN_LOAD, "&Load...");
+  pFileMenu->Append(MEN_SAVE, "&Save");
+  pFileMenu->Append(MEN_CLOSE, "&Close");
 
-  menu = new wxMenu("",wxMENU_TEAROFF);
-  menu->Append(MEN_LOAD, "&Load");
-  menu->Append(MEN_SAVE, "&Save");
-  menu->Append(MEN_CLOSE, "&Close");
-  menu_bar->Append(menu, "&File");
+  wxMenu* pSettingsMenu = new wxMenu;
+  pSettingsMenu->Append(MEN_EDIT, "&Chord");
+  pSettingsMenu->Append(MEN_SETTINGS, "&Global");
+  pSettingsMenu->Append(MEN_MIDI, "&Midi");
+  pSettingsMenu->Append(MEN_HAUNSCH, "&Haunschild Layout");
 
-  menu = new wxMenu("",wxMENU_TEAROFF);
-  menu->Append(MEN_EDIT, "&Chord");
-  menu->Append(MEN_SETTINGS, "&Global");
-  menu->Append(MEN_MIDI, "&Midi");
-  menu->Append(MEN_HAUNSCH, "&Haunschild Layout");
-  menu_bar->Append(menu, "&Settings");
+  wxMenu* pScaleMenu = new wxMenu;
+  pScaleMenu->Append(MEN_MAJSCALE, "&Major");
+  pScaleMenu->Append(MEN_HARSCALE, "&Harmonic Minor");
+  pScaleMenu->Append(MEN_MELSCALE, "&Melodic Minor");
+  pScaleMenu->Append(MEN_IONSCALE, "&Ionic");
 
-  menu = new wxMenu("",wxMENU_TEAROFF);
-  menu->Append(MEN_MAJSCALE, "&Major");
-  menu->Append(MEN_HARSCALE, "&Harmonic Minor");
-  menu->Append(MEN_MELSCALE, "&Melodic Minor");
-  menu->Append(MEN_IONSCALE, "&Ionic");
-  menu_bar->Append(menu, "&Scale");
+  wxMenu* pShowMenu = new wxMenu;
+  pShowMenu->Append(MEN_EQ4, "&4 equal notes");
+  pShowMenu->Append(MEN_EQ3, "&3 equal notes");
+  pShowMenu->Append(MEN_EQ2, "&2 equal notes");
+  pShowMenu->Append(MEN_EQ1, "&1 equal note");
+  pShowMenu->Append(MEN_EQ0, "&0 equal notes");
+  pShowMenu->Append(MEN_EQH, "1/2 note &difference");
+  pShowMenu->Append(MEN_251, "2-5-1 &move");
+  pShowMenu->Append(MEN_EQB, "&Same bass note");
+  pShowMenu->Append(MEN_TRITONE, "&Tritone substitute");
+  pShowMenu->Append(MEN_PIANO, "Contains &Pianowin Buffer");
 
-  menu = new wxMenu("",wxMENU_TEAROFF);
-  menu->Append(MEN_EQ4, "&4 equal notes");
-  menu->Append(MEN_EQ3, "&3 equal notes");
-  menu->Append(MEN_EQ2, "&2 equal notes");
-  menu->Append(MEN_EQ1, "&1 equal note");
-  menu->Append(MEN_EQ0, "&0 equal notes");
-  menu->Append(MEN_EQH, "1/2 note &difference");
-  menu->Append(MEN_251, "2-5-1 &move");
-  menu->Append(MEN_EQB, "&Same bass note");
-  menu->Append(MEN_TRITONE, "&Tritone substitute");
-  menu->Append(MEN_PIANO, "Contains &Pianowin Buffer");
-  menu_bar->Append(menu, "&Show");
+  wxMenu* pActionMenu = new wxMenu;
+  pActionMenu->Append(MEN_TRANSPOSE, "&Transpose");
+  pActionMenu->Append(MEN_ANALYZE, "&Analyze");
+  pActionMenu->AppendSeparator();
+  pActionMenu->Append(MEN_CLEARSEQ, "&Clear Sequence");
 
-  menu = new wxMenu("",wxMENU_TEAROFF);
-  menu->Append(MEN_TRANSPOSE, "&Transpose");
-  menu->Append(MEN_ANALYZE,   "&Analyze");
-  menu->AppendSeparator();
-  menu->Append(MEN_CLEARSEQ, "&Clear Sequence");
-  menu_bar->Append(menu, "&Action");
+  wxMenu* pHelpMenu = new wxMenu;
+  pHelpMenu->Append(MEN_HELP, "&Harmony Browser");
+  pHelpMenu->Append(MEN_MOUSE, "&Mouse");
 
-  menu = new wxMenu("",wxMENU_TEAROFF);
-  menu->Append(MEN_HELP, "&Harmony Browser");
-  menu->Append(MEN_MOUSE, "&Mouse");
-  menu_bar->Append(menu, "&Help");
+  wxMenuBar* pMenuBar = new wxMenuBar;
 
+  pMenuBar->Append(pFileMenu, "&File");
+  pMenuBar->Append(pSettingsMenu, "&Settings");
+  pMenuBar->Append(pScaleMenu, "&Scale");
+  pMenuBar->Append(pShowMenu, "&Show");
+  pMenuBar->Append(pActionMenu, "&Action");
+  pMenuBar->Append(pHelpMenu, "&Help");
 
-  SetMenuBar(menu_bar);
+  SetMenuBar(pMenuBar);
 
+  int w, h;
   GetClientSize(&w, &h);
-  cnvs =  new HBCanvas(this, 0, 0, w, h);
-  mpToolBar->ToggleTool(MEN_MAJSCALE, TRUE);
+  mpHbWindow = new HBCanvas(this, 0, 0, w, h);
+
+  mpToolBar->ToggleTool(MEN_MAJSCALE, true);
 }
 
-HBAnalyzer * HBFrame::getAnalyzer()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+HBFrame::~HBFrame()
 {
-  return cnvs->getAnalyzer();
+  int XPixel, YPixel;
+  GetPosition(&XPixel, &YPixel);
+  gpConfig->Put(C_HarmonyXpos, XPixel);
+  gpConfig->Put(C_HarmonyYpos, YPixel);
+  delete mpToolBar;
+  delete mpHbWindow;
+  gpHarmonyBrowser = 0;
 }
 
-
-BEGIN_EVENT_TABLE(HBFrame, wxFrame)
-  EVT_SIZE(HBFrame::OnSize)
-END_EVENT_TABLE()
-
-void HBFrame::OnSize(wxSizeEvent& Event)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool HBFrame::OnClose()
 {
-  int frameWidth, frameHeight;
-  GetClientSize(&frameWidth, &frameHeight);
-
-  cout << "HBFrame::OnSize"<<endl;
-
-#ifdef OBSOLETE
-  float th = 0.0;
-#endif
-  if (cnvs)
-       cnvs->SetSize(0, (int)0, (int)frameWidth, (int)(frameHeight));
-  //    cnvs->SetSize(0, (int)th, cw, ch - (int)th);
-
-#ifdef OBSOLETE
-  float tw = 0.0;
-  if (mpToolBar)
-    mpToolBar->GetMaxSize(&tw, &th);
-  if (mpToolBar)
-    mpToolBar->SetSize(0, 0, (int)cw, (int)th);
-#endif
+  return true;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int HBFrame::SeqDefined()
+{
+  return mpHbWindow->SeqDefined();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int HBFrame::SeqSelected()
+{
+  if (mpHbWindow->mSequenceCount == 0 || mpHbWindow->mouse_context.SeqNr() == 0)
+  {
+    wxMessageBox("Select a chord from sequence first", "Error", wxOK);
+    return 0;
+  }
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int HBFrame::GetChordKeys(int *out, int step, int n_steps)
+{
+  return mpHbWindow->GetChordKeys(out, step, n_steps);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int HBFrame::GetSelectedChord(int *out)
+{
+  return mpHbWindow->GetSelectedChord(out);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int HBFrame::GetSelectedScale(int *out)
+{
+  return mpHbWindow->GetSelectedScale(out);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int HBFrame::GetBassKeys(int *out, int step, int n_steps)
+{
+  return mpHbWindow->GetBassKeys(out, step, n_steps);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBFrame::OnMenuCommand(int id)
+{
+  switch(id)
+  {
+
+    case MEN_EDIT:
+      {
+        if (!SeqSelected())
+        {
+          return;
+        }
+      }
+      (void) new HBContextDlg(
+        mpHbWindow,
+        this,
+        mpHbWindow->seq[mpHbWindow->mouse_context.SeqNr() - 1]);
+      break;
+
+    case MEN_CLOSE:
+//      DELETE_THIS();
+      Destroy();
+      break;
+
+    default:
+      mpHbWindow->OnMenuCommand(id, mpToolBar->GetDelegateToolBar());
+      break;
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBFrame::OnSettingsMidi(wxCommandEvent& Event)
+{
+  mpHbWindow->player.SettingsDialog(this);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBFrame::OnSettingsHaunschild(wxCommandEvent& Event)
+{
+  mpHbWindow->ToggleHaunschildLayout();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBFrame::OnFileLoad(wxCommandEvent& Event)
+{
+  mpHbWindow->FileLoad();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBFrame::OnActionClearSequence(wxCommandEvent& Event)
+{
+  mpHbWindow->ClearSeq();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBFrame::OnMouseHelp(wxCommandEvent& Event)
+{
+  wxMessageBox(
+    "left: select chord\n"
+    "  +shift: put chord into sequence\n"
+    "middle: same as left+shift\n"
+    "right: play chord\n", "Mousebuttons", wxOK);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBFrame::OnHelp(wxCommandEvent& Event)
+{
+//  gpHelpInstance->ShowTopic("Harmony browser");
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+HBAnalyzer* HBFrame::GetAnalyzer()
+{
+  return mpHbWindow->GetAnalyzer();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void HBFrame::TransposeSelection()
 {
-  cnvs->TransposeSelection();
+  mpHbWindow->TransposeSelection();
 }
 
-void CreateHarmonyBrowser(wxFrame* pParent)
+void CreateHarmonyBrowser()
 {
   if (!gpHarmonyBrowser)
   {
-    gpHarmonyBrowser = new HBFrame(pParent);
+    gpHarmonyBrowser = new HBFrame();
   }
   ((HBFrame *)gpHarmonyBrowser)->Show(true);
 }
-

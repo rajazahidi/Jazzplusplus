@@ -30,7 +30,8 @@ class HBAnalyzer;
 class HBCanvas;
 class tGenMelody;
 
-
+//*****************************************************************************
+//*****************************************************************************
 class tHBInterface
 {
   public:
@@ -51,35 +52,62 @@ class tHBInterface
 
     virtual int GetSelectedScale(int *out) = 0; // returns # keys
 
-    virtual HBAnalyzer * getAnalyzer() = 0;
+    virtual HBAnalyzer* GetAnalyzer() = 0;
 
     virtual void TransposeSelection() = 0;
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class HBFrame : public wxFrame, public tHBInterface
 {
   public:
-    HBFrame(wxFrame *parent);
+
+    HBFrame();
+
     ~HBFrame();
+
     int SeqDefined();
+
     int GetChordKeys(int *out, int step, int n_steps);
+
     int GetSelectedChord(int *out);
+
     int GetSelectedScale(int *out);
+
     int GetBassKeys(int *out, int step, int n_steps);
-    virtual void OnSize(wxSizeEvent& Event);
-    HBAnalyzer * getAnalyzer();
+
+    HBAnalyzer* GetAnalyzer();
+
     virtual bool OnClose();
+
     void TransposeSelection();
+
   protected:
+
     virtual void OnMenuCommand(int id);
+
+    void OnFileLoad(wxCommandEvent& Event);
+
+    void OnSettingsMidi(wxCommandEvent& Event);
+
+    void OnSettingsHaunschild(wxCommandEvent& Event);
+
+    void OnActionClearSequence(wxCommandEvent& Event);
+
+    void OnMouseHelp(wxCommandEvent& Event);
+
+    void OnHelp(wxCommandEvent& Event);
+
   private:
-    HBCanvas* cnvs;
+
+    HBCanvas* mpHbWindow;
     int SeqSelected();
     JZToolBar* mpToolBar;
     tGenMelody* genmeldy;
     DECLARE_EVENT_TABLE()
 };
 
-extern void CreateHarmonyBrowser(wxFrame* pParent);
+extern void CreateHarmonyBrowser();
 
 #endif // !defined(JZ_HARMONY_H)

@@ -116,10 +116,12 @@ void tTimingDlg::OnOk()
 {
   int i;
   char *str = copystring( ClkSrcListBox->GetStringSelection() );
-  for (i = 0; i < 4; i++) {
-	if (!strcmp(str,ClkSrcArray[i])) {
-		break;
-	}
+  for (i = 0; i < 4; i++)
+  {
+    if (!strcmp(str,ClkSrcArray[i]))
+    {
+      break;
+    }
   }
   delete str;
   if (i > 3)
@@ -144,7 +146,7 @@ void tTimingDlg::OnOk()
       case CsFsk:
       case CsInt:
       default:
-	Midi = new tWinAudioPlayer(EventWin->Song);
+        Midi = new tWinAudioPlayer(EventWin->Song);
         break;
     }
     if (!Midi->Installed())
@@ -157,11 +159,13 @@ void tTimingDlg::OnOk()
 
   tMtcType MtcType;
   str = copystring( MtcTypeListBox->GetStringSelection() );
-  for (i = 0; i < 4; i++) {
-	if (!strcmp(str,MtcTypeArray[i])) {
-		MtcType = (tMtcType) i;
-		break;
-	}
+  for (i = 0; i < 4; i++)
+  {
+    if (!strcmp(str,MtcTypeArray[i]))
+    {
+      MtcType = (tMtcType) i;
+      break;
+    }
   }
   delete str;
   if (i > 3)
@@ -177,7 +181,7 @@ void tTimingDlg::OnOk()
 
 void tTimingDlg::OnHelp()
 {
-	HelpInstance->ShowTopic("Timing");
+  HelpInstance->ShowTopic("Timing");
 }
 
 
@@ -191,11 +195,15 @@ void tTimingDlg::EditForm(wxPanel *panel)
   panel->NewLine();
 
   panel->SetLabelPosition(wxVERTICAL);
-  ClkSrcListBox = new wxListBox( panel,
-				 NULL,
-				 "Clock Source",
-				 wxSINGLE|wxALWAYS_SB,
-				 -1, -1, -1, -1 );
+  ClkSrcListBox = new wxListBox(
+    panel,
+    NULL,
+    "Clock Source",
+    wxSINGLE | wxALWAYS_SB,
+    -1,
+    -1,
+    -1,
+    -1);
 
 #ifdef wx_msw
   ClkSrcListBox->Append( ClkSrcArray[CsInt] );
@@ -221,13 +229,14 @@ void tTimingDlg::EditForm(wxPanel *panel)
   char str[80];
   tMtcTime *offs = t->GetMtcOffset();
   offs->ToString( str );
-  MtcOffsetEntry = new wxText( panel,
-			       NULL,
-			       "MTC offset",
-			       str,
-                -1,
-                -1,
-                100 );
+  MtcOffsetEntry = new wxText(
+    panel,
+    NULL,
+    "MTC offset",
+    str,
+    -1,
+    -1,
+    100);
 
   panel->NewLine();
 
@@ -237,11 +246,16 @@ void tTimingDlg::EditForm(wxPanel *panel)
   panel->NewLine();
 #endif
 
-  MtcTypeListBox = new wxListBox( panel,
-				  NULL,
-				  "MTC Type",
-				  wxSINGLE|wxALWAYS_SB,
-				  -1, -1, -1, -1 );
+  MtcTypeListBox = new wxListBox(
+    panel,
+    NULL,
+    "MTC Type",
+    wxSINGLE|wxALWAYS_SB,
+    -1,
+    -1,
+    -1,
+    -1);
+
   MtcTypeListBox->Append( MtcTypeArray[0] );
   MtcTypeListBox->Append( MtcTypeArray[1] );
   MtcTypeListBox->Append( MtcTypeArray[2] );
@@ -250,14 +264,13 @@ void tTimingDlg::EditForm(wxPanel *panel)
   delete offs;
   panel->NewLine();
 
-  RealTimeCheckBox = new wxCheckBox( panel,
-				     NULL,
-				     "Realtime to MIDI Out" );
+  RealTimeCheckBox = new wxCheckBox(
+    panel,
+    NULL,
+    "Realtime to MIDI Out");
+
   RealTimeCheckBox->SetValue( Config(C_RealTimeOut) );
   panel->NewLine();
 }
 
-
-
 #endif // Porting
-

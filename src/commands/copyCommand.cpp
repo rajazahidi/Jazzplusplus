@@ -48,9 +48,13 @@ int tCopyCommand::Event(wxMouseEvent& e)
     if (Mouse->Aborted)
     {
       if (CopyDlg)
-	CopyDlg->OnCancel();
+      {
+        CopyDlg->OnCancel();
+      }
       else
-	Execute(0);
+      {
+        Execute(0);
+      }
     }
     else if (!MarkRepeat)
     {

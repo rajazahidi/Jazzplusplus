@@ -26,7 +26,7 @@
 
 void tCopyDlg::OnHelp()
 {
-	HelpInstance->ShowTopic("Replicate");
+  HelpInstance->ShowTopic("Replicate");
 }
 
 

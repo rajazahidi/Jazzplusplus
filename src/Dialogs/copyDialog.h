@@ -31,16 +31,30 @@ class tCopyDlg : public wxForm
 {
   tCopyCommand *cp;
 
- public:
-  tCopyDlg(tCopyCommand *c)
-	: wxForm( USED_WXFORM_BUTTONS ) { cp = c; }
-  void OnOk()                           { cp->OnOk(); wxForm::OnOk(); }
-  void OnCancel()                       { cp->OnCancel(); wxForm::OnCancel(); }
-  void OnHelp();
-  void EditForm(wxPanel *panel);
+  public:
+    tCopyDlg(tCopyCommand *c)
+      : wxForm( USED_WXFORM_BUTTONS )
+    {
+      cp = c;
+    }
+
+    void OnOk()
+    {
+      cp->OnOk();
+      wxForm::OnOk();
+    }
+
+    void OnCancel()
+    {
+      cp->OnCancel();
+      wxForm::OnCancel();
+    }
+
+    void OnHelp();
+
+    void EditForm(wxPanel *panel);
 };
 
 #endif // Porting
 
 #endif // COPYDIALOG
-

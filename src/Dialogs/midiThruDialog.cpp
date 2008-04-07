@@ -37,7 +37,7 @@ tMidiThruDlg::tMidiThruDlg(tEventWin *w)
 
 void tMidiThruDlg::OnHelp()
 {
-	HelpInstance->ShowTopic("Midi Thru");
+  HelpInstance->ShowTopic("Midi Thru");
 }
 
 

@@ -36,7 +36,7 @@ void sig_chorus(
   float pitch_range,  // 1 = one octave
   float pan_freq,     // in Hz
   float pan_spread,   // 0..1
-  float volume	      // -1..1
+  float volume        // -1..1
 );
 
 void sig_reverb(
@@ -47,12 +47,12 @@ void sig_reverb(
   float room_val);   // echo delay
 
 void sig_wavsynth(
-  tSample& spl,		// destin
-  double durat,		// length in seconds
-  int midi_key,		// base freq
-  double fshift,	// frequeny modulation factor
-  int N,		// number of wavetables to be mixed
-  JZRndArray* arr[][4],  // (fft, vol, pitch, pan) * N
+  tSample& spl,         // destin
+  double durat,         // length in seconds
+  int midi_key,         // base freq
+  double fshift,        // frequeny modulation factor
+  int N,                // number of wavetables to be mixed
+  JZRndArray* arr[][4], // (fft, vol, pitch, pan) * N
   int noisegen          // first array is noise filter
 );
 

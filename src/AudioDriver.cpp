@@ -101,7 +101,7 @@ class tAudioListener : public wxTimer
       count_info cinfo;
       if (ioctl(mpPlayer->dev, SNDCTL_DSP_GETOPTR, &cinfo) == -1)
       {
-	perror("SNDCTL_DSP_GETOPTR");
+        perror("SNDCTL_DSP_GETOPTR");
       }
       return (cinfo.bytes - cinfo.ptr) / sizeof(short);
     }
@@ -143,7 +143,7 @@ tAudioPlayer::tAudioPlayer(JZSong *song)
 
     if (caps & DSP_CAP_DUPLEX)
     {
-      mCanDuplex = 1;	// good soundcard!
+      mCanDuplex = 1;   // good soundcard!
     }
 
     if (!(caps & DSP_CAP_TRIGGER))
@@ -325,7 +325,7 @@ void tAudioPlayer::CloseDsp(bool Reset)
     {
       if (ioctl(dev,  SNDCTL_DSP_RESET, 0) == -1)
       {
-	perror("SNDCTL_DSP_RESET");
+        perror("SNDCTL_DSP_RESET");
       }
     }
     else
@@ -432,7 +432,7 @@ void tAudioPlayer::ReadSamples()
       // oss bug? It send EINTR?? on first read..
       if (errno != EINTR && errno != EAGAIN)
       {
-	perror("read");
+        perror("read");
       }
       recbuffers.UndoRequest();
       break;
@@ -501,11 +501,11 @@ void tAudioPlayer::MidiSync()
       if (ioctl(seqfd, SNDCTL_TMR_TEMPO, &new_speed) < 0)
       {
         // Sometimes this happens with mpu-401 timer.
-	; // perror("SNDCTL_TMR_TEMPO");
+        ; // perror("SNDCTL_TMR_TEMPO");
       }
       else
       {
-	curr_speed = new_speed;
+        curr_speed = new_speed;
       }
     }
   }

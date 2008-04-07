@@ -57,11 +57,20 @@ class tTimingDlg : public wxForm
   static void HelpFunc( tMidiButton& button, wxCommandEvent& event );
 };
 
-class tMidiButton : public wxButton {
+class tMidiButton : public wxButton
+{
   public:
-    tMidiButton( tTimingDlg *dlg,
-		 wxPanel *panel, wxFunction func, char *label, int x = -1, int y = -1,
-		 int width = -1, int height = -1, long style = 0, char *name = "button")
+    tMidiButton(
+      tTimingDlg *dlg,
+      wxPanel *panel,
+      wxFunction func,
+      char *label,
+      int x = -1,
+      int y = -1,
+      int width = -1,
+      int height = -1,
+      long style = 0,
+      char *name = "button")
     : wxButton( panel, func, label, x, y, width, height, style, name )
     {
       midiDlg = dlg;

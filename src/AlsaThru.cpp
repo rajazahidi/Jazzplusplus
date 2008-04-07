@@ -21,7 +21,7 @@
 //
 // Changes
 //
-// 2000.03.18	Takashi Iwai <iwai@ww.uni-erlangen.de>
+// 2000.03.18    Takashi Iwai <iwai@ww.uni-erlangen.de>
 // - Modified for ALSA 0.5.x
 // - Thru-connection is done inside ALSA sequencer core if
 //   USE_DIRECT_CONNECTION is defined in alsathru.h.

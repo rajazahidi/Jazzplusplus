@@ -31,17 +31,17 @@
 wxString add_default_ext(const wxString fn, const wxString ext)
 
 {
-  // is any extension already there?
+  // Is any extension already there?
   {
     const wxString x = wxFileNameFromPath(fn);
-    if (x.find( '.', TRUE) != 0)
+    if (x.find('.', TRUE) != 0)
     {
-      //if there is a dot, assume its an extension and return
+      // if there is a dot, assume its an extension and return.
       return fn;
     }
   }
 
-  // otherwise append the supplied extension and return
+  // Otherwise append the supplied extension and return
   wxString RevisedFileName = fn;
   RevisedFileName += ext;
   return RevisedFileName;
@@ -64,7 +64,6 @@ wxString file_selector(
   bool changed,
   const wxString ext)
 {
-   wxString s;
    wxString file;
    wxString path;
 
@@ -76,10 +75,10 @@ wxString file_selector(
    path = wxPathOnly(deffile);
 
    int flags = save ? wxFD_SAVE : wxFD_OPEN;
-   s = wxFileSelector(title, path, file, 0, ext, flags);
+   wxString s = wxFileSelector(title, path, file, 0, ext, flags);
 
   // add extension if missing
-  if (s && ext)
+   if (!s.empty() && ext)
   {
     s = add_default_ext(s, ext);
   }
@@ -104,7 +103,8 @@ wxString file_selector(
     wxString buf;
     buf<<deffile;
     buf <<" has changed. Load anyway?";
-    if (wxMessageBox(buf, "Load ?", wxYES_NO) == wxNO) {
+    if (wxMessageBox(buf, "Load ?", wxYES_NO) == wxNO)
+    {
       s = wxEmptyString;
     }
   }

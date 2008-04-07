@@ -46,7 +46,7 @@
 using namespace std;
 
 #define MEN_CLOSE        1
-#define MEN_MIDI        2
+#define MEN_MIDI             2
 #define MEN_TRANSPOSE        4
 #define MEN_CLEARSEQ        6
 #define MEN_EDIT        7
@@ -127,52 +127,81 @@ static JZToolDef tdefs[] =
 };
 
 
-// ------------------------ HBPlayer ------------------------
-
-/** handle playing of the harmony*/
+//*****************************************************************************
+// Description:
+//   This class handles the playing of the harmony.
+//*****************************************************************************
 class HBPlayer : public wxTimer
 {
     friend class HBCanvas;
+
   public:
+
     HBPlayer();
+
     void StartPlay(const HBContext &);
+
     void Paste(tEventArray &);
+
     void StopPlay();
+
     void SettingsDialog(wxFrame *parent);
-    int  IsPlaying() const { return playing; }
-    const HBContext &Context()        { return context; }
+
+    int IsPlaying() const
+    {
+      return playing;
+    }
+
+    const HBContext& Context()
+    {
+      return context;
+    }
 
     virtual void Notify();
 
-    int  GetChordKeys(int *out, const HBContext &);
-    int  GetMeldyKeys(int *out, const HBContext &);
-    int  GetBassKey(const HBContext &);
+    int GetChordKeys(int *out, const HBContext &);
+
+    int GetMeldyKeys(int *out, const HBContext &);
+
+    int GetBassKey(const HBContext &);
 
   private:
+
     HBContext context;
+
     static int bass_channel, bass_veloc;
+
     static int chord_channel, chord_veloc;
+
     static int meldy_channel, meldy_veloc;
-    static bool bass_enabled, chord_enabled, meldy_enabled;
+
+    static bool mBassEnabled, mChordEnabled, meldy_enabled;
+
     static int bass_pitch, chord_pitch, meldy_pitch;
+
     static int meldy_speed;
 
     int bass_key, chord_keys[12], n_chord_keys;
+
     int meldy_keys[12], n_meldy_keys, meldy_index;
+
     int note_length;
+
     int playing;
+
     int device;
+
 };
 
-bool HBPlayer::bass_enabled  = 1;
+bool HBPlayer::mBassEnabled = true;
 int HBPlayer::bass_channel  = 1;
 int HBPlayer::bass_veloc    = 90;
 int HBPlayer::bass_pitch    = 40;
 
-bool HBPlayer::chord_enabled = 1;
-int HBPlayer::chord_channel = 2;
-int HBPlayer::chord_veloc   = 90;
-int HBPlayer::chord_pitch   = 60;
+bool HBPlayer::mChordEnabled = true;
+int HBPlayer::chord_channel  = 2;
+int HBPlayer::chord_veloc    = 90;
+int HBPlayer::chord_pitch    = 60;
 
 bool HBPlayer::meldy_enabled = 0;
 int HBPlayer::meldy_channel = 3;
@@ -234,13 +263,13 @@ int HBPlayer::GetMeldyKeys(int *out, const HBContext &context)
 
 void HBPlayer::Paste(tEventArray &arr)
 {
-  if (bass_enabled)
+  if (mBassEnabled)
   {
     tKeyOn e(0, bass_channel - 1, bass_key, bass_veloc, note_length);
     arr.Put(e.Copy());
   }
 
-  if (chord_enabled)
+  if (mChordEnabled)
   {
     for (int i = 0; i < n_chord_keys; i++)
     {
@@ -267,13 +296,13 @@ void HBPlayer::StartPlay(const HBContext &ct)
   n_meldy_keys = GetMeldyKeys(meldy_keys, context);
 
   // Generate KeyOn's
-  if (bass_enabled)
+  if (mBassEnabled)
   {
     tKeyOn e(0, bass_channel - 1, bass_key, bass_veloc);
     gpMidiPlayer->OutNow(device, &e);
   }
 
-  if (chord_enabled)
+  if (mChordEnabled)
   {
     for (i = 0; i < n_chord_keys; i++)
     {
@@ -308,14 +337,15 @@ void HBPlayer::StopPlay()
   playing = 0;
 
   int i;
+
   // Generate KeyOff's
-  if (bass_enabled)
+  if (mBassEnabled)
   {
     tKeyOff e(0, bass_channel - 1, bass_key);
     gpMidiPlayer->OutNow(device, &e);
   }
 
-  if (chord_enabled)
+  if (mChordEnabled)
   {
     for (i = 0; i < n_chord_keys; i++)
     {
@@ -363,7 +393,7 @@ void HBPlayer::SettingsDialog(wxFrame *parent)
 
   panel->SetLabelPosition(wxHORIZONTAL);
 
-  form->Add(wxMakeFormBool("Bass enable", &bass_enabled));
+  form->Add(wxMakeFormBool("Bass enable", &mBassEnabled));
   form->Add(wxMakeFormNewLine());
   form->Add(wxMakeFormShort("Channel", &bass_channel, wxFORM_DEFAULT, new wxList(wxMakeConstraintRange(1.0, 16.0), 0)));
   form->Add(wxMakeFormNewLine());
@@ -372,7 +402,7 @@ void HBPlayer::SettingsDialog(wxFrame *parent)
   form->Add(wxMakeFormShort("Pitch", &bass_pitch, wxFORM_DEFAULT, new wxList(wxMakeConstraintRange(30.0, 99.0), 0)));
   form->Add(wxMakeFormNewLine());
 
-  form->Add(wxMakeFormBool("Chord enable", &chord_enabled));
+  form->Add(wxMakeFormBool("Chord enable", &mChordEnabled));
   form->Add(wxMakeFormNewLine());
   form->Add(wxMakeFormShort("Channel", &chord_channel, wxFORM_DEFAULT, new wxList(wxMakeConstraintRange(1.0, 16.0), 0)));
   form->Add(wxMakeFormNewLine());
@@ -401,9 +431,9 @@ void HBPlayer::SettingsDialog(wxFrame *parent)
 #endif
 }
 
-// =============================================================
+//*****************************************************************************
 // HBCanvas
-// =============================================================
+//*****************************************************************************
 
 /** painting component for the harmony browser*/
 class HBCanvas : public wxScrolledWindow
@@ -413,13 +443,15 @@ class HBCanvas : public wxScrolledWindow
     friend class HBMatchMarkers;
     friend ostream & operator << (ostream &os, HBCanvas const &a);
     friend istream & operator >> (istream &is, HBCanvas &a);
+
   public:
+
     HBCanvas(wxFrame *parent, int x, int y, int w, int h);
     virtual ~HBCanvas();
     virtual void OnDraw(wxDC& dc);
     void DrawMarkers(const HBContext &c, wxDC* dc);
+
     void ClearSeq();
-    virtual void OnEvent(wxMouseEvent &e);
 
     int SeqDefined()        { return n_seq > 0; }
     int GetChordKeys(int *out, int step, int n_steps);
@@ -441,11 +473,16 @@ class HBCanvas : public wxScrolledWindow
     HBAnalyzer * getAnalyzer();
 
   protected:
+
     static const int ScFa;
     void ChordRect(JZRectangle &r, const HBContext &ct);
     void DrawChord(const HBContext &ct);
     void UnDrawChord(const HBContext &ct);
     bool Find(float x, float y, HBContext &out);
+
+  private:
+
+    virtual void OnMouseEvent(wxMouseEvent& MouseEvent);
 
   private:
 
@@ -480,6 +517,8 @@ class HBCanvas : public wxScrolledWindow
 
     static tScaleType scale_type;
     void SetScaleType(int menu_id, tScaleType st, wxToolBar *tb);
+
+  DECLARE_EVENT_TABLE()
 };
 
 tScaleType HBCanvas::scale_type = Major;
@@ -487,6 +526,13 @@ const int HBCanvas::ScFa = 50;
 int HBCanvas::transpose_res = 8;
 int HBCanvas::analyze_res = 8;
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+BEGIN_EVENT_TABLE(HBCanvas, wxScrolledWindow)
+
+  EVT_MOUSE_EVENTS(HBCanvas::OnMouseEvent)
+
+END_EVENT_TABLE()
 
 HBCanvas::HBCanvas(wxFrame *p, int x, int y, int w, int h)
   : wxScrolledWindow(p, -1, wxPoint(x, y), wxSize(w, h))
@@ -901,7 +947,6 @@ bool HBMatchMarkers::operator()(const HBContext &o_context)
   return msg[2] ? 1 : 0;
 }
 
-
 void HBCanvas::DrawMarkers(const HBContext &ct, wxDC* dc)
 {
   JZRectangle r;
@@ -967,18 +1012,21 @@ void HBCanvas::ClearSeq()
 }
 
 
-void HBCanvas::OnEvent(wxMouseEvent &e)
+void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
 {
   wxDC* dc= new wxClientDC(this);
   HBContext context;
   int x, y;
-  e.GetPosition(&x, &y);
+  MouseEvent.GetPosition(&x, &y);
   if (Find(x, y, context))
   {
-    if (e.ButtonDown())
+    if (MouseEvent.ButtonDown())
     {
       player.StartPlay(context);
-      if (e.LeftDown() && e.ShiftDown() || e.MiddleDown())
+      if (
+        MouseEvent.LeftDown() &&
+        MouseEvent.ShiftDown() ||
+        MouseEvent.MiddleDown())
       {
         if (context.SeqNr())
         {
@@ -1010,13 +1058,14 @@ void HBCanvas::OnEvent(wxMouseEvent &e)
         }
       }
     }
-    else if (e.Dragging() && player.IsPlaying() && context != player.Context())
+    else if (
+      MouseEvent.Dragging() && player.IsPlaying() && context != player.Context())
     {
       player.StopPlay();
       player.StartPlay(context);
     }
 
-    if (e.LeftDown() || e.MiddleDown()) // && context != mouse_context)
+    if (MouseEvent.LeftDown() || MouseEvent.MiddleDown()) // && context != mouse_context)
     {
       DrawMarkers(mouse_context, dc);
       mouse_context = context;
@@ -1024,7 +1073,7 @@ void HBCanvas::OnEvent(wxMouseEvent &e)
       DrawMarkers(mouse_context, dc);
 
       // paste to PianoWin buffer
-      if (!mark_piano)
+      if (!mark_piano && gpTrackFrame->GetPianoWindow())
       {
         tEventArray &buf = gpTrackFrame->GetPianoWindow()->mPasteBuffer;
         buf.Clear();
@@ -1032,18 +1081,24 @@ void HBCanvas::OnEvent(wxMouseEvent &e)
         gpTrackFrame->GetPianoWindow()->Refresh();
       }
 
-      // Show in GuitarWin
-      JZGuitarFrame* guitar = gpTrackFrame->GetPianoWindow()->GetGuitarFrame();
-      if (guitar)
+      if (gpTrackFrame->GetPianoWindow())
       {
-        guitar->ShowPitch(0);        // remove actual pianowin/mouse position
-//        guitar->Redraw();
-        guitar->Update();
+        // Show in GuitarWin
+        JZGuitarFrame* guitar = gpTrackFrame->GetPianoWindow()->GetGuitarFrame();
+        if (guitar)
+        {
+          // Remove actual pianowin/mouse position
+          guitar->ShowPitch(0);
+//          guitar->Redraw();
+          guitar->Update();
+        }
       }
     }
   }
-  if (e.ButtonUp() && player.IsPlaying())
+  if (MouseEvent.ButtonUp() && player.IsPlaying())
+  {
     player.StopPlay();
+  }
   delete dc;
 }
 

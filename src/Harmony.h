@@ -34,17 +34,25 @@ class tGenMelody;
 class tHBInterface
 {
   public:
+
     virtual ~tHBInterface()
     {
     }
+
     virtual int SeqDefined() = 0;        // true = yes
 
-    // return number of keys in out
+    // Return number of keys in out
+
     virtual int GetChordKeys(int *out, int step, int n_steps) = 0;
+
     virtual int GetBassKeys(int *out, int step, int n_steps) = 0;
+
     virtual int GetSelectedChord(int *out) = 0; // returns # keys
+
     virtual int GetSelectedScale(int *out) = 0; // returns # keys
+
     virtual HBAnalyzer * getAnalyzer() = 0;
+
     virtual void TransposeSelection() = 0;
 };
 

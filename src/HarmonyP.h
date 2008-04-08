@@ -24,6 +24,7 @@
 #define JZ_HARMONYP_H
 
 #include <iostream>
+#include <string>
 
 // ------------------------------------------------------------------
 // HBChord
@@ -194,18 +195,19 @@ class HBChord
       *this += key+1;
     }
 
-    void Name(char *buf, int key, int flat = 0);
+    void CreateName(std::string& CordName, int key, int flat = 0);
 
-    static const char * ScaleName(int key, int flat = 0)
+    static const std::string ScaleName(int key, int flat = 0)
     {
-      return scale_names[flat != 0][(key + 240) % 12];
+      return mScaleNames[flat != 0][(key + 240) % 12];
     }
 
   protected:
     int keys;
 
   private:
-    static const char * const scale_names[2][12];
+
+    static const std::string const mScaleNames[2][12];
 };
 
 inline std::ostream& operator << (std::ostream& os, HBChord const &a)
@@ -323,16 +325,19 @@ class HBContext
       seq_nr = n;
     }
 
-    const char* ChordName() const;                // "Dm75-"
+    // For example "Dm75-"
+    std::string GetChordName() const;
 
-    const char* ChordNrName() const;              // "IV"
+    // For example "IV"
+    const char* ChordNrName() const;
 
     const char* ContextName() const               // "mixo#11"
     {
       return context_names[scale_type][chord_nr];
     }
 
-    const char* ScaleName() const;                // "C#"
+    // For example "C#"
+    const std::string& GetScaleName() const;
 
     const char* ScaleTypeName() const;            // "major"
 

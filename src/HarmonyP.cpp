@@ -25,13 +25,15 @@
 #include <assert.h>
 #include <string.h>
 
+#include <iostream>
+
 using namespace std;
 
 // ========================================================================
 // HBChord
 // ========================================================================
 
-const char *const HBChord::scale_names[2][12] =
+const string const HBChord::mScaleNames[2][12] =
 {
   { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" },
   { "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B" }
@@ -54,17 +56,18 @@ HBChord::HBChord(int a, int b, int c, int d, int e, int f, int g, int h, int i, 
   if (l >= 0) operator += (l);
 }
 
-void HBChord::Name(char *buf, int key, int flat)
+void HBChord::CreateName(string& ChordName, int key, int flat)
 {
   HBChord c = *this;
-  strcpy(buf, ScaleName(key, flat));
-  int i = strlen(buf);
-  c.Rotate(-key);        // transpose to C
+  ChordName = ScaleName(key, flat);
 
-  // special cases
+  // Transpose to C.
+  c.Rotate(-key);
+
+  // Handle special cases.
   if (c == C0)
   {
-    strcat(buf, "o");
+    ChordName.append("o");
     return;
   }
 
@@ -79,21 +82,24 @@ void HBChord::Name(char *buf, int key, int flat)
   if (c.Contains(3))
   {
     if (!c.Contains(4))
-      buf[i++] = 'm';
+    {
+      ChordName.append("m");
+    }
     else
+    {
       sharp9 = true;
+    }
   }
 
   // 7
   if (c.Contains(11))
   {
-    buf[i++] = 'j';
-    buf[i++] = '7';
+    ChordName.append("j7");
     seven = true;
   }
   else if (c.Contains(10))
   {
-    buf[i++] = '7';
+    ChordName.append("j");
     seven = true;
   }
 
@@ -102,32 +108,35 @@ void HBChord::Name(char *buf, int key, int flat)
   {
     if (!c.Contains(4))
     {
-      strcpy(buf + i, "sus4");
-      i += 5;
+      ChordName.append("sus4");
     }
     else
+    {
       nat11 = true;
+    }
   }
 
   // 5
   if (c.Contains(7))
   {
     if (c.Contains(6))
+    {
       sharp11 = true;
+    }
     if (c.Contains(8))
+    {
       flat13 = true;
+    }
   }
   else
   {
     if (c.Contains(6))
     {
-      buf[i++] = '5';
-      buf[i++] = '-';
+      ChordName.append("5-");
     }
     if (c.Contains(8))
     {
-      buf[i++] = '5';
-      buf[i++] = '+';
+      ChordName.append("5+");
     }
   }
 
@@ -135,56 +144,49 @@ void HBChord::Name(char *buf, int key, int flat)
   if (c.Contains(9))
   {
     if (!seven)
-      buf[i++] = '6';
+    {
+      ChordName.append("6");
+    }
     else
+    {
       nat13 = true;
+    }
   }
 
   // 9
   if (c.Contains(1))
   {
-    buf[i++] = '9';
-    buf[i++] = '-';
+    ChordName.append("9-");
   }
   if (c.Contains(2))
   {
-    buf[i++] = '9';
+    ChordName.append("5");
   }
 
   if (sharp9)
   {
-    buf[i++] = '9';
-    buf[i++] = '+';
+    ChordName.append("9+");
   }
 
   // 11
   if (nat11)
   {
-    buf[i++] = '1';
-    buf[i++] = '1';
-    buf[i++] = ' ';
+    ChordName.append("11 ");
   }
   if (sharp11)
   {
-    buf[i++] = '1';
-    buf[i++] = '1';
-    buf[i++] = '+';
+    ChordName.append("11+");
   }
 
   // 13
   if (flat13)
   {
-    buf[i++] = '1';
-    buf[i++] = '3';
-    buf[i++] = '-';
+    ChordName.append("13-");
   }
   if (nat13)
   {
-    buf[i++] = '1';
-    buf[i++] = '3';
+    ChordName.append("13");
   }
-
-  buf[i++] = 0;
 }
 
 
@@ -332,22 +334,21 @@ HBContext::HBContext()
   Initialize();
 }
 
-const char * HBContext::ChordName() const
+string HBContext::GetChordName() const
 {
 #if NAME_TABLE
-  // use table of chordnames (fast)
-  static char buf[20];
+  // Use the table of chord names (fast).
   int chord_key = ChordKey();
-  strcpy(buf, HBChord::ScaleName(chord_key, flat_keys[scale_nr]));
-  strcat(buf, chord_names[scale_type][chord_nr]);
-  return buf;  // "Dm75-"
+  string ChordName = HBChord::ScaleName(chord_key, flat_keys[scale_nr]);
+  ChordName.append(chord_names[scale_type][chord_nr]);
+  return ChordName;
 #else
-  // compute chordname (slow, but flexible)
-  static char buf[20];
+  // Compute the chord name (slow, but flexible).
   int chord_key = ChordKey();
   HBChord chord = Chord();
-  chord.Name(buf, chord_key, flat_keys[chord_key]);
-  return buf;
+  string ChordName;
+  chord.CreateName(ChordName, chord_key, flat_keys[chord_key]);
+  return ChordName;
 #endif
 }
 
@@ -356,16 +357,16 @@ const char * HBContext::ChordNrName() const
   return chord_nr_names[chord_nr];        // "IV"
 }
 
-const char * HBContext::ScaleName() const
+const string& HBContext::GetScaleName() const
 {
-  static char buf[20];
+  static string ScaleName;
   //strcpy(buf, scale_names[flat_keys[scale_nr]][scale_nr]);
-  strcpy(buf, HBChord::ScaleName(scale_nr, flat_keys[scale_nr]));
+  ScaleName = HBChord::ScaleName(scale_nr, flat_keys[scale_nr]);
 #if 0
   strcat(buf, "/");
   strcat(buf, scale_type_names[scale_type]);
 #endif
-  return buf;
+  return ScaleName;
 }
 
 const char * HBContext::ScaleTypeName() const
@@ -698,7 +699,7 @@ int main()
   gensc(chords);
   cout << "};\n\n";
 
-  cout << "tNamedChord scale_names[n_scale_names] = {\n";
+  cout << "tNamedChord mScaleNames[n_scale_names] = {\n";
   gensc(scales);
   cout << "};\n\n";
 

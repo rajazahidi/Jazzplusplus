@@ -1057,12 +1057,12 @@ void HBCanvas::DrawChord(wxDC& Dc, const HBContext& Context)
     Rectangle.width,
     Rectangle.height);
 
-  const char* pName = Context.ChordName();
+  string ChordName = Context.GetChordName();
 
   int TextWidth, TextHeight;
-  Dc.GetTextExtent(pName, &TextWidth, &TextHeight);
+  Dc.GetTextExtent(ChordName.c_str(), &TextWidth, &TextHeight);
   Dc.DrawText(
-    pName,
+    ChordName.c_str(),
     Rectangle.x + (Rectangle.width - TextWidth) / 2,
     Rectangle.y + (Rectangle.height - TextHeight) / 2);
 }
@@ -1110,7 +1110,7 @@ void HBCanvas::OnDraw(wxDC& Dc)
     {
       JZRectangle Rectangle;
       ChordRect(Rectangle, Context);
-      Dc.DrawText(Context.ScaleName(), 5, Rectangle.y);
+      Dc.DrawText(Context.GetScaleName().c_str(), 5, Rectangle.y);
     }
   }
 
@@ -1518,7 +1518,7 @@ HBAnalyzer * HBCanvas::GetAnalyzer()
 
 struct tNamedChord
 {
-  const char* mpName;
+  const std::string mName;
   int bits;
 };
 
@@ -1542,7 +1542,7 @@ tNamedChord chord_names[n_chord_names] =
   { " 75-",          0x451},
 };
 
-tNamedChord scale_names[n_scale_names] =
+tNamedChord mScaleNames[n_scale_names] =
 {
   { "***** major scales *****",       0x0},
   { "maj I   (ionic)",                0xab5},
@@ -1698,13 +1698,17 @@ HBContextDlg::HBContextDlg(HBCanvas *c, wxFrame *parent, HBContext *pct)
     scale_chk[i] = new wxCheckBox(this, wxID_ANY,  " ", wxPoint(x, y+2*h));//(wxFunction)ScaleCheck,
     if (notename[i])
     {
-      (void) new wxStaticText(this, wxID_ANY, (char *)notename[i], wxPoint(x, y+3*h));
+      new wxStaticText(this, wxID_ANY, notename[i], wxPoint(x, y + 3 * h));
     }
-    (void) new wxStaticText(this, wxID_ANY, (char *)HBChord::ScaleName(i + chord_key), wxPoint(x, y+0*h));
+    new wxStaticText(
+      this,
+      wxID_ANY,
+      HBChord::ScaleName(i + chord_key),
+      wxPoint(x, y + 0 * h));
   }
   y += 4*h;
 
-  // list boxes                                                               x  y    w    h
+  // list boxes    x  y    w    h
 #ifdef OBSOLETE
   SetLabelPosition(wxVERTICAL);
 #endif
@@ -1713,7 +1717,7 @@ HBContextDlg::HBContextDlg(HBCanvas *c, wxFrame *parent, HBContext *pct)
 
   for (i = 0; i < n_chord_names; i++)
   {
-    cnames[i] = (char *)chord_names[i].mpName;
+    cnames[i] = chord_names[i].mName;
   }
 
   chord_lst = new wxListBox(this, -1,   wxPoint(10, y), wxSize(100, 200), n_chord_names, cnames, wxLB_SINGLE| wxLB_NEEDED_SB);//"Chords"
@@ -1723,7 +1727,7 @@ HBContextDlg::HBContextDlg(HBCanvas *c, wxFrame *parent, HBContext *pct)
   wxString* snames = new wxString[n_scale_names];
   for (i = 0; i < n_scale_names; i++)
   {
-    snames[i] = (char *)scale_names[i].mpName;
+    snames[i] = mScaleNames[i].mName;
   }
   scale_lst = new wxListBox(
     this,
@@ -1755,9 +1759,9 @@ void HBContextDlg::ShowValues()
 {
   // show single notes
   int i;
-  char buf[30];
-  chord.Name(buf, ChordKey(0));
-  chord_msg->SetLabel(buf);
+  string ChordName;
+  chord.CreateName(ChordName, ChordKey(0));
+  chord_msg->SetLabel(ChordName.c_str());
   for (i = 0; i < 12; i++)
   {
     chord_chk[i]->SetValue(0 != chord.Contains(ChordKey(i)));
@@ -1784,11 +1788,11 @@ void HBContextDlg::ShowValues()
   HBChord s = scale;
   s.Rotate(-ScaleKey());
   i = chord_lst->GetSelection();
-  if (i < 0 || s.Keys() != scale_names[i].bits)
+  if (i < 0 || s.Keys() != mScaleNames[i].bits)
   {
     for (i = 0; i < n_scale_names; i++)
     {
-      if (scale_names[i].bits == s.Keys())
+      if (mScaleNames[i].bits == s.Keys())
       {
         scale_lst->SetSelection(i);
         break;
@@ -1863,7 +1867,6 @@ void HBContextDlg::RestartPlayer()
 
 void HBContextDlg::OnChordCheck()
 {
-  char buf[30];
   chord.Clear();
   for (int i = 0; i < 12; i++)
   {
@@ -1872,8 +1875,9 @@ void HBContextDlg::OnChordCheck()
       chord += ChordKey(i);
     }
   }
-  chord.Name(buf, ChordKey());
-  chord_msg->SetLabel(buf);
+  string ChordName;
+  chord.CreateName(ChordName, ChordKey());
+  chord_msg->SetLabel(ChordName.c_str());
   RestartPlayer();
 }
 
@@ -1910,7 +1914,7 @@ void HBContextDlg::OnScaleList()
   int i = scale_lst->GetSelection();
   if (i >= 0)
   {
-    HBChord s(scale_names[i].bits);
+    HBChord s(mScaleNames[i].bits);
     s.Rotate(ScaleKey());
     scale = s;
     ShowValues();

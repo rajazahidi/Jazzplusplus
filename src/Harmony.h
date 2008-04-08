@@ -91,6 +91,12 @@ class HBFrame : public wxFrame, public tHBInterface
     void OnUpdateMelodicMinorScale(wxUpdateUIEvent& Event);
     void OnUpdateIonicScale(wxUpdateUIEvent& Event);
 
+    void OnUpdateFourEqualNotes(wxUpdateUIEvent& Event);
+    void OnUpdateThreeEqualNotes(wxUpdateUIEvent& Event);
+    void OnUpdateTwoEqualNotes(wxUpdateUIEvent& Event);
+    void OnUpdateOneEqualNotes(wxUpdateUIEvent& Event);
+    void OnUpdateZeroEqualNotes(wxUpdateUIEvent& Event);
+
     void OnToolBarSelect(wxCommandEvent& Event);
 
     void OnFileLoad(wxCommandEvent& Event);

@@ -487,6 +487,17 @@ class HBCanvas : public wxScrolledWindow
 
     virtual ~HBCanvas();
 
+    bool GetMark4Common() const;
+    bool GetMark3Common() const;
+    bool GetMark2Common() const;
+    bool GetMark1Common() const;
+    bool GetMarkBCommon() const;
+    bool GetMark0Common() const;
+    bool GetMark1Semi() const;
+    bool GetMark251() const;
+    bool GetMarkTritone() const;
+    bool GetMarkPiano() const;
+
     virtual void OnDraw(wxDC& Dc);
 
     void DrawMarkers(wxDC& Dc, const HBContext& Context);
@@ -601,7 +612,67 @@ class HBCanvas : public wxScrolledWindow
 inline
 bool HBCanvas::IsUsingHaunschildLayout() const
 {
-   return mHaunschildLayout;
+  return mHaunschildLayout;
+}
+
+inline
+bool HBCanvas::GetMark4Common() const
+{
+  return mMark4Common;
+}
+
+inline
+bool HBCanvas::GetMark3Common() const
+{
+  return mMark3Common;
+}
+
+inline
+bool HBCanvas::GetMark2Common() const
+{
+  return mMark2Common;
+}
+
+inline
+bool HBCanvas::GetMark1Common() const
+{
+  return mMark1Common;
+}
+
+inline
+bool HBCanvas::GetMarkBCommon() const
+{
+  return mMarkBCommon;
+}
+
+inline
+bool HBCanvas::GetMark0Common() const
+{
+  return mMark0Common;
+}
+
+inline
+bool HBCanvas::GetMark1Semi() const
+{
+  return mMark1Semi;
+}
+
+inline
+bool HBCanvas::GetMark251() const
+{
+  return mMark251;
+}
+
+inline
+bool HBCanvas::GetMarkTritone() const
+{
+  return mMarkTritone;
+}
+
+inline
+bool HBCanvas::GetMarkPiano() const
+{
+  return mMarkPiano;
 }
 
 //*****************************************************************************
@@ -1866,11 +1937,21 @@ BEGIN_EVENT_TABLE(HBFrame, wxFrame)
   EVT_UPDATE_UI(MEN_IONSCALE, HBFrame::OnUpdateIonicScale)
   EVT_MENU(MEN_IONSCALE, HBFrame::OnToolBarSelect)
 
+  EVT_UPDATE_UI(MEN_EQ4, HBFrame::OnUpdateFourEqualNotes)
   EVT_MENU(MEN_EQ4, HBFrame::OnToolBarSelect)
+
+  EVT_UPDATE_UI(MEN_EQ3, HBFrame::OnUpdateThreeEqualNotes)
   EVT_MENU(MEN_EQ3, HBFrame::OnToolBarSelect)
+
+  EVT_UPDATE_UI(MEN_EQ2, HBFrame::OnUpdateTwoEqualNotes)
   EVT_MENU(MEN_EQ2, HBFrame::OnToolBarSelect)
+
+  EVT_UPDATE_UI(MEN_EQ1, HBFrame::OnUpdateOneEqualNotes)
   EVT_MENU(MEN_EQ1, HBFrame::OnToolBarSelect)
+
+  EVT_UPDATE_UI(MEN_EQ1, HBFrame::OnUpdateZeroEqualNotes)
   EVT_MENU(MEN_EQ0, HBFrame::OnToolBarSelect)
+
   EVT_MENU(MEN_EQH, HBFrame::OnToolBarSelect)
   EVT_MENU(MEN_251, HBFrame::OnToolBarSelect)
   EVT_MENU(MEN_EQB, HBFrame::OnToolBarSelect)
@@ -1933,22 +2014,76 @@ HBFrame::HBFrame()
     true);
 
   wxMenu* pScaleMenu = new wxMenu;
-  pScaleMenu->Append(MEN_MAJSCALE, "&Major", "Use Major Scales", true);
-  pScaleMenu->Append(MEN_HARSCALE, "&Harmonic Minor", "Use Harmonic Minor Scales", true);
-  pScaleMenu->Append(MEN_MELSCALE, "&Melodic Minor", "Use Melodic Minor Scales", true);
-  pScaleMenu->Append(MEN_IONSCALE, "&Ionic", "Use Ionic Scales", true);
+  pScaleMenu->Append(
+    MEN_MAJSCALE,
+    "&Major",
+    "Use Major Scales",
+    true);
+  pScaleMenu->Append(
+    MEN_HARSCALE,
+    "&Harmonic Minor",
+    "Use Harmonic Minor Scales",
+    true);
+  pScaleMenu->Append(
+    MEN_MELSCALE,
+    "&Melodic Minor",
+    "Use Melodic Minor Scales",
+    true);
+  pScaleMenu->Append(
+    MEN_IONSCALE,
+    "&Ionic",
+    "Use Ionic Scales",
+    true);
 
   wxMenu* pShowMenu = new wxMenu;
-  pShowMenu->Append(MEN_EQ4, "&4 equal notes");
-  pShowMenu->Append(MEN_EQ3, "&3 equal notes");
-  pShowMenu->Append(MEN_EQ2, "&2 equal notes");
-  pShowMenu->Append(MEN_EQ1, "&1 equal note");
-  pShowMenu->Append(MEN_EQ0, "&0 equal notes");
-  pShowMenu->Append(MEN_EQH, "1/2 note &difference");
-  pShowMenu->Append(MEN_251, "2-5-1 &move");
-  pShowMenu->Append(MEN_EQB, "&Same bass note");
-  pShowMenu->Append(MEN_TRITONE, "&Tritone substitute");
-  pShowMenu->Append(MEN_PIANO, "Contains &Pianowin Buffer");
+  pShowMenu->Append(
+    MEN_EQ4,
+    "&4 equal notes",
+    "Display Chords with 4 common notes",
+    true);
+  pShowMenu->Append(
+    MEN_EQ3,
+    "&3 equal notes",
+    "Display Chords with 3 common notes",
+    true);
+  pShowMenu->Append(
+    MEN_EQ2,
+    "&2 equal notes",
+    "Display Chords with 2 common notes",
+    true);
+  pShowMenu->Append(
+    MEN_EQ1,
+    "&1 equal note",
+    "Display Chords with 1 common notes",
+    true);
+  pShowMenu->Append(
+    MEN_EQ0,
+    "&0 equal notes",
+    "Display Chords with no common notes",
+    true);
+  pShowMenu->Append(
+    MEN_EQH,
+    "1/2 note &difference",
+    "Display Chords with a 1/2 note difference",
+    true);
+  pShowMenu->Append(
+    MEN_251,
+    "2-5-1 &move",
+    "Display Chords with a 2-5-1 move",
+    true);
+  pShowMenu->Append(
+    MEN_EQB,
+    "&Same bass note",
+    "Display Chords with the same bass note",
+    true);
+  pShowMenu->Append(
+    MEN_TRITONE,
+    "&Tritone substitute",
+    "Display Chords with that are tritone substitutes",
+    true);
+  pShowMenu->Append(
+    MEN_PIANO,
+    "Contains &Pianowin Buffer");
 
   wxMenu* pActionMenu = new wxMenu;
   pActionMenu->Append(MEN_TRANSPOSE, "&Transpose");
@@ -2073,6 +2208,41 @@ void HBFrame::OnUpdateMelodicMinorScale(wxUpdateUIEvent& Event)
 void HBFrame::OnUpdateIonicScale(wxUpdateUIEvent& Event)
 {
   Event.Check(HBCanvas::GetScaleType() == Ionb13);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBFrame::OnUpdateFourEqualNotes(wxUpdateUIEvent& Event)
+{
+  Event.Check(mpHbWindow->GetMark4Common());
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBFrame::OnUpdateThreeEqualNotes(wxUpdateUIEvent& Event)
+{
+  Event.Check(mpHbWindow->GetMark3Common());
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBFrame::OnUpdateTwoEqualNotes(wxUpdateUIEvent& Event)
+{
+  Event.Check(mpHbWindow->GetMark2Common());
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBFrame::OnUpdateOneEqualNotes(wxUpdateUIEvent& Event)
+{
+  Event.Check(mpHbWindow->GetMark1Common());
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBFrame::OnUpdateZeroEqualNotes(wxUpdateUIEvent& Event)
+{
+  Event.Check(mpHbWindow->GetMark0Common());
 }
 
 //-----------------------------------------------------------------------------

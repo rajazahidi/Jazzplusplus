@@ -29,7 +29,14 @@
 // HBChord
 // ------------------------------------------------------------------
 
-enum tScaleType { Major, Harmon, Melod, Ionb13, nScaleTypes };
+enum TEScaleType
+{
+  Major,
+  Harmon,
+  Melod,
+  Ionb13,
+  nScaleTypes
+};
 
 
 class HBChord
@@ -257,7 +264,7 @@ class HBContext
 
   public:
 
-    HBContext(int sn, int cn = 0, tScaleType st = Major);
+    HBContext(int sn, int cn = 0, TEScaleType st = Major);
 
     HBContext();
 
@@ -301,7 +308,7 @@ class HBContext
       return scale_nr;
     }
 
-    tScaleType ScaleType() const
+    TEScaleType ScaleType() const
     {
       return scale_type;
     }
@@ -352,7 +359,7 @@ class HBContext
 
     int MakeChordKey() const;
 
-    tScaleType scale_type;
+    TEScaleType scale_type;
 
     int scale_nr;
 
@@ -426,7 +433,7 @@ class HBContextIterator
       n_seq = n;
     }
 
-    void SetScaleType(tScaleType st)
+    void SetScaleType(TEScaleType st)
     {
       scale_type = st;
     }
@@ -455,7 +462,7 @@ class HBContextIterator
 
     int i_seq, n_seq;
 
-    tScaleType scale_type;
+    TEScaleType scale_type;
 };
 
 #endif // !defined(JZ_HARMONYP_H)

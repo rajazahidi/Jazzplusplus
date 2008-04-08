@@ -86,6 +86,11 @@ class HBFrame : public wxFrame, public tHBInterface
 
   protected:
 
+    void OnUpdateMajorScale(wxUpdateUIEvent& Event);
+    void OnUpdateHarmonicMinorScale(wxUpdateUIEvent& Event);
+    void OnUpdateMelodicMinorScale(wxUpdateUIEvent& Event);
+    void OnUpdateIonicScale(wxUpdateUIEvent& Event);
+
     void OnToolBarSelect(wxCommandEvent& Event);
 
     void OnFileLoad(wxCommandEvent& Event);
@@ -96,6 +101,7 @@ class HBFrame : public wxFrame, public tHBInterface
 
     void OnSettingsMidi(wxCommandEvent& Event);
 
+    void OnUpdateHaunschildLayout(wxUpdateUIEvent& Event);
     void OnSettingsHaunschild(wxCommandEvent& Event);
 
     void OnActionClearSequence(wxCommandEvent& Event);

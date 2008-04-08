@@ -481,6 +481,8 @@ class HBCanvas : public wxScrolledWindow
 
   public:
 
+    static TEScaleType GetScaleType();
+
     HBCanvas(wxFrame* pParent, int x, int y, int w, int h);
 
     virtual ~HBCanvas();
@@ -507,6 +509,8 @@ class HBCanvas : public wxScrolledWindow
     void SettingsDialog();
 
     void ToggleHaunschildLayout();
+
+    bool IsUsingHaunschildLayout() const;
 
     void FileLoad();
 
@@ -543,11 +547,11 @@ class HBCanvas : public wxScrolledWindow
 
     void SetMarker(int MenuId, wxToolBar* pToolBar);
 
-    void SetScaleType(int MenuId, tScaleType ScaleType, wxToolBar* pToolBar);
+    void SetScaleType(int MenuId, TEScaleType ScaleType, wxToolBar* pToolBar);
 
   private:
 
-    static tScaleType mScaleType;
+    static TEScaleType mScaleType;
 
     static int transpose_res;
 
@@ -593,6 +597,12 @@ class HBCanvas : public wxScrolledWindow
 
   DECLARE_EVENT_TABLE()
 };
+
+inline
+bool HBCanvas::IsUsingHaunschildLayout() const
+{
+   return mHaunschildLayout;
+}
 
 //*****************************************************************************
 // Description:
@@ -712,10 +722,17 @@ bool HBMatchMarkers::operator()(const HBContext &o_context)
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tScaleType HBCanvas::mScaleType = Major;
+TEScaleType HBCanvas::mScaleType = Major;
 const int HBCanvas::ScFa = 50;
 int HBCanvas::transpose_res = 8;
 int HBCanvas::analyze_res = 8;
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+TEScaleType HBCanvas::GetScaleType()
+{
+  return mScaleType;
+}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -1291,7 +1308,7 @@ void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
 //-----------------------------------------------------------------------------
 void HBCanvas::SetScaleType(
   int MenuId,
-  tScaleType ScaleType,
+  TEScaleType ScaleType,
   wxToolBar* pToolBar)
 {
   mScaleType = ScaleType;
@@ -1836,10 +1853,19 @@ void HBContextDlg::OnScaleList()
 //-----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(HBFrame, wxFrame)
 
+
+  EVT_UPDATE_UI(MEN_MAJSCALE, HBFrame::OnUpdateMajorScale)
   EVT_MENU(MEN_MAJSCALE, HBFrame::OnToolBarSelect)
+
+  EVT_UPDATE_UI(MEN_HARSCALE, HBFrame::OnUpdateHarmonicMinorScale)
   EVT_MENU(MEN_HARSCALE, HBFrame::OnToolBarSelect)
+
+  EVT_UPDATE_UI(MEN_MELSCALE, HBFrame::OnUpdateMelodicMinorScale)
   EVT_MENU(MEN_MELSCALE, HBFrame::OnToolBarSelect)
+
+  EVT_UPDATE_UI(MEN_IONSCALE, HBFrame::OnUpdateIonicScale)
   EVT_MENU(MEN_IONSCALE, HBFrame::OnToolBarSelect)
+
   EVT_MENU(MEN_EQ4, HBFrame::OnToolBarSelect)
   EVT_MENU(MEN_EQ3, HBFrame::OnToolBarSelect)
   EVT_MENU(MEN_EQ2, HBFrame::OnToolBarSelect)
@@ -1859,6 +1885,7 @@ BEGIN_EVENT_TABLE(HBFrame, wxFrame)
 
   EVT_MENU(MEN_MIDI, HBFrame::OnSettingsMidi)
 
+  EVT_UPDATE_UI(MEN_MAJSCALE, HBFrame::OnUpdateHaunschildLayout)
   EVT_MENU(MEN_HAUNSCH, HBFrame::OnSettingsHaunschild)
 
   EVT_MENU(MEN_CLEARSEQ, HBFrame::OnActionClearSequence)
@@ -1899,13 +1926,17 @@ HBFrame::HBFrame()
   pSettingsMenu->Append(MEN_EDIT, "&Chord");
   pSettingsMenu->Append(MEN_SETTINGS, "&Global");
   pSettingsMenu->Append(MEN_MIDI, "&Midi");
-  pSettingsMenu->Append(MEN_HAUNSCH, "&Haunschild Layout");
+  pSettingsMenu->Append(
+    MEN_HAUNSCH,
+    "&Haunschild Layout",
+    "Display using Haunschild Layout",
+    true);
 
   wxMenu* pScaleMenu = new wxMenu;
-  pScaleMenu->Append(MEN_MAJSCALE, "&Major");
-  pScaleMenu->Append(MEN_HARSCALE, "&Harmonic Minor");
-  pScaleMenu->Append(MEN_MELSCALE, "&Melodic Minor");
-  pScaleMenu->Append(MEN_IONSCALE, "&Ionic");
+  pScaleMenu->Append(MEN_MAJSCALE, "&Major", "Use Major Scales", true);
+  pScaleMenu->Append(MEN_HARSCALE, "&Harmonic Minor", "Use Harmonic Minor Scales", true);
+  pScaleMenu->Append(MEN_MELSCALE, "&Melodic Minor", "Use Melodic Minor Scales", true);
+  pScaleMenu->Append(MEN_IONSCALE, "&Ionic", "Use Ionic Scales", true);
 
   wxMenu* pShowMenu = new wxMenu;
   pShowMenu->Append(MEN_EQ4, "&4 equal notes");
@@ -2018,6 +2049,34 @@ int HBFrame::GetBassKeys(int* out, int step, int n_steps)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void HBFrame::OnUpdateMajorScale(wxUpdateUIEvent& Event)
+{
+  Event.Check(HBCanvas::GetScaleType() == Major);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBFrame::OnUpdateHarmonicMinorScale(wxUpdateUIEvent& Event)
+{
+  Event.Check(HBCanvas::GetScaleType() == Harmon);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBFrame::OnUpdateMelodicMinorScale(wxUpdateUIEvent& Event)
+{
+  Event.Check(HBCanvas::GetScaleType() == Melod);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBFrame::OnUpdateIonicScale(wxUpdateUIEvent& Event)
+{
+  Event.Check(HBCanvas::GetScaleType() == Ionb13);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void HBFrame::OnToolBarSelect(wxCommandEvent& Event)
 {
   mpHbWindow->MenuCommand(
@@ -2044,6 +2103,13 @@ void HBFrame::OnSettingsChord(wxCommandEvent& Event)
 void HBFrame::OnSettingsMidi(wxCommandEvent& Event)
 {
   mpHbWindow->player.SettingsDialog(this);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBFrame::OnUpdateHaunschildLayout(wxUpdateUIEvent& Event)
+{
+  Event.Check(mpHbWindow->IsUsingHaunschildLayout());
 }
 
 //-----------------------------------------------------------------------------

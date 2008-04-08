@@ -147,7 +147,9 @@ void HBChord::Name(char *buf, int key, int flat)
     buf[i++] = '-';
   }
   if (c.Contains(2))
+  {
     buf[i++] = '9';
+  }
 
   if (sharp9)
   {
@@ -312,7 +314,7 @@ const char* const HBContext::scale_type_names[nScaleTypes] =
 };
 
 
-HBContext::HBContext(int sn, int cn, tScaleType st)
+HBContext::HBContext(int sn, int cn, TEScaleType st)
 {
   scale_type = st;
   scale_nr   = sn % 12;
@@ -454,7 +456,7 @@ istream & operator >> (istream &is, HBContext &a)
   int sc;
   is >> sc >> a.scale_nr >> a.chord_nr >> a.seq_nr >> a.chord_key;
   is >> a.chord >> a.scale;
-  a.scale_type = (tScaleType)sc;
+  a.scale_type = (TEScaleType)sc;
   return is;
 }
 
@@ -470,7 +472,7 @@ bool HBMatchContains::operator()(const HBContext &context)
 HBContextIterator::HBContextIterator()
   : match(def_match)
 {
-  context.scale_type = (tScaleType)0;
+  context.scale_type = (TEScaleType)0;
   context.scale_nr   = 0;
   context.chord_nr   = -1;
   i_seq = n_seq = 0;
@@ -480,7 +482,7 @@ HBContextIterator::HBContextIterator()
 HBContextIterator::HBContextIterator(HBMatch &m)
   : match(m)
 {
-  context.scale_type = (tScaleType)0;
+  context.scale_type = (TEScaleType)0;
   context.scale_nr   = 0;
   context.chord_nr   = -1;
   i_seq = n_seq = 0;
@@ -495,7 +497,7 @@ bool HBContextIterator::operator()()
   {
     if (scale_type != nScaleTypes && context.scale_type != scale_type)
     {
-      context.scale_type = (tScaleType)((int)context.scale_type + 1);
+      context.scale_type = (TEScaleType)((int)context.scale_type + 1);
       continue;
     }
 
@@ -512,7 +514,7 @@ bool HBContextIterator::operator()()
       context.scale_nr ++;
     }
     context.scale_nr = 0;
-    context.scale_type = (tScaleType)((int)context.scale_type + 1);
+    context.scale_type = (TEScaleType)((int)context.scale_type + 1);
   }
 
   while (i_seq < n_seq)

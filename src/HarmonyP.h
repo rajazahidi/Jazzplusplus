@@ -207,7 +207,7 @@ class HBChord
 
   private:
 
-    static const std::string const mScaleNames[2][12];
+    static const std::string mScaleNames[2][12];
 };
 
 inline std::ostream& operator << (std::ostream& os, HBChord const &a)

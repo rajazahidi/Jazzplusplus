@@ -228,7 +228,7 @@ tKeyLengthDragger::tKeyLengthDragger(tKeyOn *k, JZPianoWindow *w)
   wxClientDC Dc(Win);
 
   // to translate scrolled coordinates
-  Win->PrepareDC(Dc);
+  Win->DoPrepareDC(Dc);
 
   Win->DrawEvent(Dc, Copy, wxWHITE_BRUSH, 0);
   Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 1, 1);
@@ -250,7 +250,7 @@ int tKeyLengthDragger::Event(wxMouseEvent& Event)
 int tKeyLengthDragger::Dragging(wxMouseEvent& Event)
 {
   wxClientDC Dc(Win);
-  Win->PrepareDC(Dc); //to translate scrolled coordinates
+  Win->DoPrepareDC(Dc); //to translate scrolled coordinates
   Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 1, 1);
   int fx, fy;
   Win->LogicalMousePosition(Event, fx, fy);
@@ -339,7 +339,7 @@ tPlayTrackLengthDragger::tPlayTrackLengthDragger(tPlayTrack *k, JZPianoWindow *w
   Win->GetSong()->NewUndoBuffer();
   //
   wxClientDC Dc(Win);
-  Win->PrepareDC(Dc);
+  Win->DoPrepareDC(Dc);
   Win->DrawEvent(Dc, Copy, wxWHITE_BRUSH, 0);
   Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 1, 1);
 }
@@ -360,7 +360,7 @@ int tPlayTrackLengthDragger::Event(wxMouseEvent& Event)
 int tPlayTrackLengthDragger::Dragging(wxMouseEvent& Event)
 {
   wxClientDC Dc(Win);
-  Win->PrepareDC(Dc);
+  Win->DoPrepareDC(Dc);
   Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 1, 1);
   int fx, fy;
   Win->LogicalMousePosition(Event, fx, fy);
@@ -377,7 +377,7 @@ int tPlayTrackLengthDragger::Dragging(wxMouseEvent& Event)
 int tPlayTrackLengthDragger::ButtonUp(wxMouseEvent& Event)
 {
   wxClientDC Dc(Win);
-  Win->PrepareDC(Dc);
+  Win->DoPrepareDC(Dc);
   Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 1, 1);
   Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 0, 1);
 
@@ -437,7 +437,7 @@ int tVelocCounter::Event(wxMouseEvent& Event)
     Win->ApplyToTrack(mpKeyOn, Copy);
 
     wxClientDC Dc(Win);
-    Win->PrepareDC(Dc);
+    Win->DoPrepareDC(Dc);
     Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 0, 1);
 
     Win->UpdateControl();
@@ -1753,7 +1753,9 @@ int JZPianoWindow::OnEventWinMouseEvent(wxMouseEvent& Event)
     int x;
     int y;
     LogicalMousePosition(Event, x, y);
-    if (mEventsX < x && x < mEventsX + mEventsWidth && mEventsY < y && y < mEventsY + mEventsHeight)
+    if (
+      mEventsX < x && x < mEventsX + mEventsWidth &&
+      mEventsY < y && y < mEventsY + mEventsHeight)
     {
       if (Event.LeftDown())
       {
@@ -1762,7 +1764,9 @@ int JZPianoWindow::OnEventWinMouseEvent(wxMouseEvent& Event)
 
           if (mpSnapSel->Selected)
           {
-            Refresh(); //redraw the whole window instead(inefficient, we should rather invalidate a rect)
+            // Redraw the whole window instead (inefficient, we should rather
+            // invalidate a rect).
+            Refresh();
           }
           mpSnapSel->Event(Event);
           mpMouseAction = mpSnapSel;
@@ -1781,7 +1785,10 @@ int JZPianoWindow::OnEventWinMouseEvent(wxMouseEvent& Event)
       if (mpMouseAction == mpSnapSel)
       {
         SnapSelStop(Event);
-        Refresh(); //ineficcient, invalidate rect first instead
+
+        // inefficient, invalidate rect first instead.
+        Refresh();
+
         mpMouseAction = 0;
         return 1;
       }
@@ -1792,11 +1799,14 @@ int JZPianoWindow::OnEventWinMouseEvent(wxMouseEvent& Event)
   return 0;
 }
 
+//-----------------------------------------------------------------------------
+// Description:
 //   Indicate which key on the pianoroll that the mouse is hovering over by
 // highlighting it.  This function is bad because it draws directly in the dc,
 // rather it should invalidate and let OnDraw do the actual painting.
 // Currently the code doesn't work because it doesn't care about scrolling
 // (because I get the dc the wrong way).
+//-----------------------------------------------------------------------------
 void JZPianoWindow::ShowPitch(int Pitch)
 {
   // This is the current position of the mouse.  mMouseLine is the last
@@ -1807,7 +1817,7 @@ void JZPianoWindow::ShowPitch(int Pitch)
     wxClientDC Dc(this);
 
     // Translate scrolled coordinates.
-    PrepareDC(Dc);
+    DoPrepareDC(Dc);
 
     Dc.SetLogicalFunction(wxXOR);
 
@@ -1875,7 +1885,7 @@ void JZPianoWindow::MouseCutPaste(wxMouseEvent& Event, bool Cut)
 {
   wxClientDC Dc(this);
 
-  PrepareDC(Dc);
+  DoPrepareDC(Dc);
 
   // Convert physical coordinates to logical (scrolled) coordinates.
   wxPoint Point = Event.GetLogicalPosition(Dc);
@@ -2660,7 +2670,7 @@ void JZPianoWindow::Copy(JZTrack* pTrack, JZEvent* pEvent, int Kill)
     }
 
     wxClientDC Dc(this);
-    PrepareDC(Dc);
+    DoPrepareDC(Dc);
     DrawEvent(Dc, pEvent, wxWHITE_BRUSH, 0);
     pTrack->Kill(pEvent);
     pTrack->Cleanup();
@@ -2745,7 +2755,7 @@ void JZPianoWindow::Paste(JZTrack* pTrack, int Clock, int Pitch)
         }
       }
       wxClientDC Dc(this);
-      PrepareDC(Dc);
+      DoPrepareDC(Dc);
       DrawEvent(Dc, c, c->GetBrush(), 0, 1);
       pTrack->Put(c);
       pEvent = Iterator.Next();

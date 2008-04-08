@@ -61,7 +61,7 @@ JZGuitarFrame::JZGuitarFrame(wxWindow* pParent)
       wxID_ANY,
       "Guitar board",
       wxPoint(20, 20),
-      wxSize(600, 120),
+      wxSize(600, 150),
       wxDEFAULT_FRAME_STYLE | wxNO_FULL_REPAINT_ON_RESIZE)
 {
   // set the frame icon

@@ -25,6 +25,10 @@
 #include "GuitarWindow.h"
 #include "GuitarFrame.h"
 
+#include <string>
+
+using namespace std;
+
 //*****************************************************************************
 // Description:
 //   This is the guitar window definition.
@@ -99,8 +103,10 @@ JZGuitarWindow::JZGuitarWindow(
       wxHSCROLL | wxVSCROLL | wxNO_FULL_REPAINT_ON_RESIZE),
 //    mpGuitarFrame(pParent),
 //    mpPianoWindow(pPianoWindow)
+    mMargin(2),
     mActivePitch(0),
-    mPlayPitch(0)
+    mPlayPitch(0),
+    mpFont(0)
 {
   mWidth = Size.GetWidth();
   mHeight = Size.GetHeight();
@@ -117,7 +123,16 @@ JZGuitarWindow::JZGuitarWindow(
     mStringCount = 6;
   }
   mStringHeight = mHeight / (mStringCount + 1);
-  mFretWidth   = mWidth / mFretCount;
+  mFretWidth = mWidth / mFretCount;
+
+  mpFont = new wxFont(12, wxSWISS, wxNORMAL, wxNORMAL);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZGuitarWindow::~JZGuitarWindow()
+{
+  delete mpFont;
 }
 
 //-----------------------------------------------------------------------------
@@ -145,6 +160,8 @@ void JZGuitarWindow::ShowPitch(int Pitch)
   wxClientDC Dc(this);
   PrepareDC(Dc);
 
+  Dc.SetFont(*mpFont);
+  Dc.SetTextBackground(GetForegroundColour());
   ShowPitch(Dc, Pitch);
 }
 
@@ -162,15 +179,7 @@ void JZGuitarWindow::OnPaint(wxPaintEvent& Event)
 //-----------------------------------------------------------------------------
 void JZGuitarWindow::OnDraw(wxDC& Dc)
 {
-  Dc.SetFont(*wxSMALL_FONT);
-
-  //Dc.SetFont(wxNORMAL_FONT);
-  //mpFont = new wxFont(12, wxSWISS, wxNORMAL, wxNORMAL);
-  //Dc.SetFont(mpFont);
-
-  mpFont = 0;
-
-  Dc.GetTextExtent("xG#", &mTextWidth, &mTextHeight);
+  Dc.SetFont(*mpFont);
 
   GetSize(&mWidth, &mHeight);
 
@@ -178,7 +187,6 @@ void JZGuitarWindow::OnDraw(wxDC& Dc)
 
   DrawBoard(Dc);
   DrawPitch(Dc, mActivePitch, true);
-//  DrawBuffer(Dc, piano->PasteBuffer, true);
 }
 
 //-----------------------------------------------------------------------------
@@ -190,14 +198,14 @@ void JZGuitarWindow::DrawBoard(wxDC& Dc)
   mStringHeight = mHeight / (mStringCount + 1);
   mFretWidth = mWidth / mFretCount;
 
-  // paint strings
-  for (i = 0; i < mStringCount; i++)
+  // Paint the guitar strings.
+  for (i = 0; i < mStringCount; ++i)
   {
     int y = mHeight * (i + 1) / (mStringCount + 1);
     Dc.DrawLine(0, y, mWidth, y);
   }
 
-  // paint frets
+  // Paint the guitar frets.
   int y1 = mHeight / (mStringCount + 1);
   int y2 = mHeight * (mStringCount) / (mStringCount + 1);
   int d1 = mHeight / 5;
@@ -235,7 +243,7 @@ void JZGuitarWindow::DrawBoard(wxDC& Dc)
 //-----------------------------------------------------------------------------
 void JZGuitarWindow::DrawPitch(wxDC& Dc, int Pitch, int String, bool Show)
 {
-  static const char* KeyNames[12] =
+  static const string KeyNames[12] =
   {
     "C",
     "C#",
@@ -251,28 +259,45 @@ void JZGuitarWindow::DrawPitch(wxDC& Dc, int Pitch, int String, bool Show)
     "B"
   };
 
-  int x = (Pitch - mpPitches[String] - 1) * mWidth / mFretCount + mFretWidth / 3;
+  int x =
+    (Pitch - mpPitches[String] - 1) * mWidth / mFretCount + mFretWidth / 3;
   if (x < 0 || x > mWidth)
   {
     return;
   }
 
-  int y = mHeight * (String + 1) / (mStringCount + 1) - int(mTextHeight / 2);
-  int h = mTextHeight + 1;
+  int TextWidth, TextHeight;
+  Dc.GetTextExtent(KeyNames[Pitch % 12].c_str(), &TextWidth, &TextHeight);
 
+  int y = mHeight * (String + 1) / (mStringCount + 1) - int(TextHeight / 2);
+
+  wxPen OldPen = Dc.GetPen();
   Dc.SetPen(*wxTRANSPARENT_PEN);
-  Dc.SetBrush(*wxWHITE_BRUSH);
-  Dc.DrawRectangle(x, y, mTextWidth, h);
+  wxBrush OldBrush = Dc.GetBrush();
+  wxBrush Brush(GetBackgroundColour());
+  Dc.SetBrush(Brush);
+  Dc.DrawRectangle(
+    x - mMargin,
+    y - mMargin,
+    TextWidth + 2 * mMargin,
+    TextHeight + 2 * mMargin);
   Dc.SetPen(*wxBLACK_PEN);
-  Dc.SetBrush(*wxBLACK_BRUSH);
+  Dc.SetBrush(OldBrush);
+
   if (Show)
   {
-    Dc.DrawText((char *)KeyNames[Pitch % 12], x, y);
+    // Draw the note name.
+    Dc.DrawText(KeyNames[Pitch % 12].c_str(), x, y);
   }
   else
   {
-    int YPosition = y + mTextHeight / 2;
-    Dc.DrawLine(x, YPosition, x + mTextWidth, YPosition);
+    // Draw the guitar string.
+    int YPosition = y + TextHeight / 2;
+    Dc.DrawLine(
+      x - mMargin,
+      YPosition,
+      x + TextWidth + 2 * mMargin,
+      YPosition);
   }
 }
 
@@ -285,7 +310,6 @@ void JZGuitarWindow::ShowPitch(wxDC& Dc, int Pitch)
     DrawPitch(Dc, mActivePitch, false);
     mActivePitch = Pitch;
     DrawPitch(Dc, mActivePitch, true);
-//    DrawBuffer(Dc, mpPianoWindow->PasteBuffer, true);
   }
 }
 
@@ -330,6 +354,8 @@ void JZGuitarWindow::OnMouseMove(wxMouseEvent& Event)
 
   int Pitch = Xy2Pitch(x, y);
 
+  Dc.SetFont(*mpFont);
+  Dc.SetTextBackground(GetForegroundColour());
   ShowPitch(Dc, Pitch);
 }
 

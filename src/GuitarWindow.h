@@ -35,6 +35,8 @@ class JZGuitarWindow : public wxScrolledWindow
       const wxPoint& Position,
       const wxSize& Size);
 
+    virtual ~JZGuitarWindow();
+
     virtual void OnDraw(wxDC& Dc);
 
     void ClearBuffer();
@@ -88,7 +90,7 @@ class JZGuitarWindow : public wxScrolledWindow
 
     int mWidth, mHeight;
     int mStringHeight, mFretWidth;        // rounded values
-    int mTextWidth, mTextHeight;
+    int mMargin;
     int mActivePitch;     // mouse move
     int mPlayPitch;       // sound
     int put_clock;        // left up

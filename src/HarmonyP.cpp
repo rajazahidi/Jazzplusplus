@@ -33,7 +33,7 @@ using namespace std;
 // HBChord
 // ========================================================================
 
-const string const HBChord::mScaleNames[2][12] =
+const string HBChord::mScaleNames[2][12] =
 {
   { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" },
   { "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B" }

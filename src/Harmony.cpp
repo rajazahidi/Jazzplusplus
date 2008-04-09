@@ -1928,6 +1928,9 @@ void HBContextDlg::OnScaleList()
 //-----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(HBFrame, wxFrame)
 
+  EVT_CLOSE(HBFrame::OnClose)
+
+  EVT_MENU(wxID_CLOSE, HBFrame::OnCloseWindow)
 
   EVT_UPDATE_UI(MEN_MAJSCALE, HBFrame::OnUpdateMajorScale)
   EVT_MENU(MEN_MAJSCALE, HBFrame::OnToolBarSelect)
@@ -2132,13 +2135,6 @@ HBFrame::~HBFrame()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool HBFrame::OnClose()
-{
-  return true;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 bool HBFrame::IsSequenceDefined()
 {
   return mpHbWindow->IsSequenceDefined();
@@ -2184,6 +2180,20 @@ int HBFrame::GetSelectedScale(int* out)
 int HBFrame::GetBassKeys(int* out, int step, int n_steps)
 {
   return mpHbWindow->GetBassKeys(out, step, n_steps);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBFrame::OnClose(wxCloseEvent& Event)
+{
+  Event.Skip();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void HBFrame::OnCloseWindow(wxCommandEvent& Event)
+{
+  Close();
 }
 
 //-----------------------------------------------------------------------------

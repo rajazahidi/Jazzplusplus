@@ -80,11 +80,13 @@ class HBFrame : public wxFrame, public tHBInterface
 
     HBAnalyzer* GetAnalyzer();
 
-    virtual bool OnClose();
-
     void TransposeSelection();
 
   protected:
+
+    void OnClose(wxCloseEvent& Event);
+
+    void OnCloseWindow(wxCommandEvent& Event);
 
     void OnUpdateMajorScale(wxUpdateUIEvent& Event);
     void OnUpdateHarmonicMinorScale(wxUpdateUIEvent& Event);

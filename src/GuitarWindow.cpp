@@ -182,8 +182,6 @@ void JZGuitarWindow::OnDraw(wxDC& Dc)
 
   GetSize(&mWidth, &mHeight);
 
-  Dc.Clear();
-
   DrawBoard(Dc);
   DrawPitch(Dc, mActivePitch, true);
 }

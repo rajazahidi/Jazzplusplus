@@ -45,13 +45,10 @@
 
 using namespace std;
 
-
-
-
-
 //*****************************************************************************
 //*****************************************************************************
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZListen::JZListen()
   : mActive(false),
     mPitch(-1),
@@ -60,6 +57,8 @@ JZListen::JZListen()
 {
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZListen::KeyOn(
   JZTrack* pTrack,
   int Pitch,
@@ -79,6 +78,8 @@ void JZListen::KeyOn(
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZListen::Notify()
 {
   Stop();
@@ -104,19 +105,22 @@ class tMousePlay : public tMouseAction
     JZPianoWindow* mpPianoWindow;
 };
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tMousePlay::tMousePlay(JZPianoWindow* pPianoWindow, wxMouseEvent& Event)
   : mPitch(0),
     mVeloc(-1),
     mChannel(-1),
     mpPianoWindow(pPianoWindow)
 {
-  mChannel =
-    mpPianoWindow->GetTrack()->Channel ? mpPianoWindow->GetTrack()->Channel - 1 : 0;
+  mChannel = mpPianoWindow->GetTrack()->Channel ?
+    mpPianoWindow->GetTrack()->Channel - 1 : 0;
 
   ProcessEvent(Event);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tMousePlay::ProcessEvent(wxMouseEvent& Event)
 {
   int x, y;
@@ -185,12 +189,6 @@ int tMousePlay::ProcessEvent(wxMouseEvent& Event)
   return 0;
 }
 
-
-
-
-
-
-
 //*****************************************************************************
 // Description:
 //   tKeyLengthDragger
@@ -199,7 +197,7 @@ class tKeyLengthDragger : public tMouseAction
 {
   public:
 
-    tKeyLengthDragger(tKeyOn *k, JZPianoWindow *w);
+    tKeyLengthDragger(tKeyOn* k, JZPianoWindow* pPianoWindow);
 
     int Dragging(wxMouseEvent& Event);
 
@@ -215,12 +213,13 @@ class tKeyLengthDragger : public tMouseAction
     JZTrack* mpTrack;
 };
 
-
-tKeyLengthDragger::tKeyLengthDragger(tKeyOn *k, JZPianoWindow *w)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+tKeyLengthDragger::tKeyLengthDragger(tKeyOn* k, JZPianoWindow* pPianoWindow)
 {
   mpKeyOn = k;
   Copy  = k->Copy() -> IsKeyOn();
-  Win   = w;
+  Win   = pPianoWindow;
 
   // SN++ BUG FIX: undo/redo
   Win->GetSong()->NewUndoBuffer();
@@ -234,6 +233,8 @@ tKeyLengthDragger::tKeyLengthDragger(tKeyOn *k, JZPianoWindow *w)
   Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 1, 1);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tKeyLengthDragger::Event(wxMouseEvent& Event)
 {
   if (Event.Dragging())
@@ -247,6 +248,8 @@ int tKeyLengthDragger::Event(wxMouseEvent& Event)
   return 0;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tKeyLengthDragger::Dragging(wxMouseEvent& Event)
 {
   wxClientDC Dc(Win);
@@ -266,6 +269,8 @@ int tKeyLengthDragger::Dragging(wxMouseEvent& Event)
   return 0;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tKeyLengthDragger::ButtonUp(wxMouseEvent& Event)
 {
   // SN++ Key_Aftertouch
@@ -308,7 +313,6 @@ int tKeyLengthDragger::ButtonUp(wxMouseEvent& Event)
   return 0;
 }
 
-
 //*****************************************************************************
 // Description:
 //   tPlayTrackLengthDragger JAVE this is just copied from tKeyLengthDragger,
@@ -322,18 +326,21 @@ class tPlayTrackLengthDragger : public tMouseAction
     JZTrack* mpTrack;
 
   public:
-    tPlayTrackLengthDragger(tPlayTrack *k, JZPianoWindow *w);
+    tPlayTrackLengthDragger(tPlayTrack *k, JZPianoWindow* pPianoWindow);
     int Dragging(wxMouseEvent& Event);
     int ButtonUp(wxMouseEvent& Event);
     int Event(wxMouseEvent& Event);
 };
 
-
-tPlayTrackLengthDragger::tPlayTrackLengthDragger(tPlayTrack *k, JZPianoWindow *w)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+tPlayTrackLengthDragger::tPlayTrackLengthDragger(
+  tPlayTrack* k,
+  JZPianoWindow* pPianoWindow)
 {
   mpKeyOn = k;
   Copy  = k->Copy() -> IsPlayTrack();
-  Win   = w;
+  Win   = pPianoWindow;
 
   // SN++ BUG FIX: undo/redo
   Win->GetSong()->NewUndoBuffer();
@@ -344,6 +351,8 @@ tPlayTrackLengthDragger::tPlayTrackLengthDragger(tPlayTrack *k, JZPianoWindow *w
   Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 1, 1);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tPlayTrackLengthDragger::Event(wxMouseEvent& Event)
 {
   if (Event.Dragging())
@@ -357,6 +366,8 @@ int tPlayTrackLengthDragger::Event(wxMouseEvent& Event)
   return 0;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tPlayTrackLengthDragger::Dragging(wxMouseEvent& Event)
 {
   wxClientDC Dc(Win);
@@ -374,6 +385,8 @@ int tPlayTrackLengthDragger::Dragging(wxMouseEvent& Event)
   return 0;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tPlayTrackLengthDragger::ButtonUp(wxMouseEvent& Event)
 {
   wxClientDC Dc(Win);
@@ -395,20 +408,19 @@ int tPlayTrackLengthDragger::ButtonUp(wxMouseEvent& Event)
   return 0;
 }
 
-
-
-// --------------------------------------------------------------------
-// VelocCounter
-// --------------------------------------------------------------------
-
+//*****************************************************************************
+//*****************************************************************************
 class tVelocCounter : public tMouseCounter
 {
   public:
     int Event(wxMouseEvent& Event);
-    tVelocCounter(JZPianoWindow *w, JZRectangle* r, tKeyOn* pEvent)
-      : tMouseCounter(w, r, pEvent->Veloc, 1, 127)
+    tVelocCounter(
+      JZPianoWindow* pPianoWindow,
+      JZRectangle* r,
+      tKeyOn* pEvent)
+      : tMouseCounter(pPianoWindow, r, pEvent->Veloc, 1, 127)
     {
-      Win = w;
+      Win = pPianoWindow;
       mpKeyOn = pEvent;
 
       // SN++ BUG FIX: undo/redo
@@ -425,8 +437,8 @@ class tVelocCounter : public tMouseCounter
     tKeyOn* mpKeyOn;
 };
 
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tVelocCounter::Event(wxMouseEvent& Event)
 {
   if (tMouseCounter::Event(Event))
@@ -460,6 +472,8 @@ int tVelocCounter::Event(wxMouseEvent& Event)
 
 
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 static int mPianoFontSizes[] =
 {
   6,  // Tiny
@@ -470,6 +484,8 @@ static int mPianoFontSizes[] =
   -1, // End of list
 };
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 const int isBlack[12] =
 {
   0,
@@ -486,9 +502,13 @@ const int isBlack[12] =
   0
 };
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 #define IsBlack(Key)  isBlack[(Key) % 12]
 
+//-----------------------------------------------------------------------------
 // Mouse Actions Mapping
+//-----------------------------------------------------------------------------
 enum
 {
   MA_PLAY = 1, // 0 represents no action.
@@ -503,6 +523,8 @@ enum
   MA_VELOCITY
 };
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 const int play_actions[12] =
 {
   // left        middle           right
@@ -512,6 +534,8 @@ const int play_actions[12] =
   0,             0,               0             // shift+ctrl
 };
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 const int evnt_actions[12] =
 {
   // left        middle          right
@@ -842,10 +866,14 @@ void JZPianoWindow::OnPaintSub(wxDC& Dc, int x, int y)
 
           int x = Clock2x(start);
           if (x < mEventsX)        // clip to left border
+          {
             x = mEventsX;
+          }
           int w = Clock2x(stop) - x;
           if (w <= 0)
+          {
             continue;
+          }
 
           int h = mTrackHeight;
           for (int i = 0; i < 12; i++)
@@ -925,9 +953,11 @@ void JZPianoWindow::OnPaintSub(wxDC& Dc, int x, int y)
   DrawPlayPosition(Dc);
 }
 
+//-----------------------------------------------------------------------------
 // Decription:
 //   Draw the "play position", by placing a vertical line where the
 // "play clock" is.
+//-----------------------------------------------------------------------------
 void JZPianoWindow::DrawPlayPosition(wxDC& Dc)
 {
   if (!mpSnapSel->Active && mPlayClock >= mFromClock && mPlayClock < mToClock)
@@ -946,6 +976,8 @@ void JZPianoWindow::DrawPlayPosition(wxDC& Dc)
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::OnEventWinPaintSub(int x, int y)
 {
   mCanvasX = x;
@@ -996,7 +1028,6 @@ void JZPianoWindow::OnMenuCommand(int Id)
       break;
   }
 }
-
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -1054,6 +1085,8 @@ bool JZPianoWindow::OnKeyEvent(wxKeyEvent& Event)
   return false;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::NewPosition(int TrackIndex, int Clock)
 {
   mFromLines[mTrackIndex] = mFromLine;
@@ -1105,11 +1138,11 @@ int JZPianoWindow::Line2y(int Line)
   return Line * mTrackHeight + mTopInfoHeight;
 }
 
-// ********************************************************************
+//=============================================================================
 // Painting
-// ********************************************************************
-
-
+//=============================================================================
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
 {
   // Draw the grey background for the keyboard.
@@ -1247,6 +1280,8 @@ void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
   Dc.SetFont(*mpFont);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::DrawEvent(
   wxDC& Dc,
   JZEvent* pEvent,
@@ -1302,6 +1337,8 @@ void JZPianoWindow::DrawEvent(
   Dc.SetBrush(*wxBLACK_BRUSH);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::DrawEvents(
   wxDC& Dc,
   JZTrack *t,
@@ -1421,8 +1458,10 @@ void JZPianoWindow::DrawEvents(
 //  Dc.DestroyClippingRegion();
 }
 
+//-----------------------------------------------------------------------------
 // Draws the a 3D button with text in it.  Used to draw the little area in the
 // top left of the window.
+//-----------------------------------------------------------------------------
 void JZPianoWindow::LineText(
   wxDC& Dc,
   int x,
@@ -1556,10 +1595,9 @@ void JZPianoWindow::OnMouseEvent(wxMouseEvent& Event)
   }
 }
 
-
-// ------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Snapper
-// ------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::SnapSelStop(wxMouseEvent& Event)
 {
   if (mpSnapSel->Selected)
@@ -1613,6 +1651,8 @@ void JZPianoWindow::SnapSelStop(wxMouseEvent& Event)
     mpCtrlEdit->UpDate();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::SnapSelStart(wxMouseEvent &)
 {
   mSnapCount = 0;
@@ -1637,6 +1677,8 @@ void JZPianoWindow::SnapSelStart(wxMouseEvent &)
     mTrackHeight);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZPianoWindow::SnapClock(int Clock, int up)
 {
   int qnt = SnapClocks();
@@ -1648,6 +1690,8 @@ int JZPianoWindow::SnapClock(int Clock, int up)
   return Clock;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::NewPlayPosition(int Clock)
 {
   int scroll_clock = (mFromClock + 5 * mToClock) / 6L;
@@ -1689,6 +1733,8 @@ void JZPianoWindow::NewPlayPosition(int Clock)
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZPianoWindow::EventsSelected(const char *msg)
 {
   if (!mpSnapSel->Selected)
@@ -1701,6 +1747,8 @@ int JZPianoWindow::EventsSelected(const char *msg)
   return 1;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::ZoomIn()
 {
   if (mClockTicsPerPixel >= 2)
@@ -1722,6 +1770,8 @@ void JZPianoWindow::ZoomIn()
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::ZoomOut()
 {
   if (mClockTicsPerPixel <= 120)
@@ -1743,7 +1793,8 @@ void JZPianoWindow::ZoomOut()
   }
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZPianoWindow::OnEventWinMouseEvent(wxMouseEvent& Event)
 {
   if (!mpMouseAction)
@@ -1844,11 +1895,15 @@ void JZPianoWindow::ShowPitch(int Pitch)
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZPianoWindow::x2Clock(int x)
 {
   return (x - mEventsX) * mClockTicsPerPixel + mFromClock;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZPianoWindow::y2Line(int y, int up)
 {
   if (up)
@@ -1859,6 +1914,8 @@ int JZPianoWindow::y2Line(int y, int up)
   return y / mTrackHeight;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZPianoWindow::x2BarClock(int x, int next)
 {
   int clk = x2Clock(x);
@@ -1869,6 +1926,8 @@ int JZPianoWindow::x2BarClock(int x, int next)
   return b.Clock;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZPianoWindow::y2yLine(int y, int up)
 {
   if (up)
@@ -1881,6 +1940,8 @@ int JZPianoWindow::y2yLine(int y, int up)
   return y;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::MouseCutPaste(wxMouseEvent& Event, bool Cut)
 {
   wxClientDC Dc(this);
@@ -1909,6 +1970,8 @@ void JZPianoWindow::MouseCutPaste(wxMouseEvent& Event, bool Cut)
   Refresh();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::MouseEvents(wxMouseEvent& Event)
 {
   int action = mMouseEvent.Action(Event);
@@ -2004,6 +2067,8 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& Event)
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::MousePiano(wxMouseEvent& Event)
 {
   if (Event.ButtonDown())
@@ -2042,10 +2107,11 @@ void JZPianoWindow::ButtonLabelDisplay(const wxString& Text, bool IsButtonDown)
   LineText(Dc, 0, 0, mPianoWidth, mTopInfoHeight, Text, IsButtonDown);
 }
 
-//*****************************************************************************
+//=============================================================================
 // Visible
-//*****************************************************************************
-
+//=============================================================================
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZPianoWindow::IsVisible(JZEvent* pEvent)
 {
   switch (pEvent->Stat)
@@ -2074,6 +2140,8 @@ int JZPianoWindow::IsVisible(JZEvent* pEvent)
   return 0;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZPianoWindow::IsVisible(JZTrack* pTrack)
 {
   if (!mVisibleAllTracks)
@@ -2090,6 +2158,8 @@ int JZPianoWindow::IsVisible(JZTrack* pTrack)
 // Utilities
 // ********************************************************************
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZPianoWindow::SnapClocks()
 {
   int clk = mpSong->TicksPerQuarter * 4L / mSnapDenomiator;
@@ -2098,6 +2168,8 @@ int JZPianoWindow::SnapClocks()
   return clk;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::SetSnapDenom(int Value)
 {
   const int Size = 4;
@@ -2130,6 +2202,8 @@ void JZPianoWindow::SetSnapDenom(int Value)
 //  mMouseEvent.SetLeftAction(MA_CUTPASTE);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZPianoWindow::y2Pitch(int y)
 {
   int pitch = 127 - y2Line(y);
@@ -2140,15 +2214,17 @@ int JZPianoWindow::y2Pitch(int y)
   return pitch;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZPianoWindow::Pitch2y(int Pitch)
 {
   return Line2y(127 - Pitch);
 }
 
-
+//-----------------------------------------------------------------------------
+// If Pitch == -1: search for any pitches.
+//-----------------------------------------------------------------------------
 JZEvent *JZPianoWindow::FindEvent(JZTrack* pTrack, int Clock, int Pitch)
-// Pitch == -1: search for any pitches
 {
   tEventIterator Iterator(pTrack);
   JZEvent* pEvent = Iterator.First();
@@ -2172,7 +2248,8 @@ JZEvent *JZPianoWindow::FindEvent(JZTrack* pTrack, int Clock, int Pitch)
   return 0;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::kill_keys_aftertouch(JZTrack *t, JZEvent* pEvent)
 {
   int key,channel;
@@ -2204,6 +2281,8 @@ void JZPianoWindow::kill_keys_aftertouch(JZTrack *t, JZEvent* pEvent)
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::paste_keys_aftertouch(JZTrack *t, JZEvent* pEvent)
 {
   int key,channel;
@@ -2229,12 +2308,16 @@ void JZPianoWindow::paste_keys_aftertouch(JZTrack *t, JZEvent* pEvent)
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZPianoWindow::Clock2x(int Clock)
 {
   return mEventsX + (Clock - mFromClock) / mClockTicsPerPixel;
 }
 
+//-----------------------------------------------------------------------------
 // show the guitar edit window.
+//-----------------------------------------------------------------------------
 void JZPianoWindow::CreateGuitarWindow()
 {
   if (!mpGuitarFrame)
@@ -2244,6 +2327,8 @@ void JZPianoWindow::CreateGuitarWindow()
   mpGuitarFrame->Show(true);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::UpdateControl()
 {
   if (mpCtrlEdit)
@@ -2252,6 +2337,8 @@ void JZPianoWindow::UpdateControl()
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::ApplyToTrack(JZEvent* pEvent1, JZEvent* pEvent2)
 {
   mpTrack->Kill(pEvent1);
@@ -2259,16 +2346,22 @@ void JZPianoWindow::ApplyToTrack(JZEvent* pEvent1, JZEvent* pEvent2)
   mpTrack->Cleanup();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::KillTrackEvent(JZEvent* pEvent)
 {
   mpTrack->Kill(pEvent);
 }
 
+//-----------------------------------------------------------------------------
 // positions for controller editor
+//-----------------------------------------------------------------------------
 #define CtrlH(h)        ((h)/4)
 #define CtrlY(h)        (h - CtrlH(h))
 
+//-----------------------------------------------------------------------------
 // Activate velocity edit.
+//-----------------------------------------------------------------------------
 void JZPianoWindow::CtrlVelocity()
 {
   int Width, Height;
@@ -2290,6 +2383,8 @@ void JZPianoWindow::CtrlVelocity()
   Refresh();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::CtrlChannelAftertouchEdit()
 {
   int Width, Height;
@@ -2310,6 +2405,8 @@ void JZPianoWindow::CtrlChannelAftertouchEdit()
   Refresh();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::CtrlPolyAftertouchEdit()
 {
   int Width, Height;
@@ -2330,6 +2427,8 @@ void JZPianoWindow::CtrlPolyAftertouchEdit()
   Refresh();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::CtrlNone()
 {
   delete mpCtrlEdit;
@@ -2337,6 +2436,8 @@ void JZPianoWindow::CtrlNone()
   Refresh();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::CtrlTempo()
 {
   tEventIterator Iterator(mpTrack);
@@ -2399,11 +2500,15 @@ void JZPianoWindow::CtrlTempo()
   Refresh();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::EditFilter()
 {
   mpFilter->Dialog(0);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::SelectController()
 {
   int i = SelectControllerDlg();
@@ -2429,6 +2534,8 @@ void JZPianoWindow::SelectController()
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::CtrlModulation()
 {
   int Width, Height;
@@ -2450,6 +2557,8 @@ void JZPianoWindow::CtrlModulation()
   Refresh();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::CtrlPitch()
 {
   int Width, Height;
@@ -2470,6 +2579,8 @@ void JZPianoWindow::CtrlPitch()
   Refresh();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::Redo()
 {
   mpSong->Redo();
@@ -2480,7 +2591,9 @@ void JZPianoWindow::Redo()
   }
 }
 
+//-----------------------------------------------------------------------------
 // Undo actions
+//-----------------------------------------------------------------------------
 void JZPianoWindow::Undo()
 {
   mpSong->Undo();
@@ -2491,7 +2604,9 @@ void JZPianoWindow::Undo()
   }
 }
 
+//-----------------------------------------------------------------------------
 // Quantize selected events.
+//-----------------------------------------------------------------------------
 void JZPianoWindow::Quantize()
 {
   if (EventsSelected())
@@ -2502,7 +2617,9 @@ void JZPianoWindow::Quantize()
   }
 }
 
+//-----------------------------------------------------------------------------
 // Flip events up and down.
+//-----------------------------------------------------------------------------
 void JZPianoWindow::ExchangeUpDown()
 {
   if (EventsSelected())
@@ -2513,7 +2630,9 @@ void JZPianoWindow::ExchangeUpDown()
   }
 }
 
+//-----------------------------------------------------------------------------
 // Flip events left to right.
+//-----------------------------------------------------------------------------
 void JZPianoWindow::ExchangeLeftRight()
 {
   if (EventsSelected())
@@ -2524,7 +2643,9 @@ void JZPianoWindow::ExchangeLeftRight()
   }
 }
 
+//-----------------------------------------------------------------------------
 // Shift events snapclock clocks to left.
+//-----------------------------------------------------------------------------
 void JZPianoWindow::ShiftLeft()
 {
   if (EventsSelected())
@@ -2536,7 +2657,9 @@ void JZPianoWindow::ShiftLeft()
   }
 }
 
+//-----------------------------------------------------------------------------
 // Shift events snapclock clocks to right.
+//-----------------------------------------------------------------------------
 void JZPianoWindow::ShiftRight()
 {
   if (EventsSelected())
@@ -2548,7 +2671,9 @@ void JZPianoWindow::ShiftRight()
   }
 }
 
+//-----------------------------------------------------------------------------
 // helper for cut and copy events
+//-----------------------------------------------------------------------------
 void JZPianoWindow::CutOrCopy(int Id)
 {
   if (EventsSelected())
@@ -2572,6 +2697,8 @@ void JZPianoWindow::CutOrCopy(int Id)
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::Erase()
 {
   if (EventsSelected())
@@ -2582,6 +2709,8 @@ void JZPianoWindow::Erase()
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::ToggleVisibleAllTracks()
 {
   mVisibleAllTracks = !mVisibleAllTracks;
@@ -2589,54 +2718,72 @@ void JZPianoWindow::ToggleVisibleAllTracks()
   Refresh();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::MSelect()
 {
   mpPianoFrame->PressRadio(ID_SELECT);
   mMouseEvent.SetLeftAction(MA_SELECT);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::MLength()
 {
   mpPianoFrame->PressRadio(ID_CHANGE_LENGTH);
   mMouseEvent.SetLeftAction(MA_LENGTH);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::MDialog()
 {
   mpPianoFrame->PressRadio(ID_EVENT_DIALOG);
   mMouseEvent.SetLeftAction(MA_DIALOG);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::MCutPaste()
 {
   mpPianoFrame->PressRadio(ID_CUT_PASTE_EVENTS);
   mMouseEvent.SetLeftAction(MA_CUTPASTE);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::Snap8()
 {
   mPasteBuffer.Clear();
   SetSnapDenom(8);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::Snap8D()
 {
   mPasteBuffer.Clear();
   SetSnapDenom(12);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::Snap16()
 {
   mPasteBuffer.Clear();
   SetSnapDenom(16);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::Snap16D()
 {
   mPasteBuffer.Clear();
   SetSnapDenom(24);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::Copy(JZTrack* pTrack, JZEvent* pEvent, int Kill)
 {
   if (!pEvent)
@@ -2689,7 +2836,8 @@ void JZPianoWindow::Copy(JZTrack* pTrack, JZEvent* pEvent, int Kill)
   }
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::Paste(JZTrack* pTrack, int Clock, int Pitch)
 {
   if (mPasteBuffer.nEvents == 0)
@@ -2769,6 +2917,8 @@ void JZPianoWindow::Paste(JZTrack* pTrack, int Clock, int Pitch)
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZPianoWindow::GetKeyOnEventCount()
 {
   int Count = 0;
@@ -2786,23 +2936,31 @@ int JZPianoWindow::GetKeyOnEventCount()
   return Count;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZPianoWindow::Channel()
 {
   return mpTrack->Channel ? mpTrack->Channel - 1 : 0;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::SnapDialog()
 {
   tSnapDlg* pSnapDialog = new tSnapDlg(this, &mSnapDenomiator);
   pSnapDialog->Create();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::SetVisibleAllTracks(bool Value)
 {
   mVisibleAllTracks = Value;
   Refresh();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::ActivateSettingsDialog()
 {
   jppResourceDialog Dialog(this, "windowSettings");
@@ -2818,8 +2976,10 @@ void JZPianoWindow::ActivateSettingsDialog()
   }
 }
 
+//-----------------------------------------------------------------------------
 // This is a test to see how to implement a dialog with Patrick's system.
 // It replaces tMidiDelayDlg, which isnt necesarily a good idea.
+//-----------------------------------------------------------------------------
 void JZPianoWindow::ActivateMidiDelayDialog()
 {
   if (!EventsSelected())
@@ -2847,6 +3007,8 @@ void JZPianoWindow::ActivateMidiDelayDialog()
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::ActivateSequenceLengthDialog()
 {
   if (!EventsSelected())
@@ -2870,6 +3032,8 @@ void JZPianoWindow::ActivateSequenceLengthDialog()
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::ActivateVelocityDialog()
 {
   int FromValue = 64;
@@ -2890,9 +3054,9 @@ void JZPianoWindow::ActivateVelocityDialog()
   }
 
   jppResourceDialog dialog(this, "velocity");
-   dialog.Attach("start",&FromValue);
-   dialog.Attach("stop",&ToValue);
-   dialog.Attach("mode",&Mode,modes);
+  dialog.Attach("start" ,&FromValue);
+  dialog.Attach("stop", &ToValue);
+  dialog.Attach("mode", &Mode, modes);
 
   if (dialog.ShowModal() == wxID_OK)
   {

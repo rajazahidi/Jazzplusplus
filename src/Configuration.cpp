@@ -29,6 +29,7 @@
 #include "FindFile.h"
 #include "Globals.h"
 
+#include <stack>
 #include <iostream>
 #include <sstream>
 
@@ -676,6 +677,8 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
 
   mFileName = FileName;
 
+  // Get the current working directory so the code can return to this
+  // directory when it is done reading the configuration file.
   wxString OriginalCurrentWorkingDirectory = ::wxGetCwd();
 
   wxFileName FileNameObject(mFileName);
@@ -689,50 +692,46 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
 
   vector<pair<string, int> >* pVector = 0;
 
-  const int MaxIncs = 10;
-
-  FILE *FdArr[MaxIncs];
-  int IncLevel = 0;
-
-  for (i = 0; i < MaxIncs; ++i)
-  {
-    FdArr[i] = NULL;
-  }
+  stack<FILE*> FileDescriptors;
 
   cout
     << "JZConfiguration::LoadConfig:" << '\n'
     << "  \"" << mFileName << '"'
     << endl;
 
-  FdArr[IncLevel] = fopen(mFileName.c_str(), "r");
-  if (FdArr[IncLevel] == NULL)
+  FileDescriptors.push(fopen(mFileName.c_str(), "r"));
+  if (FileDescriptors.top() == NULL)
   {
-    wxMessageBox(
-      "Error reading config file.\n"
-        "Please check permissions and set the environment variable\n"
-        "JAZZ to the installation directory",
-      "Warning",
-      wxOK);
+    wxString String;
+    String
+      << "Error reading config file..." << '\n'
+      << '"' << mFileName << '"' << '\n'
+      << "Please check permissions and set the environment variable" << '\n'
+      << "JAZZ to the installation directory";
+    ::wxMessageBox(String, "Warning", wxOK);
+
+    // Return to the original working directory.
     ::wxSetWorkingDirectory(OriginalCurrentWorkingDirectory);
+
     return;
   }
 
   while (1)
   {
-    // Read a line from the current file
-    if (fgets(buf, sizeof(buf), FdArr[IncLevel]) == NULL)
+    // Read a line from the current file.
+    if (fgets(buf, sizeof(buf), FileDescriptors.top()) == NULL)
     {
-      fclose(FdArr[IncLevel]);
-      FdArr[IncLevel] = NULL;
-      --IncLevel;
-      if (IncLevel < 0)
+      fclose(FileDescriptors.top());
+      FileDescriptors.pop();
+      if (FileDescriptors.empty())
       {
-        // Last line of jazz.cfg (.jazz)
+        // The code has reached the last line of the Jazz++ configuration file
+        // (jazz.cfg or .jazz).
         break;
       }
       else
       {
-        // Last line of current include-file
+        // The code has reached the last line of current include-file.
         continue;
       }
     }
@@ -789,24 +788,23 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
             // include file
             wxString pathname = FindFile(GetStrValue(entry));
             cout << "include " << entry << endl;
-            IncLevel++;
-            assert(IncLevel < MaxIncs);
             if (pathname)
             {
-              FdArr[IncLevel] = fopen(pathname, "r");
+              FileDescriptors.push(fopen(pathname, "r"));
             }
             else
             {
-              FdArr[IncLevel] = NULL;
+              FileDescriptors.push(NULL);
             }
 
-            if (FdArr[IncLevel] == NULL)
+            if (FileDescriptors.top() == NULL)
             {
               wxString String;
               String
-                << "Could not open config include file \"" << buf << "\"";
-              wxMessageBox(String, "Warning", wxOK);
-              --IncLevel;
+                << "Could not open configuration include file:" << '\n'
+                << '"' << buf << '"';
+              ::wxMessageBox(String, "Warning", wxOK);
+              FileDescriptors.pop();
             }
           }
           break;
@@ -838,7 +836,7 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
 
           mVoiceNames[VoiceIndex + 1].second = Value + 1;
 
-          // Remove the off \n.
+          // Remove the \n.
           buf[strlen(buf) - 1] = 0;
 
           mVoiceNames[VoiceIndex + 1].first = buf + j;
@@ -870,7 +868,9 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
           }
           mDrumSets[DrumsetIndex + 1].second = Value + 1;
 
-          buf[strlen(buf) - 1] = 0;        // cut off \n
+          // Remove the \n.
+          buf[strlen(buf) - 1] = 0;
+
           mDrumSets[DrumsetIndex + 1].first = buf + j;
 
           ++DrumsetIndex;
@@ -888,7 +888,9 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
       {
         sscanf(buf, " %d %n", &i, &j);
         assert(0 <= i && i <= 127);
-        buf[strlen(buf) - 1] = 0;        // cut off \n
+
+        // Remove the \n.
+        buf[strlen(buf) - 1] = 0;
 
         mCtrlNames[i + 1].first = buf + j;
       }
@@ -898,7 +900,9 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
       {
         sscanf(buf, " %d %n", &i, &j);
         assert(0 <= i && i <= 127);
-        buf[strlen(buf) - 1] = 0;        // cut off \n
+
+        // Remove the \n.
+        buf[strlen(buf) - 1] = 0;
 
         mDrumNames[i + 1].first = buf + j;
       }
@@ -906,9 +910,9 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
       {
         wxString String;
         String
-          << "LoadConfig: error reading line" << "\n"
-          << buf;
-        wxMessageBox(String, "Warning", wxOK);
+          << "LoadConfig: error reading line" << '\n'
+          << '"' << buf << '"';
+        ::wxMessageBox(String, "Warning", wxOK);
       }
     }
 
@@ -929,5 +933,6 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
     }
   }
 
+  // Return to the original working directory.
   ::wxSetWorkingDirectory(OriginalCurrentWorkingDirectory);
 }

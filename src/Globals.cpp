@@ -31,7 +31,7 @@
 
 using namespace std;
 
-tConfig* gpConfig = 0;
+JZConfiguration* gpConfig = 0;
 
 JZSong* gpSong = 0;
 

@@ -891,8 +891,10 @@ void tRhythmWin::AddInstrumentDlg()
     {
       r->parm = SelectControllerDlg();
       if (r->parm < 0)
+      {
         return;
-      r->SetLabel(gpConfig->CtrlName(r->parm).first.c_str());
+      }
+      r->SetLabel(gpConfig->GetCtrlName(r->parm).first.c_str());
       r->mode = MODE_CONTROL;
       r->n_keys = 0;
     }

@@ -171,7 +171,7 @@ class JZProject : public JZSong
 
     static wxString mConfFileName;
 
-    tConfig* mpConfig;
+    JZConfiguration* mpConfig;
 
     JZPlayer* mpMidiPlayer;
 

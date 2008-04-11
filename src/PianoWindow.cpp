@@ -1220,7 +1220,7 @@ void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
       while (Pitch >= 0 && y < mEventsY + mEventsHeight)
       {
         Dc.DrawText(
-          gpConfig->DrumName(Pitch + 1).first.c_str(),
+          gpConfig->GetDrumName(Pitch + 1).first.c_str(),
           mCanvasX + mLittleBit,
           y);
 
@@ -1235,7 +1235,7 @@ void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
       while (Pitch >= 0 && y < mEventsY + mEventsHeight)
       {
         Dc.DrawText(
-          gpConfig->CtrlName(Pitch + 1).first.c_str(),
+          gpConfig->GetCtrlName(Pitch + 1).first.c_str(),
           mCanvasX + mLittleBit,
           y);
 
@@ -1249,7 +1249,7 @@ void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
       while (Pitch >= 0 && y < mEventsY + mEventsHeight)
       {
         Dc.DrawText(
-          gpConfig->VoiceName(Pitch + 1).first.c_str(),
+          gpConfig->GetVoiceName(Pitch + 1).first.c_str(),
           mCanvasX + mLittleBit,
           y);
 
@@ -2522,7 +2522,7 @@ void JZPianoWindow::SelectController()
     mpCtrlEdit = new tCtrlEdit(
       i - 1,
       this,
-      gpConfig->CtrlName(i).first.c_str(),
+      gpConfig->GetCtrlName(i).first.c_str(),
       mPianoWidth,
       0,
       CtrlY(Height),

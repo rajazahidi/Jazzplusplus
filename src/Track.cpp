@@ -1703,7 +1703,7 @@ tTrackDlg::tTrackDlg(JZTrackWindow *w, JZTrack *t)
   : wxForm(USED_WXFORM_BUTTONS),
     PatchChoice(
       "Patch",
-      t->IsDrumTrack() ? &gpConfig->DrumSet(0) : &gpConfig->VoiceName(0),
+      t->IsDrumTrack() ? &gpConfig->GetDrumSet(0) : &gpConfig->GetVoiceName(0),
       &PatchNr),
     DeviceChoice("Device", gpMidiPlayer->GetOutputDevices().AsNamedValue(), &Device)
 {

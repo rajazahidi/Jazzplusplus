@@ -962,8 +962,8 @@ class tControlDlg : public tChEventDlg
 
 
 tControlDlg::tControlDlg(tControl *e, JZPianoWindow* w, JZTrack *t)
-  : tChEventDlg(e, w, t)
-  //,    Choice("Controller", &gpConfig->CtrlName(0), &Control)
+  : tChEventDlg(e, w, t)//,
+//    Choice("Controller", &gpConfig->GetCtrlName(0), &Control)
 {
   Event = e;
   Value = e->Value;
@@ -982,7 +982,7 @@ bool tControlDlg::OnClose()
 void tControlDlg::AddProperties()
 {
   //  Add(Choice.mkFormItem(300, 300));
- //,    Choice("Controller", &gpConfig->CtrlName(0), &Control)
+//  Choice("Controller", &gpConfig->GetCtrlName(0), &Control)
   sheet->AddProperty(new wxProperty(
     "Controller",
     tNamedValueListValue(&Control, gpConfig->GetControlNames()),
@@ -1168,8 +1168,8 @@ class tProgramDlg : public tEventDlg
 
 tProgramDlg::tProgramDlg(tProgram *e, JZPianoWindow* w, JZTrack *t)
   : tEventDlg(e, w, t),
-    Program(e->Program + 1)
-  //,    Choice("Program", &gpConfig->VoiceName(0), &Program)
+    Program(e->Program + 1)//,
+//    Choice("Program", &gpConfig->GetVoiceName(0), &Program)
 {
   Event = e;
 }

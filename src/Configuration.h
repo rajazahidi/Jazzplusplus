@@ -26,13 +26,17 @@
 #include <string>
 #include <vector>
 
-class tDoubleCommand
+//*****************************************************************************
+//*****************************************************************************
+class JZDoubleCommand
 {
   public:
     int Command[2];
 };
 
-enum ConfigNames
+//*****************************************************************************
+//*****************************************************************************
+enum TEConfigurationNames
 {
   C_Seq2Device = 0,
   C_MidiDriver,
@@ -103,14 +107,18 @@ enum ConfigNames
   NumConfigNames
 };
 
-enum ConfigEntryType
+//*****************************************************************************
+//*****************************************************************************
+enum TEConfigEntryType
 {
   ConfigEntryTypeInt = 0,
   ConfigEntryTypeStr,
   ConfigEntryTypeEmpty
 };
 
+//*****************************************************************************
 // values for C_MidiDriver
+//*****************************************************************************
 enum TEMidiDriver
 {
   eMidiDriverJazz = 0, // C_DRV_JAZZ  0
@@ -120,113 +128,98 @@ enum TEMidiDriver
 
 //*****************************************************************************
 //*****************************************************************************
-class tConfigEntry
+class JZConfigEntry
 {
   public:
 
-    tConfigEntry(const char* pName, int IntegerValue);
+    JZConfigEntry(const char* pName, int IntegerValue);
 
-    tConfigEntry(const char* pName, const char* pStringValue);
+    JZConfigEntry(const char* pName, const char* pStringValue);
 
-    tConfigEntry(const char* pName, const std::string& StringValue);
+    JZConfigEntry(const char* pName, const std::string& StringValue);
 
-    tConfigEntry(const char* pName);
+    JZConfigEntry(const char* pName);
 
-    ~tConfigEntry();
+    ~JZConfigEntry();
 
-    ConfigEntryType GetType() const
+    TEConfigEntryType GetType() const
     {
-      return Type;
+      return mType;
     }
 
     const char* GetName() const
     {
-      return Name;
+      return mName;
     }
 
     const int& GetValue() const
     {
-      return Value;
+      return mValue;
     }
 
     void SetValue(const int& value)
     {
-      Value = value;
+      mValue = value;
     }
 
     const char* GetStrValue() const
     {
-      return StrValue;
+      return mStrValue;
     }
 
     void SetStrValue(const char* pStringValue);
 
   private:
 
-    ConfigEntryType Type;
-    char* Name;
-    int Value;
-    char* StrValue;
+    TEConfigEntryType mType;
+    char* mName;
+    int mValue;
+    char* mStrValue;
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tConfig
+class JZConfiguration
 {
   public:
 
-    tConfig();
+    JZConfiguration();
 
-    ~tConfig();
+    ~JZConfiguration();
 
     void LoadConfig(const wxString& FileName);
 
     int Check(const char* pName) const;
+
     int Load(char* buf);
 
-    std::pair<std::string, int>& DrumName(unsigned entry);
-    std::pair<std::string, int>& DrumSet(unsigned entry);
-    std::pair<std::string, int>& VoiceName(unsigned entry);
-    std::pair<std::string, int>& CtrlName(unsigned entry);
-    tDoubleCommand& BankEntry(unsigned entry);
+    const std::pair<std::string, int>& GetDrumName(unsigned entry) const;
+    const std::pair<std::string, int>& GetDrumSet(unsigned entry) const;
+    const std::pair<std::string, int>& GetVoiceName(unsigned entry) const;
+    const std::pair<std::string, int>& GetCtrlName(unsigned entry) const;
 
-    const char* Name(int entry)
-    {
-      assert((entry >= 0) && (entry < NumConfigNames));
-      return Names[entry]->GetName();
-    }
+    JZDoubleCommand& BankEntry(unsigned entry);
 
-    const char* StrValue(int entry)
-    {
-      assert((entry >= 0) && (entry < NumConfigNames));
-      return Names[entry]->GetStrValue();
-    }
+    const char* GetName(int entry) const;
+
+    const char* GetStrValue(int entry) const;
 
     const int& GetValue(const char* pName) const;
     const int& GetValue(int Index) const;
 
-    bool Get(int entry, char *value);
-    bool Get(int entry, long &value);
+    bool Get(int entry, char* value);
+    bool Get(int entry, long& value);
 
     bool Put(int entry, const char *value);
     bool Put(int entry, long value);
     bool Put(int entry);
     bool Put(int entry, int value);
 
-    const std::vector<std::pair<std::string, int> >& GetDrumNames()
-    {
-      return mDrumNames;
-    }
+    const std::vector<std::pair<std::string, int> >& GetDrumNames() const;
 
-    const std::vector<std::pair<std::string, int> >& GetControlNames()
-    {
-      return mCtrlNames;
-    }
+    const std::vector<std::pair<std::string, int> >& GetControlNames() const;
 
-    const std::vector<std::pair<std::string, int> >& GetVoiceNames()
-    {
-      return mVoiceNames;
-    }
+    const std::vector<std::pair<std::string, int> >& GetVoiceNames() const;
 
   private:
 
@@ -240,7 +233,7 @@ class tConfig
 
     wxString mFileName;
 
-    tConfigEntry* Names[NumConfigNames];
+    JZConfigEntry* mNames[NumConfigNames];
 
     std::vector<std::pair<std::string, int> > mDrumNames;
 
@@ -250,7 +243,56 @@ class tConfig
 
     std::vector<std::pair<std::string, int> > mVoiceNames;
 
-    std::vector<tDoubleCommand> mBankTable;
+    std::vector<JZDoubleCommand> mBankTable;
 };
+
+//*****************************************************************************
+// Description:
+//   These are the configuration class inline member functions.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+const char* JZConfiguration::GetName(int entry) const
+{
+  assert((entry >= 0) && (entry < NumConfigNames));
+  return mNames[entry]->GetName();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+const char* JZConfiguration::GetStrValue(int entry) const
+{
+  assert((entry >= 0) && (entry < NumConfigNames));
+  return mNames[entry]->GetStrValue();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+const std::vector<std::pair<std::string, int> >&
+JZConfiguration::GetDrumNames() const
+{
+  return mDrumNames;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+const std::vector<std::pair<std::string, int> >&
+JZConfiguration::GetControlNames() const
+{
+  return mCtrlNames;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+const std::vector<std::pair<std::string, int> >&
+JZConfiguration::GetVoiceNames() const
+{
+  return mVoiceNames;
+}
 
 #endif // !defined(JZ_CONFIGURATION_H)

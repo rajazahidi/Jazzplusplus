@@ -134,7 +134,7 @@ JZProject::JZProject()
     gSynthesierTypeFiles.push_back(make_pair("other.jzi", SynthTypeOther));
   }
 
-  mpConfig = new tConfig;
+  mpConfig = new JZConfiguration;
   gpConfig = mpConfig;
 
   ReadConfiguration();
@@ -143,9 +143,9 @@ JZProject::JZProject()
 
   mMetronomeInfo.ReadFromConfiguration();
 
-  if (mpConfig->StrValue(C_SynthType))
+  if (mpConfig->GetStrValue(C_SynthType))
   {
-    mpSynth = NewSynth(mpConfig->StrValue(C_SynthType));
+    mpSynth = NewSynth(mpConfig->GetStrValue(C_SynthType));
   }
   else
   {
@@ -316,7 +316,7 @@ JZProject::JZProject()
   }
   else
   {
-    StartUpSong = mpConfig->StrValue(C_StartUpSong);
+    StartUpSong = mpConfig->GetStrValue(C_StartUpSong);
   }
 
   FILE* pFd = fopen(StartUpSong.c_str(), "r");
@@ -393,20 +393,6 @@ void JZProject::ReadConfiguration()
       << endl;
 
     mpConfig->LoadConfig(ConfFileNameAndPath);
-
-    DEBUG(
-      if (BankTable != (tDoubleCommand *) NULL)
-      {
-        for (int i = 0; BankTable[i].Command[0] >= 0; i++)
-        {
-          cerr
-            << "Bank " << i << ": "
-            << BankTable[i].Command[0]
-            << ' ' << BankTable[i].Command[1]
-            << endl;
-        }
-      }
-    )
   }
   else
   {

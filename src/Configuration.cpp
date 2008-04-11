@@ -34,76 +34,92 @@
 
 using namespace std;
 
-tConfigEntry::tConfigEntry(const char* pName, int IntegerValue)
-  : Type(ConfigEntryTypeInt),
-    Name(0),
-    Value(IntegerValue),
-    StrValue(0)
+//*****************************************************************************
+// Description:
+//   This is the configuration entry class definition.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZConfigEntry::JZConfigEntry(const char* pName, int IntegerValue)
+  : mType(ConfigEntryTypeInt),
+    mName(0),
+    mValue(IntegerValue),
+    mStrValue(0)
 {
   if (pName)
   {
-    Name = new char [strlen(pName) + 1];
-    strcpy(Name, pName);
+    mName = new char [strlen(pName) + 1];
+    strcpy(mName, pName);
   }
 }
 
-tConfigEntry::tConfigEntry(const char* pName, const char* pStringValue)
-  : Type(ConfigEntryTypeStr),
-    Name(0),
-    Value(0),
-    StrValue(0)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZConfigEntry::JZConfigEntry(const char* pName, const char* pStringValue)
+  : mType(ConfigEntryTypeStr),
+    mName(0),
+    mValue(0),
+    mStrValue(0)
 {
   if (pName)
   {
-    Name = new char [strlen(pName) + 1];
-    strcpy(Name, pName);
+    mName = new char [strlen(pName) + 1];
+    strcpy(mName, pName);
   }
 
   if (pStringValue)
   {
-    StrValue = new char[strlen(pStringValue) + 1];
-    strcpy(StrValue, pStringValue);
+    mStrValue = new char[strlen(pStringValue) + 1];
+    strcpy(mStrValue, pStringValue);
   }
 }
 
-tConfigEntry::tConfigEntry(const char* pName, const string& StringValue)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZConfigEntry::JZConfigEntry(const char* pName, const string& StringValue)
 {
   if (pName)
   {
-    Name = new char [strlen(pName) + 1];
-    strcpy(Name, pName);
+    mName = new char [strlen(pName) + 1];
+    strcpy(mName, pName);
   }
 
-  StrValue = new char[strlen(StringValue.c_str()) + 1];
-  strcpy(StrValue, StringValue.c_str());
+  mStrValue = new char[strlen(StringValue.c_str()) + 1];
+  strcpy(mStrValue, StringValue.c_str());
 }
 
-tConfigEntry::tConfigEntry(const char* pName)
-  : Type(ConfigEntryTypeEmpty),
-    Name(0),
-    Value(0),
-    StrValue(0)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZConfigEntry::JZConfigEntry(const char* pName)
+  : mType(ConfigEntryTypeEmpty),
+    mName(0),
+    mValue(0),
+    mStrValue(0)
 {
   if (pName)
   {
-    Name = new char [strlen(pName) + 1];
-    strcpy(Name, pName);
+    mName = new char [strlen(pName) + 1];
+    strcpy(mName, pName);
   }
 }
 
-tConfigEntry::~tConfigEntry()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZConfigEntry::~JZConfigEntry()
 {
-  delete [] Name;
-  delete [] StrValue;
+  delete [] mName;
+  delete [] mStrValue;
 }
 
-void tConfigEntry::SetStrValue(const char* pStringValue)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZConfigEntry::SetStrValue(const char* pStringValue)
 {
-  delete [] StrValue;
+  delete [] mStrValue;
   if (pStringValue)
   {
-    StrValue = new char[strlen(pStringValue) + 1];
-    strcpy(StrValue, pStringValue);
+    mStrValue = new char[strlen(pStringValue) + 1];
+    strcpy(mStrValue, pStringValue);
   }
 }
 
@@ -113,7 +129,13 @@ void tConfigEntry::SetStrValue(const char* pStringValue)
 
 
 
-tConfig::tConfig()
+//*****************************************************************************
+// Description:
+//   This is the configuration class definition.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZConfiguration::JZConfiguration()
   : mFileName(),
     mDrumNames(),
     mDrumSets(),
@@ -123,142 +145,158 @@ tConfig::tConfig()
 {
   for (int i = 0; i < NumConfigNames; ++i)
   {
-    Names[i] = 0;
+    mNames[i] = 0;
   }
 
   const char* pNoneString = "None";
 
   // search for midi device
-  Names[C_Seq2Device] = new tConfigEntry(".device", -1);
+  mNames[C_Seq2Device] = new JZConfigEntry(".device", -1);
 
   // use /dev/music
-  Names[C_MidiDriver] = new tConfigEntry(".driver", 1);
+  mNames[C_MidiDriver] = new JZConfigEntry(".driver", 1);
 
-  // Enable audio at startup
-  Names[C_EnableAudio] = new tConfigEntry(".enable_audio", 1);
+  // Enable audio at startup.
+  mNames[C_EnableAudio] = new JZConfigEntry(".enable_audio", 1);
 
-  // Windows midi devices
-  Names[C_WinInputDevice] = new tConfigEntry(".win_input_device", -1);
-  Names[C_WinOutputDevice] = new tConfigEntry(".win_output_device", -1);
+  // Windows midi devices.
+  mNames[C_WinInputDevice] = new JZConfigEntry(".win_input_device", -1);
+  mNames[C_WinOutputDevice] = new JZConfigEntry(".win_output_device", -1);
 
-  // ALSA midi devices
-  Names[C_AlsaInputDevice] = new tConfigEntry(".alsa_input_device", -1);
-  Names[C_AlsaOutputDevice] = new tConfigEntry(".alsa_output_device", -1);
+  // ALSA midi devices.
+  mNames[C_AlsaInputDevice] = new JZConfigEntry(".alsa_input_device", -1);
+  mNames[C_AlsaOutputDevice] = new JZConfigEntry(".alsa_output_device", -1);
 
-  // ALSA audio devices
-  Names[C_AlsaAudioInputDevice] = new tConfigEntry(".alsa_audio_input_device", "hw:0,0");
-  Names[C_AlsaAudioOutputDevice] = new tConfigEntry(".alsa_audio_output_device", "hw:0,0");
+  // ALSA audio devices.
+  mNames[C_AlsaAudioInputDevice] = new JZConfigEntry(
+    ".alsa_audio_input_device",
+    "hw:0,0");
+  mNames[C_AlsaAudioOutputDevice] = new JZConfigEntry(
+    ".alsa_audio_output_device",
+    "hw:0,0");
 
-  // emulate midi thru
-  Names[C_SoftThru] = new tConfigEntry(".softthru", 1);
+  // Emulate MIDI thru.
+  mNames[C_SoftThru] = new JZConfigEntry(".softthru", 1);
 
-  // mpu401 hardware midi thru
-  Names[C_HardThru] = new tConfigEntry(".hardthru", 1);
+  // mpu401 hardware MIDI thru.
+  mNames[C_HardThru] = new JZConfigEntry(".hardthru", 1);
 
-  // midi clock source (0 = internal)
-  Names[C_ClockSource] = new tConfigEntry(".clocksource", 0);
+  // MIDI clock source (0 = internal).
+  mNames[C_ClockSource] = new JZConfigEntry(".clocksource", 0);
 
-  // send realtime midi messages to midi out
-  Names[C_RealTimeOut] = new tConfigEntry(".realtime_out", 0);
+  // Send realtime MIDI messages to MIDI out.
+  mNames[C_RealTimeOut] = new JZConfigEntry(".realtime_out", 0);
 
-  // use GS reverb macro
-  Names[C_UseReverbMacro] = new tConfigEntry(".use_reverb_macro", 1);
+  // Use the GS reverb macro.
+  mNames[C_UseReverbMacro] = new JZConfigEntry(".use_reverb_macro", 1);
 
-  // use GS chorus macro
-  Names[C_UseChorusMacro] = new tConfigEntry(".use_chorus_macro", 1);
+  // Use the GS chorus macro.
+  mNames[C_UseChorusMacro] = new JZConfigEntry(".use_chorus_macro", 1);
 
-  // Default drum channel is 10
-  Names[C_DrumChannel] = new tConfigEntry(".drumchannel", 10);
+  // Default drum channel is 10.
+  mNames[C_DrumChannel] = new JZConfigEntry(".drumchannel", 10);
 
-  // Controller for bank select
-  Names[C_BankControlNumber] = new tConfigEntry(".bank_control_number", 0);
+  // Controller for bank select.
+  mNames[C_BankControlNumber] = new JZConfigEntry(".bank_control_number", 0);
 
-  // Controller2 for bank select with two commands
-  Names[C_BankControlNumber2] = new tConfigEntry(".bank_2nd_control_number", 32);
+  // Controller2 for bank select with two commands.
+  mNames[C_BankControlNumber2] = new JZConfigEntry(
+    ".bank_2nd_control_number",
+    32);
 
-  // Max number of entries in bank table (two commands)
-  Names[C_MaxBankTableEntries] = new tConfigEntry(".max_bank_table_entries", 256);
+  // Maximum number of entries in bank table (two commands).
+  mNames[C_MaxBankTableEntries] = new JZConfigEntry(
+    ".max_bank_table_entries",
+    256);
 
-  // Number of columns to draw in Parts dialogs
-  Names[C_PartsColumnsMax] = new tConfigEntry(".parts_columns_max", 4);
+  // Number of columns to draw in Parts dialogs.
+  mNames[C_PartsColumnsMax] = new JZConfigEntry(".parts_columns_max", 4);
 
   // Draw tracknames on the right too?
-  Names[C_PartsTracknamesRight] = new tConfigEntry(
+  mNames[C_PartsTracknamesRight] = new JZConfigEntry(
     ".parts_tracknames_right",
     1);
 
-  // Maximum number of voice names in .jazz
-  Names[C_MaxVoiceNames] = new tConfigEntry(".max_voice_names", 317);
+  // Maximum number of voice names in .jazz.
+  mNames[C_MaxVoiceNames] = new JZConfigEntry(".max_voice_names", 317);
 
   // Use two-command bank select?
-  Names[C_UseTwoCommandBankSelect] = new tConfigEntry(
+  mNames[C_UseTwoCommandBankSelect] = new JZConfigEntry(
     ".use_two_command_bank_select",
     0);
 
-  // Metronome settings
-  Names[C_MetroIsAccented] = new tConfigEntry(".metronome_is_accented", 1);
-  Names[C_MetroVelocity] = new tConfigEntry(".metronome_velocity", 127);
-  Names[C_MetroNormalClick] = new tConfigEntry(".metronome_normal_click", 37);
-  Names[C_MetroAccentedClick] = new tConfigEntry(
+  // Metronome settings.
+  mNames[C_MetroIsAccented] = new JZConfigEntry(
+    ".metronome_is_accented",
+    1);
+  mNames[C_MetroVelocity] = new JZConfigEntry(
+    ".metronome_velocity",
+    127);
+  mNames[C_MetroNormalClick] = new JZConfigEntry(
+    ".metronome_normal_click",
+    37);
+  mNames[C_MetroAccentedClick] = new JZConfigEntry(
     ".metronome_accented_click",
     36);
 
   // Window geometry settings.
-  Names[C_TrackWinXpos] = new tConfigEntry(".trackwin_xpos", 10);
-  Names[C_TrackWinYpos] = new tConfigEntry(".trackwin_ypos", 10);
-  Names[C_TrackWinWidth] = new tConfigEntry(".trackwin_width", 600);
-  Names[C_TrackWinHeight] = new tConfigEntry(".trackwin_height", 400);
-  Names[C_PianoWinXpos] = new tConfigEntry(".pianowin_xpos", 30);
-  Names[C_PianoWinYpos] = new tConfigEntry(".pianowin_ypos", 30);
-  Names[C_PianoWinWidth] = new tConfigEntry(".pianowin_width", 600);
-  Names[C_PianoWinHeight] = new tConfigEntry(".pianowin_height", 400);
-  Names[C_PartsDlgXpos] = new tConfigEntry(".partsdialog_xpos", 50);
-  Names[C_PartsDlgYpos] = new tConfigEntry(".partsdialog_ypos", 50);
-  Names[C_TrackDlgXpos] = new tConfigEntry(".trackdialog_xpos", 50);
-  Names[C_TrackDlgYpos] = new tConfigEntry(".trackdialog_ypos", 50);
-  Names[C_HarmonyXpos] = new tConfigEntry(".harmonybrowser_xpos", 100);
-  Names[C_HarmonyYpos] = new tConfigEntry(".harmonybrowser_ypos", 100);
-  Names[C_RhythmXpos] = new tConfigEntry(".randomrhythm_xpos", 150);
-  Names[C_RhythmYpos] = new tConfigEntry(".randomrhythm_ypos", 150);
+  mNames[C_TrackWinXpos] = new JZConfigEntry(".trackwin_xpos", 10);
+  mNames[C_TrackWinYpos] = new JZConfigEntry(".trackwin_ypos", 10);
+  mNames[C_TrackWinWidth] = new JZConfigEntry(".trackwin_width", 600);
+  mNames[C_TrackWinHeight] = new JZConfigEntry(".trackwin_height", 400);
+  mNames[C_PianoWinXpos] = new JZConfigEntry(".pianowin_xpos", 30);
+  mNames[C_PianoWinYpos] = new JZConfigEntry(".pianowin_ypos", 30);
+  mNames[C_PianoWinWidth] = new JZConfigEntry(".pianowin_width", 600);
+  mNames[C_PianoWinHeight] = new JZConfigEntry(".pianowin_height", 400);
+  mNames[C_PartsDlgXpos] = new JZConfigEntry(".partsdialog_xpos", 50);
+  mNames[C_PartsDlgYpos] = new JZConfigEntry(".partsdialog_ypos", 50);
+  mNames[C_TrackDlgXpos] = new JZConfigEntry(".trackdialog_xpos", 50);
+  mNames[C_TrackDlgYpos] = new JZConfigEntry(".trackdialog_ypos", 50);
+  mNames[C_HarmonyXpos] = new JZConfigEntry(".harmonybrowser_xpos", 100);
+  mNames[C_HarmonyYpos] = new JZConfigEntry(".harmonybrowser_ypos", 100);
+  mNames[C_RhythmXpos] = new JZConfigEntry(".randomrhythm_xpos", 150);
+  mNames[C_RhythmYpos] = new JZConfigEntry(".randomrhythm_ypos", 150);
 
-  // Show Dialog unless initialized
-  Names[C_SynthDialog] = new tConfigEntry(".synth_dialog", 1);
+  // Show dialog unless initialized.
+  mNames[C_SynthDialog] = new JZConfigEntry(".synth_dialog", 1);
 
-  // Default synthesizer type
-  Names[C_SynthType] = new tConfigEntry(
+  // Default synthesizer type.
+  mNames[C_SynthType] = new JZConfigEntry(
     ".synth_type",
     gSynthesizerTypes[SynthTypeGS].first.c_str());
 
-  // Default synthesizer config file
-  Names[C_SynthConfig] = new tConfigEntry(
+  // Default synthesizer configuration file.
+  mNames[C_SynthConfig] = new JZConfigEntry(
     ".synth_config",
     gSynthesierTypeFiles[SynthTypeGS].first.c_str());
 
-  // When to send synthesizer reset (0=never, 1=song start, 2=start play)
-  Names[C_SendSynthReset] = new tConfigEntry(".send_synth_reset", 1);
+  // When to send synthesizer reset (0 = never, 1 = song start,
+  // 2 = start play).
+  mNames[C_SendSynthReset] = new JZConfigEntry(".send_synth_reset", 1);
 
-  // Current include file
-  Names[C_Include] = new tConfigEntry(".include", "");
+  // Current include file.
+  mNames[C_Include] = new JZConfigEntry(".include", "");
 
-  // Entries with empty values
-  Names[C_BankTable] = new tConfigEntry(".bank_table");
-  Names[C_VoiceNames] = new tConfigEntry(".voicenames");
-  Names[C_DrumSets] = new tConfigEntry(".drumsets");
-  Names[C_CtrlNames] = new tConfigEntry(".ctrlnames");
-  Names[C_DrumNames] = new tConfigEntry(".drumnames");
+  // Entries with empty values.
+  mNames[C_BankTable] = new JZConfigEntry(".bank_table");
+  mNames[C_VoiceNames] = new JZConfigEntry(".voicenames");
+  mNames[C_DrumSets] = new JZConfigEntry(".drumsets");
+  mNames[C_CtrlNames] = new JZConfigEntry(".ctrlnames");
+  mNames[C_DrumNames] = new JZConfigEntry(".drumnames");
 
-  // The startup song
-  Names[C_StartUpSong] = new tConfigEntry(".startup_song", "jazz.mid");
-  Names[C_OssBug1] = new tConfigEntry(".ossbug1", 0);
-  Names[C_OssBug2] = new tConfigEntry(".ossbug2", 0);
-  Names[C_DuplexAudio] = new tConfigEntry(".duplex_audio", 0);
-  Names[C_ThruInput] = new tConfigEntry(".thru_input", 0);
-  Names[C_ThruOutput] = new tConfigEntry(".thru_output", 0);
+  // The startup song.
+  mNames[C_StartUpSong] = new JZConfigEntry(".startup_song", "jazz.mid");
+
+  mNames[C_OssBug1] = new JZConfigEntry(".ossbug1", 0);
+  mNames[C_OssBug2] = new JZConfigEntry(".ossbug2", 0);
+  mNames[C_DuplexAudio] = new JZConfigEntry(".duplex_audio", 0);
+  mNames[C_ThruInput] = new JZConfigEntry(".thru_input", 0);
+  mNames[C_ThruOutput] = new JZConfigEntry(".thru_output", 0);
 
   // Enable/disable splash dialog.
-  Names[C_EnableWelcome] = new tConfigEntry(".enable_welcome", 1);
+  mNames[C_EnableWelcome] = new JZConfigEntry(".enable_welcome", 1);
 
-  // Other initialization
+  // Other initialization.
 
   for (int i = 0; i < 130; ++i)
   {
@@ -280,48 +318,62 @@ tConfig::tConfig()
   mVoiceNames.push_back(make_pair("", 0));
 }
 
-tConfig::~tConfig()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZConfiguration::~JZConfiguration()
 {
   for (int i = 0; i < NumConfigNames; ++i)
   {
-    if (Names[i])
+    if (mNames[i])
     {
-      delete Names[i];
+      delete mNames[i];
     }
   }
 }
 
-pair<string, int>& tConfig::DrumName(unsigned entry)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+const pair<string, int>& JZConfiguration::GetDrumName(unsigned entry) const
 {
   assert((entry >= 0) && (entry < mDrumNames.size()));
   return mDrumNames[entry];
 }
 
-pair<string, int>& tConfig::DrumSet(unsigned entry)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+const pair<string, int>& JZConfiguration::GetDrumSet(unsigned entry) const
 {
   assert((entry >= 0) && (entry < mDrumSets.size()));
   return mDrumSets[entry];
 }
 
-pair<string, int>& tConfig::VoiceName(unsigned entry)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+const pair<string, int>& JZConfiguration::GetVoiceName(unsigned entry) const
 {
   assert((entry >= 0) && (entry < mVoiceNames.size()));
   return mVoiceNames[entry];
 }
 
-pair<string, int>& tConfig::CtrlName(unsigned entry)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+const pair<string, int>& JZConfiguration::GetCtrlName(unsigned entry) const
 {
    assert((entry >= 0) && (entry < mCtrlNames.size()));
    return mCtrlNames[entry];
 }
 
-tDoubleCommand& tConfig::BankEntry(unsigned entry)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZDoubleCommand& JZConfiguration::BankEntry(unsigned entry)
 {
    assert((entry >= 0) && (entry < mBankTable.size()));
    return mBankTable[entry];
 }
 
-int tConfig::Check(const char* pName) const
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZConfiguration::Check(const char* pName) const
 {
   if (!pName || (pName[0] != '.'))
   {
@@ -330,11 +382,11 @@ int tConfig::Check(const char* pName) const
 
   for (int i = 0; i < NumConfigNames; i++)
   {
-    if (!Names[i])
+    if (!mNames[i])
     {
       continue;
     }
-    if (!strncmp(pName, Names[i]->GetName(), strlen(Names[i]->GetName())))
+    if (!strncmp(pName, mNames[i]->GetName(), strlen(mNames[i]->GetName())))
     {
       // Found
       return i;
@@ -349,7 +401,7 @@ int tConfig::Check(const char* pName) const
 // value has not been set by an earlier call to LoadConfig, attempt to find
 // the file using FindFile().
 //-----------------------------------------------------------------------------
-wxString tConfig::GetFileName()
+wxString JZConfiguration::GetFileName()
 {
   if (!mFileName.empty())
   {
@@ -366,7 +418,9 @@ wxString tConfig::GetFileName()
   return mFileName;
 }
 
-int tConfig::Load(char* buf)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZConfiguration::Load(char* buf)
 {
    int entry = Check(buf);
 
@@ -375,17 +429,17 @@ int tConfig::Load(char* buf)
 
    char format[100];
    int result = 1;
-   if (Names[entry]->GetType() == ConfigEntryTypeInt)
+   if (mNames[entry]->GetType() == ConfigEntryTypeInt)
    {
-      sprintf(format, "%s %%d", Names[entry]->GetName());
+      sprintf(format, "%s %%d", mNames[entry]->GetName());
       int Value;
       result = sscanf(buf, format, &Value);
-      Names[entry]->SetValue(Value);
+      mNames[entry]->SetValue(Value);
    }
-   else if (Names[entry]->GetType() == ConfigEntryTypeStr)
+   else if (mNames[entry]->GetType() == ConfigEntryTypeStr)
    {
       // allow whitespace inside entries like "C:\Program Files\JazzWare"
-      int ofs = strlen(Names[entry]->GetName());
+      int ofs = strlen(mNames[entry]->GetName());
       while (buf[ofs] == ' ' || buf[ofs] == '\t')  // not \n
         ofs++;
       int end = strlen(buf) - 1;
@@ -399,7 +453,7 @@ int tConfig::Load(char* buf)
       char* pStringValue = new char[size + 1];
       memcpy(pStringValue, buf + ofs, size);
       pStringValue[size] = 0;
-      Names[entry]->SetStrValue(pStringValue);
+      mNames[entry]->SetStrValue(pStringValue);
       delete [] pStringValue;
    }
    else
@@ -417,55 +471,67 @@ int tConfig::Load(char* buf)
    }
 }
 
-const int& tConfig::GetValue(const char* pName) const
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+const int& JZConfiguration::GetValue(const char* pName) const
 {
   int i = Check(pName);
 
   assert(i >= 0);
 
-  return Names[i]->GetValue();
+  return mNames[i]->GetValue();
 }
 
-const int& tConfig::GetValue(int Index) const
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+const int& JZConfiguration::GetValue(int Index) const
 {
   assert((Index >= 0) && (Index < NumConfigNames));
-  return Names[Index]->GetValue();
+  return mNames[Index]->GetValue();
 }
 
-bool tConfig::Get(int entry, char *value)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZConfiguration::Get(int entry, char *value)
 {
-   assert((entry >= 0) && (entry < NumConfigNames));
+  assert((entry >= 0) && (entry < NumConfigNames));
 
-   wxString FileName = GetFileName();
-   if (FileName.IsEmpty())
-   {
-     return false;
-   }
+  wxString FileName = GetFileName();
+  if (FileName.IsEmpty())
+  {
+    return false;
+  }
 
-   FILE *fd = fopen(FileName.c_str(), "r");
-   const char* name = Name(entry);
+  FILE *fd = fopen(FileName.c_str(), "r");
+  const char* name = GetName(entry);
 
-   int  len = strlen(name);
-   char buf[1000];
-   bool found = false;
-   while (!found && fgets(buf, sizeof(buf), fd) != NULL)
-   {
-      if (strncmp(buf, name, len) == 0)
+  int  len = strlen(name);
+  char buf[1000];
+  bool found = false;
+  while (!found && fgets(buf, sizeof(buf), fd) != NULL)
+  {
+    if (strncmp(buf, name, len) == 0)
+    {
+      while (isspace(buf[len]))
       {
-         while (isspace(buf[len]))
-            len++;
-         int end = strlen(buf) - 1;
-         while (end > 0 && isspace(buf[end]))
-            buf[end--] = 0;
-         strcpy(value, buf + len);
-         found = true;
+        len++;
       }
-   }
-   fclose(fd);
-   return found;
+      int end = strlen(buf) - 1;
+      while (end > 0 && isspace(buf[end]))
+      {
+        buf[end--] = 0;
+      }
+      strcpy(value, buf + len);
+      found = true;
+    }
+  }
+  fclose(fd);
+  return found;
 }
 
-bool tConfig::Get(int entry, long &value)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZConfiguration::Get(int entry, long &value)
 {
   char buf[512];
   if (Get(entry, buf))
@@ -482,7 +548,7 @@ bool tConfig::Get(int entry, long &value)
 // entries to there.  If the name/value pair is found, replace it, otherwise
 // write it.  Finally copy the temp file over the old configuration file.
 //-----------------------------------------------------------------------------
-bool tConfig::Put(int Index, const char *value)
+bool JZConfiguration::Put(int Index, const char *value)
 {
   assert((Index >= 0) && (Index < NumConfigNames));
 
@@ -502,7 +568,7 @@ bool tConfig::Put(int Index, const char *value)
   }
 
   FILE* inp = fopen(FileName.c_str(), "r");
-  const char* name = Name(Index);
+  const char* name = GetName(Index);
 
   int  len = strlen(name);
   char buf[1000];
@@ -530,26 +596,32 @@ bool tConfig::Put(int Index, const char *value)
   return true;
 }
 
-bool tConfig::Put(int Index, long Value)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZConfiguration::Put(int Index, long Value)
 {
   ostringstream Oss;
   Oss << Value;
   return Put(Index, Oss.str().c_str());
 }
 
-bool tConfig::Put(int Index)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZConfiguration::Put(int Index)
 {
   assert((Index >= 0) && (Index < NumConfigNames));
-  Names[Index]->SetValue(Index);
-  long LongValue = Names[Index]->GetValue();
+  mNames[Index]->SetValue(Index);
+  long LongValue = mNames[Index]->GetValue();
   return Put(Index, LongValue);
 }
 
-bool tConfig::Put(int Index, int Value)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZConfiguration::Put(int Index, int Value)
 {
   assert((Index >= 0) && (Index < NumConfigNames));
-  Names[Index]->SetValue(Value);
-  long LongValue = Names[Index]->GetValue();
+  mNames[Index]->SetValue(Value);
+  long LongValue = mNames[Index]->GetValue();
   return Put(Index, LongValue);
 }
 
@@ -557,7 +629,7 @@ bool tConfig::Put(int Index, int Value)
 // Description:
 //   Load the configuration from a file.  This code supports file inclusion.
 //-----------------------------------------------------------------------------
-void tConfig::LoadConfig(const wxString& FileName)
+void JZConfiguration::LoadConfig(const wxString& FileName)
 {
   if (!::wxFileExists(FileName))
   {
@@ -590,7 +662,7 @@ void tConfig::LoadConfig(const wxString& FileName)
   }
 
   cout
-    << "tConfig::LoadConfig:" << '\n'
+    << "JZConfiguration::LoadConfig:" << '\n'
     << "  \"" << mFileName << '"'
     << endl;
 
@@ -642,7 +714,7 @@ void tConfig::LoadConfig(const wxString& FileName)
           if (mBankTable.empty())
           {
             mBankTable.clear();
-            tDoubleCommand DoubleCommand;
+            JZDoubleCommand DoubleCommand;
             for (i = 0; i <= GetValue(C_MaxBankTableEntries); ++i)
             {
               DoubleCommand.Command[0] = -1;
@@ -677,7 +749,7 @@ void tConfig::LoadConfig(const wxString& FileName)
         case C_Include:
           {
             // include file
-            wxString pathname = FindFile(StrValue(entry));
+            wxString pathname = FindFile(GetStrValue(entry));
             cout << "include " << entry << endl;
             IncLevel++;
             assert(IncLevel < MaxIncs);

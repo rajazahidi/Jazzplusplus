@@ -134,8 +134,8 @@ tAlsaAudioPlayer::tAlsaAudioPlayer(JZSong* pSong)
   pcm[PLAYBACK] = NULL;
   pcm[CAPTURE] = NULL;
 
-  dev[PLAYBACK] = gpConfig->StrValue(C_AlsaAudioOutputDevice);
-  dev[CAPTURE] = gpConfig->StrValue(C_AlsaAudioInputDevice);
+  dev[PLAYBACK] = gpConfig->GetStrValue(C_AlsaAudioOutputDevice);
+  dev[CAPTURE] = gpConfig->GetStrValue(C_AlsaAudioInputDevice);
 
   // FIXME
   mCanDuplex = 1;

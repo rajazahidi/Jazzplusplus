@@ -29,7 +29,7 @@
 // #define DEBUG(x) x
 #define DEBUG(x)
 
-class tConfig;
+class JZConfiguration;
 class JZSong;
 class JZSynth;
 class JZPlayer;
@@ -45,7 +45,7 @@ enum TESizes
   eMaxTrackCount = 127
 };
 
-extern tConfig* gpConfig;
+extern JZConfiguration* gpConfig;
 extern JZSong* gpSong;
 extern JZSynth* gpSynth;
 extern JZPlayer* gpMidiPlayer;

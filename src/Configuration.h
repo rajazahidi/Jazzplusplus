@@ -150,7 +150,7 @@ class JZConfigurationEntry
 
     void SetValue(const int& Value);
 
-    const char* GetStrValue() const;
+    const std::string& GetStrValue() const;
 
     void SetStrValue(const char* pStringValue);
 
@@ -201,9 +201,9 @@ void JZConfigurationEntry::SetValue(const int& Value)
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 inline
-const char* JZConfigurationEntry::GetStrValue() const
+const std::string& JZConfigurationEntry::GetStrValue() const
 {
-  return mStrValue.c_str();
+  return mStrValue;
 }
 
 //*****************************************************************************
@@ -231,7 +231,7 @@ class JZConfiguration
 
     const char* GetName(int entry) const;
 
-    const char* GetStrValue(int entry) const;
+    const std::string& GetStrValue(int entry) const;
 
     const int& GetValue(const char* pName) const;
     const int& GetValue(int Index) const;
@@ -291,7 +291,7 @@ const char* JZConfiguration::GetName(int entry) const
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 inline
-const char* JZConfiguration::GetStrValue(int entry) const
+const std::string& JZConfiguration::GetStrValue(int entry) const
 {
   assert((entry >= 0) && (entry < NumConfigNames));
   return mNames[entry]->GetStrValue();

@@ -364,7 +364,7 @@ class JZSynth
 
 };
 
-JZSynth* NewSynth(const char* pType);
+JZSynth* NewSynth(const std::string& Type);
 
 class tGM : public JZSynth
 {

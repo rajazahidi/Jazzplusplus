@@ -143,13 +143,13 @@ JZProject::JZProject()
 
   mMetronomeInfo.ReadFromConfiguration();
 
-  if (mpConfig->GetStrValue(C_SynthType))
+  if (mpConfig->GetStrValue(C_SynthType).empty())
   {
-    mpSynth = NewSynth(mpConfig->GetStrValue(C_SynthType));
+    mpSynth = NewSynth("GM");
   }
   else
   {
-    mpSynth = NewSynth("GM");
+    mpSynth = NewSynth(mpConfig->GetStrValue(C_SynthType));
   }
   gpSynth = mpSynth;
 

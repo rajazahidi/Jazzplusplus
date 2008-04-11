@@ -115,7 +115,7 @@ bool JZSynthesizerDialog::TransferDataToWindow()
     iPair != gSynthesizerTypes.end();
     ++iPair, ++Index)
   {
-    if (strcmp(iPair->first.c_str(), gpConfig->GetStrValue(C_SynthType)) == 0)
+    if (iPair->first == gpConfig->GetStrValue(C_SynthType))
     {
       mOldSynthTypeName = iPair->first;
       Selection = Index;

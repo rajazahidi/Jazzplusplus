@@ -53,12 +53,12 @@ using namespace std;
 #define XG_NAT 0x43,0x10,0x4c
 #define XG_NAT_LEN 8 // no command ID or checksum for XG native!
 
-JZSynth* NewSynth(const char* pType)
+JZSynth* NewSynth(const string& Type)
 {
   int i;
   for (i = 0; i < NumSynthTypes; i++)
   {
-    if (gSynthesizerTypes[i].first != string(pType))
+    if (gSynthesizerTypes[i].first == Type)
     {
       break;
     }

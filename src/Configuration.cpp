@@ -785,16 +785,26 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
         case C_SynthConfig:
         case C_Include:
           {
-            // include file
-            wxString pathname = FindFile(GetStrValue(entry));
-            cout << "include " << entry << endl;
-            if (pathname)
+            if (entry == C_SynthConfig)
             {
-              FileDescriptors.push(fopen(pathname, "r"));
+              cout << "Include synthesizer configuration file \"";
             }
             else
             {
+              cout << "Include file \"";
+            }
+            cout << GetStrValue(entry) << '"' << endl;
+
+            // Get the name of the include file.
+            wxString IncludeFileName = FindFile(GetStrValue(entry));
+
+            if (IncludeFileName.empty())
+            {
               FileDescriptors.push(NULL);
+            }
+            else
+            {
+              FileDescriptors.push(fopen(IncludeFileName, "r"));
             }
 
             if (FileDescriptors.top() == NULL)

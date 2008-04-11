@@ -40,93 +40,78 @@ using namespace std;
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZConfigEntry::JZConfigEntry(const char* pName, int IntegerValue)
-  : mType(ConfigEntryTypeInt),
-    mName(0),
+JZConfigurationEntry::JZConfigurationEntry(
+  const char* pName,
+  int IntegerValue)
+  : mType(eConfigEntryTypeInt),
+    mName(),
     mValue(IntegerValue),
-    mStrValue(0)
+    mStrValue()
 {
   if (pName)
   {
-    mName = new char [strlen(pName) + 1];
-    strcpy(mName, pName);
+    mName = pName;
   }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZConfigEntry::JZConfigEntry(const char* pName, const char* pStringValue)
-  : mType(ConfigEntryTypeStr),
-    mName(0),
+JZConfigurationEntry::JZConfigurationEntry(
+  const char* pName,
+  const char* pStringValue)
+  : mType(eConfigEntryTypeStr),
+    mName(),
     mValue(0),
-    mStrValue(0)
+    mStrValue()
 {
   if (pName)
   {
-    mName = new char [strlen(pName) + 1];
-    strcpy(mName, pName);
+    mName = pName;
   }
 
   if (pStringValue)
   {
-    mStrValue = new char[strlen(pStringValue) + 1];
-    strcpy(mStrValue, pStringValue);
+    mStrValue = pStringValue;
   }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZConfigEntry::JZConfigEntry(const char* pName, const string& StringValue)
+JZConfigurationEntry::JZConfigurationEntry(
+  const char* pName,
+  const string& StringValue)
 {
   if (pName)
   {
-    mName = new char [strlen(pName) + 1];
-    strcpy(mName, pName);
+    mName = pName;
   }
 
-  mStrValue = new char[strlen(StringValue.c_str()) + 1];
-  strcpy(mStrValue, StringValue.c_str());
+  mStrValue = StringValue;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZConfigEntry::JZConfigEntry(const char* pName)
-  : mType(ConfigEntryTypeEmpty),
-    mName(0),
+JZConfigurationEntry::JZConfigurationEntry(const char* pName)
+  : mType(eConfigEntryTypeEmpty),
+    mName(),
     mValue(0),
-    mStrValue(0)
+    mStrValue()
 {
   if (pName)
   {
-    mName = new char [strlen(pName) + 1];
-    strcpy(mName, pName);
+    mName = pName;
   }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZConfigEntry::~JZConfigEntry()
+void JZConfigurationEntry::SetStrValue(const char* pStringValue)
 {
-  delete [] mName;
-  delete [] mStrValue;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZConfigEntry::SetStrValue(const char* pStringValue)
-{
-  delete [] mStrValue;
   if (pStringValue)
   {
-    mStrValue = new char[strlen(pStringValue) + 1];
-    strcpy(mStrValue, pStringValue);
+    mStrValue = pStringValue;
   }
 }
-
-
-
-
-
 
 
 //*****************************************************************************
@@ -151,150 +136,198 @@ JZConfiguration::JZConfiguration()
   const char* pNoneString = "None";
 
   // search for midi device
-  mNames[C_Seq2Device] = new JZConfigEntry(".device", -1);
+  mNames[C_Seq2Device] = new JZConfigurationEntry(".device", -1);
 
   // use /dev/music
-  mNames[C_MidiDriver] = new JZConfigEntry(".driver", 1);
+  mNames[C_MidiDriver] = new JZConfigurationEntry(".driver", 1);
 
   // Enable audio at startup.
-  mNames[C_EnableAudio] = new JZConfigEntry(".enable_audio", 1);
+  mNames[C_EnableAudio] = new JZConfigurationEntry(".enable_audio", 1);
 
   // Windows midi devices.
-  mNames[C_WinInputDevice] = new JZConfigEntry(".win_input_device", -1);
-  mNames[C_WinOutputDevice] = new JZConfigEntry(".win_output_device", -1);
+  mNames[C_WinInputDevice] = new JZConfigurationEntry(
+    ".win_input_device",
+    -1);
+  mNames[C_WinOutputDevice] = new JZConfigurationEntry(
+    ".win_output_device",
+    -1);
 
   // ALSA midi devices.
-  mNames[C_AlsaInputDevice] = new JZConfigEntry(".alsa_input_device", -1);
-  mNames[C_AlsaOutputDevice] = new JZConfigEntry(".alsa_output_device", -1);
+  mNames[C_AlsaInputDevice] = new JZConfigurationEntry(
+    ".alsa_input_device",
+    -1);
+  mNames[C_AlsaOutputDevice] = new JZConfigurationEntry(
+    ".alsa_output_device",
+    -1);
 
   // ALSA audio devices.
-  mNames[C_AlsaAudioInputDevice] = new JZConfigEntry(
+  mNames[C_AlsaAudioInputDevice] = new JZConfigurationEntry(
     ".alsa_audio_input_device",
     "hw:0,0");
-  mNames[C_AlsaAudioOutputDevice] = new JZConfigEntry(
+  mNames[C_AlsaAudioOutputDevice] = new JZConfigurationEntry(
     ".alsa_audio_output_device",
     "hw:0,0");
 
   // Emulate MIDI thru.
-  mNames[C_SoftThru] = new JZConfigEntry(".softthru", 1);
+  mNames[C_SoftThru] = new JZConfigurationEntry(".softthru", 1);
 
   // mpu401 hardware MIDI thru.
-  mNames[C_HardThru] = new JZConfigEntry(".hardthru", 1);
+  mNames[C_HardThru] = new JZConfigurationEntry(".hardthru", 1);
 
   // MIDI clock source (0 = internal).
-  mNames[C_ClockSource] = new JZConfigEntry(".clocksource", 0);
+  mNames[C_ClockSource] = new JZConfigurationEntry(".clocksource", 0);
 
   // Send realtime MIDI messages to MIDI out.
-  mNames[C_RealTimeOut] = new JZConfigEntry(".realtime_out", 0);
+  mNames[C_RealTimeOut] = new JZConfigurationEntry(".realtime_out", 0);
 
   // Use the GS reverb macro.
-  mNames[C_UseReverbMacro] = new JZConfigEntry(".use_reverb_macro", 1);
+  mNames[C_UseReverbMacro] = new JZConfigurationEntry(".use_reverb_macro", 1);
 
   // Use the GS chorus macro.
-  mNames[C_UseChorusMacro] = new JZConfigEntry(".use_chorus_macro", 1);
+  mNames[C_UseChorusMacro] = new JZConfigurationEntry(".use_chorus_macro", 1);
 
   // Default drum channel is 10.
-  mNames[C_DrumChannel] = new JZConfigEntry(".drumchannel", 10);
+  mNames[C_DrumChannel] = new JZConfigurationEntry(".drumchannel", 10);
 
   // Controller for bank select.
-  mNames[C_BankControlNumber] = new JZConfigEntry(".bank_control_number", 0);
+  mNames[C_BankControlNumber] = new JZConfigurationEntry(
+    ".bank_control_number",
+    0);
 
   // Controller2 for bank select with two commands.
-  mNames[C_BankControlNumber2] = new JZConfigEntry(
+  mNames[C_BankControlNumber2] = new JZConfigurationEntry(
     ".bank_2nd_control_number",
     32);
 
   // Maximum number of entries in bank table (two commands).
-  mNames[C_MaxBankTableEntries] = new JZConfigEntry(
+  mNames[C_MaxBankTableEntries] = new JZConfigurationEntry(
     ".max_bank_table_entries",
     256);
 
   // Number of columns to draw in Parts dialogs.
-  mNames[C_PartsColumnsMax] = new JZConfigEntry(".parts_columns_max", 4);
+  mNames[C_PartsColumnsMax] = new JZConfigurationEntry(
+    ".parts_columns_max",
+    4);
 
   // Draw tracknames on the right too?
-  mNames[C_PartsTracknamesRight] = new JZConfigEntry(
+  mNames[C_PartsTracknamesRight] = new JZConfigurationEntry(
     ".parts_tracknames_right",
     1);
 
   // Maximum number of voice names in .jazz.
-  mNames[C_MaxVoiceNames] = new JZConfigEntry(".max_voice_names", 317);
+  mNames[C_MaxVoiceNames] = new JZConfigurationEntry(".max_voice_names", 317);
 
   // Use two-command bank select?
-  mNames[C_UseTwoCommandBankSelect] = new JZConfigEntry(
+  mNames[C_UseTwoCommandBankSelect] = new JZConfigurationEntry(
     ".use_two_command_bank_select",
     0);
 
   // Metronome settings.
-  mNames[C_MetroIsAccented] = new JZConfigEntry(
+  mNames[C_MetroIsAccented] = new JZConfigurationEntry(
     ".metronome_is_accented",
     1);
-  mNames[C_MetroVelocity] = new JZConfigEntry(
+  mNames[C_MetroVelocity] = new JZConfigurationEntry(
     ".metronome_velocity",
     127);
-  mNames[C_MetroNormalClick] = new JZConfigEntry(
+  mNames[C_MetroNormalClick] = new JZConfigurationEntry(
     ".metronome_normal_click",
     37);
-  mNames[C_MetroAccentedClick] = new JZConfigEntry(
+  mNames[C_MetroAccentedClick] = new JZConfigurationEntry(
     ".metronome_accented_click",
     36);
 
+  //--------------------------
   // Window geometry settings.
-  mNames[C_TrackWinXpos] = new JZConfigEntry(".trackwin_xpos", 10);
-  mNames[C_TrackWinYpos] = new JZConfigEntry(".trackwin_ypos", 10);
-  mNames[C_TrackWinWidth] = new JZConfigEntry(".trackwin_width", 600);
-  mNames[C_TrackWinHeight] = new JZConfigEntry(".trackwin_height", 400);
-  mNames[C_PianoWinXpos] = new JZConfigEntry(".pianowin_xpos", 30);
-  mNames[C_PianoWinYpos] = new JZConfigEntry(".pianowin_ypos", 30);
-  mNames[C_PianoWinWidth] = new JZConfigEntry(".pianowin_width", 600);
-  mNames[C_PianoWinHeight] = new JZConfigEntry(".pianowin_height", 400);
-  mNames[C_PartsDlgXpos] = new JZConfigEntry(".partsdialog_xpos", 50);
-  mNames[C_PartsDlgYpos] = new JZConfigEntry(".partsdialog_ypos", 50);
-  mNames[C_TrackDlgXpos] = new JZConfigEntry(".trackdialog_xpos", 50);
-  mNames[C_TrackDlgYpos] = new JZConfigEntry(".trackdialog_ypos", 50);
-  mNames[C_HarmonyXpos] = new JZConfigEntry(".harmonybrowser_xpos", 100);
-  mNames[C_HarmonyYpos] = new JZConfigEntry(".harmonybrowser_ypos", 100);
-  mNames[C_RhythmXpos] = new JZConfigEntry(".randomrhythm_xpos", 150);
-  mNames[C_RhythmYpos] = new JZConfigEntry(".randomrhythm_ypos", 150);
+  //--------------------------
+
+  // Track window.
+  mNames[C_TrackWinXpos] = new JZConfigurationEntry(
+    ".trackwin_xpos",
+    10);
+  mNames[C_TrackWinYpos] = new JZConfigurationEntry(
+    ".trackwin_ypos",
+    10);
+  mNames[C_TrackWinWidth] = new JZConfigurationEntry(
+    ".trackwin_width",
+    600);
+  mNames[C_TrackWinHeight] = new JZConfigurationEntry(
+    ".trackwin_height",
+    400);
+
+  // Piano window.
+  mNames[C_PianoWinXpos] = new JZConfigurationEntry(
+    ".pianowin_xpos",
+    30);
+  mNames[C_PianoWinYpos] = new JZConfigurationEntry(
+    ".pianowin_ypos",
+    30);
+  mNames[C_PianoWinWidth] = new JZConfigurationEntry(
+    ".pianowin_width",
+    600);
+  mNames[C_PianoWinHeight] = new JZConfigurationEntry(
+    ".pianowin_height",
+    400);
+
+  // Parts dialog.
+  mNames[C_PartsDlgXpos] = new JZConfigurationEntry(".partsdialog_xpos", 50);
+  mNames[C_PartsDlgYpos] = new JZConfigurationEntry(".partsdialog_ypos", 50);
+
+  // Track dialog.
+  mNames[C_TrackDlgXpos] = new JZConfigurationEntry(".trackdialog_xpos", 50);
+  mNames[C_TrackDlgYpos] = new JZConfigurationEntry(".trackdialog_ypos", 50);
+
+  // Harmony browser.
+  mNames[C_HarmonyXpos] = new JZConfigurationEntry(
+    ".harmonybrowser_xpos",
+    100);
+  mNames[C_HarmonyYpos] = new JZConfigurationEntry(
+    ".harmonybrowser_ypos",
+    100);
+
+  // Random rhythm.
+  mNames[C_RhythmXpos] = new JZConfigurationEntry(".randomrhythm_xpos", 150);
+  mNames[C_RhythmYpos] = new JZConfigurationEntry(".randomrhythm_ypos", 150);
 
   // Show dialog unless initialized.
-  mNames[C_SynthDialog] = new JZConfigEntry(".synth_dialog", 1);
+  mNames[C_SynthDialog] = new JZConfigurationEntry(".synth_dialog", 1);
 
   // Default synthesizer type.
-  mNames[C_SynthType] = new JZConfigEntry(
+  mNames[C_SynthType] = new JZConfigurationEntry(
     ".synth_type",
     gSynthesizerTypes[SynthTypeGS].first.c_str());
 
   // Default synthesizer configuration file.
-  mNames[C_SynthConfig] = new JZConfigEntry(
+  mNames[C_SynthConfig] = new JZConfigurationEntry(
     ".synth_config",
     gSynthesierTypeFiles[SynthTypeGS].first.c_str());
 
   // When to send synthesizer reset (0 = never, 1 = song start,
   // 2 = start play).
-  mNames[C_SendSynthReset] = new JZConfigEntry(".send_synth_reset", 1);
+  mNames[C_SendSynthReset] = new JZConfigurationEntry(".send_synth_reset", 1);
 
   // Current include file.
-  mNames[C_Include] = new JZConfigEntry(".include", "");
+  mNames[C_Include] = new JZConfigurationEntry(".include", "");
 
   // Entries with empty values.
-  mNames[C_BankTable] = new JZConfigEntry(".bank_table");
-  mNames[C_VoiceNames] = new JZConfigEntry(".voicenames");
-  mNames[C_DrumSets] = new JZConfigEntry(".drumsets");
-  mNames[C_CtrlNames] = new JZConfigEntry(".ctrlnames");
-  mNames[C_DrumNames] = new JZConfigEntry(".drumnames");
+  mNames[C_BankTable] = new JZConfigurationEntry(".bank_table");
+  mNames[C_VoiceNames] = new JZConfigurationEntry(".voicenames");
+  mNames[C_DrumSets] = new JZConfigurationEntry(".drumsets");
+  mNames[C_CtrlNames] = new JZConfigurationEntry(".ctrlnames");
+  mNames[C_DrumNames] = new JZConfigurationEntry(".drumnames");
 
   // The startup song.
-  mNames[C_StartUpSong] = new JZConfigEntry(".startup_song", "jazz.mid");
+  mNames[C_StartUpSong] = new JZConfigurationEntry(
+    ".startup_song",
+    "jazz.mid");
 
-  mNames[C_OssBug1] = new JZConfigEntry(".ossbug1", 0);
-  mNames[C_OssBug2] = new JZConfigEntry(".ossbug2", 0);
-  mNames[C_DuplexAudio] = new JZConfigEntry(".duplex_audio", 0);
-  mNames[C_ThruInput] = new JZConfigEntry(".thru_input", 0);
-  mNames[C_ThruOutput] = new JZConfigEntry(".thru_output", 0);
+  mNames[C_OssBug1] = new JZConfigurationEntry(".ossbug1", 0);
+  mNames[C_OssBug2] = new JZConfigurationEntry(".ossbug2", 0);
+  mNames[C_DuplexAudio] = new JZConfigurationEntry(".duplex_audio", 0);
+  mNames[C_ThruInput] = new JZConfigurationEntry(".thru_input", 0);
+  mNames[C_ThruOutput] = new JZConfigurationEntry(".thru_output", 0);
 
   // Enable/disable splash dialog.
-  mNames[C_EnableWelcome] = new JZConfigEntry(".enable_welcome", 1);
+  mNames[C_EnableWelcome] = new JZConfigurationEntry(".enable_welcome", 1);
 
   // Other initialization.
 
@@ -422,53 +455,58 @@ wxString JZConfiguration::GetFileName()
 //-----------------------------------------------------------------------------
 int JZConfiguration::Load(char* buf)
 {
-   int entry = Check(buf);
+  int entry = Check(buf);
 
-   if (entry < 0)
-      return entry;
+  if (entry < 0)
+  {
+    return entry;
+  }
 
-   char format[100];
-   int result = 1;
-   if (mNames[entry]->GetType() == ConfigEntryTypeInt)
-   {
-      sprintf(format, "%s %%d", mNames[entry]->GetName());
-      int Value;
-      result = sscanf(buf, format, &Value);
-      mNames[entry]->SetValue(Value);
-   }
-   else if (mNames[entry]->GetType() == ConfigEntryTypeStr)
-   {
-      // allow whitespace inside entries like "C:\Program Files\JazzWare"
-      int ofs = strlen(mNames[entry]->GetName());
-      while (buf[ofs] == ' ' || buf[ofs] == '\t')  // not \n
-        ofs++;
-      int end = strlen(buf) - 1;
-      while (end > ofs) {
-        if (!isspace(buf[end]))
-          break;
-        end--;
+  char format[100];
+  int result = 1;
+  if (mNames[entry]->GetType() == eConfigEntryTypeInt)
+  {
+    sprintf(format, "%s %%d", mNames[entry]->GetName());
+    int Value;
+    result = sscanf(buf, format, &Value);
+    mNames[entry]->SetValue(Value);
+  }
+  else if (mNames[entry]->GetType() == eConfigEntryTypeStr)
+  {
+    // Allow whitespace inside entries like "C:\Program Files\JazzWare".
+    int ofs = strlen(mNames[entry]->GetName());
+    while (buf[ofs] == ' ' || buf[ofs] == '\t')  // not \n
+    {
+      ++ofs;
+    }
+    int end = strlen(buf) - 1;
+    while (end > ofs)
+    {
+      if (!isspace(buf[end]))
+      {
+        break;
       }
-      int size = end - ofs + 1;
+      --end;
+    }
+    int size = end - ofs + 1;
 
-      char* pStringValue = new char[size + 1];
-      memcpy(pStringValue, buf + ofs, size);
-      pStringValue[size] = 0;
-      mNames[entry]->SetStrValue(pStringValue);
-      delete [] pStringValue;
-   }
-   else
-   {
-      result = 1;
-   }
+    char* pStringValue = new char[size + 1];
+    memcpy(pStringValue, buf + ofs, size);
+    pStringValue[size] = 0;
+    mNames[entry]->SetStrValue(pStringValue);
+    delete [] pStringValue;
+  }
+  else
+  {
+    result = 1;
+  }
 
-   if (result <= 0)
-   {
-      return -1;
-   }
-   else
-   {
-      return entry;
-   }
+  if (result <= 0)
+  {
+    return -1;
+  }
+
+  return entry;
 }
 
 //-----------------------------------------------------------------------------

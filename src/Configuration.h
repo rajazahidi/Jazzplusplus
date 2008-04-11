@@ -111,9 +111,9 @@ enum TEConfigurationNames
 //*****************************************************************************
 enum TEConfigEntryType
 {
-  ConfigEntryTypeInt = 0,
-  ConfigEntryTypeStr,
-  ConfigEntryTypeEmpty
+  eConfigEntryTypeInt = 0,
+  eConfigEntryTypeStr,
+  eConfigEntryTypeEmpty
 };
 
 //*****************************************************************************
@@ -127,55 +127,84 @@ enum TEMidiDriver
 };
 
 //*****************************************************************************
+// Description:
+//   This is the configuration entry class declaration.
 //*****************************************************************************
-class JZConfigEntry
+class JZConfigurationEntry
 {
   public:
 
-    JZConfigEntry(const char* pName, int IntegerValue);
+    JZConfigurationEntry(const char* pName, int IntegerValue);
 
-    JZConfigEntry(const char* pName, const char* pStringValue);
+    JZConfigurationEntry(const char* pName, const char* pStringValue);
 
-    JZConfigEntry(const char* pName, const std::string& StringValue);
+    JZConfigurationEntry(const char* pName, const std::string& StringValue);
 
-    JZConfigEntry(const char* pName);
+    JZConfigurationEntry(const char* pName);
 
-    ~JZConfigEntry();
+    TEConfigEntryType GetType() const;
 
-    TEConfigEntryType GetType() const
-    {
-      return mType;
-    }
+    const char* GetName() const;
 
-    const char* GetName() const
-    {
-      return mName;
-    }
+    const int& GetValue() const;
 
-    const int& GetValue() const
-    {
-      return mValue;
-    }
+    void SetValue(const int& Value);
 
-    void SetValue(const int& value)
-    {
-      mValue = value;
-    }
-
-    const char* GetStrValue() const
-    {
-      return mStrValue;
-    }
+    const char* GetStrValue() const;
 
     void SetStrValue(const char* pStringValue);
 
   private:
 
     TEConfigEntryType mType;
-    char* mName;
+    std::string mName;
     int mValue;
-    char* mStrValue;
+    std::string mStrValue;
 };
+
+//*****************************************************************************
+// Description:
+//   These are the configuration entry class inline member functions.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+TEConfigEntryType JZConfigurationEntry::GetType() const
+{
+  return mType;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+const char* JZConfigurationEntry::GetName() const
+{
+  return mName.c_str();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+const int& JZConfigurationEntry::GetValue() const
+{
+  return mValue;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+void JZConfigurationEntry::SetValue(const int& Value)
+{
+  mValue = Value;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+const char* JZConfigurationEntry::GetStrValue() const
+{
+  return mStrValue.c_str();
+}
 
 //*****************************************************************************
 //*****************************************************************************
@@ -233,7 +262,7 @@ class JZConfiguration
 
     wxString mFileName;
 
-    JZConfigEntry* mNames[NumConfigNames];
+    JZConfigurationEntry* mNames[NumConfigNames];
 
     std::vector<std::pair<std::string, int> > mDrumNames;
 

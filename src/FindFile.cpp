@@ -37,7 +37,7 @@ using namespace std;
 //    environment variable, if it exists
 // 3. appending the passed file name to the path specified by the JAZZ
 //    environment variable, if it exists
-// 4. appending the passed file name to the location of the jazz executable
+// 4. appending the passed file name to the location of the Jazz++ executable
 //
 // Returns:
 //   wxString:
@@ -48,7 +48,7 @@ wxString FindFile(const wxString& FileName)
 {
   if (::wxFileExists(FileName))
   {
-    cout << "imediate hit " << FileName << endl;
+    cout << "FindFile: Immediate hit on file \"" << FileName << '"' << endl;
     return FileName;
   }
 
@@ -61,7 +61,7 @@ wxString FindFile(const wxString& FileName)
     FoundFileName << Home << wxFileName::GetPathSeparator() << FileName;
     if (wxFileExists(FoundFileName))
     {
-      cout << "home " << FoundFileName << endl;
+      cout << "FindFile: HOME: \"" << FoundFileName << '"' << endl;
       return FoundFileName;
     }
   }
@@ -73,7 +73,7 @@ wxString FindFile(const wxString& FileName)
     FoundFileName << Home << wxFileName::GetPathSeparator() << FileName;
     if (wxFileExists(FoundFileName))
     {
-      cout << "jazz " << FoundFileName <<endl;
+      cout << "FindFile: JAZZ: \"" << FoundFileName << '"' << endl;
       return FoundFileName;
     }
   }
@@ -84,9 +84,11 @@ wxString FindFile(const wxString& FileName)
   FoundFileName << Home << wxFileName::GetPathSeparator() << FileName;
   if (wxFileExists(FoundFileName))
   {
-    cout << "startup " << FoundFileName << endl;
+    cout << "FindFile: Startup directory: \"" << FoundFileName << '"' << endl;
     return FoundFileName;
   }
+
+  cout << "FindFile: File not found: \"" << FileName << '"' << endl;
 
   return wxEmptyString;
 }

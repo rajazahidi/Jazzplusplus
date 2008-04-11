@@ -134,8 +134,8 @@ tAlsaAudioPlayer::tAlsaAudioPlayer(JZSong* pSong)
   pcm[PLAYBACK] = NULL;
   pcm[CAPTURE] = NULL;
 
-  dev[PLAYBACK] = gpConfig->GetStrValue(C_AlsaAudioOutputDevice);
-  dev[CAPTURE] = gpConfig->GetStrValue(C_AlsaAudioInputDevice);
+  mDeviceNames[PLAYBACK] = gpConfig->GetStrValue(C_AlsaAudioOutputDevice);
+  mDeviceNames[CAPTURE] = gpConfig->GetStrValue(C_AlsaAudioInputDevice);
 
   // FIXME
   mCanDuplex = 1;
@@ -202,7 +202,10 @@ void tAlsaAudioPlayer::StartPlay(long clock, long loopClock, int cont)
     recbuffers.ResetBufferSize(frag_byte_size[CAPTURE]);
   }
 
-  if (dev[CAPTURE] != dev[PLAYBACK] || mCanDuplex || running_mode == 0)
+  if (
+    mDeviceNames[CAPTURE] != mDeviceNames[PLAYBACK] ||
+    mCanDuplex ||
+    running_mode == 0)
   {
     OpenDsp(PLAYBACK, 1);
     mSamples.ResetBufferSize(frag_byte_size[PLAYBACK]);
@@ -266,7 +269,12 @@ void tAlsaAudioPlayer::OpenDsp(int mode, int sync_mode)
 
   snd_pcm_stream_t stream = (mode == PLAYBACK) ?
     SND_PCM_STREAM_PLAYBACK : SND_PCM_STREAM_CAPTURE;
-  if (snd_pcm_open(&pcm[mode], dev[mode], stream, SND_PCM_NONBLOCK) < 0)
+  if (
+    snd_pcm_open(
+      &pcm[mode],
+      mDeviceNames[mode].c_str(),
+      stream,
+      SND_PCM_NONBLOCK) < 0)
   {
     perror("snd_pcm_open");
     audio_enabled = 0;

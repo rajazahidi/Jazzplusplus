@@ -94,7 +94,7 @@ class tAlsaAudioPlayer : public tAlsaPlayer
     int  audio_enabled; // 0 means midi only
 
     int card; // card number in config
-    const char *dev[2]; // device names
+    std::string mDeviceNames[2]; // device names
     long frag_size[2];
     long frag_byte_size[2];
     int frame_shift[2];

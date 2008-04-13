@@ -50,7 +50,7 @@ class tAudioListener : public wxTimer
 
   public:
 
-    tAudioListener(tWinAudioPlayer* pPlayer, int key)
+    tAudioListener(JZWindowsAudioPlayer* pPlayer, int key)
       : wxTimer(),
         mpPlayer(pPlayer),
         mCount(0),
@@ -74,7 +74,7 @@ class tAudioListener : public wxTimer
     }
 
     tAudioListener(
-      tWinAudioPlayer* pPlayer,
+      JZWindowsAudioPlayer* pPlayer,
       tSample& spl,
       long fr_smpl,
       long to_smpl)
@@ -133,7 +133,7 @@ class tAudioListener : public wxTimer
 
   private:
 
-    tWinAudioPlayer* mpPlayer;
+    JZWindowsAudioPlayer* mpPlayer;
 
     long mCount;
 
@@ -144,8 +144,8 @@ class tAudioListener : public wxTimer
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tWinAudioPlayer::tWinAudioPlayer(JZSong* pSong)
-  : tWinIntPlayer(pSong),
+JZWindowsAudioPlayer::JZWindowsAudioPlayer(JZSong* pSong)
+  : JZWindowsIntPlayer(pSong),
     mErrorCode(NoError),
     mCanDuplex(false),
     mCanSynchronize(true),
@@ -197,7 +197,7 @@ tWinAudioPlayer::tWinAudioPlayer(JZSong* pSong)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tWinAudioPlayer::~tWinAudioPlayer()
+JZWindowsAudioPlayer::~JZWindowsAudioPlayer()
 {
   delete mpListener;
   delete AudioBuffer;
@@ -211,7 +211,7 @@ tWinAudioPlayer::~tWinAudioPlayer()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinAudioPlayer::ShowError()
+void JZWindowsAudioPlayer::ShowError()
 {
   const char* pMessage = 0;
   switch (mErrorCode)
@@ -249,14 +249,14 @@ void tWinAudioPlayer::ShowError()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tWinAudioPlayer::LoadSamples(const char *filename)
+int JZWindowsAudioPlayer::LoadSamples(const char *filename)
 {
   return mSamples.Load(filename);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tWinAudioPlayer::OpenDsp()
+int JZWindowsAudioPlayer::OpenDsp()
 {
   int i;
   MMRESULT res;
@@ -369,7 +369,7 @@ int tWinAudioPlayer::OpenDsp()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tWinAudioPlayer::CloseDsp()
+int JZWindowsAudioPlayer::CloseDsp()
 {
   // todo: close the device immediately if open
 
@@ -441,13 +441,13 @@ void FAR PASCAL audioInterrupt(
 {
   if (wMsg == MM_WOM_DONE || wMsg == MM_WIM_DATA)
   {
-    ((tWinAudioPlayer *)dwUser)->AudioCallback(wMsg);
+    ((JZWindowsAudioPlayer *)dwUser)->AudioCallback(wMsg);
   }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinAudioPlayer::AudioCallback(UINT wMsg)
+void JZWindowsAudioPlayer::AudioCallback(UINT wMsg)
 {
   // async called by driver when the driver has processed a buffer completely
   EnterCriticalSection(&mutex);
@@ -468,7 +468,7 @@ void tWinAudioPlayer::AudioCallback(UINT wMsg)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinAudioPlayer::StartAudio()
+void JZWindowsAudioPlayer::StartAudio()
 {
   // async called by driver to start audio in sync with midi
   if (hout_open)
@@ -487,7 +487,7 @@ void tWinAudioPlayer::StartAudio()
 // Description:
 //   Send the sample set to driver.
 //-----------------------------------------------------------------------------
-void tWinAudioPlayer::WriteBuffers()
+void JZWindowsAudioPlayer::WriteBuffers()
 {
   if (audio_enabled && hout_open)
   {
@@ -514,7 +514,7 @@ void tWinAudioPlayer::WriteBuffers()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinAudioPlayer::Notify()
+void JZWindowsAudioPlayer::Notify()
 {
   if (audio_enabled)
   {
@@ -599,15 +599,15 @@ void tWinAudioPlayer::Notify()
     LeaveCriticalSection(&mutex);
   }  // if (audio_enabled)
 
-  tWinIntPlayer::Notify();
+  JZWindowsIntPlayer::Notify();
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinAudioPlayer::StartPlay(long Clock, long LoopClock, int Continue)
+void JZWindowsAudioPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 {
   mSamples.StartPlay(Clock);
-  tWinIntPlayer::StartPlay(Clock, LoopClock, Continue);
+  JZWindowsIntPlayer::StartPlay(Clock, LoopClock, Continue);
 
   if (!audio_enabled)
     return;
@@ -625,9 +625,9 @@ void tWinAudioPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinAudioPlayer::StopPlay()
+void JZWindowsAudioPlayer::StopPlay()
 {
-  tWinIntPlayer::StopPlay();
+  JZWindowsIntPlayer::StopPlay();
   CloseDsp();
   mSamples.StopPlay();
   if (RecordMode())
@@ -646,7 +646,7 @@ void tWinAudioPlayer::StopPlay()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinAudioPlayer::ListenAudio(int key, int start_stop_mode)
+void JZWindowsAudioPlayer::ListenAudio(int key, int start_stop_mode)
 {
   if (!audio_enabled)
   {
@@ -677,7 +677,7 @@ void tWinAudioPlayer::ListenAudio(int key, int start_stop_mode)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinAudioPlayer::ListenAudio(tSample &spl, long fr_smpl, long to_smpl)
+void JZWindowsAudioPlayer::ListenAudio(tSample &spl, long fr_smpl, long to_smpl)
 {
   if (!audio_enabled)
     return;
@@ -694,7 +694,7 @@ void tWinAudioPlayer::ListenAudio(tSample &spl, long fr_smpl, long to_smpl)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long tWinAudioPlayer::GetListenerPlayPosition()
+long JZWindowsAudioPlayer::GetListenerPlayPosition()
 {
   if (!mpListener)
   {
@@ -705,7 +705,7 @@ long tWinAudioPlayer::GetListenerPlayPosition()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tWinAudioPlayer::RecordMode() const
+int JZWindowsAudioPlayer::RecordMode() const
 {
   return rec_info != 0 && rec_info->mpTrack->GetAudioMode();
 }

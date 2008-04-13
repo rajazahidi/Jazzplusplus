@@ -34,7 +34,8 @@
 #define ID_EXPORT_SELECTION_AS_MIDI          wxID_HIGHEST + 2
 
 #define ID_SETTINGS_METRONOME                wxID_HIGHEST + 10
-#define ID_SETTINGS_SYNTH                    wxID_HIGHEST + 11
+#define ID_SETTINGS_SYNTHESIZER              wxID_HIGHEST + 11
+#define ID_SETTINGS_MIDI_DEVICE              wxID_HIGHEST + 12
 
 #define ID_TRIM                              wxID_HIGHEST + 30
 #define ID_QUANTIZE                          wxID_HIGHEST + 31

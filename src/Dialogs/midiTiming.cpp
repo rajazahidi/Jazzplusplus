@@ -55,13 +55,13 @@ void tTimingDlg::MtcRecFunc( tMidiButton& button, wxCommandEvent& event )
 
 void tTimingDlg::MtcInitRec()
 {
-#ifdef wx_msw
+#ifdef __WXMSW__
   if (Config(C_ClockSource) != CsMtc)
   {
     delete Midi;
     Config(C_ClockSource) = CsMtc;
     ClkSrcListBox->SetStringSelection( ClkSrcArray[ Config(C_ClockSource) ] );
-    Midi = new tWinMtcPlayer(EventWin->Song);
+    Midi = new JZWindowsMtcPlayer(EventWin->Song);
     if (!Midi->Installed())
     {
       wxMessageBox("no midi driver installed", "Error", wxOK);
@@ -130,7 +130,7 @@ void tTimingDlg::OnOk()
   if (i != Config(C_ClockSource))
   {
     Config(C_ClockSource) = (tClockSource) i;
-#ifdef wx_msw
+#ifdef __WXMSW__
     // Re-install the midi device
     delete Midi;
 
@@ -138,10 +138,10 @@ void tTimingDlg::OnOk()
     switch (Config(C_ClockSource))
     {
       case CsMidi:
-        Midi = new tWinMidiPlayer(EventWin->Song);
+        Midi = new JZWindowsMidiPlayer(EventWin->Song);
         break;
       case CsMtc:
-        Midi = new tWinMtcPlayer(EventWin->Song);
+        Midi = new JZWindowsMtcPlayer(EventWin->Song);
         break;
       case CsFsk:
       case CsInt:
@@ -205,7 +205,7 @@ void tTimingDlg::EditForm(wxPanel *panel)
     -1,
     -1);
 
-#ifdef wx_msw
+#ifdef __WXMSW__
   ClkSrcListBox->Append( ClkSrcArray[CsInt] );
   ClkSrcListBox->Append( ClkSrcArray[CsMidi] );
   ClkSrcListBox->Append( ClkSrcArray[CsMtc] );
@@ -240,7 +240,7 @@ void tTimingDlg::EditForm(wxPanel *panel)
 
   panel->NewLine();
 
-#ifdef wx_msw
+#ifdef __WXMSW__
   (void) new wxMessage( panel, "Record MTC offset: " );
   (void) new tMidiButton( this, panel, (wxFunction) MtcRecFunc, "Start" );
   panel->NewLine();

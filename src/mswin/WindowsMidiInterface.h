@@ -48,7 +48,7 @@ void CALLBACK MidiOutProc(
 );
 }
 
-class tWinAudioPlayer;
+class JZWindowsAudioPlayer;
 
 // pseudo data word of struct midi_event, values must be less
 // than 128 to be distinguished from a midi status
@@ -348,7 +348,7 @@ struct tWinPlayerState
   tMidiQueue play_buffer;
   tMidiQueue thru_buffer;
 
-  tWinAudioPlayer* audio_player;
+  JZWindowsAudioPlayer* audio_player;
   long time_correction;
 
   tWinSysexBufferArray* isx_buffers;

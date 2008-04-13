@@ -177,7 +177,7 @@ class tAudioBufferQueue
 class tAudioRecordBuffer
 {
   friend class tSampleSet;
-  friend class tWinAudioPlayer;
+  friend class JZWindowsAudioPlayer;
 
   public:
 
@@ -224,7 +224,7 @@ class tSampleSet
     friend class tSample;
     friend class tAudioGloblForm;
     friend class tSamplesDlg;
-    friend class tWinAudioPlayer;
+    friend class JZWindowsAudioPlayer;
     friend class tAudioPlayer;
     friend class tAlsaAudioPlayer;
 

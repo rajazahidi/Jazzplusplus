@@ -39,6 +39,10 @@
 #include "Dialogs/SynthesizerSettingsDialog.h"
 #include "AboutDialog.h"
 
+#ifdef __WXMSW__
+#include "mswin/WindowsPlayer.h"
+#endif
+
 // These are the tool bar icons.
 #include "Bitmaps/open.xpm"
 #include "Bitmaps/save.xpm"
@@ -93,7 +97,9 @@ BEGIN_EVENT_TABLE(JZTrackFrame, wxFrame)
 
   EVT_MENU(ID_SETTINGS_METRONOME, JZTrackFrame::OnSettingsMetronome)
 
-  EVT_MENU(ID_SETTINGS_SYNTH, JZTrackFrame::OnSettingsSynthesizerType)
+  EVT_MENU(ID_SETTINGS_SYNTHESIZER, JZTrackFrame::OnSettingsSynthesizerType)
+
+  EVT_MENU(ID_SETTINGS_MIDI_DEVICE, JZTrackFrame::OnSettingsMidiDevice)
 
   EVT_MENU(wxID_HELP_CONTENTS, JZTrackFrame::OnHelpContents)
 
@@ -334,19 +340,21 @@ void JZTrackFrame::CreateMenu()
   pSettingMenu->Append(MEN_TIMING,    "&Timing...");
   pSettingMenu->Append(MEN_MIDI_THRU, "&Midi Thru...");
 #endif
-  pSettingMenu->Append(ID_SETTINGS_SYNTH, "&Synthesizer Type...");
+  pSettingMenu->Append(ID_SETTINGS_SYNTHESIZER, "&Synthesizer Type...");
 
-#if 0
 #ifdef __WXMSW__
-  pSettingMenu->Append(MEN_DEVICE, "&Midi Device...");
+  pSettingMenu->Append(ID_SETTINGS_MIDI_DEVICE, "&Midi Device...");
 #else
   if (
     gpConfig->GetValue(C_MidiDriver) == eMidiDriverOss ||
     gpConfig->GetValue(C_MidiDriver) == eMidiDriverAlsa)
   {
-    pSettingMenu->Append(MEN_DEVICE, "&Midi Device...");
+    pSettingMenu->Append(ID_SETTINGS_MIDI_DEVICE, "&Midi Device...");
   }
 #endif
+
+#if 0
+
   save_settings_menu = new wxMenu;
   save_settings_menu->Append( MEN_SAVE_THRU, "&Midi Thru" );
   save_settings_menu->Append( MEN_SAVE_TIM, "&Timing" );
@@ -563,6 +571,41 @@ void JZTrackFrame::OnSettingsSynthesizerType(wxCommandEvent& Event)
 {
   JZSynthesizerDialog SynthesizerDialog(this);
   SynthesizerDialog.ShowModal();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnSettingsMidiDevice(wxCommandEvent& Event)
+{
+  long InputDevice, OutputDevice;
+#ifdef __WXMSW__
+  gpConfig->Get(C_WinInputDevice, InputDevice);
+  gpConfig->Get(C_WinOutputDevice, OutputDevice);
+  JZWindowsPlayer::SettingsDlg(InputDevice, OutputDevice);
+  ::wxMessageBox(
+    "Restart Jazz++ to activate changes in device settings",
+    "Info",
+    wxOK);
+#else
+/*
+  if (gpConfig->GetValue(C_MidiDriver) == eMidiDriverOss)
+  {
+    int Device = mpMidiPlayer->FindMidiDevice();
+    if (Device >= 0)
+    {
+      SaveMidiDeviceSettings(Device);
+      ::wxMessageBox(
+        "Restart Jazz++ to activate changes in device settings",
+        "Info",
+        wxOK);
+    }
+    else
+    {
+      ::wxMessageBox("No midi device found", "Info", wxOK);
+    }
+  }
+*/
+#endif
 }
 
 //-----------------------------------------------------------------------------

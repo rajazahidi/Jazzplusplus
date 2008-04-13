@@ -29,10 +29,11 @@
 #include "Audio.h"
 #include "WindowsMidiInterface.h"
 
-
 class tSample;
 
-class tWinAudioPlayer : public tWinIntPlayer
+//*****************************************************************************
+//*****************************************************************************
+class JZWindowsAudioPlayer : public JZWindowsIntPlayer
 {
   friend class tAudioListener;
 
@@ -51,9 +52,9 @@ class tWinAudioPlayer : public tWinIntPlayer
       ErrCapSync
     };
 
-    tWinAudioPlayer(JZSong* pSong);
+    JZWindowsAudioPlayer(JZSong* pSong);
 
-    virtual ~tWinAudioPlayer();
+    virtual ~JZWindowsAudioPlayer();
 
     int LoadSamples(const char *filename);
 
@@ -67,7 +68,7 @@ class tWinAudioPlayer : public tWinIntPlayer
 
     virtual int Installed()
     {
-      return installed && tWinIntPlayer::Installed();
+      return installed && JZWindowsIntPlayer::Installed();
     }
 
     virtual int GetAudioEnabled() const
@@ -134,8 +135,8 @@ class tWinAudioPlayer : public tWinIntPlayer
     int CloseDsp();   // 0 = ok
 
     int installed;
-    int audio_enabled;   // 0 means midi only
-    long blocks_played;   // # of blocks written to device
+    int audio_enabled;        // 0 means midi only
+    long blocks_played;       // # of blocks written to device
     int play_buffers_needed;  // driver requests more output buffers
 
     long start_clock;     // when did play start

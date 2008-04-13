@@ -255,20 +255,20 @@ JZProject::JZProject()
   switch (mpConfig->GetValue(C_ClockSource))
   {
     case CsMidi:
-      mpMidiPlayer = new tWinMidiPlayer(this);
+      mpMidiPlayer = new JZWindowsMidiPlayer(this);
       break;
     case CsMtc:
-      mpMidiPlayer = new tWinMtcPlayer(this);
+      mpMidiPlayer = new JZWindowsMtcPlayer(this);
       break;
     case CsFsk:
     case CsInt:
     default:
-      mpMidiPlayer = new tWinAudioPlayer(this);
+      mpMidiPlayer = new JZWindowsAudioPlayer(this);
       if (!mpMidiPlayer->Installed())
       {
         mpMidiPlayer->ShowError();
         delete mpMidiPlayer;
-        mpMidiPlayer = new tWinIntPlayer(this);
+        mpMidiPlayer = new JZWindowsIntPlayer(this);
       }
       break;
   }

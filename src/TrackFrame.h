@@ -88,6 +88,8 @@ class JZTrackFrame : public wxFrame, public tButtonLabelInterface
 
     void OnSettingsSynthesizerType(wxCommandEvent& Event);
 
+    void OnSettingsMidiDevice(wxCommandEvent& Event);
+
     void OnHelpContents(wxCommandEvent& Event);
 
     void OnHelpAbout(wxCommandEvent& Event);

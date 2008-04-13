@@ -45,7 +45,7 @@ using namespace std;
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tWinPlayer::tWinPlayer(JZSong* pSong)
+JZWindowsPlayer::JZWindowsPlayer(JZSong* pSong)
   : JZPlayer(pSong)
 {
   poll_millisec = 25;
@@ -161,14 +161,14 @@ tWinPlayer::tWinPlayer(JZSong* pSong)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tWinPlayer::Installed()
+int JZWindowsPlayer::Installed()
 {
   return timer_installed && state->hout;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tWinPlayer::~tWinPlayer()
+JZWindowsPlayer::~JZWindowsPlayer()
 {
   if (state->hinp)
   {
@@ -193,14 +193,14 @@ tWinPlayer::~tWinPlayer()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinPlayer::SetSoftThru(int on, int InputDevice, int OutputDevice)
+void JZWindowsPlayer::SetSoftThru(int on, int InputDevice, int OutputDevice)
 {
   state->soft_thru = on;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZEvent *tWinPlayer::Dword2Event(DWORD dw)
+JZEvent *JZWindowsPlayer::Dword2Event(DWORD dw)
 {
   union
   {
@@ -250,7 +250,7 @@ JZEvent *tWinPlayer::Dword2Event(DWORD dw)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-DWORD tWinPlayer::Event2Dword(JZEvent *e)
+DWORD JZWindowsPlayer::Event2Dword(JZEvent *e)
 {
   union
   {
@@ -355,7 +355,7 @@ DWORD tWinPlayer::Event2Dword(JZEvent *e)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long tWinPlayer::Clock2Time(long clock)
+long JZWindowsPlayer::Clock2Time(long clock)
 {
   if (clock < state->start_clock)
     return state->start_time;
@@ -365,7 +365,7 @@ long tWinPlayer::Clock2Time(long clock)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long tWinPlayer::Time2Clock(long time)
+long JZWindowsPlayer::Time2Clock(long time)
 {
   if (time < state->start_time)
     return state->start_clock;
@@ -376,7 +376,7 @@ long tWinPlayer::Time2Clock(long time)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinPlayer::SetTempo(long bpm, long clock)
+void JZWindowsPlayer::SetTempo(long bpm, long clock)
 {
   long t1 = Clock2Time(clock);
   state->ticks_per_minute = (long)bpm * (long)Song->TicksPerQuarter;
@@ -386,7 +386,7 @@ void tWinPlayer::SetTempo(long bpm, long clock)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long tWinPlayer::RealTimeClock2Time(long clock)
+long JZWindowsPlayer::RealTimeClock2Time(long clock)
 {
   if (clock < state->start_clock)
     return real_start_time;
@@ -395,7 +395,7 @@ long tWinPlayer::RealTimeClock2Time(long clock)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long tWinPlayer::Time2RealTimeClock(long time)
+long JZWindowsPlayer::Time2RealTimeClock(long time)
 {
   if (time < real_start_time)
     return state->start_clock;
@@ -404,7 +404,7 @@ long tWinPlayer::Time2RealTimeClock(long time)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinPlayer::SetRealTimeTempo(long bpm, long clock)
+void JZWindowsPlayer::SetRealTimeTempo(long bpm, long clock)
 {
   long t1 = RealTimeClock2Time(clock);
   real_ticks_per_minute = (long)bpm * (long)Song->TicksPerQuarter;
@@ -414,7 +414,7 @@ void tWinPlayer::SetRealTimeTempo(long bpm, long clock)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tWinPlayer::OutSysex(JZEvent *e, DWORD time)
+int JZWindowsPlayer::OutSysex(JZEvent *e, DWORD time)
 {
   tSysEx *sx = e->IsSysEx();
   if (sx == 0)
@@ -433,7 +433,7 @@ int tWinPlayer::OutSysex(JZEvent *e, DWORD time)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tWinPlayer::OutEvent(JZEvent *e)
+int JZWindowsPlayer::OutEvent(JZEvent *e)
 {
   DWORD d = Event2Dword(e);
   if (d)
@@ -449,7 +449,7 @@ int tWinPlayer::OutEvent(JZEvent *e)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tWinMidiPlayer::OutEvent(JZEvent *e)
+int JZWindowsMidiPlayer::OutEvent(JZEvent *e)
 {
   DWORD d = Event2Dword(e);
   if (d)
@@ -466,7 +466,7 @@ int tWinMidiPlayer::OutEvent(JZEvent *e)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinPlayer::OutNow(JZEvent* pEvent)
+void JZWindowsPlayer::OutNow(JZEvent* pEvent)
 {
   DWORD d = Event2Dword(pEvent);
   if (d)
@@ -503,7 +503,7 @@ void tWinPlayer::OutNow(JZEvent* pEvent)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinPlayer::OutNow(tParam *r)
+void JZWindowsPlayer::OutNow(tParam *r)
 {
   OutNow(&r->Msb);
   OutNow(&r->Lsb);
@@ -512,7 +512,9 @@ void tWinPlayer::OutNow(tParam *r)
   OutNow(&r->ResetLsb);
 }
 
-void tWinPlayer::FillMidiClocks(long to)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZWindowsPlayer::FillMidiClocks(long to)
 {
   while (midiClockOut <= to)
   {
@@ -525,7 +527,7 @@ void tWinPlayer::FillMidiClocks(long to)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinPlayer::OutBreak(long clock)
+void JZWindowsPlayer::OutBreak(long clock)
 {
   if (gpConfig->GetValue(C_RealTimeOut))
   {
@@ -540,7 +542,7 @@ void tWinPlayer::OutBreak(long clock)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinMidiPlayer::OutBreak(long clock)
+void JZWindowsMidiPlayer::OutBreak(long clock)
 {
   if (gpConfig->GetValue(C_RealTimeOut))
   {
@@ -555,7 +557,7 @@ void tWinMidiPlayer::OutBreak(long clock)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinPlayer::OutBreak()
+void JZWindowsPlayer::OutBreak()
 {
   OutBreak(OutClock);
 }
@@ -587,7 +589,7 @@ static DWORD GetMtcTime(tWinPlayerState* pState)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinPlayer::StartPlay(long Clock, long LoopClock, int Continue)
+void JZWindowsPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 {
   state->play_buffer.clear();
   state->recd_buffer.clear();
@@ -696,7 +698,7 @@ void tWinPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinPlayer::StopPlay()
+void JZWindowsPlayer::StopPlay()
 {
   wxBeginBusyCursor();
   state->playing = FALSE;
@@ -750,7 +752,7 @@ void tWinPlayer::StopPlay()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinPlayer::FlushToDevice()
+void JZWindowsPlayer::FlushToDevice()
 // try to send all events up to OutClock to device
 {
   if (gpConfig->GetValue(C_RealTimeOut))
@@ -763,7 +765,7 @@ void tWinPlayer::FlushToDevice()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinPlayer::FlushToDevice(long clock)
+void JZWindowsPlayer::FlushToDevice(long clock)
 {
   tEventIterator Iterator(&mPlayBuffer);
   JZEvent* pEvent = Iterator.Range(0, clock);
@@ -782,7 +784,7 @@ void tWinPlayer::FlushToDevice(long clock)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long tWinIntPlayer::GetRealTimeClock()
+long JZWindowsIntPlayer::GetRealTimeClock()
 {
   while (!state->recd_buffer.empty())
   {
@@ -826,7 +828,7 @@ long tWinIntPlayer::GetRealTimeClock()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long tWinMidiPlayer::GetRealTimeClock()
+long JZWindowsMidiPlayer::GetRealTimeClock()
 {
   long clock;
 
@@ -880,7 +882,7 @@ long tWinMidiPlayer::GetRealTimeClock()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long tWinMtcPlayer::GetRealTimeClock()
+long JZWindowsMtcPlayer::GetRealTimeClock()
 {
   long clock;
 
@@ -960,7 +962,7 @@ long tWinMtcPlayer::GetRealTimeClock()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinMtcPlayer::InitMtcRec()
+void JZWindowsMtcPlayer::InitMtcRec()
 {
   state->doing_mtc_rec = TRUE;
   StartPlay( 0, 0, 0 );
@@ -968,7 +970,7 @@ void tWinMtcPlayer::InitMtcRec()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tMtcTime* tWinMtcPlayer::FreezeMtcRec()
+tMtcTime* JZWindowsMtcPlayer::FreezeMtcRec()
 {
   StopPlay();
   state->doing_mtc_rec = FALSE;
@@ -979,7 +981,7 @@ tMtcTime* tWinMtcPlayer::FreezeMtcRec()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tWinPlayer::SettingsDlg(long& InputDevice, long& OutputDevice)
+void JZWindowsPlayer::SettingsDlg(long& InputDevice, long& OutputDevice)
 {
   vector<pair<string, int> > MidiDevices;
 

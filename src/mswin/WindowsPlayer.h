@@ -34,14 +34,14 @@ extern "C"
 
 //*****************************************************************************
 //*****************************************************************************
-class tWinPlayer : public JZPlayer
+class JZWindowsPlayer : public JZPlayer
 {
   public:
 
-    tWinPlayer(JZSong* pSong);
+    JZWindowsPlayer(JZSong* pSong);
 
     int Installed();
-    virtual ~tWinPlayer();
+    virtual ~JZWindowsPlayer();
     virtual int OutEvent(JZEvent* e);
     virtual int OutSysex(JZEvent* e, DWORD time);
     void OutNow(JZEvent *e);
@@ -98,12 +98,12 @@ class tWinPlayer : public JZPlayer
 
 //*****************************************************************************
 //*****************************************************************************
-class tWinIntPlayer : public tWinPlayer
+class JZWindowsIntPlayer : public JZWindowsPlayer
 {
   public:
 
-    tWinIntPlayer(JZSong* pSong)
-      : tWinPlayer(pSong)
+    JZWindowsIntPlayer(JZSong* pSong)
+      : JZWindowsPlayer(pSong)
     {
     }
 
@@ -112,27 +112,27 @@ class tWinIntPlayer : public tWinPlayer
 
 //*****************************************************************************
 //*****************************************************************************
-class tWinMidiPlayer : public tWinPlayer
+class JZWindowsMidiPlayer : public JZWindowsPlayer
 {
   public:
 
-    tWinMidiPlayer(JZSong* pSong)
-      : tWinPlayer(pSong)
+    JZWindowsMidiPlayer(JZSong* pSong)
+      : JZWindowsPlayer(pSong)
     {
     }
 
     virtual long GetRealTimeClock();
-    virtual int OutEvent(JZEvent *e);
+    virtual int OutEvent(JZEvent* pEvent);
     virtual void OutBreak(long clock);
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tWinMtcPlayer : public tWinPlayer
+class JZWindowsMtcPlayer : public JZWindowsPlayer
 {
   public:
-    tWinMtcPlayer(JZSong* pSong)
-      : tWinPlayer(pSong)
+    JZWindowsMtcPlayer(JZSong* pSong)
+      : JZWindowsPlayer(pSong)
     {
     }
 

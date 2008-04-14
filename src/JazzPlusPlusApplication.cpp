@@ -25,6 +25,7 @@
 #include "JazzPlusPlusApplication.h"
 #include "TrackFrame.h"
 #include "Project.h"
+#include "ProjectManager.h"
 #include "Globals.h"
 
 #ifdef _MSC_VER
@@ -135,17 +136,18 @@ bool JZJazzPlusPlusApplication::OnInit()
   wxApp::OnInit();
 
   // Create the main application window.
-  mpTrackFrame = new JZTrackFrame(
-    0,
-    "Jazz++",
-    gpSong,
-    wxPoint(10, 10),
-    wxSize(600, 400));
+  mpTrackFrame = JZProjectManager::Instance()->CreateTrackView();
+//    new JZTrackFrame(
+//    0,
+//    "Jazz++",
+//    gpSong,
+//    wxPoint(10, 10),
+//    wxSize(600, 400));
 
   gpTrackFrame = mpTrackFrame;
 
   // Show it and tell the application that it's our main window
-  mpTrackFrame->Show(true);
+//  mpTrackFrame->Show(true);
   SetTopWindow(mpTrackFrame);
 
   return true;
@@ -166,6 +168,8 @@ int JZJazzPlusPlusApplication::OnExit()
 
   // Prevent reported leaks from the configuration class.
   delete wxConfigBase::Set(0);
+
+  JZProjectManager::Destroy();
 
   return 0;
 }

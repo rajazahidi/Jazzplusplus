@@ -32,6 +32,7 @@
 #include "WxWidgets.h"
 
 #include "AlsaPlayer.h"
+#include "ProjectManager.h"
 #include "TrackFrame.h"
 #include "TrackWindow.h"
 #include "Dialogs.h"
@@ -715,7 +716,7 @@ void tAlsaPlayer::StopPlay()
   flush_output();
   stop_queue_timer();
   clear_input_queue();
-  gpTrackWindow->NewPlayPosition(-1L);
+  JZProjectManager::Instance()->NewPlayPosition(-1);
   RecdBuffer.Keyoff2Length();
 }
 
@@ -849,7 +850,8 @@ long tAlsaPlayer::GetRealTimeClock()
   }
   if (recd_clock != old_recd_clock)
   {
-    gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(recd_clock/48 * 48));
+    JZProjectManager::Instance()->NewPlayPosition(
+      PlayLoop->Ext2IntClock(recd_clock / 48 * 48));
   }
   return recd_clock;
 }

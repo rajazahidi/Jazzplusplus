@@ -29,8 +29,8 @@
 #include "Player.h"
 #include "RecordingInfo.h"
 #include "JazzPlusPlusApplication.h"
+#include "ProjectManager.h"
 #include "ToolBar.h"
-#include "PianoFrame.h"
 #include "Project.h"
 #include "Globals.h"
 #include "Configuration.h"
@@ -120,7 +120,6 @@ JZTrackFrame::JZTrackFrame(
     mpFileMenu(0),
     mpEditMenu(0),
     mpToolsMenu(0),
-//    mpPianoFrame(0),
     mPreviousClock(0),
     mPreviouslyRecording(false)
 {
@@ -137,12 +136,6 @@ JZTrackFrame::JZTrackFrame(
   gpTrackWindow = mpTrackWindow;
 
   mpTrackWindow->Create();
-
-//  mpPianoFrame = new JZPianoFrame(
-//    this,
-//    "Piano",
-//    wxDefaultPosition,
-//    wxSize(640, 480));
 }
 
 //-----------------------------------------------------------------------------
@@ -405,6 +398,13 @@ void JZTrackFrame::CreateMenu()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void JZTrackFrame::NewPlayPosition(int Clock)
+{
+  mpTrackWindow->NewPlayPosition(Clock);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 bool JZTrackFrame::OnClose()
 {
 //  if (JZTrack::changed)
@@ -451,7 +451,7 @@ void JZTrackFrame::OnFileOpen(wxCommandEvent& Event)
     gpProject->OpenSong(FileName);
     SetTitle(FileName);
 //    NextWin->NewPosition(1, 0);
-    mpTrackWindow->SetScrollRanges(0, 0);
+    mpTrackWindow->SetScrollRanges();
 //    mpTrackWindow->SetScrollPosition(0, 0);
 //    NextWin->Canvas->SetScrollRanges();
     mpTrackWindow->Refresh(false);
@@ -511,14 +511,7 @@ void JZTrackFrame::OnPlayLoop(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnPianoWindow(wxCommandEvent& Event)
 {
-  JZPianoFrame* pPianoFrame = new JZPianoFrame(
-    this,
-    "Piano",
-    gpSong,
-    wxDefaultPosition,
-    wxSize(640, 480));
-
-  pPianoFrame->Show(true);
+  JZProjectManager::Instance()->CreatePianoView();
 }
 
 //-----------------------------------------------------------------------------

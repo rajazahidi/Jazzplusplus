@@ -25,6 +25,7 @@
 #include "WindowsPlayer.h"
 #include "WindowsMidiInterface.h"
 #include "JazzPlusPlusApplication.h"
+#include "ProjectManager.h"
 #include "TrackFrame.h"
 #include "TrackWindow.h"
 #include "Dialogs.h"
@@ -631,7 +632,10 @@ void JZWindowsPlayer::StartPlay(long Clock, long LoopClock, int Continue)
     state->play_buffer.put(START_AUDIO, state->start_time);
 
   OutOfBandEvents.Clear();
-  gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(Clock));
+
+  JZProjectManager::Instance()->NewPlayPosition(
+    PlayLoop->Ext2IntClock(Clock));
+
   state->playing = TRUE;  // allow for SetTempo in OutNow()
   JZPlayer::StartPlay(Clock, LoopClock, Continue);
 
@@ -801,7 +805,8 @@ long JZWindowsIntPlayer::GetRealTimeClock()
 
   long clock = Time2RealTimeClock( (long)timeGetTime() + state->time_correction );
 
-  gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(clock/48 * 48));
+  JZProjectManager::Instance()->NewPlayPosition(
+    PlayLoop->Ext2IntClock(clock / 48 * 48));
 
   if ( !OutOfBandEvents.IsEmpty() )
   {
@@ -876,7 +881,9 @@ long JZWindowsMidiPlayer::GetRealTimeClock()
     clock = state->virtual_clock + delta_clock;
   }
 
-  gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(clock/48 * 48));
+  JZProjectManager::Instance()->NewPlayPosition(
+    PlayLoop->Ext2IntClock(clock / 48 * 48));
+
   return clock;
 }
 
@@ -935,7 +942,8 @@ long JZWindowsMtcPlayer::GetRealTimeClock()
     clock = lastValidMtcClock;
   }
 
-  gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(clock/48 * 48));
+  JZProjectManager::Instance()->NewPlayPosition(
+    PlayLoop->Ext2IntClock(clock / 48 * 48));
 
   if ( !OutOfBandEvents.IsEmpty() )
   {

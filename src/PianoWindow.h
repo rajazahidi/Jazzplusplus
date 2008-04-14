@@ -35,7 +35,6 @@ class JZEvent;
 class JZFilter;
 class tCtrlEditBase;
 class tSnapSelection;
-class JZGuitarFrame;
 
 //*****************************************************************************
 //*****************************************************************************
@@ -78,11 +77,9 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     JZFilter* GetFilter();
 
-    void CreateGuitarWindow();
-
-    JZGuitarFrame* GetGuitarFrame();
-
     JZTrack* GetTrack();
+
+    void ShowPitch(int Pitch);
 
     // Channel of actual track 0..15
     int Channel();
@@ -107,7 +104,7 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     void ZoomOut();
 
-    int Line2y(int Line);
+    int TrackIndex2y(int TrackIndex);
 
     int IsVisible(JZEvent* pEvent);
 
@@ -125,11 +122,7 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     void SnapDialog();
 
-    void LogicalMousePosition(wxMouseEvent& MouseEvent, int& x, int& y);
-
     int y2Pitch(int y);
-
-    int Clock2x(int Clock);
 
     void CtrlVelocity();
 
@@ -220,7 +213,7 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
   public:
 
-    void SetScrollRanges(const int& x, const int& y);
+    void SetScrollRanges();
 
     void DrawEvent(
       wxDC& Dc,
@@ -229,13 +222,9 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
       int xoor,
       int force_color=0);
 
-    int x2Clock(int x);
-
   private:
 
     void Setup();
-
-    void ShowPitch(int Pitch);
 
     // Utils
     int Pitch2y(int Pitch);
@@ -248,12 +237,9 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
     void kill_keys_aftertouch(JZTrack *t, JZEvent *e);
     int GetKeyOnEventCount();
 
-    int y2Line(int y, int up = 0);
+    int y2TrackIndex(int y);
     int EventsSelected(const char *msg = 0);
-    int x2BarClock(int x, int next);
     int OnEventWinMouseEvent(wxMouseEvent &e);
-    int y2yLine(int y, int up = 0);
-    void GetVirtualEventSize(int& Width, int& Height);
 
     void DrawEvents(
       wxDC& Dc,
@@ -275,9 +261,19 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     void OnSize(wxSizeEvent& Event);
 
+    void OnEraseBackground(wxEraseEvent& Event);
+
     void OnDraw(wxDC& Dc);
 
+    void OnPaint(wxMouseEvent& Event);
+
     void OnMouseEvent(wxMouseEvent& Event);
+
+    void OnScroll(wxScrollWinEvent& Event);
+
+    void HorizontalScroll(wxScrollWinEvent& Event);
+
+    void VerticalScroll(wxScrollWinEvent& Event);
 
     void MouseCutPaste(wxMouseEvent& Event, bool Cut);
 
@@ -295,12 +291,9 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     void OnMenuCommand(int Id);
 
-    // Next 3 statements are "Patrick Approved."
     void InitColors();
 
-    void OnPaintSub(wxDC& Dc, int x, int y);
-
-    void OnEventWinPaintSub(int x, int y);
+    void Draw(wxDC& Dc);
 
     // Overridden tButtonLabelInterface finction.
     void ButtonLabelDisplay(const wxString& Text, bool IsButtonDown);
@@ -326,16 +319,7 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     wxBrush mpColorBrush[NUM_COLORS];
 
-    int mLittleBit;
-    int mClockTicsPerPixel;
-    int mTopInfoHeight;
-    int mLeftInfoWidth;
-    int mFromClock, mToClock;
-    int mFromLine, mToLine;
-    int mCanvasX, mCanvasY, mCanvasWidth, mCanvasHeight;
     int mPianoX, mPianoWidth;
-    int mTrackHeight;
-    int mEventsX, mEventsY, mEventsWidth, mEventsHeight;
     bool mUseColors;
 
     int mMouseLine;
@@ -363,7 +347,9 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
     bool mVisibleHBChord;
     bool mVisibleMono;
 
-    JZGuitarFrame* mpGuitarFrame;
+    bool mDrawing;
+
+    wxBitmap* mpFrameBuffer;
 
   DECLARE_EVENT_TABLE()
 };
@@ -372,12 +358,6 @@ inline
 JZFilter* JZPianoWindow::GetFilter()
 {
   return mpFilter;
-}
-
-inline
-JZGuitarFrame* JZPianoWindow::GetGuitarFrame()
-{
-  return mpGuitarFrame;
 }
 
 inline

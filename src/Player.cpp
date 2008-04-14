@@ -23,6 +23,7 @@
 #include "WxWidgets.h"
 
 #include "Player.h"
+#include "ProjectManager.h"
 #include "Synth.h"
 #include "TrackFrame.h"
 #include "TrackWindow.h"
@@ -482,7 +483,10 @@ void JZPlayer::StartPlay(long Clock, long LoopClock, int Continue)
     gpConfig->GetValue(C_ThruOutput));
 
   OutClock = Clock + FIRST_DELTACLOCK;
-  gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(Clock));
+
+  JZProjectManager::Instance()->NewPlayPosition(
+    PlayLoop->Ext2IntClock(Clock));
+
   PlayLoop->PrepareOutput(&mPlayBuffer, Song, Clock, Clock + FIRST_DELTACLOCK, 0);
   if (AudioBuffer)
   {
@@ -534,7 +538,7 @@ void JZPlayer::StopPlay()
     }
   }
 
-  gpTrackWindow->NewPlayPosition(-1L);
+  JZProjectManager::Instance()->NewPlayPosition(-1);
 }
 
 
@@ -1131,11 +1135,17 @@ long tMpuPlayer::GetRealTimeClock()
 #ifdef SLOW_MACHINE
       /* Update screen every 4 beats (120 ticks/beat) */
       if ( (clock_to_host_counter % 32) == 0 )
-        gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(playclock));
+      {
+        JZProjectManager::Instance()->NewPlayPosition(
+          PlayLoop->Ext2IntClock(playclock));
+      }
 #else
       /* Update screen every 8'th note (120 ticks/beat) */
       if ( (clock_to_host_counter % 4) == 0 )
-        gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(playclock));
+      {
+        JZProjectManager::Instance()->NewPlayPosition(
+          PlayLoop->Ext2IntClock(playclock));
+      }
 #endif
       FlushOutOfBand(playclock);
     }
@@ -1750,7 +1760,8 @@ void tSeq2Player::StartPlay(long Clock, long LoopClock, int Continue)
   play_clock   = Clock;
   recd_clock   = Clock;
 
-  gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(Clock));
+  JZProjectManager::Instance()->NewPlayPosition(
+    PlayLoop->Ext2IntClock(Clock));
 
   // send initial program changes, controller etc
   SEQ_START_TIMER();
@@ -1796,7 +1807,7 @@ void tSeq2Player::StopPlay()
   {
     through = new tOSSThru();
   }
-  gpTrackWindow->NewPlayPosition(-1L);
+  JZProjectManager::Instance()->NewPlayPosition(-1);
   RecdBuffer.Keyoff2Length();
 }
 
@@ -1927,7 +1938,8 @@ long tSeq2Player::GetRealTimeClock()
     }
   }
 
-  gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(recd_clock/48 * 48));
+  JZProjectManager::Instance()->NewPlayPosition(
+    PlayLoop->Ext2IntClock(recd_clock/48 * 48));
   return recd_clock;
 }
 

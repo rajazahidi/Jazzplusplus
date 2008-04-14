@@ -25,12 +25,17 @@
 
 class JZGuitarWindow;
 
-// Define a new frame type: this is going to be our main frame
+//*****************************************************************************
+// Description:
+//   This is the guitar frame class declaration.
+//*****************************************************************************
 class JZGuitarFrame : public wxFrame
 {
   public:
 
     JZGuitarFrame(wxWindow* pParent = 0);
+
+    ~JZGuitarFrame();
 
     void PrepareDC(wxDC& Dc);
 

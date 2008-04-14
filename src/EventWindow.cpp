@@ -45,16 +45,12 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-const int JZEventWindow::mScrollSize = 50;
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 JZEventWindow::JZEventWindow(
   wxFrame* pParent,
   JZSong* pSong,
   const wxPoint& Position,
   const wxSize& Size)
-  : wxScrolledWindow(
+  : wxWindow(
       pParent,
       wxID_ANY,
       Position,
@@ -65,9 +61,23 @@ JZEventWindow::JZEventWindow(
     mpSong(pSong),
     mpGreyColor(0),
     mpGreyBrush(0),
+    mClockTicsPerPixel(36),
     mTopInfoHeight(40),
+    mLeftInfoWidth(100),
     mTrackHeight(10),
-    mLittleBit(2)
+    mLittleBit(2),
+    mEventsX(0),
+    mEventsY(mTopInfoHeight),
+    mEventsWidth(),
+    mEventsHeight(),
+    mCanvasWidth(0),
+    mCanvasHeight(0),
+    mFromClock(0),
+    mToClock(0),
+    mFromLine(0),
+    mToLine(0),
+    mScrolledX(0),
+    mScrolledY(0)
 {
   mpSnapSel = new tSnapSelection(this);
 
@@ -105,26 +115,94 @@ int JZEventWindow::EventsSelected(const wxString& Message) const
 }
 
 //-----------------------------------------------------------------------------
+// Description:
+//   Only consider the event portion of the window when computing the virtual
+// size.  Do not consider the static information of the left or top portion of
+// the screen.
 //-----------------------------------------------------------------------------
-//void JZEventWindow::SetScrollRanges()
-//{
-//  int Width, Height;
-//  GetVirtualEventSize(Width, Height);
-//  SetScrollbars(
-//    mScrollSize,
-//    mScrollSize,
-//    Width / mScrollSize,
-//    Height / mScrollSize);
-//  EnableScrolling(false, false);
-//}
+void JZEventWindow::GetVirtualEventSize(
+  int& EventWidth,
+  int& EventHeight) const
+{
+  int TotalClockTics = mpSong->MaxQuarters * mpSong->TicksPerQuarter;
+  EventWidth = TotalClockTics / mClockTicsPerPixel;
+  EventHeight = 127 * mTrackHeight;
+}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZEventWindow::SetScrollPosition(int x, int y)
+void JZEventWindow::SetXScrollPosition(int x)
 {
-  x /= mScrollSize;
-  y /= mScrollSize;
-  Scroll(x, y);
+  // The following line converts an x position in window coordinates to an
+  // x position in scrolled coordinates.
+  int ScrolledX = x - mEventsX + mScrolledX;
+
+  if (mScrolledX != ScrolledX)
+  {
+    mScrolledX = ScrolledX;
+
+    // Set the new from clock and to clock positions based on the new scroll
+    // position.
+    mFromClock = mScrolledX * mClockTicsPerPixel;
+    mToClock = x2Clock(mCanvasWidth);
+
+    SetScrollPos(wxHORIZONTAL, mScrolledX);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZEventWindow::SetYScrollPosition(int y)
+{
+  // The following line converts a y position in window coordinates to a
+  // y position in scrolled coordinates.
+  int ScrolledY = y - mEventsY + mScrolledY;
+
+  if (mScrolledY != y)
+  {
+    mScrolledY = ScrolledY;
+
+    // Set the new from line and to line positions based on the new scroll
+    // position.
+    mFromLine = mScrolledY / mTrackHeight;
+    mToLine = 1 + (mScrolledY + mCanvasHeight - mTopInfoHeight) / mTrackHeight;
+
+    SetScrollPos(wxVERTICAL, mScrolledY);
+  }
+}
+
+//-----------------------------------------------------------------------------
+// Description:
+//   This function takes an x-pixel value in window coordinates and converts
+// it to clock tics.
+//-----------------------------------------------------------------------------
+int JZEventWindow::x2Clock(int x)
+{
+  return (x - mEventsX) * mClockTicsPerPixel + mFromClock;
+}
+
+//-----------------------------------------------------------------------------
+// Description:
+//   This function takes clock tics and converts the value into an x-pixel
+// location on the screen in window coordinates.
+//-----------------------------------------------------------------------------
+int JZEventWindow::Clock2x(int Clock)
+{
+  return mEventsX + (Clock - mFromClock) / mClockTicsPerPixel;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZEventWindow::x2BarClock(int x, int Next)
+{
+  int Clock = x2Clock(x);
+  JZBarInfo BarInfo(mpSong);
+  BarInfo.SetClock(Clock);
+  while (Next--)
+  {
+    BarInfo.Next();
+  }
+  return BarInfo.Clock;
 }
 
 //-----------------------------------------------------------------------------
@@ -139,6 +217,22 @@ int JZEventWindow::y2yLine(int y, int Up)
   y -= y % mTrackHeight;
   y += mTopInfoHeight;
   return y;
+}
+
+//-----------------------------------------------------------------------------
+// Was the VLine macro
+//-----------------------------------------------------------------------------
+void JZEventWindow::DrawVerticalLine(wxDC& Dc, int XPosition) const
+{
+  Dc.DrawLine(XPosition, 0, XPosition, mEventsY + mEventsHeight);
+}
+
+//-----------------------------------------------------------------------------
+// Was the HLine macro
+//-----------------------------------------------------------------------------
+void JZEventWindow::DrawHorizontalLine(wxDC& Dc, int YPosition) const
+{
+  Dc.DrawLine(0, YPosition, mCanvasWidth, YPosition);
 }
 
 //-----------------------------------------------------------------------------
@@ -210,21 +304,6 @@ void JZEventWindow::LineText(
 }
 
 //-----------------------------------------------------------------------------
-// JAVE seems to want to clip the paint area
-// calls the subclass paint routine
-//
-// OnPaint seems never to get called
-//-----------------------------------------------------------------------------
-//void JZEventWindow::OnDraw(wxDC& Dc)
-//{
-//  //onpaint never seems to get called, but ondraw does get called
-//  int x = 0, y = 0;
-//  GetViewStart(&x, &y);
-//  EventWin->OnPaintSub(Dc, x * mScrollSize, y * mScrollSize);
-//  cout << "JZEventWindow::OnDraw << endl;
-//}
-
-//-----------------------------------------------------------------------------
 //   This mouse handler delegates to the subclased event window.
 //-----------------------------------------------------------------------------
 //void JZEventWindow::OnMouseEvent(wxMouseEvent& MouseEvent)
@@ -284,19 +363,13 @@ JZEventFrame::JZEventFrame(
   : wxFrame(pParent, wxID_ANY, Title, Position, Size),
     Song(pSong),
     mpFilter(0),
-    NextWin(0),
-//    mpEventWindow(0),
-    mpFont(0),
     mpFixedFont(0),
     hFixedFont(0),
-    LittleBit(1),
     mTrackHeight(0),
     mTopInfoHeight(40),
-    mLeftInfoWidth(100),
     FontSize(12),
     ClocksPerPixel(36),
-    UseColors(true),
-    mEventsX(mLeftInfoWidth),
+    mEventsX(),
     mEventsY(mTopInfoHeight),
     mEventsWidth(0),
     mEventsHeight(0),
@@ -337,7 +410,6 @@ JZEventFrame::~JZEventFrame()
 
   delete mpFilter;
 
-  delete mpFont;
   delete mpFixedFont;
 
   delete mpToolBar;
@@ -373,16 +445,9 @@ second phase of creation. make menus, the canvas, and so on
 */
 void JZEventFrame::Create()
 {
-  cout <<"JZEventFrame::Create\n";
   CreateMenu();
 
-//  CreateCanvas();
-//  SnapSel = new tSnapSelection(mpEventWindow);
-
-
   Setup();
-//  mpEventWindow->SetScrollRanges();
-//  mpEventWindow->SetScrollPosition(0, 0); //this wasnt here before wx2, why?
 }
 
 
@@ -405,10 +470,10 @@ void JZEventFrame::Setup()
   Dc.SetFont(*mpFont);
 
   Dc.GetTextExtent("M", &x, &y);
-  LittleBit = (int)(x/2);
+  mLittleBit = (int)(x/2);
 
   Dc.GetTextExtent("HXWjgi", &x, &y);
-  mTrackHeight = (int)y + LittleBit;
+  mTrackHeight = (int)y + mLittleBit;
 */
 }
 
@@ -472,30 +537,6 @@ bool JZEventFrame::OnCharHook(wxKeyEvent& e)
 // *******************************************************************
 // Coord-Functions
 // *******************************************************************
-
-
-int JZEventFrame::x2Clock(int x)
-{
-  return (x - mEventsX) * ClocksPerPixel + FromClock;
-}
-
-
-int JZEventFrame::Clock2x(int clk)
-{
-  return mEventsX + (clk - FromClock) / ClocksPerPixel;
-}
-
-int JZEventFrame::x2BarClock(int x, int next)
-{
-  int clk = x2Clock(x);
-  JZBarInfo b(Song);
-  b.SetClock(clk);
-  while (next--)
-  {
-    b.Next();
-  }
-  return b.Clock;
-}
 
 
 int JZEventFrame::y2yLine(int y, int up)
@@ -571,7 +612,7 @@ void JZEventFrame::LineText(wxDC *dc, int x, int y, int w, const char *str, int 
     y -= 2;
   }
   dc->SetTextBackground(*mpGreyColor);
-  dc->DrawText((char *)str, x + LittleBit, y + LittleBit);
+  dc->DrawText((char *)str, x + mLittleBit, y + mLittleBit);
   dc->SetTextBackground(*wxWHITE);
 }
 */
@@ -593,42 +634,6 @@ void JZEventFrame::Redraw()
 
 //  mpEventWindow->Refresh();
 
-}
-
-/**
-   JAVE this was originally called OnPaint(x,y), but i renamed it because i confused it with the OnPaint() framework routine
-   the call graph feels odd: the canvas is a member of the eventwin, with a pointer to the parent. the child calss the parent to redraw itself
-
-   it doesnt do any real drawing, instead it sets up some member vars, to be used by other parts of the class
-
-   it is now normally called from OnDraw in the mpEventWindow class,and also overridden in the subclass.
-   so this one here just sets up  constants
-
-
-   dc is the device context to draw in, normally generated from the framework from ondraw
-   x and y is the coordinates of the start of the view
-
-*/
-void JZEventFrame::OnPaintSub(wxDC *dc, int x, int y)
-{
-  //printf("EventWin::OnPaintSub: x %ld, y %ld, w %ld, h %ld\n", x, y, w, h);
-  CanvasX = x;
-  CanvasY = y;
-// wxCanvas::GetClientSize returns huge values, at least in wx_xt
-  int xc, yc;
-  GetClientSize(&xc, &yc);
-  CanvasW = xc;
-  CanvasH = yc;
-
-  mEventsX = CanvasX + mLeftInfoWidth;
-  mEventsY = CanvasY + mTopInfoHeight;
-  mEventsWidth = CanvasW - mLeftInfoWidth;
-  mEventsHeight = CanvasH - mTopInfoHeight;
-
-  FromLine = CanvasY / mTrackHeight;
-  ToLine   = (CanvasY + CanvasH - mTopInfoHeight) / mTrackHeight;
-  FromClock = CanvasX * ClocksPerPixel;
-  ToClock = x2Clock(CanvasX + CanvasW);
 }
 
 // ******************************************************************
@@ -712,82 +717,8 @@ void JZEventFrame::SnapSelStop(wxMouseEvent& MouseEvent)
 }
 
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZEventFrame::GetVirtualEventSize(int& Width, int& Height)
-{
-  int TotalClockTics = Song->MaxQuarters * Song->TicksPerQuarter;
-  Width = TotalClockTics / ClocksPerPixel + mLeftInfoWidth;
-  Height = 127 * mTrackHeight + mTopInfoHeight;
-}
-
-//-----------------------------------------------------------------------------
 // PlayPosition
 //-----------------------------------------------------------------------------
-
-//   Update the play position to the clock argument, and trigger a redraw so
-// the play bar will be drawn.
-void JZEventFrame::NewPlayPosition(int Clock)
-{
-  int scroll_clock = (FromClock + 5 * ToClock) / 6;
-
-  if (!SnapSel->Active && ((Clock > scroll_clock) || (Clock < FromClock)) && (Clock >= 0))
-  {
-    // avoid permenent redraws when end of scroll range is reached
-    if (Clock > FromClock && ToClock >= Song->MaxQuarters * Song->TicksPerQuarter)
-      return;
-//    int x = Clock2x(Clock);
-//    mpEventWindow->SetScrollPosition(x - mLeftInfoWidth, CanvasY);
-  }
-
-  if (!SnapSel->Active)        // sets clipping
-  {
-    if (PlayClock != Clock)
-    {
-//      int oldplayclock=PlayClock;
-//      PlayClock = Clock;
-//      wxRect invalidateRect;
-//      invalidateRect.x=Clock2x(oldplayclock)-1;
-//      invalidateRect.y=CanvasY;
-//      invalidateRect.width=3;
-//      invalidateRect.height= 100000000;
-//      //DrawPlayPosition();
-//      mpEventWindow->Refresh(TRUE,&invalidateRect);
-
-//      invalidateRect.x=Clock2x(PlayClock)-1;
-//      mpEventWindow->Refresh(TRUE,&invalidateRect);
-        //DrawPlayPosition();
-
-//      mpEventWindow->Refresh();
-    }
-  }
-  if (NextWin)
-  {
-    NextWin->NewPlayPosition(Clock);
-  }
-}
-
-/** draw the "play position", by placing a vertical line where the "play clock" is */
-void JZEventFrame::DrawPlayPosition(wxDC* dc)
-{
-  if (!SnapSel->Active && PlayClock >= FromClock && PlayClock < ToClock)
-  {
-//    wxDC* dc = new wxClientDC(this);
-//    dc->SetLogicalFunction(wxXOR);
-    dc->SetBrush(*wxBLACK_BRUSH);
-    dc->SetPen(*wxBLACK_PEN);
-    int x = Clock2x(PlayClock);
-
-    //cout<<"JZEventFrame::DrawPlayPosition play pos x "<<x<<" "<<FromClock<<" "<<ToClock<<endl;
-    //dc->DrawRectangle(x, CanvasY, 2*LittleBit, mTopInfoHeight);
-    dc->DrawLine(x,     CanvasY, x,     mEventsY + mEventsHeight); //draw a line, 2 pixwels wide
-    dc->DrawLine(x + 1, CanvasY, x + 1, mEventsY + mEventsHeight);
-    dc->SetLogicalFunction(wxCOPY);
-  }
-//OLD  if (NextWin)
-//OLD  {
-//OLD    NextWin->DrawPlayPosition(dc);
-//OLD  }
-}
 
 // **************************************************************************
 // EventsSelected
@@ -964,10 +895,6 @@ void JZEventFrame::MenConvertToModulation()
   tCmdConvertToModulation cmd(mpFilter);
   cmd.Execute();
   Redraw();
-  if (NextWin)
-          NextWin->Redraw();
-
-
 }
 
 
@@ -1065,44 +992,4 @@ void JZEventFrame::MenMeterChange()
   //  mpSettingsDialog = new wxDialogBox(this, "MeterChange", FALSE );
   dlg = new tMeterChangeDlg(this);
   dlg->Create();
-
-}
-
-
-void JZEventFrame::ZoomIn()
-{
-
-//  if (ClocksPerPixel >= 2)
-//  {
-//    ClocksPerPixel /= 2;
-//    int x = CanvasX * 2;
-//    int y = CanvasY;
-
-//    wxDC* dc=new wxClientDC(mpEventWindow);
-//    JZEventFrame::OnPaintSub(dc, x, y);
-//    mpEventWindow->SetScrollRanges();
-//    mpEventWindow->SetScrollPosition(x, y);
-//    if (x == 0)
-//      Redraw();
-
-//  }
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZEventFrame::ZoomOut()
-{
-//  if (ClocksPerPixel <= 120)
-//  {
-//    ClocksPerPixel *= 2;
-//    int x = CanvasX / 2;
-//    int y = CanvasY;
-
-    //wxClientDC Dc(mpEventWindow);
-    //JZEventFrame::OnPaintSub(Dc, x, y);
-//    mpEventWindow->SetScrollRanges();
-//    mpEventWindow->SetScrollPosition(x, y);
-    //if (x == 0)
-    //  Redraw();
-//  }
 }

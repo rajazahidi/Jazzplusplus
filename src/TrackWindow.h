@@ -82,21 +82,27 @@ class JZTrackWindow : public JZEventWindow
 
     void ZoomOut();
 
-    void SetScrollRanges(const int& x, const int& y);
+    void SetScrollRanges();
 
   private:
-
-    void GetVirtualEventSize(int& Width, int& Height) const;
 
     void OnSize(wxSizeEvent& Event);
 
     void OnEraseBackground(wxEraseEvent& Event);
+
+    void OnPaint(wxPaintEvent& Event);
 
     void OnLeftButtonDown(wxMouseEvent& Event);
 
     void OnLeftButtonUp(wxMouseEvent& Event);
 
     void OnRightButtonUp(wxMouseEvent& Event);
+
+    void OnScroll(wxScrollWinEvent& Event);
+
+    void HorizontalScroll(wxScrollWinEvent& Event);
+
+    void VerticalScroll(wxScrollWinEvent& Event);
 
     void ToggleTrackState(const wxPoint& Point);
 
@@ -135,12 +141,6 @@ class JZTrackWindow : public JZEventWindow
 
     void SnapSelectionStop(wxMouseEvent& Event);
 
-    // Was the VLine macro
-    void DrawVerticalLine(wxDC& Dc, int XPosition) const;
-
-    // Was the HLine macro
-    void DrawHorizontalLine(wxDC& Dc, int YPosition) const;
-
     int x2xBar(int x);
 
     int x2wBar(int x);
@@ -151,23 +151,11 @@ class JZTrackWindow : public JZEventWindow
 
     JZTrack* y2Track(int y);
 
-    int x2Clock(int x);
-
-    int Clock2x(int Clock);
-
-    int x2BarClock(int x, int Next = 0);
-
   private:
 
     int mLeftInfoWidth;
-    int mClocksPerPixel;
     int mPlayClock;
     bool mUseColors;
-    int mEventsX, mEventsY, mEventsWidth, mEventsHeight;
-    int mScrolledX, mScrolledY;
-    int mCanvasWidth, mCanvasHeight;
-    int mFromClock, mToClock;
-    int mFromLine, mToLine;
 
     // The values indicate the staring postions and widths of the track fields
     // on the left hand side of the screen.  Note that the position of the

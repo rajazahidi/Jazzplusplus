@@ -92,7 +92,7 @@ int tMouseMapper::Action(wxMouseEvent &e)
 //////////////////////////////////////////////////////////
 //tSelection implementation
 
-tSelection::tSelection(wxScrolledWindow* pWindow)
+tSelection::tSelection(wxWindow* pWindow)
   : win(pWindow),
     mpBackgroundBrush(0)
 {
@@ -343,7 +343,7 @@ void tSnapSelection::Snap(float &fx, float &fy, int drag)
 }
 
 
-tSnapSelection::tSnapSelection(wxScrolledWindow *c)
+tSnapSelection::tSnapSelection(wxWindow *c)
   : tSelection(c)
 {
   xCoords = 0;
@@ -471,7 +471,7 @@ void tMouseCounter::ShowValue(bool down)
 // -------------------------------------------------------------------------
 
 
-tMarkDestin::tMarkDestin(wxScrolledWindow* canvas, wxFrame *frame, int left)
+tMarkDestin::tMarkDestin(wxWindow* canvas, wxFrame *frame, int left)
 {
   wxCursor c;
   Canvas = canvas;

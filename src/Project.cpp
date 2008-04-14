@@ -275,6 +275,7 @@ JZProject::JZProject()
   if (!mpMidiPlayer->Installed())
   {
     mpMidiPlayer->ShowError();
+    delete mpMidiPlayer;
     mpMidiPlayer = new tNullPlayer(this);
   }
 #endif // __WXMSW__

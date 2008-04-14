@@ -27,6 +27,7 @@
 #include "GuitarFrame.h"
 #include "GuitarWindow.h"
 #include "GuitarSettingsDialog.h"
+#include "ProjectManager.h"
 
 //*****************************************************************************
 // Description:
@@ -80,6 +81,13 @@ JZGuitarFrame::JZGuitarFrame(wxWindow* pParent)
 
   mpFretBoardWindow = new JZGuitarWindow(this, wxPoint(0, 0), wxSize(600, 120));
 //  mpFretBoardWindow->SetScrollbars(10, 10, 100, 240);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZGuitarFrame::~JZGuitarFrame()
+{
+  JZProjectManager::Instance()->Detach(this);
 }
 
 //-----------------------------------------------------------------------------

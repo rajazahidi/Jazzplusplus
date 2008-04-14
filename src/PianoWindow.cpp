@@ -26,6 +26,7 @@
 
 #include "PianoWindow.h"
 #include "PianoFrame.h"
+#include "ProjectManager.h"
 #include "ControlEdit.h"
 #include "Song.h"
 #include "Filter.h"
@@ -124,9 +125,9 @@ tMousePlay::tMousePlay(JZPianoWindow* pPianoWindow, wxMouseEvent& Event)
 int tMousePlay::ProcessEvent(wxMouseEvent& Event)
 {
   int x, y;
+  Event.GetPosition(&x, &y);
 
   int OldPitch = mPitch;
-  mpPianoWindow->LogicalMousePosition(Event, x, y);
 
   if (Event.LeftDown())
   {
@@ -227,7 +228,7 @@ tKeyLengthDragger::tKeyLengthDragger(tKeyOn* k, JZPianoWindow* pPianoWindow)
   wxClientDC Dc(Win);
 
   // to translate scrolled coordinates
-  Win->DoPrepareDC(Dc);
+  Win->PrepareDC(Dc);
 
   Win->DrawEvent(Dc, Copy, wxWHITE_BRUSH, 0);
   Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 1, 1);
@@ -253,10 +254,10 @@ int tKeyLengthDragger::Event(wxMouseEvent& Event)
 int tKeyLengthDragger::Dragging(wxMouseEvent& Event)
 {
   wxClientDC Dc(Win);
-  Win->DoPrepareDC(Dc); //to translate scrolled coordinates
+  Win->PrepareDC(Dc); //to translate scrolled coordinates
   Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 1, 1);
   int fx, fy;
-  Win->LogicalMousePosition(Event, fx, fy);
+  Event.GetPosition(&fx, &fy);
   int Clock = Win->x2Clock(fx);
   int  Length = Clock - Copy->GetClock();
   if (Length <= 0)
@@ -346,7 +347,7 @@ tPlayTrackLengthDragger::tPlayTrackLengthDragger(
   Win->GetSong()->NewUndoBuffer();
   //
   wxClientDC Dc(Win);
-  Win->DoPrepareDC(Dc);
+  Win->PrepareDC(Dc);
   Win->DrawEvent(Dc, Copy, wxWHITE_BRUSH, 0);
   Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 1, 1);
 }
@@ -371,10 +372,10 @@ int tPlayTrackLengthDragger::Event(wxMouseEvent& Event)
 int tPlayTrackLengthDragger::Dragging(wxMouseEvent& Event)
 {
   wxClientDC Dc(Win);
-  Win->DoPrepareDC(Dc);
+  Win->PrepareDC(Dc);
   Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 1, 1);
   int fx, fy;
-  Win->LogicalMousePosition(Event, fx, fy);
+  Event.GetPosition(&fx, &fy);
   int Clock = Win->x2Clock(fx);
   int  Length = Clock - Copy->GetClock();
   if (Length <= 0)
@@ -390,7 +391,7 @@ int tPlayTrackLengthDragger::Dragging(wxMouseEvent& Event)
 int tPlayTrackLengthDragger::ButtonUp(wxMouseEvent& Event)
 {
   wxClientDC Dc(Win);
-  Win->DoPrepareDC(Dc);
+  Win->PrepareDC(Dc);
   Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 1, 1);
   Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 0, 1);
 
@@ -449,7 +450,7 @@ int tVelocCounter::Event(wxMouseEvent& Event)
     Win->ApplyToTrack(mpKeyOn, Copy);
 
     wxClientDC Dc(Win);
-    Win->DoPrepareDC(Dc);
+    Win->PrepareDC(Dc);
     Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 0, 1);
 
     Win->UpdateControl();
@@ -504,7 +505,7 @@ const int isBlack[12] =
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-#define IsBlack(Key)  isBlack[(Key) % 12]
+#define IsBlack(Key) isBlack[(Key) % 12]
 
 //-----------------------------------------------------------------------------
 // Mouse Actions Mapping
@@ -556,7 +557,13 @@ BEGIN_EVENT_TABLE(JZPianoWindow, JZEventWindow)
 
   EVT_SIZE(JZPianoWindow::OnSize)
 
+  EVT_ERASE_BACKGROUND(JZPianoWindow::OnEraseBackground)
+
+  EVT_PAINT(JZPianoWindow::OnPaint)
+
   EVT_MOUSE_EVENTS(JZPianoWindow::OnMouseEvent)
+
+  EVT_SCROLLWIN(JZPianoWindow::OnScroll)
 
 END_EVENT_TABLE()
 
@@ -581,19 +588,6 @@ JZPianoWindow::JZPianoWindow(
     mpCtrlEdit(0),
     mMousePlay(play_actions),
     mMouseEvent(evnt_actions),
-    mLittleBit(1),
-    mClockTicsPerPixel(4),
-    mTopInfoHeight(40),
-    mLeftInfoWidth(100),
-    mFromClock(0),
-    mToClock(0),
-    mFromLine(0),
-    mToLine(0),
-    mCanvasX(0),
-    mCanvasY(0),
-    mCanvasWidth(0),
-    mCanvasHeight(0),
-    mTrackHeight(0),
     mUseColors(true),
     mMouseLine(-1),
     mFontSize(12),
@@ -603,18 +597,22 @@ JZPianoWindow::JZPianoWindow(
     mpDrumFont(0),
     mSnapDenomiator(16),
     mVisibleKeyOn(true),
-    mVisiblePitch(false),
-    mVisibleController(false),
-    mVisibleProgram(false),
-    mVisibleTempo(false),
-    mVisibleSysex(false),
-    mVisiblePlayTrack(false),
+    mVisiblePitch(true),
+    mVisibleController(true),
+    mVisibleProgram(true),
+    mVisibleTempo(true),
+    mVisibleSysex(true),
+    mVisiblePlayTrack(true),
     mVisibleDrumNames(true),
-    mVisibleAllTracks(false),
+    mVisibleAllTracks(true),
     mVisibleHBChord(true),
-    mVisibleMono(false),
-    mpGuitarFrame(0)
+    mVisibleMono(true),
+    mDrawing(false),
+    mpFrameBuffer(0)
 {
+  // This is more appropriate than the value in the event window constructor.
+  mClockTicsPerPixel = 4;
+
   InitColors();
 
   mpTrack = mpSong->GetTrack(mTrackIndex);
@@ -628,6 +626,8 @@ JZPianoWindow::JZPianoWindow(
 
   mMouseEvent.SetLeftAction(MA_SELECT);
 
+  mpFrameBuffer = new wxBitmap;
+
   Setup();
 }
 
@@ -639,7 +639,7 @@ JZPianoWindow::~JZPianoWindow()
   delete mpFont;
   delete mpFixedFont;
   delete mpDrumFont;
-  delete mpGuitarFrame;
+  delete mpFrameBuffer;
 }
 
 //-----------------------------------------------------------------------------
@@ -694,29 +694,60 @@ void JZPianoWindow::Setup()
   mPianoWidth = Width + mLittleBit;
 
   mLeftInfoWidth = mPianoWidth;
+
+  SetScrollRanges();
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZPianoWindow::OnDraw(wxDC& Dc)
 {
-  // OnPaint never seems to get called, but OnDraw does get called.
-  int x = 0, y = 0;
-  GetViewStart(&x, &y);
-  OnPaintSub(Dc, x * mScrollSize, y * mScrollSize);
+  Draw(Dc);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZPianoWindow::OnPaintSub(wxDC& Dc, int x, int y)
+void JZPianoWindow::Draw(wxDC& Dc)
 {
+  if (!mpFrameBuffer->Ok() || mDrawing)
+  {
+    return;
+  }
+
+  mDrawing = true;
+
+  // Create a memory device context and select the frame bitmap into it.
+  wxMemoryDC LocalDc;
+  LocalDc.SelectObject(*mpFrameBuffer);
+
+  LocalDc.SetFont(*mpFont);
+
+  // Setup the brush that is used to clear the background.
+  LocalDc.SetBackground(*wxWHITE_BRUSH);
+
+  // Clear the background using the brush that was just setup,
+  // in case the following drawing calls fail.
+  LocalDc.Clear();
+
 //  int OldFromClock = mFromClock;
 
-  OnEventWinPaintSub(x, y);
+  GetClientSize(&mCanvasWidth, &mCanvasHeight);
 
-// SN++ Da Jazz nun eine ReDo Funktion hat. Behebt gleichzeitig ein kleines
-//                Update Problem beim mehrfachen ZoomOut.
-//                Aktives Ctrl-Fenster neu zeichnen bzw. reinitialisieren.
+  mEventsX = mLeftInfoWidth;
+  mEventsY = mTopInfoHeight;
+
+  mEventsWidth = mCanvasWidth - mLeftInfoWidth;
+  mEventsHeight = mCanvasHeight - mTopInfoHeight;
+
+  mFromLine = mScrolledY / mTrackHeight;
+  mToLine = 1 + (mScrolledY + mCanvasHeight - mTopInfoHeight) / mTrackHeight;
+
+  mFromClock = mScrolledX * mClockTicsPerPixel;
+  mToClock = x2Clock(mCanvasWidth);
+
+  // SN++ Because jazz has a ReDo function.  Fixes simultaneously update a
+  // small problem when multiple ZoomOut.  Active Ctrl draw new windows or
+  // reinitialize.
 
 //  if (mpCtrlEdit && OldFromClock != mFromClock)
 //    mpCtrlEdit->ReInit(mpTrack, mFromClock, mClockTicsPerPixel);
@@ -726,46 +757,50 @@ void JZPianoWindow::OnPaintSub(wxDC& Dc, int x, int y)
     mpCtrlEdit->ReInit(mpTrack, mFromClock, mClockTicsPerPixel);
   }
 
-  mPianoX = mCanvasX;
+  mPianoX = 0;
 
-  int StopClk;
   JZBarInfo BarInfo(mpSong);
-  char buf[20];
 
-  Dc.DestroyClippingRegion();
-  Dc.SetBackground(*wxWHITE_BRUSH);
-  DrawPlayPosition(Dc);
-  mpSnapSel->Draw(Dc, mEventsX, mEventsY, mEventsWidth, mEventsHeight);
-  Dc.Clear();
-
+//DEBUG  cout
+//DEBUG    << "mLeftInfoWidth:                " << mLeftInfoWidth << '\n'
+//DEBUG    << "mCanvasWidth - mLeftInfoWidth: " << mCanvasWidth - mLeftInfoWidth << '\n'
+//DEBUG    << "BarInfo.TicksPerBar            " << BarInfo.TicksPerBar << '\n'
+//DEBUG    << "From Clock:                    " << mFromClock << '\n'
+//DEBUG    << "To Clock:                      " << mToClock << '\n'
+//DEBUG    << "Clocks/Pixel:                  " << mClockTicsPerPixel << '\n'
+//DEBUG    << "From Measure:                  " << mFromClock / BarInfo.TicksPerBar << '\n'
+//DEBUG    << "To Measure:                    " << mToClock / BarInfo.TicksPerBar << '\n'
+//DEBUG    << "From X:                        " << Clock2x(mFromClock) << '\n'
+//DEBUG    << "To X:                          " << Clock2x(mToClock) << '\n'
+//DEBUG    << endl;
 
   ///////////////////////////////////////////////////////////////
   // horizontal lines(ripped from drawpianoroll code)
 
-//     for (y = Line2y(mFromLine); y < mEventsY + mEventsHeight; y += mTrackHeight)
+//     for (y = TrackIndex2y(mFromLine); y < mEventsY + mEventsHeight; y += mTrackHeight)
 //      if (y > mEventsY)        // cheaper than clipping
-//        Dc.DrawLine(mEventsX+1, y, mEventsX + mEventsWidth, y);
+//        LocalDc.DrawLine(mEventsX+1, y, mEventsX + mEventsWidth, y);
 
-  Dc.SetPen(*wxGREY_PEN);
-  wxBrush blackKeysBrush=wxBrush(wxColor(250,240,240),wxSOLID);
+  LocalDc.SetPen(*wxGREY_PEN);
+  wxBrush blackKeysBrush = wxBrush(wxColor(250, 240, 240), wxSOLID);
   int Pitch = 127 - mFromLine;
-  y = Line2y(mFromLine);
+  int y = TrackIndex2y(mFromLine);
   while (Pitch >= 0 && y < mEventsY + mEventsHeight)
   {
     if (IsBlack(Pitch))
     {
-      Dc.SetBrush(blackKeysBrush);//*wxLIGHT_GREY_PEN
-      Dc.DrawRectangle(mCanvasX, y, 2000, mTrackHeight);
+      LocalDc.SetBrush(blackKeysBrush);
+      LocalDc.DrawRectangle(0, y, 2000, mTrackHeight);
     }
     else if ((Pitch % 12) == 0)
     {
-      Dc.SetPen(*wxCYAN_PEN);
-      Dc.DrawLine(mCanvasX, y + mTrackHeight, 2000, y + mTrackHeight);
+      LocalDc.SetPen(*wxCYAN_PEN);
+      LocalDc.DrawLine(0, y + mTrackHeight, 2000, y + mTrackHeight);
     }
     else if (!IsBlack(Pitch - 1))
     {
-      Dc.SetPen(*wxGREEN_PEN);
-      Dc.DrawLine(mCanvasX, y + mTrackHeight, 2000, y + mTrackHeight);
+      LocalDc.SetPen(*wxGREEN_PEN);
+      LocalDc.DrawLine(0, y + mTrackHeight, 2000, y + mTrackHeight);
     }
 
     y += mTrackHeight;
@@ -775,62 +810,58 @@ void JZPianoWindow::OnPaintSub(wxDC& Dc, int x, int y)
 
   ///////////////////////////////////////////////////////////////
 
-
   mMouseLine = -1;
 
-  #define VLine(x) DrawLine(x, mCanvasY, x, mEventsY + mEventsHeight)
-  #define HLine(y) DrawLine(mCanvasX, y, mCanvasX + mCanvasWidth, y)
+  LocalDc.SetPen(*wxBLACK_PEN);
 
-  Dc.SetPen(*wxBLACK_PEN);
+  DrawVerticalLine(LocalDc, 0);
+  DrawVerticalLine(LocalDc, mEventsX);
+  DrawVerticalLine(LocalDc, mEventsX - 1);
 
-  // vertical lines
-
-  Dc.VLine(mPianoX);
-  Dc.VLine(mEventsX);
-  Dc.VLine(mEventsX - 1);
-  Dc.HLine(mEventsY);
-  Dc.HLine(mEventsY - 1);
-  Dc.HLine(mEventsY + mEventsHeight);
+  DrawHorizontalLine(LocalDc, mEventsY);
+  DrawHorizontalLine(LocalDc, mEventsY - 1);
+  DrawHorizontalLine(LocalDc, mEventsY + mEventsHeight);
 
   // draw vlines and bar numbers
 
-  Dc.SetFont(*mpFixedFont);
+  LocalDc.SetFont(*mpFixedFont);
   BarInfo.SetClock(mFromClock);
-  StopClk = x2Clock(mCanvasX + mCanvasWidth);
+  int StopClk = x2Clock(mCanvasWidth);
   int clk = BarInfo.Clock;
   int intro = mpSong->GetIntroLength();
   while (clk < StopClk)
   {
     clk = BarInfo.Clock;
-    x = Clock2x(clk);
+    int x = Clock2x(clk);
     // vertical lines and bar numbers
     int i;
-    Dc.SetPen(*wxBLACK_PEN);
-    sprintf(buf, "%d", BarInfo.BarNr + 1 - intro);
+    LocalDc.SetPen(*wxBLACK_PEN);
+    ostringstream Oss;
+    Oss << BarInfo.BarNr + 1 - intro;
     if (x > mEventsX)
     {
-      Dc.DrawText(buf, x + mLittleBit, mEventsY - mFixedFontHeight - 2);
-      Dc.SetPen(*wxGREY_PEN);
-      Dc.DrawLine(x, mEventsY - mFixedFontHeight, x, mEventsY + mEventsHeight);
+      LocalDc.DrawText(Oss.str().c_str(), x + mLittleBit, mEventsY - mFixedFontHeight - 2);
+      LocalDc.SetPen(*wxGREY_PEN);
+      LocalDc.DrawLine(x, mEventsY - mFixedFontHeight, x, mEventsY + mEventsHeight);
     }
 
-    Dc.SetPen(*wxLIGHT_GREY_PEN);
+    LocalDc.SetPen(*wxLIGHT_GREY_PEN);
     for (i = 0; i < BarInfo.CountsPerBar; i++)
     {
       clk += BarInfo.TicksPerBar / BarInfo.CountsPerBar;
       x = Clock2x(clk);
       if (x > mEventsX)
       {
-        Dc.DrawLine(x, mEventsY + 1, x, mEventsY + mEventsHeight);
+        LocalDc.DrawLine(x, mEventsY + 1, x, mEventsY + mEventsHeight);
       }
     }
     BarInfo.Next();
   }
 
-  LineText(Dc, mCanvasX, mCanvasY, mPianoWidth, mTopInfoHeight);
+  LineText(LocalDc, 0, 0, mPianoWidth, mTopInfoHeight);
 
-  Dc.SetPen(*wxBLACK_PEN);
-  DrawPianoRoll(Dc);
+  LocalDc.SetPen(*wxBLACK_PEN);
+  DrawPianoRoll(LocalDc);
 
   // Draw chords from harmony-browser.
   if (mVisibleHBChord && gpHarmonyBrowser && !mpTrack->IsDrumTrack())
@@ -848,9 +879,9 @@ void JZPianoWindow::OnPaintSub(wxDC& Dc, int x, int y)
       sbrush.SetColour(230,255,230);
 #endif
 
-      //Dc.SetClippingRegion(mEventsX, mEventsY, mEventsWidth, mEventsHeight);
-      Dc.SetLogicalFunction(wxXOR);
-      Dc.SetPen(*wxTRANSPARENT_PEN);
+//      LocalDc.SetClippingRegion(mEventsX, mEventsY, mEventsWidth, mEventsHeight);
+      LocalDc.SetLogicalFunction(wxXOR);
+      LocalDc.SetPen(*wxTRANSPARENT_PEN);
 
       int steps = pAnalyzer->Steps();
       for (int step = 0; step < steps; step ++)
@@ -890,13 +921,13 @@ void JZPianoWindow::OnPaintSub(wxDC& Dc, int x, int y)
             }
             if (brush)
             {
-              Dc.SetBrush(*brush);
+              LocalDc.SetBrush(*brush);
               while (pitch < 127)
               {
                 int y = Pitch2y(pitch);
                 if (y >= mEventsY && y <= mEventsY + mEventsHeight - h) // y-clipping
                 {
-                  Dc.DrawRectangle(x, y, w, h);
+                  LocalDc.DrawRectangle(x, y, w, h);
                 }
                 pitch += 12;
               }
@@ -905,52 +936,81 @@ void JZPianoWindow::OnPaintSub(wxDC& Dc, int x, int y)
         }
       }
 
-      //Dc.DestroyClippingRegion();
-      Dc.SetLogicalFunction(wxCOPY);
-      Dc.SetPen(*wxBLACK_PEN);
-      Dc.SetBrush(*wxBLACK_BRUSH);
+//      LocalDc.DestroyClippingRegion();
+      LocalDc.SetLogicalFunction(wxCOPY);
+      LocalDc.SetPen(*wxBLACK_PEN);
+      LocalDc.SetBrush(*wxBLACK_BRUSH);
     }
   }
   /////////end draw choords
 
   if (mVisibleAllTracks)
   {
-    int i;
-    for (i = 0; i < mpSong->nTracks; i++)
+    for (int i = 0; i < mpSong->nTracks; ++i)
     {
-      JZTrack *t = mpSong->GetTrack(i);
-      if (t != mpTrack && IsVisible(t))
+      JZTrack* pTrack = mpSong->GetTrack(i);
+      if (pTrack != mpTrack && IsVisible(pTrack))
       {
-        DrawEvents(Dc, t, StatKeyOn, wxLIGHT_GREY_BRUSH, TRUE);
+        DrawEvents(LocalDc, pTrack, StatKeyOn, wxLIGHT_GREY_BRUSH, TRUE);
       }
     }
   }
 
   if (mVisibleKeyOn)
-    DrawEvents(Dc, mpTrack, StatKeyOn, wxRED_BRUSH, FALSE);
+  {
+    DrawEvents(LocalDc, mpTrack, StatKeyOn, wxRED_BRUSH, FALSE);
+  }
   if (mVisiblePitch)
-    DrawEvents(Dc, mpTrack, StatPitch, wxBLUE_BRUSH, FALSE);
+  {
+    DrawEvents(LocalDc, mpTrack, StatPitch, wxBLUE_BRUSH, FALSE);
+  }
   if (mVisibleController)
-    DrawEvents(Dc, mpTrack, StatControl, wxCYAN_BRUSH, FALSE);
+  {
+    DrawEvents(LocalDc, mpTrack, StatControl, wxCYAN_BRUSH, FALSE);
+  }
   if (mVisibleProgram)
-    DrawEvents(Dc, mpTrack, StatProgram, wxGREEN_BRUSH, FALSE);
+  {
+    DrawEvents(LocalDc, mpTrack, StatProgram, wxGREEN_BRUSH, FALSE);
+  }
   if (mVisibleTempo)
-    DrawEvents(Dc, mpTrack, StatSetTempo, wxGREEN_BRUSH, FALSE);
+  {
+    DrawEvents(LocalDc, mpTrack, StatSetTempo, wxGREEN_BRUSH, FALSE);
+  }
   if (mVisibleSysex)
-    DrawEvents(Dc, mpTrack, StatSysEx, wxGREEN_BRUSH, FALSE);
+  {
+    DrawEvents(LocalDc, mpTrack, StatSysEx, wxGREEN_BRUSH, FALSE);
+  }
   if (mVisiblePlayTrack)
-    DrawEvents(Dc, mpTrack, StatPlayTrack, wxLIGHT_GREY_BRUSH, FALSE);
+  {
+    DrawEvents(LocalDc, mpTrack, StatPlayTrack, wxLIGHT_GREY_BRUSH, FALSE);
+  }
 
-  DrawEvents(Dc, mpTrack, StatEndOfTrack, wxRED_BRUSH, FALSE);
-  DrawEvents(Dc, mpTrack, StatText, wxBLACK_BRUSH, FALSE);
+  DrawEvents(LocalDc, mpTrack, StatEndOfTrack, wxRED_BRUSH, FALSE);
+  DrawEvents(LocalDc, mpTrack, StatText, wxBLACK_BRUSH, FALSE);
 
-  Dc.SetPen(*wxBLACK_PEN);
-  Dc.SetBrush(*wxBLACK_BRUSH);
-  Dc.SetBackground(*wxWHITE_BRUSH);        // xor-bug
+//  LocalDc.SetPen(*wxBLACK_PEN);
+//  LocalDc.SetBrush(*wxBLACK_BRUSH);
+//  LocalDc.SetBackground(*wxWHITE_BRUSH);        // xor-bug
 
-  mpSnapSel->Draw(Dc, mEventsX, mEventsY, mEventsWidth, mEventsHeight);
+  DrawPlayPosition(LocalDc);
 
-  DrawPlayPosition(Dc);
+  // Draw the selection box.
+  mpSnapSel->Draw(LocalDc, mEventsX, mEventsY, mEventsWidth, mEventsHeight);
+
+  Dc.Blit(
+    0,
+    0,
+    mCanvasWidth,
+    mCanvasHeight,
+    &LocalDc,
+    0,
+    0,
+    wxCOPY);
+
+  LocalDc.SetFont(wxNullFont);
+  LocalDc.SelectObject(wxNullBitmap);
+
+  mDrawing = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -964,38 +1024,13 @@ void JZPianoWindow::DrawPlayPosition(wxDC& Dc)
   {
     Dc.SetBrush(*wxBLACK_BRUSH);
     Dc.SetPen(*wxBLACK_PEN);
+
     int x = Clock2x(mPlayClock);
 
-//    Dc.SetLogicalFunction(wxXOR);
-
     // Draw a line, 2 pixels wide.
-    Dc.DrawLine(x,  mCanvasY,x,  mEventsY + mEventsHeight);
-    Dc.DrawLine(x+1,mCanvasY,x+1,mEventsY + mEventsHeight);
-
-//    Dc.SetLogicalFunction(wxCOPY);
+    Dc.DrawLine(x,     0, x,     mEventsY + mEventsHeight);
+    Dc.DrawLine(x + 1, 0, x + 1, mEventsY + mEventsHeight);
   }
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZPianoWindow::OnEventWinPaintSub(int x, int y)
-{
-  mCanvasX = x;
-  mCanvasY = y;
-  int xc, yc;
-  GetClientSize(&xc, &yc);
-  mCanvasWidth = xc;
-  mCanvasHeight = yc;
-
-  mEventsX = mCanvasX + mLeftInfoWidth;
-  mEventsY = mCanvasY + mTopInfoHeight;
-  mEventsWidth = mCanvasWidth - mLeftInfoWidth;
-  mEventsHeight = mCanvasHeight - mTopInfoHeight;
-
-  mFromLine = mCanvasY / mTrackHeight;
-  mToLine = (mCanvasY + mCanvasHeight - mTopInfoHeight) / mTrackHeight;
-  mFromClock = mCanvasX * mClockTicsPerPixel;
-  mToClock = x2Clock(mCanvasX + mCanvasWidth);
 }
 
 //-----------------------------------------------------------------------------
@@ -1005,8 +1040,8 @@ void JZPianoWindow::OnSize(wxSizeEvent& Event)
   GetClientSize(&mCanvasWidth, &mCanvasHeight);
   if (mCanvasWidth > 0 && mCanvasHeight > 0)
   {
-    SetScrollRanges(mCanvasX, mCanvasY);
-    Refresh(false);
+    mpFrameBuffer->Create(mCanvasWidth, mCanvasHeight);
+    SetScrollRanges();
   }
 }
 
@@ -1097,16 +1132,19 @@ void JZPianoWindow::NewPosition(int TrackIndex, int Clock)
     mTrackIndex = TrackIndex;
     mpTrack = mpSong->GetTrack(mTrackIndex);
     mpPianoFrame->SetTitle(mpTrack->GetName());
+
+    SetYScrollPosition(TrackIndex2y(mFromLines[mTrackIndex]));
   }
 
   // change position
   if (Clock >= 0)
   {
     int x = Clock2x(Clock);
-    SetScrollPosition(x - mLeftInfoWidth, Line2y(mFromLines[mTrackIndex]));
+//OLD    SetScrollPosition(x, TrackIndex2y(mFromLines[mTrackIndex]));
+    SetXScrollPosition(x);
   }
 
-// SN++ Ist geaendert. OnPaint zeichnet immer neu -> Bug Fix bei ZoomOut!
+// SN++ Is changed. OnPaint always draws new -> Bug Fix for ZoomOut!
 /*
   // OnPaint() redraws only if clock has changed
   if (mpCtrlEdit && TrackIndex >= 0)
@@ -1117,25 +1155,34 @@ void JZPianoWindow::NewPosition(int TrackIndex, int Clock)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZPianoWindow::SetScrollRanges(const int& x, const int& y)
+void JZPianoWindow::SetScrollRanges()
 {
-  int Width, Height;
-  GetVirtualEventSize(Width, Height);
-  SetScrollbars(
-    mScrollSize,
-    mScrollSize,
-    Width / mScrollSize,
-    Height / mScrollSize,
-    x,
-    y);
-  EnableScrolling(false, false);
+  int EventWidth, EventHeight;
+  GetVirtualEventSize(EventWidth, EventHeight);
+
+  // Must add the thumb size to the passed range to reach the maximum
+  // desired value.
+  int ThumbSize;
+
+  ThumbSize = EventWidth / 10;
+  SetScrollbar(wxHORIZONTAL, mScrolledX, ThumbSize, EventWidth + ThumbSize);
+
+  ThumbSize = EventHeight / 10;
+  SetScrollbar(wxVERTICAL, mScrolledY, ThumbSize, EventHeight + ThumbSize);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZPianoWindow::Line2y(int Line)
+int JZPianoWindow::TrackIndex2y(int TrackIndex)
 {
-  return Line * mTrackHeight + mTopInfoHeight;
+  return TrackIndex * mTrackHeight + mTopInfoHeight - mScrolledY;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZPianoWindow::y2TrackIndex(int y)
+{
+  return (y + mScrolledY - mTopInfoHeight) / mTrackHeight;
 }
 
 //=============================================================================
@@ -1159,7 +1206,7 @@ void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
 
   int wBlack = mPianoWidth * 2 / 3;
   int Pitch = 127 - mFromLine;
-  int y = Line2y(mFromLine);
+  int y = TrackIndex2y(mFromLine);
 
   if (
     mVisibleKeyOn &&
@@ -1172,28 +1219,28 @@ void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
     {
       if (IsBlack(Pitch))
       {
-        Dc.DrawRectangle(mCanvasX, y, wBlack, mTrackHeight);
-        Dc.DrawLine(mCanvasX + wBlack, y + mTrackHeight/2, mCanvasX + mPianoWidth, y + mTrackHeight/2);
+        Dc.DrawRectangle(0, y, wBlack, mTrackHeight);
+        Dc.DrawLine(wBlack, y + mTrackHeight/2, mPianoWidth, y + mTrackHeight/2);
         Dc.SetPen(*wxWHITE_PEN);
-        Dc.DrawLine(mCanvasX + wBlack+1, y + mTrackHeight/2+1, mCanvasX + mPianoWidth, y + mTrackHeight/2+1);
-        Dc.DrawLine(mCanvasX, y, mCanvasX + wBlack, y);
+        Dc.DrawLine(wBlack + 1, y + mTrackHeight/2+1, mPianoWidth, y + mTrackHeight/2+1);
+        Dc.DrawLine(0, y, wBlack, y);
         Dc.SetPen(*wxBLACK_PEN);
       }
       else if ((Pitch % 12) == 0)
       {
-        Dc.DrawLine(mCanvasX, y + mTrackHeight, mCanvasX + mPianoWidth, y + mTrackHeight);
+        Dc.DrawLine(0, y + mTrackHeight, mPianoWidth, y + mTrackHeight);
         Dc.SetPen(*wxWHITE_PEN);
-        Dc.DrawLine(mCanvasX, y + mTrackHeight + 1, mCanvasX + mPianoWidth, y + mTrackHeight + 1);
+        Dc.DrawLine(0, y + mTrackHeight + 1, mPianoWidth, y + mTrackHeight + 1);
         Dc.SetPen(*wxBLACK_PEN);
         ostringstream Oss;
         Oss << Pitch / 12;
-        Dc.DrawText(Oss.str().c_str(), mCanvasX + wBlack + mLittleBit, y + mTrackHeight / 2);
+        Dc.DrawText(Oss.str().c_str(), wBlack + mLittleBit, y + mTrackHeight / 2);
       }
       else if (!IsBlack(Pitch - 1))
       {
-        Dc.DrawLine(mCanvasX, y + mTrackHeight, mCanvasX + mPianoWidth, y + mTrackHeight);
+        Dc.DrawLine(0, y + mTrackHeight, mPianoWidth, y + mTrackHeight);
         Dc.SetPen(*wxWHITE_PEN);
-        Dc.DrawLine(mCanvasX, y + mTrackHeight + 1, mCanvasX + mPianoWidth, y + mTrackHeight + 1);
+        Dc.DrawLine(0, y + mTrackHeight + 1, mPianoWidth, y + mTrackHeight + 1);
         Dc.SetPen(*wxBLACK_PEN);
       }
 
@@ -1206,7 +1253,7 @@ void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
     Dc.SetFont(*mpDrumFont);
     while (Pitch >= 0 && y < mEventsY + mEventsHeight)
     {
-      Dc.DrawText(gpMidiPlayer->GetSampleName(Pitch), mCanvasX + mLittleBit, y);
+      Dc.DrawText(gpMidiPlayer->GetSampleName(Pitch), mLittleBit, y);
       y += mTrackHeight;
       --Pitch;
     }
@@ -1221,7 +1268,7 @@ void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
       {
         Dc.DrawText(
           gpConfig->GetDrumName(Pitch + 1).first.c_str(),
-          mCanvasX + mLittleBit,
+          mLittleBit,
           y);
 
         y += mTrackHeight;
@@ -1236,7 +1283,7 @@ void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
       {
         Dc.DrawText(
           gpConfig->GetCtrlName(Pitch + 1).first.c_str(),
-          mCanvasX + mLittleBit,
+          mLittleBit,
           y);
 
         y += mTrackHeight;
@@ -1250,7 +1297,7 @@ void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
       {
         Dc.DrawText(
           gpConfig->GetVoiceName(Pitch + 1).first.c_str(),
-          mCanvasX + mLittleBit,
+          mLittleBit,
           y);
 
         y += mTrackHeight;
@@ -1264,7 +1311,7 @@ void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
       {
         Dc.DrawText(
           tSynthSysex::GetSysexGroupName(Pitch + 1),
-          mCanvasX + mLittleBit,
+          mLittleBit,
           y);
         y += mTrackHeight;
         --Pitch;
@@ -1341,7 +1388,7 @@ void JZPianoWindow::DrawEvent(
 //-----------------------------------------------------------------------------
 void JZPianoWindow::DrawEvents(
   wxDC& Dc,
-  JZTrack *t,
+  JZTrack* pTrack,
   int Stat,
   const wxBrush* Brush,
   int force_color)
@@ -1349,7 +1396,7 @@ void JZPianoWindow::DrawEvents(
 //  Dc.SetClippingRegion(mEventsX, mEventsY, mEventsWidth, mEventsHeight);
   Dc.SetBrush(*Brush);
 
-  tEventIterator Iterator(t);
+  tEventIterator Iterator(pTrack);
   JZEvent* pEvent = Iterator.First();
   int FromPitch = 127 - mToLine;
   int ToPitch   = 127 - mFromLine;
@@ -1357,8 +1404,7 @@ void JZPianoWindow::DrawEvents(
   // Coordinate for Linien
 
   int x0 = Clock2x(0);
-  int y0 = Line2y(64);
-  char buf[20];
+  int y0 = TrackIndex2y(64);
 
   while (pEvent)
   {
@@ -1369,15 +1415,21 @@ void JZPianoWindow::DrawEvents(
       int Clock  = pEvent->GetClock();
 
       int x1 = Clock2x(Clock);
-      int y1 = Line2y(127 - Pitch);
-//        if (pEvent->IsPlayTrack()) {
-//          y1=Line2y(127-pEvent->IsPlayTrack()->track); //JAVE so the y position of playtrack events tell which track they play (the drawing should rather be polymorpic in my opinion)
-      //use pitch instead
-      //      }
+      int y1 = TrackIndex2y(127 - Pitch);
+
+//      if (pEvent->IsPlayTrack())
+//      {
+//        // JAVE so the y position of playtrack events tell which
+//        // track they play (the drawing should rather be polymorpic
+//        // in my opinion)
+//        y1 = TrackIndex2y(127 - pEvent->IsPlayTrack()->track);
+//        // use pitch instead
+//      }
       // event partially visible?
       if (Clock + Length >= mFromClock && FromPitch < Pitch && Pitch <= ToPitch)
       {
-        int DrawLength = Length/mClockTicsPerPixel;
+        int DrawLength = Length / mClockTicsPerPixel;
+
         // do clipping ourselves
         if (x1 < mEventsX)
         {
@@ -1417,30 +1469,36 @@ void JZPianoWindow::DrawEvents(
 
       if (Clock + Length >= mFromClock)
       {
-        //thesse events are always visible in vertical
+        // These events are always visible in vertical.
         if (pEvent->IsEndOfTrack())
         {
           Dc.SetPen(*wxRED_PEN);
-          Dc.VLine(x1); //draw a vertical bar
+
+          // Draw a vertical bar.
+          DrawVerticalLine(Dc, x1);
+
           Dc.SetPen(*wxBLACK_PEN);
-          sprintf(buf, "EOT");
-          Dc.DrawText(buf, x1, y1 + mLittleBit);
+          Dc.DrawText("EOT", x1, y1 + mLittleBit);
         }
 
         if (pEvent->IsText())
         {
           Dc.SetPen(*wxGREEN_PEN);
-          Dc.VLine(x1); //draw a vertical bar
+
+          // Draw a vertical bar.
+          DrawVerticalLine(Dc, x1);
+
           Dc.SetPen(*wxBLACK_PEN);
-          sprintf(buf, (const char*)pEvent->IsText()->GetText());
           int textX;
           int textY;
 
-          Dc.GetTextExtent((const char*)pEvent->IsText()->GetText(), &textX, &textY);
+          Dc.GetTextExtent(pEvent->IsText()->GetText(), &textX, &textY);
           Dc.SetBrush(*wxWHITE_BRUSH);
-          int textlabely = mCanvasY + mTopInfoHeight;//text labels drawn at top
+
+          // Draw text labels drawn at top.
+          int textlabely = mTopInfoHeight;
           Dc.DrawRectangle(x1-textX, textlabely + mLittleBit, textX, textY);//mTrackHeight - 2 * mLittleBit);
-          Dc.DrawText(buf, x1-textX, textlabely + mLittleBit);
+          Dc.DrawText(pEvent->IsText()->GetText(), x1-textX, textlabely + mLittleBit);
         }
       }
 
@@ -1511,6 +1569,27 @@ void JZPianoWindow::LineText(
 }
 
 //-----------------------------------------------------------------------------
+// Description:
+//   Do nothing, to avoid flickering.
+//-----------------------------------------------------------------------------
+void JZPianoWindow::OnEraseBackground(wxEraseEvent& Event)
+{
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPianoWindow::OnPaint(wxPaintEvent& Event)
+{
+  // One must always create a wxPaintDC object, even if it is not used.
+  // Otherwise, under MS Windows, refreshing for this and other windows will
+  // fail.
+  wxPaintDC Dc(this);
+  PrepareDC(Dc);
+
+  OnDraw(Dc);
+}
+
+//-----------------------------------------------------------------------------
 // Descriptions:
 //   This mouse handler delegates to the subclassed event window.
 //-----------------------------------------------------------------------------
@@ -1519,13 +1598,9 @@ void JZPianoWindow::OnMouseEvent(wxMouseEvent& Event)
   if (Event.Moving() && !Event.Dragging() && !mpMouseAction)
   {
     int fx, fy;
-    LogicalMousePosition(Event, fx, fy);
-    int pitch = y2Pitch(fy);
-    ShowPitch(pitch);
-    if (mpGuitarFrame)
-    {
-      mpGuitarFrame->ShowPitch(pitch);
-    }
+    Event.GetPosition(&fx, &fy);
+    int Pitch = y2Pitch(fy);
+    JZProjectManager::Instance()->ShowPitch(Pitch);
   }
 
   // dispatch
@@ -1533,7 +1608,7 @@ void JZPianoWindow::OnMouseEvent(wxMouseEvent& Event)
   if (!mpMouseAction)
   {
     int x, y;
-    LogicalMousePosition(Event, x, y);
+    Event.GetPosition(&x, &y);
 
     if (y > mEventsY)        // click in event area?
     {
@@ -1592,6 +1667,134 @@ void JZPianoWindow::OnMouseEvent(wxMouseEvent& Event)
   else
   {
     OnEventWinMouseEvent(Event);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPianoWindow::OnScroll(wxScrollWinEvent& Event)
+{
+  if (Event.GetOrientation() == wxHORIZONTAL)
+  {
+    HorizontalScroll(Event);
+  }
+  else if (Event.GetOrientation() == wxVERTICAL)
+  {
+    VerticalScroll(Event);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPianoWindow::HorizontalScroll(wxScrollWinEvent& Event)
+{
+  int EventWidth, EventHeight;
+  GetVirtualEventSize(EventWidth, EventHeight);
+
+  int NewScrolledX = mScrolledX;
+
+  if (Event.GetEventType() == wxEVT_SCROLLWIN_LINEUP)
+  {
+    --NewScrolledX;
+  }
+  else if (Event.GetEventType() == wxEVT_SCROLLWIN_LINEDOWN)
+  {
+    ++NewScrolledX;
+  }
+  else if (Event.GetEventType() == wxEVT_SCROLLWIN_PAGEUP)
+  {
+    NewScrolledX -= 10;
+  }
+  else if (Event.GetEventType() == wxEVT_SCROLLWIN_PAGEDOWN)
+  {
+    NewScrolledX += 10;
+  }
+  else if (Event.GetEventType() == wxEVT_SCROLLWIN_TOP)
+  {
+    NewScrolledX = 0;
+  }
+  else if (Event.GetEventType() == wxEVT_SCROLLWIN_BOTTOM)
+  {
+    NewScrolledX = EventWidth - 1;
+  }
+  else if (
+    Event.GetEventType() == wxEVT_SCROLLWIN_THUMBTRACK ||
+    Event.GetEventType() == wxEVT_SCROLLWIN_THUMBRELEASE)
+  {
+    NewScrolledX = Event.GetPosition();
+  }
+
+  if (NewScrolledX < 0)
+  {
+    NewScrolledX = 0;
+  }
+  if (NewScrolledX > EventWidth - 1)
+  {
+    NewScrolledX = EventWidth - 1;
+  }
+
+  if (NewScrolledX != mScrolledX)
+  {
+    mScrolledX = NewScrolledX;
+    SetScrollPos(wxHORIZONTAL, mScrolledX, true);
+    Refresh(false);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPianoWindow::VerticalScroll(wxScrollWinEvent& Event)
+{
+  int EventWidth, EventHeight;
+  GetVirtualEventSize(EventWidth, EventHeight);
+
+  int NewScrolledY = mScrolledY;
+
+  if (Event.GetEventType() == wxEVT_SCROLLWIN_LINEUP)
+  {
+    --NewScrolledY;
+  }
+  else if (Event.GetEventType() == wxEVT_SCROLLWIN_LINEDOWN)
+  {
+    ++NewScrolledY;
+  }
+  else if (Event.GetEventType() == wxEVT_SCROLLWIN_PAGEUP)
+  {
+    NewScrolledY -= 10;
+  }
+  else if (Event.GetEventType() == wxEVT_SCROLLWIN_PAGEDOWN)
+  {
+    NewScrolledY += 10;
+  }
+  else if (Event.GetEventType() == wxEVT_SCROLLWIN_TOP)
+  {
+    NewScrolledY = 0;
+  }
+  else if (Event.GetEventType() == wxEVT_SCROLLWIN_BOTTOM)
+  {
+    NewScrolledY = EventHeight - 1;
+  }
+  else if (
+    Event.GetEventType() == wxEVT_SCROLLWIN_THUMBTRACK ||
+    Event.GetEventType() == wxEVT_SCROLLWIN_THUMBRELEASE)
+  {
+    NewScrolledY = Event.GetPosition();
+  }
+
+  if (NewScrolledY < 0)
+  {
+    NewScrolledY = 0;
+  }
+  if (NewScrolledY > EventHeight - 1)
+  {
+    NewScrolledY = EventHeight - 1;
+  }
+
+  if (NewScrolledY != mScrolledY)
+  {
+    mScrolledY = NewScrolledY;
+    SetScrollPos(wxVERTICAL, mScrolledY, true);
+    Refresh(false);
   }
 }
 
@@ -1691,44 +1894,49 @@ int JZPianoWindow::SnapClock(int Clock, int up)
 }
 
 //-----------------------------------------------------------------------------
+// Description:
+//   Update the play position to the clock argument, and trigger a redraw so
+// the play bar will be drawn.
 //-----------------------------------------------------------------------------
 void JZPianoWindow::NewPlayPosition(int Clock)
 {
-  int scroll_clock = (mFromClock + 5 * mToClock) / 6L;
+  int scroll_clock = (mFromClock + 5 * mToClock) / 6;
 
   if (
     !mpSnapSel->Active &&
-    ((Clock > scroll_clock) || (Clock < mFromClock)) && (Clock >= 0L))
+    (Clock > scroll_clock || Clock < mFromClock) && Clock >= 0)
   {
-    // Avoid permenent redraws when end of scroll range is reached
-    if (Clock > mFromClock && mToClock >= mpSong->MaxQuarters * mpSong->TicksPerQuarter)
+    // Avoid permenent redraws when end of scroll range is reached.
+    if (
+      Clock > mFromClock &&
+      mToClock >= mpSong->MaxQuarters * mpSong->TicksPerQuarter)
     {
       return;
     }
 
     int x = Clock2x(Clock);
-    SetScrollPosition(x - mLeftInfoWidth, mCanvasY);
+    SetXScrollPosition(x);
   }
 
-  if (!mpSnapSel->Active)        // sets clipping
+  if (!mpSnapSel->Active)  // sets clipping
   {
     if (mPlayClock != Clock)
     {
- //     int oldplayclock = mPlayClock;
-//      mPlayClock = Clock;
-//        wxRect invalidateRect;
-//        invalidateRect.x=Clock2x(oldplayclock)-1;
-//        invalidateRect.y=mCanvasY;
-//        invalidateRect.width=3;
-//        invalidateRect.height= 100000000;
-//       //       DrawPlayPosition();
-//        Refresh(true, &invalidateRect);
+      int OldPlayClock = mPlayClock;
+      mPlayClock = Clock;
+//      wxRect InvalidateRect;
+//      InvalidateRect.x = Clock2x(OldPlayClock) - 1;
+//      InvalidateRect.y = 0;
+//      InvalidateRect.width = 3;
+//      InvalidateRect.height= 100000000;
 
-//              invalidateRect.x=Clock2x(mPlayClock)-1;
-//       Refresh(true, &invalidateRect);
-//       DrawPlayPosition();
+//      Refresh(true, &InvalidateRect);
 
-      Refresh();
+//      InvalidateRect.x = Clock2x(mPlayClock) - 1;
+
+//      Refresh(true, &InvalidateRect);
+
+      Refresh(false);
     }
   }
 }
@@ -1754,19 +1962,13 @@ void JZPianoWindow::ZoomIn()
   if (mClockTicsPerPixel >= 2)
   {
     mClockTicsPerPixel /= 2;
-    int x = mCanvasX * 2;
-    int y = mCanvasY;
+    mScrolledX *= 2;
 
-    OnEventWinPaintSub(x, y);
-    SetScrollRanges(x, y);
-//    SetScrollPosition(x, y);
+    SetScrollRanges();
 
-    NewPosition(mTrackIndex, mFromClock);
+//    NewPosition(mTrackIndex, mFromClock);
 
-    if (x == 0)
-    {
-      Refresh();
-    }
+    Refresh(false);
   }
 }
 
@@ -1777,19 +1979,13 @@ void JZPianoWindow::ZoomOut()
   if (mClockTicsPerPixel <= 120)
   {
     mClockTicsPerPixel *= 2;
-    int x = mCanvasX / 2;
-    int y = mCanvasY;
+    mScrolledX /= 2;
 
-    OnEventWinPaintSub(x, y);
-    SetScrollRanges(x, y);
-//    SetScrollPosition(x, y);
+    SetScrollRanges();
 
-    NewPosition(mTrackIndex, mFromClock);
+//    NewPosition(mTrackIndex, mFromClock);
 
-    if (x == 0)
-    {
-      Refresh();
-    }
+    Refresh(false);
   }
 }
 
@@ -1801,9 +1997,8 @@ int JZPianoWindow::OnEventWinMouseEvent(wxMouseEvent& Event)
   {
     // create mpSnapSel?
 
-    int x;
-    int y;
-    LogicalMousePosition(Event, x, y);
+    int x, y;
+    Event.GetPosition(&x, &y);
     if (
       mEventsX < x && x < mEventsX + mEventsWidth &&
       mEventsY < y && y < mEventsY + mEventsHeight)
@@ -1855,20 +2050,18 @@ int JZPianoWindow::OnEventWinMouseEvent(wxMouseEvent& Event)
 //   Indicate which key on the pianoroll that the mouse is hovering over by
 // highlighting it.  This function is bad because it draws directly in the dc,
 // rather it should invalidate and let OnDraw do the actual painting.
-// Currently the code doesn't work because it doesn't care about scrolling
-// (because I get the dc the wrong way).
 //-----------------------------------------------------------------------------
 void JZPianoWindow::ShowPitch(int Pitch)
 {
   // This is the current position of the mouse.  mMouseLine is the last
   // position.
-  int Line = y2Line(Pitch2y(Pitch));
+  int Line = y2TrackIndex(Pitch2y(Pitch));
   if (Line >= mFromLine && Line != mMouseLine)
   {
     wxClientDC Dc(this);
 
     // Translate scrolled coordinates.
-    DoPrepareDC(Dc);
+    PrepareDC(Dc);
 
     Dc.SetLogicalFunction(wxXOR);
 
@@ -1878,16 +2071,17 @@ void JZPianoWindow::ShowPitch(int Pitch)
       // Erase the previous highlight.
       Dc.DrawRectangle(
         mPianoX,
-        Line2y(mMouseLine) + mLittleBit,
+        TrackIndex2y(mMouseLine) + mLittleBit,
         mPianoWidth,
         mTrackHeight - 2 * mLittleBit);
     }
+
     mMouseLine = Line;
 
     // Draw the new position.
     Dc.DrawRectangle(
       mPianoX,
-      Line2y(mMouseLine) + mLittleBit,
+      TrackIndex2y(mMouseLine) + mLittleBit,
       mPianoWidth,
       mTrackHeight - 2 * mLittleBit);
 
@@ -1897,56 +2091,11 @@ void JZPianoWindow::ShowPitch(int Pitch)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZPianoWindow::x2Clock(int x)
-{
-  return (x - mEventsX) * mClockTicsPerPixel + mFromClock;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-int JZPianoWindow::y2Line(int y, int up)
-{
-  if (up)
-  {
-    y += mTrackHeight;
-  }
-  y -= mTopInfoHeight;
-  return y / mTrackHeight;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-int JZPianoWindow::x2BarClock(int x, int next)
-{
-  int clk = x2Clock(x);
-  JZBarInfo b(mpSong);
-  b.SetClock(clk);
-  while (next--)
-    b.Next();
-  return b.Clock;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-int JZPianoWindow::y2yLine(int y, int up)
-{
-  if (up)
-  {
-    y += mTrackHeight;
-  }
-  y -= mTopInfoHeight;
-  y -= y % mTrackHeight;
-  y += mTopInfoHeight;
-  return y;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 void JZPianoWindow::MouseCutPaste(wxMouseEvent& Event, bool Cut)
 {
   wxClientDC Dc(this);
 
-  DoPrepareDC(Dc);
+  PrepareDC(Dc);
 
   // Convert physical coordinates to logical (scrolled) coordinates.
   wxPoint Point = Event.GetLogicalPosition(Dc);
@@ -1979,7 +2128,7 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& Event)
   if (action)
   {
     int x, y;
-    LogicalMousePosition(Event, x, y);
+    Event.GetPosition(&x, &y);
 
     int Clock = x2Clock(x);
     int Pitch = y2Pitch(y);
@@ -2052,8 +2201,8 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& Event)
         if (k)
         {
           JZRectangle r;
-          r.x = mCanvasX + mLittleBit;
-          r.y = mCanvasY;
+          r.x = mLittleBit;
+          r.y = 0;
           r.SetWidth(mPianoWidth - 2 * mLittleBit);
           r.SetHeight(mTopInfoHeight);
 
@@ -2075,27 +2224,6 @@ void JZPianoWindow::MousePiano(wxMouseEvent& Event)
   {
     mpMouseAction = new tMousePlay(this, Event);
   }
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZPianoWindow::GetVirtualEventSize(int& Width, int& Height)
-{
-  int TotalClockTics = mpSong->MaxQuarters * mpSong->TicksPerQuarter;
-  Width = TotalClockTics / mClockTicsPerPixel + mLeftInfoWidth;
-  Height = 127 * mTrackHeight + mTopInfoHeight;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZPianoWindow::LogicalMousePosition(
-  wxMouseEvent& MouseEvent,
-  int& x,
-  int& y)
-{
-  MouseEvent.GetPosition(&x, &y);
-  x += mCanvasX;
-  y += mCanvasY;
 }
 
 //-----------------------------------------------------------------------------
@@ -2206,19 +2334,23 @@ void JZPianoWindow::SetSnapDenom(int Value)
 //-----------------------------------------------------------------------------
 int JZPianoWindow::y2Pitch(int y)
 {
-  int pitch = 127 - y2Line(y);
-  if (pitch < 0)
+  int Pitch = 127 - y2TrackIndex(y);
+  if (Pitch < 0)
+  {
     return 0;
-  if (pitch > 127)
+  }
+  if (Pitch > 127)
+  {
     return 127;
-  return pitch;
+  }
+  return Pitch;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 int JZPianoWindow::Pitch2y(int Pitch)
 {
-  return Line2y(127 - Pitch);
+  return TrackIndex2y(127 - Pitch);
 }
 
 //-----------------------------------------------------------------------------
@@ -2250,10 +2382,10 @@ JZEvent *JZPianoWindow::FindEvent(JZTrack* pTrack, int Clock, int Pitch)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZPianoWindow::kill_keys_aftertouch(JZTrack *t, JZEvent* pEvent)
+void JZPianoWindow::kill_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
 {
   int key,channel;
-  tEventIterator iter(t);
+  tEventIterator iter(pTrack);
   tKeyPressure *a;
   tKeyOn *k = pEvent->IsKeyOn();
   if (!k)
@@ -2274,7 +2406,7 @@ void JZPianoWindow::kill_keys_aftertouch(JZTrack *t, JZEvent* pEvent)
     {
       if (a->Key == key && a->Channel == channel)
       {
-        t->Kill(pEvent);
+        pTrack->Kill(pEvent);
       }
     }
     pEvent = iter.Next();
@@ -2283,10 +2415,10 @@ void JZPianoWindow::kill_keys_aftertouch(JZTrack *t, JZEvent* pEvent)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZPianoWindow::paste_keys_aftertouch(JZTrack *t, JZEvent* pEvent)
+void JZPianoWindow::paste_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
 {
   int key,channel;
-  tEventIterator iter(t);
+  tEventIterator iter(pTrack);
   tKeyPressure *a;
   tKeyOn *k = pEvent->IsKeyOn();
   if (!k) return;
@@ -2306,25 +2438,6 @@ void JZPianoWindow::paste_keys_aftertouch(JZTrack *t, JZEvent* pEvent)
     }
     pEvent = iter.Next();
   }
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-int JZPianoWindow::Clock2x(int Clock)
-{
-  return mEventsX + (Clock - mFromClock) / mClockTicsPerPixel;
-}
-
-//-----------------------------------------------------------------------------
-// show the guitar edit window.
-//-----------------------------------------------------------------------------
-void JZPianoWindow::CreateGuitarWindow()
-{
-  if (!mpGuitarFrame)
-  {
-    mpGuitarFrame = new JZGuitarFrame(this);
-  }
-  mpGuitarFrame->Show(true);
 }
 
 //-----------------------------------------------------------------------------
@@ -2689,11 +2802,13 @@ void JZPianoWindow::CutOrCopy(int Id)
       Refresh();
     }
     mpFilter->OtherSelected = 0;
-    if (mpGuitarFrame)
-    {
-      mpGuitarFrame->Update();
-//      mpGuitarFrame->Redraw();
-    }
+//OLD    if (mpGuitarFrame)
+//OLD    {
+//OLD      mpGuitarFrame->Update();
+//OLD//      mpGuitarFrame->Redraw();
+//OLD    }
+    // Need a guitar window hint here.
+    JZProjectManager::Instance()->UpdateAllViews();
   }
 }
 
@@ -2817,17 +2932,19 @@ void JZPianoWindow::Copy(JZTrack* pTrack, JZEvent* pEvent, int Kill)
     }
 
     wxClientDC Dc(this);
-    DoPrepareDC(Dc);
+    PrepareDC(Dc);
     DrawEvent(Dc, pEvent, wxWHITE_BRUSH, 0);
     pTrack->Kill(pEvent);
     pTrack->Cleanup();
   }
 
-  if (mpGuitarFrame)
-  {
-    mpGuitarFrame->Update();
-//    mpGuitarFrame->Redraw();
-  }
+//OLD  if (mpGuitarFrame)
+//OLD  {
+//OLD    mpGuitarFrame->Update();
+//OLD//    mpGuitarFrame->Redraw();
+//OLD  }
+  // Need a guitar window hint here.
+  JZProjectManager::Instance()->UpdateAllViews();
 
   // SN++ Veloc- oder Aftertouch-Editor updaten
   if (mpCtrlEdit)
@@ -2903,7 +3020,7 @@ void JZPianoWindow::Paste(JZTrack* pTrack, int Clock, int Pitch)
         }
       }
       wxClientDC Dc(this);
-      DoPrepareDC(Dc);
+      PrepareDC(Dc);
       DrawEvent(Dc, c, c->GetBrush(), 0, 1);
       pTrack->Put(c);
       pEvent = Iterator.Next();
@@ -2971,7 +3088,7 @@ void JZPianoWindow::ActivateSettingsDialog()
   if (Dialog.ShowModal() == wxID_OK)
   {
     Setup();
-    SetScrollRanges(mCanvasX, mCanvasY);
+    SetScrollRanges();
     Refresh();
   }
 }
@@ -3000,9 +3117,9 @@ void JZPianoWindow::ActivateMidiDelayDialog()
   if (dialog.ShowModal() == wxID_OK)
   {
     //execute the command
-    tCmdMidiDelay cmd(mpFilter, scale/100.0,clockDelay,repeat);
+    tCmdMidiDelay cmd(mpFilter, scale / 100.0, clockDelay, repeat);
     cmd.Execute();
-    SetScrollRanges(mCanvasX, mCanvasY);
+    SetScrollRanges();
     Refresh();
   }
 }
@@ -3025,9 +3142,9 @@ void JZPianoWindow::ActivateSequenceLengthDialog()
   if (dialog.ShowModal() == wxID_OK)
   {
     //execute the command
-    tCmdSeqLength cmd(mpFilter, (1.0*scale)/100.0);
+    tCmdSeqLength cmd(mpFilter, scale / 100.0);
     cmd.Execute();
-    SetScrollRanges(mCanvasX, mCanvasY);
+    SetScrollRanges();
     Refresh();
   }
 }
@@ -3063,7 +3180,7 @@ void JZPianoWindow::ActivateVelocityDialog()
     //execute the command
     tCmdVelocity cmd(mpFilter, FromValue, ToValue, Mode);
     cmd.Execute();
-    SetScrollRanges(mCanvasX, mCanvasY);
+    SetScrollRanges();
     Refresh();
   }
 }

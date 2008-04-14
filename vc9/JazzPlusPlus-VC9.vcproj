@@ -564,6 +564,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\ProjectManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\ProjectManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\DeprecatedWx\prop.cpp"
 				>
 			</File>

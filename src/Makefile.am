@@ -55,6 +55,7 @@ PianoFrame.cpp \
 PianoWindow.cpp \
 Player.cpp \
 Project.cpp \
+ProjectManager.cpp \
 PropertyListDialog.cpp \
 Random.cpp \
 RecordingInfo.cpp \
@@ -130,6 +131,7 @@ PianoFrame.h \
 PianoWindow.h \
 Player.h \
 Project.h \
+ProjectManager.h \
 PropertyListDialog.h \
 Random.h \
 RecordingInfo.h \

@@ -96,6 +96,7 @@ struct tAudioBuffer
 
   ~tAudioBuffer()
   {
+    delete hdr;
     delete [] data;
   }
 

@@ -59,8 +59,6 @@ class JZPianoFrame : public wxFrame
     void OnMDialog(wxCommandEvent& Event);
     void OnMCutPaste(wxCommandEvent& Event);
 
-    void OnZoomIn(wxCommandEvent& Event);
-    void OnZoomOut(wxCommandEvent& Event);
     void OnSnap8(wxCommandEvent& Event);
     void OnSnap8D(wxCommandEvent& Event);
     void OnSnap16(wxCommandEvent& Event);
@@ -68,10 +66,7 @@ class JZPianoFrame : public wxFrame
 
     void VisibleDialog();
 
-
     void CreateMenu();
-
-    void OnPaintSub(wxDC* dc, int x, int y);
 
     void OnSnapDlg(wxCommandEvent& Event);
 
@@ -80,8 +75,6 @@ class JZPianoFrame : public wxFrame
     JZTrack* Track;
 
     void MouseCutPaste(wxMouseEvent &e, bool cut);
-
-    JZGuitarFrame* GetGuitarFrame();
 
     bool OnClose();
 
@@ -121,13 +114,19 @@ class JZPianoFrame : public wxFrame
     void OnCut(wxCommandEvent& Event);
     void OnCopy(wxCommandEvent& Event);
     void OnErase(wxCommandEvent& Event);
-    void OnVisibleAllTracks(wxCommandEvent& Event);
     void OnReset(wxCommandEvent& Event);
 
-  public:
+    //==============================================
+    // These are facades for piano window functions.
+    //==============================================
 
     void NewPlayPosition(int Clock);
+
+    void ShowPitch(int Pitch);
+
     void Redraw();
+
+  public:
 
     JZPianoWindow* mpPianoWindow;
 
@@ -137,6 +136,11 @@ class JZPianoFrame : public wxFrame
     wxDialog* MixerForm;
 
   private:
+
+    void OnZoomIn(wxCommandEvent& Event);
+    void OnZoomOut(wxCommandEvent& Event);
+
+    void OnVisibleAllTracks(wxCommandEvent& Event);
 
     void OnGuitar(wxCommandEvent& Event);
 

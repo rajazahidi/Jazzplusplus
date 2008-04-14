@@ -24,6 +24,7 @@
 
 #include "Harmony.h"
 #include "HarmonyP.h"
+#include "ProjectManager.h"
 #include "Player.h"
 #include "TrackFrame.h"
 #include "TrackWindow.h"
@@ -1356,16 +1357,8 @@ void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
 
       if (gpTrackFrame->GetPianoWindow())
       {
-        // Show in GuitarWin
-        JZGuitarFrame* pGuitarFrame =
-          gpTrackFrame->GetPianoWindow()->GetGuitarFrame();
-        if (pGuitarFrame)
-        {
-          // Remove actual pianowin/mouse position
-          pGuitarFrame->ShowPitch(0);
-//          pGuitarFrame->Redraw();
-          pGuitarFrame->Update();
-        }
+        // Show in the guitar view.
+        JZProjectManager::Instance()->ShowPitch(0);
       }
     }
   }

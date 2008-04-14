@@ -46,11 +46,15 @@ BEGIN_EVENT_TABLE(JZTrackWindow, JZEventWindow)
 
   EVT_ERASE_BACKGROUND(JZTrackWindow::OnEraseBackground)
 
+  EVT_PAINT(JZTrackWindow::OnPaint)
+
   EVT_LEFT_DOWN(JZTrackWindow::OnLeftButtonDown)
 
   EVT_LEFT_UP(JZTrackWindow::OnLeftButtonUp)
 
   EVT_RIGHT_UP(JZTrackWindow::OnRightButtonUp)
+
+  EVT_SCROLLWIN(JZTrackWindow::OnScroll)
 
 END_EVENT_TABLE()
 
@@ -62,22 +66,8 @@ JZTrackWindow::JZTrackWindow(
   const wxPoint& Position,
   const wxSize& Size)
   : JZEventWindow(pParent, pSong, Position, Size),
-    mLeftInfoWidth(100),
-    mClocksPerPixel(36),
     mPlayClock(-1),
     mUseColors(true),
-    mEventsX(),
-    mEventsY(),
-    mEventsWidth(),
-    mEventsHeight(),
-    mScrolledX(0),
-    mScrolledY(0),
-    mCanvasWidth(0),
-    mCanvasHeight(0),
-    mFromClock(0),
-    mToClock(0),
-    mFromLine(0),
-    mToLine(0),
     mNumberWidth(),
     mTrackNameX(),
     mTrackNameWidth(),
@@ -100,6 +90,8 @@ JZTrackWindow::JZTrackWindow(
   SetBackgroundColour(*wxWHITE);
 
   mpFrameBuffer = new wxBitmap;
+
+  SetScrollRanges();
 }
 
 //-----------------------------------------------------------------------------
@@ -161,8 +153,6 @@ void JZTrackWindow::Create()
 //DEBUG    << endl;
 
   UnMark();
-
-//  delete pDc;
 }
 
 //-----------------------------------------------------------------------------
@@ -172,11 +162,11 @@ void JZTrackWindow::Create()
 //-----------------------------------------------------------------------------
 void JZTrackWindow::NewPlayPosition(int Clock)
 {
-  int scroll_clock = (mFromClock + 5 * mToClock) / 6L;
+  int scroll_clock = (mFromClock + 5 * mToClock) / 6;
 
   if (
     !mpSnapSel->Active &&
-    ((Clock > scroll_clock) || (Clock < mFromClock)) && (Clock >= 0L))
+    (Clock > scroll_clock || Clock < mFromClock) && Clock >= 0)
   {
     // Avoid permanent redraws when end of scroll range is reached.
     if (
@@ -185,8 +175,9 @@ void JZTrackWindow::NewPlayPosition(int Clock)
     {
       return;
     }
+
     int x = Clock2x(Clock);
-    SetScrollPosition(x - mLeftInfoWidth, mScrolledY);
+    SetXScrollPosition(x);
   }
 
   if (!mpSnapSel->Active)  // sets clipping
@@ -195,19 +186,17 @@ void JZTrackWindow::NewPlayPosition(int Clock)
     {
       int OldPlayClock = mPlayClock;
       mPlayClock = Clock;
-      wxRect invalidateRect;
-      invalidateRect.x = Clock2x(OldPlayClock) - 1;
-      invalidateRect.y = mScrolledY;
-      invalidateRect.width = 3;
-      invalidateRect.height= 100000000;
-      //DrawPlayPosition();
+//      wxRect InvalidateRect;
+//      InvalidateRect.x = Clock2x(OldPlayClock) - 1;
+//      InvalidateRect.y = 0;
+//      InvalidateRect.width = 3;
+//      InvalidateRect.height= 100000000;
 
-      Refresh(true, &invalidateRect);
+//      Refresh(true, &InvalidateRect);
 
-      invalidateRect.x = Clock2x(mPlayClock) - 1;
+//      InvalidateRect.x = Clock2x(mPlayClock) - 1;
 
-      Refresh(true, &invalidateRect);
-      //DrawPlayPosition();
+//      Refresh(true, &InvalidateRect);
 
       Refresh(false);
     }
@@ -243,8 +232,7 @@ void JZTrackWindow::OnSize(wxSizeEvent& Event)
   if (mCanvasWidth > 0 && mCanvasHeight > 0)
   {
     mpFrameBuffer->Create(mCanvasWidth, mCanvasHeight);
-    SetScrollRanges(mScrolledX, mScrolledY);
-//    SetScrollPosition(0, 0);
+    SetScrollRanges();
   }
 }
 
@@ -254,6 +242,19 @@ void JZTrackWindow::OnSize(wxSizeEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackWindow::OnEraseBackground(wxEraseEvent& Event)
 {
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::OnPaint(wxPaintEvent& Event)
+{
+  // One must always create a wxPaintDC object, even if it is not used.
+  // Otherwise, under MS Windows, refreshing for this and other windows will
+  // fail.
+  wxPaintDC Dc(this);
+  PrepareDC(Dc);
+
+  OnDraw(Dc);
 }
 
 //-----------------------------------------------------------------------------
@@ -386,15 +387,14 @@ void JZTrackWindow::ToggleTrackState(const wxPoint& Point)
 //-----------------------------------------------------------------------------
 void JZTrackWindow::ZoomIn()
 {
-  if (mClocksPerPixel >= 2)
+  if (mClockTicsPerPixel >= 2)
   {
-    mClocksPerPixel /= 2;
-    int x = mScrolledX * 2;
-    int y = mScrolledY;
+    mClockTicsPerPixel /= 2;
+    mScrolledX *= 2;
 
-    SetScrollRanges(x, y);
+    SetScrollRanges();
 
-//    Refresh(false);
+    Refresh(false);
   }
 }
 
@@ -402,13 +402,12 @@ void JZTrackWindow::ZoomIn()
 //-----------------------------------------------------------------------------
 void JZTrackWindow::ZoomOut()
 {
-  if (mClocksPerPixel <= 120)
+  if (mClockTicsPerPixel <= 120)
   {
-    mClocksPerPixel *= 2;
-    int x = mScrolledX / 2;
-    int y = mScrolledY;
+    mClockTicsPerPixel *= 2;
+    mScrolledX /= 2;
 
-    SetScrollRanges(x, y);
+    SetScrollRanges();
 
     Refresh(false);
   }
@@ -447,22 +446,7 @@ void JZTrackWindow::Draw(wxDC& Dc)
   // in case the following drawing calls fail.
   LocalDc.Clear();
 
-  // Get the location, in scrolling units, of the upper left hand corner of
-  // viewable portion of the virtual window that makes up the scrolled window.
-  // Note that the bitmap we are drawing to always has upper left coordinates
-  // of (0, 0).  The y value is used to draw the proper tracks and the x
-  // value is used to draw the proper measures or bars.
-  GetViewStart(&mScrolledX, &mScrolledY);
-
-  // Convert scrolling units into pixels.
-  mScrolledX *= mScrollSize;
-  mScrolledY *= mScrollSize;
-
   GetClientSize(&mCanvasWidth, &mCanvasHeight);
-//DEBUG  cout
-//DEBUG    << "mCanvasWidth: " << mCanvasWidth
-//DEBUG    << "   mCanvasHeight: " << mCanvasHeight
-//DEBUG    << endl;
 
   mEventsX = mLeftInfoWidth;
   mEventsY = mTopInfoHeight;
@@ -471,11 +455,11 @@ void JZTrackWindow::Draw(wxDC& Dc)
   mEventsHeight = mCanvasHeight - mTopInfoHeight;
 
   mFromLine = mScrolledY / mTrackHeight;
-
   mToLine = 1 + (mScrolledY + mCanvasHeight - mTopInfoHeight) / mTrackHeight;
-  mFromClock = mScrolledX * mClocksPerPixel;
-//OLD  mToClock = x2Clock(mScrolledX + mCanvasWidth);
-  mToClock = x2Clock(mScrolledX + mCanvasWidth - mLeftInfoWidth);
+
+  mFromClock = mScrolledX * mClockTicsPerPixel;
+  mToClock = x2Clock(mCanvasWidth);
+
   mTrackNameX = mNumberWidth;
   mStateX = mTrackNameX + mTrackNameWidth;
   mPatchX = mStateX  + mStateWidth;
@@ -499,15 +483,16 @@ void JZTrackWindow::Draw(wxDC& Dc)
     JZBarInfo BarInfo(mpSong);
 
 //DEBUG    cout
+//DEBUG      << "mLeftInfoWidth:                " << mLeftInfoWidth << '\n'
 //DEBUG      << "mCanvasWidth - mLeftInfoWidth: " << mCanvasWidth - mLeftInfoWidth << '\n'
 //DEBUG      << "BarInfo.TicksPerBar            " << BarInfo.TicksPerBar << '\n'
 //DEBUG      << "From Clock:                    " << mFromClock << '\n'
 //DEBUG      << "To Clock:                      " << mToClock << '\n'
-//DEBUG      << "Clocks/Pixel:                  " << mClocksPerPixel << '\n'
+//DEBUG      << "Clocks/Pixel:                  " << mClockTicsPerPixel << '\n'
 //DEBUG      << "From Measure:                  " << mFromClock / BarInfo.TicksPerBar << '\n'
-//DEBUG      << "To Measure:                    " << mToClock / BarInfo.TicksPerBar
-////DEBUG      << "From X:                        " << mFromClock << '\n'
-////DEBUG      << "To X:                          " << mToClock << '\n'
+//DEBUG      << "To Measure:                    " << mToClock / BarInfo.TicksPerBar << '\n'
+//DEBUG      << "From X:                        " << Clock2x(mFromClock) << '\n'
+//DEBUG      << "To X:                          " << Clock2x(mToClock) << '\n'
 //DEBUG      << endl;
 
 
@@ -527,7 +512,7 @@ void JZTrackWindow::Draw(wxDC& Dc)
       if (x >= mEventsX)
       {
         int c;
-        if (mClocksPerPixel > 48)
+        if (mClockTicsPerPixel > 48)
         {
           c = 8;
         }
@@ -636,17 +621,15 @@ void JZTrackWindow::Draw(wxDC& Dc)
   // Draw the selection box.
   mpSnapSel->Draw(LocalDc, mEventsX, mEventsY, mEventsWidth, mEventsHeight);
 
-//  LocalDc.SetClippingRegion(0, 0, mCanvasWidth, mCanvasHeight);
   Dc.Blit(
-    mScrolledX,
-    mScrolledY,
+    0,
+    0,
     mCanvasWidth,
     mCanvasHeight,
     &LocalDc,
     0,
     0,
     wxCOPY);
-//  LocalDc.DestroyClippingRegion();
 
   LocalDc.SetFont(wxNullFont);
   LocalDc.SelectObject(wxNullBitmap);
@@ -741,14 +724,10 @@ void JZTrackWindow::DrawPlayPosition(wxDC& Dc)
 
     int x = Clock2x(mPlayClock);
 
-    // Draw a line, 2 pixwels wide.
+    // Draw a line, 2 pixels wide.
     Dc.DrawLine(x,     0, x,     mEventsY + mEventsHeight);
     Dc.DrawLine(x + 1, 0, x + 1, mEventsY + mEventsHeight);
   }
-//  if (mpNextWin)
-//  {
-//    mpNextWin->DrawPlayPosition(Dc);
-//  }
 }
 
 //-----------------------------------------------------------------------------
@@ -895,7 +874,7 @@ void JZTrackWindow::DrawEvents(wxDC& Dc)
     if (Track)
     {
       tEventIterator Iterator(Track);
-      int StopClk = x2Clock(mScrolledX + mCanvasWidth);
+      int StopClk = x2Clock(mCanvasWidth);
       JZEvent* pEvent = Iterator.Range(mFromClock, StopClk);
       int y0 = y + mLittleBit;
       int y1 = y + mTrackHeight - mLittleBit;
@@ -1023,22 +1002,6 @@ const char* JZTrackWindow::GetNumberString() const
 }
 
 //-----------------------------------------------------------------------------
-// Was the VLine macro
-//-----------------------------------------------------------------------------
-void JZTrackWindow::DrawVerticalLine(wxDC& Dc, int XPosition) const
-{
-  Dc.DrawLine(XPosition, 0, XPosition, mEventsY + mEventsHeight);
-}
-
-//-----------------------------------------------------------------------------
-// Was the HLine macro
-//-----------------------------------------------------------------------------
-void JZTrackWindow::DrawHorizontalLine(wxDC& Dc, int YPosition) const
-{
-  Dc.DrawLine(0, YPosition, mCanvasWidth, YPosition);
-}
-
-//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 int JZTrackWindow::x2xBar(int x)
 {
@@ -1071,9 +1034,9 @@ int JZTrackWindow::x2wBar(int x)
 // Description:
 //   Convert a track index into a y-pixel location in the visible window.
 //-----------------------------------------------------------------------------
-int JZTrackWindow::TrackIndex2y(int Track)
+int JZTrackWindow::TrackIndex2y(int TrackIndex)
 {
-  return Track * mTrackHeight + mTopInfoHeight - mScrolledY;
+  return TrackIndex * mTrackHeight + mTopInfoHeight - mScrolledY;
 }
 
 //-----------------------------------------------------------------------------
@@ -1092,34 +1055,6 @@ JZTrack* JZTrackWindow::y2Track(int y)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZTrackWindow::x2Clock(int x)
-{
-  return (x - mEventsX) * mClocksPerPixel + mFromClock;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-int JZTrackWindow::Clock2x(int Clock)
-{
-  return mEventsX + (Clock - mFromClock) / mClocksPerPixel;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-int JZTrackWindow::x2BarClock(int x, int Next)
-{
-  int Clock = x2Clock(x);
-  JZBarInfo BarInfo(mpSong);
-  BarInfo.SetClock(Clock);
-  while (Next--)
-  {
-    BarInfo.Next();
-  }
-  return BarInfo.Clock;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 int JZTrackWindow::EventsSelected(const wxString& Message)
 {
   if (!mpSnapSel->Selected)
@@ -1131,42 +1066,21 @@ int JZTrackWindow::EventsSelected(const wxString& Message)
 }
 
 //-----------------------------------------------------------------------------
-// Description:
-//   Only consider the event portion of the window when computing the virtual
-// size.  Do not consider the static information of the left or top portion of
-// the screen.
 //-----------------------------------------------------------------------------
-void JZTrackWindow::GetVirtualEventSize(int& Width, int& Height) const
+void JZTrackWindow::SetScrollRanges()
 {
-  int TotalClockTics = mpSong->MaxQuarters * mpSong->TicksPerQuarter;
-  Width = TotalClockTics / mClocksPerPixel + mLeftInfoWidth;
-  Height = 127 * mTrackHeight + mTopInfoHeight;
-}
+  int EventWidth, EventHeight;
+  GetVirtualEventSize(EventWidth, EventHeight);
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZTrackWindow::SetScrollRanges(const int& x, const int& y)
-{
-  int Width, Height;
-  GetVirtualEventSize(Width, Height);
-#ifdef DEBUG_TRACK_WINDOW_SCROLL
-  cout
-    << mScrollSize
-    << ' ' << mScrollSize
-    << ' ' << (Width + mScrollSize) / mScrollSize
-    << ' ' << (Height + mScrollSize) / mScrollSize
-    << ' ' << x
-    << ' ' << y
-    << endl;
-#endif // DEBUG_TRACK_WINDOW_SCROLL
-  SetScrollbars(
-    mScrollSize,
-    mScrollSize,
-    (Width + mScrollSize) / mScrollSize,
-    (Height + mScrollSize) / mScrollSize,
-    x,
-    y);
-  EnableScrolling(false, false);
+  // Must add the thumb size to the passed range to reach the maximum
+  // desired value.
+  int ThumbSize;
+
+  ThumbSize = EventWidth / 10;
+  SetScrollbar(wxHORIZONTAL, mScrolledX, ThumbSize, EventWidth + ThumbSize);
+
+  ThumbSize = EventHeight / 10;
+  SetScrollbar(wxVERTICAL, mScrolledY, ThumbSize, EventHeight + ThumbSize);
 }
 
 //-----------------------------------------------------------------------------
@@ -1363,5 +1277,133 @@ void JZTrackWindow::SnapSelectionStop(wxMouseEvent& Event)
     mpFilter->ToClock = x2BarClock(
       mpSnapSel->r.x + mpSnapSel->r.GetWidth() + 1);
 //    NextWin->NewPosition(mpFilter->FromTrack, mpFilter->FromClock);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::OnScroll(wxScrollWinEvent& Event)
+{
+  if (Event.GetOrientation() == wxHORIZONTAL)
+  {
+    HorizontalScroll(Event);
+  }
+  else if (Event.GetOrientation() == wxVERTICAL)
+  {
+    VerticalScroll(Event);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::HorizontalScroll(wxScrollWinEvent& Event)
+{
+  int EventWidth, EventHeight;
+  GetVirtualEventSize(EventWidth, EventHeight);
+
+  int NewScrolledX = mScrolledX;
+
+  if (Event.GetEventType() == wxEVT_SCROLLWIN_LINEUP)
+  {
+    --NewScrolledX;
+  }
+  else if (Event.GetEventType() == wxEVT_SCROLLWIN_LINEDOWN)
+  {
+    ++NewScrolledX;
+  }
+  else if (Event.GetEventType() == wxEVT_SCROLLWIN_PAGEUP)
+  {
+    NewScrolledX -= 10;
+  }
+  else if (Event.GetEventType() == wxEVT_SCROLLWIN_PAGEDOWN)
+  {
+    NewScrolledX += 10;
+  }
+  else if (Event.GetEventType() == wxEVT_SCROLLWIN_TOP)
+  {
+    NewScrolledX = 0;
+  }
+  else if (Event.GetEventType() == wxEVT_SCROLLWIN_BOTTOM)
+  {
+    NewScrolledX = EventWidth - 1;
+  }
+  else if (
+    Event.GetEventType() == wxEVT_SCROLLWIN_THUMBTRACK ||
+    Event.GetEventType() == wxEVT_SCROLLWIN_THUMBRELEASE)
+  {
+    NewScrolledX = Event.GetPosition();
+  }
+
+  if (NewScrolledX < 0)
+  {
+    NewScrolledX = 0;
+  }
+  if (NewScrolledX > EventWidth - 1)
+  {
+    NewScrolledX = EventWidth - 1;
+  }
+
+  if (NewScrolledX != mScrolledX)
+  {
+    mScrolledX = NewScrolledX;
+    SetScrollPos(wxHORIZONTAL, mScrolledX, true);
+    Refresh(false);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::VerticalScroll(wxScrollWinEvent& Event)
+{
+  int EventWidth, EventHeight;
+  GetVirtualEventSize(EventWidth, EventHeight);
+
+  int NewScrolledY = mScrolledY;
+
+  if (Event.GetEventType() == wxEVT_SCROLLWIN_LINEUP)
+  {
+    --NewScrolledY;
+  }
+  else if (Event.GetEventType() == wxEVT_SCROLLWIN_LINEDOWN)
+  {
+    ++NewScrolledY;
+  }
+  else if (Event.GetEventType() == wxEVT_SCROLLWIN_PAGEUP)
+  {
+    NewScrolledY -= 10;
+  }
+  else if (Event.GetEventType() == wxEVT_SCROLLWIN_PAGEDOWN)
+  {
+    NewScrolledY += 10;
+  }
+  else if (Event.GetEventType() == wxEVT_SCROLLWIN_TOP)
+  {
+    NewScrolledY = 0;
+  }
+  else if (Event.GetEventType() == wxEVT_SCROLLWIN_BOTTOM)
+  {
+    NewScrolledY = EventHeight - 1;
+  }
+  else if (
+    Event.GetEventType() == wxEVT_SCROLLWIN_THUMBTRACK ||
+    Event.GetEventType() == wxEVT_SCROLLWIN_THUMBRELEASE)
+  {
+    NewScrolledY = Event.GetPosition();
+  }
+
+  if (NewScrolledY < 0)
+  {
+    NewScrolledY = 0;
+  }
+  if (NewScrolledY > EventHeight - 1)
+  {
+    NewScrolledY = EventHeight - 1;
+  }
+
+  if (NewScrolledY != mScrolledY)
+  {
+    mScrolledY = NewScrolledY;
+    SetScrollPos(wxVERTICAL, mScrolledY, true);
+    Refresh(false);
   }
 }

@@ -26,6 +26,7 @@
 
 #include "PianoFrame.h"
 #include "PianoWindow.h"
+#include "ProjectManager.h"
 #include "Song.h"
 #include "Track.h"
 #include "Synth.h"
@@ -87,8 +88,6 @@ using namespace std;
 #define MEN_CTRL_TEMPO             42
 
 #define MEN_REDO                   47
-#define MEN_ZOOMIN                 48
-#define MEN_ZOOMOUT                49
 
 #define MEN_CTRL_POLY_AFTER        50
 #define MEN_CTRL_CHANNEL_AFTER     51
@@ -117,8 +116,8 @@ static JZToolDef tdefs[] =
   { MEN_SHIFTR,      FALSE, shiftr_xpm,   "shift selection right"},
   { MEN_VIS_ALL_TRK, TRUE,  evnts_xpm,    "show events from all tracks"},
   { JZToolBar::eToolBarSeparator },
-  { MEN_ZOOMIN,      FALSE, zoomin_xpm,   "zoom in"},
-  { MEN_ZOOMOUT,     FALSE, zoomout_xpm,  "zoom out"},
+  { wxID_ZOOM_IN,    FALSE, zoomin_xpm,   "zoom in"},
+  { wxID_ZOOM_OUT,   FALSE, zoomout_xpm,  "zoom out"},
   { wxID_UNDO,       FALSE, undo_xpm,     "undo"},
   { MEN_REDO,        FALSE, redo_xpm,     "redo"},
   { MEN_RESET,       FALSE, panic_xpm,    "all notes off"},
@@ -156,8 +155,8 @@ static JZToolDef tdefs[] =
 //*****************************************************************************
 BEGIN_EVENT_TABLE(JZPianoFrame, wxFrame)
 
-  EVT_MENU(MEN_ZOOMIN, JZPianoFrame::OnZoomIn)
-  EVT_MENU(MEN_ZOOMOUT, JZPianoFrame::OnZoomOut)
+  EVT_MENU(wxID_ZOOM_IN, JZPianoFrame::OnZoomIn)
+  EVT_MENU(wxID_ZOOM_OUT, JZPianoFrame::OnZoomOut)
   EVT_MENU(ID_SNAP_8, JZPianoFrame::OnSnap8)
   EVT_MENU(ID_SNAP_8D, JZPianoFrame::OnSnap8D)
   EVT_MENU(ID_SNAP_16, JZPianoFrame::OnSnap16)
@@ -268,6 +267,8 @@ JZPianoFrame::~JZPianoFrame()
   delete MixerForm;
 
   delete mpToolBar;
+
+  JZProjectManager::Instance()->Detach(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -308,7 +309,7 @@ void JZPianoFrame::CreateToolBar()
 // show the guitar edit window.
 void JZPianoFrame::OnGuitar(wxCommandEvent& Event)
 {
-  mpPianoWindow->CreateGuitarWindow();
+  JZProjectManager::Instance()->CreateGuitarView();
 }
 
 
@@ -374,13 +375,6 @@ void JZPianoFrame::CreateMenu()
   menu_bar->Append(help_menu,    "&Help");
 
   SetMenuBar(menu_bar);
-}
-
-
-
-JZGuitarFrame* JZPianoFrame::GetGuitarFrame()
-{
-  return mpPianoWindow->GetGuitarFrame();
 }
 
 void JZPianoFrame::OnFilter(wxCommandEvent& Event)
@@ -745,6 +739,11 @@ void JZPianoFrame::SetVisibleAllTracks(bool Value)
 void JZPianoFrame::NewPlayPosition(int Clock)
 {
   mpPianoWindow->NewPlayPosition(Clock);
+}
+
+void JZPianoFrame::ShowPitch(int Pitch)
+{
+  mpPianoWindow->ShowPitch(Pitch);
 }
 
 void JZPianoFrame::Redraw()

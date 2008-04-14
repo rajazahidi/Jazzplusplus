@@ -149,7 +149,7 @@ class tSelection : public tMouseAction
 {
   public:
 
-    tSelection(wxScrolledWindow* w);//wxCanvas *canvas);
+    tSelection(wxWindow* w);//wxCanvas *canvas);
     virtual ~tSelection();
 
     int Active;
@@ -168,7 +168,7 @@ class tSelection : public tMouseAction
 
   private:
 
-    wxScrolledWindow* win;
+    wxWindow* win;
 
     //  wxCanvas *Canvas;
     wxBrush* mpBackgroundBrush;
@@ -179,7 +179,7 @@ class tSelection : public tMouseAction
 class tSnapSelection : public tSelection
 {
   public:
-    tSnapSelection(wxScrolledWindow *c);
+    tSnapSelection(wxWindow *c);
     virtual void Snap(float &x, float &y, int up);
     void SetXSnap(int ny, int *cx);
     void SetYSnap(int ny, int *cy);
@@ -194,15 +194,13 @@ class tSnapSelection : public tSelection
 
 
 //*****************************************************************************
-/**
-  tButtonLabelInterface
-
-  Specifies an interface for displaying a text string within another widget.
-  The other widget would inherit from this interface and implement the Display
-  method to print the string somewhere appropriate.  The down argument
-  indicates if the text should be displayed in a depressed button or a normal
-  button.
-*/
+//  tButtonLabelInterface
+//
+//  Specifies an interface for displaying a text string within another widget.
+//  The other widget would inherit from this interface and implement the Display
+//  method to print the string somewhere appropriate.  The down argument
+//  indicates if the text should be displayed in a depressed button or a normal
+//  button.
 //*****************************************************************************
 class tButtonLabelInterface
 {
@@ -219,13 +217,26 @@ class tButtonLabelInterface
 
 
 //*****************************************************************************
-/**
-  MouseCounter - let you enter numbers with left/right mouse button
-
-*/
+//  MouseCounter - let you enter numbers with left/right mouse button
 //*****************************************************************************
 class tMouseCounter : public wxTimer, public tMouseAction
 {
+  public:
+
+    JZRectangle r;
+
+    int Value;
+
+    tMouseCounter(
+      tButtonLabelInterface *win,
+      JZRectangle *rec,
+      int val,
+      int min,
+      int max,
+      int wait = 0);
+
+  private:
+
     int Min, Max, Delta;
     int Timeout;
     int Wait;        // don't inc/dec at Init
@@ -237,10 +248,6 @@ class tMouseCounter : public wxTimer, public tMouseAction
     virtual int RightUp(wxMouseEvent &);
     virtual void Notify();
     virtual void ShowValue(bool down);
-  public:
-    JZRectangle r;
-    int Value;
-    tMouseCounter(tButtonLabelInterface *win, JZRectangle *rec, int val, int min, int max, int wait = 0);
 };
 
 
@@ -249,7 +256,7 @@ class tMouseCounter : public wxTimer, public tMouseAction
 //*****************************************************************************
 class tMarkDestin : public tMouseAction
 {
-  wxScrolledWindow *Canvas;
+  wxWindow *Canvas;
   wxFrame  *Frame;
   int ButtonDown(wxMouseEvent &);
 
@@ -259,7 +266,7 @@ public:
 
   virtual int LeftDown(wxMouseEvent &);
   virtual int RightDown(wxMouseEvent &);
-  tMarkDestin(wxScrolledWindow *canvas, wxFrame *frame, int left);
+  tMarkDestin(wxWindow *canvas, wxFrame *frame, int left);
 };
 
 //*****************************************************************************

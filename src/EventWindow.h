@@ -36,7 +36,7 @@ class JZPianoFrame;
 //   This class is derived from a wxWidgets scrolled window, and acts as the
 // common base class for JZTrackWindow and JSPianoWindow.
 //*****************************************************************************
-class JZEventWindow : public wxScrolledWindow
+class JZEventWindow : public wxWindow
 {
   public:
 
@@ -66,35 +66,49 @@ class JZEventWindow : public wxScrolledWindow
       int Height = -1,
       bool Down = false);
 
-//    void SetScrollRanges();
+    //========================================
+    // Coordinate conversion member functions.
+    //========================================
 
-    void SetScrollPosition(int x, int y);
+    int x2Clock(int x);
+
+    int Clock2x(int Clock);
+
+    int x2BarClock(int x, int Next = 0);
 
   protected:
 
-//    void OnPaint(wxPaintEvent& Event);
-//    void OnMouseEvent(wxMouseEvent& Event);
-//    void OnChar(wxKeyEvent& Event);
-//    bool OnCharHook(wxKeyEvent& Event);
-//    void OnDraw(wxDC& Dc);
+    void DrawVerticalLine(wxDC& Dc, int XPosition) const;
+
+    void DrawHorizontalLine(wxDC& Dc, int YPosition) const;
+
+    virtual void GetVirtualEventSize(int& EventWidth, int& EventHeight) const;
+
+    virtual void SetXScrollPosition(int x);
+
+    virtual void SetYScrollPosition(int y);
 
     int y2yLine(int y, int Up = 0);
 
   protected:
 
-    static const int mScrollSize;
-
     JZSong* mpSong;
-
-//    JZEventFrame* mpEventFrame;
 
     wxColor* mpGreyColor;
     wxBrush* mpGreyBrush;
 
+    int mClockTicsPerPixel;
     int mTopInfoHeight;
+    int mLeftInfoWidth;
     int mTrackHeight;
     int mLittleBit;
 
+    int mEventsX, mEventsY, mEventsWidth, mEventsHeight;
+    int mCanvasWidth, mCanvasHeight;
+    int mFromClock, mToClock;
+    int mFromLine, mToLine;
+
+    int mScrolledX, mScrolledY;
 
 //  DECLARE_EVENT_TABLE()
 };
@@ -143,9 +157,6 @@ class JZEventFrame : public wxFrame
 
     JZFilter* mpFilter;
 
-    JZPianoFrame* NextWin;
-
-
     // 2) Create():
     virtual void Create();
     virtual void CreateMenu();
@@ -153,24 +164,18 @@ class JZEventFrame : public wxFrame
 //    JZEventWindow* mpEventWindow;
 
     // Setup()
-    wxFont* mpFont;
     wxFont* mpFixedFont; // remains with 12pt
     int hFixedFont;   // Height of letters
 
-    int LittleBit;
     int mTrackHeight;
 
     int mTopInfoHeight;
-    int mLeftInfoWidth;
     int FontSize;
     int ClocksPerPixel;
-    bool UseColors;
 
     // Parameters changed, e.g. Song loaded
     virtual void Setup();
 
-    // filled by OnPaint()
-    //wxDC *dc;
     int mEventsX, mEventsY, mEventsWidth, mEventsHeight;
     int CanvasX, CanvasY, CanvasW, CanvasH;        // canvas coords
     int FromClock, ToClock;
@@ -187,21 +192,10 @@ class JZEventFrame : public wxFrame
     int y2yLine(int y, int up = 0);
     int Line2y(int line);
 //    void LineText(wxDC *dc, int x, int y, int w, const char *str, int h = -1, bool down = false);
-    int x2Clock(int x);
-    int Clock2x(int clk);
-    int x2BarClock(int x, int Next = 0);
 
     int PlayClock;
-    virtual void NewPlayPosition(int Clock);
-    virtual void DrawPlayPosition(wxDC* dc);
-
-    // sent by trackwin: scroll to Position
-    virtual void NewPosition(int TrackNr, int Clock)
-    {
-    }
 
     // Events
-    virtual void OnPaintSub(wxDC *dc, int x, int y);
     virtual int  OnMouseEvent(wxMouseEvent& Event);
     virtual bool OnKeyEvent(wxKeyEvent& Event); // true = processed by eventwin
     virtual void OnSize(wxSizeEvent& Event);
@@ -217,8 +211,6 @@ class JZEventFrame : public wxFrame
 
     // Mixer-Dialog
     wxDialog* MixerForm;
-
-    virtual void GetVirtualEventSize(int& Width, int& Height);
 
     // Edit-Menu
 
@@ -238,9 +230,6 @@ class JZEventFrame : public wxFrame
     void MenCleanup();
     void MenSearchReplace();
     void MenMeterChange();
-
-    void ZoomIn();
-    void ZoomOut();
 
   protected:
 

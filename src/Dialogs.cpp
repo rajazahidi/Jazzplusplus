@@ -27,6 +27,7 @@
 #include "Synth.h"
 #include "Command.h"
 #include "EventWindow.h"
+#include "ProjectManager.h"
 #include "Track.h"
 #include "Events.h"
 #include "Player.h"
@@ -54,7 +55,6 @@ tShiftDlg::tShiftDlg(JZEventFrame* pEventWindow, JZFilter* pFilter, long unit)
   : tPropertyListDlg("Shift events left/right"),
     mSteps(0),
     mUnit(unit),
-    mpEventWindow(pEventWindow),
     mpFilter(pFilter),
     mpSong(pFilter->mpSong)
 {
@@ -67,11 +67,8 @@ bool tShiftDlg::OnClose()
   cout << "tShiftDlg::OnClose " << mSteps << endl;
   tCmdShift cmd(mpFilter, mSteps * mUnit);
   cmd.Execute();
-  mpEventWindow->Refresh();
-  if (mpEventWindow->NextWin)
-  {
-    mpEventWindow->NextWin->Refresh();
-  }
+
+  JZProjectManager::Instance()->UpdateAllViews();
 
   //  wxForm::OnOk();
   return false;
@@ -110,7 +107,6 @@ tCleanupDlg::tCleanupDlg(JZEventFrame *w, JZFilter *f)
 {
   Filter = f;
   Song = f->mpSong;
-  mpEventWindow = w;
 }
 
 
@@ -123,11 +119,8 @@ bool tCleanupDlg::OnClose()
     << endl;
   tCmdCleanup cln(Filter, limit, shortenOverlaps);
   cln.Execute();
-  mpEventWindow->Refresh();
-  if (mpEventWindow->NextWin)
-  {
-    mpEventWindow->NextWin->Refresh();
-  }
+
+  JZProjectManager::Instance()->UpdateAllViews();
 
   //wxForm::OnOk();
   return false;
@@ -194,18 +187,14 @@ tSearchReplaceDlg::tSearchReplaceDlg(JZEventFrame *w, JZFilter *f)
 {
   Filter = f;
   Song = f->mpSong;
-  mpEventWindow = w;
 }
 
 bool tSearchReplaceDlg::OnClose()
 {
   tCmdSearchReplace sr(Filter, frCtrl - 1, toCtrl-1);
   sr.Execute();
-  mpEventWindow->Refresh();
-  if (mpEventWindow->NextWin)
-  {
-    mpEventWindow->NextWin->Refresh();
-  }
+
+  JZProjectManager::Instance()->UpdateAllViews();
 
   return false;
 }
@@ -244,7 +233,6 @@ bool tTransposeDlg::FitIntoScale = 0;
 tTransposeDlg::tTransposeDlg(JZEventFrame *w, JZFilter *f)
   : tPropertyListDlg("Transpose")
 {
-  mpEventWindow = w;
   Filter = f;
   Song   = f->mpSong;
 }
@@ -254,14 +242,8 @@ bool tTransposeDlg::OnClose()
 {
   tCmdTranspose trn(Filter, Notes, Scale, FitIntoScale);
   trn.Execute();
-  if (mpEventWindow->NextWin)
-  {
-    mpEventWindow->NextWin->Refresh();
-  }
-  else
-  {
-    mpEventWindow->Refresh();
-  }
+
+  JZProjectManager::Instance()->UpdateAllViews();
 
   return false;
 }
@@ -404,7 +386,6 @@ tLengthDlg::tLengthDlg(JZEventFrame *w, JZFilter *f)
 {
   Filter = f;
   Song = f->mpSong;
-  mpEventWindow = w;
 }
 
 
@@ -413,11 +394,7 @@ bool tLengthDlg::OnClose()
   tCmdLength cmd(Filter, FromValue, ToValue, Mode);
   cmd.Execute();
 
-  mpEventWindow->Refresh();
-  if (mpEventWindow->NextWin)
-  {
-    mpEventWindow->NextWin->Refresh();
-  }
+  JZProjectManager::Instance()->UpdateAllViews();
 
   //tPropertyListDlg::OnClose();
   return false;
@@ -469,7 +446,6 @@ tSeqLengthDlg::tSeqLengthDlg(JZEventFrame *w, JZFilter *f)
 {
   Filter = f;
   Song = f->mpSong;
-  mpEventWindow = w;
 }
 
 
@@ -477,11 +453,8 @@ bool tSeqLengthDlg::OnClose()
 {
   tCmdSeqLength cmd(Filter, scale);
   cmd.Execute();
-  mpEventWindow->Refresh();
-  if (mpEventWindow->NextWin)
-  {
-    mpEventWindow->NextWin->Refresh();
-  }
+
+  JZProjectManager::Instance()->UpdateAllViews();
 
   //tPropertyListDlg::OnClose();
   return false;
@@ -516,7 +489,6 @@ tMidiDelayDlg::tMidiDelayDlg(JZEventFrame *w, JZFilter *f)
 {
   Filter = f;
   Song = f->mpSong;
-  mpEventWindow = w;
 }
 
 
@@ -525,11 +497,8 @@ bool tMidiDelayDlg::OnClose()
 
   tCmdMidiDelay cmd(Filter, scale,clockDelay,repeat);
   cmd.Execute();
-  mpEventWindow->Refresh();
-  if (mpEventWindow->NextWin)
-  {
-    mpEventWindow->NextWin->Refresh();
-  }
+
+  JZProjectManager::Instance()->UpdateAllViews();
 
   //tPropertyListDlg::OnClose();
   return false;
@@ -579,7 +548,6 @@ tDeleteDlg::tDeleteDlg(JZEventFrame *w, JZFilter *f)
 : tPropertyListDlg("Delete" )
 {
   Filter = f;
-  mpEventWindow = w;
 }
 
 
@@ -587,11 +555,8 @@ bool tDeleteDlg::OnClose()
 {
   tCmdErase cmd(Filter, LeaveSpace);
   cmd.Execute();
-  mpEventWindow->Refresh();
-  if (mpEventWindow->NextWin)
-  {
-    mpEventWindow->NextWin->Refresh();
-  }
+
+  JZProjectManager::Instance()->UpdateAllViews();
 
 //  tPropertyListDlg::OnClose();
   return false;
@@ -674,7 +639,6 @@ tQuantizeDlg::tQuantizeDlg(JZEventFrame *w, JZFilter *f)
 {
   Filter = f;
   Song = f->mpSong;
-  mpEventWindow = w;
 }
 
 
@@ -687,11 +651,8 @@ bool tQuantizeDlg::OnClose()
   qnt.NoteStart = NoteStart;
   qnt.NoteLength = NoteLength;
   qnt.Execute();
-  mpEventWindow->Refresh();
-  if (mpEventWindow->NextWin)
-  {
-    mpEventWindow->NextWin->Refresh();
-  }
+
+  JZProjectManager::Instance()->UpdateAllViews();
 
   //tPropertyListDlg::OnClose();
   return false;
@@ -699,14 +660,14 @@ bool tQuantizeDlg::OnClose()
 
 void tQuantizeDlg::OnHelp()
 {
-  if (mpEventWindow->NextWin)
-  {
-    gpHelpInstance->ShowTopic("Quantize");
-  }
-  else
-  {
-    gpHelpInstance->ShowTopic("Pianowin Quantize");
-  }
+//  if (mpEventWindow->NextWin)
+//  {
+//    gpHelpInstance->ShowTopic("Quantize");
+//  }
+//  else
+//  {
+//    gpHelpInstance->ShowTopic("Pianowin Quantize");
+//  }
 }
 
 void tQuantizeDlg::AddProperties()

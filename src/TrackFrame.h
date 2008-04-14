@@ -51,6 +51,8 @@ class JZTrackFrame : public wxFrame, public tButtonLabelInterface
       return 0;
     }
 
+    void NewPlayPosition(int Clock);
+
     // Overridden tButtonLabelInterface finction.
     virtual void ButtonLabelDisplay(const wxString& Text, bool IsButtonDown);
 
@@ -107,8 +109,6 @@ class JZTrackFrame : public wxFrame, public tButtonLabelInterface
     wxMenu* mpToolsMenu;
 
     JZTrackWindow* mpTrackWindow;
-
-//    JZPianoWindow* mpPianoWindow;
 
     int mPreviousClock;
     bool mPreviouslyRecording;

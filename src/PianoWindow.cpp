@@ -1922,7 +1922,7 @@ void JZPianoWindow::NewPlayPosition(int Clock)
   {
     if (mPlayClock != Clock)
     {
-      int OldPlayClock = mPlayClock;
+//      int OldPlayClock = mPlayClock;
       mPlayClock = Clock;
 //      wxRect InvalidateRect;
 //      InvalidateRect.x = Clock2x(OldPlayClock) - 1;

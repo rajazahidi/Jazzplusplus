@@ -265,7 +265,7 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     void OnDraw(wxDC& Dc);
 
-    void OnPaint(wxMouseEvent& Event);
+    void OnPaint(wxPaintEvent& Event);
 
     void OnMouseEvent(wxMouseEvent& Event);
 
@@ -282,8 +282,6 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
     void MousePiano(wxMouseEvent& Event);
 
     bool OnCharHook(wxKeyEvent& Event);
-
-    void OnPaint(wxPaintEvent& Event);
 
     void OnChar(wxKeyEvent& Event);
 

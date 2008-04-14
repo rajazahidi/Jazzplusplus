@@ -77,7 +77,7 @@ class tSampleVoice;
 // =============================================================
 
 #ifndef __WXMSW__
-#define WAVEHDR void
+#define WAVEHDR char
 #endif
 
 struct tAudioBuffer
@@ -87,8 +87,9 @@ struct tAudioBuffer
   short* data;
 
   tAudioBuffer(int dummy)
+    : hdr(0),
+      data(0)
   {
-    hdr  = 0;
     data = new short [BUFSHORTS];
     // in case recording stops inside a buffer
     memset(data, 0, BUFBYTES);
@@ -137,12 +138,12 @@ class tAudioBufferQueue
       }
     }
 
-    int  Count() const
+    int Count() const
     {
       return written - read;
     }
 
-    int  Empty() const
+    int Empty() const
     {
       return written == read;
     }
@@ -196,7 +197,7 @@ class tAudioRecordBuffer
     tAudioBuffer * RequestBuffer();
     void UndoRequest()
     {
-      num_buffers--;
+      --num_buffers;
     }
     void ResetBufferSize(int size)
     {

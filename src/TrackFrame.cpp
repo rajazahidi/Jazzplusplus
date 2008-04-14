@@ -570,8 +570,8 @@ void JZTrackFrame::OnSettingsSynthesizerType(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnSettingsMidiDevice(wxCommandEvent& Event)
 {
-  long InputDevice, OutputDevice;
 #ifdef __WXMSW__
+  long InputDevice, OutputDevice;
   gpConfig->Get(C_WinInputDevice, InputDevice);
   gpConfig->Get(C_WinOutputDevice, OutputDevice);
   JZWindowsPlayer::SettingsDlg(InputDevice, OutputDevice);
@@ -580,13 +580,12 @@ void JZTrackFrame::OnSettingsMidiDevice(wxCommandEvent& Event)
     "Info",
     wxOK);
 #else
-/*
   if (gpConfig->GetValue(C_MidiDriver) == eMidiDriverOss)
   {
-    int Device = mpMidiPlayer->FindMidiDevice();
+    int Device = gpMidiPlayer->FindMidiDevice();
     if (Device >= 0)
     {
-      SaveMidiDeviceSettings(Device);
+      gpConfig->Put(C_Seq2Device, Device);
       ::wxMessageBox(
         "Restart Jazz++ to activate changes in device settings",
         "Info",
@@ -597,7 +596,6 @@ void JZTrackFrame::OnSettingsMidiDevice(wxCommandEvent& Event)
       ::wxMessageBox("No midi device found", "Info", wxOK);
     }
   }
-*/
 #endif
 }
 

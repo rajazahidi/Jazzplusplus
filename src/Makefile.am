@@ -18,6 +18,7 @@ DeprecatedStringUtils.cpp \
 DeprecatedWx/prop.cpp \
 DeprecatedWx/propform.cpp \
 DeprecatedWx/proplist.cpp \
+Dialogs/KeyOnDialog.cpp \
 Dialogs/MetronomeSettingsDialog.cpp \
 Dialogs/SynthesizerSettingsDialog.cpp \
 Dialogs.cpp \
@@ -72,6 +73,7 @@ SliderWindow.cpp \
 Song.cpp \
 StandardFile.cpp \
 StringReadWrite.cpp \
+StringUtilities.cpp \
 Synth.cpp \
 ToolBar.cpp \
 Track.cpp \
@@ -94,7 +96,8 @@ DeprecatedWx/prop.h \
 DeprecatedWx/propform.h \
 DeprecatedWx/proplist.h \
 DeprecatedStringUtils.h \
-Dialogs/MetronomeSettingsDialog.cpp \
+Dialogs/KeyOnDialog.h \
+Dialogs/MetronomeSettingsDialog.h \
 Dialogs/SynthesizerSettingsDialog.h \
 Dialogs.h \
 DynamicArray.h \
@@ -150,6 +153,7 @@ SliderWindow.h \
 Song.h \
 StandardFile.h \
 StringReadWrite.h \
+StringUtilities.h \
 Synth.h \
 ToolBar.h \
 TrackFrame.h \

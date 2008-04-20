@@ -27,34 +27,35 @@
 #include "DeprecatedStringUtils.h"
 #include "DeprecatedWx/proplist.h"
 
-tKeyDlg::tKeyDlg(const char* pTitle, int Key)
+using namespace std;
+
+JZKeyDialog::JZKeyDialog(const char* pTitle, int Key)
 {
-  char buf[50];
-  Key2Str(Key, buf);
-  mpString = copystring(buf);
+  string KeyString;
+  KeyToString(Key, KeyString);
+  mpString = copystring(KeyString.c_str());
   mpTitle = pTitle;
 }
 
 
-tKeyDlg::~tKeyDlg()
+JZKeyDialog::~JZKeyDialog()
 {
   delete mpString;
 }
 
 #ifdef OBSOLETE
-wxFormItem *tKeyDlg::mkFormItem(int w)
+wxFormItem *JZKeyDialog::mkFormItem(int w)
 {
   return wxMakeFormString(mpTitle, &mpString, wxFORM_DEFAULT, 0, 0, 0, w);
 }
 #endif
 
-wxProperty* tKeyDlg::mkProperty()
+wxProperty* JZKeyDialog::mkProperty()
 {
   return new wxProperty(mpTitle, wxPropertyValue((char**)&mpString), "string");
 }
 
-int tKeyDlg::GetKey()
+int JZKeyDialog::GetKey()
 {
-  return Str2Key(mpString);
+  return StringToKey(mpString);
 }
-

@@ -20,13 +20,17 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include <string.h>
-#include <stdio.h>
-#include <ctype.h>
+//#include <locale>
+#include <string>
+#include <sstream>
 
-void Key2Str(int Key, char* pString)
+using namespace std;
+
+//*****************************************************************************
+//*****************************************************************************
+void KeyToString(int Key, string& String)
 {
-  static const char* pNames[] =
+  static string Names[] =
   {
     "C",
     "C#",
@@ -42,14 +46,17 @@ void Key2Str(int Key, char* pString)
     "B"
   };
 
-  strcpy(pString, pNames[Key % 12]);
-  sprintf(pString + strlen(pString), "%d", Key / 12);
+  ostringstream Oss;
+  Oss << Names[Key % 12] << Key / 12;
+  String = Oss.str();
 }
 
-int Str2Key(const char *pString)
+//*****************************************************************************
+//*****************************************************************************
+int StringToKey(const string& String)
 {
-  static const char sKey[] = "cCdDeEfFgGaAbB";
-  static int nKey[] =
+  static const char NoteCharacter[] = "cCdDeEfFgGaAbB";
+  static int NoteKeyValue[] =
   {
     0,
     0,
@@ -69,38 +76,39 @@ int Str2Key(const char *pString)
 
   int Key = 0;
 
-  while (*pString)
+  for (int i = 0; i < String.length(); ++i)
   {
-    if (*pString == '#')
+    if (String[i] == '#')
     {
+      // A sharp adds a half step.
       Key += 1;
-      ++pString;
     }
-    else if (isdigit(*pString))
+    else if (isdigit(String[i]))
     {
+      // Process the octave digits.
       int n = 0;
-      while (isdigit(*pString))
+      for (; isdigit(String[i]) && i < String.length(); ++i)
       {
-        n = 10 * n + *pString++ - '0';
+        n = 10 * n + String[i] - '0';
       }
       Key += 12 * n;
     }
     else
     {
-      int i;
-      for (i = 0; sKey[i]; ++i)
+      // Process the note character.
+      int j;
+      for (j = 0; NoteCharacter[j]; ++j)
       {
-        if (pString[0] == sKey[i])
+        if (String[i] == NoteCharacter[j])
         {
-          Key += nKey[i];
-          ++pString;
+          Key += NoteKeyValue[j];
           break;
         }
       }
-      if (!sKey[i])
+      if (!NoteCharacter[j])
       {
-        // error
-        ++pString;
+        // This is an error condition.  For now, bogus note characters are
+        // ignored.
       }
     }
   }

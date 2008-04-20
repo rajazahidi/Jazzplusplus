@@ -510,17 +510,18 @@ void tSampleCnvs::DrawTicks(int x, int y, int w)
     int cfr = static_cast<int>(spl->Samples2Ticks(sfr));
     int cto = static_cast<int>(spl->Samples2Ticks(sto));
     JZMapper Map(cfr, cto, x, x+w);
-    JZBarInfo bi(gpSong);
-    bi.SetClock(cfr);
-    bi.SetBar(bi.BarNr);
-    while (bi.Clock < cto)
+    JZBarInfo BarInfo(*gpSong);
+    BarInfo.SetClock(cfr);
+    BarInfo.SetBar(BarInfo.GetBarIndex());
+    while (BarInfo.GetClock() < cto)
     {
-      int ticks_per_count = bi.TicksPerBar / bi.CountsPerBar;
+      int ticks_per_count = BarInfo.GetTicksPerBar() / BarInfo.GetCountsPerBar();
       int ticks_per_step = ticks_per_count / 4;
-      for (int i = 0; i < bi.CountsPerBar; i++)
+      for (int i = 0; i < BarInfo.GetCountsPerBar(); ++i)
       {
-        for (int j = 0; j < 4; j++) {
-          int clock = bi.Clock + i * ticks_per_count + j * ticks_per_step;
+        for (int j = 0; j < 4; j++)
+        {
+          int clock = BarInfo.GetClock() + i * ticks_per_count + j * ticks_per_step;
           int xx = static_cast<int>(Map.XToY(clock));
           // draw a tickmark line
           dc->DrawLine(xx, y - 5, xx, y);
@@ -535,7 +536,7 @@ void tSampleCnvs::DrawTicks(int x, int y, int w)
         }
       }
 
-      bi.Next();
+      BarInfo.Next();
     }
   }
 

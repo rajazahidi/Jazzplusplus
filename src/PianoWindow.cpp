@@ -198,7 +198,7 @@ class tKeyLengthDragger : public tMouseAction
 {
   public:
 
-    tKeyLengthDragger(tKeyOn* k, JZPianoWindow* pPianoWindow);
+    tKeyLengthDragger(tKeyOn* pKeyOn, JZPianoWindow* pPianoWindow);
 
     int Dragging(wxMouseEvent& Event);
 
@@ -216,10 +216,12 @@ class tKeyLengthDragger : public tMouseAction
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tKeyLengthDragger::tKeyLengthDragger(tKeyOn* k, JZPianoWindow* pPianoWindow)
+tKeyLengthDragger::tKeyLengthDragger(
+  tKeyOn* pKeyOn,
+  JZPianoWindow* pPianoWindow)
 {
-  mpKeyOn = k;
-  Copy  = k->Copy() -> IsKeyOn();
+  mpKeyOn = pKeyOn;
+  Copy  = pKeyOn->Copy()->IsKeyOn();
   Win   = pPianoWindow;
 
   // SN++ BUG FIX: undo/redo
@@ -264,7 +266,7 @@ int tKeyLengthDragger::Dragging(wxMouseEvent& Event)
   {
     Length = 1;
   }
-  Copy->Length = Length;
+  Copy->mLength = Length;
 
   Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 1, 1);
   return 0;
@@ -275,16 +277,16 @@ int tKeyLengthDragger::Dragging(wxMouseEvent& Event)
 int tKeyLengthDragger::ButtonUp(wxMouseEvent& Event)
 {
   // SN++ Key_Aftertouch
-  if (Copy->Length < mpKeyOn->Length)
+  if (Copy->mLength < mpKeyOn->mLength)
   {
     int key, channel;
     tEventIterator iter(Win->GetTrack());
     tKeyPressure *a;
-    key = Copy->Key;
+    key = Copy->mKey;
     channel = Copy->Channel;
     JZEvent* pEvent = iter.Range(
-      Copy->GetClock() + Copy->Length,
-      Copy->GetClock() + mpKeyOn->Length);
+      Copy->GetClock() + Copy->mLength,
+      Copy->GetClock() + mpKeyOn->mLength);
     while (pEvent)
     {
       a = pEvent->IsKeyPressure();
@@ -322,12 +324,12 @@ int tKeyLengthDragger::ButtonUp(wxMouseEvent& Event)
 class tPlayTrackLengthDragger : public tMouseAction
 {
     tPlayTrack* mpKeyOn;
-    tPlayTrack    *Copy;
-    JZPianoWindow *Win;
+    tPlayTrack* Copy;
+    JZPianoWindow* Win;
     JZTrack* mpTrack;
 
   public:
-    tPlayTrackLengthDragger(tPlayTrack *k, JZPianoWindow* pPianoWindow);
+    tPlayTrackLengthDragger(tPlayTrack* k, JZPianoWindow* pPianoWindow);
     int Dragging(wxMouseEvent& Event);
     int ButtonUp(wxMouseEvent& Event);
     int Event(wxMouseEvent& Event);
@@ -340,7 +342,7 @@ tPlayTrackLengthDragger::tPlayTrackLengthDragger(
   JZPianoWindow* pPianoWindow)
 {
   mpKeyOn = k;
-  Copy  = k->Copy() -> IsPlayTrack();
+  Copy  = k->Copy()->IsPlayTrack();
   Win   = pPianoWindow;
 
   // SN++ BUG FIX: undo/redo
@@ -417,12 +419,12 @@ class tVelocCounter : public tMouseCounter
     int Event(wxMouseEvent& Event);
     tVelocCounter(
       JZPianoWindow* pPianoWindow,
-      JZRectangle* r,
-      tKeyOn* pEvent)
-      : tMouseCounter(pPianoWindow, r, pEvent->Veloc, 1, 127)
+      JZRectangle* pRectangle,
+      tKeyOn* pKeyOn)
+      : tMouseCounter(pPianoWindow, pRectangle, pKeyOn->mVelocity, 1, 127)
     {
       Win = pPianoWindow;
-      mpKeyOn = pEvent;
+      mpKeyOn = pKeyOn;
 
       // SN++ BUG FIX: undo/redo
       Win->GetSong()->NewUndoBuffer();
@@ -444,14 +446,14 @@ int tVelocCounter::Event(wxMouseEvent& Event)
 {
   if (tMouseCounter::Event(Event))
   {
-    tKeyOn *Copy = (tKeyOn *)mpKeyOn->Copy();
-    Copy->Veloc = Value;
+    tKeyOn* pKeyOnCopy = (tKeyOn *)mpKeyOn->Copy();
+    pKeyOnCopy->mVelocity = Value;
 
-    Win->ApplyToTrack(mpKeyOn, Copy);
+    Win->ApplyToTrack(mpKeyOn, pKeyOnCopy);
 
     wxClientDC Dc(Win);
     Win->PrepareDC(Dc);
-    Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 0, 1);
+    Win->DrawEvent(Dc, pKeyOnCopy, pKeyOnCopy->GetBrush(), 0, 1);
 
     Win->UpdateControl();
 
@@ -759,7 +761,7 @@ void JZPianoWindow::Draw(wxDC& Dc)
 
   mPianoX = 0;
 
-  JZBarInfo BarInfo(mpSong);
+  JZBarInfo BarInfo(*mpSong);
 
 //DEBUG  cout
 //DEBUG    << "mLeftInfoWidth:                " << mLeftInfoWidth << '\n'
@@ -827,17 +829,17 @@ void JZPianoWindow::Draw(wxDC& Dc)
   LocalDc.SetFont(*mpFixedFont);
   BarInfo.SetClock(mFromClock);
   int StopClk = x2Clock(mCanvasWidth);
-  int clk = BarInfo.Clock;
+  int clk = BarInfo.GetClock();
   int intro = mpSong->GetIntroLength();
   while (clk < StopClk)
   {
-    clk = BarInfo.Clock;
+    clk = BarInfo.GetClock();
     int x = Clock2x(clk);
     // vertical lines and bar numbers
     int i;
     LocalDc.SetPen(*wxBLACK_PEN);
     ostringstream Oss;
-    Oss << BarInfo.BarNr + 1 - intro;
+    Oss << BarInfo.GetBarIndex() + 1 - intro;
     if (x > mEventsX)
     {
       LocalDc.DrawText(Oss.str().c_str(), x + mLittleBit, mEventsY - mFixedFontHeight - 2);
@@ -846,9 +848,9 @@ void JZPianoWindow::Draw(wxDC& Dc)
     }
 
     LocalDc.SetPen(*wxLIGHT_GREY_PEN);
-    for (i = 0; i < BarInfo.CountsPerBar; i++)
+    for (i = 0; i < BarInfo.GetCountsPerBar(); i++)
     {
-      clk += BarInfo.TicksPerBar / BarInfo.CountsPerBar;
+      clk += BarInfo.GetTicksPerBar() / BarInfo.GetCountsPerBar();
       x = Clock2x(clk);
       if (x > mEventsX)
       {
@@ -946,7 +948,7 @@ void JZPianoWindow::Draw(wxDC& Dc)
 
   if (mVisibleAllTracks)
   {
-    for (int i = 0; i < mpSong->nTracks; ++i)
+    for (int i = 0; i < mpSong->GetTrackCount(); ++i)
     {
       JZTrack* pTrack = mpSong->GetTrack(i);
       if (pTrack != mpTrack && IsVisible(pTrack))
@@ -1099,7 +1101,7 @@ bool JZPianoWindow::OnKeyEvent(wxKeyEvent& Event)
         }
         return true;
       case WXK_DOWN:
-        if (mTrackIndex < mpSong->nTracks - 1)
+        if (mTrackIndex < mpSong->GetTrackCount() - 1)
         {
           ++mTrackIndex;
           NewPosition(mTrackIndex, -1L);
@@ -1364,7 +1366,7 @@ void JZPianoWindow::DrawEvent(
   // show velocity as colors
   if (force_color != 0 && mUseColors && pEvent->IsKeyOn())
   {
-    int vel = pEvent->IsKeyOn()->Veloc;
+    int vel = pEvent->IsKeyOn()->mVelocity;
 
     // Next line is "Patrick Approved."
     Dc.SetBrush(mpColorBrush[ vel * NUM_COLORS / 128 ]);
@@ -1446,7 +1448,7 @@ void JZPianoWindow::DrawEvents(
         // show velocity as colors
         if (!force_color && mUseColors && pEvent->IsKeyOn())
         {
-          int vel = pEvent->IsKeyOn()->Veloc;
+          int vel = pEvent->IsKeyOn()->mVelocity;
           Dc.SetBrush(mpColorBrush[ vel * NUM_COLORS / 128 ]);
         }
         else
@@ -1909,7 +1911,7 @@ void JZPianoWindow::NewPlayPosition(int Clock)
     // Avoid permenent redraws when end of scroll range is reached.
     if (
       Clock > mFromClock &&
-      mToClock >= mpSong->MaxQuarters * mpSong->TicksPerQuarter)
+      mToClock >= mpSong->GetMaxQuarters() * mpSong->GetTicksPerQuarter())
     {
       return;
     }
@@ -2133,12 +2135,12 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& Event)
     int Clock = x2Clock(x);
     int Pitch = y2Pitch(y);
     JZEvent *m = FindEvent(mpTrack, Clock, Pitch);
-    tKeyOn *k = 0;
+    tKeyOn* pKeyOn = 0;
     tPlayTrack *p = 0;
     if (m)
     {
       // both these events are drag length
-      k = m->IsKeyOn();
+      pKeyOn = m->IsKeyOn();
       p = m->IsPlayTrack();
     }
     switch (action)
@@ -2152,11 +2154,11 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& Event)
         break;
 
       case MA_LENGTH:
-        if (k)
+        if (pKeyOn)
         {
           if (!mpTrack->GetAudioMode())
           {
-            mpMouseAction = new tKeyLengthDragger(k, this);
+            mpMouseAction = new tKeyLengthDragger(pKeyOn, this);
           }
         }
         else
@@ -2169,7 +2171,7 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& Event)
           {
             // event not found, maybe change to another Track
             int i;
-            for (i = 0; i < mpSong->nTracks; i++)
+            for (i = 0; i < mpSong->GetTrackCount(); i++)
             {
               JZTrack* pTrack = mpSong->GetTrack(i);
               if (IsVisible(pTrack) && FindEvent(pTrack, Clock, Pitch))
@@ -2198,7 +2200,7 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& Event)
         break;
 
       case MA_VELOCITY:
-        if (k)
+        if (pKeyOn)
         {
           JZRectangle r;
           r.x = mLittleBit;
@@ -2206,7 +2208,7 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& Event)
           r.SetWidth(mPianoWidth - 2 * mLittleBit);
           r.SetHeight(mTopInfoHeight);
 
-          tVelocCounter *VelocCounter = new tVelocCounter(this, &r, k);
+          tVelocCounter *VelocCounter = new tVelocCounter(this, &r, pKeyOn);
           VelocCounter->Event(Event);
           mpMouseAction = VelocCounter;
         }
@@ -2290,10 +2292,12 @@ int JZPianoWindow::IsVisible(JZTrack* pTrack)
 //-----------------------------------------------------------------------------
 int JZPianoWindow::SnapClocks()
 {
-  int clk = mpSong->TicksPerQuarter * 4L / mSnapDenomiator;
-  if (clk < 1)
+  int Clock = mpSong->GetTicksPerQuarter() * 4L / mSnapDenomiator;
+  if (Clock < 1)
+  {
     return 1;
-  return clk;
+  }
+  return Clock;
 }
 
 //-----------------------------------------------------------------------------
@@ -2387,18 +2391,18 @@ void JZPianoWindow::kill_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
   int key,channel;
   tEventIterator iter(pTrack);
   tKeyPressure *a;
-  tKeyOn *k = pEvent->IsKeyOn();
-  if (!k)
+  tKeyOn* pKeyOn = pEvent->IsKeyOn();
+  if (!pKeyOn)
   {
     return;
   }
-  if (k->Length < 2)
+  if (pKeyOn->mLength < 2)
   {
     return;
   }
-  key = k->Key;
-  channel = k->Channel;
-  pEvent = iter.Range(k->GetClock() + 1, k->GetClock() + k->Length);
+  key = pKeyOn->mKey;
+  channel = pKeyOn->Channel;
+  pEvent = iter.Range(pKeyOn->GetClock() + 1, pKeyOn->GetClock() + pKeyOn->mLength);
   while (pEvent)
   {
     a = pEvent->IsKeyPressure();
@@ -2420,12 +2424,22 @@ void JZPianoWindow::paste_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
   int key,channel;
   tEventIterator iter(pTrack);
   tKeyPressure *a;
-  tKeyOn *k = pEvent->IsKeyOn();
-  if (!k) return;
-  channel = k->Channel;
-  if (k->Length < 2) return;
-  key = k->Key;
-  pEvent = iter.Range(k->GetClock() + 1, k->GetClock() + k->Length);
+  tKeyOn* pKeyOn = pEvent->IsKeyOn();
+  if (!pKeyOn)
+  {
+    return;
+  }
+  channel = pKeyOn->Channel;
+  if (pKeyOn->mLength < 2)
+  {
+    return;
+  }
+  key = pKeyOn->mKey;
+
+  pEvent = iter.Range(
+    pKeyOn->GetClock() + 1,
+    pKeyOn->GetClock() + pKeyOn->mLength);
+
   while (pEvent)
   {
     a = pEvent->IsKeyPressure();
@@ -2917,17 +2931,22 @@ void JZPianoWindow::Copy(JZTrack* pTrack, JZEvent* pEvent, int Kill)
 
   if (Kill)
   {
-    tKeyOn *k = pEvent->IsKeyOn();
-    if (k)
+    tKeyOn* pKeyOn = pEvent->IsKeyOn();
+    if (pKeyOn)
     {
       kill_keys_aftertouch(pTrack, pEvent);
       if (pTrack->GetAudioMode())
       {
-        gpMidiPlayer->ListenAudio(k->Key, 0);
+        gpMidiPlayer->ListenAudio(pKeyOn->mKey, 0);
       }
       else
       {
-        mListen.KeyOn(pTrack, k->Key, k->Channel, k->Veloc, k->Length);
+        mListen.KeyOn(
+          pTrack,
+          pKeyOn->mKey,
+          pKeyOn->Channel,
+          pKeyOn->mVelocity,
+          pKeyOn->mLength);
       }
     }
 
@@ -3007,16 +3026,21 @@ void JZPianoWindow::Paste(JZTrack* pTrack, int Clock, int Pitch)
       c->SetClock(c->GetClock() + DeltaClock);
       if (pTrack->ForceChannel && c->IsChannelEvent())
         c->IsChannelEvent()->Channel = pTrack->Channel - 1;
-      tKeyOn *k = c->IsKeyOn();
-      if (k)
+      tKeyOn* pKeyOn = c->IsKeyOn();
+      if (pKeyOn)
       {
         if (pTrack->GetAudioMode())
         {
-          gpMidiPlayer->ListenAudio(k->Key, 0);
+          gpMidiPlayer->ListenAudio(pKeyOn->mKey, 0);
         }
         else
         {
-          mListen.KeyOn(pTrack, k->Key, k->Channel, k->Veloc, k->Length);
+          mListen.KeyOn(
+            pTrack,
+            pKeyOn->mKey,
+            pKeyOn->Channel,
+            pKeyOn->mVelocity,
+            pKeyOn->mLength);
         }
       }
       wxClientDC Dc(this);

@@ -137,10 +137,10 @@ tSelectedKeys::tSelectedKeys(JZFilter* pFilter)
 //-----------------------------------------------------------------------------
 void tSelectedKeys::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tKeyOn* pKey = pEvent->IsKeyOn();
-  if (pKey)
+  tKeyOn* pKeyOn = pEvent->IsKeyOn();
+  if (pKeyOn)
   {
-    Keys[pKey->Key] += pKey->Length;
+    Keys[pKeyOn->mKey] += pKeyOn->mLength;
   }
 }
 
@@ -150,12 +150,14 @@ void tSelectedKeys::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
                             //  c     d     e  f     g    a      b
 static const int CMajor[12] = { 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
 
-void tScale::Init(int ScaleNr, JZFilter *f)
+void tScale::Init(int ScaleNr, JZFilter* pFilter)
 {
   int i;
 
   for (i = 0; i < 12; i++)
+  {
     ScaleKeys[i] = 0;
+  }
 
   if (ScaleNr == gScaleChromatic)
   {
@@ -166,7 +168,7 @@ void tScale::Init(int ScaleNr, JZFilter *f)
   else if (ScaleNr == gScaleSelected)
   {
     int found = 0;
-    tSelectedKeys cmd(f);
+    tSelectedKeys cmd(pFilter);
     cmd.Execute(0);
     for (i = 0; i < 128; i++)
     {
@@ -190,7 +192,7 @@ void tScale::Init(int ScaleNr, JZFilter *f)
 }
 
 
-int tScale::Analyze(JZFilter *f)
+int tScale::Analyze(JZFilter* pFilter)
 {
   long keys[12];
   for (int i = 0; i < 12; i++)
@@ -198,7 +200,7 @@ int tScale::Analyze(JZFilter *f)
     keys[i] = 0;
   }
 
-  tSelectedKeys cmd(f);
+  tSelectedKeys cmd(pFilter);
   cmd.Execute(0);
   for (int i = 0; i < 128; i++)
   {
@@ -289,26 +291,26 @@ int tScale::FitInto(int Key)
 // tCmdShift
 // ***********************************************************************
 
-tCmdShift::tCmdShift(JZFilter *f, long dclk)
-  : tCommand(f)
+tCmdShift::tCmdShift(JZFilter* pFilter, long dclk)
+  : tCommand(pFilter)
 {
   DeltaClock = dclk;
 }
 
-void tCmdShift::ExecuteEvent(JZTrack *t, JZEvent *e)
+void tCmdShift::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  JZEvent *c = e->Copy();
-  t->Kill(e);
+  JZEvent* c = pEvent->Copy();
+  pTrack->Kill(pEvent);
   c->SetClock(c->GetClock() + DeltaClock);
-  t->Put(c);
+  pTrack->Put(c);
 }
 
 // ************************************************************************
 // tCmdErase
 // ************************************************************************
 
-tCmdErase::tCmdErase(JZFilter *f, int lvsp)
-  : tCommand(f)
+tCmdErase::tCmdErase(JZFilter* pFilter, int lvsp)
+  : tCommand(pFilter)
 {
   LeaveSpace = lvsp;
 }
@@ -318,26 +320,26 @@ void tCmdErase::Execute(int NewUndo)
   tCommand::Execute(NewUndo);
   if (!LeaveSpace)
   {
-    JZFilter f(mpFilter);
-    f.FromClock = mpFilter->ToClock;
-    f.ToClock   = mpSong->GetLastClock() + 1;
+    JZFilter Filter(mpFilter);
+    Filter.FromClock = mpFilter->ToClock;
+    Filter.ToClock = mpSong->GetLastClock() + 1;
     long DeltaClock = mpFilter->FromClock - mpFilter->ToClock;
-    tCmdShift shift(&f, DeltaClock);
+    tCmdShift shift(&Filter, DeltaClock);
     shift.Execute(0);
   }
 }
 
-void tCmdErase::ExecuteEvent(JZTrack *t, JZEvent *e)
+void tCmdErase::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  t->Kill(e);
+  pTrack->Kill(pEvent);
 }
 
 // ************************************************************************
 // tCmdQuantize
 // ************************************************************************
 
-tCmdQuantize::tCmdQuantize(JZFilter *f, long clks, int grov, int dly)
-  : tCommand(f)
+tCmdQuantize::tCmdQuantize(JZFilter* pFilter, long clks, int grov, int dly)
+  : tCommand(pFilter)
 {
   QntClocks = clks;
   Groove    = grov;
@@ -357,22 +359,22 @@ long tCmdQuantize::Quantize(long Clock, int islen)
   return Clock > minclk ? Clock : minclk;
 }
 
-void tCmdQuantize::ExecuteEvent(JZTrack *t, JZEvent *e)
+void tCmdQuantize::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tKeyOn *k;
-  if ((k = e->IsKeyOn()) != 0)
+  tKeyOn* pKeyOn;
+  if ((pKeyOn = pEvent->IsKeyOn()) != 0)
   {
-    k = (tKeyOn *)e->Copy();
+    pKeyOn = (tKeyOn *)pEvent->Copy();
     if (NoteStart)
     {
-      k->SetClock(Quantize(k->GetClock(), 0));
+      pKeyOn->SetClock(Quantize(pKeyOn->GetClock(), 0));
     }
     if (NoteLength)
     {
-      k->Length = Quantize(k->Length, 2);
+      pKeyOn->mLength = Quantize(pKeyOn->mLength, 2);
     }
-    t->Kill(e);
-    t->Put(k);
+    pTrack->Kill(pEvent);
+    pTrack->Put(pKeyOn);
   }
 }
 
@@ -380,35 +382,37 @@ void tCmdQuantize::ExecuteEvent(JZTrack *t, JZEvent *e)
 // tCmdTranspose
 // ************************************************************************
 
-tCmdTranspose::tCmdTranspose(JZFilter *f, int notes, int ScaleNr, int fit)
-  : tCommand(f)
+tCmdTranspose::tCmdTranspose(JZFilter* pFilter, int notes, int ScaleNr, int fit)
+  : tCommand(pFilter)
 {
   Scale.Init(ScaleNr, mpFilter);
   Notes = notes;
   FitIntoScale = fit;
 }
 
-void tCmdTranspose::ExecuteEvent(JZTrack *t, JZEvent *e)
+void tCmdTranspose::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tKeyOn *k;
-  if (e->IsKeyOn())
+  tKeyOn* pKeyOn;
+  if (pEvent->IsKeyOn())
   {
-    k = (tKeyOn *)e->Copy();
+    pKeyOn = (tKeyOn *)pEvent->Copy();
     if (FitIntoScale)
     {
-      k->Key += Notes;
-      k->Key = Scale.FitInto(k->Key);
+      pKeyOn->mKey += Notes;
+      pKeyOn->mKey = Scale.FitInto(pKeyOn->mKey);
     }
     else if (Notes)
-      k->Key = Scale.Transpose(k->Key, Notes);
-    t->Kill(e);
-    t->Put(k);
+    {
+      pKeyOn->mKey = Scale.Transpose(pKeyOn->mKey, Notes);
+    }
+    pTrack->Kill(pEvent);
+    pTrack->Put(pKeyOn);
   }
 // SN++ Aftertouch
   tKeyPressure *a;
-  if (e->IsKeyPressure())
+  if (pEvent->IsKeyPressure())
   {
-    a = (tKeyPressure *)e->Copy();
+    a = (tKeyPressure *)pEvent->Copy();
     if (FitIntoScale)
     {
       a->Key += Notes;
@@ -416,8 +420,8 @@ void tCmdTranspose::ExecuteEvent(JZTrack *t, JZEvent *e)
     }
     else if (Notes)
       a->Key = Scale.Transpose(a->Key, Notes);
-    t->Kill(e);
-    t->Put(a);
+    pTrack->Kill(pEvent);
+    pTrack->Put(a);
   }
 //
 }
@@ -426,22 +430,22 @@ void tCmdTranspose::ExecuteEvent(JZTrack *t, JZEvent *e)
 // tCmdSetChannel
 // ************************************************************************
 
-tCmdSetChannel::tCmdSetChannel(JZFilter *f, int chan)
-  : tCommand(f)
+tCmdSetChannel::tCmdSetChannel(JZFilter* pFilter, int chan)
+  : tCommand(pFilter)
 {
   NewChannel = chan;
 }
 
-void tCmdSetChannel::ExecuteEvent(JZTrack *t, JZEvent *e)
+void tCmdSetChannel::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tChannelEvent *c;
+  tChannelEvent* c;
 
-  if ((c = e->IsChannelEvent()) != 0)
+  if ((c = pEvent->IsChannelEvent()) != 0)
   {
-    c = (tChannelEvent *)e->Copy();
+    c = (tChannelEvent *)pEvent->Copy();
     c->Channel = NewChannel;
-    t->Kill(e);
-    t->Put(c);
+    pTrack->Kill(pEvent);
+    pTrack->Put(c);
   }
 }
 
@@ -449,34 +453,40 @@ void tCmdSetChannel::ExecuteEvent(JZTrack *t, JZEvent *e)
 // tCmdVelocity
 // ************************************************************************
 
-tCmdVelocity::tCmdVelocity(JZFilter *f, int from, int to, int m)
-  : tCommand(f)
+tCmdVelocity::tCmdVelocity(JZFilter* pFilter, int from, int to, int m)
+  : tCommand(pFilter)
 {
   FromValue = from;
   ToValue  = to;
   Mode = m;
 }
 
-void tCmdVelocity::ExecuteEvent(JZTrack *t, JZEvent *e)
+void tCmdVelocity::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tKeyOn *k;
+  tKeyOn* pKeyOn;
 
-  if (e->IsKeyOn() != 0)
+  if (pEvent->IsKeyOn() != 0)
   {
-    k = (tKeyOn *)e->Copy();
+    pKeyOn = (tKeyOn *)pEvent->Copy();
     long val = 0;
     if (ToValue <= 0)
       val = FromValue;
     else
-      val = Interpolate(k->GetClock(), FromValue, ToValue);
-    switch (Mode) {
-      case 0: break;
-      case 1: val = k->Veloc + val; break;
-      case 2: val = k->Veloc - val; break;
+      val = Interpolate(pKeyOn->GetClock(), FromValue, ToValue);
+    switch (Mode)
+    {
+      case 0:
+        break;
+      case 1:
+        val = pKeyOn->mVelocity + val;
+        break;
+      case 2:
+        val = pKeyOn->mVelocity - val;
+        break;
     }
-    k->Veloc = val < 1 ? 1 : (val > 127 ? 127 : val);
-    t->Kill(e);
-    t->Put(k);
+    pKeyOn->mVelocity = val < 1 ? 1 : (val > 127 ? 127 : val);
+    pTrack->Kill(pEvent);
+    pTrack->Put(pKeyOn);
   }
 }
 
@@ -484,35 +494,41 @@ void tCmdVelocity::ExecuteEvent(JZTrack *t, JZEvent *e)
 // tCmdLength
 // ************************************************************************
 
-tCmdLength::tCmdLength(JZFilter *f, int from, int to, int m)
-  : tCommand(f)
+tCmdLength::tCmdLength(JZFilter* pFilter, int from, int to, int m)
+  : tCommand(pFilter)
 {
   FromValue = from;
   ToValue  = to;
   Mode = m;
 }
 
-void tCmdLength::ExecuteEvent(JZTrack *t, JZEvent *e)
+void tCmdLength::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tKeyOn *k;
+  tKeyOn* pKeyOn;
 
-  if (e->IsKeyOn() != 0)
+  if (pEvent->IsKeyOn() != 0)
   {
-    k = (tKeyOn *)e->Copy();
+    pKeyOn = (tKeyOn *)pEvent->Copy();
     long val = 0;
     if (ToValue <= 0)
       val = FromValue;
     else
-      val = Interpolate(k->GetClock(), FromValue, ToValue);
-    switch (Mode) {
-      case 0: break;
-      case 1: val = k->Length + val; break;
-      case 2: val = k->Length - val; break;
+      val = Interpolate(pKeyOn->GetClock(), FromValue, ToValue);
+    switch (Mode)
+    {
+      case 0:
+        break;
+      case 1:
+        val = pKeyOn->mLength + val;
+        break;
+      case 2:
+        val = pKeyOn->mLength - val;
+        break;
     }
 
-    k->Length = val < 1 ? 1 : val;
-    t->Kill(e);
-    t->Put(k);
+    pKeyOn->mLength = val < 1 ? 1 : val;
+    pTrack->Kill(pEvent);
+    pTrack->Put(pKeyOn);
   }
 }
 
@@ -524,8 +540,8 @@ void tCmdLength::ExecuteEvent(JZTrack *t, JZEvent *e)
 //   by factor "scale" from starting point "startClock"
 // ************************************************************************
 
-tCmdSeqLength::tCmdSeqLength(JZFilter *f, double scale)
-  : tCommand(f)
+tCmdSeqLength::tCmdSeqLength(JZFilter* pFilter, double scale)
+  : tCommand(pFilter)
 {
   this->scale=scale;
   this->startClock=-1000;
@@ -533,21 +549,22 @@ tCmdSeqLength::tCmdSeqLength(JZFilter *f, double scale)
 
 /** move an event according to startclock and scale
  */
-void tCmdSeqLength::ExecuteEvent(JZTrack *t, JZEvent *e)
+void tCmdSeqLength::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
   // Make a copy of the current event.
-  JZEvent *k;
-  k = (tKeyOn *)e->Copy();
+  JZEvent* k;
+  k = (tKeyOn *)pEvent->Copy();
 
   //little hack, if clock is -1000 it means set startclock from the first event.
-  if(startClock==-1000){
-    startClock=k->GetClock();
+  if(startClock==-1000)
+  {
+    startClock = k->GetClock();
   }
 
   //calculate the new start clock, move the new event and kill the old one
-  k->SetClock((long int)(((k->GetClock()-startClock)*scale) + startClock ) );
-  t->Kill(e);
-  t->Put(k);
+  k->SetClock((long int)(((k->GetClock() - startClock) * scale) + startClock));
+  pTrack->Kill(pEvent);
+  pTrack->Put(k);
 }
 
 
@@ -558,20 +575,20 @@ void tCmdSeqLength::ExecuteEvent(JZTrack *t, JZEvent *e)
 // to a pitch bend/volume control sequence instead
 // ************************************************************************
 
-tCmdConvertToModulation::tCmdConvertToModulation(JZFilter *f)
-  : tCommand(f)
+tCmdConvertToModulation::tCmdConvertToModulation(JZFilter* pFilter)
+  : tCommand(pFilter)
 {
 }
 
 //need to override executetrack, since we have begin/end behaviour in this filter
 
-void tCmdConvertToModulation::ExecuteTrack(JZTrack *t)
+void tCmdConvertToModulation::ExecuteTrack(JZTrack* pTrack)
 {
   //JAVE:iterate over all events, make a long event from start until stop of the sequence,
   //convert all note-on messages to a pitch bend/volume controller pair, velocity -> volume
   //make a volume off controller at the end of the current event
-  tEventIterator Iterator(t);
-  JZEvent *e = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
+  tEventIterator Iterator(pTrack);
+  JZEvent* pEvent = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
   long startclock=-1;
   long endclock=-1;
   unsigned char channel=0;
@@ -595,42 +612,49 @@ void tCmdConvertToModulation::ExecuteTrack(JZTrack *t)
 
   long startvelocity=0;
   long startkey=0;
-  while (e)
+  while (pEvent)
   {
-    if (mpFilter->IsSelected(e) && e->IsKeyOn())
+    if (mpFilter->IsSelected(pEvent) && pEvent->IsKeyOn())
+    {
+      if (startclock == -1)
       {
-        if (startclock == -1)
-        {
-          startclock=e->IsKeyOn()->GetClock();
-          startvelocity=e->IsKeyOn()->Veloc;
-          channel=e->IsKeyOn()->Channel;
-          startkey=e->IsKeyOn()->Key;
-          previouspitch=e->GetPitch();
-        }
-        pitchdiff=e->GetPitch()-previouspitch;
-
-        tPitch* pitchmodulation=0;
-        pitchmodulation = new tPitch(e->GetClock(), channel, pitchsteparray[pitchdiff+4]);
-
-        t->Put(pitchmodulation);
-
-
-        t->Kill(e); //remove the old event
-
-        t->Put(new tControl(e->GetClock(), channel, 0x07, e->IsKeyOn()->Veloc));
-        t->Put(new tControl(e->GetClock()+e->IsKeyOn()->Length, channel, 0x07,0));
-
-        lastlength=e->IsKeyOn()->Length;
-        endclock=e->GetClock();
-        previouspitch=e->GetPitch();
+        startclock = pEvent->IsKeyOn()->GetClock();
+        startvelocity = pEvent->IsKeyOn()->mVelocity;
+        channel = pEvent->IsKeyOn()->Channel;
+        startkey = pEvent->IsKeyOn()->mKey;
+        previouspitch = pEvent->GetPitch();
       }
-      //ExecuteEvent(t, e);
-    e = Iterator.Next();
+      pitchdiff = pEvent->GetPitch()-previouspitch;
+
+      tPitch* pitchmodulation=0;
+      pitchmodulation = new tPitch(
+        pEvent->GetClock(),
+        channel,
+        pitchsteparray[pitchdiff + 4]);
+
+      pTrack->Put(pitchmodulation);
+
+      pTrack->Kill(pEvent); //remove the old event
+
+      pTrack->Put(new tControl(pEvent->GetClock(), channel, 0x07, pEvent->IsKeyOn()->mVelocity));
+      pTrack->Put(new tControl(pEvent->GetClock() + pEvent->IsKeyOn()->mLength, channel, 0x07, 0));
+
+      lastlength = pEvent->IsKeyOn()->mLength;
+      endclock = pEvent->GetClock();
+      previouspitch = pEvent->GetPitch();
+    }
+    //ExecuteEvent(pTrack, pEvent);
+    pEvent = Iterator.Next();
   }
   //now insert the new long event
-  tKeyOn* longevent = new tKeyOn(startclock, channel, startkey, startvelocity, endclock-startclock+lastlength );
-  t->Put(longevent);
-  t->Cleanup();
+  tKeyOn* longevent = new tKeyOn(
+    startclock,
+    channel,
+    startkey,
+    startvelocity,
+    endclock - startclock + lastlength);
+  pTrack->Put(longevent);
+  pTrack->Cleanup();
 }
 
 // ************************************************************************
@@ -638,27 +662,31 @@ void tCmdConvertToModulation::ExecuteTrack(JZTrack *t)
 //    JAVE this is a simple midi delay line
 // ************************************************************************
 
-tCmdMidiDelay::tCmdMidiDelay(JZFilter *f, double scale,  long clockDelay, int repeat)
-  : tCommand(f)
+tCmdMidiDelay::tCmdMidiDelay(
+  JZFilter* pFilter,
+  double scale,
+  long clockDelay,
+  int repeat)
+  : tCommand(pFilter)
 {
   this->scale=scale;
   this->clockDelay=clockDelay;
   this->repeat=repeat;
 }
 
-void tCmdMidiDelay::ExecuteEvent(JZTrack *t, JZEvent *e)
+void tCmdMidiDelay::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tKeyOn *k;
+  tKeyOn* pKeyOn;
 
   for (int i = 1; i < repeat; ++i)
   {
-    if (e->IsKeyOn())
+    if (pEvent->IsKeyOn())
     {
-      //only echo note events
-      k = (tKeyOn *)e->Copy();
-      k->SetClock(k->GetClock()+ clockDelay * i);
-      k->Veloc = (unsigned char)(pow(scale, i) * k->Veloc);
-      t->Put(k);
+      // only echo note events
+      pKeyOn = (tKeyOn *)pEvent->Copy();
+      pKeyOn->SetClock(pKeyOn->GetClock()+ clockDelay * i);
+      pKeyOn->mVelocity = (unsigned char)(pow(scale, i) * pKeyOn->mVelocity);
+      pTrack->Put(pKeyOn);
     }
   }
 }
@@ -669,40 +697,42 @@ void tCmdMidiDelay::ExecuteEvent(JZTrack *t, JZEvent *e)
 // tCmdCleanup
 // ************************************************************************
 
-tCmdCleanup::tCmdCleanup(JZFilter *f, long clks, int so)
-  : tCommand(f)
+tCmdCleanup::tCmdCleanup(JZFilter* pFilter, long clks, int so)
+  : tCommand(pFilter)
 {
   lengthLimit = clks;
   shortenOverlaps = so;
 }
 
-void tCmdCleanup::ExecuteTrack(JZTrack *t)
+void tCmdCleanup::ExecuteTrack(JZTrack* pTrack)
 {
   memset(prev_note, 0, sizeof(prev_note));
-  tCommand::ExecuteTrack(t);
+  tCommand::ExecuteTrack(pTrack);
 }
 
-void tCmdCleanup::ExecuteEvent(JZTrack *t, JZEvent *e)
+void tCmdCleanup::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tKeyOn *k;
-  if ((k = e->IsKeyOn()) != 0)
+  tKeyOn* pKeyOn;
+  if ((pKeyOn = pEvent->IsKeyOn()) != 0)
   {
-    if (k->Length < lengthLimit) {
+    if (pKeyOn->mLength < lengthLimit)
+    {
       // remove short notes
-      t->Kill(e);
+      pTrack->Kill(pEvent);
     }
-    else if (shortenOverlaps) {
+    else if (shortenOverlaps)
+    {
       // shorten length of overlapping notes
-      tKeyOn *p = prev_note[k->Channel][k->Key];
-      if (p && p->GetClock() + p->Length >= k->GetClock())
+      tKeyOn *p = prev_note[pKeyOn->Channel][pKeyOn->mKey];
+      if (p && p->GetClock() + p->mLength >= pKeyOn->GetClock())
       {
-        p->Length = k->GetClock() - p->GetClock() - 1;
-        if (p->Length < lengthLimit)
+        p->mLength = pKeyOn->GetClock() - p->GetClock() - 1;
+        if (p->mLength < lengthLimit)
         {
-          t->Kill(p);
+          pTrack->Kill(p);
         }
       }
-      prev_note[k->Channel][k->Key] = k;
+      prev_note[pKeyOn->Channel][pKeyOn->mKey] = pKeyOn;
     }
   }
 }
@@ -711,24 +741,24 @@ void tCmdCleanup::ExecuteEvent(JZTrack *t, JZEvent *e)
 // tCmdSearchReplace
 // ************************************************************************
 
-tCmdSearchReplace::tCmdSearchReplace(JZFilter *f, short sf, short st)
-  : tCommand(f)
+tCmdSearchReplace::tCmdSearchReplace(JZFilter* pFilter, short sf, short st)
+  : tCommand(pFilter)
 {
   fr = sf;
   to = st;
 }
 
-void tCmdSearchReplace::ExecuteEvent(JZTrack *t, JZEvent *e)
+void tCmdSearchReplace::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
   tControl *ctrl;
-  if ((ctrl = e->IsControl()) != 0)
+  if ((ctrl = pEvent->IsControl()) != 0)
   {
     if (ctrl->Control == fr)
     {
       tControl *copy = (tControl *)ctrl->Copy();
       copy->Control = to;
-      t->Kill(ctrl);
-      t->Put(copy);
+      pTrack->Kill(ctrl);
+      pTrack->Put(copy);
     }
   }
 }
@@ -756,8 +786,8 @@ void tCmdCopyToBuffer::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 
 
 
-tCmdCopy::tCmdCopy(JZFilter *f, long dt, long dc)
-  : tCommand(f)
+tCmdCopy::tCmdCopy(JZFilter* pFilter, long dt, long dc)
+  : tCommand(pFilter)
 {
   DestTrack = dt;
   DestClock = dc;
@@ -808,24 +838,24 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
     {
       tEventIterator Iterator(s);
       long  DeltaClock = StartClock - mpFilter->FromClock;
-      JZEvent *e = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
-      while (e)
+      JZEvent* pEvent = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
+      while (pEvent)
       {
-        long NewClock = e->GetClock() + DeltaClock;
+        long NewClock = pEvent->GetClock() + DeltaClock;
         if (NewClock >= StopClock)
           break;
 
-        if (mpFilter->IsSelected(e))
+        if (mpFilter->IsSelected(pEvent))
         {
-          JZEvent* cpy = e->Copy();
+          JZEvent* cpy = pEvent->Copy();
           cpy->SetClock(NewClock);
           tmp.Put(cpy);
         }
 
-        e = Iterator.Next();
-        if (!e)
+        pEvent = Iterator.Next();
+        if (!pEvent)
         {
-          e = Iterator.First();
+          pEvent = Iterator.First();
           DeltaClock += mpFilter->ToClock - mpFilter->FromClock;
         }
       }
@@ -836,18 +866,18 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
     if (InsertSpace && d->GetLastClock() > StartClock)
     {
       tEventIterator Iterator(d);
-      JZEvent *e = Iterator.Range(StartClock, d->GetLastClock() + 1);
+      JZEvent* pEvent = Iterator.Range(StartClock, d->GetLastClock() + 1);
       long DeltaClock = StopClock - StartClock;
-      while (e)
+      while (pEvent)
       {
-        if (mpFilter->IsSelected(e))
+        if (mpFilter->IsSelected(pEvent))
         {
-          JZEvent *c = e->Copy();
+          JZEvent* c = pEvent->Copy();
           c->SetClock(c->GetClock() + DeltaClock);
-          d->Kill(e);
+          d->Kill(pEvent);
           d->Put(c);
         }
-        e = Iterator.Next();
+        pEvent = Iterator.Next();
       }
       d->Cleanup();
     }
@@ -857,12 +887,14 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
     if (EraseSource)
     {
       tEventIterator Iterator(s);
-      JZEvent *e = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
-      while (e)
+      JZEvent* pEvent = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
+      while (pEvent)
       {
-        if (mpFilter->IsSelected(e))
-          s->Kill(e);
-        e = Iterator.Next();
+        if (mpFilter->IsSelected(pEvent))
+        {
+          s->Kill(pEvent);
+        }
+        pEvent = Iterator.Next();
       }
       s->Cleanup();
     }
@@ -872,12 +904,14 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
     if (EraseDestin)
     {
       tEventIterator Iterator(d);
-      JZEvent *e = Iterator.Range(StartClock, StopClock);
-      while (e)
+      JZEvent* pEvent = Iterator.Range(StartClock, StopClock);
+      while (pEvent)
       {
-        if (mpFilter->IsSelected(e))
-          d->Kill(e);
-        e = Iterator.Next();
+        if (mpFilter->IsSelected(pEvent))
+        {
+          d->Kill(pEvent);
+        }
+        pEvent = Iterator.Next();
       }
       d->Cleanup();
     }
@@ -893,19 +927,20 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
 // tCmdExchLeftRight
 // ************************************************************************
 
-tCmdExchLeftRight::tCmdExchLeftRight(JZFilter *f)
-  : tCommand(f)
+tCmdExchLeftRight::tCmdExchLeftRight(JZFilter* pFilter)
+  : tCommand(pFilter)
 {
 }
 
-void tCmdExchLeftRight::ExecuteEvent(JZTrack *t, JZEvent *e)
+void tCmdExchLeftRight::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  if (e->IsKeyOn())
+  if (pEvent->IsKeyOn())
   {
-    tKeyOn *k = (tKeyOn *)e->Copy();
-    k->SetClock(mpFilter->FromClock + mpFilter->ToClock - k->GetClock());
-    t->Kill(e);
-    t->Put(k);
+    tKeyOn* pKeyOn = (tKeyOn *)pEvent->Copy();
+    pKeyOn->SetClock(
+      mpFilter->FromClock + mpFilter->ToClock - pKeyOn->GetClock());
+    pTrack->Kill(pEvent);
+    pTrack->Put(pKeyOn);
   }
 }
 
@@ -914,176 +949,226 @@ void tCmdExchLeftRight::ExecuteEvent(JZTrack *t, JZEvent *e)
 // tCmdExchUpDown
 // ************************************************************************
 
-tCmdExchUpDown::tCmdExchUpDown(JZFilter *f)
-  : tCommand(f)
+tCmdExchUpDown::tCmdExchUpDown(JZFilter* pFilter)
+  : tCommand(pFilter)
 {
 }
 
-void tCmdExchUpDown::ExecuteTrack(JZTrack *t)
+void tCmdExchUpDown::ExecuteTrack(JZTrack* pTrack)
 {
   int i;
   int Keys[128];
-  JZEvent *e;
+  JZEvent* pEvent;
 
   // find all Key's selected
 
   for (i = 0; i < 128; i++)
-    Keys[i] = 0;
-
-  tEventIterator Iterator(t);
-  e = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
-  while (e)
   {
-    if (mpFilter->IsSelected(e) && e->IsKeyOn())
+    Keys[i] = 0;
+  }
+
+  tEventIterator Iterator(pTrack);
+  pEvent = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
+  while (pEvent)
+  {
+    if (mpFilter->IsSelected(pEvent) && pEvent->IsKeyOn())
     {
-      tKeyOn *k = (tKeyOn *)e;
-      Keys[k->Key] = 1;
+      tKeyOn* pKeyOn = (tKeyOn *)pEvent;
+      Keys[pKeyOn->mKey] = 1;
     }
-    e = Iterator.Next();
+    pEvent = Iterator.Next();
   }
 
   // reverse Key's
 
-  e = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
-  while(e)
+  pEvent = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
+  while (pEvent)
   {
-    if (mpFilter->IsSelected(e) && e->IsKeyOn())
+    if (mpFilter->IsSelected(pEvent) && pEvent->IsKeyOn())
     {
-      tKeyOn *k = (tKeyOn *)e->Copy();
+      tKeyOn* pKeyOn = (tKeyOn *)pEvent->Copy();
       int n_th = 0;
+
       // the n'th key from bottom ..
-      for (i = 0; i <= k->Key; i++)
+      for (i = 0; i <= pKeyOn->mKey; i++)
+      {
         n_th += Keys[i];
+      }
+
       // .. becomes the n'th key from top
       for (i = 127; i > 0 && n_th; --i)
+      {
         n_th -= Keys[i];
-      k->Key = i + 1;
+      }
 
-      t->Kill(e);
-      t->Put(k);
+      pKeyOn->mKey = i + 1;
+
+      pTrack->Kill(pEvent);
+      pTrack->Put(pKeyOn);
     }
-    e = Iterator.Next();
+    pEvent = Iterator.Next();
   }
-  t->Cleanup();
+  pTrack->Cleanup();
 }
 
-// ************************************************************************
-// tCmdMapper
-// ************************************************************************
-
-//enum prop { veloc, length, key, rhythm, random, pan, modul, cc1, cc2, pitch, clock };
-tCmdMapper::tCmdMapper(JZFilter *f, prop src, prop dst, JZRndArray &arr, int nb, int ad)
-  : tCommand(f),
-    array(arr)
+//*****************************************************************************
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+tCmdMapper::tCmdMapper(
+  JZFilter* pFilter,
+  prop Source,
+  prop Destination,
+  JZRndArray& RandomArray,
+  int BarCount,
+  bool Add)
+  : tCommand(pFilter),
+    mBarCount(BarCount),
+    mStartBar(0),
+    mAdd(Add),
+    mSource(Source),
+    mDestination(Destination),
+    mpBarInfo(0),
+    mRandomArray(RandomArray)
 {
-  n_bars          = nb;
-  source          = src;
-  destin          = dst;
-  add             = ad;
-  binfo           = new JZBarInfo(mpSong);
-  binfo->SetClock(mpFilter->FromClock);
-  start_bar       = binfo->BarNr;
+  mpBarInfo = new JZBarInfo(*mpSong);
+  mpBarInfo->SetClock(mpFilter->FromClock);
+  mStartBar = mpBarInfo->GetBarIndex();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tCmdMapper::~tCmdMapper()
 {
-  delete binfo;
+  delete mpBarInfo;
 }
 
-void tCmdMapper::ExecuteEvent(JZTrack *t, JZEvent *e)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void tCmdMapper::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tKeyOn *k = e->IsKeyOn();
-  if (k)
+  tKeyOn* pKeyOn = pEvent->IsKeyOn();
+  if (pKeyOn)
   {
     int sval = 0;
-    switch (source)
+    switch (mSource)
     {
       case veloc:
-        sval = array[(int)k->Veloc];
+        sval = mRandomArray[(int)pKeyOn->mVelocity];
         break;
 
       case length:
-        sval = array[(int)k->Length];
+        sval = mRandomArray[(int)pKeyOn->mLength];
         break;
 
       case key:
-        sval = array[(int)k->Key];
+        sval = mRandomArray[(int)pKeyOn->mKey];
         break;
 
-      case rhythm: {
-        binfo->SetClock(k->GetClock());
-//        long sng_tpb = binfo->TicksPerBar;
-        long arr_tpb = array.Size() / n_bars;
-        long arr_bar = (binfo->BarNr - start_bar) % n_bars;
-        long i = arr_tpb * arr_bar + arr_tpb * (k->GetClock() - binfo->Clock) / binfo->TicksPerBar;
-// printf("sng_tpb %ld, arr_tpb %ld, k->GetClock() %ld, binfo->Clock %ld,\n arr.Size() %ld, n_bars %ld, i %ld\n",
-//  sng_tpb, arr_tpb, k->GetClock(), binfo->Clock, array.Size(), n_bars, i);
-// fflush(stdout);
-        sval = array[(int)i];
+      case rhythm:
+      {
+        mpBarInfo->SetClock(pKeyOn->GetClock());
+        long arr_tpb = mRandomArray.Size() / mBarCount;
+        long arr_bar = (mpBarInfo->GetBarIndex() - mStartBar) % mBarCount;
+        long i = arr_tpb * arr_bar + arr_tpb *
+          (pKeyOn->GetClock() - mpBarInfo->GetClock()) / mpBarInfo->GetTicksPerBar();
+//        cout
+//          << "mpBarInfo->GetTicksPerBar() " << mpBarInfo->GetTicksPerBar()
+//          << ", arr_tpb " << arr_tpb
+//          << ", pKeyOn->GetClock() " << pKeyOn->GetClock()
+//          << ", mpBarInfo->GetClock() " << mpBarInfo->GetClock()
+//          << '\n'
+//          << "mRandomArray.Size() " << mRandomArray.Size()
+//          << ", mBarCount " << mBarCount
+//          << ", i " << i
+//          << endl;
+        sval = mRandomArray[(int)i];
       }
       break;
 
       case random:
-        sval = array.Random();
-        if (add)
-          sval -= array.Size()/2;
+        sval = mRandomArray.Random();
+        if (mAdd)
+        {
+          sval -= mRandomArray.Size()/2;
+        }
         break;
 
       default:
         break;
     }
 
-    switch (destin)
+    switch (mDestination)
     {
-      case veloc: {
-        if (add)
-          sval = k->Veloc + sval;
-        if (sval > 127)
-          sval = 127;
-        if (sval < 1)
-          sval = 1;
-        tKeyOn *c = (tKeyOn *)k->Copy();
-        t->Kill(k);
-        c->Veloc = sval;
-        t->Put(c);
-      }
-      break;
-
-      case key: {
-        if (add)
-          sval = k->Key + sval;
-        if (sval > 127)
-          sval = 127;
-        if (sval < 1)
-          sval = 1;
-        tKeyOn *c = (tKeyOn *)k->Copy();
-        t->Kill(k);
-        c->Key = sval;
-        t->Put(c);
-      }
-      break;
-
-      case length: {
-        if (add)
-          sval = k->Length + sval;
-        if (sval < 1)
-          sval = 1;
-        tKeyOn *c = (tKeyOn *)k->Copy();
-        t->Kill(k);
-        c->Length = sval;
-        t->Put(c);
-      }
-      break;
-
-      case clock: {
-        tKeyOn *c = (tKeyOn *)k->Copy();
-        c->SetClock(c->GetClock() + sval);
-        if (c->GetClock() < 0)
+      case veloc:
+      {
+        if (mAdd)
         {
-          c->SetClock(0);
+          sval = pKeyOn->mVelocity + sval;
         }
-        t->Kill(k);
-        t->Put(c);
+        if (sval > 127)
+        {
+          sval = 127;
+        }
+        if (sval < 1)
+        {
+          sval = 1;
+        }
+        tKeyOn* pKeyOnCopy = (tKeyOn *)pKeyOn->Copy();
+        pTrack->Kill(pKeyOn);
+        pKeyOnCopy->mVelocity = sval;
+        pTrack->Put(pKeyOnCopy);
+      }
+      break;
+
+      case key:
+      {
+        if (mAdd)
+        {
+          sval = pKeyOn->mKey + sval;
+        }
+        if (sval > 127)
+        {
+          sval = 127;
+        }
+        if (sval < 1)
+        {
+          sval = 1;
+        }
+        tKeyOn* pKeyOnCopy = (tKeyOn *)pKeyOn->Copy();
+        pTrack->Kill(pKeyOn);
+        pKeyOnCopy->mKey = sval;
+        pTrack->Put(pKeyOnCopy);
+      }
+      break;
+
+      case length:
+      {
+        if (mAdd)
+        {
+          sval = pKeyOn->mLength + sval;
+        }
+        if (sval < 1)
+        {
+          sval = 1;
+        }
+        tKeyOn* pKeyOnCopy = (tKeyOn *)pKeyOn->Copy();
+        pTrack->Kill(pKeyOn);
+        pKeyOnCopy->mLength = sval;
+        pTrack->Put(pKeyOnCopy);
+      }
+      break;
+
+      case clock:
+      {
+        tKeyOn* pKeyOnCopy = (tKeyOn *)pKeyOn->Copy();
+        pKeyOnCopy->SetClock(pKeyOnCopy->GetClock() + sval);
+        if (pKeyOnCopy->GetClock() < 0)
+        {
+          pKeyOnCopy->SetClock(0);
+        }
+        pTrack->Kill(pKeyOn);
+        pTrack->Put(pKeyOnCopy);
       }
       break;
 
@@ -1097,4 +1182,3 @@ void tCmdMapper::ExecuteEvent(JZTrack *t, JZEvent *e)
     }
   }
 }
-

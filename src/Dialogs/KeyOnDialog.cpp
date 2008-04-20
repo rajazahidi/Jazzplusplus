@@ -195,7 +195,7 @@ bool JZKeyOnDialog::TransferDataToWindow()
   mpOffVelocityKnob->SetValue(mpEvent->GetOffVelocity());
 
   wxString LengthString;
-  LengthString << mpEvent->Length;
+  LengthString << mpEvent->mLength;
   mpLengthEdit->ChangeValue(LengthString);
 
   Oss.str("");
@@ -224,7 +224,7 @@ bool JZKeyOnDialog::TransferDataFromWindow()
 
   wxString LengthString = mpLengthEdit->GetValue();
   istringstream Iss(LengthString.c_str());
-  Iss >> mpEvent->Length;
+  Iss >> mpEvent->mLength;
 
   mpEvent->Channel = mpChannelKnob->GetValue() - 1;
 

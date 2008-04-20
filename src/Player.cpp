@@ -191,12 +191,12 @@ void tPlayLoop::PrepareOutput(
 // ------------------------- JZPlayer ---------------------
 
 
-JZPlayer::JZPlayer(JZSong *song)
-  : mSamples(song->TicksPerQuarter * song->Speed())
+JZPlayer::JZPlayer(JZSong* pSong)
+  : mSamples(pSong->GetTicksPerQuarter() * pSong->Speed())
 {
   DummyDeviceList.Add("default");
   poll_millisec = 200;  // default
-  Song = song;
+  Song = pSong;
   OutClock = 0;
   Playing = false;
   PlayLoop = new tPlayLoop();
@@ -254,7 +254,7 @@ void JZPlayer::StartPlay(long Clock, long LoopClock, int Continue)
     }
 
     // Send Volume, Pan, Chorus, etc
-    for (i = 0; i < Song->nTracks; ++i)
+    for (i = 0; i < Song->GetTrackCount(); ++i)
     {
       t = Song->GetTrack(i);
       if (t->mpBank)
@@ -514,7 +514,7 @@ void JZPlayer::StopPlay()
   int ii;
   tKeyOff off(0, 0, 0);
 
-  for (ii = 0; ii < Song->nTracks; ii++)
+  for (ii = 0; ii < Song->GetTrackCount(); ii++)
   {
     JZTrack *Track = Song->GetTrack(ii);
     if (Track)
@@ -523,13 +523,13 @@ void JZPlayer::StopPlay()
       JZEvent *e = Iterator.First();
       while (e && e->GetClock() < Clock + 100)
       {
-        tKeyOn *k = e->IsKeyOn();
-        if (k)
+        tKeyOn* pKeyOn = e->IsKeyOn();
+        if (pKeyOn)
         {
-          if (k->GetClock() + k->Length >= Clock - 100)
+          if (pKeyOn->GetClock() + pKeyOn->mLength >= Clock - 100)
           {
-            off.Channel = k->Channel;
-            off.Key     = k->Key;
+            off.Channel = pKeyOn->Channel;
+            off.Key     = pKeyOn->mKey;
             OutNow(&off);
           }
         }
@@ -661,8 +661,8 @@ void JZPlayer::OutNow(JZTrack *t, tParam *r)
 
 #ifdef DEV_MPU401
 
-tMpuPlayer::tMpuPlayer(JZSong *song)
-  : JZPlayer(song)
+tMpuPlayer::tMpuPlayer(JZSong* pSong)
+  : JZPlayer(pSong)
 {
         poll_millisec = 25;
         midinethost = getenv("MIDINETHOST");
@@ -776,7 +776,7 @@ void tMpuPlayer::StartPlay(long IntClock, long LoopClock, int Continue)
   // Setup Timebase
   char timebase[2];
   timebase[0] = CMD+1;
-  switch (Song->TicksPerQuarter)
+  switch (Song->GetTicksPerQuarter())
   {
     case  48: timebase[1] = 0xc2; break;
     case  72: timebase[1] = 0xc3; break;
@@ -1128,20 +1128,21 @@ long tMpuPlayer::GetRealTimeClock()
   while ((c = RecBytes.Get(dev)) >= 0)
   {
     // The midinetd sends 0xfd to jazz every 15'th tick
-    if (c == 0xfd) {
-    // CLOCK_TO_HOST received
+    if (c == 0xfd)
+    {
+      // CLOCK_TO_HOST received
       playclock += CLOCK_TO_HOST_TICKS;
       clock_to_host_counter++;
 #ifdef SLOW_MACHINE
-      /* Update screen every 4 beats (120 ticks/beat) */
-      if ( (clock_to_host_counter % 32) == 0 )
+      // Update screen every 4 beats (120 ticks/beat).
+      if ((clock_to_host_counter % 32) == 0)
       {
         JZProjectManager::Instance()->NewPlayPosition(
           PlayLoop->Ext2IntClock(playclock));
       }
 #else
-      /* Update screen every 8'th note (120 ticks/beat) */
-      if ( (clock_to_host_counter % 4) == 0 )
+      // Update screen every 8'th note (120 ticks/beat).
+      if ((clock_to_host_counter % 4) == 0)
       {
         JZProjectManager::Instance()->NewPlayPosition(
           PlayLoop->Ext2IntClock(playclock));
@@ -1149,46 +1150,50 @@ long tMpuPlayer::GetRealTimeClock()
 #endif
       FlushOutOfBand(playclock);
     }
-    else if (c == 0xfa) {
-        // Start play received
+    else if (c == 0xfa)
+    {
+      // Start play received
     }
-    else if (c == 0xfb) {
-        // Continue play received
+    else if (c == 0xfb)
+    {
+      // Continue play received
     }
-    else if (c == 0xfc) {
-        // Stop play received
-        AllNotesOff();
-        return( -1 );
+    else if (c == 0xfc)
+    {
+      // Stop play received
+      AllNotesOff();
+      return -1;
     }
-    else if ( (c == 0xf2) || (receiving_song_ptr) ) {
-        // Song pointer received
-        receiving_song_ptr++;
+    else if (c == 0xf2 || receiving_song_ptr)
+    {
+      // Song pointer received
+      receiving_song_ptr++;
 
-        long ExtClock;
+      long ExtClock;
 
-        switch (receiving_song_ptr) {
-            case 1:
-                break;
-            case 2:
-                d0 = c;
-                break;
-            case 3:
-                gpMidiPlayer->StopPlay();
-                d1 = c;
-                ExtClock = (d0 + (128 * d1)) * (Song->TicksPerQuarter / 4);
-                receiving_song_ptr = 0;
-                d0 = d1 = 0;
-                gpMidiPlayer->StartPlay( ExtClock, 0, 1 );
-                return( -1 );
-            default:
-                receiving_song_ptr = 0;
-                d0 = d1 = 0;
-        }
+      switch (receiving_song_ptr)
+      {
+        case 1:
+          break;
+        case 2:
+          d0 = c;
+          break;
+        case 3:
+          gpMidiPlayer->StopPlay();
+          d1 = c;
+          ExtClock = (d0 + (128 * d1)) * (Song->GetTicksPerQuarter() / 4);
+          receiving_song_ptr = 0;
+          d0 = d1 = 0;
+          gpMidiPlayer->StartPlay(ExtClock, 0, 1);
+          return -1;
+        default:
+          receiving_song_ptr = 0;
+          d0 = d1 = 0;
+      }
     }
   }
   return playclock;
 }
-
 
 
 long tMpuPlayer::GetRecordedData()
@@ -1395,8 +1400,8 @@ void tOSSThru::Notify()
 // ------------------------- tSeq2Player ---------------------
 
 
-tSeq2Player::tSeq2Player(JZSong *song)
-  : JZPlayer(song)
+tSeq2Player::tSeq2Player(JZSong* pSong)
+  : JZPlayer(pSong)
 {
   // got to poll fast for midi thru
   poll_millisec = 10;
@@ -1773,7 +1778,7 @@ void tSeq2Player::StartPlay(long Clock, long LoopClock, int Continue)
   seqbuf_dump();
 
   // setup timebase and current speed
-  int time_base = Song->TicksPerQuarter;
+  int time_base = Song->GetTicksPerQuarter();
   int cur_speed = Song->GetTrack(0)->GetCurrentSpeed(Clock);
   if (ioctl(seqfd, SNDCTL_TMR_TIMEBASE, &time_base) < 0)
     perror("ioctl time_base");

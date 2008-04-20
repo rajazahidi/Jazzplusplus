@@ -66,11 +66,11 @@ void HBAnalyzer::Init(JZFilter* pFilter, int epc)
   }
   else
   {
-    JZBarInfo BarInfo(mpFilter->mpSong);
+    JZBarInfo BarInfo(*mpFilter->mpSong);
     BarInfo.SetClock(start_clock);
-    int start_bar = BarInfo.BarNr;
+    int start_bar = BarInfo.GetBarIndex();
     BarInfo.SetClock(stop_clock);
-    int stop_bar = BarInfo.BarNr;
+    int stop_bar = BarInfo.GetBarIndex();
     mSteps = (stop_bar - start_bar) * 8L / eighths_per_chord;
   }
 
@@ -127,7 +127,7 @@ int HBAnalyzer::Transpose(JZFilter* pFilter, int qbc)
 }
 
 
-void HBAnalyzer::IterateEvents(void (HBAnalyzer::*Action)(tKeyOn *on, JZTrack *t))
+void HBAnalyzer::IterateEvents(void (HBAnalyzer::*Action)(tKeyOn*, JZTrack*))
 {
   tTrackIterator Tracks(mpFilter);
   JZTrack *t = Tracks.First();
@@ -139,10 +139,10 @@ void HBAnalyzer::IterateEvents(void (HBAnalyzer::*Action)(tKeyOn *on, JZTrack *t
       JZEvent *e = Events.Range(mpFilter->FromClock, mpFilter->ToClock);
       while (e)
       {
-        tKeyOn *on = e->IsKeyOn();
-        if (on)
+        tKeyOn* pKeyOn = e->IsKeyOn();
+        if (pKeyOn)
         {
-          (this->*Action)(on, t);
+          (this->*Action)(pKeyOn, t);
         }
         e = Events.Next();
       }
@@ -160,56 +160,60 @@ int HBAnalyzer::Step2Clock(int step)
   return (step * (to - fr)) / mSteps + fr;
 }
 
-void HBAnalyzer::CountEvent(tKeyOn *on, JZTrack *t)
+void HBAnalyzer::CountEvent(tKeyOn* pKeyOn, JZTrack *t)
 {
   for (int i = 0; i < mSteps; i++)
   {
     int start = Step2Clock(i);
     int stop  = Step2Clock(i+1);
-    if (on->GetClock() + on->Length >= start && on->GetClock() < stop)
+    if (
+      pKeyOn->GetClock() + pKeyOn->mLength >= start &&
+      pKeyOn->GetClock() < stop)
     {
-      if (on->GetClock() > start)
+      if (pKeyOn->GetClock() > start)
       {
-        start = on->GetClock();
+        start = pKeyOn->GetClock();
       }
-      if (on->GetClock() + on->Length < stop)
+      if (pKeyOn->GetClock() + pKeyOn->mLength < stop)
       {
-        stop = on->GetClock() + on->Length;
+        stop = pKeyOn->GetClock() + pKeyOn->mLength;
       }
-      count[i][on->Key % 12] += stop - start;
+      count[i][pKeyOn->mKey % 12] += stop - start;
     }
   }
 }
 
 
-void HBAnalyzer::TransposeEvent(tKeyOn *on, JZTrack* pTrack)
+void HBAnalyzer::TransposeEvent(tKeyOn* pKeyOn, JZTrack* pTrack)
 {
   for (int i = 0; i < mSteps; i++)
   {
     int start = Step2Clock(i);
     int stop  = Step2Clock(i+1);
-    if (on->GetClock() + on->Length >= start && on->GetClock() < stop)
+    if (
+      pKeyOn->GetClock() + pKeyOn->mLength >= start &&
+      pKeyOn->GetClock() < stop)
     {
       // key matches this step
       int fr = start;
       int to = stop;
-      if (on->GetClock() > fr)
+      if (pKeyOn->GetClock() > fr)
       {
-        fr = on->GetClock();
+        fr = pKeyOn->GetClock();
       }
-      if (on->GetClock() + on->Length < to)
+      if (pKeyOn->GetClock() + pKeyOn->mLength < to)
       {
-        to = on->GetClock() + on->Length;
+        to = pKeyOn->GetClock() + pKeyOn->mLength;
       }
 
       // transpose if most of key length belongs to this step
       // OR: it covers the whole step
-      if (to - fr >= on->Length/2 || (fr == start && to == stop))
+      if (to - fr >= pKeyOn->mLength / 2 || (fr == start && to == stop))
       {
-        tKeyOn *cp = (tKeyOn *)on->Copy();
-        cp->Key += delta[i][on->Key % 12];
-        pTrack->Kill(on);
-        pTrack->Put(cp);
+        tKeyOn* pKeyOnCopy = (tKeyOn *)pKeyOn->Copy();
+        pKeyOnCopy->mKey += delta[i][pKeyOn->mKey % 12];
+        pTrack->Kill(pKeyOn);
+        pTrack->Put(pKeyOnCopy);
 
         // do not transpose again
         break;

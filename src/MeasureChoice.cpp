@@ -38,6 +38,6 @@ int tMeasureChoice::GetTicks(JZSong* pSong)
   {
     m = 16;
   }
-  m = pSong->TicksPerQuarter * 4 / m;
+  m = pSong->GetTicksPerQuarter() * 4 / m;
   return (m > 0) ? m : 1;
 }

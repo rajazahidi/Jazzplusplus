@@ -39,37 +39,38 @@
 #include "Help.h"
 
 #include <fstream>
+#include <sstream>
 
 using namespace std;
 
 tRhythmWin *rhythm_win = 0;
 
-void tRhyGroup::write(ostream &os)
+void tRhyGroup::write(ostream& Os) const
 {
-  os << listen << " ";
-  os << contrib << " ";
+  Os << listen << " ";
+  Os << contrib << " ";
 }
 
-void tRhyGroup::read(istream &is, int version)
+void tRhyGroup::read(istream& Is, int version)
 {
-  is >> listen;
-  is >> contrib;
+  Is >> listen;
+  Is >> contrib;
 }
 
-void tRhyGroups::write(ostream &os)
+void tRhyGroups::write(ostream& Os) const
 {
   for (int i = 0; i < MAX_GROUPS; i++)
   {
-    g[i].write(os);
+    g[i].write(Os);
   }
-  os << endl;
+  Os << endl;
 }
 
-void tRhyGroups::read(istream &is, int version)
+void tRhyGroups::read(istream& Is, int version)
 {
   for (int i = 0; i < MAX_GROUPS; i++)
   {
-    g[i].read(is, version);
+    g[i].read(Is, version);
   }
 }
 
@@ -83,7 +84,8 @@ static const int MODE_CONTROL   = -4;
 
 
 tRhythm::tRhythm(int k)
-  : rhythm(64, 0, 100),
+  : mLabel("random rhythm"),
+    rhythm(64, 0, 100),
     length( 8, 0, 100),
     veloc (32, 0, 100),
     history(64, 0, 100)
@@ -96,54 +98,54 @@ tRhythm::tRhythm(int k)
   count_per_bar   = 4;
   n_bars          = 1;
   randomize       = true;
-
-  label = copystring("random rhythm");
 }
 
-tRhythm::tRhythm(const tRhythm &o)
-  : rhythm(o.rhythm),
-    length(o.length),
-    veloc (o.veloc),
-    groups(o.groups),
-    history(o.history)
+tRhythm::tRhythm(const tRhythm& Other)
+  : rhythm(Other.rhythm),
+    length(Other.length),
+    veloc (Other.veloc),
+    groups(Other.groups),
+    history(Other.history)
 {
-  mode            = o.mode;
-  n_keys          = o.n_keys;
+  mode = Other.mode;
+  n_keys = Other.n_keys;
   for (int i = 0; i < n_keys; i++)
   {
-    keys[i] = o.keys[i];
+    keys[i] = Other.keys[i];
   }
-  parm            = o.parm;
-  n_bars          = o.n_bars;
-  steps_per_count = o.steps_per_count;
-  count_per_bar   = o.count_per_bar;
-  randomize       = o.randomize;
-  groups          = o.groups;
+  parm = Other.parm;
+  n_bars = Other.n_bars;
+  steps_per_count = Other.steps_per_count;
+  count_per_bar = Other.count_per_bar;
+  randomize = Other.randomize;
+  groups = Other.groups;
 
-  label           = copystring(o.label);
+  mLabel = Other.mLabel;
 }
 
-tRhythm & tRhythm::operator=(const tRhythm &o)
+tRhythm& tRhythm::operator = (const tRhythm& Rhs)
 {
-  mode            = o.mode;
-  n_keys          = o.n_keys;
-  for (int i = 0; i < n_keys; i++)
+  if (this != &Rhs)
   {
-    keys[i] = o.keys[i];
-  }
-  rhythm          = o.rhythm;
-  length          = o.length;
-  veloc           = o.veloc;
-  parm            = o.parm;
-  n_bars          = o.n_bars;
-  steps_per_count = o.steps_per_count;
-  count_per_bar   = o.count_per_bar;
-  randomize       = o.randomize;
-  groups          = o.groups;
-  history         = o.history;
+    mode            = Rhs.mode;
+    n_keys          = Rhs.n_keys;
+    for (int i = 0; i < n_keys; i++)
+    {
+      keys[i] = Rhs.keys[i];
+    }
+    rhythm          = Rhs.rhythm;
+    length          = Rhs.length;
+    veloc           = Rhs.veloc;
+    parm            = Rhs.parm;
+    n_bars          = Rhs.n_bars;
+    steps_per_count = Rhs.steps_per_count;
+    count_per_bar   = Rhs.count_per_bar;
+    randomize       = Rhs.randomize;
+    groups          = Rhs.groups;
+    history         = Rhs.history;
 
-  delete label;
-  label           = copystring(o.label);
+    mLabel = Rhs.mLabel;
+  }
 
   return *this;
 }
@@ -151,44 +153,43 @@ tRhythm & tRhythm::operator=(const tRhythm &o)
 
 tRhythm::~tRhythm()
 {
-  delete label;
 }
 
 
-void tRhythm::write(ostream &os)
+void tRhythm::write(ostream& Os) const
 {
-  os << rhythm;
-  os << length;
-  os << veloc;
+  Os << rhythm;
+  Os << length;
+  Os << veloc;
 
-  os << steps_per_count << " ";
-  os << count_per_bar << " ";
-  os << n_bars << " ";
-  os << mode << " ";
-  os << n_keys << " ";
+  Os << steps_per_count << " ";
+  Os << count_per_bar << " ";
+  Os << n_bars << " ";
+  Os << mode << " ";
+  Os << n_keys << " ";
   for (int i = 0; i < n_keys; i++)
   {
-    os << keys[i] << " ";
+    Os << keys[i] << " ";
   }
-  os << parm << endl;
-  WriteString(os, label) << endl;
+  Os << parm << endl;
+  WriteString(Os, mLabel.c_str()) << endl;
 
-  os << randomize << " ";
-  groups.write(os);
+  Os << randomize << " ";
+  groups.write(Os);
 }
 
 
-void tRhythm::read(istream &is, int version)
+void tRhythm::read(istream& Is, int version)
 {
   char buf[200];
-  is >> rhythm;
-  is >> length;
-  is >> veloc;
+  Is >> rhythm;
+  Is >> length;
+  Is >> veloc;
 
-  is >> steps_per_count;
-  is >> count_per_bar;
-  is >> n_bars;
-  is >> mode;
+  Is >> steps_per_count;
+  Is >> count_per_bar;
+  Is >> n_bars;
+  Is >> mode;
   if (mode >= 0) // old format
   {
     n_keys = 1;
@@ -197,40 +198,39 @@ void tRhythm::read(istream &is, int version)
   }
   else
   {
-    is >> n_keys;
+    Is >> n_keys;
     for (int i = 0; i < n_keys; i++)
     {
-      is >> keys[i];
+      Is >> keys[i];
     }
   }
-  is >> parm;
+  Is >> parm;
 
-  ReadString(is, buf, sizeof(buf));
+  ReadString(Is, buf, sizeof(buf));
   SetLabel(buf);
 
   if (version > 1)
   {
-    is >> randomize;
-    groups.read(is, version);
+    Is >> randomize;
+    groups.read(Is, version);
   }
 }
 
-void tRhythm::SetLabel(char const *s)
+void tRhythm::SetLabel(const string& Label)
 {
-  delete label;
-  label = copystring(s);
+  mLabel = Label;
 }
 
 
-int tRhythm::Clock2i(long clock, JZBarInfo &bi) const
+int tRhythm::Clock2i(long clock, const JZBarInfo& BarInfo) const
 {
-  int clocks_per_step = bi.TicksPerBar / (steps_per_count * count_per_bar);
+  int clocks_per_step = BarInfo.GetTicksPerBar() / (steps_per_count * count_per_bar);
   return (int)(((clock - start_clock) / clocks_per_step) % rhythm.Size());
 }
 
-int tRhythm::ClocksPerStep(JZBarInfo &bi) const
+int tRhythm::ClocksPerStep(const JZBarInfo& BarInfo) const
 {
-  return bi.TicksPerBar / (steps_per_count * count_per_bar);
+  return BarInfo.GetTicksPerBar() / (steps_per_count * count_per_bar);
 }
 
 
@@ -312,10 +312,14 @@ void tRhythm::Generate(JZTrack *track, long fr_clock, long to_clock, long ticks_
       // put event here
       int rndval;
       if (randomize)
+      {
         // keep seed < 1.0
         rndval = veloc.Random((double)rhythm[i] / ((double)rhythm.Max() + 0.001));
+      }
       else
+      {
         rndval = veloc.Random();
+      }
       short vel = rndval * 127 / veloc.Size() + 1;
       short len = (length.Random() + 1) * clocks_per_step;
 
@@ -327,9 +331,13 @@ void tRhythm::Generate(JZTrack *track, long fr_clock, long to_clock, long ticks_
           long step = (clock - fr_clock) * total_steps / (to_clock - fr_clock);
           int keys[12], n_keys;
           if (key == CHORD_KEY)
+          {
             n_keys = gpHarmonyBrowser->GetChordKeys(keys, (int)step, (int)total_steps);
+          }
           else
+          {
             n_keys = gpHarmonyBrowser->GetBassKeys(keys, (int)step, (int)total_steps);
+          }
           for (int j = 0; j < n_keys; j++)
           {
             tKeyOn *k = new tKeyOn(clock, chan, keys[j], vel, len - clocks_per_step/2);
@@ -376,26 +384,31 @@ void tRhythm::Generate(JZTrack *track, long fr_clock, long to_clock, long ticks_
 
 
 
-void tRhythm::GenGroup(JZRndArray &out, int grp, JZBarInfo &bi, tRhythm *rhy[], int n_rhy)
+void tRhythm::GenGroup(
+  JZRndArray& out,
+  int grp,
+  const JZBarInfo& BarInfo,
+  tRhythm *rhy[],
+  int n_rhy)
 {
   out.Clear();
 
-  int clocks_per_step = ClocksPerStep(bi);
+  int clocks_per_step = ClocksPerStep(BarInfo);
 
   for (int ri = 0; ri < n_rhy; ri++)
   {
-    tRhythm *r = rhy[ri];
-    int fuzz = r->groups[grp].contrib;
-    if (fuzz && r != this)
+    tRhythm* pRhythm = rhy[ri];
+    int fuzz = pRhythm->groups[grp].contrib;
+    if (fuzz && pRhythm != this)
     {
       JZRndArray tmp(rhythm);
       tmp.Clear();
-      long clock = bi.Clock;
-      while (clock < bi.Clock + bi.TicksPerBar)
+      long clock = BarInfo.GetClock();
+      while (clock < BarInfo.GetClock() + BarInfo.GetTicksPerBar())
       {
-        int i = Clock2i(clock, bi);
-        int j = r->Clock2i(clock, bi);
-        tmp[i] = r->history[j];
+        int i = Clock2i(clock, BarInfo);
+        int j = pRhythm->Clock2i(clock, BarInfo);
+        tmp[i] = pRhythm->history[j];
         clock += clocks_per_step;
       }
       out.SetUnion(tmp, fuzz);
@@ -404,7 +417,11 @@ void tRhythm::GenGroup(JZRndArray &out, int grp, JZBarInfo &bi, tRhythm *rhy[], 
 }
 
 
-void tRhythm::Generate(JZTrack *track, JZBarInfo &bi, tRhythm *rhy[], int n_rhy)
+void tRhythm::Generate(
+  JZTrack* track,
+  const JZBarInfo& BarInfo,
+  tRhythm* rhy[],
+  int n_rhy)
 {
   JZRndArray rrg(rhythm);
 
@@ -414,7 +431,7 @@ void tRhythm::Generate(JZTrack *track, JZBarInfo &bi, tRhythm *rhy[], int n_rhy)
   {
     if (groups[gi].listen)
     {
-      GenGroup(tmp, gi, bi, rhy, n_rhy);
+      GenGroup(tmp, gi, BarInfo, rhy, n_rhy);
       if (groups[gi].listen > 0)
       {
         rrg.SetIntersection(tmp, groups[gi].listen);
@@ -427,21 +444,20 @@ void tRhythm::Generate(JZTrack *track, JZBarInfo &bi, tRhythm *rhy[], int n_rhy)
   }
 
   // clear part of the history
-  long clock = bi.Clock;
-  int clocks_per_step = ClocksPerStep(bi);
-  while (clock < bi.Clock + bi.TicksPerBar)
+  long clock = BarInfo.GetClock();
+  int clocks_per_step = ClocksPerStep(BarInfo);
+  while (clock < BarInfo.GetClock() + BarInfo.GetTicksPerBar())
   {
-    int i = Clock2i(clock, bi);
+    int i = Clock2i(clock, BarInfo);
     history[i] = 0;
     clock += clocks_per_step;
   }
 
-
   //  generate the events
   clock = next_clock;
-  while (clock < bi.Clock + bi.TicksPerBar)
+  while (clock < BarInfo.GetClock() + BarInfo.GetTicksPerBar())
   {
-    int i = Clock2i(clock, bi);
+    int i = Clock2i(clock, BarInfo);
     if ((!randomize && rrg[i] > 0) || rrg.Random(i))
     {
       // put event here
@@ -749,8 +765,8 @@ void tRhythmWin::OnMenuCommand(int id)
           "*.rhy");
         if (fname)
         {
-          ifstream is(fname);
-          is >> *this;
+          ifstream Is(fname);
+          Is >> *this;
           OnPaint();
         }
       }
@@ -767,8 +783,8 @@ void tRhythmWin::OnMenuCommand(int id)
           "*.rhy");
         if (fname)
         {
-          ofstream os(fname);
-          os << *this;
+          ofstream Os(fname);
+          Os << *this;
         }
       }
       break;
@@ -871,44 +887,51 @@ void tRhythmWin::AddInstrumentDlg()
   {
     Win2Instrument(); // save actual values
 
-    tRhythm *r = 0;
+    tRhythm* pRhythm = 0;
     if (act_instrument >= 0)
-      r = new tRhythm(*instruments[act_instrument]);
+    {
+      pRhythm = new tRhythm(*instruments[act_instrument]);
+    }
     else
-      r = new tRhythm(keys[i]);
+    {
+      pRhythm = new tRhythm(keys[i]);
+    }
 
     // drum key?
     if (keys[i] >= 0)
     {
-      r->n_keys  = 1;
-      r->keys[0] = keys[i];
-      r->mode    = MODE_ALL_OF;
-      r->SetLabel(names[i]);
+      pRhythm->n_keys  = 1;
+      pRhythm->keys[0] = keys[i];
+      pRhythm->mode    = MODE_ALL_OF;
+      pRhythm->SetLabel(names[i].c_str());
     }
 
     // choose controller?
     else if (keys[i] == MODE_CONTROL)
     {
-      r->parm = SelectControllerDlg();
-      if (r->parm < 0)
+      pRhythm->parm = SelectControllerDlg();
+      if (pRhythm->parm < 0)
       {
         return;
       }
-      r->SetLabel(gpConfig->GetCtrlName(r->parm).first.c_str());
-      r->mode = MODE_CONTROL;
-      r->n_keys = 0;
+      pRhythm->SetLabel(gpConfig->GetCtrlName(pRhythm->parm).first.c_str());
+      pRhythm->mode = MODE_CONTROL;
+      pRhythm->n_keys = 0;
     }
 
     else if (keys[i] == MODE_ONE_OF || keys[i] == MODE_ALL_OF)
     {
-      char buf[2000];
-      buf[0] = 0;
+      ostringstream Oss;
       if (keys[i] == MODE_ONE_OF)
-        strcpy(buf, "one: ");
+      {
+        Oss << "one: ";
+      }
       else
-        strcpy(buf, "all: ");
-      r->n_keys = 0;
-      r->mode   = keys[i];
+      {
+        Oss << "all: ";
+      }
+      pRhythm->n_keys = 0;
+      pRhythm->mode   = keys[i];
       tEventArray events;
       tCmdCopyToBuffer cmd(gpTrackFrame->GetPianoWindow()->GetFilter(), &events);
       cmd.Execute(0);   // no UNDO
@@ -918,34 +941,42 @@ void tRhythmWin::AddInstrumentDlg()
         tKeyOn *on = events.Events[ii]->IsKeyOn();
         if (on)
         {
-          r->keys[r->n_keys++] = on->Key;
-          if (r->n_keys > 1)
-            strcat(buf, ", ");
-          Key2Str(on->Key, buf + strlen(buf));
-          if (r->n_keys >= MAX_KEYS)
+          pRhythm->keys[pRhythm->n_keys++] = on->mKey;
+          if (pRhythm->n_keys > 1)
+          {
+            Oss << ", ";
+          }
+          string KeyString;
+          KeyToString(on->mKey, KeyString);
+          Oss << KeyString;
+          if (pRhythm->n_keys >= MAX_KEYS)
+          {
             break;
+          }
         }
       }
-      r->SetLabel(buf);
+      pRhythm->SetLabel(Oss.str());
 
-      if (r->n_keys == 0)
+      if (pRhythm->n_keys == 0)
       {
         wxMessageBox("select some notes in pianowin first", "Error", wxOK);
-        delete r;
-        r = 0;
+        delete pRhythm;
+        pRhythm = 0;
       }
     }
 
-    if (r != 0)
-      AddInstrument(r);
+    if (pRhythm != 0)
+    {
+      AddInstrument(pRhythm);
+    }
   }
 }
 
-void tRhythmWin::AddInstrument(tRhythm *r)
+void tRhythmWin::AddInstrument(tRhythm* pRhythm)
 {
   act_instrument = n_instruments++;
-  instruments[act_instrument] = r;
-  instrument_list->Append((char *)r->GetLabel());
+  instruments[act_instrument] = pRhythm;
+  instrument_list->Append(pRhythm->GetLabel().c_str());
 
   instrument_list->SetSelection(act_instrument);
   Instrument2Win();
@@ -981,9 +1012,13 @@ void tRhythmWin::InitInstrumentList()
 {
   instrument_list->Clear();
   for (int i = 0; i < n_instruments; i++)
-    instrument_list->Append((char *)instruments[i]->GetLabel());
+  {
+    instrument_list->Append(instruments[i]->GetLabel().c_str());
+  }
   if (act_instrument >= 0)
+  {
     instrument_list->SetSelection(act_instrument);
+  }
 }
 
 void tRhythmWin::Del(wxButton &but, wxCommandEvent& event)
@@ -1001,7 +1036,9 @@ void tRhythmWin::DelInstrument()
     int k;
     delete instruments[i];
     for (k = i; k < n_instruments-1; k++)
+    {
       instruments[k] = instruments[k+1];
+    }
     instruments[k] = 0;
     n_instruments--;
     instrument_list->Delete(i);
@@ -1045,26 +1082,36 @@ void tRhythmWin::GenRhythm()
   mpSong->NewUndoBuffer();
 
   // remove selection
-  //if (wxMessageBox("Erase destination before generating?", "Replace", wxYES_NO) == wxYES)
+//  if (
+//    wxMessageBox(
+//      "Erase destination before generating?",
+//      "Replace",
+//      wxYES_NO) == wxYES)
   {
     tCmdErase erase(pFilter, 1);
     erase.Execute(0);
   }
 
   for (int i = 0; i < n_instruments; i++)
+  {
     instruments[i]->GenInit(fr_clock);
+  }
 
-  JZBarInfo bar_info(mpSong);
-  bar_info.SetClock(fr_clock);
+  JZBarInfo BarInfo(*mpSong);
+  BarInfo.SetClock(fr_clock);
 
-  // for (int i = 0; i < n_instruments; i++)
-  //   instruments[i]->Generate(track, fr_clock, to_clock, bar_info.TicksPerBar);
+//  for (int i = 0; i < n_instruments; i++)
+//  {
+//    instruments[i]->Generate(track, fr_clock, to_clock, BarInfo.GetTicksPerBar());
+//  }
 
-  while (bar_info.Clock < to_clock)
+  while (BarInfo.GetClock() < to_clock)
   {
     for (int i = 0; i < n_instruments; i++)
-      instruments[i]->Generate(track, bar_info, instruments, n_instruments);
-    bar_info.Next();
+    {
+      instruments[i]->Generate(track, BarInfo, instruments, n_instruments);
+    }
+    BarInfo.Next();
   }
 
   track->Cleanup();
@@ -1094,12 +1141,18 @@ void tRhythmWin::ItemCallback(wxItem& item, wxCommandEvent& event)
 void tRhythmWin::Win2Instrument(int i)
 {
   if (in_create)
+  {
     return;
+  }
 
   if (i < 0)
+  {
     i = act_instrument;
+  }
   if (i < 0)
+  {
     return;
+  }
 
   edit.steps_per_count = steps_per_count->GetValue();
   edit.count_per_bar   = count_per_bar->GetValue();
@@ -1119,12 +1172,18 @@ void tRhythmWin::Win2Instrument(int i)
 void tRhythmWin::Instrument2Win(int i)
 {
   if (in_create)
+  {
     return;
+  }
 
   if (i < 0)
+  {
     i = act_instrument;
+  }
   if (i < 0)
+  {
     return;
+  }
 
   edit = *instruments[i];
   steps_per_count->SetValue(edit.steps_per_count);
@@ -1185,7 +1244,9 @@ bool tRhythmWin::OnClose()
 void tRhythmWin::OnPaint()
 {
   if (in_create)
+  {
     return;
+  }
 
   rhythm_edit->SetMeter(edit.steps_per_count, edit.count_per_bar, edit.n_bars);
 
@@ -1194,24 +1255,26 @@ void tRhythmWin::OnPaint()
   rhythm_edit->Refresh();
 }
 
-ostream & operator << (ostream &os, tRhythmWin const &a)
+ostream & operator << (ostream& Os, tRhythmWin const &a)
 {
   int i;
-  os << 2 << endl;
-  os << a.n_instruments << endl;
+  Os << 2 << endl;
+  Os << a.n_instruments << endl;
   for (i = 0; i < a.n_instruments; i++)
-    a.instruments[i]->write(os);
-  return os;
+  {
+    a.instruments[i]->write(Os);
+  }
+  return Os;
 }
 
-istream & operator >> (istream &is, tRhythmWin &a)
+istream & operator >> (istream& Is, tRhythmWin& a)
 {
   int version;
-  is >> version;
+  Is >> version;
   if (version > 2)
   {
     wxMessageBox("Wrong file format!", "Error", wxOK);
-    return is;
+    return Is;
   }
 
   int i, n = a.n_instruments;
@@ -1221,13 +1284,13 @@ istream & operator >> (istream &is, tRhythmWin &a)
     a.DelInstrument();
   }
 
-  is >> n;
+  Is >> n;
   for (i = 0; i < n; i++)
   {
-    tRhythm *r = new tRhythm(0);
-    r->read(is, version);
-    a.AddInstrument(r);
+    tRhythm* pRhythm = new tRhythm(0);
+    pRhythm->read(Is, version);
+    a.AddInstrument(pRhythm);
   }
-  return is;
+  return Is;
 }
 

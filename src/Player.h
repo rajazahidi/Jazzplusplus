@@ -219,7 +219,7 @@ class JZPlayer : public wxTimer
 
     virtual void AdjustAudioLength(JZTrack *t)
     {
-      long ticks_per_minute = Song->TicksPerQuarter * Song->Speed();
+      long ticks_per_minute = Song->GetTicksPerQuarter() * Song->Speed();
       mSamples.AdjustAudioLength(t, ticks_per_minute);
     }
 

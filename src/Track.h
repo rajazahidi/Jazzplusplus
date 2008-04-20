@@ -378,7 +378,7 @@ class tEventArray : public tSimpleEventArray
     void Read(JZReadBase& Io);
     void Write(JZWriteBase& Io);
 
-    int GetLastClock();
+    int GetLastClock() const;
     int IsEmpty();
     int GetFirstClock();
 
@@ -586,12 +586,12 @@ class JZTrack : public tEventArray
 
 class tEventIterator
 {
-    tSimpleEventArray *Track;
+    const tSimpleEventArray* Track;
     int Start, Stop, Actual;
 
   public:
 
-    tEventIterator(tSimpleEventArray *t)
+    tEventIterator(const tSimpleEventArray* t)
     {
       Track  = t;
       Start  = 0;

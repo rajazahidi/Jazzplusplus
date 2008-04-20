@@ -424,10 +424,10 @@ int tSampleSet::FillBuffers(long last_clock)
     }
     event_index++;
 
-    tKeyOn *k = e->IsKeyOn();
-    if (k && num_voices < MAXPOLY)
+    tKeyOn* pKeyOn = e->IsKeyOn();
+    if (pKeyOn && num_voices < MAXPOLY)
     {
-      voices[num_voices++]->Start(samples[k->Key], k->GetClock());
+      voices[num_voices++]->Start(samples[pKeyOn->mKey], pKeyOn->GetClock());
     }
   }
 
@@ -532,12 +532,17 @@ void tSampleSet::AdjustAudioLength(JZTrack *t, long tpm)
 
   tEventIterator it(t);
   JZEvent *e = it.First();
-  while (e) {
-    tKeyOn *k = e->IsKeyOn();
-    if (k) {
-      k->Length = (int)Samples2Ticks(samples[k->Key]->GetLength());
-      if (k->Length < 15)  // invisble?
-        k->Length = 15;
+  while (e)
+  {
+    tKeyOn* pKeyOn = e->IsKeyOn();
+    if (pKeyOn)
+    {
+      pKeyOn->mLength =
+        (int)Samples2Ticks(samples[pKeyOn->mKey]->GetLength());
+      if (pKeyOn->mLength < 15)  // invisble?
+      {
+        pKeyOn->mLength = 15;
+      }
     }
     e = it.Next();
   }
@@ -840,13 +845,13 @@ void tSampleSet::AddNote(const char *fname, long frc, long toc)
     e = iter.Next();
   }
   // add a noteon
-  tKeyOn *k = new tKeyOn(
+  tKeyOn* pKeyOn = new tKeyOn(
     frc,
     track->Channel - 1,
     key,
     64,
     (unsigned short)(toc - frc));
-  track->Put(k);
+  track->Put(pKeyOn);
   track->Cleanup();
 
   // repaint trackwin
@@ -1006,7 +1011,7 @@ char *tSamplesDlg::ListEntry(int i)
 {
   char buf[500];
   sprintf(buf, "%d ", i+1);
-  //Key2Str(i, buf + strlen(buf));
+//  KeyToString(i, buf + strlen(buf));
   sprintf(buf + strlen(buf), set.samples[i]->GetLabel());
   return copystring(buf);
 }

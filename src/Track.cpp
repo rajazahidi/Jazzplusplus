@@ -1156,17 +1156,17 @@ void tEventArray::Length2Keyoff()
   for (int i = 0; i < n; i++)
   {
     tKeyOn *on;
-    if ((on = Events[i]->IsKeyOn()) != 0 && on->Length != 0)
+    if ((on = Events[i]->IsKeyOn()) != 0 && on->mLength != 0)
     {
-//      JZEvent *of = new tKeyOff(on->GetClock() + on->Length, on->Channel, on->Key);
+//      JZEvent *of = new tKeyOff(on->GetClock() + on->mLength, on->Channel, on->Key);
       // SN++ added off veloc
       JZEvent *of = new tKeyOff(
-        on->GetClock() + on->Length,
+        on->GetClock() + on->mLength,
         on->Channel,
-        on->Key,
-        on->OffVeloc);
+        on->mKey,
+        on->GetOffVelocity());
 
-      on->Length = 0;
+      on->mLength = 0;
       of->SetDevice(on->GetDevice());
       Put(of);
     }
@@ -1225,8 +1225,8 @@ void tEventArray::Keyoff2Length()
   int i;
   for (i = 0; i < nEvents; i++)
   {
-    tKeyOn *on;
-    if ((on = Events[i]->IsKeyOn()) != 0 && on->Length == 0)
+    tKeyOn* on;
+    if ((on = Events[i]->IsKeyOn()) != 0 && on->mLength == 0)
     {
       int j;
       for (j = i + 1; j < nEvents; j++)
@@ -1235,13 +1235,13 @@ void tEventArray::Keyoff2Length()
         if (
           of &&
           !of->IsKilled() &&
-          on->Key == of->Key &&
+          on->mKey == of->Key &&
           on->Channel == of->Channel)
         {
-          on->Length = of->GetClock() - on->GetClock();
-          if (on->Length <= 0L)
+          on->mLength = of->GetClock() - on->GetClock();
+          if (on->mLength <= 0L)
           {
-            on->Length = 1;
+            on->mLength = 1;
           }
           of->Kill();
           break;
@@ -1254,8 +1254,8 @@ void tEventArray::Keyoff2Length()
   // and kill all remaining KeyOff's
   for (i = 0; i < nEvents; i++)
   {
-    tKeyOn *on = Events[i]->IsKeyOn();
-    if (on && on->Length <= 0)
+    tKeyOn* on = Events[i]->IsKeyOn();
+    if (on && on->mLength <= 0)
     {
       on->Kill();
     }
@@ -1619,6 +1619,7 @@ void tEventArray::Read(JZReadBase& Io)
     if (!SpecialEvent)
     {
       Put(e);
+      NeedToDelete = false;
       if (!Channel && e->IsChannelEvent())
       {
         Channel = e->IsChannelEvent()->Channel + 1;
@@ -1649,7 +1650,7 @@ void tEventArray::Read(JZReadBase& Io)
 }
 
 
-int tEventArray::GetLastClock()
+int tEventArray::GetLastClock() const
 {
   if (!nEvents)
   {
@@ -1669,7 +1670,7 @@ int tEventArray::GetFirstClock()
   {
     return Events[0]->GetClock();
   }
-  return LastClock;
+  return LAST_CLOCK;
 }
 
 // ***********************************************************************

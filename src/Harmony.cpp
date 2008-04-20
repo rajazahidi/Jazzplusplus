@@ -324,8 +324,8 @@ void HBPlayer::Notify()
     tKeyOff of(0, meldy_channel - 1, meldy_keys[meldy_index]);
     gpMidiPlayer->OutNow(device, &of);
     meldy_index = (meldy_index + 1) % n_meldy_keys;
-    tKeyOn on(0, meldy_channel - 1, meldy_keys[meldy_index], meldy_veloc);
-    gpMidiPlayer->OutNow(device, &on);
+    tKeyOn pKeyOn(0, meldy_channel - 1, meldy_keys[meldy_index], meldy_veloc);
+    gpMidiPlayer->OutNow(device, &pKeyOn);
   }
 }
 
@@ -708,10 +708,10 @@ HBMatchMarkers::HBMatchMarkers(const HBContext& Context, HBCanvas* cv)
     tEventArray &buf = gpTrackFrame->GetPianoWindow()->mPasteBuffer;
     for (int i = 0; i < buf.nEvents; i++)
     {
-      tKeyOn *on = buf.Events[i]->IsKeyOn();
-      if (on)
+      tKeyOn* pKeyOn = buf.Events[i]->IsKeyOn();
+      if (pKeyOn)
       {
-        piano += on->Key;
+        piano += pKeyOn->mKey;
       }
     }
   }

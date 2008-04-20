@@ -23,8 +23,14 @@
 #ifndef JZ_KEYSTRINGCONVERTERS_H
 #define JZ_KEYSTRINGCONVERTERS_H
 
-void Key2Str(int Key, char* pString);
+#include <string>
 
-int Str2Key(const char* pString);
+//*****************************************************************************
+//*****************************************************************************
+void KeyToString(int Key, std::string& String);
+
+//*****************************************************************************
+//*****************************************************************************
+int StringToKey(const std::string& String);
 
 #endif // !defined(JZ_KEYSTRINGCONVERTERS_H)

@@ -39,24 +39,30 @@ class JZBarInfo;
 
 #define MOTIF_Y_OFFSET 16
 
-struct tRhyGroup {
+struct tRhyGroup
+{
   int contrib;
   int listen;
 
-  tRhyGroup() {
+  tRhyGroup()
+  {
     listen = 0;
     contrib = 0;
   }
-  void write(std::ostream& os);
-  void read(std::istream& is, int version);
+  void write(std::ostream& Os) const;
+  void read(std::istream& Is, int Version);
 };
 
 
-struct tRhyGroups {
+struct tRhyGroups
+{
   tRhyGroup g[MAX_GROUPS];
-  tRhyGroup& operator [] (int i) { return g[i]; }
-  void write(std::ostream& os);
-  void read(std::istream &is, int version);
+  tRhyGroup& operator [] (int i)
+  {
+    return g[i];
+  }
+  void write(std::ostream& Os) const;
+  void read(std::istream& Is, int Version);
 };
 
 
@@ -64,7 +70,9 @@ class tRhythm
 {
     friend class tRhythmWin;
 
-    char * label;
+  private:
+
+    std::string mLabel;
 
   protected:
 
@@ -88,26 +96,54 @@ class tRhythm
     long start_clock;
     long next_clock;
 
-    void GenGroup(JZRndArray &out, int grp, JZBarInfo &bi, tRhythm *rhy[], int n_rhy);
-    int Clock2i(long clock, JZBarInfo &bi) const;
-    int ClocksPerStep(JZBarInfo &bi) const;
+    void GenGroup(
+      JZRndArray& out,
+      int grp,
+      const JZBarInfo& BarInfo,
+      tRhythm* rhy[],
+      int n_rhy);
+
+    int Clock2i(long clock, const JZBarInfo& BarInfo) const;
+
+    int ClocksPerStep(const JZBarInfo& BarInfo) const;
 
   public:
+
     tRhythm(int key);
-    tRhythm(const tRhythm &o);
+    tRhythm(const tRhythm& Other);
     tRhythm & operator= (const tRhythm &o);
     virtual ~tRhythm();
 
-    char const * GetLabel() { return label; }
-    void SetLabel(char const *);
+    const std::string& GetLabel() const
+    {
+      return mLabel;
+    }
 
-    void Generate(JZTrack *track, long fr_clock, long to_clock, long ticks_per_bar);
-    void Generate(JZTrack *track, JZBarInfo &bi, tRhythm *rhy[], int n_rhy);
+    void SetLabel(const std::string& Label);
+
+    void Generate(
+      JZTrack* pTrack,
+      long fr_clock,
+      long to_clock,
+      long ticks_per_bar);
+
+    void Generate(
+      JZTrack* pTrack,
+      const JZBarInfo& BarInfo,
+      tRhythm* rhy[],
+      int n_rhy);
+
     void GenInit(long start_clock);
-    void GenerateEvent(JZTrack *track, long clock, short vel, short len);
 
-    void write(std::ostream& os);
-    void read(std::istream& is, int version);
+    void GenerateEvent(
+      JZTrack* pTrack,
+      long clock,
+      short vel,
+      short len);
+
+    void write(std::ostream& Os) const;
+
+    void read(std::istream& Is, int version);
 };
 
 
@@ -131,8 +167,8 @@ class tRhythmWin : public wxFrame
 
   private:
 
-    friend std::ostream& operator << (std::ostream& os, tRhythmWin const &a);
-    friend std::istream& operator >> (std::istream& is, tRhythmWin &a);
+    friend std::ostream& operator << (std::ostream& os, tRhythmWin const& a);
+    friend std::istream& operator >> (std::istream& Is, tRhythmWin& a);
 
     wxPanel    *inst_panel;
 #ifdef OBSOLETE

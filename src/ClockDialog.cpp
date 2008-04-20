@@ -28,6 +28,10 @@
 #include "DeprecatedStringUtils.h"
 #include "DeprecatedWx/proplist.h"
 
+#include <string>
+
+using namespace std;
+
 //*****************************************************************************
 // Description:
 //   This is the clock dialog class declaration.
@@ -36,9 +40,9 @@
 //-----------------------------------------------------------------------------
 JZClockDialog::JZClockDialog(JZSong* pSong, const char* pTitle, int Clock)
 {
-  char Buffer[500];
-  pSong->Clock2String(Clock, Buffer);
-  mpString = copystring(Buffer);
+  string ClockString;
+  pSong->ClockToString(Clock, ClockString);
+  mpString = copystring(ClockString.c_str());
   mpTitle = pTitle;
   mpSong = pSong;
 }
@@ -64,5 +68,5 @@ wxProperty* JZClockDialog::mkProperty()
 //-----------------------------------------------------------------------------
 int JZClockDialog::GetClock()
 {
-  return mpSong->String2Clock(mpString);
+  return mpSong->StringToClock(mpString);
 }

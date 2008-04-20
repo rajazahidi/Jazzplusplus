@@ -41,6 +41,8 @@
 #include "Help.h"
 #include "DeprecatedWx/proplist.h"
 
+#include "Dialogs/KeyOnDialog.h"
+
 #include <sstream>
 #include <iomanip>
 
@@ -113,7 +115,7 @@ tCleanupDlg::tCleanupDlg(JZEventFrame *w, JZFilter *f)
 
 bool tCleanupDlg::OnClose()
 {
-  int limit = Song->TicksPerQuarter * 4 / lowLimit;
+  int limit = Song->GetTicksPerQuarter() * 4 / lowLimit;
   cout
     << "tCleanupDlg::OnClose " << lowLimit << ' ' << shortenOverlaps
     << endl;
@@ -410,7 +412,7 @@ void tLengthDlg::AddProperties()
 {
   sheet->AddProperty(new wxProperty(
     "Ticks/Quarter",
-    wxPropertyValue((long)Song->TicksPerQuarter),
+    wxPropertyValue((long)Song->GetTicksPerQuarter()),
     "integer",
     new wxIntegerListValidator(-16, 16)));  //r/o
 
@@ -418,12 +420,12 @@ void tLengthDlg::AddProperties()
     "Start",
     wxPropertyValue(&FromValue),
     "integer",
-    new wxIntegerListValidator(0, Song->TicksPerQuarter * 4)));
+    new wxIntegerListValidator(0, Song->GetTicksPerQuarter() * 4)));
   sheet->AddProperty(new wxProperty(
     "Stop",
     wxPropertyValue(&ToValue),
     "integer",
-    new wxIntegerListValidator(0, Song->TicksPerQuarter * 4)));
+    new wxIntegerListValidator(0, Song->GetTicksPerQuarter() * 4)));
   sheet->AddProperty(new wxProperty(
     "Mode",
     tNamedValueListValue(&Mode, gModes),
@@ -646,7 +648,7 @@ tQuantizeDlg::tQuantizeDlg(JZEventFrame *w, JZFilter *f)
 bool tQuantizeDlg::OnClose()
 {
   //Steps.GetValue();
-  int step = Song->TicksPerQuarter * 4 / QntStep;
+  int step = Song->GetTicksPerQuarter() * 4 / QntStep;
   tCmdQuantize qnt(Filter, step, Groove * step / 100, Delay * step / 100);
   qnt.NoteStart = NoteStart;
   qnt.NoteLength = NoteLength;
@@ -788,82 +790,6 @@ bool tChEventDlg::OnClose()
   return false;
 }
 
-// -------------------------------- Note On -------------------------------
-
-class tKeyOnDlg : public tChEventDlg
-{
- public:
-
-  tKeyDlg PitchDlg;
-  int Pitch;
-  int Veloc;
-  int Length;
-  // SN++
-  int OffVeloc;
-
-  tKeyOnDlg(tKeyOn *e, JZPianoWindow* w, JZTrack *t);
-
-  void AddProperties();
-  bool OnClose();
-};
-
-
-tKeyOnDlg::tKeyOnDlg(tKeyOn *e, JZPianoWindow* w, JZTrack *t)
-  : tChEventDlg(e, w, t),
-    PitchDlg("Pitch", e->Key)
-{
-  Event = e;
-  Veloc = e->Veloc;
-  Pitch = e->Key;
-  Length = e->Length;
-  // SN++ Off veloc support
-  OffVeloc = e->OffVeloc;
-}
-
-
-bool tKeyOnDlg::OnClose()
-{
-  tKeyOn *k = (tKeyOn *)Copy;
-  k->Key = PitchDlg.GetKey();
-  k->Veloc = Veloc;
-  k->Length = Length;
-  // SN++ off veloc support
-  k->OffVeloc = OffVeloc;
-  tChEventDlg::OnClose();
-  return false;
-}
-
-void tKeyOnDlg::AddProperties()
-{
-//   char* tst = copystring("test");
-//   sheet->AddProperty(new wxProperty("test", wxPropertyValue((char**)&tst), "string"));
-
-  sheet->AddProperty(PitchDlg.mkProperty());
-  sheet->AddProperty(new wxProperty(
-    "Velocity",
-    wxPropertyValue(&Veloc),
-    "integer",
-    new wxIntegerListValidator(1, 127)));
-  // SN++ off veloc support
-//  Add(wxMakeFormShort(
-//    "OffVel:",
-//     &OffVeloc,
-//     wxFORM_DEFAULT,
-//     new wxList(wxMakeConstraintRange(0.0, 127.0), 0)));
-  sheet->AddProperty(new wxProperty(
-    "Off Velocity",
-    wxPropertyValue(&OffVeloc),
-    "integer",
-    new wxIntegerListValidator(0, 127)));
-  sheet->AddProperty(new wxProperty(
-    "Length",
-    wxPropertyValue(&Length),
-    "integer"));
-//  Add(wxMakeFormShort("Length:", &Length, wxFORM_DEFAULT, 0, 0, 0, 120));
-  tChEventDlg::AddProperties();
-}
-
-
 // -------------------------------- Pitch -------------------------------
 
 class tPitchDlg : public tChEventDlg
@@ -872,7 +798,7 @@ class tPitchDlg : public tChEventDlg
 
   int Value;
 
-  tPitchDlg(tPitch *e, JZPianoWindow* w, JZTrack *t);
+  tPitchDlg(tPitch* e, JZPianoWindow* w, JZTrack *t);
 
   void AddProperties();
   bool OnClose();
@@ -1438,13 +1364,18 @@ void EventDialog(
   switch (e->Stat)
   {
     case StatKeyOn:
-      if (t->GetAudioMode()) {
+      if (t->GetAudioMode())
+      {
         if (!gpMidiPlayer->IsPlaying())
-          gpMidiPlayer->EditSample(e->IsKeyOn()->Key);
+          gpMidiPlayer->EditSample(e->IsKeyOn()->mKey);
         break;
       }
       str = "Key On";
-      dlg = new tKeyOnDlg(e->IsKeyOn(), pPianoWindow, t);
+//      dlg = new tKeyOnDlg(e->IsKeyOn(), pPianoWindow, t);
+      {
+        JZKeyOnDialog KeyOnDialog(e->IsKeyOn(), pPianoWindow);
+        KeyOnDialog.ShowModal();
+      }
       break;
 
     case StatPitch:

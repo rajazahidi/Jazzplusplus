@@ -267,8 +267,8 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent *e)
       {
         tKeyOn *k = e->IsKeyOn();
         u.c[0] = 0x90 | k->Channel;
-        u.c[1] = k->Key;
-        u.c[2] = k->Veloc;
+        u.c[1] = k->mKey;
+        u.c[2] = k->mVelocity;
       }
       break;
 
@@ -380,7 +380,7 @@ long JZWindowsPlayer::Time2Clock(long time)
 void JZWindowsPlayer::SetTempo(long bpm, long clock)
 {
   long t1 = Clock2Time(clock);
-  state->ticks_per_minute = (long)bpm * (long)Song->TicksPerQuarter;
+  state->ticks_per_minute = (long)bpm * (long)Song->GetTicksPerQuarter();
   long t2 = Clock2Time(clock);
   state->start_time += (t1 - t2);
 }
@@ -408,7 +408,7 @@ long JZWindowsPlayer::Time2RealTimeClock(long time)
 void JZWindowsPlayer::SetRealTimeTempo(long bpm, long clock)
 {
   long t1 = RealTimeClock2Time(clock);
-  real_ticks_per_minute = (long)bpm * (long)Song->TicksPerQuarter;
+  real_ticks_per_minute = (long)bpm * (long)Song->GetTicksPerQuarter();
   long t2 = RealTimeClock2Time(clock);
   real_start_time += (t1 - t2);
 }
@@ -596,9 +596,9 @@ void JZWindowsPlayer::StartPlay(long Clock, long LoopClock, int Continue)
   state->recd_buffer.clear();
   state->sysex_found = FALSE;
 
-  state->ticks_per_minute  = Song->TicksPerQuarter * Song->Speed();
+  state->ticks_per_minute  = Song->GetTicksPerQuarter() * Song->Speed();
   real_ticks_per_minute    = state->ticks_per_minute;
-  state->ticks_per_signal  = Song->TicksPerQuarter / 24;
+  state->ticks_per_signal  = Song->GetTicksPerQuarter() / 24;
   state->time_per_tick = 60000000L / state->ticks_per_minute;
   state->time_correction   = 0;
 
@@ -856,7 +856,8 @@ long JZWindowsMidiPlayer::GetRealTimeClock()
       } u;
       gpMidiPlayer->StopPlay();
       u.w = m->data;
-      clock = ((long)u.c[1] + (128L * (long)u.c[2])) * (Song->TicksPerQuarter / 4);
+      clock =
+        ((long)u.c[1] + (128L * (long)u.c[2])) * (Song->GetTicksPerQuarter() / 4);
       gpMidiPlayer->StartPlay( clock, 0, 1 );
       return -1;
     }

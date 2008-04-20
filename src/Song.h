@@ -27,78 +27,95 @@
 #include "Configuration.h"
 #include "Globals.h"
 
+#include <string>
+
 class JZMetronomeInfo;
 class JZSong;
 
+//*****************************************************************************
+//*****************************************************************************
 class JZBarInfo
 {
   public:
 
-    int BarNr;
-    int Clock;
-    int TicksPerBar;
-    int CountsPerBar;
+    JZBarInfo(const JZSong& Song);
 
-    JZBarInfo(JZSong *Song);
+    int GetBarIndex() const;
 
     void SetBar(int Bar = 0);
 
+    int GetClock() const;
+
     void SetClock(int Clock = 0);
+
+    int GetCountsPerBar() const;
+
+    int GetTicksPerBar() const;
 
     void Next();
 
   private:
 
-    tEventIterator Iterator;
+    int mBarIndex;
+    int mClock;
+    int mCountsPerBar;
+    int mTicksPerQuarter;
+    int mTicksPerBar;
+    tEventIterator mIterator;
+    JZEvent* mpEvent;
 
-    JZEvent *e;
-
-    int TicksPerQuarter;
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class JZSong
 {
   friend class JZBarInfo;
 
-  void MakeMetronome(
-    int FrClock,
-    int ToClock,
-    tEventArray *Destin,
-    const JZMetronomeInfo& MetronomeInfo,
-    int delta = 0);
-
   public:
 
-    int MaxQuarters;    // end of song in quarters for scrollbar settings
-    int nTracks;
-    int TicksPerQuarter;
+    JZSong();
+    virtual ~JZSong();
 
-    JZTrack mTracks[eMaxTrackCount];
+    int GetMaxQuarters() const;
+
+    int GetTicksPerQuarter() const;
+
+    void SetTicksPerQuarter(int TicksPerQuarter);
+
+    int GetTrackCount() const;
+
+    int GetIntroLength() const;
+
+    void SetIntroLength(int IntroLength);
 
     void NewUndoBuffer();
     void Undo();
     void Redo();
 
-    JZSong();
-    virtual ~JZSong();
-
     void Clear();
+
     void Read(JZReadBase& Io, const char* pFileName = 0);
+
     void Write(JZWriteBase& Io, const char* pFileName = 0);
 
-    JZTrack *GetTrack(int Nr);
-    int GetLastClock();
+    JZTrack* GetTrack(int TrackIndex);
+
+    int GetLastClock() const;
+
     int NumUsedTracks();        // number of used tracks
+
     int Speed();
 
 // SN++
     void moveTrack(int from,int to);
 //
 
-    void Clock2String(int Clock, char *buf);
-    int String2Clock(const char *buf);
+    void ClockToString(int Clock, std::string& ClockString) const;
 
-    // merge Events from all Tracks into Destin
+    int StringToClock(const std::string& ClockString) const;
+
+    // Merge events from all tracks into the destination array.
     void MergeTracks(
       int FrClock,
       int ToClock,
@@ -112,26 +129,114 @@ class JZSong
       tEventArray *Destin,
       int recursionDepth);
 
-    void SetTicksPerQuarter(int NewTicks);
-
     int SetMeterChange(
       int BarNr,
       int Numerator,
       int Denomiator); //  0 = ok
 
-    int GetIntroLength() const
-    {
-      return intro_length;
-    }
+  private:
 
-    void SetIntroLength(int x)
-    {
-      intro_length = x;
-    }
+    void MakeMetronome(
+      int FrClock,
+      int ToClock,
+      tEventArray *Destin,
+      const JZMetronomeInfo& MetronomeInfo,
+      int delta = 0);
 
   private:
 
-    int intro_length;
+    // This value sindicates the end of song in quarter notes for scrollbar
+    // settings.
+    int mMaxQuarters;
+
+    int mTicksPerQuarter;
+
+    int mIntroLength;
+
+  public:
+
+    int mTrackCount;
+    JZTrack mTracks[eMaxTrackCount];
 };
+
+//*****************************************************************************
+// Description:
+//   These are the bar information class inline member functions.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZBarInfo::GetBarIndex() const
+{
+  return mBarIndex;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZBarInfo::GetClock() const
+{
+  return mClock;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZBarInfo::GetTicksPerBar() const
+{
+  return mTicksPerBar;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZBarInfo::GetCountsPerBar() const
+{
+  return mCountsPerBar;
+}
+
+//*****************************************************************************
+// Description:
+//   These are the song class inline member functions.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZSong::GetMaxQuarters() const
+{
+  return mMaxQuarters;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZSong::GetTicksPerQuarter() const
+{
+  return mTicksPerQuarter;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZSong::GetTrackCount() const
+{
+  return mTrackCount;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZSong::GetIntroLength() const
+{
+  return mIntroLength;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+void JZSong::SetIntroLength(int IntroLength)
+{
+  mIntroLength = IntroLength;
+}
 
 #endif // !defined(JZ_SONG_H)

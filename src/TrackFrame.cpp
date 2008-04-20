@@ -164,7 +164,7 @@ void JZTrackFrame::CreateToolBar()
     { ID_PLAY,             false, play_xpm,     "start play"},
     { ID_PLAY_LOOP,        false, playloop_xpm, "loop play"},
     { ID_RECORD,           false, record_xpm,   "record"},
-    { ID_METRONOME_TOGGLE, true, metro_xpm,    "metronome" },
+    { ID_METRONOME_TOGGLE, true, metro_xpm,     "metronome" },
     { JZToolBar::eToolBarSeparator },
     { wxID_ZOOM_IN,       false, zoomin_xpm,  "zoom in" },
     { wxID_ZOOM_OUT,      false, zoomout_xpm, "zoom out"},

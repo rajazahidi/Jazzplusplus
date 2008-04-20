@@ -25,13 +25,15 @@
 
 class wxProperty;
 
-class tKeyDlg
+//*****************************************************************************
+//*****************************************************************************
+class JZKeyDialog
 {
   public:
 
-    tKeyDlg(const char* pTitle, int Key);
+    JZKeyDialog(const char* pTitle, int Key);
 
-    ~tKeyDlg();
+    ~JZKeyDialog();
 
   //wxFormItem *mkFormItem(int w);
 

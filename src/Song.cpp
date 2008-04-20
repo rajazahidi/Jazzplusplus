@@ -29,38 +29,146 @@
 //#include "Command.h"
 //#include "Audio.h"
 #include "Metronome.h"
+#include "StringUtilities.h"
 
+#include <sstream>
+#include <iomanip>
 
-JZSong::JZSong()
-  : mTracks()
+using namespace std;
+
+//*****************************************************************************
+// Description:
+//   This is the bar information class definition.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZBarInfo::JZBarInfo(const JZSong& Song)
+  : mBarIndex(0),
+    mClock(0),
+    mCountsPerBar(4),
+    mTicksPerQuarter(Song.GetTicksPerQuarter()),
+    mTicksPerBar(mTicksPerQuarter * 4),
+    mIterator(&Song.mTracks[0]),
+    mpEvent(0)
 {
-  nTracks = eMaxTrackCount;
-  TicksPerQuarter = 120;
-  intro_length = 0;
-
-  // Start with 100 measures of 4:4 time.
-  MaxQuarters = 100 * 4;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZBarInfo::SetBar(int BarIndex)
+{
+  if (BarIndex < 0)  // avoid infinite loop
+  {
+    BarIndex = 0;
+  }
+
+  mBarIndex = BarIndex;
+  mClock = 0;
+  mTicksPerBar = mTicksPerQuarter * 4;
+  mpEvent = mIterator.First();
+  while (1)
+  {
+    // Events bis Taktanfang nach MeterChange durchsuchen
+    // Meter-Event vor oder genau auf Taktanfang stehen
+    while (mpEvent && mpEvent->GetClock() <= mClock)
+    {
+      mpEvent->BarInfo(mTicksPerBar, mCountsPerBar, mTicksPerQuarter);
+      mpEvent = mIterator.Next();
+    }
+
+    if (!BarIndex)
+    {
+      return;
+    }
+
+    // Clock + Bar auf Anfang naechster Takt
+    --BarIndex;
+    mClock += mTicksPerBar;
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZBarInfo::SetClock(int Clock)
+{
+  mBarIndex = 0;
+  mClock = 0;
+  mTicksPerBar = mTicksPerQuarter * 4;
+  mpEvent = mIterator.First();
+  while (1)
+  {
+    while (mpEvent && mpEvent->GetClock() <= mClock)
+    {
+      mpEvent->BarInfo(mTicksPerBar, mCountsPerBar, mTicksPerQuarter);
+      mpEvent = mIterator.Next();
+    }
+
+    if (mClock + mTicksPerBar > Clock)
+    {
+      return;
+    }
+
+    // Clock + Bar auf Anfang naechster Takt
+    mClock += mTicksPerBar;
+    ++mBarIndex;
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZBarInfo::Next()
+{
+  ++mBarIndex;
+  mClock += mTicksPerBar;
+
+  while (mpEvent && mpEvent->GetClock() <= mClock)
+  {
+    mpEvent->BarInfo(mTicksPerBar, mCountsPerBar, mTicksPerQuarter);
+    mpEvent = mIterator.Next();
+  }
+}
+
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZSong::JZSong()
+  : // Start with 100 measures of 4:4 time.
+    mMaxQuarters(100 * 4),
+
+    mTicksPerQuarter(120),
+    mIntroLength(0),
+    mTrackCount(eMaxTrackCount),
+    mTracks()
+{
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZSong::~JZSong()
 {
   Clear();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSong::Clear()
 {
-  for (int i = 0; i < nTracks; i++)
+  for (int i = 0; i < mTrackCount; i++)
   {
     mTracks[i].Clear();
   }
-  nTracks = eMaxTrackCount;
+  mTrackCount = eMaxTrackCount;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZSong::Speed()
 {
   return mTracks[0].GetDefaultSpeed();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSong::Read(JZReadBase& Io, const char* pFileName)
 {
   int i;
@@ -75,28 +183,29 @@ void JZSong::Read(JZReadBase& Io, const char* pFileName)
     mTracks[i].Read(Io);
   }
   Io.Close();
-  TicksPerQuarter = Io.GetTicksPerQuarter();
+  mTicksPerQuarter = Io.GetTicksPerQuarter();
 
-  if (TicksPerQuarter < 48)
+  if (mTicksPerQuarter < 48)
   {
     SetTicksPerQuarter(48);
   }
-  else if (TicksPerQuarter > 192)
+  else if (mTicksPerQuarter > 192)
   {
     SetTicksPerQuarter(192);
   }
 
   // Adjust the song length to equal the MIDI file length plus 16 bars.
-  int NewLength = GetLastClock() / TicksPerQuarter + 16 * 4;
-  if (NewLength > MaxQuarters)
+  int NewLength = GetLastClock() / mTicksPerQuarter + 16 * 4;
+  if (NewLength > mMaxQuarters)
   {
-    MaxQuarters = NewLength;
+    mMaxQuarters = NewLength;
   }
 
   wxEndBusyCursor();
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSong::Write(JZWriteBase& Io, const char* pFileName)
 {
   // Make sure track 0 has a synth reset
@@ -106,7 +215,7 @@ void JZSong::Write(JZWriteBase& Io, const char* pFileName)
   }
 
   int n = NumUsedTracks();
-  if (!Io.Open(pFileName, n, TicksPerQuarter))
+  if (!Io.Open(pFileName, n, mTicksPerQuarter))
   {
     return;
   }
@@ -120,94 +229,145 @@ void JZSong::Write(JZWriteBase& Io, const char* pFileName)
   wxEndBusyCursor();
 }
 
-
-JZTrack *JZSong::GetTrack(int Nr)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZTrack* JZSong::GetTrack(int TrackIndex)
 {
-  if (Nr >= 0 && Nr < nTracks)
+  if (TrackIndex >= 0 && TrackIndex < mTrackCount)
   {
-    return &mTracks[Nr];
+    return &mTracks[TrackIndex];
   }
   return 0;
 }
 
-
-int JZSong::GetLastClock()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZSong::GetLastClock() const
 {
-  int max = 0;
-  for (int i = 0; i < nTracks; i++)
+  int LastClock = 0;
+  for (int i = 0; i < mTrackCount; ++i)
   {
-    int clk = mTracks[i].GetLastClock();
-    if (clk > max)
+    int Clock = mTracks[i].GetLastClock();
+    if (Clock > LastClock)
     {
-      max = clk;
+      LastClock = Clock;
     }
   }
-  return max;
+  return LastClock;
 }
 
-
-void JZSong::Clock2String(int clk, char *buf)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZSong::ClockToString(int Clock, string& ClockString) const
 {
-  JZBarInfo b(this);
-  b.SetClock(clk);
-  clk -= b.Clock;
-  int TicksPerCount = b.TicksPerBar / b.CountsPerBar;
-  int Count = clk / TicksPerCount;
+  JZBarInfo BarInfo(*this);
+  BarInfo.SetClock(Clock);
+  Clock -= BarInfo.GetClock();
+  int TicksPerCount = BarInfo.GetTicksPerBar() / BarInfo.GetCountsPerBar();
+  int Count = Clock / TicksPerCount;
+
+  ostringstream Oss;
+  Oss
+    << setw(3) << BarInfo.GetBarIndex() + 1 - mIntroLength
+    << ':' << Count + 1
+    << ':' << setw(3) << setfill('0') << Clock % TicksPerCount;
+  ClockString = Oss.str();
+#ifdef TEST_CLOCK_TO_STRING
+  char Buffer[500];
   sprintf(
-    buf,
+    Buffer,
     "%3d:%d:%03d",
-    b.BarNr + 1 - intro_length,
+    BarInfo.GetBarIndex() + 1 - mIntroLength,
     Count + 1,
-    clk % TicksPerCount);
+    Clock % TicksPerCount);
+  if (ClockString != string(buf))
+  {
+    cout << ClockString << '\n' << buf << endl;
+  }
+#endif // TEST_CLOCK_TO_STRING
 }
 
-int JZSong::String2Clock(const char* buf)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZSong::StringToClock(const string& ClockString) const
 {
   int Bar = 1;
   int Clock = 0;
   int Count = 1;
-  sscanf(buf, "%d:%d:%d", &Bar, &Count, &Clock);
+//OLD  sscanf(buf, "%d:%d:%d", &Bar, &Count, &Clock);
+
+  const string Delimiters(":");
+  vector<string> Tokens;
+  if (TNStringUtilities::Tokenize(Delimiters, ClockString, Tokens) < 3)
+  {
+    return 0;
+  }
+
+  istringstream Iss;
+
+  Iss.clear();
+  Iss.str(Tokens[0]);
+  Iss >> Bar;
+
+  // Adjust for the start count index.  Users start with 1; the code starts
+  // with 0.
   --Bar;
+
+  // The string is from user input so we must adjust by the intro length.
+  Bar += mIntroLength;
+
+  Iss.clear();
+  Iss.str(Tokens[1]);
+  Iss >> Count;
+
+  // Adjust for the start count index.  Users start with 1; the code starts
+  // with 0.
   --Count;
-  Bar += intro_length;  // buf is from user input!
-  JZBarInfo BarInfo(this);
+
+  Iss.clear();
+  Iss.str(Tokens[2]);
+  Iss >> Clock;
+
+  JZBarInfo BarInfo(*this);
   BarInfo.SetBar(Bar);
-  int TicksPerCount = BarInfo.TicksPerBar / BarInfo.CountsPerBar;
-  return BarInfo.Clock + Count * TicksPerCount + Clock;
+  int TicksPerCount = BarInfo.GetTicksPerBar() / BarInfo.GetCountsPerBar();
+  return BarInfo.GetClock() + Count * TicksPerCount + Clock;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSong::MergeTracks(
   int FrClock,
   int ToClock,
-  tEventArray *Destin,
+  tEventArray* Destin,
   const JZMetronomeInfo& MetronomeInfo,
   int delta,
   int mode)
 {
-  int i;
-
   // Make metronome
   if (MetronomeInfo.IsOn())
   {
     MakeMetronome(FrClock, ToClock, Destin, MetronomeInfo, delta);
   }
 
-  // Find Solo-Tracks
-  int solo = 0;
-  for (i = 0; i < nTracks; i++)
+  // Find solo-tracks.
+  int i;
+  bool DoSoloTracksExist = false;
+  for (i = 0; i < mTrackCount; i++)
   {
     if (mTracks[i].State == tsSolo)
     {
-      solo = 1;
+      DoSoloTracksExist = true;
       break;
     }
   }
 
-  for (i = 0; i < nTracks; ++i)
+  for (i = 0; i < mTrackCount; ++i)
   {
     JZTrack* pTrack = &mTracks[i];
-    if (pTrack->State == tsSolo || (!solo && pTrack->State == tsPlay))
+    if (
+      pTrack->State == tsSolo ||
+      (!DoSoloTracksExist && pTrack->State == tsPlay))
     {
       if (pTrack->GetAudioMode() != mode)
       {
@@ -215,47 +375,63 @@ void JZSong::MergeTracks(
       }
 
       tEventIterator Iterator(&mTracks[i]);
-      JZEvent *e = Iterator.Range(FrClock, ToClock);
-      while (e)
+      JZEvent* pEvent = Iterator.Range(FrClock, ToClock);
+      while (pEvent)
       {
-        JZEvent *c = e->Copy();
-        c->SetClock(c->GetClock() + delta);
-        c->SetDevice(pTrack->GetDevice());
-        Destin->Put(c);
+        JZEvent* pEventCopy = pEvent->Copy();
+        pEventCopy->SetClock(pEventCopy->GetClock() + delta);
+        pEventCopy->SetDevice(pTrack->GetDevice());
+        Destin->Put(pEventCopy);
 
-        if(c->IsPlayTrack())
+        if (pEventCopy->IsPlayTrack())
         {
-          MergePlayTrackEvent(c->IsPlayTrack(), Destin, 0);
+          MergePlayTrackEvent(pEventCopy->IsPlayTrack(), Destin, 0);
         }
 
-        e = Iterator.Next();
+        pEvent = Iterator.Next();
       }
     }
   }
 }
 
-//should call recursively, so playtrack events will resolve playtrack events
+//-----------------------------------------------------------------------------
+// Should call recursively, so playtrack events will resolve playtrack events.
+//-----------------------------------------------------------------------------
 void JZSong::MergePlayTrackEvent(
   tPlayTrack* c, //the playtrack event
-  tEventArray *Destin,
+  tEventArray* Destin,
   int recursionDepth)
 {
-  //recursion might be simple, but we have the infinite loop problem, if a playtrack point to itself, either directly or indirectly
-  //we probaly need to keep a list of seen tracks, simpler is to limit the recursion level to 100 or something.
-  //the actual recursion is done later in the loop
+  // Recursion might be simple, but we have the infinite loop problem, if a
+  // playtrack point to itself, either directly or indirectly.
+  // We probaly need to keep a list of seen tracks, simpler is to limit the
+  // recursion level to 100 or something.
+  // The actual recursion is done later in the loop.
   recursionDepth++;
-  if(recursionDepth>100) //yes yes, you should use symbolics...
+  if (recursionDepth > 100) //yes yes, you should use symbolics...
+  {
     return;
-  fprintf(stderr, "playtrack %d\n",c->track);
-  JZTrack* pTrack = &mTracks[c->track];//the track we want to play
-  tEventIterator IteratorPL(pTrack); //get an iterator of all events the playtrack is pointing to
-  JZEvent *f;
+  }
 
-  //FIXME this is just to test the idea, it would be good to modify getlastclock instead i think
-  //find an EOT event, otherwise default to the last clock(should be + length of the last event as well)
+  fprintf(stderr, "playtrack %d\n", c->track);
+  JZTrack* pTrack = &mTracks[c->track]; // the track we want to play
+
+  // Get an iterator of all events the playtrack is pointing to.
+  tEventIterator IteratorPL(pTrack);
+  JZEvent* f;
+
+  // FIXME this is just to test the idea.  It would be good to modify
+  // GetLastClock instead.
+  // Find an EOT event, otherwise default to the last clock (should be +
+  // length of the last event as well).
   int loopLength = 0;
-  tEventIterator IteratorEOT(pTrack); //get an iterator of all events the playtrack is pointing to
+
+  // Get an iterator of all events the playtrack is pointing to.
+  tEventIterator IteratorEOT(pTrack);
   f = IteratorEOT.Range(0, pTrack->GetLastClock());
+
+  // looplength will be used to loop the track, for the duration of
+  // the playtrack event.
   loopLength = pTrack->GetLastClock();
   while(f)
   {
@@ -266,9 +442,7 @@ void JZSong::MergePlayTrackEvent(
     f = IteratorEOT.Next();
   }
 
-  // looplength will be used to loop the track, for the duration of
-  // the playtrack event.
-  int loopOffset=0;
+  int loopOffset = 0;
 
   //   The loop below is supposed to repeat the referenced track for the
   // duration of the playtrack event.  Also, we should look out for if we
@@ -281,16 +455,18 @@ void JZSong::MergePlayTrackEvent(
   // There would still be a problem with playtracks not even bar length.
   while(loopOffset < c->eventlength)
   {
-    f = IteratorPL.Range(0, (c->eventlength-loopOffset));  //no more events then the length of the playtrack! and ensure last iteration is no longer than what is left
+    // No more events than the length of the playtrack!  and ensure the last
+    // iteration is no longer than what is left.
+    f = IteratorPL.Range(0, (c->eventlength-loopOffset));
     while (f)
     {
-      JZEvent *d = f->Copy();
+      JZEvent* d = f->Copy();
       d->SetClock(d->GetClock() + c->GetClock() + loopOffset);
-      if(d->IsKeyOn())
+      if (d->IsKeyOn())
       {
-        d->IsKeyOn()->Key += c->transpose;
+        d->IsKeyOn()->mKey += c->transpose;
       }
-      if(d->IsPlayTrack())
+      if (d->IsPlayTrack())
       {
         MergePlayTrackEvent(d->IsPlayTrack(), Destin, recursionDepth);
       }
@@ -302,31 +478,32 @@ void JZSong::MergePlayTrackEvent(
   }
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSong::MakeMetronome(
   int FrClock,
   int ToClock,
-  tEventArray *Destin,
+  tEventArray* Destin,
   const JZMetronomeInfo& MetronomeInfo,
   int delta)
 {
-  JZBarInfo BarInfo( this );
+  JZBarInfo BarInfo(*this);
   BarInfo.SetClock(FrClock);
-  int clk = BarInfo.Clock;
+  int clk = BarInfo.GetClock();
   int count = 1;
 
   while (clk < FrClock)
   {
-    clk += BarInfo.TicksPerBar / BarInfo.CountsPerBar;
+    clk += BarInfo.GetTicksPerBar() / BarInfo.GetCountsPerBar();
     count++;
   }
 
   while (clk < ToClock)
   {
-    if (count > BarInfo.CountsPerBar)
+    if (count > BarInfo.GetCountsPerBar())
     {
       BarInfo.Next();
-      clk = BarInfo.Clock;
+      clk = BarInfo.GetClock();
       count = 1;
     }
 
@@ -340,181 +517,93 @@ void JZSong::MakeMetronome(
       Destin->Put(MetronomeInfo.CreateAccentedEvent(clk + delta));
     }
 
-    clk += BarInfo.TicksPerBar / BarInfo.CountsPerBar;
+    clk += BarInfo.GetTicksPerBar() / BarInfo.GetCountsPerBar();
     count++;
   }
 }
 
-
-// ********************************************************************
-// BarInfo
-// *******************************************************************
-
-
-JZBarInfo::JZBarInfo(JZSong *Song)
-  : Iterator(&Song->mTracks[0])
-{
-  BarNr = 0;
-  Clock = 0;
-  TicksPerQuarter = Song->TicksPerQuarter;
-  CountsPerBar = 4;
-  TicksPerBar = TicksPerQuarter * 4;
-}
-
-
-void JZBarInfo::SetBar(int barnr)
-{
-  if (barnr < 0)  // avoid infinite loop
-    barnr = 0;
-
-  BarNr = barnr;
-  Clock = 0;
-  TicksPerBar = TicksPerQuarter * 4;
-  e = Iterator.First();
-  while (1)
-  {
-    // Events bis Taktanfang nach MeterChange durchsuchen
-    // Meter-Event vor oder genau auf Taktanfang stehen
-    while (e && e->GetClock() <= Clock)
-    {
-      e->BarInfo(TicksPerBar, CountsPerBar, TicksPerQuarter);
-      e = Iterator.Next();
-    }
-
-    if (!barnr)
-      return;
-
-    // Clock + Bar auf Anfang naechster Takt
-    -- barnr;
-    Clock += TicksPerBar;
-  }
-}
-
-
-void JZBarInfo::SetClock(int clock)
-{
-  BarNr = 0;
-  Clock = 0;
-  TicksPerBar = TicksPerQuarter * 4;
-  e = Iterator.First();
-  while (1)
-  {
-    while (e && e->GetClock() <= Clock)
-    {
-      e->BarInfo(TicksPerBar, CountsPerBar, TicksPerQuarter);
-      e = Iterator.Next();
-    }
-
-    if (Clock + TicksPerBar > clock)
-      return;
-
-    // Clock + Bar auf Anfang naechster Takt
-    Clock += TicksPerBar;
-    ++ BarNr;
-  }
-}
-
-
-void JZBarInfo::Next()
-{
-  ++ BarNr;
-  Clock += TicksPerBar;
-
-  while (e && e->GetClock() <= Clock)
-  {
-    e->BarInfo(TicksPerBar, CountsPerBar, TicksPerQuarter);
-    e = Iterator.Next();
-  }
-}
-
-
-// ***********************************************************************
-// Undo
-// ***********************************************************************
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSong::NewUndoBuffer()
 {
-  for (int i = 0; i < nTracks; ++i)
+  for (int i = 0; i < mTrackCount; ++i)
   {
     mTracks[i].NewUndoBuffer();
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSong::Undo()
 {
   wxBeginBusyCursor();
-  for (int i = 0; i < nTracks; ++i)
+  for (int i = 0; i < mTrackCount; ++i)
   {
     mTracks[i].Undo();
   }
   wxEndBusyCursor();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSong::Redo()
 {
   wxBeginBusyCursor();
-  for (int i = 0; i < nTracks; ++i)
+  for (int i = 0; i < mTrackCount; ++i)
   {
     mTracks[i].Redo();
   }
   wxEndBusyCursor();
 }
 
-// ***********************************************************************
-// SetTicksPerQuarter
-// ***********************************************************************
-
-void JZSong::SetTicksPerQuarter(int NewTicks)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZSong::SetTicksPerQuarter(int TicksPerQuarter)
 {
-  int tt, ee;
-
-  double f = (double)NewTicks / (double)TicksPerQuarter;
-  for (tt = 0; tt < nTracks; ++tt)
+  double f = (double)TicksPerQuarter / (double)mTicksPerQuarter;
+  for (int TrackIndex = 0; TrackIndex < mTrackCount; ++TrackIndex)
   {
-    JZTrack* pTrack = &mTracks[tt];
-    for (ee = 0; ee < pTrack->nEvents; ee++)
+    JZTrack* pTrack = &mTracks[TrackIndex];
+    for (int EventIndex = 0; EventIndex < pTrack->nEvents; ++EventIndex)
     {
-      JZEvent *e = pTrack->Events[ee];
-      e->SetClock((int)(f * e->GetClock() + 0.5));
-      tKeyOn *k = e->IsKeyOn();
-      if (k)
+      JZEvent* pEvent = pTrack->Events[EventIndex];
+      pEvent->SetClock((int)(f * pEvent->GetClock() + 0.5));
+      tKeyOn* pKeyOn = pEvent->IsKeyOn();
+      if (pKeyOn)
       {
-        k->Length = (int)(f * k->Length + 0.5);
+        pKeyOn->mLength = (int)(f * pKeyOn->mLength + 0.5);
       }
     }
   }
-  TicksPerQuarter = NewTicks;
+  mTicksPerQuarter = TicksPerQuarter;
 }
 
-// ***********************************************************************
-// SetMeterChange
-// ***********************************************************************
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZSong::SetMeterChange(int BarNr, int Numerator, int Denomiator)
 {
-
   NewUndoBuffer();
 
   // Clock Taktanfang und -ende
 
-  JZBarInfo BarInfo(this);
+  JZBarInfo BarInfo(*this);
   BarInfo.SetBar(BarNr - 1);
-  int FrClock = BarInfo.Clock;
+  int FrClock = BarInfo.GetClock();
   BarInfo.Next();
-  int ToClock = BarInfo.Clock;
+  int ToClock = BarInfo.GetClock();
 
   // evtl vorhandene TimeSignatures loeschen
 
   JZTrack* pTrack = &mTracks[0];
   tEventIterator Iterator(pTrack);
-  JZEvent *e = Iterator.Range(FrClock, ToClock);
-  while (e)
+  JZEvent* pEvent = Iterator.Range(FrClock, ToClock);
+  while (pEvent)
   {
-    if (e->IsTimeSignat())
+    if (pEvent->IsTimeSignat())
     {
-      pTrack->Kill(e);
+      pTrack->Kill(pEvent);
     }
-    e = Iterator.Next();
+    pEvent = Iterator.Next();
   }
 
   // neues TimeSignature Event ablegen
@@ -530,46 +619,48 @@ int JZSong::SetMeterChange(int BarNr, int Numerator, int Denomiator)
     case 32: Shift = 5; break;
   }
 
-  e = new tTimeSignat(FrClock, Numerator, Shift);
-  pTrack->Put(e);
+  pEvent = new tTimeSignat(FrClock, Numerator, Shift);
+  pTrack->Put(pEvent);
   pTrack->Cleanup();
   return 0;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZSong::NumUsedTracks()
 {
-  int n;
-  for (n = nTracks; n > 1; n--)
+  int UsedTrackCount;
+  for (UsedTrackCount = mTrackCount; UsedTrackCount > 1; --UsedTrackCount)
   {
-    if (!mTracks[n - 1].IsEmpty())
+    if (!mTracks[UsedTrackCount - 1].IsEmpty())
     {
       break;
     }
   }
-  return n;
+  return UsedTrackCount;
 }
 
-
+//-----------------------------------------------------------------------------
 // SN++
+//-----------------------------------------------------------------------------
 void JZSong::moveTrack(int from, int to)
 {
-  JZTrack* pTrack;
-  int i;
+  if (from == to)
+  {
+    return;
+  }
 
-  if (from == to) return;
-
-  pTrack = &mTracks[from];
+  JZTrack* pTrack = &mTracks[from];
   if (from > to)
   {
-    for (i = from; i >= to; i--)
+    for (int i = from; i >= to; --i)
     {
        mTracks[i] = mTracks[i - 1];
     }
   }
   else
   {
-    for (i = from; i <= to; i++)
+    for (int i = from; i <= to; ++i)
     {
        mTracks[i] = mTracks[i + 1];
     }

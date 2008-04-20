@@ -77,17 +77,20 @@ void tCtrlEditBase::Create(
 
   wxBoxSizer *topsizer = new wxBoxSizer( wxVERTICAL );
 
-  if (!ctrlmode) {
-    topsizer->Add(new wxButton(panel, -1,   "Apply")) ;
+  if (!ctrlmode)
+  {
+    topsizer->Add(new wxButton(panel, wxID_ANY, "Apply")) ;
     //(wxFunction)Apply,
-    topsizer->Add(new wxButton(panel, -1,  "Revert")) ;
+    topsizer->Add(new wxButton(panel, wxID_ANY, "Revert")) ;
     //(wxFunction)Revert,
 
     //(void)new wxButton(panel, (wxFunction)Bars,   "Bars");
-  } else {
-    topsizer->Add(new wxButton(panel, -1,  "Create"));  // create new events (wxFunction)Apply,
-    topsizer->Add(new wxButton(panel, -1,    "Change"));  // change existing events (wxFunction)Edit,
-    topsizer->Add(new wxButton(panel, -1, "Revert")); //(wxFunction)Revert,
+  }
+  else
+  {
+    topsizer->Add(new wxButton(panel, wxID_ANY, "Create"));  // create new events (wxFunction)Apply,
+    topsizer->Add(new wxButton(panel, wxID_ANY,"Change"));  // change existing events (wxFunction)Edit,
+    topsizer->Add(new wxButton(panel, wxID_ANY, "Revert")); //(wxFunction)Revert,
     //(void)new wxButton(panel, (wxFunction)Bars,   "Bars");
   }
   ctrlmode = 0;
@@ -115,7 +118,10 @@ tCtrlEditBase::~tCtrlEditBase()
 // SN++
 void tCtrlEditBase::UpDate()
 {
-  if (!selectable) return;
+  if (!selectable)
+  {
+    return;
+  }
   OnRevert();
 }
 //
@@ -157,16 +163,21 @@ int tCtrlEditBase::Clock2Val(long clock)
 {
   long i = Clock2i(clock);
   if (i >= i_max-1)
-    /* PAT - The following ifdef was removed due to changes in gcc 3.x.  If it
-       needs to be put back for compatibility purposes, it will need to return
-       in an alternate form. */
-    /*#ifdef FOR_MSW*/
-    return array[(int)(i_max-1)];
+  {
+    //* PAT - The following ifdef was removed due to changes in gcc 3.x.  If
+    // it needs to be put back for compatibility purposes, it will need to
+    // return in an alternate form.
+//    #ifdef FOR_MSW
+    return array[(int)(i_max - 1)];
+  }
   return array[(int)i];
-  /*#else
-    return array[i_max-1];
-  return array[i];
-  #endif*/
+//#else
+//  {
+//    return array[i_max-1];
+//  }
+//  return array[i];
+//#endif
+
 #if 0
   long v1 = array[i];
   long v2 = array[i+1];
@@ -186,28 +197,30 @@ void tCtrlEditBase::OnRevert()
 
   if (sticky && !selectable)
   {
-    JZEvent *e = iter.Range(0, from_clock);
-    while (e)
+    JZEvent* pEvent = iter.Range(0, from_clock);
+    while (pEvent)
     {
-      if (IsCtrlEdit(e))
+      if (IsCtrlEdit(pEvent))
       {
-        val = GetValue(e);
+        val = GetValue(pEvent);
       }
-      e = iter.Next();
+      pEvent = iter.Next();
     }
   }
 
-  JZEvent *e = iter.Range(from_clock, to_clock);
+  JZEvent* pEvent = iter.Range(from_clock, to_clock);
 
   for (i = 0; i < array.Size(); i++)
+  {
     array[i] = val;
+  }
 
   i = 0;
-  while (e)
+  while (pEvent)
   {
-    if (IsCtrlEdit(e))
+    if (IsCtrlEdit(pEvent))
     {
-      int k = Clock2i(e->GetClock());
+      int k = Clock2i(pEvent->GetClock());
       if (sticky)
       {
         while (i < k)
@@ -215,14 +228,18 @@ void tCtrlEditBase::OnRevert()
           array[i++] = val;
         }
       }
-      val = GetValue(e);
+      val = GetValue(pEvent);
       array[k] = val;
     }
-    e = iter.Next();
+    pEvent = iter.Next();
   }
   if (sticky && !selectable)
+  {
     while (i < array.Size())
+    {
       array[i++] = val;
+    }
+  }
 
   edit->Refresh();
 }
@@ -243,30 +260,32 @@ void tCtrlEditBase::OnApply()
   // delete old events, but skip clock 0 to preserve track defaults:
   // (dirty but might work...)
   tEventIterator iter(track);
-  JZEvent *e = iter.Range(std::max(1L, from_clock), to_clock);
+  JZEvent* pEvent = iter.Range(std::max(1L, from_clock), to_clock);
   int old_val = Missing();
 
 // SN++ events nur im apply-mode loeschen!
   if (!ctrlmode)
   {
-    while (e)
+    while (pEvent)
     {
-      if (IsCtrlEdit(e))
-        track->Kill(e);
-      e = iter.Next();
+      if (IsCtrlEdit(pEvent))
+      {
+        track->Kill(pEvent);
+      }
+      pEvent = iter.Next();
     }
 
     // find any previous events
     if (sticky)
     {
-      e = iter.Range(0, from_clock - 1);
-      while (e)
+      pEvent = iter.Range(0, from_clock - 1);
+      while (pEvent)
       {
-        if (IsCtrlEdit(e))
+        if (IsCtrlEdit(pEvent))
         {
-          old_val = GetValue(e);
+          old_val = GetValue(pEvent);
         }
-        e = iter.Next();
+        pEvent = iter.Next();
       }
     }
 
@@ -279,8 +298,8 @@ void tCtrlEditBase::OnApply()
 
       if (old_val != new_val)
       {
-        e = NewEvent(clock, new_val);
-        track->Put(e);
+        pEvent = NewEvent(clock, new_val);
+        track->Put(pEvent);
         old_val = new_val;
       }
     }
@@ -290,20 +309,20 @@ void tCtrlEditBase::OnApply()
     // edit mode: Erzeugt keine neuen Events sondern aendert den Wert
     // bestehender Events.
     // SN++
-    tControl *cpy;
-    while (e)
+    tControl* pControlCopy;
+    while (pEvent)
     {
-      if(IsCtrlEdit(e))
+      if (IsCtrlEdit(pEvent))
       {
-        if (Clock2Val(e->GetClock()) != e->IsControl()->Value)
+        if (Clock2Val(pEvent->GetClock()) != pEvent->IsControl()->Value)
         {
-          cpy = e->Copy()->IsControl();
-          cpy->Value = Clock2Val(e->GetClock());
-          track->Kill(e);
-          track->Put(cpy);
+          pControlCopy = pEvent->Copy()->IsControl();
+          pControlCopy->Value = Clock2Val(pEvent->GetClock());
+          track->Kill(pEvent);
+          track->Put(pControlCopy);
         }
       }
-      e = iter.Next();
+      pEvent = iter.Next();
     }
   }
 
@@ -359,25 +378,27 @@ void tCtrlEditBase::OnEdit()
 // av: called by tArrayEdit::OnPaint
 void tCtrlEditBase::DrawBars(wxDC* dc)
 {
-  JZBarInfo BarInfo(mpPianoWindow->GetSong());
+  JZBarInfo BarInfo(*mpPianoWindow->GetSong());
   BarInfo.SetClock(from_clock);
   long gclk,x;
   int  ii;
   if (bars_state > 0)
   {
-    gclk = BarInfo.Clock;
+    gclk = BarInfo.GetClock();
     while (gclk < to_clock)
     {
-      gclk = BarInfo.Clock;
+      gclk = BarInfo.GetClock();
       x = mpPianoWindow->Clock2x(gclk-from_clock);
       edit->DrawBarLine(dc, x - x_off);
       if (bars_state == 2)
-        for (ii = 0; ii < BarInfo.CountsPerBar; ii++)
+      {
+        for (ii = 0; ii < BarInfo.GetCountsPerBar(); ++ii)
         {
-          gclk += BarInfo.TicksPerBar / BarInfo.CountsPerBar;
+          gclk += BarInfo.GetTicksPerBar() / BarInfo.GetCountsPerBar();
           x = mpPianoWindow->Clock2x(gclk-from_clock);
           edit->DrawBarLine(dc, x - x_off);
         }
+      }
       BarInfo.Next();
     }
   }
@@ -403,14 +424,14 @@ int tPitchEdit::Missing()
   return 0;
 }
 
-int tPitchEdit::IsCtrlEdit(JZEvent *e)
+int tPitchEdit::IsCtrlEdit(JZEvent* pEvent)
 {
-  return e->IsPitch() != 0;
+  return pEvent->IsPitch() != 0;
 }
 
-int tPitchEdit::GetValue(JZEvent *e)
+int tPitchEdit::GetValue(JZEvent* pEvent)
 {
-  return e->IsPitch()->Value;
+  return pEvent->IsPitch()->Value;
 }
 
 JZEvent * tPitchEdit::NewEvent(long clock, int val)
@@ -440,21 +461,22 @@ tCtrlEdit::tCtrlEdit(
 
 int tCtrlEdit::Missing()
 {
-
   if (ctrl_num == 10)
+  {
     return 64;
+  }
   return 0;
 }
 
-int tCtrlEdit::IsCtrlEdit(JZEvent *e)
+int tCtrlEdit::IsCtrlEdit(JZEvent* pEvent)
 {
-  tControl *c = e->IsControl();
+  tControl *c = pEvent->IsControl();
   return (c && c->Control == ctrl_num);
 }
 
-int tCtrlEdit::GetValue(JZEvent *e)
+int tCtrlEdit::GetValue(JZEvent* pEvent)
 {
-  return e->IsControl()->Value;
+  return pEvent->IsControl()->Value;
 }
 
 JZEvent * tCtrlEdit::NewEvent(long clock, int val)
@@ -483,30 +505,30 @@ int tVelocEdit::Missing()
   return 1;
 }
 
-int tVelocEdit::IsCtrlEdit(JZEvent *e)
+int tVelocEdit::IsCtrlEdit(JZEvent* pEvent)
 {
   // SN++ Falls im PianoWin Events selektiert sind, werden nur diese
   //      Events geaendert
   if (!mpPianoWindow->mpSnapSel->Selected)
   {
-    return (e->IsKeyOn() != 0);
+    return (pEvent->IsKeyOn() != 0);
   }
   else
   {
-    if (e->IsKeyOn())
+    if (pEvent->IsKeyOn())
     {
       return (
-        mpPianoWindow->GetFilter()->IsSelected(e) &&
-        (e->GetClock() >= mpPianoWindow->GetFilter()->FromClock &&
-          e->GetClock() <= mpPianoWindow->GetFilter()->ToClock));
+        mpPianoWindow->GetFilter()->IsSelected(pEvent) &&
+        (pEvent->GetClock() >= mpPianoWindow->GetFilter()->FromClock &&
+          pEvent->GetClock() <= mpPianoWindow->GetFilter()->ToClock));
     }
   }
   return 0;
 }
 
-int tVelocEdit::GetValue(JZEvent *e)
+int tVelocEdit::GetValue(JZEvent* pEvent)
 {
-  return e->IsKeyOn()->Veloc;
+  return pEvent->IsKeyOn()->mVelocity;
 }
 
 void tVelocEdit::OnApply()
@@ -522,31 +544,36 @@ void tVelocEdit::OnApply()
   {
     from_clk = mpPianoWindow->GetFilter()->FromClock;
     to_clk   = mpPianoWindow->GetFilter()->ToClock;
-  } else {
+  }
+  else
+  {
     from_clk = from_clock;
     to_clk   = to_clock;
   }
 
-  JZEvent *e = iter.Range(from_clk, to_clk);
+  JZEvent* pEvent = iter.Range(from_clk, to_clk);
 
-  while (e) {
+  while (pEvent)
+  {
     // SN++ Falls im PianoWin Events selektiert sind, werden nur diese
     //      Events geaendert
-    if (!mpPianoWindow->mpSnapSel->Selected || mpPianoWindow->GetFilter()->IsSelected(e) )
-  {
-
-    tKeyOn *k = e->IsKeyOn();
-    if (k)
+    if (
+      !mpPianoWindow->mpSnapSel->Selected ||
+      mpPianoWindow->GetFilter()->IsSelected(pEvent))
     {
-      tKeyOn *cpy = k->Copy()->IsKeyOn();
 
-      int i = Clock2i(cpy->GetClock());
-      cpy->Veloc = array[i];
-      track->Kill(k);
-      track->Put(cpy);
+      tKeyOn* pKeyOn = pEvent->IsKeyOn();
+      if (pKeyOn)
+      {
+        tKeyOn* pKeyOnCopy = pKeyOn->Copy()->IsKeyOn();
+
+        int i = Clock2i(pKeyOnCopy->GetClock());
+        pKeyOnCopy->mVelocity = array[i];
+        track->Kill(pKeyOn);
+        track->Put(pKeyOnCopy);
+      }
     }
-    }
-    e = iter.Next();
+    pEvent = iter.Next();
   }
   track->Cleanup();
   wxEndBusyCursor();
@@ -578,28 +605,34 @@ int tPolyAfterEdit::Missing()
   return 0;
 }
 
-int tPolyAfterEdit::IsCtrlEdit(JZEvent *e)
+int tPolyAfterEdit::IsCtrlEdit(JZEvent* pEvent)
 {
   // SN++ Falls im PianoWin Events selektiert sind, werden nur diese
   //      Events geaendert
 
   if (!mpPianoWindow->mpSnapSel->Selected)
-  return e->IsKeyPressure() != 0;
+  {
+    return pEvent->IsKeyPressure() != 0;
+  }
   else
-      if (e->IsKeyPressure())
-      {
-        return (
-          mpPianoWindow->GetFilter()->IsSelected(e) &&
-          (e->GetClock() >= mpPianoWindow->GetFilter()->FromClock &&
-          e->GetClock() <= mpPianoWindow->GetFilter()->ToClock));
-      }
+  {
+    if (pEvent->IsKeyPressure())
+    {
+      return (
+        mpPianoWindow->GetFilter()->IsSelected(pEvent) &&
+        (pEvent->GetClock() >= mpPianoWindow->GetFilter()->FromClock &&
+        pEvent->GetClock() <= mpPianoWindow->GetFilter()->ToClock));
+    }
+  }
   return 0;
 }
 
-int tPolyAfterEdit::GetValue(JZEvent *e)
+int tPolyAfterEdit::GetValue(JZEvent* pEvent)
 {
-  if (e->IsKeyPressure())
-  return e->IsKeyPressure()->Value;
+  if (pEvent->IsKeyPressure())
+  {
+    return pEvent->IsKeyPressure()->Value;
+  }
   return -1;
 }
 
@@ -607,7 +640,7 @@ int tPolyAfterEdit::GetValue(JZEvent *e)
 void tPolyAfterEdit::OnApply()
 {
   static long from_clk, to_clk;
-  JZEvent *e;
+  JZEvent* pEvent;
 
   // SN++ Apply works only if some events are selected !!
   if (!mpPianoWindow->mpSnapSel->Selected)
@@ -634,36 +667,44 @@ void tPolyAfterEdit::OnApply()
   tKeyPressure *k;
   tKeyOn      *keyon;
 
-  if (!ctrlmode) { // OnApply
-  // SN++ Alle selektierten AfterTouch events loeschen
-    e = iter.Range(from_clk, to_clk);
-    while (e) {
-      if (!mpPianoWindow->mpSnapSel->Selected || mpPianoWindow->GetFilter()->IsSelected(e) )
+  if (!ctrlmode)
+  {
+    // OnApply
+
+    // SN++ Alle selektierten AfterTouch events loeschen
+    pEvent = iter.Range(from_clk, to_clk);
+    while (pEvent)
+    {
+      if (
+        !mpPianoWindow->mpSnapSel->Selected ||
+        mpPianoWindow->GetFilter()->IsSelected(pEvent))
       {
-        k = e->IsKeyPressure();
+        k = pEvent->IsKeyPressure();
         if (k)
         {
           track->Kill(k);
         }
       }
-      e = iter.Next();
+      pEvent = iter.Next();
     }
     // SN++ Neue Aftertouch's von KeyOn bis KeyLength einfuehgen;
     long key_end(-1), key_clk(-1);
     int  key_val = -1;
     int  key_cha(-1);
     JZEvent *after;
-    e = iter.Range(from_clk, to_clk);
-    while (e)
+    pEvent = iter.Range(from_clk, to_clk);
+    while (pEvent)
     {
-      if (!mpPianoWindow->mpSnapSel->Selected || mpPianoWindow->GetFilter()->IsSelected(e) )
+      if (
+        !mpPianoWindow->mpSnapSel->Selected ||
+        mpPianoWindow->GetFilter()->IsSelected(pEvent))
       {
-        keyon = e->IsKeyOn();
+        keyon = pEvent->IsKeyOn();
         if (keyon)
         {
           key_clk = keyon->GetClock() + 1;
-          key_end = keyon->GetClock() + keyon->Length;
-          key_val = keyon->Key;
+          key_end = keyon->GetClock() + keyon->mLength;
+          key_val = keyon->mKey;
           key_cha = keyon->Channel;
         }
         if (key_val>0)
@@ -685,7 +726,7 @@ void tPolyAfterEdit::OnApply()
           key_val = -1;
         }
       }
-      e = iter.Next();
+      pEvent = iter.Next();
     }
   }
   else
@@ -694,24 +735,26 @@ void tPolyAfterEdit::OnApply()
     // edit mode: Erzeugt keine neuen Events sondern aendert den Wert
     // bestehender Events.
     // SN++
-    e = iter.Range(from_clk, to_clk);
-    tKeyPressure *cpy;
-    while (e)
+    pEvent = iter.Range(from_clk, to_clk);
+    tKeyPressure* pKeyPressureCopy;
+    while (pEvent)
     {
-      if (!mpPianoWindow->mpSnapSel->Selected || mpPianoWindow->GetFilter()->IsSelected(e))
+      if (
+        !mpPianoWindow->mpSnapSel->Selected ||
+        mpPianoWindow->GetFilter()->IsSelected(pEvent))
       {
-        if(e->IsKeyPressure())
+        if (pEvent->IsKeyPressure())
         {
-          if (Clock2Val(e->GetClock()) != e->IsKeyPressure()->Value)
+          if (Clock2Val(pEvent->GetClock()) != pEvent->IsKeyPressure()->Value)
           {
-            cpy = e->Copy()->IsKeyPressure();
-            cpy->Value = Clock2Val(e->GetClock());
-            track->Kill(e);
-            track->Put(cpy);
+            pKeyPressureCopy = pEvent->Copy()->IsKeyPressure();
+            pKeyPressureCopy->Value = Clock2Val(pEvent->GetClock());
+            track->Kill(pEvent);
+            track->Put(pKeyPressureCopy);
           }
         }
       }
-      e = iter.Next();
+      pEvent = iter.Next();
     }
   }
 
@@ -742,14 +785,14 @@ int tChannelAfterEdit::Missing()
   return 0;
 }
 
-int tChannelAfterEdit::IsCtrlEdit(JZEvent *e)
+int tChannelAfterEdit::IsCtrlEdit(JZEvent* pEvent)
 {
-  return e->IsChnPressure() != 0;
+  return pEvent->IsChnPressure() != 0;
 }
 
-int tChannelAfterEdit::GetValue(JZEvent *e)
+int tChannelAfterEdit::GetValue(JZEvent* pEvent)
 {
-  return e->IsChnPressure()->Value;
+  return pEvent->IsChnPressure()->Value;
 }
 
 
@@ -772,32 +815,32 @@ void tChannelAfterEdit::OnApply()
   // delete old events, but skip clock 0 to preserve track defaults:
   // (dirty but might work...)
   tEventIterator iter(track);
-  JZEvent *e = iter.Range(std::max(1L, from_clock), to_clock);
+  JZEvent* pEvent = iter.Range(std::max(1L, from_clock), to_clock);
   int old_val = Missing();
 
   // SN++ events nur im apply-mode loeschen!
   if (!ctrlmode)
   {
-    while (e)
+    while (pEvent)
     {
-      if (IsCtrlEdit(e))
+      if (IsCtrlEdit(pEvent))
       {
-        track->Kill(e);
+        track->Kill(pEvent);
       }
-      e = iter.Next();
+      pEvent = iter.Next();
     }
 
     // find any previous events
     if (sticky)
     {
-      e = iter.Range(0, from_clock - 1);
-      while (e)
+      pEvent = iter.Range(0, from_clock - 1);
+      while (pEvent)
       {
-        if (IsCtrlEdit(e))
+        if (IsCtrlEdit(pEvent))
         {
-          old_val = GetValue(e);
+          old_val = GetValue(pEvent);
         }
-        e = iter.Next();
+        pEvent = iter.Next();
       }
     }
 
@@ -810,8 +853,8 @@ void tChannelAfterEdit::OnApply()
 
       if (old_val != new_val)
       {
-        e = NewEvent(clock, new_val);
-        track->Put(e);
+        pEvent = NewEvent(clock, new_val);
+        track->Put(pEvent);
         old_val = new_val;
       }
     }
@@ -821,20 +864,20 @@ void tChannelAfterEdit::OnApply()
     // edit mode: Erzeugt keine neuen Events sondern aendert den Wert
     // bestehender Events.
     // SN++
-    tChnPressure *cpy;
-    while (e)
+    tChnPressure* pChnPressureCopy;
+    while (pEvent)
     {
-      if(IsCtrlEdit(e))
+      if (IsCtrlEdit(pEvent))
       {
-        if (Clock2Val(e->GetClock()) != GetValue(e))
+        if (Clock2Val(pEvent->GetClock()) != GetValue(pEvent))
         {
-          cpy = e->Copy()->IsChnPressure();
-          cpy->Value = Clock2Val(e->GetClock());
-          track->Kill(e);
-          track->Put(cpy);
+          pChnPressureCopy = pEvent->Copy()->IsChnPressure();
+          pChnPressureCopy->Value = Clock2Val(pEvent->GetClock());
+          track->Kill(pEvent);
+          track->Put(pChnPressureCopy);
         }
       }
-      e = iter.Next();
+      pEvent = iter.Next();
     }
   }
 
@@ -867,14 +910,14 @@ int tTempoEdit::Missing()
   return track->GetDefaultSpeed();
 }
 
-int tTempoEdit::IsCtrlEdit(JZEvent *e)
+int tTempoEdit::IsCtrlEdit(JZEvent* pEvent)
 {
-  return e->IsSetTempo() != 0;
+  return pEvent->IsSetTempo() != 0;
 }
 
-int tTempoEdit::GetValue(JZEvent *e)
+int tTempoEdit::GetValue(JZEvent* pEvent)
 {
-  return e->IsSetTempo()->GetBPM();
+  return pEvent->IsSetTempo()->GetBPM();
 }
 
 JZEvent * tTempoEdit::NewEvent(long clock, int val)

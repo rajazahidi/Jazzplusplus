@@ -70,4 +70,8 @@
 
 #define IDC_KB_VOLUME                        wxID_HIGHEST + 1000
 
+#define IDC_KB_VELOCITY                      wxID_HIGHEST + 1100
+#define IDC_KB_OFF_VELOCITY                  wxID_HIGHEST + 1101
+#define IDC_KB_CHANNEL                       wxID_HIGHEST + 1102
+
 #endif // !defined(JZ_RESOURCES_H)

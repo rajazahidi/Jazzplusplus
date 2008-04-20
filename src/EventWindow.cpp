@@ -124,7 +124,8 @@ void JZEventWindow::GetVirtualEventSize(
   int& EventWidth,
   int& EventHeight) const
 {
-  int TotalClockTics = mpSong->MaxQuarters * mpSong->TicksPerQuarter;
+  int TotalClockTics =
+    mpSong->GetMaxQuarters() * mpSong->GetTicksPerQuarter();
   EventWidth = TotalClockTics / mClockTicsPerPixel;
   EventHeight = 127 * mTrackHeight;
 }
@@ -196,13 +197,13 @@ int JZEventWindow::Clock2x(int Clock)
 int JZEventWindow::x2BarClock(int x, int Next)
 {
   int Clock = x2Clock(x);
-  JZBarInfo BarInfo(mpSong);
+  JZBarInfo BarInfo(*mpSong);
   BarInfo.SetClock(Clock);
   while (Next--)
   {
     BarInfo.Next();
   }
-  return BarInfo.Clock;
+  return BarInfo.GetClock();
 }
 
 //-----------------------------------------------------------------------------

@@ -465,7 +465,7 @@ tSynthSysex::~tSynthSysex()
   }
 }
 
-int tSynthSysex::GetId( tSysEx *s ) const
+int tSynthSysex::GetId(const tSysEx* s) const
 {
    if (!s)
       return SX_NONE;
@@ -672,7 +672,7 @@ int tSynthSysex::GetId( tSysEx *s ) const
 }
 
 
-unsigned char* tSynthSysex::GetValPtr(tSysEx* s) const
+unsigned char* tSynthSysex::GetValPtr(const tSysEx* s) const
 {
   if (!s)
   {
@@ -721,7 +721,7 @@ unsigned char* tSynthSysex::GetValPtr(tSysEx* s) const
   return 0;
 }
 
-unsigned char * tSynthSysex::GetChaPtr( tSysEx *s )
+unsigned char * tSynthSysex::GetChaPtr(const tSysEx* s)
 {
    // Get the byte where the channel number is (if any)
 
@@ -761,47 +761,60 @@ unsigned char * tSynthSysex::GetChaPtr( tSysEx *s )
    return 0;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSynthSysex::FixCheckSum( tSysEx *s )
 {
-   if ((s->Data[0] == 0x41) &&
-       (((s->Data[3] == 0x12) && (s->Length >= 10)) ||
-        ((s->Data[3] == 0x11) && (s->Length >= 12))))
-   {
-      // Roland RQ1 or DT1
-      int len = s->Length;
-      unsigned char *sx = s->Data;
-      unsigned char sum = 0x00;
+  if (
+    (s->Data[0] == 0x41) &&
+    (((s->Data[3] == 0x12) && (s->Length >= 10)) ||
+      ((s->Data[3] == 0x11) && (s->Length >= 12))))
+  {
+    // Roland RQ1 or DT1
+    int len = s->Length;
+    unsigned char *sx = s->Data;
+    unsigned char sum = 0x00;
 
-      for (int i = 4; i < (len-2); i++)
-      {
-        sum += sx[i];
-      }
-      sx[len - 2] = (0x80 - (sum & 0x7f)) & 0x7f;
-      sx[len-1] = 0xf7;
-   }
-
-   return;
+    for (int i = 4; i < (len-2); i++)
+    {
+      sum += sx[i];
+    }
+    sx[len - 2] = (0x80 - (sum & 0x7f)) & 0x7f;
+    sx[len-1] = 0xf7;
+  }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tSysEx* tSynthSysex::operator()(long clk, int id, unsigned char val)
 {
-   return (*this)(clk, id, -1, 1, &val);
+  return (*this)(clk, id, -1, 1, &val);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tSysEx* tSynthSysex::operator()(long clk, int id, int datalen, unsigned char val[])
 {
-   return (*this)(clk, id, -1, datalen, val);
+  return (*this)(clk, id, -1, datalen, val);
 }
 
-tSysEx* tSynthSysex::operator()(long clk, int id, int channel, int datalen, unsigned char val[])
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+tSysEx* tSynthSysex::operator()(
+  long clk,
+  int id,
+  int channel,
+  int datalen,
+  unsigned char val[])
 {
-   assert( (id > SX_NONE) && (id < NumSysexIds) );
-   assert( datalen > 0 );
+  assert( (id > SX_NONE) && (id < NumSysexIds) );
+  assert( datalen > 0 );
 
-   int i;
-   for (i = 0; i < datalen; i++)
-      assert( val[i] < 128 );
+  int i;
+  for (i = 0; i < datalen; i++)
+  {
+    assert( val[i] < 128 );
+  }
 
    int len = sxlen[id] + datalen - 1;
    unsigned char* sx = new unsigned char[len];

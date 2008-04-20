@@ -171,7 +171,7 @@ void JZTrackWindow::NewPlayPosition(int Clock)
     // Avoid permanent redraws when end of scroll range is reached.
     if (
       Clock > mFromClock &&
-      mToClock >= mpSong->MaxQuarters * mpSong->TicksPerQuarter)
+      mToClock >= mpSong->GetMaxQuarters() * mpSong->GetTicksPerQuarter())
     {
       return;
     }
@@ -480,7 +480,7 @@ void JZTrackWindow::Draw(wxDC& Dc)
 
   if (mpSong)
   {
-    JZBarInfo BarInfo(mpSong);
+    JZBarInfo BarInfo(*mpSong);
 
 //DEBUG    cout
 //DEBUG      << "mLeftInfoWidth:                " << mLeftInfoWidth << '\n'
@@ -503,7 +503,7 @@ void JZTrackWindow::Draw(wxDC& Dc)
     LocalDc.SetPen(*wxGREY_PEN);
     while (1)
     {
-      int x = Clock2x(BarInfo.Clock);
+      int x = Clock2x(BarInfo.GetClock());
       if (x > mScrolledX + mCanvasWidth)
       {
         break;
@@ -520,11 +520,11 @@ void JZTrackWindow::Draw(wxDC& Dc)
         {
           c = 4;
         }
-        if (((BarInfo.BarNr - Intro + 96) % c) == 0)
+        if (((BarInfo.GetBarIndex() - Intro + 96) % c) == 0)
         {
           LocalDc.SetPen(*wxBLACK_PEN);
           ostringstream Oss;
-          Oss << BarInfo.BarNr + 1 - Intro;
+          Oss << BarInfo.GetBarIndex() + 1 - Intro;
           LocalDc.DrawText(Oss.str().c_str(), x + mLittleBit, mEventsY - mTrackHeight);
           LocalDc.SetPen(*wxGREY_PEN);
           LocalDc.DrawLine(x, mEventsY + 1 - mTrackHeight, x, mEventsY + mEventsHeight);
@@ -860,7 +860,7 @@ void JZTrackWindow::DrawEvents(wxDC& Dc)
     return;
   }
 
-  JZBarInfo BarInfo(mpSong);
+  JZBarInfo BarInfo(*mpSong);
 
   Dc.SetClippingRegion(mEventsX, mEventsY, mEventsWidth, mEventsHeight);
 
@@ -925,7 +925,7 @@ void JZTrackWindow::DrawEvents(wxDC& Dc)
           int x = Clock2x(pEvent->GetClock());
 
           // Avoid painting events ON the bar
-          if ( !(pEvent->GetClock() % BarInfo.TicksPerBar) ) x = x + 1;
+          if ( !(pEvent->GetClock() % BarInfo.GetTicksPerBar()) ) x = x + 1;
 
           if (x > xblack)
           {
@@ -1138,15 +1138,15 @@ void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
         {
           return;
         }
-        JZBarInfo bi(gpProject);
+        JZBarInfo BarInfo(*gpProject);
 
-        bi.SetClock(mpFilter->FromClock);
+        BarInfo.SetClock(mpFilter->FromClock);
 
-        if (bi.BarNr > 0)
+        if (BarInfo.GetBarIndex() > 0)
         {
-          bi.SetBar(bi.BarNr - 1);
+          BarInfo.SetBar(BarInfo.GetBarIndex() - 1);
         }
-        gpProject->SetPlayPosition(bi.Clock);
+        gpProject->SetPlayPosition(BarInfo.GetClock());
         gpProject->SetRecord(true);
         gpProject->SetLoop(false);
         break;

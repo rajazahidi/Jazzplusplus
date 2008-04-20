@@ -732,6 +732,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\StringUtilities.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\StringUtilities.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Synth.cpp"
 				>
 			</File>
@@ -820,6 +828,14 @@
 		<Filter
 			Name="Dialog Source Files"
 			>
+			<File
+				RelativePath="..\src\Dialogs\KeyOnDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\KeyOnDialog.h"
+				>
+			</File>
 			<File
 				RelativePath="..\src\Dialogs\MetronomeSettingsDialog.cpp"
 				>

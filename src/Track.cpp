@@ -27,10 +27,10 @@
 #include "Configuration.h"
 #include "Player.h"
 #include "JazzPlusPlusApplication.h"
-//#include "eventwin.h"
 #include "TrackWindow.h"
 #include "Globals.h"
 #include "Song.h"
+#include "Dialogs/TrackDialog.h"
 
 #include <cstdlib>
 #include <assert.h>
@@ -1902,26 +1902,17 @@ void tTrackDlg::EditForm(wxPanel *panel)
 
 #endif // OBSOLETE
 
-void JZTrack::Dialog(JZTrackWindow *parent)
+void JZTrack::Dialog(JZTrackWindow* pParent)
 {
+  JZTrackDialog TrackDialog(*this, pParent);
+  TrackDialog.ShowModal();
 #ifdef OBSOLETE
-
-  tTrackDlg *dlg;
-  if (DialogBox)
-  {
-    DialogBox->Show(true);
-    return;
-  }
-#ifdef __WXMSW__
-  bool modal = true;  // keep button down
-#else
-  bool modal = false;
-#endif
-  DialogBox = new wxDialogBox(parent, "Track Settings", modal, Config(C_TrackDlgXpos), Config(C_TrackDlgYpos));
-  dlg = new tTrackDlg((JZTrackWindow*) parent, this);
-  dlg->EditForm(DialogBox);
-  DialogBox->Fit();
-  DialogBox->Show(TRUE);
+  DialogBox = new wxDialogBox(
+    pParent,
+    "Track Settings",
+    modal,
+    Config(C_TrackDlgXpos),
+    Config(C_TrackDlgYpos));
 #endif // OBSOLETE
 }
 

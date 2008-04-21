@@ -342,6 +342,18 @@ void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& Event)
   {
     ToggleTrackState(Point);
   }
+  // Check to see if the mouse was clicked inside of a track name.
+  else if (
+    Point.x >= mTrackNameX &&
+    Point.x < mTrackNameX + mTrackNameWidth)
+  {
+    // Edit the track settings.
+    JZTrack* pTrack = y2Track(Point.y);
+    if (pTrack)
+    {
+      pTrack->Dialog(this);
+    }
+  }
   else if (
     Point.x >= mEventsX && Point.x < mEventsX + mEventsWidth &&
     Point.y >= mEventsY && Point.y < mEventsY + mEventsHeight)

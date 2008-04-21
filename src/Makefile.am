@@ -21,6 +21,7 @@ DeprecatedWx/proplist.cpp \
 Dialogs/KeyOnDialog.cpp \
 Dialogs/MetronomeSettingsDialog.cpp \
 Dialogs/SynthesizerSettingsDialog.cpp \
+Dialogs/TrackDialog.cpp \
 Dialogs.cpp \
 DynamicArray.cpp \
 ErrorMessage.cpp \
@@ -99,6 +100,7 @@ DeprecatedStringUtils.h \
 Dialogs/KeyOnDialog.h \
 Dialogs/MetronomeSettingsDialog.h \
 Dialogs/SynthesizerSettingsDialog.h \
+Dialogs/TrackDialog.h \
 Dialogs.h \
 DynamicArray.h \
 ErrorMessage.h \

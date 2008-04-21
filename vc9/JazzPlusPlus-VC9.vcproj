@@ -852,6 +852,14 @@
 				RelativePath="..\src\Dialogs\SynthesizerSettingsDialog.h"
 				>
 			</File>
+			<File
+				RelativePath="..\src\Dialogs\TrackDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\TrackDialog.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

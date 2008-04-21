@@ -193,7 +193,7 @@ void tAudioPlayer::StartAudio()
     return;
   }
 
-  long ticks_per_minute = Song->TicksPerQuarter * Song->Speed();
+  long ticks_per_minute = Song->GetTicksPerQuarter() * Song->Speed();
   mSamples.ResetBuffers(AudioBuffer, start_clock, ticks_per_minute);
   if (PlaybackMode())
   {

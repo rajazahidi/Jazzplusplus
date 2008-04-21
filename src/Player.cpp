@@ -1568,16 +1568,24 @@ int tSeq2Player::OutEvent(JZEvent *e, int now)
   {
     case StatKeyOn:
       {
-        tKeyOn *k = e->IsKeyOn();
-        SEQ_START_NOTE(mididev, k->Channel, k->Key, k->Veloc);
+        tKeyOn* pKeyOn = e->IsKeyOn();
+        SEQ_START_NOTE(
+          mididev,
+          pKeyOn->Channel,
+          pKeyOn->mKey,
+          pKeyOn->mVelocity);
         if (now) seqbuf_flush_last_event();
       }
       break;
 
     case StatKeyOff:
       {
-        tKeyOff *k = e->IsKeyOff();
-        SEQ_STOP_NOTE(mididev, k->Channel, k->Key, k->OffVeloc);
+        tKeyOff* pKeyOff = e->IsKeyOff();
+        SEQ_STOP_NOTE(
+          mididev,
+          pKeyOff->Channel,
+          pKeyOff->Key,
+          pKeyOff->OffVeloc);
         if (now) seqbuf_flush_last_event();
       }
       break;

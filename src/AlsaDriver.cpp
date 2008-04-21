@@ -187,7 +187,7 @@ void tAlsaAudioPlayer::StartPlay(long clock, long loopClock, int cont)
     return;
   }
 
-  long ticks_per_minute = Song->TicksPerQuarter * Song->Speed();
+  long ticks_per_minute = Song->GetTicksPerQuarter() * Song->Speed();
   mSamples.ResetBuffers(AudioBuffer, clock, ticks_per_minute);
   last_scount = 0;
   cur_pos = 0;
@@ -522,8 +522,8 @@ void tAlsaAudioPlayer::ResetPlay(long clock)
   if (pcm[PLAYBACK])
   {
     snd_pcm_drop(pcm[PLAYBACK]);
-    //long ticks_per_minute = Song->TicksPerQuarter * Song->Speed();
-    //mSamples.ResetBuffers(AudioBuffer, clock, ticks_per_minute);
+//    long ticks_per_minute = Song->GetTicksPerQuarter() * Song->Speed();
+//    mSamples.ResetBuffers(AudioBuffer, clock, ticks_per_minute);
   }
   audio_clock_offset = clock;
   cur_pos = 0;

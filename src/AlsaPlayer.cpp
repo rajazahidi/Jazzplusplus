@@ -322,8 +322,8 @@ int tAlsaPlayer::OutEvent(JZEvent *e, int now)
         tKeyOn *k = e->IsKeyOn();
         set_event_header(&ev, e->GetClock(), SND_SEQ_EVENT_NOTEON);
         ev.data.note.channel = k->Channel;
-        ev.data.note.note = k->Key;
-        ev.data.note.velocity = k->Veloc;
+        ev.data.note.note = k->mKey;
+        ev.data.note.velocity = k->mVelocity;
         rc = write(&ev, now);
       }
       break;
@@ -592,7 +592,7 @@ void tAlsaPlayer::set_event_header(
 //-----------------------------------------------------------------------------
 int tAlsaPlayer::start_timer(long clock)
 {
-  int time_base = Song->TicksPerQuarter;
+  int time_base = Song->GetTicksPerQuarter();
   int cur_speed = Song->GetTrack(0)->GetCurrentSpeed(clock);
   init_queue_tempo(time_base, cur_speed);
   start_queue_timer(clock);

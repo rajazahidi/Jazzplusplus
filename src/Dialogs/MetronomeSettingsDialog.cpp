@@ -84,7 +84,6 @@ JZMetronomeSettingsDialog::JZMetronomeSettingsDialog(
   mKeyNormalName =
     mIndexToName[mPitchToIndex[mMetronomeInfo.GetKeyNormal()]];
 
-
   mKeyAccentedName =
     mIndexToName[mPitchToIndex[mMetronomeInfo.GetKeyAccented()]];
 

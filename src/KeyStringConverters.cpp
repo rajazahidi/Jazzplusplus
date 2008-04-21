@@ -76,7 +76,7 @@ int StringToKey(const string& String)
 
   int Key = 0;
 
-  for (int i = 0; i < String.length(); ++i)
+  for (unsigned i = 0; i < String.length(); ++i)
   {
     if (String[i] == '#')
     {

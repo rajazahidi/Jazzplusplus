@@ -38,20 +38,20 @@ JZTrackDialog::JZTrackDialog(JZTrack& Track, wxWindow* pParent)
   mpTrackNameEdit = new wxTextCtrl(this, wxID_ANY);
 
   mpPatchListBox = new wxListBox(this, wxID_ANY);
-  if (Track.IsDrumTrack())
+  if (mTrack.IsDrumTrack())
   {
-    const vector<pair<string, int> >& DrumNames = gpConfig->GetDrumNames();
+    const vector<pair<string, int> >& DrumSets = gpConfig->GetDrumSets();
     for (
-      vector<pair<string, int> >::const_iterator iDrumName =
-        DrumNames.begin();
-      iDrumName != DrumNames.end();
-      ++iDrumName)
+      vector<pair<string, int> >::const_iterator iDrumSet =
+        DrumSets.begin();
+      iDrumSet != DrumSets.end();
+      ++iDrumSet)
     {
-      const string& DrumName = iDrumName->first;
+      const string& DrumSet = iDrumSet->first;
 
-      if (!DrumName.empty())
+      if (!DrumSet.empty())
       {
-        mpPatchListBox->Append(DrumName.c_str());
+        mpPatchListBox->Append(DrumSet.c_str());
       }
     }
   }
@@ -84,15 +84,15 @@ JZTrackDialog::JZTrackDialog(JZTrack& Track, wxWindow* pParent)
     new wxStaticText(this, wxID_ANY, "Track Name:"),
     0,
     wxALL,
-    2);
-  pTopSizer->Add(mpTrackNameEdit, 0, wxGROW | wxALL, 2);
+    4);
+  pTopSizer->Add(mpTrackNameEdit, 0, wxGROW | wxALL, 4);
 
   pTopSizer->Add(
     new wxStaticText(this, wxID_ANY, "Patch:"),
     0,
     wxALL,
-    2);
-  pTopSizer->Add(mpPatchListBox, 0, wxGROW | wxALL, 2);
+    4);
+  pTopSizer->Add(mpPatchListBox, 0, wxGROW | wxALL, 4);
 
   wxBoxSizer* pButtonSizer = new wxBoxSizer(wxHORIZONTAL);
   pButtonSizer->Add(pOkButton, 0, wxALL, 5);
@@ -114,6 +114,9 @@ bool JZTrackDialog::TransferDataToWindow()
 {
   mpTrackNameEdit->ChangeValue(mTrack.GetName());
 
+  int PatchIndex = mTrack.GetPatch() + (mTrack.GetBank() << 8);
+  mpPatchListBox->SetSelection(PatchIndex);
+
   return true;
 }
 
@@ -121,5 +124,17 @@ bool JZTrackDialog::TransferDataToWindow()
 //-----------------------------------------------------------------------------
 bool JZTrackDialog::TransferDataFromWindow()
 {
+  wxString Trackname = mpTrackNameEdit->GetValue();
+  mTrack.SetName(Trackname.c_str());
+
+  int Selection = mpPatchListBox->GetSelection();
+  if (Selection != wxNOT_FOUND)
+  {
+    int Patch = Selection & 0x000000ff;;
+    int Bank = (Selection & 0x0000ff00) >> 8;
+    mTrack.SetPatch(Patch);
+    mTrack.SetBank(Bank);
+  }
+
   return true;
 }

@@ -92,7 +92,7 @@ static double framesPerSecond[] = { 24.0, 25.0, 30.0, 30.0 };
 
 tMtcTime::tMtcTime(tMtcOffset *s)
 {
-  type = (tMtcType) ((s->Data[0] & 0x60) >> 5);
+  type = (tMtcType) ((s->mpData[0] & 0x60) >> 5);
   if (type < Mtc24)
   {
     type = Mtc24;
@@ -101,10 +101,10 @@ tMtcTime::tMtcTime(tMtcOffset *s)
   {
     type = Mtc30Ndf;
   }
-  hour = s->Data[0] & 0x1f;
-  min = s->Data[1];
-  sec = s->Data[2];
-  fm = s->Data[3];
+  hour = s->mpData[0] & 0x1f;
+  min = s->mpData[1];
+  sec = s->mpData[2];
+  fm = s->mpData[3];
 }
 
 tMtcTime::tMtcTime(int millisec, tMtcType t)
@@ -2085,7 +2085,7 @@ const char* JZTrack::GetCopyright()
 {
   if (Copyright)
   {
-    return (const char *)Copyright->Data;
+    return (const char *)Copyright->mpData;
   }
   return "";
 }
@@ -2116,22 +2116,22 @@ const char* JZTrack::GetName()
 {
   if (mName)
   {
-    return (const char*)mName->Data;
+    return (const char*)mName->mpData;
   }
   return "";
 }
 
 
 
-void JZTrack::SetName(char *str)
+void JZTrack::SetName(const char* pTrackName)
 {
   if (mName)
   {
     Kill(mName);
   }
-  if (strlen(str))
+  if (strlen(pTrackName))
   {
-    Put(new tTrackName(0, (unsigned char *)str, strlen(str)));
+    Put(new tTrackName(0, (unsigned char *)pTrackName, strlen(pTrackName)));
   }
   Cleanup();
 }

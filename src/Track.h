@@ -452,7 +452,7 @@ class JZTrack : public tEventArray
     void Cleanup();
 
     const char* GetName();
-    void SetName(char *Name);
+    void SetName(const char *Name);
 
     const char* GetCopyright();
     void SetCopyright(char *Copyright);

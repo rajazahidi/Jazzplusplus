@@ -1152,8 +1152,8 @@ tSysexDlg::tSysexDlg(tSysEx *s, JZPianoWindow* w, JZTrack *t)
 
   for (int i = 0; i < s->Length; i++)
   {
-     sprintf( hexbyte, "%02x ", s->Data[i] );
-     strcat( str, hexbyte );
+    sprintf(hexbyte, "%02x ", s->mpData[i]);
+    strcat(str, hexbyte);
   }
 }
 
@@ -1245,7 +1245,7 @@ void tSysexDlg::AddProperties()
       ostringstream Oss;
       Oss
         << "First data byte is at offset "
-        << uptr - Event->IsSysEx()->Data + 1 << ", value "
+        << uptr - Event->IsSysEx()->mpData + 1 << ", value "
         << setw(2) << hex << static_cast<int>(*uptr)
         << dec << " (" << static_cast<int>(*uptr) << " decimal)";
       sheet->AddProperty(new wxProperty(

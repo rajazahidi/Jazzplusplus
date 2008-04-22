@@ -352,6 +352,7 @@ void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& Event)
     if (pTrack)
     {
       pTrack->Dialog(this);
+      Refresh(false);
     }
   }
   else if (

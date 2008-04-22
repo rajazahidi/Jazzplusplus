@@ -861,27 +861,32 @@ class tMetaEvent : public JZEvent
 {
   public:
 
-    unsigned char* Data;
+    unsigned char* mpData;
     unsigned short Length;
 
-    tMetaEvent(int clk, unsigned char sta, unsigned char *dat, unsigned short len)
+    tMetaEvent(
+      int clk,
+      unsigned char sta,
+      unsigned char* dat,
+      unsigned short len)
       : JZEvent(clk, sta)
     {
       Length = len;
-      Data = new unsigned char [len + 1];
+      mpData = new unsigned char [len + 1];
       if (dat)
-        memcpy(Data, dat, len);
-      Data[len] = 0;
+        memcpy(mpData, dat, len);
+      mpData[len] = 0;
     }
 
     virtual ~tMetaEvent()
     {
-      delete [] Data;
+      delete [] mpData;
     }
 
     virtual int Write(JZWriteBase &io)
     {
-      edb(); return io.Write(this, Data, Length);
+      edb();
+      return io.Write(this, mpData, Length);
     }
 
     virtual tMetaEvent* IsMetaEvent()
@@ -893,7 +898,7 @@ class tMetaEvent : public JZEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tMetaEvent(mClock, Stat, Data, Length);
+      return new tMetaEvent(mClock, Stat, mpData, Length);
     }
 };
 
@@ -910,44 +915,50 @@ class tJazzMeta : public tMetaEvent
       : tMetaEvent(clk, StatJazzMeta, dat, len)
     {
     }
-    tJazzMeta() : tMetaEvent(0, StatJazzMeta, 0, DATALEN) {
-      memset(Data, 0, DATALEN);
-      memcpy(Data, "JAZ2", 4);
-      Data[4] = 1; // version or so
+    tJazzMeta()
+      : tMetaEvent(0, StatJazzMeta, 0, DATALEN)
+    {
+      memset(mpData, 0, DATALEN);
+      memcpy(mpData, "JAZ2", 4);
+      mpData[4] = 1; // version or so
     }
-    char GetAudioMode() const {
-      return Data[5];
+    char GetAudioMode() const
+    {
+      return mpData[5];
     }
-    void SetAudioMode(char c) {
-      Data[5] = c;
+    void SetAudioMode(char c)
+    {
+      mpData[5] = c;
     }
-    char GetTrackState() const {
-      return Data[6];
+    char GetTrackState() const
+    {
+      return mpData[6];
     }
-    void SetTrackState(char c) {
-      Data[6] = c;
+    void SetTrackState(char c)
+    {
+      mpData[6] = c;
     }
 
-    // Data[7] is unused
+    // mpData[7] is unused
 
     unsigned char GetTrackDevice() const
     {
-      return Data[8];
+      return mpData[8];
     }
 
     void SetTrackDevice(unsigned char x)
     {
-      Data[8] = x;
+      mpData[8] = x;
     }
 
     unsigned char GetIntroLength() const
     {
-      return Data[9];
+      return mpData[9];
     }
 
     void SetIntroLength(unsigned char x)
     {
-      Data[9] = x;
+      mpData[9] = x;
     }
 
     virtual tJazzMeta* IsJazzMeta()
@@ -959,7 +970,7 @@ class tJazzMeta : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tJazzMeta(mClock, Data, Length);
+      return new tJazzMeta(mClock, mpData, Length);
     }
 };
 
@@ -982,7 +993,7 @@ class tSysEx : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tSysEx(mClock, Data, Length);
+      return new tSysEx(mClock, mpData, Length);
     }
 
     // todo
@@ -1007,7 +1018,7 @@ class tSongPtr : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tSongPtr(mClock, Data, Length);
+      return new tSongPtr(mClock, mpData, Length);
     }
 };
 
@@ -1033,7 +1044,7 @@ class tMidiClock : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tMidiClock(mClock, Data, Length);
+      return new tMidiClock(mClock, mpData, Length);
     }
 };
 
@@ -1057,7 +1068,7 @@ class tStartPlay : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tStartPlay(mClock, Data, Length);
+      return new tStartPlay(mClock, mpData, Length);
     }
 };
 
@@ -1083,7 +1094,7 @@ class tContPlay : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tContPlay(mClock, Data, Length);
+      return new tContPlay(mClock, mpData, Length);
     }
 };
 
@@ -1110,7 +1121,7 @@ class tStopPlay : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tStopPlay(mClock, Data, Length);
+      return new tStopPlay(mClock, mpData, Length);
     }
 };
 
@@ -1134,12 +1145,12 @@ class tText : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tText(mClock, Data, Length);
+      return new tText(mClock, mpData, Length);
     }
 
     virtual unsigned char* GetText()
     {
-      return Data;
+      return mpData;
     }
 };
 
@@ -1163,7 +1174,7 @@ class tCopyright : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tCopyright(mClock, Data, Length);
+      return new tCopyright(mClock, mpData, Length);
     }
 };
 
@@ -1181,7 +1192,7 @@ class tTrackName : public tMetaEvent
       // clip to 16 chars
       if (len > 16)
       {
-        Data[16] = 0;
+        mpData[16] = 0;
         Length   = 16;
       }
 #endif
@@ -1197,7 +1208,7 @@ class tTrackName : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tTrackName(mClock, Data, Length);
+      return new tTrackName(mClock, mpData, Length);
     }
 };
 
@@ -1221,7 +1232,7 @@ class tMarker : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tMarker(mClock, Data, Length);
+      return new tMarker(mClock, mpData, Length);
     }
 };
 
@@ -1278,16 +1289,16 @@ class tPlayTrack : public tMetaEvent
 
     virtual int Write(JZWriteBase &io)
     {
-      Data = new unsigned char [Length + 1];
-      int* dat = (int *)Data;
+      mpData = new unsigned char [Length + 1];
+      int* dat = (int *)mpData;
       dat[0] = track;
       dat[1] = transpose;
       dat[2] = eventlength;
       Length = sizeof(int) * 3;
       edb();
 
-      Data[Length] = 0;
-      return io.Write(this, Data, Length);
+      mpData[Length] = 0;
+      return io.Write(this, mpData, Length);
     }
 
     virtual tPlayTrack* IsPlayTrack()
@@ -1388,7 +1399,7 @@ class tMtcOffset : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tMtcOffset(mClock, Data, Length);
+      return new tMtcOffset(mClock, mpData, Length);
     }
 };
 

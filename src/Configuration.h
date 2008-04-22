@@ -244,6 +244,8 @@ class JZConfiguration
     bool Put(int entry);
     bool Put(int entry, int value);
 
+    const std::vector<std::pair<std::string, int> >& GetDrumSets() const;
+
     const std::vector<std::pair<std::string, int> >& GetDrumNames() const;
 
     const std::vector<std::pair<std::string, int> >& GetControlNames() const;
@@ -295,6 +297,15 @@ const std::string& JZConfiguration::GetStrValue(int entry) const
 {
   assert((entry >= 0) && (entry < NumConfigNames));
   return mNames[entry]->GetStrValue();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+const std::vector<std::pair<std::string, int> >&
+JZConfiguration::GetDrumSets() const
+{
+  return mDrumSets;
 }
 
 //-----------------------------------------------------------------------------

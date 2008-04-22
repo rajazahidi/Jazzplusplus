@@ -25,7 +25,6 @@
 #include "Synth.h"
 
 #include "Track.h"
-//#include "util.h"
 #include "Player.h"
 #include "JazzPlusPlusApplication.h"
 //#include "eventwin.h"
@@ -340,37 +339,37 @@ tSynthSysex::tSynthSysex()
 
   gs_dt1[4] = 0x40;
   gs_dt1[5] = 0x20;
-  for ( i = 0; i < 11; i++ )
+  for (i = 0; i < 11; i++)
   {
     gs_dt1[6] = 0x00 + i;
     SXDECL(SX_GS_ModPitch + i, GS_DT1_LEN, gs_dt1);
   }
 
-  for ( i = 0; i < 11; i++ )
+  for (i = 0; i < 11; i++)
   {
     gs_dt1[6] = 0x10 + i;
     SXDECL(SX_GS_BendPitch + i, GS_DT1_LEN, gs_dt1);
   }
 
-  for ( i = 0; i < 11; i++ )
+  for (i = 0; i < 11; i++)
   {
     gs_dt1[6] = 0x20 + i;
     SXDECL(SX_GS_CafPitch + i, GS_DT1_LEN, gs_dt1);
   }
 
-  for ( i = 0; i < 11; i++ )
+  for (i = 0; i < 11; i++)
   {
     gs_dt1[6] = 0x30 + i;
     SXDECL(SX_GS_PafPitch + i, GS_DT1_LEN, gs_dt1);
   }
 
-  for ( i = 0; i < 11; i++ )
+  for (i = 0; i < 11; i++)
   {
     gs_dt1[6] = 0x40 + i;
     SXDECL(SX_GS_CC1Pitch + i, GS_DT1_LEN, gs_dt1);
   }
 
-  for ( i = 0; i < 11; i++ )
+  for (i = 0; i < 11; i++)
   {
     gs_dt1[6] = 0x50 + i;
     SXDECL(SX_GS_CC2Pitch + i, GS_DT1_LEN, gs_dt1);
@@ -378,19 +377,44 @@ tSynthSysex::tSynthSysex()
 
   gs_dt1[4] = 0x40;
   gs_dt1[5] = 0x01;
-  for ( i = 0; i < 7; i++ )
+  for (i = 0; i < 7; i++)
   {
     gs_dt1[6] = 0x30 + i;
     SXDECL(SX_GS_ReverbMacro + i, GS_DT1_LEN, gs_dt1);
   }
 
-  for ( i = 0; i < 8; i++ )
+  for (i = 0; i < 8; i++)
   {
     gs_dt1[6] = 0x38 + i;
     SXDECL(SX_GS_ChorusMacro + i, GS_DT1_LEN, gs_dt1);
   }
 
-  const unsigned char gs_partial_reserve[] = {GS_DT1,0x40,0x01,0x10,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xf7};
+  const unsigned char gs_partial_reserve[] =
+  {
+    GS_DT1,
+    0x40,
+    0x01,
+    0x10,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0x00,
+    0xf7
+  };
+
   SXDECL(SX_GS_PartialReserve, GS_DT1_LEN, gs_partial_reserve);
 
   gs_dt1[4] = 0x40;
@@ -413,8 +437,6 @@ tSynthSysex::tSynthSysex()
   gs_dt1[6] = 0x20;
   SXDECL(SX_GS_CC2CtrlNo, GS_DT1_LEN, gs_dt1);
 
-
-
   // XG native
   const unsigned char xg_on[] = {XG_NAT,0x00,0x00,0x7e,0x00,0xf7};
   SXDECL(SX_XG_ON, XG_NAT_LEN, xg_on);
@@ -422,13 +444,13 @@ tSynthSysex::tSynthSysex()
   // XG native multipart
   unsigned char xg_multi[] = {XG_NAT,0x08,0x00,0x00,0x00,0x7f};
 
-  for ( i = 0; i < 12; i++ )
+  for (i = 0; i < 12; i++)
   {
     xg_multi[5] = 0x1d + i;
     SXDECL(SX_XG_ModPitch + i, XG_NAT_LEN, xg_multi);
   }
 
-  for ( i = 0; i < 26; i++ )
+  for (i = 0; i < 26; i++)
   {
     xg_multi[5] = 0x4d + i;
     SXDECL(SX_XG_CafPitch + i, XG_NAT_LEN, xg_multi);
@@ -470,11 +492,11 @@ int tSynthSysex::GetId(const tSysEx* s) const
    if (!s)
       return SX_NONE;
 
-   switch (s->Data[0])
+   switch (s->mpData[0])
    {
     case 0x7e:
        // GM ON ?
-       if (!memcmp(sxdata[SX_GM_ON], s->Data, s->Length))
+       if (!memcmp(sxdata[SX_GM_ON], s->mpData, s->Length))
        {
          return SX_GM_ON;
        }
@@ -486,7 +508,7 @@ int tSynthSysex::GetId(const tSysEx* s) const
 
     case 0x7f:
        // GM MasterVol ?
-       if (!memcmp(sxdata[SX_GM_MasterVol],s->Data,4))
+       if (!memcmp(sxdata[SX_GM_MasterVol], s->mpData, 4))
        {
          return SX_GM_MasterVol;
        }
@@ -500,11 +522,11 @@ int tSynthSysex::GetId(const tSysEx* s) const
        // Roland!
 
        // GS DT1?
-       if ((s->Data[2] == 0x42) && (s->Data[3] == 0x12))
+       if ((s->mpData[2] == 0x42) && (s->mpData[3] == 0x12))
        {
-         register unsigned char a1 = s->Data[4];
-         register unsigned char a2 = s->Data[5];
-         register unsigned char a3 = s->Data[6];
+         register unsigned char a1 = s->mpData[4];
+         register unsigned char a2 = s->mpData[5];
+         register unsigned char a3 = s->mpData[6];
 
          if (a1 == 0x40)
          {
@@ -536,7 +558,7 @@ int tSynthSysex::GetId(const tSysEx* s) const
              else if (a3 == 0x10)
                return SX_GS_PartialReserve;
            }
-           else if ( (a2 & 0xf0) == 0x10 )
+           else if ((a2 & 0xf0) == 0x10)
            {
              // 0x40 0x1n 0x??
              switch (a3)
@@ -556,7 +578,7 @@ int tSynthSysex::GetId(const tSysEx* s) const
                break;
              }
            }
-           else if ( (a2 & 0xf0) == 0x20 )
+           else if ((a2 & 0xf0) == 0x20)
            {
              // 0x40 0x2n 0x??
              if (a3 <= 0x0a)
@@ -575,11 +597,11 @@ int tSynthSysex::GetId(const tSysEx* s) const
          } // end a1 == 0x40
        } // end GS DT1
 
-       if ((s->Data[3] == 0x12) && (s->Length >= 10))
+       if ((s->mpData[3] == 0x12) && (s->Length >= 10))
        {
          return SX_ROLAND_DT1;
        }
-       else if ((s->Data[3] == 0x11) && (s->Length >= 12))
+       else if ((s->mpData[3] == 0x11) && (s->Length >= 12))
        {
          return SX_ROLAND_RQ1;
        }
@@ -593,11 +615,11 @@ int tSynthSysex::GetId(const tSysEx* s) const
     case 0x43:
       // Yamaha!
       // XG Native?
-      if (((s->Data[1] & 0xf0) == 0x10) && (s->Data[2] == 0x4c))
+      if (((s->mpData[1] & 0xf0) == 0x10) && (s->mpData[2] == 0x4c))
       {
-        register unsigned char a1 = s->Data[3];
-        register unsigned char a2 = s->Data[4];
-        register unsigned char a3 = s->Data[5];
+        register unsigned char a1 = s->mpData[3];
+        register unsigned char a2 = s->mpData[4];
+        register unsigned char a3 = s->mpData[5];
 
         // Multipart?
         if (a1 == 0x08)
@@ -648,11 +670,11 @@ int tSynthSysex::GetId(const tSysEx* s) const
         }
       }
 
-      if (s->Data[2] == 0x4c)
+      if (s->mpData[2] == 0x4c)
       {
         return SX_XG_NATIVE;
       }
-      else if (s->Data[2] == 0x49)
+      else if (s->mpData[2] == 0x49)
       {
         return SX_MU80_NATIVE;
       }
@@ -679,38 +701,38 @@ unsigned char* tSynthSysex::GetValPtr(const tSysEx* s) const
     return 0;
   }
 
-  switch (s->Data[0])
+  switch (s->mpData[0])
   {
     case 0x7f:
       // GM MasterVol?
-      if (!memcmp(sxdata[SX_GM_MasterVol],s->Data,4))
+      if (!memcmp(sxdata[SX_GM_MasterVol], s->mpData,4))
       {
-        return &s->Data[4];
+        return &s->mpData[4];
       }
       break;
 
     case 0x41:
       // Roland!
       // GS DT1?
-      if ((s->Data[2] == 0x42) && (s->Data[3] == 0x12) && (s->Length >= 10))
+      if ((s->mpData[2] == 0x42) && (s->mpData[3] == 0x12) && (s->Length >= 10))
       {
-        return &s->Data[7];
+        return &s->mpData[7];
       }
       // other DT1 or RQ1 ?
       else if (
-        ((s->Data[3] == 0x12) && (s->Length >= 10)) ||
-        ((s->Data[3] == 0x11) && (s->Length >= 12)))
+        ((s->mpData[3] == 0x12) && (s->Length >= 10)) ||
+        ((s->mpData[3] == 0x11) && (s->Length >= 12)))
       {
-        return &s->Data[7];
+        return &s->mpData[7];
       }
       break;
 
     case 0x43:
       // Yamaha!
       // XG Native?
-      if (((s->Data[1] & 0xf0) == 0x10) && (s->Data[2] == 0x4c))
+      if (((s->mpData[1] & 0xf0) == 0x10) && (s->mpData[2] == 0x4c))
       {
-        return &s->Data[6];
+        return &s->mpData[6];
       }
       break;
     default:
@@ -730,17 +752,21 @@ unsigned char * tSynthSysex::GetChaPtr(const tSysEx* s)
       return 0;
    }
 
-   switch (s->Data[0])
+   switch (s->mpData[0])
    {
     case 0x41:
        // Roland!
        // GS DT1 + address 0x40?
-       if ((s->Data[2] == 0x42) && (s->Data[3] == 0x12) &&
-           (s->Data[4] == 0x40))
+       if (
+         (s->mpData[2] == 0x42) &&
+         (s->mpData[3] == 0x12) &&
+         (s->mpData[4] == 0x40))
        {
-         if ( ((s->Data[5] & 0xf0) == 0x10 ) || ((s->Data[5] & 0xf0) == 0x20 ) )
+         if (
+           ((s->mpData[5] & 0xf0) == 0x10) ||
+           ((s->mpData[5] & 0xf0) == 0x20))
          {
-           return &s->Data[5];
+           return &s->mpData[5];
          }
        }
        break;
@@ -748,9 +774,12 @@ unsigned char * tSynthSysex::GetChaPtr(const tSysEx* s)
     case 0x43:
        // Yamaha!
        // XG Native multipart?
-       if (((s->Data[1] & 0xf0) == 0x10) && (s->Data[2] == 0x4c) && (s->Data[3] == 0x08))
+       if (
+         ((s->mpData[1] & 0xf0) == 0x10) &&
+         (s->mpData[2] == 0x4c) &&
+         (s->mpData[3] == 0x08))
        {
-         return &s->Data[4];
+         return &s->mpData[4];
        }
        break;
     default:
@@ -763,16 +792,16 @@ unsigned char * tSynthSysex::GetChaPtr(const tSysEx* s)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSynthSysex::FixCheckSum( tSysEx *s )
+void tSynthSysex::FixCheckSum(tSysEx* s)
 {
   if (
-    (s->Data[0] == 0x41) &&
-    (((s->Data[3] == 0x12) && (s->Length >= 10)) ||
-      ((s->Data[3] == 0x11) && (s->Length >= 12))))
+    (s->mpData[0] == 0x41) &&
+    (((s->mpData[3] == 0x12) && (s->Length >= 10)) ||
+      ((s->mpData[3] == 0x11) && (s->Length >= 12))))
   {
     // Roland RQ1 or DT1
     int len = s->Length;
-    unsigned char *sx = s->Data;
+    unsigned char *sx = s->mpData;
     unsigned char sum = 0x00;
 
     for (int i = 4; i < (len-2); i++)
@@ -793,7 +822,11 @@ tSysEx* tSynthSysex::operator()(long clk, int id, unsigned char val)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tSysEx* tSynthSysex::operator()(long clk, int id, int datalen, unsigned char val[])
+tSysEx* tSynthSysex::operator()(
+  long clk,
+  int id,
+  int datalen,
+  unsigned char val[])
 {
   return (*this)(clk, id, -1, datalen, val);
 }
@@ -807,18 +840,18 @@ tSysEx* tSynthSysex::operator()(
   int datalen,
   unsigned char val[])
 {
-  assert( (id > SX_NONE) && (id < NumSysexIds) );
-  assert( datalen > 0 );
+  assert((id > SX_NONE) && (id < NumSysexIds));
+  assert(datalen > 0);
 
   int i;
   for (i = 0; i < datalen; i++)
   {
-    assert( val[i] < 128 );
+    assert(val[i] < 128);
   }
 
    int len = sxlen[id] + datalen - 1;
    unsigned char* sx = new unsigned char[len];
-   memcpy( sx, sxdata[id], sxlen[id] );
+   memcpy(sx, sxdata[id], sxlen[id]);
    tSysEx* s = 0;
 
    if (id == SX_GM_MasterVol)
@@ -829,7 +862,7 @@ tSysEx* tSynthSysex::operator()(
       else
         sx[4] = 0;
       sx[5] = val[0]; // MSB
-      s = new tSysEx( clk, sx, len );
+      s = new tSysEx(clk, sx, len);
    }
    else if ((id > SX_GS_ON) && (id < SX_XG_ON))
    {
@@ -839,7 +872,7 @@ tSysEx* tSynthSysex::operator()(
 
       if (channel >= 0)
       {
-        sx[5] = sx[5] | sysex_channel( channel );
+        sx[5] = sx[5] | sysex_channel(channel);
       }
 
       unsigned char sum = 0x00;
@@ -847,20 +880,22 @@ tSysEx* tSynthSysex::operator()(
         sum += sx[i];
       sx[len - 2] = (0x80 - (sum & 0x7f)) & 0x7f;
       sx[len-1] = 0xf7;
-      s = new tSysEx( clk, sx, len );
+      s = new tSysEx(clk, sx, len);
    }
    else if (id > SX_XG_ON)
    {
       // XG Native
       for (i = 0; i < datalen; i++)
+      {
         sx[i+6] = val[i];
+      }
 
       if (channel >= 0)
       {
         sx[4] = channel - 1;
       }
       sx[len-1] = 0xf7;
-      s = new tSysEx( clk, sx, len );
+      s = new tSysEx(clk, sx, len);
    }
 
    delete sx;
@@ -868,194 +903,194 @@ tSysEx* tSynthSysex::operator()(
 }
 
 
-JZEvent* tGS::MasterVolSX( long clk, unsigned char vol )
+JZEvent* tGS::MasterVolSX(long clk, unsigned char vol)
 {
-   return Sysex( clk, SX_GS_MasterVol, vol );
+   return Sysex(clk, SX_GS_MasterVol, vol);
 }
 
-JZEvent* tGS::MasterPanSX( long clk, unsigned char pan )
+JZEvent* tGS::MasterPanSX(long clk, unsigned char pan)
 {
-   return Sysex( clk, SX_GS_MasterPan, pan );
+   return Sysex(clk, SX_GS_MasterPan, pan);
 }
 
-JZEvent* tGS::ModSX( int index, long clk, int cha, unsigned char val )
+JZEvent* tGS::ModSX(int index, long clk, int cha, unsigned char val)
 {
-   return Sysex( clk, SX_GS_ModPitch + index, cha, 1, &val );
+   return Sysex(clk, SX_GS_ModPitch + index, cha, 1, &val);
 }
 
-JZEvent* tGS::BendSX( int index, long clk, int cha, unsigned char val )
+JZEvent* tGS::BendSX(int index, long clk, int cha, unsigned char val)
 {
-   return Sysex( clk, SX_GS_BendPitch + index, cha, 1, &val );
+   return Sysex(clk, SX_GS_BendPitch + index, cha, 1, &val);
 }
 
-JZEvent* tGS::CafSX( int index, long clk, int cha, unsigned char val )
+JZEvent* tGS::CafSX(int index, long clk, int cha, unsigned char val)
 {
-   return Sysex( clk, SX_GS_CafPitch + index, cha, 1, &val );
+   return Sysex(clk, SX_GS_CafPitch + index, cha, 1, &val);
 }
 
-JZEvent* tGS::PafSX( int index, long clk, int cha, unsigned char val )
+JZEvent* tGS::PafSX(int index, long clk, int cha, unsigned char val)
 {
-   return Sysex( clk, SX_GS_PafPitch + index, cha, 1, &val );
+   return Sysex(clk, SX_GS_PafPitch + index, cha, 1, &val);
 }
 
-JZEvent* tGS::CC1SX( int index, long clk, int cha, unsigned char val )
+JZEvent* tGS::CC1SX(int index, long clk, int cha, unsigned char val)
 {
-   return Sysex( clk, SX_GS_CC1Pitch + index, cha, 1, &val );
+   return Sysex(clk, SX_GS_CC1Pitch + index, cha, 1, &val);
 }
 
-JZEvent* tGS::CC2SX( int index, long clk, int cha, unsigned char val )
+JZEvent* tGS::CC2SX(int index, long clk, int cha, unsigned char val)
 {
-   return Sysex( clk, SX_GS_CC2Pitch + index, cha, 1, &val );
+   return Sysex(clk, SX_GS_CC2Pitch + index, cha, 1, &val);
 }
 
-JZEvent* tGS::PartialReserveSX( long clk, int cha, unsigned char *valptr )
+JZEvent* tGS::PartialReserveSX(long clk, int cha, unsigned char *valptr)
 {
-   return Sysex( clk, SX_GS_PartialReserve, 16, valptr );
+   return Sysex(clk, SX_GS_PartialReserve, 16, valptr);
 }
 
-JZEvent* tGS::RxChannelSX( long clk, int cha, unsigned char val )
+JZEvent* tGS::RxChannelSX(long clk, int cha, unsigned char val)
 {
-   return Sysex( clk, SX_GS_RxChannel, cha, 1, &val );
+   return Sysex(clk, SX_GS_RxChannel, cha, 1, &val);
 }
 
-JZEvent* tGS::UseForRhythmSX( long clk, int cha, unsigned char val )
+JZEvent* tGS::UseForRhythmSX(long clk, int cha, unsigned char val)
 {
-   return Sysex( clk, SX_GS_UseForRhythm, cha, 1, &val );
+   return Sysex(clk, SX_GS_UseForRhythm, cha, 1, &val);
 }
 
-JZEvent* tGS::ControllerNumberSX( int ctrlno, long clk, int cha, unsigned char val )
+JZEvent* tGS::ControllerNumberSX(int ctrlno, long clk, int cha, unsigned char val)
 {
-   if (ctrlno == 1)
-      return Sysex( clk, SX_GS_CC1CtrlNo, cha, 1, &val );
-   else if (ctrlno == 2)
-      return Sysex( clk, SX_GS_CC2CtrlNo, cha, 1, &val );
-   else
-      return 0;
+  if (ctrlno == 1)
+    return Sysex(clk, SX_GS_CC1CtrlNo, cha, 1, &val);
+  else if (ctrlno == 2)
+    return Sysex(clk, SX_GS_CC2CtrlNo, cha, 1, &val);
+  else
+    return 0;
 }
 
-JZEvent* tGS::ReverbMacroSX( long clk, unsigned char val, unsigned char lsb )
+JZEvent* tGS::ReverbMacroSX(long clk, unsigned char val, unsigned char lsb)
 {
-   return Sysex( clk, SX_GS_ReverbMacro, val );
+   return Sysex(clk, SX_GS_ReverbMacro, val);
 }
 
-JZEvent* tGS::ReverbParamSX( int index, long clk, unsigned char val )
+JZEvent* tGS::ReverbParamSX(int index, long clk, unsigned char val)
 {
-   return Sysex( clk, SX_GS_RevCharacter + index, val );
+   return Sysex(clk, SX_GS_RevCharacter + index, val);
 }
 
-JZEvent* tGS::ChorusMacroSX( long clk, unsigned char val, unsigned char lsb )
+JZEvent* tGS::ChorusMacroSX(long clk, unsigned char val, unsigned char lsb)
 {
-   return Sysex( clk, SX_GS_ChorusMacro, val );
+   return Sysex(clk, SX_GS_ChorusMacro, val);
 }
 
-JZEvent* tGS::ChorusParamSX( int index, long clk, unsigned char val )
+JZEvent* tGS::ChorusParamSX(int index, long clk, unsigned char val)
 {
-   return Sysex( clk, SX_GS_ChoPreLpf + index, val );
+   return Sysex(clk, SX_GS_ChoPreLpf + index, val);
 }
 
 
 
 // XG:
 
-JZEvent* tXG::ModSX( int index, long clk, int cha, unsigned char val )
+JZEvent* tXG::ModSX(int index, long clk, int cha, unsigned char val)
 {
    if ((index >= 0) && (index <= 2))
-      return Sysex( clk, SX_XG_ModPitch + index, cha, 1, &val );
+      return Sysex(clk, SX_XG_ModPitch + index, cha, 1, &val);
    else if ((index >= 4) && (index <=6))
-      return Sysex( clk, SX_XG_ModPitch + index - 1, cha, 1, &val );
+      return Sysex(clk, SX_XG_ModPitch + index - 1, cha, 1, &val);
    else
       return 0;
 }
 
-JZEvent* tXG::BendSX( int index, long clk, int cha, unsigned char val )
+JZEvent* tXG::BendSX(int index, long clk, int cha, unsigned char val)
 {
    if ((index >= 0) && (index <= 2))
-      return Sysex( clk, SX_XG_BendPitch + index, cha, 1, &val );
+      return Sysex(clk, SX_XG_BendPitch + index, cha, 1, &val);
    else if ((index >= 4) && (index <=6))
-       return Sysex( clk, SX_XG_BendPitch + index - 1, cha, 1, &val );
+       return Sysex(clk, SX_XG_BendPitch + index - 1, cha, 1, &val);
    else
       return 0;
 }
 
-JZEvent* tXG::CafSX( int index, long clk, int cha, unsigned char val )
+JZEvent* tXG::CafSX(int index, long clk, int cha, unsigned char val)
 {
    if ((index >= 0) && (index <= 2))
-      return Sysex( clk, SX_XG_CafPitch + index, cha, 1, &val );
+      return Sysex(clk, SX_XG_CafPitch + index, cha, 1, &val);
    else if ((index >= 4) && (index <= 6))
-       return Sysex( clk, SX_XG_CafPitch + index - 1, cha, 1, &val );
+       return Sysex(clk, SX_XG_CafPitch + index - 1, cha, 1, &val);
    else
       return 0;
 }
 
-JZEvent* tXG::PafSX( int index, long clk, int cha, unsigned char val )
+JZEvent* tXG::PafSX(int index, long clk, int cha, unsigned char val)
 {
    if ((index >= 0) && (index <= 2))
-      return Sysex( clk, SX_XG_PafPitch + index, cha, 1, &val );
+      return Sysex(clk, SX_XG_PafPitch + index, cha, 1, &val);
    else if ((index >= 4) && (index <= 6))
-       return Sysex( clk, SX_XG_PafPitch + index - 1, cha, 1, &val );
+       return Sysex(clk, SX_XG_PafPitch + index - 1, cha, 1, &val);
    else
       return 0;
 }
 
-JZEvent* tXG::CC1SX( int index, long clk, int cha, unsigned char val )
+JZEvent* tXG::CC1SX(int index, long clk, int cha, unsigned char val)
 {
    if ((index >= 0) && (index <= 2))
-      return Sysex( clk, SX_XG_CC1Pitch + index, cha, 1, &val );
+      return Sysex(clk, SX_XG_CC1Pitch + index, cha, 1, &val);
    else if ((index >= 4) && (index <= 6))
-       return Sysex( clk, SX_XG_CC1Pitch + index - 1, cha, 1, &val );
+       return Sysex(clk, SX_XG_CC1Pitch + index - 1, cha, 1, &val);
    else
       return 0;
 }
 
-JZEvent* tXG::CC2SX( int index, long clk, int cha, unsigned char val )
+JZEvent* tXG::CC2SX(int index, long clk, int cha, unsigned char val)
 {
    if ((index >= 0) && (index <= 2))
-      return Sysex( clk, SX_XG_CC2Pitch + index, cha, 1, &val );
+      return Sysex(clk, SX_XG_CC2Pitch + index, cha, 1, &val);
    else if ((index >= 4) && (index <= 6))
-       return Sysex( clk, SX_XG_CC2Pitch + index - 1, cha, 1, &val );
+       return Sysex(clk, SX_XG_CC2Pitch + index - 1, cha, 1, &val);
    else
       return 0;
 }
 
-JZEvent* tXG::RxChannelSX( long clk, int cha, unsigned char val )
+JZEvent* tXG::RxChannelSX(long clk, int cha, unsigned char val)
 {
-   return Sysex( clk, SX_XG_RxChannel, cha, 1, &val );
+   return Sysex(clk, SX_XG_RxChannel, cha, 1, &val);
 }
 
-JZEvent* tXG::UseForRhythmSX( long clk, int cha, unsigned char val )
+JZEvent* tXG::UseForRhythmSX(long clk, int cha, unsigned char val)
 {
-   return Sysex( clk, SX_XG_UseForRhythm, cha, 1, &val );
+   return Sysex(clk, SX_XG_UseForRhythm, cha, 1, &val);
 }
 
-JZEvent* tXG::ControllerNumberSX( int ctrlno, long clk, int cha, unsigned char val )
+JZEvent* tXG::ControllerNumberSX(int ctrlno, long clk, int cha, unsigned char val)
 {
    if (ctrlno == 1)
-      return Sysex( clk, SX_XG_CC1CtrlNo, cha, 1, &val );
+      return Sysex(clk, SX_XG_CC1CtrlNo, cha, 1, &val);
    else if (ctrlno == 2)
-      return Sysex( clk, SX_XG_CC2CtrlNo, cha, 1, &val );
+      return Sysex(clk, SX_XG_CC2CtrlNo, cha, 1, &val);
    else
       return 0;
 }
 
-JZEvent* tXG::ReverbMacroSX( long clk, unsigned char val, unsigned char lsb )
+JZEvent* tXG::ReverbMacroSX(long clk, unsigned char val, unsigned char lsb)
 {
    unsigned char valp[2];
    valp[0] = val;
    valp[1] = lsb;
 
-   return Sysex( clk, SX_XG_ReverbMacro, 2, valp );
+   return Sysex(clk, SX_XG_ReverbMacro, 2, valp);
 }
 
-JZEvent* tXG::ChorusMacroSX( long clk, unsigned char val, unsigned char lsb )
+JZEvent* tXG::ChorusMacroSX(long clk, unsigned char val, unsigned char lsb)
 {
-   unsigned char valp[2];
-   valp[0] = val;
-   valp[1] = lsb;
+  unsigned char valp[2];
+  valp[0] = val;
+  valp[1] = lsb;
 
-   return Sysex( clk, SX_XG_ChorusMacro, 2, valp );
+  return Sysex(clk, SX_XG_ChorusMacro, 2, valp);
 }
 
-JZEvent* tXG::EqualizerMacroSX( long clk, unsigned char val )
+JZEvent* tXG::EqualizerMacroSX(long clk, unsigned char val)
 {
-   return Sysex( clk, SX_XG_EqualizerMacro, val );
+  return Sysex(clk, SX_XG_EqualizerMacro, val);
 }

@@ -1660,7 +1660,7 @@ int tSeq2Player::OutEvent(JZEvent *e, int now)
             sysex->device_no = mididev;
             sysex->len = s->Length + 1;
             sysex->data[0] = 0xf0;
-            memcpy(sysex->data + 1, s->Data, s->Length);
+            memcpy(sysex->data + 1, s->mpData, s->Length);
             SEQ_WRPATCH(sysex, sizeof(*sysex) + sysex->len - 1);
 
             delete [] (char *)sysex;
@@ -1678,7 +1678,7 @@ int tSeq2Player::OutEvent(JZEvent *e, int now)
                SEQ_SYSEX(mididev, (unsigned char *)buf, N);
                i = 0;
              }
-             buf[i++] = sx->Data[j];
+             buf[i++] = sx->mpData[j];
            }
            if (i > 0) {
              SEQ_SYSEX(mididev, (unsigned char *)buf, i);

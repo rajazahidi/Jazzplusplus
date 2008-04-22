@@ -407,7 +407,7 @@ int tAlsaPlayer::OutEvent(JZEvent *e, int now)
         // prepend 0xf0
         char *buf = new char[s->Length + 1];
         buf[0] = 0xF0;
-        memcpy(buf + 1, s->Data, s->Length);
+        memcpy(buf + 1, s->mpData, s->Length);
         set_event_header(&ev, e->GetClock(), s->Length + 1, buf);
         rc = write(&ev, now);
         delete [] buf;

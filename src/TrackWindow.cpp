@@ -142,7 +142,8 @@ void JZTrackWindow::Create()
   Dc.GetTextExtent("999", &Width, &Height);
   mPatchWidth = Width + 2 * mLittleBit;
 
-  mLeftInfoWidth = mNumberWidth + mTrackNameWidth + mStateWidth + mPatchWidth + 1;
+  mLeftInfoWidth =
+    mNumberWidth + mTrackNameWidth + mStateWidth + mPatchWidth + 1;
 
 //DEBUG  cout
 //DEBUG    << ' ' << mNumberWidth
@@ -280,10 +281,10 @@ void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& Event)
   // Check to see if the mouse was clicked in the top header.
   if (Point.y < mTopInfoHeight)
   {
-    // Check to see if the mouse was clicked inside of the number mode
-    // indicator.
-    if (Point.x < mNumberWidth && Point.y < mTopInfoHeight)
+    if (Point.x < mNumberWidth)
     {
+      // The point is inside of the number mode indicator, so toggle the first
+      // column between track index and MIDI channel.
       if (mNumberMode == eNmTrackNr)
       {
         mNumberMode = eNmMidiChannel;
@@ -295,11 +296,13 @@ void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& Event)
         Refresh(false);
       }
     }
-    // Check to see if the mouse was clicked inside of the track name header.
     else if (
       Point.x >= mTrackNameX &&
       Point.x < mTrackNameX + mTrackNameWidth)
     {
+      // The point is inside of the track name header.  This cell indicates
+      // the song tempo.
+
       // Bump up the speed value one tick.
       int SpeedBpm = gpProject->GetTrack(0)->GetDefaultSpeed();
       ++SpeedBpm;
@@ -309,9 +312,10 @@ void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& Event)
       }
       Refresh(false);
     }
-    // Check to see if the mouse was clicked inside of the patch header.
     else if (Point.x >= mPatchX && Point.x < mPatchX + mPatchWidth)
     {
+      // The point is inside the patch header.
+
       // Toggle the patch type.
       switch (mCounterMode)
       {
@@ -338,28 +342,45 @@ void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& Event)
       Refresh(false);
     }
   }
-  else if (Point.x >= mStateX && Point.x < mStateX + mStateWidth)
+  else
   {
-    ToggleTrackState(Point);
-  }
-  // Check to see if the mouse was clicked inside of a track name.
-  else if (
-    Point.x >= mTrackNameX &&
-    Point.x < mTrackNameX + mTrackNameWidth)
-  {
-    // Edit the track settings.
+    // The point is not in the top header row.
+
+    // Get the track associated with the y position.
     JZTrack* pTrack = y2Track(Point.y);
     if (pTrack)
     {
-      pTrack->Dialog(this);
-      Refresh(false);
+      if (Point.x < mNumberWidth)
+      {
+        // The point is inside the number field.
+      }
+      else if (
+        Point.x >= mTrackNameX &&
+        Point.x < mTrackNameX + mTrackNameWidth)
+      {
+        // The point is inside of a track name column.  Edit the track
+        // settings.
+        pTrack->Dialog(this);
+        Refresh(false);
+      }
+      else if (Point.x >= mStateX && Point.x < mStateX + mStateWidth)
+      {
+        // The point is inside the track name field.  Toggle the track state.
+        pTrack->ToggleState(1);
+        Refresh(false);
+      }
+      else if (Point.x >= mPatchX && Point.x < mPatchX + mPatchWidth)
+      {
+        IncreaseTrackNumberField(pTrack);
+      }
+      else if (
+        Point.x >= mEventsX && Point.x < mEventsX + mEventsWidth &&
+        Point.y >= mEventsY && Point.y < mEventsY + mEventsHeight)
+      {
+        // The point is in event area.
+        SnapSelectionStop(Event);
+      }
     }
-  }
-  else if (
-    Point.x >= mEventsX && Point.x < mEventsX + mEventsWidth &&
-    Point.y >= mEventsY && Point.y < mEventsY + mEventsHeight)
-  {
-    SnapSelectionStop(Event);
   }
 }
 
@@ -369,29 +390,103 @@ void JZTrackWindow::OnRightButtonUp(wxMouseEvent& Event)
 {
   wxPoint Point = Event.GetPosition();
 
-  if (
-    Point.x >= mTrackNameX && Point.x < mTrackNameX + mTrackNameWidth &&
-    Point.y < mTopInfoHeight)
+  if (Point.y < mTopInfoHeight)
   {
-    // Knock down the speed value one tick.
-    int SpeedBpm = gpProject->GetTrack(0)->GetDefaultSpeed();
-    --SpeedBpm;
-    if (SpeedBpm > 0 && SpeedBpm < 300)
+    // The point is inside the top header line.
+
+    if (Point.x >= mTrackNameX && Point.x < mTrackNameX + mTrackNameWidth)
     {
-      gpProject->GetTrack(0)->SetDefaultSpeed(SpeedBpm);
+      // The point is inside the track name field.
+      int SpeedBpm = gpProject->GetTrack(0)->GetDefaultSpeed();
+
+      // Knock down the speed value one tick.
+      --SpeedBpm;
+
+      if (SpeedBpm > 0 && SpeedBpm < 300)
+      {
+        gpProject->GetTrack(0)->SetDefaultSpeed(SpeedBpm);
+      }
+      Refresh(false);
     }
+  }
+  else
+  {
+    // The point is below the top header line.
+
+    // Get the track associated with the y position.
+    JZTrack* pTrack = y2Track(Point.y);
+    if (pTrack)
+    {
+      if (Point.x < mNumberWidth)
+      {
+        // The point is inside the number field.
+      }
+      else if (Point.x >= mStateX && Point.x < mStateX + mStateWidth)
+      {
+        // The point is inside the track name field.
+      }
+      else if (Point.x >= mPatchX && Point.x < mPatchX + mPatchWidth)
+      {
+        DecreaseTrackNumberField(pTrack);
+      }
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::IncreaseTrackNumberField(JZTrack* pTrack)
+{
+  bool UpdateFlag = false;
+
+  switch (mCounterMode)
+  {
+    case eCmProgram:
+      break;
+    case eCmBank:
+      break;
+    case eCmVolume:
+      UpdateFlag = pTrack->IncreaseVolume();
+      break;
+    case eCmPan:
+      break;
+    case eCmReverb:
+      break;
+    case eCmChorus:
+    default:
+      break;
+  }
+  if (UpdateFlag)
+  {
     Refresh(false);
   }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZTrackWindow::ToggleTrackState(const wxPoint& Point)
+void JZTrackWindow::DecreaseTrackNumberField(JZTrack* pTrack)
 {
-  JZTrack* pTrack = y2Track(Point.y);
-  if (pTrack)
+  bool UpdateFlag = false;
+
+  switch (mCounterMode)
   {
-    pTrack->ToggleState(1);
+    case eCmProgram:
+      break;
+    case eCmBank:
+      break;
+    case eCmVolume:
+      UpdateFlag = pTrack->DecreaseVolume();
+      break;
+    case eCmPan:
+      break;
+    case eCmReverb:
+      break;
+    case eCmChorus:
+    default:
+      break;
+  }
+  if (UpdateFlag)
+  {
     Refresh(false);
   }
 }

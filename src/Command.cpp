@@ -750,15 +750,15 @@ tCmdSearchReplace::tCmdSearchReplace(JZFilter* pFilter, short sf, short st)
 
 void tCmdSearchReplace::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tControl *ctrl;
-  if ((ctrl = pEvent->IsControl()) != 0)
+  tControl* pControl = pEvent->IsControl();
+  if (pControl)
   {
-    if (ctrl->Control == fr)
+    if (pControl->mControl == fr)
     {
-      tControl *copy = (tControl *)ctrl->Copy();
-      copy->Control = to;
-      pTrack->Kill(ctrl);
-      pTrack->Put(copy);
+      tControl* pControlCopy = (tControl *)pControl->Copy();
+      pControlCopy->mControl = to;
+      pTrack->Kill(pControl);
+      pTrack->Put(pControlCopy);
     }
   }
 }

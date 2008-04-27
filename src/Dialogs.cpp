@@ -853,16 +853,16 @@ tControlDlg::tControlDlg(tControl *e, JZPianoWindow* w, JZTrack *t)
 //    Choice("Controller", &gpConfig->GetCtrlName(0), &Control)
 {
   Event = e;
-  Value = e->Value;
-  Control = e->Control + 1;
+  Value = e->mValue;
+  Control = e->mControl + 1;
 }
 
 
 bool tControlDlg::OnClose()
 {
-  ((tControl *)Copy)->Value = Value;
+  ((tControl *)Copy)->mValue = Value;
   //  Choice.GetValue();
-  ((tControl *)Copy)->Control = Control - 1;
+  ((tControl *)Copy)->mControl = Control - 1;
   return tChEventDlg::OnClose();
 }
 

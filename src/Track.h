@@ -72,7 +72,7 @@ class tParam
     virtual void SetCha( unsigned char cha );
     virtual int GetVal()
     {
-      return( DataMsb.Value );
+      return DataMsb.mValue;
     }
 
     tControl Msb;
@@ -472,6 +472,8 @@ class JZTrack : public tEventArray
 
     int  GetVolume();
     void SetVolume(int Volume);
+    bool DecreaseVolume();
+    bool IncreaseVolume();
 
     int  GetPan();
     void SetPan(int Pan);
@@ -575,8 +577,6 @@ class JZTrack : public tEventArray
 
     tMtcTime* GetMtcOffset();
     void SetMtcOffset( tMtcTime* mtc );
-
-
 };
 
 

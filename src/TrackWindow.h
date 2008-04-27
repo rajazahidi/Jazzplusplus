@@ -104,7 +104,9 @@ class JZTrackWindow : public JZEventWindow
 
     void VerticalScroll(wxScrollWinEvent& Event);
 
-    void ToggleTrackState(const wxPoint& Point);
+    void IncreaseTrackNumberField(JZTrack* pTrack);
+
+    void DecreaseTrackNumberField(JZTrack* pTrack);
 
     virtual void OnDraw(wxDC& Dc);
 
@@ -157,7 +159,7 @@ class JZTrackWindow : public JZEventWindow
     int mPlayClock;
     bool mUseColors;
 
-    // The values indicate the staring postions and widths of the track fields
+    // The values indicate the starting postions and widths of the track fields
     // on the left hand side of the screen.  Note that the position of the
     // first field displayed is always 0, so it doesn't need to be recorded.
     int mNumberWidth;

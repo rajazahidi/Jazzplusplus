@@ -299,10 +299,10 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent *e)
 
     case StatControl:
       {
-        tControl *k = e->IsControl();
-        u.c[0] = 0xB0 | k->Channel;
-        u.c[1] = k->Control;
-        u.c[2] = k->Value;
+        tControl* pControl = e->IsControl();
+        u.c[0] = 0xB0 | pControl->Channel;
+        u.c[1] = pControl->mControl;
+        u.c[2] = pControl->mValue;
       }
       break;
 

@@ -314,10 +314,10 @@ void tCtrlEditBase::OnApply()
     {
       if (IsCtrlEdit(pEvent))
       {
-        if (Clock2Val(pEvent->GetClock()) != pEvent->IsControl()->Value)
+        if (Clock2Val(pEvent->GetClock()) != pEvent->IsControl()->mValue)
         {
           pControlCopy = pEvent->Copy()->IsControl();
-          pControlCopy->Value = Clock2Val(pEvent->GetClock());
+          pControlCopy->mValue = Clock2Val(pEvent->GetClock());
           track->Kill(pEvent);
           track->Put(pControlCopy);
         }
@@ -470,13 +470,13 @@ int tCtrlEdit::Missing()
 
 int tCtrlEdit::IsCtrlEdit(JZEvent* pEvent)
 {
-  tControl *c = pEvent->IsControl();
-  return (c && c->Control == ctrl_num);
+  tControl* pControl = pEvent->IsControl();
+  return (pControl && pControl->mControl == ctrl_num);
 }
 
 int tCtrlEdit::GetValue(JZEvent* pEvent)
 {
-  return pEvent->IsControl()->Value;
+  return pEvent->IsControl()->mValue;
 }
 
 JZEvent * tCtrlEdit::NewEvent(long clock, int val)

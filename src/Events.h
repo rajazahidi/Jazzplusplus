@@ -739,20 +739,20 @@ class tControl : public tChannelEvent
 {
   public:
 
-    unsigned char Control;
-    unsigned char Value;
+    unsigned char mControl;
+    unsigned char mValue;
 
     tControl(int clk, int cha, unsigned char ctl, unsigned char val)
       : tChannelEvent(clk, StatControl, cha)
     {
-      Control = ctl;
-      Value   = val;
+      mControl = ctl;
+      mValue   = val;
     }
 
     virtual int Write(JZWriteBase &io)
     {
       edb();
-      return io.Write(this, Control, Value);
+      return io.Write(this, mControl, mValue);
     }
 
     virtual tControl* IsControl()
@@ -770,19 +770,19 @@ class tControl : public tChannelEvent
     virtual int GetValue() const
     {
       edb();
-      return Control;
+      return mControl;
     }
 
     virtual int GetPitch() const
     {
       edb();
-      return Control;
+      return mControl;
     }
 
     virtual void SetPitch(int p)
     {
       edb();
-      Control = p;
+      mControl = p;
     }
 
     virtual const wxPen* GetPen() const

@@ -78,16 +78,31 @@ BEGIN_EVENT_TABLE(JZKnob,wxControl)
   EVT_SIZE(JZKnob::OnSize)
   EVT_ERASE_BACKGROUND(JZKnob::OnEraseBackground)
   EVT_PAINT(JZKnob::OnPaint)
-  EVT_LEFT_DOWN(JZKnob::OnMouse)
-  EVT_LEFT_UP(JZKnob::OnMouse)
-  EVT_MOTION(JZKnob::OnMouse)
-  EVT_MOUSEWHEEL(JZKnob::OnMouse)
+  EVT_LEFT_DOWN(JZKnob::OnLeftButtonDown)
+  EVT_RIGHT_DOWN(JZKnob::OnRightButtonDown)
+  EVT_MOTION(JZKnob::OnMouseMove)
+  EVT_LEFT_UP(JZKnob::OnLeftButtonUp)
+  EVT_LEFT_DCLICK(JZKnob::OnLeftButtonDoubleClick)
+  EVT_RIGHT_DCLICK(JZKnob::OnRightButtonDoubleClick)
+  EVT_MOUSEWHEEL(JZKnob::OnMouseWheel)
 END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+int JZKnob::mSensitivity = 4;
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZKnob::JZKnob()
-  : wxControl()
+  : wxControl(),
+    mMinValue(0),
+    mMaxValue(100),
+    mSetting(50),
+    mRange(300),
+    mMaxAngle(300),
+    mBuffer(),
+    mDragging(false),
+    mLastPoint()
 {
 }
 
@@ -106,7 +121,15 @@ JZKnob::JZKnob(
   long WindowStyle,
   const wxValidator& Validator,
   const wxString& Name)
-  : wxControl()
+  : wxControl(),
+    mMinValue(0),
+    mMaxValue(100),
+    mSetting(50),
+    mRange(300),
+    mMaxAngle(300),
+    mBuffer(),
+    mDragging(false),
+    mLastPoint()
 {
   Create(
     pParent,
@@ -209,6 +232,15 @@ int JZKnob::SetValueWithEvent(int Value)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void JZKnob::GetCenter(int& x, int& y) const
+{
+  wxSize Size = GetSize();
+  x = Size.x / 2;
+  y = Size.y / 2;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZKnob::OnSize(wxSizeEvent& Event)
 {
   int Width, Height;
@@ -247,7 +279,8 @@ void JZKnob::OnPaint(wxPaintEvent& Event)
 
   wxBufferedDC Dc(&PaintDc, mBuffer);
 
-  Dc.SetBackground(wxBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE)));
+  Dc.SetBackground(
+    wxBrush(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE)));
 
   Dc.Clear();
 
@@ -284,87 +317,96 @@ void JZKnob::OnPaint(wxPaintEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZKnob::OnMouse(wxMouseEvent& Event)
+void JZKnob::OnLeftButtonDown(wxMouseEvent& Event)
 {
-  wxEventType ScrollEvent = wxEVT_NULL;
+  SetFocus();
 
-  if (Event.Moving())
-  {
-    Event.Skip();
-    return;
-  }
+  mLastPoint = Event.GetPosition();
 
-  if (Event.GetWheelRotation() < 0)
-  {
-    SetValueWithEvent(GetValue() - 1);
-    Event.Skip();
-    return;
-  }
+  SetCursor(wxCursor(wxCURSOR_SIZENS));
 
-  if (Event.GetWheelRotation() > 0)
-  {
-    SetValueWithEvent(GetValue() + 1);
-    Event.Skip();
-    return;
-  }
+  CaptureMouse();
 
-  int XCenter, YCenter;
-  GetCenter(XCenter, YCenter);
+  mDragging = true;
+}
 
-  double DeltaX = Event.m_x - XCenter;
-  double DeltaY = YCenter - Event.m_y;
-  if (DeltaX == 0.0 && DeltaY == 0.0)
-  {
-    return;
-  }
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZKnob::OnRightButtonDown(wxMouseEvent& Event)
+{
+  SetFocus();
+}
 
-  double Theta = atan2(DeltaY, DeltaX) * gRadiansToDegrees;
-  if (Theta < 0.0)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZKnob::OnMouseMove(wxMouseEvent& Event)
+{
+  if (mDragging)
   {
-    Theta += 360.0;
-  }
+    wxPoint Point = Event.GetPosition();
 
-  double DeltaTheta = Theta - mMaxAngle;
-  if (DeltaTheta < 0.0)
-  {
-    DeltaTheta += 360;
-  }
-  if (DeltaTheta > mRange)
-  {
-    return;
-  }
-  int NewValue = int(
-    mMaxValue - (DeltaTheta / mRange) * (mMaxValue - mMinValue));
+    int Delta = (mLastPoint.y - Point.y) / mSensitivity;
 
-  SetValueWithEvent(NewValue);
-  if (Event.Dragging() || Event.ButtonUp())
-  {
-    if (Event.ButtonUp())
+    if (Delta)
     {
-      ScrollEvent = wxEVT_SCROLL_THUMBRELEASE;
+      int PriorValue = GetValue();
+      SetValueWithEvent(PriorValue + Delta);
+      if (PriorValue != GetValue())
+      {
+        mLastPoint = Point;
+      }
     }
-    else
-    {
-      ScrollEvent = wxEVT_SCROLL_THUMBTRACK;
-    }
-
-    wxScrollEvent ScrollEvent(wxEVT_SCROLL_CHANGED, m_windowId);
-    ScrollEvent.SetPosition(NewValue);
-    ScrollEvent.SetEventObject(this);
-    GetEventHandler()->ProcessEvent(ScrollEvent);
-
-    wxCommandEvent CommandEvent(wxEVT_COMMAND_SLIDER_UPDATED, m_windowId);
-    CommandEvent.SetInt(NewValue);
-    CommandEvent.SetEventObject(this);
-    GetEventHandler()->ProcessEvent(CommandEvent);
   }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZKnob::GetCenter(int& x, int& y) const
+void JZKnob::OnLeftButtonUp(wxMouseEvent& Event)
 {
-  wxSize Size = GetSize();
-  x = Size.x / 2;
-  y = Size.y / 2;
+  if (HasCapture())
+  {
+    ReleaseMouse();
+  }
+
+  SetCursor(wxCursor(wxCURSOR_ARROW));
+
+  mDragging = false;
+
+  wxPoint Point = Event.GetPosition();
+
+  int Delta = (mLastPoint.y - Point.y) / mSensitivity;
+  if (Delta)
+  {
+    SetValueWithEvent(GetValue() + Delta);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZKnob::OnLeftButtonDoubleClick(wxMouseEvent& Event)
+{
+  SetValueWithEvent(GetValue() + 1);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZKnob::OnRightButtonDoubleClick(wxMouseEvent& Event)
+{
+  SetValueWithEvent(GetValue() - 1);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZKnob::OnMouseWheel(wxMouseEvent& Event)
+{
+  int WheelRotation = Event.GetWheelRotation();
+
+  if (WheelRotation < 0)
+  {
+    SetValueWithEvent(GetValue() - 1);
+  }
+  else if (WheelRotation > 0)
+  {
+    SetValueWithEvent(GetValue() + 1);
+  }
 }

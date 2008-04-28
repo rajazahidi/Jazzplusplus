@@ -145,9 +145,23 @@ class JZKnob : public wxControl
 
     void OnPaint(wxPaintEvent& Event);
 
-    void OnMouse(wxMouseEvent& Event);
+    void OnLeftButtonDown(wxMouseEvent& Event);
+
+    void OnRightButtonDown(wxMouseEvent& Event);
+
+    void OnMouseMove(wxMouseEvent& Event);
+
+    void OnLeftButtonUp(wxMouseEvent& Event);
+
+    void OnLeftButtonDoubleClick(wxMouseEvent& Event);
+
+    void OnRightButtonDoubleClick(wxMouseEvent& Event);
+
+    void OnMouseWheel(wxMouseEvent& Event);
 
   private:
+
+    static int mSensitivity;
 
     int mMinValue;
 
@@ -155,11 +169,15 @@ class JZKnob : public wxControl
 
     int mSetting;
 
-    unsigned int mMaxAngle;
-
     unsigned int mRange;
 
+    unsigned int mMaxAngle;
+
     wxBitmap mBuffer;
+
+    bool mDragging;
+
+    wxPoint mLastPoint;
 
   DECLARE_EVENT_TABLE()
 };

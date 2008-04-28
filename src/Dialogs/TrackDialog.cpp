@@ -21,14 +21,30 @@
 #include "WxWidgets.h"
 
 #include "TrackDialog.h"
+#include "../Knob.h"
 #include "../Track.h"
 #include "../Configuration.h"
 #include "../Globals.h"
+#include "../Resources.h"
+
+#include <sstream>
 
 using namespace std;
 
 //*****************************************************************************
 //*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+BEGIN_EVENT_TABLE(JZTrackDialog, wxDialog)
+
+  EVT_KNOB_CHANGED(IDC_KB_CHANNEL, JZTrackDialog::OnChannelChange)
+
+  EVT_BUTTON(wxID_HELP, JZTrackDialog::OnHelp)
+
+END_EVENT_TABLE()
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZTrackDialog::JZTrackDialog(JZTrack& Track, wxWindow* pParent)
   : wxDialog(pParent, wxID_ANY, wxString("Track Settings")),
     mTrack(Track),
@@ -73,6 +89,10 @@ JZTrackDialog::JZTrackDialog(JZTrack& Track, wxWindow* pParent)
     }
   }
 
+  mpChannelValue = new wxStaticText(this, wxID_ANY, "00");
+
+  mpChannelKnob = new JZKnob(this, IDC_KB_CHANNEL, 0, 1, 16);
+
   wxButton* pOkButton = new wxButton(this, wxID_OK, "&OK");
   wxButton* pCancelButton = new wxButton(this, wxID_CANCEL, "Cancel");
   wxButton* pHelpButton = new wxButton(this, wxID_HELP, "Help");
@@ -93,6 +113,21 @@ JZTrackDialog::JZTrackDialog(JZTrack& Track, wxWindow* pParent)
     wxALL,
     4);
   pTopSizer->Add(mpPatchListBox, 0, wxGROW | wxALL, 4);
+
+  wxFlexGridSizer* pFlexGridSizer = new wxFlexGridSizer(1, 3, 4, 2);
+
+  pFlexGridSizer->Add(
+    new wxStaticText(this, wxID_ANY, "Channel:"),
+    0,
+    wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
+  pFlexGridSizer->Add(
+    mpChannelValue,
+    0,
+    wxALIGN_CENTER_VERTICAL | wxFIXED_MINSIZE);
+  pFlexGridSizer->Add(mpChannelKnob, 0, wxALIGN_CENTER_VERTICAL);
+
+  pTopSizer->Add(pFlexGridSizer, 0, wxCENTER | wxALL, 2);
+
 
   wxBoxSizer* pButtonSizer = new wxBoxSizer(wxHORIZONTAL);
   pButtonSizer->Add(pOkButton, 0, wxALL, 5);
@@ -117,6 +152,13 @@ bool JZTrackDialog::TransferDataToWindow()
   int PatchIndex = mTrack.GetPatch() + (mTrack.GetBank() << 8);
   mpPatchListBox->SetSelection(PatchIndex);
 
+  ostringstream Oss;
+
+  Oss << (int)mTrack.Channel;
+  mpChannelValue->SetLabel(Oss.str().c_str());
+
+  mpChannelKnob->SetValue(mTrack.Channel);
+
   return true;
 }
 
@@ -134,7 +176,25 @@ bool JZTrackDialog::TransferDataFromWindow()
     int Bank = (Selection & 0x0000ff00) >> 8;
     mTrack.SetPatch(Patch);
     mTrack.SetBank(Bank);
+    mTrack.Channel = mpChannelKnob->GetValue();
   }
 
   return true;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackDialog::OnChannelChange(JZKnobEvent& Event)
+{
+  int Value = Event.GetValue();
+  ostringstream Oss;
+  Oss << Value;
+  mpChannelValue->SetLabel(Oss.str().c_str());
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackDialog::OnHelp(wxCommandEvent& Event)
+{
+//  gpHelpInstance->ShowTopic("Track Dialog");
 }

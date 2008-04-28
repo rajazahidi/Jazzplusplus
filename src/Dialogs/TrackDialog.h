@@ -23,6 +23,9 @@
 
 class JZTrack;
 class wxTextCtrl;
+class wxStaticText;
+class JZKnobEvent;
+class JZKnob;
 
 //*****************************************************************************
 //*****************************************************************************
@@ -38,6 +41,10 @@ class JZTrackDialog : public wxDialog
 
     virtual bool TransferDataFromWindow();
 
+    void OnChannelChange(JZKnobEvent& Event);
+
+    void OnHelp(wxCommandEvent& Event);
+
   private:
 
     JZTrack& mTrack;
@@ -45,6 +52,12 @@ class JZTrackDialog : public wxDialog
     wxTextCtrl* mpTrackNameEdit;
 
     wxListBox* mpPatchListBox;
+
+    wxStaticText* mpChannelValue;
+
+    JZKnob* mpChannelKnob;
+
+  DECLARE_EVENT_TABLE();
 };
 
 #endif // !defined(JZ_TRACKDIALOG_H)

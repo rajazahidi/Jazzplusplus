@@ -36,14 +36,41 @@ class JZTrackWindow;
 #define tsSolo 2
 
 // Mixer-defs
-enum { MxVol = 0, MxPan, MxRev, MxCho, MxParams };
-
+enum
+{
+  MxVol = 0,
+  MxPan,
+  MxRev,
+  MxCho,
+  MxParams
+};
 
 // Param (Nrpn / Rpn) things
-enum { NrpnVibRate = 0, NrpnVibDepth, NrpnVibDelay, NrpnVibParams };
-enum { NrpnCutoff = 0, NrpnResonance, NrpnSoundParams };
-enum { NrpnEnvAttack = 0, NrpnEnvDecay, NrpnEnvRelease, NrpnEnvParams };
+enum
+{
+  NrpnVibRate = 0,
+  NrpnVibDepth,
+  NrpnVibDelay,
+  NrpnVibParams
+};
 
+enum
+{
+  NrpnCutoff = 0,
+  NrpnResonance,
+  NrpnSoundParams
+};
+
+enum
+{
+  NrpnEnvAttack = 0,
+  NrpnEnvDecay,
+  NrpnEnvRelease,
+  NrpnEnvParams
+};
+
+//*****************************************************************************
+//*****************************************************************************
 class tParam
 {
   public:
@@ -56,11 +83,11 @@ class tParam
       unsigned char id2,
       unsigned char lsb,
       unsigned char msbval)
-      : Msb( clk, cha, id1, msb ),
-        Lsb( clk, cha, id2, lsb ),
-        DataMsb( clk, cha, 0x06, msbval ),
-        ResetMsb( clk, cha, id1, 0x7f ),
-        ResetLsb( clk, cha, id2, 0x7f )
+      : mMsb(clk, cha, id1, msb),
+        mLsb(clk, cha, id2, lsb),
+        mDataMsb(clk, cha, 0x06, msbval),
+        mResetMsb(clk, cha, id1, 0x7f),
+        mResetLsb(clk, cha, id2, 0x7f)
     {
     }
 
@@ -69,19 +96,23 @@ class tParam
     }
 
     virtual int Write(JZWriteBase& Io);
-    virtual void SetCha( unsigned char cha );
+
+    virtual void SetCha(unsigned char cha);
+
     virtual int GetVal()
     {
-      return DataMsb.mValue;
+      return mDataMsb.mValue;
     }
 
-    tControl Msb;
-    tControl Lsb;
-    tControl DataMsb;
-    tControl ResetMsb;
-    tControl ResetLsb;
+    tControl mMsb;
+    tControl mLsb;
+    tControl mDataMsb;
+    tControl mResetMsb;
+    tControl mResetLsb;
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tNrpn : public tParam
 {
   public:
@@ -97,6 +128,8 @@ class tNrpn : public tParam
     }
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tRpn : public tParam
 {
   public:
@@ -123,56 +156,133 @@ int sysex_channel(int Channel);
 
 enum ModulationSysexParameter
 {
-  mspModPitchControl = 0, mspModTvfCut, mspModAmpl, mspModLfo1Rate,
-  mspModLfo1Pitch, mspModLfo1Tvf, mspModLfo1Tva, mspModLfo2Rate,
-  mspModLfo2Pitch, mspModLfo2Tvf, mspModLfo2Tva, mspModulationSysexParameters
+  mspModPitchControl = 0,
+  mspModTvfCut,
+  mspModAmpl,
+  mspModLfo1Rate,
+  mspModLfo1Pitch,
+  mspModLfo1Tvf,
+  mspModLfo1Tva,
+  mspModLfo2Rate,
+  mspModLfo2Pitch,
+  mspModLfo2Tvf,
+  mspModLfo2Tva,
+  mspModulationSysexParameters
 };
 
-enum BenderSysexParameter {
-  bspBendPitchControl = 0, bspBendTvfCut, bspBendAmpl, bspBendLfo1Rate,
-  bspBendLfo1Pitch, bspBendLfo1Tvf, bspBendLfo1Tva, bspBendLfo2Rate,
-  bspBendLfo2Pitch, bspBendLfo2Tvf, bspBendLfo2Tva, bspBenderSysexParameters
+enum BenderSysexParameter
+{
+  bspBendPitchControl = 0,
+  bspBendTvfCut,
+  bspBendAmpl,
+  bspBendLfo1Rate,
+  bspBendLfo1Pitch,
+  bspBendLfo1Tvf,
+  bspBendLfo1Tva,
+  bspBendLfo2Rate,
+  bspBendLfo2Pitch,
+  bspBendLfo2Tvf,
+  bspBendLfo2Tva,
+  bspBenderSysexParameters
 };
 
-enum CAfSysexParameter {
-  cspCAfPitchControl = 0, cspCAfTvfCut, cspCAfAmpl, cspCAfLfo1Rate,
-  cspCAfLfo1Pitch, cspCAfLfo1Tvf, cspCAfLfo1Tva, cspCAfLfo2Rate,
-  cspCAfLfo2Pitch, cspCAfLfo2Tvf, cspCAfLfo2Tva, cspCAfSysexParameters
+enum CAfSysexParameter
+{
+  cspCAfPitchControl = 0,
+  cspCAfTvfCut,
+  cspCAfAmpl,
+  cspCAfLfo1Rate,
+  cspCAfLfo1Pitch,
+  cspCAfLfo1Tvf,
+  cspCAfLfo1Tva,
+  cspCAfLfo2Rate,
+  cspCAfLfo2Pitch,
+  cspCAfLfo2Tvf,
+  cspCAfLfo2Tva,
+  cspCAfSysexParameters
 };
 
-enum PAfSysexParameter {
-  pspPAfPitchControl = 0, pspPAfTvfCut, pspPAfAmpl, pspPAfLfo1Rate,
-  pspPAfLfo1Pitch, pspPAfLfo1Tvf, pspPAfLfo1Tva, pspPAfLfo2Rate,
-  pspPAfLfo2Pitch, pspPAfLfo2Tvf, pspPAfLfo2Tva, pspPAfSysexParameters
+enum PAfSysexParameter
+{
+  pspPAfPitchControl = 0,
+  pspPAfTvfCut,
+  pspPAfAmpl,
+  pspPAfLfo1Rate,
+  pspPAfLfo1Pitch,
+  pspPAfLfo1Tvf,
+  pspPAfLfo1Tva,
+  pspPAfLfo2Rate,
+  pspPAfLfo2Pitch,
+  pspPAfLfo2Tvf,
+  pspPAfLfo2Tva,
+  pspPAfSysexParameters
 };
 
-enum CC1SysexParameter {
-  cspCC1PitchControl = 0, cspCC1TvfCut, cspCC1Ampl, cspCC1Lfo1Rate,
-  cspCC1Lfo1Pitch, cspCC1Lfo1Tvf, cspCC1Lfo1Tva, cspCC1Lfo2Rate,
-  cspCC1Lfo2Pitch, cspCC1Lfo2Tvf, cspCC1Lfo2Tva, cspCC1SysexParameters
+enum CC1SysexParameter
+{
+  cspCC1PitchControl = 0,
+  cspCC1TvfCut,
+  cspCC1Ampl,
+  cspCC1Lfo1Rate,
+  cspCC1Lfo1Pitch,
+  cspCC1Lfo1Tvf,
+  cspCC1Lfo1Tva,
+  cspCC1Lfo2Rate,
+  cspCC1Lfo2Pitch,
+  cspCC1Lfo2Tvf,
+  cspCC1Lfo2Tva,
+  cspCC1SysexParameters
 };
 
-enum CC2SysexParameter {
-  cspCC2PitchControl = 0, cspCC2TvfCut, cspCC2Ampl, cspCC2Lfo1Rate,
-  cspCC2Lfo1Pitch, cspCC2Lfo1Tvf, cspCC2Lfo1Tva, cspCC2Lfo2Rate,
-  cspCC2Lfo2Pitch, cspCC2Lfo2Tvf, cspCC2Lfo2Tva, cspCC2SysexParameters
+enum CC2SysexParameter
+{
+  cspCC2PitchControl = 0,
+  cspCC2TvfCut,
+  cspCC2Ampl,
+  cspCC2Lfo1Rate,
+  cspCC2Lfo1Pitch,
+  cspCC2Lfo1Tvf,
+  cspCC2Lfo1Tva,
+  cspCC2Lfo2Rate,
+  cspCC2Lfo2Pitch,
+  cspCC2Lfo2Tvf,
+  cspCC2Lfo2Tva,
+  cspCC2SysexParameters
 };
 
-enum ReverbSysexParameter {
-  rspRevCharacter = 0, rspRevPreLpf, rspRevLevel, rspRevTime,
-  rspRevDelayFeedback, rspRevSendChorus, rspReverbSysexParameters
+enum ReverbSysexParameter
+{
+  rspRevCharacter = 0,
+  rspRevPreLpf,
+  rspRevLevel,
+  rspRevTime,
+  rspRevDelayFeedback,
+  rspRevSendChorus,
+  rspReverbSysexParameters
 };
 
-enum ChorusSysexParameter {
-  cspChoPreLpf = 0, cspChoLevel, cspChoFeedback, cspChoDelay,
-  cspChoRate, cspChoDepth, cspChoSendReverb, cspChorusSysexParameters
+enum ChorusSysexParameter
+{
+  cspChoPreLpf = 0,
+  cspChoLevel,
+  cspChoFeedback,
+  cspChoDelay,
+  cspChoRate,
+  cspChoDepth,
+  cspChoSendReverb,
+  cspChorusSysexParameters
 };
 
-enum ModeSysexParameter {
-  mspRxChannel = 0x02, mspRxCAf = 0x04, mspRxPAf = 0x07, mspUseForRhythm = 0x15
+enum ModeSysexParameter
+{
+  mspRxChannel = 0x02,
+  mspRxCAf = 0x04,
+  mspRxPAf = 0x07,
+  mspUseForRhythm = 0x15
 };
 
-enum DrumInstrumentParameter {
+enum DrumInstrumentParameter
+{
   drumPitch = 0x18,
   drumTva = 0x1a,
   drumPan = 0x1c,
@@ -180,7 +290,8 @@ enum DrumInstrumentParameter {
   drumChorus = 0x1e
 };
 
-enum DrumInstrumentParameterIndex {
+enum DrumInstrumentParameterIndex
+{
   drumPitchIndex = 0,
   drumTvaIndex,
   drumPanIndex,
@@ -189,34 +300,42 @@ enum DrumInstrumentParameterIndex {
   numDrumParameters
 };
 
-int drumParam2Index( int par );
-int drumIndex2Param( int index );
+int drumParam2Index(int par);
+int drumIndex2Param(int index);
 
 class tDrumInstrumentParameterList;
 
+//*****************************************************************************
+//*****************************************************************************
 class tDrumInstrumentParameter
 {
-
     friend class tDrumInstrumentParameterList;
 
-  private:
-    int pitch;
-    tNrpn *param[numDrumParameters];
-    tDrumInstrumentParameter *next;
   public:
+
     tDrumInstrumentParameter( tNrpn *par );
     tNrpn *Get( int index );
     void Put( tNrpn *par );
     tDrumInstrumentParameter *Next();
     int Pitch();
+
+  private:
+
+    int mPitch;
+    tNrpn* param[numDrumParameters];
+    tDrumInstrumentParameter* mpNext;
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tDrumInstrumentParameterList
 {
-  private:
-    tDrumInstrumentParameter *list;
   public:
-    tDrumInstrumentParameterList() : list(0) {}
+
+    tDrumInstrumentParameterList()
+      : list(0)
+    {
+    }
     tDrumInstrumentParameter *GetElem( int pit );
     tNrpn *GetParam( int pit, int index );
     void PutParam( tNrpn *par );
@@ -225,14 +344,30 @@ class tDrumInstrumentParameterList
     tDrumInstrumentParameter *NextElem( tDrumInstrumentParameter *cur );
     void DelElem( int pit );
     void Clear();
-    int IsEmpty() { return( list == 0 ); }
+    int IsEmpty()
+    {
+      return( list == 0 );
+    }
+
+  private:
+
+    tDrumInstrumentParameter* list;
 };
 
-enum tMtcType { Mtc24 = 0, Mtc25, Mtc30Df, Mtc30Ndf };
+enum tMtcType
+{
+  Mtc24 = 0,
+  Mtc25,
+  Mtc30Df,
+  Mtc30Ndf
+};
 
+//*****************************************************************************
+//*****************************************************************************
 class tMtcTime
 {
   public:
+
     tMtcType type;
     int hour;
     int min;
@@ -249,6 +384,8 @@ class tMtcTime
 };
 
 
+//*****************************************************************************
+//*****************************************************************************
 class tSimpleEventArray : public wxObject
 {
   public:
@@ -282,6 +419,8 @@ class tSimpleEventArray : public wxObject
 };
 
 
+//*****************************************************************************
+//*****************************************************************************
 class tUndoBuffer : public tSimpleEventArray
 {
   friend class JZTrack;
@@ -289,10 +428,11 @@ class tUndoBuffer : public tSimpleEventArray
   public:
 
     virtual void Clear();
-    void Put(JZEvent *e, int killed)
+
+    void Put(JZEvent* pEvent, int killed)
     {
       bits.set(nEvents, killed);
-      tSimpleEventArray::Put(e);
+      tSimpleEventArray::Put(pEvent);
     }
 
   private:
@@ -301,6 +441,8 @@ class tUndoBuffer : public tSimpleEventArray
 };
 
 
+//*****************************************************************************
+//*****************************************************************************
 class tEventArray : public tSimpleEventArray
 {
     friend class tEventIterator;
@@ -402,41 +544,42 @@ class tEventArray : public tSimpleEventArray
 };
 
 
-
 #define MaxUndo 20
 
+//*****************************************************************************
+// Description:
+//   This is the track class declaration.
+//*****************************************************************************
 class JZTrack : public tEventArray
 {
   public:
 
-    static bool changed;
+    static bool mChanged;
 
     JZTrack();
-    ~JZTrack() { Clear(); }
+
+    virtual ~JZTrack();
 
     bool IsDrumTrack();
 
-    int iUndo;  // index to actual undo buffer
-    int nRedo;  // current number of possible redo's
-    int nUndo;  // current number of possible undo's
-    tUndoBuffer UndoBuffers[MaxUndo];
+  public:
 
-    wxDialog *DialogBox;
+    void Dialog(JZTrackWindow* pParent);
 
-    void Dialog(JZTrackWindow *parent);
+    bool IsEditing() const;
 
-    void Put(JZEvent *e)
+    void Put(JZEvent* pEvent)
     {
-      changed = true;
-      tEventArray::Put(e);
-      UndoBuffers[iUndo].Put(e, 0);
+      mChanged = true;
+      tEventArray::Put(pEvent);
+      mUndoBuffers[mUndoIndex].Put(pEvent, 0);
     }
 
-    void Kill(JZEvent *e)
+    void Kill(JZEvent* pEvent)
     {
-      changed = true;
-      e->Kill();
-      UndoBuffers[iUndo].Put(e, 1);
+      mChanged = true;
+      pEvent->Kill();
+      mUndoBuffers[mUndoIndex].Put(pEvent, 1);
     }
 
     void Merge(tEventArray *other);
@@ -508,7 +651,7 @@ class JZTrack : public tEventArray
     int  GetEnvRelease();
     void SetEnvRelease(int EnvRelease);
 
-    int GetDrumParam( int pitch, int index );
+    int  GetDrumParam(int pitch, int index);
     void SetDrumParam(int pitch, int index, int Value);
 
     int  GetBendPitchSens();
@@ -577,95 +720,111 @@ class JZTrack : public tEventArray
 
     tMtcTime* GetMtcOffset();
     void SetMtcOffset( tMtcTime* mtc );
+
+  private:
+
+    // Index in the actual undo buffer.
+    int mUndoIndex;
+
+    // Current number of possible redo's.
+    int mRedoCount;
+
+    // Current number of possible undo's.
+    int mUndoCount;
+
+    tUndoBuffer mUndoBuffers[MaxUndo];
+
+    wxDialog* mpDialog;
 };
 
 
-// ***********************************************************************
-// tEventIterator
-// *********************************************************************
-
+//*****************************************************************************
+// Description:
+//   This is the event iterator class declaration.
+//*****************************************************************************
 class tEventIterator
 {
-    const tSimpleEventArray* Track;
-    int Start, Stop, Actual;
-
   public:
 
-    tEventIterator(const tSimpleEventArray* t)
+    tEventIterator(const tSimpleEventArray* pTrack)
     {
-      Track  = t;
-      Start  = 0;
-      Stop   = Track->nEvents;
-      Actual = Start;
+      mpTrack = pTrack;
+      mStart  = 0;
+      mStop   = mpTrack->nEvents;
+      mActual = mStart;
     }
 
-
-    JZEvent *GreaterEqual(int Clock)
+    JZEvent* GreaterEqual(int Clock)
     {
-      int lo = Start;
-      int hi = Stop;
-      int clk = 0;
-      while (lo < hi)
+      int Lo = mStart;
+      int Hi = mStop;
+      int TestClock = 0;
+      while (Lo < Hi)
       {
-        Actual  = (hi + lo) / 2;
-        clk = Track->Events[Actual]->GetClock();
-        if (clk < Clock)
+        mActual  = (Hi + Lo) / 2;
+        TestClock = mpTrack->Events[mActual]->GetClock();
+        if (TestClock < Clock)
         {
-          lo = Actual + 1;
+          Lo = mActual + 1;
         }
         else
         {
-          hi = Actual;
+          Hi = mActual;
         }
       }
-      if (Actual < Stop-1 && clk < Clock)
+      if (mActual < mStop - 1 && TestClock < Clock)
       {
-        clk = Track->Events[++Actual]->GetClock();
+        TestClock = mpTrack->Events[++mActual]->GetClock();
       }
-      if (Actual < Stop && clk >= Clock)
+      if (mActual < mStop && TestClock >= Clock)
       {
-        return Track->Events[Actual];
+        return mpTrack->Events[mActual];
       }
       return 0;
     }
 
-
-    JZEvent *First(int Clock = 0)
+    JZEvent* First(int Clock = 0)
     {
-      Actual = Start;
+      mActual = mStart;
       return GreaterEqual(Clock);
     }
 
-
-    JZEvent *Range(int frClock, unsigned toClock)
+    JZEvent* Range(int FromClock, unsigned ToClock)
     {
-      Start = Actual = 0;
-      Stop  = Track->nEvents;
+      mStart = mActual = 0;
+      mStop  = mpTrack->nEvents;
 
-      if (!GreaterEqual(frClock))
+      if (!GreaterEqual(FromClock))
+      {
         return 0;
-      Start = Actual;
-      if (GreaterEqual(toClock))
-        Stop = Actual;
-      Actual = Start;
-      return (Actual < Stop ? Track->Events[Actual] : 0);
+      }
+      mStart = mActual;
+      if (GreaterEqual(ToClock))
+      {
+        mStop = mActual;
+      }
+      mActual = mStart;
+      return (mActual < mStop ? mpTrack->Events[mActual] : 0);
     }
 
-
-    JZEvent *Next()
+    JZEvent* Next()
     {
-      if (Actual < Stop)
+      if (mActual < mStop)
       {
-        ++Actual;
+        ++mActual;
       }
-      return (Actual < Stop ? Track->Events[Actual] : 0);
+      return (mActual < mStop ? mpTrack->Events[mActual] : 0);
     }
 
     int EventsLeft()
     {
-      return Stop - Actual;
+      return mStop - mActual;
     }
 
+  private:
+
+    const tSimpleEventArray* mpTrack;
+    int mStart, mStop, mActual;
 };
 
 #endif // !defined(JZ_TRACK_H)

@@ -506,11 +506,11 @@ void JZWindowsPlayer::OutNow(JZEvent* pEvent)
 //-----------------------------------------------------------------------------
 void JZWindowsPlayer::OutNow(tParam *r)
 {
-  OutNow(&r->Msb);
-  OutNow(&r->Lsb);
-  OutNow(&r->DataMsb);
-  OutNow(&r->ResetMsb);
-  OutNow(&r->ResetLsb);
+  OutNow(&r->mMsb);
+  OutNow(&r->mLsb);
+  OutNow(&r->mDataMsb);
+  OutNow(&r->mResetMsb);
+  OutNow(&r->mResetLsb);
 }
 
 //-----------------------------------------------------------------------------

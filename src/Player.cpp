@@ -648,11 +648,11 @@ void JZPlayer::AllNotesOff(int Reset)
 
 void JZPlayer::OutNow(JZTrack *t, tParam *r)
 {
-  OutNow(t, &r->Msb);
-  OutNow(t, &r->Lsb);
-  OutNow(t, &r->DataMsb);
-  OutNow(t, &r->ResetMsb);
-  OutNow(t, &r->ResetLsb);
+  OutNow(t, &r->mMsb);
+  OutNow(t, &r->mLsb);
+  OutNow(t, &r->mDataMsb);
+  OutNow(t, &r->mResetMsb);
+  OutNow(t, &r->mResetLsb);
 }
 
 // ----------------------------------------------------------------------------------------------

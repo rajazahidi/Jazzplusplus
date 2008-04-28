@@ -685,14 +685,28 @@ void JZTrackWindow::Draw(wxDC& Dc)
         mEventsHeight);
 
       // Draw the track name.
-      if (pTrack->DialogBox)
+      if (pTrack->IsEditing())
       {
         // Show the button pressed when the dialog box is open.
-        LineText(LocalDc, mTrackNameX, y, mTrackNameWidth, pTrack->GetName(), -1, true);
+        LineText(
+          LocalDc,
+          mTrackNameX,
+          y,
+          mTrackNameWidth,
+          pTrack->GetName(),
+          -1,
+          true);
       }
       else
       {
-        LineText(LocalDc, mTrackNameX, y, mTrackNameWidth, pTrack->GetName(), -1, false);
+        LineText(
+          LocalDc,
+          mTrackNameX,
+          y,
+          mTrackNameWidth,
+          pTrack->GetName(),
+          -1,
+          false);
       }
 
       // Draw the track status.

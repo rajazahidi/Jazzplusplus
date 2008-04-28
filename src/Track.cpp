@@ -37,20 +37,20 @@
 
 int tParam::Write(JZWriteBase& Io)
 {
-  return Msb.Write(Io) + Lsb.Write(Io) + DataMsb.Write(Io);
+  return mMsb.Write(Io) + mLsb.Write(Io) + mDataMsb.Write(Io);
 }
 
 void tParam::SetCha(unsigned char cha)
 {
-  Msb.Channel = cha;
-  Lsb.Channel = cha;
-  DataMsb.Channel = cha;
+  mMsb.Channel = cha;
+  mLsb.Channel = cha;
+  mDataMsb.Channel = cha;
 
 #ifdef OBSOLETE
-  ResetMb.Channel = cha; //???? JAVE commented out this while porting
+  mResetMb.Channel = cha; //???? JAVE commented out this while porting
 #endif // OBSOLETE
 
-  ResetLsb.Channel = cha;
+  mResetLsb.Channel = cha;
 }
 
 /*
@@ -246,14 +246,14 @@ int drumIndex2Param(int index)
 }
 
 tDrumInstrumentParameter::tDrumInstrumentParameter(tNrpn *par)
-  : pitch(par->Lsb.mValue),
-    next(0)
+  : mPitch(par->mLsb.mValue),
+    mpNext(0)
 {
   for (int i = drumPitchIndex; i < numDrumParameters; i++)
   {
     param[i] = 0;
   }
-  param[drumParam2Index(par->Msb.mValue)] = par;
+  param[drumParam2Index(par->mMsb.mValue)] = par;
 }
 
 tNrpn *tDrumInstrumentParameter::Get(int index)
@@ -264,17 +264,17 @@ tNrpn *tDrumInstrumentParameter::Get(int index)
 
 void tDrumInstrumentParameter::Put(tNrpn *par)
 {
-  param[par->Lsb.mValue] = par;
+  param[par->mLsb.mValue] = par;
 }
 
 tDrumInstrumentParameter *tDrumInstrumentParameter::Next()
 {
-  return next;
+  return mpNext;
 }
 
 int tDrumInstrumentParameter::Pitch()
 {
-  return pitch;
+  return mPitch;
 }
 
 tDrumInstrumentParameter
@@ -283,11 +283,11 @@ tDrumInstrumentParameter
   tDrumInstrumentParameter *ptr = list;
   while (ptr)
   {
-    if (ptr->pitch == pit)
+    if (ptr->mPitch == pit)
     {
       break;
     }
-    ptr = ptr->next;
+    ptr = ptr->mpNext;
   }
   return ptr;
 }
@@ -304,16 +304,16 @@ tNrpn *tDrumInstrumentParameterList::GetParam(int pit, int index)
 
 void tDrumInstrumentParameterList::PutParam(tNrpn *par)
 {
-  tDrumInstrumentParameter* ptr = GetElem(par->Lsb.mValue);
+  tDrumInstrumentParameter* ptr = GetElem(par->mLsb.mValue);
   if (!ptr)
   {
     ptr = new tDrumInstrumentParameter(par);
-    ptr ->next = list;
+    ptr->mpNext = list;
     list = ptr;
   }
   else
   {
-    ptr->param[drumParam2Index(par->Msb.mValue)] = par;
+    ptr->param[drumParam2Index(par->mMsb.mValue)] = par;
   }
 }
 
@@ -344,21 +344,21 @@ void tDrumInstrumentParameterList::DelElem(int pit)
   tDrumInstrumentParameter *prev = 0;
   while (ptr)
   {
-    if (ptr->pitch == pit)
+    if (ptr->mPitch == pit)
     {
       if (prev)
       {
-        prev->next = ptr->next;
+        prev->mpNext = ptr->mpNext;
       }
       else
       {
-        list = ptr->next;
+        list = ptr->mpNext;
       }
       delete ptr;
       break;
     }
     prev = ptr;
-    ptr = ptr->next;
+    ptr = ptr->mpNext;
   }
 }
 
@@ -372,10 +372,10 @@ tDrumInstrumentParameter *tDrumInstrumentParameterList::NextElem(
 {
   if (cur)
   {
-    tDrumInstrumentParameter *ptr = GetElem(cur->pitch);
+    tDrumInstrumentParameter *ptr = GetElem(cur->mPitch);
     if (ptr)
     {
-      return ptr->next;
+      return ptr->mpNext;
     }
     else
     {
@@ -393,7 +393,7 @@ void tDrumInstrumentParameterList::Clear()
   tDrumInstrumentParameter *ptr = list;
   while (ptr)
   {
-    list = ptr->next;
+    list = ptr->mpNext;
     delete ptr;
     ptr = list;
   }
@@ -1714,7 +1714,7 @@ tTrackDlg::tTrackDlg(JZTrackWindow *w, JZTrack *t)
 
 void tTrackDlg::OnCancel()
 {
-  trk->DialogBox = 0;
+  trk->mpDialog = 0;
   TrackWin->Redraw();
   wxForm::OnCancel();
 }
@@ -1726,8 +1726,8 @@ void tTrackDlg::OnHelp()
 
 void tTrackDlg::OnOk()
 {
-  trk->DialogBox->GetPosition(&Config(C_TrackDlgXpos), &Config(C_TrackDlgYpos));
-  trk->DialogBox = 0;
+  trk->mpDialog->GetPosition(&Config(C_TrackDlgXpos), &Config(C_TrackDlgYpos));
+  trk->mpDialog = 0;
   trk->SetAudioMode(AudioMode);
 
   if (ClearTrack)
@@ -1907,7 +1907,7 @@ void JZTrack::Dialog(JZTrackWindow* pParent)
   JZTrackDialog TrackDialog(*this, pParent);
   TrackDialog.ShowModal();
 #ifdef OBSOLETE
-  DialogBox = new wxDialogBox(
+  mpDialog = new wxDialogBox(
     pParent,
     "Track Settings",
     modal,
@@ -1916,26 +1916,47 @@ void JZTrack::Dialog(JZTrackWindow* pParent)
 #endif // OBSOLETE
 }
 
-
-
-// ***********************************************************************
-// JZTrack
-// ***********************************************************************
-
-
-bool JZTrack::changed = false;
-
-JZTrack::JZTrack()
-  : tEventArray()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZTrack::IsEditing() const
 {
-  iUndo = 0;
-  nRedo = 0;
-  nUndo = 0;
-  DialogBox = 0;
-  ForceChannel = 1;
+  if (mpDialog)
+  {
+    return (mpDialog->GetHandle() != 0);
+  }
+  return false;
 }
 
 
+//*****************************************************************************
+// Description:
+//   This is the track class definition.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZTrack::mChanged = false;
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZTrack::JZTrack()
+  : tEventArray(),
+    mUndoIndex(0),
+    mRedoCount(0),
+    mUndoCount(0),
+    mpDialog(0)
+{
+  ForceChannel = 1;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZTrack::~JZTrack()
+{
+  Clear();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 bool JZTrack::IsDrumTrack()
 {
   return Channel == gpConfig->GetValue(C_DrumChannel);
@@ -1999,9 +2020,9 @@ void JZTrack::Cleanup()
 
 void JZTrack::Undo()
 {
-  if (nUndo > 0)
+  if (mUndoCount > 0)
   {
-    tUndoBuffer *undo = &UndoBuffers[iUndo];
+    tUndoBuffer *undo = &mUndoBuffers[mUndoIndex];
     for (int i = undo->nEvents - 1; i >= 0; i--)
     {
       JZEvent *e = undo->Events[i];
@@ -2019,19 +2040,19 @@ void JZTrack::Undo()
     }
     tEventArray::Cleanup(TRUE);
 
-    iUndo = (iUndo - 1 + MaxUndo) % MaxUndo;
-    nUndo--;
-    nRedo++;
+    mUndoIndex = (mUndoIndex - 1 + MaxUndo) % MaxUndo;
+    --mUndoCount;
+    ++mRedoCount;
   }
 }
 
 void JZTrack::Redo()
 {
-  if (nRedo > 0)
+  if (mRedoCount > 0)
   {
-    iUndo = (iUndo + 1) % MaxUndo;
+    mUndoIndex = (mUndoIndex + 1) % MaxUndo;
 
-    tUndoBuffer *undo = &UndoBuffers[iUndo];
+    tUndoBuffer *undo = &mUndoBuffers[mUndoIndex];
     for (int i = 0; i < undo->nEvents; i++)
     {
       JZEvent *e = undo->Events[i];
@@ -2049,23 +2070,23 @@ void JZTrack::Redo()
     }
     tEventArray::Cleanup(TRUE);
 
-    nRedo--;
-    nUndo++;
+    --mRedoCount;
+    ++mUndoCount;
   }
 }
 
 
 void JZTrack::NewUndoBuffer()
 {
-  nRedo = 0;
-  nUndo++;
-  if (nUndo > MaxUndo)
+  mRedoCount = 0;
+  ++mUndoCount;
+  if (mUndoCount > MaxUndo)
   {
-    nUndo = MaxUndo;
+    mUndoCount = MaxUndo;
   }
 
-  iUndo = (iUndo + 1) % MaxUndo;
-  UndoBuffers[iUndo].Clear();
+  mUndoIndex = (mUndoIndex + 1) % MaxUndo;
+  mUndoBuffers[mUndoIndex].Clear();
 };
 
 
@@ -2073,7 +2094,7 @@ void JZTrack::Clear()
 {
   for (int i = 0; i < MaxUndo; i++)
   {
-    UndoBuffers[i].Clear();
+    mUndoBuffers[i].Clear();
   }
   State  = tsPlay;
   tEventArray::Clear();
@@ -2372,7 +2393,7 @@ void JZTrack::SetBank(int Value)
       mpBank2->Control,
       mpBank2->Value);
     )
-    changed = true;
+    mChanged = true;
   }
 }
 
@@ -2398,7 +2419,7 @@ void JZTrack::SetPatch(int PatchNr)
   {
     mPatch = new tProgram(0, Channel - 1, PatchNr - 1);
     gpMidiPlayer->OutNow(this, mPatch);
-    changed = true;
+    mChanged = true;
   }
 }
 
@@ -2425,7 +2446,7 @@ void JZTrack::SetVibRate(int Value)
   {
     VibRate = new tNrpn(0, Channel - 1, 0x01, 0x08, Value - 1);
     gpMidiPlayer->OutNow(this, VibRate);
-    changed = true;
+    mChanged = true;
   }
 }
 
@@ -2451,7 +2472,7 @@ void JZTrack::SetVibDepth(int Value)
   {
     VibDepth = new tNrpn(0, Channel - 1, 0x01, 0x09, Value - 1);
     gpMidiPlayer->OutNow(this,  VibDepth);
-    changed = true;
+    mChanged = true;
   }
 }
 
@@ -2478,7 +2499,7 @@ void JZTrack::SetVibDelay(int Value)
   {
     VibDelay = new tNrpn(0, Channel - 1, 0x01, 0x0a, Value - 1);
     gpMidiPlayer->OutNow(this,  VibDelay);
-    changed = true;
+    mChanged = true;
   }
 }
 
@@ -2505,7 +2526,7 @@ void JZTrack::SetCutoff(int Value)
   {
     Cutoff = new tNrpn(0, Channel - 1, 0x01, 0x20, Value - 1);
     gpMidiPlayer->OutNow(this,  Cutoff);
-    changed = true;
+    mChanged = true;
   }
 }
 
@@ -2532,7 +2553,7 @@ void JZTrack::SetResonance(int Value)
   {
     Resonance = new tNrpn(0, Channel - 1, 0x01, 0x21, Value - 1);
     gpMidiPlayer->OutNow(this,  Resonance);
-    changed = true;
+    mChanged = true;
   }
 }
 
@@ -2559,7 +2580,7 @@ void JZTrack::SetEnvAttack(int Value)
   {
     EnvAttack = new tNrpn(0, Channel - 1, 0x01, 0x63, Value - 1);
     gpMidiPlayer->OutNow(this,  EnvAttack);
-    changed = true;
+    mChanged = true;
   }
 }
 
@@ -2586,7 +2607,7 @@ void JZTrack::SetEnvDecay(int Value)
   {
     EnvDecay = new tNrpn(0, Channel - 1, 0x01, 0x64, Value - 1);
     gpMidiPlayer->OutNow(this,  EnvDecay);
-    changed = true;
+    mChanged = true;
   }
 }
 
@@ -2613,7 +2634,7 @@ void JZTrack::SetEnvRelease(int Value)
   {
     EnvRelease = new tNrpn(0, Channel - 1, 0x01, 0x66, Value - 1);
     gpMidiPlayer->OutNow(this,  EnvRelease);
-    changed = true;
+    mChanged = true;
   }
 }
 
@@ -2640,7 +2661,7 @@ void JZTrack::SetDrumParam(int pitch, int index, int Value)
     DrumParams.PutParam(
       new tNrpn(0, Channel - 1, drumIndex2Param(index), pitch, Value - 1));
     gpMidiPlayer->OutNow(this, DrumParams.GetParam(pitch, index));
-    changed = true;
+    mChanged = true;
   }
 }
 
@@ -2666,8 +2687,8 @@ void JZTrack::SetBendPitchSens(int Value)
   if (Value > 0)
   {
     BendPitchSens = new tRpn(0, Channel - 1, 0x00, 0x00, Value - 1);
-    gpMidiPlayer->OutNow(this,  BendPitchSens);
-    changed = true;
+    gpMidiPlayer->OutNow(this, BendPitchSens);
+    mChanged = true;
   }
 }
 

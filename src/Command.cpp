@@ -42,7 +42,7 @@ using namespace std;
 tCommand::tCommand(JZFilter* pFilter)
   : mpFilter(pFilter),
     mpSong(pFilter->mpSong),
-    mReverse(0)
+    mReverse(false)
 {
 }
 
@@ -61,7 +61,7 @@ void tCommand::Execute(int NewUndo)
   {
     mpSong->NewUndoBuffer();
   }
-  tTrackIterator Tracks(mpFilter, mReverse);
+  JZTrackIterator Tracks(mpFilter, mReverse);
   JZTrack* pTrack = Tracks.First();
   while (pTrack)
   {
@@ -799,7 +799,9 @@ tCmdCopy::tCmdCopy(JZFilter* pFilter, long dt, long dc)
 
   mReverse = DestTrack > mpFilter->FromTrack;
   if (mReverse)
+  {
     DestTrack += mpFilter->ToTrack - mpFilter->FromTrack; // ToTrack inclusive
+  }
 }
 
 

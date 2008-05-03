@@ -71,7 +71,7 @@ class tCommand
 
     JZFilter* mpFilter;
     JZSong* mpSong;
-    int mReverse;
+    bool mReverse;
 };
 
 

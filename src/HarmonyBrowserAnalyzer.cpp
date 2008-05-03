@@ -129,7 +129,7 @@ int HBAnalyzer::Transpose(JZFilter* pFilter, int qbc)
 
 void HBAnalyzer::IterateEvents(void (HBAnalyzer::*Action)(tKeyOn*, JZTrack*))
 {
-  tTrackIterator Tracks(mpFilter);
+  JZTrackIterator Tracks(mpFilter);
   JZTrack *t = Tracks.First();
   while (t)
   {

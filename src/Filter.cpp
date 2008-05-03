@@ -33,7 +33,7 @@
 #include <cstdlib>
 
 
-const tFltEvent FltEvents[nFltEvents] =
+const JZFilterEvent FltEvents[nFltEvents] =
 {
   { StatKeyOn,          "Note",               1,     0,  127},
   { StatKeyPressure,    "Poly Aftertouch",    1,     0,  127},
@@ -50,7 +50,7 @@ const tFltEvent FltEvents[nFltEvents] =
 JZFilter::JZFilter(JZSong *s)
 {
   mpSong = s;
-  FltEvents = new tFltEvent [nFltEvents];
+  FltEvents = new JZFilterEvent [nFltEvents];
   memcpy(FltEvents, ::FltEvents, sizeof(::FltEvents));
 
   FromClock = 0;
@@ -93,7 +93,7 @@ void JZFilter::copy(JZFilter const &o)
   ToTrack       = o.ToTrack;
   OtherSelected = o.OtherSelected;
 
-  FltEvents = new tFltEvent [nFltEvents];
+  FltEvents = new JZFilterEvent [nFltEvents];
   memcpy(FltEvents, o.FltEvents, sizeof(::FltEvents));
 }
 
@@ -202,48 +202,60 @@ void JZFilter::Dialog(wxFrame *parent, int ShowEventStats)
 
 
 
-// --------------------------------------------------------------------------
-// tTrackIterator
-// --------------------------------------------------------------------------
-
-
-
-tTrackIterator::tTrackIterator(JZFilter *f, int rev)
+//*****************************************************************************
+// Description:
+//   This is the track iterator class definition.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+JZTrackIterator::JZTrackIterator(JZFilter* pFilter, bool Reverse)
+  : mpFilter(pFilter),
+    mpSong(mpFilter->mpSong),
+    mTrackIndex(0),
+    mReverse(Reverse)
 {
-  Filter = f;
-  Song   = Filter->mpSong;
-  Reverse = rev;
 }
 
-
-JZTrack *tTrackIterator::First()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZTrack* JZTrackIterator::First()
 {
-  if (Reverse)
-    TrackNr = Filter->ToTrack;
-  else
-    TrackNr = Filter->FromTrack;
-  return Song->GetTrack(TrackNr);
-}
-
-
-JZTrack *tTrackIterator::Next()
-{
-  if (Reverse)
+  if (mReverse)
   {
-    -- TrackNr;
-    if (TrackNr < Filter->FromTrack)
-      return 0;
+    mTrackIndex = mpFilter->ToTrack;
   }
   else
   {
-    ++ TrackNr;
-    if (TrackNr > Filter->ToTrack)
-      return 0;
+    mTrackIndex = mpFilter->FromTrack;
   }
-  return Song->GetTrack(TrackNr);
+  return mpSong->GetTrack(mTrackIndex);
 }
 
-int tTrackIterator::Count() const {
-  return Filter->ToTrack - Filter->FromTrack + 1;
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZTrack* JZTrackIterator::Next()
+{
+  if (mReverse)
+  {
+    --mTrackIndex;
+    if (mTrackIndex < mpFilter->FromTrack)
+    {
+      return 0;
+    }
+  }
+  else
+  {
+    ++mTrackIndex;
+    if (mTrackIndex > mpFilter->ToTrack)
+    {
+      return 0;
+    }
+  }
+  return mpSong->GetTrack(mTrackIndex);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZTrackIterator::Count() const
+{
+  return mpFilter->ToTrack - mpFilter->FromTrack + 1;
+}

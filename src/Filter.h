@@ -31,38 +31,39 @@ class JZTrack;
 
 #define FltKeyOn        0
 #define FltKeyPressure  1  // SN++ PolyAftertouch gehoert to KeyOn Events!
-#define FltControl        2
-#define FltProgram        3
+#define FltControl      2
+#define FltProgram      3
 #define FltPitch        4
 #define FltTempo        5
 #define FltChnPressure  6  // SN++ Channel Aftertouch
 #define FltSysEx        7
 
-#define nFltEvents 8
+#define nFltEvents      8
 
-
-class tFltEvent
+//*****************************************************************************
+//*****************************************************************************
+class JZFilterEvent
 {
   public:
-    int  Stat;
+    int Stat;
     const char* Name;
     bool Selected;
     int MinValue, MaxValue;
     int FromValue, ToValue;
 };
 
-
-
+//*****************************************************************************
+//*****************************************************************************
 class JZFilter : public wxObject
 {
     friend class tFilterDlg;
-    wxDialog *DialogBox;
-    void copy(JZFilter const &o);
+    wxDialog* DialogBox;
+    void copy(const JZFilter& Other);
 
   public:
 
-    tFltEvent *FltEvents;
-    bool      OtherSelected;
+    JZFilterEvent* FltEvents;
+    bool OtherSelected;
 
     JZSong* mpSong;
 
@@ -74,63 +75,73 @@ class JZFilter : public wxObject
 
     JZFilter(JZSong* pSong);
     JZFilter(JZFilter* pOtherFilter);
-    JZFilter(JZFilter const &o);
-    JZFilter& operator=(JZFilter const &o);
+    JZFilter(const JZFilter& Other);
+    JZFilter& operator = (const JZFilter& Rhs);
     virtual ~JZFilter();
 
-    int IsSelected(JZEvent *e)
+    int IsSelected(JZEvent* pEvent)
     {
-      int val = e->GetValue();
-      for (int i = 0; i < nFltEvents; i++)
+      int Value = pEvent->GetValue();
+      for (int i = 0; i < nFltEvents; ++i)
       {
-        if (e->Stat == FltEvents[i].Stat)
+        if (pEvent->Stat == FltEvents[i].Stat)
         {
            // SN++ Aftertouch gehoert eigendlich zu KeyOn Events.
-          if (e->Stat == StatKeyPressure) {
-            int aval = e->IsKeyPressure()->Key;
-            return FltEvents[i].Selected &&
-                   FltEvents[i].FromValue <= aval && aval <= FltEvents[i].ToValue;
+          if (pEvent->Stat == StatKeyPressure)
+          {
+            int aval = pEvent->IsKeyPressure()->Key;
+            return
+              FltEvents[i].Selected &&
+              FltEvents[i].FromValue <= aval &&
+              aval <= FltEvents[i].ToValue;
           }
-           if( e->Stat == StatTimeSignat)
+          if (pEvent->Stat == StatTimeSignat)
+          {
             return FltEvents[i].Selected;
+          }
           // SN++
-          if( e->Stat == StatChnPressure)
+          if (pEvent->Stat == StatChnPressure)
+          {
             return FltEvents[i].Selected;
+          }
 
-          if (e->Stat == StatSysEx)
+          if (pEvent->Stat == StatSysEx)
+          {
             return FltEvents[i].Selected;
+          }
 
-          return FltEvents[i].Selected && FltEvents[i].FromValue <= val && val <= FltEvents[i].ToValue;
+          return
+            FltEvents[i].Selected &&
+            FltEvents[i].FromValue <= Value &&
+            Value <= FltEvents[i].ToValue;
         }
       }
       return OtherSelected;
     }
-
 };
-
-
-// extern JZFilter *GlobalFilter;
 
 // void GlobalFilterDlg(wxButton& but, wxMouseEvent& event);
 // void GlobalFilterDlgNoStats(wxButton& but, wxMouseEvent& event);
 
-
-// ----------------------------------------------------------------------
-// get selected Tracks from Filter
-// ----------------------------------------------------------------------
-
-
-class tTrackIterator
+//*****************************************************************************
+// Description:
+//   This is the track iterator class declaration.
+//*****************************************************************************
+class JZTrackIterator
 {
-  JZFilter *Filter;
-  JZSong   *Song;
-  int     TrackNr;
-  int     Reverse;
   public:
-    tTrackIterator(JZFilter *f, int Reverse = 0);
-    JZTrack *First();
-    JZTrack *Next();
-    int    Count() const;
+
+    JZTrackIterator(JZFilter* pFilter, bool Reverse = false);
+    JZTrack* First();
+    JZTrack* Next();
+    int Count() const;
+
+  private:
+
+    JZFilter* mpFilter;
+    JZSong* mpSong;
+    int mTrackIndex;
+    bool mReverse;
 };
 
 #endif // !defined(JZ_FILTER_H)

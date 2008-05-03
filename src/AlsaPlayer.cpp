@@ -375,8 +375,8 @@ int tAlsaPlayer::OutEvent(JZEvent *e, int now)
         tControl *k = e->IsControl();
         set_event_header(&ev, e->GetClock(), SND_SEQ_EVENT_CONTROLLER);
         ev.data.control.channel = k->Channel;
-        ev.data.control.param = k->Control;
-        ev.data.control.value = k->Value;
+        ev.data.control.param = k->mControl;
+        ev.data.control.value = k->mValue;
         rc = write(&ev, now);
       }
       break;

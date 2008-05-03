@@ -1618,7 +1618,7 @@ int tSeq2Player::OutEvent(JZEvent *e, int now)
     case StatControl:
       {
         tControl *k = e->IsControl();
-        SEQ_CONTROL(mididev, k->Channel, k->Control, k->Value);
+        SEQ_CONTROL(mididev, k->Channel, k->mControl, k->mValue);
         if (now) seqbuf_flush_last_event();
       }
       break;

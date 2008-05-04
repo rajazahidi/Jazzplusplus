@@ -509,7 +509,7 @@ int tVelocEdit::IsCtrlEdit(JZEvent* pEvent)
 {
   // SN++ Falls im PianoWin Events selektiert sind, werden nur diese
   //      Events geaendert
-  if (!mpPianoWindow->mpSnapSel->Selected)
+  if (!mpPianoWindow->mpSnapSel->IsSelected())
   {
     return (pEvent->IsKeyOn() != 0);
   }
@@ -540,7 +540,7 @@ void tVelocEdit::OnApply()
 
   tEventIterator iter(track);
 
-  if (mpPianoWindow->mpSnapSel->Selected)
+  if (mpPianoWindow->mpSnapSel->IsSelected())
   {
     from_clk = mpPianoWindow->GetFilter()->FromClock;
     to_clk   = mpPianoWindow->GetFilter()->ToClock;
@@ -558,7 +558,7 @@ void tVelocEdit::OnApply()
     // SN++ Falls im PianoWin Events selektiert sind, werden nur diese
     //      Events geaendert
     if (
-      !mpPianoWindow->mpSnapSel->Selected ||
+      !mpPianoWindow->mpSnapSel->IsSelected() ||
       mpPianoWindow->GetFilter()->IsSelected(pEvent))
     {
 
@@ -610,7 +610,7 @@ int tPolyAfterEdit::IsCtrlEdit(JZEvent* pEvent)
   // SN++ Falls im PianoWin Events selektiert sind, werden nur diese
   //      Events geaendert
 
-  if (!mpPianoWindow->mpSnapSel->Selected)
+  if (!mpPianoWindow->mpSnapSel->IsSelected())
   {
     return pEvent->IsKeyPressure() != 0;
   }
@@ -643,7 +643,7 @@ void tPolyAfterEdit::OnApply()
   JZEvent* pEvent;
 
   // SN++ Apply works only if some events are selected !!
-  if (!mpPianoWindow->mpSnapSel->Selected)
+  if (!mpPianoWindow->mpSnapSel->IsSelected())
   {
     OnRevert();
     return;
@@ -654,7 +654,7 @@ void tPolyAfterEdit::OnApply()
 
   tEventIterator iter(track);
 
-  if (mpPianoWindow->mpSnapSel->Selected)
+  if (mpPianoWindow->mpSnapSel->IsSelected())
   {
     from_clk = mpPianoWindow->GetFilter()->FromClock;
     to_clk   = mpPianoWindow->GetFilter()->ToClock;
@@ -676,7 +676,7 @@ void tPolyAfterEdit::OnApply()
     while (pEvent)
     {
       if (
-        !mpPianoWindow->mpSnapSel->Selected ||
+        !mpPianoWindow->mpSnapSel->IsSelected() ||
         mpPianoWindow->GetFilter()->IsSelected(pEvent))
       {
         k = pEvent->IsKeyPressure();
@@ -696,7 +696,7 @@ void tPolyAfterEdit::OnApply()
     while (pEvent)
     {
       if (
-        !mpPianoWindow->mpSnapSel->Selected ||
+        !mpPianoWindow->mpSnapSel->IsSelected() ||
         mpPianoWindow->GetFilter()->IsSelected(pEvent))
       {
         keyon = pEvent->IsKeyOn();
@@ -740,7 +740,7 @@ void tPolyAfterEdit::OnApply()
     while (pEvent)
     {
       if (
-        !mpPianoWindow->mpSnapSel->Selected ||
+        !mpPianoWindow->mpSnapSel->IsSelected() ||
         mpPianoWindow->GetFilter()->IsSelected(pEvent))
       {
         if (pEvent->IsKeyPressure())

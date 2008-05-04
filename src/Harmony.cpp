@@ -1489,7 +1489,7 @@ void HBCanvas::MenuCommand(int MenuId, wxToolBar* pToolBar)
 //-----------------------------------------------------------------------------
 HBAnalyzer * HBCanvas::GetAnalyzer()
 {
-  if (mSequenceCount > 0 && gpTrackWindow->mpSnapSel->Selected)
+  if (mSequenceCount > 0 && gpTrackWindow->mpSnapSel->IsSelected())
   {
     HBAnalyzer *analyzer = new HBAnalyzer(mSequence, mSequenceCount);
     analyzer->Init(gpTrackWindow->mpFilter, transpose_res);

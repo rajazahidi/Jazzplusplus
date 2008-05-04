@@ -67,335 +67,389 @@ void tMouseMapper::SetAction(int code, Button but, bool shift, bool ctrl)
   actions[i] = code;
 }
 
-int tMouseMapper::Action(wxMouseEvent &e)
+int tMouseMapper::Action(wxMouseEvent& Event)
 {
-  if (!e.ButtonDown())
+  if (!Event.ButtonDown())
+  {
     return 0;
+  }
 
-  if (left_action > 0 && e.LeftDown() &&!e.ShiftDown() && !e.ControlDown())
+  if (
+    left_action > 0 &&
+    Event.LeftDown() &&
+    !Event.ShiftDown() &&
+    !Event.ControlDown())
+  {
     return left_action;
+  }
 
   int i = 0;        // left down
-  if (e.MiddleDown())
+  if (Event.MiddleDown())
+  {
     i = 1;
-  else
-  if (e.RightDown())
+  }
+  else if (Event.RightDown())
+  {
     i = 2;
+  }
 
-  if (e.ShiftDown())
+  if (Event.ShiftDown())
+  {
     i += 3;
-  if (e.ControlDown())
+  }
+  if (Event.ControlDown())
+  {
     i += 6;
+  }
   return actions[i];
 }
 
-//////////////////////////////////////////////////////////
-//tSelection implementation
-
-tSelection::tSelection(wxWindow* pWindow)
-  : win(pWindow),
+//*****************************************************************************
+// Description:
+//  This is the selection class definition.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZSelection::JZSelection(wxWindow* pWindow)
+  : mActive(false),
+    mSelected(false),
+    mRectangle(),
+    mpWindow(pWindow),
     mpBackgroundBrush(0)
 {
-  Active = 0;
-  Selected = false;
-  mpBackgroundBrush = new wxBrush(wxColor(192, 192, 192), wxSOLID);
+//  mpBackgroundBrush = new wxBrush(wxColor(192, 192, 192), wxSOLID);
+  mpBackgroundBrush = new wxBrush(wxColor(100, 100, 100), wxSOLID);
 }
 
-tSelection::~tSelection()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZSelection::~JZSelection()
 {
   delete mpBackgroundBrush;
 }
 
-int tSelection::Event(wxMouseEvent &e)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZSelection::Event(wxMouseEvent& Event)
 {
-  if (e.ButtonDown())
-    return ButtonDown(e);
-  else if (e.ButtonUp())
-    return ButtonUp(e);
-  else if (e.Dragging())
-    return Dragging(e);
+  if (Event.ButtonDown())
+  {
+    return ButtonDown(Event);
+  }
+  else if (Event.ButtonUp())
+  {
+    return ButtonUp(Event);
+  }
+  else if (Event.Dragging())
+  {
+    return Dragging(Event);
+  }
   return 0;
 }
 
-int tSelection::ButtonDown(wxMouseEvent &e)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZSelection::ButtonDown(wxMouseEvent& Event)
 {
-  if (!Active)
+  if (!mActive)
   {
-#ifdef __WXMSW__
-//OBSOLETE    Canvas->CaptureMouse();
-#endif
-    Active = 1;
-//     wxDC *dc = new wxPaintDC(win);//Canvas->GetDC();
-//     Dc.SetBrush(*mpBackgroundBrush);
-//     Dc.SetLogicalFunction(wxXOR);
-    if (Selected && e.ShiftDown())
+    mActive = true;
+    if (mSelected && Event.ShiftDown())
     {
       // Continue selection
-      JZRectangle rr = r;
-      rr.SetNormal();
-//       if (rr.width && rr.height)
-//         Dc.DrawRectangle(rr.x, rr.y, rr.width, rr.height);
-      Dragging(e);
+      JZRectangle Rectangle = mRectangle;
+      Rectangle.SetNormal();
+      Dragging(Event);
     }
     else
     {
-      Selected = false;
-      int x, y;
-      //e.Position(&x, &y);
-      wxDC *dc = new wxClientDC(win);//Canvas->GetDC();
-      wxPoint point=e.GetLogicalPosition(*dc);
-      delete dc;
-      x=point.x;y=point.y;
+      mSelected = false;
+      int x = Event.GetX();
+      int y = Event.GetY();
       Snap(x, y, 0);
-      r.x = x;
-      r.y = y;
-      r.width = 1;
-      r.height = 1;
-//       Dc.DrawRectangle(r.x, r.y, r.width, r.height);
-      //Dragging(e);
+      mRectangle.x = x;
+      mRectangle.y = y;
+      mRectangle.width = 1;
+      mRectangle.height = 1;
     }
-//     Dc.SetLogicalFunction(wxCOPY);
   }
-  win->Refresh(); //invalidate
   return 0;
 }
 
-
-int tSelection::Dragging(wxMouseEvent &e)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZSelection::Dragging(wxMouseEvent& Event)
 {
-  if (!Active)
-    ButtonDown(e);
-
-  if (Active)
+  if (!mActive)
   {
-    int x, y;
-    JZRectangle r1, r2; //r1=previous rect, r2=new rect
+    ButtonDown(Event);
+  }
 
-    wxDC *dc = new wxClientDC(win);
-    wxPoint point=e.GetLogicalPosition(*dc);
-    delete dc;
-
-    x=point.x;
-    y=point.y;
-    if ((short)x < 0)
+  if (mActive)
+  {
+    int x = Event.GetX();
+    int y = Event.GetY();
+    if (x < 0)
+    {
       x = 0;
-    if ((short)y < 0)
+    }
+    if (y < 0)
+    {
       y = 0;
+    }
     Snap(x, y, 1);
 
-    r1 = r;
-    r1.SetNormal();
-
-    r.width = x - r.x;
-    r.height = y - r.y;
-
-    r2 = r;
-    r2.SetNormal();
-
-    win->Refresh(TRUE, &r1);
-    win->Refresh(TRUE, &r2);
+    mRectangle.width = x - mRectangle.x;
+    mRectangle.height = y - mRectangle.y;
   }
-  //invalidate both old and new rect
 
   return 0;
 }
 
-
-int tSelection::ButtonUp(wxMouseEvent &e)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZSelection::ButtonUp(wxMouseEvent& Event)
 {
-  if (Active)
+  if (mActive)
   {
-#ifdef __WXMSW__
-//OBSOLETE    Canvas->ReleaseMouse();
-#endif
-    Active = 0;
-    r.SetNormal();
-//     wxDC *dc = new wxPaintDC(win);//Canvas->GetDC();
+    mActive = false;
+    mRectangle.SetNormal();
 
-//     Dc.SetLogicalFunction(wxXOR);
-//     if (r.width && r.height)
-//       Dc.DrawRectangle(r.x, r.y, r.width, r.height);
-//     Dc.SetLogicalFunction(wxCOPY);
-    Selected = (r.width > 3 && r.height > 3); //its selected only if larger than 3x3 pixels
+    // Only select if the rectangle is larger than 3x3 pixels.
+    mSelected = (mRectangle.width > 3 && mRectangle.height > 3);
     return 1;
   }
-  win->Refresh();
+
+  mpWindow->Refresh();
   return 0;
 }
 
+//-----------------------------------------------------------------------------
 // Description:
 //   Draw the selected rectangle, normally called from OnDraw
 // in the parent window.
-void tSelection::Draw(wxDC& Dc)
+//-----------------------------------------------------------------------------
+void JZSelection::Draw(wxDC& Dc, int ScrolledX, int ScrolledY)
 {
-//  cout
-//    << "tSelection::Draw ---------------------------------------------------"
-//    << endl;
-  //    Dc.DrawRectangle(100,100,100,100);
-// if (Selected) //we cant check for "selected" here, because...
-// {
-
-    JZRectangle rr = r;
-
-    Dc.DestroyClippingRegion();
+//  if (mSelected)
+  {
+    JZRectangle Rectangle = mRectangle;
 
     Dc.SetLogicalFunction(wxXOR);
     Dc.SetBrush(*mpBackgroundBrush);
 
-    rr.SetNormal();
-    if (rr.width && rr.height)
+    Rectangle.SetNormal();
+    if (Rectangle.width && Rectangle.height)
     {
-      Dc.DrawRectangle(rr.x, rr.y, rr.width, rr.height);
+      Dc.DrawRectangle(
+        Rectangle.x - ScrolledX,
+        Rectangle.y - ScrolledY,
+        Rectangle.width,
+        Rectangle.height);
     }
     Dc.SetLogicalFunction(wxCOPY);
-//  }
+  }
 }
 
-// Draw, but use clipping to redruce drawing
-void tSelection::Draw(wxDC& Dc, int x, int y, int w, int h)
+//-----------------------------------------------------------------------------
+// Description:
+//   Draw, but use clipping to redruce drawing.
+//-----------------------------------------------------------------------------
+void JZSelection::Draw(
+  wxDC& Dc,
+  int ScrolledX,
+  int ScrolledY,
+  int ClipX,
+  int ClipY,
+  int ClipWidth,
+  int ClipHeight)
 {
-//   if (Selected)
-//   {
-    Dc.SetClippingRegion(x, y, w, h);
-    Draw(Dc);
+//  if (mSelected)
+  {
+    Dc.SetClippingRegion(ClipX, ClipY, ClipWidth, ClipHeight);
+    Draw(Dc, ScrolledX, ScrolledY);
     Dc.DestroyClippingRegion();
-    //  }
+  }
 }
 
+//-----------------------------------------------------------------------------
 //   I think this one is meant to select a rectangle and repaint it.
 // It did this by drawing directly in the device context.  This is bad, so I
 // tried changing it to invalidation instead.
-void tSelection::Select(JZRectangle &rr, int x, int y, int w, int h)
+//-----------------------------------------------------------------------------
+void JZSelection::Select(JZRectangle& Rectangle, int x, int y, int w, int h)
 {
   // clear old rectangle
   //  Draw(x, y, w, h);
   // make new one
-  r = rr;
-  Selected = true;
+  mRectangle = Rectangle;
+  mSelected = true;
   //  Draw(x, y, w, h);
-  win->Refresh(); //inefficient because should invvalidate only the rectangle
+
+  // Inefficient because should invalidate only the rectangle.
+  mpWindow->Refresh();
 }
 
-void tSelection::Select(JZRectangle &rr)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZSelection::Select(JZRectangle& Rectangle)
 {
-  Select(rr, 0,0,3000,3000);
+  Select(Rectangle, 0, 0, 3000, 3000);
 }
 
-// ***********************************************************************
-// tSnapSelection
-// ***********************************************************************
-
-
-
-
-static void SnapVec(int &x, int *Coords, int nCoords, int up)
+//*****************************************************************************
+// Description:
+//   This is the snap selection class definition.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZSnapSelection::JZSnapSelection(wxWindow* pWindow)
+  : JZSelection(pWindow),
+    mXCoordinates(),
+    mYCoordinates(),
+    mXMin(0),
+    mXMax(0),
+    mXStep(0), 
+    mYMin(0),
+    mYMax(0),
+    mYStep(0)
 {
-  int i;
-  for (i = 0; i < nCoords; i++)
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZSnapSelection::Snap(int& x, int& y, bool drag)
+{
+  if (!mXCoordinates.empty())
   {
-    if (Coords[i] > x)
+    SnapToVector(x, mXCoordinates, drag);
+  }
+  else if (mXStep)
+  {
+    SnapMod(x, mXMin, mXMax, mXStep, drag);
+  }
+
+  if (!mYCoordinates.empty())
+  {
+    SnapToVector(y, mYCoordinates, drag);
+  }
+  else if (mYStep)
+  {
+    SnapMod(y, mYMin, mYMax, mYStep, drag);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZSnapSelection::SetXSnap(int XCount, int* pXVector)
+{
+  mXCoordinates.clear();
+  for (int i = 0; i < XCount; ++i)
+  {
+    mXCoordinates.push_back(pXVector[i]);
+  }
+  mXStep = 0;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZSnapSelection::SetYSnap(int YCount, int* pYVector)
+{
+  mYCoordinates.clear();
+  for (int i = 0; i < YCount; ++i)
+  {
+    mXCoordinates.push_back(pYVector[i]);
+  }
+  mYStep = 0;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZSnapSelection::SetXSnap(int XMin, int XMax, int XStep)
+{
+  mXMin = XMin;
+  mXMax = XMax;
+  mXStep = XStep;
+  mXCoordinates.clear();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZSnapSelection::SetYSnap(int YMin, int YMax, int YStep)
+{
+  mYMin = YMin;
+  mYMax = YMax;
+  mYStep = YStep;
+  mYCoordinates.clear();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZSnapSelection::SnapToVector(
+  int& Coordinate,
+  vector<int> Vector,
+  bool Up)
+{
+  for (unsigned i = 0; i < Vector.size(); ++i)
+  {
+    if (Vector[i] > Coordinate)
     {
-      if (up || i == 0)
-        x = Coords[i];
+      if (Up || i == 0)
+      {
+        Coordinate = Vector[i];
+      }
       else
-        x = Coords[i-1];
+      {
+        Coordinate = Vector[i - 1];
+      }
       return;
     }
   }
-  x = Coords[nCoords - 1];
+  Coordinate = Vector[Vector.size() - 1];
 }
 
-
-static void SnapMod(int &x, int Min, int Max, int Step, int up)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZSnapSelection::SnapMod(
+  int& Coordinate,
+  int Min,
+  int Max,
+  int Step,
+  bool Up)
 {
-  if (x <= Min)
+  if (Coordinate <= Min)
   {
-    x = Min;
+    Coordinate = Min;
     return;
   }
-  if (x >= Max)
+  if (Coordinate >= Max)
   {
-    x = Max;
+    Coordinate = Max;
     return;
   }
-  x -= (x - Min) % Step;
-  if (up)
-    x += Step;
-}
-
-
-
-void tSnapSelection::Snap(float &fx, float &fy, int drag)
-{
-  int x = (int)fx;
-  int y = (int)fy;
-  if (xCoords)
-    SnapVec(x, xCoords, nxCoords, drag);
-  else if (xStep)
-    SnapMod(x, xMin, xMax, xStep, drag);
-
-  if (yCoords)
-    SnapVec(y, yCoords, nyCoords, drag);
-  else if (yStep)
-    SnapMod(y, yMin, yMax, yStep, drag);
-  fx = x;
-  fy = y;
-}
-
-
-tSnapSelection::tSnapSelection(wxWindow *c)
-  : tSelection(c)
-{
-  xCoords = 0;
-  yCoords = 0;
-  xStep = yStep = 0;
-}
-
-void tSnapSelection::SetXSnap(int nx, int *cx)
-{
-  xCoords = cx;
-  nxCoords = nx;
-  xStep = 0;
-}
-
-void tSnapSelection::SetYSnap(int ny, int *cy)
-{
-  yCoords = cy;
-  nyCoords = ny;
-  yStep = 0;
-}
-
-void tSnapSelection::SetXSnap(int xmin, int xmax, int xstep)
-{
-  xMin = xmin;
-  xMax = xmax;
-  xStep = xstep;
-  xCoords = 0;
-}
-
-void tSnapSelection::SetYSnap(int ymin, int ymax, int ystep)
-{
-  yMin = ymin;
-  yMax = ymax;
-  yStep = ystep;
-  yCoords = 0;
+  Coordinate -= (Coordinate - Min) % Step;
+  if (Up)
+  {
+    Coordinate += Step;
+  }
 }
 
 
 // *************************************************************************
 // tMouseCounter
 // *************************************************************************
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tMouseCounter::tMouseCounter(
   tButtonLabelInterface* wwin,
-  JZRectangle* rr,
+  JZRectangle* Rectangle,
   int val,
   int min,
   int max,
   int wait)
 {
   win = wwin;
-  r  = *rr;
+  r = *Rectangle;
   Value = val;
   Min = min;
   Max = max;
@@ -403,45 +457,59 @@ tMouseCounter::tMouseCounter(
   Wait = wait;
 }
 
-
-int tMouseCounter::LeftDown(wxMouseEvent &e)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int tMouseCounter::LeftDown(wxMouseEvent& Event)
 {
-  Delta = e.ShiftDown() ? 10 : 1;
+  Delta = Event.ShiftDown() ? 10 : 1;
   Start(Timeout);
   if (Wait)
+  {
     ShowValue(TRUE);
+  }
   else
+  {
     Notify();
+  }
   return 0;
 }
 
-int tMouseCounter::LeftUp(wxMouseEvent &e)
+int tMouseCounter::LeftUp(wxMouseEvent& Event)
 {
   Stop();
   ShowValue(FALSE);
   return 1;
 }
 
-int tMouseCounter::RightDown(wxMouseEvent &e)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int tMouseCounter::RightDown(wxMouseEvent& Event)
 {
-  Delta = e.ShiftDown() ? -10 :  -1;
+  Delta = Event.ShiftDown() ? -10 :  -1;
   Start(Timeout);
   if (Wait)
+  {
     ShowValue(TRUE);
+  }
   else
+  {
     Notify();
+  }
   return 0;
+
 }
 
-
-int tMouseCounter::RightUp(wxMouseEvent &e)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int tMouseCounter::RightUp(wxMouseEvent& Event)
 {
   Stop();
   ShowValue(FALSE);
   return 1;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tMouseCounter::Notify()
 {
   Value += Delta;
@@ -458,7 +526,8 @@ void tMouseCounter::Notify()
   }
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tMouseCounter::ShowValue(bool down)
 {
   char buf[20];
@@ -485,7 +554,7 @@ tMarkDestin::tMarkDestin(wxWindow* canvas, wxFrame *frame, int left)
   //Frame->SetStatusText("Click Destination point");
 }
 
-int tMarkDestin::ButtonDown(wxMouseEvent &e)
+int tMarkDestin::ButtonDown(wxMouseEvent& Event)
 {
   wxCursor c =  wxCursor(wxCURSOR_ARROW);
   Canvas->SetCursor(c);
@@ -493,7 +562,7 @@ int tMarkDestin::ButtonDown(wxMouseEvent &e)
   //converts physical coords to logical(scrolled) coords
   wxClientDC* scrolledDC=new wxClientDC(Canvas);
   Canvas->PrepareDC(*scrolledDC);
-  wxPoint point=e.GetLogicalPosition(*scrolledDC);
+  wxPoint point = Event.GetLogicalPosition(*scrolledDC);
   delete scrolledDC;
 
   x=point.x;
@@ -502,17 +571,17 @@ int tMarkDestin::ButtonDown(wxMouseEvent &e)
   return 1;
 }
 
-int tMarkDestin::RightDown(wxMouseEvent &e)
+int tMarkDestin::RightDown(wxMouseEvent& Event)
 {
-  ButtonDown(e);
+  ButtonDown(Event);
   Aborted = 1;
   //Frame->SetStatusText("Operation aborted");
   return 1;
 }
 
-int tMarkDestin::LeftDown(wxMouseEvent &e)
+int tMarkDestin::LeftDown(wxMouseEvent& Event)
 {
-  ButtonDown(e);
+  ButtonDown(Event);
   Aborted = 0;
   //Frame->SetStatusText("");
   return 1;

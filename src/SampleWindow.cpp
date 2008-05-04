@@ -153,7 +153,7 @@ class tSampleCnvs : public wxScrolledWindow
     int paint_offset;
     int paint_length;
 
-    tSnapSelection snapsel;
+    JZSnapSelection snapsel;
     // sel_fr == 0: no selection and no insertion point
     // sel_fr >  0 && sel_fr == sel_to: insertion point
     // sel_fr >  0 && sel_fr <  sel_to: selected range
@@ -323,48 +323,59 @@ void tSampleCnvs::OnEvent(wxMouseEvent &e)
   {
     mouse_up_sets_insertion_point = 0;
     mouse_down = TRUE;
-    if (snapsel.Selected)
+    if (snapsel.IsSelected())
     {
-      snapsel.Draw(*pDc);
-      snapsel.Selected = 0;
+      snapsel.Draw(*pDc, 0, 0);
+      snapsel.SetSelected(false);
     }
     else if (inspt.IsVisible())
+    {
       inspt.Draw();
+    }
     else
+    {
       mouse_up_sets_insertion_point = 1;
+    }
     snapsel.Event(e);
   }
   else if (e.LeftUp())
   {
     mouse_down = FALSE;
     snapsel.Event(e);
-    if (snapsel.Selected)
+    if (snapsel.IsSelected())
     {
-      snapsel.Draw(*pDc);
-      sel_fr = Pixel2Sample(snapsel.r.x);
-      sel_to = Pixel2Sample(snapsel.r.x + snapsel.r.width);
+      snapsel.Draw(*pDc, 0, 0);
+      sel_fr = Pixel2Sample(
+        snapsel.GetRectangle().x);
+      sel_to = Pixel2Sample(
+        snapsel.GetRectangle().x + snapsel.GetRectangle().width);
     }
-    else if (mouse_up_sets_insertion_point) {
+    else if (mouse_up_sets_insertion_point)
+    {
       int x, y;
       e.GetPosition(&x, &y);
       sel_fr = sel_to = Pixel2Sample(x);
       inspt.Draw(x);
     }
     else
+    {
       sel_fr = sel_to = -1;
+    }
   }
   else if (e.Dragging() && mouse_down)
+  {
     snapsel.Event(e);
+  }
 }
 
 
 void tSampleCnvs::ClearSelection()
 {
-  if (snapsel.Selected)
+  if (snapsel.IsSelected())
   {
     wxDC* pDc = new wxClientDC(this);
-    snapsel.Draw(*pDc);
-    snapsel.Selected = 0;
+    snapsel.Draw(*pDc, 0, 0);
+    snapsel.SetSelected(false);
   }
   else if (inspt.IsVisible())
   {
@@ -395,10 +406,10 @@ void tSampleCnvs::SetSelection(int fr, int to)
   GetClientSize(&cw, &ch);
   r.SetY(0);
   r.SetHeight(ch);
-  snapsel.r = r;
-  snapsel.Selected = TRUE;
+  snapsel.SetRectangle(r);
+  snapsel.SetSelected(true);
   wxDC* pDc = new wxClientDC(this);
-  snapsel.Draw(*pDc);
+  snapsel.Draw(*pDc, 0, 0);
 }
 
 
@@ -452,16 +463,16 @@ void tSampleCnvs::OnPaint()
       DrawTicks(x, y, w);
   }
 
-  if (snapsel.Selected)
+  if (snapsel.IsSelected())
   {
     JZRectangle r;
     r.SetX(Sample2Pixel(sel_fr));
     r.SetWidth(Sample2Pixel(sel_to) - r.x);
     r.SetY(0);
     r.SetHeight(ch);
-    snapsel.r = r;
+    snapsel.SetRectangle(r);
     wxDC* pDc = new wxClientDC(this);
-    snapsel.Draw(*pDc);
+    snapsel.Draw(*pDc, 0, 0);
   }
   else if (sel_fr > 0)
   {

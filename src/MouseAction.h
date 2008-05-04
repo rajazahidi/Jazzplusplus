@@ -29,6 +29,8 @@
 
 #include "Rectangle.h"
 
+#include <vector>
+
 class JZEventWindow;
 
 enum TEMousePlayMode
@@ -140,56 +142,125 @@ class tMouseAction
 
 //*****************************************************************************
 // Description:
-// Selection -    draw a rectangle with the mouse, selecting events
-//   This class needs to draw in the window, thus it needs access to the
-// device context of the window.  This was  by storing a wxCanvas pointer
-// in wxwin168, but wxCanvas is gone in wxwin2.
+//   This is the selection class declaration.  This class selects events using
+// the mouse and draws indicating the selected events.
 //*****************************************************************************
-class tSelection : public tMouseAction
+class JZSelection : public tMouseAction
 {
   public:
 
-    tSelection(wxWindow* w);//wxCanvas *canvas);
-    virtual ~tSelection();
+    JZSelection(wxWindow* pWindow);
 
-    int Active;
-    virtual void Snap(int &x, int &y, int drag) {}
-    JZRectangle r;
-    bool Selected;                // r is valid
-    virtual int Dragging(wxMouseEvent &);
-    virtual int Event(wxMouseEvent &e);
-    virtual int ButtonDown(wxMouseEvent &);
-    virtual int ButtonUp(wxMouseEvent &);
-    virtual void Draw(wxDC& Dc);
-    virtual void Draw(wxDC& Dc, int x, int y, int w, int h); // clipping
-    // may not be called while dragging
-    void Select(JZRectangle &rr, int x, int y, int w, int h);
-    void Select(JZRectangle &rr);
+    virtual ~JZSelection();
+
+    virtual bool IsActive() const
+    {
+      return mActive;
+    }
+
+    virtual bool IsSelected() const
+    {
+      return mSelected;
+    }
+
+    virtual void SetSelected(bool Selected)
+    {
+      mSelected = Selected;
+    }
+
+    virtual const JZRectangle& GetRectangle() const
+    {
+      return mRectangle;
+    }
+
+    virtual void SetRectangle(const JZRectangle& Rectangle)
+    {
+      mRectangle = Rectangle;
+    }
+
+    virtual void Snap(int& x, int& y, bool drag)
+    {
+    }
+
+    virtual int Dragging(wxMouseEvent& Event);
+
+    virtual int Event(wxMouseEvent& Event);
+
+    virtual int ButtonDown(wxMouseEvent& Event);
+
+    virtual int ButtonUp(wxMouseEvent& Event);
+
+    virtual void Draw(wxDC& Dc, int ScrolledX, int ScrolledY);
+
+    // Drawing with clipping.
+    virtual void Draw(
+      wxDC& Dc,
+      int ScrolledX,
+      int ScrolledY,
+      int ClipX,
+      int ClipY,
+      int ClipWidth,
+      int ClipHeight);
+
+    // May not be called while dragging.
+    void Select(JZRectangle& rr, int x, int y, int w, int h);
+
+    void Select(JZRectangle& Rectangle);
 
   private:
 
-    wxWindow* win;
+    bool mActive;
 
-    //  wxCanvas *Canvas;
+    // The following indicates if the rectangle is valid.
+    bool mSelected;
+    JZRectangle mRectangle;
+
+    wxWindow* mpWindow;
+
     wxBrush* mpBackgroundBrush;
 };
 
 //*****************************************************************************
+// Description:
+//   This is the snap selection class declaration.
 //*****************************************************************************
-class tSnapSelection : public tSelection
+class JZSnapSelection : public JZSelection
 {
   public:
-    tSnapSelection(wxWindow *c);
-    virtual void Snap(float &x, float &y, int up);
-    void SetXSnap(int ny, int *cx);
-    void SetYSnap(int ny, int *cy);
-    void SetXSnap(int xMin, int xMax, int xStep);
-    void SetYSnap(int yMin, int yMax, int yStep);
+
+    JZSnapSelection(wxWindow* pWindow);
+
+    virtual void Snap(int& x, int& y, bool Up);
+
+    void SetXSnap(int XCount, int* pXVector);
+
+    void SetYSnap(int YCount, int* pYVector);
+
+    void SetXSnap(int XMin, int XMax, int XStep);
+
+    void SetYSnap(int YMin, int YMax, int YStep);
+
+  private:
+
+    static void SnapToVector(
+      int& Coordinate,
+      std::vector<int> Vector,
+      bool Up);
+
+    static void SnapMod(
+      int& Coordinate,
+      int Min,
+      int Max,
+      int Step,
+      bool Up);
 
   protected:
-    int *xCoords, nxCoords;
-    int *yCoords, nyCoords;
-    int xMin, xMax, xStep, yMin, yMax, yStep;
+
+    std::vector<int> mXCoordinates;
+
+    std::vector<int> mYCoordinates;
+
+    int mXMin, mXMax, mXStep, mYMin, mYMax, mYStep;
 };
 
 

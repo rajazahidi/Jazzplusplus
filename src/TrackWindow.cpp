@@ -50,6 +50,8 @@ BEGIN_EVENT_TABLE(JZTrackWindow, JZEventWindow)
 
   EVT_LEFT_DOWN(JZTrackWindow::OnLeftButtonDown)
 
+  EVT_MOTION(JZTrackWindow::OnMouseMove)
+
   EVT_LEFT_UP(JZTrackWindow::OnLeftButtonUp)
 
   EVT_RIGHT_UP(JZTrackWindow::OnRightButtonUp)
@@ -166,7 +168,7 @@ void JZTrackWindow::NewPlayPosition(int Clock)
   int scroll_clock = (mFromClock + 5 * mToClock) / 6;
 
   if (
-    !mpSnapSel->Active &&
+    !mpSnapSel->IsActive() &&
     (Clock > scroll_clock || Clock < mFromClock) && Clock >= 0)
   {
     // Avoid permanent redraws when end of scroll range is reached.
@@ -181,7 +183,7 @@ void JZTrackWindow::NewPlayPosition(int Clock)
     SetXScrollPosition(x);
   }
 
-  if (!mpSnapSel->Active)  // sets clipping
+  if (!mpSnapSel->IsActive())  // sets clipping
   {
     if (mPlayClock != Clock)
     {
@@ -269,6 +271,19 @@ void JZTrackWindow::OnLeftButtonDown(wxMouseEvent& Event)
     Point.y >= mEventsY && Point.y < mEventsY + mEventsHeight)
   {
     SnapSelectionStart(Event);
+    mpSnapSel->ButtonDown(Event);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::OnMouseMove(wxMouseEvent& Event)
+{
+  if (Event.LeftIsDown())
+  {
+    mpSnapSel->Dragging(Event);
+//    SnapSelectionStop(Event);
+    Refresh(false);
   }
 }
 
@@ -377,6 +392,8 @@ void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& Event)
         Point.x >= mEventsX && Point.x < mEventsX + mEventsWidth &&
         Point.y >= mEventsY && Point.y < mEventsY + mEventsHeight)
       {
+        mpSnapSel->ButtonUp(Event);
+
         // The point is in event area.
         SnapSelectionStop(Event);
       }
@@ -633,9 +650,16 @@ void JZTrackWindow::Draw(wxDC& Dc)
           LocalDc.SetPen(*wxBLACK_PEN);
           ostringstream Oss;
           Oss << BarInfo.GetBarIndex() + 1 - Intro;
-          LocalDc.DrawText(Oss.str().c_str(), x + mLittleBit, mEventsY - mTrackHeight);
+          LocalDc.DrawText(
+            Oss.str().c_str(),
+            x + mLittleBit,
+            mEventsY - mTrackHeight);
           LocalDc.SetPen(*wxGREY_PEN);
-          LocalDc.DrawLine(x, mEventsY + 1 - mTrackHeight, x, mEventsY + mEventsHeight);
+          LocalDc.DrawLine(
+            x,
+            mEventsY + 1 - mTrackHeight,
+            x,
+            mEventsY + mEventsHeight);
         }
         else
         {
@@ -741,7 +765,14 @@ void JZTrackWindow::Draw(wxDC& Dc)
   DrawPlayPosition(LocalDc);
 
   // Draw the selection box.
-  mpSnapSel->Draw(LocalDc, mEventsX, mEventsY, mEventsWidth, mEventsHeight);
+  mpSnapSel->Draw(
+    LocalDc,
+    mScrolledX,
+    mScrolledY,
+    mEventsX,
+    mEventsY,
+    mEventsWidth,
+    mEventsHeight);
 
   Dc.Blit(
     0,
@@ -839,7 +870,10 @@ void JZTrackWindow::DrawSpeed(wxDC& Dc, int Value, bool Down)
 //-----------------------------------------------------------------------------
 void JZTrackWindow::DrawPlayPosition(wxDC& Dc)
 {
-  if (!mpSnapSel->Active && mPlayClock >= mFromClock && mPlayClock < mToClock)
+  if (
+    !mpSnapSel->IsActive() &&
+    mPlayClock >= mFromClock &&
+    mPlayClock < mToClock)
   {
     Dc.SetBrush(*wxBLACK_BRUSH);
     Dc.SetPen(*wxBLACK_PEN);
@@ -1179,7 +1213,7 @@ JZTrack* JZTrackWindow::y2Track(int y)
 //-----------------------------------------------------------------------------
 int JZTrackWindow::EventsSelected(const wxString& Message)
 {
-  if (!mpSnapSel->Selected)
+  if (!mpSnapSel->IsSelected())
   {
     wxMessageBox(Message, "Error", wxOK);
     return 0;
@@ -1227,14 +1261,16 @@ void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
         Event.GetPosition(&x, &y);
         gpProject->SetPlayPosition(x2BarClock(x));
         gpProject->Mute((Event.RightDown() != 0));
-        if (mpSnapSel->Selected && (Event.ShiftDown() || Event.MiddleDown()))
+        if (
+          mpSnapSel->IsSelected() &&
+          (Event.ShiftDown() || Event.MiddleDown()))
         {
           gpProject->SetLoop(true);
         }
         else
         {
           gpProject->SetLoop(false);
-          mPreviouslyRecording = mpSnapSel->Selected;
+          mPreviouslyRecording = mpSnapSel->IsSelected();
         }
         break;
 
@@ -1281,7 +1317,7 @@ void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
     bool record = gpProject->mRecord;
 
     // Is it possible to record?
-    if (record && mpSnapSel->Selected)
+    if (record && mpSnapSel->IsSelected())
     {
       pRecInfo->mTrackIndex = mpFilter->FromTrack;
 
@@ -1315,7 +1351,7 @@ void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
 
     // Is it possible to loop?
     int loop_clock = 0;
-    if (loop && mpSnapSel->Selected)
+    if (loop && mpSnapSel->IsSelected())
     {
       mPreviousClock = mpFilter->FromClock;
       loop_clock = mpFilter->ToClock;
@@ -1390,14 +1426,15 @@ void JZTrackWindow::SnapSelectionStart(wxMouseEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackWindow::SnapSelectionStop(wxMouseEvent& Event)
 {
-  if (mpSnapSel->Selected)
+  if (mpSnapSel->IsSelected())
   {
-    mpFilter->FromTrack = y2TrackIndex(mpSnapSel->r.y);
-    mpFilter->ToTrack   = y2TrackIndex(
-      mpSnapSel->r.y + mpSnapSel->r.GetHeight() - 1);
-    mpFilter->FromClock = x2BarClock(mpSnapSel->r.x + 1);
+    mpFilter->FromTrack = y2TrackIndex(mpSnapSel->GetRectangle().y);
+    mpFilter->ToTrack = y2TrackIndex(
+      mpSnapSel->GetRectangle().y +
+      mpSnapSel->GetRectangle().GetHeight() - 1);
+    mpFilter->FromClock = x2BarClock(mpSnapSel->GetRectangle().x + 1);
     mpFilter->ToClock = x2BarClock(
-      mpSnapSel->r.x + mpSnapSel->r.GetWidth() + 1);
+      mpSnapSel->GetRectangle().x + mpSnapSel->GetRectangle().GetWidth() + 1);
 //    NextWin->NewPosition(mpFilter->FromTrack, mpFilter->FromClock);
   }
 }

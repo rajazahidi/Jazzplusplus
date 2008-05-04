@@ -40,7 +40,7 @@ class JZEventWindow : public wxWindow
 {
   public:
 
-    tSnapSelection* mpSnapSel;
+    JZSnapSelection* mpSnapSel;
 
     JZFilter* mpFilter;
 
@@ -182,7 +182,7 @@ class JZEventFrame : public wxFrame
     int FromLine, ToLine;
 
     // Mousehandling
-    tSnapSelection *SnapSel;
+    JZSnapSelection *SnapSel;
     tMouseAction *MouseAction;
     virtual void SnapSelStart(wxMouseEvent &e);
     virtual void SnapSelStop(wxMouseEvent &e);

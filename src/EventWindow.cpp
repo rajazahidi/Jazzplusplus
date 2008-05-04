@@ -33,7 +33,6 @@
 
 using namespace std;
 
-
 //*****************************************************************************
 // Description:
 //   This is the event window class definition.
@@ -79,7 +78,7 @@ JZEventWindow::JZEventWindow(
     mScrolledX(0),
     mScrolledY(0)
 {
-  mpSnapSel = new tSnapSelection(this);
+  mpSnapSel = new JZSnapSelection(this);
 
   mpFilter = new JZFilter(mpSong);
 
@@ -106,7 +105,7 @@ JZEventWindow::~JZEventWindow()
 //-----------------------------------------------------------------------------
 int JZEventWindow::EventsSelected(const wxString& Message) const
 {
-  if (!mpSnapSel->Selected)
+  if (!mpSnapSel->IsSelected())
   {
     wxMessageBox(Message, "Error", wxOK);
     return 0;
@@ -401,7 +400,6 @@ JZEventFrame::JZEventFrame(
   mpFilter = new JZFilter(Song);
 }
 
-
 JZEventFrame::~JZEventFrame()
 {
   delete SnapSel;
@@ -421,18 +419,17 @@ JZEventFrame::~JZEventFrame()
   }
 }
 
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZEventFrame::CreateMenu()
 {
 }
 
 
-/**
-
-create the canvas component(used for differently dependingon the subclass)
-size it to the client area of the frame(frame size minus toolbar and menus )
-*/
+//-----------------------------------------------------------------------------
+// create the canvas component(used for differently dependingon the subclass)
+// size it to the client area of the frame(frame size minus toolbar and menus )
+//-----------------------------------------------------------------------------
 //void JZEventFrame::CreateCanvas()
 //{
 //  cout << "CreateCanvas" << endl;
@@ -451,8 +448,9 @@ void JZEventFrame::Create()
   Setup();
 }
 
-
+//-----------------------------------------------------------------------------
 // Initialize the constants used in drawing.
+//-----------------------------------------------------------------------------
 void JZEventFrame::Setup()
 {
 /*
@@ -478,11 +476,10 @@ void JZEventFrame::Setup()
 */
 }
 
-
-/**
-this onsize handler is supposed to take care of handling of the resizing the two subwindows sizes to
-they dont overlap
-*/
+//-----------------------------------------------------------------------------
+// this onsize handler is supposed to take care of handling of the resizing
+// the two subwindows sizes to they dont overlap
+//-----------------------------------------------------------------------------
 void JZEventFrame::OnSize(wxSizeEvent& Event)
 {
 //  wxFrame::OnSize(Event);
@@ -535,11 +532,8 @@ bool JZEventFrame::OnCharHook(wxKeyEvent& e)
   return OnKeyEvent(e);
 }
 
-// *******************************************************************
-// Coord-Functions
-// *******************************************************************
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZEventFrame::y2yLine(int y, int up)
 {
   if (up)
@@ -552,6 +546,8 @@ int JZEventFrame::y2yLine(int y, int up)
   return y;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZEventFrame::y2Line(int y, int up)
 {
   if (up)
@@ -562,13 +558,16 @@ int JZEventFrame::y2Line(int y, int up)
   return y / mTrackHeight;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZEventFrame::Line2y(int Line)
 {
   return Line * mTrackHeight + mTopInfoHeight;
 }
 
 /*
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZEventFrame::LineText(wxDC *dc, int x, int y, int w, const char *str, int h, bool down)
 {
   if (h <= 0)
@@ -618,10 +617,8 @@ void JZEventFrame::LineText(wxDC *dc, int x, int y, int w, const char *str, int 
 }
 */
 
-// *******************************************************************
-// Painting behavior
-// *******************************************************************
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZEventFrame::Redraw()
 {
 //   wxDC* dc=new wxClientDC(this);
@@ -631,29 +628,26 @@ void JZEventFrame::Redraw()
 //   //the problem is that onpaint no longer tkes no argument, and is supposed to be called from the framework only, so it should be split
 //   delete dc;
 
-
-
 //  mpEventWindow->Refresh();
-
 }
 
-// ******************************************************************
-// Mouse
-// ******************************************************************
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 bool JZEventFrame::OnKeyEvent(wxKeyEvent &e)
 {
   return false;
 }
 
-/** seems to handle the "selection" rectangle. normally called from the base class onmouseevent handler */
+//-----------------------------------------------------------------------------
+// seems to handle the "selection" rectangle. normally called from the base
+// class onmouseevent handler
+//-----------------------------------------------------------------------------
 int JZEventFrame::OnMouseEvent(wxMouseEvent &e)
 {
   //  cout <<"JZEventFrame::OnMouseEvent"<<endl;
   if (!MouseAction)
   {
     // create SnapSel?
-
     int x;
     int y;
     e.GetPosition(&x, &y);
@@ -664,7 +658,8 @@ int JZEventFrame::OnMouseEvent(wxMouseEvent &e)
         {
           SnapSelStart(e);
 
-          if (SnapSel->Selected){
+          if (SnapSel->IsSelected())
+          {
             Refresh(); //redraw the whole window instead(inefficient, we should rather invalidate a rect)
           }
           SnapSel->Event(e);
@@ -673,7 +668,6 @@ int JZEventFrame::OnMouseEvent(wxMouseEvent &e)
       }
     }
   }
-
   else
   {
     // MouseAction active
@@ -696,38 +690,36 @@ int JZEventFrame::OnMouseEvent(wxMouseEvent &e)
   return 0;
 }
 
-// ******************************************************************
-// dummies
-// ******************************************************************
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 bool JZEventFrame::OnClose()
 {
   return FALSE;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZEventFrame::OnMenuCommand(int)
 {
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZEventFrame::SnapSelStart(wxMouseEvent& MouseEvent)
 {
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZEventFrame::SnapSelStop(wxMouseEvent& MouseEvent)
 {
 }
 
 //-----------------------------------------------------------------------------
-// PlayPosition
 //-----------------------------------------------------------------------------
-
-// **************************************************************************
-// EventsSelected
-// **************************************************************************
-
-int JZEventFrame::EventsSelected(const char *msg)
+int JZEventFrame::EventsSelected(const char* msg)
 {
-  if (!SnapSel->Selected)
+  if (!SnapSel->IsSelected())
   {
     if (msg == 0)
     {
@@ -739,158 +731,104 @@ int JZEventFrame::EventsSelected(const char *msg)
   return 1;
 }
 
-// **************************************************************************
-// Quantize
-// **************************************************************************
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZEventFrame::MenQuantize()
 {
-
-
   if (!EventsSelected())
     return;
   //  wxDialogBox *panel = new wxDialogBox(this, "Quantize", FALSE );
   tQuantizeDlg * dlg = new tQuantizeDlg(this, mpFilter);
   dlg->Create();
-
-
 }
 
-// **************************************************************************
-// Cleanup
-// **************************************************************************
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZEventFrame::MenCleanup()
 {
-
-
   if (!EventsSelected())
     return;
   tCleanupDlg * dlg = new tCleanupDlg(this, mpFilter);
   dlg->Create();
-
 }
 
-
-// **************************************************************************
-// SearchReplace
-// **************************************************************************
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZEventFrame::MenSearchReplace()
 {
-
-
   if (!EventsSelected())
     return;
   tSearchReplaceDlg * dlg = new tSearchReplaceDlg(this, mpFilter);
   dlg->Create();
-
-
 }
 
-
-// **************************************************************************
-// SetChannel
-// **************************************************************************
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZEventFrame::MenSetChannel()
 {
-
-
   if (!EventsSelected())
     return;
   tSetChannelDlg * dlg = new tSetChannelDlg(mpFilter);
   dlg->Create();
-
 }
 
-
-// **************************************************************************
-// Transpose
-// **************************************************************************
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZEventFrame::MenTranspose()
 {
-
-
   if (!EventsSelected())
     return;
   tTransposeDlg * dlg = new tTransposeDlg(this, mpFilter);
   dlg->Create();
-
-
 }
 
-/**show the "shift events" dialog */
-
+//-----------------------------------------------------------------------------
+// show the "shift events" dialog
+//-----------------------------------------------------------------------------
 void JZEventFrame::MenShift(int Unit)
 {
   if (EventsSelected())
   {
-
     tShiftDlg * dlg = new tShiftDlg(this, mpFilter, Unit);
     dlg->Create();
   }
-
-
 }
 
-
-// ********************************************************************************
-// Delete
-// ********************************************************************************
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZEventFrame::MenDelete()
 {
-
-
   if (!EventsSelected())
     return;
   tDeleteDlg * dlg = new tDeleteDlg(this, mpFilter);
   dlg->Create();
 }
 
-// ********************************************************************************
-// Velocity
-// ********************************************************************************
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZEventFrame::MenVelocity()
 {
-
   if (!EventsSelected())
     return;
   tVelocityDlg * dlg = new tVelocityDlg(mpFilter);
   dlg->Create();
 }
 
-// ********************************************************************************
-// Length
-// ********************************************************************************
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZEventFrame::MenLength()
 {
-
-
   if (!EventsSelected())
     return;
   tLengthDlg * dlg = new tLengthDlg(this, mpFilter);
   dlg->Create();
-
 }
 
-
-// ********************************************************************************
+//-----------------------------------------------------------------------------
 // convert to modulation
-// ********************************************************************************
-
-
+//-----------------------------------------------------------------------------
 void JZEventFrame::MenConvertToModulation()
 {
-
-
   if (!EventsSelected())
     return;
   tCmdConvertToModulation cmd(mpFilter);
@@ -898,29 +836,22 @@ void JZEventFrame::MenConvertToModulation()
   Redraw();
 }
 
-
-
-
-
-// ******************************************************************
+//*****************************************************************************
 // MeterChange Dialog
-// ******************************************************************
-
-
+//*****************************************************************************
 class tMeterChangeDlg : public tPropertyListDlg
 {
-public:
-  JZEventFrame *EventWin;
-  static int Numerator;
-  static int Denomiator;
-  static int BarNr;
-  tMeterChangeDlg(JZEventFrame *w);
-  void AddProperties();
-  virtual bool OnClose();
-  virtual void OnCancel();
-  virtual void OnHelp();
+  public:
+    JZEventFrame *EventWin;
+    static int Numerator;
+    static int Denomiator;
+    static int BarNr;
+    tMeterChangeDlg(JZEventFrame *w);
+    void AddProperties();
+    virtual bool OnClose();
+    virtual void OnCancel();
+    virtual void OnHelp();
 };
-
 
 int tMeterChangeDlg::Numerator = 4;
 int tMeterChangeDlg::Denomiator = 4;
@@ -932,13 +863,11 @@ tMeterChangeDlg::tMeterChangeDlg(JZEventFrame *w)
   EventWin = w;
 }
 
-
 void tMeterChangeDlg::OnCancel()
 {
   EventWin->mpSettingsDialog = 0;
   //wxForm::OnCancel();
 }
-
 
 bool tMeterChangeDlg::OnClose()
 {
@@ -954,7 +883,6 @@ void tMeterChangeDlg::OnHelp()
 {
   gpHelpInstance->ShowTopic("Meterchange");
 }
-
 
 void tMeterChangeDlg::AddProperties()
 {
@@ -979,8 +907,6 @@ void tMeterChangeDlg::AddProperties()
     wxPropertyValue(&Denomiator),
      "integer"));//JAVE should be a integer list instead FIXME
 }
-
-
 
 void JZEventFrame::MenMeterChange()
 {

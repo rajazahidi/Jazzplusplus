@@ -30,7 +30,6 @@
 class JZSong;
 class JZTrack;
 class JZFilter;
-class tSnapSelection;
 class wxFont;
 
 enum TECounterModes
@@ -93,6 +92,8 @@ class JZTrackWindow : public JZEventWindow
     void OnPaint(wxPaintEvent& Event);
 
     void OnLeftButtonDown(wxMouseEvent& Event);
+
+    void OnMouseMove(wxMouseEvent& Event);
 
     void OnLeftButtonUp(wxMouseEvent& Event);
 

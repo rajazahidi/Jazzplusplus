@@ -997,7 +997,14 @@ void JZPianoWindow::Draw(wxDC& Dc)
   DrawPlayPosition(LocalDc);
 
   // Draw the selection box.
-  mpSnapSel->Draw(LocalDc, mEventsX, mEventsY, mEventsWidth, mEventsHeight);
+  mpSnapSel->Draw(
+    LocalDc,
+    mScrolledX,
+    mScrolledY,
+    mEventsX,
+    mEventsY,
+    mEventsWidth,
+    mEventsHeight);
 
   Dc.Blit(
     0,
@@ -1022,7 +1029,10 @@ void JZPianoWindow::Draw(wxDC& Dc)
 //-----------------------------------------------------------------------------
 void JZPianoWindow::DrawPlayPosition(wxDC& Dc)
 {
-  if (!mpSnapSel->Active && mPlayClock >= mFromClock && mPlayClock < mToClock)
+  if (
+    !mpSnapSel->IsActive() &&
+    mPlayClock >= mFromClock &&
+    mPlayClock < mToClock)
   {
     Dc.SetBrush(*wxBLACK_BRUSH);
     Dc.SetPen(*wxBLACK_PEN);
@@ -1639,7 +1649,7 @@ void JZPianoWindow::OnMouseEvent(wxMouseEvent& Event)
           int Clock, LoopClock;
           if (action == MA_CYCLE)
           {
-            if (mpSnapSel->Selected)
+            if (mpSnapSel->IsSelected())
             {
               Clock = mpFilter->FromClock;
               LoopClock = mpFilter->ToClock;
@@ -1805,10 +1815,11 @@ void JZPianoWindow::VerticalScroll(wxScrollWinEvent& Event)
 //-----------------------------------------------------------------------------
 void JZPianoWindow::SnapSelStop(wxMouseEvent& Event)
 {
-  if (mpSnapSel->Selected)
+  if (mpSnapSel->IsSelected())
   {
-    int fr = y2Pitch((mpSnapSel->r.y + mpSnapSel->r.height - 1));
-    int to = y2Pitch(mpSnapSel->r.y + 1);
+    int fr = y2Pitch(
+      mpSnapSel->GetRectangle().y + mpSnapSel->GetRectangle().height - 1);
+    int to = y2Pitch(mpSnapSel->GetRectangle().y + 1);
 
     mpFilter->FltEvents[FltKeyOn].Selected = mVisibleKeyOn;
     mpFilter->FltEvents[FltKeyOn].FromValue = fr;
@@ -1847,13 +1858,16 @@ void JZPianoWindow::SnapSelStop(wxMouseEvent& Event)
 
     mpFilter->FromTrack = mTrackIndex;
     mpFilter->ToTrack   = mTrackIndex;
-    mpFilter->FromClock = SnapClock(x2Clock(mpSnapSel->r.x + 1));
-    mpFilter->ToClock   = SnapClock(x2Clock((mpSnapSel->r.x + mpSnapSel->r.width + 1)));
+    mpFilter->FromClock = SnapClock(x2Clock(mpSnapSel->GetRectangle().x + 1));
+    mpFilter->ToClock   = SnapClock(x2Clock(
+      mpSnapSel->GetRectangle().x + mpSnapSel->GetRectangle().width + 1));
   }
 
   // SN++ Veloc- oder Aftertouch-Editor updaten
   if (mpCtrlEdit)
+  {
     mpCtrlEdit->UpDate();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1905,7 +1919,7 @@ void JZPianoWindow::NewPlayPosition(int Clock)
   int scroll_clock = (mFromClock + 5 * mToClock) / 6;
 
   if (
-    !mpSnapSel->Active &&
+    !mpSnapSel->IsActive() &&
     (Clock > scroll_clock || Clock < mFromClock) && Clock >= 0)
   {
     // Avoid permenent redraws when end of scroll range is reached.
@@ -1920,7 +1934,7 @@ void JZPianoWindow::NewPlayPosition(int Clock)
     SetXScrollPosition(x);
   }
 
-  if (!mpSnapSel->Active)  // sets clipping
+  if (!mpSnapSel->IsActive())  // sets clipping
   {
     if (mPlayClock != Clock)
     {
@@ -1947,7 +1961,7 @@ void JZPianoWindow::NewPlayPosition(int Clock)
 //-----------------------------------------------------------------------------
 int JZPianoWindow::EventsSelected(const char *msg)
 {
-  if (!mpSnapSel->Selected)
+  if (!mpSnapSel->IsSelected())
   {
     if (msg == 0)
       msg = "please select some events first";
@@ -2010,7 +2024,7 @@ int JZPianoWindow::OnEventWinMouseEvent(wxMouseEvent& Event)
         {
           SnapSelStart(Event);
 
-          if (mpSnapSel->Selected)
+          if (mpSnapSel->IsSelected())
           {
             // Redraw the whole window instead (inefficient, we should rather
             // invalidate a rect).

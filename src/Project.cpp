@@ -38,7 +38,7 @@
 #ifdef __WXMSW__
 #include "WindowsPlayer.h"
 #include "WindowsAudioInterface.h"
-#else
+#elif __WXGTK__
 #include "AudioDriver.h"
 #endif
 #ifdef DEV_ALSA

@@ -93,11 +93,12 @@ dnl    AC_MSG_ERROR(no alsa i can use! check if its at least 090 and running)
 dnl  fi
 
   dnl This test comes with the alsa distribution!
-    
-  AM_PATH_ALSA(0.9.0)
+dnl  AM_PATH_ALSA(0.9.0)
 
   LIBS="$LIBS $ALSA_LIBS"
 fi
+
+AM_CONDITIONAL(USE_ALSA, test "$enable_alsa" = yes)
 
 dnl --------------------------------------------
 dnl check if we are to enable sequencer2 support

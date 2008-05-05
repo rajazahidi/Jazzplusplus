@@ -2,6 +2,7 @@
 
 bin_PROGRAMS = jazz
 
+if USE_ALSA
 jazz_SOURCES = \
 AboutDialog.cpp \
 AlsaDriver.cpp \
@@ -80,6 +81,82 @@ ToolBar.cpp \
 Track.cpp \
 TrackFrame.cpp \
 TrackWindow.cpp
+else
+jazz_SOURCES = \
+AboutDialog.cpp \
+AsciiMidiFile.cpp \
+Audio.cpp \
+ClockDialog.cpp \
+Command.cpp \
+Configuration.cpp \
+ControlEdit.cpp \
+DeprecatedStringUtils.cpp \
+DeprecatedWx/prop.cpp \
+DeprecatedWx/propform.cpp \
+DeprecatedWx/proplist.cpp \
+Dialogs/KeyOnDialog.cpp \
+Dialogs/MetronomeSettingsDialog.cpp \
+Dialogs/SynthesizerSettingsDialog.cpp \
+Dialogs/TrackDialog.cpp \
+Dialogs.cpp \
+DynamicArray.cpp \
+ErrorMessage.cpp \
+Events.cpp \
+EventWindow.cpp \
+FileSelector.cpp \
+Filter.cpp \
+FindFile.cpp \
+FrequencyTable.cpp \
+GetOptionIndex.cpp \
+Globals.cpp \
+GuitarFrame.cpp \
+GuitarSettings.cpp \
+GuitarSettingsDialog.cpp \
+GuitarWindow.cpp \
+HarmonyBrowserAnalyzer.cpp \
+Harmony.cpp \
+HarmonyP.cpp \
+Help.cpp \
+JazzPlusPlusApplication.cpp \
+KeyDialog.cpp \
+KeyStringConverters.cpp \
+Knob.cpp \
+Mapper.cpp \
+MeasureChoice.cpp \
+MidiDeviceDialog.cpp \
+Metronome.cpp \
+MouseAction.cpp \
+NamedChoice.cpp \
+NamedValue.cpp \
+NamedValueChoice.cpp \
+PianoFrame.cpp \
+PianoWindow.cpp \
+Player.cpp \
+Project.cpp \
+ProjectManager.cpp \
+PropertyListDialog.cpp \
+Random.cpp \
+RecordingInfo.cpp \
+Rectangle.cpp \
+ResourceDialog.cpp \
+Rhythm.cpp \
+SampleCommand.cpp \
+Sample.cpp \
+SampleDialog.cpp \
+SampleWindow.cpp \
+SelectControllerDialog.cpp \
+Signal2.cpp \
+SliderWindow.cpp \
+Song.cpp \
+StandardFile.cpp \
+StringReadWrite.cpp \
+StringUtilities.cpp \
+Synth.cpp \
+ToolBar.cpp \
+Track.cpp \
+TrackFrame.cpp \
+TrackWindow.cpp
+endif
 
 noinst_HEADERS = \
 AboutDialog.h \

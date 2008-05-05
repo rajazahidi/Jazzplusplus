@@ -32,7 +32,7 @@ END_EVENT_TABLE()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZGuitarSettingsDialog::JZGuitarSettingsDialog(wxWindow* pParent)
-  : wxDialog(pParent, wxID_ANY, "Guitar Settings"),
+  : wxDialog(pParent, wxID_ANY, wxString("Guitar Settings")),
     mpChordModeCheckBox(0),
     mpBassGuitarCheckBox(0),
     mpShowOctavesCheckBox(0)//,

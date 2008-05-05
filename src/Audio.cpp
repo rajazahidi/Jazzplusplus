@@ -956,7 +956,7 @@ char * tSamplesDlg::path = 0;
 int    tSamplesDlg::current = 0;
 
 tSamplesDlg::tSamplesDlg(wxWindow* pParent, tSampleSet &s)
-  : wxDialog(pParent, wxID_ANY, "Sample Settings"),
+  : wxDialog(pParent, wxID_ANY, wxString("Sample Settings")),
     set(s)
 {
   if (path == 0)

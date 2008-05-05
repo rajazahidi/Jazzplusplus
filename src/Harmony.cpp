@@ -1638,7 +1638,7 @@ class HBContextDlg : public wxDialog
 
 
 HBContextDlg::HBContextDlg(HBCanvas *c, wxFrame *parent, HBContext *pct)
-  : wxDialog(parent, wxID_ANY, "Edit chord/scale" )
+  : wxDialog(parent, wxID_ANY, wxString("Edit chord/scale"))
 {
   int i;
 

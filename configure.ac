@@ -74,17 +74,34 @@ AC_MSG_RESULT($result)
 
 dnl optional stuff, like alsa oss...
 
-dnl ---------------------------------------
-dnl check if we are to enable alsa support
-dnl ---------------------------------------
-AC_ARG_ENABLE(alsa,  --enable-alsa     Support ALSA)
+dnl To support a new system, you need to add its canonical name (as determined
+dnl by config.sub or specified by the configure command line) to this "case"
+dnl and also define the shared library flags below - search for
+dnl SHARED_LIB_SETUP to find the exact place.
+case "${host}" in
+  *-darwin* )
+    mac_build=yes
+  ;;
+  *-*-linux* )
+    mac_build=no
+  ;;
+  *)
+    AC_MSG_ERROR(unknown system type ${host}.)
+esac
 
-if test x$enable_alsa = xyes ; then
-  AC_MSG_RESULT(alsa is enabled)
-  AC_DEFINE(DEV_ALSA,1,[use alsa drivers])
+if test x$mac_build = xno ; then
 
-  dnl for alsa to work it must be installed(logical no?)
-  dnl this test is just preliminary
+  dnl ---------------------------------------
+  dnl check if we are to enable alsa support
+  dnl ---------------------------------------
+  AC_ARG_ENABLE(alsa,  --enable-alsa     Support ALSA)
+
+  if test x$enable_alsa = xyes ; then
+    AC_MSG_RESULT(alsa is enabled)
+    AC_DEFINE(DEV_ALSA,1,[use alsa drivers])
+
+    dnl for alsa to work it must be installed(logical no?)
+    dnl this test is just preliminary
 dnl  if test -f /proc/asound/version; then
 dnl    AC_MSG_RESULT(alsa seems to be running...very good!)
 dnl    LIBS="$LIBS -lasound"
@@ -92,10 +109,11 @@ dnl  else
 dnl    AC_MSG_ERROR(no alsa i can use! check if its at least 090 and running)
 dnl  fi
 
-  dnl This test comes with the alsa distribution!
-dnl  AM_PATH_ALSA(0.9.0)
+    dnl This test comes with the alsa distribution!
+    AM_PATH_ALSA(0.9.0)
 
-  LIBS="$LIBS $ALSA_LIBS"
+    LIBS="$LIBS $ALSA_LIBS"
+  fi
 fi
 
 AM_CONDITIONAL(USE_ALSA, test "$enable_alsa" = yes)

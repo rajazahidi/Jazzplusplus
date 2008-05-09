@@ -89,21 +89,24 @@ case "${host}" in
     AC_MSG_ERROR(unknown system type ${host}.)
 esac
 
-dnl ---------------------------------------
-dnl check if we are to enable alsa support
-dnl ---------------------------------------
-dnl AC_ARG_ENABLE(alsa,  --enable-alsa     Support ALSA)
-dnl 
-dnl if test x$enable_alsa = xyes ; then
-dnl   AC_MSG_RESULT(alsa is enabled)
-dnl   AC_DEFINE(DEV_ALSA,1,[use alsa drivers])
-dnl 
-dnl   dnl This test comes with the alsa distribution!
-dnl  AM_PATH_ALSA(0.9.0)
-dnl 
-dnl fi
-
 AM_CONDITIONAL(USE_ALSA, test "$have_alsa" = yes)
+
+if [[ $have_alsa = "yes" ]] ; then
+
+  dnl ---------------------------------------
+  dnl check if we are to enable alsa support
+  dnl ---------------------------------------
+  AC_ARG_ENABLE(alsa,  --enable-alsa     Support ALSA)
+
+  if test x$enable_alsa = xyes ; then
+    AC_MSG_RESULT(alsa is enabled)
+    AC_DEFINE(DEV_ALSA,1,[use alsa drivers])
+
+    dnl This test comes with the alsa distribution!
+    AM_PATH_ALSA(0.9.0)
+  
+  fi
+fi
 
 dnl --------------------------------------------
 dnl check if we are to enable sequencer2 support

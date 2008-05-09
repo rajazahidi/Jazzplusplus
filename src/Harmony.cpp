@@ -841,7 +841,7 @@ HBCanvas::HBCanvas(wxFrame* pParent, int x, int y, int w, int h)
 
   wxClientDC Dc(this);
 
-  Dc.SetFont(*wxSMALL_FONT);
+  Dc.SetFont(*wxNORMAL_FONT);
   int TextWidth, TextHeight;
   Dc.GetTextExtent("xD#j75+9-x", &TextWidth, &TextHeight);
 
@@ -1091,7 +1091,7 @@ void HBCanvas::OnDraw(wxDC& Dc)
 {
   Dc.Clear();
 
-  Dc.SetFont(*wxSMALL_FONT);
+  Dc.SetFont(*wxNORMAL_FONT);
 
   Dc.DrawText("Seq", 5, 5);
 
@@ -1286,7 +1286,7 @@ void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
 
   DoPrepareDC(Dc);
 
-  Dc.SetFont(*wxSMALL_FONT);
+  Dc.SetFont(*wxNORMAL_FONT);
 
   HBContext Context;
   int x, y;

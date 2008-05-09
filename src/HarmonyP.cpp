@@ -99,7 +99,7 @@ void HBChord::CreateName(string& ChordName, int key, int flat)
   }
   else if (c.Contains(10))
   {
-    ChordName.append("j");
+    ChordName.append("7");
     seven = true;
   }
 

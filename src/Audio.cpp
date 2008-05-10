@@ -37,6 +37,7 @@
 #include "FileSelector.h"
 #include "StringReadWrite.h"
 #include "Help.h"
+#include "Resources.h"
 
 #include <iostream>
 #include <fstream>
@@ -51,21 +52,22 @@ using namespace std;
 
 #define db(a) cout << #a << " = " << a << endl
 
-// -----------------------------------------------------------
-
-
-class tSampleVoice {
-  /*
-   * activated on note on. Copies data from a tSample Object to the
-   * output buffer as needed by the driver.
-   */
+//*****************************************************************************
+//*****************************************************************************
+class tSampleVoice
+{
+  // Activated on note on.  Copies data from a tSample object to the output
+  // buffer as needed by the driver.
 
   public:
 
-    tSampleVoice(tSampleSet &s) : set(s) {
+    tSampleVoice(tSampleSet &s)
+      : set(s)
+    {
     }
 
-    void Start(tSample *s, long c) {
+    void Start(tSample *s, long c)
+    {
       spl    = s;
       clock  = c;
       first  = 1;
@@ -74,7 +76,8 @@ class tSampleVoice {
       prev   = 0;
     }
 
-    void AddBuffer(short *b, long buffer_clock, unsigned int bufsize) {
+    void AddBuffer(short *b, long buffer_clock, unsigned int bufsize)
+    {
 
       // everything done?
       if (length <= 0)
@@ -113,28 +116,33 @@ class tSampleVoice {
       length -= count;
       b += offset;
       while (count--)
+      {
         *b++ += *data++;
+      }
     }
 
-
-
-    void AddListen(short *b, long fr_smpl, long to_smpl, unsigned int bufsize) {
-
-      // everything done?
+    void AddListen(short *b, long fr_smpl, long to_smpl, unsigned int bufsize)
+    {
+      // Is everything done?
       if (length <= 0)
+      {
         return;
+      }
 
-      if (first) {
+      if (first)
+      {
 
         if (to_smpl > 0 && to_smpl < length)
+        {
           length = to_smpl;
+        }
 
         if (fr_smpl > 0 && fr_smpl < length)
         {
           data += fr_smpl;
           length -= fr_smpl;
         }
-        first = FALSE;
+        first = false;
         if (length <= 0)
         {
           return;
@@ -143,7 +151,9 @@ class tSampleVoice {
 
       int count = bufsize;
       if (count > length)
+      {
         count = length;
+      }
 
       // update length and copy data
       length -= count;
@@ -153,23 +163,25 @@ class tSampleVoice {
       }
     }
 
-
-    int Finished() {
+    int Finished()
+    {
       return length <= 0;
     }
 
   private:
-    tSampleSet &set;
-    long       clock;
-    tSample    *spl;
-    short      *data;
-    int        first;
-    long       length;
-    short      prev;
+    tSampleSet& set;
+    long        clock;
+    tSample*    spl;
+    short*      data;
+    int         first;
+    long        length;
+    short       prev;
 };
 
-// ------------------------------------------------------------
-
+//*****************************************************************************
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tSampleSet::tSampleSet(long tpm)
   : mDefaultFileName("noname.spl"),
     mRecordFileName("noname.wav")
@@ -179,7 +191,9 @@ tSampleSet::tSampleSet(long tpm)
   ticks_per_minute = tpm;
 
   for (i = 0; i < BUFCOUNT; i++)
+  {
     buffers[i] = new tAudioBuffer(0);
+  }
 
   adjust_audio_length = 1;
   has_changed  = false;
@@ -189,7 +203,8 @@ tSampleSet::tSampleSet(long tpm)
   softsync     = 1;
   dirty        = 0;
 
-  for (i = 0; i < MAXSMPL; i++) {
+  for (i = 0; i < MAXSMPL; i++)
+  {
     samples[i] = new tSample(*this);
     samplewin[i] = 0;
   }
@@ -198,26 +213,34 @@ tSampleSet::tSampleSet(long tpm)
   bits     = 16;        // dont change!!
 
   for (i = 0; i < MAXPOLY; i++)
+  {
     voices[i] = new tSampleVoice(*this);
+  }
   num_voices = 0;
-
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tSampleSet::~tSampleSet()
 {
   int i;
-  for (i = 0; i < MAXSMPL; i++) {
+  for (i = 0; i < MAXSMPL; i++)
+  {
     delete samples[i];
     delete samplewin[i];
   }
   for (i = 0; i < MAXPOLY; i++)
+  {
     delete voices[i];
+  }
   for (i = 0; i < BUFCOUNT; i++)
+  {
     delete buffers[i];
+  }
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSampleSet::Edit(int key)
 {
   if (samplewin[key] == 0)
@@ -226,11 +249,12 @@ void tSampleSet::Edit(int key)
 
     samplewin[key] = new tSampleWin(gpTrackWindow, &samplewin[key], *spl);
   }
-  samplewin[key]->Show(TRUE);
+  samplewin[key]->Show(true);
   samplewin[key]->Redraw();
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSampleSet::LoadDefaultSettings()
 {
   wxString FileName = FindFile("jazz.spl");
@@ -240,12 +264,14 @@ void tSampleSet::LoadDefaultSettings()
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tSampleSet::Load(const wxString& FileName)
 {
   int version;
 
   // enable audio when loading a sample set
-  gpMidiPlayer->SetAudioEnabled(TRUE);
+  gpMidiPlayer->SetAudioEnabled(true);
 
   wxBeginBusyCursor();
   for (int i = 0; i < MAXSMPL; i++)
@@ -313,6 +339,8 @@ int tSampleSet::Load(const wxString& FileName)
   return 0;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSampleSet::ReloadSamples()
 {
   for (int i = 0; i < MAXSMPL; i++)
@@ -320,12 +348,14 @@ void tSampleSet::ReloadSamples()
   dirty = 0;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tSampleSet::Save(const wxString& FileName)
 {
   ofstream os(FileName.c_str());
   os << 1 << " " << speed << " " << channels << " " << softsync << endl;
-  for (int i = 0; i < MAXSMPL; i++) {
+  for (int i = 0; i < MAXSMPL; i++)
+  {
     tSample *spl = samples[i];
     const char *fname = spl->GetFilename();
     const char *label = spl->GetLabel();
@@ -344,14 +374,19 @@ int tSampleSet::Save(const wxString& FileName)
   return 0;
 }
 
-
-const char *tSampleSet::GetSampleName(int i) {
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+const char* tSampleSet::GetSampleName(int i)
+{
   if (0 <= i && i < MAXSMPL)
+  {
     return samples[i]->GetLabel();
+  }
   return "";
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tSampleSet::ResetBuffers(tEventArray *evnt_arr, long clock, long tpm)
 {
   int i;
@@ -359,7 +394,9 @@ int tSampleSet::ResetBuffers(tEventArray *evnt_arr, long clock, long tpm)
   full_buffers.Clear();
   driv_buffers.Clear();
   for (i = 0; i < BUFCOUNT; i++)
+  {
     free_buffers.Put(buffers[i]);
+  }
   buffers_written   = 0;
 
   events            = evnt_arr;
@@ -372,10 +409,12 @@ int tSampleSet::ResetBuffers(tEventArray *evnt_arr, long clock, long tpm)
   return 0;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tSampleSet::ResetBufferSize(unsigned int bufsize)
 {
-  if (bufsize == 0 || bufsize > BUFBYTES || (bufsize & 1)) {
+  if (bufsize == 0 || bufsize > BUFBYTES || (bufsize & 1))
+  {
     cerr << "invalid buffer size " << bufsize << '\n';
     return 1;
   }
@@ -384,7 +423,8 @@ int tSampleSet::ResetBufferSize(unsigned int bufsize)
   return 0;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tSampleSet::FillBuffers(long last_clock)
 {
   // check if last_clock is bigger than free buffer space
@@ -412,7 +452,6 @@ int tSampleSet::FillBuffers(long last_clock)
   {
     return 0;
   }
-
 
   // iterate the events and add sounding voices
   while (event_index < events->nEvents)
@@ -468,9 +507,10 @@ int tSampleSet::FillBuffers(long last_clock)
   return nfree;
 }
 
-
+//-----------------------------------------------------------------------------
 // returns the number of buffers containing sound. Fills as many
 // buffers as possible, the last buffers may contain silence only.
+//-----------------------------------------------------------------------------
 int tSampleSet::PrepareListen(tSample *spl, long fr_smpl, long to_smpl)
 {
   listen_sample = spl;
@@ -481,10 +521,12 @@ int tSampleSet::PrepareListen(tSample *spl, long fr_smpl, long to_smpl)
   int nfree = free_buffers.Count();
   int sound_buffers = 0;
 
-  for (int i = 0; i < nfree; i++) {
+  for (int i = 0; i < nfree; i++)
+  {
     tAudioBuffer *buf = free_buffers.Get();
     buf->Clear();
-    if (!voices[0]->Finished()) {
+    if (!voices[0]->Finished())
+    {
       voices[0]->AddListen(buf->Data(), fr_smpl, to_smpl, bufshorts);
       sound_buffers++;
     }
@@ -494,14 +536,16 @@ int tSampleSet::PrepareListen(tSample *spl, long fr_smpl, long to_smpl)
   return sound_buffers;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tSampleSet::PrepareListen(int key, long fr_smpl, long to_smpl)
 {
   tSample *spl = samples[key];
   return PrepareListen(spl, fr_smpl, to_smpl);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tSampleSet::ContinueListen()
 {
   int nfree = free_buffers.Count();
@@ -511,7 +555,8 @@ int tSampleSet::ContinueListen()
   {
     tAudioBuffer *buf = free_buffers.Get();
     buf->Clear();
-    if (!voices[0]->Finished()) {
+    if (!voices[0]->Finished())
+    {
       voices[0]->AddListen(buf->Data(), -1, -1, bufshorts);
       sound_buffers++;
     }
@@ -521,8 +566,8 @@ int tSampleSet::ContinueListen()
   return sound_buffers;
 }
 
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSampleSet::AdjustAudioLength(JZTrack *t, long tpm)
 {
   if (!t->GetAudioMode() || !adjust_audio_length)
@@ -548,14 +593,15 @@ void tSampleSet::AdjustAudioLength(JZTrack *t, long tpm)
   }
 }
 
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSampleSet::StartPlay(long clock)
 {
   ReloadSamples();
 
   // touch all playback sample data, so they may get swapped into memory
-  for (int i = 0; i < MAXSMPL; i++) {
+  for (int i = 0; i < MAXSMPL; i++)
+  {
     tSample *spl = samples[i];
     spl->GotoRAM();
   }
@@ -563,16 +609,17 @@ void tSampleSet::StartPlay(long clock)
   is_playing = 1;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSampleSet::StopPlay()
 {
   is_playing = 0;
 }
 
-// ******************************************************************
-//                                GUI
-// ******************************************************************
-
+//*****************************************************************************
+// Description:
+//   This is the sample dialog.
+//*****************************************************************************
 class tSamplesDlg : public wxDialog
 {
   friend class tSampleSet;
@@ -635,7 +682,14 @@ class tAudioGloblForm : public wxForm
       ossbug2      = gpConfig->GetValue(C_OssBug2);
       duplex_audio = gpConfig->GetValue(C_DuplexAudio);
 
-      static const char *speedtxt[] = { "8000", "11025", "22050", "44100", 0 };
+      static const char *speedtxt[] =
+      {
+        "8000",
+        "11025",
+        "22050",
+        "44100",
+        0
+      };
       speed    = set.GetSpeed();
       speedstr = 0;
       for (int i = 0; speedtxt[i]; i++)
@@ -722,7 +776,8 @@ class tAudioGloblForm : public wxForm
       wxEndBusyCursor();
       wxForm::OnOk();
     }
-    void OnCancel() {
+    void OnCancel()
+    {
       set.glb_dialog = 0;
       wxForm::OnCancel();
     }
@@ -742,25 +797,30 @@ class tAudioGloblForm : public wxForm
 
 #endif // OBSOLETE
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSampleSet::GlobalSettingsDlg()
 {
-  if (spl_dialog) {
-    spl_dialog->Show(TRUE);
+  if (spl_dialog)
+  {
+    spl_dialog->Show(true);
     return;
   }
 
   if (glb_dialog == 0)
   {
 #ifdef OBSOLETE
-    glb_dialog = new wxDialogBox(gpTrackWindow, "Audio Settings", FALSE );
+    glb_dialog = new wxDialogBox(gpTrackWindow, "Audio Settings", false);
     tAudioGloblForm *form  = new tAudioGloblForm(*this);
     form->AssociatePanel(glb_dialog);
     glb_dialog->Fit();
 #endif // OBSOLETE
   }
-  glb_dialog->Show(TRUE);
+  glb_dialog->Show(true);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSampleSet::SaveRecordingDlg(long frc, long toc, tAudioRecordBuffer &buf)
 {
   if (frc >= toc)
@@ -796,24 +856,27 @@ void tSampleSet::SaveRecordingDlg(long frc, long toc, tAudioRecordBuffer &buf)
   }
 }
 
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSampleSet::AddNote(const char *fname, long frc, long toc)
 {
   int i;
   tSample *spl;
 
   // see if fname is already present in sample list
-  for (i = 0; i < MAXSMPL; i++) {
+  for (i = 0; i < MAXSMPL; i++)
+  {
     spl = samples[i];
     if (strcmp(spl->GetFilename(), fname) == 0)
       break;
   }
 
   // if no entry is there, add an entry
-  if (i >= MAXSMPL) {
+  if (i >= MAXSMPL)
+  {
     // start somewhere near the top of the list
-    for (i = 15; i < MAXSMPL; i++) {
+    for (i = 15; i < MAXSMPL; i++)
+    {
       spl = samples[i];
       if (spl->GetFilename()[0] == 0)
         break;
@@ -840,7 +903,8 @@ void tSampleSet::AddNote(const char *fname, long frc, long toc)
 #endif
   tEventIterator iter(info->mpTrack);
   JZEvent *e = iter.Range(frc, toc);
-  while (e != 0) {
+  while (e != 0)
+  {
     track->Kill(e);
     e = iter.Next();
   }
@@ -859,9 +923,13 @@ void tSampleSet::AddNote(const char *fname, long frc, long toc)
   gpTrackWindow->Update();
 }
 
-
-
-void tSampleSet::SaveWave(const char *fname, long frc, long toc, tAudioRecordBuffer &buf)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void tSampleSet::SaveWave(
+  const char *fname,
+  long frc,
+  long toc,
+  tAudioRecordBuffer &buf)
 {
   WaveHeader wh;
   wh.main_chunk = RIFF;
@@ -913,7 +981,8 @@ void tSampleSet::SaveWave(const char *fname, long frc, long toc, tAudioRecordBuf
   // very slow, but works!
   ofstream slow("t2.wav", ios::out | ios::bin | ios::trunc);
   slow.write((char *)&wh, sizeof(wh));
-  for (long i = start_index; i < end_index; i++) {
+  for (long i = start_index; i < end_index; i++)
+  {
     int bi = i / bufsize;
     int di = i % bufsize;
     slow.write((char *)&buf.buffers[bi]->data[di], sizeof(short));
@@ -927,20 +996,27 @@ void tSampleSet::SaveWave(const char *fname, long frc, long toc, tAudioRecordBuf
 
 DEFINE_ARRAY(tAudioBufferArray, tAudioBuffer *)
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tAudioRecordBuffer::Clear()
 {
   int n = buffers.GetSize();
-  for (int i = 0; i < n; i++) {
+  for (int i = 0; i < n; i++)
+  {
     delete buffers[i];
     buffers[i] = 0;
   }
   num_buffers = 0;
 }
 
-tAudioBuffer * tAudioRecordBuffer::RequestBuffer() {
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+tAudioBuffer * tAudioRecordBuffer::RequestBuffer()
+{
   if (buffers[num_buffers] == 0)
     buffers[num_buffers] = new tAudioBuffer(0);
-  if (buffers[num_buffers] == 0) {
+  if (buffers[num_buffers] == 0)
+  {
     Clear();
     fprintf(stderr, "memory exhausted!\n");
   }
@@ -952,9 +1028,13 @@ tAudioBuffer * tAudioRecordBuffer::RequestBuffer() {
 // -----------------------------------------------------------------
 
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 char * tSamplesDlg::path = 0;
 int    tSamplesDlg::current = 0;
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tSamplesDlg::tSamplesDlg(wxWindow* pParent, tSampleSet &s)
   : wxDialog(pParent, wxID_ANY, wxString("Sample Settings")),
     set(s)
@@ -964,7 +1044,9 @@ tSamplesDlg::tSamplesDlg(wxWindow* pParent, tSampleSet &s)
 
   names = new char * [tSampleSet::MAXSMPL];
   for (int i = 0; i < tSampleSet::MAXSMPL; i++)
+  {
     names[i] = ListEntry(i);
+  }
 
   // buttons
 #ifdef OBSOLETE
@@ -1003,10 +1085,12 @@ tSamplesDlg::tSamplesDlg(wxWindow* pParent, tSampleSet &s)
 #endif // OBSOLETE
   Fit();
   Sample2Win(current);
-  list->SetSelection(current, TRUE);
-  Show(TRUE);
+  list->SetSelection(current, true);
+  Show(true);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 char *tSamplesDlg::ListEntry(int i)
 {
   char buf[500];
@@ -1016,6 +1100,8 @@ char *tSamplesDlg::ListEntry(int i)
   return copystring(buf);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSamplesDlg::Sample2Win(int i)
 {
   tSample *spl = set.samples[i];
@@ -1028,6 +1114,8 @@ void tSamplesDlg::Sample2Win(int i)
 #endif
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSamplesDlg::Win2Sample(int i)
 {
   tSample *spl = set.samples[i];
@@ -1040,16 +1128,20 @@ void tSamplesDlg::Win2Sample(int i)
 #endif
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSamplesDlg::SetCurrentListEntry(int i)
 {
   if (i >= 0)
   {
     current = i;
     list->SetString(current, ListEntry(current));
-    list->SetSelection(current, TRUE);
+    list->SetSelection(current, true);
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tSamplesDlg::~tSamplesDlg()
 {
   for (int i = 0; i < tSampleSet::MAXSMPL; i++)
@@ -1057,6 +1149,8 @@ tSamplesDlg::~tSamplesDlg()
   delete [] names;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSamplesDlg::OnCloseButton()
 {
   if (set.is_playing)
@@ -1070,6 +1164,8 @@ void tSamplesDlg::OnCloseButton()
   Destroy();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSamplesDlg::OnAddButton()
 {
   wxString fname = file_selector(path, "Load Sample", false, false, "*.wav");
@@ -1084,6 +1180,8 @@ void tSamplesDlg::OnAddButton()
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSamplesDlg::OnEditButton()
 {
   wxBeginBusyCursor();
@@ -1096,10 +1194,14 @@ void tSamplesDlg::OnEditButton()
   set.Edit(current);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSamplesDlg::OnPlayButton()
 {
   if (set.is_playing)
+  {
     return;
+  }
   if (gpMidiPlayer->IsListening())
   {
     gpMidiPlayer->ListenAudio(-1);
@@ -1114,6 +1216,8 @@ void tSamplesDlg::OnPlayButton()
   wxEndBusyCursor();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSamplesDlg::OnClrButton()
 {
   tSample *spl = set.samples[current];
@@ -1122,16 +1226,21 @@ void tSamplesDlg::OnClrButton()
   Sample2Win(current);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSamplesDlg::OnHelpButton()
 {
   gpHelpInstance->ShowTopic("Sample Settings");
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSamplesDlg::OnListClick()
 {
   Win2Sample(current);
   int i = list->GetSelection();
-  if (i >= 0) {
+  if (i >= 0)
+  {
     current = i;
     SetCurrentListEntry(i);
     Sample2Win(current);
@@ -1170,17 +1279,22 @@ void tSamplesDlg::ListClick(wxItem &itm, wxCommandEvent& event)
 }
 #endif // OBSOLETE
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSampleSet::SamplesDlg()
 {
-  if (glb_dialog) {
-    glb_dialog->Show(TRUE);
+  if (glb_dialog)
+  {
+    glb_dialog->Show(true);
     return;
   }
   if (spl_dialog == 0)
     spl_dialog = new tSamplesDlg(gpTrackWindow, *this);
-  spl_dialog->Show(TRUE);
+  spl_dialog->Show(true);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSampleSet::RefreshDialogs()
 {
   if (spl_dialog)
@@ -1191,12 +1305,13 @@ void tSampleSet::RefreshDialogs()
 // -------------------------------- menu ---------------------------
 // -----------------------------------------------------------------
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tSampleSet::OnMenuCommand(int id)
 {
   switch (id)
   {
-    case MEN_AUDIO_LOAD:
+    case ID_AUDIO_LOAD:
       {
         wxString fname = file_selector(
           mDefaultFileName,
@@ -1211,7 +1326,7 @@ int tSampleSet::OnMenuCommand(int id)
         return 1;
       }
 
-    case MEN_AUDIO_SAVE_AS:
+    case ID_AUDIO_SAVE_AS:
       {
         wxString fname = file_selector(
           mDefaultFileName,
@@ -1226,25 +1341,25 @@ int tSampleSet::OnMenuCommand(int id)
         return 1;
       }
 
-    case MEN_AUDIO_SAVE:
+    case ID_AUDIO_SAVE:
       {
         if (mDefaultFileName == "noname.spl")
         {
-          return OnMenuCommand(MEN_AUDIO_SAVE_AS);
+          return OnMenuCommand(ID_AUDIO_SAVE_AS);
         }
         Save(mDefaultFileName);
         return 1;
       }
 
-    case MEN_AUDIO_GLOBAL:
+    case ID_AUDIO_GLOBAL:
       GlobalSettingsDlg();
       break;
 
-    case MEN_AUDIO_SAMPLES:
+    case ID_AUDIO_SAMPLES:
       SamplesDlg();
       return 1;
 
-    case MEN_AUDIO_NEW:
+    case ID_AUDIO_NEW:
       if (spl_dialog == 0 && glb_dialog == 0)
       {
         if (wxMessageBox("Clear Sample Set?", "Confirm", wxYES_NO) == wxNO)
@@ -1261,6 +1376,3 @@ int tSampleSet::OnMenuCommand(int id)
   }
   return 0;
 }
-
-
-

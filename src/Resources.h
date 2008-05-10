@@ -37,6 +37,13 @@
 #define ID_SETTINGS_SYNTHESIZER              wxID_HIGHEST + 11
 #define ID_SETTINGS_MIDI_DEVICE              wxID_HIGHEST + 12
 
+#define ID_AUDIO_GLOBAL                      wxID_HIGHEST + 20
+#define ID_AUDIO_SAMPLES                     wxID_HIGHEST + 21
+#define ID_AUDIO_LOAD                        wxID_HIGHEST + 22
+#define ID_AUDIO_SAVE                        wxID_HIGHEST + 23
+#define ID_AUDIO_SAVE_AS                     wxID_HIGHEST + 24
+#define ID_AUDIO_NEW                         wxID_HIGHEST + 25
+
 #define ID_TRIM                              wxID_HIGHEST + 30
 #define ID_QUANTIZE                          wxID_HIGHEST + 31
 #define ID_SHIFT_LEFT                        wxID_HIGHEST + 32

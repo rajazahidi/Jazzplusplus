@@ -39,15 +39,6 @@
 class JZRecordingInfo;
 
 
-// audio-menu
-#define MEN_AUDIO_LOAD     200
-#define MEN_AUDIO_SAVE     201
-#define MEN_AUDIO_GLOBAL   202
-#define MEN_AUDIO_SAMPLES  203
-#define MEN_AUDIO_NEW      204
-#define MEN_AUDIO_SAVE_AS  205
-
-
 class tPlayLoop
 {
   public:

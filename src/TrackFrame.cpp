@@ -378,16 +378,15 @@ void JZTrackFrame::CreateMenu()
 
   pMenuBar->Append(pSettingMenu, "&Settings");
 
-#if 0
-  audio_menu = new wxMenu;
-  audio_menu->Append(MEN_AUDIO_GLOBAL, "&Global Settings...");
-  audio_menu->Append(MEN_AUDIO_SAMPLES, "Sample Se&ttings... ");
-  audio_menu->Append(MEN_AUDIO_LOAD, "&Load Set...");
-  audio_menu->Append(MEN_AUDIO_SAVE, "&Save Set");
-  audio_menu->Append(MEN_AUDIO_SAVE_AS, "Save Set &As");
-  audio_menu->Append(MEN_AUDIO_NEW, "&New Set");
-  pMenuBar->Append(audio_menu, "&Audio");
-#endif
+  wxMenu* pAudioMenu = new wxMenu;
+  pAudioMenu->Append(ID_AUDIO_GLOBAL, "&Global Settings...");
+  pAudioMenu->Append(ID_AUDIO_SAMPLES, "Sample Se&ttings... ");
+  pAudioMenu->Append(ID_AUDIO_LOAD, "&Load Set...");
+  pAudioMenu->Append(ID_AUDIO_SAVE, "&Save Set");
+  pAudioMenu->Append(ID_AUDIO_SAVE_AS, "Save Set &As");
+  pAudioMenu->Append(ID_AUDIO_NEW, "&New Set");
+
+  pMenuBar->Append(pAudioMenu, "&Audio");
 
   pMenuBar->Append(mpHelpMenu , "&Help");
 

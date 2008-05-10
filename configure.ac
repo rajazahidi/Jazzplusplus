@@ -101,10 +101,6 @@ if [[ $have_alsa = "yes" ]] ; then
   if test x$enable_alsa = xyes ; then
     AC_MSG_RESULT(alsa is enabled)
     AC_DEFINE(DEV_ALSA,1,[use alsa drivers])
-
-    dnl This test comes with the alsa distribution!
-    AM_PATH_ALSA(0.9.0)
-  
   fi
 fi
 

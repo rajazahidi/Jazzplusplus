@@ -643,7 +643,7 @@ void tAlsaPlayer::start_queue_timer(long clock)
   }
 
   cout
-    << "tAlsaPlayer::start_queue_timer added trial-and-terror start_queue"
+    << "tAlsaPlayer::start_queue_timer added trial-and-error start_queue"
     << endl;
 
   snd_seq_start_queue(handle, queue, NULL);

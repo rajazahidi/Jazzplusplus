@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="A JazzPlusPlus Application"
 	ProjectGUID="{8C82269C-4753-428B-B9B1-D21B46C6AD83}"
+	RootNamespace="A JazzPlusPlus Application"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -823,6 +824,25 @@
 			<File
 				RelativePath="..\doc\jazz.tex"
 				>
+				<FileConfiguration
+					Name="Debug GUI VC9|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Performing Custom Help Build Step"
+						CommandLine="echo cd &quot;$(InputDir)&quot;&#x0D;&#x0A;cd &quot;$(InputDir)&quot;&#x0D;&#x0A;echo $(EXT_PKGS)\wxMSW-2.8.7-VC9\bin\tex2rtf &quot;$(InputName).tex&quot; &quot;$(InputName).html&quot; -html -twice&#x0D;&#x0A;$(EXT_PKGS)\wxMSW-2.8.7-VC9\bin\tex2rtf &quot;$(InputName).tex&quot; &quot;$(InputName).html&quot; -html -twice&#x0D;&#x0A;"
+						Outputs="$(InputDir)$(InputName)_contents.html;$(InputDir)$(InputName).hhc;$(InputDir)$(InputName).hhp;$(InputDir)$(InputName).hhk;$(InputDir)$(InputName).ref;$(InputDir)$(InputName).con;$(InputDir)$(InputName).htx"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release GUI VC9|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="echo cd &quot;$(InputDir)&quot;&#x0D;&#x0A;cd &quot;$(InputDir)&quot;&#x0D;&#x0A;echo $(EXT_PKGS)\wxMSW-2.8.7-VC9\bin\tex2rtf &quot;$(InputName).tex&quot; &quot;$(InputName).html&quot; -html -twice&#x0D;&#x0A;$(EXT_PKGS)\wxMSW-2.8.7-VC9\bin\tex2rtf &quot;$(InputName).tex&quot; &quot;$(InputName).html&quot; -html -twice&#x0D;&#x0A;"
+						Outputs="$(InputDir)$(InputName)_contents.html"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter

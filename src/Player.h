@@ -83,14 +83,7 @@ class tDeviceList
 {
   public:
 
-    enum
-    {
-      eMaximumDeviceCount = 10
-    };
-
     tDeviceList();
-
-    tDeviceList(const char* pName);
 
     virtual ~tDeviceList();
 
@@ -113,26 +106,15 @@ class tDeviceList
     {
       mDeviceNames.push_back(pName);
       return mDeviceNames.size();
-//      if (count < eMaximumDeviceCount)
-//      {
-//        names[count] = copystring(name);
-//        return count++;
-//      }
-//      return eMaximumDeviceCount;
     }
 
     void Clear()
     {
       mDeviceNames.clear();
-//      count = 0;
     }
-
-//    tNamedValue* AsNamedValue();
 
   protected:
 
-//    int count;
-//    char *names[eMaximumDeviceCount];
     std::vector<std::string> mDeviceNames;
 
   private:

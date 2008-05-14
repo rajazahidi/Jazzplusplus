@@ -28,12 +28,14 @@
 
 #include <alsa/asoundlib.h>
 
+#include <string>
+
 class tAlsaDeviceList : public tDeviceList
 {
   public:
     unsigned add(const char* pName, const snd_seq_addr_t& a);
     snd_seq_addr_t& operator[](unsigned i);
-    void print(const char *msg);
+    void AsciiWrite(const std::string& Message);
   private:
     std::vector<snd_seq_addr_t> addr;
 };

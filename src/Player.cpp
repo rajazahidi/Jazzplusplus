@@ -77,39 +77,11 @@ using namespace std;
 tDeviceList::tDeviceList()
   : mDeviceNames()
 {
-//  count = 0;
-//  for (int i = 0; i < eMaximumDeviceCount; i++)
-//    names[i] = 0;
-}
-
-tDeviceList::tDeviceList(const char* pName)
-{
-  mDeviceNames.push_back(pName);
-//  count = 1;
-//  for (int i = 0; i < eMaximumDeviceCount; i++)
-//    names[i] = 0;
-//  names[0] = copystring(name);
 }
 
 tDeviceList::~tDeviceList()
 {
-//  for (int i = 0; i < count; i++)
-//    delete [] names[i];
 }
-
-//tNamedValue *tDeviceList::AsNamedValue()
-//{
-//  tNamedValue *nv = new tNamedValue[count + 1];
-//  for (int i = 0; i < count; i++)
-//  {
-//    nv[i].Name = copystring(names[i]);
-//    nv[i].Value = i;
-//  }
-//  nv[count].Name = 0;
-//  nv[count].Value = 0;
-//  return nv;
-//}
-
 
 // ------------------------- tPlayLoop --------------------------
 

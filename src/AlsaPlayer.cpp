@@ -99,6 +99,12 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
   // scan input addressess
   scan_clients(iaddr, SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ);
 
+  cout << "Input device count: " << iaddr.GetCount() << endl;
+  if (iaddr.GetCount())
+  {
+    iaddr.AsciiWrite("Input Devices");
+  }
+
   // scan output addresses
   scan_clients(oaddr, SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE);
 
@@ -212,7 +218,7 @@ void tAlsaPlayer::subscribe_out(int outp)
 //-----------------------------------------------------------------------------
 void tAlsaPlayer::subscribe_inp(int inp)
 {
-  snd_seq_port_subscribe_t *subs;
+  snd_seq_port_subscribe_t* subs;
   snd_seq_port_subscribe_alloca(&subs);
   snd_seq_port_subscribe_set_time_update(subs, 1);
   snd_seq_port_subscribe_set_queue(subs, queue);
@@ -970,9 +976,9 @@ int tAlsaPlayer::select_list(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tAlsaDeviceList::print(const char *msg)
+void tAlsaDeviceList::AsciiWrite(const string& Message)
 {
-  cout << msg << endl;
+  cout << Message << endl;
   int i = 0;
   for (
     vector<snd_seq_addr_t>::const_iterator iSound = addr.begin();

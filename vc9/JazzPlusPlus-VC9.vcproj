@@ -822,7 +822,7 @@
 			Filter="*.tex"
 			>
 			<File
-				RelativePath="..\doc\jazz.tex"
+				RelativePath="..\src\HelpFiles\jazz.tex"
 				>
 				<FileConfiguration
 					Name="Debug GUI VC9|Win32"

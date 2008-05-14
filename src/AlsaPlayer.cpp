@@ -108,28 +108,65 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
   // scan output addresses
   scan_clients(oaddr, SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE);
 
-  inp_dev = gpConfig->GetValue(C_AlsaInputDevice);
-  if (inp_dev < 0)
+  mInputDeviceIndex = gpConfig->GetValue(C_AlsaInputDevice);
+  if (mInputDeviceIndex < 0)
   {
-    cout << "invalid input device, so selecting one" << endl;
-    inp_dev = select_list(iaddr, "Input Device", inp_dev);
-    cout << "Input device is: " << inp_dev << endl;
-    gpConfig->Put(C_AlsaInputDevice, inp_dev);
+    cout << "INFO: input device is -1, so selecting one." << endl;
+    mInputDeviceIndex = select_list(
+      iaddr,
+      "Input Device",
+      mInputDeviceIndex);
+    cout << "Input device is: " << mInputDeviceIndex << endl;
+    gpConfig->Put(C_AlsaInputDevice, mInputDeviceIndex);
   }
-  outp_dev = gpConfig->GetValue(C_AlsaOutputDevice);
-  if (outp_dev < 0)
+  else if (static_cast<unsigned>(mInputDeviceIndex) > iaddr.GetCount())
   {
-    cout << "invalid output device, so selecting one" << endl;
-    outp_dev = select_list(oaddr, "Output Device", outp_dev);
+    cout << "INFO: output device is out of range, so selecting one." << endl;
+    mInputDeviceIndex = select_list(
+      iaddr,
+      "Output Device",
+      mInputDeviceIndex);
   }
 
-  if (inp_dev >= 0)
+  mOutputDeviceIndex = gpConfig->GetValue(C_AlsaOutputDevice);
+  if (mOutputDeviceIndex < 0)
   {
-    subscribe_inp(inp_dev);
+    cout << "INFO: output device is -1, so selecting one." << endl;
+    mOutputDeviceIndex = select_list(
+      oaddr,
+      "Output Device",
+      mOutputDeviceIndex);
   }
-  if (outp_dev >= 0)
+  else if (static_cast<unsigned>(mOutputDeviceIndex) > oaddr.GetCount())
   {
-    subscribe_out(outp_dev);
+    cout << "INFO: output device is out of range, so selecting one." << endl;
+    mOutputDeviceIndex = select_list(
+      oaddr,
+      "Output Device",
+      mOutputDeviceIndex);
+  }
+
+  if (mInputDeviceIndex >= 0)
+  {
+    if (static_cast<unsigned>(mInputDeviceIndex) < iaddr.GetCount())
+    {
+      subscribe_inp(mInputDeviceIndex);
+    }
+    else
+    {
+      cout << "WARNING: The input device index is out of range!" << endl;
+    }
+  }
+  if (mOutputDeviceIndex >= 0)
+  {
+    if (static_cast<unsigned>(mOutputDeviceIndex) < iaddr.GetCount())
+    {
+      subscribe_out(mOutputDeviceIndex);
+    }
+    else
+    {
+      cout << "WARNING: The output device index is out of range!" << endl;
+    }
   }
 
   set_pool_sizes();
@@ -909,26 +946,32 @@ void tAlsaPlayer::scan_clients(
 //-----------------------------------------------------------------------------
 int tAlsaPlayer::FindMidiDevice()
 {
-  if (inp_dev != -1)
+  if (mInputDeviceIndex != -1)
   {
-    unsubscribe_inp(inp_dev);
+    unsubscribe_inp(mInputDeviceIndex);
   }
-  inp_dev = select_list(iaddr, "Input MIDI device", inp_dev);
-  gpConfig->Put(C_AlsaInputDevice, inp_dev);
-  if (inp_dev != -1)
+  mInputDeviceIndex = select_list(
+    iaddr,
+    "Input MIDI device",
+    mInputDeviceIndex);
+  gpConfig->Put(C_AlsaInputDevice, mInputDeviceIndex);
+  if (mInputDeviceIndex != -1)
   {
-    subscribe_inp(inp_dev);
+    subscribe_inp(mInputDeviceIndex);
   }
 
-  if (outp_dev != -1)
+  if (mOutputDeviceIndex != -1)
   {
-    unsubscribe_out(outp_dev);
+    unsubscribe_out(mOutputDeviceIndex);
   }
-  outp_dev = select_list(oaddr, "Output MIDI device", outp_dev);
-  gpConfig->Put(C_AlsaOutputDevice, outp_dev);
-  if (outp_dev != -1)
+  mOutputDeviceIndex = select_list(
+    oaddr,
+    "Output MIDI device",
+    mOutputDeviceIndex);
+  gpConfig->Put(C_AlsaOutputDevice, mOutputDeviceIndex);
+  if (mOutputDeviceIndex != -1)
   {
-    subscribe_out(outp_dev);
+    subscribe_out(mOutputDeviceIndex);
   }
   return 0;
 }

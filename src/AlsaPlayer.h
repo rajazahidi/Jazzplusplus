@@ -75,7 +75,7 @@ class tAlsaPlayer : public JZPlayer
     int client;            // me
     snd_seq_addr_t self;   // my address
     int queue;             // queue
-    int inp_dev, outp_dev; // input/output device index
+    int mInputDeviceIndex, mOutputDeviceIndex;
     int sync_in, sync_in_dev, sync_in_mtcType;
     int sync_out, sync_out_dev, sync_out_mtcType;
 

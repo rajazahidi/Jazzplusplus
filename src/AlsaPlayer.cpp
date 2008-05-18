@@ -86,7 +86,7 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
   self.port    = create_port(handle, "Input/Output");
 
   cout
-    << "created client:port = " << static_cast<int>(self.client)
+    << "INFO: Created client:port = " << static_cast<int>(self.client)
     << ':' << static_cast<int>(self.port)
     << endl;
 
@@ -99,7 +99,7 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
   // scan input addressess
   scan_clients(iaddr, SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ);
 
-  cout << "Input device count: " << iaddr.GetCount() << endl;
+  cout << "INFO: Input device count: " << iaddr.GetCount() << endl;
   if (iaddr.GetCount())
   {
     iaddr.AsciiWrite("Input Devices");
@@ -107,6 +107,12 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
 
   // scan output addresses
   scan_clients(oaddr, SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE);
+
+  cout << "INFO: Output device count: " << oaddr.GetCount() << endl;
+  if (oaddr.GetCount())
+  {
+    oaddr.AsciiWrite("Output Devices");
+  }
 
   mInputDeviceIndex = gpConfig->GetValue(C_AlsaInputDevice);
   if (mInputDeviceIndex < 0)
@@ -116,12 +122,12 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
       iaddr,
       "Input Device",
       mInputDeviceIndex);
-    cout << "Input device is: " << mInputDeviceIndex << endl;
+    cout << "INFO: Input device is: " << mInputDeviceIndex << endl;
     gpConfig->Put(C_AlsaInputDevice, mInputDeviceIndex);
   }
   else if (static_cast<unsigned>(mInputDeviceIndex) > iaddr.GetCount())
   {
-    cout << "INFO: output device is out of range, so selecting one." << endl;
+    cout << "INFO: Input device is out of range, so selecting one." << endl;
     mInputDeviceIndex = select_list(
       iaddr,
       "Output Device",
@@ -131,7 +137,7 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
   mOutputDeviceIndex = gpConfig->GetValue(C_AlsaOutputDevice);
   if (mOutputDeviceIndex < 0)
   {
-    cout << "INFO: output device is -1, so selecting one." << endl;
+    cout << "INFO: Output device is -1, so selecting one." << endl;
     mOutputDeviceIndex = select_list(
       oaddr,
       "Output Device",
@@ -139,7 +145,7 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
   }
   else if (static_cast<unsigned>(mOutputDeviceIndex) > oaddr.GetCount())
   {
-    cout << "INFO: output device is out of range, so selecting one." << endl;
+    cout << "INFO: Output device is out of range, so selecting one." << endl;
     mOutputDeviceIndex = select_list(
       oaddr,
       "Output Device",
@@ -154,18 +160,29 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
     }
     else
     {
-      cout << "WARNING: The input device index is out of range!" << endl;
+      cout
+        << "WARNING: The input device index (" << mInputDeviceIndex
+        << ") is out of range!" << '\n'
+        << "Setting the value to -1"
+        << endl;
+      mInputDeviceIndex = -1;
     }
   }
   if (mOutputDeviceIndex >= 0)
   {
-    if (static_cast<unsigned>(mOutputDeviceIndex) < iaddr.GetCount())
+    if (static_cast<unsigned>(mOutputDeviceIndex) < oaddr.GetCount())
     {
       subscribe_out(mOutputDeviceIndex);
     }
     else
     {
       cout << "WARNING: The output device index is out of range!" << endl;
+      cout
+        << "WARNING: The output device index (" << mOutputDeviceIndex
+        << ") is out of range!" << '\n'
+        << "Setting the value to -1"
+        << endl;
+      mOutputDeviceIndex = -1;
     }
   }
 
@@ -219,12 +236,44 @@ void tAlsaPlayer::SetSoftThru(int on, int idev, int odev)
 
     thru->Stop();
   }
+
   if (on && !thru->IsRunning())
   {
-    thru->SetSource(iaddr[ithru].client, iaddr[ithru].port);
-    thru->SetDestin(oaddr[othru].client, oaddr[othru].port);
+    bool StartThru = false;
+    if (static_cast<unsigned>(ithru) < iaddr.GetCount())
+    {
+      thru->SetSource(iaddr[ithru].client, iaddr[ithru].port);
+      StartThru = true;
+    }
+    else
+    {
+      cout
+        << "WARNING: The input MIDI thru device index (" << ithru
+        << ") is out of range!" << '\n'
+        << "Setting the value to -1"
+        << endl;
+      ithru = -1;
+    }
 
-    thru->Start();
+    if (static_cast<unsigned>(othru) < oaddr.GetCount())
+    {
+      thru->SetDestin(oaddr[othru].client, oaddr[othru].port);
+      StartThru = true;
+    }
+    else
+    {
+      cout
+        << "WARNING: The output MIDI thru device index (" << othru
+        << ") is out of range!" << '\n'
+        << "Setting the value to -1"
+        << endl;
+      othru = -1;
+    }
+
+    if (StartThru)
+    {
+      thru->Start();
+    }
   }
   else if (!on && thru->IsRunning())
   {
@@ -1012,7 +1061,7 @@ int tAlsaPlayer::select_list(
   }
   else
   {
-    cerr << "no device found!" << endl;
+    cerr << "INFO: No device found!" << endl;
     return -1;
   }
 }

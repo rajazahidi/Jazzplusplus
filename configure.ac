@@ -81,7 +81,7 @@ case "${host}" in
   ;;
   *-*-linux* )
     AC_CHECK_LIB(asound, snd_pcm_open, have_alsa=yes, have_alsa=no)
-    if [[ $have_alsa = "yes" ]] ; then
+    if [[ x$have_alsa = x"yes" ]] ; then
       LIBS="$LIBS -lasound"
     fi
   ;;
@@ -91,7 +91,7 @@ esac
 
 AM_CONDITIONAL(USE_ALSA, test "$have_alsa" = yes)
 
-if [[ $have_alsa = "yes" ]] ; then
+if [[ x$have_alsa = x"yes" ]] ; then
 
   dnl ---------------------------------------
   dnl check if we are to enable alsa support

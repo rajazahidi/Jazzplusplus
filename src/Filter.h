@@ -84,10 +84,10 @@ class JZFilter : public wxObject
       int Value = pEvent->GetValue();
       for (int i = 0; i < nFltEvents; ++i)
       {
-        if (pEvent->Stat == FltEvents[i].Stat)
+        if (pEvent->GetStat() == FltEvents[i].Stat)
         {
            // SN++ Aftertouch gehoert eigendlich zu KeyOn Events.
-          if (pEvent->Stat == StatKeyPressure)
+          if (pEvent->GetStat() == StatKeyPressure)
           {
             int aval = pEvent->IsKeyPressure()->Key;
             return
@@ -95,17 +95,17 @@ class JZFilter : public wxObject
               FltEvents[i].FromValue <= aval &&
               aval <= FltEvents[i].ToValue;
           }
-          if (pEvent->Stat == StatTimeSignat)
+          if (pEvent->GetStat() == StatTimeSignat)
           {
             return FltEvents[i].Selected;
           }
           // SN++
-          if (pEvent->Stat == StatChnPressure)
+          if (pEvent->GetStat() == StatChnPressure)
           {
             return FltEvents[i].Selected;
           }
 
-          if (pEvent->Stat == StatSysEx)
+          if (pEvent->GetStat() == StatSysEx)
           {
             return FltEvents[i].Selected;
           }

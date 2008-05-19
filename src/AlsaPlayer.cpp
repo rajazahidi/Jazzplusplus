@@ -402,17 +402,17 @@ tAlsaPlayer::~tAlsaPlayer()
 // 0 = event successfully sent to driver
 // 1 = try again later
 //-----------------------------------------------------------------------------
-int tAlsaPlayer::OutEvent(JZEvent *e, int now)
+int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
 {
   int rc = 0;
   snd_seq_event_t ev;
   memset(&ev, 0, sizeof(ev));
-  switch (e->Stat)
+  switch (pEvent->GetStat())
   {
     case StatKeyOn:
       {
-        tKeyOn *k = e->IsKeyOn();
-        set_event_header(&ev, e->GetClock(), SND_SEQ_EVENT_NOTEON);
+        tKeyOn *k = pEvent->IsKeyOn();
+        set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_NOTEON);
         ev.data.note.channel = k->Channel;
         ev.data.note.note = k->mKey;
         ev.data.note.velocity = k->mVelocity;
@@ -422,8 +422,8 @@ int tAlsaPlayer::OutEvent(JZEvent *e, int now)
 
     case StatKeyOff:
       {
-        tKeyOff *k = e->IsKeyOff();
-        set_event_header(&ev, e->GetClock(), SND_SEQ_EVENT_NOTEOFF);
+        tKeyOff *k = pEvent->IsKeyOff();
+        set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_NOTEOFF);
         ev.data.note.channel = k->Channel;
         ev.data.note.note = k->Key;
         ev.data.note.velocity = k->OffVeloc;
@@ -433,8 +433,8 @@ int tAlsaPlayer::OutEvent(JZEvent *e, int now)
 
     case StatProgram:
       {
-        tProgram *k = e->IsProgram();
-        set_event_header(&ev, e->GetClock(), SND_SEQ_EVENT_PGMCHANGE);
+        tProgram *k = pEvent->IsProgram();
+        set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_PGMCHANGE);
         ev.data.control.channel = k->Channel;
         ev.data.control.value = k->Program;
         rc = write(&ev, now);
@@ -443,8 +443,8 @@ int tAlsaPlayer::OutEvent(JZEvent *e, int now)
 
     case StatKeyPressure:
       {
-        tKeyPressure *k = e->IsKeyPressure();
-        set_event_header(&ev, e->GetClock(), SND_SEQ_EVENT_KEYPRESS);
+        tKeyPressure *k = pEvent->IsKeyPressure();
+        set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_KEYPRESS);
         ev.data.note.channel = k->Channel;
         ev.data.note.note = k->Key;
         ev.data.note.velocity = k->Value;
@@ -454,8 +454,8 @@ int tAlsaPlayer::OutEvent(JZEvent *e, int now)
 
     case StatChnPressure:
       {
-        tChnPressure *k = e->IsChnPressure();
-        set_event_header(&ev, e->GetClock(), SND_SEQ_EVENT_CHANPRESS);
+        tChnPressure *k = pEvent->IsChnPressure();
+        set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_CHANPRESS);
         ev.data.control.channel = k->Channel;
         ev.data.control.value = k->Value;
         rc = write(&ev, now);
@@ -464,8 +464,8 @@ int tAlsaPlayer::OutEvent(JZEvent *e, int now)
 
     case StatControl:
       {
-        tControl *k = e->IsControl();
-        set_event_header(&ev, e->GetClock(), SND_SEQ_EVENT_CONTROLLER);
+        tControl *k = pEvent->IsControl();
+        set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_CONTROLLER);
         ev.data.control.channel = k->Channel;
         ev.data.control.param = k->mControl;
         ev.data.control.value = k->mValue;
@@ -475,8 +475,8 @@ int tAlsaPlayer::OutEvent(JZEvent *e, int now)
 
     case StatPitch:
       {
-        tPitch *k = e->IsPitch();
-        set_event_header(&ev, e->GetClock(), SND_SEQ_EVENT_PITCHBEND);
+        tPitch *k = pEvent->IsPitch();
+        set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_PITCHBEND);
         ev.data.control.channel = k->Channel;
         ev.data.control.value = k->Value;
         rc = write(&ev, now);
@@ -485,9 +485,9 @@ int tAlsaPlayer::OutEvent(JZEvent *e, int now)
 
     case StatSetTempo:
       {
-        int bpm = e->IsSetTempo()->GetBPM();
+        int bpm = pEvent->IsSetTempo()->GetBPM();
         int us  = (int)( 60.0E6 / (double)bpm );
-        set_event_header(&ev, e->GetClock(), SND_SEQ_EVENT_TEMPO);
+        set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_TEMPO);
         snd_seq_ev_set_queue_tempo(&ev, queue, us);
         rc = write(&ev, now);
       }
@@ -495,12 +495,12 @@ int tAlsaPlayer::OutEvent(JZEvent *e, int now)
 
     case StatSysEx:
       {
-        tSysEx *s = e->IsSysEx();
+        tSysEx *s = pEvent->IsSysEx();
         // prepend 0xf0
         char *buf = new char[s->Length + 1];
         buf[0] = 0xF0;
         memcpy(buf + 1, s->mpData, s->Length);
-        set_event_header(&ev, e->GetClock(), s->Length + 1, buf);
+        set_event_header(&ev, pEvent->GetClock(), s->Length + 1, buf);
         rc = write(&ev, now);
         delete [] buf;
       }

@@ -1420,7 +1420,7 @@ void JZPianoWindow::DrawEvents(
 
   while (pEvent)
   {
-    if (pEvent->Stat == Stat)
+    if (pEvent->GetStat() == Stat)
     {
       int Pitch   = pEvent->GetPitch();
       int Length = pEvent->GetLength();
@@ -2258,7 +2258,7 @@ void JZPianoWindow::ButtonLabelDisplay(const wxString& Text, bool IsButtonDown)
 //-----------------------------------------------------------------------------
 int JZPianoWindow::IsVisible(JZEvent* pEvent)
 {
-  switch (pEvent->Stat)
+  switch (pEvent->GetStat())
   {
     case StatKeyOn:
       return mVisibleKeyOn;

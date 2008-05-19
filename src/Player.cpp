@@ -71,38 +71,48 @@ char *midinetservice = NULL;
 
 using namespace std;
 
-// ------------------------- tDeviceList --------------------------
-
-
+//*****************************************************************************
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tDeviceList::tDeviceList()
   : mDeviceNames()
 {
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tDeviceList::~tDeviceList()
 {
 }
 
-// ------------------------- tPlayLoop --------------------------
-
+//*****************************************************************************
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tPlayLoop::tPlayLoop()
   : mStartClock(0),
     mStopClock(0)
 {
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tPlayLoop::Reset()
 {
   mStartClock = mStopClock = 0;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tPlayLoop::Set(long Start, long Stop)
 {
   mStartClock = Start;
   mStopClock = Stop;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 long tPlayLoop::Ext2IntClock(long Clock)
 {
   if (mStopClock)
@@ -112,12 +122,17 @@ long tPlayLoop::Ext2IntClock(long Clock)
   return Clock;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 long tPlayLoop::Int2ExtClock(long Clock)
 {
   return Clock;
 }
 
-// Copy events from song to output buffer.
+//-----------------------------------------------------------------------------
+// Description:
+//   Copy events from the passed song to output buffer.
+//-----------------------------------------------------------------------------
 void tPlayLoop::PrepareOutput(
   tEventArray* buf,
   JZSong* pSong,
@@ -160,9 +175,10 @@ void tPlayLoop::PrepareOutput(
   }
 }
 
-// ------------------------- JZPlayer ---------------------
-
-
+//*****************************************************************************
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZPlayer::JZPlayer(JZSong* pSong)
   : mSamples(pSong->GetTicksPerQuarter() * pSong->Speed())
 {
@@ -176,17 +192,22 @@ JZPlayer::JZPlayer(JZSong* pSong)
   rec_info = 0;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZPlayer::~JZPlayer()
 {
   delete PlayLoop;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPlayer::ShowError()
 {
   wxMessageBox("could not install driver", "Error", wxOK);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 {
 #ifdef DEBUG_PLAYER_STARTPLAY
@@ -433,10 +454,10 @@ void JZPlayer::StartPlay(long Clock, long LoopClock, int Continue)
   } // if !Continue
 
   t = Song->GetTrack(0);
-  JZEvent *e = t->GetCurrentTempo(Clock);
-  if (e)
+  JZEvent* pEvent = t->GetCurrentTempo(Clock);
+  if (pEvent)
   {
-    OutNow(e);
+    OutNow(pEvent);
   }
 
   // Send songpointer?
@@ -473,7 +494,8 @@ void JZPlayer::StartPlay(long Clock, long LoopClock, int Continue)
   Playing = true;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPlayer::StopPlay()
 {
   // Stop the wxTimer.
@@ -492,10 +514,10 @@ void JZPlayer::StopPlay()
     if (Track)
     {
       tEventIterator Iterator(Track);
-      JZEvent *e = Iterator.First();
-      while (e && e->GetClock() < Clock + 100)
+      JZEvent* pEvent = Iterator.First();
+      while (pEvent && pEvent->GetClock() < Clock + 100)
       {
-        tKeyOn* pKeyOn = e->IsKeyOn();
+        tKeyOn* pKeyOn = pEvent->IsKeyOn();
         if (pKeyOn)
         {
           if (pKeyOn->GetClock() + pKeyOn->mLength >= Clock - 100)
@@ -505,7 +527,7 @@ void JZPlayer::StopPlay()
             OutNow(&off);
           }
         }
-        e = Iterator.Next();
+        pEvent = Iterator.Next();
       }
     }
   }
@@ -513,7 +535,8 @@ void JZPlayer::StopPlay()
   JZProjectManager::Instance()->NewPlayPosition(-1);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPlayer::Notify()
 {
   // called by timer
@@ -560,22 +583,24 @@ void JZPlayer::Notify()
   }
 }
 
-
+//-----------------------------------------------------------------------------
+// Description:
+//   Try to send all events up to OutClock to device.
+//-----------------------------------------------------------------------------
 void JZPlayer::FlushToDevice()
-// try to send all events up to OutClock to device
 {
   int BufferFull = 0;
 
   tEventIterator Iterator(&mPlayBuffer);
-  JZEvent *e = Iterator.Range(0, OutClock);
-  while (!BufferFull && e)
+  JZEvent* pEvent = Iterator.Range(0, OutClock);
+  while (!BufferFull && pEvent)
   {
-    if (OutEvent(e) != 0)
+    if (OutEvent(pEvent) != 0)
       BufferFull = 1;
     else
     {
-      e->Kill();
-      e = Iterator.Next();
+      pEvent->Kill();
+      pEvent = Iterator.Next();
     }
   }
 
@@ -584,7 +609,8 @@ void JZPlayer::FlushToDevice()
   mPlayBuffer.Cleanup(0);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPlayer::AllNotesOff(int Reset)
 {
   tControl NoteOff(0, 0, 0x78, 0);
@@ -616,8 +642,8 @@ void JZPlayer::AllNotesOff(int Reset)
   }
 }
 
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPlayer::OutNow(JZTrack *t, tParam *r)
 {
   OutNow(t, &r->mMsb);
@@ -627,42 +653,47 @@ void JZPlayer::OutNow(JZTrack *t, tParam *r)
   OutNow(t, &r->mResetLsb);
 }
 
-// ----------------------------------------------------------------------------------------------
-// MPU-Player
-// ----------------------------------------------------------------------------------------------
-
 #ifdef DEV_MPU401
 
+//*****************************************************************************
+// MPU-Player
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tMpuPlayer::tMpuPlayer(JZSong* pSong)
   : JZPlayer(pSong)
 {
-        poll_millisec = 25;
-        midinethost = getenv("MIDINETHOST");
-        if (!midinethost || !strlen(midinethost)) {
-                midinethost = "localhost";
-        }
-        midinetservice = getenv("MIDINETSERVICE");
-        if (!midinetservice || !strlen(midinetservice)) {
-                midinetservice = MIDINETSERVICE;
-        }
-        dev = midinetconnect( midinethost, midinetservice );
+  poll_millisec = 25;
+  midinethost = getenv("MIDINETHOST");
+  if (!midinethost || !strlen(midinethost))
+  {
+    midinethost = "localhost";
+  }
+  midinetservice = getenv("MIDINETSERVICE");
+  if (!midinetservice || !strlen(midinetservice))
+  {
+    midinetservice = MIDINETSERVICE;
+  }
+  dev = midinetconnect( midinethost, midinetservice );
 }
 
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tMpuPlayer::~tMpuPlayer()
 {
   close(dev);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tMpuPlayer::Installed()
 {
   return dev >= 0;
 }
 
-
 #if DB_WRITE
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int dwrite(int dev, const char *buf, int size)
 {
   int i, written;
@@ -675,13 +706,17 @@ int dwrite(int dev, const char *buf, int size)
   }
   printf("W: ");
   for (i = 0; i < written; i++)
+  {
     printf("%02x ", (unsigned char)buf[i]);
+  }
   putchar('\n');
   if (written != size)
   {
     printf("L: ");
     for (i = written; i < size; i++)
+    {
       printf("%02x ", (unsigned char)buf[i]);
+    }
     putchar('\n');
   }
   fflush(stdout);
@@ -689,6 +724,8 @@ int dwrite(int dev, const char *buf, int size)
 }
 #endif
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tMpuPlayer::StartPlay(long IntClock, long LoopClock, int Continue)
 {
   long ExtClock = PlayLoop->Int2ExtClock(IntClock);
@@ -740,9 +777,10 @@ void tMpuPlayer::StartPlay(long IntClock, long LoopClock, int Continue)
   clock_to_host_counter = 0;
 
   ActiveTrack = 0;
-  for (int i = 0; i < ACTIVE_TRACKS; i++) {
-        TrackClock[i] = ExtClock;
-        TrackRunningStatus[i] = 0;
+  for (int i = 0; i < ACTIVE_TRACKS; i++)
+  {
+    TrackClock[i] = ExtClock;
+    TrackRunningStatus[i] = 0;
   }
 
   // Setup Timebase
@@ -765,49 +803,50 @@ void tMpuPlayer::StartPlay(long IntClock, long LoopClock, int Continue)
   JZPlayer::StartPlay(IntClock, LoopClock, Continue);
 
   // Supress realtime messages to MIDI Out port?
-  if (!Config(C_RealTimeOut)) {
-          char realtime[2];
-          realtime[0] = CMD+1;
-        realtime[1] = 0x32;
-        write_ack_mpu( realtime, 2 );
+  if (!Config(C_RealTimeOut))
+  {
+    char realtime[2];
+    realtime[0] = CMD + 1;
+    realtime[1] = 0x32;
+    write_ack_mpu(realtime, 2);
   }
 
   // What is the clock source ?
   char clocksource[2];
   clocksource[0] = CMD+1;
-  switch (Config(C_ClockSource)) {
-        case CsInt:
-                clocksource[1] = 0x80;
-                play = play1;
-                playsize = sizeof( play1 );
-                break;
-        case CsFsk:
-                clocksource[1] = 0x81;
-                play = play1;
-                playsize = sizeof( play1 );
-                break;
-        case CsMidi:
-                clocksource[1] = 0x82;
-                play = play2;
-                playsize = sizeof( play2 );
-                break;
-        default:
-                clocksource[1] = 0x80;
-                play = play1;
-                playsize = sizeof( play1 );
-                break;
+  switch (Config(C_ClockSource))
+  {
+    case CsInt:
+      clocksource[1] = 0x80;
+      play = play1;
+      playsize = sizeof( play1 );
+      break;
+    case CsFsk:
+      clocksource[1] = 0x81;
+      play = play1;
+      playsize = sizeof( play1 );
+      break;
+    case CsMidi:
+      clocksource[1] = 0x82;
+      play = play2;
+      playsize = sizeof( play2 );
+      break;
+    default:
+      clocksource[1] = 0x80;
+      play = play1;
+      playsize = sizeof( play1 );
+      break;
   }
   write_ack_mpu(clocksource, 2);
 
   JZPlayer::Notify();
 
   // Start play
-  write_ack_mpu( play, playsize );
-
+  write_ack_mpu(play, playsize);
 }
 
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tMpuPlayer::StopPlay()
 {
   static const char stop = RES;
@@ -822,25 +861,33 @@ void tMpuPlayer::StopPlay()
   RecdBuffer.Keyoff2Length();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tMpuPlayer::SetHardThru(int on, int idummy, int odummy)
 {
-
   char midithru[2];
   midithru[0] = CMD+1;
   if (on)
+  {
     midithru[1] = 0x89;
+  }
   else
+  {
     midithru[1] = 0x88;
+  }
   write_ack_mpu( midithru, 2 );
-
 }
 
-int tMpuPlayer::OutEvent(JZEvent *e)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int tMpuPlayer::OutEvent(JZEvent* pEvent)
 {
   if (!PlyBytes.WriteFile(dev))
+  {
     return 1;        // buffer full
+  }
 
-  int Stat = e->Stat;
+  int Stat = pEvent->GetStat();
 
   switch (Stat)
   {
@@ -851,156 +898,167 @@ int tMpuPlayer::OutEvent(JZEvent *e)
     case StatProgram:
     case StatChnPressure:
     case StatPitch:
+    {
+      tGetMidiBytes midi;
+      int i;
+      tChannelEvent *c;
+
+      pEvent->Write(midi);
+      Stat = midi.Buffer[0]; // Status + Channel
+
+      OutBreak(pEvent->GetClock());
+
+      if ((c = pEvent->IsChannelEvent()) != 0)
       {
-        tGetMidiBytes midi;
-        int i;
-        tChannelEvent *c;
-
-        e->Write(midi);
-        Stat = midi.Buffer[0]; // Status + Channel
-
-        OutBreak(e->GetClock());
-
-        if ( (c = e->IsChannelEvent()) != 0 ) {
-                switch (c->Channel) {
-                        case 0:
-                        case 3:
-                                ActiveTrack = 5;
-                                break;
-                        case 1:
-                        case 4:
-                                ActiveTrack = 4;
-                                break;
-                        case 2:
-                        case 5:
-                                ActiveTrack = 3;
-                                break;
-                        case 6:
-                        case 10:
-                        case 13:
-                                ActiveTrack = 2;
-                                break;
-                        case 9:
-                                ActiveTrack = 6;
-                                break;
-                        case 7:
-                        case 11:
-                        case 14:
-                                ActiveTrack = 1;
-                                break;
-                        case 8:
-                        case 12:
-                        case 15:
-                                ActiveTrack = 0;
-                                break;
-                        default:
-                                ActiveTrack = 6;
-                                break;
-                }
-        }
-        else {
-                // Not channel event => play on track #6
-                ActiveTrack = 6;
-        }
-
-        long Time = e->GetClock() - TrackClock[ActiveTrack];
-        assert(Time < 240);
-
-        if (Stat != TrackRunningStatus[ActiveTrack])
+        switch (c->Channel)
         {
-          PlyBytes.Put(TRK + midi.nBytes + 1 + 1);
-          PlyBytes.Put(ActiveTrack);
-          PlyBytes.Put(Time);
-          PlyBytes.Put(Stat);
-          TrackRunningStatus[ActiveTrack] = Stat;
+          case 0:
+          case 3:
+            ActiveTrack = 5;
+            break;
+          case 1:
+          case 4:
+            ActiveTrack = 4;
+            break;
+          case 2:
+          case 5:
+            ActiveTrack = 3;
+            break;
+          case 6:
+          case 10:
+          case 13:
+            ActiveTrack = 2;
+            break;
+          case 9:
+            ActiveTrack = 6;
+            break;
+          case 7:
+          case 11:
+          case 14:
+            ActiveTrack = 1;
+            break;
+          case 8:
+          case 12:
+          case 15:
+            ActiveTrack = 0;
+            break;
+          default:
+            ActiveTrack = 6;
+            break;
         }
-        else
-        {
-          PlyBytes.Put(TRK + midi.nBytes + 1);
-          PlyBytes.Put(ActiveTrack);
-          PlyBytes.Put(Time);
-        }
-        for (i = 1; i < midi.nBytes; i++)
-          PlyBytes.Put(midi.Buffer[i]);
-
-        TrackClock[ActiveTrack] = e->GetClock();
-        return 0;
       }
+      else
+      {
+        // Not channel event => play on track #6
+        ActiveTrack = 6;
+      }
+
+      long Time = pEvent->GetClock() - TrackClock[ActiveTrack];
+      assert(Time < 240);
+
+      if (Stat != TrackRunningStatus[ActiveTrack])
+      {
+        PlyBytes.Put(TRK + midi.nBytes + 1 + 1);
+        PlyBytes.Put(ActiveTrack);
+        PlyBytes.Put(Time);
+        PlyBytes.Put(Stat);
+        TrackRunningStatus[ActiveTrack] = Stat;
+      }
+      else
+      {
+        PlyBytes.Put(TRK + midi.nBytes + 1);
+        PlyBytes.Put(ActiveTrack);
+        PlyBytes.Put(Time);
+      }
+      for (i = 1; i < midi.nBytes; i++)
+        PlyBytes.Put(midi.Buffer[i]);
+
+      TrackClock[ActiveTrack] = pEvent->GetClock();
+      return 0;
+    }
 
     case StatSetTempo:
     case StatSysEx:
+    {
+      if (pEvent->GetClock() > 0)
       {
-        if (e->GetClock() > 0)
-        {
-          OutOfBandEvents.Put(e->Copy());
-        }
-        return 0;
+        OutOfBandEvents.Put(pEvent->Copy());
       }
-   default:        // Meterchange etc
       return 0;
-      break;
+    }
+   default:        // Meterchange etc
+    return 0;
+    break;
   }
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tMpuPlayer::OutBreak()
 {
   // send a break to the driver starting at PlyBytes.GetClock() and ending at OutClock
   if (!PlyBytes.WriteFile(dev))
+  {
     return;
+  }
 
   (void)OutBreak(OutClock);
   PlyBytes.WriteFile(dev);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tMpuPlayer::OutBreak(long BreakOver)
 {
-int OverFlow = 1;
+  int OverFlow = 1;
 
-    while (OverFlow) {
-        OverFlow = 0;
-        for (int i = 0; i < ACTIVE_TRACKS; i++) {
-                if ( (BreakOver - TrackClock[i]) >= 240 ) {
-                        PlyBytes.Put(TRK+1+1);
-                        PlyBytes.Put( i );
-                        PlyBytes.Put(0xf8);
-                        TrackClock[i] += 240;
-                        OverFlow = 1;
-                }
-        }
+  while (OverFlow)
+  {
+    OverFlow = 0;
+    for (int i = 0; i < ACTIVE_TRACKS; i++)
+    {
+      if ((BreakOver - TrackClock[i]) >= 240)
+      {
+        PlyBytes.Put(TRK + 1 + 1);
+        PlyBytes.Put(i);
+        PlyBytes.Put(0xf8);
+        TrackClock[i] += 240;
+        OverFlow = 1;
+      }
     }
+  }
 }
 
-
-
-void tMpuPlayer::OutNow(JZEvent *e)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void tMpuPlayer::OutNow(JZEvent* pEvent)
 {
   // send event to driver immediately regardless of events remaining
   // in the play-queue.
 
   int i, n = 0;
   tGetMidiBytes midi;
-  if (e->Write(midi) == 0)
+  if (pEvent->Write(midi) == 0)
   {
     char *buf = new char[midi.nBytes + 3];
     buf[n++] = CMD+1;
     buf[n++] = 0xd7;
     buf[n++] = DAT+midi.nBytes;
     for (i = 0; i < midi.nBytes; i++)
+    {
       buf[n++] = midi.Buffer[i];
+    }
     write_noack_mpu(buf, n);
     delete[] buf;
   }
-
   else        // special event
   {
-    switch (e->Stat)
+    switch (pEvent->GetStat())
     {
       case StatSetTempo:
         {
           char cmd[4];
-          tSetTempo *s = (tSetTempo *)e;
+          tSetTempo *s = (tSetTempo *)pEvent;
           int bpm = s->GetBPM();
           cmd[0] = CMD+1;
           cmd[1] = 0xE0;
@@ -1011,31 +1069,35 @@ void tMpuPlayer::OutNow(JZEvent *e)
         break;
       case StatSysEx:
         {
-                n = 0;
-                tSysEx *s = (tSysEx *) e;
-                char *sysex = new char[s->Length+4];
-                    sysex[n++] = CMD+1;
-                sysex[n++] = 0xdf;
-                sysex[n++] = DAT + s->Length + 1;
-                sysex[n++] = StatSysEx;
-                for (i = 0; i < s->Length; i++)
-                        sysex[n++] = s->Data[i];
-                write_noack_mpu(sysex, n);
-                delete[] sysex;
+          n = 0;
+          tSysEx *s = (tSysEx *) pEvent;
+          char *sysex = new char[s->Length+4];
+          sysex[n++] = CMD+1;
+          sysex[n++] = 0xdf;
+          sysex[n++] = DAT + s->Length + 1;
+          sysex[n++] = StatSysEx;
+          for (i = 0; i < s->Length; i++)
+          {
+            sysex[n++] = s->Data[i];
+          }
+          write_noack_mpu(sysex, n);
+          delete[] sysex;
         }
       case StatSongPtr:
         {
-                n = 0;
-                tSongPtr *s = (tSongPtr *) e;
-                char *common = new char[s->Length+4];
-                    common[n++] = CMD+1;
-                common[n++] = 0xdf;
-                common[n++] = DAT + s->Length + 1;
-                common[n++] = StatSongPtr;
-                for (i = 0; i < s->Length; i++)
-                        common[n++] = s->Data[i];
-                write_noack_mpu(common, n);
-                delete[] common;
+          n = 0;
+          tSongPtr *s = (tSongPtr *) pEvent;
+          char *common = new char[s->Length+4];
+          common[n++] = CMD+1;
+          common[n++] = 0xdf;
+          common[n++] = DAT + s->Length + 1;
+          common[n++] = StatSongPtr;
+          for (i = 0; i < s->Length; i++)
+          {
+            common[n++] = s->Data[i];
+          }
+          write_noack_mpu(common, n);
+          delete[] common;
         }
         break;
 
@@ -1045,20 +1107,21 @@ void tMpuPlayer::OutNow(JZEvent *e)
   }
 }
 
-
-void tMpuPlayer::FlushOutOfBand(long Clock)
+//-----------------------------------------------------------------------------
 // try to send all out of band events up to Clock to device
+//-----------------------------------------------------------------------------
+void tMpuPlayer::FlushOutOfBand(long Clock)
 {
   tEventIterator Iterator(&OutOfBandEvents);
-  JZEvent *e = Iterator.Range(0, Clock);
-  while (e)
+  JZEvent* pEvent = Iterator.Range(0, Clock);
+  while (pEvent)
   {
-    switch (e->Stat)
+    switch (pEvent->GetStat())
     {
       case StatSetTempo:
         {
           char cmd[4];
-          tSetTempo *s = (tSetTempo *)e;
+          tSetTempo *s = (tSetTempo *)pEvent;
           int bpm = s->GetBPM();
           cmd[0] = CMD+1;
           cmd[1] = 0xE0;
@@ -1070,7 +1133,7 @@ void tMpuPlayer::FlushOutOfBand(long Clock)
       case StatSysEx:
         {
            int n = 0;
-           tSysEx *s = (tSysEx *) e;
+           tSysEx *s = (tSysEx *) pEvent;
            char *sysex = new char[s->Length+4];
            sysex[n++] = CMD+1;
            sysex[n++] = 0xdf;
@@ -1084,14 +1147,15 @@ void tMpuPlayer::FlushOutOfBand(long Clock)
       default:
         break;
     }
-    e->Kill();
-    e = Iterator.Next();
+    pEvent->Kill();
+    pEvent = Iterator.Next();
   }
 
   OutOfBandEvents.Cleanup(0);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 long tMpuPlayer::GetRealTimeClock()
 {
   static int receiving_song_ptr = 0;
@@ -1167,7 +1231,8 @@ long tMpuPlayer::GetRealTimeClock()
   return playclock;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 long tMpuPlayer::GetRecordedData()
 {
   int c, i;
@@ -1196,7 +1261,7 @@ long tMpuPlayer::GetRecordedData()
       {
         unsigned char c1, c2;
         int Channel;
-        JZEvent *e = 0;
+        JZEvent* pEvent = 0;
 
         if (c & 0x80)
         {
@@ -1211,39 +1276,43 @@ long tMpuPlayer::GetRecordedData()
         {
           case StatKeyOff:
             c2 = recbuf[i++];  // SN++ added veloc
-            e = new tKeyOff(RecBytes.Clock, Channel, c1, c2);
-            e = new tKeyOff(RecBytes.Clock, Channel, c1);
+            pEvent = new tKeyOff(RecBytes.Clock, Channel, c1, c2);
+            pEvent = new tKeyOff(RecBytes.Clock, Channel, c1);
             break;
 
           case StatKeyOn:
             c2 = recbuf[i++];
             if (!c2)
-              e = new tKeyOff(RecBytes.Clock, Channel, c1);
+            {
+              pEvent = new tKeyOff(RecBytes.Clock, Channel, c1);
+            }
             else
-              e = new tKeyOn(RecBytes.Clock, Channel, c1, c2);
+            {
+              pEvent = new tKeyOn(RecBytes.Clock, Channel, c1, c2);
+            }
             break;
 // #if 0
           case StatKeyPressure:
             c2 = recbuf[i++];
-            e  = new tKeyPressure(RecBytes.Clock, Channel, c1, c2);
+            pEvent = new tKeyPressure(RecBytes.Clock, Channel, c1, c2);
             break;
 
           case StatChnPressure:
-            e  = new tChnPressure(RecBytes.Clock, Channel, c1);
+            pEvent = new tChnPressure(RecBytes.Clock, Channel, c1);
             break;
 
           case StatControl:
             c2 = recbuf[i++];
-            e  = new tControl(RecBytes.Clock, Channel, c1, c2);
+            pEvent = new tControl(RecBytes.Clock, Channel, c1, c2);
             break;
 
           case StatProgram:
-            e  = new tProgram(RecBytes.Clock, Channel, c1);
+            pEvent = new tProgram(RecBytes.Clock, Channel, c1);
             break;
 
           case StatPitch:
             c2 = recbuf[i++];
-            e  = new tPitch(RecBytes.Clock, Channel, c1, c2);
+            pEvent = new tPitch(RecBytes.Clock, Channel, c1, c2);
             break;
 
           default:
@@ -1251,13 +1320,14 @@ long tMpuPlayer::GetRecordedData()
             break;
 
         }
-        if (e)
+        if (pEvent)
         {
-          e->Clock = PlayLoop->Ext2IntClock(e->Clock);
-          RecdBuffer.Put(e);
+          pEvent->Clock = PlayLoop->Ext2IntClock(pEvent->Clock);
+          RecdBuffer.Put(pEvent);
         }
       }
-      else if (c == 0xfc) {
+      else if (c == 0xfc)
+      {
         // Data end mark
       }
       else
@@ -1273,11 +1343,11 @@ long tMpuPlayer::GetRecordedData()
 #endif // DEV_MPU401
 
 
-// ****************************************************************
-//                     /dev/sequencer2
-// ****************************************************************
-
 #ifdef DEV_SEQUENCER2
+
+//*****************************************************************************
+// /dev/sequencer2
+//*****************************************************************************
 
 // SN-- SEQ_DEFINEBUF (32768);
 #define sequencer_buffer     65536
@@ -1286,6 +1356,8 @@ SEQ_DEFINEBUF (sequencer_buffer);  // 64K
 int seqfd   = -1;
 int mididev = -1;
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void seqbuf_dump(void)
 {
   if (_seqbufptr)
@@ -1309,10 +1381,12 @@ void seqbuf_dump(void)
       memmove(_seqbuf, _seqbuf + size, _seqbufptr);
   }
 }
-#define seqbuf_empty()        (_seqbufptr == 0)
+
+#define seqbuf_empty()  (_seqbufptr == 0)
 #define seqbuf_clear()  (_seqbufptr = 0)
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void seqbuf_flush_last_event()
 {
   _seqbufptr -= 8;
@@ -1320,8 +1394,11 @@ void seqbuf_flush_last_event()
     perror("ioctl flush_last");
 }
 
-// --------------------- voxware midi through ------------------------
-
+//*****************************************************************************
+// voxware midi through
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tOSSThru::tOSSThru()
 {
   int time_base = 120;
@@ -1335,7 +1412,8 @@ tOSSThru::tOSSThru()
   Start(5);        // poll every 5 ms
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tOSSThru::~tOSSThru()
 {
   Stop();
@@ -1343,7 +1421,8 @@ tOSSThru::~tOSSThru()
   seqbuf_dump();
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tOSSThru::Notify()
 {
   unsigned char buf[128];
@@ -1365,13 +1444,15 @@ void tOSSThru::Notify()
   }
 
   if (_seqbufptr)
+  {
     seqbuf_dump();
+  }
 }
 
-
-// ------------------------- tSeq2Player ---------------------
-
-
+//*****************************************************************************
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tSeq2Player::tSeq2Player(JZSong* pSong)
   : JZPlayer(pSong)
 {
@@ -1426,22 +1507,25 @@ tSeq2Player::tSeq2Player(JZSong* pSong)
   }
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tSeq2Player::Installed()
 {
   return seqfd >= 0 && mididev >= 0;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tSeq2Player::~tSeq2Player()
 {
   delete through;
    if (seqfd > 0)
      close(seqfd);
    seqfd = -1;
- }
+}
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tSeq2Player::FindMidiDevice()
 {
   struct synth_info si;
@@ -1507,6 +1591,8 @@ int tSeq2Player::FindMidiDevice()
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSeq2Player::SetSoftThru(int on, int idummy, int odummy)
 {
   gpConfig->Put(C_SoftThru, on);
@@ -1527,20 +1613,21 @@ void tSeq2Player::SetSoftThru(int on, int idummy, int odummy)
   }
 }
 
-
-int tSeq2Player::OutEvent(JZEvent *e, int now)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
 {
   if (!now)
   {
-    OutBreak(e->GetClock());
+    OutBreak(pEvent->GetClock());
   }
 
-  int Stat = e->Stat;
+  int Stat = pEvent->GetStat();
   switch (Stat)
   {
     case StatKeyOn:
       {
-        tKeyOn* pKeyOn = e->IsKeyOn();
+        tKeyOn* pKeyOn = pEvent->IsKeyOn();
         SEQ_START_NOTE(
           mididev,
           pKeyOn->Channel,
@@ -1552,7 +1639,7 @@ int tSeq2Player::OutEvent(JZEvent *e, int now)
 
     case StatKeyOff:
       {
-        tKeyOff* pKeyOff = e->IsKeyOff();
+        tKeyOff* pKeyOff = pEvent->IsKeyOff();
         SEQ_STOP_NOTE(
           mididev,
           pKeyOff->Channel,
@@ -1563,7 +1650,7 @@ int tSeq2Player::OutEvent(JZEvent *e, int now)
       break;
     case StatProgram:
       {
-        tProgram *k = e->IsProgram();
+        tProgram *k = pEvent->IsProgram();
         SEQ_SET_PATCH(mididev, k->Channel, k->Program);
         if (now) seqbuf_flush_last_event();
       }
@@ -1572,7 +1659,7 @@ int tSeq2Player::OutEvent(JZEvent *e, int now)
 // SN++ Aftertouch
     case StatKeyPressure:
       {
-         tKeyPressure *k = e->IsKeyPressure();
+         tKeyPressure *k = pEvent->IsKeyPressure();
          SEQ_KEY_PRESSURE(mididev, k->Channel, k->Key, k->Value);
          if (now) seqbuf_flush_last_event();
       }
@@ -1581,7 +1668,7 @@ int tSeq2Player::OutEvent(JZEvent *e, int now)
 
     case StatChnPressure:
       {
-         tChnPressure *k = e->IsChnPressure();
+         tChnPressure *k = pEvent->IsChnPressure();
          SEQ_CHN_PRESSURE(mididev, k->Channel, k->Value);
          if (now) seqbuf_flush_last_event();
       }
@@ -1589,7 +1676,7 @@ int tSeq2Player::OutEvent(JZEvent *e, int now)
 
     case StatControl:
       {
-        tControl *k = e->IsControl();
+        tControl *k = pEvent->IsControl();
         SEQ_CONTROL(mididev, k->Channel, k->mControl, k->mValue);
         if (now) seqbuf_flush_last_event();
       }
@@ -1597,7 +1684,7 @@ int tSeq2Player::OutEvent(JZEvent *e, int now)
 
     case StatPitch:
       {
-        tPitch *k = e->IsPitch();
+        tPitch *k = pEvent->IsPitch();
         SEQ_BENDER(mididev, k->Channel, k->Value + 8192);
         if (now) seqbuf_flush_last_event();
       }
@@ -1605,7 +1692,7 @@ int tSeq2Player::OutEvent(JZEvent *e, int now)
 
     case StatSetTempo:
       {
-        int bpm = e->IsSetTempo()->GetBPM();
+        int bpm = pEvent->IsSetTempo()->GetBPM();
         if (now)
         {
           if (ioctl(seqfd, SNDCTL_TMR_TEMPO, &bpm) < 0)
@@ -1614,7 +1701,7 @@ int tSeq2Player::OutEvent(JZEvent *e, int now)
         else
         {
           if (!GetAudioEnabled())
-            if (e->GetClock() > 0)
+            if (pEvent->GetClock() > 0)
               SEQ_SET_TEMPO(bpm);
         }
       }
@@ -1625,7 +1712,7 @@ int tSeq2Player::OutEvent(JZEvent *e, int now)
          if (now)
          {
             // todo
-            tSysEx *s = e->IsSysEx();
+            tSysEx *s = pEvent->IsSysEx();
             struct sysex_info *sysex = (struct sysex_info *)new char [sizeof(struct sysex_info) + s->Length + 1];
 
             sysex->key = SYSEX_PATCH;
@@ -1637,9 +1724,10 @@ int tSeq2Player::OutEvent(JZEvent *e, int now)
 
             delete [] (char *)sysex;
          }
-         else if (e->GetClock() > 0) {
+         else if (pEvent->GetClock() > 0)
+         {
            // OSS wants small packets with max 6 bytes
-           tSysEx *sx = e->IsSysEx();
+           tSysEx *sx = pEvent->IsSysEx();
            const int N = 6;
            int i, j;
            char buf[N];
@@ -1666,8 +1754,8 @@ int tSeq2Player::OutEvent(JZEvent *e, int now)
   return 0;
 }
 
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSeq2Player::OutBreak(long clock)
 {
   if (play_clock < clock)
@@ -1688,13 +1776,16 @@ void tSeq2Player::OutBreak(long clock)
   play_clock = clock;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSeq2Player::OutBreak()
 {
   OutBreak(OutClock);
   seqbuf_dump();
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSeq2Player::StartPlay(long Clock, long LoopClock, int Continue)
 {
   char buf[512];
@@ -1772,7 +1863,8 @@ void tSeq2Player::StartPlay(long Clock, long LoopClock, int Continue)
   seqbuf_dump();
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tSeq2Player::StopPlay()
 {
   seqbuf_clear();
@@ -1796,20 +1888,21 @@ void tSeq2Player::StopPlay()
   RecdBuffer.Keyoff2Length();
 }
 
-
-void tSeq2Player::FlushToDevice()
+//-----------------------------------------------------------------------------
 // try to send all events up to OutClock to device
+//-----------------------------------------------------------------------------
+void tSeq2Player::FlushToDevice()
 {
   tEventIterator Iterator(&mPlayBuffer);
-  JZEvent *e = Iterator.Range(0, OutClock);
-  if (e)
+  JZEvent* pEvent = Iterator.Range(0, OutClock);
+  if (pEvent)
   {
     do
     {
-      OutEvent(e);
-      e->Kill();
-      e = Iterator.Next();
-    } while (e);
+      OutEvent(pEvent);
+      pEvent->Kill();
+      pEvent = Iterator.Next();
+    } while (pEvent);
 
     mPlayBuffer.Cleanup(0);
   }
@@ -1817,7 +1910,8 @@ void tSeq2Player::FlushToDevice()
   seqbuf_dump();
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 long tSeq2Player::GetRealTimeClock()
 {
   unsigned char buf[256];
@@ -1827,7 +1921,7 @@ long tSeq2Player::GetRealTimeClock()
     int i = 0;
     while (i < size)
     {
-      JZEvent *e = 0;
+      JZEvent* pEvent = 0;
       switch(buf[i])
       {
 
@@ -1854,16 +1948,16 @@ long tSeq2Player::GetRealTimeClock()
             //printf("got: chn %d, ctl %d, val %d\n", chn, ctl, val);
             switch(buf[i+2]) {
               case MIDI_CTL_CHANGE:
-                e = new tControl(0, chn, ctl, val);
+                pEvent = new tControl(0, chn, ctl, val);
                 break;
               case MIDI_PGM_CHANGE:
-                e = new tProgram(0, chn, ctl);
+                pEvent = new tProgram(0, chn, ctl);
                 break;
               case MIDI_CHN_PRESSURE:
-                 e = new tChnPressure(0, chn, ctl);
+                 pEvent = new tChnPressure(0, chn, ctl);
                  break;
               case MIDI_PITCH_BEND:
-                e = new tPitch(0, chn, val - 8192);
+                pEvent = new tPitch(0, chn, val - 8192);
                 break;
             }
 
@@ -1882,18 +1976,23 @@ long tSeq2Player::GetRealTimeClock()
             unsigned char chn = buf[i+3];
             unsigned char key = buf[i+4];
             unsigned char vel = buf[i+5];
-            switch(buf[i+2]) {
+            switch(buf[i+2])
+            {
               case MIDI_NOTEOFF:  // SN++ added veloc
-                e = new tKeyOff(0, chn, key, vel);
+                pEvent = new tKeyOff(0, chn, key, vel);
                 break;
               case MIDI_NOTEON:
                 if (vel == 0)
-                  e = new tKeyOff(0, chn, key);
+                {
+                  pEvent = new tKeyOff(0, chn, key);
+                }
                 else
-                  e = new tKeyOn(0, chn, key, vel);
+                {
+                  pEvent = new tKeyOn(0, chn, key, vel);
+                }
                 break;
               case MIDI_KEY_PRESSURE:
-                 e = new tKeyPressure(0, chn, key, vel);
+                 pEvent = new tKeyPressure(0, chn, key, vel);
                  break;
             }
 
@@ -1913,11 +2012,11 @@ long tSeq2Player::GetRealTimeClock()
           break;
       }
 
-      if (e)
+      if (pEvent)
       {
-        e->SetClock(PlayLoop->Ext2IntClock(recd_clock));
-        RecdBuffer.Put(e);
-        e = 0;
+        pEvent->SetClock(PlayLoop->Ext2IntClock(recd_clock));
+        RecdBuffer.Put(pEvent);
+        pEvent = 0;
       }
 
     }

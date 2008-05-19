@@ -334,8 +334,12 @@ class JZEvent
     }
 #endif
 
-    unsigned char Stat;
-    int mClock;  // should be protected ...
+  public:
+
+    unsigned char GetStat() const
+    {
+      return mStat;
+    }
 
     int GetClock() const
     {
@@ -353,11 +357,11 @@ class JZEvent
       BROADCAST_DEVICE = 0
     };
 
-    JZEvent(int clk, unsigned char sta)
+    JZEvent(int Clock, unsigned char Stat)
     {
-      mClock = clk;
-      Stat  = sta;
-      Device = BROADCAST_DEVICE;
+      mClock = Clock;
+      mStat  = Stat;
+      mDevice = BROADCAST_DEVICE;
 #ifdef E_DBUG
       Magic = MAGIC;
 #endif
@@ -493,17 +497,23 @@ class JZEvent
 
     int GetDevice() const
     {
-      return Device;
+      return mDevice;
     }
 
-    void SetDevice(int d)
+    void SetDevice(int Device)
     {
-      Device = d;
+      mDevice = Device;
     }
+
+  protected:
+
+    unsigned char mStat;
+
+    int mClock;
 
  private:
 
-    int Device;
+    int mDevice;
 };
 
 
@@ -898,7 +908,7 @@ class tMetaEvent : public JZEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tMetaEvent(mClock, Stat, mpData, Length);
+      return new tMetaEvent(mClock, mStat, mpData, Length);
     }
 };
 

@@ -158,7 +158,7 @@ void JZWriteBase::Close()
 //-----------------------------------------------------------------------------
 int tGetMidiBytes::Write(JZEvent* pEvent, unsigned char* pData, int Length)
 {
-  int Stat = pEvent->Stat;
+  int Stat = pEvent->GetStat();
 
   switch (Stat)
   {

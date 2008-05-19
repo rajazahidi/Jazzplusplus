@@ -230,10 +230,10 @@ void JZStandardChunk::Put(JZEvent* pEvent, unsigned char* Data, int Length)
 
 #if 0
   printfxxo("%02X %02X   ", pEvent->Clock, dif);
-  if (pEvent->Stat != 0x90)
+  if (pEvent->GetStat() != 0x90)
   {
     int i;
-    printf("%02X ", pEvent->Stat);
+    printf("%02X ", pEvent->GetStat());
     for (i = 0; i < Length; i++)
     {
       printf("%02X ", Data[i]);
@@ -242,7 +242,7 @@ void JZStandardChunk::Put(JZEvent* pEvent, unsigned char* Data, int Length)
   }
 #endif
 
-  switch (pEvent->Stat)
+  switch (pEvent->GetStat())
   {
     // KeyOff -> KeyOn mit Vel=0. Gives better Runningstatus!
     case StatKeyOff:
@@ -281,7 +281,7 @@ void JZStandardChunk::Put(JZEvent* pEvent, unsigned char* Data, int Length)
     // SN++
     case StatChnPressure:
 
-      Stat = pEvent->Stat | pEvent->IsChannelEvent()->Channel;
+      Stat = pEvent->GetStat() | pEvent->IsChannelEvent()->Channel;
       if (Stat != RunningStatus)
       {
         RunningStatus = Stat;
@@ -323,14 +323,14 @@ void JZStandardChunk::Put(JZEvent* pEvent, unsigned char* Data, int Length)
 if (1)
 {
    int i;
-   printf("%02X ", pEvent->Stat);
+   printf("%02X ", pEvent->GetStat());
    for (i = 0; i < Length; i++)
      printf("%02X ", Data[i]);
    putchar('\n');
 }
 #endif
 
-      Stat = pEvent->Stat;
+      Stat = pEvent->GetStat();
       RunningStatus = 0;
       *cp++ = 0xff;
       *cp++ = Stat;

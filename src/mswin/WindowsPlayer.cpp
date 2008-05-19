@@ -210,48 +210,50 @@ JZEvent *JZWindowsPlayer::Dword2Event(DWORD dw)
   } u;
   u.w = dw;
 
-  JZEvent *e = 0;
+  JZEvent* pEvent = 0;
 
   switch(u.c[0] & 0xf0)
   {
     case 0x80:
-      e = new tKeyOff(0, u.c[0] & 0x0f, u.c[1]);
+      pEvent = new tKeyOff(0, u.c[0] & 0x0f, u.c[1]);
       break;
 
     case 0x90:
       if (u.c[2])
-        e = new tKeyOn(0, u.c[0] & 0x0f, u.c[1], u.c[2], 0);
+        pEvent = new tKeyOn(0, u.c[0] & 0x0f, u.c[1], u.c[2], 0);
       else
-        e = new tKeyOff(0, u.c[0] & 0x0f, u.c[1]);
+        pEvent = new tKeyOff(0, u.c[0] & 0x0f, u.c[1]);
       break;
 
     case 0xA0:
-      e = new tKeyPressure(0, u.c[0] & 0x0f, u.c[1], u.c[2]);
+      pEvent = new tKeyPressure(0, u.c[0] & 0x0f, u.c[1], u.c[2]);
       break;
 
     case 0xB0:
       if (u.c[1] != 0x7b)
-          e = new tControl(0, u.c[0] & 0x0f, u.c[1], u.c[2]);
+      {
+        pEvent = new tControl(0, u.c[0] & 0x0f, u.c[1], u.c[2]);
+      }
       break;
 
     case 0xC0:
-      e = new tProgram(0, u.c[0] & 0x0f, u.c[1]);
+      pEvent = new tProgram(0, u.c[0] & 0x0f, u.c[1]);
       break;
 
     case 0xD0:
-      e = new tChnPressure(0, u.c[0] & 0x0f, u.c[1]);
+      pEvent = new tChnPressure(0, u.c[0] & 0x0f, u.c[1]);
       break;
 
     case 0xE0:
-      e = new tPitch(0, u.c[0] & 0x0f, u.c[1], u.c[2]);
+      pEvent = new tPitch(0, u.c[0] & 0x0f, u.c[1], u.c[2]);
       break;
   }
-  return e;
+  return pEvent;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-DWORD JZWindowsPlayer::Event2Dword(JZEvent *e)
+DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
 {
   union
   {
@@ -260,12 +262,12 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent *e)
   } u;
   u.w = 0;
 
-  int Stat = e->Stat;
+  int Stat = pEvent->GetStat();
   switch (Stat)
   {
     case StatKeyOn:
       {
-        tKeyOn *k = e->IsKeyOn();
+        tKeyOn *k = pEvent->IsKeyOn();
         u.c[0] = 0x90 | k->Channel;
         u.c[1] = k->mKey;
         u.c[2] = k->mVelocity;
@@ -274,7 +276,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent *e)
 
     case StatKeyOff:
       {
-        tKeyOff *k = e->IsKeyOff();
+        tKeyOff *k = pEvent->IsKeyOff();
         u.c[0] = 0x80 | k->Channel;
         u.c[1] = k->Key;
         u.c[2] = 0;
@@ -283,7 +285,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent *e)
 
     case StatProgram:
       {
-        tProgram *k = e->IsProgram();
+        tProgram *k = pEvent->IsProgram();
         u.c[0] = 0xC0 | k->Channel;
         u.c[1] = k->Program;
       }
@@ -291,7 +293,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent *e)
 
     case StatChnPressure:
       {
-        tChnPressure *k = e->IsChnPressure();
+        tChnPressure *k = pEvent->IsChnPressure();
         u.c[0] = 0xC0 | k->Channel;
         u.c[1] = k->Value;
       }
@@ -299,7 +301,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent *e)
 
     case StatControl:
       {
-        tControl* pControl = e->IsControl();
+        tControl* pControl = pEvent->IsControl();
         u.c[0] = 0xB0 | pControl->Channel;
         u.c[1] = pControl->mControl;
         u.c[2] = pControl->mValue;
@@ -308,7 +310,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent *e)
 
     case StatKeyPressure:
       {
-        tKeyPressure *k = e->IsKeyPressure();
+        tKeyPressure *k = pEvent->IsKeyPressure();
         u.c[0] = 0xA0 | k->Channel;
         u.c[1] = k->Key;
         u.c[2] = k->Value;
@@ -317,7 +319,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent *e)
 
     case StatPitch:
       {
-        tPitch *k = e->IsPitch();
+        tPitch *k = pEvent->IsPitch();
         int     v = k->Value + 8192;
         u.c[0] = 0xE0 | k->Channel;
         u.c[1] = (unsigned char)(v & 0x7F);
@@ -339,11 +341,11 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent *e)
 
     case StatSetTempo:
       {
-        tSetTempo *t = e->IsSetTempo();
+        tSetTempo *t = pEvent->IsSetTempo();
         if (t && t->GetClock() > 0)
         {
           SetTempo( t->GetBPM(), t->GetClock() );
-          OutOfBandEvents.Put( e->Copy() );
+          OutOfBandEvents.Put(pEvent->Copy());
         }
       }
       break;
@@ -415,9 +417,9 @@ void JZWindowsPlayer::SetRealTimeTempo(long bpm, long clock)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZWindowsPlayer::OutSysex(JZEvent *e, DWORD time)
+int JZWindowsPlayer::OutSysex(JZEvent* pEvent, DWORD time)
 {
-  tSysEx *sx = e->IsSysEx();
+  tSysEx *sx = pEvent->IsSysEx();
   if (sx == 0)
     return 1;
 
@@ -434,32 +436,32 @@ int JZWindowsPlayer::OutSysex(JZEvent *e, DWORD time)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZWindowsPlayer::OutEvent(JZEvent *e)
+int JZWindowsPlayer::OutEvent(JZEvent* pEvent)
 {
-  DWORD d = Event2Dword(e);
+  DWORD d = Event2Dword(pEvent);
   if (d)
   {
-    state->play_buffer.put(d, Clock2Time(e->GetClock()));
+    state->play_buffer.put(d, Clock2Time(pEvent->GetClock()));
   }
-  else if (e->IsSysEx() && (e->GetClock() > 0))
+  else if (pEvent->IsSysEx() && (pEvent->GetClock() > 0))
   {
-    OutSysex(e, Clock2Time(e->GetClock()));
+    OutSysex(pEvent, Clock2Time(pEvent->GetClock()));
   }
   return 0;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZWindowsMidiPlayer::OutEvent(JZEvent *e)
+int JZWindowsMidiPlayer::OutEvent(JZEvent* pEvent)
 {
-  DWORD d = Event2Dword(e);
+  DWORD d = Event2Dword(pEvent);
   if (d)
   {
-    state->play_buffer.put(d, e->GetClock());
+    state->play_buffer.put(d, pEvent->GetClock());
   }
-  else if (e->IsSysEx() && (e->GetClock() > 0))
+  else if (pEvent->IsSysEx() && (pEvent->GetClock() > 0))
   {
-    OutSysex(e, e->GetClock());
+    OutSysex(pEvent, pEvent->GetClock());
   }
   return 0;
 }
@@ -474,14 +476,14 @@ void JZWindowsPlayer::OutNow(JZEvent* pEvent)
   {
     midiOutShortMsg(state->hout, d);
   }
-  else if (pEvent->Stat == StatSetTempo)
+  else if (pEvent->GetStat() == StatSetTempo)
   {
     if (state->playing)
     {
       SetTempo(pEvent->IsSetTempo()->GetBPM(), OutClock);
     }
   }
-  else if (pEvent->Stat == StatSysEx)
+  else if (pEvent->GetStat() == StatSysEx)
   {
     tSysEx *s = pEvent->IsSysEx();
     if (s->Length + 1 < maxSysLen)
@@ -641,12 +643,16 @@ void JZWindowsPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 
   if (gpConfig->GetValue(C_RealTimeOut))
   {
-    tMetaEvent *e;
+    tMetaEvent* pEvent;
     if (!Continue)
-      e = new tStartPlay( 0 );
+    {
+      pEvent = new tStartPlay(0);
+    }
     else
-      e = new tContPlay( 0 );
-    OutNow( e );
+    {
+      pEvent = new tContPlay(0);
+    }
+    OutNow(pEvent);
     FillMidiClocks(mPlayBuffer.GetLastClock()); // also does a sort
   }
 
@@ -709,9 +715,9 @@ void JZWindowsPlayer::StopPlay()
   JZPlayer::StopPlay();
   if (gpConfig->GetValue(C_RealTimeOut))
   {
-    tStopPlay *e = new tStopPlay(0);
-    OutNow( e );
-    delete e;
+    tStopPlay* pEvent = new tStopPlay(0);
+    OutNow(pEvent);
+    delete pEvent;
   }
   AllNotesOff();
   RecdBuffer.Keyoff2Length();
@@ -795,11 +801,11 @@ long JZWindowsIntPlayer::GetRealTimeClock()
     midi_event *m = state->recd_buffer.get();
 
     // Event?
-    JZEvent     *e = Dword2Event(m->data);
-    if (e)
+    JZEvent* pEvent = Dword2Event(m->data);
+    if (pEvent)
     {
-      e->SetClock(PlayLoop->Ext2IntClock(Time2RealTimeClock(m->ref)));
-      RecdBuffer.Put(e);
+      pEvent->SetClock(PlayLoop->Ext2IntClock(Time2RealTimeClock(m->ref)));
+      RecdBuffer.Put(pEvent);
     }
   }
 
@@ -811,19 +817,19 @@ long JZWindowsIntPlayer::GetRealTimeClock()
   if ( !OutOfBandEvents.IsEmpty() )
   {
     tEventIterator Iterator(&OutOfBandEvents);
-    JZEvent *e = Iterator.Range(0, clock);
-    while (e)
+    JZEvent* pEvent = Iterator.Range(0, clock);
+    while (pEvent)
     {
-      switch (e->Stat)
+      switch (pEvent->GetStat())
       {
         case StatSetTempo:
-          SetRealTimeTempo( ((tSetTempo *)e)->GetBPM(), clock );
+          SetRealTimeTempo( ((tSetTempo *)pEvent)->GetBPM(), clock );
           break;
         default:
           break;
       }
-      e->Kill();
-      e = Iterator.Next();
+      pEvent->Kill();
+      pEvent = Iterator.Next();
     }
     OutOfBandEvents.Cleanup(0);
   }
@@ -863,11 +869,11 @@ long JZWindowsMidiPlayer::GetRealTimeClock()
     }
 
     // Event?
-    JZEvent     *e = Dword2Event(m->data);
-    if (e)
+    JZEvent* pEvent = Dword2Event(m->data);
+    if (pEvent)
     {
-      e->SetClock(PlayLoop->Ext2IntClock(m->ref));
-      RecdBuffer.Put(e);
+      pEvent->SetClock(PlayLoop->Ext2IntClock(m->ref));
+      RecdBuffer.Put(pEvent);
     }
   }
 
@@ -908,11 +914,11 @@ long JZWindowsMtcPlayer::GetRealTimeClock()
     }
 
     // Event?
-    JZEvent     *e = Dword2Event(m->data);
-    if (e)
+    JZEvent* pEvent = Dword2Event(m->data);
+    if (pEvent)
     {
-      e->SetClock(PlayLoop->Ext2IntClock(Time2Clock(m->ref)));
-      RecdBuffer.Put(e);
+      pEvent->SetClock(PlayLoop->Ext2IntClock(Time2Clock(m->ref)));
+      RecdBuffer.Put(pEvent);
     }
   }
 
@@ -949,19 +955,19 @@ long JZWindowsMtcPlayer::GetRealTimeClock()
   if ( !OutOfBandEvents.IsEmpty() )
   {
     tEventIterator Iterator(&OutOfBandEvents);
-    JZEvent *e = Iterator.Range(0, clock);
-    while (e)
+    JZEvent* pEvent = Iterator.Range(0, clock);
+    while (pEvent)
     {
-      switch (e->Stat)
+      switch (pEvent->GetStat())
       {
         case StatSetTempo:
-          SetRealTimeTempo( ((tSetTempo *)e)->GetBPM(), clock );
+          SetRealTimeTempo( ((tSetTempo *)pEvent)->GetBPM(), clock );
           break;
         default:
           break;
       }
-      e->Kill();
-      e = Iterator.Next();
+      pEvent->Kill();
+      pEvent = Iterator.Next();
     }
     OutOfBandEvents.Cleanup(0);
   }

@@ -1361,7 +1361,7 @@ void EventDialog(
 
   tEventDlg *dlg = 0;
   const char* str = 0;
-  switch (e->Stat)
+  switch (e->GetStat())
   {
     case StatKeyOn:
       if (t->GetAudioMode())

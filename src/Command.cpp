@@ -140,7 +140,7 @@ void tSelectedKeys::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   tKeyOn* pKeyOn = pEvent->IsKeyOn();
   if (pKeyOn)
   {
-    Keys[pKeyOn->mKey] += pKeyOn->mLength;
+    Keys[pKeyOn->GetKey()] += pKeyOn->GetEventLength();
   }
 }
 
@@ -371,7 +371,7 @@ void tCmdQuantize::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
     }
     if (NoteLength)
     {
-      pKeyOn->mLength = Quantize(pKeyOn->mLength, 2);
+      pKeyOn->SetLength(Quantize(pKeyOn->GetEventLength(), 2));
     }
     pTrack->Kill(pEvent);
     pTrack->Put(pKeyOn);
@@ -398,12 +398,12 @@ void tCmdTranspose::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
     pKeyOn = (tKeyOn *)pEvent->Copy();
     if (FitIntoScale)
     {
-      pKeyOn->mKey += Notes;
-      pKeyOn->mKey = Scale.FitInto(pKeyOn->mKey);
+      pKeyOn->SetKey(pKeyOn->GetKey() + Notes);
+      pKeyOn->SetKey(Scale.FitInto(pKeyOn->GetKey()));
     }
     else if (Notes)
     {
-      pKeyOn->mKey = Scale.Transpose(pKeyOn->mKey, Notes);
+      pKeyOn->SetKey(Scale.Transpose(pKeyOn->GetKey(), Notes));
     }
     pTrack->Kill(pEvent);
     pTrack->Put(pKeyOn);
@@ -478,13 +478,13 @@ void tCmdVelocity::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
       case 0:
         break;
       case 1:
-        val = pKeyOn->mVelocity + val;
+        val = pKeyOn->GetVelocity() + val;
         break;
       case 2:
-        val = pKeyOn->mVelocity - val;
+        val = pKeyOn->GetVelocity() - val;
         break;
     }
-    pKeyOn->mVelocity = val < 1 ? 1 : (val > 127 ? 127 : val);
+    pKeyOn->SetVelocity(val < 1 ? 1 : (val > 127 ? 127 : val));
     pTrack->Kill(pEvent);
     pTrack->Put(pKeyOn);
   }
@@ -519,14 +519,14 @@ void tCmdLength::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
       case 0:
         break;
       case 1:
-        val = pKeyOn->mLength + val;
+        val = pKeyOn->GetEventLength() + val;
         break;
       case 2:
-        val = pKeyOn->mLength - val;
+        val = pKeyOn->GetEventLength() - val;
         break;
     }
 
-    pKeyOn->mLength = val < 1 ? 1 : val;
+    pKeyOn->SetLength(val < 1 ? 1 : val);
     pTrack->Kill(pEvent);
     pTrack->Put(pKeyOn);
   }
@@ -619,9 +619,9 @@ void tCmdConvertToModulation::ExecuteTrack(JZTrack* pTrack)
       if (startclock == -1)
       {
         startclock = pEvent->IsKeyOn()->GetClock();
-        startvelocity = pEvent->IsKeyOn()->mVelocity;
+        startvelocity = pEvent->IsKeyOn()->GetVelocity();
         channel = pEvent->IsKeyOn()->Channel;
-        startkey = pEvent->IsKeyOn()->mKey;
+        startkey = pEvent->IsKeyOn()->GetKey();
         previouspitch = pEvent->GetPitch();
       }
       pitchdiff = pEvent->GetPitch()-previouspitch;
@@ -636,10 +636,18 @@ void tCmdConvertToModulation::ExecuteTrack(JZTrack* pTrack)
 
       pTrack->Kill(pEvent); //remove the old event
 
-      pTrack->Put(new tControl(pEvent->GetClock(), channel, 0x07, pEvent->IsKeyOn()->mVelocity));
-      pTrack->Put(new tControl(pEvent->GetClock() + pEvent->IsKeyOn()->mLength, channel, 0x07, 0));
+      pTrack->Put(new tControl(
+        pEvent->GetClock(),
+        channel,
+        0x07,
+        pEvent->IsKeyOn()->GetVelocity()));
+      pTrack->Put(new tControl(
+        pEvent->GetClock() + pEvent->IsKeyOn()->GetEventLength(),
+        channel,
+        0x07,
+        0));
 
-      lastlength = pEvent->IsKeyOn()->mLength;
+      lastlength = pEvent->IsKeyOn()->GetEventLength();
       endclock = pEvent->GetClock();
       previouspitch = pEvent->GetPitch();
     }
@@ -685,7 +693,8 @@ void tCmdMidiDelay::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
       // only echo note events
       pKeyOn = (tKeyOn *)pEvent->Copy();
       pKeyOn->SetClock(pKeyOn->GetClock()+ clockDelay * i);
-      pKeyOn->mVelocity = (unsigned char)(pow(scale, i) * pKeyOn->mVelocity);
+      pKeyOn->SetVelocity(
+        (unsigned char)(pow(scale, i) * pKeyOn->GetVelocity()));
       pTrack->Put(pKeyOn);
     }
   }
@@ -715,24 +724,28 @@ void tCmdCleanup::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   tKeyOn* pKeyOn;
   if ((pKeyOn = pEvent->IsKeyOn()) != 0)
   {
-    if (pKeyOn->mLength < lengthLimit)
+    if (pKeyOn->GetEventLength() < lengthLimit)
     {
-      // remove short notes
+      // Remove short notes.
       pTrack->Kill(pEvent);
     }
     else if (shortenOverlaps)
     {
-      // shorten length of overlapping notes
-      tKeyOn *p = prev_note[pKeyOn->Channel][pKeyOn->mKey];
-      if (p && p->GetClock() + p->mLength >= pKeyOn->GetClock())
+      // Shorten length of overlapping notes.
+      tKeyOn* pPreviousKeyOn = prev_note[pKeyOn->Channel][pKeyOn->GetKey()];
+      if (
+        pPreviousKeyOn &&
+        pPreviousKeyOn->GetClock() + pPreviousKeyOn->GetEventLength() >=
+          pKeyOn->GetClock())
       {
-        p->mLength = pKeyOn->GetClock() - p->GetClock() - 1;
-        if (p->mLength < lengthLimit)
+        pPreviousKeyOn->SetLength(
+          pKeyOn->GetClock() - pPreviousKeyOn->GetClock() - 1);
+        if (pPreviousKeyOn->GetEventLength() < lengthLimit)
         {
-          pTrack->Kill(p);
+          pTrack->Kill(pPreviousKeyOn);
         }
       }
-      prev_note[pKeyOn->Channel][pKeyOn->mKey] = pKeyOn;
+      prev_note[pKeyOn->Channel][pKeyOn->GetKey()] = pKeyOn;
     }
   }
 }
@@ -976,7 +989,7 @@ void tCmdExchUpDown::ExecuteTrack(JZTrack* pTrack)
     if (mpFilter->IsSelected(pEvent) && pEvent->IsKeyOn())
     {
       tKeyOn* pKeyOn = (tKeyOn *)pEvent;
-      Keys[pKeyOn->mKey] = 1;
+      Keys[pKeyOn->GetKey()] = 1;
     }
     pEvent = Iterator.Next();
   }
@@ -992,7 +1005,7 @@ void tCmdExchUpDown::ExecuteTrack(JZTrack* pTrack)
       int n_th = 0;
 
       // the n'th key from bottom ..
-      for (i = 0; i <= pKeyOn->mKey; i++)
+      for (i = 0; i <= pKeyOn->GetKey(); i++)
       {
         n_th += Keys[i];
       }
@@ -1003,7 +1016,7 @@ void tCmdExchUpDown::ExecuteTrack(JZTrack* pTrack)
         n_th -= Keys[i];
       }
 
-      pKeyOn->mKey = i + 1;
+      pKeyOn->SetKey(i + 1);
 
       pTrack->Kill(pEvent);
       pTrack->Put(pKeyOn);
@@ -1056,15 +1069,15 @@ void tCmdMapper::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
     switch (mSource)
     {
       case veloc:
-        sval = mRandomArray[(int)pKeyOn->mVelocity];
+        sval = mRandomArray[(int)pKeyOn->GetVelocity()];
         break;
 
       case length:
-        sval = mRandomArray[(int)pKeyOn->mLength];
+        sval = mRandomArray[(int)pKeyOn->GetEventLength()];
         break;
 
       case key:
-        sval = mRandomArray[(int)pKeyOn->mKey];
+        sval = mRandomArray[(int)pKeyOn->GetKey()];
         break;
 
       case rhythm:
@@ -1106,7 +1119,7 @@ void tCmdMapper::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
       {
         if (mAdd)
         {
-          sval = pKeyOn->mVelocity + sval;
+          sval = pKeyOn->GetVelocity() + sval;
         }
         if (sval > 127)
         {
@@ -1118,7 +1131,7 @@ void tCmdMapper::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
         }
         tKeyOn* pKeyOnCopy = (tKeyOn *)pKeyOn->Copy();
         pTrack->Kill(pKeyOn);
-        pKeyOnCopy->mVelocity = sval;
+        pKeyOnCopy->SetVelocity(sval);
         pTrack->Put(pKeyOnCopy);
       }
       break;
@@ -1127,7 +1140,7 @@ void tCmdMapper::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
       {
         if (mAdd)
         {
-          sval = pKeyOn->mKey + sval;
+          sval = pKeyOn->GetKey() + sval;
         }
         if (sval > 127)
         {
@@ -1139,7 +1152,7 @@ void tCmdMapper::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
         }
         tKeyOn* pKeyOnCopy = (tKeyOn *)pKeyOn->Copy();
         pTrack->Kill(pKeyOn);
-        pKeyOnCopy->mKey = sval;
+        pKeyOnCopy->SetKey(sval);
         pTrack->Put(pKeyOnCopy);
       }
       break;
@@ -1148,7 +1161,7 @@ void tCmdMapper::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
       {
         if (mAdd)
         {
-          sval = pKeyOn->mLength + sval;
+          sval = pKeyOn->GetEventLength() + sval;
         }
         if (sval < 1)
         {
@@ -1156,7 +1169,7 @@ void tCmdMapper::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
         }
         tKeyOn* pKeyOnCopy = (tKeyOn *)pKeyOn->Copy();
         pTrack->Kill(pKeyOn);
-        pKeyOnCopy->mLength = sval;
+        pKeyOnCopy->SetLength(sval);
         pTrack->Put(pKeyOnCopy);
       }
       break;

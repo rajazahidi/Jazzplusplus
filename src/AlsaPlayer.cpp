@@ -411,22 +411,22 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
   {
     case StatKeyOn:
       {
-        tKeyOn *k = pEvent->IsKeyOn();
+        tKeyOn* pKeyOn = pEvent->IsKeyOn();
         set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_NOTEON);
-        ev.data.note.channel = k->Channel;
-        ev.data.note.note = k->mKey;
-        ev.data.note.velocity = k->mVelocity;
+        ev.data.note.channel = pKeyOn->Channel;
+        ev.data.note.note = pKeyOn->GetKey();
+        ev.data.note.velocity = pKeyOn->GetVelocity();
         rc = write(&ev, now);
       }
       break;
 
     case StatKeyOff:
       {
-        tKeyOff *k = pEvent->IsKeyOff();
+        tKeyOff* pKeyOff = pEvent->IsKeyOff();
         set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_NOTEOFF);
-        ev.data.note.channel = k->Channel;
-        ev.data.note.note = k->Key;
-        ev.data.note.velocity = k->OffVeloc;
+        ev.data.note.channel = pKeyOff->Channel;
+        ev.data.note.note = pKeyOff->Key;
+        ev.data.note.velocity = pKeyOff->OffVeloc;
         rc = write(&ev, now);
       }
       break;

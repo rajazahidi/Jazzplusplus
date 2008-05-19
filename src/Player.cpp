@@ -520,10 +520,10 @@ void JZPlayer::StopPlay()
         tKeyOn* pKeyOn = pEvent->IsKeyOn();
         if (pKeyOn)
         {
-          if (pKeyOn->GetClock() + pKeyOn->mLength >= Clock - 100)
+          if (pKeyOn->GetClock() + pKeyOn->GetEventLength() >= Clock - 100)
           {
             off.Channel = pKeyOn->Channel;
-            off.Key     = pKeyOn->mKey;
+            off.Key     = pKeyOn->GetKey();
             OutNow(&off);
           }
         }
@@ -1631,8 +1631,8 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
         SEQ_START_NOTE(
           mididev,
           pKeyOn->Channel,
-          pKeyOn->mKey,
-          pKeyOn->mVelocity);
+          pKeyOn->GetKey(),
+          pKeyOn->GetVelocity());
         if (now) seqbuf_flush_last_event();
       }
       break;

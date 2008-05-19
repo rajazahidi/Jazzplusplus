@@ -550,28 +550,16 @@ class tKeyOn : public tChannelEvent
 {
   public:
 
-    unsigned char mKey;
-    unsigned char mVelocity;
-
-    // Length is 0 if a corresponding tKeyOff exists.
-    unsigned short mLength;
-
-  private:
-
-    unsigned short mOffVelocity;
-
-  public:
-
     tKeyOn(
       int clk,
       int cha,
       unsigned char Key,
       unsigned char Velocity,
-      unsigned short len = 0)
+      unsigned short Length = 0)
       : tChannelEvent(clk, StatKeyOn, cha),
         mKey(Key),
         mVelocity(Velocity),
-        mLength(len),
+        mLength(Length),
         mOffVelocity(0)
     {
     }
@@ -594,18 +582,6 @@ class tKeyOn : public tChannelEvent
       return new tKeyOn(*this);
     }
 
-    virtual unsigned short GetEventLength() const
-    {
-      edb();
-      return mLength;
-    }
-
-    virtual int GetLength() const
-    {
-      edb();
-      return mLength;
-    }
-
     virtual int GetValue() const
     {
       edb();
@@ -622,6 +598,43 @@ class tKeyOn : public tChannelEvent
     {
       edb();
       mKey = p;
+    }
+
+    unsigned char GetKey() const
+    {
+      return mKey;
+    }
+
+    void SetKey(unsigned char Key)
+    {
+      mKey = Key;
+    }
+
+    unsigned char GetVelocity() const
+    {
+      return mVelocity;
+    }
+
+    void SetVelocity(unsigned char Velocity)
+    {
+      mVelocity = Velocity;
+    }
+
+    virtual unsigned short GetEventLength() const
+    {
+      edb();
+      return mLength;
+    }
+
+    virtual int GetLength() const
+    {
+      edb();
+      return mLength;
+    }
+
+    void SetLength(unsigned short Length)
+    {
+      mLength = Length;
     }
 
     unsigned short GetOffVelocity() const
@@ -643,6 +656,17 @@ class tKeyOn : public tChannelEvent
     {
       return wxBLACK_BRUSH;
     }
+
+  private:
+
+    unsigned char mKey;
+
+    unsigned char mVelocity;
+
+    // Length is 0 if a corresponding tKeyOff exists.
+    unsigned short mLength;
+
+    unsigned short mOffVelocity;
 };
 
 

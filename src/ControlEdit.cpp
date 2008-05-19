@@ -528,7 +528,7 @@ int tVelocEdit::IsCtrlEdit(JZEvent* pEvent)
 
 int tVelocEdit::GetValue(JZEvent* pEvent)
 {
-  return pEvent->IsKeyOn()->mVelocity;
+  return pEvent->IsKeyOn()->GetVelocity();
 }
 
 void tVelocEdit::OnApply()
@@ -568,7 +568,7 @@ void tVelocEdit::OnApply()
         tKeyOn* pKeyOnCopy = pKeyOn->Copy()->IsKeyOn();
 
         int i = Clock2i(pKeyOnCopy->GetClock());
-        pKeyOnCopy->mVelocity = array[i];
+        pKeyOnCopy->SetVelocity(array[i]);
         track->Kill(pKeyOn);
         track->Put(pKeyOnCopy);
       }
@@ -665,7 +665,7 @@ void tPolyAfterEdit::OnApply()
     to_clk   = to_clock;
   }
   tKeyPressure *k;
-  tKeyOn      *keyon;
+  tKeyOn* pKeyOn;
 
   if (!ctrlmode)
   {
@@ -699,13 +699,13 @@ void tPolyAfterEdit::OnApply()
         !mpPianoWindow->mpSnapSel->IsSelected() ||
         mpPianoWindow->GetFilter()->IsSelected(pEvent))
       {
-        keyon = pEvent->IsKeyOn();
-        if (keyon)
+        pKeyOn = pEvent->IsKeyOn();
+        if (pKeyOn)
         {
-          key_clk = keyon->GetClock() + 1;
-          key_end = keyon->GetClock() + keyon->mLength;
-          key_val = keyon->mKey;
-          key_cha = keyon->Channel;
+          key_clk = pKeyOn->GetClock() + 1;
+          key_end = pKeyOn->GetClock() + pKeyOn->GetEventLength();
+          key_val = pKeyOn->GetKey();
+          key_cha = pKeyOn->Channel;
         }
         if (key_val>0)
         {

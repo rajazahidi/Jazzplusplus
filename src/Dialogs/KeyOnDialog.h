@@ -50,10 +50,6 @@ class JZKeyOnDialog : public wxDialog
   private:
 
     tKeyOn* mpEvent;
-//    int mPitch;
-//    int mVelocity;
-//    int mLength;
-//    int mOffVelocity;
 
     wxTextCtrl* mpPitchEdit;
     wxStaticText* mpVelocityValue;

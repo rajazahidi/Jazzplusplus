@@ -266,7 +266,7 @@ int tKeyLengthDragger::Dragging(wxMouseEvent& Event)
   {
     Length = 1;
   }
-  Copy->mLength = Length;
+  Copy->SetLength(Length);
 
   Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 1, 1);
   return 0;
@@ -277,16 +277,16 @@ int tKeyLengthDragger::Dragging(wxMouseEvent& Event)
 int tKeyLengthDragger::ButtonUp(wxMouseEvent& Event)
 {
   // SN++ Key_Aftertouch
-  if (Copy->mLength < mpKeyOn->mLength)
+  if (Copy->GetEventLength() < mpKeyOn->GetEventLength())
   {
     int key, channel;
     tEventIterator iter(Win->GetTrack());
     tKeyPressure *a;
-    key = Copy->mKey;
+    key = Copy->GetKey();
     channel = Copy->Channel;
     JZEvent* pEvent = iter.Range(
-      Copy->GetClock() + Copy->mLength,
-      Copy->GetClock() + mpKeyOn->mLength);
+      Copy->GetClock() + Copy->GetEventLength(),
+      Copy->GetClock() + mpKeyOn->GetEventLength());
     while (pEvent)
     {
       a = pEvent->IsKeyPressure();
@@ -421,7 +421,7 @@ class tVelocCounter : public tMouseCounter
       JZPianoWindow* pPianoWindow,
       JZRectangle* pRectangle,
       tKeyOn* pKeyOn)
-      : tMouseCounter(pPianoWindow, pRectangle, pKeyOn->mVelocity, 1, 127)
+      : tMouseCounter(pPianoWindow, pRectangle, pKeyOn->GetVelocity(), 1, 127)
     {
       Win = pPianoWindow;
       mpKeyOn = pKeyOn;
@@ -447,7 +447,7 @@ int tVelocCounter::Event(wxMouseEvent& Event)
   if (tMouseCounter::Event(Event))
   {
     tKeyOn* pKeyOnCopy = (tKeyOn *)mpKeyOn->Copy();
-    pKeyOnCopy->mVelocity = Value;
+    pKeyOnCopy->SetVelocity(Value);
 
     Win->ApplyToTrack(mpKeyOn, pKeyOnCopy);
 
@@ -1376,7 +1376,7 @@ void JZPianoWindow::DrawEvent(
   // show velocity as colors
   if (force_color != 0 && mUseColors && pEvent->IsKeyOn())
   {
-    int vel = pEvent->IsKeyOn()->mVelocity;
+    int vel = pEvent->IsKeyOn()->GetVelocity();
 
     // Next line is "Patrick Approved."
     Dc.SetBrush(mpColorBrush[ vel * NUM_COLORS / 128 ]);
@@ -1458,7 +1458,7 @@ void JZPianoWindow::DrawEvents(
         // show velocity as colors
         if (!force_color && mUseColors && pEvent->IsKeyOn())
         {
-          int vel = pEvent->IsKeyOn()->mVelocity;
+          int vel = pEvent->IsKeyOn()->GetVelocity();
           Dc.SetBrush(mpColorBrush[ vel * NUM_COLORS / 128 ]);
         }
         else
@@ -2410,13 +2410,15 @@ void JZPianoWindow::kill_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
   {
     return;
   }
-  if (pKeyOn->mLength < 2)
+  if (pKeyOn->GetEventLength() < 2)
   {
     return;
   }
-  key = pKeyOn->mKey;
+  key = pKeyOn->GetKey();
   channel = pKeyOn->Channel;
-  pEvent = iter.Range(pKeyOn->GetClock() + 1, pKeyOn->GetClock() + pKeyOn->mLength);
+  pEvent = iter.Range(
+    pKeyOn->GetClock() + 1,
+    pKeyOn->GetClock() + pKeyOn->GetEventLength());
   while (pEvent)
   {
     a = pEvent->IsKeyPressure();
@@ -2444,15 +2446,15 @@ void JZPianoWindow::paste_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
     return;
   }
   channel = pKeyOn->Channel;
-  if (pKeyOn->mLength < 2)
+  if (pKeyOn->GetEventLength() < 2)
   {
     return;
   }
-  key = pKeyOn->mKey;
+  key = pKeyOn->GetKey();
 
   pEvent = iter.Range(
     pKeyOn->GetClock() + 1,
-    pKeyOn->GetClock() + pKeyOn->mLength);
+    pKeyOn->GetClock() + pKeyOn->GetEventLength());
 
   while (pEvent)
   {
@@ -2951,16 +2953,16 @@ void JZPianoWindow::Copy(JZTrack* pTrack, JZEvent* pEvent, int Kill)
       kill_keys_aftertouch(pTrack, pEvent);
       if (pTrack->GetAudioMode())
       {
-        gpMidiPlayer->ListenAudio(pKeyOn->mKey, 0);
+        gpMidiPlayer->ListenAudio(pKeyOn->GetKey(), 0);
       }
       else
       {
         mListen.KeyOn(
           pTrack,
-          pKeyOn->mKey,
+          pKeyOn->GetKey(),
           pKeyOn->Channel,
-          pKeyOn->mVelocity,
-          pKeyOn->mLength);
+          pKeyOn->GetVelocity(),
+          pKeyOn->GetEventLength());
       }
     }
 
@@ -3045,16 +3047,16 @@ void JZPianoWindow::Paste(JZTrack* pTrack, int Clock, int Pitch)
       {
         if (pTrack->GetAudioMode())
         {
-          gpMidiPlayer->ListenAudio(pKeyOn->mKey, 0);
+          gpMidiPlayer->ListenAudio(pKeyOn->GetKey(), 0);
         }
         else
         {
           mListen.KeyOn(
             pTrack,
-            pKeyOn->mKey,
+            pKeyOn->GetKey(),
             pKeyOn->Channel,
-            pKeyOn->mVelocity,
-            pKeyOn->mLength);
+            pKeyOn->GetVelocity(),
+            pKeyOn->GetEventLength());
         }
       }
       wxClientDC Dc(this);

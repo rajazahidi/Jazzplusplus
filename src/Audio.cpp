@@ -466,7 +466,7 @@ int tSampleSet::FillBuffers(long last_clock)
     tKeyOn* pKeyOn = e->IsKeyOn();
     if (pKeyOn && num_voices < MAXPOLY)
     {
-      voices[num_voices++]->Start(samples[pKeyOn->mKey], pKeyOn->GetClock());
+      voices[num_voices++]->Start(samples[pKeyOn->GetKey()], pKeyOn->GetClock());
     }
   }
 
@@ -582,11 +582,13 @@ void tSampleSet::AdjustAudioLength(JZTrack *t, long tpm)
     tKeyOn* pKeyOn = e->IsKeyOn();
     if (pKeyOn)
     {
-      pKeyOn->mLength =
-        (int)Samples2Ticks(samples[pKeyOn->mKey]->GetLength());
-      if (pKeyOn->mLength < 15)  // invisble?
+      pKeyOn->SetLength(
+        (int)Samples2Ticks(samples[pKeyOn->GetKey()]->GetLength()));
+
+      // Is the event visble?
+      if (pKeyOn->GetEventLength() < 15)
       {
-        pKeyOn->mLength = 15;
+        pKeyOn->SetLength(15);
       }
     }
     e = it.Next();

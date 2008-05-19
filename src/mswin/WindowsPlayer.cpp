@@ -267,18 +267,18 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
   {
     case StatKeyOn:
       {
-        tKeyOn *k = pEvent->IsKeyOn();
-        u.c[0] = 0x90 | k->Channel;
-        u.c[1] = k->mKey;
-        u.c[2] = k->mVelocity;
+        tKeyOn* pKeyOn = pEvent->IsKeyOn();
+        u.c[0] = 0x90 | pKeyOn->Channel;
+        u.c[1] = pKeyOn->GetKey();
+        u.c[2] = pKeyOn->GetVelocity();
       }
       break;
 
     case StatKeyOff:
       {
-        tKeyOff *k = pEvent->IsKeyOff();
-        u.c[0] = 0x80 | k->Channel;
-        u.c[1] = k->Key;
+        tKeyOff* pKeyOff = pEvent->IsKeyOff();
+        u.c[0] = 0x80 | pKeyOff->Channel;
+        u.c[1] = pKeyOff->Key;
         u.c[2] = 0;
       }
       break;

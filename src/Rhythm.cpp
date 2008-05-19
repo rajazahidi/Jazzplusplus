@@ -352,10 +352,10 @@ void tRhythm::Generate(JZTrack *track, long fr_clock, long to_clock, long ticks_
         tEventArray &src = gpTrackWindow->GetPianoWindow()->PasteBuffer;
         for (int ii = 0; ii < src.nEvents; ii++)
         {
-          tKeyOn *on = src.Events[ii]->IsKeyOn();
-          if (on)
+          tKeyOn* pKeyOn = src.Events[ii]->IsKeyOn();
+          if (pKeyOn)
           {
-            tKeyOn *k = new tKeyOn(clock, chan, on->Key, vel, len - clocks_per_step/2);
+            tKeyOn *k = new tKeyOn(clock, chan, pKeyOn->Key, vel, len - clocks_per_step / 2);
             track->Put(k);
           }
         }
@@ -938,16 +938,16 @@ void tRhythmWin::AddInstrumentDlg()
 
       for (int ii = 0; ii < events.nEvents; ii++)
       {
-        tKeyOn *on = events.Events[ii]->IsKeyOn();
-        if (on)
+        tKeyOn* pKeyOn = events.Events[ii]->IsKeyOn();
+        if (pKeyOn)
         {
-          pRhythm->keys[pRhythm->n_keys++] = on->mKey;
+          pRhythm->keys[pRhythm->n_keys++] = pKeyOn->GetKey();
           if (pRhythm->n_keys > 1)
           {
             Oss << ", ";
           }
           string KeyString;
-          KeyToString(on->mKey, KeyString);
+          KeyToString(pKeyOn->GetKey(), KeyString);
           Oss << KeyString;
           if (pRhythm->n_keys >= MAX_KEYS)
           {

@@ -464,7 +464,7 @@ void JZSong::MergePlayTrackEvent(
       d->SetClock(d->GetClock() + c->GetClock() + loopOffset);
       if (d->IsKeyOn())
       {
-        d->IsKeyOn()->mKey += c->transpose;
+        d->IsKeyOn()->SetKey(d->IsKeyOn()->GetKey() + c->transpose);
       }
       if (d->IsPlayTrack())
       {
@@ -571,7 +571,7 @@ void JZSong::SetTicksPerQuarter(int TicksPerQuarter)
       tKeyOn* pKeyOn = pEvent->IsKeyOn();
       if (pKeyOn)
       {
-        pKeyOn->mLength = (int)(f * pKeyOn->mLength + 0.5);
+        pKeyOn->SetLength((int)(f * pKeyOn->GetEventLength() + 0.5));
       }
     }
   }

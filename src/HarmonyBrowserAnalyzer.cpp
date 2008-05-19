@@ -167,18 +167,18 @@ void HBAnalyzer::CountEvent(tKeyOn* pKeyOn, JZTrack *t)
     int start = Step2Clock(i);
     int stop  = Step2Clock(i+1);
     if (
-      pKeyOn->GetClock() + pKeyOn->mLength >= start &&
+      pKeyOn->GetClock() + pKeyOn->GetEventLength() >= start &&
       pKeyOn->GetClock() < stop)
     {
       if (pKeyOn->GetClock() > start)
       {
         start = pKeyOn->GetClock();
       }
-      if (pKeyOn->GetClock() + pKeyOn->mLength < stop)
+      if (pKeyOn->GetClock() + pKeyOn->GetEventLength() < stop)
       {
-        stop = pKeyOn->GetClock() + pKeyOn->mLength;
+        stop = pKeyOn->GetClock() + pKeyOn->GetEventLength();
       }
-      count[i][pKeyOn->mKey % 12] += stop - start;
+      count[i][pKeyOn->GetKey() % 12] += stop - start;
     }
   }
 }
@@ -191,7 +191,7 @@ void HBAnalyzer::TransposeEvent(tKeyOn* pKeyOn, JZTrack* pTrack)
     int start = Step2Clock(i);
     int stop  = Step2Clock(i+1);
     if (
-      pKeyOn->GetClock() + pKeyOn->mLength >= start &&
+      pKeyOn->GetClock() + pKeyOn->GetEventLength() >= start &&
       pKeyOn->GetClock() < stop)
     {
       // key matches this step
@@ -201,17 +201,17 @@ void HBAnalyzer::TransposeEvent(tKeyOn* pKeyOn, JZTrack* pTrack)
       {
         fr = pKeyOn->GetClock();
       }
-      if (pKeyOn->GetClock() + pKeyOn->mLength < to)
+      if (pKeyOn->GetClock() + pKeyOn->GetEventLength() < to)
       {
-        to = pKeyOn->GetClock() + pKeyOn->mLength;
+        to = pKeyOn->GetClock() + pKeyOn->GetEventLength();
       }
 
       // transpose if most of key length belongs to this step
       // OR: it covers the whole step
-      if (to - fr >= pKeyOn->mLength / 2 || (fr == start && to == stop))
+      if (to - fr >= pKeyOn->GetEventLength() / 2 || (fr == start && to == stop))
       {
         tKeyOn* pKeyOnCopy = (tKeyOn *)pKeyOn->Copy();
-        pKeyOnCopy->mKey += delta[i][pKeyOn->mKey % 12];
+        pKeyOnCopy->SetKey(pKeyOnCopy->GetKey() + delta[i][pKeyOn->GetKey() % 12]);
         pTrack->Kill(pKeyOn);
         pTrack->Put(pKeyOnCopy);
 

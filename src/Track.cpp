@@ -1155,20 +1155,24 @@ void tEventArray::Length2Keyoff()
   int n = nEvents;
   for (int i = 0; i < n; i++)
   {
-    tKeyOn *on;
-    if ((on = Events[i]->IsKeyOn()) != 0 && on->mLength != 0)
+    tKeyOn* pKeyOn;
+    if ((pKeyOn = Events[i]->IsKeyOn()) != 0 && pKeyOn->GetEventLength() != 0)
     {
-//      JZEvent *of = new tKeyOff(on->GetClock() + on->mLength, on->Channel, on->Key);
-      // SN++ added off veloc
-      JZEvent *of = new tKeyOff(
-        on->GetClock() + on->mLength,
-        on->Channel,
-        on->mKey,
-        on->GetOffVelocity());
+//      JZEvent* pKeyOff = new tKeyOff(
+//        pKeyOn->GetClock() + pKeyOn->GetEventLength(),
+//        pKeyOn->Channel,
+//        pKeyOn->Key);
 
-      on->mLength = 0;
-      of->SetDevice(on->GetDevice());
-      Put(of);
+      // SN++ added off veloc
+      JZEvent* pKeyOff = new tKeyOff(
+        pKeyOn->GetClock() + pKeyOn->GetEventLength(),
+        pKeyOn->Channel,
+        pKeyOn->GetKey(),
+        pKeyOn->GetOffVelocity());
+
+      pKeyOn->SetLength(0);
+      pKeyOff->SetDevice(pKeyOn->GetDevice());
+      Put(pKeyOff);
     }
   }
   Sort();
@@ -1182,21 +1186,25 @@ void tEventArray::Keyoff2Length()
   int i;
   for (i = 1; i < nEvents; i++)
   {
-    tKeyOff *of;
-    if ((of = Events[i]->IsKeyOff()) != 0)
+    tKeyOff* pKeyOff;
+    if ((pKeyOff = Events[i]->IsKeyOff()) != 0)
     {
       JZEvent **e = &Events[i - 1];
       while (e >= Events)
       {
-        tKeyOn *on = (*e)->IsKeyOn();
-        if (on && on->Key == of->Key && on->Channel == of->Channel && on->Length == 0)
+        tKeyOn* pKeyOn = (*e)->IsKeyOn();
+        if (
+          pKeyOn &&
+          pKeyOn->Key == pKeyOff->Key &&
+          pKeyOn->Channel == pKeyOff->Channel &&
+          pKeyOn->Length == 0)
         {
-          on->Length = of->GetClock() - on->GetClock();
-          if (on->Length <= 0L)
+          pKeyOn->Length = pKeyOff->GetClock() - pKeyOn->GetClock();
+          if (pKeyOn->Length <= 0L)
           {
-            on->Length = 1;
+            pKeyOn->Length = 1;
           }
-          of->Kill();
+          pKeyOff->Kill();
           break;
         }
         --e;
@@ -1225,25 +1233,25 @@ void tEventArray::Keyoff2Length()
   int i;
   for (i = 0; i < nEvents; i++)
   {
-    tKeyOn* on;
-    if ((on = Events[i]->IsKeyOn()) != 0 && on->mLength == 0)
+    tKeyOn* pKeyOn;
+    if ((pKeyOn = Events[i]->IsKeyOn()) != 0 && pKeyOn->GetEventLength() == 0)
     {
       int j;
       for (j = i + 1; j < nEvents; j++)
       {
-        tKeyOff *of = Events[j]->IsKeyOff();
+        tKeyOff* pKeyOff = Events[j]->IsKeyOff();
         if (
-          of &&
-          !of->IsKilled() &&
-          on->mKey == of->Key &&
-          on->Channel == of->Channel)
+          pKeyOff &&
+          !pKeyOff->IsKilled() &&
+          pKeyOn->GetKey() == pKeyOff->Key &&
+          pKeyOn->Channel == pKeyOff->Channel)
         {
-          on->mLength = of->GetClock() - on->GetClock();
-          if (on->mLength <= 0L)
+          pKeyOn->SetLength(pKeyOff->GetClock() - pKeyOn->GetClock());
+          if (pKeyOn->GetEventLength() <= 0)
           {
-            on->mLength = 1;
+            pKeyOn->SetLength(1);
           }
-          of->Kill();
+          pKeyOff->Kill();
           break;
         }
       }
@@ -1254,15 +1262,15 @@ void tEventArray::Keyoff2Length()
   // and kill all remaining KeyOff's
   for (i = 0; i < nEvents; i++)
   {
-    tKeyOn* on = Events[i]->IsKeyOn();
-    if (on && on->mLength <= 0)
+    tKeyOn* pKeyOn = Events[i]->IsKeyOn();
+    if (pKeyOn && pKeyOn->GetEventLength() <= 0)
     {
-      on->Kill();
+      pKeyOn->Kill();
     }
-    tKeyOff *of = Events[i]->IsKeyOff();
-    if (of)
+    tKeyOff* pKeyOff = Events[i]->IsKeyOff();
+    if (pKeyOff)
     {
-      of->Kill();
+      pKeyOff->Kill();
     }
   }
   Cleanup(0);

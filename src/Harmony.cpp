@@ -711,7 +711,7 @@ HBMatchMarkers::HBMatchMarkers(const HBContext& Context, HBCanvas* cv)
       tKeyOn* pKeyOn = buf.Events[i]->IsKeyOn();
       if (pKeyOn)
       {
-        piano += pKeyOn->mKey;
+        piano += pKeyOn->GetKey();
       }
     }
   }

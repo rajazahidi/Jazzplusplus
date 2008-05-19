@@ -1367,7 +1367,9 @@ void EventDialog(
       if (t->GetAudioMode())
       {
         if (!gpMidiPlayer->IsPlaying())
-          gpMidiPlayer->EditSample(e->IsKeyOn()->mKey);
+        {
+          gpMidiPlayer->EditSample(e->IsKeyOn()->GetKey());
+        }
         break;
       }
       str = "Key On";

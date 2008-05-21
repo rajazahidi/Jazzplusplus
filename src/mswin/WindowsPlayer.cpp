@@ -268,7 +268,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
     case StatKeyOn:
       {
         tKeyOn* pKeyOn = pEvent->IsKeyOn();
-        u.c[0] = 0x90 | pKeyOn->Channel;
+        u.c[0] = 0x90 | pKeyOn->GetChannel();
         u.c[1] = pKeyOn->GetKey();
         u.c[2] = pKeyOn->GetVelocity();
       }
@@ -277,7 +277,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
     case StatKeyOff:
       {
         tKeyOff* pKeyOff = pEvent->IsKeyOff();
-        u.c[0] = 0x80 | pKeyOff->Channel;
+        u.c[0] = 0x80 | pKeyOff->GetChannel();
         u.c[1] = pKeyOff->Key;
         u.c[2] = 0;
       }
@@ -286,7 +286,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
     case StatProgram:
       {
         tProgram *k = pEvent->IsProgram();
-        u.c[0] = 0xC0 | k->Channel;
+        u.c[0] = 0xC0 | k->GetChannel();
         u.c[1] = k->Program;
       }
       break;
@@ -294,7 +294,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
     case StatChnPressure:
       {
         tChnPressure *k = pEvent->IsChnPressure();
-        u.c[0] = 0xC0 | k->Channel;
+        u.c[0] = 0xC0 | k->GetChannel();
         u.c[1] = k->Value;
       }
       break;
@@ -302,7 +302,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
     case StatControl:
       {
         tControl* pControl = pEvent->IsControl();
-        u.c[0] = 0xB0 | pControl->Channel;
+        u.c[0] = 0xB0 | pControl->GetChannel();
         u.c[1] = pControl->mControl;
         u.c[2] = pControl->mValue;
       }
@@ -311,7 +311,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
     case StatKeyPressure:
       {
         tKeyPressure *k = pEvent->IsKeyPressure();
-        u.c[0] = 0xA0 | k->Channel;
+        u.c[0] = 0xA0 | k->GetChannel();
         u.c[1] = k->Key;
         u.c[2] = k->Value;
       }
@@ -321,7 +321,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
       {
         tPitch *k = pEvent->IsPitch();
         int     v = k->Value + 8192;
-        u.c[0] = 0xE0 | k->Channel;
+        u.c[0] = 0xE0 | k->GetChannel();
         u.c[1] = (unsigned char)(v & 0x7F);
         u.c[2] = (unsigned char)(v >> 7);
       }

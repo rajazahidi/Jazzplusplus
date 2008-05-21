@@ -283,7 +283,7 @@ int tKeyLengthDragger::ButtonUp(wxMouseEvent& Event)
     tEventIterator iter(Win->GetTrack());
     tKeyPressure *a;
     key = Copy->GetKey();
-    channel = Copy->Channel;
+    channel = Copy->GetChannel();
     JZEvent* pEvent = iter.Range(
       Copy->GetClock() + Copy->GetEventLength(),
       Copy->GetClock() + mpKeyOn->GetEventLength());
@@ -292,7 +292,7 @@ int tKeyLengthDragger::ButtonUp(wxMouseEvent& Event)
       a = pEvent->IsKeyPressure();
       if (a)
       {
-        if (a->Key == key && a->Channel == channel)
+        if (a->Key == key && a->GetChannel() == channel)
         {
           Win->KillTrackEvent(pEvent);
         }
@@ -2415,7 +2415,7 @@ void JZPianoWindow::kill_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
     return;
   }
   key = pKeyOn->GetKey();
-  channel = pKeyOn->Channel;
+  channel = pKeyOn->GetChannel();
   pEvent = iter.Range(
     pKeyOn->GetClock() + 1,
     pKeyOn->GetClock() + pKeyOn->GetEventLength());
@@ -2424,7 +2424,7 @@ void JZPianoWindow::kill_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
     a = pEvent->IsKeyPressure();
     if (a)
     {
-      if (a->Key == key && a->Channel == channel)
+      if (a->Key == key && a->GetChannel() == channel)
       {
         pTrack->Kill(pEvent);
       }
@@ -2445,7 +2445,7 @@ void JZPianoWindow::paste_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
   {
     return;
   }
-  channel = pKeyOn->Channel;
+  channel = pKeyOn->GetChannel();
   if (pKeyOn->GetEventLength() < 2)
   {
     return;
@@ -2461,7 +2461,7 @@ void JZPianoWindow::paste_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
     a = pEvent->IsKeyPressure();
     if (a)
     {
-      if (a->Key == key && a->Channel == channel)
+      if (a->Key == key && a->GetChannel() == channel)
       {
         mPasteBuffer.Put(pEvent->Copy());
       }
@@ -2960,7 +2960,7 @@ void JZPianoWindow::Copy(JZTrack* pTrack, JZEvent* pEvent, int Kill)
         mListen.KeyOn(
           pTrack,
           pKeyOn->GetKey(),
-          pKeyOn->Channel,
+          pKeyOn->GetChannel(),
           pKeyOn->GetVelocity(),
           pKeyOn->GetEventLength());
       }
@@ -3041,7 +3041,9 @@ void JZPianoWindow::Paste(JZTrack* pTrack, int Clock, int Pitch)
       c->SetPitch(c->GetPitch() + DeltaPitch);
       c->SetClock(c->GetClock() + DeltaClock);
       if (pTrack->ForceChannel && c->IsChannelEvent())
-        c->IsChannelEvent()->Channel = pTrack->Channel - 1;
+      {
+        c->IsChannelEvent()->SetChannel(pTrack->Channel - 1);
+      }
       tKeyOn* pKeyOn = c->IsKeyOn();
       if (pKeyOn)
       {
@@ -3054,7 +3056,7 @@ void JZPianoWindow::Paste(JZTrack* pTrack, int Clock, int Pitch)
           mListen.KeyOn(
             pTrack,
             pKeyOn->GetKey(),
-            pKeyOn->Channel,
+            pKeyOn->GetChannel(),
             pKeyOn->GetVelocity(),
             pKeyOn->GetEventLength());
         }

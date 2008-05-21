@@ -313,6 +313,10 @@ class tChnPressure;
 class tPlayTrack;
 class tEndOfTrack;
 
+//*****************************************************************************
+// Description:
+//   This is the MIDI event base class declaration.
+//*****************************************************************************
 class JZEvent
 {
   public:
@@ -521,12 +525,10 @@ class tChannelEvent : public JZEvent
 {
   public:
 
-    unsigned char Channel;
-
-    tChannelEvent(int clk, unsigned char sta, int cha)
+    tChannelEvent(int clk, unsigned char sta, int Channel)
       : JZEvent(clk, sta)
     {
-      Channel = cha;
+      mChannel = Channel;
     }
 
     virtual tChannelEvent* IsChannelEvent()
@@ -540,6 +542,20 @@ class tChannelEvent : public JZEvent
       edb();
       return new tChannelEvent(*this);
     }
+
+    unsigned char GetChannel() const
+    {
+      return mChannel;
+    }
+
+    void SetChannel(unsigned char Channel)
+    {
+      mChannel = Channel;
+    }
+
+  private:
+
+    unsigned char mChannel;
 };
 
 

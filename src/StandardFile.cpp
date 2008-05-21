@@ -249,7 +249,7 @@ void JZStandardChunk::Put(JZEvent* pEvent, unsigned char* Data, int Length)
       // SN-- only if KeyOff veloc is zero
       if (!pEvent->IsKeyOff()->OffVeloc)
       {
-        Stat = StatKeyOn | pEvent->IsChannelEvent()->Channel;
+        Stat = StatKeyOn | pEvent->IsChannelEvent()->GetChannel();
         if (Stat != RunningStatus)
         {
           RunningStatus = Stat;
@@ -260,7 +260,7 @@ void JZStandardChunk::Put(JZEvent* pEvent, unsigned char* Data, int Length)
       }
       else
       {
-        Stat = StatKeyOff | pEvent->IsChannelEvent()->Channel;
+        Stat = StatKeyOff | pEvent->IsChannelEvent()->GetChannel();
         if (Stat != RunningStatus)
         {
           RunningStatus = Stat;
@@ -281,7 +281,7 @@ void JZStandardChunk::Put(JZEvent* pEvent, unsigned char* Data, int Length)
     // SN++
     case StatChnPressure:
 
-      Stat = pEvent->GetStat() | pEvent->IsChannelEvent()->Channel;
+      Stat = pEvent->GetStat() | pEvent->IsChannelEvent()->GetChannel();
       if (Stat != RunningStatus)
       {
         RunningStatus = Stat;

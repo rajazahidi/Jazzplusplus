@@ -172,7 +172,7 @@ int tGetMidiBytes::Write(JZEvent* pEvent, unsigned char* pData, int Length)
     case StatPitch:
       nBytes = 0;
 
-      Buffer[nBytes++] = Stat | ((tChannelEvent *)pEvent)->Channel;
+      Buffer[nBytes++] = Stat | ((tChannelEvent *)pEvent)->GetChannel();
       while(Length--)
       {
         Buffer[nBytes++] = *pData++;

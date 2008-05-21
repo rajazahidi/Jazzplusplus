@@ -162,12 +162,12 @@ int JZAsciiWrite::Open(
 //-----------------------------------------------------------------------------
 int JZAsciiWrite::Write(JZEvent* pEvent, unsigned char* pData, int Length)
 {
-  tChannelEvent *ce;
+  tChannelEvent* pChannelEvent;
 
   fprintf(mpFd, "%6d %02x ",  pEvent->GetClock(), pEvent->GetStat());
-  if ((ce = pEvent->IsChannelEvent()) != 0)
+  if ((pChannelEvent = pEvent->IsChannelEvent()) != 0)
   {
-    fprintf(mpFd, "%2d ",  ce->Channel);
+    fprintf(mpFd, "%2d ",  pChannelEvent->GetChannel());
   }
   else
   {

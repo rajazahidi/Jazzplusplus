@@ -522,7 +522,7 @@ void JZPlayer::StopPlay()
         {
           if (pKeyOn->GetClock() + pKeyOn->GetEventLength() >= Clock - 100)
           {
-            off.Channel = pKeyOn->Channel;
+            off.SetChannel(pKeyOn->GetChannel());
             off.Key     = pKeyOn->GetKey();
             OutNow(&off);
           }
@@ -622,15 +622,15 @@ void JZPlayer::AllNotesOff(int Reset)
   {
     for (int c = 0; c < 16; c++)
     {
-      NoteOff.Channel = c;
+      NoteOff.SetChannel(c);
       NoteOff.SetDevice(dev);
       OutNow(&NoteOff);
 
-      Pitch.Channel = c;
+      Pitch.SetChannel(c);
       Pitch.SetDevice(dev);
       OutNow(&Pitch);
 
-      CtrlRes.Channel = c;
+      CtrlRes.SetChannel(c);
       CtrlRes.SetDevice(dev);
       OutNow(&CtrlRes);
     }

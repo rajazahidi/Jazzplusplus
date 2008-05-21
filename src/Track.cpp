@@ -40,17 +40,17 @@ int tParam::Write(JZWriteBase& Io)
   return mMsb.Write(Io) + mLsb.Write(Io) + mDataMsb.Write(Io);
 }
 
-void tParam::SetCha(unsigned char cha)
+void tParam::SetCha(unsigned char Channel)
 {
-  mMsb.Channel = cha;
-  mLsb.Channel = cha;
-  mDataMsb.Channel = cha;
+  mMsb.SetChannel(Channel);
+  mLsb.SetChannel(Channel);
+  mDataMsb.SetChannel(Channel);
 
 #ifdef OBSOLETE
-  mResetMb.Channel = cha; //???? JAVE commented out this while porting
+  mResetMb.SetChannel(Channel); //???? JAVE commented out this while porting
 #endif // OBSOLETE
 
-  mResetLsb.Channel = cha;
+  mResetLsb.SetChannel(Channel);
 }
 
 /*
@@ -1166,7 +1166,7 @@ void tEventArray::Length2Keyoff()
       // SN++ added off veloc
       JZEvent* pKeyOff = new tKeyOff(
         pKeyOn->GetClock() + pKeyOn->GetEventLength(),
-        pKeyOn->Channel,
+        pKeyOn->GetChannel(),
         pKeyOn->GetKey(),
         pKeyOn->GetOffVelocity());
 
@@ -1244,7 +1244,7 @@ void tEventArray::Keyoff2Length()
           pKeyOff &&
           !pKeyOff->IsKilled() &&
           pKeyOn->GetKey() == pKeyOff->Key &&
-          pKeyOn->Channel == pKeyOff->Channel)
+          pKeyOn->GetChannel() == pKeyOff->GetChannel())
         {
           pKeyOn->SetLength(pKeyOff->GetClock() - pKeyOn->GetClock());
           if (pKeyOn->GetEventLength() <= 0)
@@ -1476,7 +1476,7 @@ void tEventArray::Read(JZReadBase& Io)
         case 0x06:
           Data = e->IsControl()->mValue; // Rpn/Nrpn Data
           SpecialEvent = 1;
-          cha = e->IsControl()->Channel;
+          cha = e->IsControl()->GetChannel();
           switch (Msb)
           {
             case 0x01: // Nrpn
@@ -1630,7 +1630,7 @@ void tEventArray::Read(JZReadBase& Io)
       NeedToDelete = false;
       if (!Channel && e->IsChannelEvent())
       {
-        Channel = e->IsChannelEvent()->Channel + 1;
+        Channel = e->IsChannelEvent()->GetChannel() + 1;
       }
     }
     if (e->IsEndOfTrack())
@@ -1767,7 +1767,7 @@ void tTrackDlg::OnOk()
       if ((c = e->IsChannelEvent()) != 0)
       {
         c = (tChannelEvent *)e->Copy();
-        c->Channel = trk->Channel - 1;
+        c->SetChannel(trk->Channel - 1);
         trk->Kill(e);
         trk->Put(c);
       }
@@ -2002,10 +2002,10 @@ void JZTrack::MergeRange(tEventArray *other, int FromClock, int ToClock, int Rep
     JZEvent *c = e->Copy();
     if (ForceChannel)
     {
-      tChannelEvent *k = c->IsChannelEvent();
-      if (k)
+      tChannelEvent* pChannelEvent = c->IsChannelEvent();
+      if (pChannelEvent)
       {
-        k->Channel = Channel - 1;
+        pChannelEvent->SetChannel(Channel - 1);
       }
     }
     Put(c);

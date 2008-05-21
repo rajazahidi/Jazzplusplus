@@ -705,7 +705,7 @@ void tPolyAfterEdit::OnApply()
           key_clk = pKeyOn->GetClock() + 1;
           key_end = pKeyOn->GetClock() + pKeyOn->GetEventLength();
           key_val = pKeyOn->GetKey();
-          key_cha = pKeyOn->Channel;
+          key_cha = pKeyOn->GetChannel();
         }
         if (key_val>0)
         {

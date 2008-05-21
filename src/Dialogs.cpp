@@ -763,10 +763,10 @@ class tChEventDlg : public tEventDlg
 
     int Channel;
 
-    tChEventDlg(tChannelEvent *e, JZPianoWindow* w, JZTrack *t)
-      : tEventDlg(e, w, t)
+    tChEventDlg(tChannelEvent* pChannelEvent, JZPianoWindow* w, JZTrack *t)
+      : tEventDlg(pChannelEvent, w, t)
     {
-      Channel = e->Channel + 1;                // 1..16
+      Channel = pChannelEvent->GetChannel() + 1;                // 1..16
     }
     void AddProperties();
     bool OnClose();
@@ -785,7 +785,7 @@ void tChEventDlg::AddProperties()
 
 bool tChEventDlg::OnClose()
 {
-  ((tChannelEvent *)Copy)->Channel = Channel - 1;
+  ((tChannelEvent *)Copy)->SetChannel(Channel - 1);
   tEventDlg::OnClose();
   return false;
 }

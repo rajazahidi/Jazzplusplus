@@ -199,10 +199,10 @@ bool JZKeyOnDialog::TransferDataToWindow()
   mpLengthEdit->ChangeValue(LengthString);
 
   Oss.str("");
-  Oss << (int)mpEvent->Channel + 1;
+  Oss << (int)mpEvent->GetChannel() + 1;
   mpChannelValue->SetLabel(Oss.str().c_str());
 
-  mpChannelKnob->SetValue(mpEvent->Channel + 1);
+  mpChannelKnob->SetValue(mpEvent->GetChannel() + 1);
 
   string ClockString;
   gpProject->ClockToString(mpEvent->GetClock(), ClockString);
@@ -228,7 +228,7 @@ bool JZKeyOnDialog::TransferDataFromWindow()
   Iss >> Length;
   mpEvent->SetLength(Length);
 
-  mpEvent->Channel = mpChannelKnob->GetValue() - 1;
+  mpEvent->SetChannel(mpChannelKnob->GetValue() - 1);
 
   wxString ClockString = mpClockEdit->GetValue();
   int Clock = gpProject->StringToClock(ClockString.c_str());

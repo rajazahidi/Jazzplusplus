@@ -443,7 +443,7 @@ void tCmdSetChannel::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   if ((c = pEvent->IsChannelEvent()) != 0)
   {
     c = (tChannelEvent *)pEvent->Copy();
-    c->Channel = NewChannel;
+    c->SetChannel(NewChannel);
     pTrack->Kill(pEvent);
     pTrack->Put(c);
   }
@@ -620,7 +620,7 @@ void tCmdConvertToModulation::ExecuteTrack(JZTrack* pTrack)
       {
         startclock = pEvent->IsKeyOn()->GetClock();
         startvelocity = pEvent->IsKeyOn()->GetVelocity();
-        channel = pEvent->IsKeyOn()->Channel;
+        channel = pEvent->IsKeyOn()->GetChannel();
         startkey = pEvent->IsKeyOn()->GetKey();
         previouspitch = pEvent->GetPitch();
       }
@@ -732,7 +732,7 @@ void tCmdCleanup::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
     else if (shortenOverlaps)
     {
       // Shorten length of overlapping notes.
-      tKeyOn* pPreviousKeyOn = prev_note[pKeyOn->Channel][pKeyOn->GetKey()];
+      tKeyOn* pPreviousKeyOn = prev_note[pKeyOn->GetChannel()][pKeyOn->GetKey()];
       if (
         pPreviousKeyOn &&
         pPreviousKeyOn->GetClock() + pPreviousKeyOn->GetEventLength() >=
@@ -745,7 +745,7 @@ void tCmdCleanup::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
           pTrack->Kill(pPreviousKeyOn);
         }
       }
-      prev_note[pKeyOn->Channel][pKeyOn->GetKey()] = pKeyOn;
+      prev_note[pKeyOn->GetChannel()][pKeyOn->GetKey()] = pKeyOn;
     }
   }
 }

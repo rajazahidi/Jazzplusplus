@@ -413,7 +413,7 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
       {
         tKeyOn* pKeyOn = pEvent->IsKeyOn();
         set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_NOTEON);
-        ev.data.note.channel = pKeyOn->Channel;
+        ev.data.note.channel = pKeyOn->GetChannel();
         ev.data.note.note = pKeyOn->GetKey();
         ev.data.note.velocity = pKeyOn->GetVelocity();
         rc = write(&ev, now);
@@ -424,7 +424,7 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
       {
         tKeyOff* pKeyOff = pEvent->IsKeyOff();
         set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_NOTEOFF);
-        ev.data.note.channel = pKeyOff->Channel;
+        ev.data.note.channel = pKeyOff->GetChannel();
         ev.data.note.note = pKeyOff->Key;
         ev.data.note.velocity = pKeyOff->OffVeloc;
         rc = write(&ev, now);
@@ -435,7 +435,7 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
       {
         tProgram *k = pEvent->IsProgram();
         set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_PGMCHANGE);
-        ev.data.control.channel = k->Channel;
+        ev.data.control.channel = k->GetChannel();
         ev.data.control.value = k->Program;
         rc = write(&ev, now);
       }
@@ -445,7 +445,7 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
       {
         tKeyPressure *k = pEvent->IsKeyPressure();
         set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_KEYPRESS);
-        ev.data.note.channel = k->Channel;
+        ev.data.note.channel = k->GetChannel();
         ev.data.note.note = k->Key;
         ev.data.note.velocity = k->Value;
         rc = write(&ev, now);
@@ -456,7 +456,7 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
       {
         tChnPressure *k = pEvent->IsChnPressure();
         set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_CHANPRESS);
-        ev.data.control.channel = k->Channel;
+        ev.data.control.channel = k->GetChannel();
         ev.data.control.value = k->Value;
         rc = write(&ev, now);
       }
@@ -466,7 +466,7 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
       {
         tControl *k = pEvent->IsControl();
         set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_CONTROLLER);
-        ev.data.control.channel = k->Channel;
+        ev.data.control.channel = k->GetChannel();
         ev.data.control.param = k->mControl;
         ev.data.control.value = k->mValue;
         rc = write(&ev, now);
@@ -477,7 +477,7 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
       {
         tPitch *k = pEvent->IsPitch();
         set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_PITCHBEND);
-        ev.data.control.channel = k->Channel;
+        ev.data.control.channel = k->GetChannel();
         ev.data.control.value = k->Value;
         rc = write(&ev, now);
       }

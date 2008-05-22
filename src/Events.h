@@ -525,8 +525,8 @@ class tChannelEvent : public JZEvent
 {
   public:
 
-    tChannelEvent(int clk, unsigned char sta, int Channel)
-      : JZEvent(clk, sta)
+    tChannelEvent(int Clock, unsigned char sta, int Channel)
+      : JZEvent(Clock, sta)
     {
       mChannel = Channel;
     }
@@ -567,12 +567,12 @@ class tKeyOn : public tChannelEvent
   public:
 
     tKeyOn(
-      int clk,
-      int cha,
+      int Clock,
+      int Channel,
       unsigned char Key,
       unsigned char Velocity,
       unsigned short Length = 0)
-      : tChannelEvent(clk, StatKeyOn, cha),
+      : tChannelEvent(Clock, StatKeyOn, Channel),
         mKey(Key),
         mVelocity(Velocity),
         mLength(Length),
@@ -689,20 +689,21 @@ class tKeyOn : public tChannelEvent
 class tKeyOff : public tChannelEvent
 {
   public:
-    unsigned char Key;
-    // SN++
-    unsigned char OffVeloc;
-
-    tKeyOff(int clk, int cha, unsigned char key, unsigned char veloc = 0)
-      : tChannelEvent(clk, StatKeyOff, cha)
+    tKeyOff(
+      int Clock,
+      int Channel,
+      unsigned char Key,
+      unsigned char OffVelocity = 0)
+      : tChannelEvent(Clock, StatKeyOff, Channel),
+        mKey(Key),
+        mOffVelocity(OffVelocity)
     {
-      Key = key;
-      OffVeloc = veloc;
     }
 
     virtual int Write(JZWriteBase &io)
     {
-      edb(); return io.Write(this, Key, OffVeloc);
+      edb();
+      return io.Write(this, mKey, mOffVelocity);
     }
 
     virtual tKeyOff* IsKeyOff()
@@ -716,6 +717,27 @@ class tKeyOff : public tChannelEvent
       edb();
       return new tKeyOff(*this);
     }
+
+    unsigned char GetKey() const
+    {
+      return mKey;
+    }
+
+    void SetKey(unsigned char Key)
+    {
+      mKey = Key;
+    }
+
+    unsigned char GetOffVelocity() const
+    {
+      return mOffVelocity;
+    }
+
+  private:
+
+    unsigned char mKey;
+
+    unsigned char mOffVelocity;
 };
 
 
@@ -724,14 +746,18 @@ class tPitch : public tChannelEvent
   public:
     short Value;
 
-    tPitch(int clk, unsigned short cha, unsigned char lo, unsigned char hi)
-      : tChannelEvent(clk, StatPitch, cha)
+    tPitch(
+      int Clock,
+      unsigned short Channel,
+      unsigned char lo,
+      unsigned char hi)
+      : tChannelEvent(Clock, StatPitch, Channel)
     {
       Value  = ((hi << 7) | lo) - 8192;
     }
 
-    tPitch(int clk, unsigned short cha, short val)
-      : tChannelEvent(clk, StatPitch, cha)
+    tPitch(int Clock, unsigned short Channel, short val)
+      : tChannelEvent(Clock, StatPitch, Channel)
     {
       Value  = val;
     }
@@ -792,8 +818,12 @@ class tControl : public tChannelEvent
     unsigned char mControl;
     unsigned char mValue;
 
-    tControl(int clk, int cha, unsigned char ctl, unsigned char val)
-      : tChannelEvent(clk, StatControl, cha)
+    tControl(
+      int Clock,
+      int Channel,
+      unsigned char ctl,
+      unsigned char val)
+      : tChannelEvent(Clock, StatControl, Channel)
     {
       mControl = ctl;
       mValue   = val;
@@ -851,8 +881,8 @@ class tProgram : public tChannelEvent
 {
   public:
 
-    tProgram(int clk, int Channel, unsigned char Program)
-      : tChannelEvent(clk, StatProgram, Channel)
+    tProgram(int Clock, int Channel, unsigned char Program)
+      : tChannelEvent(Clock, StatProgram, Channel)
     {
       mProgram = Program;
     }
@@ -927,11 +957,11 @@ class tMetaEvent : public JZEvent
     unsigned short Length;
 
     tMetaEvent(
-      int clk,
+      int Clock,
       unsigned char sta,
       unsigned char* dat,
       unsigned short len)
-      : JZEvent(clk, sta)
+      : JZEvent(Clock, sta)
     {
       Length = len;
       mpData = new unsigned char [len + 1];
@@ -973,8 +1003,8 @@ class tJazzMeta : public tMetaEvent
   // the file.
   public:
     enum { DATALEN = 20 };
-    tJazzMeta(int clk, unsigned char *dat, unsigned short len)
-      : tMetaEvent(clk, StatJazzMeta, dat, len)
+    tJazzMeta(int Clock, unsigned char *dat, unsigned short len)
+      : tMetaEvent(Clock, StatJazzMeta, dat, len)
     {
     }
     tJazzMeta()
@@ -1041,8 +1071,8 @@ class tSysEx : public tMetaEvent
 {
   public:
 
-    tSysEx(int clk, unsigned char *dat, unsigned short len)
-      : tMetaEvent(clk, StatSysEx, dat, len)
+    tSysEx(int Clock, unsigned char *dat, unsigned short len)
+      : tMetaEvent(Clock, StatSysEx, dat, len)
     {
     }
 
@@ -1066,8 +1096,8 @@ class tSongPtr : public tMetaEvent
 {
   public:
 
-    tSongPtr(int clk, unsigned char *dat, unsigned short len)
-      : tMetaEvent(clk, StatSongPtr, dat, len)
+    tSongPtr(int Clock, unsigned char *dat, unsigned short len)
+      : tMetaEvent(Clock, StatSongPtr, dat, len)
     {
     }
 
@@ -1087,13 +1117,13 @@ class tSongPtr : public tMetaEvent
 class tMidiClock : public tMetaEvent
 {
   public:
-    tMidiClock(int clk, unsigned char *dat, unsigned short len)
-      : tMetaEvent(clk, StatMidiClock, dat, len)
+    tMidiClock(int Clock, unsigned char *dat, unsigned short len)
+      : tMetaEvent(Clock, StatMidiClock, dat, len)
     {
     }
 
-    tMidiClock(int clk)
-      : tMetaEvent(clk, StatMidiClock, 0, 0)
+    tMidiClock(int Clock)
+      : tMetaEvent(Clock, StatMidiClock, 0, 0)
     {
     }
 
@@ -1113,14 +1143,17 @@ class tMidiClock : public tMetaEvent
 class tStartPlay : public tMetaEvent
 {
   public:
-    tStartPlay(int clk, unsigned char *dat, unsigned short len)
-      : tMetaEvent(clk, StatStartPlay, dat, len)
+
+    tStartPlay(int Clock, unsigned char *dat, unsigned short len)
+      : tMetaEvent(Clock, StatStartPlay, dat, len)
     {
     }
-    tStartPlay(int clk)
-      : tMetaEvent(clk, StatStartPlay, 0, 0)
+
+    tStartPlay(int Clock)
+      : tMetaEvent(Clock, StatStartPlay, 0, 0)
     {
     }
+
     virtual tStartPlay* IsStartPlay()
     {
       edb();
@@ -1137,13 +1170,14 @@ class tStartPlay : public tMetaEvent
 class tContPlay : public tMetaEvent
 {
   public:
-    tContPlay(int clk, unsigned char *dat, unsigned short len)
-      : tMetaEvent(clk, StatContPlay, dat, len)
+
+    tContPlay(int Clock, unsigned char *dat, unsigned short len)
+      : tMetaEvent(Clock, StatContPlay, dat, len)
     {
     }
 
-    tContPlay(int clk)
-      : tMetaEvent(clk, StatContPlay, 0, 0)
+    tContPlay(int Clock)
+      : tMetaEvent(Clock, StatContPlay, 0, 0)
     {
     }
 
@@ -1164,13 +1198,13 @@ class tStopPlay : public tMetaEvent
 {
   public:
 
-    tStopPlay(int clk, unsigned char *dat, unsigned short len)
-      : tMetaEvent(clk, StatStopPlay, dat, len)
+    tStopPlay(int Clock, unsigned char *dat, unsigned short len)
+      : tMetaEvent(Clock, StatStopPlay, dat, len)
     {
     }
 
-    tStopPlay(int clk)
-      : tMetaEvent(clk, StatStopPlay, 0, 0)
+    tStopPlay(int Clock)
+      : tMetaEvent(Clock, StatStopPlay, 0, 0)
     {
     }
 
@@ -1190,14 +1224,17 @@ class tStopPlay : public tMetaEvent
 class tText : public tMetaEvent
 {
   public:
-    tText(int clk, unsigned char *dat, unsigned short len)
-      : tMetaEvent(clk, StatText, dat, len)
+
+    tText(int Clock, unsigned char *dat, unsigned short len)
+      : tMetaEvent(Clock, StatText, dat, len)
     {
     }
-    tText(int clk, unsigned char *dat)
-      : tMetaEvent(clk, StatText, dat, strlen((const char*)dat))
+
+    tText(int Clock, unsigned char *dat)
+      : tMetaEvent(Clock, StatText, dat, strlen((const char*)dat))
     {
     }
+
     virtual tText* IsText()
     {
       edb();
@@ -1222,8 +1259,8 @@ class tCopyright : public tMetaEvent
 {
   public:
 
-    tCopyright(int clk, unsigned char *dat, unsigned short len)
-      : tMetaEvent(clk, StatCopyright, dat, len)
+    tCopyright(int Clock, unsigned char *dat, unsigned short len)
+      : tMetaEvent(Clock, StatCopyright, dat, len)
     {
     }
 
@@ -1244,8 +1281,8 @@ class tTrackName : public tMetaEvent
 {
   public:
 
-    tTrackName(int clk, unsigned char *dat, unsigned short len)
-      : tMetaEvent(clk, StatTrackName, dat, len)
+    tTrackName(int Clock, unsigned char *dat, unsigned short len)
+      : tMetaEvent(Clock, StatTrackName, dat, len)
     {
 // SN++ Diese Restriktion ist viel zu hart. Es genuegt, den Namen im Mixerdialog
 //                zu begrenzen!!!
@@ -1280,8 +1317,8 @@ class tMarker : public tMetaEvent
 {
   public:
 
-    tMarker(int clk, unsigned char *dat, unsigned short len)
-      : tMetaEvent(clk, StatMarker, dat, len)
+    tMarker(int Clock, unsigned char *dat, unsigned short len)
+      : tMetaEvent(Clock, StatMarker, dat, len)
     {
     }
 
@@ -1318,8 +1355,8 @@ class tPlayTrack : public tMetaEvent
     // that seems to be for serialization.
     int eventlength;
 
-    tPlayTrack(int clk, unsigned char *chardat, unsigned short len)
-      : tMetaEvent(clk, StatPlayTrack, chardat, len)
+    tPlayTrack(int Clock, unsigned char *chardat, unsigned short len)
+      : tMetaEvent(Clock, StatPlayTrack, chardat, len)
     {
       int *dat = (int *)chardat;
     
@@ -1335,8 +1372,8 @@ class tPlayTrack : public tMetaEvent
       }
     }
 
-    tPlayTrack(int clk, int track, int transpose, int eventlength)
-      : tMetaEvent(clk, StatPlayTrack, 0, 0)
+    tPlayTrack(int Clock, int track, int transpose, int eventlength)
+      : tMetaEvent(Clock, StatPlayTrack, 0, 0)
     {
       this->track=track;
       this->transpose=transpose;
@@ -1391,11 +1428,11 @@ class tSetTempo : public JZEvent
     int uSec;
 
     tSetTempo(
-      int clk,
+      int Clock,
       unsigned char Character1,
       unsigned char Character2,
       unsigned char Character3)
-      : JZEvent(clk, StatSetTempo)
+      : JZEvent(Clock, StatSetTempo)
     {
       uSec =
         ((unsigned)Character1 << 16L) +
@@ -1403,8 +1440,8 @@ class tSetTempo : public JZEvent
         Character3;
     }
 
-    tSetTempo(int clk, int bpm)
-      : JZEvent(clk, StatSetTempo)
+    tSetTempo(int Clock, int bpm)
+      : JZEvent(Clock, StatSetTempo)
     {
       SetBPM(bpm);
     }
@@ -1448,8 +1485,8 @@ class tSetTempo : public JZEvent
 class tMtcOffset : public tMetaEvent
 {
   public:
-    tMtcOffset(int clk, unsigned char *dat, unsigned short len)
-      : tMetaEvent(clk, StatMtcOffset, dat, len)
+    tMtcOffset(int Clock, unsigned char *dat, unsigned short len)
+      : tMetaEvent(Clock, StatMtcOffset, dat, len)
     {
     }
     virtual tMtcOffset* IsMtcOffset()
@@ -1473,12 +1510,12 @@ class tTimeSignat : public JZEvent
     unsigned char Numerator, Denomiator, Clocks, Quarter;
 
     tTimeSignat(
-      int clk,
+      int Clock,
       unsigned char Character1,
       unsigned char Character2,
       unsigned char Character3 = 24,
       unsigned char Character4 = 8)
-      : JZEvent(clk, StatTimeSignat)
+      : JZEvent(Clock, StatTimeSignat)
     {
       Numerator   = Character1;
       Denomiator  = Character2;
@@ -1518,8 +1555,8 @@ class tEndOfTrack : public JZEvent
 {
   public:
 
-    tEndOfTrack(int clk)
-      : JZEvent(clk, StatEndOfTrack)
+    tEndOfTrack(int Clock)
+      : JZEvent(Clock, StatEndOfTrack)
     {
     }
 
@@ -1549,8 +1586,8 @@ class tKeySignat : public JZEvent
     int Sharps;
     int Minor;
 
-    tKeySignat(int clk, int Character1, int Character2)
-      : JZEvent(clk, StatKeySignat)
+    tKeySignat(int Clock, int Character1, int Character2)
+      : JZEvent(Clock, StatKeySignat)
     {
       Sharps = Character1;
       Minor  = Character2;
@@ -1581,8 +1618,12 @@ class tKeyPressure: public tChannelEvent
     short Value;
     short Key;
 
-    tKeyPressure(int clk, unsigned short cha, unsigned char key, unsigned char val)
-      : tChannelEvent(clk, StatKeyPressure, cha)
+    tKeyPressure(
+      int Clock,
+      unsigned short Channel,
+      unsigned char key,
+      unsigned char val)
+      : tChannelEvent(Clock, StatKeyPressure, Channel)
     {
       Value = val;
       Key = key;
@@ -1630,8 +1671,8 @@ class tChnPressure : public tChannelEvent
   public:
     unsigned char Value;
 
-    tChnPressure(int clk, int cha, unsigned char val)
-      : tChannelEvent(clk, StatChnPressure, cha)
+    tChnPressure(int Clock, int Channel, unsigned char val)
+      : tChannelEvent(Clock, StatChnPressure, Channel)
     {
       Value = val;
     }

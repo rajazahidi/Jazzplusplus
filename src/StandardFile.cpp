@@ -247,7 +247,7 @@ void JZStandardChunk::Put(JZEvent* pEvent, unsigned char* Data, int Length)
     // KeyOff -> KeyOn mit Vel=0. Gives better Runningstatus!
     case StatKeyOff:
       // SN-- only if KeyOff veloc is zero
-      if (!pEvent->IsKeyOff()->OffVeloc)
+      if (!pEvent->IsKeyOff()->GetOffVelocity())
       {
         Stat = StatKeyOn | pEvent->IsChannelEvent()->GetChannel();
         if (Stat != RunningStatus)

@@ -1243,7 +1243,7 @@ void tEventArray::Keyoff2Length()
         if (
           pKeyOff &&
           !pKeyOff->IsKilled() &&
-          pKeyOn->GetKey() == pKeyOff->Key &&
+          pKeyOn->GetKey() == pKeyOff->GetKey() &&
           pKeyOn->GetChannel() == pKeyOff->GetChannel())
         {
           pKeyOn->SetLength(pKeyOff->GetClock() - pKeyOn->GetClock());

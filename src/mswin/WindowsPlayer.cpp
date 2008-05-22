@@ -278,7 +278,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
       {
         tKeyOff* pKeyOff = pEvent->IsKeyOff();
         u.c[0] = 0x80 | pKeyOff->GetChannel();
-        u.c[1] = pKeyOff->Key;
+        u.c[1] = pKeyOff->GetKey();
         u.c[2] = 0;
       }
       break;

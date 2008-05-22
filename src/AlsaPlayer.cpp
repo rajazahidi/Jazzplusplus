@@ -425,8 +425,8 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
         tKeyOff* pKeyOff = pEvent->IsKeyOff();
         set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_NOTEOFF);
         ev.data.note.channel = pKeyOff->GetChannel();
-        ev.data.note.note = pKeyOff->Key;
-        ev.data.note.velocity = pKeyOff->OffVeloc;
+        ev.data.note.note = pKeyOff->GetKey();
+        ev.data.note.velocity = pKeyOff->GetOffVelocity();
         rc = write(&ev, now);
       }
       break;

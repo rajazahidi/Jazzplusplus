@@ -506,7 +506,7 @@ void JZPlayer::StopPlay()
 
   // SN++ Patch: Notes off for not GM/GS devices
   int ii;
-  tKeyOff off(0, 0, 0);
+  tKeyOff pKeyOff(0, 0, 0);
 
   for (ii = 0; ii < Song->GetTrackCount(); ii++)
   {
@@ -522,9 +522,9 @@ void JZPlayer::StopPlay()
         {
           if (pKeyOn->GetClock() + pKeyOn->GetEventLength() >= Clock - 100)
           {
-            off.SetChannel(pKeyOn->GetChannel());
-            off.Key     = pKeyOn->GetKey();
-            OutNow(&off);
+            pKeyOff.SetChannel(pKeyOn->GetChannel());
+            pKeyOff.SetKey(pKeyOn->GetKey());
+            OutNow(&pKeyOff);
           }
         }
         pEvent = Iterator.Next();

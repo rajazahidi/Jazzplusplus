@@ -1643,8 +1643,8 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
         SEQ_STOP_NOTE(
           mididev,
           pKeyOff->GetChannel(),
-          pKeyOff->Key,
-          pKeyOff->OffVeloc);
+          pKeyOff->GetKey(),
+          pKeyOff->GetOffVelocity());
         if (now) seqbuf_flush_last_event();
       }
       break;

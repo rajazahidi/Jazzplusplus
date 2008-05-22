@@ -101,7 +101,7 @@ class tParam
 
     virtual int GetVal()
     {
-      return mDataMsb.mValue;
+      return mDataMsb.GetValue();
     }
 
     tControl mMsb;

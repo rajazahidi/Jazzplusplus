@@ -338,8 +338,6 @@ class JZEvent
     }
 #endif
 
-  public:
-
     unsigned char GetStat() const
     {
       return mStat;
@@ -349,23 +347,24 @@ class JZEvent
     {
       return mClock & ~KILLED_CLOCK;
     }
-    void SetClock(int c)
+
+    void SetClock(int Clock)
     {
-      mClock = c;
+      mClock = Clock;
     }
 
-    // the device is dynamically set when events are copied to
-    // the playback queue (from the track device)
+    // The device is dynamically set when events are copied to the playback
+    // queue (from the track device).
     enum
     {
       BROADCAST_DEVICE = 0
     };
 
     JZEvent(int Clock, unsigned char Stat)
+      : mStat(Stat),
+        mClock(Clock),
+        mDevice(BROADCAST_DEVICE)
     {
-      mClock = Clock;
-      mStat  = Stat;
-      mDevice = BROADCAST_DEVICE;
 #ifdef E_DBUG
       Magic = MAGIC;
 #endif
@@ -515,12 +514,13 @@ class JZEvent
 
     int mClock;
 
- private:
+  private:
 
     int mDevice;
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 class tChannelEvent : public JZEvent
 {
   public:
@@ -557,8 +557,6 @@ class tChannelEvent : public JZEvent
 
     unsigned char mChannel;
 };
-
-
 
 //*****************************************************************************
 //*****************************************************************************
@@ -685,7 +683,8 @@ class tKeyOn : public tChannelEvent
     unsigned short mOffVelocity;
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 class tKeyOff : public tChannelEvent
 {
   public:
@@ -740,7 +739,8 @@ class tKeyOff : public tChannelEvent
     unsigned char mOffVelocity;
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 class tPitch : public tChannelEvent
 {
   public:
@@ -809,27 +809,24 @@ class tPitch : public tChannelEvent
     }
 };
 
-
-
+//*****************************************************************************
+//*****************************************************************************
 class tControl : public tChannelEvent
 {
   public:
 
-    unsigned char mControl;
-    unsigned char mValue;
-
     tControl(
       int Clock,
       int Channel,
-      unsigned char ctl,
-      unsigned char val)
-      : tChannelEvent(Clock, StatControl, Channel)
+      unsigned char Control,
+      unsigned char Value)
+      : tChannelEvent(Clock, StatControl, Channel),
+        mControl(Control),
+        mValue(Value)
     {
-      mControl = ctl;
-      mValue   = val;
     }
 
-    virtual int Write(JZWriteBase &io)
+    virtual int Write(JZWriteBase& io)
     {
       edb();
       return io.Write(this, mControl, mValue);
@@ -859,10 +856,10 @@ class tControl : public tChannelEvent
       return mControl;
     }
 
-    virtual void SetPitch(int p)
+    virtual void SetPitch(int Pitch)
     {
       edb();
-      mControl = p;
+      mControl = Pitch;
     }
 
     virtual const wxPen* GetPen() const
@@ -874,6 +871,31 @@ class tControl : public tChannelEvent
     {
       return wxCYAN_BRUSH;
     }
+
+    unsigned char GetControl() const
+    {
+      return mControl;
+    }
+
+    void SetControl(unsigned char Control)
+    {
+      mControl = Control;
+    }
+
+    unsigned char GetControlValue() const
+    {
+      return mValue;
+    }
+
+    void SetControlValue(unsigned char Value)
+    {
+      mValue = Value;
+    }
+
+  private:
+
+    unsigned char mControl;
+    unsigned char mValue;
 };
 
 
@@ -1525,7 +1547,8 @@ class tTimeSignat : public JZEvent
 
     virtual int Write(JZWriteBase &io)
     {
-      edb(); return io.Write(this, Numerator, Denomiator, Clocks, Quarter);
+      edb();
+      return io.Write(this, Numerator, Denomiator, Clocks, Quarter);
     }
 
     virtual tTimeSignat* IsTimeSignat()
@@ -1550,7 +1573,8 @@ class tTimeSignat : public JZEvent
     }
 };
 
-//end of track JAVE new event(it is a standard type, i want it to define track loop points, as defined by the midi standard)
+// End of track JAVE new event(it is a standard type, i want
+// it to define track loop points, as defined by the midi standard)
 class tEndOfTrack : public JZEvent
 {
   public:
@@ -1699,12 +1723,17 @@ class tChnPressure : public tChannelEvent
       edb();
       return Value;
     }
+
     virtual int GetPitch() const
     {
       edb();
       return 0;
     }
-    virtual void  SetPitch(int v)        { edb();  }
+
+    virtual void  SetPitch(int v)
+    {
+      edb();
+    }
 
     virtual const wxPen* GetPen() const
     {

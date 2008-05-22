@@ -766,10 +766,10 @@ void tCmdSearchReplace::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   tControl* pControl = pEvent->IsControl();
   if (pControl)
   {
-    if (pControl->mControl == fr)
+    if (pControl->GetControl() == fr)
     {
       tControl* pControlCopy = (tControl *)pControl->Copy();
-      pControlCopy->mControl = to;
+      pControlCopy->SetControl(to);
       pTrack->Kill(pControl);
       pTrack->Put(pControlCopy);
     }

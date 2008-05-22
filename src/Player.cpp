@@ -1633,7 +1633,10 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
           pKeyOn->GetChannel(),
           pKeyOn->GetKey(),
           pKeyOn->GetVelocity());
-        if (now) seqbuf_flush_last_event();
+        if (now)
+        {
+          seqbuf_flush_last_event();
+        }
       }
       break;
 
@@ -1645,14 +1648,20 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
           pKeyOff->GetChannel(),
           pKeyOff->GetKey(),
           pKeyOff->GetOffVelocity());
-        if (now) seqbuf_flush_last_event();
+        if (now)
+        {
+          seqbuf_flush_last_event();
+        }
       }
       break;
     case StatProgram:
       {
         tProgram* pProgram = pEvent->IsProgram();
         SEQ_SET_PATCH(mididev, pProgram->GetChannel(), pProgram->GetProgram());
-        if (now) seqbuf_flush_last_event();
+        if (now)
+        {
+          seqbuf_flush_last_event();
+        }
       }
       break;
 
@@ -1661,7 +1670,10 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
       {
          tKeyPressure *k = pEvent->IsKeyPressure();
          SEQ_KEY_PRESSURE(mididev, k->GetChannel(), k->Key, k->Value);
-         if (now) seqbuf_flush_last_event();
+         if (now)
+         {
+           seqbuf_flush_last_event();
+         }
       }
       break;
 //
@@ -1670,15 +1682,21 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
       {
          tChnPressure *k = pEvent->IsChnPressure();
          SEQ_CHN_PRESSURE(mididev, k->GetChannel(), k->Value);
-         if (now) seqbuf_flush_last_event();
+         if (now)
+         {
+           seqbuf_flush_last_event();
+         }
       }
       break;
 
     case StatControl:
       {
         tControl *k = pEvent->IsControl();
-        SEQ_CONTROL(mididev, k->GetChannel(), k->mControl, k->mValue);
-        if (now) seqbuf_flush_last_event();
+        SEQ_CONTROL(mididev, k->GetChannel(), k->GetControl(), k->GetControlValue());
+        if (now)
+        {
+          seqbuf_flush_last_event();
+        }
       }
       break;
 
@@ -1686,7 +1704,10 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
       {
         tPitch *k = pEvent->IsPitch();
         SEQ_BENDER(mididev, k->GetChannel(), k->Value + 8192);
-        if (now) seqbuf_flush_last_event();
+        if (now)
+        {
+          seqbuf_flush_last_event();
+        }
       }
       break;
 

@@ -303,8 +303,8 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
       {
         tControl* pControl = pEvent->IsControl();
         u.c[0] = 0xB0 | pControl->GetChannel();
-        u.c[1] = pControl->mControl;
-        u.c[2] = pControl->mValue;
+        u.c[1] = pControl->GetControl();
+        u.c[2] = pControl->GetControlValue();
       }
       break;
 

@@ -246,14 +246,14 @@ int drumIndex2Param(int index)
 }
 
 tDrumInstrumentParameter::tDrumInstrumentParameter(tNrpn *par)
-  : mPitch(par->mLsb.mValue),
+  : mPitch(par->mLsb.GetControlValue()),
     mpNext(0)
 {
   for (int i = drumPitchIndex; i < numDrumParameters; i++)
   {
     param[i] = 0;
   }
-  param[drumParam2Index(par->mMsb.mValue)] = par;
+  param[drumParam2Index(par->mMsb.GetControlValue())] = par;
 }
 
 tNrpn *tDrumInstrumentParameter::Get(int index)
@@ -264,7 +264,7 @@ tNrpn *tDrumInstrumentParameter::Get(int index)
 
 void tDrumInstrumentParameter::Put(tNrpn *par)
 {
-  param[par->mLsb.mValue] = par;
+  param[par->mLsb.GetControlValue()] = par;
 }
 
 tDrumInstrumentParameter *tDrumInstrumentParameter::Next()
@@ -304,7 +304,7 @@ tNrpn *tDrumInstrumentParameterList::GetParam(int pit, int index)
 
 void tDrumInstrumentParameterList::PutParam(tNrpn *par)
 {
-  tDrumInstrumentParameter* ptr = GetElem(par->mLsb.mValue);
+  tDrumInstrumentParameter* ptr = GetElem(par->mLsb.GetControlValue());
   if (!ptr)
   {
     ptr = new tDrumInstrumentParameter(par);
@@ -313,7 +313,7 @@ void tDrumInstrumentParameterList::PutParam(tNrpn *par)
   }
   else
   {
-    ptr->param[drumParam2Index(par->mMsb.mValue)] = par;
+    ptr->param[drumParam2Index(par->mMsb.GetControlValue())] = par;
   }
 }
 
@@ -847,7 +847,7 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
     }
     if ((pControl = e->IsControl()) != 0)
     {
-      switch (pControl->mControl)
+      switch (pControl->GetControl())
       {
         case 0x07:
           if (!Volume)
@@ -1388,7 +1388,7 @@ void tEventArray::Write(JZWriteBase& Io)
     WrittenBefore = 0;
     if (e->IsControl())
     {
-      switch (e->IsControl()->mControl)
+      switch (e->IsControl()->GetControl())
       {
         // Don't write these again if present as events
         // and clock == 0 (should not happen)
@@ -1459,22 +1459,22 @@ void tEventArray::Read(JZReadBase& Io)
     }
     if (e->IsControl())
     {
-      switch (e->IsControl()->mControl)
+      switch (e->IsControl()->GetControl())
       {
         // Grab Rpn/Nrpn/Bank from file and save them, don't put
         // them into event-array
         case 0x63:
         case 0x65:
-          Msb = e->IsControl()->mValue; // Rpn/Nrpn Msb
+          Msb = e->IsControl()->GetControlValue(); // Rpn/Nrpn Msb
           SpecialEvent = 1;
           break;
         case 0x62:
         case 0x64:
-          Lsb = e->IsControl()->mValue; // Rpn/Nrpn Lsb
+          Lsb = e->IsControl()->GetControlValue(); // Rpn/Nrpn Lsb
           SpecialEvent = 1;
           break;
         case 0x06:
-          Data = e->IsControl()->mValue; // Rpn/Nrpn Data
+          Data = e->IsControl()->GetControlValue(); // Rpn/Nrpn Data
           SpecialEvent = 1;
           cha = e->IsControl()->GetChannel();
           switch (Msb)
@@ -2171,7 +2171,7 @@ int JZTrack::GetVolume()
 {
   if (Volume)
   {
-    return Volume->mValue + 1;
+    return Volume->GetControlValue() + 1;
   }
   return 0;
 }
@@ -2193,13 +2193,17 @@ void JZTrack::SetVolume(int Value)
 
 bool JZTrack::DecreaseVolume()
 {
-  if (Volume && Volume->mValue > 0)
+  if (Volume && Volume->GetControlValue() > 0)
   {
     Kill(Volume);
 
-    --Volume->mValue;
+    Volume->SetControlValue(Volume->GetControlValue() - 1);
 
-    JZEvent* pEvent = new tControl(0, Channel - 1, 0x07, Volume->mValue);
+    JZEvent* pEvent = new tControl(
+      0,
+      Channel - 1,
+      0x07,
+      Volume->GetControlValue());
     Put(pEvent);
     gpMidiPlayer->OutNow(this, pEvent);
 
@@ -2212,13 +2216,18 @@ bool JZTrack::DecreaseVolume()
 
 bool JZTrack::IncreaseVolume()
 {
-  if (Volume && Volume->mValue < 127)
+  if (Volume && Volume->GetControlValue() < 127)
   {
     Kill(Volume);
 
-    ++Volume->mValue;
+    Volume->SetControlValue(Volume->GetControlValue() + 1);
 
-    JZEvent* pEvent = new tControl(0, Channel - 1, 0x07, Volume->mValue);
+    JZEvent* pEvent = new tControl(
+      0,
+      Channel - 1,
+      0x07,
+      Volume->GetControlValue());
+
     Put(pEvent);
     gpMidiPlayer->OutNow(this, pEvent);
 
@@ -2235,7 +2244,7 @@ int JZTrack::GetPan()
 {
   if (Pan)
   {
-    return Pan->mValue + 1;
+    return Pan->GetControlValue() + 1;
   }
   return 0;
 }
@@ -2261,7 +2270,7 @@ int JZTrack::GetReverb()
 {
   if (Reverb)
   {
-    return Reverb->mValue + 1;
+    return Reverb->GetControlValue() + 1;
   }
   return 0;
 }
@@ -2287,7 +2296,7 @@ int JZTrack::GetChorus()
 {
   if (Chorus)
   {
-    return Chorus->mValue + 1;
+    return Chorus->GetControlValue() + 1;
   }
   return 0;
 }
@@ -2317,7 +2326,7 @@ int JZTrack::GetBank()
     if (mpBank)
     {
       DEBUG(fprintf(stderr,"Bank %d selected.\n\n",mpBank->Value);)
-      return mpBank->mValue;
+      return mpBank->GetControlValue();
     }
     else
     {
@@ -2330,8 +2339,8 @@ int JZTrack::GetBank()
     for (int i=0; gpConfig->BankEntry(i).Command[0]>=0; i++)
     {
       if (
-        gpConfig->BankEntry(i).Command[0] == mpBank->mValue &&
-        gpConfig->BankEntry(i).Command[1] == mpBank2->mValue)
+        gpConfig->BankEntry(i).Command[0] == mpBank->GetControlValue() &&
+        gpConfig->BankEntry(i).Command[1] == mpBank2->GetControlValue())
       {
         DEBUG(fprintf(stderr,"Bank %d selected.\n\n",i);)
         return i;

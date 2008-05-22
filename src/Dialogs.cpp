@@ -848,21 +848,21 @@ class tControlDlg : public tChEventDlg
 };
 
 
-tControlDlg::tControlDlg(tControl *e, JZPianoWindow* w, JZTrack *t)
-  : tChEventDlg(e, w, t)//,
+tControlDlg::tControlDlg(tControl* pControl, JZPianoWindow* w, JZTrack *t)
+  : tChEventDlg(pControl, w, t)//,
 //    Choice("Controller", &gpConfig->GetCtrlName(0), &Control)
 {
-  Event = e;
-  Value = e->mValue;
-  Control = e->mControl + 1;
+  Event = pControl;
+  Value = pControl->GetControlValue();
+  Control = pControl->GetControl() + 1;
 }
 
 
 bool tControlDlg::OnClose()
 {
-  ((tControl *)Copy)->mValue = Value;
+  ((tControl *)Copy)->SetControlValue(Value);
   //  Choice.GetValue();
-  ((tControl *)Copy)->mControl = Control - 1;
+  ((tControl *)Copy)->SetControl(Control - 1);
   return tChEventDlg::OnClose();
 }
 

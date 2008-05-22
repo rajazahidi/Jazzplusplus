@@ -1650,8 +1650,8 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
       break;
     case StatProgram:
       {
-        tProgram *k = pEvent->IsProgram();
-        SEQ_SET_PATCH(mididev, k->GetChannel(), k->Program);
+        tProgram* pProgram = pEvent->IsProgram();
+        SEQ_SET_PATCH(mididev, pProgram->GetChannel(), pProgram->GetProgram());
         if (now) seqbuf_flush_last_event();
       }
       break;

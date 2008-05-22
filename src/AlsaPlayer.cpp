@@ -433,10 +433,10 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
 
     case StatProgram:
       {
-        tProgram *k = pEvent->IsProgram();
+        tProgram* pProgram = pEvent->IsProgram();
         set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_PGMCHANGE);
-        ev.data.control.channel = k->GetChannel();
-        ev.data.control.value = k->Program;
+        ev.data.control.channel = pProgram->GetChannel();
+        ev.data.control.value = pProgram->GetProgram();
         rc = write(&ev, now);
       }
       break;

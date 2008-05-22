@@ -2411,7 +2411,7 @@ int JZTrack::GetPatch()
 {
   if (mPatch)
   {
-    return mPatch->Program + 1;
+    return mPatch->GetProgram() + 1;
   }
   return 0;
 }

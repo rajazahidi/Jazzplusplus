@@ -851,17 +851,15 @@ class tProgram : public tChannelEvent
 {
   public:
 
-    unsigned char Program;
-
-    tProgram(int clk, int cha, unsigned char prg)
-      : tChannelEvent(clk, StatProgram, cha)
+    tProgram(int clk, int Channel, unsigned char Program)
+      : tChannelEvent(clk, StatProgram, Channel)
     {
-      Program = prg;
+      mProgram = Program;
     }
 
     virtual int Write(JZWriteBase &io)
     {
-      edb(); return io.Write(this, Program);
+      edb(); return io.Write(this, mProgram);
     }
 
     virtual tProgram* IsProgram()
@@ -879,19 +877,19 @@ class tProgram : public tChannelEvent
     virtual int GetValue() const
     {
       edb();
-      return Program;
+      return mProgram;
     }
 
     virtual int GetPitch() const
     {
       edb();
-      return Program;
+      return mProgram;
     }
 
-    virtual void SetPitch(int p)
+    virtual void SetPitch(int Pitch)
     {
       edb();
-      Program = p;
+      mProgram = Pitch;
     }
 
     virtual const wxPen* GetPen() const
@@ -903,6 +901,20 @@ class tProgram : public tChannelEvent
     {
       return wxGREEN_BRUSH;
     }
+
+    unsigned char GetProgram() const
+    {
+      return mProgram;
+    }
+
+    void SetProgram(unsigned char Program)
+    {
+      mProgram = Program;
+    }
+
+  private:
+
+    unsigned char mProgram;
 };
 
 

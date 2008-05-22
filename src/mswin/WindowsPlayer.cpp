@@ -285,15 +285,15 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
 
     case StatProgram:
       {
-        tProgram *k = pEvent->IsProgram();
-        u.c[0] = 0xC0 | k->GetChannel();
-        u.c[1] = k->Program;
+        tProgram* pProgram = pEvent->IsProgram();
+        u.c[0] = 0xC0 | pProgram->GetChannel();
+        u.c[1] = pProgram->GetProgram();
       }
       break;
 
     case StatChnPressure:
       {
-        tChnPressure *k = pEvent->IsChnPressure();
+        tChnPressure* k = pEvent->IsChnPressure();
         u.c[0] = 0xC0 | k->GetChannel();
         u.c[1] = k->Value;
       }

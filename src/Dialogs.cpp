@@ -1053,21 +1053,23 @@ class tProgramDlg : public tEventDlg
 };
 
 
-tProgramDlg::tProgramDlg(tProgram *e, JZPianoWindow* w, JZTrack *t)
-  : tEventDlg(e, w, t),
-    Program(e->Program + 1)//,
+tProgramDlg::tProgramDlg(tProgram* pProgram, JZPianoWindow* w, JZTrack *t)
+  : tEventDlg(pProgram, w, t),
+    Program(pProgram->GetProgram() + 1)//,
 //    Choice("Program", &gpConfig->GetVoiceName(0), &Program)
 {
-  Event = e;
+  Event = pProgram;
 }
 
 
 bool tProgramDlg::OnClose()
 {
-  //Choice.GetValue();
+//  Choice.GetValue();
   if (Program <= 0)
+  {
     Program = 1;
-  ((tProgram *)Copy)->Program = Program - 1;
+  }
+  ((tProgram *)Copy)->SetProgram(Program - 1);
   return tEventDlg::OnClose();
 }
 

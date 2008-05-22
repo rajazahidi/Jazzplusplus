@@ -16,8 +16,8 @@
 
 \chapter{Introduction}\label{introduction}
 
-JAZZ++ is a fully featured MIDI sequencer with audio support. In addition to 
-basic sequencer functions like record and play, JAZZ++ provides many edit 
+JAZZ++ is a fully featured MIDI sequencer with audio support. In addition to
+basic sequencer functions like record and play, JAZZ++ provides many edit
 features like quantize, copy, transpose, graphical pitch editing, multiple
 undo/redo etc.
 
@@ -49,15 +49,135 @@ As an extension to normal MIDI sequencing, JAZZ++ provides audio play
 \section{System requirements}\label{requirements}
 
 \subsection{MIDI and audio equipment}
-To play MIDI music your PC must be attached to a MIDI synthesizer device. The
-synthesizer can either be an integrated part of a sound-card, or an external
-device attached to the PC with a cable.  To record MIDI music you will need a
-midi-capable piano-keyboard attached to the PC (as an alternative you can
-enter notes using the mouse).
 
-For audio you need an audio capable sound card.
+*NEW*
+[ed: this is an example of keeping original content]
+
+The original Jazz++ documentation recorded here;
+
+"To play MIDI music your PC must be attached to a MIDI synthesizer
+device. The synthesizer can either be an integrated part of a
+sound-card, or an external device attached to the PC with a cable.
+To record MIDI music you will need a midi-capable piano-keyboard
+attached to the PC (as an alternative you can enter notes using
+the mouse). For audio you need an audio capable sound card."
+
+
+A lot of that is still the same even today - if you're not using
+a hardware MIDI/synth soundcard or externally connected MIDI
+synthesizer, you will need an audio capable soundcard to hear
+anything. Today however, most personal computers already have
+'onboard' audio sound chipsets, so for most people it's very
+likely that you already have this requirement satisfied. Likewise,
+MIDI/synth capable addon soundcards are a -lot- cheaper today
+than when Jazz++ first started out, and you can buy MIDI/synth
+soundcards of various types for under 50 dollars these days.
+One can also buy high-end MIDI/synth soundcards for a few hundred
+dollars if you're looking for the very best quality sound ouput,
+or otherwise 'professional' features and specifications.
+
+Back when the original Jazz++ documentation was written, there
+weren't many 'software synthesizer' programs available for the
+personal computer, and even if they were available, the then
+computing hardware was simply too slow to run such software
+properly. A lot has changed since then and now. Today, even so
+called 'entry level' personal computers have more than enough power
+to run Jazz++ concurrently with one (or more) 'software synthesizers'
+running on the same machine, thus making it possible for Jazz++ to
+become the basis of a fully functional Digital Audio Workstation
+(DAW) using otherwise standard, low cost personal computer systems
+and/or other now affordable add-on sound/MIDI hardware options.
+
+This area of the Jazz++ documentation provides information
+detailing how to get the most out of you personal computer when
+using it with Jazz++, and also platform/OS specific information
+regarding setting up and using Jazz++ with the now available
+hardware technologies and various 'software synthesizer' MIDI
+programs available to the user today.
+
+
+*NEW*
+
+\item MIDI, Time and the Personal Computer
+
+The MIDI protocol attempts to be a real time protocol. This is
+unsurprising -- sound generation and replay (of a song or most
+all musical compositions) happens in real time, the audience
+and/or the recording studio hear the performance in real time.
+If you are a performer on stage using MIDI equipment, that MIDI
+equipment must be operating as close to real time performance
+as it possibly can -- when the performer plays a note on a MIDI
+keyboard, that note event should be heard almost instantaneously
+not in 50 to 200 milliseconds of time after the event. Likewise,
+every note event should be acted upon - if the MIDI track is
+sequenced to produce 8 beats on a kick drum voice, you should
+hear the synthesizer produce 8 beats of that voice, not 7 beats.
+
+Time (with regards to MIDI) is what we used to measure the actual
+deviation from 'real' time that the MIDI response time effectively
+is. Remember, I stated MIDI *attempts* to be a real time protocol,
+but in actual practise it very rarely is. There are latencies in
+various parts of the MIDI chain -- even the physical length of
+the MIDI patch-cords introduce latency..albeit small..into the
+interconnected MIDI device chain. The response time of the
+MIDI instrument receiving a transmitted note event is another
+place latency can be experienced, and if you are using Jazz++
+to trigger another externally connected MIDI device which itself
+is a sequencer, the timing is even more important to ensure
+everything starts, plays, and remains 'in sync'.
+
+The above two paragraphs are things common to the MIDI domain
+that MIDI users have always had to deal with, regardless of
+whether or not a PC was being used in the MIDI chain. As a
+matter of fact, a 'virtual' MIDI chain involving softsynths
+and Jazz++ running on a PC, is subject to exactly the same
+kinds of limitations and latency problems as 'real' MIDI
+equipment does...plus one extra layer -- the inherent amount
+of latency in the operating system and PC hardware being used
+to 'host' the virtual MIDI machines and software programs.
+
+When using a PC in this fashion, there are possible latencies
+in a few different places of the setup overall ; how fast the
+'host' system executes (runs) Jazz++ itself, how fast the
+generated note events can be delivered to/from the computer's
+hardware ports, and/or how fast these same note events can
+be delivered to and be rendered by a softsynth running concurrently
+on the same system. Just how powerful your particular hardware is
+does matter, however there are some common methods and practises
+that can be employed to better tailor how your personal computer
+performs with Jazz++. There are also some platform/OS specific
+'tweaks' that can be employed to help make your platform of
+choice run better when using Jazz++ with timing critical
+protocols such as MIDI on the modern day PC.
+
+Running Jazz++ should not impose any significant system load
+by itself, however it does rely on the operating system to
+deliver the MIDI data to the intended hardware/virtual ports,
+and also for delivering software data to the computer's
+graphics adapter for GUI updates..ie; track window scrolling.
+
+No matter what PC hardware you are using, most all of this
+software data has to be processed by (or pass through) the
+operating system in use, and most modern operating systems
+allow the software programmers to use so called 'real time'
+kernel calls, and direct, immediate access to I/O ports and
+so forth to the actual computer hardware itself. On some
+platform/OS types this doesn't happen automatically, and some
+users might have change some system configurations to achieve
+optimum performance when using Jazz++ and MIDI on their
+personal computing machine.
+
+
+This area of the Jazz++ documentation provides information
+detailing how to get the most out of you personal computer when
+using it with Jazz++, and also platform/OS specific information
+regarding setting up and using Jazz++ with the now available
+hardware technologies and various 'software synthesizer' MIDI
+programs available to the user today.
 
 \subsection{Linux operating systems}
+
+[ed: This part, down to my out mark, should probably go]
 
 The device-independent part of JAZZ++ (the sequencer / editor part) is known
 to run on Linux, Sun-OS4 and Solaris2 systems, but should compile and run
@@ -65,7 +185,7 @@ to run on Linux, Sun-OS4 and Solaris2 systems, but should compile and run
 will need the wxWidgets GUI package together with GTK.
 
 The device-dependant part (midi-driver) currently supports:
-\begin{itemize}
+
 \item OSS/Free (OSS/Linux) midi driver API (formerly known as USS/Lite and
 VoxWare). This API is included in later Linux kernels. The JAZZ++ code
 interfacing OSS has only been tested on Linux platforms.
@@ -75,173 +195,247 @@ load-module. In this mode JAZZ++ works as a TCP/IP-based client/server
 application allowing the sequencer/editor and the midi-driver to run on
 separate computers. The native driver has better support for the MPU-401
 than the JAZZ++/OSS solution (e.g. support for external timing source).
+
+[ed: and be replaced with something more current...ie; if it still
+works on Sun-OS4 and Solaris2 systems currently is unknown, USS/lite
+and voxware..?..and I thought mpu-401 was dinosaured? I'll get some
+clarity before I deal with the section above. *MARK* ]
+
+\begin{itemize}
+
 \item *New*
- Introduction                                                           
-                                                                             
-Years ago when the Jazz++ project first came to my attention,                   
-using it with Linux on the PC was a much different proposition to               
-what is possible today on this platform/OS. Although it would be                
-entirely possible to create a MIDI score with jazz, (in the same way            
-this text is being produced with a text-editor), the whole point of             
-the exercise would be to compose a MIDI score you could actually hear.          
-                                                    
-                                                                             
-Back then with Linux, making sound via MIDI applications meant having           
-MIDI *hardware*. This may have taken the form of a MIDI adapter plugged         
-in the PC's serial port or soundcard gameport (in MPU-401 mode), with a real    
-world MIDI instrument(s) attached to that, or else a MIDI capable soundcard     
-with a hardware based MIDI sound synthesis chip to make the actual sound.       
-(so called 'MIDI/synth' capable soundcards)                                     
-In that latter case, the soundcard necessarily had to be supported              
-by Linux drivers, and in that respect these drivers were more than              
-likely using the now deprecated 'OSS' sound system modules.                     
-                                                                                
-Things have changed. The x86 based hardwares have become faster and             
-cheaper, Linux has grown and matured as an operating system, and                
-likewise Free software has multiplied and proliferated around the world         
-giving rise to the creation of a great many new software applications.          
-Along the way, the venerable 'OSS' sound system drivers were replaced           
-with the 'Advanced Linux Sound Architecture' (ALSA) drivers and API.            
-                                                                                
-The result of these many advances and changes over time, means Linux            
-users are no longer constrained by the need of having actual MIDI               
-capable hardware or a MIDI/synth capable soundcard, to obtain good sound        
-production with MIDI applications like Jazz++. Instead of having one            
-or more hardware sound synthesis chips (be they on a soundcard or               
-in a MIDI musical instrument) to produce the sound(s), we can now               
-use a software application to achieve the same ends, and many folks             
-loosely refer to these software applications as being 'softsynths'.             
+
+\end{itemize}
 
 
-For many years now, users with Windows on their PC have had a distinct          
-advantage over Linux users on the PC, because virtually every sound             
-card (and/or onboard sound chip) typically ships with proprietary               
-Windows drivers that enable the use of that hardware as a 'softsynth' in        
-conjunction with the underlying Windows sound API supports. In                  
-effect, Windows users could come to the website, download Jazz++ and            
-install it, and be making noise in under 2 minutes with very little             
-or no effort. If only users of other platforms/OS' could have it this           
-easy - hopefully this documentation will help bridge the (Linux) gap.           
-                                                                            
-                                                                                
+Introduction
 
-  Hardware based sound synthesis and Linux on the x86 PC                 
+Years ago when the Jazz++ project first came to my attention,
+using it with Linux on the PC was a much different proposition to
+what is possible today on this platform/OS. Although it would be
+entirely possible to create a MIDI score with jazz, (in the same way
+this text is being produced with a text-editor), the whole point of
+the exercise would be to compose a MIDI score you could actually hear.
 
-Thanks to all the great work done by the ALSA team over the years, Linux        
-now has much better driver supports for the various soundcards on the market    
-today that have hardware based MIDI/synth chips as part of their design.        
-                                                                                
-However, at this point documentation detailing the configuration and            
-use of such soundcard hardware with Linux and Jazz++ will be the                
-focus of future efforts here. Why? Simply because the majority of               
-people out there on the x86 PC don't have a hardware MIDI/synth soundcard       
-as part of their computer's hardware. They need to know how to setup a          
-'softsynth' in Linux if they don't have this sort of soundcard or               
-any 'real' MIDI hardware to hear Jazz++ with...and believe me, this             
-will be 80% or more of people out there using Linux and the PC.                 
-                                                                                
+Back then with Linux, making sound via MIDI applications meant having
+MIDI *hardware*. This may have taken the form of a MIDI adapter plugged
+in the PC's serial port or soundcard gameport (in MPU-401 mode), with a real
+world MIDI instrument(s) attached to that, or else a MIDI capable soundcard
+with a hardware based MIDI sound synthesis chip to make the actual sound.
+(so called 'MIDI/synth' capable soundcards) In that latter case, the
+soundcard necessarily had to be supported by Linux drivers, and in that
+respect these drivers were more than likely using the now deprecated 'OSS'
+sound system modules.
 
-I will however include a section here soon listing all the sound                
-cards of this type that are currently supported under Linux, and                
-later document configuration details here for use with Jazz++.                  
-                                                                                
+Things have changed. The x86 based hardwares have become faster and
+cheaper, Linux has grown and matured as an operating system, and
+likewise Free software has multiplied and proliferated around the world
+giving rise to the creation of a great many new software applications.
+Along the way, the venerable 'OSS' sound system drivers were replaced
+with the 'Advanced Linux Sound Architecture' (ALSA) drivers and API.
 
+The result of these many advances and changes over time, means Linux
+users are no longer constrained by the need of having actual MIDI
+capable hardware or a MIDI/synth capable soundcard, to obtain good sound
+production with MIDI applications like Jazz++. Instead of having one
+or more hardware sound synthesis chips (be they on a soundcard or
+in a MIDI musical instrument) to produce the sound(s), we can now
+use a software application to achieve the same ends, and many folks
+loosely refer to these software applications as being 'softsynths'.
 
-   Software based sound synthesis and Linux on the x86 PC                 
-                                                                             
-This area of the documentation will grow over time. There is a lot              
-that can be documented here now with Linux, however at this early               
-stage of Jazz++'s development, it's more important for potential                
-users and testers of the Jazz++ code to have some form of consistant            
-MIDI 'test-bed' to prove and test Jazz++ itself on linux.
-
-Although this isn't 'set in stone', the Jazz++ developers have                  
-been using a softsynth setup in Linux as I describe below, which                
-uses JACK, FLUIDSYNTH and QSYNTH. A similar setup should also                   
-work on the Mac running Mac OSX.                                                
-                                                                                
-Essentially, -any- ALSA based, MIDI capable softsynth setup                     
-should work with Jazz++, and I've already tested a few that seem                
-to work fine. However, more consistant and comparable results of                
-testing, will be observed using the same softsynth 'kit' as the                 
-Jazz++ developers do, and this is why documentation of this                     
-softsynth setup comes first.                                                    
+For many years now, users with Windows on their PC have had a distinct
+advantage over Linux users on the PC, because virtually every sound
+card (and/or 'onboard' sound chip) typically ships with proprietary
+Windows drivers that enable the use of that hardware as a 'softsynth' in
+conjunction with the underlying Windows sound API supports. In effect,
+Windows users could come to the website, download Jazz++ and install it,
+and be making noise in under 2 minutes with very little or no effort. If
+only users of other platforms/OS' could have it this easy - hopefully
+this documentation will help bridge the gap, when using Jazz++ on this
+platform with MIDI softsynth implementations.
 
 
-                                                                                
-    Overview of a typical Linux softsynth setup
 
-\item Abstract:
-                            
-Softsynth setups in Linux are comprised of a number of                          
-software applications which work together to form a virtual                     
-machine that emulates hardware based MIDI/synth devices. The                    
-so formed virtual machine can be easily broken down into it's                   
-individual parts, to better understand how the components                       
-'expose' themselves to the user ;                                               
-                                                                                
-\item The ALSA part -- forms virtual MIDI and real audio paths for the                
-other parts of the virtual machine to communicate across. Allows                
-PCM data rendered by the virtual machine to be realized as an                   
-analogue audio signal at the line outputs of the soundcard hardware.            
 
-\item The JACK part -- a low-latency sound server. Forms both a virtual               
-MIDI patch-bay and a virtual audio patch-bay to control and                     
-define how the virtual machine parts interconnect with and across               
-the virtual and real machine paths formed by the ALSA part.                     
+\begin{itemize}
+\item  Hardware based sound synthesis and Linux on the x86 PC
+\end{itemize}
+Thanks to all the great work done by the ALSA team over the years, Linux
+now has much better driver supports for the various soundcards on the market
+today that have hardware based MIDI/synth chips as part of their design.
 
-\item The FLUIDSYNTH part -- the virtual MIDI synthesizer itself. It                  
-accepts valid MIDI data as input, and renders that data into                    
-PCM data output, as determined by sound/instrument data contained               
+One of the main benefits of using MIDI/synth based soundcards (and
+this is true for all platforms), is that it removes the system overhead
+of having a softsynth running -- the MIDI data output of Jazz++ is sent
+directly to the hardware MIDI/synth chip on the soundcard, and it takes
+care of generating the actual sound (and sound data) itself. This allows
+the kernel to be closer to 'real time' when using Jazz++, because the
+system CPU isn't having to 'play' the sound, and render that sound, all
+at the same time. A good analogy, would be to compare all this to the
+difference it makes to system -graphics- performance, when you add
+a dedicated 3D graphics-card with it's own onboard processor unit. Not
+only are the graphics greatly improved, the system responsiveness is
+greatly improved.
+
+Adding a dedicated MIDI/synth soundcard to your system helps for
+exactly the same reasons here - it frees up your system CPU so it
+can do other tasks. In Linux, drivers for more than a few of these types of
+MIDI/synth soundcards are already available, and are a standard part
+of the linux kernel tree. Most linux distributions include so called
+'hardware detection' softwares, which should automatically discover
+your MIDI/synth soundcard (if supported), and configure your system's
+ALSA drivers accordingly. Sometimes these routines do not detect certain
+hardware cards correctly (or at all) in some situations, however it is
+beyond the scope of the Jazz++ manual to help people with problems of this
+nature.
+
+The correct place to get help with specific ALSA / soundcard related
+problems, can be found by visiting the ALSA website at ;
+
+\urlref{http://www.alsa-project.org/}{http://www.alsa-project.org/}
+
+The lastest list of ALSA supported MIDI/synth soundcards, is always
+available inside the current alsa-driver source tarball available from
+the above website. Once you unpack that archive, read the file ;
+
+alsa-driver-1.0.1x/doc/SOUNDCARDS
+
+There you can see if your MIDI/synth soundcard is currently supported
+under ALSA and linux. Some MIDI/synth soundcards require firmware being
+loaded before the card will work - most all of these kinds of soundcards
+require some kind of helper application called a 'loader' to copy various
+instrument files and data (for example 'soundfont' files) into the working
+RAM of the MIDI/synth chip. Documentation regarding these things and help
+with configuring ALSA itself can be found in the same alsa-driver archive ;
+
+alsa-driver-1.0.1x/alsa-kernel/Documentation/
+
+
+Another good repository of current knowledge regarding linux sound drivers
+overall (not just the ALSA sound drivers) can be found at ;
+
+\urlref{http://linux-sound.org/drivers.html}{http://linux-sound.org/drivers.html}
+
+Once you have your MIDI/synth soundcard up and running, it will appear
+in Jazz++ configuration dialogs just like any other MIDI device connected
+to the computer running Jazz++. Using a hardware based MIDI/synth soundcard,
+is very much like using a software based 'softsynth' as described below -
+you still have to decide which soundfonts to use, and which bank to load them
+into. Hardware or software, they are both MIDI instruments, and share very
+common ways of getting things done at this level.
+
+
+
+
+\begin{itemize}
+\item Software based sound synthesis and Linux on the x86 PC
+\end{itemize}
+This area of the documentation will grow over time. There is a lot
+that can be documented here now with Linux.
+
+In the early stages of the current Jazz++'s revitalization, developers,
+users and testers alike of the Jazz++ source code used softsynths. One
+of the softsynth setups used by the Jazz++ developers and testers in Linux,
+is as I describe below, which uses JACK, FLUIDSYNTH and QSYNTH. A similar
+setup should also work on the Mac running Mac OSX.
+
+Essentially, -any- ALSA based, MIDI capable softsynth setup should work
+with Jazz++ in linux. I've already tested a few that seem to work fine.
+However, it is useful to know how to setup the same softsynth kit that
+the Jazz++ developers use for testing and improving the Jazz++ code itself,
+and this is why documentation of this softsynth setup comes first.
+
+\item  Overview of a typical Linux softsynth setup
+
+Abstract:
+
+Softsynth setups in Linux are comprised of a number of
+software applications which work together to form a virtual
+machine that emulates hardware based MIDI/synth devices. The
+so formed virtual machine can be easily broken down into it's
+individual parts, to better understand how the components
+'expose' themselves to the user ;
+
+\item The ALSA part -- forms virtual MIDI and real audio paths for the
+other parts of the virtual machine to communicate across. Allows
+PCM data rendered by the virtual machine to be realized as an
+analogue audio signal at the line outputs of the soundcard hardware.
+
+\item The JACK part -- a low-latency sound server. Forms both a virtual
+MIDI patch-bay and a virtual audio patch-bay to control and
+define how the virtual machine parts interconnect with and across
+the virtual and real machine paths formed by the ALSA part.
+
+\item The FLUIDSYNTH part -- the virtual MIDI synthesizer itself. It
+accepts valid MIDI data as input, and renders that data into
+PCM data output, as determined by sound/instrument data contained
 in a 'SoundFont' file.
 
-\item The QSYNTH part -- this forms the virtual control panel of the                  
-virtual synthesizer part. Essentially, this comprises a GUI to                  
-easily allow the user to change/control the virtual synthesizer                 
-itself, add/remove SoundFont files, define bank settings, and                   
-adjust other working parameters of the virtual synthesizer itself.              
-                                                                                
-Additionally, the QJACKCTL software provides a GUI visualization                
-of the virtual MIDI/audio patch-bays formed by the JACK part,                   
-allowing the user a quick and easy way to 'hook it all up' as it                
-were, in any particular configuration they desire.                              
-                                                                                
-For the sake of accuracy with this overview, it is worth noting                 
-that Jazz++ itself is a virtual machine - it is a software emulation            
-of -hardware- based MIDI sequencers that were in common use years               
-ago. Jazz++ is of course much more capable than these old hardware              
-sequencers I speak of, which in their day were little more than                 
-'drum machines' triggering sound events on a MIDI or otherwise                  
-connected 'tip-and-ring patch cord configured' analogue synthesizer.            
-                                                                                
-Also note here, the virtual machine softsynth described in the                  
-overview above, lacks one obvious component - the INPUT part.                   
-It is basically a virtual MIDI synthesizer with all the bells,                  
-knobs and whistles, but without a keyboard or anything else                     
-'driving' it. Jazz++ is that part. The MIDI data produced by Jazz++             
-is that MIDI input data the FLUIDSYNTH part accepts.                            
-                                                                                
-Jazz++ can itself accept valid MIDI data from either the virtual                
-and/or 'real world' MIDI domains. This means, you can connect                   
-a real MIDI synthesizer keyboard to Jazz++ as a MIDI data INPUT                 
-part, and record notes played on that with Jazz++. Equally, you                 
-could connect the same external MIDI keyboard as an INPUT part                  
-to FLUIDSYNTH and use the virtual MIDI softsynth to replay the                  
-notes you are playing instead of the synthesizer's own hardware kit.
+\item The QSYNTH part -- this forms the virtual control panel of the
+virtual synthesizer part. Essentially, this comprises a GUI to
+easily allow the user to change/control the virtual synthesizer
+itself, add/remove SoundFont files, define bank settings, and
+adjust other working parameters of the virtual synthesizer itself.
 
-Finally, there are other virtual machines in software that                      
-can be used as valid MIDI data INPUT parts here, such as the                    
-program VKEYBD, which is a virtual onscreen MIDI keyboard GUI                   
-with keys you click on with your mouse -- all these MIDI devices                
-be they virtual machines or not, can interact and interconnect                  
-with each other, and thus possibly form very complex MIDI                       
-sound production environments that traverse and inter-operate                   
+Additionally, the QJACKCTL software provides a GUI visualization
+of the virtual MIDI/audio patch-bays formed by the JACK part,
+allowing the user a quick and easy way to 'hook it all up' as it
+were, in any particular configuration they desire.
+
+For the sake of accuracy with this overview, it is worth noting
+that Jazz++ itself is a virtual machine - it is a software emulation
+of -hardware- based MIDI sequencers that were in common use years
+ago, so called 'step sequencers'. Jazz++ is of course much more
+capable than these old hardware sequencers I speak of, and more
+closely resembles a modern day Digial Audio Workstation. In their
+day, old MIDI sequencers were little more than 'drum machines'
+triggering sound events on a MIDI or otherwise connected 'tip-and
+-ring patch cord configured' analogue synthesizer.
+
+Also note here, the virtual machine softsynth described in the
+overview above, lacks one obvious component - the INPUT part.
+It is basically a virtual MIDI synthesizer with all the bells,
+knobs and whistles, but without a keyboard or anything else
+'driving' it. Jazz++ is that part. The MIDI data produced by Jazz++
+is that MIDI input data the FLUIDSYNTH part accepts.
+
+Jazz++ can itself accept valid MIDI data from either the virtual
+and/or 'real world' MIDI domains. This means, you can connect
+a real MIDI synthesizer keyboard to Jazz++ as a MIDI data INPUT
+part, and record notes played on that with Jazz++. Equally, you
+could connect the same external MIDI keyboard as an INPUT part
+to FLUIDSYNTH and use the virtual MIDI softsynth to replay the
+notes you are playing instead of the synthesizer's own hardware
+kit. Other combinations are possible as well.
+
+Finally, there are other virtual machines in software that
+can be used as valid MIDI data INPUT parts here, such as the
+program VKEYBD, which is a virtual onscreen MIDI keyboard GUI
+with keys you click on with your mouse -- all these MIDI devices
+be they virtual machines or not, can interact and interconnect
+with each other, and thus possibly form very complex MIDI
+sound production environments that traverse and inter-operate
 across the software virtual and real hardware MIDI domains.
 
 \item Practical:
 
+Many people have troubles getting these softsynths installed and
+working properly on Linux based systems. The Jazz++ developers
+have also noted, that dependant on just which Linux distribution
+you use, (and what release version that might be), also dictates
+just how easy or difficult this process might be to complete.
+
+If you have any problems with the following instructions,
+please check the documentation Appendix for possible solutions
+relative to the Linux distribution you might be using.
+
+For some Linux distributions, the whole process can be as
+straight forward and simple as installing the needed software
+packages from your Linux distribution's installation discs and/or
+online package repository.
+
 Still work in progress, come back soon!!
-\end{itemize}
+
 
 \subsection{Windows operating systems}
 
@@ -264,16 +458,31 @@ For latest updates on software from {\em sourceforge}, please look at the
 JAZZ++ homepage at
 
 \begin{indented}{2cm}
-{\tt http://jazzplusplus.sourceforge.net}
+\urlref{http://jazzplusplus.sourceforge.net}{http://jazzplusplus.sourceforge.net}
 \end{indented}
 
-You are welcome to join the JAZZ++ mailing list by sending mail to
+You are welcome to join the JAZZ++ mailing lists.  In order to cut down on the
+amount of spam on the list, you must subscribe to post to any of the lists.
+There are three mailing lists.  The first is a devoted to JAZZ++ users.  To
+subscribe, visit
 
 \begin{indented}{2cm}
-{\tt jazzplusplus-user@lists.sourceforge.net}
+\urlref{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-user}{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-user}
 \end{indented}
 
-with subject-field containing {\tt subscribe}.
+The second is devoted to developers.  To subscribe visit
+
+\begin{indented}{2cm}
+\urlref{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-devel}{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-devel}
+\end{indented}
+
+The third list contains messages generated by developers when they commit
+documentation, web content, or code to the JAZZ++ sunversion repository.
+To subscribe visit
+
+\begin{indented}{2cm}
+\urlref{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-updates}{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-updates}
+\end{indented}
 
 We'd be happy to receive your bug reports (well, somehow) or success
 stories. And - of course - you are welcome to contribute to the JAZZ++

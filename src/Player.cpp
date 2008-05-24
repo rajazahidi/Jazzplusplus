@@ -1668,8 +1668,14 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
 // SN++ Aftertouch
     case StatKeyPressure:
       {
-         tKeyPressure *k = pEvent->IsKeyPressure();
-         SEQ_KEY_PRESSURE(mididev, k->GetChannel(), k->Key, k->Value);
+         tKeyPressure* pKeyPressure = pEvent->IsKeyPressure();
+
+         SEQ_KEY_PRESSURE(
+           mididev,
+           pKeyPressure->GetChannel(),
+           pKeyPressure->GetKey(),
+           pKeyPressure->GetPressureValue());
+
          if (now)
          {
            seqbuf_flush_last_event();

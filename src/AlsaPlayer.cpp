@@ -443,11 +443,11 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
 
     case StatKeyPressure:
       {
-        tKeyPressure *k = pEvent->IsKeyPressure();
+        tKeyPressure* pKeyPressure = pEvent->IsKeyPressure();
         set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_KEYPRESS);
-        ev.data.note.channel = k->GetChannel();
-        ev.data.note.note = k->Key;
-        ev.data.note.velocity = k->Value;
+        ev.data.note.channel = pKeyPressure->GetChannel();
+        ev.data.note.note = pKeyPressure->GetKey();
+        ev.data.note.velocity = pKeyPressure->GetPressureValue();
         rc = write(&ev, now);
       }
       break;

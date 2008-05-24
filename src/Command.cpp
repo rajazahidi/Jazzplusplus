@@ -408,22 +408,23 @@ void tCmdTranspose::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
     pTrack->Kill(pEvent);
     pTrack->Put(pKeyOn);
   }
-// SN++ Aftertouch
-  tKeyPressure *a;
+
+  // After touch.
   if (pEvent->IsKeyPressure())
   {
-    a = (tKeyPressure *)pEvent->Copy();
+    tKeyPressure* pKeyPressure = (tKeyPressure *)pEvent->Copy();
     if (FitIntoScale)
     {
-      a->Key += Notes;
-      a->Key = Scale.FitInto(a->Key);
+      pKeyPressure->SetKey(pKeyPressure->GetKey() + Notes);
+      pKeyPressure->SetKey(Scale.FitInto(pKeyPressure->GetKey()));
     }
     else if (Notes)
-      a->Key = Scale.Transpose(a->Key, Notes);
+    {
+      pKeyPressure->SetKey(Scale.Transpose(pKeyPressure->GetKey(), Notes));
+    }
     pTrack->Kill(pEvent);
-    pTrack->Put(a);
+    pTrack->Put(pKeyPressure);
   }
-//
 }
 
 // ************************************************************************

@@ -310,10 +310,10 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
 
     case StatKeyPressure:
       {
-        tKeyPressure *k = pEvent->IsKeyPressure();
-        u.c[0] = 0xA0 | k->GetChannel();
-        u.c[1] = k->Key;
-        u.c[2] = k->Value;
+        tKeyPressure* pKeyPressure = pEvent->IsKeyPressure();
+        u.c[0] = 0xA0 | pKeyPressure->GetChannel();
+        u.c[1] = pKeyPressure->GetKey();
+        u.c[2] = pKeyPressure->GetPressureValue();
       }
       break;
 

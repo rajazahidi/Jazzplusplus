@@ -89,7 +89,7 @@ class JZFilter : public wxObject
            // SN++ Aftertouch gehoert eigendlich zu KeyOn Events.
           if (pEvent->GetStat() == StatKeyPressure)
           {
-            int aval = pEvent->IsKeyPressure()->Key;
+            int aval = pEvent->IsKeyPressure()->GetKey();
             return
               FltEvents[i].Selected &&
               FltEvents[i].FromValue <= aval &&

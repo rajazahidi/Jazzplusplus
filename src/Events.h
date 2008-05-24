@@ -1692,23 +1692,22 @@ class tKeySignat : public JZEvent
 class tKeyPressure: public tChannelEvent
 {
   public:
-    short Value;
-    short Key;
 
     tKeyPressure(
       int Clock,
       unsigned short Channel,
-      unsigned char key,
-      unsigned char val)
-      : tChannelEvent(Clock, StatKeyPressure, Channel)
+      unsigned char Key,
+      unsigned char Value)
+      : tChannelEvent(Clock, StatKeyPressure, Channel),
+        mKey(Key),
+        mValue(Value)
     {
-      Value = val;
-      Key = key;
     }
 
     virtual int Write(JZWriteBase &io)
     {
-      edb(); return io.Write(this, Key, Value);
+      edb();
+      return io.Write(this, mKey, mValue);
     }
 
     virtual tKeyPressure* IsKeyPressure()
@@ -1726,20 +1725,45 @@ class tKeyPressure: public tChannelEvent
     virtual int GetValue() const
     {
       edb();
-      return Value;
+      return mValue;
     }
 
     virtual int GetPitch() const
     {
       edb();
-      return Key;
+      return mKey;
     }
 
-    virtual void SetPitch(int p)
+    virtual void SetPitch(int Pitch)
     {
       edb();
-      Key = p;
+      mKey = Pitch;
     }
+
+    unsigned char GetKey() const
+    {
+      return mKey;
+    }
+
+    void SetKey(unsigned char Key)
+    {
+      mKey = Key;
+    }
+
+    short GetPressureValue() const
+    {
+      return mValue;
+    }
+
+    void SetPressureValue(short Value)
+    {
+      mValue = Value;
+    }
+
+  private:
+
+    short mKey;
+    short mValue;
 };
 
 //*****************************************************************************

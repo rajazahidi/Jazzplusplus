@@ -281,18 +281,23 @@ int tKeyLengthDragger::ButtonUp(wxMouseEvent& Event)
   {
     int key, channel;
     tEventIterator iter(Win->GetTrack());
-    tKeyPressure *a;
     key = Copy->GetKey();
     channel = Copy->GetChannel();
+
+    tKeyPressure* pKeyPressure;
+
     JZEvent* pEvent = iter.Range(
       Copy->GetClock() + Copy->GetEventLength(),
       Copy->GetClock() + mpKeyOn->GetEventLength());
+
     while (pEvent)
     {
-      a = pEvent->IsKeyPressure();
-      if (a)
+      pKeyPressure = pEvent->IsKeyPressure();
+      if (pKeyPressure)
       {
-        if (a->Key == key && a->GetChannel() == channel)
+        if (
+          pKeyPressure->GetKey() == key &&
+          pKeyPressure->GetChannel() == channel)
         {
           Win->KillTrackEvent(pEvent);
         }
@@ -2404,7 +2409,6 @@ void JZPianoWindow::kill_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
 {
   int key,channel;
   tEventIterator iter(pTrack);
-  tKeyPressure *a;
   tKeyOn* pKeyOn = pEvent->IsKeyOn();
   if (!pKeyOn)
   {
@@ -2416,15 +2420,19 @@ void JZPianoWindow::kill_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
   }
   key = pKeyOn->GetKey();
   channel = pKeyOn->GetChannel();
+
+  tKeyPressure* pKeyPressure;
   pEvent = iter.Range(
     pKeyOn->GetClock() + 1,
     pKeyOn->GetClock() + pKeyOn->GetEventLength());
   while (pEvent)
   {
-    a = pEvent->IsKeyPressure();
-    if (a)
+    pKeyPressure = pEvent->IsKeyPressure();
+    if (pKeyPressure)
     {
-      if (a->Key == key && a->GetChannel() == channel)
+      if (
+        pKeyPressure->GetKey() == key &&
+        pKeyPressure->GetChannel() == channel)
       {
         pTrack->Kill(pEvent);
       }
@@ -2439,7 +2447,6 @@ void JZPianoWindow::paste_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
 {
   int key,channel;
   tEventIterator iter(pTrack);
-  tKeyPressure *a;
   tKeyOn* pKeyOn = pEvent->IsKeyOn();
   if (!pKeyOn)
   {
@@ -2452,16 +2459,20 @@ void JZPianoWindow::paste_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
   }
   key = pKeyOn->GetKey();
 
+  tKeyPressure* pKeyPressure;
+
   pEvent = iter.Range(
     pKeyOn->GetClock() + 1,
     pKeyOn->GetClock() + pKeyOn->GetEventLength());
 
   while (pEvent)
   {
-    a = pEvent->IsKeyPressure();
-    if (a)
+    pKeyPressure = pEvent->IsKeyPressure();
+    if (pKeyPressure)
     {
-      if (a->Key == key && a->GetChannel() == channel)
+      if (
+        pKeyPressure->GetKey() == key &&
+        pKeyPressure->GetChannel() == channel)
       {
         mPasteBuffer.Put(pEvent->Copy());
       }

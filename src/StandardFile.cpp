@@ -476,7 +476,6 @@ if (1)
           return pEvent;
 
         case StatKeyPressure:
-// SN++ Aftertouch
           pEvent = new tKeyPressure(Clock, Channel, cp[0], cp[1]);
           cp += 2;
           return pEvent;

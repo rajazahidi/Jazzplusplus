@@ -631,9 +631,10 @@ int tPolyAfterEdit::IsCtrlEdit(JZEvent* pEvent)
 
 int tPolyAfterEdit::GetValue(JZEvent* pEvent)
 {
-  if (pEvent->IsKeyPressure())
+  tKeyPressure* pKeyPressure = pEvent->IsKeyPressure();
+  if (pKeyPressure)
   {
-    return pEvent->IsKeyPressure()->Value;
+    return pKeyPressure->GetPressureValue();
   }
   return -1;
 }
@@ -666,7 +667,6 @@ void tPolyAfterEdit::OnApply()
     from_clk = from_clock;
     to_clk   = to_clock;
   }
-  tKeyPressure *k;
   tKeyOn* pKeyOn;
 
   if (!ctrlmode)
@@ -681,10 +681,10 @@ void tPolyAfterEdit::OnApply()
         !mpPianoWindow->mpSnapSel->IsSelected() ||
         mpPianoWindow->GetFilter()->IsSelected(pEvent))
       {
-        k = pEvent->IsKeyPressure();
-        if (k)
+        tKeyPressure* pKeyPressure = pEvent->IsKeyPressure();
+        if (pKeyPressure)
         {
-          track->Kill(k);
+          track->Kill(pKeyPressure);
         }
       }
       pEvent = iter.Next();
@@ -693,7 +693,7 @@ void tPolyAfterEdit::OnApply()
     long key_end(-1), key_clk(-1);
     int  key_val = -1;
     int  key_cha(-1);
-    JZEvent *after;
+    tKeyPressure* pKeyPressure;
     pEvent = iter.Range(from_clk, to_clk);
     while (pEvent)
     {
@@ -720,8 +720,8 @@ void tPolyAfterEdit::OnApply()
             //      und der Wert groesser als 0 ist.
             if (array[i] > 0 && array[i] != temp)
             {
-              after = new tKeyPressure(iclk, key_cha, key_val, array[i]);
-              track->Put(after);
+              pKeyPressure = new tKeyPressure(iclk, key_cha, key_val, array[i]);
+              track->Put(pKeyPressure);
               temp = array[i];
             }
           }
@@ -747,10 +747,12 @@ void tPolyAfterEdit::OnApply()
       {
         if (pEvent->IsKeyPressure())
         {
-          if (Clock2Val(pEvent->GetClock()) != pEvent->IsKeyPressure()->Value)
+          if (
+            Clock2Val(pEvent->GetClock()) !=
+              pEvent->IsKeyPressure()->GetPressureValue())
           {
             pKeyPressureCopy = pEvent->Copy()->IsKeyPressure();
-            pKeyPressureCopy->Value = Clock2Val(pEvent->GetClock());
+            pKeyPressureCopy->SetPressureValue(Clock2Val(pEvent->GetClock()));
             track->Kill(pEvent);
             track->Put(pKeyPressureCopy);
           }

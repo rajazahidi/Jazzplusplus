@@ -89,12 +89,12 @@ become the basis of a fully functional Digital Audio Workstation
 and/or other now affordable add-on sound/MIDI hardware options.
 
 This area of the Jazz++ documentation provides information
-detailing how to get the most out of you personal computer when
-using it with Jazz++, and also platform/OS specific information
-regarding setting up and using Jazz++ with the now available
-hardware technologies and various 'software synthesizer' MIDI
-programs available to the user today.
-
+explaining common concepts of working with MIDI, details of how to
+get the most out of you personal computer when using it with
+Jazz++, and also platform/OS specific information regarding setting
+up and using Jazz++ with the now available hardware technologies
+and various 'software synthesizer' MIDI programs available to the
+personal computer user today.
 
 *NEW*
 
@@ -167,6 +167,36 @@ users might have change some system configurations to achieve
 optimum performance when using Jazz++ and MIDI on their
 personal computing machine.
 
+\item SoundFonts - what are they, who needs them.
+
+Soundfonts are data files that both hardware MIDI/synth cards and
+MIDI softsynths may use to create (or synthesize) the actual sound
+you hear playing. Soundfont files, typically end in the .sf2 .SF2
+extensions, although you may also find .sfArk or .sfpack files, which
+are normal .sf2 packages compressed with a lossless encoding tool. A
+multitude of free soundfont packages exist on the internet, most of
+them quite good however some have decidedly better sound quality than
+others. There are also soundfont editors available for most platforms
+supported by Jazz++, which allows the user to create their own custom
+soundfont library file.
+
+A soundfont itself is a software library file containing both sampled
+audio data, and synthsizer parameter definitions, along with the
+table of MIDI data that describes the 'soundbank' itself. The soundbank
+presents itself to the user, as a list describing exactly what
+instruments, voices, or sounds are contained in each soundfont library
+file. Taking your time to search for 'the right' soundfont for your
+use can take a bit of trial and error, but it's well worth the trouble.
+On the other hand, you can also buy high quality soundfont libraries
+from commercial companies, sometimes referred to as sound 'foundaries'.
+
+Many MIDI/synth soundcards require soundfont files to work, and the
+softsynth setup described below also requires 1 (or more) soundfont
+files to actually make any pleasing sounds. Although the FLUIDSYNTH
+package includes it's own sample soundfont file, the quality is not
+the best...which you'll discover, when you download and install your
+own soundfont files. In the Appendix section of the manual, is a
+short list of soundfont resources we here at Jazz++ think you should try.
 
 This area of the Jazz++ documentation provides information
 detailing how to get the most out of you personal computer when
@@ -174,6 +204,86 @@ using it with Jazz++, and also platform/OS specific information
 regarding setting up and using Jazz++ with the now available
 hardware technologies and various 'software synthesizer' MIDI
 programs available to the user today.
+
+\subsection{Common Considerations when using Jazz++}
+
+\item CPU and RAM Requirements
+
+CPU
+
+The original Jazz++ user manual advised -- "For MIDI-only operation
+a 486 CPU (or equivalent) is sufficient in most cases.  For
+satisfactory audio operation a Pentium CPU with 32 MBytes RAM is
+recommended." That may well be true for MIDI only operations with
+no sound of any kind being needed to be produced by the computer
+hardware. Perhaps we will never know for sure how well Jazz++ ran
+on such computing powerhouses as the i486 CPU running at a then
+whopping 100mHz, because most of this hardware is now dead and gone.
+
+Most modern personal computer systems now boast CPU speeds in
+excess of 2.0 gHz -- even a new low-end 'entry level' computer
+system is likely to be running at speeds greater than 1.5gHz.
+This should be more than enough computing (CPU) power to run
+and use Jazz++ effectively on a modern personal computing machine,
+even with softsynths running to produce the actual sound itself.
+
+RAM
+
+As mentioned earlier, Jazz++ itself should not present any
+significant system load to the personal computer it's being
+run on. Likewise, Jazz++ doesn't need a lot of system RAM to
+work correctly with modern computer hardwares. The user will
+however need enough system RAM installed to meet the following
+requirements for smooth and trouble free Jazz++ sessions ;
+
+1. You will need enough system RAM installed to cover your computer's
+system requirements without the system needing to access the
+hard-disk based 'swap' (or 'pagefile') area of RAM whilst
+using Jazz++. Compared to real 'chip' RAM, hard-disk based
+RAM devices are incredibly slow and this can 'bottlenexk'
+other system operations. More importantly, to access hard-disk
+based RAM means generating a lot of hardware interrupts at the
+same time. Doing this is very likely to impact on MIDI playback
+and record operations in Jazz++ and introduce timing latency issues.
+
+2. If you use soundfonts (and you probably will do), you need
+enough system RAM to hold these soundfile libraries, -above-
+the system RAM requirements. Soundfont libraries are loaded into
+RAM, and whilst a lot of soundfont files are small (<1mb), others
+can be quite large (100+mb), and depending on how many soundfont
+libraries you intend to use and how big they are, dictates exactly
+how much RAM you will need here.
+
+It is nearly impossible to correctly and accurately predict just
+how much CPU speed and system RAM is needed in every individual's
+case -- there as just too many variables to consider. To give the
+reader some idea though, the following are results observed by
+one of the Jazz++ testing team ;
+
+[ed: add system stats]
+
+Other Jazz++ operational tricks ;
+
+1. Try lowering your desktop resolution and/or bits-per-pixel value.
+Doing this will also lower the load on your CPU when running Jazz++, and
+enable things to run closer to real time overall. Try using the lowest
+possible resolution and screen dimension that you can -comfortably-
+work with while using Jazz++ at a color depth of 8 bits-per-pixel,
+and see if that helps real time performance.
+
+2. The ZOOM buttons are your friends! To avoid unnecessary system
+load when running record/replay sessions with Jazz++, always remember
+to zoom out so the track window graphics are in complete view with
+no need to paginate the window scrolling operation. Zoom in again if
+you want to edit a portion of a track. Having to paginate and scroll
+the Jazz++ track window, generates hardware interrupts which may
+impact real time performance.
+
+3. Try to have as few software programs running in the background at
+the same when using Jazz++ on a computer system. Really serious Jazz++
+users will try to have the absolute minimum of other software programs
+running when using Jazz++, to ensure they get as close to real time
+performance as is possible using Jazz++ on their personal computer.
 
 \subsection{Linux operating systems}
 
@@ -281,7 +391,7 @@ Adding a dedicated MIDI/synth soundcard to your system helps for
 exactly the same reasons here - it frees up your system CPU so it
 can do other tasks. In Linux, drivers for more than a few of these types of
 MIDI/synth soundcards are already available, and are a standard part
-of the linux kernel tree. Most linux distributions include so called
+of the Linux kernel tree. Most Linux distributions include so called
 'hardware detection' softwares, which should automatically discover
 your MIDI/synth soundcard (if supported), and configure your system's
 ALSA drivers accordingly. Sometimes these routines do not detect certain
@@ -301,7 +411,7 @@ the above website. Once you unpack that archive, read the file ;
 alsa-driver-1.0.1x/doc/SOUNDCARDS
 
 There you can see if your MIDI/synth soundcard is currently supported
-under ALSA and linux. Some MIDI/synth soundcards require firmware being
+under ALSA and Linux. Some MIDI/synth soundcards require firmware being
 loaded before the card will work - most all of these kinds of soundcards
 require some kind of helper application called a 'loader' to copy various
 instrument files and data (for example 'soundfont' files) into the working
@@ -311,7 +421,7 @@ with configuring ALSA itself can be found in the same alsa-driver archive ;
 alsa-driver-1.0.1x/alsa-kernel/Documentation/
 
 
-Another good repository of current knowledge regarding linux sound drivers
+Another good repository of current knowledge regarding Linux sound drivers
 overall (not just the ALSA sound drivers) can be found at ;
 
 \urlref{http://linux-sound.org/drivers.html}{http://linux-sound.org/drivers.html}
@@ -340,7 +450,7 @@ is as I describe below, which uses JACK, FLUIDSYNTH and QSYNTH. A similar
 setup should also work on the Mac running Mac OSX.
 
 Essentially, -any- ALSA based, MIDI capable softsynth setup should work
-with Jazz++ in linux. I've already tested a few that seem to work fine.
+with Jazz++ in Linux. I've already tested a few that seem to work fine.
 However, it is useful to know how to setup the same softsynth kit that
 the Jazz++ developers use for testing and improving the Jazz++ code itself,
 and this is why documentation of this softsynth setup comes first.
@@ -3050,6 +3160,12 @@ Look at how you can edit the samples in the
 At last you should look at the 'guitar' audio track in the
 \helpref{Piano Window}{pianowin}. Scroll
 up and down until you find the defined samples.
+
+\subsection{Appendix}
+
+\item Appendix
+
+The appendix has not been appended yet, come back soon!
 
 
 \end{document}

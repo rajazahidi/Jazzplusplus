@@ -451,7 +451,7 @@ class tEventArray : public tSimpleEventArray
 
   public:
 
-    tTrackName* mName;
+    tTrackName* mpName;
     tCopyright* Copyright;
     tProgram* mPatch;
     tSetTempo* Speed;

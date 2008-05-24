@@ -90,9 +90,10 @@ unsigned char *SysExDT1(
 
 static double framesPerSecond[] = { 24.0, 25.0, 30.0, 30.0 };
 
-tMtcTime::tMtcTime(tMtcOffset *s)
+tMtcTime::tMtcTime(tMtcOffset* pMtcOffset)
 {
-  type = (tMtcType) ((s->mpData[0] & 0x60) >> 5);
+  const unsigned char* pData = pMtcOffset->GetData();
+  type = (tMtcType) ((pData[0] & 0x60) >> 5);
   if (type < Mtc24)
   {
     type = Mtc24;
@@ -101,10 +102,10 @@ tMtcTime::tMtcTime(tMtcOffset *s)
   {
     type = Mtc30Ndf;
   }
-  hour = s->mpData[0] & 0x1f;
-  min = s->mpData[1];
-  sec = s->mpData[2];
-  fm = s->mpData[3];
+  hour = pData[0] & 0x1f;
+  min = pData[1];
+  sec = pData[2];
+  fm = pData[3];
 }
 
 tMtcTime::tMtcTime(int millisec, tMtcType t)
@@ -567,7 +568,7 @@ void tSimpleEventArray::Copy(tSimpleEventArray& src, int frclk, int toclk)
 
 tEventArray::tEventArray()
   : tSimpleEventArray(),
-    mName(0),
+    mpName(0),
     Copyright(0),
     mPatch(0),
     Speed(0),
@@ -599,8 +600,8 @@ void tEventArray::Clear()
 
   tSimpleEventArray::Clear();
 
-//  delete mName;
-  mName = 0;
+//  delete mpName;
+  mpName = 0;
 
   Copyright = 0;
 
@@ -738,8 +739,8 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
   Sort();  // moves all killed events to the end of array
 
   // clear track defaults
-//  delete mName;
-  mName = 0;
+//  delete mpName;
+  mpName = 0;
 
   Copyright = 0;
 
@@ -828,9 +829,9 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
       continue;
     }
 
-    if (!mName)
+    if (!mpName)
     {
-      mName = e->IsTrackName();
+      mpName = e->IsTrackName();
     }
 
     if (!Copyright)
@@ -1774,17 +1775,17 @@ void tTrackDlg::OnOk()
       else if ((s = e->IsSysEx()) != 0)
       {
         // Check for sysex that contains channel number
-        unsigned char *chaptr = gpSynth->GetSysexChaPtr(s);
-        if (chaptr)
+        const unsigned char* pChannel = gpSynth->GetSysexChaPtr(s);
+        if (pChannel)
         {
           if (gpSynth->IsXG())
           {
-            *chaptr = trk->Channel - 1;
+            *pChannel = trk->Channel - 1;
           }
           else
           {
-            *chaptr &= 0xf0;
-            *chaptr |= sysex_channel(trk->Channel);
+            *pChannel &= 0xf0;
+            *pChannel |= sysex_channel(trk->Channel);
           }
 
           s = (tSysEx *) e->Copy();
@@ -2114,7 +2115,7 @@ const char* JZTrack::GetCopyright()
 {
   if (Copyright)
   {
-    return (const char *)Copyright->mpData;
+    return (const char *)Copyright->GetData();
   }
   return "";
 }
@@ -2143,9 +2144,9 @@ void JZTrack::SetCopyright(char *str)
 
 const char* JZTrack::GetName()
 {
-  if (mName)
+  if (mpName)
   {
-    return (const char*)mName->mpData;
+    return (const char*)mpName->GetData();
   }
   return "";
 }
@@ -2154,9 +2155,9 @@ const char* JZTrack::GetName()
 
 void JZTrack::SetName(const char* pTrackName)
 {
-  if (mName)
+  if (mpName)
   {
-    Kill(mName);
+    Kill(mpName);
   }
   if (strlen(pTrackName))
   {
@@ -2713,11 +2714,12 @@ void JZTrack::SetBendPitchSens(int Value)
 
 int JZTrack::GetModulationSysex(int msp)
 {
-  unsigned char *valp = gpSynth->GetSysexValPtr(ModulationSettings[msp]);
+  const unsigned char* pValue =
+    gpSynth->GetSysexValPtr(ModulationSettings[msp]);
 
-  if (valp)
+  if (pValue)
   {
-    return *valp + 1;
+    return *pValue + 1;
   }
 
   return 0;
@@ -2745,11 +2747,11 @@ void JZTrack::SetModulationSysex(int msp, int Value)
 
 int JZTrack::GetBenderSysex(int bsp)
 {
-  unsigned char *valp = gpSynth->GetSysexValPtr(BenderSettings[bsp]);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(BenderSettings[bsp]);
 
-  if (valp)
+  if (pValue)
   {
-    return *valp + 1;
+    return *pValue + 1;
   }
 
   return 0;
@@ -2777,11 +2779,11 @@ void JZTrack::SetBenderSysex(int bsp, int Value)
 
 int JZTrack::GetCAfSysex(int csp)
 {
-  unsigned char *valp = gpSynth->GetSysexValPtr(CAfSettings[csp]);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(CAfSettings[csp]);
 
-  if (valp)
+  if (pValue)
   {
-    return *valp + 1;
+    return *pValue + 1;
   }
 
   return 0;
@@ -2809,11 +2811,11 @@ void JZTrack::SetCAfSysex(int csp, int Value)
 
 int JZTrack::GetPAfSysex(int psp)
 {
-  unsigned char *valp = gpSynth->GetSysexValPtr(PAfSettings[psp]);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(PAfSettings[psp]);
 
-  if (valp)
+  if (pValue)
   {
-    return *valp + 1;
+    return *pValue + 1;
   }
 
   return 0;
@@ -2841,11 +2843,11 @@ void JZTrack::SetPAfSysex(int psp, int Value)
 
 int JZTrack::GetCC1Sysex(int csp)
 {
-  unsigned char *valp = gpSynth->GetSysexValPtr(CC1Settings[csp]);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(CC1Settings[csp]);
 
-  if (valp)
+  if (pValue)
   {
-    return *valp + 1;
+    return *pValue + 1;
   }
 
   return 0;
@@ -2873,11 +2875,11 @@ void JZTrack::SetCC1Sysex(int csp, int Value)
 
 int JZTrack::GetCC2Sysex(int csp)
 {
-  unsigned char *valp = gpSynth->GetSysexValPtr(CC2Settings[csp]);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(CC2Settings[csp]);
 
-  if (valp)
+  if (pValue)
   {
-    return *valp + 1;
+    return *pValue + 1;
   }
 
   return 0;
@@ -2903,11 +2905,11 @@ void JZTrack::SetCC2Sysex(int csp, int Value)
 
 int JZTrack::GetCC1ControllerNr()
 {
-  unsigned char *valp = gpSynth->GetSysexValPtr(CC1ControllerNr);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(CC1ControllerNr);
 
-  if (valp)
+  if (pValue)
   {
-    return *valp + 1;
+    return *pValue + 1;
   }
 
   return 0;
@@ -2935,11 +2937,11 @@ void JZTrack::SetCC1ControllerNr(int Value)
 
 int JZTrack::GetCC2ControllerNr()
 {
-  unsigned char *valp = gpSynth->GetSysexValPtr(CC2ControllerNr);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(CC2ControllerNr);
 
-  if (valp)
+  if (pValue)
   {
-    return *valp + 1;
+    return *pValue + 1;
   }
 
   return 0;
@@ -2967,15 +2969,15 @@ void JZTrack::SetCC2ControllerNr(int Value)
 
 int JZTrack::GetReverbType(int lsb)
 {
-  unsigned char *valp = gpSynth->GetSysexValPtr(ReverbType);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(ReverbType);
 
-  if (valp)
+  if (pValue)
   {
     if (lsb)
     {
-      ++valp;
+      ++pValue;
     }
-    return *valp + 1;
+    return *pValue + 1;
   }
 
  return 0;
@@ -3007,16 +3009,16 @@ void JZTrack::SetReverbType(int Value, int lsb)
 
 int JZTrack::GetChorusType(int lsb)
 {
-  unsigned char *valp = gpSynth->GetSysexValPtr(ChorusType);
+  const unsigned char *pValue = gpSynth->GetSysexValPtr(ChorusType);
 
-  if (valp)
+  if (pValue)
   {
     if (lsb)
     {
-      ++valp;
+      ++pValue;
     }
 
-    return *valp + 1;
+    return *pValue + 1;
   }
 
   return 0;
@@ -3048,11 +3050,11 @@ void JZTrack::SetChorusType(int Value, int lsb)
 
 int JZTrack::GetEqualizerType()
 {
-  unsigned char *valp = gpSynth->GetSysexValPtr(EqualizerType);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(EqualizerType);
 
-  if (valp)
+  if (pValue)
   {
-    return *valp + 1;
+    return *pValue + 1;
   }
 
   return 0;
@@ -3081,11 +3083,11 @@ void JZTrack::SetEqualizerType(int Value)
 
 int JZTrack::GetRevSysex(int rsp)
 {
-  unsigned char *valp = gpSynth->GetSysexValPtr(ReverbSettings[rsp]);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(ReverbSettings[rsp]);
 
-  if (valp)
+  if (pValue)
   {
-    return *valp + 1;
+    return *pValue + 1;
   }
 
   return 0;
@@ -3117,11 +3119,11 @@ void JZTrack::SetRevSysex(int rsp, int Value)
 
 int JZTrack::GetChoSysex(int csp)
 {
-  unsigned char *valp = gpSynth->GetSysexValPtr(ChorusSettings[csp]);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(ChorusSettings[csp]);
 
-  if (valp)
+  if (pValue)
   {
-    return *valp + 1;
+    return *pValue + 1;
   }
 
   return 0;
@@ -3154,11 +3156,11 @@ void JZTrack::SetChoSysex(int csp, int Value)
 
 int JZTrack::GetPartRsrv(int chan)
 {
-  unsigned char *valp = gpSynth->GetSysexValPtr(PartialReserve);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(PartialReserve);
 
-  if (valp)
+  if (pValue)
   {
-    return *(valp + sysex_channel(chan)) + 1;
+    return *(pValue + sysex_channel(chan)) + 1;
   }
 
   return 0;
@@ -3187,17 +3189,17 @@ void JZTrack::SetPartRsrv(unsigned char *rsrv)
 
 int JZTrack::GetMasterVol()
 {
-  unsigned char *valp = gpSynth->GetSysexValPtr(MasterVol);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(MasterVol);
 
-  if (valp)
+  if (pValue)
   {
     if (gpSynth->GetSysexId(MasterVol) == SX_GM_MasterVol)
     {
       // first data byte is lsb; get msb instead!
-      ++valp;
+      ++pValue;
     }
 
-    return *valp + 1;
+    return *pValue + 1;
   }
 
   return 0;
@@ -3226,11 +3228,11 @@ void JZTrack::SetMasterVol(int Value)
 
 int JZTrack::GetMasterPan()
 {
-  unsigned char *valp = gpSynth->GetSysexValPtr(MasterPan);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(MasterPan);
 
-  if (valp)
+  if (pValue)
   {
-    return *valp + 1;
+    return *pValue + 1;
   }
 
   return 0;
@@ -3258,22 +3260,22 @@ void JZTrack::SetMasterPan(int Value)
 
 int JZTrack::GetModeSysex(int param)
 {
-   unsigned char *valp = 0;
+   const unsigned char* pValue = 0;
 
    switch (param)
    {
      case mspRxChannel:
-       valp = gpSynth->GetSysexValPtr(RxChannel);
+       pValue = gpSynth->GetSysexValPtr(RxChannel);
        break;
 
      case mspUseForRhythm:
-       valp = gpSynth->GetSysexValPtr(UseForRhythm);
+       pValue = gpSynth->GetSysexValPtr(UseForRhythm);
        break;
    }
 
-   if (valp)
+   if (pValue)
    {
-     return *valp + 1;
+     return *pValue + 1;
    }
 
    return 0;

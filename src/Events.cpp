@@ -185,6 +185,27 @@ int tGetMidiBytes::Write(JZEvent* pEvent, unsigned char* pData, int Length)
 }
 
 //*****************************************************************************
+// Description:
+//   This is the meta event class definition.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+// Description:
+//   This function fixed the checksum bytes at the end of the data stream.
+//-----------------------------------------------------------------------------
+void tMetaEvent::FixCheckSum()
+{
+  unsigned char Sum = 0x00;
+  for (unsigned short i = 4; i < (mLength - 2); ++i)
+  {
+    Sum += mpData[i];
+  }
+  mpData[mLength - 2] = (0x80 - (Sum & 0x7f)) & 0x7f;
+  mpData[mLength - 1] = 0xf7;
+}
+
+//*****************************************************************************
+// Description:
+//   This is the System Exclusive (SysEx) event class definition.
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

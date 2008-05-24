@@ -245,10 +245,11 @@ class tSynthSysex
     int GetId(const tSysEx* s) const;
 
     // Get pointer to the data value (if any)
-    unsigned char* GetValPtr(const tSysEx* s) const;
+    const unsigned char* GetValPtr(const tSysEx* pSysEx) const;
 
-    // Get pointer to the byte with the channel (if any)
-    unsigned char* GetChaPtr(const tSysEx* s);
+    // Description:
+    //   Return a pointer to the byte with the channel (if any).
+    const unsigned char* GetChaPtr(const tSysEx* pSysEx);
 
     // Fix checksum byte (if any)
     void FixCheckSum( tSysEx *s );
@@ -309,14 +310,14 @@ class JZSynth
       return Sysex.GetId( s );
     }
 
-    virtual unsigned char * GetSysexValPtr( tSysEx *s ) const
+    virtual const unsigned char* GetSysexValPtr(tSysEx* pSysEx) const
     {
-      return Sysex.GetValPtr( s );
+      return Sysex.GetValPtr(pSysEx);
     }
 
-    virtual unsigned char * GetSysexChaPtr( tSysEx *s )
+    virtual const unsigned char* GetSysexChaPtr(tSysEx* pSysEx)
     {
-      return Sysex.GetChaPtr( s );
+      return Sysex.GetChaPtr(pSysEx);
     }
 
     virtual void FixSysexCheckSum( tSysEx *s )

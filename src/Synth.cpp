@@ -487,148 +487,176 @@ tSynthSysex::~tSynthSysex()
   }
 }
 
-int tSynthSysex::GetId(const tSysEx* s) const
+int tSynthSysex::GetId(const tSysEx* pSysEx) const
 {
-   if (!s)
-      return SX_NONE;
+  if (!pSysEx)
+  {
+    return SX_NONE;
+  }
 
-   switch (s->mpData[0])
-   {
+  const unsigned char* pData = pSysEx->GetData();
+  switch (pData[0])
+  {
     case 0x7e:
-       // GM ON ?
-       if (!memcmp(sxdata[SX_GM_ON], s->mpData, s->Length))
-       {
-         return SX_GM_ON;
-       }
-       else
-       {
-         return SX_UNIV_NON_REALTIME;
-       }
-       break;
+      // GM ON ?
+      if (!memcmp(sxdata[SX_GM_ON], pData, pSysEx->GetDataLength()))
+      {
+        return SX_GM_ON;
+      }
+      else
+      {
+        return SX_UNIV_NON_REALTIME;
+      }
+      break;
 
     case 0x7f:
-       // GM MasterVol ?
-       if (!memcmp(sxdata[SX_GM_MasterVol], s->mpData, 4))
-       {
-         return SX_GM_MasterVol;
-       }
-       else
-       {
-         return SX_UNIV_REALTIME;
-       }
-       break;
+      // GM MasterVol ?
+      if (!memcmp(sxdata[SX_GM_MasterVol], pData, 4))
+      {
+        return SX_GM_MasterVol;
+      }
+      else
+      {
+        return SX_UNIV_REALTIME;
+      }
+      break;
 
     case 0x41:
-       // Roland!
+      //-------
+      // Roland
+      //-------
 
-       // GS DT1?
-       if ((s->mpData[2] == 0x42) && (s->mpData[3] == 0x12))
-       {
-         register unsigned char a1 = s->mpData[4];
-         register unsigned char a2 = s->mpData[5];
-         register unsigned char a3 = s->mpData[6];
+      // GS DT1?
+      if (pData[2] == 0x42 && pData[3] == 0x12)
+      {
+        register unsigned char a1 = pData[4];
+        register unsigned char a2 = pData[5];
+        register unsigned char a3 = pData[6];
 
-         if (a1 == 0x40)
-         {
-           // MSB address 0x40:
-           if (a2 == 0x00)
-           {
-             // 0x40 0x00 0x??
-             switch (a3)
-             {
-             case 0x7f:
-               return SX_GS_ON;
-             case 0x04:
-               return SX_GS_MasterVol;
-             case 0x06:
-               return SX_GS_MasterPan;
-             default:
-               break;
-             }
-           }
-           else if (a2 == 0x01)
-           {
-             // 0x40 0x01 0x??
-             if ((a3 >= 0x30) && (a3 <= 0x36))
-               // reverb settings
-               return SX_GS_ReverbMacro + (a3 - 0x30);
-             else if ((a3 >= 0x38) && (a3 <= 0x3f))
-               // chorus settings
-               return SX_GS_ChorusMacro + (a3 - 0x38);
-             else if (a3 == 0x10)
-               return SX_GS_PartialReserve;
-           }
-           else if ((a2 & 0xf0) == 0x10)
-           {
-             // 0x40 0x1n 0x??
-             switch (a3)
-             {
-             case 0x02:
-               return SX_GS_RxChannel;
+        if (a1 == 0x40)
+        {
+          // MSB address 0x40:
+          if (a2 == 0x00)
+          {
+            // 0x40 0x00 0x??
+            switch (a3)
+            {
+              case 0x7f:
+                return SX_GS_ON;
+              case 0x04:
+                return SX_GS_MasterVol;
+              case 0x06:
+                return SX_GS_MasterPan;
+              default:
+                break;
+            }
+          }
+          else if (a2 == 0x01)
+          {
+            // 0x40 0x01 0x??
+            if (a3 >= 0x30 && a3 <= 0x36)
+            {
+              // These are reverb settings.
+              return SX_GS_ReverbMacro + (a3 - 0x30);
+            }
+            else if (a3 >= 0x38 && a3 <= 0x3f)
+            {
+              // These are chorus settings.
+              return SX_GS_ChorusMacro + (a3 - 0x38);
+            }
+            else if (a3 == 0x10)
+            {
+              return SX_GS_PartialReserve;
+            }
+          }
+          else if ((a2 & 0xf0) == 0x10)
+          {
+            // 0x40 0x1n 0x??
+            switch (a3)
+            {
+              case 0x02:
+                return SX_GS_RxChannel;
 
-             case 0x15:
-               return SX_GS_UseForRhythm;
+              case 0x15:
+                return SX_GS_UseForRhythm;
 
-             case 0x1f:
-               return SX_GS_CC1CtrlNo;
+              case 0x1f:
+                return SX_GS_CC1CtrlNo;
 
-             case 0x20:
-               return SX_GS_CC2CtrlNo;
-             default:
-               break;
-             }
-           }
-           else if ((a2 & 0xf0) == 0x20)
-           {
-             // 0x40 0x2n 0x??
-             if (a3 <= 0x0a)
-               return SX_GS_ModPitch + (a3 - 0x00);
-             else if ((a3 >= 0x10) && (a3 <= 0x1a))
-               return SX_GS_BendPitch + (a3 - 0x10);
-             else if ((a3 >= 0x20) && (a3 <= 0x2a))
-               return SX_GS_CafPitch + (a3 - 0x20);
-             else if ((a3 >= 0x30) && (a3 <= 0x3a))
-               return SX_GS_PafPitch + (a3 - 0x30);
-             else if ((a3 >= 0x40) && (a3 <= 0x4a))
-               return SX_GS_CC1Pitch + (a3 - 0x40);
-             else if ((a3 >= 0x50) && (a3 <= 0x5a))
-               return SX_GS_CC2Pitch + (a3 - 0x50);
-           }
-         } // end a1 == 0x40
-       } // end GS DT1
+              case 0x20:
+                return SX_GS_CC2CtrlNo;
 
-       if ((s->mpData[3] == 0x12) && (s->Length >= 10))
-       {
-         return SX_ROLAND_DT1;
-       }
-       else if ((s->mpData[3] == 0x11) && (s->Length >= 12))
-       {
-         return SX_ROLAND_RQ1;
-       }
-       else
-       {
-         return SX_ROLAND_UNKNOWN;
-       }
+              default:
+                break;
+            }
+          }
+          else if ((a2 & 0xf0) == 0x20)
+          {
+            // 0x40 0x2n 0x??
+            if (a3 <= 0x0a)
+            {
+              return SX_GS_ModPitch + (a3 - 0x00);
+            }
+            else if (a3 >= 0x10 && a3 <= 0x1a)
+            {
+              return SX_GS_BendPitch + (a3 - 0x10);
+            }
+            else if (a3 >= 0x20 && a3 <= 0x2a)
+            {
+              return SX_GS_CafPitch + (a3 - 0x20);
+            }
+            else if (a3 >= 0x30 && a3 <= 0x3a)
+            {
+              return SX_GS_PafPitch + (a3 - 0x30);
+            }
+            else if (a3 >= 0x40 && a3 <= 0x4a)
+            {
+              return SX_GS_CC1Pitch + (a3 - 0x40);
+            }
+            else if (a3 >= 0x50 && a3 <= 0x5a)
+            {
+              return SX_GS_CC2Pitch + (a3 - 0x50);
+            }
+          }
+        } // end a1 == 0x40
+      } // end GS DT1
 
-       break; // end Roland
+      if (pData[3] == 0x12 && pSysEx->GetDataLength() >= 10)
+      {
+        return SX_ROLAND_DT1;
+      }
+      else if (pData[3] == 0x11 && pSysEx->GetDataLength() >= 12)
+      {
+        return SX_ROLAND_RQ1;
+      }
+      else
+      {
+        return SX_ROLAND_UNKNOWN;
+      }
+
+      break;
+      // end Roland
 
     case 0x43:
-      // Yamaha!
+      //-------
+      // Yamaha
+      //-------
+
       // XG Native?
-      if (((s->mpData[1] & 0xf0) == 0x10) && (s->mpData[2] == 0x4c))
+      if (((pData[1] & 0xf0) == 0x10) && pData[2] == 0x4c)
       {
-        register unsigned char a1 = s->mpData[3];
-        register unsigned char a2 = s->mpData[4];
-        register unsigned char a3 = s->mpData[5];
+        register unsigned char a1 = pData[3];
+        register unsigned char a2 = pData[4];
+        register unsigned char a3 = pData[5];
 
         // Multipart?
         if (a1 == 0x08)
         {
-          if ((a3 >= 0x1d) && (a3 <= 0x28))
+          if (a3 >= 0x1d && a3 <= 0x28)
           {
             return SX_XG_ModPitch + (a3 - 0x1d);
           }
-          else if ((a3 >= 0x4d) && (a3 <= 0x66))
+          else if (a3 >= 0x4d && a3 <= 0x66)
           {
             return SX_XG_CafPitch + (a3 - 0x4d);
           }
@@ -643,7 +671,7 @@ int tSynthSysex::GetId(const tSysEx* s) const
         }
 
         // Effect 1?
-        else if ((a1 == 0x02) && (a2 == 0x01))
+        else if (a1 == 0x02 && a2 == 0x01)
         {
           if (a3 == 0x00)
           {
@@ -654,8 +682,9 @@ int tSynthSysex::GetId(const tSysEx* s) const
             return SX_XG_ChorusMacro;
           }
         }
+
         // Multi EQ?
-        else if ((a1 == 0x02) && (a2 == 0x40))
+        else if (a1 == 0x02 && a2 == 0x40)
         {
           if (a3 == 0x00)
           {
@@ -664,17 +693,17 @@ int tSynthSysex::GetId(const tSysEx* s) const
         }
 
         // XG system on?
-        else if ((a1 == 0x00) && (a2 == 0x00) && (a3 == 0x7e))
+        else if (a1 == 0x00 && a2 == 0x00 && a3 == 0x7e)
         {
           return SX_XG_ON;
         }
       }
 
-      if (s->mpData[2] == 0x4c)
+      if (pData[2] == 0x4c)
       {
         return SX_XG_NATIVE;
       }
-      else if (s->mpData[2] == 0x49)
+      else if (pData[2] == 0x49)
       {
         return SX_MU80_NATIVE;
       }
@@ -683,58 +712,64 @@ int tSynthSysex::GetId(const tSysEx* s) const
         return SX_YAMAHA_UNKNOWN;
       }
 
-      break; // end Yamaha
+      break;
+      // end Yamaha
 
     default:
       break;
-   }
+  }
 
-   // Not recognized
-   return SX_NONE;
+  // Not recognized
+  return SX_NONE;
 }
 
 
-unsigned char* tSynthSysex::GetValPtr(const tSysEx* s) const
+const unsigned char* tSynthSysex::GetValPtr(const tSysEx* pSysEx) const
 {
-  if (!s)
+  if (!pSysEx)
   {
     return 0;
   }
 
-  switch (s->mpData[0])
+  const unsigned char* pData = pSysEx->GetData();
+  switch (pData[0])
   {
     case 0x7f:
       // GM MasterVol?
-      if (!memcmp(sxdata[SX_GM_MasterVol], s->mpData,4))
+      if (!memcmp(sxdata[SX_GM_MasterVol], pData, 4))
       {
-        return &s->mpData[4];
+        return &pData[4];
       }
       break;
 
     case 0x41:
-      // Roland!
+      //-------
+      // Roland
+      //-------
+
       // GS DT1?
-      if ((s->mpData[2] == 0x42) && (s->mpData[3] == 0x12) && (s->Length >= 10))
+      if (pData[2] == 0x42 && pData[3] == 0x12 && pSysEx->GetDataLength() >= 10)
       {
-        return &s->mpData[7];
+        return &pData[7];
       }
       // other DT1 or RQ1 ?
       else if (
-        ((s->mpData[3] == 0x12) && (s->Length >= 10)) ||
-        ((s->mpData[3] == 0x11) && (s->Length >= 12)))
+        (pData[3] == 0x12 && pSysEx->GetDataLength() >= 10) ||
+        (pData[3] == 0x11 && pSysEx->GetDataLength() >= 12))
       {
-        return &s->mpData[7];
+        return &pData[7];
       }
       break;
 
     case 0x43:
       // Yamaha!
       // XG Native?
-      if (((s->mpData[1] & 0xf0) == 0x10) && (s->mpData[2] == 0x4c))
+      if (((pData[1] & 0xf0) == 0x10) && pData[2] == 0x4c)
       {
-        return &s->mpData[6];
+        return &pData[6];
       }
       break;
+
     default:
       break;
   }
@@ -743,73 +778,66 @@ unsigned char* tSynthSysex::GetValPtr(const tSysEx* s) const
   return 0;
 }
 
-unsigned char * tSynthSysex::GetChaPtr(const tSysEx* s)
+//-----------------------------------------------------------------------------
+// Description:
+//   Return a pointer to the byte with the channel (if any).
+//-----------------------------------------------------------------------------
+const unsigned char* tSynthSysex::GetChaPtr(const tSysEx* pSysEx)
 {
-   // Get the byte where the channel number is (if any)
+  if (!pSysEx)
+  {
+    return 0;
+  }
 
-   if (!s)
-   {
-      return 0;
-   }
-
-   switch (s->mpData[0])
-   {
+  const unsigned char* pData = pSysEx->GetData();
+  switch (pData[0])
+  {
     case 0x41:
-       // Roland!
-       // GS DT1 + address 0x40?
-       if (
-         (s->mpData[2] == 0x42) &&
-         (s->mpData[3] == 0x12) &&
-         (s->mpData[4] == 0x40))
-       {
-         if (
-           ((s->mpData[5] & 0xf0) == 0x10) ||
-           ((s->mpData[5] & 0xf0) == 0x20))
-         {
-           return &s->mpData[5];
-         }
-       }
-       break;
+      //-------
+      // Roland
+      //-------
+
+      // GS DT1 + address 0x40?
+      if (pData[2] == 0x42 && pData[3] == 0x12 && pData[4] == 0x40)
+      {
+        if ((pData[5] & 0xf0) == 0x10 || (pData[5] & 0xf0) == 0x20)
+        {
+          return &pData[5];
+        }
+      }
+      break;
 
     case 0x43:
-       // Yamaha!
-       // XG Native multipart?
-       if (
-         ((s->mpData[1] & 0xf0) == 0x10) &&
-         (s->mpData[2] == 0x4c) &&
-         (s->mpData[3] == 0x08))
-       {
-         return &s->mpData[4];
-       }
-       break;
-    default:
-       break;
-   }
+      //-------
+      // Yamaha
+      //-------
 
-   // Not recognized
-   return 0;
+      // XG Native multipart?
+      if ((pData[1] & 0xf0) == 0x10 && pData[2] == 0x4c && pData[3] == 0x08)
+      {
+        return &pData[4];
+      }
+      break;
+    default:
+      break;
+  }
+
+  // Not recognized.
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSynthSysex::FixCheckSum(tSysEx* s)
+void tSynthSysex::FixCheckSum(tSysEx* pSysEx)
 {
+  const unsigned char* pData = pSysEx->GetData();
   if (
-    (s->mpData[0] == 0x41) &&
-    (((s->mpData[3] == 0x12) && (s->Length >= 10)) ||
-      ((s->mpData[3] == 0x11) && (s->Length >= 12))))
+    pData[0] == 0x41 &&
+    ((pData[3] == 0x12 && pSysEx->GetDataLength() >= 10) ||
+     (pData[3] == 0x11 && pSysEx->GetDataLength() >= 12)))
   {
-    // Roland RQ1 or DT1
-    int len = s->Length;
-    unsigned char *sx = s->mpData;
-    unsigned char sum = 0x00;
-
-    for (int i = 4; i < (len-2); i++)
-    {
-      sum += sx[i];
-    }
-    sx[len - 2] = (0x80 - (sum & 0x7f)) & 0x7f;
-    sx[len-1] = 0xf7;
+    // The synthesizer is a Roland RQ1 or DT1.
+    pSysEx->FixCheckSum();
   }
 }
 
@@ -852,7 +880,7 @@ tSysEx* tSynthSysex::operator()(
    int len = sxlen[id] + datalen - 1;
    unsigned char* sx = new unsigned char[len];
    memcpy(sx, sxdata[id], sxlen[id]);
-   tSysEx* s = 0;
+   tSysEx* pSysEx = 0;
 
    if (id == SX_GM_MasterVol)
    {
@@ -862,7 +890,7 @@ tSysEx* tSynthSysex::operator()(
       else
         sx[4] = 0;
       sx[5] = val[0]; // MSB
-      s = new tSysEx(clk, sx, len);
+      pSysEx = new tSysEx(clk, sx, len);
    }
    else if ((id > SX_GS_ON) && (id < SX_XG_ON))
    {
@@ -880,7 +908,7 @@ tSysEx* tSynthSysex::operator()(
         sum += sx[i];
       sx[len - 2] = (0x80 - (sum & 0x7f)) & 0x7f;
       sx[len-1] = 0xf7;
-      s = new tSysEx(clk, sx, len);
+      pSysEx = new tSysEx(clk, sx, len);
    }
    else if (id > SX_XG_ON)
    {
@@ -895,11 +923,11 @@ tSysEx* tSynthSysex::operator()(
         sx[4] = channel - 1;
       }
       sx[len-1] = 0xf7;
-      s = new tSysEx(clk, sx, len);
+      pSysEx = new tSysEx(clk, sx, len);
    }
 
    delete sx;
-   return s;
+   return pSysEx;
 }
 
 

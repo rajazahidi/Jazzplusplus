@@ -1140,21 +1140,24 @@ class tSysexDlg : public tEventDlg
 };
 
 
-tSysexDlg::tSysexDlg(tSysEx *s, JZPianoWindow* w, JZTrack *t)
-  : tEventDlg(s, w, t)
+tSysexDlg::tSysexDlg(tSysEx* pSysEx, JZPianoWindow* w, JZTrack *t)
+  : tEventDlg(pSysEx, w, t)
 {
-  Event = s;
+  Event = pSysEx;
   char hexbyte[10];
 
   str = new char[256];
   str[0] = 0;
 
-  if (s->Length)
-     strcat( str, "f0 " );
-
-  for (int i = 0; i < s->Length; i++)
+  if (pSysEx->GetDataLength())
   {
-    sprintf(hexbyte, "%02x ", s->mpData[i]);
+    strcat(str, "f0 ");
+  }
+
+  const unsigned char* pData = pSysEx->GetData();
+  for (int i = 0; i < pSysEx->GetDataLength(); i++)
+  {
+    sprintf(hexbyte, "%02x ", pData[i]);
     strcat(str, hexbyte);
   }
 }
@@ -1223,9 +1226,8 @@ bool tSysexDlg::OnClose()
 void tSysexDlg::AddProperties()
 {
 //  char label1[100];
-  unsigned char* uptr;
 
-  if (Event->IsSysEx()->Length)
+  if (Event->IsSysEx()->GetDataLength())
   {
 //    sprintf(
 //      label1,
@@ -1240,16 +1242,16 @@ void tSysexDlg::AddProperties()
         Event->IsSysEx()))),
       "string"));//r/o
 
-    uptr = gpSynth->GetSysexValPtr(Event->IsSysEx());
+    const unsigned char* pData = gpSynth->GetSysexValPtr(Event->IsSysEx());
 
-    if (uptr)
+    if (pData)
     {
       ostringstream Oss;
       Oss
         << "First data byte is at offset "
-        << uptr - Event->IsSysEx()->mpData + 1 << ", value "
-        << setw(2) << hex << static_cast<int>(*uptr)
-        << dec << " (" << static_cast<int>(*uptr) << " decimal)";
+        << pData - Event->IsSysEx()->GetData() + 1 << ", value "
+        << setw(2) << hex << static_cast<int>(*pData)
+        << dec << " (" << static_cast<int>(*pData) << " decimal)";
       sheet->AddProperty(new wxProperty(
         Oss.str().c_str(),
         wxPropertyValue((char*)""),

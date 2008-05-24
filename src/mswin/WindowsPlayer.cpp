@@ -428,7 +428,7 @@ int JZWindowsPlayer::OutSysex(JZEvent* pEvent, DWORD time)
 
   state->sysex_found = TRUE;
   tWinSysexBuffer *buf = state->osx_buffers->AllocBuffer();
-  buf->PrepareOut(state->hout, sx->mpData, sx->Length - 1);
+  buf->PrepareOut(state->hout, sx->GetData(), sx->GetLength() - 1);
   state->play_buffer.put(SYSEX_EVENT, time);
   state->play_buffer.put((DWORD)buf, time);
   return 0;
@@ -486,13 +486,13 @@ void JZWindowsPlayer::OutNow(JZEvent* pEvent)
   else if (pEvent->GetStat() == StatSysEx)
   {
     tSysEx *s = pEvent->IsSysEx();
-    if (s->Length + 1 < maxSysLen)
+    if (s->GetDataLength() + 1 < maxSysLen)
     {
       pSysBuf[0] = 0xf0;
-      memcpy(pSysBuf + 1, s->mpData, s->Length);
+      memcpy(pSysBuf + 1, s->GetData(), s->GetDataLength());
 
       pSysHdr->lpData = (LPSTR)pSysBuf;
-      pSysHdr->dwBufferLength = s->Length + 1;
+      pSysHdr->dwBufferLength = s->GetDataLength() + 1;
       pSysHdr->dwUser = 0;
 
       if (midiOutPrepareHeader(state->hout, pSysHdr, sizeof(MIDIHDR)) == 0)

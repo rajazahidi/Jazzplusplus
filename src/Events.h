@@ -898,7 +898,8 @@ class tControl : public tChannelEvent
     unsigned char mValue;
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 class tProgram : public tChannelEvent
 {
   public:
@@ -969,27 +970,27 @@ class tProgram : public tChannelEvent
     unsigned char mProgram;
 };
 
-
-
+//*****************************************************************************
+//*****************************************************************************
 class tMetaEvent : public JZEvent
 {
   public:
 
-    unsigned char* mpData;
-    unsigned short Length;
-
     tMetaEvent(
       int Clock,
       unsigned char sta,
-      unsigned char* dat,
-      unsigned short len)
-      : JZEvent(Clock, sta)
+      unsigned char* pData,
+      unsigned short Length)
+      : JZEvent(Clock, sta),
+        mpData(0),
+        mLength(Length)
     {
-      Length = len;
-      mpData = new unsigned char [len + 1];
-      if (dat)
-        memcpy(mpData, dat, len);
-      mpData[len] = 0;
+      mpData = new unsigned char [Length + 1];
+      if (pData)
+      {
+        memcpy(mpData, pData, Length);
+      }
+      mpData[Length] = 0;
     }
 
     virtual ~tMetaEvent()
@@ -1000,7 +1001,7 @@ class tMetaEvent : public JZEvent
     virtual int Write(JZWriteBase &io)
     {
       edb();
-      return io.Write(this, mpData, Length);
+      return io.Write(this, mpData, mLength);
     }
 
     virtual tMetaEvent* IsMetaEvent()
@@ -1012,23 +1013,47 @@ class tMetaEvent : public JZEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tMetaEvent(mClock, mStat, mpData, Length);
+      return new tMetaEvent(mClock, mStat, mpData, mLength);
     }
+
+    const unsigned char* GetData() const
+    {
+      return mpData;
+    }
+
+    unsigned short GetDataLength() const
+    {
+      return mLength;
+    }
+
+    virtual void FixCheckSum();
+
+  protected:
+
+    unsigned char* mpData;
+    unsigned short mLength;
 };
 
-
-
+//*****************************************************************************
+// Description:
+//   This event contains proprietary information for Jazz++.  This event
+// should should not go into a track itself but is read/written from/to
+// the file.
+//*****************************************************************************
 class tJazzMeta : public tMetaEvent
 {
-  // proprietary information of jazz stored to a track. This event
-  // should not go into a track itself but is read/written from/to
-  // the file.
   public:
-    enum { DATALEN = 20 };
-    tJazzMeta(int Clock, unsigned char *dat, unsigned short len)
-      : tMetaEvent(Clock, StatJazzMeta, dat, len)
+
+    enum
+    {
+      DATALEN = 20
+    };
+
+    tJazzMeta(int Clock, unsigned char* pData, unsigned short Length)
+      : tMetaEvent(Clock, StatJazzMeta, pData, Length)
     {
     }
+
     tJazzMeta()
       : tMetaEvent(0, StatJazzMeta, 0, DATALEN)
     {
@@ -1036,18 +1061,22 @@ class tJazzMeta : public tMetaEvent
       memcpy(mpData, "JAZ2", 4);
       mpData[4] = 1; // version or so
     }
+
     char GetAudioMode() const
     {
       return mpData[5];
     }
+
     void SetAudioMode(char c)
     {
       mpData[5] = c;
     }
+
     char GetTrackState() const
     {
       return mpData[6];
     }
+
     void SetTrackState(char c)
     {
       mpData[6] = c;
@@ -1084,17 +1113,18 @@ class tJazzMeta : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tJazzMeta(mClock, mpData, Length);
+      return new tJazzMeta(mClock, mpData, mLength);
     }
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 class tSysEx : public tMetaEvent
 {
   public:
 
-    tSysEx(int Clock, unsigned char *dat, unsigned short len)
-      : tMetaEvent(Clock, StatSysEx, dat, len)
+    tSysEx(int Clock, unsigned char* pData, unsigned short Length)
+      : tMetaEvent(Clock, StatSysEx, pData, Length)
     {
     }
 
@@ -1107,19 +1137,21 @@ class tSysEx : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tSysEx(mClock, mpData, Length);
+      return new tSysEx(mClock, mpData, mLength);
     }
 
     // todo
     virtual int GetPitch() const;
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tSongPtr : public tMetaEvent
 {
   public:
 
-    tSongPtr(int Clock, unsigned char *dat, unsigned short len)
-      : tMetaEvent(Clock, StatSongPtr, dat, len)
+    tSongPtr(int Clock, unsigned char* pData, unsigned short Length)
+      : tMetaEvent(Clock, StatSongPtr, pData, Length)
     {
     }
 
@@ -1132,15 +1164,17 @@ class tSongPtr : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tSongPtr(mClock, mpData, Length);
+      return new tSongPtr(mClock, mpData, mLength);
     }
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tMidiClock : public tMetaEvent
 {
   public:
-    tMidiClock(int Clock, unsigned char *dat, unsigned short len)
-      : tMetaEvent(Clock, StatMidiClock, dat, len)
+    tMidiClock(int Clock, unsigned char* pData, unsigned short Length)
+      : tMetaEvent(Clock, StatMidiClock, pData, Length)
     {
     }
 
@@ -1158,16 +1192,18 @@ class tMidiClock : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tMidiClock(mClock, mpData, Length);
+      return new tMidiClock(mClock, mpData, mLength);
     }
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tStartPlay : public tMetaEvent
 {
   public:
 
-    tStartPlay(int Clock, unsigned char *dat, unsigned short len)
-      : tMetaEvent(Clock, StatStartPlay, dat, len)
+    tStartPlay(int Clock, unsigned char* pData, unsigned short Length)
+      : tMetaEvent(Clock, StatStartPlay, pData, Length)
     {
     }
 
@@ -1185,16 +1221,18 @@ class tStartPlay : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tStartPlay(mClock, mpData, Length);
+      return new tStartPlay(mClock, mpData, mLength);
     }
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tContPlay : public tMetaEvent
 {
   public:
 
-    tContPlay(int Clock, unsigned char *dat, unsigned short len)
-      : tMetaEvent(Clock, StatContPlay, dat, len)
+    tContPlay(int Clock, unsigned char* pData, unsigned short Length)
+      : tMetaEvent(Clock, StatContPlay, pData, Length)
     {
     }
 
@@ -1212,16 +1250,18 @@ class tContPlay : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tContPlay(mClock, mpData, Length);
+      return new tContPlay(mClock, mpData, mLength);
     }
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tStopPlay : public tMetaEvent
 {
   public:
 
-    tStopPlay(int Clock, unsigned char *dat, unsigned short len)
-      : tMetaEvent(Clock, StatStopPlay, dat, len)
+    tStopPlay(int Clock, unsigned char* pData, unsigned short Length)
+      : tMetaEvent(Clock, StatStopPlay, pData, Length)
     {
     }
 
@@ -1239,21 +1279,23 @@ class tStopPlay : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tStopPlay(mClock, mpData, Length);
+      return new tStopPlay(mClock, mpData, mLength);
     }
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tText : public tMetaEvent
 {
   public:
 
-    tText(int Clock, unsigned char *dat, unsigned short len)
-      : tMetaEvent(Clock, StatText, dat, len)
+    tText(int Clock, unsigned char* pData, unsigned short Length)
+      : tMetaEvent(Clock, StatText, pData, Length)
     {
     }
 
-    tText(int Clock, unsigned char *dat)
-      : tMetaEvent(Clock, StatText, dat, strlen((const char*)dat))
+    tText(int Clock, unsigned char* pData)
+      : tMetaEvent(Clock, StatText, pData, strlen((const char*)pData))
     {
     }
 
@@ -1266,7 +1308,7 @@ class tText : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tText(mClock, mpData, Length);
+      return new tText(mClock, mpData, mLength);
     }
 
     virtual unsigned char* GetText()
@@ -1275,14 +1317,14 @@ class tText : public tMetaEvent
     }
 };
 
-
-
+//*****************************************************************************
+//*****************************************************************************
 class tCopyright : public tMetaEvent
 {
   public:
 
-    tCopyright(int Clock, unsigned char *dat, unsigned short len)
-      : tMetaEvent(Clock, StatCopyright, dat, len)
+    tCopyright(int Clock, unsigned char* pData, unsigned short Length)
+      : tMetaEvent(Clock, StatCopyright, pData, Length)
     {
     }
 
@@ -1295,23 +1337,25 @@ class tCopyright : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tCopyright(mClock, mpData, Length);
+      return new tCopyright(mClock, mpData, mLength);
     }
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tTrackName : public tMetaEvent
 {
   public:
 
-    tTrackName(int Clock, unsigned char *dat, unsigned short len)
-      : tMetaEvent(Clock, StatTrackName, dat, len)
+    tTrackName(int Clock, unsigned char* pData, unsigned short Length)
+      : tMetaEvent(Clock, StatTrackName, pData, Length)
     {
 // SN++ Diese Restriktion ist viel zu hart. Es genuegt, den Namen im Mixerdialog
 //                zu begrenzen!!!
 /*
 #ifdef wx_motif
       // clip to 16 chars
-      if (len > 16)
+      if (Length > 16)
       {
         mpData[16] = 0;
         Length   = 16;
@@ -1329,18 +1373,18 @@ class tTrackName : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tTrackName(mClock, mpData, Length);
+      return new tTrackName(mClock, mpData, mLength);
     }
 };
 
-
-
+//*****************************************************************************
+//*****************************************************************************
 class tMarker : public tMetaEvent
 {
   public:
 
-    tMarker(int Clock, unsigned char *dat, unsigned short len)
-      : tMetaEvent(Clock, StatMarker, dat, len)
+    tMarker(int Clock, unsigned char* pData, unsigned short Length)
+      : tMetaEvent(Clock, StatMarker, pData, Length)
     {
     }
 
@@ -1353,16 +1397,18 @@ class tMarker : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tMarker(mClock, mpData, Length);
+      return new tMarker(mClock, mpData, mLength);
     }
 };
 
+//*****************************************************************************
 // the meaning of this event is to be able to reference a track and have that
 // play the instant the event is executed.  You can also transpose the
 // referenced track and loop it for the duration of the playtrack event.  This
 // makes it possible to compose in a structured fashion.
 //
 // Execution of the events takes place in song.cpp.
+//*****************************************************************************
 class tPlayTrack : public tMetaEvent
 {
   public:
@@ -1377,20 +1423,20 @@ class tPlayTrack : public tMetaEvent
     // that seems to be for serialization.
     int eventlength;
 
-    tPlayTrack(int Clock, unsigned char *chardat, unsigned short len)
-      : tMetaEvent(Clock, StatPlayTrack, chardat, len)
+    tPlayTrack(int Clock, unsigned char *chardat, unsigned short Length)
+      : tMetaEvent(Clock, StatPlayTrack, chardat, Length)
     {
-      int *dat = (int *)chardat;
+      int* pData = (int *)chardat;
     
       // Fill in the fields from the data.
       track = 0;
       transpose = 0;
       eventlength = 0;
-      if (dat!=0)
+      if (pData != 0)
       {
-        track = dat[0];
-        transpose = dat[1];
-        eventlength = dat[2];
+        track = pData[0];
+        transpose = pData[1];
+        eventlength = pData[2];
       }
     }
 
@@ -1410,16 +1456,16 @@ class tPlayTrack : public tMetaEvent
 
     virtual int Write(JZWriteBase &io)
     {
-      mpData = new unsigned char [Length + 1];
-      int* dat = (int *)mpData;
-      dat[0] = track;
-      dat[1] = transpose;
-      dat[2] = eventlength;
-      Length = sizeof(int) * 3;
+      mpData = new unsigned char [mLength + 1];
+      int* pData = (int *)mpData;
+      pData[0] = track;
+      pData[1] = transpose;
+      pData[2] = eventlength;
+      mLength = sizeof(int) * 3;
       edb();
 
-      mpData[Length] = 0;
-      return io.Write(this, mpData, Length);
+      mpData[mLength] = 0;
+      return io.Write(this, mpData, mLength);
     }
 
     virtual tPlayTrack* IsPlayTrack()
@@ -1442,8 +1488,8 @@ class tPlayTrack : public tMetaEvent
     }
 };
 
-
-
+//*****************************************************************************
+//*****************************************************************************
 class tSetTempo : public JZEvent
 {
   public:
@@ -1504,13 +1550,16 @@ class tSetTempo : public JZEvent
     }
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tMtcOffset : public tMetaEvent
 {
   public:
-    tMtcOffset(int Clock, unsigned char *dat, unsigned short len)
-      : tMetaEvent(Clock, StatMtcOffset, dat, len)
+    tMtcOffset(int Clock, unsigned char* pData, unsigned short Length)
+      : tMetaEvent(Clock, StatMtcOffset, pData, Length)
     {
     }
+
     virtual tMtcOffset* IsMtcOffset()
     {
       edb();
@@ -1520,11 +1569,12 @@ class tMtcOffset : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tMtcOffset(mClock, mpData, Length);
+      return new tMtcOffset(mClock, mpData, mLength);
     }
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 class tTimeSignat : public JZEvent
 {
   public:
@@ -1573,8 +1623,9 @@ class tTimeSignat : public JZEvent
     }
 };
 
-// End of track JAVE new event(it is a standard type, i want
-// it to define track loop points, as defined by the midi standard)
+//*****************************************************************************
+//   This is the end-of-track event.
+//*****************************************************************************
 class tEndOfTrack : public JZEvent
 {
   public:
@@ -1602,8 +1653,8 @@ class tEndOfTrack : public JZEvent
     }
 };
 
-
-
+//*****************************************************************************
+//*****************************************************************************
 class tKeySignat : public JZEvent
 {
   public:
@@ -1635,7 +1686,9 @@ class tKeySignat : public JZEvent
     }
 };
 
-// SN++ Aftertouch
+//*****************************************************************************
+// Aftertouch
+//*****************************************************************************
 class tKeyPressure: public tChannelEvent
 {
   public:
@@ -1689,7 +1742,9 @@ class tKeyPressure: public tChannelEvent
     }
 };
 
-// SN++ Channel Pressure
+//*****************************************************************************
+// Channel Pressure
+//*****************************************************************************
 class tChnPressure : public tChannelEvent
 {
   public:

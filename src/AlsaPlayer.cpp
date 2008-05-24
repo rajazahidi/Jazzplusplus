@@ -495,14 +495,18 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
 
     case StatSysEx:
       {
-        tSysEx *s = pEvent->IsSysEx();
+        tSysEx* pSysEx = pEvent->IsSysEx();
         // prepend 0xf0
-        char *buf = new char[s->Length + 1];
-        buf[0] = 0xF0;
-        memcpy(buf + 1, s->mpData, s->Length);
-        set_event_header(&ev, pEvent->GetClock(), s->Length + 1, buf);
+        char* pBuffer = new char[pSysEx->GetDataLength() + 1];
+        pBuffer[0] = 0xF0;
+        memcpy(pBuffer + 1, pSysEx->GetData(), pSysEx->GetDataLength());
+        set_event_header(
+          &ev,
+          pEvent->GetClock(),
+          pSysEx->GetDataLength() + 1,
+          pBuffer);
         rc = write(&ev, now);
-        delete [] buf;
+        delete [] pBuffer;
       }
       break;
 

@@ -1734,13 +1734,14 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
          {
             // todo
             tSysEx *s = pEvent->IsSysEx();
-            struct sysex_info *sysex = (struct sysex_info *)new char [sizeof(struct sysex_info) + s->Length + 1];
+            struct sysex_info *sysex = (struct sysex_info *)new char [
+              sizeof(struct sysex_info) + s->GetDataLength() + 1];
 
             sysex->key = SYSEX_PATCH;
             sysex->device_no = mididev;
-            sysex->len = s->Length + 1;
+            sysex->len = s->GetDataLength() + 1;
             sysex->data[0] = 0xf0;
-            memcpy(sysex->data + 1, s->mpData, s->Length);
+            memcpy(sysex->data + 1, s->GetData(), s->GetDataLength());
             SEQ_WRPATCH(sysex, sizeof(*sysex) + sysex->len - 1);
 
             delete [] (char *)sysex;
@@ -1749,19 +1750,23 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
          {
            // OSS wants small packets with max 6 bytes
            tSysEx *sx = pEvent->IsSysEx();
+           const unsigned char* pData = pEvent->IsSysEx()->GetData();
            const int N = 6;
            int i, j;
            char buf[N];
            buf[0] = (char)0xf0;
            i = 1;
-           for (j = 0; j < sx->Length; j++) {
-             if (i == N) {
+           for (j = 0; j < sx->GetDataLength(); j++)
+           {
+             if (i == N)
+             {
                SEQ_SYSEX(mididev, (unsigned char *)buf, N);
                i = 0;
              }
-             buf[i++] = sx->mpData[j];
+             buf[i++] = pData[j];
            }
-           if (i > 0) {
+           if (i > 0)
+           {
              SEQ_SYSEX(mididev, (unsigned char *)buf, i);
            }
          }

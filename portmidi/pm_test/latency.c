@@ -88,9 +88,6 @@ CHANGE LOG
 #endif
 
 int get_number(char *prompt);
-void Debug(PmError error);
-void DebugStream(PmError error, PortMidiStream * stream);
-static void prompt_and_exit(void);
 
 PtTimestamp previous_callback_time = 0;
 
@@ -129,7 +126,7 @@ void pt_callback(PtTimestamp timestamp, void *userData)
             buffer[0].message = Pm_Message(0x90, 60, 100);
             note_on = 1;
         }
-        DebugStream(Pm_Write(out, buffer, 1),out);
+        Pm_Write(out, buffer, 1);
         iteration = 0;
     }
 
@@ -138,9 +135,9 @@ void pt_callback(PtTimestamp timestamp, void *userData)
        PmError status;
        PmEvent buffer[1];
        do {
-          DebugStream((status = Pm_Poll(in)),in);
+          status = Pm_Poll(in);
           if (status == TRUE) {
-              DebugStream(Pm_Read(in,buffer,1),in);
+              Pm_Read(in,buffer,1);
           }
        } while (status == TRUE);
     }
@@ -164,12 +161,12 @@ int main()
     int i;
     int len;
     int choice;
-    int test_in, test_out;
     PtTimestamp stop;
     printf("Latency histogram.\n");
-    printf("Latency histogram.\n");
-    period = get_number("Choose timer period (in ms): ");
-    assert(period >= 1);
+    period = 0;
+    while (period < 1) {
+        period = get_number("Choose timer period (in ms, >= 1): ");
+    }
     printf("Benchmark with:\n\t%s\n\t%s\n\t%s\n\t%s\n",
            "1. No MIDI traffic",
            "2. MIDI input",
@@ -198,23 +195,35 @@ int main()
         /* open stream(s) */
         if (test_in) {
             int i = get_number("MIDI input device number: ");
-            Debug(Pm_OpenInput(&in, 
+            Pm_OpenInput(&in, 
                   i,
                   NULL, 
                   INPUT_BUFFER_SIZE, 
                   (long (*)(void *)) Pt_Time, 
-                  NULL, 
-                  NULL)); /* no midi thru */
+                  NULL);
+            /* turn on filtering; otherwise, input might overflow in the 
+               5-second period before timer callback starts reading midi */
+            Pm_SetFilter(in, PM_FILT_ACTIVE | PM_FILT_CLOCK);
         }
         if (test_out) {
             int i = get_number("MIDI output device number: ");
-            Debug(Pm_OpenOutput(&out, 
+            PmEvent buffer[1];
+            Pm_OpenOutput(&out, 
                   i,
                   NULL,
                   OUTPUT_BUFFER_SIZE,
                   (long (*)(void *)) Pt_Time,
                   NULL, 
-                  0)); /* no latency scheduling */
+                  0); /* no latency scheduling */
+
+            /* send a program change to force a status byte -- this fixes
+               a problem with a buggy linux MidiSport driver, and shouldn't
+               hurt anything else
+             */
+            buffer[0].timestamp = 0;
+            buffer[0].message = Pm_Message(0xC0, 0, 0); /* program change */
+            Pm_Write(out, buffer, 1);
+
             output_period = get_number(
                 "MIDI out should be sent every __ callback iterations: ");
 
@@ -234,7 +243,7 @@ int main()
        PmEvent buffer[1];
        buffer[0].timestamp = Pt_Time(NULL);
        buffer[0].message = Pm_Message(0x90, 60, 0);
-       DebugStream(Pm_Write(out, buffer, 1),out);
+       Pm_Write(out, buffer, 1);
     }
 
     /* print the histogram */
@@ -243,15 +252,25 @@ int main()
     /* avoid printing beyond last non-zero histogram entry */
     len = min(HIST_LEN, max_latency + 1);
     for (i = 0; i < len; i++) {
-        printf("%2d      %10d\n", i, histogram[i]);
+        printf("%2d      %10ld\n", i, histogram[i]);
     }
-    printf("Number of points greater than %dms: %d\n", 
+    printf("Number of points greater than %dms: %ld\n", 
            HIST_LEN - 1, out_of_range);
-    printf("Maximum latency: %d milliseconds\n", max_latency);
+    printf("Maximum latency: %ld milliseconds\n", max_latency);
     printf("\nNote that due to rounding, actual latency can be 1ms higher\n");
     printf("than the numbers reported here.\n");
     printf("Type return to exit...");
     fgets(line, STRING_MAX, stdin);
+
+	if(choice == 2)
+		Pm_Close(in);
+	else if(choice == 3)
+		Pm_Close(out);
+	else if(choice == 4)
+	{
+		Pm_Close(in);
+		Pm_Close(out);
+	}
     return 0;
 }
 
@@ -268,40 +287,4 @@ int get_number(char *prompt)
 
     }
     return i;
-}
-
-/* Debugging routines borrowed from test.c (good to use in client apps.) */
-
-static void prompt_and_exit(void)
-{
-    char line[STRING_MAX];
-    printf("type ENTER...");
-    fgets(line, STRING_MAX, stdin);
-    /* this will clean up open ports: */
-    exit(-1);
-}
-
-void Debug(PmError error)
-{
-    /* note that errors are negative and some routines return
-     * positive values to indicate success status rather than error
-     */
-    if (error < 0) {
-        printf("PortMidi call failed...\n");
-        printf(Pm_GetErrorText(error));
-        prompt_and_exit();
-    }
-}
-
-void DebugStream(PmError error, PortMidiStream * stream) {
-    if (error == pmHostError) {
-        char msg[PM_HOST_ERROR_MSG_LEN];
-        printf("HostError: ");
-        /* this function handles bogus stream pointer */
-        Pm_GetHostErrorText(stream, msg, PM_HOST_ERROR_MSG_LEN);
-        printf("%s\n", msg);
-        prompt_and_exit();
-    } else if (error < 0) {
-        Debug(error);
-    }
 }

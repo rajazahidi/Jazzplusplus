@@ -1,109 +1,102 @@
 File: PortMidi Win32 Readme
 Author: Belinda Thom, June 16 2002
-Revised by: Roger Dannenberg, June 2002
+Revised by: Roger Dannenberg, June 2002, May 2004, June 2007, 
+            Umpei Kurokawa, June 2007
 
 =============================================================================
 USING PORTMIDI:
 =============================================================================
 
-PortMidi has been created using a DLL because the Win32 MMedia API doesn't 
-handle midiInput properly in the debugger. Specifically, it doesn't clean up
-after itself if the user (i.e. you, a PortMidi application) hasn't explicitly
-closed all open midi input devices. This lack of cleanup can lead to much
-pain and agony, including the blue-screen-of-death. This situation becomes
-increasingly unacceptable when you are debugging your code, so a portMidi DLL
-seemed to be the only elegant solution.
+Using Microsoft Visual C++ project files (provided with PortMidi), there
+are two configurations of the PortMidi library. The Debug version is 
+intended for debugging, especially in a console application. The Debug
+version enables some extra error checking and outputs some text as well
+as a prompt to type ENTER so that you don't lose any debugging text when
+the program exits. You can turn off this extra debugging info by taking
+out the compile-time definition for DEBUG. (But leave _DEBUG, which I
+think is important for compiling in Debug mode.) This debugging version also
+defines PM_CHECK_ERRORS, which forces a check for error return codes from
+every call to PortMidi. You can disable this checking (especially if you
+want to handle error codes in your own way) by removing PM_CHECK_ERRORS
+from the predefined symbols list in the Settings dialog box.
 
-We suggest using PortMidi in the Debug release version, and call it from a
-console application. The "console" suggestion allows you to receive debug
-information about why devices may or may not open using stdio. Of course,
-this is only possible for testing. PortMidi is designed to run without a
-console and should work perfectly well within a graphical user interface
-application. When there is a problem, you will always be prompted to enter 
-a key before your application (and any related error messages) disappears. 
-This will help you identify when you are using portMidi incorrectly, and 
-help us to help you should an internal PortMidi error arise.
+PortMidi for Windows is based on the Win32 MMedia API. Historically, this
+API would crash Windows if a MIDI input device was left open, so PortMidi
+uses a DLL to clean up when a program exits. (The DLL cannot catch all
+exits, but any normal exit or Control-C handler will try to unload the DLL
+at which point code runs to clean up PortMidi.)
 
-The "Debug release" suggestion allows your code to verify the assert
-statements that we have added to the code to verify PortMidi's correct
-operation. This logic also will help us debug PortMidi should the need arise.
+PortMidi is designed to run without a console and should work perfectly 
+well within a graphical user interface application. The Release version
+is both optimized and lacking the debugging printout code of the Debug
+version.
 
 Read the portmidi.h file for PortMidi API details on using the PortMidi API.
 See <...>\pm_dll_test\test.c or <...>\multithread\test.c for usage examples.
-Important: to aid in debugging your client application, use the Pm_Debug and
-Pm_DebugStream commands to check status of any PortMidi calls that you make.
-The former should be used on PortMidi calls that do not operate on a
-PortMidiStream argument, the latter on PortMidi calls that do.
 
 =============================================================================
 TO INSTALL PORTMIDI:
 =============================================================================
-1)  download portmidi.zip
+1)  get current source from the portmedia project at SourceForge.net
 
-2)  unzip portmidi.zip into directory: <...>\portmidi
+2)  copy source into directory: <...>\portmidi
 
 =============================================================================
 TO COMPILE PORTMIDI:
 =============================================================================
 
-3)  go to this directory
+3)  cd to or open the portmidi directory
 
-4)  click on the portmidi.dsw workspace
+4)  start or click on the portmidi.sln workspace
+	
 
 5)  the following projects exist within this workspace:
     - portmidi (the PortMidi library)
-	- pm_dll (the dll library used to close midi ports on program exit)
-	- porttime (a small portable library implementing timer facilities)
-	- test (simple midi I/O testing)
-	- multithread (more complicated midi I/O transformation based on timers;
-        midi output is timer-based, i.e. client application based, with
-        no latency)
-	- sysex (simple sysex message I/O testing)
-	- latency (uses porttime to measure system latency)
+    - pm_dll (the dll library used to close midi ports on program exit)
+    - porttime (a small portable library implementing timer facilities)
+    - test (simple midi I/O testing)
+    - midithread (an example illustrating low-latency MIDI processing
+        using a dedicated low-latency thread)
+    - sysex (simple sysex message I/O testing)
+    - latency (uses porttime to measure system latency)
+    - midithru (an example illustrating software MIDI THRU)
+    - qtest (a test of the new multicore-safe queue implementation)
+    - mm  (allows monitoring of midi messages)
+
 
 6)  verify that all project settings are for Win32 Debug release:
-	- hit Alt^F7
-	- highlight all three projects in left part of Project Settings window; 
-	- "Settings For" should say "Win32 Debug"
+    - type Alt-F7
+    - highlight all three projects in left part of Project Settings window; 
+    - "Settings For" should say "Win32 Debug"
+	
+    -In Visual C++ 2005 Express Edition, there is a drop down menu in 
+     the top toolbar to select the Win32 and Debug option.
 
-7)  set pm_dll as the active project (e.g. Project->Select Active Project)
+7)  use Build->Batch Build ... to build everything in the project
+	
+    -In Visual C++ 2005 Express Edition, use Build->Build Solution
+	
+8)  The settings for these projects were distributed in the zip file, so
+    compile should just work.
 
-8)  rebuild all (Build->Rebuild All) to build the PortMidi DLL library
-
-9)  The settings for these projects were distributed in the zip file, so
-    compile should just work. In output window you should see:
-
-	Linking...
-	   Creating library Debug/pm_dll.lib and object Debug/pm_dll.exp
-
-	pm_dll.dll - 0 error(s), 0 warning(s)
-
-10) important! in order to be able to use DLL from the test project and set
-    breakpoints, copy following files from <...>\pm_dll\Debug into 
-    <...>\pm_dll_test\Debug and	<...>\multithread\Debug directories:
-		pm_dll.lib
-		pm_dll.dll
-    each time you rebuild pm_dll, these copies must be redone!
-
-11) set pm_dll_test as active project
-
-12) build this project (F7)
-
-13) run test project; use the menu that shows up from the command prompt to
+9) run test project; use the menu that shows up from the command prompt to
     test that portMidi works on your system. tests include: 
 		- verify midi output works
 		- verify midi input works
-		- verify midi input w/midi thru works
 
-14) repeat steps 11 -> 13 for multithread and other projects if you wish
+10) run other projects if you wish: sysex, latency, midithread, mm, 
+    qtest, midithru
 
 ============================================================================
 TO CREATE YOUR OWN PORTMIDI CLIENT APPLICATION:
 ============================================================================
 
+NOTE: this section needs to be reviewed and tested. My suggestion would
+be to copy the test project file (test.dsp) and modify it. -RBD
+
 The easiest way is to start a new project w/in the portMidi workspace:
 
-1) To open new porject: 
+1) To open new project: 
 	- File->New->Projects
 	- Location: <...>\portmidi\<yourProjectName>
 	- check Add to current workspace
@@ -112,6 +105,15 @@ The easiest way is to start a new project w/in the portMidi workspace:
       in the next step)
 	- Click OK
 	- Select "An Empty Project" and click Finish
+	
+	In Visual C++ 2005 Express Edition, 
+	- File->New->Projects
+	- Location: <...>\portmidi\<yourProjectName>
+	- select Add to solution
+	- select CLR Empty project in CLR
+	- select Win32 Console Application in Win32
+	- select Empty project in General
+	
 
 2) Now this project will be the active project. Make it explicitly depend
    on PortMidi dll:
@@ -119,17 +121,18 @@ The easiest way is to start a new project w/in the portMidi workspace:
 	- Click pm_dll
 
 3) Important! in order to be able to use portMidi DLL from your new project
-   and set breakpoints,	copy following files from <...>\pm_dll\Debug into 
+   and set breakpoints,	copy following files from <...>\pm_win\Debug into 
    <...>\<yourProjectName>\Debug directory:
 		pm_dll.lib
 		pm_dll.dll
     each time you rebuild pm_dll, these copies must be redone!
 
+
 4) add whatever files you wish to add to your new project, using portMidi
    calls as desired (see USING PORTMIDI at top of this readme)
 
 5) when you include portMidi files, do so like this:
-	- #include "..\pm_dll\portmidi.h"
+	- #include "..\pm_common\portmidi.h"
 	- etc.
 
 6) build and run your project
@@ -140,18 +143,16 @@ DESIGN NOTES
 
 The DLL is used so that PortMidi can (usually) close open devices when the
 program terminates. Failure to close input devices under WinNT, Win2K, and
-probably later systems causes the OS to crash.
+probably later systems causes the OS to crash. NOTE: Microsoft seems to 
+have fixed this bug in current versions of WinXP.
 
-One way to do this would be to make a .LIB/.DLL pair, linking to the .LIB
-in order to access functions in the .DLL. I'm not sure how to do this with
-VC++, and it seems simple enough to create a DLL that does nothing but
-call a function when the program terminates. To make this work, we need to
-pass in a pointer to funciton; otherwise, I think the function will be
-copied into the DLL, which we do not want.
+This is accomplished with a .LIB/.DLL pair, linking to the .LIB
+in order to access functions in the .DLL. Note that the PortMidi library
+itself is configured for static linking -- it is not a DLL.
 
-So the structure will be: PortMidi for Win32 exists as a simple library,
+PortMidi for Win32 exists as a simple static library,
 with Win32-specific code in pmwin.c and MM-specific code in pmwinmm.c.
-pmwin.c will use a DLL in pmdll.c to call Pm_Terminate() when the program
+pmwin.c uses a DLL in pmdll.c to call Pm_Terminate() when the program
 exits to make sure that all MIDI ports are closed.
 
 Orderly cleanup after errors are encountered is based on a fixed order of
@@ -168,12 +169,118 @@ To open input:
         set descriptor field of PmInternal structure
         - open device
         set handle field of midiwinmm_type structure
-        - allocate buffer 1 for sysex
-        buffer is added to input port
-        - allocate buffer 2 for sysex
-        buffer is added to input port
+        - allocate buffers
+        - start device
         - return
     - return
 
+SYSEX HANDLING -- the most complex, least exercised, and therefore most
+      buggy part of PortMidi (but maybe bugs are finally gone)
+
+There are three cases: simple output, stream output, input
+Each must deal with:
+ 1. Buffer Initialization (creating buffers)
+ 2. Buffer Allocation (finding a free buffer)
+ 3. Buffer Fill (putting bytes in the buffer)
+ 4. Buffer Preparation (midiOutPrepare, etc.)
+ 5. Buffer Send (to Midi device)
+ 6. Buffer Receive (in callback)
+ 7. Buffer Empty (removing bytes from buffer)
+ 8. Buffer Free (returning to the buffer pool)
+ 9. Buffer Finalization (returning to heap)
+
+Here's how simple output handles sysex:
+ 1. Buffer Initialization (creating buffers)
+  allocated when code tries to write first byte to a buffer
+  the test is "if (!m->sysex_buffers[0]) { ... }"
+  this field is initialized to NULL when device is opened
+  the size is SYSEX_BYTES_PER_BUFFER
+  allocate_sysex_buffers() does the initialization
+  note that the actual size of the allocation includes
+      additional space for a MIDIEVENT (3 longs) which are
+      not used in this case
+ 2. Buffer Allocation (finding a free buffer)
+  see get_free_sysex_buffer()
+  cycle through m->sysex_buffers[] using m->next_sysex_buffer
+      to determine where to look next
+  if nothing is found, wait by blocking on m->sysex_buffer_signal
+  this is signaled by the callback every time a message is
+      received
+ 3. Buffer Fill (putting bytes in the buffer)
+  essentially a state machine approach
+  hdr->dwBytesRecorded is a position in message pointed to by m->hdr
+  keep appending bytes until dwBytesRecorded >= SYSEX_BYTES_PER_BUFFER
+  then send the message, reseting the state to initial values
+ 4. Buffer Preparation (midiOutPrepare, etc.)
+  just before sending in winmm_end_sysex()
+ 5. Buffer Send (to Midi device)
+  message is padded with zero at end (since extra space was allocated
+      this is ok) -- the zero works around a bug in (an old version of)
+      MIDI YOKE drivers
+  dwBufferLength gets dwBytesRecorded, and dwBytesRecorded gets 0
+  uses midiOutLongMsg()
+ 6. Buffer Receive (in callback)
+ 7. Buffer Empty (removing bytes from buffer)
+  not applicable for output
+ 8. Buffer Free (returning to the buffer pool)
+  unprepare message to indicate that it is free
+  SetEvent on m->buffer_signal in case client is waiting
+ 9. Buffer Finalization (returning to heap)
+  when device is closed, winmm_out_delete frees all sysex buffers
+
+Here's how stream output handles sysex:
+ 1. Buffer Initialization (creating buffers)
+  same code as simple output (see above)
+ 2. Buffer Allocation (finding a free buffer)
+  same code as simple output (see above)
+ 3. Buffer Fill (putting bytes in the buffer)
+  essentially a state machine approach
+  m->dwBytesRecorded is a position in message
+  keep appending bytes until buffer is full (one byte to spare)
+ 4. Buffer Preparation (midiOutPrepare, etc.)
+  done before sending message
+  dwBytesRecorded and dwBufferLength are set in winmm_end_sysex
+ 5. Buffer Send (to Midi device)
+  uses midiStreamOutMsg()
+ 6. Buffer Receive (in callback)
+ 7. Buffer Empty (removing bytes from buffer)
+  not applicable for output
+ 8. Buffer Free (returning to the buffer pool)
+  unprepare message to indicate that it is free
+  SetEvent on m->buffer_signal in case client is waiting
+ 9. Buffer Finalization (returning to heap)
+  when device is closed, winmm_out_delete frees all sysex buffers
+
+
+Here's how input handles sysex:
+ 1. Buffer Initialization (creating buffers)
+  two buffers are allocated in winmm_in_open
+ 2. Buffer Allocation (finding a free buffer)
+  same code as simple output (see above)
+ 3. Buffer Fill (putting bytes in the buffer)
+  not applicable for input
+ 4. Buffer Preparation (midiOutPrepare, etc.)
+  done before sending message -- in winmm_in_open and in callback
+ 5. Buffer Send (to Midi device)
+  uses midiInAddbuffer in allocate_sysex_input_buffer (called from
+      winmm_in_open) and callback
+ 6. Buffer Receive (in callback)
+ 7. Buffer Empty (removing bytes from buffer)
+      done without pause in loop in callback
+ 8. Buffer Free (returning to the buffer pool)
+  done by midiInAddBuffer in callback, no pointer to buffers
+      is retained except by device
+ 9. Buffer Finalization (returning to heap)
+  when device is closed, empty buffers are delivered to callback,
+      which frees them
+
+IMPORTANT: In addition to the above, PortMidi now has
+"shortcuts" to optimize the transfer of sysex data. To enable
+the optimization for sysex output, the system-dependent code
+sets fields in the pmInternal structure: fill_base, fill_offset_ptr,
+and fill_length. When fill_base is non-null, the system-independent
+part of PortMidi is allowed to directly copy sysex bytes to
+"fill_base[*fill_offset_ptr++]" until *fill_offset_ptr reaches
+fill_length. See the code for details.
 
 

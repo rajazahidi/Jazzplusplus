@@ -13,11 +13,22 @@
 #include "portmidi.h"
 #include "porttime.h"
 #include "string.h"
+#ifdef WIN32
+// need to get declaration for Sleep()
+#include "windows.h"
+#else
+#define Sleep(n) usleep(n * 1000)
+#endif
 
 #define MIDI_SYSEX 0xf0
 #define MIDI_EOX 0xf7
 
 #define STRING_MAX 80
+
+#ifndef true
+#define true 1
+#define false 0
+#endif
 
 int latency = 0;
 
@@ -37,48 +48,6 @@ int get_number(char *prompt)
 }
 
 
-/*
-=====================================================================
-routines for client debugging
-=====================================================================
-    this stuff really important for debugging client app. These are
-    not included in PortMidi because they rely on console and printf()
-*/
-
-static void prompt_and_exit(void)
-{
-    char line[80];
-    printf("type ENTER...");
-    fgets(line, STRING_MAX, stdin);
-    /* this will clean up open ports: */
-    exit(-1);
-}
-
-void Debug(PmError error)
-{
-    /* note that errors are negative and some routines return
-     * positive values to indicate success status rather than error
-     */
-    if (error < 0) {
-        printf("PortMidi call failed...\n");
-        printf(Pm_GetErrorText(error));
-        prompt_and_exit();
-    }
-}
-
-void DebugStream(PmError error, PortMidiStream * stream) {
-    if (error == pmHostError) {
-        char msg[PM_HOST_ERROR_MSG_LEN];
-        /* this function handles bogus stream pointer */
-        Pm_GetHostErrorText(stream, msg, PM_HOST_ERROR_MSG_LEN);
-        printf(msg);
-        prompt_and_exit();
-    } else if (error < 0) {
-        Debug(error);
-    }
-}
-
-
 /* loopback test -- send/rcv from 2 to 1000 bytes of random midi data */
 /**/
 void loopback_test()
@@ -95,7 +64,8 @@ void loopback_test()
     PmEvent event;
     int shift;
 
-
+    Pt_Start(1, 0, 0);
+    
     printf("Connect a midi cable from an output port to an input port.\n");
     printf("This test will send random data via sysex message from output\n");
     printf("to input and check that the correct data was received.\n");
@@ -105,75 +75,280 @@ void loopback_test()
        series of buffers. This is nicer than allocating a big buffer for the
        message, and it also seems to work better. Either way works.
      */
-    Debug(Pm_OpenOutput(&midi_out, outp, NULL, 0, NULL, NULL, latency));
+    while ((latency = get_number(
+                     "Latency in milliseconds (0 to send data immediatedly,\n"
+                     "  >0 to send timestamped messages): ")) < 0);
+    Pm_OpenOutput(&midi_out, outp, NULL, 0, NULL, NULL, latency);
     inp = get_number("Type input device number: ");
     /* since we are going to send and then receive, make sure the input buffer
        is large enough for the entire message */
-    Debug(Pm_OpenInput(&midi_in, inp, NULL, 512, NULL, NULL, NULL));
+    Pm_OpenInput(&midi_in, inp, NULL, 512, NULL, NULL);
 
     srand((unsigned int) Pt_Time()); /* seed for random numbers */
 
     while (1) {
         PmError count;
-        printf("Type return to send message, q to quit: ");
-        fgets(line, STRING_MAX, stdin);
-        if (line[0] == 'q') goto cleanup;
+        long start_time;
+        long error_position = -1; /* 0; -1; -1 for continuous */ 
+        long expected = 0;
+        long actual = 0;
+        /* this modification will run until an error is detected */
+        /* set error_position above to 0 for interactive, -1 for */
+        /* continuous */
+        if (error_position >= 0) {
+            printf("Type return to send message, q to quit: ");
+            fgets(line, STRING_MAX, stdin);
+            if (line[0] == 'q') goto cleanup;
+        }
 
         /* compose the message */
         len = rand() % 998 + 2; /* len only counts data bytes */
         msg[0] = (char) MIDI_SYSEX; /* start of SYSEX message */
         /* data bytes go from 1 to len */
         for (i = 0; i < len; i++) {
-            msg[i + 1] = rand() & 0x7f; /* MIDI data */
+/* pick whether data is sequential or random... (docs say random) */
+#define DATA_EXPR (i+1)
+// #define DATA_EXPR rand()
+            msg[i + 1] = DATA_EXPR & 0x7f; /* MIDI data */
         }
         /* final EOX goes in len+1, total of len+2 bytes in msg */
         msg[len + 1] = (char) MIDI_EOX;
 
         /* sanity check: before we send, there should be no queued data */
-        DebugStream(count = Pm_Read(midi_in, &event, 1), midi_in);
+        count = Pm_Read(midi_in, &event, 1);
 
         if (count != 0) {
-			printf("Before sending anything, a MIDI message was found in\n");
-			printf("the input buffer. Please try again.\n");
-			break;
+            printf("Before sending anything, a MIDI message was found in\n");
+            printf("the input buffer. Please try again.\n");
+            break;
 		}
 
         /* send the message */
-        printf("Sending %d byte sysex message.\n", len + 2);
-        DebugStream(Pm_WriteSysEx(midi_out, 0, msg), midi_out);
+        printf("Sending %ld byte sysex message.\n", len + 2);
+        Pm_WriteSysEx(midi_out, 0, msg);
 
         /* receive the message and compare to msg[] */
         data = 0;
         shift = 0;
         i = 0;
-        while (data != MIDI_EOX) {
-            DebugStream(count = Pm_Read(midi_in, &event, 1), midi_in);
-            /* CAUTION: this causes busy waiting. It would be better to 
-               be in a polling loop to avoid being compute bound. PortMidi
-               does not support a blocking read since this is so seldom
-               useful. There is no timeout, so if we don't receive a sysex
-               message, or at least an EOX, the program will hang here.
-             */
-            if (count == 0) continue;
-
+        start_time = Pt_Time();
+        error_position = -1;
+        /* allow up to 2 seconds for transmission */
+        while (data != MIDI_EOX && start_time + 2000 > Pt_Time()) {
+            count = Pm_Read(midi_in, &event, 1);
+            if (count == 0) {
+                Sleep(1); /* be nice: give some CPU time to the system */
+                continue; /* continue polling for input */
+            }
+            
+            /* printf("read %lx ", event.message);
+               fflush(stdout); */
+            
             /* compare 4 bytes of data until you reach an eox */
             for (shift = 0; shift < 32 && (data != MIDI_EOX); shift += 8) {
                 data = (event.message >> shift) & 0xFF;
-                if (data != msg[i]) {
-                    printf("Error at byte %d: sent %x recd %x\n", i, msg[i], data);
-                    goto cleanup;
+                if (data != msg[i] && error_position < 0) {
+                    error_position = i;
+                    expected = msg[i];
+                    actual = data;
                 }
                 i++;
             }
         }
-
-        printf("Received %d byte sysex message.\n", len + 2);
+        if (error_position >= 0) {
+            printf("Error at byte %ld: sent %lx recd %lx\n", error_position, 
+                   expected, actual);
+        } else if (i != len + 2) {
+            printf("Error: byte %d not received\n", i);
+        } else {
+            printf("Correctly ");
+        }
+        printf("received %d byte sysex message.\n", i);
     }
 cleanup:
     Pm_Close(midi_out);
     Pm_Close(midi_in);
     return;
 }
+
+
+/* send_multiple test -- send many sysex messages */
+/**/
+void send_multiple_test()
+{
+    int outp;
+    int length;
+    int num_msgs;
+    PmStream *midi_out;
+    unsigned char msg[1024];
+    int i;
+    PtTimestamp start_time;
+    PtTimestamp stop_time;
+
+    Pt_Start(1, 0, 0);
+    
+    printf("This is for performance testing. You should be sending to this\n");
+    printf("program running the receive multiple test. Do NOT send to\n");
+    printf("a synthesizer or you risk reprogramming it\n");
+    outp = get_number("Type output device number: ");
+    while ((latency = get_number(
+                     "Latency in milliseconds (0 to send data immediatedly,\n"
+                     "  >0 to send timestamped messages): ")) < 0);
+    Pm_OpenOutput(&midi_out, outp, NULL, 0, NULL, NULL, latency);
+    while ((length = get_number("Message length (7 - 1024): ")) < 7 ||
+           length > 1024) ;
+    while ((num_msgs = get_number("Number of messages: ")) < 1);
+    /* latency, length, and num_msgs should now all be valid */
+    /* compose the message except for sequence number in first 5 bytes */
+    msg[0] = (char) MIDI_SYSEX;
+    for (i = 6; i < length - 1; i++) {
+        msg[i] = i % 128; /* this is just filler */
+    }
+    msg[length - 1] = (char) MIDI_EOX;
+
+    start_time = Pt_Time();
+    /* send the messages */
+    for (i = num_msgs; i > 0; i--) {
+        /* insert sequence number into first 5 data bytes */
+        /* sequence counts down to zero */
+        int j;
+        int count = i;
+        /* 7 bits of message count i goes into each data byte */
+        for (j = 1; j <= 5; j++) {
+            msg[j] = count & 127;
+            count >>= 7;
+        }
+        /* send the message */
+        Pm_WriteSysEx(midi_out, 0, msg);
+    }
+    stop_time = Pt_Time();
+    Pm_Close(midi_out);
+    return;
+}
+
+#define MAX_MSG_LEN 1024
+static unsigned char receive_msg[MAX_MSG_LEN];
+static long receive_msg_index;
+static long receive_msg_length;
+static long receive_msg_count;
+static long receive_msg_error;
+static long receive_msg_messages;
+static PmStream *receive_msg_midi_in;
+static int receive_poll_running;
+
+/* receive_poll -- callback function to check for midi input */
+/**/
+void receive_poll(PtTimestamp timestamp, void *userData)
+{
+    PmError count;
+    PmEvent event;
+    int shift;
+    int data = 0;
+    int i;
+    
+    if (!receive_poll_running) return; /* wait until midi device is opened */
+    shift = 0;
+    while (data != MIDI_EOX) {
+        count = Pm_Read(receive_msg_midi_in, &event, 1);
+        if (count == 0) return;
+
+        /* compare 4 bytes of data until you reach an eox */
+        for (shift = 0; shift < 32 && (data != MIDI_EOX); shift += 8) {
+            receive_msg[receive_msg_index++] = data = 
+                (event.message >> shift) & 0xFF;
+            if (receive_msg_index >= MAX_MSG_LEN) {
+                printf("error: incoming sysex too long\n");
+                goto error;
+            }
+        }
+    }
+    /* check the message */
+    if (receive_msg_length == 0) {
+        receive_msg_length = receive_msg_index;
+    }
+    if (receive_msg_length != receive_msg_index) {
+        printf("error: incoming sysex wrong length\n");
+        goto error;
+    }
+    if (receive_msg[0] != MIDI_SYSEX) {
+        printf("error: incoming sysex missing status byte\n");
+        goto error;
+    }
+    /* get and check the count */
+    count = 0;
+    for (i = 0; i < 5; i++) {
+        count += receive_msg[i + 1] << (7 * i);
+    }
+    if (receive_msg_count == -1) {
+        receive_msg_count = count;
+        receive_msg_messages = count;
+    }
+    if (receive_msg_count != count) {
+        printf("error: incoming sysex has wrong count\n");
+        goto error;
+    }
+    for (i = 6; i < receive_msg_index - 1; i++) {
+        if (receive_msg[i] != i % 128) {
+            printf("error: incoming sysex has bad data\n");
+            goto error;
+        }
+    }
+    if (receive_msg[receive_msg_length - 1] != MIDI_EOX) goto error;
+    receive_msg_index = 0; /* get ready for next message */
+    receive_msg_count--;
+    return;
+ error:
+    receive_msg_error = 1;
+    return;
+}
+
+
+/* receive_multiple_test -- send/rcv from 2 to 1000 bytes of random midi data */
+/**/
+void receive_multiple_test()
+{
+    PmError err;
+    int inp;
+    
+    printf("This test expects to receive data sent by the send_multiple test\n");
+    printf("The test will check that correct data is received.\n");
+
+    /* Important: start PortTime first -- if it is not started first, it will
+       be started by PortMidi, and then our attempt to open again will fail */
+    receive_poll_running = false;
+    if (err = Pt_Start(1, receive_poll, 0)) {
+        printf("PortTime error code: %d\n", err);
+        goto cleanup;
+    }
+    inp = get_number("Type input device number: ");
+    Pm_OpenInput(&receive_msg_midi_in, inp, NULL, 512, NULL, NULL);
+    receive_msg_index = 0;
+    receive_msg_length = 0;
+    receive_msg_count = -1;
+    receive_msg_error = 0;
+    receive_poll_running = true;
+    while ((!receive_msg_error) && (receive_msg_count != 0)) {
+#ifdef WIN32
+        Sleep(1000);
+#else
+        sleep(1); /* block and wait */
+#endif
+    }
+    if (receive_msg_error) {
+        printf("Receive_multiple test encountered an error\n");
+    } else {
+        printf("Receive_multiple test successfully received %d sysex messages\n", 
+               receive_msg_messages);
+    }
+cleanup:
+    receive_poll_running = false;
+    Pm_Close(receive_msg_midi_in);
+    Pt_Stop();
+    return;
+}
+
+
+#define is_real_time_msg(msg) ((0xF0 & Pm_MessageStatus(msg)) == 0xF8)
 
 
 void receive_sysex()
@@ -190,7 +365,7 @@ void receive_sysex()
     int i = get_number("Type input device number: ");
 
     /* open input device */
-    Debug(Pm_OpenInput(&midi, i, NULL, 512, NULL, NULL, NULL));
+    Pm_OpenInput(&midi, i, NULL, 512, NULL, NULL);
     printf("Midi Input opened, type file for sysex data: ");
 
     /* open file */
@@ -209,17 +384,22 @@ void receive_sysex()
     /* read data and write to file */
     while (data != MIDI_EOX) {
         PmError count;
-        DebugStream(count = Pm_Read(midi, &msg, 1), midi);
+        count = Pm_Read(midi, &msg, 1);
         /* CAUTION: this causes busy waiting. It would be better to 
            be in a polling loop to avoid being compute bound. PortMidi
            does not support a blocking read since this is so seldom
            useful.
          */
         if (count == 0) continue;
+        /* ignore real-time messages */
+        if (is_real_time_msg(Pm_MessageStatus(msg.message))) continue;
 
         /* write 4 bytes of data until you reach an eox */
         for (shift = 0; shift < 32 && (data != MIDI_EOX); shift += 8) {
             data = (msg.message >> shift) & 0xFF;
+            /* if this is a status byte that's not MIDI_EOX, the sysex
+               message is incomplete and there is no more sysex data */
+            if (data & 0x80 && data != MIDI_EOX) break;
             fprintf(f, "%2x ", data);
             if (++bytes_on_line >= 16) {
                 fprintf(f, "\n");
@@ -227,7 +407,7 @@ void receive_sysex()
             }
         }
     }
-	fclose(f);
+    fclose(f);
     Pm_Close(midi);
 }
 
@@ -243,11 +423,14 @@ void send_sysex()
 
 	/* determine which output device to use */
     int i = get_number("Type output device number: ");
+    while ((latency = get_number(
+                     "Latency in milliseconds (0 to send data immediatedly,\n"
+                     "  >0 to send timestamped messages): ")) < 0);
 
     msg.timestamp = 0; /* no need for timestamp */
 
 	/* open output device */
-    Debug(Pm_OpenOutput(&midi, i, NULL, 0, NULL, NULL, latency));
+    Pm_OpenOutput(&midi, i, NULL, 0, NULL, NULL, latency);
 	printf("Midi Output opened, type file with sysex data: ");
 
     /* open file */
@@ -279,7 +462,7 @@ void send_sysex()
                but this method is simpler. See Pm_WriteSysex for a more
                efficient code example.
              */
-            DebugStream(Pm_Write(midi, &msg, 1), midi);
+            Pm_Write(midi, &msg, 1);
             msg.message = 0;
             shift = 0;
         }
@@ -297,19 +480,18 @@ int main()
     int i;
     char line[80];
     
-	/* list device information */
-	for (i = 0; i < Pm_CountDevices(); i++) {
+    /* list device information */
+    for (i = 0; i < Pm_CountDevices(); i++) {
         const PmDeviceInfo *info = Pm_GetDeviceInfo(i);
         printf("%d: %s, %s", i, info->interf, info->name);
         if (info->input) printf(" (input)");
         if (info->output) printf(" (output)");
         printf("\n");
     }
-	latency = get_number("Latency in milliseconds (0 to send data immediatedly,\n"
-		                 "  >0 to send timestamped messages): ");    
     while (1) {
         printf("Type r to receive sysex, s to send,"
-               " l for loopback test, q to quit: ");
+               " l for loopback test, m to send multiple,"
+               " n to receive multiple, q to quit: ");
         fgets(line, STRING_MAX, stdin);
         switch (line[0]) {
           case 'r':
@@ -320,16 +502,18 @@ int main()
             break;
           case 'l':
             loopback_test();
+            break;
+          case 'm':
+            send_multiple_test();
+            break;
+          case 'n':
+            receive_multiple_test();
+            break;
           case 'q':
-            prompt_and_exit();
+            exit(0);
           default:
             break;
         }
     }
     return 0;
 }
-
-
-     
-
-            

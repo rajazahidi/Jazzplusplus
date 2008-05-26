@@ -8,7 +8,7 @@
 #define INPUT_BUFFER_SIZE 100
 #define OUTPUT_BUFFER_SIZE 0
 #define DRIVER_INFO NULL
-#define TIME_PROC Pt_Time
+#define TIME_PROC ((long (*)(void *)) Pt_Time)
 #define TIME_INFO NULL
 #define TIME_START Pt_Start(1, 0, 0) /* timer started w/millisecond accuracy */
 
@@ -46,57 +46,13 @@ int get_number(char *prompt)
     return i;
 }
 
-/*
-=====================================================================
-routines for client debugging
-=====================================================================
-    this stuff really important for debugging client app. These are
-    not included in PortMidi because they rely on console and printf()
-*/
 
-static void prompt_and_exit(void)
-{
-    char line[STRING_MAX];
-    printf("type ENTER...");
-    fgets(line, STRING_MAX, stdin);
-    /* this will clean up open ports: */
-    exit(-1);
-}
-
-void Debug(PmError error)
-{
-    /* note that errors are negative and some routines return
-     * positive values to indicate success status rather than error
-     */
-    if (error < 0) {
-        printf("PortMidi call failed...\n");
-        printf(Pm_GetErrorText(error));
-        prompt_and_exit();
-    }
-}
-
-void DebugStream(PmError error, PortMidiStream * stream) {
-    if (error == pmHostError) {
-        char msg[PM_HOST_ERROR_MSG_LEN];
-        printf("HostError: ");
-        /* this function handles bogus stream pointer */
-        Pm_GetHostErrorText(stream, msg, PM_HOST_ERROR_MSG_LEN);
-        printf("%s\n", msg);
-        prompt_and_exit();
-    } else if (error < 0) {
-        Debug(error);
-    }
-}
-
-
-/* read some MIDI data */
 /*
  * the somethingStupid parameter can be set to simulate a program crash.
  * We want PortMidi to close Midi ports automatically in the event of a
  * crash because Windows does not (and this may cause an OS crash)
  */
 void main_test_input(unsigned int somethingStupid) {
-    int n = 0;
     PmStream * midi;
     PmError status, length;
     PmEvent buffer[1];
@@ -108,29 +64,28 @@ void main_test_input(unsigned int somethingStupid) {
     TIME_START;
 
     /* open input device */
-    Debug(Pm_OpenInput(&midi, 
-                       i,
-                       DRIVER_INFO, 
-                       INPUT_BUFFER_SIZE, 
-                       TIME_PROC, 
-                       TIME_INFO, 
-                       NULL)); /* no midi thru */
+    Pm_OpenInput(&midi, 
+                 i,
+                 DRIVER_INFO, 
+                 INPUT_BUFFER_SIZE, 
+                 TIME_PROC, 
+                 TIME_INFO);
 
     printf("Midi Input opened. Reading %d Midi messages...\n",num);
     Pm_SetFilter(midi, PM_FILT_ACTIVE | PM_FILT_CLOCK);
     /* empty the buffer after setting filter, just in case anything
        got through */
     while (Pm_Poll(midi)) {
-        DebugStream(Pm_Read(midi, buffer, 1), midi);
+        Pm_Read(midi, buffer, 1);
     }
     /* now start paying attention to messages */
     i = 0; /* count messages as they arrive */
     while (i < num) {
-        DebugStream((status = Pm_Poll(midi)),midi);
+        status = Pm_Poll(midi);
         if (status == TRUE) {
-            DebugStream((length = Pm_Read(midi,buffer,1)),midi);
+            length = Pm_Read(midi,buffer, 1);
             if (length > 0) {
-                printf("Got message %d: time %d, %2x %2x %2x\n",
+                printf("Got message %d: time %ld, %2lx %2lx %2lx\n",
                        i,
                        buffer[0].timestamp,
                        Pm_MessageStatus(buffer[0].message),
@@ -152,34 +107,39 @@ void main_test_input(unsigned int somethingStupid) {
     /* close device (this not explicitly needed in most implementations) */
     printf("ready to close...");
 
-    Debug(Pm_Close(midi));
+    Pm_Close(midi);
     printf("done closing...");
 }
 
 
 
 void main_test_output() {
-    int n = 0;
     PmStream * midi;
 	char line[80];
-    PmEvent buffer[2];
     long off_time;
+    int chord[] = { 60, 67, 76, 83, 90 };
+    #define chord_size 5 
+    PmEvent buffer[chord_size];
+    PmTimestamp timestamp;
 
-	/* determine which output device to use */
+    /* determine which output device to use */
     int i = get_number("Type output number: ");
 
     /* It is recommended to start timer before PortMidi */
     TIME_START;
 
-	/* open output device */
-    Debug(Pm_OpenOutput(&midi, 
-                        i, 
-                        DRIVER_INFO,
-                        OUTPUT_BUFFER_SIZE, 
-                        TIME_PROC,
-                        TIME_INFO, 
-                        latency));
-    printf("Midi Output opened with %d ms latency.\n", latency);
+    /* open output device -- since PortMidi avoids opening a timer
+       when latency is zero, we will pass in a NULL timer pointer
+       for that case. If PortMidi tries to access the time_proc,
+       we will crash, so this test will tell us something. */
+    Pm_OpenOutput(&midi, 
+                  i, 
+                  DRIVER_INFO,
+                  OUTPUT_BUFFER_SIZE, 
+                  (latency == 0 ? NULL : TIME_PROC),
+                  (latency == 0 ? NULL : TIME_INFO), 
+                  latency);
+    printf("Midi Output opened with %ld ms latency.\n", latency);
 
     /* output note on/off w/latency offset; hold until user prompts */
     printf("ready to send program 1 change... (type RETURN):");
@@ -190,52 +150,59 @@ void main_test_output() {
        The source of timestamps should always correspond to the TIME_PROC
        and TIME_INFO parameters used in Pm_OpenOutput(). */
     buffer[0].timestamp = TIME_PROC(TIME_INFO);
-    buffer[0].message = Pm_Message(0xC0, 0, 0);
-    DebugStream(Pm_Write(midi, buffer, 1),midi);
+    /* Send a program change to increase the chances we will hear notes */
+    /* Program 0 is usually a piano, but you can change it here: */
+#define PROGRAM 0
+    buffer[0].message = Pm_Message(0xC0, PROGRAM, 0);
+    Pm_Write(midi, buffer, 1);
 
     printf("ready to note-on... (type RETURN):");
     fgets(line, STRING_MAX, stdin);
     buffer[0].timestamp = TIME_PROC(TIME_INFO);
     buffer[0].message = Pm_Message(0x90, 60, 100);
-    DebugStream(Pm_Write(midi, buffer, 1), midi);
+    Pm_Write(midi, buffer, 1);
     printf("ready to note-off... (type RETURN):");
     fgets(line, STRING_MAX, stdin);
     buffer[0].timestamp = TIME_PROC(TIME_INFO);
     buffer[0].message = Pm_Message(0x90, 60, 0);
-    DebugStream(Pm_Write(midi, buffer, 1), midi);
+    Pm_Write(midi, buffer, 1);
 
     /* output short note on/off w/latency offset; hold until user prompts */
     printf("ready to note-on (short form)... (type RETURN):");
     fgets(line, STRING_MAX, stdin);
-    DebugStream(Pm_WriteShort(midi, TIME_PROC(TIME_INFO),
-                              Pm_Message(0x90, 60, 100)), midi);
+    Pm_WriteShort(midi, TIME_PROC(TIME_INFO),
+                  Pm_Message(0x90, 60, 100));
     printf("ready to note-off (short form)... (type RETURN):");
     fgets(line, STRING_MAX, stdin);
-    DebugStream(Pm_WriteShort(midi, TIME_PROC(TIME_INFO),
-                              Pm_Message(0x90, 60, 0)), midi);
+    Pm_WriteShort(midi, TIME_PROC(TIME_INFO),
+                  Pm_Message(0x90, 60, 0));
 
-    /* output several note on/offs w/latency offset; hold for 100ms */
+    /* output several note on/offs to test timing. 
+       Should be 1s between notes */
+    printf("chord will arpeggiate if latency > 0\n");
     printf("ready to chord-on/chord-off... (type RETURN):");
     fgets(line, STRING_MAX, stdin);
-    buffer[0].timestamp = TIME_PROC(TIME_INFO);
-    buffer[0].message = Pm_Message(0x90, 60, 100);
-    buffer[1].timestamp = TIME_PROC(TIME_INFO);
-    buffer[1].message = Pm_Message(0x90, 67, 100);
-    DebugStream(Pm_Write(midi, buffer, 2), midi);
-    off_time = Pt_Time() + 500; /* hold chord for 500ms */
-    while (Pt_Time() < off_time) 
+    timestamp = TIME_PROC(TIME_INFO);
+    for (i = 0; i < chord_size; i++) {
+        buffer[i].timestamp = timestamp + 1000 * i;
+        buffer[i].message = Pm_Message(0x90, chord[i], 100);
+    }
+    Pm_Write(midi, buffer, chord_size);
+
+    off_time = timestamp + 1000 + chord_size * 1000; 
+    while (TIME_PROC(TIME_INFO) < off_time) 
 		/* busy wait */;
-    buffer[0].timestamp = TIME_PROC(TIME_INFO);
-    buffer[0].message = Pm_Message(0x90, 60, 0);
-    buffer[1].timestamp = TIME_PROC(TIME_INFO);
-    buffer[1].message = Pm_Message(0x90, 67, 0);
-    DebugStream(Pm_Write(midi, buffer, 2),midi);
+    for (i = 0; i < chord_size; i++) {
+        buffer[i].timestamp = timestamp + 1000 * i;
+        buffer[i].message = Pm_Message(0x90, chord[i], 0);
+    }
+    Pm_Write(midi, buffer, chord_size);    
 
     /* close device (this not explicitly needed in most implementations) */
     printf("ready to close and terminate... (type RETURN):");
     fgets(line, STRING_MAX, stdin);
 	
-    Debug(Pm_Close(midi));
+    Pm_Close(midi);
     Pm_Terminate();
     printf("done closing and terminating...\n");
 }
@@ -243,7 +210,7 @@ void main_test_output() {
 
 void main_test_both()
 {
-    int i = 0, n = 0;
+    int i = 0;
     int in, out;
     PmStream * midi, * midiOut;
     PmEvent buffer[1];
@@ -251,43 +218,42 @@ void main_test_both()
     int num = 10;
     
     in = get_number("Type input number: ");
-    out = get_number("Type input-midi-thru output number: ");
+    out = get_number("Type output number: ");
 
     /* In is recommended to start timer before PortMidi */
     TIME_START;
 
-    /* must open midi thru before opening midi in */
-    Debug(Pm_OpenOutput(&midiOut, 
-                        out, 
-                        DRIVER_INFO,
-                        OUTPUT_BUFFER_SIZE, 
-                        TIME_PROC,
-                        TIME_INFO, 
-                        latency));
-    printf("Midi Output opened with %d ms latency.\n", latency);
+    Pm_OpenOutput(&midiOut, 
+                  out, 
+                  DRIVER_INFO,
+                  OUTPUT_BUFFER_SIZE, 
+                  TIME_PROC,
+                  TIME_INFO, 
+                  latency);
+    printf("Midi Output opened with %ld ms latency.\n", latency);
     /* open input device */
-    Debug(Pm_OpenInput(&midi, 
-                       in,
-                       DRIVER_INFO, 
-                       INPUT_BUFFER_SIZE, 
-                       TIME_PROC, 
-                       TIME_INFO, 
-                       midiOut)); /* midi thru */
+    Pm_OpenInput(&midi, 
+                 in,
+                 DRIVER_INFO, 
+                 INPUT_BUFFER_SIZE, 
+                 TIME_PROC, 
+                 TIME_INFO);
     printf("Midi Input opened. Reading %d Midi messages...\n",num);
     Pm_SetFilter(midi, PM_FILT_ACTIVE | PM_FILT_CLOCK);
     /* empty the buffer after setting filter, just in case anything
        got through */
     while (Pm_Poll(midi)) {
-        DebugStream(Pm_Read(midi, buffer, 1), midi);
+        Pm_Read(midi, buffer, 1);
     }
     i = 0;
     while (i < num) {
-        DebugStream((status = Pm_Poll(midi)),midi);
+        status = Pm_Poll(midi);
         if (status == TRUE) {
-            DebugStream((length = Pm_Read(midi,buffer,1)),midi);
+            length = Pm_Read(midi,buffer,1);
             if (length > 0) {
-                printf("Got message %d: time %d, %2x %2x %2x\n",
-					i,
+                Pm_Write(midiOut, buffer, 1);
+                printf("Got message %d: time %ld, %2lx %2lx %2lx\n",
+					   i,
                        buffer[0].timestamp,
                        Pm_MessageStatus(buffer[0].message),
                        Pm_MessageData1(buffer[0].message),
@@ -301,9 +267,9 @@ void main_test_both()
 
     /* since close device should not needed, lets get
        rid of it just to make sure program exit closes MIDI devices */
-	/* Pm_Close(midi);
+	  Pm_Close(midi);
 	  Pm_Close(midiOut);
-	  Pm_Terminate(); */
+	  Pm_Terminate(); 
 }
 
 
@@ -315,7 +281,6 @@ void main_test_both()
    this function allows us to exercise the system and test it.
  */
 void main_test_stream() {
-    int n = 0;
     PmStream * midi;
 	char line[80];
     PmEvent buffer[16];
@@ -330,14 +295,14 @@ void main_test_stream() {
     TIME_START;
 
 	/* open output device */
-    Debug(Pm_OpenOutput(&midi, 
-                        i, 
-                        DRIVER_INFO,
-                        OUTPUT_BUFFER_SIZE, 
-                        TIME_PROC,
-                        TIME_INFO, 
-                        latency));
-    printf("Midi Output opened with %d ms latency.\n", latency);
+    Pm_OpenOutput(&midi, 
+                  i, 
+                  DRIVER_INFO,
+                  OUTPUT_BUFFER_SIZE, 
+                  TIME_PROC,
+                  TIME_INFO, 
+                  latency);
+    printf("Midi Output opened with %ld ms latency.\n", latency);
 
     /* output note on/off w/latency offset; hold until user prompts */
     printf("ready to send output... (type RETURN):");
@@ -367,7 +332,7 @@ void main_test_stream() {
 	buffer[8].timestamp = buffer[0].timestamp + 4000;
 	buffer[8].message = Pm_Message(0x90, 66, 0);
 
-    DebugStream(Pm_Write(midi, buffer, 9),midi);
+    Pm_Write(midi, buffer, 9);
 #ifdef SEND8
 	/* Now, we're ready for the real test.
 	   Play 4 notes at now, now+500, now+1000, and now+1500
@@ -381,7 +346,7 @@ void main_test_stream() {
 		buffer[i * 2 + 1].timestamp = now + 250 + (i * 500);
 		buffer[i * 2 + 1].message = Pm_Message(0x90, 60, 0);
 	}
-    DebugStream(Pm_Write(midi, buffer, 8), midi);
+    Pm_Write(midi, buffer, 8);
 
     while (Pt_Time() < now + 2500) 
 		/* busy wait */;
@@ -394,13 +359,13 @@ void main_test_stream() {
 		buffer[i * 2 + 1].timestamp = now + 250 + (i * 500);
 		buffer[i * 2 + 1].message = Pm_Message(0x90, 60, 0);
 	}
-    DebugStream(Pm_Write(midi, buffer, 8), midi);
+    Pm_Write(midi, buffer, 8);
 #endif
     /* close device (this not explicitly needed in most implementations) */
     printf("ready to close and terminate... (type RETURN):");
     fgets(line, STRING_MAX, stdin);
 	
-    Debug(Pm_Close(midi));
+    Pm_Close(midi);
     Pm_Terminate();
     printf("done closing and terminating...\n");
 }
@@ -426,7 +391,7 @@ int main(int argc, char *argv[])
         } else if (strcmp(argv[i], "-l") == 0 && (i + 1 < argc)) {
             i = i + 1;
             latency = atoi(argv[i]);
-            printf("Latency will be %d\n", latency);
+            printf("Latency will be %ld\n", latency);
 			latency_valid = TRUE;
         } else {
             show_usage();
@@ -435,7 +400,7 @@ int main(int argc, char *argv[])
 
 	while (!latency_valid) {
 		printf("Latency in ms: ");
-		if (scanf("%d", &latency) == 1) {
+		if (scanf("%ld", &latency) == 1) {
 			latency_valid = TRUE;
 		}
 	}

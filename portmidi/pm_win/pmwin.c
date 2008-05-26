@@ -13,6 +13,7 @@
 
 #include "stdlib.h"
 #include "portmidi.h"
+#include "pmutil.h"
 #include "pminternal.h"
 #include "pmwinmm.h"
 #ifdef USE_DLL_FOR_CLEANUP
@@ -22,6 +23,26 @@
 #include "stdio.h"
 #endif
 
+/* pm_exit is called when the program exits.
+   It calls pm_term to make sure PortMidi is properly closed.
+   If DEBUG is on, we prompt for input to avoid losing error messages.
+ */
+static void pm_exit(void) {
+    pm_term();
+#ifdef DEBUG
+#define STRING_MAX 80
+    {
+        char line[STRING_MAX];
+        printf("Type ENTER...\n");
+        /* note, w/o this prompting, client console application can not see one
+           of its errors before closing. */
+        fgets(line, STRING_MAX, stdin);
+    }
+#endif
+}
+
+
+/* pm_init is the windows-dependent initialization.*/
 void pm_init(void)
 {
 #ifdef USE_DLL_FOR_CLEANUP
@@ -29,22 +50,23 @@ void pm_init(void)
        but the DLL does not seem to run after crashes. Thus, the atexit()
        mechanism is just as powerful, and simpler to implement.
      */
-    pm_set_close_function(pm_term);
+    pm_set_close_function(pm_exit);
 #ifdef DEBUG
-	printf("registered pm_term with cleanup DLL\n");
+    printf("registered pm_term with cleanup DLL\n");
 #endif
 #else
-    atexit(pm_term);
+    atexit(pm_exit);
 #ifdef DEBUG
-	printf("registered pm_term with atexit()\n");
+    printf("registered pm_exit with atexit()\n");
 #endif
 #endif
-	pm_winmm_init();
+    pm_winmm_init();
+    /* initialize other APIs (DirectX?) here */
 }
 
 
 void pm_term(void) {
-	pm_winmm_term();
+    pm_winmm_term();
 }
 
 
@@ -54,8 +76,8 @@ PmDeviceID Pm_GetDefaultInputDeviceID() {
        the first device of the proper input/output flavor.
      */
     int i;
-	Pm_Initialize(); /* make sure descriptors exist! */
-    for (i = 0; i < descriptor_index; i++) {
+    Pm_Initialize(); /* make sure descriptors exist! */
+    for (i = 0; i < pm_descriptor_index; i++) {
         if (descriptors[i].pub.input) {
             return i;
         }
@@ -69,8 +91,8 @@ PmDeviceID Pm_GetDefaultOutputDeviceID() {
        the first device of the proper input/output flavor.
      */
     int i;
-	Pm_Initialize(); /* make sure descriptors exist! */
-    for (i = 0; i < descriptor_index; i++) {
+    Pm_Initialize(); /* make sure descriptors exist! */
+    for (i = 0; i < pm_descriptor_index; i++) {
         if (descriptors[i].pub.output) {
             return i;
         }
@@ -82,11 +104,11 @@ PmDeviceID Pm_GetDefaultOutputDeviceID() {
 #include "stdio.h" 
 
 void *pm_alloc(size_t s) {
-	return malloc(s); 
+    return malloc(s); 
 }
 
 
 void pm_free(void *ptr) { 
-	free(ptr); 
+    free(ptr); 
 }
 

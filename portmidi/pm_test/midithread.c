@@ -64,45 +64,6 @@
 
 #define STRING_MAX 80
 
-/*
-=====================================================================
-routines for client debugging
-=====================================================================
-    this stuff really important for debugging client app. These are
-    not included in PortMidi because they rely on console and printf()
-*/
-
-static void prompt_and_exit(void)
-{
-    char line[STRING_MAX];
-    printf("type ENTER...");
-    fgets(line, STRING_MAX, stdin);
-    /* this will clean up open ports: */
-    exit(-1);
-}
-
-void Debug(PmError error)
-{
-    if (error < 0) {
-        printf("PortMidi call failed...\n");
-        printf(Pm_GetErrorText(error));
-        prompt_and_exit();
-    }
-}
-
-void DebugStream(PmError error, PortMidiStream * stream) {
-    if (error == pmHostError) {
-        char msg[PM_HOST_ERROR_MSG_LEN];
-        /* this function handles bogus stream pointer */
-        Pm_GetHostErrorText(stream, msg, PM_HOST_ERROR_MSG_LEN);
-        printf(msg);
-        prompt_and_exit();
-    } else if (error < 0) {
-        Debug(error);
-    }
-}
-
-
 /**********************************/
 /* DATA USED ONLY BY process_midi */
 /* (except during initialization) */
@@ -110,6 +71,8 @@ void DebugStream(PmError error, PortMidiStream * stream) {
 
 int active = FALSE;
 int monitor = FALSE;
+int midi_thru = TRUE;
+
 long transpose;
 PmStream *midi_in;
 PmStream *midi_out;
@@ -124,6 +87,7 @@ PmQueue *main_to_midi;
 
 #define QUIT_MSG 1000
 #define MONITOR_MSG 1001
+#define THRU_MSG 1002
 
 /* timer interrupt for processing midi data */
 void process_midi(PtTimestamp timestamp, void *userData)
@@ -138,13 +102,13 @@ void process_midi(PtTimestamp timestamp, void *userData)
 
     /* check for messages */
     do { 
-        Debug(result = Pm_Dequeue(main_to_midi, &msg)); 
+        result = Pm_Dequeue(main_to_midi, &msg); 
         if (result) {
             if (msg >= -127 && msg <= 127) 
                 transpose = msg;
             else if (msg == QUIT_MSG) {
                 /* acknowledge receipt of quit message */
-                Debug(Pm_Enqueue(midi_to_main, &msg));
+                Pm_Enqueue(midi_to_main, &msg);
                 active = FALSE;
                 return;
             } else if (msg == MONITOR_MSG) {
@@ -152,17 +116,22 @@ void process_midi(PtTimestamp timestamp, void *userData)
                  * records the request:
                  */
                 monitor = TRUE;
+            } else if (msg == THRU_MSG) {
+                /* toggle Thru on or off */
+                midi_thru = !midi_thru;
             }
         }
     } while (result);         
     
     /* see if there is any midi input to process */
     do {
-		DebugStream(result = Pm_Poll(midi_in), midi_in);
+		result = Pm_Poll(midi_in);
         if (result) {
             long status, data1, data2;
             if (Pm_Read(midi_in, &buffer, 1) == pmBufferOverflow) 
                 continue;
+            if (midi_thru) 
+                Pm_Write(midi_out, &buffer, 1);
             /* unless there was overflow, we should have a message now */
             status = Pm_MessageStatus(buffer.message);
             data1 = Pm_MessageData1(buffer.message);
@@ -181,11 +150,11 @@ void process_midi(PtTimestamp timestamp, void *userData)
                 
                 /* send the message */
                 buffer.message = Pm_Message(status, data1, data2);
-                DebugStream(Pm_Write(midi_out, &buffer, 1), midi_out);
+                Pm_Write(midi_out, &buffer, 1);
                 
                 /* if monitor is set, send the pitch to the main thread */
                 if (monitor) {
-                    Debug(Pm_Enqueue(midi_to_main, &data1));
+                    Pm_Enqueue(midi_to_main, &data1);
                     monitor = FALSE; /* only send one pitch per request */
                 }
             }
@@ -234,14 +203,14 @@ int main()
      * the other. Since the midi thread is not running, this is safe.
      */
     n = 1234567890;
-    Debug(Pm_Enqueue(midi_to_main, &n));
+    Pm_Enqueue(midi_to_main, &n);
     n = 987654321;
-    Debug(Pm_Enqueue(midi_to_main, &n));
-	Debug(Pm_Dequeue(midi_to_main, &n));
+    Pm_Enqueue(midi_to_main, &n);
+	Pm_Dequeue(midi_to_main, &n);
 	if (n != 1234567890) {
         exit_with_message("Pm_Dequeue produced unexpected result.");
     }
-    DebugStream(Pm_Dequeue(midi_to_main, &n),midi_to_main);
+    Pm_Dequeue(midi_to_main, &n);
 	if(n != 987654321) {
         exit_with_message("Pm_Dequeue produced unexpected result.");
     }
@@ -261,13 +230,13 @@ int main()
     printf("Opening output device %s %s\n", info->interf, info->name);
 
     /* use zero latency because we want output to be immediate */
-    Debug(Pm_OpenOutput(&midi_out, 
-                        id, 
-                        DRIVER_INFO,
-                        OUTPUT_BUFFER_SIZE,
-                        TIME_PROC,
-                        TIME_INFO,
-                        LATENCY));
+    Pm_OpenOutput(&midi_out, 
+                  id, 
+                  DRIVER_INFO,
+                  OUTPUT_BUFFER_SIZE,
+                  TIME_PROC,
+                  TIME_INFO,
+                  LATENCY);
 
     id = Pm_GetDefaultInputDeviceID();
     info = Pm_GetDeviceInfo(id);
@@ -276,13 +245,12 @@ int main()
         exit_with_message("");
     }
     printf("Opening input device %s %s\n", info->interf, info->name);
-    Debug(Pm_OpenInput(&midi_in, 
-                       id, 
-                       DRIVER_INFO,
-                       INPUT_BUFFER_SIZE,
-                       TIME_PROC,
-                       TIME_INFO,
-                       NULL)); /* no midi thru */
+    Pm_OpenInput(&midi_in, 
+                 id, 
+                 DRIVER_INFO,
+                 INPUT_BUFFER_SIZE,
+                 TIME_PROC,
+                 TIME_INFO);
 
     active = TRUE; /* enable processing in the midi thread -- yes, this
                       is a shared variable without synchronization, but
@@ -290,9 +258,9 @@ int main()
 
     printf("Enter midi input; it will be transformed as specified by...\n");
     printf("%s\n%s\n%s\n",
-                   "Type 'q' to quit, 'm' to monitor next pitch, or",
-                   "type a number to specify transposition.",
-				   "Must terminate with [ENTER]");
+           "Type 'q' to quit, 'm' to monitor next pitch, t to toggle thru or",
+           "type a number to specify transposition.",
+		   "Must terminate with [ENTER]");
 
     while (!done) {
         long msg;
@@ -303,25 +271,34 @@ int main()
         if (len > 0) line[len - 1] = 0; /* overwrite the newline char */
         if (strcmp(line, "q") == 0) {
             msg = QUIT_MSG;
-            DebugStream(Pm_Enqueue(main_to_midi, &msg),main_to_midi);
+            Pm_Enqueue(main_to_midi, &msg);
             /* wait for acknowlegement */
             do {
-                Debug(spin = Pm_Dequeue(midi_to_main, &msg));
+                spin = Pm_Dequeue(midi_to_main, &msg);
             } while (spin == 0); /* spin */ ;
             done = TRUE; /* leave the command loop and wrap up */
         } else if (strcmp(line, "m") == 0) {
             msg = MONITOR_MSG;
-            Debug(Pm_Enqueue(main_to_midi, &msg));
+            Pm_Enqueue(main_to_midi, &msg);
             printf("Waiting for note...\n");
             do {
-                Debug(spin = Pm_Dequeue(midi_to_main, &msg));
+                spin = Pm_Dequeue(midi_to_main, &msg);
             } while (spin == 0); /* spin */ ;
-            printf("... pitch is %d\n", msg);
-        } else if (sscanf(line, "%d", &msg) == 1) {
+            printf("... pitch is %ld\n", msg);
+        } else if (strcmp(line, "t") == 0) {
+            /* reading midi_thru asynchronously could give incorrect results,
+               e.g. if you type "t" twice before the midi thread responds to
+               the first one, but we'll do it this way anyway. Perhaps a more
+               correct way would be to wait for an acknowledgement message
+               containing the new state. */
+            printf("Setting THRU %s\n", (midi_thru ? "off" : "on"));
+            msg = THRU_MSG;
+            Pm_Enqueue(main_to_midi, &msg);
+        } else if (sscanf(line, "%ld", &msg) == 1) {
             if (msg >= -127 && msg <= 127) {
                 /* send transposition value */
-                printf("Transposing by %d\n", msg);
-                Debug(Pm_Enqueue(main_to_midi, &msg));
+                printf("Transposing by %ld\n", msg);
+                Pm_Enqueue(main_to_midi, &msg);
             } else {
                 printf("Transposition must be within -127...127\n");
             }
@@ -337,13 +314,14 @@ int main()
      * the midi input and output
      */
     Pt_Stop(); /* stop the timer */
-    Debug(Pm_QueueDestroy(midi_to_main));
-    Debug(Pm_QueueDestroy(main_to_midi));
+    Pm_QueueDestroy(midi_to_main);
+    Pm_QueueDestroy(main_to_midi);
 
     /* Belinda! if close fails here, some memory is deleted, right??? */
-    Debug(Pm_Close(midi_in));
-    Debug(Pm_Close(midi_out));
+    Pm_Close(midi_in);
+    Pm_Close(midi_out);
     
     printf("finished portMidi multithread test...enter any character to quit [RETURN]...");
     fgets(line, STRING_MAX, stdin);
+    return 0;
 }

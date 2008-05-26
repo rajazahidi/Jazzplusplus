@@ -9,6 +9,9 @@
 
 #include "stdlib.h"
 #include "portmidi.h"
+#ifdef NEWBUFFER
+#include "pmutil.h"
+#endif
 #include "pminternal.h"
 #include "pmlinuxalsa.h"
 #include "string.h"
@@ -41,7 +44,8 @@
 extern pm_fns_node pm_linuxalsa_in_dictionary;
 extern pm_fns_node pm_linuxalsa_out_dictionary;
 
-static snd_seq_t *seq; // all input comes here, output queue allocated on seq
+static snd_seq_t *seq = NULL; // all input comes here, 
+                              // output queue allocated on seq
 static int queue, queue_used; /* one for all ports, reference counted */
 
 typedef struct alsa_descriptor_struct {
@@ -125,9 +129,6 @@ static int midi_message_length(PmMessage message)
 }
 
 
-/*
- *  Calls the ALSA rawmidi_open function with card 0.
- */
 static PmError alsa_out_open(PmInternal *midi, void *driverInfo) 
 {
     void *client_port = descriptors[midi->device_id].descriptor;
@@ -188,7 +189,7 @@ static PmError alsa_out_open(PmInternal *midi, void *driverInfo)
 }
     
 
-static void output_byte(PmInternal *midi, unsigned char byte, 
+static PmError alsa_write_byte(PmInternal *midi, unsigned char byte, 
                         PmTimestamp timestamp)
 {
     alsa_descriptor_type desc = (alsa_descriptor_type) midi->descriptor;
@@ -211,7 +212,7 @@ static void output_byte(PmInternal *midi, unsigned char byte,
             when = (when - now) + midi->latency;
             if (when < 0) when = 0;
             VERBOSE printf("timestamp %d now %d latency %d, ", 
-                           timestamp, now, midi->latency);
+                           (int) timestamp, (int) now, midi->latency);
             VERBOSE printf("scheduling event after %d\n", when);
             /* message is sent in relative ticks, where 1 tick = 1 ms */
             snd_seq_ev_schedule_tick(&ev, queue, 1, when);
@@ -232,14 +233,15 @@ static void output_byte(PmInternal *midi, unsigned char byte,
         err = snd_seq_event_output(seq, &ev);
         if (err < 0) {
             desc->error = err;
+            return pmHostError;
         }
     }
+    return pmNoError;
 }
 
 
 static PmError alsa_out_close(PmInternal *midi)
 {
-    int err;
     alsa_descriptor_type desc = (alsa_descriptor_type) midi->descriptor;
     if (!desc) return pmBadPtr;
 
@@ -253,6 +255,7 @@ static PmError alsa_out_close(PmInternal *midi)
     }
     if (midi->latency > 0) alsa_unuse_queue();
     snd_midi_event_free(desc->parser);
+    midi->descriptor = NULL; /* destroy the pointer to signify "closed" */
     pm_free(desc);
     if (pm_hosterror) {
         get_alsa_error_text(pm_hosterror_text, PM_HOST_ERROR_MSG_LEN, 
@@ -330,7 +333,6 @@ static PmError alsa_in_open(PmInternal *midi, void *driverInfo)
 
 static PmError alsa_in_close(PmInternal *midi)
 {
-    int err;
     alsa_descriptor_type desc = (alsa_descriptor_type) midi->descriptor;
     if (!desc) return pmBadPtr;
     if (pm_hosterror = snd_seq_disconnect_from(seq, desc->this_port, 
@@ -352,13 +354,37 @@ static PmError alsa_in_close(PmInternal *midi)
 
 static PmError alsa_abort(PmInternal *midi)
 {
+    /* NOTE: ALSA documentation is vague. This is supposed to 
+     * remove any pending output messages. If you can test and 
+     * confirm this code is correct, please update this comment. -RBD
+     */
+    /* Unfortunately, I can't even compile it -- my ALSA version 
+     * does not implement snd_seq_remove_events_t, so this does
+     * not compile. I'll try again, but it looks like I'll need to
+     * upgrade my entire Linux OS -RBD
+     */
+    /*
     alsa_descriptor_type desc = (alsa_descriptor_type) midi->descriptor;
-    /* This is supposed to flush any pending output. */
+    snd_seq_remove_events_t info;
+    snd_seq_addr_t addr;
+    addr.client = desc->client;
+    addr.port = desc->port;
+    snd_seq_remove_events_set_dest(&info, &addr);
+    snd_seq_remove_events_set_condition(&info, SND_SEQ_REMOVE_DEST);
+    pm_hosterror = snd_seq_remove_events(seq, &info);
+    if (pm_hosterror) {
+        get_alsa_error_text(pm_hosterror_text, PM_HOST_ERROR_MSG_LEN, 
+                            pm_hosterror);
+        return pmHostError;
+    }
+    */
     printf("WARNING: alsa_abort not implemented\n");
     return pmNoError;
 }
 
 
+#ifdef GARBAGE
+This is old code here temporarily for reference
 static PmError alsa_write(PmInternal *midi, PmEvent *buffer, long length)
 {
     alsa_descriptor_type desc = (alsa_descriptor_type) midi->descriptor;
@@ -375,7 +401,7 @@ static PmError alsa_write(PmInternal *midi, PmEvent *buffer, long length)
             msg = buffer->message;
             for (i = 0; i < 4; i++) {
                 byte = msg;  /* extract next byte to send */
-                output_byte(midi, byte, buffer->timestamp);
+                alsa_write_byte(midi, byte, buffer->timestamp);
                 if (byte == MIDI_EOX) {
                     desc->in_sysex = FALSE;
                     break;
@@ -389,7 +415,7 @@ static PmError alsa_write(PmInternal *midi, PmEvent *buffer, long length)
             for (i = 0; i < bytes; i++) {
                 byte = msg; /* extract next byte to send */
                 VERBOSE printf("sending 0x%x\n", byte);
-                output_byte(midi, byte, buffer->timestamp);
+                alsa_write_byte(midi, byte, buffer->timestamp);
                 if (desc->error < 0) break;
                 msg >>= 8; /* shift next byte into position */
             }
@@ -403,6 +429,54 @@ static PmError alsa_write(PmInternal *midi, PmEvent *buffer, long length)
 
     desc->error = pmNoError;
     return pmNoError;
+}
+#endif
+
+
+static PmError alsa_write_flush(PmInternal *midi, PmTimestamp timestamp)
+{
+    alsa_descriptor_type desc = (alsa_descriptor_type) midi->descriptor;
+    VERBOSE printf("snd_seq_drain_output: 0x%x\n", (unsigned int) seq);
+    desc->error = snd_seq_drain_output(seq);
+    if (desc->error < 0) return pmHostError;
+
+    desc->error = pmNoError;
+    return pmNoError;
+}
+
+
+static PmError alsa_write_short(PmInternal *midi, PmEvent *event)
+{
+    int bytes = midi_message_length(event->message);
+    long msg = event->message;
+    int i;
+    alsa_descriptor_type desc = (alsa_descriptor_type) midi->descriptor;
+    for (i = 0; i < bytes; i++) {
+        unsigned char byte = msg;
+        VERBOSE printf("sending 0x%x\n", byte);
+        alsa_write_byte(midi, byte, event->timestamp);
+        if (desc->error < 0) break;
+        msg >>= 8; /* shift next byte into position */
+    }
+    if (desc->error < 0) return pmHostError;
+    desc->error = pmNoError;
+    return pmNoError;
+}
+
+
+/* alsa_sysex -- implements begin_sysex and end_sysex */
+PmError alsa_sysex(PmInternal *midi, PmTimestamp timestamp) {
+    return pmNoError;
+}
+
+
+static PmTimestamp alsa_synchronize(PmInternal *midi)
+{
+    return 0; /* linux implementation does not use this synchronize function */
+    /* Apparently, Alsa data is relative to the time you send it, and there
+       is no reference. If this is true, this is a serious shortcoming of
+       Alsa. If not true, then PortMidi has a serious shortcoming -- it 
+       should be scheduling relative to Alsa's time reference. */
 }
 
 
@@ -434,141 +508,142 @@ static void handle_event(snd_seq_event_t *ev)
         pm_ev.message = Pm_Message(0x90 | ev->data.note.channel,
                                    ev->data.note.note & 0x7f,
                                    ev->data.note.velocity & 0x7f);
-        pm_enqueue(midi, &pm_ev);
+        pm_read_short(midi, &pm_ev);
         break;
     case SND_SEQ_EVENT_NOTEOFF:
         pm_ev.message = Pm_Message(0x80 | ev->data.note.channel,
                                    ev->data.note.note & 0x7f,
                                    ev->data.note.velocity & 0x7f);
-        pm_enqueue(midi, &pm_ev);
+        pm_read_short(midi, &pm_ev);
         break;
     case SND_SEQ_EVENT_KEYPRESS:
         pm_ev.message = Pm_Message(0xa0 | ev->data.note.channel,
                                    ev->data.note.note & 0x7f,
                                    ev->data.note.velocity & 0x7f);
-        pm_enqueue(midi, &pm_ev);
+        pm_read_short(midi, &pm_ev);
         break;
     case SND_SEQ_EVENT_CONTROLLER:
         pm_ev.message = Pm_Message(0xb0 | ev->data.note.channel,
                                    ev->data.control.param & 0x7f,
                                    ev->data.control.value & 0x7f);
-        pm_enqueue(midi, &pm_ev);
+        pm_read_short(midi, &pm_ev);
         break;
     case SND_SEQ_EVENT_PGMCHANGE:
         pm_ev.message = Pm_Message(0xc0 | ev->data.note.channel,
                                    ev->data.control.value & 0x7f, 0);
-        pm_enqueue(midi, &pm_ev);
+        pm_read_short(midi, &pm_ev);
         break;
     case SND_SEQ_EVENT_CHANPRESS:
         pm_ev.message = Pm_Message(0xd0 | ev->data.note.channel,
                                    ev->data.control.value & 0x7f, 0);
-        pm_enqueue(midi, &pm_ev);
+        pm_read_short(midi, &pm_ev);
         break;
     case SND_SEQ_EVENT_PITCHBEND:
         pm_ev.message = Pm_Message(0xe0 | ev->data.note.channel,
                             (ev->data.control.value + 0x2000) & 0x7f,
                             ((ev->data.control.value + 0x2000) >> 7) & 0x7f);
-        pm_enqueue(midi, &pm_ev);
+        pm_read_short(midi, &pm_ev);
         break;
     case SND_SEQ_EVENT_CONTROL14:
         if (ev->data.control.param < 0x20) {
             pm_ev.message = Pm_Message(0xb0 | ev->data.note.channel,
                                        ev->data.control.param,
                                        (ev->data.control.value >> 7) & 0x7f);
-            pm_enqueue(midi, &pm_ev);
+            pm_read_short(midi, &pm_ev);
             pm_ev.message = Pm_Message(0xb0 | ev->data.note.channel,
                                        ev->data.control.param + 0x20,
                                        ev->data.control.value & 0x7f);
-            pm_enqueue(midi, &pm_ev);
+            pm_read_short(midi, &pm_ev);
         } else {
             pm_ev.message = Pm_Message(0xb0 | ev->data.note.channel,
                                        ev->data.control.param & 0x7f,
                                        ev->data.control.value & 0x7f);
 
-            pm_enqueue(midi, &pm_ev);
+            pm_read_short(midi, &pm_ev);
         }
         break;
     case SND_SEQ_EVENT_SONGPOS:
         pm_ev.message = Pm_Message(0xf2,
                                    ev->data.control.value & 0x7f,
                                    (ev->data.control.value >> 7) & 0x7f);
-        pm_enqueue(midi, &pm_ev);
+        pm_read_short(midi, &pm_ev);
         break;
     case SND_SEQ_EVENT_SONGSEL:
         pm_ev.message = Pm_Message(0xf3,
                                    ev->data.control.value & 0x7f, 0);
-        pm_enqueue(midi, &pm_ev);
+        pm_read_short(midi, &pm_ev);
         break;
     case SND_SEQ_EVENT_QFRAME:
         pm_ev.message = Pm_Message(0xf1,
                                    ev->data.control.value & 0x7f, 0);
-        pm_enqueue(midi, &pm_ev);
+        pm_read_short(midi, &pm_ev);
         break;
     case SND_SEQ_EVENT_START:
         pm_ev.message = Pm_Message(0xfa, 0, 0);
-        pm_enqueue(midi, &pm_ev);
+        pm_read_short(midi, &pm_ev);
         break;
     case SND_SEQ_EVENT_CONTINUE:
         pm_ev.message = Pm_Message(0xfb, 0, 0);
-        pm_enqueue(midi, &pm_ev);
+        pm_read_short(midi, &pm_ev);
         break;
     case SND_SEQ_EVENT_STOP:
         pm_ev.message = Pm_Message(0xfc, 0, 0);
-        pm_enqueue(midi, &pm_ev);
+        pm_read_short(midi, &pm_ev);
         break;
     case SND_SEQ_EVENT_CLOCK:
         pm_ev.message = Pm_Message(0xf8, 0, 0);
-        pm_enqueue(midi, &pm_ev);
+        pm_read_short(midi, &pm_ev);
         break;
     case SND_SEQ_EVENT_TUNE_REQUEST:
         pm_ev.message = Pm_Message(0xf6, 0, 0);
-        pm_enqueue(midi, &pm_ev);
+        pm_read_short(midi, &pm_ev);
         break;
     case SND_SEQ_EVENT_RESET:
         pm_ev.message = Pm_Message(0xff, 0, 0);
-        pm_enqueue(midi, &pm_ev);
+        pm_read_short(midi, &pm_ev);
         break;
     case SND_SEQ_EVENT_SENSING:
         pm_ev.message = Pm_Message(0xfe, 0, 0);
-        pm_enqueue(midi, &pm_ev);
+        pm_read_short(midi, &pm_ev);
         break;
     case SND_SEQ_EVENT_SYSEX: {
         const BYTE *ptr = (const BYTE *) ev->data.ext.ptr;
-        int i;
-        long msg = 0;
-        int shift = 0;
-		midi->sysex_in_progress = TRUE;
-        for (i = 0; i < ev->data.ext.len; i++) {
-            msg = msg | (*ptr++ << shift);
-            shift += 8;
-            if ((i & 3) == 3) {
-                pm_ev.message = msg;
-                pm_enqueue(midi, &pm_ev);
-                msg = 0;
-                shift = 0;
-            }
-        }
-        /* if i was not a multiple of 4, output rest of the message */
-        /* IS THIS CODE CORRECT? IF WE CAN GET SYSEX MESSAGES THAT ARE
-           NOT COMPLETE, THEN WE MIGHT BE INSERTING ZEROS BETWEEN 
-           PACKETS -RBD */
-        if (i & 3) {
-            pm_ev.message = msg;
-            pm_enqueue(midi, &pm_ev);
-        }
-		midi->sysex_in_progress = FALSE;
-		midi->flush = FALSE;
+        /* assume there is one sysex byte to process */
+        pm_read_bytes(midi, ptr, ev->data.ext.len, timestamp);
         break;
     }
     }
 }
 
+
 static PmError alsa_poll(PmInternal *midi)
 {
     snd_seq_event_t *ev;
-    while (snd_seq_event_input(seq, &ev) >= 0) {
-        if (ev) {
-            handle_event(ev);
+    /* expensive check for input data, gets data from device: */
+    while (snd_seq_event_input_pending(seq, TRUE) > 0) {
+        /* cheap check on local input buffer */
+        while (snd_seq_event_input_pending(seq, FALSE) > 0) {
+            /* check for and ignore errors, e.g. input overflow */
+            /* note: if there's overflow, this should be reported
+             * all the way through to client. Since input from all
+             * devices is merged, we need to find all input devices
+             * and set all to the overflow state.
+             * NOTE: this assumes every input is ALSA based.
+             */
+            int rslt = snd_seq_event_input(seq, &ev);
+            if (rslt >= 0) {
+                handle_event(ev);
+            } else if (rslt == -ENOSPC) {
+                int i;
+                for (i = 0; i < pm_descriptor_index; i++) {
+                    if (descriptors[i].pub.input) {
+                        PmInternal *midi = (PmInternal *) 
+                                descriptors[i].internalDescriptor;
+                        /* careful, device may not be open! */
+                        if (midi) Pm_SetOverflow(midi->queue);
+                    }
+                }
+            }
         }
     }
     return pmNoError;
@@ -578,11 +653,11 @@ static PmError alsa_poll(PmInternal *midi)
 static unsigned int alsa_has_host_error(PmInternal *midi)
 {
     alsa_descriptor_type desc = (alsa_descriptor_type) midi->descriptor;
-    return pm_hosterror || desc->error;
+    return desc->error;
 }
 
 
-static void alsa_host_error(PmInternal *midi, char *msg, unsigned int len)
+static void alsa_get_host_error(PmInternal *midi, char *msg, unsigned int len)
 {
     alsa_descriptor_type desc = (alsa_descriptor_type) midi->descriptor;
     int err = (pm_hosterror || desc->error);
@@ -591,23 +666,35 @@ static void alsa_host_error(PmInternal *midi, char *msg, unsigned int len)
 
 
 pm_fns_node pm_linuxalsa_in_dictionary = {
-    none_write, 
+    none_write_short,
+    none_sysex,
+    none_sysex,
+    none_write_byte,
+    none_write_short,
+    none_write_flush,
+    alsa_synchronize,
     alsa_in_open,
     alsa_abort,
     alsa_in_close,
     alsa_poll,
     alsa_has_host_error,
-    alsa_host_error
+    alsa_get_host_error
 };
 
 pm_fns_node pm_linuxalsa_out_dictionary = {
-    alsa_write, 
+    alsa_write_short,
+    alsa_sysex,
+    alsa_sysex,
+    alsa_write_byte,
+    alsa_write_short, /* short realtime message */
+    alsa_write_flush,
+    alsa_synchronize,
     alsa_out_open, 
     alsa_abort, 
     alsa_out_close,
     none_poll,
     alsa_has_host_error,
-    alsa_host_error
+    alsa_get_host_error
 };
 
 
@@ -632,8 +719,17 @@ PmError pm_linuxalsa_init( void )
     snd_seq_port_info_t *pinfo;
     unsigned int caps;
 
-    err = snd_seq_open(&seq, "default", SND_SEQ_OPEN_DUPLEX, SND_SEQ_NONBLOCK);
-    if (err < 0) return;
+    /* Previously, the last parameter was SND_SEQ_NONBLOCK, but this 
+     * would cause messages to be dropped if the ALSA buffer fills up.
+     * The correct behavior is for writes to block until there is 
+     * room to send all the data. The client should normally allocate
+     * a large enough buffer to avoid blocking on output. 
+     * Now that blocking is enabled, the seq_event_input() will block
+     * if there is no input data. This is not what we want, so must
+     * call seq_event_input_pending() to avoid blocking.
+     */
+    err = snd_seq_open(&seq, "default", SND_SEQ_OPEN_DUPLEX, 0);
+    if (err < 0) return err;
     
     snd_seq_client_info_alloca(&cinfo);
     snd_seq_port_info_alloca(&pinfo);
@@ -650,7 +746,7 @@ PmError pm_linuxalsa_init( void )
                 continue; /* ignore if you cannot read or write port */
             if (caps & SND_SEQ_PORT_CAP_SUBS_WRITE) {
                 if (pm_default_output_device_id == -1) 
-                    pm_default_output_device_id = descriptor_index;
+                    pm_default_output_device_id = pm_descriptor_index;
                 pm_add_device("ALSA",
                               pm_strdup(snd_seq_port_info_get_name(pinfo)),
                               FALSE,
@@ -660,7 +756,7 @@ PmError pm_linuxalsa_init( void )
             }
             if (caps & SND_SEQ_PORT_CAP_SUBS_READ) {
                 if (pm_default_input_device_id == -1) 
-                    pm_default_input_device_id = descriptor_index;
+                    pm_default_input_device_id = pm_descriptor_index;
                 pm_add_device("ALSA",
                               pm_strdup(snd_seq_port_info_get_name(pinfo)),
                               TRUE,
@@ -670,10 +766,17 @@ PmError pm_linuxalsa_init( void )
             }
         }
     }
+    return pmNoError;
 }
     
 
 void pm_linuxalsa_term(void)
 {
-    snd_seq_close(seq);
+    if (seq) {
+        snd_seq_close(seq);
+        pm_free(descriptors);
+        descriptors = NULL;
+        pm_descriptor_index = 0;
+        pm_descriptor_max = 0;
+    }
 }

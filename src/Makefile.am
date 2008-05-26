@@ -3,6 +3,7 @@
 bin_PROGRAMS = jazz
 
 if USE_ALSA
+
 jazz_SOURCES = \
 AboutDialog.cpp \
 AlsaDriver.cpp \
@@ -81,7 +82,9 @@ ToolBar.cpp \
 Track.cpp \
 TrackFrame.cpp \
 TrackWindow.cpp
+
 else
+
 jazz_SOURCES = \
 AboutDialog.cpp \
 AsciiMidiFile.cpp \
@@ -132,6 +135,7 @@ NamedValueChoice.cpp \
 PianoFrame.cpp \
 PianoWindow.cpp \
 Player.cpp \
+PortMidiPlayer.cpp \
 Project.cpp \
 ProjectManager.cpp \
 PropertyListDialog.cpp \
@@ -156,6 +160,7 @@ ToolBar.cpp \
 Track.cpp \
 TrackFrame.cpp \
 TrackWindow.cpp
+
 endif
 
 noinst_HEADERS = \
@@ -212,6 +217,7 @@ NamedValueChoice.h \
 PianoFrame.h \
 PianoWindow.h \
 Player.h \
+PortMidiPlayer.h \
 Project.h \
 ProjectManager.h \
 PropertyListDialog.h \
@@ -239,6 +245,11 @@ TrackFrame.h \
 Track.h \
 TrackWindow.h \
 WxWidgets.h
+
+if !USE_ALSA
+jazz_LDFLAGS = -framework CoreMIDI -framework CoreAudio
+jazz_LDADD = -L@PORTMIDI_PATH@/porttime -lporttime -L@PORTMIDI_PATH@/pm_mac -lportmidi
+endif
 
 # This directive defines the Jazz++ data directory.  This may be a hack, but
 # other programs use similar techniques.

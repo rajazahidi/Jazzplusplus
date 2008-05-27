@@ -14,11 +14,10 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Release|Win32"
-			OutputDirectory=".\mmRelease"
-			IntermediateDirectory=".\mmRelease"
+			Name="Release mm VC8|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="2"
@@ -37,7 +36,7 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				TypeLibraryName=".\mmRelease/mm.tlb"
+				TypeLibraryName=".\$(OutDir)\mm.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -49,10 +48,10 @@
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				PrecompiledHeaderFile=".\mmRelease/mm.pch"
-				AssemblerListingLocation=".\mmRelease/"
-				ObjectFile=".\mmRelease/"
-				ProgramDataBaseFileName=".\mmRelease/"
+				PrecompiledHeaderFile=".\$(OutDir)\mm.pch"
+				AssemblerListingLocation=".\$(OutDir)\"
+				ObjectFile=".\$(OutDir)\"
+				ProgramDataBaseFileName=".\$(OutDir)\"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 			/>
@@ -69,11 +68,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib winmm.lib ..\pm_win\Release\portmidi.lib ..\porttime\Release\porttime.lib"
-				OutputFile=".\mmRelease/mm.exe"
+				AdditionalDependencies="&quot;..\pm_win\Release VC8\portmidi.lib&quot; &quot;..\porttime\Release VC8\porttime.lib&quot; odbc32.lib odbccp32.lib winmm.lib"
+				OutputFile=".\$(OutDir)\mm.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				ProgramDatabaseFile=".\mmRelease/mm.pdb"
+				ProgramDatabaseFile=".\$(OutDir)\mm.pdb"
 				SubSystem="1"
 				TargetMachine="1"
 			/>
@@ -89,7 +88,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\mmRelease/mm.bsc"
+				OutputFile=".\$(OutDir)\mm.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -105,11 +104,10 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug|Win32"
-			OutputDirectory=".\mmDebug"
-			IntermediateDirectory=".\mmDebug"
+			Name="Debug mm VC8|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="2"
@@ -128,7 +126,7 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				TypeLibraryName=".\mmDebug/mm.tlb"
+				TypeLibraryName=".\$(OutDir)\mm.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -139,14 +137,14 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				PrecompiledHeaderFile=".\mmDebug/mm.pch"
-				AssemblerListingLocation=".\mmDebug/"
-				ObjectFile=".\mmDebug/"
-				ProgramDataBaseFileName=".\mmDebug/"
+				PrecompiledHeaderFile=".\$(OutDir)\mm.pch"
+				AssemblerListingLocation=".\$(OutDir)\"
+				ObjectFile=".\$(OutDir)\"
+				ProgramDataBaseFileName=".\$(OutDir)\"
 				BrowseInformation="1"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -162,12 +160,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/VERBOSE:LIB"
-				AdditionalDependencies="odbc32.lib odbccp32.lib winmm.lib ..\pm_win\Debug\portmidi.lib ..\porttime\Debug\porttime.lib"
-				OutputFile=".\mmDebug/mm.exe"
+				AdditionalDependencies="&quot;..\pm_win\Debug VC8\portmidi.lib&quot; &quot;..\porttime\Debug VC8\porttime.lib&quot; odbc32.lib odbccp32.lib winmm.lib"
+				OutputFile=".\$(OutDir)\mm.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\mmDebug/mm.pdb"
+				ProgramDatabaseFile=".\$(OutDir)\mm.pdb"
 				SubSystem="1"
 				TargetMachine="1"
 			/>
@@ -183,7 +181,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\mmDebug/mm.bsc"
+				OutputFile=".\$(OutDir)\mm.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -207,37 +205,9 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath="mm.c"
+				RelativePath=".\mm.c"
 				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
 			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl"
-			>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
-			>
 		</Filter>
 	</Files>
 	<Globals>

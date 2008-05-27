@@ -15,11 +15,10 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug|Win32"
-			OutputDirectory=".\midithruDebug"
-			IntermediateDirectory=".\midithruDebug"
+			Name="Debug midithru VC8|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="2"
@@ -38,7 +37,7 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				TypeLibraryName=".\midithruDebug/midithru.tlb"
+				TypeLibraryName=".\$(OutDir)\midithru.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -49,13 +48,13 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				PrecompiledHeaderFile=".\midithruDebug/midithru.pch"
-				AssemblerListingLocation=".\midithruDebug/"
-				ObjectFile=".\midithruDebug/"
-				ProgramDataBaseFileName=".\midithruDebug/"
+				PrecompiledHeaderFile=".\$(OutDir)\midithru.pch"
+				AssemblerListingLocation=".\$(OutDir)\"
+				ObjectFile=".\$(OutDir)\"
+				ProgramDataBaseFileName=".\$(OutDir)\"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -70,12 +69,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\pm_win\Debug\portmidi.lib ..\porttime\Debug\porttime.lib winmm.lib"
-				OutputFile=".\midithruDebug/midithru.exe"
+				AdditionalDependencies="&quot;..\pm_win\Debug VC8\portmidi.lib&quot; &quot;..\porttime\Debug VC8\porttime.lib&quot; winmm.lib"
+				OutputFile=".\$(OutDir)\midithru.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\midithruDebug/midithru.pdb"
+				ProgramDatabaseFile=".\$(OutDir)\midithru.pdb"
 				SubSystem="1"
 				TargetMachine="1"
 			/>
@@ -91,7 +90,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\midithruDebug/midithru.bsc"
+				OutputFile=".\$(OutDir)\midithru.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -107,11 +106,10 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release|Win32"
-			OutputDirectory=".\midithruRelease"
-			IntermediateDirectory=".\midithruRelease"
+			Name="Release midithru VC8|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="2"
@@ -130,7 +128,7 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				TypeLibraryName=".\midithruRelease/midithru.tlb"
+				TypeLibraryName=".\$(OutDir)\midithru.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -142,10 +140,10 @@
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				PrecompiledHeaderFile=".\midithruRelease/midithru.pch"
-				AssemblerListingLocation=".\midithruRelease/"
-				ObjectFile=".\midithruRelease/"
-				ProgramDataBaseFileName=".\midithruRelease/"
+				PrecompiledHeaderFile=".\$(OutDir)\midithru.pch"
+				AssemblerListingLocation=".\$(OutDir)\"
+				ObjectFile=".\$(OutDir)\"
+				ProgramDataBaseFileName=".\$(OutDir)\"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 			/>
@@ -162,11 +160,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\pm_win\Release\portmidi.lib ..\porttime\Release\porttime.lib winmm.lib"
-				OutputFile=".\midithruRelease/midithru.exe"
+				AdditionalDependencies="&quot;..\pm_win\Release VC8\portmidi.lib&quot; &quot;..\porttime\Release VC8\porttime.lib&quot; winmm.lib"
+				OutputFile=".\$(OutDir)\midithru.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				ProgramDatabaseFile=".\midithruRelease/midithru.pdb"
+				ProgramDatabaseFile=".\$(OutDir)\midithru.pdb"
 				SubSystem="1"
 				TargetMachine="1"
 			/>
@@ -182,7 +180,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\midithruRelease/midithru.bsc"
+				OutputFile=".\$(OutDir)\midithru.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -206,37 +204,9 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath="midithru.c"
+				RelativePath=".\midithru.c"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
 			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl"
-			>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
-			>
 		</Filter>
 	</Files>
 	<Globals>

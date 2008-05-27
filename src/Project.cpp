@@ -40,7 +40,10 @@
 #include "WindowsAudioInterface.h"
 #elif __WXGTK__
 #include "AudioDriver.h"
+#elif __WXMAC__
+#include "PortMidiPlayer.h"
 #endif
+
 #ifdef DEV_ALSA
 #include "AlsaPlayer.h"
 #include "AlsaDriver.h"
@@ -160,7 +163,7 @@ JZProject::JZProject()
   //--------------
   // Linux drivers
   //--------------
-#ifndef __WXMSW__
+#ifdef __WXGTK__
   if (gpConfig->GetValue(C_MidiDriver) == eMidiDriverOss)
   {
 #ifdef DEV_SEQUENCER2
@@ -245,7 +248,7 @@ JZProject::JZProject()
       << "Jazz will start with no play/record ability"
       << endl;
   }
-#endif // !defined(__WXMSW__)
+#endif // defined(__WXGTK__)
 
 
 #ifdef __WXMSW__
@@ -279,6 +282,17 @@ JZProject::JZProject()
     mpMidiPlayer = new tNullPlayer(this);
   }
 #endif // __WXMSW__
+
+#ifdef __WXMAC__
+  //------------------
+  // Macintosh Drivers
+  //------------------
+  mpMidiPlayer = new JZPortMidiPlayer(this);
+  if (!mpMidiPlayer->Installed())
+  {
+    cout << "Jazz++ will start with no play/record ability." << endl;
+  }
+#endif // __WXMAC__
 
   if (!mpMidiPlayer)
   {

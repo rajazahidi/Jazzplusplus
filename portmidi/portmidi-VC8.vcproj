@@ -14,7 +14,7 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug|Win32"
+			Name="Debug VC8|Win32"
 			OutputDirectory=".\pm_win\Debug"
 			IntermediateDirectory=".\pm_win\Debug"
 			ConfigurationType="4"
@@ -89,7 +89,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release|Win32"
+			Name="Release VC8|Win32"
 			OutputDirectory=".\pm_win\Release"
 			IntermediateDirectory=".\pm_win\Release"
 			ConfigurationType="4"

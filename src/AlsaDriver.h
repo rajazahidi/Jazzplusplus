@@ -43,7 +43,10 @@ class tAlsaAudioPlayer : public tAlsaPlayer
     virtual void Notify();
     virtual void StartPlay(long Clock, long LoopClock = 0, int Continue = 0);
     virtual void StopPlay();
-    virtual int Installed() { return installed && tAlsaPlayer::Installed(); }
+    virtual bool IsInstalled()
+    {
+      return mInstalled && tAlsaPlayer::IsInstalled();
+    }
     virtual int GetAudioEnabled() const { return audio_enabled; }
     virtual void SetAudioEnabled(int x) { audio_enabled = x; }
     virtual void ListenAudio(int key, int start_stop_mode = 1);
@@ -82,7 +85,7 @@ class tAlsaAudioPlayer : public tAlsaPlayer
     int mCanDuplex;
 
     snd_pcm_t *pcm[2];
-    int installed;
+    bool mInstalled;
 
     long audio_clock_offset;
     long cur_pos;

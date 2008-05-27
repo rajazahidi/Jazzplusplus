@@ -127,7 +127,7 @@ tAlsaAudioPlayer::tAlsaAudioPlayer(JZSong* pSong)
   : tAlsaPlayer(pSong)
 {
   AudioBuffer   = new tEventArray();
-  installed     = 0;
+  mInstalled    = false;
   audio_enabled = 0;
   mpListener    = 0;
   mCanDuplex    = 0;    // no duplex yet.
@@ -139,7 +139,7 @@ tAlsaAudioPlayer::tAlsaAudioPlayer(JZSong* pSong)
 
   // FIXME
   mCanDuplex = 1;
-  installed = 1;
+  mInstalled = true;
   audio_enabled = 1;
 }
 

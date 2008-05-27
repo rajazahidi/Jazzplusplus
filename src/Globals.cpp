@@ -67,3 +67,42 @@ tHBInterface* gpHarmonyBrowser = 0;
 
 const double gDegreesToRadians = 0.01745329251994330212;
 const double gRadiansToDegrees = 57.2957795130823;
+
+//*****************************************************************************
+// Decsription:
+//   This function tokenizes the input string.
+//*****************************************************************************
+int Tokenize(
+  const string& String,
+  const string& Delimiters,
+  vector<string>& Tokens)
+{
+  string::size_type Begin, End;
+
+  // Initialize the token index.
+  int TokenIndex = 0;
+
+  // Search the beginning of the line for the first token.
+  Begin = String.find_first_not_of(Delimiters);
+
+  // While at the beginning of a word found.
+  while (Begin != string::npos)
+  {
+    // Search for the end of the actual token.
+    End = String.find_first_of(Delimiters, Begin);
+
+    if (End == string::npos)
+    {
+      End = String.length();
+    }
+
+    Tokens.push_back(String.substr(Begin, End - Begin));
+
+    ++TokenIndex;
+
+    Begin = String.find_first_not_of(Delimiters, End);
+  }
+
+  return TokenIndex;
+}
+

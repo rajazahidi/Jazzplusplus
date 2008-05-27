@@ -54,7 +54,7 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
 {
   ithru = othru = 0;
 
-  installed = 1;
+  mInstalled = true;
   poll_millisec = 25;
   recd_clock = 0;
   echo_clock = 0;
@@ -62,14 +62,14 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
   if (snd_seq_open(&handle, "hw", SND_SEQ_OPEN_DUPLEX, 0) < 0)
   {
     perror("open sequencer");
-    installed = 0;
+    mInstalled = false;
     return;
   }
 
   // set myself into non blocking mode
   if (set_blocking_mode(0) < 0)
   {
-    installed = 0;
+    mInstalled = false;
     return;
   }
   client = snd_seq_client_id(handle);
@@ -190,7 +190,7 @@ tAlsaPlayer::tAlsaPlayer(JZSong *song)
 
   snd_seq_set_output_buffer_size(handle, 65536);
 
-  if (installed)
+  if (mInstalled)
   {
     thru = new tAlsaThru();
     SetSoftThru(
@@ -381,9 +381,9 @@ int tAlsaPlayer::create_port(snd_seq_t *handle, const char *name)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tAlsaPlayer::Installed()
+bool tAlsaPlayer::IsInstalled()
 {
-  return installed;
+  return mInstalled;
 }
 
 //-----------------------------------------------------------------------------

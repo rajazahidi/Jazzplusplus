@@ -60,9 +60,9 @@ class tAudioPlayer : public tSeq2Player
 
     virtual void StartAudio();
 
-    virtual int Installed()
+    virtual int IsIsInstalled()
     {
-      return installed && tSeq2Player::Installed();
+      return mInstalled && tSeq2Player::IsInstalled();
     }
 
     virtual int GetAudioEnabled() const
@@ -107,7 +107,7 @@ class tAudioPlayer : public tSeq2Player
     void CloseDsp(bool Reset);
 
     int dev;
-    int installed;
+    bool mInstalled;
 
     long midi_clock;
     long audio_bytes;

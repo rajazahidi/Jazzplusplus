@@ -39,6 +39,8 @@ using namespace std;
 
 #define AUDIO_DEVICE "/dev/dsp"
 
+//*****************************************************************************
+//*****************************************************************************
 class tAudioListener : public wxTimer
 {
   public:
@@ -115,14 +117,14 @@ class tAudioListener : public wxTimer
     int mHardExit;
 };
 
-
-
-tAudioPlayer::tAudioPlayer(JZSong *song)
-  : tSeq2Player(song)
+//*****************************************************************************
+//*****************************************************************************
+tAudioPlayer::tAudioPlayer(JZSong* pSong)
+  : tSeq2Player(pSong)
 {
   long dummy = 0;
   AudioBuffer = new tEventArray();
-  installed = 0;
+  mInstalled = false;
   dummy = gpConfig->GetValue(C_EnableAudio);
   audio_enabled = dummy;
   mpListener = 0;
@@ -152,7 +154,7 @@ tAudioPlayer::tAudioPlayer(JZSong *song)
     }
     else
     {
-      installed = 1;
+      mInstalled = true;
     }
 
     close(dev);
@@ -163,7 +165,7 @@ tAudioPlayer::tAudioPlayer(JZSong *song)
   }
 
   dev = -1;  // closed
-  audio_enabled = audio_enabled && installed;
+  audio_enabled = audio_enabled && mInstalled;
 }
 
 

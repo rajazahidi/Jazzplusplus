@@ -40,7 +40,7 @@ class JZWindowsPlayer : public JZPlayer
 
     JZWindowsPlayer(JZSong* pSong);
 
-    int Installed();
+    virtual bool IsInstalled();
     virtual ~JZWindowsPlayer();
     virtual int OutEvent(JZEvent* e);
     virtual int OutSysex(JZEvent* e, DWORD time);
@@ -63,7 +63,7 @@ class JZWindowsPlayer : public JZPlayer
       return 0;
     }
 
-    static void SettingsDlg(long& InputDevice, long& OutputDevice);
+    static void SettingsDlg(int& InputDevice, int& OutputDevice);
 
     enum { MAX_MIDI_DEVS = 10 };
 

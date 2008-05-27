@@ -144,7 +144,7 @@ class JZConfigurationEntry
 
     TEConfigEntryType GetType() const;
 
-    const char* GetName() const;
+    const std::string& GetName() const;
 
     const int& GetValue() const;
 
@@ -177,9 +177,9 @@ TEConfigEntryType JZConfigurationEntry::GetType() const
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 inline
-const char* JZConfigurationEntry::GetName() const
+const std::string& JZConfigurationEntry::GetName() const
 {
-  return mName.c_str();
+  return mName;
 }
 
 //-----------------------------------------------------------------------------
@@ -218,31 +218,30 @@ class JZConfiguration
 
     void LoadConfig(const wxString& FileName);
 
-    int Check(const char* pName) const;
+    int Check(const std::string& Name) const;
 
     int Load(char* buf);
 
-    const std::pair<std::string, int>& GetDrumName(unsigned entry) const;
-    const std::pair<std::string, int>& GetDrumSet(unsigned entry) const;
-    const std::pair<std::string, int>& GetVoiceName(unsigned entry) const;
-    const std::pair<std::string, int>& GetCtrlName(unsigned entry) const;
+    const std::pair<std::string, int>& GetDrumName(unsigned Entry) const;
+    const std::pair<std::string, int>& GetDrumSet(unsigned Entry) const;
+    const std::pair<std::string, int>& GetVoiceName(unsigned Entry) const;
+    const std::pair<std::string, int>& GetCtrlName(unsigned Entry) const;
 
-    JZDoubleCommand& BankEntry(unsigned entry);
+    JZDoubleCommand& BankEntry(unsigned Entry);
 
-    const char* GetName(int entry) const;
+    const std::string& GetName(int Entry) const;
 
-    const std::string& GetStrValue(int entry) const;
+    const std::string& GetStrValue(int Entry) const;
 
     const int& GetValue(const char* pName) const;
     const int& GetValue(int Index) const;
 
-    bool Get(int entry, char* value);
-    bool Get(int entry, long& value);
+    bool Get(int Entry, char* pValue);
+    bool Get(int Entry, int& Value);
 
-    bool Put(int entry, const char *value);
-    bool Put(int entry, long value);
-    bool Put(int entry);
-    bool Put(int entry, int value);
+    bool Put(int Entry, const std::string& ValueString);
+    bool Put(int Entry);
+    bool Put(int Entry, int Value);
 
     const std::vector<std::pair<std::string, int> >& GetDrumSets() const;
 
@@ -284,19 +283,19 @@ class JZConfiguration
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 inline
-const char* JZConfiguration::GetName(int entry) const
+const std::string& JZConfiguration::GetName(int Entry) const
 {
-  assert((entry >= 0) && (entry < NumConfigNames));
-  return mNames[entry]->GetName();
+  assert((Entry >= 0) && (Entry < NumConfigNames));
+  return mNames[Entry]->GetName();
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 inline
-const std::string& JZConfiguration::GetStrValue(int entry) const
+const std::string& JZConfiguration::GetStrValue(int Entry) const
 {
-  assert((entry >= 0) && (entry < NumConfigNames));
-  return mNames[entry]->GetStrValue();
+  assert((Entry >= 0) && (Entry < NumConfigNames));
+  return mNames[Entry]->GetStrValue();
 }
 
 //-----------------------------------------------------------------------------

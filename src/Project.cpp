@@ -168,14 +168,14 @@ JZProject::JZProject()
   {
 #ifdef DEV_SEQUENCER2
     mpMidiPlayer = new tAudioPlayer(this);
-    if (!mpMidiPlayer->Installed())
+    if (!mpMidiPlayer->IsInstalled())
     {
       cerr << "tAudioPlayer didn't install." << endl;
 
       delete mpMidiPlayer;
       mpMidiPlayer = new tSeq2Player(this);
     }
-    if (!mpMidiPlayer->Installed())
+    if (!mpMidiPlayer->IsInstalled())
     {
       cerr << "tSeq2Player didn't install." << endl;
 
@@ -195,14 +195,14 @@ JZProject::JZProject()
   {
 #ifdef DEV_ALSA
     mpMidiPlayer = new tAlsaAudioPlayer(this);
-    if (!mpMidiPlayer->Installed())
+    if (!mpMidiPlayer->IsInstalled())
     {
       cerr << "tAlsaAudioPlayer didn't install." << endl;
 
       delete mpMidiPlayer;
       mpMidiPlayer = new tAlsaPlayer(this);
     }
-    if (!mpMidiPlayer->Installed())
+    if (!mpMidiPlayer->IsInstalled())
     {
       cerr << "tAlsaPlayer didn't install." << endl;
 
@@ -223,7 +223,7 @@ JZProject::JZProject()
   {
 #ifdef DEV_MPU401
     mpMidiPlayer = new tMpuPlayer(this);
-    if (!mpMidiPlayer->Installed())
+    if (!mpMidiPlayer->IsInstalled())
     {
       cerr << "tMpuPlayer didn't install." << endl;
 
@@ -267,7 +267,7 @@ JZProject::JZProject()
     case CsInt:
     default:
       mpMidiPlayer = new JZWindowsAudioPlayer(this);
-      if (!mpMidiPlayer->Installed())
+      if (!mpMidiPlayer->IsInstalled())
       {
         mpMidiPlayer->ShowError();
         delete mpMidiPlayer;
@@ -275,7 +275,7 @@ JZProject::JZProject()
       }
       break;
   }
-  if (!mpMidiPlayer->Installed())
+  if (!mpMidiPlayer->IsInstalled())
   {
     mpMidiPlayer->ShowError();
     delete mpMidiPlayer;
@@ -288,8 +288,12 @@ JZProject::JZProject()
   // Macintosh Drivers
   //------------------
   mpMidiPlayer = new JZPortMidiPlayer(this);
-  if (!mpMidiPlayer->Installed())
+  mpMidiPlayer.DeviceSelectionDialog();
+
+  if (!mpMidiPlayer->IsInstalled())
   {
+    delete mpMidiPlayer;
+    mpMidiPlayer = 0;
     cout << "Jazz++ will start with no play/record ability." << endl;
   }
 #endif // __WXMAC__

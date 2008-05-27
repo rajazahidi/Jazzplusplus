@@ -40,7 +40,7 @@ END_EVENT_TABLE()
 //-----------------------------------------------------------------------------
 JZMidiDeviceDialog::JZMidiDeviceDialog(
   const vector<pair<string, int> >& MidiDevices,
-  long& DeviceIndex,
+  int& DeviceIndex,
   wxWindow* pParent,
   const wxString& Title)
   : wxDialog(pParent, wxID_ANY, Title),

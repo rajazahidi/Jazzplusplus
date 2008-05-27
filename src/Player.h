@@ -38,7 +38,8 @@
 
 class JZRecordingInfo;
 
-
+//*****************************************************************************
+//*****************************************************************************
 class tPlayLoop
 {
   public:
@@ -71,6 +72,8 @@ class tPlayLoop
     long mStopClock;
 };
 
+//*****************************************************************************
+//*****************************************************************************
 enum tClockSource
 {
   CsInt = 0,
@@ -79,6 +82,8 @@ enum tClockSource
   CsMtc
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tDeviceList
 {
   public:
@@ -124,6 +129,8 @@ class tDeviceList
     tDeviceList& operator = (const tDeviceList &);
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class JZPlayer : public wxTimer
 {
   protected:
@@ -139,7 +146,9 @@ class JZPlayer : public wxTimer
 
     bool Playing;        // successful StartPlay
 
-    virtual int Installed() = 0;        // Hardware found
+    // Tests if hardware found and successfully setup.
+    virtual bool IsInstalled() = 0;
+
     // if unable to install, pop up a messagebox explaining why.
     virtual void ShowError();
 
@@ -280,15 +289,17 @@ class JZPlayer : public wxTimer
 
 extern char *midinethost;
 
-// --------------------------------------------------------
+//*****************************************************************************
 // Roland MPU 401
-// --------------------------------------------------------
+//*****************************************************************************
 
 #ifdef DEV_MPU401
 
 #include <unistd.h>
 #include <fcntl.h>
 
+//*****************************************************************************
+//*****************************************************************************
 class tBuffer : public tWriteBase
 {
 
@@ -440,6 +451,8 @@ class tBuffer : public tWriteBase
 #define ACTIVE_TRACKS 7
 #define ACTIVE_TRACKS_MASK 0x7f
 
+//*****************************************************************************
+//*****************************************************************************
 class tMpuPlayer : public JZPlayer
 {
     int  dev;
@@ -465,7 +478,7 @@ class tMpuPlayer : public JZPlayer
     void StartPlay(long Clock, long LoopClock = 0, int Continue = 0);
     void StopPlay();
     long GetRealTimeClock();
-    int  Installed();
+    virtual bool IsInstalled();
     long GetRecordedData();
     void SetHardThru(int on, int idev, int odev);
 
@@ -482,8 +495,10 @@ class tMpuPlayer : public JZPlayer
 
 #endif // DEV_MPU401
 
-// ------------------------------ null-driver -------------------------------
-
+//*****************************************************************************
+// Description:
+//   This is the null driver class declaration.
+//*****************************************************************************
 class tNullPlayer : public JZPlayer
 {
   public:
@@ -493,9 +508,9 @@ class tNullPlayer : public JZPlayer
     {
     }
 
-    int Installed()
+    virtual bool IsInstalled()
     {
-      return 1;
+      return true;
     }
 
     virtual ~tNullPlayer()
@@ -544,6 +559,8 @@ void seqbuf_dump(void);
 void seqbuf_flush_last_event();
 
 
+//*****************************************************************************
+//*****************************************************************************
 class tOSSThru : public wxTimer
 {
   public:
@@ -552,14 +569,15 @@ class tOSSThru : public wxTimer
     ~tOSSThru();
 };
 
-
-
+//*****************************************************************************
+//*****************************************************************************
 class tSeq2Player : public JZPlayer
 {
   public:
+
     friend class tOSSThru;
     tSeq2Player(JZSong *song);
-    int Installed();
+    virtual bool IsInstalled();
     virtual ~tSeq2Player();
     int  OutEvent(JZEvent *e, int now);
     int  OutEvent(JZEvent *e) { OutEvent(e, 0); return 0; }

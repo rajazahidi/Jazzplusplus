@@ -32,6 +32,7 @@
 #include <stack>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 using namespace std;
 
@@ -407,12 +408,20 @@ JZDoubleCommand& JZConfiguration::BankEntry(unsigned entry)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZConfiguration::Check(const char* pName) const
+int JZConfiguration::Check(const string& InputLine) const
 {
-  if (!pName || (pName[0] != '.'))
+  string::const_iterator iString = InputLine.begin();
+
+  if (iString == InputLine.end() || *iString != '.')
   {
     return -1;
   }
+
+  const string Delimiters(" \t");
+
+  vector<string> Tokens;
+
+  Tokenize(InputLine, Delimiters, Tokens);
 
   for (int i = 0; i < NumConfigNames; i++)
   {
@@ -420,7 +429,7 @@ int JZConfiguration::Check(const char* pName) const
     {
       continue;
     }
-    if (!strncmp(pName, mNames[i]->GetName(), strlen(mNames[i]->GetName())))
+    if (Tokens[0] == mNames[i]->GetName())
     {
       // Found
       return i;
@@ -475,7 +484,7 @@ int JZConfiguration::Load(char* buf)
   else if (mNames[entry]->GetType() == eConfigEntryTypeStr)
   {
     // Allow whitespace inside entries like "C:\Program Files\JazzWare".
-    int ofs = strlen(mNames[entry]->GetName());
+    int ofs = mNames[entry]->GetName().length();
     while (buf[ofs] == ' ' || buf[ofs] == '\t')  // not \n
     {
       ++ofs;
@@ -531,7 +540,7 @@ const int& JZConfiguration::GetValue(int Index) const
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool JZConfiguration::Get(int entry, char *value)
+bool JZConfiguration::Get(int entry, char* value)
 {
   assert((entry >= 0) && (entry < NumConfigNames));
 
@@ -542,14 +551,14 @@ bool JZConfiguration::Get(int entry, char *value)
   }
 
   FILE *fd = fopen(FileName.c_str(), "r");
-  const char* name = GetName(entry);
+  const string& name = GetName(entry);
 
-  int  len = strlen(name);
+  int len = name.length();
   char buf[1000];
   bool found = false;
   while (!found && fgets(buf, sizeof(buf), fd) != NULL)
   {
-    if (strncmp(buf, name, len) == 0)
+    if (strncmp(buf, name.c_str(), len) == 0)
     {
       while (isspace(buf[len]))
       {
@@ -570,12 +579,12 @@ bool JZConfiguration::Get(int entry, char *value)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool JZConfiguration::Get(int entry, long &value)
+bool JZConfiguration::Get(int entry, int& value)
 {
   char buf[512];
   if (Get(entry, buf))
   {
-    sscanf(buf, " %ld ", &value);
+    sscanf(buf, " %d ", &value);
     return true;
   }
   return false;
@@ -587,7 +596,7 @@ bool JZConfiguration::Get(int entry, long &value)
 // entries to there.  If the name/value pair is found, replace it, otherwise
 // write it.  Finally copy the temp file over the old configuration file.
 //-----------------------------------------------------------------------------
-bool JZConfiguration::Put(int Index, const char *value)
+bool JZConfiguration::Put(int Index, const string& ValueString)
 {
   assert((Index >= 0) && (Index < NumConfigNames));
 
@@ -597,51 +606,43 @@ bool JZConfiguration::Put(int Index, const char *value)
     return false;
   }
 
-  char tempname[512];
-  strcpy(tempname, FileName.c_str());
-  strcat(tempname, ".tmp"); //make the temp file name
-  FILE *out = fopen(tempname, "w");
-  if (!out)
+  // Create a temporary file name from the current file name.
+  string TempFileName(FileName);
+  TempFileName.append(".tmp");
+  ofstream Os(TempFileName.c_str());
+  if (!Os)
   {
     return false;
   }
 
   FILE* inp = fopen(FileName.c_str(), "r");
-  const char* name = GetName(Index);
+  const string& name = GetName(Index);
 
-  int  len = strlen(name);
+  int len = name.length();
   char buf[1000];
   bool found = false;
   while (fgets(buf, sizeof(buf), inp) != NULL)
   {
-    if (strncmp(buf, name, len) == 0)
+    if (strncmp(buf, name.c_str(), len) == 0)
     {
-      fprintf(out, "%s %s\n", name, value);
+      Os << name << ' ' << ValueString << endl;
       found = true;
     }
     else
     {
-      fputs(buf, out);
+      Os << buf;
     }
   }
   if (!found)
   {
-    fprintf(out, "%s %s\n", name, value);
+    Os << name << ' ' << ValueString << endl;
   }
   fclose(inp);
-  fclose(out);
-  unlink(FileName.c_str());
-  rename(tempname, FileName.c_str());
-  return true;
-}
+  Os.close();
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-bool JZConfiguration::Put(int Index, long Value)
-{
-  ostringstream Oss;
-  Oss << Value;
-  return Put(Index, Oss.str().c_str());
+  unlink(FileName.c_str());
+  rename(TempFileName.c_str(), FileName.c_str());
+  return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -650,8 +651,8 @@ bool JZConfiguration::Put(int Index)
 {
   assert((Index >= 0) && (Index < NumConfigNames));
   mNames[Index]->SetValue(Index);
-  long LongValue = mNames[Index]->GetValue();
-  return Put(Index, LongValue);
+  int Value = mNames[Index]->GetValue();
+  return Put(Index, Value);
 }
 
 //-----------------------------------------------------------------------------
@@ -660,8 +661,9 @@ bool JZConfiguration::Put(int Index, int Value)
 {
   assert((Index >= 0) && (Index < NumConfigNames));
   mNames[Index]->SetValue(Value);
-  long LongValue = mNames[Index]->GetValue();
-  return Put(Index, LongValue);
+  ostringstream Oss;
+  Oss << Value;
+  return Put(Index, Oss.str());
 }
 
 //-----------------------------------------------------------------------------
@@ -692,6 +694,7 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
 
   vector<pair<string, int> >* pVector = 0;
 
+//  stack<ifstream> InputFileStreams;
   stack<FILE*> FileDescriptors;
 
   cout
@@ -699,7 +702,11 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
     << "  \"" << mFileName << '"'
     << endl;
 
+//  ifstream Is(mFileName.c_str());
+//  InputFileStreams.push(Is);
   FileDescriptors.push(fopen(mFileName.c_str(), "r"));
+
+//  if (!InputFileStreams.top())
   if (FileDescriptors.top() == NULL)
   {
     wxString String;
@@ -719,10 +726,17 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
   while (1)
   {
     // Read a line from the current file.
+
+//    if (getline(InputFileStreams.top(), InputLine))
     if (fgets(buf, sizeof(buf), FileDescriptors.top()) == NULL)
     {
+//      InputFileStreams.top().close();
       fclose(FileDescriptors.top());
+
+//      InputFileStreams.pop();
       FileDescriptors.pop();
+
+//      if (InputFileStreams.empty())
       if (FileDescriptors.empty())
       {
         // The code has reached the last line of the Jazz++ configuration file
@@ -800,13 +814,16 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
 
             if (IncludeFileName.empty())
             {
+//              InputFileStreams
               FileDescriptors.push(NULL);
             }
             else
             {
+//              InputFileStreams
               FileDescriptors.push(fopen(IncludeFileName, "r"));
             }
 
+//            InputFileStreams
             if (FileDescriptors.top() == NULL)
             {
               wxString String;
@@ -814,6 +831,8 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
                 << "Could not open configuration include file:" << '\n'
                 << '"' << buf << '"';
               ::wxMessageBox(String, "Warning", wxOK);
+
+//              InputFileStreams.pop();
               FileDescriptors.pop();
             }
           }

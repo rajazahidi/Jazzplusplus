@@ -686,7 +686,7 @@ tMpuPlayer::~tMpuPlayer()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tMpuPlayer::Installed()
+bool tMpuPlayer::IsInstalled()
 {
   return dev >= 0;
 }
@@ -1483,7 +1483,7 @@ tSeq2Player::tSeq2Player(JZSong* pSong)
 
     if (mididev < 0)
     {
-      return;  // Installed() == FALSE
+      return;  // IsInstalled() == FALSE
     }
   }
 
@@ -1509,7 +1509,7 @@ tSeq2Player::tSeq2Player(JZSong* pSong)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tSeq2Player::Installed()
+bool tSeq2Player::IsInstalled()
 {
   return seqfd >= 0 && mididev >= 0;
 }

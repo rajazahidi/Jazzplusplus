@@ -65,4 +65,11 @@ extern tHBInterface* gpHarmonyBrowser;
 extern const double gDegreesToRadians;
 extern const double gRadiansToDegrees;
 
+//*****************************************************************************
+//*****************************************************************************
+int Tokenize(
+  const std::string& String,
+  const std::string& Delimiters,
+  std::vector<std::string>& Tokens);
+
 #endif // !defined(JZ_GLOBALS_H)

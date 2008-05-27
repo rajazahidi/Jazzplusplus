@@ -62,9 +62,9 @@ void tTimingDlg::MtcInitRec()
     Config(C_ClockSource) = CsMtc;
     ClkSrcListBox->SetStringSelection( ClkSrcArray[ Config(C_ClockSource) ] );
     Midi = new JZWindowsMtcPlayer(EventWin->Song);
-    if (!Midi->Installed())
+    if (!Midi->IsInstalled())
     {
-      wxMessageBox("no midi driver installed", "Error", wxOK);
+      wxMessageBox("no MIDI driver installed", "Error", wxOK);
       Midi = new tNullPlayer(EventWin->Song);
     }
   }
@@ -149,9 +149,9 @@ void tTimingDlg::OnOk()
         Midi = new tWinAudioPlayer(EventWin->Song);
         break;
     }
-    if (!Midi->Installed())
+    if (!Midi->IsInstalled())
     {
-      wxMessageBox("no midi driver installed", "Error", wxOK);
+      wxMessageBox("no MIDI driver installed", "Error", wxOK);
       Midi = new tNullPlayer(EventWin->Song);
     }
 #endif

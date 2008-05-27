@@ -36,7 +36,7 @@ class JZMidiDeviceDialog : public wxDialog
 
     JZMidiDeviceDialog(
       const std::vector<std::pair<std::string, int> >& MidiDevices,
-      long& DeviceIndex,
+      int& DeviceIndex,
       wxWindow* pParent = 0,
       const wxString& Title = wxEmptyString);
 
@@ -46,7 +46,7 @@ class JZMidiDeviceDialog : public wxDialog
 
   private:
 
-    long& mDeviceIndex;
+    int& mDeviceIndex;
 
     wxListBox* mpMidiDeviceListBox;
 

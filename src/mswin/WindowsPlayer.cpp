@@ -63,7 +63,7 @@ JZWindowsPlayer::JZWindowsPlayer(JZSong* pSong)
   state->doing_mtc_rec = FALSE;
   state->audio_player = 0;
 
-  long ilong = -1, olong = -1;
+  int ilong = -1, olong = -1;
   if (
     !gpConfig->Get(C_WinInputDevice, ilong) ||
     !gpConfig->Get(C_WinOutputDevice, olong))
@@ -162,7 +162,7 @@ JZWindowsPlayer::JZWindowsPlayer(JZSong* pSong)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZWindowsPlayer::Installed()
+bool JZWindowsPlayer::IsInstalled()
 {
   return timer_installed && state->hout;
 }
@@ -996,7 +996,7 @@ tMtcTime* JZWindowsMtcPlayer::FreezeMtcRec()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZWindowsPlayer::SettingsDlg(long& InputDevice, long& OutputDevice)
+void JZWindowsPlayer::SettingsDlg(int& InputDevice, int& OutputDevice)
 {
   vector<pair<string, int> > MidiDevices;
 

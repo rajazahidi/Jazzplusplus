@@ -1,10 +1,19 @@
 #include "WxWidgets.h"
 
 #include "PortMidiPlayer.h"
+#include "JazzPlusPlusApplication.h"
+#include "TrackFrame.h"
 #include "TrackWindow.h"
 #include "Song.h"
 #include "Globals.h"
+#include "MidiDeviceDialog.h"
 
+#include <iostream>
+
+using namespace std;
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZPortMidiPlayer::JZPortMidiPlayer(JZSong* pSong)
   : JZPlayer(pSong),
     mInputDevices(),
@@ -29,96 +38,102 @@ JZPortMidiPlayer::JZPortMidiPlayer(JZSong* pSong)
 //  mOutputQueue = Pm_QueueCreate(1024, sizeof(PmEvent));
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZPortMidiPlayer::~JZPortMidiPlayer()
 {
 //   Pm_QueueDestroy(mOutputQueue);
   TermPM();
 }
 
-int
-JZPortMidiPlayer::Installed()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZPortMidiPlayer::IsInstalled()
 {
   return true;
 }
 
-wxString
-JZPortMidiPlayer::GetInputDeviceName()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+wxString JZPortMidiPlayer::GetInputDeviceName()
 {
   return mInputDevice;
 }
 
-wxString
-JZPortMidiPlayer::GetOutputDeviceName()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+wxString JZPortMidiPlayer::GetOutputDeviceName()
 {
   return mOutputDevice;
 }
 
-
-void
-JZPortMidiPlayer::SetInputDevice(const wxString & name)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPortMidiPlayer::SetInputDevice(const wxString& Name)
 {
-  bool term = InitPM();
-  PmDeviceID id = FindDevice(name, true);
+  bool NeedToTerminate = InitPM();
+  PmDeviceID id = FindDevice(Name, true);
 
   if (id != pmNoDevice)
   {
-    mInputDevice = name;
+    mInputDevice = Name;
   }
 
-  if (term)
+  if (NeedToTerminate)
   {
     TermPM();
   }
 }
 
-void
-JZPortMidiPlayer::SetOutputDevice(const wxString& name)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPortMidiPlayer::SetOutputDevice(const wxString& Name)
 {
-  bool term = InitPM();
-  PmDeviceID id = FindDevice(name, false);
+  bool NeedToTerminate = InitPM();
+  PmDeviceID id = FindDevice(Name, false);
 
   if (id != pmNoDevice)
   {
-    mOutputDevice = name;
+    mOutputDevice = Name;
   }
 
-  if (term)
+  if (NeedToTerminate)
   {
     TermPM();
   }
 }
 
-int
-JZPortMidiPlayer::SupportsMultipleDevices()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZPortMidiPlayer::SupportsMultipleDevices()
 {
   return true;
 }
 
-tDeviceList& 
-JZPortMidiPlayer::GetOutputDevices()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+tDeviceList& JZPortMidiPlayer::GetOutputDevices()
 {
-  bool term = InitPM();
-  int cnt;
-
-  cnt = Pm_CountDevices();
+  bool NeedToTerminate = InitPM();
+  int Count = Pm_CountDevices();
 
   mOutputDevices.Clear();
 
-  for (int i = 0; i < cnt; i++)
+  for (int i = 0; i < Count; ++i)
   {
-    const PmDeviceInfo *di = Pm_GetDeviceInfo(i);
+    const PmDeviceInfo* pPmDeviceInfo = Pm_GetDeviceInfo(i);
 
-    if (di && di->output)
+    if (pPmDeviceInfo && pPmDeviceInfo->output)
     {
-      wxString name = 
-        wxString(di->interf, wxConvISO8859_1) +
+      wxString Name = 
+        wxString(pPmDeviceInfo->interf, wxConvISO8859_1) +
         wxT(", ") +
-        wxString(di->name, wxConvISO8859_1);
-      mOutputDevices.Add(name);
+        wxString(pPmDeviceInfo->name, wxConvISO8859_1);
+      mOutputDevices.Add(Name);
     }
   }
 
-  if (term)
+  if (NeedToTerminate)
   {
     TermPM();
   }
@@ -126,31 +141,30 @@ JZPortMidiPlayer::GetOutputDevices()
   return mOutputDevices;
 }
 
-tDeviceList&
-JZPortMidiPlayer::GetInputDevices()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+tDeviceList& JZPortMidiPlayer::GetInputDevices()
 {
-  bool term = InitPM();
-  int cnt;
-   
-  cnt = Pm_CountDevices();
+  bool NeedToTerminate = InitPM();
+  int Count = Pm_CountDevices();
 
   mInputDevices.Clear();
 
-  for (int i = 0; i < cnt; i++)
+  for (int i = 0; i < Count; ++i)
   {
-    const PmDeviceInfo *di = Pm_GetDeviceInfo(i);
+    const PmDeviceInfo* pPmDeviceInfo = Pm_GetDeviceInfo(i);
 
-    if (di && di->input)
+    if (pPmDeviceInfo && pPmDeviceInfo->input)
     {
-      wxString name =
-        wxString(di->interf, wxConvISO8859_1) +
+      wxString Name =
+        wxString(pPmDeviceInfo->interf, wxConvISO8859_1) +
         wxT(", ") +
-        wxString(di->name, wxConvISO8859_1);
-      mInputDevices.Add(name);
+        wxString(pPmDeviceInfo->name, wxConvISO8859_1);
+      mInputDevices.Add(Name);
     }
   }
 
-  if (term)
+  if (NeedToTerminate)
   {
     TermPM();
   }
@@ -158,23 +172,24 @@ JZPortMidiPlayer::GetInputDevices()
   return mInputDevices;
 }
 
-PmDeviceID
-JZPortMidiPlayer::FindDevice(const wxString & name, bool input)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+PmDeviceID JZPortMidiPlayer::FindDevice(const wxString& Name, bool input)
 {
-  int cnt = Pm_CountDevices();
+  int Count = Pm_CountDevices();
 
-  for (int i = 0; i < cnt; i++)
+  for (int i = 0; i < Count; i++)
   {
-    const PmDeviceInfo *di = Pm_GetDeviceInfo(i);
+    const PmDeviceInfo* pPmDeviceInfo = Pm_GetDeviceInfo(i);
 
-    if (di && (input ? di->input : di->output))
+    if (pPmDeviceInfo && (input ? pPmDeviceInfo->input : pPmDeviceInfo->output))
     {
       wxString n =
-        wxString(di->interf, wxConvISO8859_1) +
+        wxString(pPmDeviceInfo->interf, wxConvISO8859_1) +
         wxT(", ") +
-        wxString(di->name, wxConvISO8859_1);
+        wxString(pPmDeviceInfo->name, wxConvISO8859_1);
 
-      if (name == n)
+      if (Name == n)
       {
         return i;
       }
@@ -184,8 +199,9 @@ JZPortMidiPlayer::FindDevice(const wxString & name, bool input)
   return pmNoDevice;
 }
 
-int
-JZPortMidiPlayer::Clock2Time(int clock)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZPortMidiPlayer::Clock2Time(int clock)
 {
   if (clock < mStartClock)
   {
@@ -195,8 +211,9 @@ JZPortMidiPlayer::Clock2Time(int clock)
   return (int)((double)(clock - mStartClock) * 60000.0 / (double) mTicksPerMinute + mStartTime);
 }
 
-int
-JZPortMidiPlayer::Time2Clock(int time)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZPortMidiPlayer::Time2Clock(int time)
 {
   if (time < mStartTime)
   {
@@ -206,8 +223,9 @@ JZPortMidiPlayer::Time2Clock(int time)
   return (int)((double)(time - mStartTime) * (double) mTicksPerMinute / 60000.0 + mStartClock);
 }
 
-void
-JZPortMidiPlayer::SetTempo(int bpm, int clock)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPortMidiPlayer::SetTempo(int bpm, int clock)
 {
   int t1 = Clock2Time(clock);
   mTicksPerMinute = bpm * Song->GetTicksPerQuarter();
@@ -215,13 +233,15 @@ JZPortMidiPlayer::SetTempo(int bpm, int clock)
   mStartTime += (t1 - t2);
 }
 
-void
-JZPortMidiPlayer::OutBreak()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPortMidiPlayer::OutBreak()
 {
 }
 
-int
-JZPortMidiPlayer::OutEvent(JZEvent* pEvent, int now)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZPortMidiPlayer::OutEvent(JZEvent* pEvent, int now)
 {
   PmError rc = pmNoError;
   PmTimestamp t = (now ? 0 : pEvent->GetClock());
@@ -321,27 +341,30 @@ JZPortMidiPlayer::OutEvent(JZEvent* pEvent, int now)
   return rc != pmNoError;
 }
 
-int
-JZPortMidiPlayer::OutEvent(JZEvent* pEvent)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZPortMidiPlayer::OutEvent(JZEvent* pEvent)
 {
   return OutEvent(pEvent, 0);
 }
 
-void
-JZPortMidiPlayer::OutNow(JZEvent*pEvent)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPortMidiPlayer::OutNow(JZEvent*pEvent)
 {
   OutEvent(pEvent, 1);
 }
 
-void
-JZPortMidiPlayer::StartPlay(int clock, int loopClock, int cont)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPortMidiPlayer::StartPlay(int clock, int loopClock, int cont)
 {
-  bool term = InitPM();
+  bool NeedToTerminate = InitPM();
   PmDeviceID id = FindDevice(mOutputDevice, false);
 
   if (id == pmNoDevice)
   {
-    if (term)
+    if (NeedToTerminate)
     {
       TermPM();
     }
@@ -349,7 +372,10 @@ JZPortMidiPlayer::StartPlay(int clock, int loopClock, int cont)
     return;
   }
 
-  printf("rc = %d %d\n", Pm_OpenOutput(&mpStream, id, NULL, 0, NULL, NULL, 100), id);
+  cout
+    << "rc = " << Pm_OpenOutput(&mpStream, id, NULL, 0, NULL, NULL, 100)
+    << ' ' << id
+    << endl;
 
   mStartTime = Pt_Time() + 500;
   mStartClock = clock;
@@ -358,8 +384,9 @@ JZPortMidiPlayer::StartPlay(int clock, int loopClock, int cont)
   JZPlayer::StartPlay(clock, loopClock, cont);
 }
 
-void
-JZPortMidiPlayer::StopPlay()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPortMidiPlayer::StopPlay()
 {
   JZPlayer::StopPlay();
 
@@ -373,18 +400,21 @@ JZPortMidiPlayer::StopPlay()
   TermPM();
 }
 
-long
-JZPortMidiPlayer::GetRealTimeClock()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+long JZPortMidiPlayer::GetRealTimeClock()
 {
   long t = Pt_Time();
 
-  gpTrackWindow->NewPlayPosition(PlayLoop->Ext2IntClock(Time2Clock(t) / 48 * 48));
+  gpTrackWindow->NewPlayPosition(
+    PlayLoop->Ext2IntClock(Time2Clock(t) / 48 * 48));
 
   return Time2Clock(t);
 }
 
-bool
-JZPortMidiPlayer::InitPM()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZPortMidiPlayer::InitPM()
 {
   if (mInitialized)
   {
@@ -398,8 +428,9 @@ JZPortMidiPlayer::InitPM()
   return true;
 }
 
-bool
-JZPortMidiPlayer::TermPM()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZPortMidiPlayer::TermPM()
 {
   if (!mInitialized)
   {
@@ -411,4 +442,110 @@ JZPortMidiPlayer::TermPM()
   mInitialized = false;
 
   return true;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPortMidiPlayer::DeviceSelectionDialog()
+{
+  // Create a list of devices.
+  bool NeedToTerminate = InitPM();
+  int Count = Pm_CountDevices();
+
+  vector<pair<string, int> > MidiDevices;
+
+  // Create a container of input devices.
+  for (int i = 0; i < Count; ++i)
+  {
+    const PmDeviceInfo* pPmDeviceInfo = Pm_GetDeviceInfo(i);
+
+    if (pPmDeviceInfo && pPmDeviceInfo->input)
+    {
+      wxString Name =
+        wxString(pPmDeviceInfo->interf, wxConvISO8859_1) +
+        wxT(", ") +
+        wxString(pPmDeviceInfo->name, wxConvISO8859_1);
+
+      MidiDevices.push_back(make_pair(Name.c_str(), i));
+    }
+  }
+
+  // Select the input device.
+  int InputDevice = -1;
+  if (!MidiDevices.empty())
+  {
+    JZMidiDeviceDialog MidiInputDeviceDialog(
+      MidiDevices,
+      InputDevice,
+      ::wxGetApp().GetMainFrame(),
+      "Input MIDI device");
+    MidiInputDeviceDialog.ShowModal();
+
+    // Set the input device based on the selected integer.
+    for (
+      vector<pair<string, int> >::const_iterator iDevice =
+        MidiDevices.begin();
+      iDevice != MidiDevices.end();
+      ++iDevice)
+    {
+      if (iDevice->second == InputDevice)
+      {
+        SetOutputDevice(iDevice->first.c_str());
+        break;
+      }
+    }
+  }
+
+  MidiDevices.clear();
+
+  // Create a container of output devices.
+  for (int i = 0; i < Count; ++i)
+  {
+    const PmDeviceInfo* pPmDeviceInfo = Pm_GetDeviceInfo(i);
+
+    if (pPmDeviceInfo && pPmDeviceInfo->output)
+    {
+      wxString Name =
+        wxString(pPmDeviceInfo->interf, wxConvISO8859_1) +
+        wxT(", ") +
+        wxString(pPmDeviceInfo->name, wxConvISO8859_1);
+
+      MidiDevices.push_back(make_pair(Name.c_str(), i));
+    }
+  }
+
+  // Select the output device.
+  int OutputDevice = -1;
+  if (!MidiDevices.empty())
+  {
+    JZMidiDeviceDialog MidiOutputDeviceDialog(
+      MidiDevices,
+      OutputDevice,
+      gpTrackWindow,
+      "Output MIDI device");
+    MidiOutputDeviceDialog.ShowModal();
+
+    // Set the output device based on the selected integer.
+    for (
+      vector<pair<string, int> >::const_iterator iDevice =
+        MidiDevices.begin();
+      iDevice != MidiDevices.end();
+      ++iDevice)
+    {
+      if (iDevice->second == OutputDevice)
+      {
+        SetOutputDevice(iDevice->first.c_str());
+        break;
+      }
+    }
+  }
+
+//  gpConfig->Put(C_WinInputDevice, InputDevice);
+
+//  gpConfig->Put(C_WinOutputDevice, OutputDevice);
+
+  if (NeedToTerminate)
+  {
+    TermPM();
+  }
 }

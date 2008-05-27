@@ -50,7 +50,7 @@ class tAlsaPlayer : public JZPlayer
     virtual ~tAlsaPlayer();
 
     void Notify();
-    int Installed();
+    bool IsInstalled();
     int  OutEvent(JZEvent *e, int now);
     int  OutEvent(JZEvent *e) { return OutEvent(e, 0); }
     void OutNow(JZEvent *e)   { OutEvent(e, 1); }
@@ -79,7 +79,7 @@ class tAlsaPlayer : public JZPlayer
     int sync_in, sync_in_dev, sync_in_mtcType;
     int sync_out, sync_out_dev, sync_out_mtcType;
 
-    int installed;
+    bool mInstalled;
 
     static int create_port(snd_seq_t *handle, const char *name);
     static void set_client_info(snd_seq_t *handle, const char *name);

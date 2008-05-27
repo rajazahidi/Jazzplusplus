@@ -66,9 +66,9 @@ class JZWindowsAudioPlayer : public JZWindowsIntPlayer
 
     virtual void StartAudio();   // called async by driver
 
-    virtual int Installed()
+    virtual bool IsInstalled()
     {
-      return installed && JZWindowsIntPlayer::Installed();
+      return mInstalled && JZWindowsIntPlayer::IsInstalled();
     }
 
     virtual int GetAudioEnabled() const
@@ -134,7 +134,7 @@ class JZWindowsAudioPlayer : public JZWindowsIntPlayer
     int OpenDsp();    // 0 = ok
     int CloseDsp();   // 0 = ok
 
-    int installed;
+    bool mInstalled;
     int audio_enabled;        // 0 means midi only
     long blocks_played;       // # of blocks written to device
     int play_buffers_needed;  // driver requests more output buffers

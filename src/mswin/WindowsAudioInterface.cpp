@@ -157,14 +157,14 @@ JZWindowsAudioPlayer::JZWindowsAudioPlayer(JZSong* pSong)
 
   long dummy    = 0;
   AudioBuffer   = new tEventArray();
-  installed     = 0;
+  mInstalled    = false;
   dummy = gpConfig->GetValue(C_EnableAudio);
   audio_enabled = dummy;
   hout_open     = 0;
   hinp_open     = 0;
 
   // check for device
-  installed = 0;
+  mInstalled = false;
   mCanDuplex = (gpConfig->GetValue(C_DuplexAudio) != 0);
 
   if (OpenDsp() == 0)
@@ -188,11 +188,11 @@ JZWindowsAudioPlayer::JZWindowsAudioPlayer(JZSong* pSong)
 
     if (!mErrorCode && CloseDsp() == 0)
     {
-      installed = 1;
+      mInstalled = true;
     }
   }
   recbuffers.Clear();
-  audio_enabled = (audio_enabled && installed);
+  audio_enabled = (audio_enabled && mInstalled);
 }
 
 //-----------------------------------------------------------------------------

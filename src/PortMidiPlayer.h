@@ -17,7 +17,7 @@ class JZPortMidiPlayer : public JZPlayer
 
     virtual ~JZPortMidiPlayer();
 
-    int Installed();
+    virtual bool IsInstalled();
     int SupportsMultipleDevices();
 
     virtual tDeviceList& GetInputDevices();
@@ -40,6 +40,8 @@ class JZPortMidiPlayer : public JZPlayer
     int Clock2Time(int clock);
     int Time2Clock(int time);
     void SetTempo(int bpm, int clock);
+
+    void DeviceSelectionDialog();
 
   private:
 

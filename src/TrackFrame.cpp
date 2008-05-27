@@ -570,7 +570,7 @@ void JZTrackFrame::OnSettingsSynthesizerType(wxCommandEvent& Event)
 void JZTrackFrame::OnSettingsMidiDevice(wxCommandEvent& Event)
 {
 #ifdef __WXMSW__
-  long InputDevice, OutputDevice;
+  int InputDevice, OutputDevice;
   gpConfig->Get(C_WinInputDevice, InputDevice);
   gpConfig->Get(C_WinOutputDevice, OutputDevice);
   JZWindowsPlayer::SettingsDlg(InputDevice, OutputDevice);

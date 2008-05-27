@@ -557,6 +557,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\PortMidiPlayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\PortMidiPlayer.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Project.cpp"
 				>
 			</File>

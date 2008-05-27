@@ -137,17 +137,10 @@ bool JZJazzPlusPlusApplication::OnInit()
 
   // Create the main application window.
   mpTrackFrame = JZProjectManager::Instance()->CreateTrackView();
-//    new JZTrackFrame(
-//    0,
-//    "Jazz++",
-//    gpSong,
-//    wxPoint(10, 10),
-//    wxSize(600, 400));
 
   gpTrackFrame = mpTrackFrame;
 
   // Show it and tell the application that it's our main window
-//  mpTrackFrame->Show(true);
   SetTopWindow(mpTrackFrame);
 
   return true;

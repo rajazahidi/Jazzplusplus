@@ -153,6 +153,9 @@ fi
 JAZZ_PATH=\${top_srcdir}
 AC_SUBST(JAZZ_PATH)
 
+PORTMIDI_PATH=$JAZZ_PATH/portmidi
+AC_SUBST(PORTMIDI_PATH)
+
 AC_MSG_CHECKING([whether to enable debugging])
 AC_ARG_ENABLE(
   debug,

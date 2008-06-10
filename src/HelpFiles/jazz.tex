@@ -15,11 +15,39 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Introduction}\label{introduction}
+\begin{center}
 
-JAZZ++ is a fully featured MIDI sequencer with audio support. In addition to
-basic sequencer functions like record and play, JAZZ++ provides many edit
-features like quantize, copy, transpose, graphical pitch editing, multiple
-undo/redo etc.
+JAZZ++ is a fully featured software MIDI sequencer with audio support. In
+addition to basic sequencer functions like record and play, JAZZ++ provides
+many specialized editing features like quantize, copy, transpose, graphical
+pitch editing, multiple undo/redo etc. As an extension to traditional normal
+MIDI sequencing, JAZZ++ provides audio play (*.wav files), audio recording and
+audio/midi integration. A multi function {\em audio editor} is also included.
+
+JAZZ++ has support for {\em GM} (General MIDI) equipment with both {\em GS}
+and {\em XG} extensions, and also offers special functions like GS/XG sound
+editing, setting of effect types, a {\em random rhythm generator} and a {\em
+harmony browser}. Windows versions of JAZZ++ can be synchronized to other sound
+equipment (e.g. a tape recorder) using MIDI Time Code (MTC) or SongPointer
+synchronization techniques. [ed: is this still only so for the Win version??]
+
+JAZZ++ is a platform/OS independant software program, and has been designed to
+work on Windows and Linux operating systems using 32bit or 64bit Intel ix86
+based computers (the 'PC'), and also for MacOSX using Mac computer systems. [ed:
+ppc? intelmac? m680x0? ;-] Being a MIDI based program, JAZZ++ can interact with
+both externally connected MIDI equipment (MIDI capable keyboards, synthesizer
+modules, drum-machines etc), internally connected MIDI equipment (soundcards
+with hardware based MIDI/synth capabilities), or with one or more MIDI capable
+software synthesizer programs ('softsynths') running on the same computer as
+JAZZ++. [ed: I'd like to add something here...is it possible ...or going to
+be...to use combinations of all of these?]
+ 
+
+
+[ed:..actually, this belongs in it's own chapter above trackwindow, with a
+title like 'Overview of working with jazz++'...then this bit below would
+fit.....]
+
 
 JAZZ++ has two main windows; one
 operating on the song as a whole, and one operating on single tracks and
@@ -27,265 +55,557 @@ single events. Among the other windows and dialogs are mixer windows for easy
 adjusting of default track parameters, and all settings are saved into the
 MIDI file for later use.
 
-JAZZ++ has support for {\em GM} (General MIDI) equipment with both {\em GS}
-and {\em XG} extensions.
 
-JAZZ++ offers special functions like GS/XG sound editing, setting of effect
-types, a {\em random rhythm generator} and a {\em harmony browser}. Windows
-versions of JAZZ++ can be synchronized to other sound equipment (e.g. a tape
-recorder) using MIDI Time Code (MTC) or SongPointer synchronization
-techniques.
+[ed:...and carry on with some bits removed from track/piano/audio chapters
+ below which are more to do with basic -program- operations and nothing
+to do with -tracks- (or the editing thereof) at all for instance.] 
 
-As an extension to normal MIDI sequencing, JAZZ++ provides audio play
-(*.wav files), audio recording and audio/midi integration. A multi function
-{\em audio editor} is also included.
-
-\begin{figure}%
-\latexonly{\includegraphics[scale=0.5]{jzwins.png}}%
-\htmlonly{\image{0cm;0cm}{jzwins.png}}%
-\caption{Main windows of JAZZ++}%
-\end{figure}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{System requirements}\label{requirements}
 
-\subsection{MIDI and audio equipment}
-
-*NEW*
-[ed: this is an example of keeping original content]
+JAZZ++ is a software MIDI sequencer that makes it possible for the JAZZ++
+user to employ everyday personal computing hardwares, and other connected MIDI
+based equipment, to potentially create a very powerful and highly featured
+Digital Audio Workstation (DAW). The performance of JAZZ++ itself when used
+is this manner, is primarily dependent on just how capable/powerful the user's
+computer system actually is  This section briefly describes the various minimum
+hardware and software requirements needed for satisfactory operation using the
+JAZZ++ software MIDI sequencer.
 
 The original Jazz++ documentation recorded here;
 
-"To play MIDI music your PC must be attached to a MIDI synthesizer
-device. The synthesizer can either be an integrated part of a
-sound-card, or an external device attached to the PC with a cable.
-To record MIDI music you will need a midi-capable piano-keyboard
-attached to the PC (as an alternative you can enter notes using
-the mouse). For audio you need an audio capable sound card."
+"To play MIDI music your PC must be attached to a MIDI synthesizer device. The
+synthesizer can either be an integrated part of a sound-card, or an external
+device attached to the PC with a cable. To record MIDI music you will need a
+midi-capable piano-keyboard attached to the PC (as an alternative you can enter
+notes using the mouse). For audio you need an audio capable sound card."
+
+It is now 2008, and a lot has changed in the computing hardware and software
+arenas since the original JAZZ++ documentation was drafted some time around
+1995. While the above paragraph is more or less still correct, it was written in
+a time before modern computers had 'onboard' sound hardware like most people
+have now-a-days. Likewise, back in those days software based MIDI synthesizers
+were not as functional (nor as plentiful) as they are today, so you really
+\underline{don't} need any 'real' MIDI hardware to play MIDI music on your PC
+anymore -- you can use a software synthesizer (softsynth) instead.
 
 
-A lot of that is still the same even today - if you're not using
-a hardware MIDI/synth soundcard or externally connected MIDI
-synthesizer, you will need an audio capable soundcard to hear
-anything. Today however, most personal computers already have
-'onboard' audio sound chipsets, so for most people it's very
-likely that you already have this requirement satisfied. Likewise,
-MIDI/synth capable addon soundcards are a -lot- cheaper today
-than when Jazz++ first started out, and you can buy MIDI/synth
-soundcards of various types for under 50 dollars these days.
-One can also buy high-end MIDI/synth soundcards for a few hundred
-dollars if you're looking for the very best quality sound ouput,
-or otherwise 'professional' features and specifications.
+\subsection{Operating Systems supported by JAZZ++}
 
-Back when the original Jazz++ documentation was written, there
-weren't many 'software synthesizer' programs available for the
-personal computer, and even if they were available, the then
-computing hardware was simply too slow to run such software
-properly. A lot has changed since then and now. Today, even so
-called 'entry level' personal computers have more than enough power
-to run Jazz++ concurrently with one (or more) 'software synthesizers'
-running on the same machine, thus making it possible for Jazz++ to
-become the basis of a fully functional Digital Audio Workstation
-(DAW) using otherwise standard, low cost personal computer systems
-and/or other now affordable add-on sound/MIDI hardware options.
+The current version of JAZZ++ is known to work with the Windows, Linux, and
+MacOSX operating systems. You will need to be running one of these operating
+systems on your computer hardware to use JAZZ++.
 
-This area of the Jazz++ documentation provides information
-explaining common concepts of working with MIDI, details of how to
-get the most out of you personal computer when using it with
-Jazz++, and also platform/OS specific information regarding setting
-up and using Jazz++ with the now available hardware technologies
-and various 'software synthesizer' MIDI programs available to the
-personal computer user today.
+\subsection{Computer Architectures supported by JAZZ++}
 
-*NEW*
+The current version of JAZZ++ is known to work with most all computer
+architectures supported by the above Operating Systems. This includes the
+Intel based 'PC' hardware platforms (x86_32bit and x86_64bit), and also Mac
+computer system hardwares.[ed: bit more clarity with the Mac stuff here]
 
-\item MIDI, Time and the Personal Computer
+\subsection{Software pre-requisites of JAZZ++}
 
-The MIDI protocol attempts to be a real time protocol. This is
-unsurprising -- sound generation and replay (of a song or most
-all musical compositions) happens in real time, the audience
-and/or the recording studio hear the performance in real time.
-If you are a performer on stage using MIDI equipment, that MIDI
-equipment must be operating as close to real time performance
-as it possibly can -- when the performer plays a note on a MIDI
-keyboard, that note event should be heard almost instantaneously
-not in 50 to 200 milliseconds of time after the event. Likewise,
-every note event should be acted upon - if the MIDI track is
-sequenced to produce 8 beats on a kick drum voice, you should
-hear the synthesizer produce 8 beats of that voice, not 7 beats.
+The current version of JAZZ++ uses the wxWidgets GUI library to create
+the JAZZ++ user interFace. The wxWidgets GUI library, like JAZZ++ itself,
+is platform/OS independant, and versions of wxWidgets are available for
+all platforms/OS' currently supported by JAZZ++. If you do not have the
+wxWidgets GUI library installed, please visit the following link to download
+and install wxWidgets for your platform/OS ;
 
-Time (with regards to MIDI) is what we used to measure the actual
-deviation from 'real' time that the MIDI response time effectively
-is. Remember, I stated MIDI *attempts* to be a real time protocol,
-but in actual practise it very rarely is. There are latencies in
-various parts of the MIDI chain -- even the physical length of
-the MIDI patch-cords introduce latency..albeit small..into the
-interconnected MIDI device chain. The response time of the
-MIDI instrument receiving a transmitted note event is another
-place latency can be experienced, and if you are using Jazz++
-to trigger another externally connected MIDI device which itself
-is a sequencer, the timing is even more important to ensure
-everything starts, plays, and remains 'in sync'.
+\begin{indented}{2cm}
+\urlref{http://www.wxwidgets.org/}{http://www.wxwidgets.org/}
+\end{indented}
 
-The above two paragraphs are things common to the MIDI domain
-that MIDI users have always had to deal with, regardless of
-whether or not a PC was being used in the MIDI chain. As a
-matter of fact, a 'virtual' MIDI chain involving softsynths
-and Jazz++ running on a PC, is subject to exactly the same
-kinds of limitations and latency problems as 'real' MIDI
-equipment does...plus one extra layer -- the inherent amount
-of latency in the operating system and PC hardware being used
-to 'host' the virtual MIDI machines and software programs.
+The wxWidgets GUI library \underline{must be installed} before installing
+JAZZ++ itself.
 
-When using a PC in this fashion, there are possible latencies
-in a few different places of the setup overall ; how fast the
-'host' system executes (runs) Jazz++ itself, how fast the
-generated note events can be delivered to/from the computer's
-hardware ports, and/or how fast these same note events can
-be delivered to and be rendered by a softsynth running concurrently
-on the same system. Just how powerful your particular hardware is
-does matter, however there are some common methods and practises
-that can be employed to better tailor how your personal computer
-performs with Jazz++. There are also some platform/OS specific
-'tweaks' that can be employed to help make your platform of
-choice run better when using Jazz++ with timing critical
-protocols such as MIDI on the modern day PC.
 
-Running Jazz++ should not impose any significant system load
-by itself, however it does rely on the operating system to
-deliver the MIDI data to the intended hardware/virtual ports,
-and also for delivering software data to the computer's
-graphics adapter for GUI updates..ie; track window scrolling.
+\subsection{Recommended Computer Specifications for using JAZZ++}
 
-No matter what PC hardware you are using, most all of this
-software data has to be processed by (or pass through) the
-operating system in use, and most modern operating systems
-allow the software programmers to use so called 'real time'
-kernel calls, and direct, immediate access to I/O ports and
-so forth to the actual computer hardware itself. On some
-platform/OS types this doesn't happen automatically, and some
-users might have change some system configurations to achieve
-optimum performance when using Jazz++ and MIDI on their
-personal computing machine.
+How powerful your computer system needs to be, is determined primarily by
+how you use it with JAZZ++ ....ie; if you are going to be using JAZZ++ on
+a computer system that is also running a MIDI 'softsynth' for the actual sound 
+rendering and reproduction, you will need more computing power compared to 
+using JAZZ++ with the same computing hardware and having MIDI/synth soundcards
+and/or external MIDI devices connected to it instead.
 
-\item SoundFonts - what are they, who needs them.
+Generally speaking though, any 'modern' computer system (post-2000) with a
+1GHz or greater CPU speed and 512Mb or system ram, should easily run JAZZ++
+in normal use. Even computer systems older than this date might be perfectly
+capable or running JAZZ++ depending on what you are doing and how much system
+ram that older computer has. More details of the actual requirements needed here
+are discussed in the 'Installation and Setup' chapter of this manual, and
+various platform/OS specific informations can be found in this manual's
+Appendix section. 
 
-Soundfonts are data files that both hardware MIDI/synth cards and
-MIDI softsynths may use to create (or synthesize) the actual sound
-you hear playing. Soundfont files, typically end in the .sf2 .SF2
-extensions, although you may also find .sfArk or .sfpack files, which
-are normal .sf2 packages compressed with a lossless encoding tool. A
-multitude of free soundfont packages exist on the internet, most of
-them quite good however some have decidedly better sound quality than
-others. There are also soundfont editors available for most platforms
-supported by Jazz++, which allows the user to create their own custom
-soundfont library file.
+\subsection{MIDI devices supported by JAZZ++}
 
-A soundfont itself is a software library file containing both sampled
-audio data, and synthsizer parameter definitions, along with the
-table of MIDI data that describes the 'soundbank' itself. The soundbank
-presents itself to the user, as a list describing exactly what
-instruments, voices, or sounds are contained in each soundfont library
-file. Taking your time to search for 'the right' soundfont for your
-use can take a bit of trial and error, but it's well worth the trouble.
-On the other hand, you can also buy high quality soundfont libraries
-from commercial companies, sometimes referred to as sound 'foundaries'.
+JAZZ++ supports all standard MIDI protocols and commands, and as such should
+work with any standard MIDI capable equipment and/or musical instruments. JAZZ++
+also supports most 'virtual' MIDI devices, such as software synthesizers, other
+software MIDI sequencers and trackers, and software virtual MIDI keyboards - if
+it's MIDI, it should work with JAZZ++ 'out of the box'.
 
-Many MIDI/synth soundcards require soundfont files to work, and the
-softsynth setup described below also requires 1 (or more) soundfont
-files to actually make any pleasing sounds. Although the FLUIDSYNTH
-package includes it's own sample soundfont file, the quality is not
-the best...which you'll discover, when you download and install your
-own soundfont files. In the Appendix section of the manual, is a
-short list of soundfont resources we here at Jazz++ think you should try.
 
-This area of the Jazz++ documentation provides information
-detailing how to get the most out of you personal computer when
-using it with Jazz++, and also platform/OS specific information
-regarding setting up and using Jazz++ with the now available
-hardware technologies and various 'software synthesizer' MIDI
-programs available to the user today.
+\section{Where to get it}\label{wheretoget}
 
-\subsection{Common Considerations when using Jazz++}
+For the latest JAZZ++ updates from {\em sourceforge}, please look at the JAZZ++
+homepage at ;
+
+\begin{indented}{2cm}
+\urlref{http://jazzplusplus.sourceforge.net}{http://jazzplusplus.sourceforge.net
+}
+\end{indented}
+
+[ed: make the above link point to downloads page? ]
+
+If you are interested in developing JAZZ++ or want to check out the latest
+'bleeding edge' version of the JAZZ++ source code, you can always checkout the
+JAZZ++ Subversion repository at ;
+
+ \begin{indented}{2cm}
+\urlref{http://jazzplusplus.sourceforge.net/subversion}{
+http://jazzplusplus.sourceforge.net/subversion}
+\end{indented}
+
+\section{Getting Help with JAZZ++}
+
+You are welcome to join the JAZZ++ mailing lists if you require any additional
+or specific help with JAZZ+ usage and setup not covered by this manual. The
+JAZZ++ mailing lists give JAZZ++ users the facility to discuss problems they
+might be having with JAZZ++, with both other users of the software -and- the
+developers of JAZZ++ itself.
+
+The JAZZ++ developers are a faily easy going bunch of people, and they really do
+look forward from hearing from you, however, to protect both themselves and
+other subscribers to the JAZZ++ mailing lists from 'SPAM', they ask that people
+who join and post emails to the JAZZ++ mailing lists adhere to the following
+two points of list etiquette ;
+
+\item{'PCYMTNQREAIYR'}
+
+\underline{Please Configure Your Mailer To Not Quote Raw E-mail Addresses In
+Your Replies.}
+Some email programs ('Mailers') by default include the raw e-mail address in the
+"Joe <joe@example.com> wrote:" line. The web archives for the mailing lists are
+publicly available. Let's not feed the spam harvesters! Mailing lists are
+routine targets for spam software to come looking for valid email addresses, and
+if you include raw email addresses in your email replies you may well be
+inadvertantly and innocently unaware that you're actually helping such spam
+operations in doing so. People who use their web-browser and one or another of
+the free public email servers available... like hotmail, yahoo and so on...have
+to be particularly careful with this, and you may find that you have to manually
+delete raw email addresses from you replies to comply with this etiquette.
+
+\item{'PCYMTWLL'}
+
+\underline{Please Configure Your Mailer To Wrap Long Lines.} Some email programs
+don't, and
+this is especially so when a web-browser interface is being used, and then most
+of the message ends up looking like one lo-ong line in the web archives. It's
+very annoying to have to scroll left and right as well as up and down. Please be
+considerate of this situation! All you have to do is remember to hit the return
+[enter] key at about 80 characters along each line, and start a new line. Your
+email text in an web-browser window, should appear as a column in the left of
+your web-browser window, not as a document that fills the entire window page. It
+makes it easier for everyone if you please comply with this etiquette when
+submitting emails to the lists. 
+
+ \begin{indented}{2cm}
+\urlref{http://jazzplusplus.sourceforge.net/mailinglist}{
+http://jazzplusplus.sourceforge.net/mailinglist}
+\end{indented}
+
+
+There are three mailing lists.  The first is a devoted to JAZZ++ users.  To
+subscribe, please visit ;
+
+ [ed: double check these links below]
+
+\begin{indented}{2cm}
+\urlref{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-user}{
+https://lists.sourceforge.net/lists/listinfo/jazzplusplus-user}
+\end{indented}
+
+The second is devoted to developers.  To subscribe visit
+
+\begin{indented}{2cm}
+\urlref{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-devel}{
+https://lists.sourceforge.net/lists/listinfo/jazzplusplus-devel}
+\end{indented}
+
+The third list contains messages generated by developers when they commit
+documentation, web content, or code to the JAZZ++ subversion repository.
+To subscribe visit
+
+\begin{indented}{2cm}
+\urlref{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-updates}{
+https://lists.sourceforge.net/lists/listinfo/jazzplusplus-updates}
+\end{indented}
+
+We'd also be happy to receive your bug reports (well, somehow). We want to find
+and fix any problems with JAZZ++, so bug reports are welcomed. Before you do
+send any email regarding a possible JAZZ++ bug, please be sure to read the
+JAZZ++ Reporting Bugs page on the JAZZ++ website, for instructions on how
+to gather the necessary informations JAZZ++ developers might need to fix the
+problem, and how to submit that bug report in a meaningful and consistant way ;
+
+ \begin{indented}{2cm}
+\urlref{http://jazzplusplus.sourceforge.net/bugreports}{
+http://jazzplusplus.sourceforge.net/bugreports}
+\end{indented} 
+
+
+//...this subpara below should be melded into the above somewhere...//
+[ed: probably to get it to hit -user instead of -devel..fix l8r]
+
+ or success stories. And - of course - you are welcome to contribute to the
+JAZZ++ project by sending code, suggestions, ..., or corrections for this
+manual.
+
+\section{Acknowledgments}
+
+JAZZ++ is based on the work of countless other people who have have made
+their software freely available. Beside all the people who made Linux,
+GNU and X11 possible, we'd like to mention
+
+\begin{itemize}
+\item {\em Hannu Savolainen} for writing all these excellent midi drivers, so
+JAZZ++ can talk to nearly every midi card on Linux.
+\item {\em Julian Smart} who wrote the free, portable GUI library
+wxwin, so JAZZ++ runs with XView, Motif and MS-Windows.
+\end{itemize}
+
+We would also like to thank Henrik Seidel and Stefan Nitschke for code
+contributions.
+
+[ed: is the above complete for this section?]
+
+\section{Copyright}\label{copyright}
+
+The JAZZ++ MIDI Sequencer is copyright (C) 1994-2000 Andreas Voss and
+Per Sigmond, all rights reserved.
+
+[ed: Pete's name should be here somewhere too ]
+
+JAZZ++ program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Installation and Setup}\label{installation}
+
+This chapter of the JAZZ++ manual, describes how to install JAZZ++ itself
+on the three platforms/OS' currently supported, and how to setup the MIDI
+and computer hardware systems for use with JAZZ++. Although most all the
+various features and functions of JAZZ++ work identically for all supported
+OS types and computer platforms, there are small inherent differences on
+how to do things relative to which platform/OS you might be using when it 
+comes to installing and setting up the systems for use with JAZZ++ itself.
+
+If you are new to JAZZ++ and the MIDI domain, you are encouraged to read the 
+following sections to gain some insight about how things work, and how they
+fit together to complete the final system setup for use in conjunction with
+the JAZZ++ software MIDI sequencer.
+
+On the other hand, if you're already conversant with MIDI operations and just
+want to get on with the installation and setup process, feel free to skip the
+following descriptive passages and move on to the OS specific instructions
+that appear later in this chapter. 
+
+
+\section{MIDI and audio equipment}
+
+The term 'MIDI' is an acronym - it stands for (the) 'Musical Instrument Digital
+Interface'. It is an industry-standard protocol that enables electronic musical
+instruments, computers, and other MIDI capable equipment to communicate,
+control, and synchronize with each other using a common 'language'. The MIDI
+protocol does not deal with audio data itself, but instead transmits (and
+receives) MIDI data that..for example...tells the connected MIDI synthesizer
+what note to play, when to play it, and how to play it. In recent years with
+the many advances in both electronics and computer technologies, it has been
+possible to incorporate both MIDI functionality and audio editting facilities
+into the same MIDI domain, and both dedicated MIDI hardware equipment, and 
+software based MIDI programs like JAZZ++, have audio (sound file) manipulation
+facilities builtin.
+
+Back when the original Jazz++ was being developed, there weren't many 'software
+synthesizer' programs available for the personal computer, and even if they were
+available, the then computing hardware was simply too slow to run such software
+properly. A lot has changed since then and now. Today, even so called 'entry
+level' personal computers have more than enough power to run Jazz++ concurrently
+with one (or more) 'software synthesizers' running on the same machine, thus
+making it possible for Jazz++ to become the basis of a fully functional Digital
+Audio Workstation (DAW) using otherwise standard, low cost personal computer
+systems and/or other now affordable add-on sound/MIDI hardware options.
+
+
+If you're not using a hardware MIDI/synth soundcard or externally connected
+MIDI synthesizer, you will need an audio capable soundcard to hear anything.
+Today however, most personal computers already have 'onboard' audio sound
+chipsets, so for most people it's very likely that you already have this
+requirement satisfied. Likewise, MIDI/synth capable addon soundcards are a -lot-
+cheaper today than when Jazz++ first started out, and you can buy MIDI/synth
+soundcards of various types for under 50 dollars these days. One can also buy
+high-end MIDI/synth soundcards for a few hundred dollars if you're looking for
+the very best quality sound ouput, or many otherwise 'professional' features 
+and specifications such soundcards boast.
+
+If on the other hand you do intend to use JAZZ++ with one or another external
+MIDI devices/instruments connected to your computer, you will need to install
+and setup your OS dependant drivers to be able to communicate with whatever
+computer-to-MIDI interface and equipment you happen to be using. It is common
+practise today to use the USB computer port to connect such hardware MIDI
+interfaces, however there are examples that use the serial port, the parallel
+port, or otherwise come as an addon computer interface card instead. Whatever
+hardware is used, the OS specific drivers must be installed and configured for
+use with JAZZ++. Unfortunately, it is beyond the scope of this manual to give
+JAZZ++ users any specific help with this task, if for no other reason than the
+JAZZ++ team simply not having hands-on access to every possible MIDI interface
+type in the world today. This is further recited, in the OS specific sections
+of the manual appearing in this chapter.
+ 
+
+This area of the Jazz++ documentation provides information explaining common
+concepts of working with MIDI and the personal computer, and details how to
+get the most out of you personal computer when using it with Jazz++, and also
+platform/OS specific information regarding setting up and using Jazz++ with the
+now available computer hardware technologies and various 'software synthesizer'
+MIDI programs available to the personal computer user today.
+
+
+\section{Common Considerations when using Jazz++}
 
 \item CPU and RAM Requirements
 
 CPU
 
 The original Jazz++ user manual advised -- "For MIDI-only operation
-a 486 CPU (or equivalent) is sufficient in most cases.  For
-satisfactory audio operation a Pentium CPU with 32 MBytes RAM is
-recommended." That may well be true for MIDI only operations with
-no sound of any kind being needed to be produced by the computer
-hardware. Perhaps we will never know for sure how well Jazz++ ran
-on such computing powerhouses as the i486 CPU running at a then
-whopping 100mHz, because most of this hardware is now dead and gone.
+a 486 CPU (or equivalent) is sufficient in most cases.  For satisfactory audio
+operation a Pentium CPU with 32 MBytes RAM is recommended." That may well be
+true for MIDI only operations with no sound of any kind being needed to be
+produced by the computer hardware. Perhaps we will never know for sure how well
+Jazz++ ran on such computing powerhouses as the i486 CPU running at a then
+whopping 100MHz, because most of this hardware is now dead and gone.
 
-Most modern personal computer systems now boast CPU speeds in
-excess of 2.0 gHz -- even a new low-end 'entry level' computer
-system is likely to be running at speeds greater than 1.5gHz.
-This should be more than enough computing (CPU) power to run
-and use Jazz++ effectively on a modern personal computing machine,
+Most modern personal computer systems now boast CPU speeds in excess of 1.5 GHz
+-- even a new low-end 'entry level' computer system is likely to be running at
+speeds greater than 2.0GHz. This should be more than enough computing (CPU)
+power to run and use Jazz++ effectively on a modern personal computing machine,
 even with softsynths running to produce the actual sound itself.
 
 RAM
 
-As mentioned earlier, Jazz++ itself should not present any
-significant system load to the personal computer it's being
-run on. Likewise, Jazz++ doesn't need a lot of system RAM to
-work correctly with modern computer hardwares. The user will
-however need enough system RAM installed to meet the following
-requirements for smooth and trouble free Jazz++ sessions ;
+As mentioned earlier, Jazz++ itself should not present any significant system
+load to the personal computer it's being run on. Likewise, Jazz++ doesn't need a
+lot of system RAM to work correctly with modern computer hardwares. The user
+will however need enough system RAM installed to meet the following requirements
+for smooth and trouble free Jazz++ sessions ;
 
-1. You will need enough system RAM installed to cover your computer's
-system requirements without the system needing to access the
-hard-disk based 'swap' (or 'pagefile') area of RAM whilst
-using Jazz++. Compared to real 'chip' RAM, hard-disk based
-RAM devices are incredibly slow and this can 'bottlenexk'
-other system operations. More importantly, to access hard-disk
-based RAM means generating a lot of hardware interrupts at the
-same time. Doing this is very likely to impact on MIDI playback
-and record operations in Jazz++ and introduce timing latency issues.
+1. You will need enough system RAM installed to cover your computer's system
+requirements without the system needing to access the hard-disk based 'swap' (or
+'pagefile') area of RAM whilst using Jazz++. Compared to real 'chip' RAM,
+hard-disk based RAM devices are incredibly slow and this can 'bottleneck'
+other system operations. More importantly, to access hard-disk based RAM means
+generating a lot of hardware interrupts at the same time. Doing this is very
+likely to impact on MIDI playback and record operations in Jazz++ and introduce
+timing latency issues.
 
-2. If you use soundfonts (and you probably will do), you need
-enough system RAM to hold these soundfile libraries, -above-
-the system RAM requirements. Soundfont libraries are loaded into
-RAM, and whilst a lot of soundfont files are small (<1mb), others
-can be quite large (100+mb), and depending on how many soundfont
-libraries you intend to use and how big they are, dictates exactly
-how much RAM you will need here.
+2. If you use soundfonts with MIDI/synth soundcards or softsynths (and you
+probably will do), you need enough system RAM to hold these soundfile libraries,
+-above- the system RAM requirements. Soundfont libraries are loaded into RAM,
+and whilst a lot of soundfont files are small (<1mb), others can be quite large
+(100+mb), and depending on how many soundfont libraries you intend to use and
+how big they are, dictates exactly how much RAM you will need here.
 
-It is nearly impossible to correctly and accurately predict just
-how much CPU speed and system RAM is needed in every individual's
-case -- there as just too many variables to consider. To give the
-reader some idea though, the following are results observed by
-one of the Jazz++ testing team ;
+It is nearly impossible to correctly and accurately predict just how much CPU
+speed and system RAM is needed in every individual's case -- there are just too
+many variables to consider. To give the reader some idea though, the following
+are results observed by one of the Jazz++ testing team ;
 
 [ed: add system stats]
 
-Other Jazz++ operational tricks ;
 
-1. Try lowering your desktop resolution and/or bits-per-pixel value.
-Doing this will also lower the load on your CPU when running Jazz++, and
-enable things to run closer to real time overall. Try using the lowest
-possible resolution and screen dimension that you can -comfortably-
-work with while using Jazz++ at a color depth of 8 bits-per-pixel,
-and see if that helps real time performance.
 
-2. The ZOOM buttons are your friends! To avoid unnecessary system
-load when running record/replay sessions with Jazz++, always remember
-to zoom out so the track window graphics are in complete view with
-no need to paginate the window scrolling operation. Zoom in again if
-you want to edit a portion of a track. Having to paginate and scroll
-the Jazz++ track window, generates hardware interrupts which may
-impact real time performance.
+*NEW*
 
-3. Try to have as few software programs running in the background at
-the same when using Jazz++ on a computer system. Really serious Jazz++
-users will try to have the absolute minimum of other software programs
-running when using Jazz++, to ensure they get as close to real time
-performance as is possible using Jazz++ on their personal computer.
+\item MIDI, Time and the Personal Computer
 
-\subsection{Linux operating systems}
+The MIDI protocol attempts to be a real time protocol. This is unsurprising --
+sound generation and replay (of a song or most all musical compositions) happens
+in real time, the audience and/or the recording studio hear the performance in
+real time. If you are a performer on stage using MIDI equipment, that MIDI
+equipment must be operating as close to real time performance as it possibly can
+-- when the performer plays a note on a MIDI keyboard, that note event should be
+heard almost instantaneously not in 5 to 200 milliseconds of time after the
+event. Likewise, every note event should be acted upon - if the MIDI track is
+sequenced to produce 8 beats on a kick drum voice, you should hear the
+synthesizer produce 8 beats of that voice, not 7 beats.
+
+Time (with regards to MIDI) is what we used to measure the actual deviation from
+'real' time that the MIDI response time effectively is. Remember, I stated MIDI
+*attempts* to be a real time protocol, but in actual practice it very rarely is.
+There are latencies in various parts of the MIDI chain -- even the physical
+length of the MIDI patch-cords introduce latency..albeit small..into the
+interconnected MIDI device chain. The response time of the MIDI instrument
+receiving a transmitted note event is another place latency can be experienced,
+and if you are using Jazz++ to trigger another externally connected MIDI device
+which itself is a sequencer, the timing is even more important to help ensure
+everything starts, plays, and remains 'in sync'.
+
+The above two paragraphs are things common to the MIDI domain that MIDI users
+have always had to deal with, regardless of whether or not a PC was being used
+in the MIDI chain. As a matter of fact, a 'virtual' MIDI chain involving
+softsynths and Jazz++ running on a PC, is subject to exactly the same kinds of
+limitations and latency problems as 'real' MIDI equipment does...plus one extra
+layer -- the inherent amount of latency in the operating system and PC hardware
+being used to 'host' the virtual MIDI machines and software programs.
+
+When using a PC in this fashion, there are possible latencies in a few different
+places of the setup overall ; how fast the 'host' system executes (runs) Jazz++
+itself, how fast the generated note events can be delivered to/from the
+computer's hardware ports, and/or how fast these same note events can be
+delivered to and be rendered by a softsynth running concurrently on the same
+system. Just how powerful your particular hardware is does matter, however there
+are some common methods and practices that can be employed to better tailor how
+your personal computer performs with Jazz++. There are also some platform/OS
+specific 'tweaks' that can be employed to help make your platform of choice run
+better when using Jazz++ with timing critical protocols such as MIDI on the
+modern day PC.
+
+Running Jazz++ should not impose any significant system load by itself, however
+it does rely on the operating system to deliver the MIDI data to the intended
+hardware/virtual ports, and also for delivering software data to the computer's
+graphics adapter for GUI updates..ie; track window scrolling.
+
+No matter what PC hardware you are using, most all of this software data has to
+be processed by (or pass through) the operating system in use, and most modern
+operating systems allow the software programmers to use so called 'real time'
+kernel calls, and direct, immediate access to I/O ports and so forth to the
+actual computer hardware itself. On some platform/OS types this doesn't happen
+automatically, and some users might have change some system configurations to
+achieve optimum performance when using Jazz++ and MIDI on their personal
+computing machine.
+
+\item SoundFonts - what are they, who needs them.
+
+Soundfonts are data files that both hardware MIDI/synth cards and MIDI
+softsynths may use to create (or synthesize) the actual sound you hear playing.
+Soundfont files, typically end in the .sf2 .SF2 extensions, although you may
+also find .sfArk or .sfpack files, which are normal .sf2 packages compressed
+with a lossless encoding tool. A multitude of free soundfont packages exist on
+the internet, most of them quite good however some have decidedly better sound
+quality than others. There are also soundfont editors available for most
+platforms supported by Jazz++, which allows the user to create their own custom
+soundfont library file.
+
+A soundfont itself is a software library file containing both sampled audio
+data, and synthesizer parameter definitions, along with the table of MIDI data
+that describes the 'soundbank' itself. The soundbank presents itself to the
+user, as a list describing exactly what instruments, voices, or sounds are
+contained in each soundfont library file. Taking your time to search for 'the
+right' soundfont for your use can take a bit of trial and error, but it's well
+worth the trouble. On the other hand, you can also buy high quality soundfont
+libraries from commercial companies, if one needs first quality performance.
+
+Many MIDI/synth soundcards require soundfont files to work, and the softsynth
+setup described further on in this manual also requires 1 (or more) soundfont
+files to actually make any pleasing sounds. Although the FLUIDSYNTH package
+includes it's own sample soundfont file, the quality is not the best...which
+you'll discover, when you download and install your own soundfont files. In the
+Appendix section of the manual, is a short list of soundfont resources we here
+at Jazz++ think you should try. 
+
+
+Jazz++ operational tricks ;
+
+1. Try lowering your desktop resolution and/or bits-per-pixel value. Doing this
+will also lower the load on your CPU when running Jazz++, and enable things to
+run closer to real time overall. Try using the lowest possible resolution and
+screen dimension that you can -comfortably- work with while using Jazz++ at a
+color depth of 8 bits-per-pixel, and see if that helps real time performance.
+
+2. The ZOOM buttons are your friends! To avoid unnecessary system load when
+running record/replay sessions with Jazz++, always remember to zoom out so the
+track window graphics are in complete view with no need to paginate the window
+scrolling operation. Zoom in again if you want to edit a portion of a track.
+Having to paginate and scroll the Jazz++ track window, generates hardware
+interrupts which may impact real time performance.
+
+3. Try to have as few software programs running in the background at the same
+when using Jazz++ on a computer system. Really serious Jazz++ users will try to
+have the absolute minimum of other software programs running when using Jazz++,
+to ensure they get as close to real time performance as is possible using Jazz++
+on their personal computer.
+
+4. If you are using other MIDI softwares or MIDI softsynths in conjunction with
+JAZZ++, if possible (and where applicable), use the relevant user GUI interface
+to set these 'virtual' MIDI entities up, but when actually playing or recording
+MIDI compositions, launch these programs from the commandline instead. Use the
+'--quiet' commandline switch if it's available. Having to render the GUI
+interfaces for such MIDI programs...especially when that GUI contains elements
+such as blinking transport running lights or 'RT' (real time) meters...steals
+valuable CPU cycles JAZZ++ (or any softsynth) might have otherwise used for it's
+own operations.
+
+
+
+
+
+
+
+ 
+\section{Windows operating systems}
+
+For Windows there is an install utility (run {\tt setup.exe}) which
+mostly automates the installation process.
+
+JAZZ++ supports the windows MIDI / audio driver interface. A driver for your
+MIDI interface card or sound card must be installed before JAZZ++ can play /
+record MIDI or audio.
+
+Provided such a MIDI driver is installed in your system, JAZZ++ currently
+supports 32-bit platforms.
+
+\section{Linux operating systems}
+
+For Linux there is a shell script {\tt install-jazz} in the
+distribution. You must be logged in as root when running the installation
+script. As a default JAZZ++ will be installed to {\tt /usr/local/jazz},
+this may be changed by editing {\tt install-jazz}. Also you
+must set the environment variable JAZZ to point the jazz directory by
+adding the line:
+
+{\tt export JAZZ=/usr/local/home}
+
+to your .profile or .bashrc. Please refer to the file
+{\tt install.txt} which contains up-to-date instructions.
+
+On startup JAZZ++ looks for its configuration files
+\begin{enumerate}
+\item in the current directory
+\item in the home directory (where the environment variable HOME points to)
+\item in the directory where the environment variable JAZZ points to
+\item in the directory from where JAZZ++ itself was started.
+\end{enumerate}
+The main configuration file is named {\tt jazz.cfg}.
+This file also contains pointers to other configuration files {\tt (*.jzi)}
+present in the same directory.
+Then JAZZ++ searches for a song named {\tt jazz.mid} in the current directory
+and loads it - if found. This song may contain default settings for your
+midi equipment.
+
 
 [ed: This part, down to my out mark, should probably go]
 
@@ -294,7 +614,7 @@ to run on Linux, Sun-OS4 and Solaris2 systems, but should compile and run
 (with some minor hacking) on any system supporting Linux/X11. To compile you
 will need the wxWidgets GUI package together with GTK.
 
-The device-dependant part (midi-driver) currently supports:
+The device-dependent part (midi-driver) currently supports:
 
 \item OSS/Free (OSS/Linux) midi driver API (formerly known as USS/Lite and
 VoxWare). This API is included in later Linux kernels. The JAZZ++ code
@@ -366,9 +686,23 @@ platform with MIDI softsynth implementations.
 
 
 
+\subsection{Command line options (Unix only)}
+
+Command line options (in any order):
 
 \begin{itemize}
-\item  Hardware based sound synthesis and Linux on the x86 PC
+\item {\tt jazz -h}                                   -- Print help text
+\item {\tt jazz -v}                                   -- Print help text
+\item {\tt jazz -f filename}                          -- Input midi file
+\item {\tt jazz -trackwin xpos ypos [width height]}   -- Position/size of main
+window
+\item {\tt jazz -pianowin xpos ypos [width height]}   -- Position/size of piano
+roll window
+\end{itemize}
+
+
+\begin{itemize}
+\subsection{Hardware based sound synthesis and Linux on the x86 PC}
 \end{itemize}
 Thanks to all the great work done by the ALSA team over the years, Linux
 now has much better driver supports for the various soundcards on the market
@@ -385,7 +719,7 @@ at the same time. A good analogy, would be to compare all this to the
 difference it makes to system -graphics- performance, when you add
 a dedicated 3D graphics-card with it's own onboard processor unit. Not
 only are the graphics greatly improved, the system responsiveness is
-greatly improved.
+greatly improved as well.
 
 Adding a dedicated MIDI/synth soundcard to your system helps for
 exactly the same reasons here - it frees up your system CPU so it
@@ -404,7 +738,7 @@ problems, can be found by visiting the ALSA website at ;
 
 \urlref{http://www.alsa-project.org/}{http://www.alsa-project.org/}
 
-The lastest list of ALSA supported MIDI/synth soundcards, is always
+The latest list of ALSA supported MIDI/synth soundcards, is always
 available inside the current alsa-driver source tarball available from
 the above website. Once you unpack that archive, read the file ;
 
@@ -424,7 +758,8 @@ alsa-driver-1.0.1x/alsa-kernel/Documentation/
 Another good repository of current knowledge regarding Linux sound drivers
 overall (not just the ALSA sound drivers) can be found at ;
 
-\urlref{http://linux-sound.org/drivers.html}{http://linux-sound.org/drivers.html}
+\urlref{http://linux-sound.org/drivers.html}{http://linux-sound.org/drivers.html
+}
 
 Once you have your MIDI/synth soundcard up and running, it will appear
 in Jazz++ configuration dialogs just like any other MIDI device connected
@@ -438,7 +773,7 @@ common ways of getting things done at this level.
 
 
 \begin{itemize}
-\item Software based sound synthesis and Linux on the x86 PC
+\subsection{Software based sound synthesis and Linux on the x86 PC}
 \end{itemize}
 This area of the documentation will grow over time. There is a lot
 that can be documented here now with Linux.
@@ -497,7 +832,7 @@ that Jazz++ itself is a virtual machine - it is a software emulation
 of -hardware- based MIDI sequencers that were in common use years
 ago, so called 'step sequencers'. Jazz++ is of course much more
 capable than these old hardware sequencers I speak of, and more
-closely resembles a modern day Digial Audio Workstation. In their
+closely resembles a modern day Digital Audio Workstation. In their
 day, old MIDI sequencers were little more than 'drum machines'
 triggering sound events on a MIDI or otherwise connected 'tip-and
 -ring patch cord configured' analogue synthesizer.
@@ -531,7 +866,7 @@ across the software virtual and real hardware MIDI domains.
 
 Many people have troubles getting these softsynths installed and
 working properly on Linux based systems. The Jazz++ developers
-have also noted, that dependant on just which Linux distribution
+have also noted, that dependent on just which Linux distribution
 you use, (and what release version that might be), also dictates
 just how easy or difficult this process might be to complete.
 
@@ -542,150 +877,268 @@ relative to the Linux distribution you might be using.
 For some Linux distributions, the whole process can be as
 straight forward and simple as installing the needed software
 packages from your Linux distribution's installation discs and/or
-online package repository.
+on line package repository. Here's how to do it ;
+
+\item{Setting up a Linux softsynth}
+
+Step 1.  Assuming you have already built/installed Jazz++, startup
+your Linux distribution's package manager application, and search
+for the package names 'qjackctl' and 'qsynth'. On a Debian 4.0 'Etch'
+linux system, these packages are named ;
+
+qjackctl_0.2.21-1_i386.deb
+
+qsynth_0.2.5-2_i386.deb
+
+You should find similarly named packages in your Linux distribution's
+package collection. Install these packages, and if installation
+completes without error (it should), continue on to the next step.
+
+[ed: if this flunks out?....]
+
+
+Step 2. You may want to download a soundfont file and have it handy
+for when we start QSYNTH. Although the FLUIDSYNTH package includes a
+soundfont library file, it isn't particularly suited for the replay of
+the MIDI composition 'jazz.mid' mentioned below. Check the resources
+section in the Appendix of this manual for places to download soundfont
+library files. You will also ultimately need a MIDI file to load into Jazz++
+so there's something to play, or else move on to creating your own MIDI
+composition, but for the purposes of this Quickstart guide you can use
+the 'jazz.mid' file contained in the Jazz++ source distribution. A general
+purpose GM/GS soundfont library file is probably best suited for replaying
+the jazz.mid file.
+
+
+Step 3. The first stage of 'turning your softsynth on', is to start the
+JACK sound server using the QJACKCTL frontend GUI you installed in the
+beginning stages here. Look in your system's Multimedia or Sound menu
+areas for the QJACKCTL link and launch the program. If all has gone well
+this far, QJACKCTL will present you with it's control GUI but the JACK
+server itself is not yet started.
+
+\begin{figure}%
+\latexonly{\includegraphics[scale=0.5]{/images/qjack-stopped.png}}%
+\htmlonly{\image{0cm;0cm}{/images/qjack-stopped.png}}%
+\caption{Main Control GUI of QJACKCTL}%
+\end{figure}%
+
+
+Next thing to do, is to click on the 'Start' button to launch the
+(background) JACK sound server, and after a moment or two the QJACKCTL
+control panel GUI should look like this ;
+
+
+\begin{figure}%
+\latexonly{\includegraphics[scale=0.5]{/images/qjack-running.png}}%
+\htmlonly{\image{0cm;0cm}{/images/qjack-running.png}}%
+\caption{Main Control GUI of QJACKCTL}%
+\end{figure}%
+
+
+Now click on the 'Connect' button - this should open the connections
+panel GUI. Click on the 'MIDI' connection tab - it should currently
+look something like this ;
+
+\begin{figure}%
+\latexonly{\includegraphics[scale=0.5]{/images/qjack-connect-win-0.png}}%
+\htmlonly{\image{0cm;0cm}{/images/qjack-connect-win-0.png}}%
+\caption{Connection  GUI of QJACKCTL}%
+\end{figure}%
+
+
+This all should have completed sucessfully and without generating any
+errors or warnings. If this is the case, move onto the next step.
+
+
+If however you have encountered errors or problems here, you will have to
+fix them first before continuing -- JACK is an essential part of the
+entire setup, and must be up and running properly before anything else
+will work here. Look in the FAQ area of the manual Appendix for help with
+common JACK/QJACKCTL errors and warnings. Once you get it all fixed, come
+back and continue on here.
+
+
+Step 4. The next step, is to start the actual synthesizer part itself.
+In this example we are using the FLUIDSYNTH software synthesizer, which 
+we control and configure using the QSYNTH frontend GUI you installed in
+the beginning stages here. Look in your system's Multimedia or Sound menu
+areas for the QSYNTH link and launch the program. If all has gone well this
+far, QSYNTH will start and present you with it's main control GUI but the
+actual softsynth itself will at this stage be unconfigured.
+
+
+\begin{figure}%
+\latexonly{\includegraphics[scale=0.5]{/images/qsynth-startup.png}}%
+\htmlonly{\image{0cm;0cm}{/images/qsynth-startup.png}}%
+\caption{Main Control GUI of QSYNTH}%
+\end{figure}%
+
+
+Next thing to do, is configure the softsynth itself. Click on the 'Setup'
+button in the main QSYNTH control GUI -- this will display the QSYNTH
+configuration GUI. The first tab is the 'MIDI' setup page ;
+
+
+\begin{figure}%
+\latexonly{\includegraphics[scale=0.5]{/images/qsynth-setup-0.png}}%
+\htmlonly{\image{0cm;0cm}{/images/qsynth-setup-0.png}}%
+\caption{The MIDI Configuration GUI of QSYNTH}%
+\end{figure}%
+
+
+
+Your setup should look something closely akin to the above for using
+a softsynth on Linux. Once you are happy with the settings, click on
+the 'Audio' tab to display the Audio setup page ;
+
+
+
+\begin{figure}%
+\latexonly{\includegraphics[scale=0.5]{/images/qsynth-setup-1.png}}%
+\htmlonly{\image{0cm;0cm}{/images/qsynth-setup-1.png}}%
+\caption{The Audio Configuration GUI of QSYNTH}%
+\end{figure}%
+
+
+
+Your setup should look something closely akin to the above for using
+a softsynth on Linux using JACK as your audio output driver. This is
+the most basic setup example - more complex environments are possible.
+Once you are happy with the settings, click on the 'Soundfonts' tab to
+display the Soundfont setup page - it should currently be empty ;
+
+
+\begin{figure}%
+\latexonly{\includegraphics[scale=0.5]{/images/qsynth-setup-2.png}}%
+\htmlonly{\image{0cm;0cm}{/images/qsynth-setup-2.png}}%
+\caption{The Soundfont Configuration GUI of QSYNTH}%
+\end{figure}%
+
+
+
+This is a most important part of the softsynth setup - it is here you
+define exactly what sounds (musical instruments, drum kits, sound FX,
+synthesizer sound presets, etc, etc) your softsynth will be able to produce,
+and how you do that is by loading (one or more) soundfont library files
+into the softsynth itself, using this setup page. Click on the 'Open'
+button, and a familiar looking 'open files' dialog window will appear ;
+
+
+
+\begin{figure}%
+\latexonly{\includegraphics[scale=0.5]{/images/qsynth-setup-3.png}}%
+\htmlonly{\image{0cm;0cm}{/images/qsynth-setup-3.png}}%
+\caption{The Soundfont selection GUI of QSYNTH}%
+\end{figure}%
+
+
+Navigate to the location of the soundfont file you are going to use.
+In the example you see above, the username 'auser' has created a
+directory 'midi' in their HOME directory, and a 'soundfonts' directory
+under that to keep their *.sf2 soundfont libraries in. Highlight the
+soundfont file you wish to load, and then click on the 'open' button
+This will load the selected soundfont library into the softsynth. Now
+your Soundfont setup page should show that you've sucessfully loaded 
+the soundfont library ;
+
+
+
+\begin{figure}%
+\latexonly{\includegraphics[scale=0.5]{/images/qsynth-setup-4.png}}%
+\htmlonly{\image{0cm;0cm}{/images/qsynth-setup-4.png}}%
+\caption{The Soundfont Configuration GUI of QSYNTH}%
+\end{figure}
+
+
+
+If all has completed sucessfully so far, you're ready to move onto
+the final step - starting Jazz++ itself. Before you do, you might
+want to click on the 'Settings' tab, to get a quick reference of the
+current synthesizer settings. Either way, once you are finished here,
+click on the 'OK' button and continue onto the next step.
+
+
+
+\begin{figure}%
+\latexonly{\includegraphics[scale=0.5]{/images/qsynth-setup-5.png}}%
+\htmlonly{\image{0cm;0cm}{/images/qsynth-setup-5.png}}%
+\caption{The Settings GUI of QSYNTH}%
+\end{figure}
+
+
+Step 5. Now start Jazz++ itself (the jazz binary). If you have no 
+currently configured MIDI input devices, Jazz++ will skip the MIDI 'input'
+dialog window, and proceed directly to displaying  the MIDI 'output'
+dialog window as exampled below ;
+
+
+
+\begin{figure}%
+\latexonly{\includegraphics[scale=0.5]{/images/jazz-output-sel-0.png}}%
+\htmlonly{\image{0cm;0cm}{/images/jazz-output-sel-0.png}}%
+\caption{The Jazz++ MIDI Output Device selection GUI}%
+\end{figure}
+
+
+
+Highlight the 'FLUID Synth (qsynth)' entry by clicking on it as in the
+above example, then click on the 'OK' button. Jazz++ should now start
+and present you with it's main track-window. Before you continue however,
+you should check everything is 'connected' properly.
+
+On the QJACKCTL control GUI, click on the 'Connect' button, and then
+click on the 'Audio' tab. Expand the 'qsynth' and 'system' entries by
+clicking on the little arrow to the left of their names. Your current
+running configuration should appear like the example below ;
+
+
+
+\begin{figure}%
+\latexonly{\includegraphics[scale=0.5]{/images/qjack-connect-win-1.png}}%
+\htmlonly{\image{0cm;0cm}{/images/qjack-connect-win-1.png}}%
+\caption{The Audio Connections GUI of QJACKCTL}%
+\end{figure}
+
+
+
+Next, click on the MIDI tab in the same window, and ensure Jazz++ is
+actually connected correctly as in the example below ;
+
+
+
+\begin{figure}% 
+\latexonly{\includegraphics[scale=0.5]{/images/qjack-connect-win-3.png}}% 
+\htmlonly{\image{0cm;0cm}{/images/qjack-connect-win-3.png}}%
+\caption{The MIDI Connections GUI of QJACKCTL}%
+\end{figure}
+
+
+
+If all appears as exampled, you should be up and running. Load a song.mid
+file into Jazz++ in the usual way, click on the play button and rejoice!
+
+
+
+[ed: more to come here soon...my experience with the above instructions
+-will- have things running, but whether the soundbank(s) get configured
+correctly is another matter...still WIP here tho' ]
+
 
 Still work in progress, come back soon!!
 
 
-\subsection{Windows operating systems}
 
-JAZZ++ supports the windows MIDI / audio driver interface. A driver for your
-MIDI interface card or sound card must be installed before JAZZ++ can play /
-record MIDI or audio.
+\section{Mac operating system}
 
-Provided such a MIDI driver is installed in your system, JAZZ++ currently
-supports 32-bit platforms.
-
-\subsection{CPU and memory}
-For MIDI-only operation a 486 CPU (or equivalent) is sufficient in most
-cases.  For satisfactory audio operation a Pentium CPU with 32 MBytes
-RAM is recommended.
-
-
-\section{Where to get it}\label{wheretoget}
-
-For latest updates on software from {\em sourceforge}, please look at the
-JAZZ++ homepage at
-
-\begin{indented}{2cm}
-\urlref{http://jazzplusplus.sourceforge.net}{http://jazzplusplus.sourceforge.net}
-\end{indented}
-
-You are welcome to join the JAZZ++ mailing lists.  In order to cut down on the
-amount of spam on the list, you must subscribe to post to any of the lists.
-There are three mailing lists.  The first is a devoted to JAZZ++ users.  To
-subscribe, visit
-
-\begin{indented}{2cm}
-\urlref{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-user}{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-user}
-\end{indented}
-
-The second is devoted to developers.  To subscribe visit
-
-\begin{indented}{2cm}
-\urlref{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-devel}{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-devel}
-\end{indented}
-
-The third list contains messages generated by developers when they commit
-documentation, web content, or code to the JAZZ++ sunversion repository.
-To subscribe visit
-
-\begin{indented}{2cm}
-\urlref{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-updates}{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-updates}
-\end{indented}
-
-We'd be happy to receive your bug reports (well, somehow) or success
-stories. And - of course - you are welcome to contribute to the JAZZ++
-project by sending code, suggestions, ..., or corrections for this
-manual.
+[ed: help!!........]
 
 
 
-\section{Copyright}\label{copyright}
+\chapter{Overview of using Jazz++}\label{jazzwin}
 
-The JAZZ++ MIDI Sequencer is copyright (C) 1994-2000 Andreas Voss and
-Per Sigmond, all rights reserved.
+[ed: fill this in later - see opening]
 
-JAZZ++ program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-
-
-
-
-\section{Installation and Startup}\label{installation}
-
-For Windows there is an install utility (run {\tt setup.exe}) which
-mostly automates the installation process.
-
-For Linux there is a shell script {\tt install-jazz} in the
-distribution. You must be logged in as root when running the installation
-script. As a default JAZZ++ will be installed to {\tt /usr/local/jazz},
-this may be changed by editing {\tt install-jazz}. Also you
-must set the environment variable JAZZ to point the jazz directory by
-adding the line:
-
-{\tt export JAZZ=/usr/local/home}
-
-to your .profile or .bashrc. Please refer to the file
-{\tt install.txt} which contains up-to-date instructions.
-
-On startup JAZZ++ looks for its configuration files
-\begin{enumerate}
-\item in the current directory
-\item in the home directory (where the environment variable HOME points to)
-\item in the directory where the environment variable JAZZ points to
-\item in the directory from where JAZZ++ itself was started.
-\end{enumerate}
-The main configuration file is named {\tt jazz.cfg}.
-This file also contains pointers to other configuration files {\tt (*.jzi)}
-present in the same directory.
-Then JAZZ++ searches for a song named {\tt jazz.mid} in the current directory
-and loads it - if found. This song may contain default settings for your
-midi equipment.
-
-
-\subsection{Command line options (Unix only)}
-
-Command line options (in any order):
-
-\begin{itemize}
-\item {\tt jazz -h}                                   -- Print help text
-\item {\tt jazz -v}                                   -- Print help text
-\item {\tt jazz -f filename}                          -- Input midi file
-\item {\tt jazz -trackwin xpos ypos [width height]}   -- Position/size of main window
-\item {\tt jazz -pianowin xpos ypos [width height]}   -- Position/size of piano roll window
-\end{itemize}
-
-
-\section{Acknowledgements}
-
-JAZZ++ is based on the work of countless other people who have have made
-their software freely available. Beside all the people who made Linux,
-GNU and X11 possible, we'd like to mention
-
-\begin{itemize}
-\item {\em Hannu Savolainen} for writing all these excellent midi drivers, so
-JAZZ++ can talk to nearly every midi card on Linux.
-\item {\em Julian Smart} who wrote the free, portable GUI library
-wxwin, so JAZZ++ runs with XView, Motif and MS-Windows.
-\end{itemize}
-
-We would also like to thank Henrik Seidel and Stefan Nitschke for code
-contributions.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Track window}\label{trackwin}
 
 The trackwindow shows bars and tracks of your song while the
@@ -725,10 +1178,6 @@ From left to right there are the following buttons:
 
 \begin{figure}%
 \latexonly{\includegraphics[scale=0.5]{twtoolb.png}}%
-\htmlonly{\image{0cm;0cm}{twtoolb.png}}%
-\caption{Trackwin toolbar}%
-\end{figure}
-
 \section{Selecting events}\label{select}
 
 Many functions (e.g 'Delete' from the edit menu) require that you have
@@ -1300,7 +1749,7 @@ than the other counts.
 Adjust GS or XG effect settings. In XG mode, also equalizer settings can be
 chosen.
 
-In GS mode, effects can be adjusted in two modes dependant on the settings
+In GS mode, effects can be adjusted in two modes dependent on the settings
 of the 'Use effect macro' and 'Use chorus macro' checkboxes:
 \begin{itemize}
 \item {\em macro mode} - the choices in the macro listboxes are valid
@@ -1851,7 +2300,7 @@ midi events, add some very small timing inaccuracy or velocity changes.
 With this dialog you can rearrange parts of your song based on random. The
 selected bars are divided into small segments (default length is 1/4 note).
 When pressing OK, jazz rearranges these segments in random order. Also,
-some of the segments may be choosen more than once while other segments do
+some of the segments may be chosen more than once while other segments do
 not appear at all. Options are:
 
 \begin{itemize}
@@ -1913,7 +2362,7 @@ In general it works as follows: first it generates a small piece of melody,
 the seed. Then this seed is repeated several times and each time some variations are
 applied to the seed. Finally the melody is mapped to the harmonies using the Harmony
 Browser. See the description of the \helpref{Random Rhythm Generator}{randrhy}
-for additional information. Adjustables:
+for additional information. Adjustable:
 
 \begin{itemize}
 
@@ -1943,8 +2392,10 @@ note length overrides the rhythm setting in concurrent situation.
 \item{\em velocity} velocity setting, same as in Random Rhythm generation
 
 \item{\em pitch interval} When the RMG generates the seed, it starts with a random
-choosen pitch. Then for every next note, it adds an interval to its previous note.
-The interval is choosen from the probabilties you define here. If, for example, there
+chosen pitch. Then for every next note, it adds an interval to its previous
+note.
+The interval is chosen from the probabilities you define here. If, for example,
+there
 is only one bar at 1, then every note will have an interval of 1 to its previous
 note.
 
@@ -2036,7 +2487,7 @@ The Event List Editor recognizes the following events:
         A set tempo event. The value is in beats per minute.
 
 \item {\tt 1:2:030 tsi 7/8}\\
-        A time signature event. The denomiator must be a power of 2, e.g one
+        A time signature event. The denominator must be a power of 2, e.g one
         of 2,4,8,16,32.
 
 \item {\tt 1:2:030 ksi maj 3}\\
@@ -2052,7 +2503,7 @@ The Event List Editor recognizes the following events:
 
 This dialog generates arpeggios from chords that are already recorded.
 The generator scans the selected track(s) in the trackwindow. Whenever
-3 or more notes sound simultanously, they are replaced by an arpeggio that
+3 or more notes sound simultaneously, they are replaced by an arpeggio that
 consists of the chord notes and their octaves.
 
 You can paint the kind of arpeggio: the x axis represents the time in steps,
@@ -2094,7 +2545,7 @@ Context specific help is available via the ``help'' button in most dialogs.
 There is also a help menu in both main windows.
 
 The help buttons and some of the help-submenus requires access to
-the wxWin help system. The help system acts a little different dependant
+the wxWin help system. The help system acts a little different dependent
 on the system platform:
 
 \begin{itemize}
@@ -2810,14 +3261,14 @@ example for a simple drum which maybe a starting point for you.
 \item save a synth settings.
 \item generate a wave
 \item listen to the generated wave (you have to generate first). If you
-dont hear anything make sure that you have painted some envelope. Also
+don't hear anything make sure that you have painted some envelope. Also
 you have to enable audio in the audio menu of the track window of course.
 \end{itemize}
 
 Near the top of the window you find some checkboxes. The first
 4 (Harmonics, Envelope, Panpot and Pitch) switch on and off the
 corresponding paint areas.  This is useful for painting on a small screen.
-The last one labeld {\it Noise} turns the first generator into a noise
+The last one labeled {\it Noise} turns the first generator into a noise
 generator when checked.
 
 {\bf Noise generator}
@@ -2841,9 +3292,9 @@ harmonics are calculated.
 {\bf working with multiple generators}
 
 With the slider labeled {\it Number of Synths} you can use up to 6 generators
-simultanously. Only the first one may be a noise generator, all others will
+simultaneously. Only the first one may be a noise generator, all others will
 be in additive synthesis mode. There is much room for experimenting with
-multiple generators, e.g you can do some kind of morphing / crossfading with
+multiple generators, e.g you can do some kind of morphing / cross-fading with
 the envelope painters, or get some chorus like effects when detuning the
 oscillators a little bit in the pitch painter.
 
@@ -2951,7 +3402,7 @@ instrument to 'None' (default).
 
 If your track is a drum track, the instrument names are a bit misleading.
 To get started we recommend that you select instrument number 1
-(labelled '1 Piano 1'). This will give you the 'standard drum kit' on a
+(labeled '1 Piano 1'). This will give you the 'standard drum kit' on a
 GM compatible synth/sound-card. You must study the instrument list in your
 synth documentation to see what other drumkits are available.
 
@@ -3161,11 +3612,198 @@ At last you should look at the 'guitar' audio track in the
 \helpref{Piano Window}{pianowin}. Scroll
 up and down until you find the defined samples.
 
-\subsection{Appendix}
 
-\item Appendix
 
+\chapter{Appendix}\label{appendix}
 The appendix has not been appended yet, come back soon!
 
+\item[RoadMap]
 
-\end{document}
+\section{Frequently Asked Questions}\title{FAQ}
+
+\section{Jazz++ Specific}
+
+\item[How powerful does my computer need to be to run JAZZ++ properly?]
+
+
+It is best to understand here, that it's not so much a matter of how much raw
+processing power your computer has -- it's more to do with JAZZ++ and other
+MIDI softwares being able to do what they want to do, -exactly when- they want
+to do it. If another software process happens to be using the CPU and OS at the
+exact same moment JAZZ++ or another MIDI program wants to send a MIDI event or
+else send PCM data to the soundcard (and both these things have to happen
+almost simultaneously), one or another process is going to have to wait. That
+can't technically happen in the MIDI domain, because the real time nature of
+compositional recording and playing doesn't allow for such.
+
+In practise, there's a tiny 'window' in time for MIDI to complete any note
+event cycle. The practical size of this 'window' is roughly bounded by the
+average human ear perception of what is actually 'in sync' and what is 'out of
+sync'. This percepton 'window' tends to vary from individual to individual,
+but for example only here, most people don't perceive things being 'out of
+sync' during MIDI performances, provided the note event 'window' isn't longer
+than 20 milliseconds or so. However, in the case of music, it's perhaps better
+not to play the note at all, if it's too far out of time with the composition,
+and that 'window' definitely closes when it comes time for the next MIDI event
+on the same channel or track. If your MIDI note event or softsynth is put on
+wait trying to access the CPU and hardware, this 'window' becomes even smaller.
+
+If you use JAZZ++ with MIDI software synths and drum-machines etc, all these
+processes compete against each other for a slice of CPU time. Critically, they
+will all want to do this at exactly the same time in empathy with the real time
+nature of the MIDI compositional playing or recording processes. At a hardware
+level, this is sometimes impossible to do. This is especially so when you've
+got MIDI softsynths running. Consider the analogy of a MIDI softsynth program
+as being akin to the old original analog synthesizers that used many discrete
+electronic components and circuits to create the actual sound one hears. Unlike
+these real world hardwares however, where one merely applies power and the
+hardware does the rest with sound emerging at end, MIDI softsynths require CPU
+cycles to render the waveform data and pass that onto the soundcard itself, to
+recreate the sound that you will eventually hear.
+
+This being the case, imagine you're replaying a MIDI composition using JAZZ++
+and a softsynth, to recreate the sound of a traditional string quartet. During
+replay, three of the instrument voices are engaged in a harmonic drone, while
+the lead violin plays solo.... 
+
+[ed: TBC.. ]
+
+\section{Windows Specific}
+
+[ed: TBC.. ]
+
+\section{Linux Specific}
+
+Here you will find topical reference for using JAZZ++ with Linux
+
+Note: At this time the following is only tested and known to be true when using
+JAZZ++ with Linux on Intel based ix86 architectures in both 32 and 64 bit
+flavors. If you are using Linux on another hardware platform, the following
+should be treated as a guide only. 
+
+Q. Does Jazz++ work on all Linux distributions?
+
+A. Jazz++ should work on most all current Linux distributions. If there are
+no binary packages available to suit your particular installation, Jazz++
+should build, install, and run currectly from the source code contained in
+either the release tarball or the Jazz++ svn repository. Note: The source 
+code obtained from the Jazz++ svn repository should be considered as being
+the 'unstable' development branch of the Jazz++ tree. Some Linux users may
+find that they have to update their system kernel (see below), however if
+you don't wish to (or don't feel up to) changing the Linux kernel on your
+installation, you might consider the following ;
+
+  "It seems some Linux distibutors are now moving towards multimedia and
+  audio-visual 'studio' type sub-distributions, specifically aimed for
+  people wanting to use Linux in this area. These distribution releases
+  have the low-latency, so called 'real time' (RT) Linux kernel build as
+  standard, and this can 'ease the pain' for a lot of Linux users..."
+
+  
+Q. Do I need a low-latency or 'RT' Linux kernel to run Jazz++ ?
+
+A. The answer to this question largely depends on what sort of Jazz++
+user you might be...ie; 'casual' or 'serious'....and exactly what kind
+of (MIDI) hardware you are using to render the actual sound with...ie;
+hardware MIDI/synth or softsynth. Generally speaking, if you experience
+latency problems with either the MIDI transports and/or sound rendering
+using softsynths, it is very likely you will need a 'RT' Linux kernel.
+Such latency problems can manifest themselves in a number of ways. (see below)
+
+
+Q. What are 'latency problems' when using Jazz++ with Linux?
+
+A. There are a couple places Linux kernel latency issues will obviate
+themselves. Each is a little different from the other, and one or more of these
+things might happen at any same given time -- they share a common cause.
+
+    1. When using Jazz++ on Linux with externally connected MIDI equipment
+    and/or hardware MIDI/synth soundcard, your computer is only dealing with
+    the MIDI data being orchestrated by Jazz++. It can happen, especially
+    during complex MIDI passages, that certain notes are being seemingly
+    'dropped' on one or more channels. 
+
+    2. When using Jazz++ on Linux with software MIDI synthesizers, your
+    computer has to deal with transporting the MIDI data *and* render the
+    actual sound your hear as well. In this case, not only might there be
+    'dropped' notes, but also the actual sound of the softsynth might be
+    distorted, or have other unwanted sound artifacts such as 'clicks' or a
+    harsh scratching noise - it varies on the type of softsynth used and
+    just how bad the actual problem itself is.
+
+Remember, Jazz++ itself is only dealing with MIDI data (when not being
+used cojointly with the audio mode features), and it attempts to both
+generate and receive that MIDI data in as close to real time as possible.
+However, getting this MIDI data to/from Jazz++ itself and real MIDI hardware
+devices, necessitates real time access to the actual -computer- hardware
+itself, and the -only- way that can happen is via the running Linux kernel.
+
+Likewise, softsynths have to actually render the sound data, and have real time
+access to the soundcard (PCM) ports, and this too has to travel through the
+Linux kernel layer. The only solution is to change your Linux kernel if you
+come across problems like these using Jazz++ on Linux, and in fact you might
+have to do this anyway if you intend to use a MIDI softsynth.
+
+
+Q. I think I have the above problems, where can I get a 'RT' Linux kernel?
+
+A. With some 250+ Linux distributions out there, this will never be an
+exhaustive list -- however, here are some pointers to help people out ;
+
+    1. Definitive: The latest Linux kernel release is always available from
+    www.kernel.org and mirrors. At the time of this writing, the 'current'
+    stable Linux kernel is the 2.6.25.4 release. If you're up to configuring
+    and installing the Linux kernel from source, currently the 'RT' patches
+    are available at www.kernel.org/pub/linux/kernel/projects/rt/  
+
+    2. I found this on a webpage: - "Many distributions have at least one 
+    specialised low-latency kernel package available via some sort of 
+    additional multimedia distribution or repository; consider using one of 
+    these. For example, Ubuntu -> Ubuntu Studio; Debian  -> 64 Studio or Musix;
+    Fedora  -> PlanetCCRMA; OpenSUSE -> JAD."
+
+    3. Ubuntu: (quote) "Lowlatency kernel is in standard ubuntu repositories,
+    just run: 
+
+    sudo apt-get install linux-lowlatency
+
+    Then reboot and select that kernel from the GRUB list. It should have no 
+    detrimental effects at all on normal usage."
+
+    4. Debian: Have a look here ;
+
+    http://apt.64studio.com/64studio/testing/pool/main/l/linux-2.6/
+
+    Although these are intended for the 64studio release, these packages
+    may work with the current Debian 4.0 branch. There are also 32bit
+    packages here as well.
+
+    5. Mandriva: Have a look here ;
+
+    http://wiki.mandriva.com/en/Docs/Howto/Mandriva_Kernels#kernel-rt
+
+    6. Fedora: Have a look here ;
+
+    http://ccrma.stanford.edu/planetccrma/software/installplaneteight.html
+
+    7. Other linux distributions: Yours not listed? Perhaps you know how
+    to address this issue with the Linux distribution you are using, and
+    would like to tell us? See the Jazz++ MailingList and let us know?
+
+Q. When I start jackd/QJACKCTL I get the following error, what's wrong?
+
+
+\subsection{Other MIDI software known to work with JAZZ++ and Linux}
+
+The following may never be a complete list of MIDI software synthesizers and
+other MIDI based programs that work with JAZZ++ and Linux today, however we take
+the time here to mention some of the more popular and actively supported
+softwares of this type, that members of the JAZZ++ team have tried and tested.
+
+[ed: TBC.. ]
+
+
+\section{Mac Specific}
+
+[ed: TBC.. ]
+

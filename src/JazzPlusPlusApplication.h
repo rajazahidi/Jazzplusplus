@@ -90,6 +90,12 @@ class JZJazzPlusPlusApplication : public wxApp
 
   private:
 
+    void FindAndRegisterHelpFilePath(wxString& HelpFilePath);
+
+  private:
+
+    static wxString mHelpFileName;
+
     JZProject* mpProject;
 
     JZTrackFrame* mpTrackFrame;

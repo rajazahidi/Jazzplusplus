@@ -360,6 +360,7 @@ void JZTrackFrame::CreateMenu()
 #endif
 
   wxMenu* mpHelpMenu = new wxMenu;
+  mpHelpMenu->Append(wxID_HELP_CONTENTS, "&Contents");
 //  mpHelpMenu->Append(MEN_HELP_JAZZ, "&Jazz");
 //  mpHelpMenu->Append(MEN_HELP_TWIN, "&Trackwin");
 //  mpHelpMenu->Append(MEN_HELP_MOUSE, "&Mouse");

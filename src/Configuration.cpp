@@ -476,7 +476,7 @@ int JZConfiguration::Load(char* buf)
   int result = 1;
   if (mNames[entry]->GetType() == eConfigEntryTypeInt)
   {
-    sprintf(format, "%s %%d", mNames[entry]->GetName());
+    sprintf(format, "%s %%d", mNames[entry]->GetName().c_str());
     int Value;
     result = sscanf(buf, format, &Value);
     mNames[entry]->SetValue(Value);

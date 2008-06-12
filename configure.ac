@@ -231,5 +231,11 @@ CXXFLAGS=`echo $EXTRA_CFLAGS $CXXFLAGS $WX_CXXFLAGS_ONLY | sed 's/ \+/ /g'`
 
 LDFLAGS="$LDFLAGS $WX_LIBS"
 
-AC_CONFIG_FILES([Makefile src/Makefile conf/Makefile])
+AC_CONFIG_FILES([\
+Makefile src/Makefile \
+src/HelpFiles/Makefile \
+src/HelpFiles/images/Makefile \
+conf/Makefile \
+])
+
 AC_OUTPUT

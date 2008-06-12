@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+SUBDIRS = HelpFiles
+
 bin_PROGRAMS = jazz
 
 if USE_ALSA

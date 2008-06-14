@@ -128,6 +128,8 @@ bool JZJazzPlusPlusApplication::OnInit()
   RedirectIoToConsole();
 #endif // _MSC_VER
 
+  ::wxInitAllImageHandlers();
+
   SetVendorName("Jazz");
   SetAppName("Jazz");
 

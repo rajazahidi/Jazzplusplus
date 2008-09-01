@@ -48,7 +48,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(EXT_PKGS)\wxMSW-2.8.7-VC9\lib\vc_lib\mswd&quot;;&quot;$(EXT_PKGS)\wxMSW-2.8.7-VC9\include&quot;;..\src;..\src\mswin"
+				AdditionalIncludeDirectories="&quot;$(EXT_PKGS)\wxMSW-2.8.8-VC9\lib\vc_lib\mswd&quot;;&quot;$(EXT_PKGS)\wxMSW-2.8.8-VC9\include&quot;;..\src;..\src\mswin"
 				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS;WINVER=0x0400;STRICT;NOMINMAX;__WXDEBUG__;WXDEBUG=1"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -71,7 +71,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="$(EXT_PKGS)\wxMSW-2.8.7-VC9\include"
+				AdditionalIncludeDirectories="$(EXT_PKGS)\wxMSW-2.8.8-VC9\include"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -82,7 +82,7 @@
 				OutputFile=".\$(OutDir)\JazzPlusPlus.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="&quot;$(EXT_PKGS)\wxMSW-2.8.7-VC9\lib\vc_lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(EXT_PKGS)\wxMSW-2.8.8-VC9\lib\vc_lib&quot;"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\$(OutDir)\JazzPlusPlus.pdb"
@@ -147,7 +147,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="3"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="&quot;$(EXT_PKGS)\wxMSW-2.8.7-VC9\lib\vc_lib\msw&quot;;&quot;$(EXT_PKGS)\wxMSW-2.8.7-VC9\include&quot;;..\src;..\src\mswin"
+				AdditionalIncludeDirectories="&quot;$(EXT_PKGS)\wxMSW-2.8.8-VC9\lib\vc_lib\msw&quot;;&quot;$(EXT_PKGS)\wxMSW-2.8.8-VC9\include&quot;;..\src;..\src\mswin"
 				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;WINVER=0x0400;STRICT;NOMINMAX"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -171,7 +171,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="$(EXT_PKGS)\wxMSW-2.8.7-VC9\include"
+				AdditionalIncludeDirectories="$(EXT_PKGS)\wxMSW-2.8.8-VC9\include"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -182,7 +182,7 @@
 				OutputFile=".\$(OutDir)\JazzPlusPlus.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="&quot;$(EXT_PKGS)\wxMSW-2.8.7-VC9\lib\vc_lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(EXT_PKGS)\wxMSW-2.8.8-VC9\lib\vc_lib&quot;"
 				IgnoreDefaultLibraryNames=""
 				ProgramDatabaseFile=".\$(OutDir)\JazzPlusPlus.pdb"
 				SubSystem="2"
@@ -838,7 +838,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Performing Custom Help Build Step"
-						CommandLine="echo cd &quot;$(InputDir)&quot;&#x0D;&#x0A;cd &quot;$(InputDir)&quot;&#x0D;&#x0A;echo $(EXT_PKGS)\wxMSW-2.8.7-VC9\bin\tex2rtf &quot;$(InputName).tex&quot; &quot;$(InputName).html&quot; -html -twice&#x0D;&#x0A;$(EXT_PKGS)\wxMSW-2.8.7-VC9\bin\tex2rtf &quot;$(InputName).tex&quot; &quot;$(InputName).html&quot; -html -twice&#x0D;&#x0A;"
+						CommandLine="echo cd &quot;$(InputDir)&quot;&#x0D;&#x0A;cd &quot;$(InputDir)&quot;&#x0D;&#x0A;echo $(EXT_PKGS)\wxMSW-2.8.8-VC9\bin\tex2rtf &quot;$(InputName).tex&quot; &quot;$(InputName).html&quot; -html -twice&#x0D;&#x0A;$(EXT_PKGS)\wxMSW-2.8.8-VC9\bin\tex2rtf &quot;$(InputName).tex&quot; &quot;$(InputName).html&quot; -html -twice&#x0D;&#x0A;"
 						Outputs="$(InputDir)$(InputName)_contents.html;$(InputDir)$(InputName).hhc;$(InputDir)$(InputName).hhp;$(InputDir)$(InputName).hhk;$(InputDir)$(InputName).ref;$(InputDir)$(InputName).con;$(InputDir)$(InputName).htx"
 					/>
 				</FileConfiguration>
@@ -847,7 +847,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="echo cd &quot;$(InputDir)&quot;&#x0D;&#x0A;cd &quot;$(InputDir)&quot;&#x0D;&#x0A;echo $(EXT_PKGS)\wxMSW-2.8.7-VC9\bin\tex2rtf &quot;$(InputName).tex&quot; &quot;$(InputName).html&quot; -html -twice&#x0D;&#x0A;$(EXT_PKGS)\wxMSW-2.8.7-VC9\bin\tex2rtf &quot;$(InputName).tex&quot; &quot;$(InputName).html&quot; -html -twice&#x0D;&#x0A;"
+						CommandLine="echo cd &quot;$(InputDir)&quot;&#x0D;&#x0A;cd &quot;$(InputDir)&quot;&#x0D;&#x0A;echo $(EXT_PKGS)\wxMSW-2.8.8-VC9\bin\tex2rtf &quot;$(InputName).tex&quot; &quot;$(InputName).html&quot; -html -twice&#x0D;&#x0A;$(EXT_PKGS)\wxMSW-2.8.8-VC9\bin\tex2rtf &quot;$(InputName).tex&quot; &quot;$(InputName).html&quot; -html -twice&#x0D;&#x0A;"
 						Outputs="$(InputDir)$(InputName)_contents.html"
 					/>
 				</FileConfiguration>

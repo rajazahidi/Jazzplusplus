@@ -119,7 +119,7 @@ DECLARE_APP(JZJazzPlusPlusApplication)
 // Ver Date       Description
 //  4  ?          Unknown for all prior versions.  Might be filled in by
 //                looking at old commit messages.
-//  5  1/21/2008  Start of the Jazz++ development revizal.
+//  5  1/21/2008  Start of the Jazz++ development revival.
 //
 // Returns:
 //   int:
@@ -141,6 +141,8 @@ int JZJazzPlusPlusApplication::GetMajorVersion() const
 //  3  1/21/2008  Major refactoring here to get the code compiling with
 //                wxWidgets 2.8.7 and recent compilers including Visual Studio
 //                .NET 2005 and GCC 4.
+//  4  9/1/2008   Updated to wxWidgets version 2.8.8.
+//
 // Returns:
 //   int:
 //     The application's minor version number.
@@ -148,7 +150,7 @@ int JZJazzPlusPlusApplication::GetMajorVersion() const
 inline
 int JZJazzPlusPlusApplication::GetMinorVersion() const
 {
-  return 0;
+  return 4;
 }
 
 //-----------------------------------------------------------------------------
@@ -159,11 +161,12 @@ int JZJazzPlusPlusApplication::GetMinorVersion() const
 //  ?  ?          Unknown for all prior versions.  Might be filled in by
 //                looking at old commit messages.
 //  11 1/21/2008  See minor version 3.
+//  12 9/1/2008   See minor version 4.
 //-----------------------------------------------------------------------------
 inline
 int JZJazzPlusPlusApplication::GetBuildNumber() const
 {
-  return 11;
+  return 12;
 }
 
 #endif // !defined(JZ_JAZZPLUSPLUSAPPLICATION_H)

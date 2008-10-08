@@ -556,30 +556,30 @@ void JZProject::SetPlayPosition(int newposition)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZProject::Mute(bool newmute)
+void JZProject::Mute(bool Mute)
 {
-  mMuted = newmute;
+  mMuted = Mute;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZProject::SetLoop(bool newloop)
+void JZProject::SetLoop(bool Loop)
 {
-  mLoop = newloop;
+  mLoop = Loop;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZProject::SetRecord(bool newrecord)
+void JZProject::SetRecord(bool Record)
 {
-  mRecord = newrecord;
+  mRecord = Record;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZProject::SetLoopClock(int newclock)
+void JZProject::SetLoopClock(int Clock)
 {
-  mStopTime = newclock;
+  mStopTime = Clock;
 }
 
 //-----------------------------------------------------------------------------

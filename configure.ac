@@ -72,6 +72,36 @@ if test $result = yes; then
 fi
 AC_MSG_RESULT($result)
 
+AC_MSG_CHECKING([whether to enable debugging])
+AC_ARG_ENABLE(
+  debug,
+  AC_HELP_STRING(
+    [--enable-debug],
+    [enable debugging code (off by default)]),
+  ac_arg_debug="$enableval",
+  ac_arg_debug="no")
+AC_MSG_RESULT(${enable_debug-no})
+
+AC_MSG_CHECKING([whether to enable optimization])
+AC_ARG_ENABLE(
+  optimize,
+  AC_HELP_STRING(
+    [--enable-optimize@<:@=ARG@:>@],
+    [enable optimized code with ARG = 0, 1, 2, or 3 (off by default ARG = 0)]),
+  [opt_level="$enableval" ac_arg_optimize="yes"],
+  ac_arg_optimize="no")
+AC_MSG_RESULT(${enable_optimize-no})
+
+AC_MSG_CHECKING([whether to enable profiling])
+AC_ARG_ENABLE(
+  profile,
+  AC_HELP_STRING(
+    [--enable-profile],
+    [enable gprof profiling code (off by default)]),
+  ac_arg_profile="$enableval",
+  ac_arg_profile="no")
+AC_MSG_RESULT(${enable_profile-no})
+
 dnl To support a new system, you need to add its canonical name (as determined
 dnl by config.sub or specified by the configure command line) to this "case"
 dnl and also define the shared library flags below - search for
@@ -113,7 +143,7 @@ AC_ARG_ENABLE(
   AC_HELP_STRING(
     [--enable-sequencer2],
     [enable sequencer2 support (off by default)]),
-  ac_arg_profile="yes",
+  ac_arg_profile="$enableval",
   ac_arg_profile="no")
 AC_MSG_RESULT(${enable_sequencer2-no})
 
@@ -132,10 +162,14 @@ if test x$enable_mpu401 = xyes ; then
   AC_DEFINE(DEV_MPU401,1,[support jazz's own driver over tcp/ip])
 fi
 
+if test x$ac_arg_debug = xyes ; then
+  wx_config_args=--debug
+fi
+
 dnl Check for wxWidgets
 AM_OPTIONS_WXCONFIG
 
-AM_PATH_WXCONFIG(2.8.7, wxWin=1)
+AM_PATH_WXCONFIG(2.8.9, wxWin=1)
 
 if test "$wxWin" != 1; then
   AC_MSG_ERROR([
@@ -146,7 +180,7 @@ if test "$wxWin" != 1; then
     directory where wxWidgets libraries are installed
     (returned by 'wx-config --libs' command) is in
     LD_LIBRARY_PATH or equivalent variable, and the
-    wxWidgets version is 2.8.7 or above.
+    wxWidgets version is 2.8.9 or above.
   ])
 fi
 
@@ -155,36 +189,6 @@ AC_SUBST(JAZZ_PATH)
 
 PORTMIDI_PATH=$JAZZ_PATH/portmidi
 AC_SUBST(PORTMIDI_PATH)
-
-AC_MSG_CHECKING([whether to enable debugging])
-AC_ARG_ENABLE(
-  debug,
-  AC_HELP_STRING(
-    [--enable-debug],
-    [enable debugging code (off by default)]),
-  ac_arg_debug="yes",
-  ac_arg_debug="no")
-AC_MSG_RESULT(${enable_debug-no})
-
-AC_MSG_CHECKING([whether to enable optimization])
-AC_ARG_ENABLE(
-  optimize,
-  AC_HELP_STRING(
-    [--enable-optimize@<:@=ARG@:>@],
-    [enable optimized code with ARG = 0, 1, 2, or 3 (off by default ARG = 0)]),
-  [opt_level="$enableval" ac_arg_optimize="yes"],
-  ac_arg_optimize="no")
-AC_MSG_RESULT(${enable_optimize-no})
-
-AC_MSG_CHECKING([whether to enable profiling])
-AC_ARG_ENABLE(
-  profile,
-  AC_HELP_STRING(
-    [--enable-profile],
-    [enable gprof profiling code (off by default)]),
-  ac_arg_profile="yes",
-  ac_arg_profile="no")
-AC_MSG_RESULT(${enable_profile-no})
 
 if test x$ac_arg_debug = xyes ; then
   TLDEBUG="-g -fno-inline"

@@ -162,8 +162,9 @@ if test x$enable_mpu401 = xyes ; then
   AC_DEFINE(DEV_MPU401,1,[support jazz's own driver over tcp/ip])
 fi
 
+wx_config_args="--static=no"
 if test x$ac_arg_debug = xyes ; then
-  wx_config_args=--debug
+  wx_config_args="$wx_config_args --debug"
 fi
 
 dnl Check for wxWidgets
@@ -199,7 +200,7 @@ fi
 PROFILE=
 if test x$ac_arg_profile = xyes ; then
   dnl The debug flag must be on for profiling to work.
-  if test x$TLDEBUG = x ; then
+  if test x$ac_arg_debug = xyes ; then
     TLDEBUG="-g -fno-inline"
   fi
   PROFILE="-pg"

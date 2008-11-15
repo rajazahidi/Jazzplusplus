@@ -307,9 +307,12 @@ int tSampleSet::Load(const wxString& FileName)
       }
       if (!wxFileExists(fname))
       {
-        char buf[500];
-        sprintf(buf, "File not found: \"%s\"", fname);
-        wxMessageBox(buf, "Error", wxOK);
+        wxString String;
+        String
+          << "File not found: \""
+          << fname
+          << '"';
+        ::wxMessageBox(String, "Error", wxOK);
         continue;
       }
       assert(0 <= key && key < MAXSMPL);
@@ -320,9 +323,12 @@ int tSampleSet::Load(const wxString& FileName)
       samples[key]->SetPitch(pitch);
       if (samples[key]->Load())
       {
-        char buf[500];
-        sprintf(buf, "could not load \"%s\"", samples[key]->GetFilename());
-        wxMessageBox(buf, "Error", wxOK);
+        wxString String;
+        String
+          << "Could not load: \""
+          << samples[key]->GetFilename()
+          << '"';
+        ::wxMessageBox(String, "Error", wxOK);
       }
       if (samplewin[key])
       {

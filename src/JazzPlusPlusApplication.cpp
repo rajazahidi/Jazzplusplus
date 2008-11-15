@@ -22,6 +22,8 @@
 
 #include "WxWidgets.h"
 
+#include <wx/stdpaths.h>
+
 #include "JazzPlusPlusApplication.h"
 #include "TrackFrame.h"
 #include "Project.h"
@@ -133,6 +135,19 @@ bool JZJazzPlusPlusApplication::OnInit()
   SetVendorName("Jazz");
   SetAppName("Jazz");
 
+  wxString ConfigDir = wxStandardPaths::Get().GetUserDataDir();
+  if (!wxDirExists(ConfigDir))
+  {
+    if (!wxMkdir(ConfigDir))
+    {
+      wxString String;
+      String
+        << "Unable to create directory \""
+        << ConfigDir << '"';
+      ::wxMessageBox(String, "Directory Creation Error");
+    }
+  }
+
   // Create the one and only top-level Jazz++ project.
   mpProject = new JZProject;
   gpProject = mpProject;
@@ -200,8 +215,12 @@ bool JZJazzPlusPlusApplication::OnInit()
 
   if (HelpFileFound)
   {
+    // GetUserDataDir returns the directory for the user-dependent application
+    // data files.  The value is $HOME/.appname on Linux,
+    // c:\Documents and Settings\username\Application Data\appname on
+    // Windows, and ~/Library/Application Support/appname on the Mac.
     // The cached version of the help file will be placed in this location.
-    mHelp.SetTempDir(HelpFilePath);
+    mHelp.SetTempDir(wxStandardPaths::Get().GetUserDataDir());
 
     // Add the IPVT help file the the help system.
     mHelp.AddBook(HelpFileNameAndPath);

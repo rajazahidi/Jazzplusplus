@@ -21,6 +21,8 @@
 //*****************************************************************************
 
 #include "WxWidgets.h"
+
+#include <wx/stdpaths.h>
 #include <wx/config.h>
 #include <wx/filename.h>
 #include <wx/file.h>
@@ -363,62 +365,47 @@ JZProject::~JZProject()
 //-----------------------------------------------------------------------------
 void JZProject::ReadConfiguration()
 {
-  wxConfigBase* pConfig = wxConfigBase::Get();
+  wxString ConfigDir = wxStandardPaths::Get().GetUserDataDir();
 
-  // Get the current working directory and append a directory separator.
-  wxString CurrentWorkingDirectory =
-    ::wxGetCwd() + wxFileName::GetPathSeparator();
-
-  // Jazz++ should be distributed with a conf subdirectory under the
-  // executable directory.  This will be our initial guess for the location of
-  // the Jazz++ configuration file.
-  wxString ConfFileDirectoryGuess =
-    CurrentWorkingDirectory + "conf" + wxFileName::GetPathSeparator();
-
-  // Attempt to obtain the path to the Jazz++ configuration file from the
-  // wxWidgets Jazz++ configuration file.
-  wxString ConfFilePath;
-  bool WasConfPathRead = false;
-  if (pConfig)
-  {
-    WasConfPathRead = pConfig->Read(
-      "/Paths/Conf",
-      &ConfFilePath,
-      ConfFileDirectoryGuess);
-  }
-
-  // Construct a full Jazz++ configuration path and file name.
-  wxString ConfFileNameAndPath = ConfFilePath + mConfFileName;
+  wxString JazzCfgFile =
+    ConfigDir +
+    wxFileName::GetPathSeparator() +
+    mConfFileName;
 
   // Test for the existence of the Jazz++ configuration file.
-  if (!::wxFileExists(ConfFileNameAndPath))
+  bool ConfigurationFileFound = false;
+  if (!::wxFileExists(JazzCfgFile))
   {
     // Return a valid path to the data.
-    FindAndRegisterConfFilePath(ConfFilePath);
-    ConfFileNameAndPath = ConfFilePath + mConfFileName;
-
-    // Try one more time.
-    if (!::wxFileExists(ConfFileNameAndPath))
+    wxString ConfFilePath;
+    if (FindAndRegisterConfFilePath(ConfFilePath))
     {
-      ConfFileNameAndPath.clear();
+      JazzCfgFile = ConfFilePath + mConfFileName;
+
+      // Try one more time.
+      if (!::wxFileExists(JazzCfgFile))
+      {
+        JazzCfgFile.clear();
+      }
+      else
+      {
+        ConfigurationFileFound = true;
+      }
     }
-  }
-
-  if (!ConfFileNameAndPath.IsEmpty())
-  {
-    cout
-      << "JZProject::ReadConfiguration() ConfFileNameAndPath:" << '\n'
-      << "  \"" << ConfFileNameAndPath << '"'
-      << endl;
-
-    mpConfig->LoadConfig(ConfFileNameAndPath);
   }
   else
   {
-    wxMessageBox(
-      "Could not find configuration file.",
-      "Warning",
-      wxOK);
+    ConfigurationFileFound = true;
+  }
+
+  if (ConfigurationFileFound)
+  {
+    cout
+      << "JZProject::ReadConfiguration() JazzCfgFile:" << '\n'
+      << "  \"" << JazzCfgFile << '"'
+      << endl;
+
+    mpConfig->LoadConfig(JazzCfgFile);
   }
 }
 
@@ -429,25 +416,28 @@ void JZProject::ReadConfiguration()
 // configuration entry so the code will find the configuration file path the
 // next time it starts.
 //
-// Returns:
+// Outputs:
 //   wxString&:
 //     A user selected path to the Jazz++ configuration file.
+//
+// Returns:
+//   bool:
+//     True if the configuration file path was set; false otherwise.
 //-----------------------------------------------------------------------------
-void JZProject::FindAndRegisterConfFilePath(wxString& ConfFilePath)
+bool JZProject::FindAndRegisterConfFilePath(wxString& ConfFilePath) const
 {
   wxString DialogTitle;
   DialogTitle = "Please Indicate the Location of " + mConfFileName;
 
   // Use an open dialog to find the Jazz++ configuration file.
-  // wxFD_CHANGE_DIR - Change the current working directory to the directory
-  // where the file(s) chosen by the user are.
   wxFileDialog OpenDialog(
     0,
     DialogTitle,
     "",
     mConfFileName,
     "*.cfg",
-    wxFD_OPEN | wxFD_CHANGE_DIR);
+    wxFD_OPEN);
+
   if (OpenDialog.ShowModal() == wxID_OK)
   {
     // Generate a c-style string that contains a path to the help file.
@@ -463,7 +453,11 @@ void JZProject::FindAndRegisterConfFilePath(wxString& ConfFilePath)
 
     // Return the user selected help file path.
     ConfFilePath = TempConfFilePath;
+
+    return true;
   }
+
+  return false;
 }
 
 //-----------------------------------------------------------------------------

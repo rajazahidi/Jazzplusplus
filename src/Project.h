@@ -165,7 +165,7 @@ class JZProject : public JZSong
 
     void ReadConfiguration();
 
-    void FindAndRegisterConfFilePath(wxString& ConfFilePath);
+    bool FindAndRegisterConfFilePath(wxString& ConfFilePath) const;
 
   private:
 

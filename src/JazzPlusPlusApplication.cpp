@@ -23,6 +23,7 @@
 #include "WxWidgets.h"
 
 #include <wx/stdpaths.h>
+#include <wx/fileconf.h>
 
 #include "JazzPlusPlusApplication.h"
 #include "TrackFrame.h"
@@ -182,25 +183,34 @@ bool JZJazzPlusPlusApplication::OnInit()
   wxString HelpFileNameAndPath = HelpFilePath + mHelpFileName;
 
   // Test for the existence of the help file.
-  bool HelpFileFound = true;
+  bool HelpFileFound = false;
   ifstream Is;
   Is.open(HelpFileNameAndPath.c_str());
   if (!Is)
   {
-    // Return a valid path to the data.
-    FindAndRegisterHelpFilePath(HelpFilePath);
-    HelpFileNameAndPath = HelpFilePath + mHelpFileName;
-
-    // Try one more time.
-    Is.close();
-    Is.clear();
-    Is.open(HelpFileNameAndPath.c_str());
-    if (!Is)
+    // Ask the user to find the help file.
+    if (FindAndRegisterHelpFilePath(HelpFilePath))
     {
-      wxString Message = "Failed to add the IPVT book " + mHelpFileName;
-      ::wxMessageBox(Message);
-      HelpFileFound = false;
+      HelpFileNameAndPath = HelpFilePath + mHelpFileName;
+
+      // Try one more time.
+      Is.close();
+      Is.clear();
+      Is.open(HelpFileNameAndPath.c_str());
+      if (!Is)
+      {
+        wxString Message = "Failed to add the IPVT book " + mHelpFileName;
+        ::wxMessageBox(Message);
+      }
+      else
+      {
+        HelpFileFound = true;
+      }
     }
+  }
+  else
+  {
+    HelpFileFound = true;
   }
 
   if (HelpFileFound)
@@ -233,6 +243,36 @@ bool JZJazzPlusPlusApplication::OnInit()
 //-----------------------------------------------------------------------------
 void JZJazzPlusPlusApplication::InsureConfigurationFileExistence() const
 {
+  // Determine the expected location of the user's data dir for Jazz++.
+  wxString UserConfigDir = wxStandardPaths::Get().GetUserDataDir();
+
+  // Determine if the directory exists.
+  if (!wxDirExists(UserConfigDir))
+  {
+    // Attempt to create the directory.
+    if (!wxMkdir(UserConfigDir))
+    {
+      wxString String;
+      String
+        << "Unable to create directory \""
+        << UserConfigDir << '"';
+      ::wxMessageBox(String, "Directory Creation Error");
+    }
+  }
+
+  // Setup the wxWidgets configuration file.
+  wxFileName WxConfigurationFileName(UserConfigDir, ".jazz");
+
+  wxFileConfig* pFileConfig = new wxFileConfig(
+    GetAppName(),
+    wxEmptyString,
+    WxConfigurationFileName.GetFullPath(),
+    wxEmptyString,
+    wxCONFIG_USE_LOCAL_FILE);
+
+  delete wxConfigBase::Set(pFileConfig);
+
+  // Make sure all of the configuration files are setup.
   vector<wxString> ConfigurationFileNames;
   ConfigurationFileNames.push_back("README");
   ConfigurationFileNames.push_back("jazz.cfg");
@@ -255,20 +295,6 @@ void JZJazzPlusPlusApplication::InsureConfigurationFileExistence() const
   ConfigurationFileNames.push_back("xgdrmnam.jzi");
   ConfigurationFileNames.push_back("xgdrmset.jzi");
   ConfigurationFileNames.push_back("xgvoices.jzi");
-
-  wxString UserConfigDir = wxStandardPaths::Get().GetUserDataDir();
-
-  if (!wxDirExists(UserConfigDir))
-  {
-    if (!wxMkdir(UserConfigDir))
-    {
-      wxString String;
-      String
-        << "Unable to create directory \""
-        << UserConfigDir << '"';
-      ::wxMessageBox(String, "Directory Creation Error");
-    }
-  }
 
   for (
     vector<wxString>::const_iterator iConfigurationFileName =
@@ -306,8 +332,8 @@ void JZJazzPlusPlusApplication::InsureConfigurationFileExistence() const
 // found, create a configuration entry so the code can find the help file path
 // the next time it starts.
 //-----------------------------------------------------------------------------
-void JZJazzPlusPlusApplication::FindAndRegisterHelpFilePath(
-  wxString& HelpFilePath)
+bool JZJazzPlusPlusApplication::FindAndRegisterHelpFilePath(
+  wxString& HelpFilePath) const
 {
   wxString Message;
   Message = "Unable to find " + mHelpFileName;
@@ -317,10 +343,11 @@ void JZJazzPlusPlusApplication::FindAndRegisterHelpFilePath(
   wxFileDialog OpenDialog(
     0,
     "Open the Help File",
-    "",
+    HelpFilePath,
     mHelpFileName,
     "*.hhp",
     wxFD_OPEN);
+
   if (OpenDialog.ShowModal() == wxID_OK)
   {
     // Generate a c-style string that contains a path to the help file.
@@ -336,7 +363,11 @@ void JZJazzPlusPlusApplication::FindAndRegisterHelpFilePath(
 
     // Return the user selected help file path.
     HelpFilePath = TempHelpFilePath;
+
+    return true;
   }
+
+  return false;
 }
 
 //-----------------------------------------------------------------------------

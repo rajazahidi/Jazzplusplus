@@ -6,6 +6,9 @@ AC_CONFIG_AUX_DIR([config])
 
 AC_CONFIG_SRCDIR([src/JazzPlusPlusApplication.cpp])
 
+dnl sets build, host, target variables and the same with _alias
+AC_CANONICAL_SYSTEM
+
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_HEADERS(src/config.h)
@@ -26,9 +29,6 @@ dnl -g and -O flags ourselves below
 CFLAGS=${CFLAGS:=}
 AC_PROG_CC
 
-AC_LANG_SAVE
-AC_LANG_CPLUSPLUS
-
 dnl C++-compiler checks
 dnl   defines CXX with the compiler to use
 dnl   defines GXX with yes if using gxx
@@ -38,8 +38,6 @@ dnl
 dnl see CFLAGS line above
 CXXFLAGS=${CXXFLAGS:=}
 AC_PROG_CXX
-
-AC_LANG_RESTORE
 
 AC_PROG_LIBTOOL
 
@@ -126,11 +124,12 @@ if [[ x$have_alsa = x"yes" ]] ; then
   dnl ---------------------------------------
   dnl check if we are to enable alsa support
   dnl ---------------------------------------
-  AC_ARG_ENABLE(alsa,  --enable-alsa     Support ALSA)
+  AC_MSG_CHECKING([whether to enable ALSA])
+  AC_ARG_ENABLE(alsa, AC_HELP_STRING([--enable-alsa], [enable ALSA support]))
+  AC_MSG_RESULT(${enable_alsa-no})
 
   if test x$enable_alsa = xyes ; then
-    AC_MSG_RESULT(alsa is enabled)
-    AC_DEFINE(DEV_ALSA,1,[use alsa drivers])
+    AC_DEFINE(DEV_ALSA, 1, [use alsa drivers])
   fi
 fi
 
@@ -142,46 +141,47 @@ AC_ARG_ENABLE(
   sequencer2,
   AC_HELP_STRING(
     [--enable-sequencer2],
-    [enable sequencer2 support (off by default)]),
-  ac_arg_profile="$enableval",
-  ac_arg_profile="no")
+    [enable sequencer2 support (off by default)]))
 AC_MSG_RESULT(${enable_sequencer2-no})
 
 if test x$enable_sequencer2 = xyes ; then
-   AC_MSG_RESULT(sequencer2 is enabled)
    AC_DEFINE(DEV_SEQUENCER2, 1, [support /dev/sequencer2])
 fi
 
 dnl ----------------------------------------
 dnl check if we are to enable mpu401 support
 dnl ----------------------------------------
-AC_ARG_ENABLE(mpu401, --enable-mpu401   Support jazz mpu401 driver)
+AC_MSG_CHECKING([whether to enable Jazz++ mpu401 driver])
+AC_ARG_ENABLE(
+  mpu401,
+  AC_HELP_STRING([--enable-mpu401], [enable support jazz mpu401 driver]))
+AC_MSG_RESULT(${enable_mpu401-no})
 
 if test x$enable_mpu401 = xyes ; then
   AC_MSG_RESULT(Mpu401 is enabled)
-  AC_DEFINE(DEV_MPU401,1,[support jazz's own driver over tcp/ip])
-fi
-
-wx_config_args="--static=no"
-if test x$ac_arg_debug = xyes ; then
-  wx_config_args="$wx_config_args --debug"
+  AC_DEFINE(DEV_MPU401, 1, [support jazz's own driver over tcp/ip])
 fi
 
 dnl Check for wxWidgets
 AM_OPTIONS_WXCONFIG
+MIN_WX_VERSION="2.8.9"
+AM_PATH_WXCONFIG(
+  $MIN_WX_VERSION,
+  [WX_FOUND=1],
+  [WXFOUND=0],
+  [std],
+  [--debug=$ac_arg_debug])
 
-AM_PATH_WXCONFIG(2.8.9, wxWin=1)
-
-if test "$wxWin" != 1; then
+if test "$WX_FOUND" != 1; then
   AC_MSG_ERROR([
     wxWidgets must be installed on your system, but the
     wx-config script couldn't be found.
-     
+
     Please check that wx-config is in your PATH, the
     directory where wxWidgets libraries are installed
     (returned by 'wx-config --libs' command) is in
     LD_LIBRARY_PATH or equivalent variable, and the
-    wxWidgets version is 2.8.9 or above.
+    wxWidgets version is $MIN_VERSION or above.
   ])
 fi
 
@@ -191,6 +191,7 @@ AC_SUBST(JAZZ_PATH)
 PORTMIDI_PATH=$JAZZ_PATH/portmidi
 AC_SUBST(PORTMIDI_PATH)
 
+TLDEBUG=
 if test x$ac_arg_debug = xyes ; then
   TLDEBUG="-g -fno-inline"
 else
@@ -200,7 +201,7 @@ fi
 PROFILE=
 if test x$ac_arg_profile = xyes ; then
   dnl The debug flag must be on for profiling to work.
-  if test x$ac_arg_debug = xyes ; then
+  if test x$TLDEBUG = x ; then
     TLDEBUG="-g -fno-inline"
   fi
   PROFILE="-pg"
@@ -209,7 +210,7 @@ fi
 OPTIMISE=-O0
 if test x$ac_arg_optimize = xyes ; then
   if test x$opt_level = x; then
-    OPTIMISE="-O2"
+    OPTIMISE="-O3"
   elif test x$opt_level = x0 ; then
     OPTIMISE="-O1"
   elif test x$opt_level = x1 ; then

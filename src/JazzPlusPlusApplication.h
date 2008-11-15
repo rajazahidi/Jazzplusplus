@@ -90,6 +90,8 @@ class JZJazzPlusPlusApplication : public wxApp
 
   private:
 
+    void InsureConfigurationFileExistence() const;
+
     void FindAndRegisterHelpFilePath(wxString& HelpFilePath);
 
   private:

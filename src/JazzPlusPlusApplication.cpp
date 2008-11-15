@@ -51,6 +51,7 @@
 #endif
 
 #include <fstream>
+#include <vector>
 
 using namespace std;
 
@@ -135,18 +136,7 @@ bool JZJazzPlusPlusApplication::OnInit()
   SetVendorName("Jazz");
   SetAppName("Jazz");
 
-  wxString ConfigDir = wxStandardPaths::Get().GetUserDataDir();
-  if (!wxDirExists(ConfigDir))
-  {
-    if (!wxMkdir(ConfigDir))
-    {
-      wxString String;
-      String
-        << "Unable to create directory \""
-        << ConfigDir << '"';
-      ::wxMessageBox(String, "Directory Creation Error");
-    }
-  }
+  InsureConfigurationFileExistence();
 
   // Create the one and only top-level Jazz++ project.
   mpProject = new JZProject;
@@ -233,6 +223,81 @@ bool JZJazzPlusPlusApplication::OnInit()
   }
 
   return true;
+}
+
+//-----------------------------------------------------------------------------
+// Description:
+//   This function checks to see if the user's Jazz++ configuration directory
+// files exist and creates the directory and copies default versions if they
+// do not.
+//-----------------------------------------------------------------------------
+void JZJazzPlusPlusApplication::InsureConfigurationFileExistence() const
+{
+  vector<wxString> ConfigurationFileNames;
+  ConfigurationFileNames.push_back("README");
+  ConfigurationFileNames.push_back("jazz.cfg");
+  ConfigurationFileNames.push_back("jazz.mid");
+  ConfigurationFileNames.push_back("ctrlnam.jzi");
+  ConfigurationFileNames.push_back("e26voice.jzi");
+  ConfigurationFileNames.push_back("e26.jzi");
+  ConfigurationFileNames.push_back("gm.jzi");
+  ConfigurationFileNames.push_back("gmdrmnam.jzi");
+  ConfigurationFileNames.push_back("gmdrmset.jzi");
+  ConfigurationFileNames.push_back("gmvoices.jzi");
+  ConfigurationFileNames.push_back("gs.jzi");
+  ConfigurationFileNames.push_back("gsdrmset.jzi");
+  ConfigurationFileNames.push_back("gsvoices.jzi");
+  ConfigurationFileNames.push_back("jv1000.jzi");
+  ConfigurationFileNames.push_back("sc88pdrm.jzi");
+  ConfigurationFileNames.push_back("sc88pro.jzi");
+  ConfigurationFileNames.push_back("sc88pvoi.jzi");
+  ConfigurationFileNames.push_back("xg.jzi");
+  ConfigurationFileNames.push_back("xgdrmnam.jzi");
+  ConfigurationFileNames.push_back("xgdrmset.jzi");
+  ConfigurationFileNames.push_back("xgvoices.jzi");
+
+  wxString UserConfigDir = wxStandardPaths::Get().GetUserDataDir();
+
+  if (!wxDirExists(UserConfigDir))
+  {
+    if (!wxMkdir(UserConfigDir))
+    {
+      wxString String;
+      String
+        << "Unable to create directory \""
+        << UserConfigDir << '"';
+      ::wxMessageBox(String, "Directory Creation Error");
+    }
+  }
+
+  for (
+    vector<wxString>::const_iterator iConfigurationFileName =
+      ConfigurationFileNames.begin();
+    iConfigurationFileName != ConfigurationFileNames.end();
+    ++iConfigurationFileName)
+  {
+    // Check to see if the user already has a jazz.cfg file in the
+    // user configuration directory.
+    wxString JazzCfgFile =
+      UserConfigDir +
+      wxFileName::GetPathSeparator() +
+      *iConfigurationFileName;
+
+    if (!::wxFileExists(JazzCfgFile))
+    {
+      // Attempt to copy the default Jazz++ configuration file to this
+      // directory.
+      wxString DefaultJazzCfgFile =
+        wxStandardPaths::Get().GetDataDir() +
+        wxFileName::GetPathSeparator() +
+        *iConfigurationFileName;
+
+      if (::wxFileExists(DefaultJazzCfgFile))
+      {
+        ::wxCopyFile(DefaultJazzCfgFile, JazzCfgFile);
+      }
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------

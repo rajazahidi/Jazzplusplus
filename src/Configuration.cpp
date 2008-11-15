@@ -22,6 +22,7 @@
 
 #include "WxWidgets.h"
 
+#include <wx/stdpaths.h>
 #include <wx/filename.h>
 
 #include "Configuration.h"
@@ -114,7 +115,6 @@ void JZConfigurationEntry::SetStrValue(const char* pStringValue)
     mStrValue = pStringValue;
   }
 }
-
 
 //*****************************************************************************
 // Description:
@@ -440,9 +440,7 @@ int JZConfiguration::Check(const string& InputLine) const
 
 //-----------------------------------------------------------------------------
 // Description:
-//   Return the Jazz++ configuration file name, normally jazz.cfg.  If the
-// value has not been set by an earlier call to LoadConfig, attempt to find
-// the file using FindFile().
+//   Return the Jazz++ configuration file name, normally jazz.cfg.
 //-----------------------------------------------------------------------------
 wxString JZConfiguration::GetFileName()
 {
@@ -451,11 +449,16 @@ wxString JZConfiguration::GetFileName()
     return mFileName;
   }
 
-  mFileName = FindFile("jazz.cfg");
+  wxString ConfigDir = wxStandardPaths::Get().GetUserDataDir();
 
-  if (mFileName.empty())
+  wxString JazzCfgFile =
+    ConfigDir +
+    wxFileName::GetPathSeparator() +
+    "jazz.cfg";
+
+  if (::wxFileExists(JazzCfgFile))
   {
-    mFileName = FindFile(".jazz");
+    mFileName = JazzCfgFile;
   }
 
   return mFileName;
@@ -607,25 +610,28 @@ bool JZConfiguration::Put(int Index, const string& ValueString)
   }
 
   // Create a temporary file name from the current file name.
+//  wxFileName TempFileName = wxFileName::CreateTempFileName(wxEmptyString);
+
   string TempFileName(FileName);
   TempFileName.append(".tmp");
   ofstream Os(TempFileName.c_str());
+//  ofstream Os(TempFileName.GetFullPath());
   if (!Os)
   {
     return false;
   }
 
   FILE* inp = fopen(FileName.c_str(), "r");
-  const string& name = GetName(Index);
+  const string& ValueName = GetName(Index);
 
-  int len = name.length();
+  int len = ValueName.length();
   char buf[1000];
   bool found = false;
   while (fgets(buf, sizeof(buf), inp) != NULL)
   {
-    if (strncmp(buf, name.c_str(), len) == 0)
+    if (strncmp(buf, ValueName.c_str(), len) == 0)
     {
-      Os << name << ' ' << ValueString << endl;
+      Os << ValueName << ' ' << ValueString << endl;
       found = true;
     }
     else
@@ -635,13 +641,14 @@ bool JZConfiguration::Put(int Index, const string& ValueString)
   }
   if (!found)
   {
-    Os << name << ' ' << ValueString << endl;
+    Os << ValueName << ' ' << ValueString << endl;
   }
   fclose(inp);
   Os.close();
 
-  unlink(FileName.c_str());
-  rename(TempFileName.c_str(), FileName.c_str());
+  ::wxRemoveFile(FileName.c_str());
+  ::wxRenameFile(TempFileName, FileName);
+
   return true;
 }
 

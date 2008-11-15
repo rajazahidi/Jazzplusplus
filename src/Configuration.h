@@ -254,9 +254,7 @@ class JZConfiguration
   private:
 
     // Description:
-    //   Return the Jazz++ configuration file name, normally jazz.cfg.  If the
-    // value has not been set by an earlier call to LoadConfig, attempt to
-    // find the file using FindFile().
+    //   Return the Jazz++ configuration file name, normally jazz.cfg.
     wxString GetFileName();
 
   private:

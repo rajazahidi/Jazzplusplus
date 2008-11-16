@@ -134,8 +134,8 @@ bool JZJazzPlusPlusApplication::OnInit()
 
   ::wxInitAllImageHandlers();
 
-  SetVendorName("Jazz");
-  SetAppName("Jazz");
+  SetVendorName("Jazz++");
+  SetAppName("Jazz++");
 
   InsureConfigurationFileExistence();
 

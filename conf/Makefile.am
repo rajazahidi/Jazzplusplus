@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 # This files specifies Jazz++ data files to install.  The default location on
-# a Linux box is /usr/local/share/jazz, which is the gnu dictated place for
+# a Linux box is /usr/local/share/Jazz++, which is the gnu dictated place for
 # such files.  jazz.cfg could be tailored after the configure options (make a
 # jazz.cfg.in and use var substitution).
 pkgdata_DATA = jazz.mid \

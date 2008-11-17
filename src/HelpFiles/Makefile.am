@@ -10,7 +10,7 @@ noinst_LIBRARIES = libphony.a
 
 libphony_a_SOURCES = jazz.tex
 
-helpdir = ${prefix}/bin/HelpFiles
+helpdir = ${prefix}/share/Jazz++/HelpFiles
 
 make-install-dirs:
 	-if test '!' -d $(helpdir); then mkdir -p $(helpdir); fi

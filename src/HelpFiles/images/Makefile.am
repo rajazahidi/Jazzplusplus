@@ -1,4 +1,4 @@
-helpimagesdir = ${prefix}/bin/HelpFiles/images
+helpimagesdir = ${prefix}/share/Jazz++/HelpFiles/images
 
 make-install-dirs :
 	-if test '!' -d $(helpimagesdir); then mkdir -p $(helpimagesdir); fi

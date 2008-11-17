@@ -159,14 +159,14 @@ bool JZJazzPlusPlusApplication::OnInit()
   // Show it and tell the application that it's our main window
   SetTopWindow(mpTrackFrame);
 
-  // Get the current working directory and append a directory separator.
-  wxString CurrentWorkingDirectory =
-    ::wxGetCwd() + wxFileName::GetPathSeparator();
-
   // This code should be distributed with a HelpFiles subdirectory under
-  // the directory the executable is stored in.
+  // the directory the executable is stored in on Windows and under the
+  // ${prefix}/shared/${appname} on Linux.
   wxString HelpFileDirectoryGuess =
-    CurrentWorkingDirectory + "HelpFiles" + wxFileName::GetPathSeparator();
+    wxStandardPaths::Get().GetDataDir() +
+    wxFileName::GetPathSeparator() +
+    "HelpFiles" +
+    wxFileName::GetPathSeparator();
 
   // Attempt to obtain the path to the help file from configuration data.
   wxString HelpFilePath;

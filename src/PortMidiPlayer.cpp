@@ -125,7 +125,7 @@ tDeviceList& JZPortMidiPlayer::GetOutputDevices()
 
     if (pPmDeviceInfo && pPmDeviceInfo->output)
     {
-      wxString Name = 
+      wxString Name =
         wxString(pPmDeviceInfo->interf, wxConvISO8859_1) +
         wxT(", ") +
         wxString(pPmDeviceInfo->name, wxConvISO8859_1);

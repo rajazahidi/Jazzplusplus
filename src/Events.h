@@ -1427,7 +1427,7 @@ class tPlayTrack : public tMetaEvent
       : tMetaEvent(Clock, StatPlayTrack, chardat, Length)
     {
       int* pData = (int *)chardat;
-    
+
       // Fill in the fields from the data.
       track = 0;
       transpose = 0;

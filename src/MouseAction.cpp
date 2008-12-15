@@ -309,7 +309,7 @@ JZSnapSelection::JZSnapSelection(wxWindow* pWindow)
     mYCoordinates(),
     mXMin(0),
     mXMax(0),
-    mXStep(0), 
+    mXStep(0),
     mYMin(0),
     mYMax(0),
     mYStep(0)

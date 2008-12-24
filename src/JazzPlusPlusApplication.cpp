@@ -213,15 +213,15 @@ bool JZJazzPlusPlusApplication::OnInit()
     HelpFileFound = true;
   }
 
+  // GetUserDataDir returns the directory for the user-dependent application
+  // data files.  The value is $HOME/.appname on Linux,
+  // c:\Documents and Settings\username\Application Data\appname on
+  // Windows, and ~/Library/Application Support/appname on the Mac.
+  // The cached version of the help file will be placed in this location.
+  mHelp.SetTempDir(wxStandardPaths::Get().GetUserDataDir());
+
   if (HelpFileFound)
   {
-    // GetUserDataDir returns the directory for the user-dependent application
-    // data files.  The value is $HOME/.appname on Linux,
-    // c:\Documents and Settings\username\Application Data\appname on
-    // Windows, and ~/Library/Application Support/appname on the Mac.
-    // The cached version of the help file will be placed in this location.
-    mHelp.SetTempDir(wxStandardPaths::Get().GetUserDataDir());
-
     // Add the IPVT help file the the help system.
     mHelp.AddBook(HelpFileNameAndPath);
 
@@ -243,7 +243,7 @@ bool JZJazzPlusPlusApplication::OnInit()
 //-----------------------------------------------------------------------------
 void JZJazzPlusPlusApplication::InsureConfigurationFileExistence() const
 {
-  // Determine the expected location of the user's data dir for Jazz++.
+  // Determine the expected location of the user's data directory for Jazz++.
   wxString UserConfigDir = wxStandardPaths::Get().GetUserDataDir();
 
   // Determine if the directory exists.

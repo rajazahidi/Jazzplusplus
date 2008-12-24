@@ -81,11 +81,17 @@ JZMetronomeSettingsDialog::JZMetronomeSettingsDialog(
     }
   }
 
-  mKeyNormalName =
-    mIndexToName[mPitchToIndex[mMetronomeInfo.GetKeyNormal()]];
+  if (mMetronomeInfo.GetKeyNormal() < mPitchToIndex.size())
+  {
+    mKeyNormalName =
+      mIndexToName[mPitchToIndex[mMetronomeInfo.GetKeyNormal()]];
+  }
 
-  mKeyAccentedName =
-    mIndexToName[mPitchToIndex[mMetronomeInfo.GetKeyAccented()]];
+  if (mMetronomeInfo.GetKeyAccented() < mPitchToIndex.size())
+  {
+    mKeyAccentedName =
+      mIndexToName[mPitchToIndex[mMetronomeInfo.GetKeyAccented()]];
+  }
 
   mpVelocityKnob = new JZKnob(this, IDC_KB_VOLUME, 100, 0, 127);
 
@@ -170,7 +176,7 @@ bool JZMetronomeSettingsDialog::TransferDataToWindow()
   mpVelocityKnob->SetValueWithEvent(mMetronomeInfo.GetVelocity());
   mpAccentedCheckBox->SetValue(mMetronomeInfo.IsAccented());
 
-  int Selection, Index;
+  unsigned Selection, Index;
 
   Selection = 0;
   Index = 0;
@@ -186,7 +192,11 @@ bool JZMetronomeSettingsDialog::TransferDataToWindow()
       break;
     }
   }
-  mpNormalListbox->SetSelection(Selection);
+
+  if (Selection < mpNormalListbox->GetCount())
+  {
+    mpNormalListbox->SetSelection(Selection);
+  }
 
   Selection = 0;
   Index = 0;
@@ -202,7 +212,11 @@ bool JZMetronomeSettingsDialog::TransferDataToWindow()
       break;
     }
   }
-  mpAccentedListbox->SetSelection(Selection);
+
+  if (Selection < mpAccentedListbox->GetCount())
+  {
+    mpAccentedListbox->SetSelection(Selection);
+  }
 
   return true;
 }

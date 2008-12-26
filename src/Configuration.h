@@ -117,7 +117,8 @@ enum TEConfigEntryType
 };
 
 //*****************************************************************************
-// values for C_MidiDriver
+// Description:
+//   These are the values associated with the C_MidiDriver entry.
 //*****************************************************************************
 enum TEMidiDriver
 {
@@ -152,14 +153,14 @@ class JZConfigurationEntry
 
     const std::string& GetStrValue() const;
 
-    void SetStrValue(const char* pStringValue);
+    void SetStringValue(const std::string& StringValue);
 
   private:
 
     TEConfigEntryType mType;
     std::string mName;
     int mValue;
-    std::string mStrValue;
+    std::string mStringValue;
 };
 
 //*****************************************************************************
@@ -203,7 +204,7 @@ void JZConfigurationEntry::SetValue(const int& Value)
 inline
 const std::string& JZConfigurationEntry::GetStrValue() const
 {
-  return mStrValue;
+  return mStringValue;
 }
 
 //*****************************************************************************
@@ -220,7 +221,7 @@ class JZConfiguration
 
     int Check(const std::string& Name) const;
 
-    int Load(char* buf);
+    int Load(const std::string& buf);
 
     const std::pair<std::string, int>& GetDrumName(unsigned Entry) const;
     const std::pair<std::string, int>& GetDrumSet(unsigned Entry) const;

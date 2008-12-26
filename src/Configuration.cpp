@@ -26,9 +26,11 @@
 #include <wx/filename.h>
 
 #include "Configuration.h"
+
 #include "Synth.h"
 #include "FindFile.h"
 #include "Globals.h"
+#include "StringUtilities.h"
 
 #include <stack>
 #include <iostream>
@@ -49,7 +51,7 @@ JZConfigurationEntry::JZConfigurationEntry(
   : mType(eConfigEntryTypeInt),
     mName(),
     mValue(IntegerValue),
-    mStrValue()
+    mStringValue()
 {
   if (pName)
   {
@@ -65,7 +67,7 @@ JZConfigurationEntry::JZConfigurationEntry(
   : mType(eConfigEntryTypeStr),
     mName(),
     mValue(0),
-    mStrValue()
+    mStringValue()
 {
   if (pName)
   {
@@ -74,7 +76,7 @@ JZConfigurationEntry::JZConfigurationEntry(
 
   if (pStringValue)
   {
-    mStrValue = pStringValue;
+    mStringValue = pStringValue;
   }
 }
 
@@ -89,7 +91,7 @@ JZConfigurationEntry::JZConfigurationEntry(
     mName = pName;
   }
 
-  mStrValue = StringValue;
+  mStringValue = StringValue;
 }
 
 //-----------------------------------------------------------------------------
@@ -98,7 +100,7 @@ JZConfigurationEntry::JZConfigurationEntry(const char* pName)
   : mType(eConfigEntryTypeEmpty),
     mName(),
     mValue(0),
-    mStrValue()
+    mStringValue()
 {
   if (pName)
   {
@@ -108,12 +110,9 @@ JZConfigurationEntry::JZConfigurationEntry(const char* pName)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZConfigurationEntry::SetStrValue(const char* pStringValue)
+void JZConfigurationEntry::SetStringValue(const string& StringValue)
 {
-  if (pStringValue)
-  {
-    mStrValue = pStringValue;
-  }
+  mStringValue = StringValue;
 }
 
 //*****************************************************************************
@@ -368,42 +367,42 @@ JZConfiguration::~JZConfiguration()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-const pair<string, int>& JZConfiguration::GetDrumName(unsigned entry) const
+const pair<string, int>& JZConfiguration::GetDrumName(unsigned Entry) const
 {
-  assert((entry >= 0) && (entry < mDrumNames.size()));
-  return mDrumNames[entry];
+  assert((Entry >= 0) && (Entry < mDrumNames.size()));
+  return mDrumNames[Entry];
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-const pair<string, int>& JZConfiguration::GetDrumSet(unsigned entry) const
+const pair<string, int>& JZConfiguration::GetDrumSet(unsigned Entry) const
 {
-  assert((entry >= 0) && (entry < mDrumSets.size()));
-  return mDrumSets[entry];
+  assert((Entry >= 0) && (Entry < mDrumSets.size()));
+  return mDrumSets[Entry];
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-const pair<string, int>& JZConfiguration::GetVoiceName(unsigned entry) const
+const pair<string, int>& JZConfiguration::GetVoiceName(unsigned Entry) const
 {
-  assert((entry >= 0) && (entry < mVoiceNames.size()));
-  return mVoiceNames[entry];
+  assert((Entry >= 0) && (Entry < mVoiceNames.size()));
+  return mVoiceNames[Entry];
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-const pair<string, int>& JZConfiguration::GetCtrlName(unsigned entry) const
+const pair<string, int>& JZConfiguration::GetCtrlName(unsigned Entry) const
 {
-   assert((entry >= 0) && (entry < mCtrlNames.size()));
-   return mCtrlNames[entry];
+   assert((Entry >= 0) && (Entry < mCtrlNames.size()));
+   return mCtrlNames[Entry];
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZDoubleCommand& JZConfiguration::BankEntry(unsigned entry)
+JZDoubleCommand& JZConfiguration::BankEntry(unsigned Entry)
 {
-   assert((entry >= 0) && (entry < mBankTable.size()));
-   return mBankTable[entry];
+   assert((Entry >= 0) && (Entry < mBankTable.size()));
+   return mBankTable[Entry];
 }
 
 //-----------------------------------------------------------------------------
@@ -466,60 +465,62 @@ wxString JZConfiguration::GetFileName()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZConfiguration::Load(char* buf)
+int JZConfiguration::Load(const string& InputLine)
 {
-  int entry = Check(buf);
+  int Entry = Check(InputLine);
 
-  if (entry < 0)
+  if (Entry < 0)
   {
-    return entry;
+    return Entry;
   }
 
-  char format[100];
-  int result = 1;
-  if (mNames[entry]->GetType() == eConfigEntryTypeInt)
+  int Result = 1;
+
+  switch (mNames[Entry]->GetType())
   {
-    sprintf(format, "%s %%d", mNames[entry]->GetName().c_str());
-    int Value;
-    result = sscanf(buf, format, &Value);
-    mNames[entry]->SetValue(Value);
-  }
-  else if (mNames[entry]->GetType() == eConfigEntryTypeStr)
-  {
-    // Allow whitespace inside entries like "C:\Program Files\JazzWare".
-    int ofs = mNames[entry]->GetName().length();
-    while (buf[ofs] == ' ' || buf[ofs] == '\t')  // not \n
+    case eConfigEntryTypeInt:
     {
-      ++ofs;
-    }
-    int end = strlen(buf) - 1;
-    while (end > ofs)
-    {
-      if (!isspace(buf[end]))
+      string Name;
+      int Value;
+      istringstream Iss(InputLine);
+      Iss >> Name >> Value;
+      if (Iss.fail())
       {
+        Result = -1;
+      }
+      mNames[Entry]->SetValue(Value);
+      break;
+    }
+    case eConfigEntryTypeStr:
+    {
+      string::size_type FindIndex = InputLine.find(mNames[Entry]->GetName());
+
+      if (FindIndex == string::npos)
+      {
+        // Give up if the configuration entry name is not found.
+        Result = -1;
         break;
       }
-      --end;
+
+      // Construct a string from the rest of the line and trim leading and
+      // trailing white space.
+      string StringValue = TNStringUtilities::TrimLeadingAndTrailingBlanks(
+        string(InputLine, FindIndex + mNames[Entry]->GetName().size()));
+
+      mNames[Entry]->SetStringValue(StringValue);
+
+      break;
     }
-    int size = end - ofs + 1;
-
-    char* pStringValue = new char[size + 1];
-    memcpy(pStringValue, buf + ofs, size);
-    pStringValue[size] = 0;
-    mNames[entry]->SetStrValue(pStringValue);
-    delete [] pStringValue;
-  }
-  else
-  {
-    result = 1;
+    case eConfigEntryTypeEmpty:
+      break;
   }
 
-  if (result <= 0)
+  if (Result <= 0)
   {
     return -1;
   }
 
-  return entry;
+  return Entry;
 }
 
 //-----------------------------------------------------------------------------
@@ -543,9 +544,9 @@ const int& JZConfiguration::GetValue(int Index) const
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool JZConfiguration::Get(int entry, char* value)
+bool JZConfiguration::Get(int Entry, char* value)
 {
-  assert((entry >= 0) && (entry < NumConfigNames));
+  assert((Entry >= 0) && (Entry < NumConfigNames));
 
   wxString FileName = GetFileName();
   if (FileName.IsEmpty())
@@ -554,7 +555,7 @@ bool JZConfiguration::Get(int entry, char* value)
   }
 
   FILE *fd = fopen(FileName.c_str(), "r");
-  const string& name = GetName(entry);
+  const string& name = GetName(Entry);
 
   int len = name.length();
   char buf[1000];
@@ -582,10 +583,10 @@ bool JZConfiguration::Get(int entry, char* value)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool JZConfiguration::Get(int entry, int& value)
+bool JZConfiguration::Get(int Entry, int& value)
 {
   char buf[512];
-  if (Get(entry, buf))
+  if (Get(Entry, buf))
   {
     sscanf(buf, " %d ", &value);
     return true;
@@ -695,26 +696,23 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
   wxString Path = FileNameObject.GetPath();
   ::wxSetWorkingDirectory(Path);
 
-  char buf[1000];
   int i, j;
   unsigned BankIndex = 0, VoiceIndex = 0, DrumsetIndex = 0;
 
   vector<pair<string, int> >* pVector = 0;
 
-//  stack<ifstream> InputFileStreams;
-  stack<FILE*> FileDescriptors;
+  stack<ifstream*> InputFileStreams;
+  string InputLine;
 
   cout
     << "JZConfiguration::LoadConfig:" << '\n'
     << "  \"" << mFileName << '"'
     << endl;
 
-//  ifstream Is(mFileName.c_str());
-//  InputFileStreams.push(Is);
-  FileDescriptors.push(fopen(mFileName.c_str(), "r"));
+  ifstream* pIs = new ifstream(mFileName.c_str());
+  InputFileStreams.push(pIs);
 
-//  if (!InputFileStreams.top())
-  if (FileDescriptors.top() == NULL)
+  if (!*InputFileStreams.top())
   {
     wxString String;
     String
@@ -734,17 +732,17 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
   {
     // Read a line from the current file.
 
-//    if (getline(InputFileStreams.top(), InputLine))
-    if (fgets(buf, sizeof(buf), FileDescriptors.top()) == NULL)
+    getline(*InputFileStreams.top(), InputLine);
+
+    // Check for an end-of-file condition.
+    if (InputFileStreams.top()->eof())
     {
-//      InputFileStreams.top().close();
-      fclose(FileDescriptors.top());
+      InputFileStreams.top()->close();
+      delete InputFileStreams.top();
+      InputFileStreams.pop();
 
-//      InputFileStreams.pop();
-      FileDescriptors.pop();
-
-//      if (InputFileStreams.empty())
-      if (FileDescriptors.empty())
+      // Are there any open streams?
+      if (InputFileStreams.empty())
       {
         // The code has reached the last line of the Jazz++ configuration file
         // (jazz.cfg or .jazz).
@@ -757,12 +755,12 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
       }
     }
 
-    int entry;
+    int Entry;
 
-    // Read keyword lines
-    if ((entry = gpConfig->Load(buf)) >= 0)
+    // Read keyword lines.
+    if ((Entry = gpConfig->Load(InputLine)) >= 0)
     {
-      switch (entry)
+      switch (Entry)
       {
         case C_BankTable:
 
@@ -806,7 +804,7 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
         case C_SynthConfig:
         case C_Include:
           {
-            if (entry == C_SynthConfig)
+            if (Entry == C_SynthConfig)
             {
               cout << "Include synthesizer configuration file \"";
             }
@@ -814,33 +812,30 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
             {
               cout << "Include file \"";
             }
-            cout << GetStrValue(entry) << '"' << endl;
+            cout << GetStrValue(Entry) << '"' << endl;
 
             // Get the name of the include file.
-            wxString IncludeFileName = FindFile(GetStrValue(entry));
+            wxString IncludeFileName = FindFile(GetStrValue(Entry));
 
             if (IncludeFileName.empty())
             {
-//              InputFileStreams
-              FileDescriptors.push(NULL);
+              InputFileStreams.push(0);
             }
             else
             {
-//              InputFileStreams
-              FileDescriptors.push(fopen(IncludeFileName, "r"));
+              pIs = new ifstream(IncludeFileName.c_str());
+              InputFileStreams.push(pIs);
             }
 
-//            InputFileStreams
-            if (FileDescriptors.top() == NULL)
+            if (!InputFileStreams.top())
             {
               wxString String;
               String
                 << "Could not open configuration include file:" << '\n'
-                << '"' << buf << '"';
+                << '"' << InputLine << '"';
               ::wxMessageBox(String, "Warning", wxOK);
 
-//              InputFileStreams.pop();
-              FileDescriptors.pop();
+              InputFileStreams.pop();
             }
           }
           break;
@@ -849,17 +844,18 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
           break;
       }
     }
-
-    // Read named value entries
-    else if (pVector && isdigit(buf[0]))
+    else if (pVector && isdigit(InputLine[0]))
     {
+      // Read named value entries.
+
       // Voice names
       if (pVector == &mVoiceNames)
       {
         if (VoiceIndex >= 0 && VoiceIndex < mVoiceNames.size())
         {
           int Value;
-          sscanf(buf, " %d %n", &Value, &j);
+          istringstream Iss(InputLine);
+          Iss >> Value;
 
           if (gpConfig->GetValue(C_UseTwoCommandBankSelect))
           {
@@ -872,10 +868,10 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
 
           mVoiceNames[VoiceIndex + 1].second = Value + 1;
 
-          // Remove the \n.
-          buf[strlen(buf) - 1] = 0;
+          string VoiceName =
+            TNStringUtilities::TrimLeadingAndTrailingBlanks(Iss.str());
 
-          mVoiceNames[VoiceIndex + 1].first = buf + j;
+          mVoiceNames[VoiceIndex + 1].first = VoiceName;
 
           ++VoiceIndex;
         }
@@ -887,13 +883,16 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
         }
       }
 
-      // Drumset names
       else if (pVector == &mDrumSets)
       {
+        // Drumset names.
+
         if (DrumsetIndex >= 0 && DrumsetIndex < 129)
         {
           int Value;
-          sscanf(buf, " %d %n", &Value, &j);
+          istringstream Iss(InputLine);
+          Iss >> Value;
+
           if (gpConfig->GetValue(C_UseTwoCommandBankSelect))
           {
             assert(0 <= Value && Value <= 65536);
@@ -904,10 +903,10 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
           }
           mDrumSets[DrumsetIndex + 1].second = Value + 1;
 
-          // Remove the \n.
-          buf[strlen(buf) - 1] = 0;
+          string DrumSetName =
+            TNStringUtilities::TrimLeadingAndTrailingBlanks(Iss.str());
 
-          mDrumSets[DrumsetIndex + 1].first = buf + j;
+          mDrumSets[DrumsetIndex + 1].first = DrumSetName;
 
           ++DrumsetIndex;
         }
@@ -918,46 +917,48 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
             << endl;
         }
       }
-
-      // Controller names.
       else if (pVector == &mCtrlNames)
       {
-        sscanf(buf, " %d %n", &i, &j);
+        // Controller names.
+
+        istringstream Iss(InputLine);
+        Iss >> i;
         assert(0 <= i && i <= 127);
 
-        // Remove the \n.
-        buf[strlen(buf) - 1] = 0;
+        string ControllerName =
+          TNStringUtilities::TrimLeadingAndTrailingBlanks(Iss.str());
 
-        mCtrlNames[i + 1].first = buf + j;
+        mCtrlNames[i + 1].first = ControllerName;
       }
-
-      // Drum instrument names.
       else if (pVector == &mDrumNames)
       {
-        sscanf(buf, " %d %n", &i, &j);
+        // Drum instrument names.
+
+        istringstream Iss(InputLine);
+        Iss >> i;
         assert(0 <= i && i <= 127);
 
-        // Remove the \n.
-        buf[strlen(buf) - 1] = 0;
+        string DrumName =
+          TNStringUtilities::TrimLeadingAndTrailingBlanks(Iss.str());
 
-        mDrumNames[i + 1].first = buf + j;
+        mDrumNames[i + 1].first = DrumName;
       }
       else
       {
         wxString String;
         String
           << "LoadConfig: error reading line" << '\n'
-          << '"' << buf << '"';
+          << '"' << InputLine << '"';
         ::wxMessageBox(String, "Warning", wxOK);
       }
     }
-
-    // Read bank table entries.
-    else if (pVector == 0 && !mBankTable.empty()&& isdigit(buf[0]))
+    else if (pVector == 0 && !mBankTable.empty()&& isdigit(InputLine[0]))
     {
+      // Read bank table entries.
       assert(0 <= BankIndex && BankIndex < mBankTable.size());
 
-      sscanf(buf, " %d %d", &i, &j);
+      istringstream Iss(InputLine);
+      Iss >> i >> j;
 
       assert(0 <= i && i <= 255);
       assert(0 <= j && j <= 255);

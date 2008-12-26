@@ -61,3 +61,20 @@ unsigned TNStringUtilities::Tokenize(
   }
   return TokenIndex;
 }
+
+//-----------------------------------------------------------------------------
+// Decsription:
+//   This function removes leading and trailing white space the input string.
+//-----------------------------------------------------------------------------
+string TNStringUtilities::TrimLeadingAndTrailingBlanks(const string& String)
+{
+  const string WhiteSpaceCharacters = " \t\n";
+
+  string::size_type Start = String.find_first_not_of(WhiteSpaceCharacters);
+  if (Start == string::npos)
+  {
+    return "";
+  }
+  string::size_type Stop = String.find_last_not_of(WhiteSpaceCharacters);
+  return string(String, Start, Stop - Start + 1);
+}

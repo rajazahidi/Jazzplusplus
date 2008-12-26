@@ -36,6 +36,12 @@ unsigned Tokenize(
   const std::string& InputString,
   std::vector<std::string>& Tokens);
 
+//-----------------------------------------------------------------------------
+// Decsription:
+//   This function removes leading and trailing white space the input string.
+//-----------------------------------------------------------------------------
+std::string TrimLeadingAndTrailingBlanks(const std::string& String);
+
 };
 
 #endif // !defined(TRC_STRINGUTILITIES_H)

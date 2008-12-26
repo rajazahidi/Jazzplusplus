@@ -2117,10 +2117,11 @@ HBFrame::HBFrame()
 //-----------------------------------------------------------------------------
 HBFrame::~HBFrame()
 {
-  int XPixel, YPixel;
-  GetPosition(&XPixel, &YPixel);
-  gpConfig->Put(C_HarmonyXpos, XPixel);
-  gpConfig->Put(C_HarmonyYpos, YPixel);
+  int XPosition, YPosition;
+  GetPosition(&XPosition, &YPosition);
+  gpConfig->Put(C_HarmonyXpos, XPosition);
+  gpConfig->Put(C_HarmonyYpos, YPosition);
+
   delete mpToolBar;
   delete mpHbWindow;
   gpHarmonyBrowser = 0;

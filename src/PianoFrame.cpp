@@ -262,6 +262,16 @@ JZPianoFrame::JZPianoFrame(
 //-----------------------------------------------------------------------------
 JZPianoFrame::~JZPianoFrame()
 {
+  int XPosition, YPosition, Width, Height;
+
+  GetPosition(&XPosition, &YPosition);
+  GetSize(&Width, &Height);
+
+  gpConfig->Put(C_PianoWinXpos, XPosition);
+  gpConfig->Put(C_PianoWinYpos, YPosition);
+  gpConfig->Put(C_PianoWinWidth, Width);
+  gpConfig->Put(C_PianoWinHeight, Height);
+
   delete mpPianoWindow;
 
   delete MixerForm;

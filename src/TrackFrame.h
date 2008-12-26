@@ -68,6 +68,8 @@ class JZTrackFrame : public wxFrame, public tButtonLabelInterface
 
     void CreateMenu();
 
+    void OnFileNew(wxCommandEvent& Event);
+
     void OnFileOpen(wxCommandEvent& Event);
 
     void OnFileSaveAs(wxCommandEvent& Event);
@@ -81,6 +83,8 @@ class JZTrackFrame : public wxFrame, public tButtonLabelInterface
     void OnPlay(wxCommandEvent& Event);
 
     void OnPlayLoop(wxCommandEvent& Event);
+
+    void OnRecord(wxCommandEvent& Event);
 
     void OnPianoWindow(wxCommandEvent& Event);
 

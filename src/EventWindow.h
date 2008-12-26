@@ -78,6 +78,10 @@ class JZEventWindow : public wxWindow
 
   protected:
 
+    virtual void SnapSelStop(wxMouseEvent& Event)
+    {
+    }
+
     void DrawVerticalLine(wxDC& Dc, int XPosition) const;
 
     void DrawHorizontalLine(wxDC& Dc, int YPosition) const;

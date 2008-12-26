@@ -83,6 +83,12 @@ class JZTrackWindow : public JZEventWindow
 
     void SetScrollRanges();
 
+  protected:
+
+    virtual void SnapSelStop(wxMouseEvent& Event)
+    {
+    }
+
   private:
 
     void OnSize(wxSizeEvent& Event);

@@ -266,7 +266,22 @@ void JZTrackWindow::OnLeftButtonDown(wxMouseEvent& Event)
 {
   wxPoint Point = Event.GetPosition();
 
-  if (
+  if (Point.x < mNumberWidth && Point.y >= mTopInfoHeight)
+  {
+    JZRectangle Rectangle(
+      0,
+      y2yLine(Point.y),
+      Clock2x(mpSong->GetMaxQuarters() * mpSong->GetTicksPerQuarter()),
+      mTrackHeight);
+    mpSnapSel->Select(
+      Rectangle,
+      mEventsX,
+      mEventsY,
+      mEventsWidth,
+      mEventsHeight);
+    SnapSelStop(Event);
+  }
+  else if (
     Point.x >= mEventsX && Point.x < mEventsX + mEventsWidth &&
     Point.y >= mEventsY && Point.y < mEventsY + mEventsHeight)
   {
@@ -1314,10 +1329,10 @@ void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
     // and make them private jppProject members
     bool loop   = gpProject->mLoop;
     bool muted  = gpProject->mMuted;
-    bool record = gpProject->mRecord;
+    bool Record = gpProject->mRecord;
 
     // Is it possible to record?
-    if (record && mpSnapSel->IsSelected())
+    if (Record && mpSnapSel->IsSelected())
     {
       pRecInfo->mTrackIndex = mpFilter->FromTrack;
 
@@ -1359,10 +1374,14 @@ void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
 
     // GO!
 
-    //if (pRecInfo->Track)  // recording?
-      //gpProject->Midi->SetRecordInfo(pRecInfo);
-    //else
-      //gpProject->Midi->SetRecordInfo(0);
+    if (pRecInfo->mpTrack)  // recording?
+    {
+      gpMidiPlayer->SetRecordInfo(pRecInfo);
+    }
+    else
+    {
+      gpMidiPlayer->SetRecordInfo(0);
+    }
 
     gpProject->mStartTime = mPreviousClock;
     gpProject->mStopTime = loop_clock;

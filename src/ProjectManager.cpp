@@ -53,13 +53,24 @@ JZTrackFrame* JZProjectManager::CreateTrackView()
 {
   if (!mpTrackFrame)
   {
+    int XPosition(10), YPosition(10), Width(600), Height(400);
+
+    gpConfig->Get(C_TrackWinXpos, XPosition);
+    gpConfig->Get(C_TrackWinYpos, YPosition);
+    gpConfig->Get(C_TrackWinWidth, Width);
+    gpConfig->Get(C_TrackWinHeight, Height);
+
+    wxPoint Position(XPosition, YPosition);
+
+    wxSize Size(Width, Height);
+
     // Create the main application window.
     mpTrackFrame = new JZTrackFrame(
       0,
       "Jazz++",
       gpSong,
-      wxPoint(10, 10),
-      wxSize(600, 400));
+      Position,
+      Size);
   }
 
   mpTrackFrame->Show(true);
@@ -73,12 +84,23 @@ void JZProjectManager::CreatePianoView()
 {
   if (!mpPianoFrame)
   {
+    int XPosition(10), YPosition(10), Width(640), Height(480);
+
+    gpConfig->Get(C_PianoWinXpos, XPosition);
+    gpConfig->Get(C_PianoWinYpos, YPosition);
+    gpConfig->Get(C_PianoWinWidth, Width);
+    gpConfig->Get(C_PianoWinHeight, Height);
+
+    wxPoint Position(XPosition, YPosition);
+
+    wxSize Size(Width, Height);
+
     mpPianoFrame = new JZPianoFrame(
       mpTrackFrame,
       "Piano",
       gpSong,
-      wxDefaultPosition,
-      wxSize(640, 480));
+      Position,
+      Size);
   }
 
   mpPianoFrame->Show(true);

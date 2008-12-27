@@ -36,10 +36,11 @@
 #include "Configuration.h"
 #include "Globals.h"
 
-#include <unistd.h>
-#include <stdlib.h>
+#include <cerrno>
+#include <cstdlib>
+#include <iostream>
 #include <sys/ioctl.h>
-#include <errno.h>
+#include <unistd.h>
 
 using namespace std;
 

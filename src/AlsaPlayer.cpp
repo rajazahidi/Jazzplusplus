@@ -38,11 +38,12 @@
 #include "TrackFrame.h"
 #include "TrackWindow.h"
 
-#include <stdlib.h>
-#include <errno.h>
-#include <sys/ioctl.h>
+#include <wx/choicdlg.h>
 
+#include <cerrno>
+#include <cstdlib>
 #include <iostream>
+#include <sys/ioctl.h>
 
 using namespace std;
 

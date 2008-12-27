@@ -15,7 +15,7 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Release VC8|Win32"
+			Name="Release VC9|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
@@ -88,7 +88,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug VC8|Win32"
+			Name="Debug VC9|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"

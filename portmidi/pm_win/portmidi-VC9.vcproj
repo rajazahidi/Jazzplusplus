@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="portmidi"
 	ProjectGUID="{33E3B196-B9F4-4D0A-85E1-31C7BBD4967A}"
+	RootNamespace="portmidi"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -15,7 +16,7 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug VC8|Win32"
+			Name="Debug VC9|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
@@ -89,7 +90,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release VC8|Win32"
+			Name="Release VC9|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"

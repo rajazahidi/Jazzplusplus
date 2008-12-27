@@ -245,8 +245,7 @@ Synth.h \
 ToolBar.h \
 TrackFrame.h \
 Track.h \
-TrackWindow.h \
-WxWidgets.h
+TrackWindow.h
 
 if !USE_ALSA
 jazz_LDFLAGS = -framework CoreMIDI -framework CoreAudio

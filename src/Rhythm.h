@@ -39,6 +39,7 @@ class wxButton;
 class wxCheckBox;
 class wxListBox;
 class wxPanel;
+class wxSlider;
 
 #define MAX_GROUPS  5
 #define MAX_KEYS   20

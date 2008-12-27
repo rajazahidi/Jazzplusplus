@@ -31,6 +31,7 @@
 #include "Audio.h"
 #include "Globals.h"
 
+#include <wx/choicdlg.h>
 #include <wx/msgdlg.h>
 
 //#include <unistd.h>

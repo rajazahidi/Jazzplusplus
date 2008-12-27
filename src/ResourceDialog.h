@@ -25,6 +25,12 @@
 
 #include <list>
 
+#include <wx/dynarray.h>
+#include <wx/string.h>
+
+class wxDialog;
+class wxWindow;
+
 /// Used by jppResourceDialog to store "Attach" entries.
 
 /** This class links together a named resource and a pointer to a data item.
@@ -225,7 +231,7 @@ class jppResourceDialog
   std::list<jppResourceElement*> links;
 
   /// Reference to the dialog created from the XRC resource.
-  wxDialog *dialog;
+  wxDialog* dialog;
 
   /// The name of the dialog resource.  Used in error reporting.
   wxString dialogName;

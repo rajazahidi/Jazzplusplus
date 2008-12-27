@@ -20,14 +20,13 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "Command.h"
+
+#include "Filter.h"
+#include "Globals.h"
 #include "Song.h"
 #include "Track.h"
-#include "Filter.h"
 #include "Random.h"
-#include "Globals.h"
 
 #include <cstdlib>
 #include <limits>

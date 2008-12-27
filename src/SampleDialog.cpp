@@ -20,13 +20,10 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
-//#include "config.h"
 #include "SampleDialog.h"
+
 #include "Sample.h"
 #include "SampleWindow.h"
-//#include "jazz.h"
 #include "Mapper.h"
 #include "Audio.h"
 #include "SignalInterface.h"
@@ -35,6 +32,12 @@
 #include "FileSelector.h"
 #include "DeprecatedStringUtils.h"
 #include "Help.h"
+
+#include <wx/checkbox.h>
+#include <wx/choice.h>
+#include <wx/msgdlg.h>
+#include <wx/slider.h>
+#include <wx/statbox.h>
 
 #include <fstream>
 #include <cmath>

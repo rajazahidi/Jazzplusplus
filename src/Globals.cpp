@@ -20,14 +20,14 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
 #include "Globals.h"
-#include "Song.h"
-#include "Synth.h"
-#include "Player.h"
+
 #include "Help.h"
 #include "NamedValue.h"
+#include "Player.h"
 #include "Project.h"
+#include "Song.h"
+#include "Synth.h"
 
 using namespace std;
 

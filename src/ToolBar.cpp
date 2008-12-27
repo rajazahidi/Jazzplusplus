@@ -20,9 +20,10 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "ToolBar.h"
+
+#include <wx/frame.h>
+#include <wx/toolbar.h>
 
 //*****************************************************************************
 // Description:

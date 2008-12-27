@@ -16,14 +16,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "WxWidgets.h"
-
-#include <wx/fs_zip.h>
-#include <wx/xrc/xmlres.h>
-
 #include "ResourceDialog.h"
 
-#include <wx/listimpl.cpp>
+#include <wx/checkbox.h>
+#include <wx/choice.h>
+#include <wx/dialog.h>
+#include <wx/fs_zip.h>
+#include <wx/msgdlg.h>
+#include <wx/slider.h>
+#include <wx/textctrl.h>
+#include <wx/xrc/xmlres.h>
+
 //WX_DEFINE_LIST(jppResourceElementList);
 
 using namespace std;

@@ -23,6 +23,8 @@
 #ifndef JZ_GUITARWINDOW_H
 #define JZ_GUITARWINDOW_H
 
+#include <wx/scrolwin.h>
+
 class JZGuitarFrame;
 
 //*****************************************************************************

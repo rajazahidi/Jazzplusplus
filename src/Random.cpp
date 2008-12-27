@@ -20,15 +20,15 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
-//#include "config.h"
-
 #include "Random.h"
 
 #include "Mapper.h"
 
-#include <assert.h>
+#include <wx/dcclient.h>
+#include <wx/frame.h>
+#include <wx/scrolwin.h>
+
+#include <cassert>
 #include <cstdlib>
 
 using namespace std;
@@ -261,7 +261,7 @@ istream & operator >> (istream &is, JZRndArray &a)
 #define TICK_LINE 0
 
 tArrayEdit::tArrayEdit(wxFrame *frame, JZRndArray &ar, int xx, int yy, int ww, int hh, int sty)
-  : wxScrolledWindow(frame,-1, wxPoint(xx, yy), wxSize(ww, hh)),
+  : wxScrolledWindow(frame, wxID_ANY, wxPoint(xx, yy), wxSize(ww, hh)),
     mArray(ar),
     n(ar.n),
     min(ar.min),

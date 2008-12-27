@@ -23,6 +23,7 @@
 #ifndef JZ_JAZZPLUSPLUSAPPLICATION_H
 #define JZ_JAZZPLUSPLUSAPPLICATION_H
 
+#include <wx/app.h>
 #include <wx/html/helpctrl.h>
 
 class JZProject;

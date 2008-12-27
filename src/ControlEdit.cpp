@@ -20,13 +20,15 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "ControlEdit.h"
-#include "PianoWindow.h"
+
 #include "EventWindow.h"
+#include "PianoWindow.h"
 #include "Song.h"
 #include "Track.h"
+
+#include <wx/button.h>
+#include <wx/sizer.h>
 
 static const long wbar = 2;
 static int bars_state = 2;  // from ArrayEdit

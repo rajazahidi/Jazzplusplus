@@ -27,12 +27,18 @@
 
 #include "ToolBar.h"
 
+#include <wx/frame.h>
+
 #include <iostream>
 
 class JZTrack;
 class JZEventWindow;
 class JZSong;
 class JZBarInfo;
+class wxButton;
+class wxCheckBox;
+class wxListBox;
+class wxPanel;
 
 #define MAX_GROUPS  5
 #define MAX_KEYS   20

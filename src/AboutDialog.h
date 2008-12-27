@@ -23,6 +23,11 @@
 #ifndef JZ_ABOUTDIALOG_H
 #define JZ_ABOUTDIALOG_H
 
+#include <wx/dialog.h>
+
+class wxBitmap;
+class wxStaticBitmap;
+
 //*****************************************************************************
 // Description:
 //   This is the JAZZ++ about dialog declaration.

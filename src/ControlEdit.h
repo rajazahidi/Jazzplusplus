@@ -25,10 +25,13 @@
 
 #include "Random.h"
 
+#include <wx/panel.h>
+
 class JZPianoWindow;
 class JZTrack;
 class JZEvent;
 class tCtrlEditBase;
+class wxButton;
 
 // to access tCtrlEditBase from Buttons etc
 
@@ -125,8 +128,8 @@ class tCtrlEditBase : public tArrayEditDrawBars
 
     void Create(JZPianoWindow* p, char const *label, int dx, int x, int y, int w, int h);
 
-    static void Apply(wxButton &but, wxCommandEvent& event);
-    static void Revert(wxButton &but, wxCommandEvent& event);
+    static void Apply(wxButton& but, wxCommandEvent& event);
+    static void Revert(wxButton& but, wxCommandEvent& event);
 // SN++
     static void Edit(wxButton &but, wxCommandEvent& event);
     static void Bars(wxButton &but, wxCommandEvent& event);

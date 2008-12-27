@@ -20,9 +20,8 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "Rhythm.h"
+
 #include "EventWindow.h"
 #include "Song.h"
 #include "Command.h"
@@ -37,6 +36,14 @@
 #include "KeyStringConverters.h"
 #include "SelectControllerDialog.h"
 #include "Help.h"
+
+#include <wx/button.h>
+#include <wx/checkbox.h>
+#include <wx/choicdlg.h>
+#include <wx/listbox.h>
+#include <wx/msgdlg.h>
+#include <wx/slider.h>
+#include <wx/toolbar.h>
 
 #include <fstream>
 #include <sstream>

@@ -820,10 +820,6 @@
 				RelativePath="..\src\mswin\WindowsPlayer.h"
 				>
 			</File>
-			<File
-				RelativePath="..\src\WxWidgets.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Help Files"

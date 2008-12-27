@@ -29,15 +29,14 @@
 //   like OSS driver mode.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "AlsaPlayer.h"
+
+#include "Configuration.h"
+#include "Dialogs.h"
+#include "Globals.h"
 #include "ProjectManager.h"
 #include "TrackFrame.h"
 #include "TrackWindow.h"
-#include "Dialogs.h"
-#include "Configuration.h"
-#include "Globals.h"
 
 #include <stdlib.h>
 #include <errno.h>

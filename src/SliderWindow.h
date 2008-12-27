@@ -25,6 +25,9 @@
 
 #include "ToolBar.h"
 
+#include <wx/frame.h>
+
+class wxPanel;
 class wxToolBar;
 struct JZToolDef;
 

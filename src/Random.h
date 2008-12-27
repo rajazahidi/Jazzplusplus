@@ -23,6 +23,8 @@
 #ifndef JZ_RANDOM_H
 #define JZ_RANDOM_H
 
+#include <wx/scrolwin.h>
+
 #include <iostream>
 
 #include "DynamicArray.h"

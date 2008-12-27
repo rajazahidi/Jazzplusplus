@@ -20,10 +20,9 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
+#include "Audio.h"
 
 #include "Sample.h"
-#include "Audio.h"
 #include "Events.h"
 #include "RecordingInfo.h"
 #include "Track.h"
@@ -39,12 +38,16 @@
 #include "Help.h"
 #include "Resources.h"
 
-#include <iostream>
-#include <fstream>
+#include <wx/listbox.h>
+#include <wx/msgdlg.h>
+#include <wx/slider.h>
+
+#include <cassert>
 #include <cmath>
 #include <cstdlib>
+#include <fstream>
+#include <iostream>
 
-#include <assert.h>
 #include <sys/stat.h>
 #include <string.h>
 

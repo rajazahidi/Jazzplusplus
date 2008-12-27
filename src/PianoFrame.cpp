@@ -20,28 +20,29 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
-#include "Resources.h"
-
 #include "PianoFrame.h"
+
+#include "Command.h"
+#include "ControlEdit.h"
+#include "Dialogs.h"
+#include "Globals.h"
+#include "Harmony.h"
 #include "PianoWindow.h"
 #include "ProjectManager.h"
+#include "Resources.h"
 #include "Song.h"
 #include "Track.h"
 #include "Synth.h"
 #include "StandardFile.h"
-#include "Dialogs.h"
-#include "Harmony.h"
-#include "Command.h"
-#include "Globals.h"
 #include "Player.h"
-#include "ControlEdit.h"
 #include "GuitarFrame.h"
 #include "ToolBar.h"
 #include "ResourceDialog.h"
 #include "Help.h"
 #include "Rectangle.h"
+
+#include <wx/menu.h>
+#include <wx/msgdlg.h>
 
 #include <sstream>
 
@@ -243,7 +244,7 @@ JZPianoFrame::JZPianoFrame(
 
 //  CreateMenu();
 
-  DialogBox = 0;
+  mpDialogBox = 0;
   MixerForm = 0;
 
   CreateMenu();

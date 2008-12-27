@@ -20,12 +20,9 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
-#include "wx/html/helpctrl.h"
-
 #include "Help.h"
-#include "Globals.h"
+
+#include <wx/html/helpctrl.h>
 
 #include <iostream>
 

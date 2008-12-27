@@ -23,18 +23,21 @@
 #ifndef samplwin_h
 #define samplwin_h
 
+#include "SampleCommand.h"
+
+#include <wx/frame.h>
+
+class JZRndArray;
+class JZToolBar;
+class tArrayEdit;
+class tCommandPainter;
+class tDistortion;
+class tEqualizer;
 class tSample;
 class tSampleCnvs;
-class JZToolBar;
-
-class tArrayEdit;
-class JZRndArray;
-class tCommandPainter;
-class tEqualizer;
-class tDistortion;
 class tSynthDlg;
-
-#include "SampleCommand.h"
+class wxDialog;
+class wxScrollBar;
 
 class tSampleWin : public wxFrame
 {

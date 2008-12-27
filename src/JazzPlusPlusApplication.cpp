@@ -20,16 +20,12 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
-#include <wx/stdpaths.h>
-#include <wx/fileconf.h>
-
 #include "JazzPlusPlusApplication.h"
-#include "TrackFrame.h"
+
+#include "Globals.h"
 #include "Project.h"
 #include "ProjectManager.h"
-#include "Globals.h"
+#include "TrackFrame.h"
 
 #ifdef _MSC_VER
 
@@ -50,6 +46,12 @@
 #include <fenv.h>
 
 #endif
+
+#include <wx/stdpaths.h>
+#include <wx/fileconf.h>
+#include <wx/filedlg.h>
+#include <wx/image.h>
+#include <wx/msgdlg.h>
 
 #include <fstream>
 #include <vector>

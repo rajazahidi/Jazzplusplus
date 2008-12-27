@@ -20,14 +20,14 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
-#include "Resources.h"
-
 #include "GuitarFrame.h"
+
 #include "GuitarWindow.h"
 #include "GuitarSettingsDialog.h"
 #include "ProjectManager.h"
+#include "Resources.h"
+
+#include <wx/menu.h>
 
 //*****************************************************************************
 // Description:

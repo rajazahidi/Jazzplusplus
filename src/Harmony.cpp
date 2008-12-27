@@ -20,9 +20,8 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "Harmony.h"
+
 #include "HarmonyP.h"
 #include "ProjectManager.h"
 #include "Player.h"
@@ -39,6 +38,16 @@
 #include "Rectangle.h"
 #include "Globals.h"
 #include "Help.h"
+
+#include <wx/button.h>
+#include <wx/checkbox.h>
+#include <wx/dcclient.h>
+#include <wx/listbox.h>
+#include <wx/menu.h>
+#include <wx/msgdlg.h>
+#include <wx/scrolwin.h>
+#include <wx/stattext.h>
+#include <wx/toolbar.h>
 
 #include <iostream>
 #include <fstream>
@@ -1612,12 +1621,12 @@ class HBContextDlg : public wxDialog
 
   private:
 
-    HBCanvas*   mpHbWindow;
-    wxCheckBox *chord_chk[12];
-    wxCheckBox *scale_chk[12];
-    wxListBox  *chord_lst;
-    wxListBox  *scale_lst;
-    wxStaticText  *chord_msg;
+    HBCanvas* mpHbWindow;
+    wxCheckBox* chord_chk[12];
+    wxCheckBox* scale_chk[12];
+    wxListBox* chord_lst;
+    wxListBox* scale_lst;
+    wxStaticText* chord_msg;
 
     wxButton   *ok_but;
     wxButton   *cancel_but;

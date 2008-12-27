@@ -20,9 +20,8 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "HarmonyBrowserAnalyzer.h"
+
 #include "EventWindow.h"
 #include "Command.h"
 #include "HarmonyP.h"

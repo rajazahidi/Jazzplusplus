@@ -23,6 +23,11 @@
 #ifndef JZ_TOOLBAR_H
 #define JZ_TOOLBAR_H
 
+#include <wx/gdicmn.h>
+
+class wxFrame;
+class wxToolBar;
+
 //*****************************************************************************
 // Description:
 //   This struct is used to initialize the JZToolBar class, which is a

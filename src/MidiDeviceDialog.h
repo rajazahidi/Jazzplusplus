@@ -23,8 +23,12 @@
 #ifndef JZ_MIDIDEVICEDIALOG_H
 #define JZ_MIDIDEVICEDIALOG_H
 
+#include <wx/dialog.h>
+
 #include <vector>
 #include <string>
+
+class wxListBox;
 
 //*****************************************************************************
 // Description:

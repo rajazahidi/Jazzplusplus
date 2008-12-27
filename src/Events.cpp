@@ -20,19 +20,17 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "Events.h"
-#include "Synth.h"
+
+#include "ErrorMessage.h"
 #include "Globals.h"
 #include "JazzPlusPlusApplication.h"
-#include "ErrorMessage.h"
+#include "Synth.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <stdarg.h>
-
+#include <cassert>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
 #include <sstream>
 
 using namespace std;

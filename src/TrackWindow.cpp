@@ -20,15 +20,18 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "TrackWindow.h"
+
 #include "TrackFrame.h"
 #include "Filter.h"
 #include "Project.h"
 #include "Player.h"
 #include "RecordingInfo.h"
 #include "Globals.h"
+
+#include <wx/dcclient.h>
+#include <wx/dcmemory.h>
+#include <wx/msgdlg.h>
 
 #include <iostream>
 #include <sstream>

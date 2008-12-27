@@ -26,6 +26,8 @@
 #include "Filter.h"
 #include "MouseAction.h"
 
+#include <wx/frame.h>
+
 class JZEventFrame;
 class JZSong;
 class JZToolBar;

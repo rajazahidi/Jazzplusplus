@@ -18,16 +18,19 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "KeyOnDialog.h"
 
-#include "../Globals.h"
-#include "../Project.h"
 #include "../Events.h"
-#include "../Knob.h"
+#include "../Globals.h"
 #include "../KeyStringConverters.h"
+#include "../Knob.h"
+#include "../Project.h"
 #include "../Resources.h"
+
+#include <wx/button.h>
+#include <wx/sizer.h>
+#include <wx/stattext.h>
+#include <wx/textctrl.h>
 
 #include <sstream>
 

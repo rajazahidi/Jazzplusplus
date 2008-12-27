@@ -21,7 +21,11 @@
 #ifndef JZ_SYNTHESIZERSETTINGDIALOG_H
 #define JZ_SYNTHESIZERSETTINGDIALOG_H
 
+#include <wx/dialog.h>
+
 #include <string>
+
+class wxListBox;
 
 //*****************************************************************************
 //*****************************************************************************

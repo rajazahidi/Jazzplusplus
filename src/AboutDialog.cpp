@@ -20,21 +20,22 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
+#include "AboutDialog.h"
 
-#include <wx/version.h>
-#include <wx/html/htmlwin.h>
-
+#include "JazzPlusPlusApplication.h"
 #include "Resources.h"
 
-#include "AboutDialog.h"
-#include "JazzPlusPlusApplication.h"
-
-#include "Bitmaps/JazzLogo.xpm"
+#include <wx/button.h>
+#include <wx/html/htmlwin.h>
+#include <wx/sizer.h>
+#include <wx/statbmp.h>
+#include <wx/version.h>
 
 #include <sstream>
 
 using namespace std;
+
+#include "Bitmaps/JazzLogo.xpm"
 
 //*****************************************************************************
 // Description:

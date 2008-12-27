@@ -28,6 +28,8 @@
 #include "Track.h"
 #include "Globals.h"
 
+#include <wx/brush.h>
+
 class JZPianoFrame;
 class JZSong;
 class JZTrack;

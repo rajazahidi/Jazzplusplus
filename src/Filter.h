@@ -27,7 +27,8 @@
 
 class JZSong;
 class JZTrack;
-
+class wxDialog;
+class wxFrame;
 
 #define FltKeyOn        0
 #define FltKeyPressure  1  // SN++ PolyAftertouch gehoert to KeyOn Events!
@@ -57,7 +58,7 @@ class JZFilterEvent
 class JZFilter : public wxObject
 {
     friend class tFilterDlg;
-    wxDialog* DialogBox;
+    wxDialog* mpDialogBox;
     void copy(const JZFilter& Other);
 
   public:
@@ -71,7 +72,7 @@ class JZFilter : public wxObject
 
     int FromTrack, ToTrack;        // 1..n einschl .. einschl
 
-    void Dialog(wxFrame *parent, int ShowEventStats = 1);
+    void Dialog(wxFrame* parent, int ShowEventStats = 1);
 
     JZFilter(JZSong* pSong);
     JZFilter(JZFilter* pOtherFilter);

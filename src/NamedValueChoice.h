@@ -23,6 +23,8 @@
 #ifndef JZ_NAMEDVALUECHOICE_H
 #define JZ_NAMEDVALUECHOICE_H
 
+#include <wx/choice.h>
+
 #include <vector>
 #include <string>
 

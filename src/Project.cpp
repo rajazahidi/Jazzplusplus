@@ -20,22 +20,16 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
-#include <wx/stdpaths.h>
-#include <wx/config.h>
-#include <wx/filename.h>
-#include <wx/file.h>
-
 #include "Project.h"
+
+#include "Filter.h"
+#include "GetOptionIndex.h"
+#include "Globals.h"
+#include "Player.h"
 #include "RecordingInfo.h"
 #include "Synth.h"
 #include "Song.h"
-#include "Globals.h"
-#include "Filter.h"
-#include "Player.h"
 #include "StandardFile.h"
-#include "GetOptionIndex.h"
 
 #ifdef __WXMSW__
 #include "WindowsPlayer.h"
@@ -50,6 +44,12 @@
 #include "AlsaPlayer.h"
 #include "AlsaDriver.h"
 #endif
+
+#include <wx/stdpaths.h>
+#include <wx/config.h>
+#include <wx/file.h>
+#include <wx/filedlg.h>
+#include <wx/filename.h>
 
 #include <fstream>
 #include <iostream>

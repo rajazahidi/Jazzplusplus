@@ -28,6 +28,7 @@
 #include "NamedValue.h"
 
 class JZTrackWindow;
+class wxDialog;
 
 // Track-States
 

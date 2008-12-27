@@ -35,19 +35,17 @@
 //   or a thread.
 //*****************************************************************************
 
+#include "AlsaThru.h"
 
-#include "WxWidgets.h"
+#include "AlsaPlayer.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <errno.h>
-#include <stdio.h>
+#include <cstdio>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <string.h>
 #include <signal.h>
-
-#include "AlsaThru.h"
-#include "AlsaPlayer.h"
 
 /*
 ** midi thru for alsa. it creates a new process (because threads dont work

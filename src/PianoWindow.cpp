@@ -20,27 +20,29 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
-#include "Resources.h"
-
 #include "PianoWindow.h"
-#include "PianoFrame.h"
-#include "ProjectManager.h"
-#include "ControlEdit.h"
-#include "Song.h"
-#include "Filter.h"
-#include "HarmonyP.h"
-#include "HarmonyBrowserAnalyzer.h"
-#include "Harmony.h"
-#include "Player.h"
-#include "Synth.h"
+
 #include "Command.h"
-#include "GuitarFrame.h"
+#include "ControlEdit.h"
 #include "Dialogs.h"
-#include "SelectControllerDialog.h"
-#include "ResourceDialog.h"
+#include "Filter.h"
+#include "GuitarFrame.h"
+#include "Harmony.h"
+#include "HarmonyBrowserAnalyzer.h"
+#include "HarmonyP.h"
 #include "Help.h"
+#include "PianoFrame.h"
+#include "Player.h"
+#include "ProjectManager.h"
+#include "ResourceDialog.h"
+#include "Resources.h"
+#include "SelectControllerDialog.h"
+#include "Song.h"
+#include "Synth.h"
+
+#include <wx/dcclient.h>
+#include <wx/dcmemory.h>
+#include <wx/msgdlg.h>
 
 #include <sstream>
 

@@ -26,6 +26,8 @@
 #include "MouseAction.h"
 #include "Song.h"
 
+#include <wx/frame.h>
+
 class JZGuitarFrame;
 class JZSong;
 class JZToolBar;
@@ -132,7 +134,7 @@ class JZPianoFrame : public wxFrame
 
     int mClockTicsPerPixel;
     JZSong* mpSong;
-    wxDialog* DialogBox;
+    wxDialog* mpDialogBox;
     wxDialog* MixerForm;
 
   private:

@@ -20,15 +20,13 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
-#include "PropertyListDialog.h"
-
 #include "Filter.h"
-#include "Events.h"
+
 #include "ClockDialog.h"
-#include "Song.h"
+#include "Events.h"
 #include "Help.h"
+#include "PropertyListDialog.h"
+#include "Song.h"
 
 #include <cstdlib>
 
@@ -191,12 +189,12 @@ void tFilterDlg::OnHelp()
 void JZFilter::Dialog(wxFrame *parent, int ShowEventStats)
 {
   tFilterDlg *dlg;
-  //  DialogBox = new wxDialogBox(parent, "Event Filter", FALSE );
+  //  mpDialogBox = new wxDialogBox(parent, "Event Filter", FALSE );
   dlg = new tFilterDlg(this, mpSong, ShowEventStats);
   dlg->Create();
-//   dlg->EditForm(DialogBox, ShowEventStats);
-//   DialogBox->Fit();
-//   DialogBox->Show(TRUE);
+//   dlg->EditForm(mpDialogBox, ShowEventStats);
+//   mpDialogBox->Fit();
+//   mpDialogBox->Show(TRUE);
 }
 
 

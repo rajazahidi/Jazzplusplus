@@ -23,6 +23,8 @@
 #ifndef JZ_RECTANGLE_H
 #define JZ_RECTANGLE_H
 
+#include <wx/gdicmn.h>
+
 //*****************************************************************************
 // Description:
 //   This is the Jazz++ rectangle class delcaration.

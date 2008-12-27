@@ -23,6 +23,10 @@
 #ifndef JZ_GUITARSETTINGSDIALOG_H
 #define JZ_GUITARSETTINGSDIALOG_H
 
+#include <wx/dialog.h>
+
+class wxCheckBox;
+
 class JZGuitarSettingsDialog : public wxDialog
 {
   public:

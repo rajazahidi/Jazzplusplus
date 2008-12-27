@@ -20,22 +20,21 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
-#include <wx/stdpaths.h>
-#include <wx/filename.h>
-
 #include "Configuration.h"
 
-#include "Synth.h"
 #include "FindFile.h"
 #include "Globals.h"
 #include "StringUtilities.h"
+#include "Synth.h"
 
-#include <stack>
+#include <wx/filename.h>
+#include <wx/msgdlg.h>
+#include <wx/stdpaths.h>
+
+#include <fstream>
 #include <iostream>
 #include <sstream>
-#include <fstream>
+#include <stack>
 
 using namespace std;
 

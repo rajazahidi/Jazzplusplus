@@ -20,19 +20,20 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
-#include "Synth.h"
-#include "Configuration.h"
 #include "Song.h"
-#include "Globals.h"
-//#include "Command.h"
+
 //#include "Audio.h"
+#include "Configuration.h"
+//#include "Command.h"
+#include "Globals.h"
 #include "Metronome.h"
 #include "StringUtilities.h"
+#include "Synth.h"
 
-#include <sstream>
+#include <wx/cursor.h>
+
 #include <iomanip>
+#include <sstream>
 
 using namespace std;
 

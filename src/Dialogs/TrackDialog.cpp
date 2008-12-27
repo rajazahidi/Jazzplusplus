@@ -18,14 +18,19 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "TrackDialog.h"
-#include "../Knob.h"
-#include "../Track.h"
+
 #include "../Configuration.h"
 #include "../Globals.h"
+#include "../Knob.h"
 #include "../Resources.h"
+#include "../Track.h"
+
+#include <wx/button.h>
+#include <wx/listbox.h>
+#include <wx/sizer.h>
+#include <wx/stattext.h>
+#include <wx/textctrl.h>
 
 #include <sstream>
 

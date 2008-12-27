@@ -20,20 +20,19 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "Track.h"
-#include "Synth.h"
-#include "Configuration.h"
-#include "Player.h"
-#include "JazzPlusPlusApplication.h"
-#include "TrackWindow.h"
-#include "Globals.h"
-#include "Song.h"
-#include "Dialogs/TrackDialog.h"
 
+#include "Configuration.h"
+#include "Dialogs/TrackDialog.h"
+#include "Globals.h"
+#include "JazzPlusPlusApplication.h"
+#include "Player.h"
+#include "Song.h"
+#include "Synth.h"
+#include "TrackWindow.h"
+
+#include <cassert>
 #include <cstdlib>
-#include <assert.h>
 
 int tParam::Write(JZWriteBase& Io)
 {

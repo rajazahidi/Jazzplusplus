@@ -20,14 +20,15 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include <windows.h>
 #include <memory.h>
 
 #include "WindowsAudioInterface.h"
-#include "RecordingInfo.h"
+
 #include "Globals.h"
+#include "RecordingInfo.h"
+
+#include <wx/msgdlg.h>
 
 // not sure if mutex may cause a dead lock when used to
 // synchronize the wxTimer::Notify() interrupt and the

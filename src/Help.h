@@ -23,6 +23,8 @@
 #ifndef JZ_HELP_H
 #define JZ_HELP_H
 
+#include <wx/string.h>
+
 class wxHtmlHelpController;
 
 //*****************************************************************************

@@ -20,9 +20,8 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "KeyDialog.h"
+
 #include "KeyStringConverters.h"
 #include "DeprecatedStringUtils.h"
 #include "DeprecatedWx/proplist.h"

@@ -20,13 +20,12 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
-#include "Sample.h"
 #include "SampleCommand.h"
+
 #include "Audio.h"
-#include "SignalInterface.h"
 #include "Mapper.h"
+#include "Sample.h"
+#include "SignalInterface.h"
 //#include "util.h"
 
 #include <cmath>

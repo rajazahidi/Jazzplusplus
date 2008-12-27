@@ -1,5 +1,3 @@
-#include "WxWidgets.h"
-
 #include "ProjectManager.h"
 
 #include "PianoFrame.h"

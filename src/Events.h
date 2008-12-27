@@ -23,9 +23,11 @@
 #ifndef JZ_EVENTS_H
 #define JZ_EVENTS_H
 
-class JZEvent;
-
 #include <cstdio>
+
+#include <wx/pen.h>
+
+class JZEvent;
 
 //*****************************************************************************
 // Output device, can be

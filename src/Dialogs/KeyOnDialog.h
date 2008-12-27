@@ -21,9 +21,13 @@
 #ifndef JZ_KEYONDIALOG_H
 #define JZ_KEYONDIALOG_H
 
-class tKeyOn;
-class JZKnobEvent;
+#include <wx/dialog.h>
+
 class JZKnob;
+class JZKnobEvent;
+class tKeyOn;
+class wxStaticText;
+class wxTextCtrl;
 
 //*****************************************************************************
 //*****************************************************************************

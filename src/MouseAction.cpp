@@ -20,10 +20,12 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "MouseAction.h"
+
 #include "EventWindow.h"
+
+#include <wx/dcclient.h>
+#include <wx/brush.h>
 
 using namespace std;
 

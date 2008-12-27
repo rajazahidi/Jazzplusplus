@@ -26,6 +26,8 @@
 #include "MouseAction.h"
 #include "Metronome.h"
 
+#include <wx/frame.h>
+
 class JZSong;
 class JZToolBar;
 class JZTrackWindow;

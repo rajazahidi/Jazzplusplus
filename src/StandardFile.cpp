@@ -20,18 +20,16 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "StandardFile.h"
+
 #include "ErrorMessage.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <stdarg.h>
-
+#include <cassert>
+#include <cstdio>
+#include <cstdlib>
+#include <cstdarg>
 #include <sstream>
+#include <string.h>
 
 using namespace std;
 

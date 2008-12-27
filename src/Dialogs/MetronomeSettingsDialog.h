@@ -21,13 +21,18 @@
 #ifndef JZ_METRONOMESETTINGDIALOG_H
 #define JZ_METRONOMESETTINGDIALOG_H
 
-class JZMetronomeInfo;
+#include <wx/dialog.h>
+
+#include <map>
+#include <string>
+#include <vector>
+
 class JZKnob;
 class JZKnobEvent;
-
-#include <vector>
-#include <string>
-#include <map>
+class JZMetronomeInfo;
+class wxCheckBox;
+class wxListBox;
+class wxStaticText;
 
 //*****************************************************************************
 //*****************************************************************************

@@ -20,10 +20,8 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
-//#include "config.h"
 #include "SliderWindow.h"
+
 #include "Random.h"
 #include "ToolBar.h"
 

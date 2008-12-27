@@ -20,10 +20,13 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
+#include "SelectControllerDialog.h"
 
 #include "Configuration.h"
 #include "Globals.h"
+
+#include <wx/arrstr.h>
+#include <wx/choicdlg.h>
 
 using namespace std;
 

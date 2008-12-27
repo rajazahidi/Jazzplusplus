@@ -21,6 +21,9 @@
 #ifndef JZ_KNOB_H
 #define JZ_KNOB_H
 
+#include <wx/bitmap.h>
+#include <wx/control.h>
+
 class JZKnobEvent;
 class JZKnob;
 

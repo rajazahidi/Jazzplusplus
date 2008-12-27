@@ -20,31 +20,31 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "Dialogs.h"
-#include "Song.h"
-#include "Synth.h"
+
+#include "ClockDialog.h"
 #include "Command.h"
-#include "EventWindow.h"
-#include "ProjectManager.h"
-#include "Track.h"
+#include "DeprecatedWx/proplist.h"
+#include "Dialogs/KeyOnDialog.h"
 #include "Events.h"
-#include "Player.h"
+#include "EventWindow.h"
+#include "Globals.h"
+#include "Help.h"
+#include "KeyDialog.h"
+#include "NamedChoice.h"
 #include "PianoFrame.h"
 #include "PianoWindow.h"
-#include "ClockDialog.h"
-#include "KeyDialog.h"
+#include "Player.h"
+#include "ProjectManager.h"
 #include "PropertyListDialog.h"
-#include "Globals.h"
-#include "NamedChoice.h"
-#include "Help.h"
-#include "DeprecatedWx/proplist.h"
+#include "Song.h"
+#include "Synth.h"
+#include "Track.h"
 
-#include "Dialogs/KeyOnDialog.h"
+#include <wx/choicdlg.h>
 
-#include <sstream>
 #include <iomanip>
+#include <sstream>
 
 using namespace std;
 

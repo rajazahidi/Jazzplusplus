@@ -26,6 +26,9 @@
 #include "DynamicArray.h"
 #include "Project.h"
 
+#include <wx/app.h>
+#include <wx/string.h>
+
 class tEventArray;
 class JZTrack;
 struct tAudioBuffer;

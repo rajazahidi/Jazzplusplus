@@ -1,5 +1,3 @@
-#include "WxWidgets.h"
-
 #include "JazzPlusPlusApplication.h"
 
 int GetOptionIndex(const wxString& Option)

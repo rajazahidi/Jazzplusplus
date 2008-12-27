@@ -20,9 +20,8 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "EventWindow.h"
+
 #include "PianoFrame.h"
 #include "Song.h"
 #include "Command.h"
@@ -30,6 +29,10 @@
 #include "Help.h"
 #include "ToolBar.h"
 #include "PropertyListDialog.h"
+
+#include <wx/brush.h>
+#include <wx/dc.h>
+#include <wx/msgdlg.h>
 
 using namespace std;
 

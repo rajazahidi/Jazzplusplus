@@ -20,7 +20,9 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
+#include <wx/filedlg.h>
+#include <wx/msgdlg.h>
+#include <wx/string.h>
 
 //*****************************************************************************
 // Description:

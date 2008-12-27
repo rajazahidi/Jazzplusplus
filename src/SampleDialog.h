@@ -28,9 +28,13 @@
 #include "SampleCommand.h"
 #include "PropertyListDialog.h"
 
+class tPaintableCommand;
 class tSampleWin;
 class tSigEqualizer;
-class tPaintableCommand;
+class wxButton;
+class wxCheckBox;
+class wxChoice;
+class wxSlider;
 
 /**
  * controls a tPaintableCommand, that is shows the parameter arrays

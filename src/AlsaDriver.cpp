@@ -29,8 +29,6 @@
 //   Initial version: only playback is tested.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "AlsaDriver.h"
 
 #include "TrackFrame.h"

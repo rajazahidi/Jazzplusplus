@@ -25,6 +25,8 @@
 
 #include "ToolBar.h"
 
+#include <wx/frame.h>
+
 class wxObject;
 class HBAnalyzer;
 class HBCanvas;

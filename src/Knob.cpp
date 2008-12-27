@@ -18,12 +18,12 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
+#include "Knob.h"
+
+#include "Globals.h"
 
 #include <wx/dcbuffer.h>
-
-#include "Knob.h"
-#include "Globals.h"
+#include <wx/settings.h>
 
 #include <cmath>
 

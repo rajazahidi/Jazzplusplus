@@ -20,23 +20,27 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "SampleWindow.h"
-#include "SampleCommand.h"
-#include "SampleDialog.h"
-#include "ToolBar.h"
-#include "Sample.h"
+
 #include "Audio.h"
-#include "MouseAction.h"
-#include "Song.h"
-#include "Player.h"
-#include "Rhythm.h"
-#include "SliderWindow.h"
-#include "Mapper.h"
 #include "FileSelector.h"
 #include "Globals.h"
 #include "Help.h"
+#include "Mapper.h"
+#include "MouseAction.h"
+#include "Player.h"
+#include "Rhythm.h"
+#include "Sample.h"
+#include "SampleCommand.h"
+#include "SampleDialog.h"
+#include "Song.h"
+#include "SliderWindow.h"
+#include "ToolBar.h"
+
+#include <wx/dcclient.h>
+#include <wx/menu.h>
+#include <wx/msgdlg.h>
+#include <wx/scrolbar.h>
 
 #include <iostream>
 

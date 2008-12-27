@@ -20,9 +20,8 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "Player.h"
+
 #include "ProjectManager.h"
 #include "Synth.h"
 #include "TrackFrame.h"
@@ -32,10 +31,12 @@
 #include "Audio.h"
 #include "Globals.h"
 
+#include <wx/msgdlg.h>
+
 //#include <unistd.h>
+#include <cassert>
 #include <cstdlib>
 
-#include <assert.h>
 #include <string.h>
 #include <errno.h>
 

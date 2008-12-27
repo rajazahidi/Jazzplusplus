@@ -20,9 +20,8 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
 #include "WindowsPlayer.h"
+
 #include "WindowsMidiInterface.h"
 #include "JazzPlusPlusApplication.h"
 #include "ProjectManager.h"
@@ -33,6 +32,8 @@
 #include "Globals.h"
 
 //#include <dos.h>
+
+#include <wx/msgdlg.h>
 
 using namespace std;
 

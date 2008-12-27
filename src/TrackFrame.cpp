@@ -20,18 +20,16 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "WxWidgets.h"
-
-#include "Resources.h"
-
 #include "TrackFrame.h"
-#include "TrackWindow.h"
-#include "Player.h"
-#include "RecordingInfo.h"
+
 #include "JazzPlusPlusApplication.h"
-#include "ProjectManager.h"
-#include "ToolBar.h"
+#include "Player.h"
 #include "Project.h"
+#include "ProjectManager.h"
+#include "Resources.h"
+#include "RecordingInfo.h"
+#include "TrackWindow.h"
+#include "ToolBar.h"
 #include "Globals.h"
 #include "Configuration.h"
 #include "Harmony.h"
@@ -62,6 +60,10 @@
 #include "Bitmaps/metro.xpm"
 #include "Bitmaps/playloop.xpm"
 #include "Bitmaps/record.xpm"
+
+#include <wx/filedlg.h>
+#include <wx/menu.h>
+#include <wx/msgdlg.h>
 
 #include <iostream>
 

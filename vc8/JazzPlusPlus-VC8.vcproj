@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="A JazzPlusPlus Application"
 	ProjectGUID="{8C82269C-4753-428B-B9B1-D21B46C6AD83}"
+	RootNamespace="A JazzPlusPlus Application"
 	>
 	<Platforms>
 		<Platform
@@ -818,10 +819,6 @@
 			</File>
 			<File
 				RelativePath="..\src\mswin\WindowsPlayer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\WxWidgets.h"
 				>
 			</File>
 		</Filter>

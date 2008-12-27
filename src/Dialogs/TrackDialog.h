@@ -21,11 +21,14 @@
 #ifndef JZ_TRACKDIALOG_H
 #define JZ_TRACKDIALOG_H
 
-class JZTrack;
-class wxTextCtrl;
-class wxStaticText;
-class JZKnobEvent;
+#include <wx/dialog.h>
+
 class JZKnob;
+class JZKnobEvent;
+class JZTrack;
+class wxListBox;
+class wxStaticText;
+class wxTextCtrl;
 
 //*****************************************************************************
 //*****************************************************************************

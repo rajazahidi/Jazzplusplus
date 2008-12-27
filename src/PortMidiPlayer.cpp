@@ -1,6 +1,5 @@
-#include "WxWidgets.h"
-
 #include "PortMidiPlayer.h"
+
 #include "JazzPlusPlusApplication.h"
 #include "TrackFrame.h"
 #include "TrackWindow.h"

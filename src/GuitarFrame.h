@@ -23,6 +23,8 @@
 #ifndef JZ_GUITARFRAME_H
 #define JZ_GUITARFRAME_H
 
+#include <wx/frame.h>
+
 class JZGuitarWindow;
 
 //*****************************************************************************

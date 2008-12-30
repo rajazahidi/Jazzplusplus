@@ -60,7 +60,15 @@ JZMidiDeviceDialog::JZMidiDeviceDialog(
     const string& MidiDeviceName = iMidiDevice->first;
     mpMidiDeviceListBox->Append(MidiDeviceName.c_str());
   }
-  mpMidiDeviceListBox->SetSelection(0);
+
+  if (mDeviceIndex < static_cast<int>(mpMidiDeviceListBox->GetCount()))
+  {
+    mpMidiDeviceListBox->SetSelection(mDeviceIndex);
+  }
+  else
+  {
+    mpMidiDeviceListBox->SetSelection(0);
+  }
 
   wxButton* pOkButton = new wxButton(this, wxID_OK, "&OK");
   wxButton* pCancelButton = new wxButton(this, wxID_CANCEL, "Cancel");

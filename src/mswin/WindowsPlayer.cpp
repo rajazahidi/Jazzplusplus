@@ -1001,7 +1001,11 @@ void JZWindowsPlayer::SettingsDlg(int& InputDevice, int& OutputDevice)
 {
   vector<pair<string, int> > MidiDevices;
 
-  // select input device
+  //=========================
+  // Select the input device.
+  //=========================
+
+  // Get a list of the available input devices.
   UINT i;
   UINT InputMidiDeviceCount = midiInGetNumDevs();
   for (i = 0; i < InputMidiDeviceCount; ++i)

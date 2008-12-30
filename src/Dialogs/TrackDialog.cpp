@@ -53,46 +53,16 @@ END_EVENT_TABLE()
 JZTrackDialog::JZTrackDialog(JZTrack& Track, wxWindow* pParent)
   : wxDialog(pParent, wxID_ANY, wxString("Track Settings")),
     mTrack(Track),
+    mLastTrackChannelWasDrums(Track.IsDrumTrack()),
     mpTrackNameEdit(0),
-    mpPatchListBox(0)
+    mpPatchListBox(0),
+    mpChannelValue(0),
+    mpChannelKnob(0)
 {
   mpTrackNameEdit = new wxTextCtrl(this, wxID_ANY);
 
   mpPatchListBox = new wxListBox(this, wxID_ANY);
-  if (mTrack.IsDrumTrack())
-  {
-    const vector<pair<string, int> >& DrumSets = gpConfig->GetDrumSets();
-    for (
-      vector<pair<string, int> >::const_iterator iDrumSet =
-        DrumSets.begin();
-      iDrumSet != DrumSets.end();
-      ++iDrumSet)
-    {
-      const string& DrumSet = iDrumSet->first;
-
-      if (!DrumSet.empty())
-      {
-        mpPatchListBox->Append(DrumSet.c_str());
-      }
-    }
-  }
-  else
-  {
-    const vector<pair<string, int> >& VoiceNames = gpConfig->GetVoiceNames();
-    for (
-      vector<pair<string, int> >::const_iterator iVoiceName =
-        VoiceNames.begin();
-      iVoiceName != VoiceNames.end();
-      ++iVoiceName)
-    {
-      const string& VoiceName = iVoiceName->first;
-
-      if (!VoiceName.empty())
-      {
-        mpPatchListBox->Append(VoiceName.c_str());
-      }
-    }
-  }
+  SetPatchListEntries();
 
   mpChannelValue = new wxStaticText(this, wxID_ANY, "00");
 
@@ -150,6 +120,48 @@ JZTrackDialog::JZTrackDialog(JZTrack& Track, wxWindow* pParent)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void JZTrackDialog::SetPatchListEntries()
+{
+  mpPatchListBox->Clear();
+
+  if (mTrack.IsDrumTrack())
+  {
+    const vector<pair<string, int> >& DrumSets = gpConfig->GetDrumSets();
+    for (
+      vector<pair<string, int> >::const_iterator iDrumSet =
+        DrumSets.begin();
+      iDrumSet != DrumSets.end();
+      ++iDrumSet)
+    {
+      const string& DrumSet = iDrumSet->first;
+
+      if (!DrumSet.empty())
+      {
+        mpPatchListBox->Append(DrumSet.c_str());
+      }
+    }
+  }
+  else
+  {
+    const vector<pair<string, int> >& VoiceNames = gpConfig->GetVoiceNames();
+    for (
+      vector<pair<string, int> >::const_iterator iVoiceName =
+        VoiceNames.begin();
+      iVoiceName != VoiceNames.end();
+      ++iVoiceName)
+    {
+      const string& VoiceName = iVoiceName->first;
+
+      if (!VoiceName.empty())
+      {
+        mpPatchListBox->Append(VoiceName.c_str());
+      }
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 bool JZTrackDialog::TransferDataToWindow()
 {
   mpTrackNameEdit->ChangeValue(mTrack.GetName());
@@ -195,6 +207,17 @@ void JZTrackDialog::OnChannelChange(JZKnobEvent& Event)
   ostringstream Oss;
   Oss << Value;
   mpChannelValue->SetLabel(Oss.str().c_str());
+  mTrack.Channel = Value;
+
+  // Test to determine if the track channel toggled in our out of drum mode.
+  if (mLastTrackChannelWasDrums != mTrack.IsDrumTrack())
+  {
+    // If it did switch, update the patch list entries.
+    SetPatchListEntries();
+  }
+
+  // Record if the current value for the channel indicates drums.
+  mLastTrackChannelWasDrums = mTrack.IsDrumTrack();
 }
 
 //-----------------------------------------------------------------------------

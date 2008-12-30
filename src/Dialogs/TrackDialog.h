@@ -40,6 +40,8 @@ class JZTrackDialog : public wxDialog
 
   private:
 
+    void SetPatchListEntries();
+
     virtual bool TransferDataToWindow();
 
     virtual bool TransferDataFromWindow();
@@ -51,6 +53,8 @@ class JZTrackDialog : public wxDialog
   private:
 
     JZTrack& mTrack;
+
+    bool mLastTrackChannelWasDrums;
 
     wxTextCtrl* mpTrackNameEdit;
 

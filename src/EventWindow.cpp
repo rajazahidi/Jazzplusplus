@@ -106,14 +106,14 @@ JZEventWindow::~JZEventWindow()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZEventWindow::EventsSelected(const wxString& Message) const
+bool JZEventWindow::EventsSelected(const wxString& Message) const
 {
   if (!mpSnapSel->IsSelected())
   {
     wxMessageBox(Message, "Error", wxOK);
-    return 0;
+    return false;
   }
-  return 1;
+  return true;
 }
 
 //-----------------------------------------------------------------------------

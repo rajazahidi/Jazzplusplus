@@ -75,7 +75,7 @@ void tCtrlEditBase::Create(
 
   // PORTING: changed the calls a bit so it would compile, need to remake the layout and do the event bindings
 
-  ctrlmode = 0;  // edit seems stupid to me ...
+  ctrlmode = 0;  // Edit seems stupid to me.
 
   wxBoxSizer *topsizer = new wxBoxSizer( wxVERTICAL );
 

@@ -90,7 +90,13 @@ unsigned char *SysExDT1(
 }
 */
 
-static double framesPerSecond[] = { 24.0, 25.0, 30.0, 30.0 };
+static double gFramesPerSecond[] =
+{
+  24.0,
+  25.0,
+  30.0,
+  30.0
+};
 
 tMtcTime::tMtcTime(tMtcOffset* pMtcOffset)
 {
@@ -127,7 +133,7 @@ tMtcTime::tMtcTime(int millisec, tMtcType t)
   sec = sec % 60;
   hour = min / 60;
   min = min % 60;
-  double frametime = 1000.0 / framesPerSecond[type];
+  double frametime = 1000.0 / gFramesPerSecond[type];
   fm = (int) ((double) msec / frametime);
 }
 
@@ -147,9 +153,9 @@ tMtcTime::tMtcTime(char* str, tMtcType t)
     type = Mtc30Ndf;
   }
   sscanf(str, "%d:%d:%d.%d", &hour, &min, &sec, &fm);
-  if (fm >= framesPerSecond[type])
+  if (fm >= gFramesPerSecond[type])
   {
-    fm = (int) framesPerSecond[type] - 1;
+    fm = (int) gFramesPerSecond[type] - 1;
   }
 }
 
@@ -193,7 +199,7 @@ tMtcOffset *tMtcTime::ToOffset()
 int tMtcTime::ToMillisec()
 {
   int msec = (((((hour * 60L) + min) * 60L) + sec) * 1000L) +
-              ((fm * 1000L) / (int) framesPerSecond[type]);
+              ((fm * 1000L) / (int) gFramesPerSecond[type]);
   return msec;
 }
 

@@ -85,6 +85,9 @@ BEGIN_EVENT_TABLE(JZTrackFrame, wxFrame)
 
   EVT_MENU(wxID_EXIT, JZTrackFrame::OnFileExit)
 
+  EVT_UPDATE_UI(ID_SHIFT, JZTrackFrame::OnUpdateEditShift)
+  EVT_MENU(ID_SHIFT, JZTrackFrame::OnEditShift)
+
   EVT_MENU(ID_PLAY, JZTrackFrame::OnPlay)
 
   EVT_MENU(ID_PLAY_LOOP, JZTrackFrame::OnPlayLoop)
@@ -236,6 +239,17 @@ void JZTrackFrame::CreateMenu()
 
   mpEditMenu->AppendSeparator();
 
+//  mpEditMenu->Append(MEN_QUANTIZE, "&Quantize...");
+//  mpEditMenu->Append(MEN_SETCHAN, "&Set MIDI Channel...");
+//  mpEditMenu->Append(MEN_TRANSP, "&Transpose...");
+//  mpEditMenu->Append(MEN_VELOC, "&Velocity...");
+//  mpEditMenu->Append(MEN_LENGTH, "&Length...");
+  mpEditMenu->Append(ID_SHIFT, "Shi&ft...");
+//  mpEditMenu->Append(MEN_CLEANUP, "C&leanup...");
+//  mpEditMenu->Append(MEN_SEARCHREP, "Search Re&place...");
+
+  mpEditMenu->AppendSeparator();
+
   mpEditMenu->Append(wxID_DELETE, "&Delete");
   mpEditMenu->Append(wxID_DELETE, "&Silence");
 
@@ -251,16 +265,6 @@ void JZTrackFrame::CreateMenu()
 
   mpEditMenu->AppendSeparator();
 
-  /* Move Elsewhere
-  mpEditMenu->Append(MEN_QUANTIZE,      "&Quantize...");
-  mpEditMenu->Append(MEN_SETCHAN,       "&Set MIDI Channel...");
-  mpEditMenu->Append(MEN_TRANSP,        "&Transpose...");
-  mpEditMenu->Append(MEN_VELOC,         "&Velocity...");
-  mpEditMenu->Append(MEN_LENGTH,        "&Length...");
-  mpEditMenu->Append(MEN_SHIFT,         "Shi&ft...");
-  mpEditMenu->Append(MEN_CLEANUP,       "C&leanup...");
-  mpEditMenu->Append(MEN_SEARCHREP,     "Search Re&place...");
-  */
 
   // Miscellaneous Menu is Stupid.
   // Now it's a View Menu
@@ -517,6 +521,19 @@ void JZTrackFrame::OnFileExit(wxCommandEvent& Event)
     return;
   }
   Close();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnUpdateEditShift(wxUpdateUIEvent& Event)
+{
+  Event.Enable(mpTrackWindow->AreEventsSelected());
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnEditShift(wxCommandEvent& Event)
+{
 }
 
 //-----------------------------------------------------------------------------

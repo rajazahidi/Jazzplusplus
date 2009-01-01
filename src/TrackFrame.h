@@ -82,6 +82,9 @@ class JZTrackFrame : public wxFrame, public tButtonLabelInterface
 
     void OnZoomOut(wxCommandEvent& Event);
 
+    void OnUpdateEditShift(wxUpdateUIEvent& Event);
+    void OnEditShift(wxCommandEvent& Event);
+
     void OnPlay(wxCommandEvent& Event);
 
     void OnPlayLoop(wxCommandEvent& Event);

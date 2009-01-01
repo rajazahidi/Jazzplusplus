@@ -57,7 +57,7 @@ class JZEventWindow : public wxWindow
     // WARNING: non-constant access.
     JZSong* GetSong() const;
 
-    int EventsSelected(const wxString& Message) const;
+    bool EventsSelected(const wxString& Message) const;
 
     void LineText(
       wxDC& Dc,

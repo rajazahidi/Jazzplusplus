@@ -270,7 +270,7 @@ class tSample {
     void Clear();
 
     void GotoRAM() {
-      // try to swap this sample into memory ...
+      // Try to swap this sample into memory.
       volatile short dummy;
       for (int i = 0; i < length; i++)
         dummy = data[i];

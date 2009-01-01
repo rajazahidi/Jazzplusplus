@@ -58,7 +58,6 @@ using namespace std;
 #define MEN_METERCH                 8
 #define ACT_HELP_MOUSE              9
 
-#define MEN_SHIFT                  11
 #define MEN_QUANTIZE               12
 #define MEN_SETCHAN                14
 #define MEN_TRANSP                 15
@@ -174,7 +173,7 @@ BEGIN_EVENT_TABLE(JZPianoFrame, wxFrame)
   EVT_MENU(wxID_DELETE, JZPianoFrame::OnErase)
   EVT_MENU(wxID_CUT, JZPianoFrame::OnCut)
   EVT_MENU(wxID_COPY, JZPianoFrame::OnCopy)
-  EVT_MENU(MEN_SHIFT, JZPianoFrame::OnShift)
+  EVT_MENU(ID_SHIFT, JZPianoFrame::OnShift)
   EVT_MENU(MEN_SHIFTL, JZPianoFrame::OnShiftLeft)
   EVT_MENU(MEN_SHIFTR, JZPianoFrame::OnShiftRight)
   EVT_MENU(MEN_LERI, JZPianoFrame::OnExchangeLeftRight)
@@ -336,28 +335,28 @@ void JZPianoFrame::CreateMenu()
   edit_menu->Append(wxID_DELETE, "&Delete");
   edit_menu->Append(wxID_COPY, "&Copy");
   edit_menu->Append(wxID_CUT, "&Cut");
-  edit_menu->Append(MEN_SHIFT, "&Shift ...");
-  edit_menu->Append(MEN_QUANTIZE, "&Quantize ...");
-  edit_menu->Append(MEN_SETCHAN, "&Set MIDI Channel ...");
-  edit_menu->Append(MEN_TRANSP, "&Transpose ...");
-  edit_menu->Append(MEN_VELOC, "&Velocity ...");
-  edit_menu->Append(MEN_LENGTH, "&Length ...");
+  edit_menu->Append(ID_SHIFT, "&Shift...");
+  edit_menu->Append(MEN_QUANTIZE, "&Quantize...");
+  edit_menu->Append(MEN_SETCHAN, "&Set MIDI Channel...");
+  edit_menu->Append(MEN_TRANSP, "&Transpose...");
+  edit_menu->Append(MEN_VELOC, "&Velocity...");
+  edit_menu->Append(MEN_LENGTH, "&Length...");
 
-  edit_menu->Append(MEN_SEQLENGTH, "&Sequence Length ...");
-  edit_menu->Append(MEN_MIDIDELAY, "&Midi Delay ...");
+  edit_menu->Append(MEN_SEQLENGTH, "&Sequence Length...");
+  edit_menu->Append(MEN_MIDIDELAY, "&Midi Delay...");
   edit_menu->Append(MEN_CONVERT_TO_MODULATION, "&Convert to Modulation(experimental)");
 
   edit_menu->Append(MEN_LERI, "&Left <-> Right");
   edit_menu->Append(MEN_UPDN, "&Up <-> Down");
-  edit_menu->Append(MEN_CLEANUP, "&Cleanup ...");
-  edit_menu->Append(MEN_SEARCHREP, "&Search Replace ...");
+  edit_menu->Append(MEN_CLEANUP, "&Cleanup...");
+  edit_menu->Append(MEN_SEARCHREP, "&Search Replace...");
 
   wxMenu *setting_menu = new wxMenu("",wxMENU_TEAROFF);
-  setting_menu->Append(MEN_FILTER,    "&Filter ...");
-  setting_menu->Append(ACT_SETTINGS,  "&Window ...");
+  setting_menu->Append(MEN_FILTER,    "&Filter...");
+  setting_menu->Append(ACT_SETTINGS,  "&Window...");
   setting_menu->Append(MEN_VISIBLE,   "&Events...");
-  setting_menu->Append(MEN_SNAP,      "&Snap ...");
-  setting_menu->Append(MEN_METERCH,   "&Meterchange ...");
+  setting_menu->Append(MEN_SNAP,      "&Snap...");
+  setting_menu->Append(MEN_METERCH,   "&Meterchange...");
 
   wxMenu *misc_menu = new wxMenu("",wxMENU_TEAROFF);
   misc_menu->Append(wxID_UNDO, "&Undo");
@@ -369,7 +368,7 @@ void JZPianoFrame::CreateMenu()
   misc_menu->Append(MEN_CTRL_POLY_AFTER, "Edit &Key Aftertouch");
   misc_menu->Append(MEN_CTRL_CHANNEL_AFTER,  "Edit &Chn Aftertouch");
 
-  misc_menu->Append(MEN_CTRL_CONTR,        "Edit &Controller ...");
+  misc_menu->Append(MEN_CTRL_CONTR,        "Edit &Controller...");
   misc_menu->Append(MEN_CTRL_TEMPO,        "Edit &Tempo");
   misc_menu->Append(MEN_CTRL_NONE,        "Edit &None");
   misc_menu->Append(MEN_GUITAR,                "&Guitar board");

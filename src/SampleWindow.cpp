@@ -322,7 +322,7 @@ void tSampleCnvs::OnEvent(wxMouseEvent &e)
 
   wxDC* pDc = new wxClientDC(this);
 
-  // tSnapSel is strange ...
+  // tSnapSel is strange.
   if (e.LeftDown())
   {
     mouse_up_sets_insertion_point = 0;
@@ -739,11 +739,11 @@ tSampleWin::tSampleWin(wxWindow* pParent, tSampleWin **ref, tSample &sample)
   menu_bar->Append(menu,        "&Edit");
 
   menu = new wxMenu;
-  menu->Append(MEN_VOLUME_PNT,   "&Volume ...");
-  menu->Append(MEN_PAN_PNT,      "&Panpot ...");
-  menu->Append(MEN_TRANSP_PNT,   "&Pitch ...");
-  menu->Append(MEN_WAHWAH,       "&Filter ...");
-  menu->Append(MEN_CANCEL,       "&None ...");
+  menu->Append(MEN_VOLUME_PNT,   "&Volume...");
+  menu->Append(MEN_PAN_PNT,      "&Panpot...");
+  menu->Append(MEN_TRANSP_PNT,   "&Pitch...");
+  menu->Append(MEN_WAHWAH,       "&Filter...");
+  menu->Append(MEN_CANCEL,       "&None...");
   menu_bar->Append(menu,         "&Painters");
 
   menu = new wxMenu;
@@ -760,8 +760,8 @@ tSampleWin::tSampleWin(wxWindow* pParent, tSampleWin **ref, tSample &sample)
   menu_bar->Append(menu,         "&Effects");
 
   menu = new wxMenu;
-  menu->Append(MEN_TRANSP_SET,   "&Pitch Painter ...");
-  menu->Append(MEN_WAHSETTINGS,  "&Filter Painter ...");
+  menu->Append(MEN_TRANSP_SET,   "&Pitch Painter...");
+  menu->Append(MEN_WAHSETTINGS,  "&Filter Painter...");
 //  menu->Append(wxID_ZOOM_IN,     "Zoom &In");
 //  menu->Append(wxID_ZOOM_OUT,     "Zoom &Out");
   menu->Append(MEN_SETTINGS,     "&View Settings...");
@@ -955,7 +955,7 @@ void tSampleWin::OnMenuCommand(int id)
     return;
   }
 
-  // player crashes if data disappear ...
+  // Player crashes if data disappear.
   if (id != MEN_PLAY)
   {
     cnvs->playpos->StopListen();

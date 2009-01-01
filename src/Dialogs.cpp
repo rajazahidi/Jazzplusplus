@@ -30,7 +30,6 @@
 #include "EventWindow.h"
 #include "Globals.h"
 #include "Help.h"
-#include "KeyDialog.h"
 #include "NamedChoice.h"
 #include "PianoFrame.h"
 #include "PianoWindow.h"
@@ -88,8 +87,16 @@ void tShiftDlg::OnHelp()
 void tShiftDlg::AddProperties()
 {
 //send wxPropertyValue REFERENCE not POINTER
-  sheet->AddProperty(new wxProperty("Snaps",  wxPropertyValue(&mSteps), "integer", new wxIntegerListValidator(-16, 16)));
-  sheet->AddProperty(new wxProperty("clocks per snap",  (long)mUnit, "integer"));//informational only
+  sheet->AddProperty(new wxProperty(
+    "Snaps",
+    wxPropertyValue(&mSteps),
+    "integer",
+    new wxIntegerListValidator(-16, 16)));
+
+  sheet->AddProperty(new wxProperty(
+    "clocks per snap",
+    (long)mUnit,
+    "integer")); // informational only
 }
 
 

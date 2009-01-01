@@ -48,7 +48,6 @@ Harmony.cpp \
 HarmonyP.cpp \
 Help.cpp \
 JazzPlusPlusApplication.cpp \
-KeyDialog.cpp \
 KeyStringConverters.cpp \
 Knob.cpp \
 Mapper.cpp \
@@ -127,7 +126,6 @@ Harmony.cpp \
 HarmonyP.cpp \
 Help.cpp \
 JazzPlusPlusApplication.cpp \
-KeyDialog.cpp \
 KeyStringConverters.cpp \
 Knob.cpp \
 Mapper.cpp \
@@ -211,7 +209,6 @@ Harmony.h \
 HarmonyP.h \
 Help.h \
 JazzPlusPlusApplication.h \
-KeyDialog.h \
 KeyStringConverters.h \
 Mapper.h \
 MeasureChoice.h \

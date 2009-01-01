@@ -446,14 +446,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\KeyDialog.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\KeyDialog.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\KeyStringConverters.cpp"
 				>
 			</File>

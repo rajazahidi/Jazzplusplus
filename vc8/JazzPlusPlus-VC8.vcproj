@@ -835,6 +835,22 @@
 			Name="Dialog Source Files"
 			>
 			<File
+				RelativePath="..\src\Dialogs\FilterDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\FilterDialog.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\IntegerEdit.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\IntegerEdit.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Dialogs\KeyOnDialog.cpp"
 				>
 			</File>

@@ -188,7 +188,6 @@ void tRhythm::write(ostream& Os) const
 
 void tRhythm::read(istream& Is, int version)
 {
-  char buf[200];
   Is >> rhythm;
   Is >> length;
   Is >> veloc;
@@ -213,8 +212,9 @@ void tRhythm::read(istream& Is, int version)
   }
   Is >> parm;
 
-  ReadString(Is, buf, sizeof(buf));
-  SetLabel(buf);
+  string Label;
+  ReadString(Is, Label);
+  SetLabel(Label.c_str());
 
   if (version > 1)
   {
@@ -1077,15 +1077,15 @@ void tRhythmWin::GenRhythm()
 
   JZFilter* pFilter = mpEventWindow->mpFilter;
 
-  if (pFilter->FromTrack != pFilter->ToTrack)
+  if (pFilter->GetFromTrack() != pFilter->GetToTrack())
   {
     wxMessageBox("you must select exacty 1 track", "Error", wxOK);
     return;
   }
 
-  long fr_clock = pFilter->FromClock;
-  long to_clock = pFilter->ToClock;
-  JZTrack *track = mpSong->GetTrack(pFilter->FromTrack);
+  long fr_clock = pFilter->GetFromClock();
+  long to_clock = pFilter->GetToClock();
+  JZTrack *track = mpSong->GetTrack(pFilter->GetFromTrack());
   mpSong->NewUndoBuffer();
 
   // remove selection

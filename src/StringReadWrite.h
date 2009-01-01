@@ -23,14 +23,15 @@
 #ifndef JZ_STRINGREADWRITE_H
 #define JZ_STRINGREADWRITE_H
 
-#include <iostream>
+#include <iosfwd>
+#include <string>
 
 //*****************************************************************************
 //*****************************************************************************
-std::istream& ReadString(std::istream& Is, char* pString, int MaximumLength);
+std::istream& ReadString(std::istream& Is, std::string& String);
 
 //*****************************************************************************
 //*****************************************************************************
-std::ostream& WriteString(std::ostream& Os, const char* pString);
+std::ostream& WriteString(std::ostream& Os, const std::string& String);
 
 #endif // !defined(JZ_STRINGREADWRITE_H)

@@ -21,44 +21,39 @@
 //*****************************************************************************
 
 #include <iostream>
+#include <string>
 
 using namespace std;
 
 //*****************************************************************************
 //*****************************************************************************
-istream& ReadString(istream& Is, char* pString, int MaximumLength)
+istream& ReadString(istream& Is, string& String)
 {
-  // Save space for the trailing 0.
-  --MaximumLength;
-
-  int c;
+  int Character;
   do
   {
     // Ignore through the first ".
-    c = Is.get();
-  } while (c != '"' && c != EOF);
+    Character = Is.get();
+  } while (Character != '"' && Character != EOF);
 
-  int i;
-  for (i = 0; i < MaximumLength; ++i)
+  // This is an intention infinite for loop.
+  for (;;)
   {
-    c = Is.get();
-    if (c == '"' || c == EOF)
+    Character = Is.get();
+    if (Character == '"' || Character != EOF)
     {
       break;
     }
-    pString[i] = c;
+    String += Character;
   }
-
-  // Terminate the C-style string.
-  pString[i] = 0;
 
   return Is;
 }
 
 //*****************************************************************************
 //*****************************************************************************
-ostream& WriteString(ostream& Os, const char* pString)
+ostream& WriteString(ostream& Os, const string& String)
 {
-  Os << '"' << pString << '"';
+  Os << '"' << String << '"';
   return Os;
 }

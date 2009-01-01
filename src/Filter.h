@@ -28,18 +28,19 @@
 class JZSong;
 class JZTrack;
 class wxDialog;
-class wxFrame;
+class wxWindow;
 
-#define FltKeyOn        0
-#define FltKeyPressure  1  // SN++ PolyAftertouch gehoert to KeyOn Events!
-#define FltControl      2
-#define FltProgram      3
-#define FltPitch        4
-#define FltTempo        5
-#define FltChnPressure  6  // SN++ Channel Aftertouch
-#define FltSysEx        7
-
-#define nFltEvents      8
+//*****************************************************************************
+//*****************************************************************************
+enum TEFilterType
+{
+  eFilterKeyOn             = 0,
+  eFilterKeyPressure       = 1,  // PolyAftertouch belongs to KeyOn Events.
+  eFilterControl           = 2,
+  eFilterProgram           = 3,
+  eFilterPitch             = 4,
+  eFilterCount             = 5
+};
 
 //*****************************************************************************
 //*****************************************************************************
@@ -47,7 +48,7 @@ class JZFilterEvent
 {
   public:
     int Stat;
-    const char* Name;
+    const char* mName;
     bool Selected;
     int MinValue, MaxValue;
     int FromValue, ToValue;
@@ -57,72 +58,86 @@ class JZFilterEvent
 //*****************************************************************************
 class JZFilter : public wxObject
 {
-    friend class tFilterDlg;
-    wxDialog* mpDialogBox;
-    void copy(const JZFilter& Other);
-
   public:
 
-    JZFilterEvent* FltEvents;
-    bool OtherSelected;
+    JZFilter(JZSong* pSong);
+
+    JZFilter(const JZFilter& Other);
+
+    JZFilter& operator = (const JZFilter& Rhs);
+
+    virtual ~JZFilter();
+
+    void GetFilterEvent(
+      TEFilterType FilterType,
+      bool& Selected,
+      int& FromValue,
+      int& ToValue);
+
+    void SetFilterEvent(
+      TEFilterType FilterType,
+      bool Selected,
+      int FromValue,
+      int ToValue);
+
+    void SetOtherSelected(bool OtherSelected);
+
+    JZSong* GetSong() const;
+
+    int GetFromClock() const;
+    void SetFromClock(int FromClock);
+    void GenerateFromTimeString(std::string& FromTimeString) const;
+    void SetFromTime(const std::string& FromTimeString);
+
+    int GetToClock() const;
+    void SetToClock(int ToClock);
+    void GenerateToTimeString(std::string& ToTimeString) const;
+    void SetToTime(const std::string& ToTimeString);
+
+    int GetFromTrack() const;
+    void SetFromTrack(int FromTrack);
+
+    int GetToTrack() const;
+    void SetToTrack(int ToTrack);
+
+    bool GetFilterMeter() const;
+    void SetFilterMeter(bool FilterMeter);
+
+    bool GetFilterChannelAftertouch() const;
+    void SetFilterChannelAftertouch(bool FilterChannelAftertouch);
+
+    bool GetFilterSysEx() const;
+    void SetFilterSysEx(bool FilterSysEx);
+
+    bool GetFilterOther() const;
+    void SetFilterOther(bool FilterOther);
+
+    int IsSelected(JZEvent* pEvent);
+
+    void Dialog(wxWindow* pParent);
+
+  private:
+
+    JZFilterEvent* mFilterEvents;
+
+    bool mOtherSelected;
 
     JZSong* mpSong;
 
-    int FromClock, ToClock;        // einschl .. ausschl
+    int mFromClock, mToClock;
 
-    int FromTrack, ToTrack;        // 1..n einschl .. einschl
+    int mFromTrack, mToTrack;
 
-    void Dialog(wxFrame* parent, int ShowEventStats = 1);
+    bool mFilterMeter;
 
-    JZFilter(JZSong* pSong);
-    JZFilter(JZFilter* pOtherFilter);
-    JZFilter(const JZFilter& Other);
-    JZFilter& operator = (const JZFilter& Rhs);
-    virtual ~JZFilter();
+    bool mFilterChannelAftertouch;
 
-    int IsSelected(JZEvent* pEvent)
-    {
-      int Value = pEvent->GetValue();
-      for (int i = 0; i < nFltEvents; ++i)
-      {
-        if (pEvent->GetStat() == FltEvents[i].Stat)
-        {
-           // SN++ Aftertouch gehoert eigendlich zu KeyOn Events.
-          if (pEvent->GetStat() == StatKeyPressure)
-          {
-            int aval = pEvent->IsKeyPressure()->GetKey();
-            return
-              FltEvents[i].Selected &&
-              FltEvents[i].FromValue <= aval &&
-              aval <= FltEvents[i].ToValue;
-          }
-          if (pEvent->GetStat() == StatTimeSignat)
-          {
-            return FltEvents[i].Selected;
-          }
-          // SN++
-          if (pEvent->GetStat() == StatChnPressure)
-          {
-            return FltEvents[i].Selected;
-          }
+    bool mFilterSysEx;
 
-          if (pEvent->GetStat() == StatSysEx)
-          {
-            return FltEvents[i].Selected;
-          }
+    bool mFilterOther;
 
-          return
-            FltEvents[i].Selected &&
-            FltEvents[i].FromValue <= Value &&
-            Value <= FltEvents[i].ToValue;
-        }
-      }
-      return OtherSelected;
-    }
+    wxDialog* mpDialogBox;
 };
-
-// void GlobalFilterDlg(wxButton& but, wxMouseEvent& event);
-// void GlobalFilterDlgNoStats(wxButton& but, wxMouseEvent& event);
 
 //*****************************************************************************
 // Description:
@@ -144,5 +159,145 @@ class JZTrackIterator
     int mTrackIndex;
     bool mReverse;
 };
+
+//*****************************************************************************
+// Description:
+//   These are the filter class inline member functions.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+JZSong* JZFilter::GetSong() const
+{
+  return mpSong;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZFilter::GetFromClock() const
+{
+  return mFromClock;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+void JZFilter::SetFromClock(int FromClock)
+{
+  mFromClock = FromClock;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZFilter::GetToClock() const
+{
+  return mToClock;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+void JZFilter::SetToClock(int ToClock)
+{
+  mToClock = ToClock;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZFilter::GetFromTrack() const
+{
+  return mFromTrack;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+void JZFilter::SetFromTrack(int FromTrack)
+{
+  mFromTrack = FromTrack;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZFilter::GetToTrack() const
+{
+  return mToTrack;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+void JZFilter::SetToTrack(int ToTrack)
+{
+  mToTrack = ToTrack;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+bool JZFilter::GetFilterMeter() const
+{
+  return mFilterMeter;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+void JZFilter::SetFilterMeter(bool FilterMeter)
+{
+  mFilterMeter = FilterMeter;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+bool JZFilter::GetFilterChannelAftertouch() const
+{
+  return mFilterChannelAftertouch;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+void JZFilter::SetFilterChannelAftertouch(bool FilterChannelAftertouch)
+{
+  mFilterChannelAftertouch = FilterChannelAftertouch;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+bool JZFilter::GetFilterSysEx() const
+{
+  return mFilterSysEx;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+void JZFilter::SetFilterSysEx(bool FilterSysEx)
+{
+  mFilterSysEx = FilterSysEx;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+bool JZFilter::GetFilterOther() const
+{
+  return mFilterOther;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+void JZFilter::SetFilterOther(bool FilterOther)
+{
+  mFilterOther = FilterOther;
+}
 
 #endif // !defined(JZ_FILTER_H)

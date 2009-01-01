@@ -22,183 +22,214 @@
 
 #include "Filter.h"
 
-#include "ClockDialog.h"
+#include "Dialogs/FilterDialog.h"
+
 #include "Events.h"
 #include "Help.h"
-#include "PropertyListDialog.h"
 #include "Song.h"
 
 #include <cstdlib>
 
+using namespace std;
 
-const JZFilterEvent FltEvents[nFltEvents] =
+//*****************************************************************************
+//*****************************************************************************
+const JZFilterEvent DefaultFilterEvents[eFilterCount] =
 {
   { StatKeyOn,          "Note",               1,     0,  127},
   { StatKeyPressure,    "Poly Aftertouch",    1,     0,  127},
   { StatControl,        "Controller",         1,     0,  127},
   { StatProgram,        "Patch",              1,     0,  127},
-  { StatPitch,          "Pitch",              1, -8192, 8192},
-  { StatTimeSignat,     "Meter",              1,     0,    0},
-  { StatChnPressure,    "Channel Aftertouch", 1,     0,    0},
-  { StatSysEx,          "SysEx",              1,     0,    0}
+  { StatPitch,          "Pitch",              1, -8192, 8192}
 };
 
-
-
-JZFilter::JZFilter(JZSong *s)
+//*****************************************************************************
+// Description:
+//   This is the filter class definition.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZFilter::JZFilter(JZSong* pSong)
+  : mFilterEvents(0),
+    mOtherSelected(true),
+    mpSong(pSong),
+    mFromClock(0),
+    mToClock(120 * 4),
+    mFromTrack(1),
+    mToTrack(1)
 {
-  mpSong = s;
-  FltEvents = new JZFilterEvent [nFltEvents];
-  memcpy(FltEvents, ::FltEvents, sizeof(::FltEvents));
+  mFilterEvents = new JZFilterEvent [eFilterCount];
+  memcpy(mFilterEvents, ::DefaultFilterEvents, sizeof(::DefaultFilterEvents));
 
-  FromClock = 0;
-  ToClock   = 120*4;
-  FromTrack = 1;
-  ToTrack   = 1;
-  OtherSelected = 1;
-
-  for (int i = 0; i < nFltEvents; i++)
+  for (int i = 0; i < eFilterCount; ++i)
   {
-    FltEvents[i].FromValue = FltEvents[i].MinValue;
-    FltEvents[i].ToValue = FltEvents[i].MaxValue;
+    mFilterEvents[i].FromValue = DefaultFilterEvents[i].MinValue;
+    mFilterEvents[i].ToValue = DefaultFilterEvents[i].MaxValue;
   }
 }
 
-
-JZFilter::JZFilter(JZFilter *f)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZFilter::JZFilter(JZFilter const& Other)
+  : mFilterEvents(0),
+    mOtherSelected(Other.mOtherSelected),
+    mpSong(Other.mpSong),
+    mFromClock(Other.mFromClock),
+    mToClock(Other.mToClock),
+    mFromTrack(Other.mFromTrack),
+    mToTrack(Other.mToTrack)
 {
-  copy (*f);
+  mFilterEvents = new JZFilterEvent [eFilterCount];
+  memcpy(mFilterEvents, Other.mFilterEvents, sizeof(::DefaultFilterEvents));
 }
 
-
-JZFilter::JZFilter(JZFilter const &o) {
-  copy(o);
-}
-
-
-JZFilter& JZFilter::operator=(JZFilter const &o) {
-  delete FltEvents;
-  copy(o);
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZFilter& JZFilter::operator = (JZFilter const& Rhs)
+{
+  if (this != &Rhs)
+  {
+    memcpy(mFilterEvents, Rhs.mFilterEvents, sizeof(::DefaultFilterEvents));
+    mOtherSelected = Rhs.mOtherSelected;
+    mpSong         = Rhs.mpSong;
+    mFromClock     = Rhs.mFromClock;
+    mToClock       = Rhs.mToClock;
+    mFromTrack     = Rhs.mFromTrack;
+    mToTrack       = Rhs.mToTrack;
+  }
   return *this;
 }
 
-void JZFilter::copy(JZFilter const &o)
-{
-  mpSong        = o.mpSong;
-  FromClock     = o.FromClock;
-  ToClock       = o.ToClock;
-  FromTrack     = o.FromTrack;
-  ToTrack       = o.ToTrack;
-  OtherSelected = o.OtherSelected;
-
-  FltEvents = new JZFilterEvent [nFltEvents];
-  memcpy(FltEvents, o.FltEvents, sizeof(::FltEvents));
-}
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZFilter::~JZFilter()
 {
-  delete FltEvents;
+  delete mFilterEvents;
 }
 
-
-// *************************************************************************
-// Dialog
-// *************************************************************************
-
-
-
-class tFilterDlg : public tPropertyListDlg
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZFilter::GetFilterEvent(
+  TEFilterType FilterType,
+  bool& Selected,
+  int& FromValue,
+  int& ToValue)
 {
-  JZFilter *Filter;
-  JZClockDialog FromClockDlg, ToClockDlg;
-
- public:
-  tFilterDlg(JZFilter *f, JZSong *s, int ShowEventStats);
-  void AddProperties();
-  bool OnClose();
-  void OnHelp();
-  int ShowEventStats;
-};
-
-
-tFilterDlg::tFilterDlg(JZFilter *f, JZSong *Song, int ShowEventStats)
-  : tPropertyListDlg("Filter"),
-    FromClockDlg(Song, "From Time: ", f->FromClock),
-    ToClockDlg(Song, "To Time: ", f->ToClock)
-{
-  this->ShowEventStats=ShowEventStats;
-  Filter = f;
+  Selected = mFilterEvents[FilterType].Selected;
+  FromValue = mFilterEvents[FilterType].FromValue;
+  ToValue = mFilterEvents[FilterType].ToValue;
 }
 
-
-void tFilterDlg::AddProperties()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZFilter::SetFilterEvent(
+  TEFilterType FilterType,
+  bool Selected,
+  int FromValue,
+  int ToValue)
 {
-//   Add(FromClockDlg.mkFormItem(150));
-//   Add(ToClockDlg.mkFormItem(150));
-//   Add(wxMakeFormNewLine());
-// #ifdef __WXMSW__
-//   Add(wxMakeFormShort("From Track:", &Filter->FromTrack, wxFORM_DEFAULT, 0,0,0,110));
-//   Add(wxMakeFormShort("To Track:", &Filter->ToTrack, wxFORM_DEFAULT, 0,0,0,110));
-//   Add(wxMakeFormNewLine());
-// #else
-//   Add(wxMakeFormShort("From Track:", &Filter->FromTrack, wxFORM_DEFAULT));
-//   Add(wxMakeFormShort("To Track:", &Filter->ToTrack, wxFORM_DEFAULT));
-//   Add(wxMakeFormNewLine());
-// #endif
-
-//   if (ShowEventStats)
-//   {
-//     for (int i = 0; i < nFltEvents; i++)
-//     {
-//       if (Filter->FltEvents[i].MinValue != Filter->FltEvents[i].MaxValue)
-//       {
-//         Add(wxMakeFormShort("Min:", &Filter->FltEvents[i].FromValue, wxFORM_DEFAULT,0,0,0,90));
-//         Add(wxMakeFormShort("Max:", &Filter->FltEvents[i].ToValue, wxFORM_DEFAULT,0,0,0,90));
-//         Add(wxMakeFormBool(Filter->FltEvents[i].Name, &Filter->FltEvents[i].Selected, wxFORM_DEFAULT));
-//         Add(wxMakeFormNewLine());
-//       }
-//       else
-//         Add(wxMakeFormBool(Filter->FltEvents[i].Name, &Filter->FltEvents[i].Selected, wxFORM_DEFAULT));
-//     }
-
-//     Add(wxMakeFormBool("Other", &Filter->OtherSelected));
-//   }
-//   AssociatePanel(panel);
+  mFilterEvents[FilterType].Selected = Selected;
+  mFilterEvents[FilterType].FromValue = FromValue;
+  mFilterEvents[FilterType].ToValue   = ToValue;
 }
 
-
-bool tFilterDlg::OnClose()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZFilter::SetOtherSelected(bool OtherSelected)
 {
-  Filter->FromClock = FromClockDlg.GetClock();
-  Filter->ToClock = ToClockDlg.GetClock();
-  //wxForm::OnOk();
-  return FALSE;
+  mOtherSelected = OtherSelected;
 }
 
-void tFilterDlg::OnHelp()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZFilter::GenerateFromTimeString(string& FromTimeString) const
 {
-  gpHelpInstance->ShowTopic("Filter");
+  if (mpSong)
+  {
+    mpSong->ClockToString(mFromClock, FromTimeString);
+  }
 }
 
-
-
-
-
-
-void JZFilter::Dialog(wxFrame *parent, int ShowEventStats)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZFilter::SetFromTime(const string& FromTimeString)
 {
-  tFilterDlg *dlg;
-  //  mpDialogBox = new wxDialogBox(parent, "Event Filter", FALSE );
-  dlg = new tFilterDlg(this, mpSong, ShowEventStats);
-  dlg->Create();
-//   dlg->EditForm(mpDialogBox, ShowEventStats);
-//   mpDialogBox->Fit();
-//   mpDialogBox->Show(TRUE);
+  if (mpSong)
+  {
+    mFromClock  = mpSong->StringToClock(FromTimeString);
+  }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZFilter::GenerateToTimeString(string& ToTimeString) const
+{
+  if (mpSong)
+  {
+    mpSong->ClockToString(mToClock, ToTimeString);
+  }
+}
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZFilter::SetToTime(const string& ToTimeString)
+{
+  if (mpSong)
+  {
+    mToClock  = mpSong->StringToClock(ToTimeString);
+  }
+}
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZFilter::IsSelected(JZEvent* pEvent)
+{
+  int Value = pEvent->GetValue();
+  for (int i = 0; i < eFilterCount; ++i)
+  {
+    if (pEvent->GetStat() == mFilterEvents[i].Stat)
+    {
+      // Aftertouch belongs to KeyOn events.
+      if (pEvent->GetStat() == StatKeyPressure)
+      {
+        int aval = pEvent->IsKeyPressure()->GetKey();
+        return
+          mFilterEvents[i].Selected &&
+          mFilterEvents[i].FromValue <= aval &&
+          aval <= mFilterEvents[i].ToValue;
+      }
+      if (pEvent->GetStat() == StatTimeSignat)
+      {
+        return mFilterEvents[i].Selected;
+      }
+      if (pEvent->GetStat() == StatChnPressure)
+      {
+        return mFilterEvents[i].Selected;
+      }
+
+      if (pEvent->GetStat() == StatSysEx)
+      {
+        return mFilterEvents[i].Selected;
+      }
+
+      return
+        mFilterEvents[i].Selected &&
+        mFilterEvents[i].FromValue <= Value &&
+        Value <= mFilterEvents[i].ToValue;
+    }
+  }
+  return mOtherSelected;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZFilter::Dialog(wxWindow* pParent)
+{
+  JZFilterDialog FilterDialog(*this, pParent);
+  if (FilterDialog.ShowModal() == wxID_OK)
+  {
+  }
+}
 
 //*****************************************************************************
 // Description:
@@ -207,7 +238,7 @@ void JZFilter::Dialog(wxFrame *parent, int ShowEventStats)
 //-----------------------------------------------------------------------------
 JZTrackIterator::JZTrackIterator(JZFilter* pFilter, bool Reverse)
   : mpFilter(pFilter),
-    mpSong(mpFilter->mpSong),
+    mpSong(mpFilter->GetSong()),
     mTrackIndex(0),
     mReverse(Reverse)
 {
@@ -219,11 +250,11 @@ JZTrack* JZTrackIterator::First()
 {
   if (mReverse)
   {
-    mTrackIndex = mpFilter->ToTrack;
+    mTrackIndex = mpFilter->GetToTrack();
   }
   else
   {
-    mTrackIndex = mpFilter->FromTrack;
+    mTrackIndex = mpFilter->GetFromTrack();
   }
   return mpSong->GetTrack(mTrackIndex);
 }
@@ -235,7 +266,7 @@ JZTrack* JZTrackIterator::Next()
   if (mReverse)
   {
     --mTrackIndex;
-    if (mTrackIndex < mpFilter->FromTrack)
+    if (mTrackIndex < mpFilter->GetFromTrack())
     {
       return 0;
     }
@@ -243,7 +274,7 @@ JZTrack* JZTrackIterator::Next()
   else
   {
     ++mTrackIndex;
-    if (mTrackIndex > mpFilter->ToTrack)
+    if (mTrackIndex > mpFilter->GetToTrack())
     {
       return 0;
     }
@@ -255,5 +286,5 @@ JZTrack* JZTrackIterator::Next()
 //-----------------------------------------------------------------------------
 int JZTrackIterator::Count() const
 {
-  return mpFilter->ToTrack - mpFilter->FromTrack + 1;
+  return mpFilter->GetToTrack() - mpFilter->GetFromTrack() + 1;
 }

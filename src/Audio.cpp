@@ -38,6 +38,7 @@
 #include "Help.h"
 #include "Resources.h"
 
+#include <wx/filename.h>
 #include <wx/listbox.h>
 #include <wx/msgdlg.h>
 #include <wx/slider.h>
@@ -45,8 +46,9 @@
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
-#include <fstream>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 #include <sys/stat.h>
 #include <string.h>
@@ -271,9 +273,7 @@ void tSampleSet::LoadDefaultSettings()
 //-----------------------------------------------------------------------------
 int tSampleSet::Load(const wxString& FileName)
 {
-  int version;
-
-  // enable audio when loading a sample set
+  // Enable audio when loading a sample set.
   gpMidiPlayer->SetAudioEnabled(true);
 
   wxBeginBusyCursor();
@@ -282,65 +282,58 @@ int tSampleSet::Load(const wxString& FileName)
     samples[i]->Clear();
   }
 
-  // path of the spl file
+  // Get the path of the sample file.
   wxString SplFilePath = ::wxPathOnly(FileName);
 
-  ifstream is(FileName.c_str());
-  is >> version >> speed >> channels >> softsync;
-  while (is)
+  ifstream Is(FileName.c_str());
+  int Version;
+  Is >> Version >> speed >> channels >> softsync;
+  while (Is)
   {
     int key, pan, vol, pitch;
-    char fname[128];
-    fname[0] = 0;
-    char label[500];
-    is >> key;
-    ReadString(is, fname, sizeof(fname));
-    ReadString(is, label, sizeof(label));
-    is >> pan >> vol >> pitch;
-    if (fname[0])
+    wxFileName SampleFileName;
+    Is >> key;
+    string FileNameString;
+    ReadString(Is, FileNameString);
+    SampleFileName.Assign(FileNameString);
+    string Label;
+    ReadString(Is, Label);
+    Is >> pan >> vol >> pitch;
+    if (!SampleFileName.FileExists())
     {
-      if (!wxFileExists(fname))
-      {
-        // try to prepend the SplFilePath
-        char tmp[128];
-        strcpy(tmp, SplFilePath.c_str());
-        strcat(tmp, "/");
-        strcat(tmp, fname);
-        strcpy(fname, tmp);
-      }
-      if (!wxFileExists(fname))
-      {
-        wxString String;
-        String
-          << "File not found: \""
-          << fname
-          << '"';
-        ::wxMessageBox(String, "Error", wxOK);
-        continue;
-      }
-      assert(0 <= key && key < MAXSMPL);
-      samples[key]->SetFilename(fname);
-      samples[key]->SetLabel(label);
-      samples[key]->SetVolume(vol);
-      samples[key]->SetPan(pan);
-      samples[key]->SetPitch(pitch);
-      if (samples[key]->Load())
-      {
-        wxString String;
-        String
-          << "Could not load: \""
-          << samples[key]->GetFilename()
-          << '"';
-        ::wxMessageBox(String, "Error", wxOK);
-      }
-      if (samplewin[key])
-      {
-        samplewin[key]->Redraw();
-      }
+      // Try to prepend the sample file path.
+      wxString PathAndFileName;
+      PathAndFileName =
+        SplFilePath +
+        wxFileName::GetPathSeparator() +
+        SampleFileName.GetFullPath();
+      SampleFileName = PathAndFileName;
     }
-    else
+    if (!SampleFileName.FileExists())
     {
-      break;
+      wxString String;
+      String = "File not found: \"" + SampleFileName.GetFullPath() + '"';
+      ::wxMessageBox(String, "Error", wxOK);
+      continue;
+    }
+    assert(0 <= key && key < MAXSMPL);
+    samples[key]->SetFilename(SplFilePath.c_str());
+    samples[key]->SetLabel(Label.c_str());
+    samples[key]->SetVolume(vol);
+    samples[key]->SetPan(pan);
+    samples[key]->SetPitch(pitch);
+    if (samples[key]->Load())
+    {
+      wxString String;
+      String
+        << "Could not load: \""
+        << samples[key]->GetFilename()
+        << '"';
+      ::wxMessageBox(String, "Error", wxOK);
+    }
+    if (samplewin[key])
+    {
+      samplewin[key]->Redraw();
     }
   }
   wxEndBusyCursor();
@@ -367,7 +360,7 @@ int tSampleSet::Save(const wxString& FileName)
   {
     tSample *spl = samples[i];
     const char *fname = spl->GetFilename();
-    const char *label = spl->GetLabel();
+    const char* pLabel = spl->GetLabel();
     int vol = spl->GetVolume();
     int pan = spl->GetPan();
     int pitch = spl->GetPitch();
@@ -376,7 +369,7 @@ int tSampleSet::Save(const wxString& FileName)
       os << i << " ";
       WriteString(os, fname);
       os << " ";
-      WriteString(os, label);
+      WriteString(os, pLabel);
       os << " " << pan << " " << vol << " " << pitch << endl;
     }
   }
@@ -663,8 +656,8 @@ class tSamplesDlg : public wxDialog
     wxSlider  *vol;
     wxSlider  *pitch;
 #ifdef OBSOLETE
-    wxText    *label;
-    wxText    *file;
+    wxText* pLabel;
+    wxText* pFile;
 #endif // OBSOLETE
 
     static char *path;
@@ -1089,7 +1082,7 @@ tSamplesDlg::tSamplesDlg(wxWindow* pParent, tSampleSet &s)
   pitch = new wxSlider(this, (wxFunction)0, " ",  0, -12, 12,    200);
   (void) new wxMessage(this, "Pitch");
   NewLine();
-  label = new wxText(this, (wxFunction)0, "Label", "", -1, -1, 300);
+  pLabel = new wxText(this, (wxFunction)0, "Label", "", -1, -1, 300);
   NewLine();
   file = new wxText(this, (wxFunction)0, "File", "", -1, -1, 300);
   NewLine();
@@ -1104,11 +1097,10 @@ tSamplesDlg::tSamplesDlg(wxWindow* pParent, tSampleSet &s)
 //-----------------------------------------------------------------------------
 char *tSamplesDlg::ListEntry(int i)
 {
-  char buf[500];
-  sprintf(buf, "%d ", i+1);
+  ostringstream Oss;
+  Oss << i + 1 << ' ' << set.samples[i]->GetLabel();
 //  KeyToString(i, buf + strlen(buf));
-  sprintf(buf + strlen(buf), set.samples[i]->GetLabel());
-  return copystring(buf);
+  return copystring(Oss.str().c_str());
 }
 
 //-----------------------------------------------------------------------------
@@ -1120,7 +1112,7 @@ void tSamplesDlg::Sample2Win(int i)
   pitch->SetValue(spl->GetPitch());
   pan->SetValue(spl->GetPan());
 #ifdef OBSOLETE
-  label->SetValue((char *)spl->GetLabel());
+  pLabel->SetValue((char *)spl->GetLabel());
   file->SetValue((char *)spl->GetFilename());
 #endif
 }
@@ -1134,7 +1126,7 @@ void tSamplesDlg::Win2Sample(int i)
   spl->SetVolume(vol->GetValue());
   spl->SetPan(pan->GetValue());
 #ifdef OBSOLETE
-  spl->SetLabel(label->GetValue());
+  spl->SetLabel(pLabel->GetValue());
   spl->SetFilename(file->GetValue());
 #endif
 }
@@ -1184,7 +1176,7 @@ void tSamplesDlg::OnAddButton()
   {
 #ifdef OBSOLETE
     file->SetValue(fname);
-    label->SetValue(wxFileNameFromPath(fname));
+    pLabel->SetValue(wxFileNameFromPath(fname));
 #endif
     Win2Sample(current);
     SetCurrentListEntry(current);

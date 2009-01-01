@@ -27,6 +27,8 @@
 #include "DynamicArray.h"
 #include "NamedValue.h"
 
+#include <string>
+
 class JZTrackWindow;
 class wxDialog;
 
@@ -379,8 +381,8 @@ class tMtcTime
     tMtcTime( int millisek, tMtcType t );
     tMtcTime( char *str, tMtcType t );
     tMtcTime( unsigned h, unsigned m, unsigned s, unsigned f, unsigned t );
-    void ToString( char *str );
-    tMtcOffset *ToOffset();
+    void ToString(std::string& String);
+    tMtcOffset* ToOffset();
     int ToMillisec();
 };
 

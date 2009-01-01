@@ -33,6 +33,9 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <sstream>
+
+using namespace std;
 
 int tParam::Write(JZWriteBase& Io)
 {
@@ -128,7 +131,11 @@ tMtcTime::tMtcTime(int millisec, tMtcType t)
   fm = (int) ((double) msec / frametime);
 }
 
-tMtcTime::tMtcTime(char *str, tMtcType t)
+tMtcTime::tMtcTime(char* str, tMtcType t)
+  : hour(0),
+    min(0),
+    sec(0),
+    fm(0)
 {
   type = t;
   if (type < Mtc24)
@@ -139,10 +146,6 @@ tMtcTime::tMtcTime(char *str, tMtcType t)
   {
     type = Mtc30Ndf;
   }
-  hour = 0;
-  min = 0;
-  sec = 0;
-  fm = 0;
   sscanf(str, "%d:%d:%d.%d", &hour, &min, &sec, &fm);
   if (fm >= framesPerSecond[type])
   {
@@ -167,9 +170,11 @@ tMtcTime::tMtcTime(unsigned h, unsigned m, unsigned s, unsigned f, unsigned t)
   }
 }
 
-void tMtcTime::ToString(char *str)
+void tMtcTime::ToString(string& String)
 {
-  sprintf(str, "%d:%d:%d.%d", hour, min, sec, fm);
+  ostringstream Oss;
+  Oss << hour << ':' << min << ':' << sec << '.' << fm;
+  String = Oss.str();
 }
 
 tMtcOffset *tMtcTime::ToOffset()

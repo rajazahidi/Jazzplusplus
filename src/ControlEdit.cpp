@@ -523,8 +523,8 @@ int tVelocEdit::IsCtrlEdit(JZEvent* pEvent)
     {
       return (
         mpPianoWindow->GetFilter()->IsSelected(pEvent) &&
-        (pEvent->GetClock() >= mpPianoWindow->GetFilter()->FromClock &&
-          pEvent->GetClock() <= mpPianoWindow->GetFilter()->ToClock));
+        (pEvent->GetClock() >= mpPianoWindow->GetFilter()->GetFromClock() &&
+          pEvent->GetClock() <= mpPianoWindow->GetFilter()->GetToClock()));
     }
   }
   return 0;
@@ -546,8 +546,8 @@ void tVelocEdit::OnApply()
 
   if (mpPianoWindow->mpSnapSel->IsSelected())
   {
-    from_clk = mpPianoWindow->GetFilter()->FromClock;
-    to_clk   = mpPianoWindow->GetFilter()->ToClock;
+    from_clk = mpPianoWindow->GetFilter()->GetFromClock();
+    to_clk   = mpPianoWindow->GetFilter()->GetToClock();
   }
   else
   {
@@ -624,8 +624,8 @@ int tPolyAfterEdit::IsCtrlEdit(JZEvent* pEvent)
     {
       return (
         mpPianoWindow->GetFilter()->IsSelected(pEvent) &&
-        (pEvent->GetClock() >= mpPianoWindow->GetFilter()->FromClock &&
-        pEvent->GetClock() <= mpPianoWindow->GetFilter()->ToClock));
+        (pEvent->GetClock() >= mpPianoWindow->GetFilter()->GetFromClock() &&
+        pEvent->GetClock() <= mpPianoWindow->GetFilter()->GetToClock()));
     }
   }
   return 0;
@@ -661,8 +661,8 @@ void tPolyAfterEdit::OnApply()
 
   if (mpPianoWindow->mpSnapSel->IsSelected())
   {
-    from_clk = mpPianoWindow->GetFilter()->FromClock;
-    to_clk   = mpPianoWindow->GetFilter()->ToClock;
+    from_clk = mpPianoWindow->GetFilter()->GetFromClock();
+    to_clk   = mpPianoWindow->GetFilter()->GetToClock();
   }
   else
   {

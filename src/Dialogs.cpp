@@ -58,7 +58,7 @@ tShiftDlg::tShiftDlg(JZEventFrame* pEventWindow, JZFilter* pFilter, long unit)
     mSteps(0),
     mUnit(unit),
     mpFilter(pFilter),
-    mpSong(pFilter->mpSong)
+    mpSong(pFilter->GetSong())
 {
 }
 
@@ -108,7 +108,7 @@ tCleanupDlg::tCleanupDlg(JZEventFrame *w, JZFilter *f)
   : tPropertyListDlg( "Clean up events" )
 {
   Filter = f;
-  Song = f->mpSong;
+  Song = f->GetSong();
 }
 
 
@@ -188,7 +188,7 @@ tSearchReplaceDlg::tSearchReplaceDlg(JZEventFrame *w, JZFilter *f)
    : tPropertyListDlg("Search and replace controller types" )
 {
   Filter = f;
-  Song = f->mpSong;
+  Song = f->GetSong();
 }
 
 bool tSearchReplaceDlg::OnClose()
@@ -236,7 +236,7 @@ tTransposeDlg::tTransposeDlg(JZEventFrame *w, JZFilter *f)
   : tPropertyListDlg("Transpose")
 {
   Filter = f;
-  Song   = f->mpSong;
+  Song   = f->GetSong();
 }
 
 
@@ -285,7 +285,7 @@ tSetChannelDlg::tSetChannelDlg(JZFilter *f)
 : tPropertyListDlg("Set MIDI Channel")
 {
   Filter = f;
-  Song = f->mpSong;
+  Song = f->GetSong();
 }
 
 
@@ -336,7 +336,7 @@ tVelocityDlg::tVelocityDlg(JZFilter *f)
 : tPropertyListDlg( "Velocity" )
 {
   Filter = f;
-  Song = f->mpSong;
+  Song = f->GetSong();
 }
 
 
@@ -387,7 +387,7 @@ tLengthDlg::tLengthDlg(JZEventFrame *w, JZFilter *f)
 : tPropertyListDlg("Length")
 {
   Filter = f;
-  Song = f->mpSong;
+  Song = f->GetSong();
 }
 
 
@@ -447,7 +447,7 @@ tSeqLengthDlg::tSeqLengthDlg(JZEventFrame *w, JZFilter *f)
 : tPropertyListDlg("stretch/contract by scale from start of selected sequence" )
 {
   Filter = f;
-  Song = f->mpSong;
+  Song = f->GetSong();
 }
 
 
@@ -490,7 +490,7 @@ tMidiDelayDlg::tMidiDelayDlg(JZEventFrame *w, JZFilter *f)
 : tPropertyListDlg("MIDI delay line" )
 {
   Filter = f;
-  Song = f->mpSong;
+  Song = f->GetSong();
 }
 
 
@@ -640,7 +640,7 @@ tQuantizeDlg::tQuantizeDlg(JZEventFrame *w, JZFilter *f)
   //, Steps("steps", gQntSteps, &gQntStep)
 {
   Filter = f;
-  Song = f->mpSong;
+  Song = f->GetSong();
 }
 
 

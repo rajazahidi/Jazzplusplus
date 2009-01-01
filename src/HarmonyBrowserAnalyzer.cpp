@@ -55,8 +55,8 @@ void HBAnalyzer::Init(JZFilter* pFilter, int epc)
   Exit();        // cleanup from previous run
 
   mpFilter = pFilter;
-  start_clock = pFilter->FromClock;
-  stop_clock = pFilter->ToClock;
+  start_clock = pFilter->GetFromClock();
+  stop_clock = pFilter->GetToClock();
   eighths_per_chord = epc;
 
   if (eighths_per_chord == 0)
@@ -65,7 +65,7 @@ void HBAnalyzer::Init(JZFilter* pFilter, int epc)
   }
   else
   {
-    JZBarInfo BarInfo(*mpFilter->mpSong);
+    JZBarInfo BarInfo(*mpFilter->GetSong());
     BarInfo.SetClock(start_clock);
     int start_bar = BarInfo.GetBarIndex();
     BarInfo.SetClock(stop_clock);
@@ -117,7 +117,7 @@ int HBAnalyzer::Analyze(JZFilter* pFilter, int qbc)
 
 int HBAnalyzer::Transpose(JZFilter* pFilter, int qbc)
 {
-  pFilter->mpSong->NewUndoBuffer();
+  pFilter->GetSong()->NewUndoBuffer();
   Init(pFilter, qbc);
   IterateEvents(&HBAnalyzer::CountEvent);
   GenerateMapping();
@@ -135,15 +135,16 @@ void HBAnalyzer::IterateEvents(void (HBAnalyzer::*Action)(tKeyOn*, JZTrack*))
     if (!t->IsDrumTrack())
     {
       tEventIterator Events(t);
-      JZEvent *e = Events.Range(mpFilter->FromClock, mpFilter->ToClock);
-      while (e)
+      JZEvent* pEvent =
+        Events.Range(mpFilter->GetFromClock(), mpFilter->GetToClock());
+      while (pEvent)
       {
-        tKeyOn* pKeyOn = e->IsKeyOn();
+        tKeyOn* pKeyOn = pEvent->IsKeyOn();
         if (pKeyOn)
         {
           (this->*Action)(pKeyOn, t);
         }
-        e = Events.Next();
+        pEvent = Events.Next();
       }
       t->Cleanup();
     }
@@ -154,8 +155,8 @@ void HBAnalyzer::IterateEvents(void (HBAnalyzer::*Action)(tKeyOn*, JZTrack*))
 
 int HBAnalyzer::Step2Clock(int step)
 {
-  int fr = mpFilter->FromClock;
-  int to = mpFilter->ToClock;
+  int fr = mpFilter->GetFromClock();
+  int to = mpFilter->GetToClock();
   return (step * (to - fr)) / mSteps + fr;
 }
 

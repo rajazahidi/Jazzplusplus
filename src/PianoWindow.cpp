@@ -1658,8 +1658,8 @@ void JZPianoWindow::OnMouseEvent(wxMouseEvent& Event)
           {
             if (mpSnapSel->IsSelected())
             {
-              Clock = mpFilter->FromClock;
-              LoopClock = mpFilter->ToClock;
+              Clock = mpFilter->GetFromClock();
+              LoopClock = mpFilter->GetToClock();
             }
             else
             {
@@ -1828,46 +1828,32 @@ void JZPianoWindow::SnapSelStop(wxMouseEvent& Event)
       mpSnapSel->GetRectangle().y + mpSnapSel->GetRectangle().height - 1);
     int to = y2Pitch(mpSnapSel->GetRectangle().y + 1);
 
-    mpFilter->FltEvents[FltKeyOn].Selected = mVisibleKeyOn;
-    mpFilter->FltEvents[FltKeyOn].FromValue = fr;
-    mpFilter->FltEvents[FltKeyOn].ToValue   = to;
+    mpFilter->SetFilterEvent(eFilterKeyOn, mVisibleKeyOn, fr, to);
 
-    mpFilter->FltEvents[FltPitch].Selected = mVisiblePitch;
-    mpFilter->FltEvents[FltPitch].FromValue = (fr << 7) - 8192;
-    mpFilter->FltEvents[FltPitch].ToValue   = ((to + 1) << 7) - 8192;
+    mpFilter->SetFilterEvent(
+      eFilterPitch,
+      mVisiblePitch,
+      (fr << 7) - 8192,
+      ((to + 1) << 7) - 8192);
 
-    mpFilter->FltEvents[FltControl].Selected = mVisibleController;
-    mpFilter->FltEvents[FltControl].FromValue = fr;
-    mpFilter->FltEvents[FltControl].ToValue   = to;
+    mpFilter->SetFilterEvent(eFilterControl, mVisibleController, fr, to);
 
-    mpFilter->FltEvents[FltProgram].Selected = mVisibleProgram;
-    mpFilter->FltEvents[FltProgram].FromValue = fr;
-    mpFilter->FltEvents[FltProgram].ToValue   = to;
+    mpFilter->SetFilterEvent(eFilterProgram, mVisibleProgram, fr, to);
 
-    mpFilter->FltEvents[FltTempo].Selected = mVisibleTempo;
-    mpFilter->FltEvents[FltTempo].FromValue = fr;
-    mpFilter->FltEvents[FltTempo].ToValue   = to;
+    mpFilter->SetFilterEvent(eFilterKeyPressure, mVisibleKeyOn, fr, to);
 
-    mpFilter->FltEvents[FltSysEx].Selected = mVisibleSysex;
-    mpFilter->FltEvents[FltSysEx].FromValue = fr;
-    mpFilter->FltEvents[FltSysEx].ToValue   = to;
+    mpFilter->SetFilterMeter(mVisibleTempo);
 
-    // SN++ Aftertouch (gehoeren to KeyOn Events).
-    mpFilter->FltEvents[FltKeyPressure].Selected  = mVisibleKeyOn;
-    mpFilter->FltEvents[FltKeyPressure].FromValue = fr;
-    mpFilter->FltEvents[FltKeyPressure].ToValue   = to;
+    mpFilter->SetFilterChannelAftertouch(mVisibleMono);
 
-    // SN++ Channel Aftertouch
-    mpFilter->FltEvents[FltChnPressure].Selected  = mVisibleMono;
-    mpFilter->FltEvents[FltChnPressure].FromValue = fr;
-    mpFilter->FltEvents[FltChnPressure].ToValue   = to;
+    mpFilter->SetFilterSysEx(mVisibleSysex);
 
-
-    mpFilter->FromTrack = mTrackIndex;
-    mpFilter->ToTrack   = mTrackIndex;
-    mpFilter->FromClock = SnapClock(x2Clock(mpSnapSel->GetRectangle().x + 1));
-    mpFilter->ToClock   = SnapClock(x2Clock(
-      mpSnapSel->GetRectangle().x + mpSnapSel->GetRectangle().width + 1));
+    mpFilter->SetFromTrack(mTrackIndex);
+    mpFilter->SetToTrack(mTrackIndex);
+    mpFilter->SetFromClock(
+      SnapClock(x2Clock(mpSnapSel->GetRectangle().x + 1)));
+    mpFilter->SetToClock(SnapClock(x2Clock(
+      mpSnapSel->GetRectangle().x + mpSnapSel->GetRectangle().width + 1)));
   }
 
   // SN++ Veloc- oder Aftertouch-Editor updaten
@@ -2836,7 +2822,7 @@ void JZPianoWindow::CutOrCopy(int Id)
   {
     mPasteBuffer.Clear();
     tCmdCopyToBuffer cmd(mpFilter, &mPasteBuffer);
-    mpFilter->OtherSelected = mVisibleTempo;
+    mpFilter->SetOtherSelected(mVisibleTempo);
     cmd.Execute(0);        // no UNDO
     if (Id == wxID_CUT)
     {
@@ -2844,7 +2830,7 @@ void JZPianoWindow::CutOrCopy(int Id)
       cmd.Execute(1);        // with UNDO
       Refresh();
     }
-    mpFilter->OtherSelected = 0;
+    mpFilter->SetOtherSelected(false);
 //OLD    if (mpGuitarFrame)
 //OLD    {
 //OLD      mpGuitarFrame->Update();

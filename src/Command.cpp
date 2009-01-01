@@ -40,7 +40,7 @@ using namespace std;
 //-----------------------------------------------------------------------------
 tCommand::tCommand(JZFilter* pFilter)
   : mpFilter(pFilter),
-    mpSong(pFilter->mpSong),
+    mpSong(pFilter->GetSong()),
     mReverse(false)
 {
 }
@@ -75,7 +75,8 @@ void tCommand::Execute(int NewUndo)
 void tCommand::ExecuteTrack(JZTrack* pTrack)
 {
   tEventIterator Iterator(pTrack);
-  JZEvent* pEvent = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
+  JZEvent* pEvent =
+    Iterator.Range(mpFilter->GetFromClock(), mpFilter->GetToClock());
   while (pEvent)
   {
     if (mpFilter->IsSelected(pEvent))
@@ -97,8 +98,8 @@ void tCommand::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 //-----------------------------------------------------------------------------
 int tCommand::Interpolate(int Clock, int vmin, int vmax)
 {
-  int ClockMin = mpFilter->FromClock;
-  int ClockMax = mpFilter->ToClock;
+  int ClockMin = mpFilter->GetFromClock();
+  int ClockMax = mpFilter->GetToClock();
   return (Clock - ClockMin) * (vmax - vmin) / (ClockMax - ClockMin) + vmin;
 }
 
@@ -319,10 +320,10 @@ void tCmdErase::Execute(int NewUndo)
   tCommand::Execute(NewUndo);
   if (!LeaveSpace)
   {
-    JZFilter Filter(mpFilter);
-    Filter.FromClock = mpFilter->ToClock;
-    Filter.ToClock = mpSong->GetLastClock() + 1;
-    long DeltaClock = mpFilter->FromClock - mpFilter->ToClock;
+    JZFilter Filter(*mpFilter);
+    Filter.SetFromClock(mpFilter->GetToClock());
+    Filter.SetToClock(mpSong->GetLastClock() + 1);
+    long DeltaClock = mpFilter->GetFromClock() - mpFilter->GetToClock();
     tCmdShift shift(&Filter, DeltaClock);
     shift.Execute(0);
   }
@@ -584,11 +585,14 @@ tCmdConvertToModulation::tCmdConvertToModulation(JZFilter* pFilter)
 
 void tCmdConvertToModulation::ExecuteTrack(JZTrack* pTrack)
 {
-  //JAVE:iterate over all events, make a long event from start until stop of the sequence,
-  //convert all note-on messages to a pitch bend/volume controller pair, velocity -> volume
-  //make a volume off controller at the end of the current event
+  // JAVE:
+  // Iterate over all events, make a long event from start until stop of the
+  // sequence, convert all note-on messages to a pitch bend/volume controller
+  // pair, velocity -> volume make a volume off controller at the end of the
+  // current event.
   tEventIterator Iterator(pTrack);
-  JZEvent* pEvent = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
+  JZEvent* pEvent =
+    Iterator.Range(mpFilter->GetFromClock(), mpFilter->GetToClock());
   long startclock=-1;
   long endclock=-1;
   unsigned char channel=0;
@@ -810,10 +814,11 @@ tCmdCopy::tCmdCopy(JZFilter* pFilter, long dt, long dc)
   InsertSpace = 0;        // no
   RepeatClock = -1;        // -1L
 
-  mReverse = DestTrack > mpFilter->FromTrack;
+  mReverse = DestTrack > mpFilter->GetFromTrack();
   if (mReverse)
   {
-    DestTrack += mpFilter->ToTrack - mpFilter->FromTrack; // ToTrack inclusive
+    // ToTrack inclusive.
+    DestTrack += mpFilter->GetToTrack() - mpFilter->GetFromTrack();
   }
 }
 
@@ -827,7 +832,7 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
   StartClock = DestClock;
 
   if (RepeatClock < 0)
-    StopClock = StartClock + mpFilter->ToClock - mpFilter->FromClock;
+    StopClock = StartClock + mpFilter->GetToClock() - mpFilter->GetFromClock();
   else
     StopClock = RepeatClock;
 
@@ -852,8 +857,9 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
     tEventArray tmp;
     {
       tEventIterator Iterator(s);
-      long  DeltaClock = StartClock - mpFilter->FromClock;
-      JZEvent* pEvent = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
+      long  DeltaClock = StartClock - mpFilter->GetFromClock();
+      JZEvent* pEvent =
+        Iterator.Range(mpFilter->GetFromClock(), mpFilter->GetToClock());
       while (pEvent)
       {
         long NewClock = pEvent->GetClock() + DeltaClock;
@@ -871,7 +877,7 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
         if (!pEvent)
         {
           pEvent = Iterator.First();
-          DeltaClock += mpFilter->ToClock - mpFilter->FromClock;
+          DeltaClock += mpFilter->GetToClock() - mpFilter->GetFromClock();
         }
       }
     }
@@ -902,7 +908,7 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
     if (EraseSource)
     {
       tEventIterator Iterator(s);
-      JZEvent* pEvent = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
+      JZEvent* pEvent = Iterator.Range(mpFilter->GetFromClock(), mpFilter->GetToClock());
       while (pEvent)
       {
         if (mpFilter->IsSelected(pEvent))
@@ -953,7 +959,7 @@ void tCmdExchLeftRight::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   {
     tKeyOn* pKeyOn = (tKeyOn *)pEvent->Copy();
     pKeyOn->SetClock(
-      mpFilter->FromClock + mpFilter->ToClock - pKeyOn->GetClock());
+      mpFilter->GetFromClock() + mpFilter->GetToClock() - pKeyOn->GetClock());
     pTrack->Kill(pEvent);
     pTrack->Put(pKeyOn);
   }
@@ -983,7 +989,8 @@ void tCmdExchUpDown::ExecuteTrack(JZTrack* pTrack)
   }
 
   tEventIterator Iterator(pTrack);
-  pEvent = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
+  pEvent =
+    Iterator.Range(mpFilter->GetFromClock(), mpFilter->GetToClock());
   while (pEvent)
   {
     if (mpFilter->IsSelected(pEvent) && pEvent->IsKeyOn())
@@ -996,7 +1003,8 @@ void tCmdExchUpDown::ExecuteTrack(JZTrack* pTrack)
 
   // reverse Key's
 
-  pEvent = Iterator.Range(mpFilter->FromClock, mpFilter->ToClock);
+  pEvent =
+    Iterator.Range(mpFilter->GetFromClock(), mpFilter->GetToClock());
   while (pEvent)
   {
     if (mpFilter->IsSelected(pEvent) && pEvent->IsKeyOn())
@@ -1047,7 +1055,7 @@ tCmdMapper::tCmdMapper(
     mRandomArray(RandomArray)
 {
   mpBarInfo = new JZBarInfo(*mpSong);
-  mpBarInfo->SetClock(mpFilter->FromClock);
+  mpBarInfo->SetClock(mpFilter->GetFromClock());
   mStartBar = mpBarInfo->GetBarIndex();
 }
 

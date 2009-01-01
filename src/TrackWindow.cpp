@@ -1316,7 +1316,7 @@ void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
         }
         JZBarInfo BarInfo(*gpProject);
 
-        BarInfo.SetClock(mpFilter->FromClock);
+        BarInfo.SetClock(mpFilter->GetFromClock());
 
         if (BarInfo.GetBarIndex() > 0)
         {
@@ -1337,12 +1337,12 @@ void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
     // Is it possible to record?
     if (Record && mpSnapSel->IsSelected())
     {
-      pRecInfo->mTrackIndex = mpFilter->FromTrack;
+      pRecInfo->mTrackIndex = mpFilter->GetFromTrack();
 
       pRecInfo->mpTrack = gpProject->GetTrack(pRecInfo->mTrackIndex);
 
-      pRecInfo->mFromClock = mpFilter->FromClock;
-      pRecInfo->mToClock   = mpFilter->ToClock;
+      pRecInfo->mFromClock = mpFilter->GetFromClock();
+      pRecInfo->mToClock   = mpFilter->GetToClock();
 
       if (muted)
       {
@@ -1371,8 +1371,8 @@ void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
     int loop_clock = 0;
     if (loop && mpSnapSel->IsSelected())
     {
-      mPreviousClock = mpFilter->FromClock;
-      loop_clock = mpFilter->ToClock;
+      mPreviousClock = mpFilter->GetFromClock();
+      loop_clock = mpFilter->GetToClock();
     }
 
     // GO!
@@ -1450,14 +1450,14 @@ void JZTrackWindow::SnapSelectionStop(wxMouseEvent& Event)
 {
   if (mpSnapSel->IsSelected())
   {
-    mpFilter->FromTrack = y2TrackIndex(mpSnapSel->GetRectangle().y);
-    mpFilter->ToTrack = y2TrackIndex(
+    mpFilter->SetFromTrack(y2TrackIndex(mpSnapSel->GetRectangle().y));
+    mpFilter->SetToTrack(y2TrackIndex(
       mpSnapSel->GetRectangle().y +
-      mpSnapSel->GetRectangle().GetHeight() - 1);
-    mpFilter->FromClock = x2BarClock(mpSnapSel->GetRectangle().x + 1);
-    mpFilter->ToClock = x2BarClock(
-      mpSnapSel->GetRectangle().x + mpSnapSel->GetRectangle().GetWidth() + 1);
-//    NextWin->NewPosition(mpFilter->FromTrack, mpFilter->FromClock);
+      mpSnapSel->GetRectangle().GetHeight() - 1));
+    mpFilter->SetFromClock(x2BarClock(mpSnapSel->GetRectangle().x + 1));
+    mpFilter->SetToClock(x2BarClock(
+      mpSnapSel->GetRectangle().x + mpSnapSel->GetRectangle().GetWidth() + 1));
+//    NextWin->NewPosition(mpFilter->GetFromTrack(), mpFilter->GetFromClock());
   }
 }
 

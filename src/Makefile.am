@@ -26,6 +26,7 @@ Dialogs/FilterDialog.cpp \
 Dialogs/IntegerEdit.cpp \
 Dialogs/KeyOnDialog.cpp \
 Dialogs/MetronomeSettingsDialog.cpp \
+Dialogs/ShiftDialog.cpp \
 Dialogs/SynthesizerSettingsDialog.cpp \
 Dialogs/TrackDialog.cpp \
 Dialogs.cpp \
@@ -105,6 +106,7 @@ Dialogs/FilterDialog.cpp \
 Dialogs/IntegerEdit.cpp \
 Dialogs/KeyOnDialog.cpp \
 Dialogs/MetronomeSettingsDialog.cpp \
+Dialogs/ShiftDialog.cpp \
 Dialogs/SynthesizerSettingsDialog.cpp \
 Dialogs/TrackDialog.cpp \
 Dialogs.cpp \
@@ -189,6 +191,7 @@ Dialogs/FilterDialog.h \
 Dialogs/IntegerEdit.h \
 Dialogs/KeyOnDialog.h \
 Dialogs/MetronomeSettingsDialog.h \
+Dialogs/ShiftDialog.h \
 Dialogs/SynthesizerSettingsDialog.h \
 Dialogs/TrackDialog.h \
 Dialogs.h \

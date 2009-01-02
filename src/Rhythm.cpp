@@ -22,20 +22,21 @@
 
 #include "Rhythm.h"
 
-#include "EventWindow.h"
-#include "Song.h"
 #include "Command.h"
+#include "DeprecatedStringUtils.h"
+#include "EventWindow.h"
+#include "FileSelector.h"
+#include "Filter.h"
 #include "Globals.h"
 #include "Harmony.h"
-#include "TrackFrame.h"
-#include "PianoWindow.h"
-#include "ToolBar.h"
-#include "DeprecatedStringUtils.h"
-#include "FileSelector.h"
-#include "StringReadWrite.h"
-#include "KeyStringConverters.h"
-#include "SelectControllerDialog.h"
 #include "Help.h"
+#include "KeyStringConverters.h"
+#include "PianoWindow.h"
+#include "SelectControllerDialog.h"
+#include "Song.h"
+#include "StringReadWrite.h"
+#include "ToolBar.h"
+#include "TrackFrame.h"
 
 #include <wx/button.h>
 #include <wx/checkbox.h>
@@ -50,7 +51,7 @@
 
 using namespace std;
 
-tRhythmWin *rhythm_win = 0;
+tRhythmWin* rhythm_win = 0;
 
 void tRhyGroup::write(ostream& Os) const
 {

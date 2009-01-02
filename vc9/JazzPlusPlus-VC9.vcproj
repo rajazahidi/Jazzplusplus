@@ -309,6 +309,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\EventFrame.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\EventFrame.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Events.cpp"
 				>
 			</File>
@@ -874,6 +882,14 @@
 			</File>
 			<File
 				RelativePath="..\src\Dialogs\MetronomeSettingsDialog.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\ShiftDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\ShiftDialog.h"
 				>
 			</File>
 			<File

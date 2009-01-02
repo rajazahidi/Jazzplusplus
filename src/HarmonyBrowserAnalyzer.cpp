@@ -22,8 +22,9 @@
 
 #include "HarmonyBrowserAnalyzer.h"
 
-#include "EventWindow.h"
 #include "Command.h"
+#include "EventWindow.h"
+#include "Filter.h"
 #include "HarmonyP.h"
 #include "Song.h"
 

@@ -534,6 +534,7 @@ void JZTrackFrame::OnUpdateEditShift(wxUpdateUIEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnEditShift(wxCommandEvent& Event)
 {
+//  mpTrackWindow->Shift();
 }
 
 //-----------------------------------------------------------------------------

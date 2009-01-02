@@ -28,6 +28,7 @@
 #include "Dialogs/KeyOnDialog.h"
 #include "Events.h"
 #include "EventWindow.h"
+#include "Filter.h"
 #include "Globals.h"
 #include "Help.h"
 #include "NamedChoice.h"
@@ -982,7 +983,7 @@ tTextDlg::tTextDlg(tText *e, JZPianoWindow* w, JZTrack *t)
 {
   Event = e;
   text=new char[2048];
-  strcpy(text,(const char*)(e->GetText()));
+  strcpy(text, (const char*)(e->GetText()));
 }
 
 

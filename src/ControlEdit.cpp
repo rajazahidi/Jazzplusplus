@@ -23,6 +23,7 @@
 #include "ControlEdit.h"
 
 #include "EventWindow.h"
+#include "Filter.h"
 #include "PianoWindow.h"
 #include "Song.h"
 #include "Track.h"

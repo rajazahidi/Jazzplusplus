@@ -32,6 +32,7 @@ Dialogs.cpp \
 DynamicArray.cpp \
 ErrorMessage.cpp \
 Events.cpp \
+EventFrame.cpp \
 EventWindow.cpp \
 FileSelector.cpp \
 Filter.cpp \
@@ -110,6 +111,7 @@ Dialogs.cpp \
 DynamicArray.cpp \
 ErrorMessage.cpp \
 Events.cpp \
+EventFrame.cpp \
 EventWindow.cpp \
 FileSelector.cpp \
 Filter.cpp \
@@ -193,6 +195,7 @@ Dialogs.h \
 DynamicArray.h \
 ErrorMessage.h \
 Events.h \
+EventFrame.h \
 EventWindow.h \
 FileSelector.h \
 Filter.h \

@@ -1,10 +1,11 @@
 #include "EventFrame.h"
 
 #include "Command.h"
-#include "Dialogs/ShiftDialog.h"
 #include "Dialogs.h"
+#include "EventWindow.h"
 #include "Filter.h"
 #include "MouseAction.h"
+#include "Resources.h"
 #include "ToolBar.h"
 
 #include <wx/dc.h>
@@ -21,18 +22,23 @@ using namespace std;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(JZEventFrame, wxFrame)
+
+  EVT_UPDATE_UI(ID_SHIFT, JZEventFrame::OnUpdateEditShift)
+  EVT_MENU(ID_SHIFT, JZEventFrame::OnEditShift)
+
   EVT_SIZE(JZEventFrame::OnSize)
+
 END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZEventFrame::JZEventFrame(
-  wxWindow* pParent,
+  JZEventWindow* pEventWindow,
   const wxString& Title,
   JZSong* pSong,
   const wxPoint& Position,
   const wxSize& Size)
-  : wxFrame(pParent, wxID_ANY, Title, Position, Size),
+  : wxFrame(pEventWindow, wxID_ANY, Title, Position, Size),
     Song(pSong),
     mpFilter(0),
     mpFixedFont(0),
@@ -60,7 +66,8 @@ JZEventFrame::JZEventFrame(
     MixerForm(0),
     mpToolBar(0),
     mpGreyColor(0),
-    mpGreyBrush(0)
+    mpGreyBrush(0),
+    mpEventWindow(pEventWindow)
 {
 #ifdef __WXMSW__
   mpGreyColor = new wxColor(192, 192, 192);
@@ -146,6 +153,20 @@ void JZEventFrame::Setup()
   Dc.GetTextExtent("HXWjgi", &x, &y);
   mTrackHeight = (int)y + mLittleBit;
 */
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZEventFrame::OnUpdateEditShift(wxUpdateUIEvent& Event)
+{
+  Event.Enable(mpEventWindow->AreEventsSelected());
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZEventFrame::OnEditShift(wxCommandEvent& Event)
+{
+//  mpEventWindow->Shift();
 }
 
 //-----------------------------------------------------------------------------
@@ -452,21 +473,6 @@ void JZEventFrame::MenTranspose()
     return;
   tTransposeDlg * dlg = new tTransposeDlg(this, mpFilter);
   dlg->Create();
-}
-
-//-----------------------------------------------------------------------------
-// show the "shift events" dialog
-//-----------------------------------------------------------------------------
-void JZEventFrame::MenShift(int Unit)
-{
-  if (EventsSelected())
-  {
-    JZShiftDialog ShiftDialog(*this, *mpFilter, this);
-
-    if (ShiftDialog.ShowModal() == wxID_OK)
-    {
-    }
-  }
 }
 
 //-----------------------------------------------------------------------------

@@ -25,6 +25,7 @@
 
 #include <wx/frame.h>
 
+class JZEventWindow;
 class JZFilter;
 class JZSnapSelection;
 class JZSong;
@@ -34,10 +35,9 @@ class wxDialog;
 
 //*****************************************************************************
 // Description:
-//   A frame window that containes a scrolled event window.  Acts as the
-// common base class for JZTrackFrame and JSPianoFrame.
-//
-// The panel and menu are administered by derived classes.
+//   A frame window that containes a scrolled event window.  This class acts
+// as the common base class for the JZTrackFrame class and the JZPianoFrame
+// class.
 // Functionality:
 //   - Settings dialog
 //   - Selection via Snapsel
@@ -46,12 +46,9 @@ class JZEventFrame : public wxFrame
 {
   public:
 
-    bool OnCharHook(wxKeyEvent& event);
-    void OnChar(wxKeyEvent& event);
-
     // 2-step initialization: 1) constructor
     JZEventFrame(
-      wxWindow* pParent,
+      JZEventWindow* pEventWindow,
       const wxString& Title,
       JZSong* pSong,
       const wxPoint& Position = wxDefaultPosition,
@@ -104,7 +101,6 @@ class JZEventFrame : public wxFrame
     // Events
     virtual int  OnMouseEvent(wxMouseEvent& Event);
     virtual bool OnKeyEvent(wxKeyEvent& Event); // true = processed by eventwin
-    virtual void OnSize(wxSizeEvent& Event);
     virtual void OnMenuCommand(int id);
     virtual bool OnClose();
 
@@ -123,10 +119,20 @@ class JZEventFrame : public wxFrame
     // if selection active: TRUE, else: Errormessage + FALSE
     int EventsSelected(const char* msg = 0);
 
+  private:
+
+    void OnUpdateEditShift(wxUpdateUIEvent& Event);
+    void OnEditShift(wxCommandEvent& Event);
+
+    void OnSize(wxSizeEvent& Event);
+
+    bool OnCharHook(wxKeyEvent& Event);
+
+    void OnChar(wxKeyEvent& Event);
+
     void MenQuantize();
     void MenSetChannel();
     void MenTranspose();
-    void MenShift(int Unit);
     void MenDelete();
     void MenVelocity();
     void MenLength();
@@ -142,6 +148,8 @@ class JZEventFrame : public wxFrame
     JZToolBar* mpToolBar;
     wxColor* mpGreyColor;
     wxBrush* mpGreyBrush;
+
+    JZEventWindow* mpEventWindow;
 
   DECLARE_EVENT_TABLE()
 };

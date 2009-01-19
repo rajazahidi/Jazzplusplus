@@ -20,7 +20,9 @@
 
 #include "ShiftDialog.h"
 
+#include "../Command.h"
 #include "../Filter.h"
+#include "../ProjectManager.h"
 #include "IntegerEdit.h"
 
 #include <wx/button.h>
@@ -47,7 +49,7 @@ END_EVENT_TABLE()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZShiftDialog::JZShiftDialog(
-  JZEventFrame& EventWindow,
+  JZEventWindow& EventWindow,
   JZFilter& Filter,
   wxWindow* pParent)
   : wxDialog(pParent, wxID_ANY, wxString("Shift")),
@@ -525,6 +527,11 @@ bool JZShiftDialog::TransferDataFromWindow()
     mFilter.SetFilterSysEx(mpSysExCheckBox->GetValue());
 
     mFilter.SetFilterOther(mpOtherBox->GetValue());
+
+//    tCmdShift ShiftCommand(&mFilter, mSteps * mUnit);
+//    ShiftCommand.Execute();
+
+    JZProjectManager::Instance()->UpdateAllViews();
 
     return true;
   }

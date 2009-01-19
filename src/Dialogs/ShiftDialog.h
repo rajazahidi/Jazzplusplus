@@ -23,7 +23,7 @@
 
 #include <wx/dialog.h>
 
-class JZEventFrame;
+class JZEventWindow;
 class JZFilter;
 class JZIntegerEdit;
 class wxCheckBox;
@@ -36,7 +36,7 @@ class JZShiftDialog : public wxDialog
   public:
 
     JZShiftDialog(
-      JZEventFrame& EventWindow,
+      JZEventWindow& EventWindow,
       JZFilter& Filter,
       wxWindow* pParent);
 
@@ -88,6 +88,5 @@ class JZShiftDialog : public wxDialog
 
   DECLARE_EVENT_TABLE();
 };
-
 
 #endif // !defined(JZ_SHIFTDIALOG_H)

@@ -38,10 +38,6 @@ class JZEventWindow : public wxWindow
 {
   public:
 
-    JZSnapSelection* mpSnapSel;
-
-    JZFilter* mpFilter;
-
     JZEventWindow(
       wxFrame* pParent,
       JZSong* pSong,
@@ -53,7 +49,11 @@ class JZEventWindow : public wxWindow
     // WARNING: non-constant access.
     JZSong* GetSong() const;
 
+    bool AreEventsSelected();
+
     bool EventsSelected(const wxString& Message) const;
+
+    void Shift(int Units);
 
     void LineText(
       wxDC& Dc,
@@ -91,6 +91,12 @@ class JZEventWindow : public wxWindow
     virtual void SetYScrollPosition(int y);
 
     int y2yLine(int y, int Up = 0);
+
+  public:
+
+    JZSnapSelection* mpSnapSel;
+
+    JZFilter* mpFilter;
 
   protected:
 

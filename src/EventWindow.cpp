@@ -22,6 +22,7 @@
 
 #include "EventWindow.h"
 
+#include "Dialogs/ShiftDialog.h"
 #include "EventFrame.h"
 #include "Filter.h"
 #include "MouseAction.h"
@@ -104,6 +105,13 @@ JZEventWindow::~JZEventWindow()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+bool JZEventWindow::AreEventsSelected()
+{
+  return mpSnapSel->IsSelected();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 bool JZEventWindow::EventsSelected(const wxString& Message) const
 {
   if (!mpSnapSel->IsSelected())
@@ -112,6 +120,22 @@ bool JZEventWindow::EventsSelected(const wxString& Message) const
     return false;
   }
   return true;
+}
+
+//-----------------------------------------------------------------------------
+// Description:
+//   Display the "shift events" dialog.
+//-----------------------------------------------------------------------------
+void JZEventWindow::Shift(int Units)
+{
+  if (AreEventsSelected())
+  {
+    JZShiftDialog ShiftDialog(*this, *mpFilter, this);
+
+    if (ShiftDialog.ShowModal() == wxID_OK)
+    {
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------

@@ -1229,13 +1229,6 @@ JZTrack* JZTrackWindow::y2Track(int y)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool JZTrackWindow::AreEventsSelected()
-{
-  return mpSnapSel->IsSelected();
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 int JZTrackWindow::EventsSelected(const wxString& Message)
 {
   if (!mpSnapSel->IsSelected())

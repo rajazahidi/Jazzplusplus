@@ -75,8 +75,6 @@ class JZTrackWindow : public JZEventWindow
 
     void MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode);
 
-    bool AreEventsSelected();
-
     int EventsSelected(const wxString& Message);
 
     void ZoomIn();

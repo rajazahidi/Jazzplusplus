@@ -2299,7 +2299,7 @@ int JZPianoWindow::IsVisible(JZTrack* pTrack)
 //-----------------------------------------------------------------------------
 int JZPianoWindow::SnapClocks()
 {
-  int Clock = mpSong->GetTicksPerQuarter() * 4L / mSnapDenomiator;
+  int Clock = mpSong->GetTicksPerQuarter() * 4 / mSnapDenomiator;
   if (Clock < 1)
   {
     return 1;

@@ -75,8 +75,9 @@ void tCommand::Execute(int NewUndo)
 void tCommand::ExecuteTrack(JZTrack* pTrack)
 {
   tEventIterator Iterator(pTrack);
-  JZEvent* pEvent =
-    Iterator.Range(mpFilter->GetFromClock(), mpFilter->GetToClock());
+  JZEvent* pEvent = Iterator.Range(
+    mpFilter->GetFromClock(),
+    mpFilter->GetToClock());
   while (pEvent)
   {
     if (mpFilter->IsSelected(pEvent))
@@ -147,64 +148,71 @@ void tSelectedKeys::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 //*****************************************************************************
 // tScale
 //*****************************************************************************
-                            //  c     d     e  f     g    a      b
+//-----------------------------------------------------------------------------
+// Description:
+//   This is a C-major scale.
+//                              c     d     e  f     g    a      b
+//-----------------------------------------------------------------------------
 static const int CMajor[12] = { 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tScale::Init(int ScaleNr, JZFilter* pFilter)
 {
-  int i;
-
-  for (i = 0; i < 12; i++)
+  for (int i = 0; i < 12; ++i)
   {
     ScaleKeys[i] = 0;
   }
 
   if (ScaleNr == gScaleChromatic)
   {
-    for (i = 0; i < 12; i++)
+    for (int i = 0; i < 12; ++i)
+    {
       ScaleKeys[i] = 1;
+    }
   }
-
   else if (ScaleNr == gScaleSelected)
   {
-    int found = 0;
+    bool Found = false;
     tSelectedKeys cmd(pFilter);
     cmd.Execute(0);
-    for (i = 0; i < 128; i++)
+    for (int i = 0; i < 128; ++i)
     {
       if (cmd.Keys[i])
       {
         ScaleKeys[ i % 12 ] = 1;
-        found = 1;
+        Found = true;
       }
     }
-    if (!found)
+    if (!Found)
     {
       ScaleKeys[0] = 1; // avoid loop in Member()
     }
   }
-
   else
   {
-    for (i = 0; i < 12; i++)
+    for (int i = 0; i < 12; ++i)
+    {
       ScaleKeys[ (i + ScaleNr) % 12 ] = CMajor[i];
+    }
   }
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tScale::Analyze(JZFilter* pFilter)
 {
-  long keys[12];
-  for (int i = 0; i < 12; i++)
+  long Keys[12];
+  for (int i = 0; i < 12; ++i)
   {
-    keys[i] = 0;
+    Keys[i] = 0;
   }
 
   tSelectedKeys cmd(pFilter);
   cmd.Execute(0);
-  for (int i = 0; i < 128; i++)
+  for (int i = 0; i < 128; ++i)
   {
-    keys[i % 12] += cmd.Keys[i];
+    Keys[i % 12] += cmd.Keys[i];
   }
 
   long Min = std::numeric_limits<long>::max();
@@ -218,7 +226,7 @@ int tScale::Analyze(JZFilter* pFilter)
     {
       if (Scale.ScaleKeys[i] == 0)
       {
-        Error += keys[i];
+        Error += Keys[i];
       }
     }
     if (Error < Min)
@@ -231,78 +239,91 @@ int tScale::Analyze(JZFilter* pFilter)
   return ScaleIndex;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tScale::Next(int Key)
 {
   do
-    ++ Key;
-  while (!Member(Key));
+  {
+    ++Key;
+  } while (!Member(Key));
   return Key;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tScale::Prev(int Key)
 {
   do
-    -- Key;
-  while (!Member(Key));
+  {
+    --Key;
+  } while (!Member(Key));
   return Key;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tScale::Transpose(int Key, int Steps)
 {
   int Offset = 0;
 
   while (!Member(Key))
   {
-    ++ Key;
-    ++ Offset;
+    ++Key;
+    ++Offset;
   }
 
   while (Steps > 0)
   {
     Key = Next(Key);
-    -- Steps;
+    --Steps;
   }
   while (Steps < 0)
   {
     Key = Prev(Key);
-    ++ Steps;
+    ++Steps;
   }
   return Key - Offset;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int tScale::FitInto(int Key)
 {
   int Offset = 0;
 
   while (!Member(Key))
   {
-    ++ Offset;
+    ++Offset;
     if (Offset & 1)
+    {
       Key += Offset;
+    }
     else
+    {
       Key -= Offset;
+    }
   }
   return Key;
 }
 
-// ***********************************************************************
+//*****************************************************************************
 // tCmdShift
-// ***********************************************************************
-
-tCmdShift::tCmdShift(JZFilter* pFilter, long dclk)
-  : tCommand(pFilter)
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+tCmdShift::tCmdShift(JZFilter* pFilter, long DeltaClock)
+  : tCommand(pFilter),
+    mDeltaClock(DeltaClock)
 {
-  DeltaClock = dclk;
 }
 
 void tCmdShift::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  JZEvent* c = pEvent->Copy();
+  JZEvent* pEventCopy = pEvent->Copy();
   pTrack->Kill(pEvent);
-  c->SetClock(c->GetClock() + DeltaClock);
-  pTrack->Put(c);
+  pEventCopy->SetClock(pEventCopy->GetClock() + mDeltaClock);
+  pTrack->Put(pEventCopy);
 }
 
 // ************************************************************************
@@ -694,7 +715,7 @@ void tCmdMidiDelay::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   {
     if (pEvent->IsKeyOn())
     {
-      // only echo note events
+      // Only echo note events.
       pKeyOn = (tKeyOn *)pEvent->Copy();
       pKeyOn->SetClock(pKeyOn->GetClock()+ clockDelay * i);
       pKeyOn->SetVelocity(
@@ -853,9 +874,9 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
   if (s && d)
   {
 
-    // Events nach tmp kopieren
     tEventArray tmp;
     {
+      // Events after temporary copy.
       tEventIterator Iterator(s);
       long  DeltaClock = StartClock - mpFilter->GetFromClock();
       JZEvent* pEvent =
@@ -882,8 +903,6 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
       }
     }
 
-    // ggf Freien Platz einfuegen
-
     if (InsertSpace && d->GetLastClock() > StartClock)
     {
       tEventIterator Iterator(d);
@@ -903,10 +922,9 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
       d->Cleanup();
     }
 
-    // ggf Quelle loeschen
-
     if (EraseSource)
     {
+      // Delete source.
       tEventIterator Iterator(s);
       JZEvent* pEvent = Iterator.Range(mpFilter->GetFromClock(), mpFilter->GetToClock());
       while (pEvent)
@@ -920,10 +938,9 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
       s->Cleanup();
     }
 
-    // ggf Ziel loeschen
-
     if (EraseDestin)
     {
+      // Delete destination.
       tEventIterator Iterator(d);
       JZEvent* pEvent = Iterator.Range(StartClock, StopClock);
       while (pEvent)
@@ -937,7 +954,7 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
       d->Cleanup();
     }
 
-    // tmp und Zieltrack zusammenmischen, aufraeumen
+    // tmp track and target mix, aufraeumen
 
     d->Merge(&tmp);
     d->Cleanup();

@@ -32,6 +32,8 @@ class JZRndArray;
 class JZBarInfo;
 class tKeyOn;
 
+//*****************************************************************************
+//*****************************************************************************
 class tScale
 {
   public:
@@ -50,7 +52,8 @@ class tScale
     static int Analyze(JZFilter* pFilter);        // returns ScaleNr
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 class tCommand
 {
   public:
@@ -74,16 +77,22 @@ class tCommand
     bool mReverse;
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 class tCmdShift : public tCommand
 {
-  long DeltaClock;
   public:
+
     tCmdShift(JZFilter* pFilter, long DeltaClock);
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
+
+  private:
+
+    long mDeltaClock;
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 class tCmdErase : public tCommand
 {
   public:
@@ -93,6 +102,8 @@ class tCmdErase : public tCommand
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tCmdVelocity : public tCommand
 {
   public:
@@ -101,7 +112,8 @@ class tCmdVelocity : public tCommand
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 class tCmdLength : public tCommand
 {
   public:
@@ -110,7 +122,8 @@ class tCmdLength : public tCommand
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 class tCmdSeqLength : public tCommand
 {
   public:
@@ -120,8 +133,8 @@ class tCmdSeqLength : public tCommand
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 };
 
-
-
+//*****************************************************************************
+//*****************************************************************************
 class tCmdMidiDelay : public tCommand
 {
   public:
@@ -137,6 +150,8 @@ class tCmdMidiDelay : public tCommand
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tCmdConvertToModulation : public tCommand
 {
   public:
@@ -145,10 +160,8 @@ class tCmdConvertToModulation : public tCommand
   virtual void ExecuteTrack(JZTrack* pTrack);
 };
 
-
-
-
-
+//*****************************************************************************
+//*****************************************************************************
 class tCmdCleanup : public tCommand
 {
     long lengthLimit;
@@ -160,7 +173,8 @@ class tCmdCleanup : public tCommand
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 class tCmdSearchReplace : public tCommand
 {
   short fr, to;
@@ -169,7 +183,8 @@ class tCmdSearchReplace : public tCommand
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 class tCmdQuantize : public tCommand
 {
     long Quantize(long Clock, int islen);
@@ -183,7 +198,8 @@ class tCmdQuantize : public tCommand
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 class tCmdTranspose : public tCommand
 {
   public:
@@ -198,7 +214,8 @@ class tCmdTranspose : public tCommand
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 class tCmdSetChannel : public tCommand
 {
   public:
@@ -207,7 +224,8 @@ class tCmdSetChannel : public tCommand
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 class tCmdCopyToBuffer : public tCommand
 {
   public:
@@ -221,8 +239,8 @@ class tCmdCopyToBuffer : public tCommand
     tEventArray* mpBuffer;
 };
 
-
-
+//*****************************************************************************
+//*****************************************************************************
 class tCmdCopy : public tCommand
 {
   public:
@@ -238,8 +256,8 @@ class tCmdCopy : public tCommand
     virtual void ExecuteTrack(JZTrack* pTrack);
 };
 
-
-
+//*****************************************************************************
+//*****************************************************************************
 class tCmdExchLeftRight : public tCommand
 {
   public:
@@ -247,6 +265,8 @@ class tCmdExchLeftRight : public tCommand
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tCmdExchUpDown : public tCommand
 {
   public:
@@ -254,6 +274,8 @@ class tCmdExchUpDown : public tCommand
     virtual void ExecuteTrack(JZTrack* pTrack);
 };
 
+//*****************************************************************************
+//*****************************************************************************
 class tCmdMapper : public tCommand
 {
   public:

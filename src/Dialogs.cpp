@@ -53,54 +53,52 @@ using namespace std;
 // *************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tShiftDlg::tShiftDlg(JZEventFrame* pEventWindow, JZFilter* pFilter, long unit)
-  : tPropertyListDlg("Shift events left/right"),
-    mSteps(0),
-    mUnit(unit),
-    mpFilter(pFilter),
-    mpSong(pFilter->GetSong())
-{
-}
+//tShiftDlg::tShiftDlg(JZEventFrame* pEventWindow, JZFilter* pFilter, long unit)
+//  : tPropertyListDlg("Shift events left/right"),
+//    mSteps(0),
+//    mUnit(unit),
+//    mpFilter(pFilter),
+//    mpSong(pFilter->GetSong())
+//{
+//}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool tShiftDlg::OnClose()
-{
-  cout << "tShiftDlg::OnClose " << mSteps << endl;
-  tCmdShift cmd(mpFilter, mSteps * mUnit);
-  cmd.Execute();
-
-  JZProjectManager::Instance()->UpdateAllViews();
-
-  //  wxForm::OnOk();
-  return false;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void tShiftDlg::OnHelp()
-{
-  gpHelpInstance->ShowTopic("Shift");
-}
+//bool tShiftDlg::OnClose()
+//{
+//  cout << "tShiftDlg::OnClose " << mSteps << endl;
+//  tCmdShift cmd(mpFilter, mSteps * mUnit);
+//  cmd.Execute();
+//
+//  JZProjectManager::Instance()->UpdateAllViews();
+//
+//  //  wxForm::OnOk();
+//  return false;
+//}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tShiftDlg::AddProperties()
-{
-//send wxPropertyValue REFERENCE not POINTER
-  sheet->AddProperty(new wxProperty(
-    "Snaps",
-    wxPropertyValue(&mSteps),
-    "integer",
-    new wxIntegerListValidator(-16, 16)));
+//void tShiftDlg::OnHelp()
+//{
+//  gpHelpInstance->ShowTopic("Shift");
+//}
 
-  sheet->AddProperty(new wxProperty(
-    "clocks per snap",
-    (long)mUnit,
-    "integer")); // informational only
-}
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//void tShiftDlg::AddProperties()
+//{
+////send wxPropertyValue REFERENCE not POINTER
+//  sheet->AddProperty(new wxProperty(
+//    "Snaps",
+//    wxPropertyValue(&mSteps),
+//    "integer",
+//    new wxIntegerListValidator(-16, 16)));
+//
+//  sheet->AddProperty(new wxProperty(
+//    "clocks per snap",
+//    (long)mUnit,
+//    "integer")); // informational only
+//}
 
 
 // **************************************************************************

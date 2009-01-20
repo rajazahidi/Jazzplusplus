@@ -33,21 +33,21 @@ class JZEventWindow;
 class JZTrack;
 class JZEvent;
 
-class tShiftDlg : public tPropertyListDlg
-{
-  public:
-
-    long mSteps;        // 0 was static
-    long mUnit;
-
-    JZFilter* mpFilter;
-    JZSong* mpSong;
-
-    tShiftDlg(JZEventFrame* pEventWindow, JZFilter* pFilter, long Unit);
-    void AddProperties();
-    bool OnClose();
-    void OnHelp();
-};
+//class tShiftDlg : public tPropertyListDlg
+//{
+//  public:
+//
+//    long mSteps;        // 0 was static
+//    long mUnit;
+//
+//    JZFilter* mpFilter;
+//    JZSong* mpSong;
+//
+//    tShiftDlg(JZEventFrame* pEventWindow, JZFilter* pFilter, long Unit);
+//    void AddProperties();
+//    bool OnClose();
+//    void OnHelp();
+//};
 
 class tCleanupDlg : public tPropertyListDlg
 {

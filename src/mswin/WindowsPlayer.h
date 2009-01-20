@@ -69,7 +69,7 @@ class JZWindowsPlayer : public JZPlayer
 
   protected:
 
-    tWinPlayerState* state;
+    tWinPlayerState* mpState;
     DWORD Event2Dword(JZEvent *e);
     JZEvent* Dword2Event(DWORD dw);
     long Clock2Time(long clock);

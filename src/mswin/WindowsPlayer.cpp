@@ -48,21 +48,22 @@ using namespace std;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZWindowsPlayer::JZWindowsPlayer(JZSong* pSong)
-  : JZPlayer(pSong)
+  : JZPlayer(pSong),
+    mpState(0)
 {
   poll_millisec = 25;
   timer_installed = FALSE;
-  state = NewWinPlayerState();
+  mpState = NewWinPlayerState();
 
-  state->hinp   = 0;
-  state->hout   = 0;
-  state->recd_buffer.clear();
-  state->play_buffer.clear();
-  state->thru_buffer.clear();
-  state->playing = FALSE;
-  state->soft_thru = gpConfig->GetValue(C_SoftThru);
-  state->doing_mtc_rec = FALSE;
-  state->audio_player = 0;
+  mpState->hinp   = 0;
+  mpState->hout   = 0;
+  mpState->recd_buffer.clear();
+  mpState->play_buffer.clear();
+  mpState->thru_buffer.clear();
+  mpState->playing = FALSE;
+  mpState->soft_thru = gpConfig->GetValue(C_SoftThru);
+  mpState->doing_mtc_rec = FALSE;
+  mpState->audio_player = 0;
 
   int ilong = -1, olong = -1;
   if (
@@ -86,28 +87,28 @@ JZWindowsPlayer::JZWindowsPlayer(JZSong* pSong)
     {
       case CsMidi:
         rc = midiInOpen(
-          &state->hinp,
+          &mpState->hinp,
           dev,
           (DWORD)midiMidiInputHandler,
-          (DWORD)state,
+          (DWORD)mpState,
           CALLBACK_FUNCTION);
         break;
       case CsMtc:
         rc = midiInOpen(
-          &state->hinp,
+          &mpState->hinp,
           dev,
           (DWORD)midiMtcInputHandler,
-          (DWORD)state,
+          (DWORD)mpState,
           CALLBACK_FUNCTION);
         break;
       case CsInt:
       case CsFsk:
       default:
         rc = midiInOpen(
-          &state->hinp,
+          &mpState->hinp,
           dev,
           (DWORD)midiIntInputHandler,
-          (DWORD)state,
+          (DWORD)mpState,
           CALLBACK_FUNCTION);
         break;
     }
@@ -126,8 +127,8 @@ JZWindowsPlayer::JZWindowsPlayer(JZSong* pSong)
     if (dev == MAX_MIDI_DEVS)
       dev = MIDI_MAPPER;
 
-    //UINT rc = midiOutOpen(&state->hout, dev, 0L, 0L, 0L);
-    UINT rc = midiOutOpen(&state->hout, dev, (DWORD)MidiOutProc, (DWORD)state, CALLBACK_FUNCTION);
+    //UINT rc = midiOutOpen(&mpState->hout, dev, 0L, 0L, 0L);
+    UINT rc = midiOutOpen(&mpState->hout, dev, (DWORD)MidiOutProc, (DWORD)mpState, CALLBACK_FUNCTION);
     if (rc)
     {
       char errtxt[200];
@@ -141,9 +142,9 @@ JZWindowsPlayer::JZWindowsPlayer(JZSong* pSong)
     TIMECAPS caps;
     if (timeGetDevCaps(&caps, sizeof(caps)) == 0)
     {
-      state->min_timer_period = caps.wPeriodMin;
-      state->max_timer_period = caps.wPeriodMax;
-      if (timeBeginPeriod(state->min_timer_period) == 0)
+      mpState->min_timer_period = caps.wPeriodMin;
+      mpState->max_timer_period = caps.wPeriodMax;
+      if (timeBeginPeriod(mpState->min_timer_period) == 0)
         timer_installed = TRUE;
     }
     if (!timer_installed)
@@ -157,47 +158,47 @@ JZWindowsPlayer::JZWindowsPlayer(JZSong* pSong)
   hSysBuf = GlobalAlloc(GMEM_SHARE | GMEM_MOVEABLE | GMEM_ZEROINIT, (DWORD)maxSysLen);
   pSysBuf = (unsigned char *)GlobalLock(hSysBuf);
 
-  if (state->hinp)
-    midiInStart(state->hinp);
+  if (mpState->hinp)
+    midiInStart(mpState->hinp);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 bool JZWindowsPlayer::IsInstalled()
 {
-  return timer_installed && state->hout;
+  return timer_installed && mpState->hout;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZWindowsPlayer::~JZWindowsPlayer()
 {
-  if (state->hinp)
+  if (mpState->hinp)
   {
-    midiInReset(state->hinp);
-    midiInClose(state->hinp);
+    midiInReset(mpState->hinp);
+    midiInClose(mpState->hinp);
   }
-  if (state->hout)
+  if (mpState->hout)
   {
-    midiOutReset(state->hout);
-    midiOutClose(state->hout);
+    midiOutReset(mpState->hout);
+    midiOutClose(mpState->hout);
   }
   if (timer_installed)
-    timeEndPeriod(state->min_timer_period);
+    timeEndPeriod(mpState->min_timer_period);
 
   GlobalUnlock(hSysHdr);
   GlobalFree(hSysHdr);
   GlobalUnlock(hSysBuf);
   GlobalFree(hSysBuf);
 
-  DeleteWinPlayerState(state);
+  DeleteWinPlayerState(mpState);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZWindowsPlayer::SetSoftThru(int on, int InputDevice, int OutputDevice)
 {
-  state->soft_thru = on;
+  mpState->soft_thru = on;
 }
 
 //-----------------------------------------------------------------------------
@@ -361,21 +362,21 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
 //-----------------------------------------------------------------------------
 long JZWindowsPlayer::Clock2Time(long clock)
 {
-  if (clock < state->start_clock)
-    return state->start_time;
-  return (long)( (double)(clock - state->start_clock) * 60000.0 /
-    (double)state->ticks_per_minute + state->start_time);
+  if (clock < mpState->start_clock)
+    return mpState->start_time;
+  return (long)( (double)(clock - mpState->start_clock) * 60000.0 /
+    (double)mpState->ticks_per_minute + mpState->start_time);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 long JZWindowsPlayer::Time2Clock(long time)
 {
-  if (time < state->start_time)
-    return state->start_clock;
+  if (time < mpState->start_time)
+    return mpState->start_clock;
   return (long)(
-    (double)(time - state->start_time) * (double)state->ticks_per_minute / 60000.0 +
-    state->start_clock);
+    (double)(time - mpState->start_time) * (double)mpState->ticks_per_minute / 60000.0 +
+    mpState->start_clock);
 }
 
 //-----------------------------------------------------------------------------
@@ -383,18 +384,18 @@ long JZWindowsPlayer::Time2Clock(long time)
 void JZWindowsPlayer::SetTempo(long bpm, long clock)
 {
   long t1 = Clock2Time(clock);
-  state->ticks_per_minute = (long)bpm * (long)Song->GetTicksPerQuarter();
+  mpState->ticks_per_minute = (long)bpm * (long)Song->GetTicksPerQuarter();
   long t2 = Clock2Time(clock);
-  state->start_time += (t1 - t2);
+  mpState->start_time += (t1 - t2);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 long JZWindowsPlayer::RealTimeClock2Time(long clock)
 {
-  if (clock < state->start_clock)
+  if (clock < mpState->start_clock)
     return real_start_time;
-  return (long)( (double)(clock - state->start_clock) * 60000.0 / (double)real_ticks_per_minute + real_start_time);
+  return (long)( (double)(clock - mpState->start_clock) * 60000.0 / (double)real_ticks_per_minute + real_start_time);
 }
 
 //-----------------------------------------------------------------------------
@@ -402,8 +403,8 @@ long JZWindowsPlayer::RealTimeClock2Time(long clock)
 long JZWindowsPlayer::Time2RealTimeClock(long time)
 {
   if (time < real_start_time)
-    return state->start_clock;
-  return (long)((double)(time - real_start_time) * (double)real_ticks_per_minute / 60000.0 + state->start_clock);
+    return mpState->start_clock;
+  return (long)((double)(time - real_start_time) * (double)real_ticks_per_minute / 60000.0 + mpState->start_clock);
 }
 
 //-----------------------------------------------------------------------------
@@ -424,14 +425,14 @@ int JZWindowsPlayer::OutSysex(JZEvent* pEvent, DWORD time)
   if (sx == 0)
     return 1;
 
-  if (state->play_buffer.nfree() < 2)
+  if (mpState->play_buffer.nfree() < 2)
     return 1;
 
-  state->sysex_found = TRUE;
-  tWinSysexBuffer *buf = state->osx_buffers->AllocBuffer();
-  buf->PrepareOut(state->hout, sx->GetData(), sx->GetLength() - 1);
-  state->play_buffer.put(SYSEX_EVENT, time);
-  state->play_buffer.put((DWORD)buf, time);
+  mpState->sysex_found = TRUE;
+  tWinSysexBuffer *buf = mpState->osx_buffers->AllocBuffer();
+  buf->PrepareOut(mpState->hout, sx->GetData(), sx->GetLength() - 1);
+  mpState->play_buffer.put(SYSEX_EVENT, time);
+  mpState->play_buffer.put((DWORD)buf, time);
   return 0;
 }
 
@@ -442,7 +443,7 @@ int JZWindowsPlayer::OutEvent(JZEvent* pEvent)
   DWORD d = Event2Dword(pEvent);
   if (d)
   {
-    state->play_buffer.put(d, Clock2Time(pEvent->GetClock()));
+    mpState->play_buffer.put(d, Clock2Time(pEvent->GetClock()));
   }
   else if (pEvent->IsSysEx() && (pEvent->GetClock() > 0))
   {
@@ -458,7 +459,7 @@ int JZWindowsMidiPlayer::OutEvent(JZEvent* pEvent)
   DWORD d = Event2Dword(pEvent);
   if (d)
   {
-    state->play_buffer.put(d, pEvent->GetClock());
+    mpState->play_buffer.put(d, pEvent->GetClock());
   }
   else if (pEvent->IsSysEx() && (pEvent->GetClock() > 0))
   {
@@ -475,11 +476,11 @@ void JZWindowsPlayer::OutNow(JZEvent* pEvent)
   DWORD d = Event2Dword(pEvent);
   if (d)
   {
-    midiOutShortMsg(state->hout, d);
+    midiOutShortMsg(mpState->hout, d);
   }
   else if (pEvent->GetStat() == StatSetTempo)
   {
-    if (state->playing)
+    if (mpState->playing)
     {
       SetTempo(pEvent->IsSetTempo()->GetBPM(), OutClock);
     }
@@ -496,11 +497,11 @@ void JZWindowsPlayer::OutNow(JZEvent* pEvent)
       pSysHdr->dwBufferLength = s->GetDataLength() + 1;
       pSysHdr->dwUser = 0;
 
-      if (midiOutPrepareHeader(state->hout, pSysHdr, sizeof(MIDIHDR)) == 0)
-        midiOutLongMsg(state->hout, pSysHdr, sizeof(MIDIHDR));
+      if (midiOutPrepareHeader(mpState->hout, pSysHdr, sizeof(MIDIHDR)) == 0)
+        midiOutLongMsg(mpState->hout, pSysHdr, sizeof(MIDIHDR));
       // here we should wait, until the data are physically sent.
       // but there is no API call for this?!
-      midiOutUnprepareHeader(state->hout, pSysHdr, sizeof(MIDIHDR));
+      midiOutUnprepareHeader(mpState->hout, pSysHdr, sizeof(MIDIHDR));
     }
   }
 }
@@ -524,7 +525,7 @@ void JZWindowsPlayer::FillMidiClocks(long to)
   {
     tMidiClock* pEvent = new tMidiClock(midiClockOut);
     mPlayBuffer.Put(pEvent);
-    midiClockOut = midiClockOut + state->ticks_per_signal;
+    midiClockOut = midiClockOut + mpState->ticks_per_signal;
   }
   mPlayBuffer.Sort();
 }
@@ -540,7 +541,7 @@ void JZWindowsPlayer::OutBreak(long clock)
   }
   else
   {
-    state->play_buffer.put(0, Clock2Time(clock));
+    mpState->play_buffer.put(0, Clock2Time(clock));
   }
 }
 
@@ -555,7 +556,7 @@ void JZWindowsMidiPlayer::OutBreak(long clock)
   }
   else
   {
-    state->play_buffer.put(0, clock);
+    mpState->play_buffer.put(0, clock);
   }
 }
 
@@ -595,51 +596,51 @@ static DWORD GetMtcTime(tWinPlayerState* pState)
 //-----------------------------------------------------------------------------
 void JZWindowsPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 {
-  state->play_buffer.clear();
-  state->recd_buffer.clear();
-  state->sysex_found = FALSE;
+  mpState->play_buffer.clear();
+  mpState->recd_buffer.clear();
+  mpState->sysex_found = FALSE;
 
-  state->ticks_per_minute  = Song->GetTicksPerQuarter() * Song->Speed();
-  real_ticks_per_minute    = state->ticks_per_minute;
-  state->ticks_per_signal  = Song->GetTicksPerQuarter() / 24;
-  state->time_per_tick = 60000000L / state->ticks_per_minute;
-  state->time_correction   = 0;
+  mpState->ticks_per_minute  = Song->GetTicksPerQuarter() * Song->Speed();
+  real_ticks_per_minute    = mpState->ticks_per_minute;
+  mpState->ticks_per_signal  = Song->GetTicksPerQuarter() / 24;
+  mpState->time_per_tick = 60000000L / mpState->ticks_per_minute;
+  mpState->time_correction   = 0;
 
   if (gpConfig->GetValue(C_ClockSource) == CsMtc)
   {
-    if (state->doing_mtc_rec)
+    if (mpState->doing_mtc_rec)
     {
       Clock = 0;
     }
     if (!Continue)
     {
       tMtcTime *offs = Song->GetTrack(0)->GetMtcOffset();
-      state->start_time = offs->ToMillisec();
-      real_start_time = state->start_time;
-      state->mtc_start.type = offs->type;
+      mpState->start_time = offs->ToMillisec();
+      real_start_time = mpState->start_time;
+      mpState->mtc_start.type = offs->type;
       delete offs;
-      state->start_clock = 0;
+      mpState->start_clock = 0;
     }
   }
   else
   {
-    state->start_time  = (long)timeGetTime() + 500;
-    real_start_time = state->start_time;
-    state->start_clock = Clock;
+    mpState->start_time  = (long)timeGetTime() + 500;
+    real_start_time = mpState->start_time;
+    mpState->start_clock = Clock;
   }
 
-  state->play_time   = state->start_time;
+  mpState->play_time   = mpState->start_time;
   midiClockOut = Clock;
 
   if (GetAudioEnabled())
-    state->play_buffer.put(START_AUDIO, state->start_time);
+    mpState->play_buffer.put(START_AUDIO, mpState->start_time);
 
   OutOfBandEvents.Clear();
 
   JZProjectManager::Instance()->NewPlayPosition(
     PlayLoop->Ext2IntClock(Clock));
 
-  state->playing = TRUE;  // allow for SetTempo in OutNow()
+  mpState->playing = TRUE;  // allow for SetTempo in OutNow()
   JZPlayer::StartPlay(Clock, LoopClock, Continue);
 
   if (gpConfig->GetValue(C_RealTimeOut))
@@ -661,46 +662,46 @@ void JZWindowsPlayer::StartPlay(long Clock, long LoopClock, int Continue)
   switch (gpConfig->GetValue(C_ClockSource))
   {
     case CsMidi:
-      state->virtual_clock = Clock - state->ticks_per_signal;
-      state->signal_time = state->start_time - 5000L;
-      // state->playing = TRUE;
-      timeSetEvent(state->min_timer_period, state->min_timer_period, midiMidiTimerHandler, (DWORD)state, TIME_ONESHOT);
+      mpState->virtual_clock = Clock - mpState->ticks_per_signal;
+      mpState->signal_time = mpState->start_time - 5000L;
+      // mpState->playing = TRUE;
+      timeSetEvent(mpState->min_timer_period, mpState->min_timer_period, midiMidiTimerHandler, (DWORD)mpState, TIME_ONESHOT);
       break;
     case CsMtc:
       if (!Continue)
       {
         // In microseconds: 1 sec / frames_per_sec
-        switch (state->mtc_start.type)
+        switch (mpState->mtc_start.type)
         {
           case 0:
-            state->time_per_frame = 1000000 / 24;
+            mpState->time_per_frame = 1000000 / 24;
             break;
           case 1:
-            state->time_per_frame = 1000000 / 25;
+            mpState->time_per_frame = 1000000 / 25;
             break;
           case 2:
           case 3:
-            state->time_per_frame = 1000000 / 30;
+            mpState->time_per_frame = 1000000 / 30;
             break;
         }
-        state->signal_time = 0;
-        state->mtc_valid = FALSE;
-        state->last_qfm = 0;
-        state->qfm_bits = 0;
+        mpState->signal_time = 0;
+        mpState->mtc_valid = FALSE;
+        mpState->last_qfm = 0;
+        mpState->qfm_bits = 0;
         lastValidMtcClock = Clock;
       }
-      // state->playing = TRUE;
-      timeSetEvent(state->min_timer_period, state->min_timer_period, midiMtcTimerHandler, (DWORD)state, TIME_ONESHOT);
+      // mpState->playing = TRUE;
+      timeSetEvent(mpState->min_timer_period, mpState->min_timer_period, midiMtcTimerHandler, (DWORD)mpState, TIME_ONESHOT);
       break;
     case CsInt:
     case CsFsk:
     default:
-      // state->playing = TRUE;
+      // mpState->playing = TRUE;
       timeSetEvent(
-        state->min_timer_period,
-        state->min_timer_period,
+        mpState->min_timer_period,
+        mpState->min_timer_period,
         midiIntTimerHandler,
-        (DWORD)state,
+        (DWORD)mpState,
         TIME_ONESHOT);
       break;
   }
@@ -712,7 +713,7 @@ void JZWindowsPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 void JZWindowsPlayer::StopPlay()
 {
   wxBeginBusyCursor();
-  state->playing = FALSE;
+  mpState->playing = FALSE;
   JZPlayer::StopPlay();
   if (gpConfig->GetValue(C_RealTimeOut))
   {
@@ -721,39 +722,39 @@ void JZWindowsPlayer::StopPlay()
     delete pEvent;
   }
   AllNotesOff();
-  RecdBuffer.Keyoff2Length();
+  mRecdBuffer.Keyoff2Length();
 
-  if (state->hout)
+  if (mpState->hout)
   {
-    if (state->sysex_found)
-      midiOutReset(state->hout);
-    int n = state->osx_buffers->Size();
+    if (mpState->sysex_found)
+      midiOutReset(mpState->hout);
+    int n = mpState->osx_buffers->Size();
     for (int i = 0; i < n; ++i)
     {
-      tWinSysexBuffer *buf = state->osx_buffers->At(i);
+      tWinSysexBuffer *buf = mpState->osx_buffers->At(i);
       if (buf->IsPrepared())
       {
-        buf->UnprepareOut(state->hout);
+        buf->UnprepareOut(mpState->hout);
       }
     }
-    state->osx_buffers->ReleaseAllBuffers();
+    mpState->osx_buffers->ReleaseAllBuffers();
   }
 
 
 /*
   // sysex recording not finished yet.
-  if (state->hinp)
+  if (mpState->hinp)
   {
-    midiInReset(state->hinp);
-    int n = state->isx_buffers->Size();
+    midiInReset(mpState->hinp);
+    int n = mpState->isx_buffers->Size();
     for (int i = 0; i < n; ++i)
     {
-      tWinSysexBuffer *buf = state->isx_buffers->At(i);
+      tWinSysexBuffer *buf = mpState->isx_buffers->At(i);
       if (buf->IsPrepared())
       {
-        buf->UnprepareIn(state->hinp);
+        buf->UnprepareIn(mpState->hinp);
       }
-      state->isx_buffers->ReleaseAllBuffers();
+      mpState->isx_buffers->ReleaseAllBuffers();
     }
   }
 */
@@ -797,20 +798,20 @@ void JZWindowsPlayer::FlushToDevice(long clock)
 //-----------------------------------------------------------------------------
 long JZWindowsIntPlayer::GetRealTimeClock()
 {
-  while (!state->recd_buffer.empty())
+  while (!mpState->recd_buffer.empty())
   {
-    midi_event *m = state->recd_buffer.get();
+    midi_event *m = mpState->recd_buffer.get();
 
     // Event?
     JZEvent* pEvent = Dword2Event(m->data);
     if (pEvent)
     {
       pEvent->SetClock(PlayLoop->Ext2IntClock(Time2RealTimeClock(m->ref)));
-      RecdBuffer.Put(pEvent);
+      mRecdBuffer.Put(pEvent);
     }
   }
 
-  long clock = Time2RealTimeClock( (long)timeGetTime() + state->time_correction );
+  long clock = Time2RealTimeClock( (long)timeGetTime() + mpState->time_correction );
 
   JZProjectManager::Instance()->NewPlayPosition(
     PlayLoop->Ext2IntClock(clock / 48 * 48));
@@ -844,9 +845,9 @@ long JZWindowsMidiPlayer::GetRealTimeClock()
 {
   long clock;
 
-  while (!state->recd_buffer.empty())
+  while (!mpState->recd_buffer.empty())
   {
-    midi_event *m = state->recd_buffer.get();
+    midi_event *m = mpState->recd_buffer.get();
     if (m->data == 0xfc)
     {
       // Stop play received
@@ -874,19 +875,19 @@ long JZWindowsMidiPlayer::GetRealTimeClock()
     if (pEvent)
     {
       pEvent->SetClock(PlayLoop->Ext2IntClock(m->ref));
-      RecdBuffer.Put(pEvent);
+      mRecdBuffer.Put(pEvent);
     }
   }
 
-  long delta_clock = (((long)timeGetTime() - state->signal_time) * 1000L) / state->time_per_tick;
+  long delta_clock = (((long)timeGetTime() - mpState->signal_time) * 1000L) / mpState->time_per_tick;
 
-  if (delta_clock > (2 * state->ticks_per_signal))
+  if (delta_clock > (2 * mpState->ticks_per_signal))
   {
-    clock = state->virtual_clock;
+    clock = mpState->virtual_clock;
   }
   else
   {
-    clock = state->virtual_clock + delta_clock;
+    clock = mpState->virtual_clock + delta_clock;
   }
 
   JZProjectManager::Instance()->NewPlayPosition(
@@ -901,9 +902,9 @@ long JZWindowsMtcPlayer::GetRealTimeClock()
 {
   long clock;
 
-  while (!state->recd_buffer.empty())
+  while (!mpState->recd_buffer.empty())
   {
-    midi_event *m = state->recd_buffer.get();
+    midi_event *m = mpState->recd_buffer.get();
     if (m->data == 0xf1)
     {
       // MTC starting (from midi input handler)
@@ -919,29 +920,29 @@ long JZWindowsMtcPlayer::GetRealTimeClock()
     if (pEvent)
     {
       pEvent->SetClock(PlayLoop->Ext2IntClock(Time2Clock(m->ref)));
-      RecdBuffer.Put(pEvent);
+      mRecdBuffer.Put(pEvent);
     }
   }
 
-  if (state->mtc_valid)
+  if (mpState->mtc_valid)
   {
-    if ( ((long)timeGetTime() - state->signal_time) > 500 )
+    if ( ((long)timeGetTime() - mpState->signal_time) > 500 )
     {
       /* Assume tape stopped */
       disable();
-      state->mtc_valid = 0;
-      state->qfm_bits = 0;
+      mpState->mtc_valid = 0;
+      mpState->qfm_bits = 0;
       enable();
       AllNotesOff();
       return( -1 );
     }
-    if (state->doing_mtc_rec)
+    if (mpState->doing_mtc_rec)
     {
       clock = 0;
     }
     else
     {
-      clock = Time2Clock( GetMtcTime( state ) );
+      clock = Time2Clock( GetMtcTime( mpState ) );
     }
     lastValidMtcClock = clock;
   }
@@ -980,7 +981,7 @@ long JZWindowsMtcPlayer::GetRealTimeClock()
 //-----------------------------------------------------------------------------
 void JZWindowsMtcPlayer::InitMtcRec()
 {
-  state->doing_mtc_rec = TRUE;
+  mpState->doing_mtc_rec = TRUE;
   StartPlay( 0, 0, 0 );
 }
 
@@ -989,10 +990,10 @@ void JZWindowsMtcPlayer::InitMtcRec()
 tMtcTime* JZWindowsMtcPlayer::FreezeMtcRec()
 {
   StopPlay();
-  state->doing_mtc_rec = FALSE;
+  mpState->doing_mtc_rec = FALSE;
   return(new tMtcTime(
-    (long) GetMtcTime(state),
-    (tMtcType) state->mtc_start.type));
+    (long) GetMtcTime(mpState),
+    (tMtcType) mpState->mtc_start.type));
 }
 
 //-----------------------------------------------------------------------------

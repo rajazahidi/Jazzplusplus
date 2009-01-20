@@ -152,7 +152,7 @@ JZWindowsAudioPlayer::JZWindowsAudioPlayer(JZSong* pSong)
     mCanSynchronize(true),
     mpListener(0)
 {
-  state->audio_player = this;
+  mpState->audio_player = this;
 
   InitializeCriticalSection(&mutex);
 
@@ -544,8 +544,8 @@ void JZWindowsAudioPlayer::Notify()
 
           // low pass filter for time-correction (not really necessary)
           const long low = 50;
-          state->time_correction =
-            (low * state->time_correction + (100 - low) * (audio_now - time_now) ) / 100L;
+          mpState->time_correction =
+            (low * mpState->time_correction + (100 - low) * (audio_now - time_now) ) / 100L;
         }
       }
     }
@@ -589,10 +589,10 @@ void JZWindowsAudioPlayer::Notify()
         {
           long time_now  = (long)timeGetTime();
           long audio_now =
-            (long)((double)state->start_time + 1000.0 * mmtime.u.sample / mSamples.speed);
+            (long)((double)mpState->start_time + 1000.0 * mmtime.u.sample / mSamples.speed);
           // low pass filter for time-correction (not really necessary)
           const long low = 50;
-          state->time_correction = (low * state->time_correction + (100 - low) * (audio_now - time_now) ) / 100L;
+          mpState->time_correction = (low * mpState->time_correction + (100 - low) * (audio_now - time_now) ) / 100L;
         }
       }
     }
@@ -616,9 +616,9 @@ void JZWindowsAudioPlayer::StartPlay(long Clock, long LoopClock, int Continue)
   delete mpListener;
 
   start_clock = Clock;
-  start_time = state->start_time;
+  start_time = mpState->start_time;
 
-  mSamples.ResetBuffers(AudioBuffer, start_clock, state->ticks_per_minute);
+  mSamples.ResetBuffers(AudioBuffer, start_clock, mpState->ticks_per_minute);
   mSamples.FillBuffers(OutClock);
 
   OpenDsp();
@@ -637,7 +637,7 @@ void JZWindowsAudioPlayer::StopPlay()
     if (frc < start_clock)
       frc = start_clock;
     long toc = rec_info->mToClock;
-    long play_clock = Time2Clock(state->play_time);
+    long play_clock = Time2Clock(mpState->play_time);
     if (toc > play_clock)
       toc = play_clock;
     mSamples.SaveRecordingDlg(frc, toc, recbuffers);

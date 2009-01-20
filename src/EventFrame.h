@@ -63,26 +63,15 @@ class JZEventFrame : public wxFrame
 
     virtual void SetEventWindow(JZEventWindow* pEventWindow);
 
-    int mTrackHeight;
-
     int mTopInfoHeight;
-    int FontSize;
-    int ClocksPerPixel;
 
     int mEventsX, mEventsY, mEventsWidth, mEventsHeight;
-    int CanvasX, CanvasY, CanvasW, CanvasH;        // canvas coords
-    int FromClock, ToClock;
-    int FromLine, ToLine;
 
-    // Mousehandling
+    // Mouse handling
     JZSnapSelection* SnapSel;
     tMouseAction* MouseAction;
     virtual void SnapSelStart(wxMouseEvent &e);
     virtual void SnapSelStop(wxMouseEvent &e);
-
-    // methods
-    int y2Line(int y, int up = 0);
-    int Line2y(int line);
 
     int PlayClock;
 
@@ -101,11 +90,6 @@ class JZEventFrame : public wxFrame
 
     // Mixer-Dialog
     wxDialog* MixerForm;
-
-    // Edit-Menu
-
-    // if selection active: TRUE, else: Errormessage + FALSE
-    int EventsSelected(const char* msg = 0);
 
   private:
 
@@ -132,8 +116,6 @@ class JZEventFrame : public wxFrame
   protected:
 
     JZToolBar* mpToolBar;
-    wxColor* mpGreyColor;
-    wxBrush* mpGreyBrush;
 
     JZEventWindow* mpEventWindow;
 

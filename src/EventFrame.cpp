@@ -40,48 +40,25 @@ JZEventFrame::JZEventFrame(
   : wxFrame(pParent, wxID_ANY, Title, Position, Size, WindowStyle),
     Song(pSong),
     mpFilter(0),
-    mTrackHeight(0),
     mTopInfoHeight(40),
-    FontSize(12),
-    ClocksPerPixel(36),
     mEventsX(),
     mEventsY(mTopInfoHeight),
     mEventsWidth(0),
     mEventsHeight(0),
-    CanvasX(0),
-    CanvasY(0),
-    CanvasW(0),
-    CanvasH(0),
-    FromClock(0),
-    ToClock(0),
-    FromLine(0),
-    ToLine(0),
     SnapSel(0),
     MouseAction(0),
     PlayClock(-1),
     mpSettingsDialog(0),
     MixerForm(0),
     mpToolBar(0),
-    mpGreyColor(0),
-    mpGreyBrush(0),
     mpEventWindow(0)
 {
-#ifdef __WXMSW__
-  mpGreyColor = new wxColor(192, 192, 192);
-#else
-  mpGreyColor = new wxColor(220, 220, 220);
-#endif
-  mpGreyBrush = new wxBrush(*mpGreyColor, wxSOLID);
-
   mpFilter = new JZFilter(Song);
 }
 
 JZEventFrame::~JZEventFrame()
 {
   delete SnapSel;
-
-  delete mpGreyColor;
-  delete mpGreyBrush;
 
   delete mpFilter;
 
@@ -135,74 +112,22 @@ bool JZEventFrame::OnCharHook(wxKeyEvent& e)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZEventFrame::y2Line(int y, int up)
-{
-  if (up)
-  {
-    y += mTrackHeight;
-  }
-  y -= mTopInfoHeight;
-  return y / mTrackHeight;
-}
+//int JZEventFrame::y2Line(int y, bool Up)
+//{
+//  if (Up)
+//  {
+//    y += mTrackHeight;
+//  }
+//  y -= mTopInfoHeight;
+//  return y / mTrackHeight;
+//}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZEventFrame::Line2y(int Line)
-{
-  return Line * mTrackHeight + mTopInfoHeight;
-}
-
-/*
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZEventFrame::LineText(wxDC *dc, int x, int y, int w, const char *str, int h, bool down)
-{
-  if (h <= 0)
-  {
-    h = mTrackHeight;
-    y = y2yLine(y);
-  }
-  if (w && h)
-  {
-    //dc->SetBrush(wxGREY_BRUSH);
-    dc->SetBrush(*mpGreyBrush);
-    dc->SetPen(*wxGREY_PEN);
-    #ifdef __WXMSW__
-    dc->DrawRectangle(x, y, w+1, h+1);
-    #else
-    dc->DrawRectangle(x, y, w, h);
-    #endif
-    x += 1;
-    y += 1;
-    w -= 2;
-    h -= 2;
-    if (down)
-    {
-      dc->SetPen(*wxBLACK_PEN);
-      dc->DrawLine(x, y, x+w, y);
-      dc->DrawLine(x, y, x, y+h);
-      dc->SetPen(*wxWHITE_PEN);
-      dc->DrawLine(x+w, y, x+w, y+h);
-      dc->DrawLine(x, y+h, x+w, y+h);
-    }
-    else
-    {
-      dc->SetPen(*wxWHITE_PEN);
-      dc->DrawLine(x, y, x+w, y);
-      dc->DrawLine(x, y, x, y+h);
-      dc->SetPen(*wxBLACK_PEN);
-      dc->DrawLine(x+w, y, x+w, y+h);
-      dc->DrawLine(x, y+h, x+w, y+h);
-    }
-    dc->SetPen(*wxBLACK_PEN);
-    x -= 2;
-    y -= 2;
-  }
-  dc->SetTextBackground(*mpGreyColor);
-  dc->DrawText((char *)str, x + mLittleBit, y + mLittleBit);
-  dc->SetTextBackground(*wxWHITE);
-}
-*/
+//int JZEventFrame::Line2y(int Line)
+//{
+//  return Line * mTrackHeight + mTopInfoHeight;
+//}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -308,26 +233,13 @@ void JZEventFrame::SnapSelStop(wxMouseEvent& MouseEvent)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZEventFrame::EventsSelected(const char* msg)
-{
-  if (!SnapSel->IsSelected())
-  {
-    if (msg == 0)
-    {
-      msg = "please select some events first";
-    }
-    wxMessageBox((char *)msg, "Error", wxOK);
-    return 0;
-  }
-  return 1;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 void JZEventFrame::MenQuantize()
 {
-  if (!EventsSelected())
-    return;
+  if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
+  {
+   return;
+  }
+
   //  wxDialogBox *panel = new wxDialogBox(this, "Quantize", FALSE );
   tQuantizeDlg * dlg = new tQuantizeDlg(this, mpFilter);
   dlg->Create();
@@ -337,8 +249,11 @@ void JZEventFrame::MenQuantize()
 //-----------------------------------------------------------------------------
 void JZEventFrame::MenCleanup()
 {
-  if (!EventsSelected())
-    return;
+  if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
+  {
+   return;
+  }
+
   tCleanupDlg * dlg = new tCleanupDlg(this, mpFilter);
   dlg->Create();
 }
@@ -347,8 +262,11 @@ void JZEventFrame::MenCleanup()
 //-----------------------------------------------------------------------------
 void JZEventFrame::MenSearchReplace()
 {
-  if (!EventsSelected())
-    return;
+  if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
+  {
+   return;
+  }
+
   tSearchReplaceDlg * dlg = new tSearchReplaceDlg(this, mpFilter);
   dlg->Create();
 }
@@ -357,8 +275,11 @@ void JZEventFrame::MenSearchReplace()
 //-----------------------------------------------------------------------------
 void JZEventFrame::MenSetChannel()
 {
-  if (!EventsSelected())
-    return;
+  if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
+  {
+   return;
+  }
+
   tSetChannelDlg * dlg = new tSetChannelDlg(mpFilter);
   dlg->Create();
 }
@@ -367,8 +288,11 @@ void JZEventFrame::MenSetChannel()
 //-----------------------------------------------------------------------------
 void JZEventFrame::MenTranspose()
 {
-  if (!EventsSelected())
-    return;
+  if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
+  {
+   return;
+  }
+
   tTransposeDlg * dlg = new tTransposeDlg(this, mpFilter);
   dlg->Create();
 }
@@ -377,8 +301,11 @@ void JZEventFrame::MenTranspose()
 //-----------------------------------------------------------------------------
 void JZEventFrame::MenDelete()
 {
-  if (!EventsSelected())
-    return;
+  if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
+  {
+   return;
+  }
+
   tDeleteDlg * dlg = new tDeleteDlg(this, mpFilter);
   dlg->Create();
 }
@@ -387,8 +314,11 @@ void JZEventFrame::MenDelete()
 //-----------------------------------------------------------------------------
 void JZEventFrame::MenVelocity()
 {
-  if (!EventsSelected())
-    return;
+  if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
+  {
+   return;
+  }
+
   tVelocityDlg * dlg = new tVelocityDlg(mpFilter);
   dlg->Create();
 }
@@ -397,8 +327,11 @@ void JZEventFrame::MenVelocity()
 //-----------------------------------------------------------------------------
 void JZEventFrame::MenLength()
 {
-  if (!EventsSelected())
-    return;
+  if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
+  {
+   return;
+  }
+
   tLengthDlg * dlg = new tLengthDlg(this, mpFilter);
   dlg->Create();
 }
@@ -408,8 +341,11 @@ void JZEventFrame::MenLength()
 //-----------------------------------------------------------------------------
 void JZEventFrame::MenConvertToModulation()
 {
-  if (!EventsSelected())
-    return;
+  if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
+  {
+   return;
+  }
+
   tCmdConvertToModulation cmd(mpFilter);
   cmd.Execute();
   Redraw();

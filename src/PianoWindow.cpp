@@ -1868,7 +1868,7 @@ void JZPianoWindow::SnapSelStop(wxMouseEvent& Event)
 void JZPianoWindow::SnapSelStart(wxMouseEvent &)
 {
   mSnapCount = 0;
-  int clk = SnapClock(mFromClock, 0);
+  int clk = SnapClock(mFromClock, false);
   int qnt = SnapClocks();
   while (clk <= mToClock && mSnapCount < eMaxSnaps)
   {
@@ -1891,11 +1891,11 @@ void JZPianoWindow::SnapSelStart(wxMouseEvent &)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZPianoWindow::SnapClock(int Clock, int up)
+int JZPianoWindow::SnapClock(int Clock, bool Up)
 {
   int qnt = SnapClocks();
   Clock -= (Clock % qnt);
-  if (up)
+  if (Up)
   {
     Clock += qnt;
   }

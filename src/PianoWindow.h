@@ -113,7 +113,7 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     void SnapSelStart(wxMouseEvent& Event);
 
-    int SnapClock(int Clock, int up = 0);
+    int SnapClock(int Clock, bool Up = false);
 
     void SnapSelStop(wxMouseEvent& Event);
 

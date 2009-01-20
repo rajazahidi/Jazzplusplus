@@ -341,7 +341,7 @@ int JZSong::StringToClock(const string& ClockString) const
 void JZSong::MergeTracks(
   int FrClock,
   int ToClock,
-  tEventArray* Destin,
+  tEventArray* pDestin,
   const JZMetronomeInfo& MetronomeInfo,
   int delta,
   int mode)
@@ -349,7 +349,7 @@ void JZSong::MergeTracks(
   // Make metronome
   if (MetronomeInfo.IsOn())
   {
-    MakeMetronome(FrClock, ToClock, Destin, MetronomeInfo, delta);
+    MakeMetronome(FrClock, ToClock, pDestin, MetronomeInfo, delta);
   }
 
   // Find solo-tracks.
@@ -383,11 +383,11 @@ void JZSong::MergeTracks(
         JZEvent* pEventCopy = pEvent->Copy();
         pEventCopy->SetClock(pEventCopy->GetClock() + delta);
         pEventCopy->SetDevice(pTrack->GetDevice());
-        Destin->Put(pEventCopy);
+        pDestin->Put(pEventCopy);
 
         if (pEventCopy->IsPlayTrack())
         {
-          MergePlayTrackEvent(pEventCopy->IsPlayTrack(), Destin, 0);
+          MergePlayTrackEvent(pEventCopy->IsPlayTrack(), pDestin, 0);
         }
 
         pEvent = Iterator.Next();
@@ -401,7 +401,7 @@ void JZSong::MergeTracks(
 //-----------------------------------------------------------------------------
 void JZSong::MergePlayTrackEvent(
   tPlayTrack* c, //the playtrack event
-  tEventArray* Destin,
+  tEventArray* pDestin,
   int recursionDepth)
 {
   // Recursion might be simple, but we have the infinite loop problem, if a
@@ -470,10 +470,10 @@ void JZSong::MergePlayTrackEvent(
       }
       if (d->IsPlayTrack())
       {
-        MergePlayTrackEvent(d->IsPlayTrack(), Destin, recursionDepth);
+        MergePlayTrackEvent(d->IsPlayTrack(), pDestin, recursionDepth);
       }
       d->SetDevice(pTrack->GetDevice());
-      Destin->Put(d);
+      pDestin->Put(d);
       f = IteratorPL.Next();
     }
     loopOffset+=loopLength;
@@ -485,7 +485,7 @@ void JZSong::MergePlayTrackEvent(
 void JZSong::MakeMetronome(
   int FrClock,
   int ToClock,
-  tEventArray* Destin,
+  tEventArray* pDestin,
   const JZMetronomeInfo& MetronomeInfo,
   int delta)
 {
@@ -510,13 +510,13 @@ void JZSong::MakeMetronome(
     }
 
     // Insert normal click always
-    Destin->Put(MetronomeInfo.CreateNormalEvent(clk + delta));
+    pDestin->Put(MetronomeInfo.CreateNormalEvent(clk + delta));
 
     //  On a bar?
     if (count == 1 && MetronomeInfo.IsAccented())
     {
       // Insert accented click also
-      Destin->Put(MetronomeInfo.CreateAccentedEvent(clk + delta));
+      pDestin->Put(MetronomeInfo.CreateAccentedEvent(clk + delta));
     }
 
     clk += BarInfo.GetTicksPerBar() / BarInfo.GetCountsPerBar();

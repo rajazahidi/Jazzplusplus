@@ -505,6 +505,7 @@ void tSimpleEventArray::RemoveEOT()
   {
     if (Events[i] != 0 && Events[i]->IsEndOfTrack())
     {
+      delete Events[i];
       ++j;
       --newnEvents;
     }
@@ -579,13 +580,13 @@ void tSimpleEventArray::Copy(tSimpleEventArray& src, int frclk, int toclk)
 tEventArray::tEventArray()
   : tSimpleEventArray(),
     mpName(0),
-    Copyright(0),
-    mPatch(0),
-    Speed(0),
-    Volume(0),
-    Pan(0),
-    Reverb(0),
-    Chorus(0),
+    mpCopyright(0),
+    mpPatch(0),
+    mpSpeed(0),
+    mpVolume(0),
+    mpPan(0),
+    mpReverb(0),
+    mpChorus(0),
     mpBank(0),
     mpBank2(0),
     mpReset(0)
@@ -613,18 +614,23 @@ void tEventArray::Clear()
 //  delete mpName;
   mpName = 0;
 
-  Copyright = 0;
+//  delete mpCopyright;
+  mpCopyright = 0;
 
-  delete mPatch;
-  mPatch = 0;
+  delete mpPatch;
+  mpPatch = 0;
 
-  Volume = 0;
+//  delete mpVolume;
+  mpVolume = 0;
 
-  Pan = 0;
+//  delete mpPan;
+  mpPan = 0;
 
-  Reverb = 0;
+//  delete mpReverb;
+  mpReverb = 0;
 
-  Chorus = 0;
+//  delete mpChorus;
+  mpChorus = 0;
 
   delete mpBank;
   mpBank = 0;
@@ -635,7 +641,9 @@ void tEventArray::Clear()
   delete mpReset;
   mpReset = 0;
 
-  Speed = 0;
+//  delete mpSpeed;
+  mpSpeed = 0;
+
   Channel = 1;
   Device = 0;
 
@@ -754,17 +762,17 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
 //  delete mpName;
   mpName = 0;
 
-  Copyright = 0;
+  mpCopyright = 0;
 
-  Speed = 0;
+  mpSpeed = 0;
 
-  Volume = 0;
+  mpVolume = 0;
 
-  Pan = 0;
+  mpPan = 0;
 
-  Reverb = 0;
+  mpReverb = 0;
 
-  Chorus = 0;
+  mpChorus = 0;
 
   for (i = 0; i < mspModulationSysexParameters; i++)
   {
@@ -846,13 +854,13 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
       mpName = pEvent->IsTrackName();
     }
 
-    if (!Copyright)
+    if (!mpCopyright)
     {
-      Copyright = pEvent->IsCopyright();
+      mpCopyright = pEvent->IsCopyright();
     }
-    if (!Speed)
+    if (!mpSpeed)
     {
-      Speed = pEvent->IsSetTempo();
+      mpSpeed = pEvent->IsSetTempo();
     }
     if (!MtcOffset)
     {
@@ -863,27 +871,27 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
       switch (pControl->GetControl())
       {
         case 0x07:
-          if (!Volume)
+          if (!mpVolume)
           {
-            Volume = pControl;
+            mpVolume = pControl;
           }
           break;
         case 0x0a:
-          if (!Pan)
+          if (!mpPan)
           {
-            Pan = pControl;
+            mpPan = pControl;
           }
           break;
         case 0x5b:
-          if (!Reverb)
+          if (!mpReverb)
           {
-            Reverb = pControl;
+            mpReverb = pControl;
           }
           break;
         case 0x5d:
-          if (!Chorus)
+          if (!mpChorus)
           {
-            Chorus = pControl;
+            mpChorus = pControl;
           }
           break;
       }
@@ -1301,9 +1309,9 @@ void tEventArray::Write(JZWriteBase& Io)
   Io.NextTrack();
 
   // Write copyright notice first (according to spec):
-  if (Copyright)
+  if (mpCopyright)
   {
-    Copyright->Write(Io);
+    mpCopyright->Write(Io);
   }
 
   // Write MTC offset before any transmittable events (spec)
@@ -1382,9 +1390,9 @@ void tEventArray::Write(JZWriteBase& Io)
     mpBank2->Write(Io);
   }
 
-  if (mPatch)
+  if (mpPatch)
   {
-    mPatch->Write(Io);
+    mpPatch->Write(Io);
   }
 
   tJazzMeta JazzMeta;
@@ -1591,21 +1599,21 @@ void tEventArray::Read(JZReadBase& Io)
     }
     else if (pEvent->IsProgram())
     {
-      if (!mPatch)
+      if (!mpPatch)
       {
-        mPatch = pEvent->IsProgram();
-        mPatch->SetClock(0);
+        mpPatch = pEvent->IsProgram();
+        mpPatch->SetClock(0);
         SpecialEvent = true;
       }
     }
     else if (pEvent->IsCopyright())
     {
-      if (!Copyright)
+      if (!mpCopyright)
       {
-        Copyright = pEvent->IsCopyright();
+        mpCopyright = pEvent->IsCopyright();
 
         // Just make sure clock is zero, then put into event array
-        Copyright->SetClock(0);
+        mpCopyright->SetClock(0);
       }
     }
     else if (pEvent->IsSysEx())
@@ -1847,9 +1855,9 @@ void tTrackDlg::OnOk()
     {
       trk->mpBank->Channel = trk->Channel - 1;
     }
-    if (trk->mPatch)
+    if (trk->mpPatch)
     {
-      trk->mPatch->Channel = trk->Channel - 1;
+      trk->mpPatch->Channel = trk->Channel - 1;
     }
     if (!trk->DrumParams.IsEmpty())
     {
@@ -2124,9 +2132,9 @@ void JZTrack::Clear()
 
 const char* JZTrack::GetCopyright()
 {
-  if (Copyright)
+  if (mpCopyright)
   {
-    return (const char *)Copyright->GetData();
+    return (const char *)mpCopyright->GetData();
   }
   return "";
 }
@@ -2135,9 +2143,9 @@ const char* JZTrack::GetCopyright()
 
 void JZTrack::SetCopyright(char *str)
 {
-  if (Copyright)
+  if (mpCopyright)
   {
-    Kill(Copyright);
+    Kill(mpCopyright);
   }
   if (str && strlen(str))
   {
@@ -2177,22 +2185,22 @@ void JZTrack::SetName(const char* pTrackName)
   Cleanup();
 }
 
-// ------------------------  Volume ------------------------------
+// ------------------------ Volume ------------------------------
 
 int JZTrack::GetVolume()
 {
-  if (Volume)
+  if (mpVolume)
   {
-    return Volume->GetControlValue() + 1;
+    return mpVolume->GetControlValue() + 1;
   }
   return 0;
 }
 
 void JZTrack::SetVolume(int Value)
 {
-  if (Volume)
+  if (mpVolume)
   {
-    Kill(Volume);
+    Kill(mpVolume);
   }
   if (Value > 0)
   {
@@ -2205,17 +2213,17 @@ void JZTrack::SetVolume(int Value)
 
 bool JZTrack::DecreaseVolume()
 {
-  if (Volume && Volume->GetControlValue() > 0)
+  if (mpVolume && mpVolume->GetControlValue() > 0)
   {
-    Kill(Volume);
+    Kill(mpVolume);
 
-    Volume->SetControlValue(Volume->GetControlValue() - 1);
+    mpVolume->SetControlValue(mpVolume->GetControlValue() - 1);
 
     JZEvent* pEvent = new tControl(
       0,
       Channel - 1,
       0x07,
-      Volume->GetControlValue());
+      mpVolume->GetControlValue());
     Put(pEvent);
     gpMidiPlayer->OutNow(this, pEvent);
 
@@ -2228,17 +2236,17 @@ bool JZTrack::DecreaseVolume()
 
 bool JZTrack::IncreaseVolume()
 {
-  if (Volume && Volume->GetControlValue() < 127)
+  if (mpVolume && mpVolume->GetControlValue() < 127)
   {
-    Kill(Volume);
+    Kill(mpVolume);
 
-    Volume->SetControlValue(Volume->GetControlValue() + 1);
+    mpVolume->SetControlValue(mpVolume->GetControlValue() + 1);
 
     JZEvent* pEvent = new tControl(
       0,
       Channel - 1,
       0x07,
-      Volume->GetControlValue());
+      mpVolume->GetControlValue());
 
     Put(pEvent);
     gpMidiPlayer->OutNow(this, pEvent);
@@ -2250,22 +2258,22 @@ bool JZTrack::IncreaseVolume()
   return false;
 }
 
-// ------------------------  Pan ------------------------------
+// ------------------------ Pan ------------------------------
 
 int JZTrack::GetPan()
 {
-  if (Pan)
+  if (mpPan)
   {
-    return Pan->GetControlValue() + 1;
+    return mpPan->GetControlValue() + 1;
   }
   return 0;
 }
 
 void JZTrack::SetPan(int Value)
 {
-  if (Pan)
+  if (mpPan)
   {
-    Kill(Pan);
+    Kill(mpPan);
   }
   if (Value > 0)
   {
@@ -2276,22 +2284,22 @@ void JZTrack::SetPan(int Value)
   Cleanup();
 }
 
-// ------------------------  Reverb ------------------------------
+// ------------------------ Reverb ------------------------------
 
 int JZTrack::GetReverb()
 {
-  if (Reverb)
+  if (mpReverb)
   {
-    return Reverb->GetControlValue() + 1;
+    return mpReverb->GetControlValue() + 1;
   }
   return 0;
 }
 
 void JZTrack::SetReverb(int Value)
 {
-  if (Reverb)
+  if (mpReverb)
   {
-    Kill(Reverb);
+    Kill(mpReverb);
   }
   if (Value > 0)
   {
@@ -2302,22 +2310,22 @@ void JZTrack::SetReverb(int Value)
   Cleanup();
 }
 
-// ------------------------  Chorus ------------------------------
+// ------------------------ Chorus ------------------------------
 
 int JZTrack::GetChorus()
 {
-  if (Chorus)
+  if (mpChorus)
   {
-    return Chorus->GetControlValue() + 1;
+    return mpChorus->GetControlValue() + 1;
   }
   return 0;
 }
 
 void JZTrack::SetChorus(int Value)
 {
-  if (Chorus)
+  if (mpChorus)
   {
-    Kill(Chorus);
+    Kill(mpChorus);
   }
   if (Value > 0)
   {
@@ -2430,24 +2438,24 @@ void JZTrack::SetBank(int Value)
 
 int JZTrack::GetPatch()
 {
-  if (mPatch)
+  if (mpPatch)
   {
-    return mPatch->GetProgram() + 1;
+    return mpPatch->GetProgram() + 1;
   }
   return 0;
 }
 
 void JZTrack::SetPatch(int PatchNr)
 {
-  if (mPatch)
+  if (mpPatch)
   {
-    delete mPatch;
-    mPatch = 0;
+    delete mpPatch;
+    mpPatch = 0;
   }
   if (PatchNr > 0)
   {
-    mPatch = new tProgram(0, Channel - 1, PatchNr - 1);
-    gpMidiPlayer->OutNow(this, mPatch);
+    mpPatch = new tProgram(0, Channel - 1, PatchNr - 1);
+    gpMidiPlayer->OutNow(this, mpPatch);
     mChanged = true;
   }
 }
@@ -3359,13 +3367,13 @@ void JZTrack::SetMtcOffset(tMtcTime* mtc)
   Cleanup();
 }
 
-// ------------------------  Speed ------------------------------
+// ------------------------ Speed ------------------------------
 
 int JZTrack::GetDefaultSpeed()
 {
-  if (Speed)
+  if (mpSpeed)
   {
-    return Speed->GetBPM();
+    return mpSpeed->GetBPM();
   }
   return 120;
 }
@@ -3374,9 +3382,9 @@ int JZTrack::GetDefaultSpeed()
 void JZTrack::SetDefaultSpeed(int bpm)
 {
   JZEvent* pEvent = new tSetTempo(0, bpm);
-  if (Speed)
+  if (mpSpeed)
   {
-    Kill(Speed);
+    Kill(mpSpeed);
   }
   Put(pEvent);
   gpMidiPlayer->OutNow(this, pEvent);
@@ -3388,7 +3396,7 @@ tSetTempo *JZTrack::GetCurrentTempo(int clk)
   tEventIterator Iterator(this);
   Sort();
   JZEvent* pEvent = Iterator.Range(0, clk + 1);
-  tSetTempo *t = Speed;
+  tSetTempo* t = mpSpeed;
   while (pEvent)
   {
     if (pEvent->IsSetTempo())

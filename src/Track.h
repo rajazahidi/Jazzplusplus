@@ -455,13 +455,13 @@ class tEventArray : public tSimpleEventArray
   public:
 
     tTrackName* mpName;
-    tCopyright* Copyright;
-    tProgram* mPatch;
-    tSetTempo* Speed;
-    tControl* Volume;
-    tControl* Pan;
-    tControl* Reverb;
-    tControl* Chorus;
+    tCopyright* mpCopyright;
+    tProgram* mpPatch;
+    tSetTempo* mpSpeed;
+    tControl* mpVolume;
+    tControl* mpPan;
+    tControl* mpReverb;
+    tControl* mpChorus;
     tControl* mpBank;
     tControl* mpBank2;
 

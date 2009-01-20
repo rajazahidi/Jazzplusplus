@@ -59,7 +59,7 @@ class tPlayLoop
     long Int2ExtClock(long Clock);
 
     void PrepareOutput(
-      tEventArray* buf,
+      tEventArray* pEventArray,
       JZSong* pSong,
       long ExtFr,
       long ExtTo,
@@ -154,7 +154,7 @@ class JZPlayer : public wxTimer
 
     JZSong *Song;
     tEventArray mPlayBuffer;
-    tEventArray RecdBuffer;
+    tEventArray mRecdBuffer;
     void SetRecordInfo(JZRecordingInfo* inf)
     {
       rec_info = inf;

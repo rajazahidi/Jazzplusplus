@@ -1412,7 +1412,7 @@ void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
       }
       if (
         !pRecInfo->mpTrack->GetAudioMode() &&
-        !gpProject->GetPlayer()->RecdBuffer.IsEmpty())
+        !gpProject->GetPlayer()->mRecdBuffer.IsEmpty())
       {
         //int choice = wxMessageBox("Keep recorded events?", "You played", wxOK | wxCANCEL);
         //if (choice == wxOK)
@@ -1420,7 +1420,7 @@ void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
           wxBeginBusyCursor();
           gpProject->NewUndoBuffer();
           pRecInfo->mpTrack->MergeRange(
-            &gpProject->GetPlayer()->RecdBuffer,
+            &gpProject->GetPlayer()->mRecdBuffer,
             pRecInfo->mFromClock,
             pRecInfo->mToClock,
             pRecInfo->mIsMuted);

@@ -136,13 +136,13 @@ long tPlayLoop::Int2ExtClock(long Clock)
 //   Copy events from the passed song to output buffer.
 //-----------------------------------------------------------------------------
 void tPlayLoop::PrepareOutput(
-  tEventArray* buf,
+  tEventArray* pEventArray,
   JZSong* pSong,
   long ExtFr,
   long ExtTo,
   int Mode)
 {
-  if (buf == 0)
+  if (pEventArray == 0)
   {
     return;
   }
@@ -155,7 +155,7 @@ void tPlayLoop::PrepareOutput(
     pSong->MergeTracks(
       From,
       mStopClock,
-      buf,
+      pEventArray,
       gpProject->GetMetronomeInfo(),
       Delta,
       Mode);
@@ -170,7 +170,7 @@ void tPlayLoop::PrepareOutput(
     pSong->MergeTracks(
       From,
       From + Size,
-      buf,
+      pEventArray,
       gpProject->GetMetronomeInfo(),
       Delta,
       Mode);
@@ -199,6 +199,8 @@ JZPlayer::JZPlayer(JZSong* pSong)
 JZPlayer::~JZPlayer()
 {
   delete PlayLoop;
+  mPlayBuffer.Clear();
+  mRecdBuffer.Clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -229,7 +231,7 @@ void JZPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 
   Clock = PlayLoop->Int2ExtClock(Clock);
   mPlayBuffer.Clear();
-  RecdBuffer.Clear();
+  mRecdBuffer.Clear();
   if (AudioBuffer)
   {
     AudioBuffer->Clear();
@@ -262,25 +264,25 @@ void JZPlayer::StartPlay(long Clock, long LoopClock, int Continue)
       {
         OutNow(t, t->mpBank2);
       }
-      if (t->mPatch)
+      if (t->mpPatch)
       {
-        OutNow(t, t->mPatch);
+        OutNow(t, t->mpPatch);
       }
-      if (t->Volume)
+      if (t->mpVolume)
       {
-        OutNow(t, t->Volume);
+        OutNow(t, t->mpVolume);
       }
-      if (t->Pan)
+      if (t->mpPan)
       {
-        OutNow(t, t->Pan);
+        OutNow(t, t->mpPan);
       }
-      if (t->Reverb)
+      if (t->mpReverb)
       {
-        OutNow(t, t->Reverb);
+        OutNow(t, t->mpReverb);
       }
-      if (t->Chorus)
+      if (t->mpChorus)
       {
-        OutNow(t, t->Chorus);
+        OutNow(t, t->mpChorus);
       }
       if (t->VibRate)
       {
@@ -700,7 +702,7 @@ bool tMpuPlayer::IsInstalled()
 #if DB_WRITE
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int dwrite(int dev, const char *buf, int size)
+int dwrite(int dev, const char* buf, int size)
 {
   int i, written;
   //dev = 2;        // stderr
@@ -864,7 +866,7 @@ void tMpuPlayer::StopPlay()
 
   // Get record buffer
   GetRecordedData();
-  RecdBuffer.Keyoff2Length();
+  mRecdBuffer.Keyoff2Length();
 }
 
 //-----------------------------------------------------------------------------
@@ -1046,7 +1048,7 @@ void tMpuPlayer::OutNow(JZEvent* pEvent)
   tGetMidiBytes midi;
   if (pEvent->Write(midi) == 0)
   {
-    char *buf = new char[midi.nBytes + 3];
+    char* buf = new char[midi.nBytes + 3];
     buf[n++] = CMD+1;
     buf[n++] = 0xd7;
     buf[n++] = DAT+midi.nBytes;
@@ -1329,7 +1331,7 @@ long tMpuPlayer::GetRecordedData()
         if (pEvent)
         {
           pEvent->Clock = PlayLoop->Ext2IntClock(pEvent->Clock);
-          RecdBuffer.Put(pEvent);
+          mRecdBuffer.Put(pEvent);
         }
       }
       else if (c == 0xfc)
@@ -1923,7 +1925,7 @@ void tSeq2Player::StopPlay()
     through = new tOSSThru();
   }
   JZProjectManager::Instance()->NewPlayPosition(-1);
-  RecdBuffer.Keyoff2Length();
+  mRecdBuffer.Keyoff2Length();
 }
 
 //-----------------------------------------------------------------------------
@@ -2053,7 +2055,7 @@ long tSeq2Player::GetRealTimeClock()
       if (pEvent)
       {
         pEvent->SetClock(PlayLoop->Ext2IntClock(recd_clock));
-        RecdBuffer.Put(pEvent);
+        mRecdBuffer.Put(pEvent);
         pEvent = 0;
       }
 

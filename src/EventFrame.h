@@ -48,11 +48,12 @@ class JZEventFrame : public wxFrame
 
     // 2-step initialization: 1) constructor
     JZEventFrame(
-      JZEventWindow* pEventWindow,
+      wxWindow* pParent,
       const wxString& Title,
       JZSong* pSong,
       const wxPoint& Position = wxDefaultPosition,
-      const wxSize& Size = wxDefaultSize);
+      const wxSize& Size = wxDefaultSize,
+      long WindowStyle = wxDEFAULT_FRAME_STYLE);
 
     virtual ~JZEventFrame();
 
@@ -60,24 +61,13 @@ class JZEventFrame : public wxFrame
 
     JZFilter* mpFilter;
 
-    // 2) Create():
-    virtual void Create();
-    virtual void CreateMenu();
-    void CreateCanvas();
-//    JZEventWindow* mpEventWindow;
-
-    // Setup()
-    wxFont* mpFixedFont; // remains with 12pt
-    int hFixedFont;   // Height of letters
+    virtual void SetEventWindow(JZEventWindow* pEventWindow);
 
     int mTrackHeight;
 
     int mTopInfoHeight;
     int FontSize;
     int ClocksPerPixel;
-
-    // Parameters changed, e.g. Song loaded
-    virtual void Setup();
 
     int mEventsX, mEventsY, mEventsWidth, mEventsHeight;
     int CanvasX, CanvasY, CanvasW, CanvasH;        // canvas coords
@@ -92,9 +82,7 @@ class JZEventFrame : public wxFrame
 
     // methods
     int y2Line(int y, int up = 0);
-    int y2yLine(int y, int up = 0);
     int Line2y(int line);
-//    void LineText(wxDC *dc, int x, int y, int w, const char *str, int h = -1, bool down = false);
 
     int PlayClock;
 
@@ -123,8 +111,6 @@ class JZEventFrame : public wxFrame
 
     void OnUpdateEditShift(wxUpdateUIEvent& Event);
     void OnEditShift(wxCommandEvent& Event);
-
-    void OnSize(wxSizeEvent& Event);
 
     bool OnCharHook(wxKeyEvent& Event);
 

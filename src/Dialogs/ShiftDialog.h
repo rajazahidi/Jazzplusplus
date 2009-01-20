@@ -28,6 +28,7 @@ class JZFilter;
 class JZIntegerEdit;
 class wxCheckBox;
 class wxTextCtrl;
+class wxSlider;
 
 //*****************************************************************************
 //*****************************************************************************
@@ -38,6 +39,8 @@ class JZShiftDialog : public wxDialog
     JZShiftDialog(
       JZEventWindow& EventWindow,
       JZFilter& Filter,
+      int Unit,
+      int& Shift,
       wxWindow* pParent);
 
   private:
@@ -51,40 +54,10 @@ class JZShiftDialog : public wxDialog
   private:
 
     JZFilter& mFilter;
+    int mUnit;
+    int& mShift;
 
-    wxTextCtrl* mpFromTimeEdit;
-    wxTextCtrl* mpToTimeEdit;
-
-    JZIntegerEdit* mpFromTrackEdit;
-    JZIntegerEdit* mpToTrackEdit;
-
-    wxCheckBox* mpNoteCheckBox;
-    JZIntegerEdit* mpNoteMinEdit;
-    JZIntegerEdit* mpNoteMaxEdit;
-
-    wxCheckBox* mpPolyAftertouchCheckBox;
-    JZIntegerEdit* mpPolyAftertouchMinEdit;
-    JZIntegerEdit* mpPolyAftertouchMaxEdit;
-
-    wxCheckBox* mpControllerCheckBox;
-    JZIntegerEdit* mpControllerMinEdit;
-    JZIntegerEdit* mpControllerMaxEdit;
-
-    wxCheckBox* mpPatchCheckBox;
-    JZIntegerEdit* mpPatchMinEdit;
-    JZIntegerEdit* mpPatchMaxEdit;
-
-    wxCheckBox* mpPitchCheckBox;
-    JZIntegerEdit* mpPitchMinEdit;
-    JZIntegerEdit* mpPitchMaxEdit;
-
-    wxCheckBox* mpMeterCheckBox;
-
-    wxCheckBox* mpChannelAftertouchCheckBox;
-
-    wxCheckBox* mpSysExCheckBox;
-
-    wxCheckBox* mpOtherBox;
+    wxSlider* mpStepsSlider;
 
   DECLARE_EVENT_TABLE();
 };

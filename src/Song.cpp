@@ -154,7 +154,7 @@ JZSong::~JZSong()
 //-----------------------------------------------------------------------------
 void JZSong::Clear()
 {
-  for (int i = 0; i < mTrackCount; i++)
+  for (int i = 0; i < eMaxTrackCount; ++i)
   {
     mTracks[i].Clear();
   }
@@ -210,9 +210,10 @@ void JZSong::Read(JZReadBase& Io, const char* pFileName)
 void JZSong::Write(JZWriteBase& Io, const char* pFileName)
 {
   // Make sure track 0 has a synth reset
-  if (!mTracks[0].Reset)
+  if (!mTracks[0].mpReset)
   {
-    mTracks[0].Reset = gpSynth->Reset()->IsSysEx();
+    JZEvent* pEvent = gpSynth->CreateResetEvent();
+    mTracks[0].mpReset = dynamic_cast<tSysEx*>(pEvent);
   }
 
   int n = NumUsedTracks();

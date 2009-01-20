@@ -75,7 +75,7 @@ using namespace std;
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-BEGIN_EVENT_TABLE(JZTrackFrame, wxFrame)
+BEGIN_EVENT_TABLE(JZTrackFrame, JZEventFrame)
 
   EVT_MENU(wxID_NEW, JZTrackFrame::OnFileNew)
 
@@ -84,9 +84,6 @@ BEGIN_EVENT_TABLE(JZTrackFrame, wxFrame)
   EVT_MENU(wxID_SAVEAS, JZTrackFrame::OnFileSaveAs)
 
   EVT_MENU(wxID_EXIT, JZTrackFrame::OnFileExit)
-
-  EVT_UPDATE_UI(ID_SHIFT, JZTrackFrame::OnUpdateEditShift)
-  EVT_MENU(ID_SHIFT, JZTrackFrame::OnEditShift)
 
   EVT_MENU(ID_PLAY, JZTrackFrame::OnPlay)
 
@@ -124,7 +121,7 @@ JZTrackFrame::JZTrackFrame(
   JZSong* pSong,
   const wxPoint& Position,
   const wxSize& Size)
-  : wxFrame(pParent, wxID_ANY, Title, Position, Size),
+  : JZEventFrame(pParent, Title, pSong, Position, Size),
     mpToolBar(0),
     mpFileMenu(0),
     mpEditMenu(0),
@@ -145,6 +142,8 @@ JZTrackFrame::JZTrackFrame(
   gpTrackWindow = mpTrackWindow;
 
   mpTrackWindow->Create();
+
+  SetEventWindow(mpTrackWindow);
 }
 
 //-----------------------------------------------------------------------------
@@ -204,7 +203,7 @@ void JZTrackFrame::CreateMenu()
   // Create the file menu.
   mpFileMenu = new wxMenu;
 
-  mpFileMenu->Append(wxID_NEW,  "&New");
+  mpFileMenu->Append(wxID_NEW, "&New");
   mpFileMenu->Append(wxID_OPEN, "&Open...");
   mpFileMenu->Append(wxID_CLOSE, "&Close");
   mpFileMenu->Append(wxID_SAVE, "&Save Project");
@@ -521,20 +520,6 @@ void JZTrackFrame::OnFileExit(wxCommandEvent& Event)
     return;
   }
   Close();
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZTrackFrame::OnUpdateEditShift(wxUpdateUIEvent& Event)
-{
-  Event.Enable(mpTrackWindow->AreEventsSelected());
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZTrackFrame::OnEditShift(wxCommandEvent& Event)
-{
-//  mpTrackWindow->Shift();
 }
 
 //-----------------------------------------------------------------------------

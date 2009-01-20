@@ -467,7 +467,7 @@ class tEventArray : public tSimpleEventArray
 
   public:
 
-    tSysEx* Reset;
+    tSysEx* mpReset;
 
     tSysEx* ModulationSettings[mspModulationSysexParameters];
     tSysEx* BenderSettings[bspBenderSysexParameters];

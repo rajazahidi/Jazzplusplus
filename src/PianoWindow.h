@@ -294,7 +294,7 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     void Draw(wxDC& Dc);
 
-    // Overridden tButtonLabelInterface finction.
+    // Overridden tButtonLabelInterface function.
     void ButtonLabelDisplay(const wxString& Text, bool IsButtonDown);
 
   private:
@@ -326,9 +326,8 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
     int mFontSize;
     wxFont* mpFont;
 
-    // remains with 12pt/ bleibt bei 12pt
     wxFont* mpFixedFont;
-    int mFixedFontHeight;        //Height letters/ Hoehe eines Buchstaben
+    int mFixedFontHeight;
 
     wxFont* mpDrumFont;
 

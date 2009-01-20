@@ -523,9 +523,9 @@ void tSimpleEventArray::RemoveEOT()
   nEvents = newnEvents;
 }
 
-void tSimpleEventArray::Put(JZEvent* e)
+void tSimpleEventArray::Put(JZEvent* pEvent)
 {
-  if (e->IsEndOfTrack())
+  if (pEvent->IsEndOfTrack())
   {
     // Remove the old EOT if we are adding a new one.
     RemoveEOT();
@@ -534,7 +534,7 @@ void tSimpleEventArray::Put(JZEvent* e)
   {
     Resize();
   }
-  Events[nEvents++] = e;
+  Events[nEvents++] = pEvent;
 
 #ifdef E_DBUG
   {
@@ -567,11 +567,11 @@ void tSimpleEventArray::GrabData(tSimpleEventArray& src)
 void tSimpleEventArray::Copy(tSimpleEventArray& src, int frclk, int toclk)
 {
   tEventIterator iter(&src);
-  JZEvent* e = iter.Range(frclk, toclk);
-  while (e)
+  JZEvent* pEvent = iter.Range(frclk, toclk);
+  while (pEvent)
   {
-    Put(e->Copy());
-    e = iter.Next();
+    Put(pEvent->Copy());
+    pEvent = iter.Next();
   }
 }
 
@@ -588,7 +588,7 @@ tEventArray::tEventArray()
     Chorus(0),
     mpBank(0),
     mpBank2(0),
-    Reset(0)
+    mpReset(0)
 {
   nEvents = 0;
 
@@ -632,7 +632,9 @@ void tEventArray::Clear()
   delete mpBank2;
   mpBank2 = 0;
 
-  Reset = 0;
+  delete mpReset;
+  mpReset = 0;
+
   Speed = 0;
   Channel = 1;
   Device = 0;
@@ -741,7 +743,7 @@ void tSimpleEventArray::Sort()
 
 void tEventArray::Cleanup(bool dont_delete_killed_events)
 {
-  JZEvent *e;
+  JZEvent* pEvent;
   tControl* pControl;
   tSysEx *s;
   int i;
@@ -820,7 +822,7 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
 
   for (i = 0; i < nEvents; i++)
   {
-    if ((e = Events[i])->IsKilled())
+    if ((pEvent = Events[i])->IsKilled())
     {
       if (!dont_delete_killed_events)
       {
@@ -834,29 +836,29 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
     }
 
     // accept only events having clock == 0 as track defaults
-    if (e->GetClock() != 0)
+    if (pEvent->GetClock() != 0)
     {
       continue;
     }
 
     if (!mpName)
     {
-      mpName = e->IsTrackName();
+      mpName = pEvent->IsTrackName();
     }
 
     if (!Copyright)
     {
-      Copyright = e->IsCopyright();
+      Copyright = pEvent->IsCopyright();
     }
     if (!Speed)
     {
-      Speed = e->IsSetTempo();
+      Speed = pEvent->IsSetTempo();
     }
     if (!MtcOffset)
     {
-      MtcOffset = e->IsMtcOffset();
+      MtcOffset = pEvent->IsMtcOffset();
     }
-    if ((pControl = e->IsControl()) != 0)
+    if ((pControl = pEvent->IsControl()) != 0)
     {
       switch (pControl->GetControl())
       {
@@ -886,13 +888,13 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
           break;
       }
     }
-    if ((s = e->IsSysEx()) != 0)
+    if ((s = pEvent->IsSysEx()) != 0)
     {
-      int sxid = gpSynth->GetSysexId(s);
+      int SysExId = gpSynth->GetSysexId(s);
 
       if (!gpSynth->IsGS())
       {
-        switch (sxid)
+        switch (SysExId)
         {
           case SX_GM_MasterVol:
             // GS has its own; SC-55 doesn't recognize GM Mastervol
@@ -905,7 +907,7 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
 
       if (gpSynth->IsGS())
       {
-        switch (sxid)
+        switch (SysExId)
         {
           case SX_GS_MasterVol:
             MasterVol = s;
@@ -924,7 +926,7 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
           case SX_GS_BendLfo2Pitch:
           case SX_GS_BendLfo2Tvf:
           case SX_GS_BendLfo2Tva:
-            BenderSettings[sxid - SX_GS_BendPitch] = s;
+            BenderSettings[SysExId - SX_GS_BendPitch] = s;
             break;
 
           case SX_GS_ModPitch:
@@ -938,7 +940,7 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
           case SX_GS_ModLfo2Pitch:
           case SX_GS_ModLfo2Tvf:
           case SX_GS_ModLfo2Tva:
-            ModulationSettings[sxid - SX_GS_ModPitch] = s;
+            ModulationSettings[SysExId - SX_GS_ModPitch] = s;
             break;
 
           case SX_GS_CafPitch:
@@ -952,7 +954,7 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
           case SX_GS_CafLfo2Pitch:
           case SX_GS_CafLfo2Tvf:
           case SX_GS_CafLfo2Tva:
-            CAfSettings[sxid - SX_GS_CafPitch] = s;
+            CAfSettings[SysExId - SX_GS_CafPitch] = s;
             break;
 
           case SX_GS_PafPitch:
@@ -966,7 +968,7 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
           case SX_GS_PafLfo2Pitch:
           case SX_GS_PafLfo2Tvf:
           case SX_GS_PafLfo2Tva:
-            PAfSettings[sxid - SX_GS_PafPitch] = s;
+            PAfSettings[SysExId - SX_GS_PafPitch] = s;
             break;
 
           case SX_GS_CC1Pitch:
@@ -980,7 +982,7 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
           case SX_GS_CC1Lfo2Pitch:
           case SX_GS_CC1Lfo2Tvf:
           case SX_GS_CC1Lfo2Tva:
-            CC1Settings[sxid - SX_GS_CC1Pitch] = s;
+            CC1Settings[SysExId - SX_GS_CC1Pitch] = s;
             break;
 
           case SX_GS_CC2Pitch:
@@ -994,7 +996,7 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
           case SX_GS_CC2Lfo2Pitch:
           case SX_GS_CC2Lfo2Tvf:
           case SX_GS_CC2Lfo2Tva:
-            CC2Settings[sxid - SX_GS_CC2Pitch] = s;
+            CC2Settings[SysExId - SX_GS_CC2Pitch] = s;
             break;
 
           case SX_GS_ReverbMacro:
@@ -1007,7 +1009,7 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
           case SX_GS_RevTime:
           case SX_GS_RevDelayFeedback:
           case SX_GS_RevSendChorus:
-            ReverbSettings[sxid - SX_GS_RevCharacter] = s;
+            ReverbSettings[SysExId - SX_GS_RevCharacter] = s;
             break;
 
           case SX_GS_ChorusMacro:
@@ -1021,7 +1023,7 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
           case SX_GS_ChoRate:
           case SX_GS_ChoDepth:
           case SX_GS_ChoSendReverb:
-            ChorusSettings[sxid - SX_GS_ChoPreLpf] = s;
+            ChorusSettings[SysExId - SX_GS_ChoPreLpf] = s;
             break;
 
           case SX_GS_CC1CtrlNo:
@@ -1050,78 +1052,78 @@ void tEventArray::Cleanup(bool dont_delete_killed_events)
       }
       else if (gpSynth->IsXG())
       {
-        switch (sxid)
+        switch (SysExId)
         {
           case SX_XG_BendPitch:
           case SX_XG_BendTvf:
           case SX_XG_BendAmpl:
-            BenderSettings[sxid - SX_XG_BendPitch] = s;
+            BenderSettings[SysExId - SX_XG_BendPitch] = s;
             break;
 
           case SX_XG_BendLfoPitch:
           case SX_XG_BendLfoTvf:
           case SX_XG_BendLfoTva:
-            BenderSettings[sxid + 1 - SX_XG_BendPitch] = s;
+            BenderSettings[SysExId + 1 - SX_XG_BendPitch] = s;
             break;
 
           case SX_XG_ModPitch:
           case SX_XG_ModTvf:
           case SX_XG_ModAmpl:
-            ModulationSettings[sxid - SX_XG_ModPitch] = s;
+            ModulationSettings[SysExId - SX_XG_ModPitch] = s;
             break;
 
           case SX_XG_ModLfoPitch:
           case SX_XG_ModLfoTvf:
           case SX_XG_ModLfoTva:
-            ModulationSettings[sxid + 1 - SX_XG_ModPitch] = s;
+            ModulationSettings[SysExId + 1 - SX_XG_ModPitch] = s;
             break;
 
           case SX_XG_CafPitch:
           case SX_XG_CafTvf:
           case SX_XG_CafAmpl:
-            CAfSettings[sxid - SX_XG_CafPitch] = s;
+            CAfSettings[SysExId - SX_XG_CafPitch] = s;
             break;
 
           case SX_XG_CafLfoPitch:
           case SX_XG_CafLfoTvf:
           case SX_XG_CafLfoTva:
-            CAfSettings[sxid + 1 - SX_XG_CafPitch] = s;
+            CAfSettings[SysExId + 1 - SX_XG_CafPitch] = s;
             break;
 
           case SX_XG_PafPitch:
           case SX_XG_PafTvf:
           case SX_XG_PafAmpl:
-            PAfSettings[sxid - SX_XG_PafPitch] = s;
+            PAfSettings[SysExId - SX_XG_PafPitch] = s;
             break;
 
           case SX_XG_PafLfoPitch:
           case SX_XG_PafLfoTvf:
           case SX_XG_PafLfoTva:
-            PAfSettings[sxid + 1 - SX_XG_PafPitch] = s;
+            PAfSettings[SysExId + 1 - SX_XG_PafPitch] = s;
             break;
 
           case SX_XG_CC1Pitch:
           case SX_XG_CC1Tvf:
           case SX_XG_CC1Ampl:
-            CC1Settings[sxid - SX_XG_CC1Pitch] = s;
+            CC1Settings[SysExId - SX_XG_CC1Pitch] = s;
             break;
 
           case SX_XG_CC1LfoPitch:
           case SX_XG_CC1LfoTvf:
           case SX_XG_CC1LfoTva:
-            CC1Settings[sxid + 1 - SX_XG_CC1Pitch] = s;
+            CC1Settings[SysExId + 1 - SX_XG_CC1Pitch] = s;
             break;
 
           case SX_XG_CC2Pitch:
           case SX_XG_CC2Tvf:
           case SX_XG_CC2Ampl:
-            CC2Settings[sxid - SX_XG_CC2Pitch] = s;
+            CC2Settings[SysExId - SX_XG_CC2Pitch] = s;
             break;
 
           case SX_XG_CC2LfoPitch:
           case SX_XG_CC2LfoTvf:
           case SX_XG_CC2LfoTva:
-            CC2Settings[sxid + 1 - SX_XG_CC2Pitch] = s;
+            CC2Settings[SysExId + 1 - SX_XG_CC2Pitch] = s;
             break;
 
           case SX_XG_ReverbMacro:
@@ -1200,10 +1202,10 @@ void tEventArray::Keyoff2Length()
     tKeyOff* pKeyOff;
     if ((pKeyOff = Events[i]->IsKeyOff()) != 0)
     {
-      JZEvent **e = &Events[i - 1];
-      while (e >= Events)
+      JZEvent** ppEvent = &Events[i - 1];
+      while (ppEvent >= Events)
       {
-        tKeyOn* pKeyOn = (*e)->IsKeyOn();
+        tKeyOn* pKeyOn = (*ppEvent)->IsKeyOn();
         if (
           pKeyOn &&
           pKeyOn->Key == pKeyOff->Key &&
@@ -1218,7 +1220,7 @@ void tEventArray::Keyoff2Length()
           pKeyOff->Kill();
           break;
         }
-        --e;
+        --ppEvent;
       }
     }
   }
@@ -1292,7 +1294,7 @@ void tEventArray::Keyoff2Length()
 
 void tEventArray::Write(JZWriteBase& Io)
 {
-  JZEvent *e;
+  JZEvent* pEvent;
   int WrittenBefore;
 
   Length2Keyoff();
@@ -1311,9 +1313,9 @@ void tEventArray::Write(JZWriteBase& Io)
   }
 
   // Synth reset
-  if (Reset)
+  if (mpReset)
   {
-    Reset->Write(Io);
+    mpReset->Write(Io);
   }
 
   // Rpn / Nrpn:
@@ -1385,21 +1387,20 @@ void tEventArray::Write(JZWriteBase& Io)
     mPatch->Write(Io);
   }
 
-  // write jazz track info
-  tJazzMeta *jazz = new tJazzMeta;
-  jazz->SetAudioMode(audio_mode);
-  jazz->SetTrackState(State);
-  jazz->SetTrackDevice(Device);
-  jazz->SetIntroLength(gpSong->GetIntroLength());
-  jazz->Write(Io);
+  tJazzMeta JazzMeta;
+  JazzMeta.SetAudioMode(audio_mode);
+  JazzMeta.SetTrackState(State);
+  JazzMeta.SetTrackDevice(Device);
+  JazzMeta.SetIntroLength(gpSong->GetIntroLength());
+  JazzMeta.Write(Io);
 
   for (int i = 0; i < nEvents; i++)
   {
-    e = Events[i];
+    pEvent = Events[i];
     WrittenBefore = 0;
-    if (e->IsControl())
+    if (pEvent->IsControl())
     {
-      switch (e->IsControl()->GetControl())
+      switch (pEvent->IsControl()->GetControl())
       {
         // Don't write these again if present as events
         // and clock == 0 (should not happen)
@@ -1410,7 +1411,7 @@ void tEventArray::Write(JZWriteBase& Io)
         case 0x06: // Rpn/Nrpn Data
         case 0x00: // mpBank
         case 0x20: // Bank2
-          if (e->GetClock() == 0)
+          if (pEvent->GetClock() == 0)
           {
             WrittenBefore = 1;
           }
@@ -1419,23 +1420,23 @@ void tEventArray::Write(JZWriteBase& Io)
           WrittenBefore = 0;
       }
     }
-    else if (e->IsProgram())
+    else if (pEvent->IsProgram())
     {
       // Don't write these again if present as events
       // and clock == 0 (should not happen)
-      if (e->GetClock() == 0)
+      if (pEvent->GetClock() == 0)
       {
         WrittenBefore = 1;
       }
     }
-    else if (e->IsCopyright() || e->IsMtcOffset())
+    else if (pEvent->IsCopyright() || pEvent->IsMtcOffset())
     {
       // Will probably happen
       WrittenBefore = 1;
     }
     if (!WrittenBefore)
     {
-      e->Write(Io);
+      pEvent->Write(Io);
     }
   }
   Keyoff2Length();
@@ -1443,10 +1444,10 @@ void tEventArray::Write(JZWriteBase& Io)
 
 void tEventArray::Read(JZReadBase& Io)
 {
-  JZEvent *e;
+  JZEvent* pEvent;
   Channel = 0;
   unsigned char Msb, Lsb, Data;
-  int SpecialEvent;
+  bool SpecialEvent;
 
   Msb = Lsb = Data = 0xff;
   int cha;
@@ -1454,13 +1455,13 @@ void tEventArray::Read(JZReadBase& Io)
   bool NeedToDelete;
 
   Io.NextTrack();
-  while ((e = Io.Read()) != 0)
+  while ((pEvent = Io.Read()) != 0)
   {
     NeedToDelete = false;
-    SpecialEvent = 0;
-    if (e->IsJazzMeta())
+    SpecialEvent = false;
+    if (pEvent->IsJazzMeta())
     {
-      tJazzMeta *j = e->IsJazzMeta();
+      tJazzMeta *j = pEvent->IsJazzMeta();
       audio_mode = (int)j->GetAudioMode();
       State      = (int)j->GetTrackState();
       Device     = (int)j->GetTrackDevice();
@@ -1468,26 +1469,26 @@ void tEventArray::Read(JZReadBase& Io)
       delete j;
       continue;
     }
-    if (e->IsControl())
+    if (pEvent->IsControl())
     {
-      switch (e->IsControl()->GetControl())
+      switch (pEvent->IsControl()->GetControl())
       {
         // Grab Rpn/Nrpn/Bank from file and save them, don't put
         // them into event-array
         case 0x63:
         case 0x65:
-          Msb = e->IsControl()->GetControlValue(); // Rpn/Nrpn Msb
-          SpecialEvent = 1;
+          Msb = pEvent->IsControl()->GetControlValue(); // Rpn/Nrpn Msb
+          SpecialEvent = true;
           break;
         case 0x62:
         case 0x64:
-          Lsb = e->IsControl()->GetControlValue(); // Rpn/Nrpn Lsb
-          SpecialEvent = 1;
+          Lsb = pEvent->IsControl()->GetControlValue(); // Rpn/Nrpn Lsb
+          SpecialEvent = true;
           break;
         case 0x06:
-          Data = e->IsControl()->GetControlValue(); // Rpn/Nrpn Data
-          SpecialEvent = 1;
-          cha = e->IsControl()->GetChannel();
+          Data = pEvent->IsControl()->GetControlValue(); // Rpn/Nrpn Data
+          SpecialEvent = true;
+          cha = pEvent->IsControl()->GetChannel();
           switch (Msb)
           {
             case 0x01: // Nrpn
@@ -1570,65 +1571,65 @@ void tEventArray::Read(JZReadBase& Io)
         case 0x00:
           if (!mpBank)
           {
-            SpecialEvent = 1;
-            mpBank = e->IsControl();
+            SpecialEvent = true;
+            mpBank = pEvent->IsControl();
             mpBank->SetClock(0);
           }
           break;
         case 0x20:
           if (!mpBank2)
           {
-            SpecialEvent = 1;
-            mpBank2 = e->IsControl();
+            SpecialEvent = true;
+            mpBank2 = pEvent->IsControl();
             mpBank2->SetClock(0);
           }
           break;
         default:
-          SpecialEvent = 0; // Other control
+          SpecialEvent = false; // Other control
           break;
       }
     }
-    else if (e->IsProgram())
+    else if (pEvent->IsProgram())
     {
       if (!mPatch)
       {
-        mPatch = e->IsProgram();
+        mPatch = pEvent->IsProgram();
         mPatch->SetClock(0);
-        SpecialEvent = 1;
+        SpecialEvent = true;
       }
     }
-    else if (e->IsCopyright())
+    else if (pEvent->IsCopyright())
     {
       if (!Copyright)
       {
-        Copyright = e->IsCopyright();
+        Copyright = pEvent->IsCopyright();
 
         // Just make sure clock is zero, then put into event array
         Copyright->SetClock(0);
       }
     }
-    else if (e->IsSysEx())
+    else if (pEvent->IsSysEx())
     {
       NeedToDelete = true;
 
       // Get hold of the Reset sysex...
-      int sxid = gpSynth->GetSysexId(e->IsSysEx());
+      int SysExId = gpSynth->GetSysexId(pEvent->IsSysEx());
 
-      if ((sxid == SX_GM_ON) || (sxid == SX_GS_ON) || (sxid == SX_XG_ON))
+      if (SysExId == SX_GM_ON || SysExId == SX_GS_ON || SysExId == SX_XG_ON)
       {
         // Take them all away
-        SpecialEvent = 1;
+        SpecialEvent = true;
 
         // Save it in the track defaults if it fits with synth
         // type settings
         if (
-          (gpSynth->IsGM() && (sxid == SX_GM_ON)) ||
-          (gpSynth->IsGS() && (sxid == SX_GS_ON)) ||
-          (gpSynth->IsXG() && (sxid == SX_XG_ON)))
+          (gpSynth->IsGM() && (SysExId == SX_GM_ON)) ||
+          (gpSynth->IsGS() && (SysExId == SX_GS_ON)) ||
+          (gpSynth->IsXG() && (SysExId == SX_XG_ON)))
         {
-          if (!Reset)
+          if (!mpReset)
           {
-            Reset = e->IsSysEx();
+            mpReset = pEvent->IsSysEx();
             NeedToDelete = false;
           }
         }
@@ -1637,14 +1638,14 @@ void tEventArray::Read(JZReadBase& Io)
 
     if (!SpecialEvent)
     {
-      Put(e);
+      Put(pEvent);
       NeedToDelete = false;
-      if (!Channel && e->IsChannelEvent())
+      if (!Channel && pEvent->IsChannelEvent())
       {
-        Channel = e->IsChannelEvent()->GetChannel() + 1;
+        Channel = pEvent->IsChannelEvent()->GetChannel() + 1;
       }
     }
-    if (e->IsEndOfTrack())
+    if (pEvent->IsEndOfTrack())
     {
       // JAVE I want explicit end of track events
       // Break out of loop here because endoftrack is end, and we want it read
@@ -1655,7 +1656,7 @@ void tEventArray::Read(JZReadBase& Io)
 
     if (NeedToDelete)
     {
-      delete e;
+      delete pEvent;
     }
 
   } // while read
@@ -1772,17 +1773,17 @@ void tTrackDlg::OnOk()
     tSysEx *s;
     tEventIterator Iterator(trk);
     trk->Sort();
-    JZEvent *e = Iterator.Range(0, (unsigned) trk->GetLastClock() + 1);
-    while (e)
+    JZEvent* pEvent = Iterator.Range(0, (unsigned) trk->GetLastClock() + 1);
+    while (pEvent)
     {
-      if ((c = e->IsChannelEvent()) != 0)
+      if ((c = pEvent->IsChannelEvent()) != 0)
       {
-        c = (tChannelEvent *)e->Copy();
+        c = (tChannelEvent *)pEvent->Copy();
         c->SetChannel(trk->Channel - 1);
-        trk->Kill(e);
+        trk->Kill(pEvent);
         trk->Put(c);
       }
-      else if ((s = e->IsSysEx()) != 0)
+      else if ((s = pEvent->IsSysEx()) != 0)
       {
         // Check for sysex that contains channel number
         const unsigned char* pChannel = gpSynth->GetSysexChaPtr(s);
@@ -1798,13 +1799,13 @@ void tTrackDlg::OnOk()
             *pChannel |= sysex_channel(trk->Channel);
           }
 
-          s = (tSysEx *) e->Copy();
-          trk->Kill(e);
+          s = (tSysEx *) pEvent->Copy();
+          trk->Kill(pEvent);
           trk->Put(s);
         }
       }
-      e = Iterator.Next();
-    } // while e
+      pEvent = Iterator.Next();
+    } // while pEvent
 
     if (trk->VibRate)
     {
@@ -1997,20 +1998,20 @@ void JZTrack::MergeRange(tEventArray *other, int FromClock, int ToClock, int Rep
   if (Replace)
   {
     tEventIterator Erase(this);
-    JZEvent *e = Erase.Range(FromClock, ToClock);
-    while (e)
+    JZEvent* pEvent = Erase.Range(FromClock, ToClock);
+    while (pEvent)
     {
-      Kill(e);
-      e = Erase.Next();
+      Kill(pEvent);
+      pEvent = Erase.Next();
     }
   }
 
   // Merge Recorded Events
   tEventIterator Copy(other);
-  JZEvent *e = Copy.Range(FromClock, ToClock);
-  while (e)
+  JZEvent* pEvent = Copy.Range(FromClock, ToClock);
+  while (pEvent)
   {
-    JZEvent *c = e->Copy();
+    JZEvent* c = pEvent->Copy();
     if (ForceChannel)
     {
       tChannelEvent* pChannelEvent = c->IsChannelEvent();
@@ -2020,7 +2021,7 @@ void JZTrack::MergeRange(tEventArray *other, int FromClock, int ToClock, int Rep
       }
     }
     Put(c);
-    e = Copy.Next();
+    pEvent = Copy.Next();
   }
   Cleanup();
 }
@@ -2044,17 +2045,17 @@ void JZTrack::Undo()
     tUndoBuffer *undo = &mUndoBuffers[mUndoIndex];
     for (int i = undo->nEvents - 1; i >= 0; i--)
     {
-      JZEvent *e = undo->Events[i];
+      JZEvent* pEvent = undo->Events[i];
       if (undo->bits(i))
       {
         undo->bits.set(i, 0);
-        e->UnKill();
-        tEventArray::Put(e);
+        pEvent->UnKill();
+        tEventArray::Put(pEvent);
       }
       else
       {
         undo->bits.set(i, 1);
-        e->Kill();
+        pEvent->Kill();
       }
     }
     tEventArray::Cleanup(TRUE);
@@ -2074,17 +2075,17 @@ void JZTrack::Redo()
     tUndoBuffer *undo = &mUndoBuffers[mUndoIndex];
     for (int i = 0; i < undo->nEvents; i++)
     {
-      JZEvent *e = undo->Events[i];
+      JZEvent* pEvent = undo->Events[i];
       if (undo->bits(i))
       {
         undo->bits.set(i, 0);
-        e->UnKill();
-        tEventArray::Put(e);
+        pEvent->UnKill();
+        tEventArray::Put(pEvent);
       }
       else
       {
         undo->bits.set(i, 1);
-        e->Kill();
+        pEvent->Kill();
       }
     }
     tEventArray::Cleanup(TRUE);
@@ -2268,9 +2269,9 @@ void JZTrack::SetPan(int Value)
   }
   if (Value > 0)
   {
-    JZEvent *e = new tControl(0, Channel - 1, 0x0a, Value - 1);
-    Put(e);
-    gpMidiPlayer->OutNow(this, e);
+    JZEvent* pEvent = new tControl(0, Channel - 1, 0x0a, Value - 1);
+    Put(pEvent);
+    gpMidiPlayer->OutNow(this, pEvent);
   }
   Cleanup();
 }
@@ -2294,9 +2295,9 @@ void JZTrack::SetReverb(int Value)
   }
   if (Value > 0)
   {
-    JZEvent *e = new tControl(0, Channel - 1, 0x5B, Value - 1);
-    Put(e);
-    gpMidiPlayer->OutNow(this, e);
+    JZEvent* pEvent = new tControl(0, Channel - 1, 0x5B, Value - 1);
+    Put(pEvent);
+    gpMidiPlayer->OutNow(this, pEvent);
   }
   Cleanup();
 }
@@ -2320,9 +2321,9 @@ void JZTrack::SetChorus(int Value)
   }
   if (Value > 0)
   {
-    JZEvent *e = new tControl(0, Channel - 1, 0x5D, Value - 1);
-    Put(e);
-    gpMidiPlayer->OutNow(this, e);
+    JZEvent* pEvent = new tControl(0, Channel - 1, 0x5D, Value - 1);
+    Put(pEvent);
+    gpMidiPlayer->OutNow(this, pEvent);
   }
   Cleanup();
 }
@@ -2743,11 +2744,11 @@ void JZTrack::SetModulationSysex(int msp, int Value)
   }
   if (Value > 0)
   {
-    JZEvent *e = gpSynth->ModSX(msp, 0, Channel, Value - 1);
-    if (e)
+    JZEvent* pEvent = gpSynth->ModSX(msp, 0, Channel, Value - 1);
+    if (pEvent)
     {
-      Put(e);
-      gpMidiPlayer->OutNow(this, e);
+      Put(pEvent);
+      gpMidiPlayer->OutNow(this, pEvent);
     }
   }
   Cleanup();
@@ -2775,11 +2776,11 @@ void JZTrack::SetBenderSysex(int bsp, int Value)
   }
   if (Value > 0)
   {
-    JZEvent *e = gpSynth->BendSX(bsp, 0, Channel, Value - 1);
-    if (e)
+    JZEvent* pEvent = gpSynth->BendSX(bsp, 0, Channel, Value - 1);
+    if (pEvent)
     {
-      Put(e);
-      gpMidiPlayer->OutNow(this, e);
+      Put(pEvent);
+      gpMidiPlayer->OutNow(this, pEvent);
     }
   }
   Cleanup();
@@ -2807,11 +2808,11 @@ void JZTrack::SetCAfSysex(int csp, int Value)
   }
   if (Value > 0)
   {
-    JZEvent *e = gpSynth->CafSX(csp, 0, Channel, Value - 1);
-    if (e)
+    JZEvent* pEvent = gpSynth->CafSX(csp, 0, Channel, Value - 1);
+    if (pEvent)
     {
-      Put(e);
-      gpMidiPlayer->OutNow(this, e);
+      Put(pEvent);
+      gpMidiPlayer->OutNow(this, pEvent);
     }
   }
   Cleanup();
@@ -2839,11 +2840,11 @@ void JZTrack::SetPAfSysex(int psp, int Value)
   }
   if (Value > 0)
   {
-    JZEvent *e = gpSynth->PafSX(psp, 0, Channel, Value - 1);
-    if (e)
+    JZEvent* pEvent = gpSynth->PafSX(psp, 0, Channel, Value - 1);
+    if (pEvent)
     {
-      Put(e);
-      gpMidiPlayer->OutNow(this, e);
+      Put(pEvent);
+      gpMidiPlayer->OutNow(this, pEvent);
     }
   }
   Cleanup();
@@ -2871,11 +2872,11 @@ void JZTrack::SetCC1Sysex(int csp, int Value)
   }
   if (Value > 0)
   {
-    JZEvent *e = gpSynth->CC1SX(csp, 0, Channel, Value - 1);
-    if (e)
+    JZEvent* pEvent = gpSynth->CC1SX(csp, 0, Channel, Value - 1);
+    if (pEvent)
     {
-      Put(e);
-      gpMidiPlayer->OutNow(this, e);
+      Put(pEvent);
+      gpMidiPlayer->OutNow(this, pEvent);
     }
   }
   Cleanup();
@@ -2901,11 +2902,11 @@ void JZTrack::SetCC2Sysex(int csp, int Value)
     Kill(CC2Settings[csp]);
   if (Value > 0)
   {
-    JZEvent *e = gpSynth->CC2SX(csp, 0, Channel, Value - 1);
-    if (e)
+    JZEvent* pEvent = gpSynth->CC2SX(csp, 0, Channel, Value - 1);
+    if (pEvent)
     {
-      Put(e);
-      gpMidiPlayer->OutNow(this, e);
+      Put(pEvent);
+      gpMidiPlayer->OutNow(this, pEvent);
     }
   }
   Cleanup();
@@ -2933,11 +2934,11 @@ void JZTrack::SetCC1ControllerNr(int Value)
   }
   if (Value > 0)
   {
-    JZEvent *e = gpSynth->ControllerNumberSX(1, 0, Channel, Value - 1);
-    if (e)
+    JZEvent* pEvent = gpSynth->ControllerNumberSX(1, 0, Channel, Value - 1);
+    if (pEvent)
     {
-      Put(e);
-      gpMidiPlayer->OutNow(this, e);
+      Put(pEvent);
+      gpMidiPlayer->OutNow(this, pEvent);
     }
   }
   Cleanup();
@@ -2965,11 +2966,11 @@ void JZTrack::SetCC2ControllerNr(int Value)
   }
   if (Value > 0)
   {
-    JZEvent *e = gpSynth->ControllerNumberSX(2, 0, Channel, Value - 1);
-    if (e)
+    JZEvent* pEvent = gpSynth->ControllerNumberSX(2, 0, Channel, Value - 1);
+    if (pEvent)
     {
-      Put(e);
-      gpMidiPlayer->OutNow(this, e);
+      Put(pEvent);
+      gpMidiPlayer->OutNow(this, pEvent);
     }
   }
   Cleanup();
@@ -3002,13 +3003,13 @@ void JZTrack::SetReverbType(int Value, int lsb)
 
   if (Value > 0)
   {
-    JZEvent *e = gpSynth->ReverbMacroSX(0, Value - 1, lsb - 1);
-    if (e)
+    JZEvent* pEvent = gpSynth->ReverbMacroSX(0, Value - 1, lsb - 1);
+    if (pEvent)
     {
-      Put(e);
+      Put(pEvent);
       if (gpConfig->GetValue(C_UseReverbMacro))
       {
-        gpMidiPlayer->OutNow(this, e);
+        gpMidiPlayer->OutNow(this, pEvent);
       }
     }
   }
@@ -3043,13 +3044,13 @@ void JZTrack::SetChorusType(int Value, int lsb)
 
   if (Value > 0)
   {
-    JZEvent *e = gpSynth->ChorusMacroSX(0, Value - 1, lsb - 1);
-    if (e)
+    JZEvent* pEvent = gpSynth->ChorusMacroSX(0, Value - 1, lsb - 1);
+    if (pEvent)
     {
-      Put(e);
+      Put(pEvent);
       if (gpConfig->GetValue(C_UseChorusMacro))
       {
-        gpMidiPlayer->OutNow(this, e);
+        gpMidiPlayer->OutNow(this, pEvent);
       }
     }
   }
@@ -3079,11 +3080,11 @@ void JZTrack::SetEqualizerType(int Value)
 
   if (Value > 0)
   {
-    JZEvent *e = gpSynth->EqualizerMacroSX(0, Value - 1);
-    if (e)
+    JZEvent* pEvent = gpSynth->EqualizerMacroSX(0, Value - 1);
+    if (pEvent)
     {
-      Put(e);
-      gpMidiPlayer->OutNow(this, e);
+      Put(pEvent);
+      gpMidiPlayer->OutNow(this, pEvent);
     }
   }
   Cleanup();
@@ -3112,13 +3113,13 @@ void JZTrack::SetRevSysex(int rsp, int Value)
 
   if (Value > 0)
   {
-    JZEvent *e = gpSynth->ReverbParamSX(rsp, 0, Value - 1);
-    if (e)
+    JZEvent* pEvent = gpSynth->ReverbParamSX(rsp, 0, Value - 1);
+    if (pEvent)
     {
-      Put(e);
+      Put(pEvent);
       if (!gpConfig->GetValue(C_UseReverbMacro))
       {
-        gpMidiPlayer->OutNow(this, e);
+        gpMidiPlayer->OutNow(this, pEvent);
       }
     }
   }
@@ -3148,13 +3149,13 @@ void JZTrack::SetChoSysex(int csp, int Value)
 
   if (Value > 0)
   {
-    JZEvent *e = gpSynth->ChorusParamSX(csp, 0, Value - 1);
-    if (e)
+    JZEvent* pEvent = gpSynth->ChorusParamSX(csp, 0, Value - 1);
+    if (pEvent)
     {
-      Put(e);
+      Put(pEvent);
       if (!gpConfig->GetValue(C_UseChorusMacro))
       {
-        gpMidiPlayer->OutNow(this, e);
+        gpMidiPlayer->OutNow(this, pEvent);
       }
     }
   }
@@ -3185,11 +3186,11 @@ void JZTrack::SetPartRsrv(unsigned char *rsrv)
 
   if (rsrv)
   {
-    JZEvent *e = gpSynth->PartialReserveSX(0, Channel, rsrv);
-    if (e)
+    JZEvent* pEvent = gpSynth->PartialReserveSX(0, Channel, rsrv);
+    if (pEvent)
     {
-      Put(e);
-      gpMidiPlayer->OutNow(this, e);
+      Put(pEvent);
+      gpMidiPlayer->OutNow(this, pEvent);
     }
   }
   Cleanup();
@@ -3223,11 +3224,11 @@ void JZTrack::SetMasterVol(int Value)
   }
   if (Value > 0)
   {
-    JZEvent *e = gpSynth->MasterVolSX(0, Value - 1);
-    if (e)
+    JZEvent* pEvent = gpSynth->MasterVolSX(0, Value - 1);
+    if (pEvent)
     {
-      Put(e);
-      gpMidiPlayer->OutNow(this, e);
+      Put(pEvent);
+      gpMidiPlayer->OutNow(this, pEvent);
     }
   }
   Cleanup();
@@ -3256,11 +3257,11 @@ void JZTrack::SetMasterPan(int Value)
   }
   if (Value > 0)
   {
-     JZEvent *e = gpSynth->MasterPanSX(0, Value - 1);
-    if (e)
+     JZEvent* pEvent = gpSynth->MasterPanSX(0, Value - 1);
+    if (pEvent)
     {
-       Put(e);
-       gpMidiPlayer->OutNow(this, e);
+       Put(pEvent);
+       gpMidiPlayer->OutNow(this, pEvent);
     }
   }
   Cleanup();
@@ -3310,24 +3311,24 @@ void JZTrack::SetModeSysex(int param, int Value)
       break;
   }
 
-  JZEvent *e = 0;
+  JZEvent* pEvent = 0;
 
   if (Value > 0)
   {
     switch (param)
     {
       case mspRxChannel:
-        e = gpSynth->RxChannelSX(0, Channel, Value - 1);
+        pEvent = gpSynth->RxChannelSX(0, Channel, Value - 1);
         break;
       case mspUseForRhythm:
-        e = gpSynth->UseForRhythmSX(0, Channel, Value - 1);
+        pEvent = gpSynth->UseForRhythmSX(0, Channel, Value - 1);
         break;
     }
 
-    if (e)
+    if (pEvent)
     {
-      Put(e);
-      gpMidiPlayer->OutNow(this, e);
+      Put(pEvent);
+      gpMidiPlayer->OutNow(this, pEvent);
     }
   }
   Cleanup();
@@ -3352,8 +3353,8 @@ void JZTrack::SetMtcOffset(tMtcTime* mtc)
   }
   if (mtc)
   {
-    JZEvent *e = mtc->ToOffset();
-    Put(e);
+    JZEvent* pEvent = mtc->ToOffset();
+    Put(pEvent);
   }
   Cleanup();
 }
@@ -3372,13 +3373,13 @@ int JZTrack::GetDefaultSpeed()
 
 void JZTrack::SetDefaultSpeed(int bpm)
 {
-  JZEvent *e = new tSetTempo(0, bpm);
+  JZEvent* pEvent = new tSetTempo(0, bpm);
   if (Speed)
   {
     Kill(Speed);
   }
-  Put(e);
-  gpMidiPlayer->OutNow(this, e);
+  Put(pEvent);
+  gpMidiPlayer->OutNow(this, pEvent);
   Cleanup();
 }
 
@@ -3386,16 +3387,16 @@ tSetTempo *JZTrack::GetCurrentTempo(int clk)
 {
   tEventIterator Iterator(this);
   Sort();
-  JZEvent *e = Iterator.Range(0, clk + 1);
+  JZEvent* pEvent = Iterator.Range(0, clk + 1);
   tSetTempo *t = Speed;
-  while (e)
+  while (pEvent)
   {
-    if (e->IsSetTempo())
+    if (pEvent->IsSetTempo())
     {
-      t = e->IsSetTempo();
+      t = pEvent->IsSetTempo();
     }
-    e = Iterator.Next();
-  } // while e
+    pEvent = Iterator.Next();
+  } // while pEvent
 
   return t;
 }

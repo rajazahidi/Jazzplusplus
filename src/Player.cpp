@@ -245,7 +245,9 @@ void JZPlayer::StartPlay(long Clock, long LoopClock, int Continue)
     {
       // fixme: we should have different synths for each device
       t = Song->GetTrack(0);
-      OutNow(t, gpSynth->Reset());
+      JZEvent* mpResetEvent = gpSynth->CreateResetEvent();
+      OutNow(t, mpResetEvent);
+      delete mpResetEvent;
     }
 
     // Send Volume, Pan, Chorus, etc
@@ -640,7 +642,9 @@ void JZPlayer::AllNotesOff(int Reset)
 
   if (Reset)
   {
-    OutNow(gpSynth->Reset());
+    JZEvent* mpResetEvent = gpSynth->CreateResetEvent();
+    OutNow(mpResetEvent);
+    delete mpResetEvent;
   }
 }
 

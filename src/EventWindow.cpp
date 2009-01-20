@@ -22,12 +22,14 @@
 
 #include "EventWindow.h"
 
+#include "Command.h"
 #include "Dialogs/ShiftDialog.h"
 #include "EventFrame.h"
 #include "Filter.h"
 #include "MouseAction.h"
 #include "Song.h"
 #include "Help.h"
+#include "ProjectManager.h"
 #include "PropertyListDialog.h"
 
 #include <wx/dc.h>
@@ -130,10 +132,16 @@ void JZEventWindow::Shift(int Units)
 {
   if (AreEventsSelected())
   {
-    JZShiftDialog ShiftDialog(*this, *mpFilter, this);
+    int Unit = 30;
+    int Shift = 0;
+    JZShiftDialog ShiftDialog(*this, *mpFilter, Units, Shift, this);
 
-    if (ShiftDialog.ShowModal() == wxID_OK)
+    if (ShiftDialog.ShowModal() == wxID_OK && Shift != 0)
     {
+      tCmdShift ShiftCommand(mpFilter, Shift * Unit);
+      ShiftCommand.Execute();
+
+      JZProjectManager::Instance()->UpdateAllViews();
     }
   }
 }

@@ -26,23 +26,20 @@ BEGIN_EVENT_TABLE(JZEventFrame, wxFrame)
   EVT_UPDATE_UI(ID_SHIFT, JZEventFrame::OnUpdateEditShift)
   EVT_MENU(ID_SHIFT, JZEventFrame::OnEditShift)
 
-  EVT_SIZE(JZEventFrame::OnSize)
-
 END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZEventFrame::JZEventFrame(
-  JZEventWindow* pEventWindow,
+  wxWindow* pParent,
   const wxString& Title,
   JZSong* pSong,
   const wxPoint& Position,
-  const wxSize& Size)
-  : wxFrame(pEventWindow, wxID_ANY, Title, Position, Size),
+  const wxSize& Size,
+  long WindowStyle)
+  : wxFrame(pParent, wxID_ANY, Title, Position, Size, WindowStyle),
     Song(pSong),
     mpFilter(0),
-    mpFixedFont(0),
-    hFixedFont(0),
     mTrackHeight(0),
     mTopInfoHeight(40),
     FontSize(12),
@@ -67,7 +64,7 @@ JZEventFrame::JZEventFrame(
     mpToolBar(0),
     mpGreyColor(0),
     mpGreyBrush(0),
-    mpEventWindow(pEventWindow)
+    mpEventWindow(0)
 {
 #ifdef __WXMSW__
   mpGreyColor = new wxColor(192, 192, 192);
@@ -88,8 +85,6 @@ JZEventFrame::~JZEventFrame()
 
   delete mpFilter;
 
-  delete mpFixedFont;
-
   delete mpToolBar;
 
   if (MixerForm)
@@ -99,123 +94,36 @@ JZEventFrame::~JZEventFrame()
 }
 
 //-----------------------------------------------------------------------------
+// Description:
+//   Register the event window with the frame.
 //-----------------------------------------------------------------------------
-void JZEventFrame::CreateMenu()
+void JZEventFrame::SetEventWindow(JZEventWindow* pEventWindow)
 {
-}
-
-
-//-----------------------------------------------------------------------------
-// create the canvas component(used for differently dependingon the subclass)
-// size it to the client area of the frame(frame size minus toolbar and menus )
-//-----------------------------------------------------------------------------
-//void JZEventFrame::CreateCanvas()
-//{
-//  cout << "CreateCanvas" << endl;
-//  int Width, Height;
-//  GetClientSize(&Width, &Height);
-//  mpEventWindow = new JZEventWindow(this, 0, 0, Width, Height);
-//}
-
-/**
-second phase of creation. make menus, the canvas, and so on
-*/
-void JZEventFrame::Create()
-{
-  CreateMenu();
-
-  Setup();
-}
-
-//-----------------------------------------------------------------------------
-// Initialize the constants used in drawing.
-//-----------------------------------------------------------------------------
-void JZEventFrame::Setup()
-{
-/*
-  int x, y;
-
-  wxClientDC Dc(mpEventWindow);
-  Dc.SetFont(wxNullFont);
-  delete mpFixedFont;
-  mpFixedFont = new wxFont(12, wxSWISS, wxNORMAL, wxNORMAL);
-  Dc.SetFont(*mpFixedFont);
-  Dc.GetTextExtent("M", &x, &y);
-  hFixedFont = (int)y;
-
-  delete mpFont;
-  mpFont = new wxFont(FontSize, wxSWISS, wxNORMAL, wxNORMAL);
-  Dc.SetFont(*mpFont);
-
-  Dc.GetTextExtent("M", &x, &y);
-  mLittleBit = (int)(x/2);
-
-  Dc.GetTextExtent("HXWjgi", &x, &y);
-  mTrackHeight = (int)y + mLittleBit;
-*/
+  mpEventWindow = pEventWindow;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZEventFrame::OnUpdateEditShift(wxUpdateUIEvent& Event)
 {
-  Event.Enable(mpEventWindow->AreEventsSelected());
+  if (mpEventWindow)
+  {
+    Event.Enable(mpEventWindow->AreEventsSelected());
+  }
+  else
+  {
+    Event.Enable(false);
+  }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZEventFrame::OnEditShift(wxCommandEvent& Event)
 {
-//  mpEventWindow->Shift();
-}
-
-//-----------------------------------------------------------------------------
-// this onsize handler is supposed to take care of handling of the resizing
-// the two subwindows sizes to they dont overlap
-//-----------------------------------------------------------------------------
-void JZEventFrame::OnSize(wxSizeEvent& Event)
-{
-//  wxFrame::OnSize(Event);
-
-  // The code below is from the toolbar sample, the layoutchidlren function
-  wxSize size = GetClientSize();
-
-  int offset;
-//  if (mpToolBar)
-//  {
-//    mpToolBar->SetSize(-1, size.y);
-//    mpToolBar->Move(0, 0);
-//
-//    offset = mpToolBar->GetSize().x;
-//  }
-//  else
-//  {
-//    offset = 0;
-//  }
-
-    // The step below should set the offset of the mpEventWindow
-    // m_textWindow->SetSize(offset, 0, size.x - offset, size.y);
-
-//  float maxToolBarWidth  = 0.0;
-//  float maxToolBarHeight = 0.0;
-//  if (mpToolBar)
-//  {
-//    mpToolBar->GetMaxSize(&maxToolBarWidth, &maxToolBarHeight);
-//  }
-
-  offset = mpToolBar->GetSize().y; //get the height of the toolbar
-
-  int frameWidth, frameHeight;
-  GetClientSize(&frameWidth, &frameHeight);
-
-//     if (mpEventWindow)
-//       //       mpEventWindow->SetSize(0, (int)offset, (int)frameWidth, (int)(frameHeight - offset));
-//       mpEventWindow->SetSize(0, (int)0, (int)frameWidth, (int)(frameHeight));
-// //   if (mpToolBar)
-// //     mpToolBar->SetSize(0, 0, (int)frameWidth, (int)maxToolBarHeight);
-
-  cout
-    << "JZEventFrame::OnSize " << frameWidth<< 'x' << frameHeight << endl;
+  if (mpEventWindow)
+  {
+    mpEventWindow->Shift(16);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -223,20 +131,6 @@ void JZEventFrame::OnSize(wxSizeEvent& Event)
 bool JZEventFrame::OnCharHook(wxKeyEvent& e)
 {
   return OnKeyEvent(e);
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-int JZEventFrame::y2yLine(int y, int up)
-{
-  if (up)
-  {
-    y += mTrackHeight;
-  }
-  y -= mTopInfoHeight;
-  y -= y % mTrackHeight;
-  y += mTopInfoHeight;
-  return y;
 }
 
 //-----------------------------------------------------------------------------
@@ -318,10 +212,14 @@ void JZEventFrame::Redraw()
 //   wxPaintEvent e;
 //   cout<<"FIXME JZEventFrame::Redraw"<<endl;
 //   mpEventWindow->OnDraw(*dc); //this will in turn call the eventwin onpaintsub
-//   //the problem is that onpaint no longer tkes no argument, and is supposed to be called from the framework only, so it should be split
+//   // the problem is that onpaint no longer takes arguments, and is supposed
+//   // to be called from the framework only, so it should be split.
 //   delete dc;
 
-//  mpEventWindow->Refresh();
+//  if (mpEventWindow)
+//  {
+//    mpEventWindow->Refresh();
+//  }
 }
 
 //-----------------------------------------------------------------------------

@@ -325,7 +325,7 @@ class JZSynth
       Sysex.FixCheckSum( s );
     }
 
-    virtual JZEvent* Reset() = 0;
+    virtual JZEvent* CreateResetEvent() = 0;
 
     virtual JZEvent* MasterVolSX( long clk, unsigned char vol )
     {
@@ -375,7 +375,7 @@ class tGM : public JZSynth
       return this;
     }
 
-    virtual JZEvent* Reset()
+    virtual JZEvent* CreateResetEvent()
     {
       return Sysex(0, SX_GM_ON);
     }
@@ -389,7 +389,7 @@ class tGS : public JZSynth
       return this;
     }
 
-    JZEvent* Reset()
+    virtual JZEvent* CreateResetEvent()
     {
       return Sysex(0, SX_GS_ON);
     }
@@ -420,7 +420,7 @@ class tXG : public JZSynth
       return this;
     }
 
-    JZEvent* Reset()
+    virtual JZEvent* CreateResetEvent()
     {
       return Sysex(0, SX_XG_ON);
     }

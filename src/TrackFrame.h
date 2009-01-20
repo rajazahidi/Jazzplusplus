@@ -26,7 +26,7 @@
 #include "MouseAction.h"
 #include "Metronome.h"
 
-#include <wx/frame.h>
+#include "EventFrame.h"
 
 class JZSong;
 class JZToolBar;
@@ -35,7 +35,7 @@ class JZPianoWindow;
 
 //*****************************************************************************
 //*****************************************************************************
-class JZTrackFrame : public wxFrame, public tButtonLabelInterface
+class JZTrackFrame : public JZEventFrame, public tButtonLabelInterface
 {
   public:
 
@@ -82,9 +82,6 @@ class JZTrackFrame : public wxFrame, public tButtonLabelInterface
 
     void OnZoomOut(wxCommandEvent& Event);
 
-    void OnUpdateEditShift(wxUpdateUIEvent& Event);
-    void OnEditShift(wxCommandEvent& Event);
-
     void OnPlay(wxCommandEvent& Event);
 
     void OnPlayLoop(wxCommandEvent& Event);
@@ -125,6 +122,12 @@ class JZTrackFrame : public wxFrame, public tButtonLabelInterface
   DECLARE_EVENT_TABLE()
 };
 
+//*****************************************************************************
+// Description:
+//   These are the track frame class inline member functions.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 inline
 void JZTrackFrame::ButtonLabelDisplay(const wxString& Text, bool IsButtonDown)
 {

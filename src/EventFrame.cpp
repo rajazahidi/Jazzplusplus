@@ -47,7 +47,6 @@ JZEventFrame::JZEventFrame(
     mEventsHeight(0),
     SnapSel(0),
     MouseAction(0),
-    PlayClock(-1),
     mpSettingsDialog(0),
     MixerForm(0),
     mpToolBar(0),
@@ -56,6 +55,8 @@ JZEventFrame::JZEventFrame(
   mpFilter = new JZFilter(Song);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZEventFrame::~JZEventFrame()
 {
   delete SnapSel;
@@ -77,6 +78,113 @@ JZEventFrame::~JZEventFrame()
 void JZEventFrame::SetEventWindow(JZEventWindow* pEventWindow)
 {
   mpEventWindow = pEventWindow;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZEventFrame::SnapSelStart(wxMouseEvent& MouseEvent)
+{
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZEventFrame::SnapSelStop(wxMouseEvent& MouseEvent)
+{
+}
+
+//-----------------------------------------------------------------------------
+// seems to handle the "selection" rectangle. normally called from the base
+// class onmouseevent handler
+//-----------------------------------------------------------------------------
+int JZEventFrame::OnMouseEvent(wxMouseEvent& MouseEvent)
+{
+//  cout << "JZEventFrame::OnMouseEvent" << endl;
+  if (!MouseAction)
+  {
+    // create SnapSel?
+    int x;
+    int y;
+    MouseEvent.GetPosition(&x, &y);
+    if (
+      mEventsX < x &&
+      x < mEventsX + mEventsWidth &&
+      mEventsY < y &&
+      y < mEventsY + mEventsHeight)
+    {
+      if (MouseEvent.LeftDown())
+      {
+        {
+          SnapSelStart(MouseEvent);
+
+          if (SnapSel->IsSelected())
+          {
+            Refresh(); //redraw the whole window instead(inefficient, we should rather invalidate a rect)
+          }
+          SnapSel->Event(MouseEvent);
+          MouseAction = SnapSel;
+        }
+      }
+    }
+  }
+  else
+  {
+    // MouseAction active
+
+    if (MouseAction->Event(MouseEvent))
+    {
+      // MouseAction finished
+
+      if (MouseAction == SnapSel)
+      {
+        SnapSelStop(MouseEvent);
+        Redraw(); //ineficcient, invalidate rect first instead
+        MouseAction = 0;
+        return 1;
+      }
+
+      MouseAction = 0;
+    }
+  }
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZEventFrame::OnKeyEvent(wxKeyEvent& KeyEvent)
+{
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZEventFrame::OnClose()
+{
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZEventFrame::Redraw()
+{
+//   wxDC* dc=new wxClientDC(this);
+//   wxPaintEvent PaintEvent;
+//   cout<<"FIXME JZEventFrame::Redraw"<<endl;
+//   mpEventWindow->OnDraw(*dc); //this will in turn call the eventwin onpaintsub
+//   // the problem is that onpaint no longer takes arguments, and is supposed
+//   // to be called from the framework only, so it should be split.
+//   delete dc;
+
+//  if (mpEventWindow)
+//  {
+//    mpEventWindow->Refresh();
+//  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZEventFrame::OnCharHook(wxKeyEvent& KeyEvent)
+{
+  return OnKeyEvent(KeyEvent);
 }
 
 //-----------------------------------------------------------------------------
@@ -105,139 +213,11 @@ void JZEventFrame::OnEditShift(wxCommandEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool JZEventFrame::OnCharHook(wxKeyEvent& e)
-{
-  return OnKeyEvent(e);
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//int JZEventFrame::y2Line(int y, bool Up)
-//{
-//  if (Up)
-//  {
-//    y += mTrackHeight;
-//  }
-//  y -= mTopInfoHeight;
-//  return y / mTrackHeight;
-//}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//int JZEventFrame::Line2y(int Line)
-//{
-//  return Line * mTrackHeight + mTopInfoHeight;
-//}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZEventFrame::Redraw()
-{
-//   wxDC* dc=new wxClientDC(this);
-//   wxPaintEvent e;
-//   cout<<"FIXME JZEventFrame::Redraw"<<endl;
-//   mpEventWindow->OnDraw(*dc); //this will in turn call the eventwin onpaintsub
-//   // the problem is that onpaint no longer takes arguments, and is supposed
-//   // to be called from the framework only, so it should be split.
-//   delete dc;
-
-//  if (mpEventWindow)
-//  {
-//    mpEventWindow->Refresh();
-//  }
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-bool JZEventFrame::OnKeyEvent(wxKeyEvent &e)
-{
-  return false;
-}
-
-//-----------------------------------------------------------------------------
-// seems to handle the "selection" rectangle. normally called from the base
-// class onmouseevent handler
-//-----------------------------------------------------------------------------
-int JZEventFrame::OnMouseEvent(wxMouseEvent &e)
-{
-  //  cout <<"JZEventFrame::OnMouseEvent"<<endl;
-  if (!MouseAction)
-  {
-    // create SnapSel?
-    int x;
-    int y;
-    e.GetPosition(&x, &y);
-    if (mEventsX < x && x < mEventsX + mEventsWidth && mEventsY < y && y < mEventsY + mEventsHeight)
-    {
-      if (e.LeftDown())
-      {
-        {
-          SnapSelStart(e);
-
-          if (SnapSel->IsSelected())
-          {
-            Refresh(); //redraw the whole window instead(inefficient, we should rather invalidate a rect)
-          }
-          SnapSel->Event(e);
-          MouseAction = SnapSel;
-        }
-      }
-    }
-  }
-  else
-  {
-    // MouseAction active
-
-    if (MouseAction->Event(e))
-    {
-      // MouseAction finished
-
-      if (MouseAction == SnapSel)
-      {
-        SnapSelStop(e);
-        Redraw(); //ineficcient, invalidate rect first instead
-        MouseAction = 0;
-        return 1;
-      }
-
-      MouseAction = 0;
-    }
-  }
-  return 0;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-bool JZEventFrame::OnClose()
-{
-  return FALSE;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZEventFrame::OnMenuCommand(int)
-{
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZEventFrame::SnapSelStart(wxMouseEvent& MouseEvent)
-{
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZEventFrame::SnapSelStop(wxMouseEvent& MouseEvent)
-{
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZEventFrame::MenQuantize()
+void JZEventFrame::OnQuantize(wxCommandEvent& Event)
 {
   if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
   {
-   return;
+    return;
   }
 
   //  wxDialogBox *panel = new wxDialogBox(this, "Quantize", FALSE );

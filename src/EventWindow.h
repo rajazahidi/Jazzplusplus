@@ -55,6 +55,8 @@ class JZEventWindow : public wxWindow
 
     void Shift(int Units);
 
+//    void Quantize();
+
     void LineText(
       wxDC& Dc,
       int x,

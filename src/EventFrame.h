@@ -57,11 +57,25 @@ class JZEventFrame : public wxFrame
 
     virtual ~JZEventFrame();
 
+    virtual void SetEventWindow(JZEventWindow* pEventWindow);
+
+    virtual void SnapSelStart(wxMouseEvent &e);
+    virtual void SnapSelStop(wxMouseEvent &e);
+
+    // Events
+    virtual int  OnMouseEvent(wxMouseEvent& Event);
+    virtual bool OnKeyEvent(wxKeyEvent& Event); // true = processed by eventwin
+    virtual bool OnClose();
+
+    // Redraw - nach Aenderungen von Parametern, kein GUI-Event
+    virtual void Redraw();
+
+
+
+
     JZSong* Song;
 
     JZFilter* mpFilter;
-
-    virtual void SetEventWindow(JZEventWindow* pEventWindow);
 
     int mTopInfoHeight;
 
@@ -70,37 +84,22 @@ class JZEventFrame : public wxFrame
     // Mouse handling
     JZSnapSelection* SnapSel;
     tMouseAction* MouseAction;
-    virtual void SnapSelStart(wxMouseEvent &e);
-    virtual void SnapSelStop(wxMouseEvent &e);
-
-    int PlayClock;
-
-    // Events
-    virtual int  OnMouseEvent(wxMouseEvent& Event);
-    virtual bool OnKeyEvent(wxKeyEvent& Event); // true = processed by eventwin
-    virtual void OnMenuCommand(int id);
-    virtual bool OnClose();
-
-    // Redraw - nach Aenderungen von Parametern, kein GUI-Event
-    virtual void Redraw();
 
     // Settings-Dialog
     wxDialog* mpSettingsDialog;
-    void SettingsDialog(int piano);
 
     // Mixer-Dialog
     wxDialog* MixerForm;
 
   private:
 
+    bool OnCharHook(wxKeyEvent& Event);
+
     void OnUpdateEditShift(wxUpdateUIEvent& Event);
     void OnEditShift(wxCommandEvent& Event);
 
-    bool OnCharHook(wxKeyEvent& Event);
+    void OnQuantize(wxCommandEvent& Event);
 
-    void OnChar(wxKeyEvent& Event);
-
-    void MenQuantize();
     void MenSetChannel();
     void MenTranspose();
     void MenDelete();

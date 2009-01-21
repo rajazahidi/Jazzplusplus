@@ -54,14 +54,11 @@ using namespace std;
 
 #define ACT_SETTINGS                5
 #define MEN_FILTER                  6
-#define MEN_SNAP                    7
 #define MEN_METERCH                 8
 #define ACT_HELP_MOUSE              9
 
-#define MEN_QUANTIZE               12
 #define MEN_SETCHAN                14
 #define MEN_TRANSP                 15
-#define MEN_VELOC                  16
 #define MEN_LERI                   18
 #define MEN_UPDN                   19
 #define MEN_LENGTH                 20
@@ -81,8 +78,6 @@ using namespace std;
 #define MEN_RESET                  36
 #define MEN_VIS_ALL_TRK            37
 #define MEN_SEARCHREP              38
-#define MEN_SHIFTL                 39
-#define MEN_SHIFTR                 40
 
 #define ACT_CLOSE                  41
 #define MEN_CTRL_TEMPO             42
@@ -110,10 +105,10 @@ static JZToolDef tdefs[] =
   { ID_SNAP_16D,    TRUE, note163_xpm,   "snap 1/24"},
   { JZToolBar::eToolBarSeparator },
   { wxID_CUT,        FALSE, cut_xpm,      "cut selection"},
-  { wxID_DELETE,        FALSE, delete_xpm,   "delete selection"},
-  { MEN_QUANTIZE,    FALSE, quantize_xpm, "quantize selection"},
-  { MEN_SHIFTL,      FALSE, shiftl_xpm,   "shift selection left"},
-  { MEN_SHIFTR,      FALSE, shiftr_xpm,   "shift selection right"},
+  { wxID_DELETE,     FALSE, delete_xpm,   "delete selection"},
+  { ID_QUANTIZE,     FALSE, quantize_xpm, "quantize selection"},
+  { ID_SHIFT_LEFT,   FALSE, shiftl_xpm,   "shift selection left"},
+  { ID_SHIFT_RIGHT,  FALSE, shiftr_xpm,   "shift selection right"},
   { MEN_VIS_ALL_TRK, TRUE,  evnts_xpm,    "show events from all tracks"},
   { JZToolBar::eToolBarSeparator },
   { wxID_ZOOM_IN,    FALSE, zoomin_xpm,   "zoom in"},
@@ -174,11 +169,11 @@ BEGIN_EVENT_TABLE(JZPianoFrame, wxFrame)
   EVT_MENU(wxID_CUT, JZPianoFrame::OnCut)
   EVT_MENU(wxID_COPY, JZPianoFrame::OnCopy)
   EVT_MENU(ID_SHIFT, JZPianoFrame::OnShift)
-  EVT_MENU(MEN_SHIFTL, JZPianoFrame::OnShiftLeft)
-  EVT_MENU(MEN_SHIFTR, JZPianoFrame::OnShiftRight)
+  EVT_MENU(ID_SHIFT_LEFT, JZPianoFrame::OnShiftLeft)
+  EVT_MENU(ID_SHIFT_RIGHT, JZPianoFrame::OnShiftRight)
   EVT_MENU(MEN_LERI, JZPianoFrame::OnExchangeLeftRight)
   EVT_MENU(MEN_UPDN, JZPianoFrame::OnExchangeUpDown)
-  EVT_MENU(MEN_QUANTIZE, JZPianoFrame::OnQuantize)
+  EVT_MENU(ID_QUANTIZE, JZPianoFrame::OnQuantize)
   EVT_MENU(wxID_UNDO, JZPianoFrame::OnUndo)
   EVT_MENU(wxID_REDO, JZPianoFrame::OnRedo)
   EVT_MENU(MEN_CTRL_PITCH, JZPianoFrame::OnCtrlPitch)
@@ -195,7 +190,7 @@ BEGIN_EVENT_TABLE(JZPianoFrame, wxFrame)
 //  EVT_MENU(MEN_SEARCHREP, JZPianoFrame::MenSearchReplace)
 //  EVT_MENU(MEN_TRANSP, JZPianoFrame::MenTranspose)
 //  EVT_MENU(MEN_SETCHAN, JZPianoFrame::MenSetChannel)
-  EVT_MENU(MEN_VELOC, JZPianoFrame::OnActivateVelocityDialog)
+  EVT_MENU(ID_VELOCITY, JZPianoFrame::OnActivateVelocityDialog)
 //  EVT_MENU(MEN_LENGTH, JZPianoFrame::MenLength)
   EVT_MENU(MEN_MIDIDELAY, JZPianoFrame::OnActivateMidiDelayDialog)
   EVT_MENU(MEN_SEQLENGTH, JZPianoFrame::OnActivateSequenceLengthDialog)
@@ -203,7 +198,7 @@ BEGIN_EVENT_TABLE(JZPianoFrame, wxFrame)
 //  EVT_MENU(MEN_CONVERT_TO_MODULATION, JZPianoFrame::MenConvertToModulation)
   EVT_MENU(ACT_SETTINGS, JZPianoFrame::OnActivateSettingsDialog)
   EVT_MENU(MEN_FILTER, JZPianoFrame::OnFilter)
-  EVT_MENU(MEN_SNAP, JZPianoFrame::OnSnapDlg)
+  EVT_MENU(ID_SNAP, JZPianoFrame::OnSnapDlg)
 
   // These are all "Patrick Approved"
   EVT_CLOSE(JZPianoFrame::ActCloseEvent)
@@ -336,10 +331,10 @@ void JZPianoFrame::CreateMenu()
   edit_menu->Append(wxID_COPY, "&Copy");
   edit_menu->Append(wxID_CUT, "&Cut");
   edit_menu->Append(ID_SHIFT, "&Shift...");
-  edit_menu->Append(MEN_QUANTIZE, "&Quantize...");
+  edit_menu->Append(ID_QUANTIZE, "&Quantize...");
   edit_menu->Append(MEN_SETCHAN, "&Set MIDI Channel...");
   edit_menu->Append(MEN_TRANSP, "&Transpose...");
-  edit_menu->Append(MEN_VELOC, "&Velocity...");
+  edit_menu->Append(ID_VELOCITY, "&Velocity...");
   edit_menu->Append(MEN_LENGTH, "&Length...");
 
   edit_menu->Append(MEN_SEQLENGTH, "&Sequence Length...");
@@ -355,7 +350,7 @@ void JZPianoFrame::CreateMenu()
   setting_menu->Append(MEN_FILTER,    "&Filter...");
   setting_menu->Append(ACT_SETTINGS,  "&Window...");
   setting_menu->Append(MEN_VISIBLE,   "&Events...");
-  setting_menu->Append(MEN_SNAP,      "&Snap...");
+  setting_menu->Append(ID_SNAP,       "&Snap...");
   setting_menu->Append(MEN_METERCH,   "&Meterchange...");
 
   wxMenu *misc_menu = new wxMenu("",wxMENU_TEAROFF);

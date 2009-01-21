@@ -238,10 +238,10 @@ void JZTrackFrame::CreateMenu()
 
   mpEditMenu->AppendSeparator();
 
-//  mpEditMenu->Append(MEN_QUANTIZE, "&Quantize...");
+//  mpEditMenu->Append(ID_QUANTIZE, "&Quantize...");
 //  mpEditMenu->Append(MEN_SETCHAN, "&Set MIDI Channel...");
 //  mpEditMenu->Append(MEN_TRANSP, "&Transpose...");
-//  mpEditMenu->Append(MEN_VELOC, "&Velocity...");
+//  mpEditMenu->Append(ID_VELOCITY, "&Velocity...");
 //  mpEditMenu->Append(MEN_LENGTH, "&Length...");
   mpEditMenu->Append(ID_SHIFT, "Shi&ft...");
 //  mpEditMenu->Append(MEN_CLEANUP, "C&leanup...");
@@ -293,7 +293,7 @@ void JZTrackFrame::CreateMenu()
   mpFileMenu->AppendSeparator();
 
   parts_menu = new wxMenu;
-  parts_menu->Append(MEN_MIXER,    "&Mixer...");
+  parts_menu->Append(ID_MIXER,    "&Mixer...");
   parts_menu->Append(MEN_MASTER,   "Mas&ter...");
   parts_menu->Append(MEN_SOUND,    "&Sound...");
   parts_menu->Append(MEN_VIBRATO,  "&Vibrato...");

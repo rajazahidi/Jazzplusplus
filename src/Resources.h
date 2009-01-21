@@ -49,13 +49,15 @@
 #define ID_SHIFT                             wxID_HIGHEST + 32
 #define ID_SHIFT_LEFT                        wxID_HIGHEST + 33
 #define ID_SHIFT_RIGHT                       wxID_HIGHEST + 34
-#define ID_SNAP_8                            wxID_HIGHEST + 35
-#define ID_SNAP_8D                           wxID_HIGHEST + 36
-#define ID_SNAP_16                           wxID_HIGHEST + 37
-#define ID_SNAP_16D                          wxID_HIGHEST + 38
-#define ID_MIXER                             wxID_HIGHEST + 39
-#define ID_PIANOWIN                          wxID_HIGHEST + 40
-#define ID_METRONOME_TOGGLE                  wxID_HIGHEST + 41
+#define ID_SNAP                              wxID_HIGHEST + 35
+#define ID_SNAP_8                            wxID_HIGHEST + 36
+#define ID_SNAP_8D                           wxID_HIGHEST + 37
+#define ID_SNAP_16                           wxID_HIGHEST + 38
+#define ID_SNAP_16D                          wxID_HIGHEST + 39
+#define ID_MIXER                             wxID_HIGHEST + 40
+#define ID_PIANOWIN                          wxID_HIGHEST + 41
+#define ID_METRONOME_TOGGLE                  wxID_HIGHEST + 42
+#define ID_VELOCITY                          wxID_HIGHEST + 43
 
 #define ID_PLAY                              wxID_HIGHEST + 50
 #define ID_PLAY_LOOP                         wxID_HIGHEST + 51

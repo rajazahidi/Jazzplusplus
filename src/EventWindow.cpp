@@ -147,6 +147,19 @@ void JZEventWindow::Shift(int Units)
 }
 
 //-----------------------------------------------------------------------------
+// Quantize selected events.
+//-----------------------------------------------------------------------------
+//void JZEventWindow::Quantize()
+//{
+//  if (AreEventsSelected())
+//  {
+//    tCmdQuantize QuantizeCommand(mpFilter, SnapClocks(), 0, 0);
+//    QuantizeCommand.Execute(1);
+//    JZProjectManager::Instance()->UpdateAllViews();
+//  }
+//}
+
+//-----------------------------------------------------------------------------
 // Description:
 //   Only consider the event portion of the window when computing the virtual
 // size.  Do not consider the static information of the left or top portion of

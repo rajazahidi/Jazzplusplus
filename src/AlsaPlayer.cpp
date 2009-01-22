@@ -813,7 +813,7 @@ void tAlsaPlayer::StopPlay()
   stop_queue_timer();
   clear_input_queue();
   JZProjectManager::Instance()->NewPlayPosition(-1);
-  RecdBuffer.Keyoff2Length();
+  mRecdBuffer.Keyoff2Length();
 }
 
 //-----------------------------------------------------------------------------
@@ -924,7 +924,7 @@ void tAlsaPlayer::recd_event(snd_seq_event_t* ev)
     // Not all events are to be recorded.  Only those filtered out and put
     // into the event.
     pEvent->SetClock(PlayLoop->Ext2IntClock(ev->time.tick));
-    RecdBuffer.Put(pEvent);
+    mRecdBuffer.Put(pEvent);
   }
 }
 

@@ -1117,14 +1117,14 @@ bool JZPianoWindow::OnKeyEvent(wxKeyEvent& Event)
         if (mTrackIndex > 0)
         {
           --mTrackIndex;
-          NewPosition(mTrackIndex, -1L);
+          NewPosition(mTrackIndex, -1);
         }
         return true;
       case WXK_DOWN:
         if (mTrackIndex < mpSong->GetTrackCount() - 1)
         {
           ++mTrackIndex;
-          NewPosition(mTrackIndex, -1L);
+          NewPosition(mTrackIndex, -1);
         }
         return true;
     }
@@ -2148,14 +2148,14 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& MouseEvent)
 
     int Clock = x2Clock(x);
     int Pitch = y2Pitch(y);
-    JZEvent *m = FindEvent(mpTrack, Clock, Pitch);
+    JZEvent* pEvent = FindEvent(mpTrack, Clock, Pitch);
     tKeyOn* pKeyOn = 0;
-    tPlayTrack *p = 0;
-    if (m)
+    tPlayTrack* pPlayTrack = 0;
+    if (pEvent)
     {
       // both these events are drag length
-      pKeyOn = m->IsKeyOn();
-      p = m->IsPlayTrack();
+      pKeyOn = pEvent->IsKeyOn();
+      pPlayTrack = pEvent->IsPlayTrack();
     }
     switch (action)
     {
@@ -2177,20 +2177,19 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& MouseEvent)
         }
         else
         {
-          if(p)
+          if (pPlayTrack)
           {
-            mpMouseAction = new tPlayTrackLengthDragger(p, this);
+            mpMouseAction = new tPlayTrackLengthDragger(pPlayTrack, this);
           }
           else if (mVisibleAllTracks)
           {
             // event not found, maybe change to another Track
-            int i;
-            for (i = 0; i < mpSong->GetTrackCount(); i++)
+            for (int i = 0; i < mpSong->GetTrackCount(); ++i)
             {
               JZTrack* pTrack = mpSong->GetTrack(i);
               if (IsVisible(pTrack) && FindEvent(pTrack, Clock, Pitch))
               {
-                NewPosition(i, -1L);
+                NewPosition(i, -1);
                 break;
               }
             }
@@ -2200,7 +2199,7 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& MouseEvent)
 
 
       case MA_DIALOG:
-        EventDialog(m, this, mpTrack, Clock, mpTrack->Channel - 1, Pitch);
+        EventDialog(pEvent, this, mpTrack, Clock, mpTrack->Channel - 1, Pitch);
         break;
 
 

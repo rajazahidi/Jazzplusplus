@@ -87,7 +87,6 @@ JZShiftDialog::JZShiftDialog(
     0,
     wxCENTER | wxALL,
     5);
-  wxBoxSizer* pCheckBoxSizer = new wxBoxSizer(wxHORIZONTAL);
 
   pTopSizer->Add(mpStepsSlider, 0, wxCENTER | wxALL, 5);
 

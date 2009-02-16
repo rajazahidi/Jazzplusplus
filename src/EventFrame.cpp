@@ -4,7 +4,6 @@
 #include "Dialogs.h"
 #include "EventWindow.h"
 #include "Filter.h"
-#include "MouseAction.h"
 #include "Resources.h"
 #include "ToolBar.h"
 
@@ -38,28 +37,18 @@ JZEventFrame::JZEventFrame(
   const wxSize& Size,
   long WindowStyle)
   : wxFrame(pParent, wxID_ANY, Title, Position, Size, WindowStyle),
-    Song(pSong),
     mpFilter(0),
-    mTopInfoHeight(40),
-    mEventsX(),
-    mEventsY(mTopInfoHeight),
-    mEventsWidth(0),
-    mEventsHeight(0),
-    SnapSel(0),
-    MouseAction(0),
     MixerForm(0),
     mpToolBar(0),
     mpEventWindow(0)
 {
-  mpFilter = new JZFilter(Song);
+  mpFilter = new JZFilter(pSong);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZEventFrame::~JZEventFrame()
 {
-  delete SnapSel;
-
   delete mpFilter;
 
   delete mpToolBar;
@@ -78,76 +67,6 @@ void JZEventFrame::SetEventWindow(JZEventWindow* pEventWindow)
 {
   mpEventWindow = pEventWindow;
 }
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//void JZEventFrame::SnapSelStart(wxMouseEvent& MouseEvent)
-//{
-//}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//void JZEventFrame::SnapSelStop(wxMouseEvent& MouseEvent)
-//{
-//}
-
-//-----------------------------------------------------------------------------
-// seems to handle the "selection" rectangle. normally called from the base
-// class onmouseevent handler
-//-----------------------------------------------------------------------------
-/*
-int JZEventFrame::OnMouseEvent(wxMouseEvent& MouseEvent)
-{
-//  cout << "JZEventFrame::OnMouseEvent" << endl;
-  if (!MouseAction)
-  {
-    // create SnapSel?
-    int x;
-    int y;
-    MouseEvent.GetPosition(&x, &y);
-    if (
-      mEventsX < x &&
-      x < mEventsX + mEventsWidth &&
-      mEventsY < y &&
-      y < mEventsY + mEventsHeight)
-    {
-      if (MouseEvent.LeftDown())
-      {
-        {
-          SnapSelStart(MouseEvent);
-
-          if (SnapSel->IsSelected())
-          {
-            Refresh(); //redraw the whole window instead(inefficient, we should rather invalidate a rect)
-          }
-          SnapSel->ProcessMouseEvent(MouseEvent);
-          MouseAction = SnapSel;
-        }
-      }
-    }
-  }
-  else
-  {
-    // MouseAction active
-
-    if (MouseAction->ProcessMouseEvent(MouseEvent))
-    {
-      // MouseAction finished
-
-      if (MouseAction == SnapSel)
-      {
-        SnapSelStop(MouseEvent);
-        Redraw(); //ineficcient, invalidate rect first instead
-        MouseAction = 0;
-        return 1;
-      }
-
-      MouseAction = 0;
-    }
-  }
-  return 0;
-}
-*/
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

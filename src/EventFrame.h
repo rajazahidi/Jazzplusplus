@@ -27,10 +27,8 @@
 
 class JZEventWindow;
 class JZFilter;
-class JZSnapSelection;
 class JZSong;
 class JZToolBar;
-class tMouseAction;
 class wxDialog;
 
 //*****************************************************************************
@@ -40,7 +38,6 @@ class wxDialog;
 // class.
 // Functionality:
 //   - Settings dialog
-//   - Selection via Snapsel
 //*****************************************************************************
 class JZEventFrame : public wxFrame
 {
@@ -59,11 +56,7 @@ class JZEventFrame : public wxFrame
 
     virtual void SetEventWindow(JZEventWindow* pEventWindow);
 
-//    virtual void SnapSelStart(wxMouseEvent &e);
-//    virtual void SnapSelStop(wxMouseEvent &e);
-
     // Events
-//    virtual int  OnMouseEvent(wxMouseEvent& Event);
     virtual bool OnKeyEvent(wxKeyEvent& Event); // true = processed by eventwin
     virtual bool OnClose();
 
@@ -71,19 +64,7 @@ class JZEventFrame : public wxFrame
     virtual void Redraw();
 
 
-
-
-    JZSong* Song;
-
     JZFilter* mpFilter;
-
-    int mTopInfoHeight;
-
-    int mEventsX, mEventsY, mEventsWidth, mEventsHeight;
-
-    // Mouse handling
-    JZSnapSelection* SnapSel;
-    tMouseAction* MouseAction;
 
     // Mixer-Dialog
     wxDialog* MixerForm;

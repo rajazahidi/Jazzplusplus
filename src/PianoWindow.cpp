@@ -2011,8 +2011,6 @@ int JZPianoWindow::OnEventWinMouseEvent(wxMouseEvent& MouseEvent)
 {
   if (!mpMouseAction)
   {
-    // create mpSnapSel?
-
     int x, y;
     MouseEvent.GetPosition(&x, &y);
     if (

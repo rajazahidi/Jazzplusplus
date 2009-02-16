@@ -487,8 +487,6 @@ void JZEventWindow::OnMouseEvent(wxMouseEvent& MouseEvent)
 {
   if (!mpMouseAction)
   {
-    // create mpSnapSel?
-
     int x, y;
     MouseEvent.GetPosition(&x, &y);
     if (

@@ -23,8 +23,8 @@ using namespace std;
 //-----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(JZEventFrame, wxFrame)
 
-  EVT_UPDATE_UI(ID_SHIFT, JZEventFrame::OnUpdateEditShift)
-  EVT_MENU(ID_SHIFT, JZEventFrame::OnEditShift)
+  EVT_UPDATE_UI(ID_SHIFT, JZEventFrame::OnUpdateEventsSelected)
+  EVT_MENU(ID_SHIFT, JZEventFrame::OnShift)
 
 END_EVENT_TABLE()
 
@@ -47,7 +47,6 @@ JZEventFrame::JZEventFrame(
     mEventsHeight(0),
     SnapSel(0),
     MouseAction(0),
-    mpSettingsDialog(0),
     MixerForm(0),
     mpToolBar(0),
     mpEventWindow(0)
@@ -189,7 +188,7 @@ bool JZEventFrame::OnCharHook(wxKeyEvent& KeyEvent)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZEventFrame::OnUpdateEditShift(wxUpdateUIEvent& Event)
+void JZEventFrame::OnUpdateEventsSelected(wxUpdateUIEvent& Event)
 {
   if (mpEventWindow)
   {
@@ -203,7 +202,7 @@ void JZEventFrame::OnUpdateEditShift(wxUpdateUIEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZEventFrame::OnEditShift(wxCommandEvent& Event)
+void JZEventFrame::OnShift(wxCommandEvent& Event)
 {
   if (mpEventWindow)
   {
@@ -215,45 +214,15 @@ void JZEventFrame::OnEditShift(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZEventFrame::OnQuantize(wxCommandEvent& Event)
 {
-  if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
+  if (mpEventWindow)
   {
-    return;
+    mpEventWindow->Quantize();
   }
-
-  //  wxDialogBox *panel = new wxDialogBox(this, "Quantize", FALSE );
-  tQuantizeDlg * dlg = new tQuantizeDlg(this, mpFilter);
-  dlg->Create();
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZEventFrame::MenCleanup()
-{
-  if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
-  {
-   return;
-  }
-
-  tCleanupDlg * dlg = new tCleanupDlg(this, mpFilter);
-  dlg->Create();
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZEventFrame::MenSearchReplace()
-{
-  if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
-  {
-   return;
-  }
-
-  tSearchReplaceDlg * dlg = new tSearchReplaceDlg(this, mpFilter);
-  dlg->Create();
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZEventFrame::MenSetChannel()
+void JZEventFrame::OnSetChannel(wxCommandEvent& Event)
 {
   if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
   {
@@ -266,7 +235,7 @@ void JZEventFrame::MenSetChannel()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZEventFrame::MenTranspose()
+void JZEventFrame::OnTranspose(wxCommandEvent& Event)
 {
   if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
   {
@@ -279,7 +248,7 @@ void JZEventFrame::MenTranspose()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZEventFrame::MenDelete()
+void JZEventFrame::OnDelete(wxCommandEvent& Event)
 {
   if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
   {
@@ -292,7 +261,7 @@ void JZEventFrame::MenDelete()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZEventFrame::MenVelocity()
+void JZEventFrame::OnVelocity(wxCommandEvent& Event)
 {
   if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
   {
@@ -305,7 +274,7 @@ void JZEventFrame::MenVelocity()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZEventFrame::MenLength()
+void JZEventFrame::OnLength(wxCommandEvent& Event)
 {
   if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
   {
@@ -317,9 +286,8 @@ void JZEventFrame::MenLength()
 }
 
 //-----------------------------------------------------------------------------
-// convert to modulation
 //-----------------------------------------------------------------------------
-void JZEventFrame::MenConvertToModulation()
+void JZEventFrame::OnConvertToModulation(wxCommandEvent& Event)
 {
   if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
   {
@@ -329,4 +297,40 @@ void JZEventFrame::MenConvertToModulation()
   tCmdConvertToModulation cmd(mpFilter);
   cmd.Execute();
   Redraw();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZEventFrame::OnCleanup(wxCommandEvent& Event)
+{
+  if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
+  {
+   return;
+  }
+
+  tCleanupDlg * dlg = new tCleanupDlg(this, mpFilter);
+  dlg->Create();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZEventFrame::OnSearchReplace(wxCommandEvent& Event)
+{
+  if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
+  {
+   return;
+  }
+
+  tSearchReplaceDlg * dlg = new tSearchReplaceDlg(this, mpFilter);
+  dlg->Create();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZEventFrame::OnMeterChange(wxCommandEvent& Event)
+{
+  if (mpEventWindow)
+  {
+    mpEventWindow->EditMeter();
+  }
 }

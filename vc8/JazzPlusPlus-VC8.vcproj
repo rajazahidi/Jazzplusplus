@@ -890,6 +890,14 @@
 				RelativePath="..\src\Dialogs\TrackDialog.h"
 				>
 			</File>
+			<File
+				RelativePath="..\src\Dialogs\VelocityDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\VelocityDialog.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

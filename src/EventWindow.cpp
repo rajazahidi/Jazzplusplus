@@ -24,6 +24,7 @@
 
 #include "Command.h"
 #include "Dialogs/ShiftDialog.h"
+#include "Dialogs.h"
 #include "EventFrame.h"
 #include "Filter.h"
 #include "MouseAction.h"
@@ -80,7 +81,8 @@ JZEventWindow::JZEventWindow(
     mFromLine(0),
     mToLine(0),
     mScrolledX(0),
-    mScrolledY(0)
+    mScrolledY(0),
+    mpSettingsDialog(0)
 {
   mpSnapSel = new JZSnapSelection(this);
 
@@ -103,6 +105,7 @@ JZEventWindow::~JZEventWindow()
   delete mpFilter;
   delete mpGreyColor;
   delete mpGreyBrush;
+  FinishMeterEdit();
 }
 
 //-----------------------------------------------------------------------------
@@ -149,15 +152,63 @@ void JZEventWindow::Shift(int Units)
 //-----------------------------------------------------------------------------
 // Quantize selected events.
 //-----------------------------------------------------------------------------
-//void JZEventWindow::Quantize()
-//{
-//  if (AreEventsSelected())
-//  {
+void JZEventWindow::Quantize()
+{
+  if (AreEventsSelected())
+  {
+//    wxDialogBox *panel = new wxDialogBox(this, "Quantize", FALSE );
+    tQuantizeDlg* pQuantizeDlg = new tQuantizeDlg(this, mpFilter);
+    pQuantizeDlg->Create();
+
 //    tCmdQuantize QuantizeCommand(mpFilter, SnapClocks(), 0, 0);
 //    QuantizeCommand.Execute(1);
 //    JZProjectManager::Instance()->UpdateAllViews();
-//  }
-//}
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZEventWindow::EditMeter()
+{
+  if (!IsEditingMeter())
+  {
+    if (!mpSettingsDialog)
+    {
+      mpSettingsDialog = new wxDialog(this, wxID_ANY, "Meter Change");
+    }
+    mpSettingsDialog->Show(true);
+  }
+  else
+  {
+    mpSettingsDialog->SetFocus();
+  }
+//  tMeterChangeDlg *dlg;
+//  dlg = new tMeterChangeDlg(this);
+//  dlg->Create();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZEventWindow::IsEditingMeter() const
+{
+  if (mpSettingsDialog)
+  {
+    return (mpSettingsDialog->GetHandle() != 0);
+  }
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZEventWindow::FinishMeterEdit()
+{
+  if (mpSettingsDialog)
+  {
+    // Mark the dialog for destruction during idle time processing.
+    mpSettingsDialog->Destroy();
+    mpSettingsDialog = 0;
+  }
+}
 
 //-----------------------------------------------------------------------------
 // Description:
@@ -373,7 +424,7 @@ void JZEventWindow::LineText(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-// void JZEventFrame::OnChar(wxKeyEvent& KeyEvent)
+// void JZEventWindow::OnChar(wxKeyEvent& KeyEvent)
 // {
 //   if (!OnKeyEvent(KeyEvent))
 //   {
@@ -387,88 +438,3 @@ void JZEventWindow::LineText(
 //{
 //  return EventWin->OnKeyEvent(KeyEvent);
 //}
-
-//*****************************************************************************
-// MeterChange Dialog
-//*****************************************************************************
-class tMeterChangeDlg : public tPropertyListDlg
-{
-  public:
-    JZEventFrame *EventWin;
-    static int Numerator;
-    static int Denomiator;
-    static int BarNr;
-    tMeterChangeDlg(JZEventFrame *w);
-    void AddProperties();
-    virtual bool OnClose();
-    virtual void OnCancel();
-    virtual void OnHelp();
-};
-
-int tMeterChangeDlg::Numerator = 4;
-int tMeterChangeDlg::Denomiator = 4;
-int tMeterChangeDlg::BarNr = 1;
-
-tMeterChangeDlg::tMeterChangeDlg(JZEventFrame *w)
-  : tPropertyListDlg("Meter Change")
-{
-  EventWin = w;
-}
-
-void tMeterChangeDlg::OnCancel()
-{
-  EventWin->mpSettingsDialog = 0;
-  //wxForm::OnCancel();
-}
-
-bool tMeterChangeDlg::OnClose()
-{
-  BarNr += EventWin->Song->GetIntroLength();
-  EventWin->Song->SetMeterChange(BarNr, Numerator, Denomiator);
-  EventWin->Redraw();
-  EventWin->mpSettingsDialog = 0;
-  //wxForm::OnOk();
-  return false;
-}
-
-void tMeterChangeDlg::OnHelp()
-{
-  gpHelpInstance->ShowTopic("Meterchange");
-}
-
-void tMeterChangeDlg::AddProperties()
-{
- //  Add(wxMakeFormShort("BarNr:",     &BarNr,      wxFORM_DEFAULT, 0,0,0,100));
-//   Add(wxMakeFormNewLine());
-//   Add(wxMakeFormShort("Numerator",  &Numerator,  wxFORM_DEFAULT, 0,0,0,100));
-//   Add(wxMakeFormNewLine());
-//   Add(wxMakeFormShort("Denomiator", &Denomiator, wxFORM_DEFAULT, 0,0,0,100));
-//   Add(wxMakeFormNewLine());
-//   Add(wxMakeFormMessage("Supported Denomiators: 2,4,8,16,32"));
-//   AssociatePanel(panel);
-  sheet->AddProperty(new wxProperty(
-    "BarNr",
-    wxPropertyValue(&BarNr),
-    "integer"));//JAVE validators here? problem is i dont know which ranges are valid FIXME
-  sheet->AddProperty(new wxProperty(
-    "Numerator",
-    wxPropertyValue(&Numerator),
-    "integer"));
-  sheet->AddProperty(new wxProperty(
-    "Denomiator(2,4,8,16,32)",
-    wxPropertyValue(&Denomiator),
-     "integer"));//JAVE should be a integer list instead FIXME
-}
-
-void JZEventFrame::MenMeterChange()
-{
-  tMeterChangeDlg *dlg;
-  if (mpSettingsDialog)
-  {
-    mpSettingsDialog->Show(TRUE);
-    return;
-  }
-  //  mpSettingsDialog = new wxDialogBox(this, "MeterChange", FALSE );
-  dlg = new tMeterChangeDlg(this);
-  dlg->Create();
-}

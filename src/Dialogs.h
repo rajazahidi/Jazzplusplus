@@ -238,7 +238,7 @@ class tQuantizeDlg : public tPropertyListDlg
 
     long Quantize(long);
 
-    tQuantizeDlg(JZEventFrame *w, JZFilter *f);
+    tQuantizeDlg(JZEventWindow* w, JZFilter* pFilter);
     void AddProperties();
     //tNamedChoice Steps;
     bool OnClose();
@@ -252,5 +252,26 @@ void EventDialog(
   long Clock,
   int Channel,
   int Pitch);
+
+//*****************************************************************************
+// MeterChange Dialog
+//*****************************************************************************
+class tMeterChangeDlg : public tPropertyListDlg
+{
+  public:
+
+    tMeterChangeDlg(JZEventWindow* pEventWindow);
+
+    void AddProperties();
+
+    virtual bool OnClose();
+    virtual void OnCancel();
+    virtual void OnHelp();
+
+    JZEventWindow* mpEventWindow;
+    static int Numerator;
+    static int Denomiator;
+    static int BarNr;
+};
 
 #endif // !defined(JZ_DIALOGS_H)

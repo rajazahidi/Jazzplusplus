@@ -26,6 +26,7 @@
 #include "Command.h"
 #include "DeprecatedWx/proplist.h"
 #include "Dialogs/KeyOnDialog.h"
+//#include "EventFrame.h"
 #include "Events.h"
 #include "EventWindow.h"
 #include "Filter.h"
@@ -48,9 +49,9 @@
 
 using namespace std;
 
-// **************************************************************************
+//*****************************************************************************
 // Shift
-// *************************************************************************
+//*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 //tShiftDlg::tShiftDlg(JZEventFrame* pEventWindow, JZFilter* pFilter, long unit)
@@ -101,9 +102,9 @@ using namespace std;
 //}
 
 
-// **************************************************************************
+//*****************************************************************************
 // Cleanup
-// *************************************************************************
+//*****************************************************************************
 
 int tCleanupDlg::lowLimit = 48;
 bool tCleanupDlg::shortenOverlaps = 1;
@@ -183,9 +184,9 @@ void tCleanupDlg::AddProperties()
 }
 
 
-// **************************************************************************
+//*****************************************************************************
 // SearchReplace
-// *************************************************************************
+//*****************************************************************************
 
 int tSearchReplaceDlg::frCtrl = 1;
 int tSearchReplaceDlg::toCtrl = 1;
@@ -230,9 +231,9 @@ void tSearchReplaceDlg::AddProperties()
 
 
 
-// **************************************************************************
+//*****************************************************************************
 // Transpose
-// *************************************************************************
+//*****************************************************************************
 
 int tTransposeDlg::Notes = 0;
 int tTransposeDlg::Scale = gScaleChromatic;
@@ -281,9 +282,9 @@ void tTransposeDlg::AddProperties()
     "bool"));
 }
 
-// **************************************************************************
+//*****************************************************************************
 // SetChannel
-// *************************************************************************
+//*****************************************************************************
 
 int tSetChannelDlg::NewChannel = 1;
 
@@ -329,9 +330,9 @@ void tSetChannelDlg::AddProperties()
 
 
 
-// **************************************************************************
+//*****************************************************************************
 // Velocity
-// *************************************************************************
+//*****************************************************************************
 
 int tVelocityDlg::FromValue = 64;
 int tVelocityDlg::ToValue = 0;
@@ -380,9 +381,9 @@ void tVelocityDlg::AddProperties()
 
 
 
-// **************************************************************************
+//*****************************************************************************
 // Length
-// *************************************************************************
+//*****************************************************************************
 
 int tLengthDlg::FromValue = 30;
 int tLengthDlg::ToValue = 0;
@@ -441,9 +442,9 @@ void tLengthDlg::AddProperties()
 
 
 
-// **************************************************************************
+//*****************************************************************************
 // seqLength
-// *************************************************************************
+//*****************************************************************************
 
 double tSeqLengthDlg::scale = 1.0;
 
@@ -484,9 +485,9 @@ void tSeqLengthDlg::AddProperties()
 }
 
 
-// **************************************************************************
+//*****************************************************************************
 // midiDelay
-// *************************************************************************
+//*****************************************************************************
 
 double tMidiDelayDlg::scale = 0.5;
 long tMidiDelayDlg::clockDelay = 10;
@@ -546,9 +547,9 @@ void tMidiDelayDlg::AddProperties()
 
 
 
-// *************************************************************************
+//*****************************************************************************
 // Delete
-// *************************************************************************
+//*****************************************************************************
 
 bool tDeleteDlg::LeaveSpace = 1;
 
@@ -585,9 +586,9 @@ void tDeleteDlg::AddProperties()
 //LAST ADDED EVENT
 
 
-// **************************************************************************
+//*****************************************************************************
 // Snap
-// *************************************************************************
+//*****************************************************************************
 
 tSnapDlg::tSnapDlg(JZPianoWindow* pPianoWindow, int* snapptr)
   : tPropertyListDlg("Snap:quantize cut/paste events"),
@@ -631,9 +632,9 @@ void tSnapDlg::AddProperties()
 }
 
 
-// **************************************************************************
+//*****************************************************************************
 // Quantize
-// *************************************************************************
+//*****************************************************************************
 
 bool tQuantizeDlg::NoteStart = 1;
 bool tQuantizeDlg::NoteLength = 0;
@@ -641,7 +642,8 @@ int tQuantizeDlg::QntStep = 16;
 int tQuantizeDlg::Delay = 0;
 int tQuantizeDlg::Groove = 0;
 
-tQuantizeDlg::tQuantizeDlg(JZEventFrame *w, JZFilter *f)
+//tQuantizeDlg::tQuantizeDlg(JZEventFrame *w, JZFilter *f)
+tQuantizeDlg::tQuantizeDlg(JZEventWindow *w, JZFilter *f)
    : tPropertyListDlg("Quantize" )
   //, Steps("steps", gQntSteps, &gQntStep)
 {
@@ -701,9 +703,9 @@ void tQuantizeDlg::AddProperties()
 }
 
 
-// ***********************************************************************
+//*****************************************************************************
 // Event-Dialogue
-// ***********************************************************************
+//*****************************************************************************
 
 class tEventDlg : public tPropertyListDlg
 {
@@ -1440,3 +1442,51 @@ void EventDialog(
   }
 }
 
+//*****************************************************************************
+// MeterChange Dialog
+//*****************************************************************************
+
+int tMeterChangeDlg::Numerator = 4;
+int tMeterChangeDlg::Denomiator = 4;
+int tMeterChangeDlg::BarNr = 1;
+
+tMeterChangeDlg::tMeterChangeDlg(JZEventWindow* pEventWindow)
+  : tPropertyListDlg("Meter Change"),
+    mpEventWindow(pEventWindow)
+{
+}
+
+void tMeterChangeDlg::AddProperties()
+{
+  sheet->AddProperty(new wxProperty(
+    "BarNr",
+    wxPropertyValue(&BarNr),
+    "integer"));//JAVE validators here? problem is i dont know which ranges are valid FIXME
+  sheet->AddProperty(new wxProperty(
+    "Numerator",
+    wxPropertyValue(&Numerator),
+    "integer"));
+  sheet->AddProperty(new wxProperty(
+    "Denomiator(2,4,8,16,32)",
+    wxPropertyValue(&Denomiator),
+     "integer"));//JAVE should be a integer list instead FIXME
+}
+
+void tMeterChangeDlg::OnCancel()
+{
+  mpEventWindow->FinishMeterEdit();
+}
+
+bool tMeterChangeDlg::OnClose()
+{
+  BarNr += mpEventWindow->GetSong()->GetIntroLength();
+  mpEventWindow->GetSong()->SetMeterChange(BarNr, Numerator, Denomiator);
+  mpEventWindow->Refresh();
+  mpEventWindow->FinishMeterEdit();
+  return false;
+}
+
+void tMeterChangeDlg::OnHelp()
+{
+  gpHelpInstance->ShowTopic("Meterchange");
+}

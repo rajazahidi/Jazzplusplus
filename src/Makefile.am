@@ -29,6 +29,7 @@ Dialogs/MetronomeSettingsDialog.cpp \
 Dialogs/ShiftDialog.cpp \
 Dialogs/SynthesizerSettingsDialog.cpp \
 Dialogs/TrackDialog.cpp \
+Dialogs/VelocityDialog.cpp \
 Dialogs.cpp \
 DynamicArray.cpp \
 ErrorMessage.cpp \

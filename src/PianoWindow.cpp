@@ -2017,12 +2017,12 @@ int JZPianoWindow::OnEventWinMouseEvent(wxMouseEvent& Event)
         {
           SnapSelStart(Event);
 
-          if (mpSnapSel->IsSelected())
-          {
+//          if (mpSnapSel->IsSelected())
+//          {
             // Redraw the whole window instead (inefficient, we should rather
             // invalidate a rect).
             Refresh();
-          }
+//          }
           mpSnapSel->Event(Event);
           mpMouseAction = mpSnapSel;
         }

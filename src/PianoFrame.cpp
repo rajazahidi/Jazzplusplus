@@ -54,7 +54,6 @@ using namespace std;
 
 #define ACT_SETTINGS                5
 #define MEN_FILTER                  6
-#define MEN_METERCH                 8
 #define ACT_HELP_MOUSE              9
 
 #define MEN_SETCHAN                14
@@ -186,16 +185,16 @@ BEGIN_EVENT_TABLE(JZPianoFrame, wxFrame)
   EVT_MENU(MEN_CTRL_CHANNEL_AFTER, JZPianoFrame::CtrlChannelAftertouchEdit)
 // FIXME PAT - We need to bring these back once Dave has figured out what
 //             he's doing with them in relation to the track window.
-//  EVT_MENU(MEN_CLEANUP, JZPianoFrame::MenCleanup)
-//  EVT_MENU(MEN_SEARCHREP, JZPianoFrame::MenSearchReplace)
-//  EVT_MENU(MEN_TRANSP, JZPianoFrame::MenTranspose)
-//  EVT_MENU(MEN_SETCHAN, JZPianoFrame::MenSetChannel)
+//  EVT_MENU(MEN_CLEANUP, JZPianoFrame::OnCleanup)
+//  EVT_MENU(MEN_SEARCHREP, JZPianoFrame::OnSearchReplace)
+//  EVT_MENU(MEN_TRANSP, JZPianoFrame::OnTranspose)
+//  EVT_MENU(MEN_SETCHAN, JZPianoFrame::OnSetChannel)
   EVT_MENU(ID_VELOCITY, JZPianoFrame::OnActivateVelocityDialog)
-//  EVT_MENU(MEN_LENGTH, JZPianoFrame::MenLength)
+//  EVT_MENU(MEN_LENGTH, JZPianoFrame::OnLength)
   EVT_MENU(MEN_MIDIDELAY, JZPianoFrame::OnActivateMidiDelayDialog)
   EVT_MENU(MEN_SEQLENGTH, JZPianoFrame::OnActivateSequenceLengthDialog)
 
-//  EVT_MENU(MEN_CONVERT_TO_MODULATION, JZPianoFrame::MenConvertToModulation)
+//  EVT_MENU(MEN_CONVERT_TO_MODULATION, JZPianoFrame::OnnConvertToModulation)
   EVT_MENU(ACT_SETTINGS, JZPianoFrame::OnActivateSettingsDialog)
   EVT_MENU(MEN_FILTER, JZPianoFrame::OnFilter)
   EVT_MENU(ID_SNAP, JZPianoFrame::OnSnapDlg)
@@ -346,12 +345,12 @@ void JZPianoFrame::CreateMenu()
   edit_menu->Append(MEN_CLEANUP, "&Cleanup...");
   edit_menu->Append(MEN_SEARCHREP, "&Search Replace...");
 
-  wxMenu *setting_menu = new wxMenu("",wxMENU_TEAROFF);
-  setting_menu->Append(MEN_FILTER,    "&Filter...");
-  setting_menu->Append(ACT_SETTINGS,  "&Window...");
-  setting_menu->Append(MEN_VISIBLE,   "&Events...");
-  setting_menu->Append(ID_SNAP,       "&Snap...");
-  setting_menu->Append(MEN_METERCH,   "&Meterchange...");
+  wxMenu *setting_menu = new wxMenu("", wxMENU_TEAROFF);
+  setting_menu->Append(MEN_FILTER,      "&Filter...");
+  setting_menu->Append(ACT_SETTINGS,    "&Window...");
+  setting_menu->Append(MEN_VISIBLE,     "&Events...");
+  setting_menu->Append(ID_SNAP,         "&Snap...");
+  setting_menu->Append(ID_METER_CHANGE, "&Meter Change...");
 
   wxMenu *misc_menu = new wxMenu("",wxMENU_TEAROFF);
   misc_menu->Append(wxID_UNDO, "&Undo");
@@ -514,7 +513,7 @@ void JZPianoFrame::OnReset(wxCommandEvent& Event)
 
 case MEN_VISIBLE:   VisibleDialog(); break;
 
-case MEN_METERCH:        MenMeterChange(); break;
+case ID_METER_CHANGE:        OnMeterChange(); break;
 
 */
 

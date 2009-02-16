@@ -28,6 +28,7 @@
 class JZFilter;
 class JZSnapSelection;
 class JZSong;
+class wxDialog;
 
 //*****************************************************************************
 // Description:
@@ -55,7 +56,11 @@ class JZEventWindow : public wxWindow
 
     void Shift(int Units);
 
-//    void Quantize();
+    void Quantize();
+
+    void EditMeter();
+    bool IsEditingMeter() const;
+    void FinishMeterEdit();
 
     void LineText(
       wxDC& Dc,
@@ -119,6 +124,9 @@ class JZEventWindow : public wxWindow
     int mFromLine, mToLine;
 
     int mScrolledX, mScrolledY;
+
+    // Settings-Dialog
+    wxDialog* mpSettingsDialog;
 
 //  DECLARE_EVENT_TABLE()
 };

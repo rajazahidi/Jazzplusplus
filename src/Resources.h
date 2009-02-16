@@ -59,6 +59,8 @@
 #define ID_METRONOME_TOGGLE                  wxID_HIGHEST + 42
 #define ID_VELOCITY                          wxID_HIGHEST + 43
 
+#define ID_METER_CHANGE                      wxID_HIGHEST + 45
+
 #define ID_PLAY                              wxID_HIGHEST + 50
 #define ID_PLAY_LOOP                         wxID_HIGHEST + 51
 #define ID_RECORD                            wxID_HIGHEST + 52

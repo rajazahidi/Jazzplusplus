@@ -85,9 +85,6 @@ class JZEventFrame : public wxFrame
     JZSnapSelection* SnapSel;
     tMouseAction* MouseAction;
 
-    // Settings-Dialog
-    wxDialog* mpSettingsDialog;
-
     // Mixer-Dialog
     wxDialog* MixerForm;
 
@@ -95,22 +92,33 @@ class JZEventFrame : public wxFrame
 
     bool OnCharHook(wxKeyEvent& Event);
 
-    void OnUpdateEditShift(wxUpdateUIEvent& Event);
-    void OnEditShift(wxCommandEvent& Event);
+    void OnUpdateEventsSelected(wxUpdateUIEvent& Event);
+
+    void OnShift(wxCommandEvent& Event);
 
     void OnQuantize(wxCommandEvent& Event);
 
-    void MenSetChannel();
-    void MenTranspose();
-    void MenDelete();
-    void MenVelocity();
-    void MenLength();
-    void MenSeqLength();
-    void MenMidiDelay();
-    void MenConvertToModulation();
-    void MenCleanup();
-    void MenSearchReplace();
-    void MenMeterChange();
+    void OnSetChannel(wxCommandEvent& Event);
+
+    void OnTranspose(wxCommandEvent& Event);
+
+    void OnDelete(wxCommandEvent& Event);
+
+    void OnVelocity(wxCommandEvent& Event);
+
+    void OnLength(wxCommandEvent& Event);
+
+//    void OnSeqLength(wxCommandEvent& Event);
+
+//    void OnMidiDelay(wxCommandEvent& Event);
+
+    void OnConvertToModulation(wxCommandEvent& Event);
+
+    void OnCleanup(wxCommandEvent& Event);
+
+    void OnSearchReplace(wxCommandEvent& Event);
+
+    void OnMeterChange(wxCommandEvent& Event);
 
   protected:
 

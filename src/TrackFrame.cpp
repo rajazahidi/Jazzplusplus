@@ -268,18 +268,18 @@ void JZTrackFrame::CreateMenu()
   // Miscellaneous Menu is Stupid.
   // Now it's a View Menu
   misc_menu = new wxMenu;
-  misc_menu->Append(MEN_TMERGE,   "Mer&ge Tracks...");
-  misc_menu->Append(MEN_TSPLIT,   "&Split Tracks...");
-  misc_menu->Append(MEN_METERCH,  "&Meterchange...");
-  misc_menu->Append(MEN_RESET,    "&Reset Midi");
-  misc_menu->Append(MEN_HARMONY,  "&Harmony Browser...");
-  misc_menu->Append(MEN_RHYTHM,   "Random R&hythm...");
-  misc_menu->Append(MEN_SHUFFLE,  "Random Sh&uffle...");
-  misc_menu->Append(MEN_GENMELDY, "Random Melod&y...");
-  misc_menu->Append(MEN_ARPEGGIO, "Random Arpeggio...");
-  misc_menu->Append(MEN_MAPPER,   "Ma&pper...");
-  misc_menu->Append(MEN_EVENTLIST, "Event &List...");
-  misc_menu->Append(MEN_COPYRIGHT,"&Set Music Copyright...");
+  misc_menu->Append(MEN_TMERGE,      "Mer&ge Tracks...");
+  misc_menu->Append(MEN_TSPLIT,      "&Split Tracks...");
+  misc_menu->Append(ID_METER_CHANGE, "&Meter Change...");
+  misc_menu->Append(MEN_RESET,       "&Reset Midi");
+  misc_menu->Append(MEN_HARMONY,     "&Harmony Browser...");
+  misc_menu->Append(MEN_RHYTHM,      "Random R&hythm...");
+  misc_menu->Append(MEN_SHUFFLE,     "Random Sh&uffle...");
+  misc_menu->Append(MEN_GENMELDY,    "Random Melod&y...");
+  misc_menu->Append(MEN_ARPEGGIO,    "Random Arpeggio...");
+  misc_menu->Append(MEN_MAPPER,      "Ma&pper...");
+  misc_menu->Append(MEN_EVENTLIST,   "Event &List...");
+  misc_menu->Append(MEN_COPYRIGHT,   "&Set Music Copyright...");
 #endif
 
   mpToolsMenu = new wxMenu;

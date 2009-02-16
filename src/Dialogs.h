@@ -59,7 +59,7 @@ class tCleanupDlg : public tPropertyListDlg
     JZFilter *Filter;
     JZSong   *Song;
 
-    tCleanupDlg(JZEventFrame *w, JZFilter *f);
+    tCleanupDlg(JZEventWindow* w, JZFilter *f);
     void AddProperties();
     //tNamedChoice Steps;
     bool OnClose();
@@ -78,7 +78,7 @@ class tSearchReplaceDlg : public tPropertyListDlg
     JZFilter *Filter;
     JZSong   *Song;
 
-    tSearchReplaceDlg(JZEventFrame *w, JZFilter *f);
+    tSearchReplaceDlg(JZEventWindow* w, JZFilter *f);
     void AddProperties();
     bool OnClose();
     void OnHelp();
@@ -97,7 +97,7 @@ class tTransposeDlg : public tPropertyListDlg
     JZSong   *Song;
 
     //tNamedChoice ScaleDlg;
-    tTransposeDlg(JZEventFrame *w, JZFilter *f);
+    tTransposeDlg(JZEventWindow* w, JZFilter *f);
     void AddProperties();
     bool OnClose();
     void OnHelp();
@@ -147,7 +147,7 @@ class tLengthDlg : public tPropertyListDlg
     JZFilter   *Filter;
     JZSong     *Song;
 
-    tLengthDlg(JZEventFrame *win, JZFilter *f);
+    tLengthDlg(JZEventWindow* win, JZFilter *f);
     void AddProperties();
     bool OnClose();
     void OnHelp();
@@ -195,7 +195,7 @@ class tDeleteDlg : public tPropertyListDlg
  public:
   static bool LeaveSpace;        // 1
 
-  tDeleteDlg(JZEventFrame *w, JZFilter *f);
+  tDeleteDlg(JZEventWindow* w, JZFilter *f);
   void AddProperties();
   bool OnClose();
   void OnHelp();

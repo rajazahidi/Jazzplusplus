@@ -59,6 +59,22 @@ class JZEventWindow : public wxWindow
 
     void Quantize();
 
+    void SetChannel();
+
+    void Transpose();
+
+    void Delete();
+
+    void Velocity();
+
+    void Length();
+
+    void ConvertToModulation();
+
+    void Cleanup();
+
+    void SearchReplace();
+
     void EditMeter();
     bool IsEditingMeter() const;
     void FinishMeterEdit();

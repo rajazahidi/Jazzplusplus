@@ -1,14 +1,8 @@
 #include "EventFrame.h"
 
-#include "Command.h"
-#include "Dialogs.h"
 #include "EventWindow.h"
-#include "Filter.h"
 #include "Resources.h"
 #include "ToolBar.h"
-
-#include <wx/dc.h>
-#include <wx/msgdlg.h>
 
 #include <iostream>
 
@@ -37,26 +31,16 @@ JZEventFrame::JZEventFrame(
   const wxSize& Size,
   long WindowStyle)
   : wxFrame(pParent, wxID_ANY, Title, Position, Size, WindowStyle),
-    mpFilter(0),
-    MixerForm(0),
     mpToolBar(0),
     mpEventWindow(0)
 {
-  mpFilter = new JZFilter(pSong);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZEventFrame::~JZEventFrame()
 {
-  delete mpFilter;
-
   delete mpToolBar;
-
-  if (MixerForm)
-  {
-    delete MixerForm;
-  }
 }
 
 //-----------------------------------------------------------------------------
@@ -66,13 +50,6 @@ JZEventFrame::~JZEventFrame()
 void JZEventFrame::SetEventWindow(JZEventWindow* pEventWindow)
 {
   mpEventWindow = pEventWindow;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-bool JZEventFrame::OnKeyEvent(wxKeyEvent& KeyEvent)
-{
-  return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -98,13 +75,6 @@ void JZEventFrame::Redraw()
 //  {
 //    mpEventWindow->Refresh();
 //  }
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-bool JZEventFrame::OnCharHook(wxKeyEvent& KeyEvent)
-{
-  return OnKeyEvent(KeyEvent);
 }
 
 //-----------------------------------------------------------------------------
@@ -147,11 +117,8 @@ void JZEventFrame::OnSetChannel(wxCommandEvent& Event)
 {
   if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
   {
-   return;
+    mpEventWindow->SetChannel();
   }
-
-  tSetChannelDlg * dlg = new tSetChannelDlg(mpFilter);
-  dlg->Create();
 }
 
 //-----------------------------------------------------------------------------
@@ -160,11 +127,8 @@ void JZEventFrame::OnTranspose(wxCommandEvent& Event)
 {
   if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
   {
-   return;
+    mpEventWindow->Transpose();
   }
-
-  tTransposeDlg * dlg = new tTransposeDlg(this, mpFilter);
-  dlg->Create();
 }
 
 //-----------------------------------------------------------------------------
@@ -173,11 +137,8 @@ void JZEventFrame::OnDelete(wxCommandEvent& Event)
 {
   if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
   {
-   return;
+    mpEventWindow->Delete();
   }
-
-  tDeleteDlg * dlg = new tDeleteDlg(this, mpFilter);
-  dlg->Create();
 }
 
 //-----------------------------------------------------------------------------
@@ -186,11 +147,8 @@ void JZEventFrame::OnVelocity(wxCommandEvent& Event)
 {
   if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
   {
-   return;
+    mpEventWindow->Velocity();
   }
-
-  tVelocityDlg * dlg = new tVelocityDlg(mpFilter);
-  dlg->Create();
 }
 
 //-----------------------------------------------------------------------------
@@ -199,11 +157,8 @@ void JZEventFrame::OnLength(wxCommandEvent& Event)
 {
   if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
   {
-   return;
+    mpEventWindow->Length();
   }
-
-  tLengthDlg * dlg = new tLengthDlg(this, mpFilter);
-  dlg->Create();
 }
 
 //-----------------------------------------------------------------------------
@@ -212,12 +167,8 @@ void JZEventFrame::OnConvertToModulation(wxCommandEvent& Event)
 {
   if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
   {
-   return;
+    mpEventWindow->ConvertToModulation();
   }
-
-  tCmdConvertToModulation cmd(mpFilter);
-  cmd.Execute();
-  Redraw();
 }
 
 //-----------------------------------------------------------------------------
@@ -226,11 +177,8 @@ void JZEventFrame::OnCleanup(wxCommandEvent& Event)
 {
   if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
   {
-   return;
+    mpEventWindow->Cleanup();
   }
-
-  tCleanupDlg * dlg = new tCleanupDlg(this, mpFilter);
-  dlg->Create();
 }
 
 //-----------------------------------------------------------------------------
@@ -239,11 +187,8 @@ void JZEventFrame::OnSearchReplace(wxCommandEvent& Event)
 {
   if (!mpEventWindow || !mpEventWindow->AreEventsSelected())
   {
-   return;
+    mpEventWindow->SearchReplace();
   }
-
-  tSearchReplaceDlg * dlg = new tSearchReplaceDlg(this, mpFilter);
-  dlg->Create();
 }
 
 //-----------------------------------------------------------------------------

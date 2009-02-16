@@ -111,7 +111,7 @@ bool tCleanupDlg::shortenOverlaps = 1;
 
 
 
-tCleanupDlg::tCleanupDlg(JZEventFrame *w, JZFilter *f)
+tCleanupDlg::tCleanupDlg(JZEventWindow* w, JZFilter *f)
   : tPropertyListDlg( "Clean up events" )
 {
   Filter = f;
@@ -191,7 +191,7 @@ void tCleanupDlg::AddProperties()
 int tSearchReplaceDlg::frCtrl = 1;
 int tSearchReplaceDlg::toCtrl = 1;
 
-tSearchReplaceDlg::tSearchReplaceDlg(JZEventFrame *w, JZFilter *f)
+tSearchReplaceDlg::tSearchReplaceDlg(JZEventWindow* w, JZFilter *f)
    : tPropertyListDlg("Search and replace controller types" )
 {
   Filter = f;
@@ -239,7 +239,7 @@ int tTransposeDlg::Notes = 0;
 int tTransposeDlg::Scale = gScaleChromatic;
 bool tTransposeDlg::FitIntoScale = 0;
 
-tTransposeDlg::tTransposeDlg(JZEventFrame *w, JZFilter *f)
+tTransposeDlg::tTransposeDlg(JZEventWindow* w, JZFilter *f)
   : tPropertyListDlg("Transpose")
 {
   Filter = f;
@@ -390,7 +390,7 @@ int tLengthDlg::ToValue = 0;
 
 int tLengthDlg::Mode;
 
-tLengthDlg::tLengthDlg(JZEventFrame *w, JZFilter *f)
+tLengthDlg::tLengthDlg(JZEventWindow* w, JZFilter *f)
 : tPropertyListDlg("Length")
 {
   Filter = f;
@@ -553,7 +553,7 @@ void tMidiDelayDlg::AddProperties()
 
 bool tDeleteDlg::LeaveSpace = 1;
 
-tDeleteDlg::tDeleteDlg(JZEventFrame *w, JZFilter *f)
+tDeleteDlg::tDeleteDlg(JZEventWindow* w, JZFilter *f)
 : tPropertyListDlg("Delete" )
 {
   Filter = f;

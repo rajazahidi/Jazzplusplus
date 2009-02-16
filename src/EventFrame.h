@@ -26,7 +26,6 @@
 #include <wx/frame.h>
 
 class JZEventWindow;
-class JZFilter;
 class JZSong;
 class JZToolBar;
 class wxDialog;
@@ -56,22 +55,12 @@ class JZEventFrame : public wxFrame
 
     virtual void SetEventWindow(JZEventWindow* pEventWindow);
 
-    // Events
-    virtual bool OnKeyEvent(wxKeyEvent& Event); // true = processed by eventwin
     virtual bool OnClose();
 
     // Redraw - nach Aenderungen von Parametern, kein GUI-Event
     virtual void Redraw();
 
-
-    JZFilter* mpFilter;
-
-    // Mixer-Dialog
-    wxDialog* MixerForm;
-
   private:
-
-    bool OnCharHook(wxKeyEvent& Event);
 
     void OnUpdateEventsSelected(wxUpdateUIEvent& Event);
 

@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2009 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -93,14 +93,15 @@ void JZListen::Notify()
 
 //*****************************************************************************
 // Description:
-//   tMousePlay - Click in pianoroll
+//   JZMousePlay - Click in pianoroll
 //*****************************************************************************
-class tMousePlay : public tMouseAction
+class JZMousePlay : public tMouseAction
 {
   public:
 
-    tMousePlay(JZPianoWindow* pPianoWindow, wxMouseEvent& Event);
-    int ProcessEvent(wxMouseEvent& Event);
+    JZMousePlay(JZPianoWindow* pPianoWindow);
+
+    virtual int ProcessMouseEvent(wxMouseEvent& MouseEvent);
 
   private:
 
@@ -110,7 +111,7 @@ class tMousePlay : public tMouseAction
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tMousePlay::tMousePlay(JZPianoWindow* pPianoWindow, wxMouseEvent& Event)
+JZMousePlay::JZMousePlay(JZPianoWindow* pPianoWindow)
   : mPitch(0),
     mVeloc(-1),
     mChannel(-1),
@@ -118,39 +119,37 @@ tMousePlay::tMousePlay(JZPianoWindow* pPianoWindow, wxMouseEvent& Event)
 {
   mChannel = mpPianoWindow->GetTrack()->Channel ?
     mpPianoWindow->GetTrack()->Channel - 1 : 0;
-
-  ProcessEvent(Event);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tMousePlay::ProcessEvent(wxMouseEvent& Event)
+int JZMousePlay::ProcessMouseEvent(wxMouseEvent& MouseEvent)
 {
   int x, y;
-  Event.GetPosition(&x, &y);
+  MouseEvent.GetPosition(&x, &y);
 
   int OldPitch = mPitch;
 
-  if (Event.LeftDown())
+  if (MouseEvent.LeftDown())
   {
     mPitch = mpPianoWindow->y2Pitch(y);
     mVeloc = 64;
   }
-  else if (Event.MiddleDown())
+  else if (MouseEvent.MiddleDown())
   {
     mPitch = mpPianoWindow->y2Pitch(y);
     mVeloc = 80;
   }
-  else if (Event.RightDown())
+  else if (MouseEvent.RightDown())
   {
     mPitch = mpPianoWindow->y2Pitch(y);
     mVeloc = 110;
   }
-  else if (Event.ButtonUp())
+  else if (MouseEvent.ButtonUp())
   {
     mPitch = 0;
   }
-  else if (Event.Dragging())
+  else if (MouseEvent.Dragging())
   {
     mPitch = mpPianoWindow->y2Pitch(y);
   }
@@ -170,23 +169,21 @@ int tMousePlay::ProcessEvent(wxMouseEvent& Event)
   {
     if (OldPitch && OldPitch != mPitch)
     {
-      tKeyOff of(0, mChannel, OldPitch);
-      gpMidiPlayer->OutNow(mpPianoWindow->GetTrack(), &of);
+      tKeyOff KeyOff(0, mChannel, OldPitch);
+      gpMidiPlayer->OutNow(mpPianoWindow->GetTrack(), &KeyOff);
       OldPitch = 0;
     }
 
     if (mPitch && mPitch != OldPitch)
     {
-      tKeyOn on(0, mChannel, mPitch, mVeloc);
-      gpMidiPlayer->OutNow(mpPianoWindow->GetTrack(), &on);
+      tKeyOn KeyOn(0, mChannel, mPitch, mVeloc);
+      gpMidiPlayer->OutNow(mpPianoWindow->GetTrack(), &KeyOn);
       OldPitch = 0;
     }
   }
 
   if (!mPitch)
   {
-    mpPianoWindow->mpMouseAction = 0;
-    delete this;
     return 1;        // done
   }
   return 0;
@@ -202,11 +199,11 @@ class tKeyLengthDragger : public tMouseAction
 
     tKeyLengthDragger(tKeyOn* pKeyOn, JZPianoWindow* pPianoWindow);
 
-    int Dragging(wxMouseEvent& Event);
+    int Dragging(wxMouseEvent& MouseEvent);
 
-    int ButtonUp(wxMouseEvent& Event);
+    int ButtonUp(wxMouseEvent& MouseEvent);
 
-    int Event(wxMouseEvent& Event);
+    int ProcessMouseEvent(wxMouseEvent& MouseEvent);
 
   private:
 
@@ -240,28 +237,28 @@ tKeyLengthDragger::tKeyLengthDragger(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tKeyLengthDragger::Event(wxMouseEvent& Event)
+int tKeyLengthDragger::ProcessMouseEvent(wxMouseEvent& MouseEvent)
 {
-  if (Event.Dragging())
+  if (MouseEvent.Dragging())
   {
-    return Dragging(Event);
+    return Dragging(MouseEvent);
   }
-  else if (Event.ButtonUp())
+  else if (MouseEvent.ButtonUp())
   {
-    return ButtonUp(Event);
+    return ButtonUp(MouseEvent);
   }
   return 0;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tKeyLengthDragger::Dragging(wxMouseEvent& Event)
+int tKeyLengthDragger::Dragging(wxMouseEvent& MouseEvent)
 {
   wxClientDC Dc(Win);
   Win->PrepareDC(Dc); //to translate scrolled coordinates
   Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 1, 1);
   int fx, fy;
-  Event.GetPosition(&fx, &fy);
+  MouseEvent.GetPosition(&fx, &fy);
   int Clock = Win->x2Clock(fx);
   int  Length = Clock - Copy->GetClock();
   if (Length <= 0)
@@ -276,7 +273,7 @@ int tKeyLengthDragger::Dragging(wxMouseEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tKeyLengthDragger::ButtonUp(wxMouseEvent& Event)
+int tKeyLengthDragger::ButtonUp(wxMouseEvent& MouseEvent)
 {
   // SN++ Key_Aftertouch
   if (Copy->GetEventLength() < mpKeyOn->GetEventLength())
@@ -330,16 +327,21 @@ int tKeyLengthDragger::ButtonUp(wxMouseEvent& Event)
 //*****************************************************************************
 class tPlayTrackLengthDragger : public tMouseAction
 {
+  public:
+
+    tPlayTrackLengthDragger(tPlayTrack* k, JZPianoWindow* pPianoWindow);
+
+    int Dragging(wxMouseEvent& MouseEvent);
+
+    int ButtonUp(wxMouseEvent& MouseEvent);
+
+    int ProcessMouseEvent(wxMouseEvent& MouseEvent);
+
+  private:
     tPlayTrack* mpKeyOn;
     tPlayTrack* Copy;
     JZPianoWindow* Win;
     JZTrack* mpTrack;
-
-  public:
-    tPlayTrackLengthDragger(tPlayTrack* k, JZPianoWindow* pPianoWindow);
-    int Dragging(wxMouseEvent& Event);
-    int ButtonUp(wxMouseEvent& Event);
-    int Event(wxMouseEvent& Event);
 };
 
 //-----------------------------------------------------------------------------
@@ -363,28 +365,28 @@ tPlayTrackLengthDragger::tPlayTrackLengthDragger(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tPlayTrackLengthDragger::Event(wxMouseEvent& Event)
+int tPlayTrackLengthDragger::ProcessMouseEvent(wxMouseEvent& MouseEvent)
 {
-  if (Event.Dragging())
+  if (MouseEvent.Dragging())
   {
-    return Dragging(Event);
+    return Dragging(MouseEvent);
   }
-  else if (Event.ButtonUp())
+  else if (MouseEvent.ButtonUp())
   {
-    return ButtonUp(Event);
+    return ButtonUp(MouseEvent);
   }
   return 0;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tPlayTrackLengthDragger::Dragging(wxMouseEvent& Event)
+int tPlayTrackLengthDragger::Dragging(wxMouseEvent& MouseEvent)
 {
   wxClientDC Dc(Win);
   Win->PrepareDC(Dc);
   Win->DrawEvent(Dc, Copy, Copy->GetBrush(), 1, 1);
   int fx, fy;
-  Event.GetPosition(&fx, &fy);
+  MouseEvent.GetPosition(&fx, &fy);
   int Clock = Win->x2Clock(fx);
   int  Length = Clock - Copy->GetClock();
   if (Length <= 0)
@@ -397,7 +399,7 @@ int tPlayTrackLengthDragger::Dragging(wxMouseEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tPlayTrackLengthDragger::ButtonUp(wxMouseEvent& Event)
+int tPlayTrackLengthDragger::ButtonUp(wxMouseEvent& MouseEvent)
 {
   wxClientDC Dc(Win);
   Win->PrepareDC(Dc);
@@ -423,7 +425,6 @@ int tPlayTrackLengthDragger::ButtonUp(wxMouseEvent& Event)
 class tVelocCounter : public tMouseCounter
 {
   public:
-    int Event(wxMouseEvent& Event);
     tVelocCounter(
       JZPianoWindow* pPianoWindow,
       JZRectangle* pRectangle,
@@ -440,6 +441,8 @@ class tVelocCounter : public tMouseCounter
       Dc.SetFont(*(Win->GetFixedFont()));
     }
 
+    virtual int ProcessMouseEvent(wxMouseEvent& MouseEvent);
+
   private:
 
     JZPianoWindow* Win;
@@ -449,9 +452,9 @@ class tVelocCounter : public tMouseCounter
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tVelocCounter::Event(wxMouseEvent& Event)
+int tVelocCounter::ProcessMouseEvent(wxMouseEvent& MouseEvent)
 {
-  if (tMouseCounter::Event(Event))
+  if (tMouseCounter::ProcessMouseEvent(MouseEvent))
   {
     tKeyOn* pKeyOnCopy = (tKeyOn *)mpKeyOn->Copy();
     pKeyOnCopy->SetVelocity(Value);
@@ -591,7 +594,7 @@ JZPianoWindow::JZPianoWindow(
     mpPianoFrame(pPianoFrame),
     mPlayClock(-1),
     mSnapCount(0),
-    mpMouseAction(0),
+    mPasteBuffer(),
     mpTrack(0),
     mTrackIndex(0),
     mpCtrlEdit(0),
@@ -1612,12 +1615,12 @@ void JZPianoWindow::OnPaint(wxPaintEvent& Event)
 // Descriptions:
 //   This mouse handler delegates to the subclassed event window.
 //-----------------------------------------------------------------------------
-void JZPianoWindow::OnMouseEvent(wxMouseEvent& Event)
+void JZPianoWindow::OnMouseEvent(wxMouseEvent& MouseEvent)
 {
-  if (Event.Moving() && !Event.Dragging() && !mpMouseAction)
+  if (MouseEvent.Moving() && !MouseEvent.Dragging() && !mpMouseAction)
   {
     int fx, fy;
-    Event.GetPosition(&fx, &fy);
+    MouseEvent.GetPosition(&fx, &fy);
     int Pitch = y2Pitch(fy);
     JZProjectManager::Instance()->ShowPitch(Pitch);
   }
@@ -1627,27 +1630,30 @@ void JZPianoWindow::OnMouseEvent(wxMouseEvent& Event)
   if (!mpMouseAction)
   {
     int x, y;
-    Event.GetPosition(&x, &y);
+    MouseEvent.GetPosition(&x, &y);
 
-    if (y > mEventsY)        // click in event area?
+    // Was the mouse event below the top line that indicates the measure?
+    if (y > mEventsY)
     {
       if (mPianoX < x && x < mPianoX + mPianoWidth)
       {
-        MousePiano(Event);
+        // The mouse event was in the piano keys area.
+        MousePiano(MouseEvent);
       }
       else if (mEventsX < x && x < mEventsX + mEventsWidth)
       {
-        MouseEvents(Event);
+        // The mouse event was in the MIDI event area.
+        MouseEvents(MouseEvent);
       }
       else
       {
-        OnEventWinMouseEvent(Event);
+        OnEventWinMouseEvent(MouseEvent);
       }
     }
     else if (x > mEventsX)
     {
       // click in top line
-      int action = mMousePlay.Action(Event);
+      int action = mMousePlay.Action(MouseEvent);
 
       if (action)
       {
@@ -1685,7 +1691,8 @@ void JZPianoWindow::OnMouseEvent(wxMouseEvent& Event)
   }
   else
   {
-    OnEventWinMouseEvent(Event);
+    MouseEvent.Skip();
+//NEW    OnEventWinMouseEvent(MouseEvent);
   }
 }
 
@@ -1820,7 +1827,7 @@ void JZPianoWindow::VerticalScroll(wxScrollWinEvent& Event)
 //-----------------------------------------------------------------------------
 // Snapper
 //-----------------------------------------------------------------------------
-void JZPianoWindow::SnapSelStop(wxMouseEvent& Event)
+void JZPianoWindow::SnapSelStop(wxMouseEvent& MouseEvent)
 {
   if (mpSnapSel->IsSelected())
   {
@@ -1865,7 +1872,20 @@ void JZPianoWindow::SnapSelStop(wxMouseEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZPianoWindow::SnapSelStart(wxMouseEvent &)
+int JZPianoWindow::SnapClock(int Clock, bool Up)
+{
+  int qnt = SnapClocks();
+  Clock -= (Clock % qnt);
+  if (Up)
+  {
+    Clock += qnt;
+  }
+  return Clock;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPianoWindow::SnapSelStart(wxMouseEvent& MouseEvent)
 {
   mSnapCount = 0;
   int clk = SnapClock(mFromClock, false);
@@ -1887,19 +1907,6 @@ void JZPianoWindow::SnapSelStart(wxMouseEvent &)
     mFromLine * mTrackHeight + mTopInfoHeight,
     mEventsY + mEventsHeight,
     mTrackHeight);
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-int JZPianoWindow::SnapClock(int Clock, bool Up)
-{
-  int qnt = SnapClocks();
-  Clock -= (Clock % qnt);
-  if (Up)
-  {
-    Clock += qnt;
-  }
-  return Clock;
 }
 
 //-----------------------------------------------------------------------------
@@ -2000,22 +2007,22 @@ void JZPianoWindow::ZoomOut()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZPianoWindow::OnEventWinMouseEvent(wxMouseEvent& Event)
+int JZPianoWindow::OnEventWinMouseEvent(wxMouseEvent& MouseEvent)
 {
   if (!mpMouseAction)
   {
     // create mpSnapSel?
 
     int x, y;
-    Event.GetPosition(&x, &y);
+    MouseEvent.GetPosition(&x, &y);
     if (
       mEventsX < x && x < mEventsX + mEventsWidth &&
       mEventsY < y && y < mEventsY + mEventsHeight)
     {
-      if (Event.LeftDown())
+      if (MouseEvent.LeftDown())
       {
         {
-          SnapSelStart(Event);
+          SnapSelStart(MouseEvent);
 
 //          if (mpSnapSel->IsSelected())
 //          {
@@ -2023,7 +2030,7 @@ int JZPianoWindow::OnEventWinMouseEvent(wxMouseEvent& Event)
             // invalidate a rect).
             Refresh();
 //          }
-          mpSnapSel->Event(Event);
+          mpSnapSel->ProcessMouseEvent(MouseEvent);
           mpMouseAction = mpSnapSel;
         }
       }
@@ -2033,13 +2040,13 @@ int JZPianoWindow::OnEventWinMouseEvent(wxMouseEvent& Event)
   {
     // mpMouseAction active
 
-    if (mpMouseAction->Event(Event))
+    if (mpMouseAction->ProcessMouseEvent(MouseEvent))
     {
       // mpMouseAction finished
 
       if (mpMouseAction == mpSnapSel)
       {
-        SnapSelStop(Event);
+        SnapSelStop(MouseEvent);
 
         // inefficient, invalidate rect first instead.
         Refresh();
@@ -2100,14 +2107,14 @@ void JZPianoWindow::ShowPitch(int Pitch)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZPianoWindow::MouseCutPaste(wxMouseEvent& Event, bool Cut)
+void JZPianoWindow::MouseCutPaste(wxMouseEvent& MouseEvent, bool Cut)
 {
   wxClientDC Dc(this);
 
   PrepareDC(Dc);
 
   // Convert physical coordinates to logical (scrolled) coordinates.
-  wxPoint Point = Event.GetLogicalPosition(Dc);
+  wxPoint Point = MouseEvent.GetLogicalPosition(Dc);
 
   int x = Point.x;
   int y = Point.y;
@@ -2130,14 +2137,14 @@ void JZPianoWindow::MouseCutPaste(wxMouseEvent& Event, bool Cut)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZPianoWindow::MouseEvents(wxMouseEvent& Event)
+void JZPianoWindow::MouseEvents(wxMouseEvent& MouseEvent)
 {
-  int action = mMouseEvent.Action(Event);
+  int action = mMouseEvent.Action(MouseEvent);
 
   if (action)
   {
     int x, y;
-    Event.GetPosition(&x, &y);
+    MouseEvent.GetPosition(&x, &y);
 
     int Clock = x2Clock(x);
     int Pitch = y2Pitch(y);
@@ -2153,11 +2160,11 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& Event)
     switch (action)
     {
       case MA_CUTPASTE:
-        MouseCutPaste(Event, 1);
+        MouseCutPaste(MouseEvent, 1);
         break;
 
       case MA_COPY:
-        MouseCutPaste(Event, 0);
+        MouseCutPaste(MouseEvent, 0);
         break;
 
       case MA_LENGTH:
@@ -2198,12 +2205,12 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& Event)
 
 
       case MA_LISTEN:
-        MousePiano(Event);
+        MousePiano(MouseEvent);
         break;
 
       case MA_SELECT:
       case MA_CONTSEL:
-        OnEventWinMouseEvent(Event);
+        OnEventWinMouseEvent(MouseEvent);
         break;
 
       case MA_VELOCITY:
@@ -2216,7 +2223,7 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& Event)
           r.SetHeight(mTopInfoHeight);
 
           tVelocCounter *VelocCounter = new tVelocCounter(this, &r, pKeyOn);
-          VelocCounter->Event(Event);
+          VelocCounter->ProcessMouseEvent(MouseEvent);
           mpMouseAction = VelocCounter;
         }
         break;
@@ -2227,11 +2234,17 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZPianoWindow::MousePiano(wxMouseEvent& Event)
+void JZPianoWindow::MousePiano(wxMouseEvent& MouseEvent)
 {
-  if (Event.ButtonDown())
+  if (MouseEvent.ButtonDown())
   {
-    mpMouseAction = new tMousePlay(this, Event);
+    mpMouseAction = new JZMousePlay(this);
+    int Status = mpMouseAction->ProcessMouseEvent(MouseEvent);
+    if (Status == 1)
+    {
+      delete mpMouseAction;
+      mpMouseAction = 0;
+    }
   }
 }
 

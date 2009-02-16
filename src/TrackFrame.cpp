@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2009 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -665,7 +665,7 @@ void JZTrackFrame::OnHelpAbout(wxCommandEvent& Event)
 // playing:
 //   left+right: stop
 //-----------------------------------------------------------------------------
-void JZTrackFrame::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
+void JZTrackFrame::MousePlay(wxMouseEvent& MouseEvent, TEMousePlayMode Mode)
 {
-  mpTrackWindow->MousePlay(Event, Mode);
+  mpTrackWindow->MousePlay(MouseEvent, Mode);
 }

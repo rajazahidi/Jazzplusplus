@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2009 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -138,7 +138,7 @@ class tSampleCnvs : public wxScrolledWindow
     }
     virtual void OnPaint();
     virtual void OnSize(int w, int h);
-    virtual void OnEvent(wxMouseEvent &evt);
+    virtual void OnEvent(wxMouseEvent& MouseEvent);
     void ClearSelection();
     void SetInsertionPoint(int offs);
     void SetSelection(int fr, int to);
@@ -311,7 +311,7 @@ void tSampleCnvs::OnSize(int w, int h)
 
 
 
-void tSampleCnvs::OnEvent(wxMouseEvent &e)
+void tSampleCnvs::OnEvent(wxMouseEvent& MouseEvent)
 {
   // dont accept mouse events as long as the
   // array edit is up
@@ -323,7 +323,7 @@ void tSampleCnvs::OnEvent(wxMouseEvent &e)
   wxDC* pDc = new wxClientDC(this);
 
   // tSnapSel is strange.
-  if (e.LeftDown())
+  if (MouseEvent.LeftDown())
   {
     mouse_up_sets_insertion_point = 0;
     mouse_down = TRUE;
@@ -340,12 +340,12 @@ void tSampleCnvs::OnEvent(wxMouseEvent &e)
     {
       mouse_up_sets_insertion_point = 1;
     }
-    snapsel.Event(e);
+    snapsel.ProcessMouseEvent(MouseEvent);
   }
-  else if (e.LeftUp())
+  else if (MouseEvent.LeftUp())
   {
     mouse_down = FALSE;
-    snapsel.Event(e);
+    snapsel.ProcessMouseEvent(MouseEvent);
     if (snapsel.IsSelected())
     {
       snapsel.Draw(*pDc, 0, 0);
@@ -357,7 +357,7 @@ void tSampleCnvs::OnEvent(wxMouseEvent &e)
     else if (mouse_up_sets_insertion_point)
     {
       int x, y;
-      e.GetPosition(&x, &y);
+      MouseEvent.GetPosition(&x, &y);
       sel_fr = sel_to = Pixel2Sample(x);
       inspt.Draw(x);
     }
@@ -366,9 +366,9 @@ void tSampleCnvs::OnEvent(wxMouseEvent &e)
       sel_fr = sel_to = -1;
     }
   }
-  else if (e.Dragging() && mouse_down)
+  else if (MouseEvent.Dragging() && mouse_down)
   {
-    snapsel.Event(e);
+    snapsel.ProcessMouseEvent(MouseEvent);
   }
 }
 

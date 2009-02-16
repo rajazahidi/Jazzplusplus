@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2009 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -69,37 +69,37 @@ void tMouseMapper::SetAction(int code, Button but, bool shift, bool ctrl)
   actions[i] = code;
 }
 
-int tMouseMapper::Action(wxMouseEvent& Event)
+int tMouseMapper::Action(wxMouseEvent& MouseEvent)
 {
-  if (!Event.ButtonDown())
+  if (!MouseEvent.ButtonDown())
   {
     return 0;
   }
 
   if (
     left_action > 0 &&
-    Event.LeftDown() &&
-    !Event.ShiftDown() &&
-    !Event.ControlDown())
+    MouseEvent.LeftDown() &&
+    !MouseEvent.ShiftDown() &&
+    !MouseEvent.ControlDown())
   {
     return left_action;
   }
 
   int i = 0;        // left down
-  if (Event.MiddleDown())
+  if (MouseEvent.MiddleDown())
   {
     i = 1;
   }
-  else if (Event.RightDown())
+  else if (MouseEvent.RightDown())
   {
     i = 2;
   }
 
-  if (Event.ShiftDown())
+  if (MouseEvent.ShiftDown())
   {
     i += 3;
   }
-  if (Event.ControlDown())
+  if (MouseEvent.ControlDown())
   {
     i += 6;
   }
@@ -132,42 +132,42 @@ JZSelection::~JZSelection()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZSelection::Event(wxMouseEvent& Event)
+int JZSelection::ProcessMouseEvent(wxMouseEvent& MouseEvent)
 {
-  if (Event.ButtonDown())
+  if (MouseEvent.ButtonDown())
   {
-    return ButtonDown(Event);
+    return ButtonDown(MouseEvent);
   }
-  else if (Event.ButtonUp())
+  else if (MouseEvent.ButtonUp())
   {
-    return ButtonUp(Event);
+    return ButtonUp(MouseEvent);
   }
-  else if (Event.Dragging())
+  else if (MouseEvent.Dragging())
   {
-    return Dragging(Event);
+    return Dragging(MouseEvent);
   }
   return 0;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZSelection::ButtonDown(wxMouseEvent& Event)
+int JZSelection::ButtonDown(wxMouseEvent& MouseEvent)
 {
   if (!mActive)
   {
     mActive = true;
-    if (mSelected && Event.ShiftDown())
+    if (mSelected && MouseEvent.ShiftDown())
     {
       // Continue selection
       JZRectangle Rectangle = mRectangle;
       Rectangle.SetNormal();
-      Dragging(Event);
+      Dragging(MouseEvent);
     }
     else
     {
       mSelected = false;
-      int x = Event.GetX();
-      int y = Event.GetY();
+      int x = MouseEvent.GetX();
+      int y = MouseEvent.GetY();
       Snap(x, y, 0);
       mRectangle.x = x;
       mRectangle.y = y;
@@ -180,17 +180,17 @@ int JZSelection::ButtonDown(wxMouseEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZSelection::Dragging(wxMouseEvent& Event)
+int JZSelection::Dragging(wxMouseEvent& MouseEvent)
 {
   if (!mActive)
   {
-    ButtonDown(Event);
+    ButtonDown(MouseEvent);
   }
 
   if (mActive)
   {
-    int x = Event.GetX();
-    int y = Event.GetY();
+    int x = MouseEvent.GetX();
+    int y = MouseEvent.GetY();
     if (x < 0)
     {
       x = 0;
@@ -210,7 +210,7 @@ int JZSelection::Dragging(wxMouseEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZSelection::ButtonUp(wxMouseEvent& Event)
+int JZSelection::ButtonUp(wxMouseEvent& MouseEvent)
 {
   if (mActive)
   {
@@ -461,9 +461,9 @@ tMouseCounter::tMouseCounter(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tMouseCounter::LeftDown(wxMouseEvent& Event)
+int tMouseCounter::LeftDown(wxMouseEvent& MouseEvent)
 {
-  Delta = Event.ShiftDown() ? 10 : 1;
+  Delta = MouseEvent.ShiftDown() ? 10 : 1;
   Start(Timeout);
   if (Wait)
   {
@@ -476,7 +476,9 @@ int tMouseCounter::LeftDown(wxMouseEvent& Event)
   return 0;
 }
 
-int tMouseCounter::LeftUp(wxMouseEvent& Event)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int tMouseCounter::LeftUp(wxMouseEvent& MouseEvent)
 {
   Stop();
   ShowValue(FALSE);
@@ -485,9 +487,9 @@ int tMouseCounter::LeftUp(wxMouseEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tMouseCounter::RightDown(wxMouseEvent& Event)
+int tMouseCounter::RightDown(wxMouseEvent& MouseEvent)
 {
-  Delta = Event.ShiftDown() ? -10 :  -1;
+  Delta = MouseEvent.ShiftDown() ? -10 :  -1;
   Start(Timeout);
   if (Wait)
   {
@@ -503,7 +505,7 @@ int tMouseCounter::RightDown(wxMouseEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tMouseCounter::RightUp(wxMouseEvent& Event)
+int tMouseCounter::RightUp(wxMouseEvent& MouseEvent)
 {
   Stop();
   ShowValue(FALSE);
@@ -556,7 +558,7 @@ tMarkDestin::tMarkDestin(wxWindow* canvas, wxFrame *frame, int left)
   //Frame->SetStatusText("Click Destination point");
 }
 
-int tMarkDestin::ButtonDown(wxMouseEvent& Event)
+int tMarkDestin::ButtonDown(wxMouseEvent& MouseEvent)
 {
   wxCursor c =  wxCursor(wxCURSOR_ARROW);
   Canvas->SetCursor(c);
@@ -564,7 +566,7 @@ int tMarkDestin::ButtonDown(wxMouseEvent& Event)
   //converts physical coords to logical(scrolled) coords
   wxClientDC* scrolledDC=new wxClientDC(Canvas);
   Canvas->PrepareDC(*scrolledDC);
-  wxPoint point = Event.GetLogicalPosition(*scrolledDC);
+  wxPoint point = MouseEvent.GetLogicalPosition(*scrolledDC);
   delete scrolledDC;
 
   x=point.x;
@@ -573,17 +575,17 @@ int tMarkDestin::ButtonDown(wxMouseEvent& Event)
   return 1;
 }
 
-int tMarkDestin::RightDown(wxMouseEvent& Event)
+int tMarkDestin::RightDown(wxMouseEvent& MouseEvent)
 {
-  ButtonDown(Event);
+  ButtonDown(MouseEvent);
   Aborted = 1;
   //Frame->SetStatusText("Operation aborted");
   return 1;
 }
 
-int tMarkDestin::LeftDown(wxMouseEvent& Event)
+int tMarkDestin::LeftDown(wxMouseEvent& MouseEvent)
 {
-  ButtonDown(Event);
+  ButtonDown(MouseEvent);
   Aborted = 0;
   //Frame->SetStatusText("");
   return 1;
@@ -638,7 +640,7 @@ tMouseButton::~tMouseButton()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tMouseButton::Event(wxMouseEvent& MouseEvent)
+int tMouseButton::ProcessMouseEvent(wxMouseEvent& MouseEvent)
 {
   if (MouseEvent.ButtonUp())
   {

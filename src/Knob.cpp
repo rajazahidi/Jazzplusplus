@@ -1,7 +1,7 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// Copyright (C) 2008 Peter J. Stieber
+// Copyright (C) 2008-2009 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -317,11 +317,11 @@ void JZKnob::OnPaint(wxPaintEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZKnob::OnLeftButtonDown(wxMouseEvent& Event)
+void JZKnob::OnLeftButtonDown(wxMouseEvent& MouseEvent)
 {
   SetFocus();
 
-  mLastPoint = Event.GetPosition();
+  mLastPoint = MouseEvent.GetPosition();
 
   SetCursor(wxCursor(wxCURSOR_SIZENS));
 
@@ -332,18 +332,18 @@ void JZKnob::OnLeftButtonDown(wxMouseEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZKnob::OnRightButtonDown(wxMouseEvent& Event)
+void JZKnob::OnRightButtonDown(wxMouseEvent& MouseEvent)
 {
   SetFocus();
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZKnob::OnMouseMove(wxMouseEvent& Event)
+void JZKnob::OnMouseMove(wxMouseEvent& MouseEvent)
 {
   if (mDragging)
   {
-    wxPoint Point = Event.GetPosition();
+    wxPoint Point = MouseEvent.GetPosition();
 
     int Delta = (mLastPoint.y - Point.y) / mSensitivity;
 
@@ -361,7 +361,7 @@ void JZKnob::OnMouseMove(wxMouseEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZKnob::OnLeftButtonUp(wxMouseEvent& Event)
+void JZKnob::OnLeftButtonUp(wxMouseEvent& MouseEvent)
 {
   if (HasCapture())
   {
@@ -372,7 +372,7 @@ void JZKnob::OnLeftButtonUp(wxMouseEvent& Event)
 
   mDragging = false;
 
-  wxPoint Point = Event.GetPosition();
+  wxPoint Point = MouseEvent.GetPosition();
 
   int Delta = (mLastPoint.y - Point.y) / mSensitivity;
   if (Delta)
@@ -383,23 +383,23 @@ void JZKnob::OnLeftButtonUp(wxMouseEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZKnob::OnLeftButtonDoubleClick(wxMouseEvent& Event)
+void JZKnob::OnLeftButtonDoubleClick(wxMouseEvent& MouseEvent)
 {
   SetValueWithEvent(GetValue() + 1);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZKnob::OnRightButtonDoubleClick(wxMouseEvent& Event)
+void JZKnob::OnRightButtonDoubleClick(wxMouseEvent& MouseEvent)
 {
   SetValueWithEvent(GetValue() - 1);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZKnob::OnMouseWheel(wxMouseEvent& Event)
+void JZKnob::OnMouseWheel(wxMouseEvent& MouseEvent)
 {
-  int WheelRotation = Event.GetWheelRotation();
+  int WheelRotation = MouseEvent.GetWheelRotation();
 
   if (WheelRotation < 0)
   {

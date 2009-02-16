@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2009 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -111,11 +111,11 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     int IsVisible(JZTrack* pTrack);
 
-    void SnapSelStart(wxMouseEvent& Event);
-
     int SnapClock(int Clock, bool Up = false);
 
-    void SnapSelStop(wxMouseEvent& Event);
+    virtual void SnapSelStart(wxMouseEvent& MouseEvent);
+
+    virtual void SnapSelStop(wxMouseEvent& MouseEvent);
 
     int SnapClocks();
 
@@ -208,8 +208,6 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     int mSnapsX[eMaxSnaps];
 
-    tMouseAction* mpMouseAction;
-
     tEventArray mPasteBuffer;
 
   public:
@@ -240,7 +238,7 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     int y2TrackIndex(int y);
     int EventsSelected(const char *msg = 0);
-    int OnEventWinMouseEvent(wxMouseEvent &e);
+    int OnEventWinMouseEvent(wxMouseEvent& MouseEvent);
 
     void DrawEvents(
       wxDC& Dc,
@@ -268,7 +266,7 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     void OnPaint(wxPaintEvent& Event);
 
-    void OnMouseEvent(wxMouseEvent& Event);
+    void OnMouseEvent(wxMouseEvent& MouseEvent);
 
     void OnScroll(wxScrollWinEvent& Event);
 
@@ -276,11 +274,11 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     void VerticalScroll(wxScrollWinEvent& Event);
 
-    void MouseCutPaste(wxMouseEvent& Event, bool Cut);
+    void MouseCutPaste(wxMouseEvent& MouseEvent, bool Cut);
 
-    void MouseEvents(wxMouseEvent& Event);
+    void MouseEvents(wxMouseEvent& MouseEvent);
 
-    void MousePiano(wxMouseEvent& Event);
+    void MousePiano(wxMouseEvent& MouseEvent);
 
     bool OnCharHook(wxKeyEvent& Event);
 

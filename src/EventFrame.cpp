@@ -81,20 +81,21 @@ void JZEventFrame::SetEventWindow(JZEventWindow* pEventWindow)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZEventFrame::SnapSelStart(wxMouseEvent& MouseEvent)
-{
-}
+//void JZEventFrame::SnapSelStart(wxMouseEvent& MouseEvent)
+//{
+//}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZEventFrame::SnapSelStop(wxMouseEvent& MouseEvent)
-{
-}
+//void JZEventFrame::SnapSelStop(wxMouseEvent& MouseEvent)
+//{
+//}
 
 //-----------------------------------------------------------------------------
 // seems to handle the "selection" rectangle. normally called from the base
 // class onmouseevent handler
 //-----------------------------------------------------------------------------
+/*
 int JZEventFrame::OnMouseEvent(wxMouseEvent& MouseEvent)
 {
 //  cout << "JZEventFrame::OnMouseEvent" << endl;
@@ -119,7 +120,7 @@ int JZEventFrame::OnMouseEvent(wxMouseEvent& MouseEvent)
           {
             Refresh(); //redraw the whole window instead(inefficient, we should rather invalidate a rect)
           }
-          SnapSel->Event(MouseEvent);
+          SnapSel->ProcessMouseEvent(MouseEvent);
           MouseAction = SnapSel;
         }
       }
@@ -129,7 +130,7 @@ int JZEventFrame::OnMouseEvent(wxMouseEvent& MouseEvent)
   {
     // MouseAction active
 
-    if (MouseAction->Event(MouseEvent))
+    if (MouseAction->ProcessMouseEvent(MouseEvent))
     {
       // MouseAction finished
 
@@ -146,6 +147,7 @@ int JZEventFrame::OnMouseEvent(wxMouseEvent& MouseEvent)
   }
   return 0;
 }
+*/
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

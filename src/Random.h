@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2009 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -145,7 +145,7 @@ class tArrayEdit : public wxScrolledWindow
     virtual void DrawYTicks(wxDC* dc);
     virtual void DrawLabel(wxDC* dc);
     virtual void DrawNull(wxDC* dc);
-    int  Index(wxMouseEvent &e);
+    int  Index(wxMouseEvent& MouseEvent);
 
     int  enabled;
     int  style_bits;
@@ -168,10 +168,10 @@ class tArrayEdit : public wxScrolledWindow
 
     virtual void OnDraw(wxDC& indc);
     virtual void OnSize(wxSizeEvent& event);
-    virtual void OnMouseEvent(wxMouseEvent &e);
-    virtual int Dragging(wxMouseEvent &);
-    virtual int ButtonDown(wxMouseEvent &);
-    virtual int ButtonUp(wxMouseEvent &);
+    virtual void OnMouseEvent(wxMouseEvent& MouseEvent);
+    virtual int Dragging(wxMouseEvent& MouseEvent);
+    virtual int ButtonDown(wxMouseEvent& MouseEvent);
+    virtual int ButtonUp(wxMouseEvent& MouseEvent);
 
     virtual void SetLabel(char const *llabel);
     void Enable(int enable = 1);

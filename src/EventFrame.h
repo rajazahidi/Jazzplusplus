@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2009 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -59,11 +59,11 @@ class JZEventFrame : public wxFrame
 
     virtual void SetEventWindow(JZEventWindow* pEventWindow);
 
-    virtual void SnapSelStart(wxMouseEvent &e);
-    virtual void SnapSelStop(wxMouseEvent &e);
+//    virtual void SnapSelStart(wxMouseEvent &e);
+//    virtual void SnapSelStop(wxMouseEvent &e);
 
     // Events
-    virtual int  OnMouseEvent(wxMouseEvent& Event);
+//    virtual int  OnMouseEvent(wxMouseEvent& Event);
     virtual bool OnKeyEvent(wxKeyEvent& Event); // true = processed by eventwin
     virtual bool OnClose();
 

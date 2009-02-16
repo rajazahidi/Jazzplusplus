@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2009 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -597,29 +597,33 @@ void tArrayEdit::SetXMinMax(int xmi, int xma)
   xmax = xma;
 }
 
-int tArrayEdit::Index(wxMouseEvent &e)
+int tArrayEdit::Index(wxMouseEvent& MouseEvent)
 {
   int ex, ey;
-  e.GetPosition(&ex, &ey);
+  MouseEvent.GetPosition(&ex, &ey);
   int i = (int)( ((short)ex - x) * n / w);
   i = i < 0 ? 0 : i;
   i = i >= n ? n-1 : i;
   return i;
 }
 
-int tArrayEdit::Dragging(wxMouseEvent &e)
+int tArrayEdit::Dragging(wxMouseEvent& MouseEvent)
 {
   if (!dragging)
+  {
     return 0;
+  }
 
   if (index < 0)
-    index = Index(e);
+  {
+    index = Index(MouseEvent);
+  }
 
   int val = nul;
-  if (e.LeftIsDown())
+  if (MouseEvent.LeftIsDown())
   {
     int ex, ey;
-    e.GetPosition(&ex, &ey);
+    MouseEvent.GetPosition(&ex, &ey);
     // $blk$ val = (int)( (y + h - (short)ey) * (max - min) / h + min);
     val = (int)( (double)(y + h - ey) * (max - min) / h + min + 0.5);
     val = val > max ? max : val;
@@ -631,12 +635,12 @@ int tArrayEdit::Dragging(wxMouseEvent &e)
     // in msw ex,ey are 65536 for negative values!
     wxDC *dc = new wxClientDC(this);//GetDC();
     char buf[500];
-    sprintf(buf, "x %4.0f, y %4.0f, sh %d", ex, ey, e.ShiftDown());
+    sprintf(buf, "x %4.0f, y %4.0f, sh %d", ex, ey, MouseEvent.ShiftDown());
     dc->DrawText(buf, 50, 50);
   }
 #endif
   wxDC *dc = new wxClientDC(this); // PORTING this is evil and shoud go
-  if (e.ShiftDown())
+  if (MouseEvent.ShiftDown())
   {
     int k;
     for (k = 0; k < n; k++)
@@ -648,7 +652,7 @@ int tArrayEdit::Dragging(wxMouseEvent &e)
 
     }
   }
-  else if (e.ControlDown())
+  else if (MouseEvent.ControlDown())
   {
     DrawBar(dc, index, 0);
     mArray[index] = val;
@@ -656,7 +660,7 @@ int tArrayEdit::Dragging(wxMouseEvent &e)
   }
   else
   {
-    int i = Index(e);
+    int i = Index(MouseEvent);
     int k = i;
     if (i < index)
       for (; i <= index; i++)
@@ -678,18 +682,18 @@ int tArrayEdit::Dragging(wxMouseEvent &e)
   return 0;
 }
 
-int tArrayEdit::ButtonDown(wxMouseEvent &e)
+int tArrayEdit::ButtonDown(wxMouseEvent& MouseEvent)
 {
 #ifdef __WXMSW__
   CaptureMouse();
 #endif
   dragging = 1;
-  index = Index(e);
-  Dragging(e);
+  index = Index(MouseEvent);
+  Dragging(MouseEvent);
   return 0;
 }
 
-int tArrayEdit::ButtonUp(wxMouseEvent &e)
+int tArrayEdit::ButtonUp(wxMouseEvent& MouseEvent)
 {
 #ifdef __WXMSW__
   ReleaseMouse();
@@ -705,16 +709,24 @@ int tArrayEdit::ButtonUp(wxMouseEvent &e)
 }
 
 
-void tArrayEdit::OnMouseEvent(wxMouseEvent &e)
+void tArrayEdit::OnMouseEvent(wxMouseEvent& MouseEvent)
 {
   if (!enabled)
+  {
     return;
-  if (e.ButtonDown())
-    ButtonDown(e);
-  else if (e.Dragging())
-    Dragging(e);
-  else if (e.ButtonUp())
-    ButtonUp(e);
+  }
+  if (MouseEvent.ButtonDown())
+  {
+    ButtonDown(MouseEvent);
+  }
+  else if (MouseEvent.Dragging())
+  {
+    Dragging(MouseEvent);
+  }
+  else if (MouseEvent.ButtonUp())
+  {
+    ButtonUp(MouseEvent);
+  }
 }
 
 void tArrayEdit::Enable(int e)

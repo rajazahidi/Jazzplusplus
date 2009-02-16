@@ -1,7 +1,7 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// Copyright (C) 2008 Peter J. Stieber
+// Copyright (C) 2008-2009 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -148,19 +148,19 @@ class JZKnob : public wxControl
 
     void OnPaint(wxPaintEvent& Event);
 
-    void OnLeftButtonDown(wxMouseEvent& Event);
+    void OnLeftButtonDown(wxMouseEvent& MouseEvent);
 
-    void OnRightButtonDown(wxMouseEvent& Event);
+    void OnRightButtonDown(wxMouseEvent& MouseEvent);
 
-    void OnMouseMove(wxMouseEvent& Event);
+    void OnMouseMove(wxMouseEvent& MouseEvent);
 
-    void OnLeftButtonUp(wxMouseEvent& Event);
+    void OnLeftButtonUp(wxMouseEvent& MouseEvent);
 
-    void OnLeftButtonDoubleClick(wxMouseEvent& Event);
+    void OnLeftButtonDoubleClick(wxMouseEvent& MouseEvent);
 
-    void OnRightButtonDoubleClick(wxMouseEvent& Event);
+    void OnRightButtonDoubleClick(wxMouseEvent& MouseEvent);
 
-    void OnMouseWheel(wxMouseEvent& Event);
+    void OnMouseWheel(wxMouseEvent& MouseEvent);
 
   private:
 

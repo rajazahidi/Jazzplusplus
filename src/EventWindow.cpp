@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2009 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -44,8 +44,9 @@ using namespace std;
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-//BEGIN_EVENT_TABLE(JZEventWindow, wxScrolledWindow)
-//END_EVENT_TABLE()
+BEGIN_EVENT_TABLE(JZEventWindow, wxWindow)
+  EVT_MOUSE_EVENTS(JZEventWindow::OnMouseEvent)
+END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -62,6 +63,7 @@ JZEventWindow::JZEventWindow(
       wxHSCROLL | wxVSCROLL | wxNO_FULL_REPAINT_ON_RESIZE),
     mpSnapSel(0),
     mpFilter(0),
+    mpMouseAction(0),
     mpSong(pSong),
     mpGreyColor(0),
     mpGreyBrush(0),
@@ -401,12 +403,71 @@ void JZEventWindow::LineText(
 }
 
 //-----------------------------------------------------------------------------
-//   This mouse handler delegates to the subclased event window.
 //-----------------------------------------------------------------------------
-//void JZEventWindow::OnMouseEvent(wxMouseEvent& MouseEvent)
-//{
-//  EventWin->OnMouseEvent(MouseEvent);
-//}
+void JZEventWindow::SnapSelStart(wxMouseEvent& MouseEvent)
+{
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZEventWindow::SnapSelStop(wxMouseEvent& MouseEvent)
+{
+}
+
+//-----------------------------------------------------------------------------
+// Descriptions:
+//   This mouse handler delegates to the subclassed event window.
+//-----------------------------------------------------------------------------
+void JZEventWindow::OnMouseEvent(wxMouseEvent& MouseEvent)
+{
+  if (!mpMouseAction)
+  {
+    // create mpSnapSel?
+
+    int x, y;
+    MouseEvent.GetPosition(&x, &y);
+    if (
+      mEventsX < x && x < mEventsX + mEventsWidth &&
+      mEventsY < y && y < mEventsY + mEventsHeight)
+    {
+      if (MouseEvent.LeftDown())
+      {
+        {
+          SnapSelStart(MouseEvent);
+
+//          if (mpSnapSel->IsSelected())
+//          {
+            // Redraw the whole window instead (inefficient, we should rather
+            // invalidate a rect).
+            Refresh();
+//          }
+          mpSnapSel->ProcessMouseEvent(MouseEvent);
+          mpMouseAction = mpSnapSel;
+        }
+      }
+    }
+  }
+  else
+  {
+    // mpMouseAction active
+
+    if (mpMouseAction->ProcessMouseEvent(MouseEvent))
+    {
+      // mpMouseAction finished
+
+      if (mpMouseAction == mpSnapSel)
+      {
+        SnapSelStop(MouseEvent);
+
+        // inefficient, invalidate rect first instead.
+        Refresh();
+      }
+
+      mpMouseAction = 0;
+    }
+  }
+}
+
 
 // JAVE the OnChar method seems to be gone in wxwin232, but its documented, so
 // I don't know what happened.  The OnCharHook should do the same thing

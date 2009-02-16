@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2009 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ class JZTrackWindow : public JZEventWindow
 
     void NewPlayPosition(int Clock);
 
-    void MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode);
+    void MousePlay(wxMouseEvent& MouseEvent, TEMousePlayMode Mode);
 
     int EventsSelected(const wxString& Message);
 
@@ -85,7 +85,7 @@ class JZTrackWindow : public JZEventWindow
 
   protected:
 
-    virtual void SnapSelStop(wxMouseEvent& Event)
+    virtual void SnapSelStop(wxMouseEvent& MouseEvent)
     {
     }
 
@@ -97,13 +97,13 @@ class JZTrackWindow : public JZEventWindow
 
     void OnPaint(wxPaintEvent& Event);
 
-    void OnLeftButtonDown(wxMouseEvent& Event);
+    void OnLeftButtonDown(wxMouseEvent& MouseEvent);
 
-    void OnMouseMove(wxMouseEvent& Event);
+    void OnMouseMove(wxMouseEvent& MouseEvent);
 
-    void OnLeftButtonUp(wxMouseEvent& Event);
+    void OnLeftButtonUp(wxMouseEvent& MouseEvent);
 
-    void OnRightButtonUp(wxMouseEvent& Event);
+    void OnRightButtonUp(wxMouseEvent& MouseEvent);
 
     void OnScroll(wxScrollWinEvent& Event);
 
@@ -146,9 +146,9 @@ class JZTrackWindow : public JZEventWindow
 
     const char* GetNumberString() const;
 
-    void SnapSelectionStart(wxMouseEvent& Event);
+    void SnapSelectionStart(wxMouseEvent& MouseEvent);
 
-    void SnapSelectionStop(wxMouseEvent& Event);
+    void SnapSelectionStop(wxMouseEvent& MouseEvent);
 
     int x2xBar(int x);
 

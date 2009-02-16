@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2009 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -341,12 +341,12 @@ void JZGuitarWindow::DrawPitch(wxDC& Dc, int Pitch, bool Show)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZGuitarWindow::OnMouseMove(wxMouseEvent& Event)
+void JZGuitarWindow::OnMouseMove(wxMouseEvent& MouseEvent)
 {
   wxClientDC Dc(this);
   PrepareDC(Dc);
 
-  wxPoint Position = Event.GetPosition();
+  wxPoint Position = MouseEvent.GetPosition();
   int x = Dc.DeviceToLogicalX(Position.x);
   int y = Dc.DeviceToLogicalY(Position.y);
 

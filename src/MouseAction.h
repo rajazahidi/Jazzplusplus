@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2009 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ class tMouseMapper
     // 9..11 = left/middle/right down + ctrl + shift
 
     tMouseMapper(const int actions[12]);
+
     tMouseMapper();
 
     enum Button
@@ -70,7 +71,7 @@ class tMouseMapper
       bool shift = false,
       bool ctrl = false);
 
-    int Action(wxMouseEvent&);
+    int Action(wxMouseEvent& MouseEvent);
 
     void SetLeftAction(int id = 0)
     {
@@ -89,23 +90,23 @@ class tMouseMapper
 //   This is a base class for mouse actions.  The classes are instantiated in
 // the mouse handler of the event window, for example, to keep state during
 // mouse operations, like drag and drop and so on.
-//   The Event() function is used to determine what to do with an incoming
-// event.  Normally, if the event is a drag event, call the drag function of
-// the class, and so on.
+//   The ProcessMouseEvent() function is used to determine what to do with an
+// incoming event.  Normally, if the event is a drag event, call the drag
+// function of the class, and so on.
 //*****************************************************************************
 class tMouseAction
 {
   public:
 
-    virtual ~tMouseAction()                     {}
-    virtual int Dragging(wxMouseEvent &)        { return 0; }
-    virtual int LeftDown(wxMouseEvent &)        { return 0; }
-    virtual int LeftUp(wxMouseEvent &)          { return 0; }
-    virtual int RightDown(wxMouseEvent &)       { return 0; }
-    virtual int RightUp(wxMouseEvent &)         { return 0; }
-    virtual int MiddleDown(wxMouseEvent &)      { return 0; }
-    virtual int MiddleUp(wxMouseEvent &)        { return 0; }
-    virtual int Event(wxMouseEvent& MouseEvent)
+    virtual ~tMouseAction()                          {}
+    virtual int Dragging(wxMouseEvent& MouseEvent)   { return 0; }
+    virtual int LeftDown(wxMouseEvent& MouseEvent)   { return 0; }
+    virtual int LeftUp(wxMouseEvent& MouseEvent)     { return 0; }
+    virtual int RightDown(wxMouseEvent& MouseEvent)  { return 0; }
+    virtual int RightUp(wxMouseEvent& MouseEvent)    { return 0; }
+    virtual int MiddleDown(wxMouseEvent& MouseEvent) { return 0; }
+    virtual int MiddleUp(wxMouseEvent& MouseEvent)   { return 0; }
+    virtual int ProcessMouseEvent(wxMouseEvent& MouseEvent)
     {
       if (MouseEvent.Dragging())
       {
@@ -182,13 +183,13 @@ class JZSelection : public tMouseAction
     {
     }
 
-    virtual int Dragging(wxMouseEvent& Event);
+    virtual int Dragging(wxMouseEvent& MouseEvent);
 
-    virtual int Event(wxMouseEvent& Event);
+    virtual int ProcessMouseEvent(wxMouseEvent& MouseEvent);
 
-    virtual int ButtonDown(wxMouseEvent& Event);
+    virtual int ButtonDown(wxMouseEvent& MouseEvent);
 
-    virtual int ButtonUp(wxMouseEvent& Event);
+    virtual int ButtonUp(wxMouseEvent& MouseEvent);
 
     virtual void Draw(wxDC& Dc, int ScrolledX, int ScrolledY);
 
@@ -313,10 +314,10 @@ class tMouseCounter : public wxTimer, public tMouseAction
     int Wait;        // don't inc/dec at Init
     tButtonLabelInterface *win;
 
-    virtual int LeftDown(wxMouseEvent &);
-    virtual int LeftUp(wxMouseEvent &);
-    virtual int RightDown(wxMouseEvent &);
-    virtual int RightUp(wxMouseEvent &);
+    virtual int LeftDown(wxMouseEvent& MouseEvent);
+    virtual int LeftUp(wxMouseEvent& MouseEvent);
+    virtual int RightDown(wxMouseEvent& MouseEvent);
+    virtual int RightUp(wxMouseEvent& MouseEvent);
     virtual void Notify();
     virtual void ShowValue(bool down);
 };
@@ -327,17 +328,18 @@ class tMouseCounter : public wxTimer, public tMouseAction
 //*****************************************************************************
 class tMarkDestin : public tMouseAction
 {
-  wxWindow *Canvas;
-  wxFrame  *Frame;
-  int ButtonDown(wxMouseEvent &);
+  public:
+    int Aborted;
+    float x, y;
 
-public:
-  int Aborted;
-  float x, y;
+    virtual int LeftDown(wxMouseEvent& MouseEvent);
+    virtual int RightDown(wxMouseEvent& MouseEvent);
+    tMarkDestin(wxWindow* canvas, wxFrame* frame, int left);
 
-  virtual int LeftDown(wxMouseEvent &);
-  virtual int RightDown(wxMouseEvent &);
-  tMarkDestin(wxWindow *canvas, wxFrame *frame, int left);
+  private:
+    wxWindow *Canvas;
+    wxFrame  *Frame;
+    int ButtonDown(wxMouseEvent& MouseEvent);
 };
 
 //*****************************************************************************
@@ -355,7 +357,7 @@ class tMouseButton : public tMouseAction
 
     virtual ~tMouseButton();
 
-    virtual int Event(wxMouseEvent& MouseEvent);
+    virtual int ProcessMouseEvent(wxMouseEvent& MouseEvent);
 
   protected:
 

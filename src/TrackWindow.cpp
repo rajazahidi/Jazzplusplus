@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2009 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -265,9 +265,9 @@ void JZTrackWindow::OnPaint(wxPaintEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZTrackWindow::OnLeftButtonDown(wxMouseEvent& Event)
+void JZTrackWindow::OnLeftButtonDown(wxMouseEvent& MouseEvent)
 {
-  wxPoint Point = Event.GetPosition();
+  wxPoint Point = MouseEvent.GetPosition();
 
   if (Point.x < mNumberWidth && Point.y >= mTopInfoHeight)
   {
@@ -282,34 +282,34 @@ void JZTrackWindow::OnLeftButtonDown(wxMouseEvent& Event)
       mEventsY,
       mEventsWidth,
       mEventsHeight);
-    SnapSelStop(Event);
+    SnapSelStop(MouseEvent);
   }
   else if (
     Point.x >= mEventsX && Point.x < mEventsX + mEventsWidth &&
     Point.y >= mEventsY && Point.y < mEventsY + mEventsHeight)
   {
-    SnapSelectionStart(Event);
-    mpSnapSel->ButtonDown(Event);
+    SnapSelectionStart(MouseEvent);
+    mpSnapSel->ButtonDown(MouseEvent);
   }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZTrackWindow::OnMouseMove(wxMouseEvent& Event)
+void JZTrackWindow::OnMouseMove(wxMouseEvent& MouseEvent)
 {
-  if (Event.LeftIsDown())
+  if (MouseEvent.LeftIsDown())
   {
-    mpSnapSel->Dragging(Event);
-//    SnapSelectionStop(Event);
+    mpSnapSel->Dragging(MouseEvent);
+//    SnapSelectionStop(MouseEvent);
     Refresh(false);
   }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& Event)
+void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& MouseEvent)
 {
-  wxPoint Point = Event.GetPosition();
+  wxPoint Point = MouseEvent.GetPosition();
 
   // Check to see if the mouse was clicked in the top header.
   if (Point.y < mTopInfoHeight)
@@ -410,10 +410,10 @@ void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& Event)
         Point.x >= mEventsX && Point.x < mEventsX + mEventsWidth &&
         Point.y >= mEventsY && Point.y < mEventsY + mEventsHeight)
       {
-        mpSnapSel->ButtonUp(Event);
+        mpSnapSel->ButtonUp(MouseEvent);
 
         // The point is in event area.
-        SnapSelectionStop(Event);
+        SnapSelectionStop(MouseEvent);
       }
     }
   }
@@ -421,9 +421,9 @@ void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZTrackWindow::OnRightButtonUp(wxMouseEvent& Event)
+void JZTrackWindow::OnRightButtonUp(wxMouseEvent& MouseEvent)
 {
-  wxPoint Point = Event.GetPosition();
+  wxPoint Point = MouseEvent.GetPosition();
 
   if (Point.y < mTopInfoHeight)
   {
@@ -1259,9 +1259,9 @@ void JZTrackWindow::SetScrollRanges()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
+void JZTrackWindow::MousePlay(wxMouseEvent& MouseEvent, TEMousePlayMode Mode)
 {
-  if (Mode == eMouse && !Event.ButtonDown())
+  if (Mode == eMouse && !MouseEvent.ButtonDown())
   {
     return;
   }
@@ -1276,12 +1276,12 @@ void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
     {
       case eMouse:
         int x, y;
-        Event.GetPosition(&x, &y);
+        MouseEvent.GetPosition(&x, &y);
         gpProject->SetPlayPosition(x2BarClock(x));
-        gpProject->Mute((Event.RightDown() != 0));
+        gpProject->Mute((MouseEvent.RightDown() != 0));
         if (
           mpSnapSel->IsSelected() &&
-          (Event.ShiftDown() || Event.MiddleDown()))
+          (MouseEvent.ShiftDown() || MouseEvent.MiddleDown()))
         {
           gpProject->SetLoop(true);
         }
@@ -1435,7 +1435,7 @@ void JZTrackWindow::MousePlay(wxMouseEvent& Event, TEMousePlayMode Mode)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZTrackWindow::SnapSelectionStart(wxMouseEvent& Event)
+void JZTrackWindow::SnapSelectionStart(wxMouseEvent& MouseEvent)
 {
   mpSnapSel->SetXSnap(mBarCount, mBarX);
   mpSnapSel->SetYSnap(
@@ -1446,7 +1446,7 @@ void JZTrackWindow::SnapSelectionStart(wxMouseEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZTrackWindow::SnapSelectionStop(wxMouseEvent& Event)
+void JZTrackWindow::SnapSelectionStop(wxMouseEvent& MouseEvent)
 {
   if (mpSnapSel->IsSelected())
   {

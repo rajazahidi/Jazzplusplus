@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2009 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include <wx/window.h>
 
 class JZFilter;
+class tMouseAction;
 class JZSnapSelection;
 class JZSong;
 class wxDialog;
@@ -83,9 +84,11 @@ class JZEventWindow : public wxWindow
 
   protected:
 
-    virtual void SnapSelStop(wxMouseEvent& Event)
-    {
-    }
+    int SnapClock(int Clock, bool Up);
+
+    virtual void SnapSelStart(wxMouseEvent& MouseEvent);
+
+    virtual void SnapSelStop(wxMouseEvent& MouseEvent);
 
     void DrawVerticalLine(wxDC& Dc, int XPosition) const;
 
@@ -99,11 +102,15 @@ class JZEventWindow : public wxWindow
 
     int y2yLine(int y, int Up = 0);
 
+    void OnMouseEvent(wxMouseEvent& MouseEvent);
+
   public:
 
     JZSnapSelection* mpSnapSel;
 
     JZFilter* mpFilter;
+
+    tMouseAction* mpMouseAction;
 
   protected:
 
@@ -128,7 +135,7 @@ class JZEventWindow : public wxWindow
     // Settings-Dialog
     wxDialog* mpSettingsDialog;
 
-//  DECLARE_EVENT_TABLE()
+  DECLARE_EVENT_TABLE()
 };
 
 //*****************************************************************************

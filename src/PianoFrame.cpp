@@ -56,11 +56,8 @@ using namespace std;
 #define MEN_FILTER                  6
 #define ACT_HELP_MOUSE              9
 
-#define MEN_SETCHAN                14
-#define MEN_TRANSP                 15
 #define MEN_LERI                   18
 #define MEN_UPDN                   19
-#define MEN_LENGTH                 20
 
 #define MEN_VISIBLE                22
 
@@ -72,11 +69,9 @@ using namespace std;
 #define MEN_CTRL_MODUL             28
 
 #define MEN_GUITAR                 29
-#define MEN_CLEANUP                31
 
 #define MEN_RESET                  36
 #define MEN_VIS_ALL_TRK            37
-#define MEN_SEARCHREP              38
 
 #define ACT_CLOSE                  41
 #define MEN_CTRL_TEMPO             42
@@ -185,12 +180,12 @@ BEGIN_EVENT_TABLE(JZPianoFrame, wxFrame)
   EVT_MENU(MEN_CTRL_CHANNEL_AFTER, JZPianoFrame::CtrlChannelAftertouchEdit)
 // FIXME PAT - We need to bring these back once Dave has figured out what
 //             he's doing with them in relation to the track window.
-//  EVT_MENU(MEN_CLEANUP, JZPianoFrame::OnCleanup)
-//  EVT_MENU(MEN_SEARCHREP, JZPianoFrame::OnSearchReplace)
-//  EVT_MENU(MEN_TRANSP, JZPianoFrame::OnTranspose)
-//  EVT_MENU(MEN_SETCHAN, JZPianoFrame::OnSetChannel)
+//  EVT_MENU(ID_CLEANUP, JZPianoFrame::OnCleanup)
+//  EVT_MENU(ID_SEARCH_AND_REPLACE, JZPianoFrame::OnSearchReplace)
+//  EVT_MENU(ID_TRANSPOSE, JZPianoFrame::OnTranspose)
+//  EVT_MENU(ID_SET_CHANNEL, JZPianoFrame::OnSetChannel)
   EVT_MENU(ID_VELOCITY, JZPianoFrame::OnActivateVelocityDialog)
-//  EVT_MENU(MEN_LENGTH, JZPianoFrame::OnLength)
+//  EVT_MENU(ID_LENGTH, JZPianoFrame::OnLength)
   EVT_MENU(MEN_MIDIDELAY, JZPianoFrame::OnActivateMidiDelayDialog)
   EVT_MENU(MEN_SEQLENGTH, JZPianoFrame::OnActivateSequenceLengthDialog)
 
@@ -331,10 +326,10 @@ void JZPianoFrame::CreateMenu()
   edit_menu->Append(wxID_CUT, "&Cut");
   edit_menu->Append(ID_SHIFT, "&Shift...");
   edit_menu->Append(ID_QUANTIZE, "&Quantize...");
-  edit_menu->Append(MEN_SETCHAN, "&Set MIDI Channel...");
-  edit_menu->Append(MEN_TRANSP, "&Transpose...");
+  edit_menu->Append(ID_SET_CHANNEL, "&Set MIDI Channel...");
+  edit_menu->Append(ID_TRANSPOSE, "&Transpose...");
   edit_menu->Append(ID_VELOCITY, "&Velocity...");
-  edit_menu->Append(MEN_LENGTH, "&Length...");
+  edit_menu->Append(ID_LENGTH, "&Length...");
 
   edit_menu->Append(MEN_SEQLENGTH, "&Sequence Length...");
   edit_menu->Append(MEN_MIDIDELAY, "&Midi Delay...");
@@ -342,8 +337,8 @@ void JZPianoFrame::CreateMenu()
 
   edit_menu->Append(MEN_LERI, "&Left <-> Right");
   edit_menu->Append(MEN_UPDN, "&Up <-> Down");
-  edit_menu->Append(MEN_CLEANUP, "&Cleanup...");
-  edit_menu->Append(MEN_SEARCHREP, "&Search Replace...");
+  edit_menu->Append(ID_CLEANUP, "&Cleanup...");
+  edit_menu->Append(ID_SEARCH_AND_REPLACE, "&Search Replace...");
 
   wxMenu *setting_menu = new wxMenu("", wxMENU_TEAROFF);
   setting_menu->Append(MEN_FILTER,      "&Filter...");

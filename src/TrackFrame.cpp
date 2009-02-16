@@ -238,14 +238,14 @@ void JZTrackFrame::CreateMenu()
 
   mpEditMenu->AppendSeparator();
 
-//  mpEditMenu->Append(ID_QUANTIZE, "&Quantize...");
-//  mpEditMenu->Append(MEN_SETCHAN, "&Set MIDI Channel...");
-//  mpEditMenu->Append(MEN_TRANSP, "&Transpose...");
-//  mpEditMenu->Append(ID_VELOCITY, "&Velocity...");
-//  mpEditMenu->Append(MEN_LENGTH, "&Length...");
+  mpEditMenu->Append(ID_QUANTIZE, "&Quantize...");
+  mpEditMenu->Append(ID_SET_CHANNEL, "&Set MIDI Channel...");
+  mpEditMenu->Append(ID_TRANSPOSE, "&Transpose...");
+  mpEditMenu->Append(ID_VELOCITY, "&Velocity...");
+  mpEditMenu->Append(ID_LENGTH, "&Length...");
   mpEditMenu->Append(ID_SHIFT, "Shi&ft...");
-//  mpEditMenu->Append(MEN_CLEANUP, "C&leanup...");
-//  mpEditMenu->Append(MEN_SEARCHREP, "Search Re&place...");
+  mpEditMenu->Append(ID_CLEANUP, "C&leanup...");
+  mpEditMenu->Append(ID_SEARCH_AND_REPLACE, "Search Re&place...");
 
   mpEditMenu->AppendSeparator();
 

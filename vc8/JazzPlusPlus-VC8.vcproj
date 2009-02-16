@@ -835,6 +835,14 @@
 			Name="Dialog Source Files"
 			>
 			<File
+				RelativePath="..\src\Dialogs\DeleteDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\DeleteDialog.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Dialogs\FilterDialog.cpp"
 				>
 			</File>

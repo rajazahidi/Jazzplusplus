@@ -548,45 +548,6 @@ void tMidiDelayDlg::AddProperties()
 
 
 //*****************************************************************************
-// Delete
-//*****************************************************************************
-
-bool tDeleteDlg::LeaveSpace = 1;
-
-tDeleteDlg::tDeleteDlg(JZEventWindow* w, JZFilter *f)
-: tPropertyListDlg("Delete" )
-{
-  Filter = f;
-}
-
-
-bool tDeleteDlg::OnClose()
-{
-  tCmdErase cmd(Filter, LeaveSpace);
-  cmd.Execute();
-
-  JZProjectManager::Instance()->UpdateAllViews();
-
-//  tPropertyListDlg::OnClose();
-  return false;
-}
-
-void tDeleteDlg::OnHelp()
-{
-  gpHelpInstance->ShowTopic("Delete");
-}
-
-void tDeleteDlg::AddProperties()
-{
-//   Add(wxMakeFormBool("Leave Space", &LeaveSpace));
-//  AssociatePanel(panel);
-  sheet->AddProperty(new wxProperty("Leave Space",  wxPropertyValue((bool*)&LeaveSpace), "bool"));
-}
-
-//LAST ADDED EVENT
-
-
-//*****************************************************************************
 // Snap
 //*****************************************************************************
 

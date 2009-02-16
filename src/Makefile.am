@@ -22,6 +22,7 @@ DeprecatedStringUtils.cpp \
 DeprecatedWx/prop.cpp \
 DeprecatedWx/propform.cpp \
 DeprecatedWx/proplist.cpp \
+Dialogs/DeleteDialog.cpp \
 Dialogs/FilterDialog.cpp \
 Dialogs/IntegerEdit.cpp \
 Dialogs/KeyOnDialog.cpp \

@@ -23,6 +23,7 @@
 #include "EventWindow.h"
 
 #include "Command.h"
+#include "Dialogs/DeleteDialog.h"
 #include "Dialogs/ShiftDialog.h"
 #include "Dialogs.h"
 #include "EventFrame.h"
@@ -188,8 +189,16 @@ void JZEventWindow::Transpose()
 //-----------------------------------------------------------------------------
 void JZEventWindow::Delete()
 {
-  tDeleteDlg * dlg = new tDeleteDlg(this, mpFilter);
-  dlg->Create();
+  bool LeaveSpace = true;
+
+  JZDeleteDialog DeleteDialog(this, LeaveSpace);
+
+  if (DeleteDialog.ShowModal() == wxID_OK)
+  {
+    tCmdErase EraseCommand(mpFilter, LeaveSpace);
+    EraseCommand.Execute();
+    JZProjectManager::Instance()->UpdateAllViews();
+  }
 }
 
 //-----------------------------------------------------------------------------

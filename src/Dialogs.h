@@ -188,20 +188,6 @@ class tMidiDelayDlg : public tPropertyListDlg
     void OnHelp();
 };
 
-class tDeleteDlg : public tPropertyListDlg
-{
-  JZFilter *Filter;
-
- public:
-  static bool LeaveSpace;        // 1
-
-  tDeleteDlg(JZEventWindow* w, JZFilter *f);
-  void AddProperties();
-  bool OnClose();
-  void OnHelp();
-};
-
-
 class tSnapDlg : public tPropertyListDlg
 {
   public:

@@ -331,64 +331,13 @@ void tSetChannelDlg::AddProperties()
 
 
 //*****************************************************************************
-// Velocity
-//*****************************************************************************
-
-int tVelocityDlg::FromValue = 64;
-int tVelocityDlg::ToValue = 0;
-int tVelocityDlg::Mode = 0;
-
-
-tVelocityDlg::tVelocityDlg(JZFilter *f)
-: tPropertyListDlg( "Velocity" )
-{
-  Filter = f;
-  Song = f->GetSong();
-}
-
-
-bool tVelocityDlg::OnClose()
-{
-  tCmdVelocity cmd(Filter, FromValue, ToValue, Mode);
-  cmd.Execute();
-  return false;
-}
-
-void tVelocityDlg::OnHelp()
-{
-  gpHelpInstance->ShowTopic("Velocity");
-}
-
-void tVelocityDlg::AddProperties()
-{
-  sheet->AddProperty(new wxProperty(
-    "Start",
-    wxPropertyValue(&FromValue),
-    "integer",
-    new wxIntegerListValidator(0, 127)));
-  sheet->AddProperty(new wxProperty(
-    "Stop",
-    wxPropertyValue(&ToValue),
-    "integer",
-    new wxIntegerListValidator(0, 127)));
-  sheet->AddProperty(new wxProperty(
-    "Mode",
-    tNamedValueListValue(&Mode, gModes),
-    "props",
-    new tNamedValueListValidator(gModes)));
-}
-
-
-
-
-//*****************************************************************************
 // Length
 //*****************************************************************************
 
 int tLengthDlg::FromValue = 30;
 int tLengthDlg::ToValue = 0;
 
-int tLengthDlg::Mode;
+JEValueAlterationMode tLengthDlg::Mode;
 
 tLengthDlg::tLengthDlg(JZEventWindow* w, JZFilter *f)
 : tPropertyListDlg("Length")
@@ -433,11 +382,11 @@ void tLengthDlg::AddProperties()
     wxPropertyValue(&ToValue),
     "integer",
     new wxIntegerListValidator(0, Song->GetTicksPerQuarter() * 4)));
-  sheet->AddProperty(new wxProperty(
-    "Mode",
-    tNamedValueListValue(&Mode, gModes),
-    "props",
-    new tNamedValueListValidator(gModes)));
+//  sheet->AddProperty(new wxProperty(
+//    "Mode",
+//    tNamedValueListValue(&Mode, gModes),
+//    "props",
+//    new tNamedValueListValidator(gModes)));
 }
 
 

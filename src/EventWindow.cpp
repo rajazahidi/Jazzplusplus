@@ -25,6 +25,7 @@
 #include "Command.h"
 #include "Dialogs/DeleteDialog.h"
 #include "Dialogs/ShiftDialog.h"
+#include "Dialogs/VelocityDialog.h"
 #include "Dialogs.h"
 #include "EventFrame.h"
 #include "Filter.h"
@@ -205,8 +206,16 @@ void JZEventWindow::Delete()
 //-----------------------------------------------------------------------------
 void JZEventWindow::Velocity()
 {
-  tVelocityDlg * dlg = new tVelocityDlg(mpFilter);
-  dlg->Create();
+  int FromValue = 64;
+  int ToValue = 0;
+  JEValueAlterationMode Mode = eSetValues;
+
+  JZVelocityDialog VelocityDialog(this, FromValue, ToValue, Mode);
+  if (VelocityDialog.ShowModal() == wxID_OK)
+  {
+    tCmdVelocity VelocityCommand(mpFilter, FromValue, ToValue, Mode);
+    VelocityCommand.Execute();
+  }
 }
 
 //-----------------------------------------------------------------------------

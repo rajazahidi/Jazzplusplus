@@ -37,7 +37,6 @@
 #include "Player.h"
 #include "GuitarFrame.h"
 #include "ToolBar.h"
-#include "ResourceDialog.h"
 #include "Help.h"
 #include "Rectangle.h"
 

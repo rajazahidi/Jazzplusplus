@@ -23,6 +23,7 @@
 #ifndef JZ_DIALOGS_H
 #define JZ_DIALOGS_H
 
+#include "CommandUtilities.h"
 #include "PropertyListDialog.h"
 
 class JZPianoWindow;
@@ -119,29 +120,13 @@ class tSetChannelDlg : public tPropertyListDlg
     void OnHelp();
 };
 
-// Velocity
-class tVelocityDlg : public tPropertyListDlg
-{
-  public:
-
-    static int FromValue, ToValue, Mode;
-    static char *mode_str;
-
-    JZFilter *Filter;
-    JZSong   *Song;
-
-    tVelocityDlg(JZFilter *f);
-    void AddProperties();
-    bool OnClose();
-    void OnHelp();
-};
-
 // Length
 class tLengthDlg : public tPropertyListDlg
 {
   public:
 
-    static int FromValue, ToValue, Mode;
+    static int FromValue, ToValue;
+    static JEValueAlterationMode Mode;
     static char *mode_str;
 
     JZFilter   *Filter;

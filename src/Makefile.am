@@ -71,7 +71,6 @@ PropertyListDialog.cpp \
 Random.cpp \
 RecordingInfo.cpp \
 Rectangle.cpp \
-ResourceDialog.cpp \
 Rhythm.cpp \
 SampleCommand.cpp \
 Sample.cpp \
@@ -152,7 +151,6 @@ PropertyListDialog.cpp \
 Random.cpp \
 RecordingInfo.cpp \
 Rectangle.cpp \
-ResourceDialog.cpp \
 Rhythm.cpp \
 SampleCommand.cpp \
 Sample.cpp \
@@ -237,7 +235,6 @@ PropertyListDialog.h \
 Random.h \
 RecordingInfo.h \
 Rectangle.h \
-ResourceDialog.h \
 Resources.h \
 Rhythm.h \
 SampleCommand.h \

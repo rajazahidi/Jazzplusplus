@@ -34,7 +34,6 @@
 #include "PianoFrame.h"
 #include "Player.h"
 #include "ProjectManager.h"
-#include "ResourceDialog.h"
 #include "Resources.h"
 #include "SelectControllerDialog.h"
 #include "Song.h"
@@ -3131,6 +3130,7 @@ void JZPianoWindow::SetVisibleAllTracks(bool Value)
 //-----------------------------------------------------------------------------
 void JZPianoWindow::ActivateSettingsDialog()
 {
+/*
   jppResourceDialog Dialog(this, "windowSettings");
 
   Dialog.Attach("use_colours", &mUseColors);
@@ -3142,6 +3142,7 @@ void JZPianoWindow::ActivateSettingsDialog()
     SetScrollRanges();
     Refresh();
   }
+*/
 }
 
 //-----------------------------------------------------------------------------
@@ -3150,6 +3151,7 @@ void JZPianoWindow::ActivateSettingsDialog()
 //-----------------------------------------------------------------------------
 void JZPianoWindow::ActivateMidiDelayDialog()
 {
+/*
   if (!EventsSelected())
   {
     return;
@@ -3173,12 +3175,14 @@ void JZPianoWindow::ActivateMidiDelayDialog()
     SetScrollRanges();
     Refresh();
   }
+*/
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZPianoWindow::ActivateSequenceLengthDialog()
 {
+/*
   if (!EventsSelected())
   {
     return;
@@ -3198,4 +3202,5 @@ void JZPianoWindow::ActivateSequenceLengthDialog()
     SetScrollRanges();
     Refresh();
   }
+*/
 }

@@ -23,6 +23,8 @@
 #ifndef JZ_COMMAND_H
 #define JZ_COMMAND_H
 
+#include "CommandUtilities.h"
+
 class JZFilter;
 class JZEvent;
 class JZTrack;
@@ -107,9 +109,19 @@ class tCmdErase : public tCommand
 class tCmdVelocity : public tCommand
 {
   public:
-    int FromValue, ToValue, Mode;
-    tCmdVelocity(JZFilter* pFilter, int From, int To, int Mode);
+
+    tCmdVelocity(
+      JZFilter* pFilter,
+      int From,
+      int To,
+      JEValueAlterationMode Mode);
+
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
+
+  private:
+
+    int mFromValue, mToValue;
+    JEValueAlterationMode mMode;
 };
 
 //*****************************************************************************
@@ -117,9 +129,19 @@ class tCmdVelocity : public tCommand
 class tCmdLength : public tCommand
 {
   public:
-    int FromValue, ToValue, Mode;
-    tCmdLength(JZFilter* pFilter, int From, int To, int Mode);
+
+    tCmdLength(
+      JZFilter* pFilter,
+      int FromValue,
+      int ToValue,
+      JEValueAlterationMode Mode);
+
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
+
+  private:
+
+    int mFromValue, mToValue;
+    JEValueAlterationMode mMode;
 };
 
 //*****************************************************************************

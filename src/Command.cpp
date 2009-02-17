@@ -475,12 +475,16 @@ void tCmdSetChannel::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 // tCmdVelocity
 // ************************************************************************
 
-tCmdVelocity::tCmdVelocity(JZFilter* pFilter, int from, int to, int m)
-  : tCommand(pFilter)
+tCmdVelocity::tCmdVelocity(
+  JZFilter* pFilter,
+  int FromValue,
+  int ToValue,
+  JEValueAlterationMode Mode)
+  : tCommand(pFilter),
+    mFromValue(FromValue),
+    mToValue(ToValue),
+    mMode(Mode)
 {
-  FromValue = from;
-  ToValue  = to;
-  Mode = m;
 }
 
 void tCmdVelocity::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
@@ -490,23 +494,27 @@ void tCmdVelocity::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   if (pEvent->IsKeyOn() != 0)
   {
     pKeyOn = (tKeyOn *)pEvent->Copy();
-    long val = 0;
-    if (ToValue <= 0)
-      val = FromValue;
-    else
-      val = Interpolate(pKeyOn->GetClock(), FromValue, ToValue);
-    switch (Mode)
+    int Value = 0;
+    if (mToValue <= 0)
     {
-      case 0:
+      Value = mFromValue;
+    }
+    else
+    {
+      Value = Interpolate(pKeyOn->GetClock(), mFromValue, mToValue);
+    }
+    switch (mMode)
+    {
+      case eSetValues:
         break;
-      case 1:
-        val = pKeyOn->GetVelocity() + val;
+      case eAddValues:
+        Value = pKeyOn->GetVelocity() + Value;
         break;
-      case 2:
-        val = pKeyOn->GetVelocity() - val;
+      case eSubtractValues:
+        Value = pKeyOn->GetVelocity() - Value;
         break;
     }
-    pKeyOn->SetVelocity(val < 1 ? 1 : (val > 127 ? 127 : val));
+    pKeyOn->SetVelocity(Value < 1 ? 1 : (Value > 127 ? 127 : Value));
     pTrack->Kill(pEvent);
     pTrack->Put(pKeyOn);
   }
@@ -516,12 +524,16 @@ void tCmdVelocity::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 // tCmdLength
 // ************************************************************************
 
-tCmdLength::tCmdLength(JZFilter* pFilter, int from, int to, int m)
-  : tCommand(pFilter)
+tCmdLength::tCmdLength(
+  JZFilter* pFilter,
+  int FromValue,
+  int ToValue,
+  JEValueAlterationMode Mode)
+  : tCommand(pFilter),
+    mFromValue(FromValue),
+    mToValue(ToValue),
+    mMode(Mode)
 {
-  FromValue = from;
-  ToValue  = to;
-  Mode = m;
 }
 
 void tCmdLength::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
@@ -531,24 +543,28 @@ void tCmdLength::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   if (pEvent->IsKeyOn() != 0)
   {
     pKeyOn = (tKeyOn *)pEvent->Copy();
-    long val = 0;
-    if (ToValue <= 0)
-      val = FromValue;
-    else
-      val = Interpolate(pKeyOn->GetClock(), FromValue, ToValue);
-    switch (Mode)
+    int Value = 0;
+    if (mToValue <= 0)
     {
-      case 0:
+      Value = mFromValue;
+    }
+    else
+    {
+      Value = Interpolate(pKeyOn->GetClock(), mFromValue, mToValue);
+    }
+    switch (mMode)
+    {
+      case eSetValues:
         break;
-      case 1:
-        val = pKeyOn->GetEventLength() + val;
+      case eAddValues:
+        Value = pKeyOn->GetEventLength() + Value;
         break;
-      case 2:
-        val = pKeyOn->GetEventLength() - val;
+      case eSubtractValues:
+        Value = pKeyOn->GetEventLength() - Value;
         break;
     }
 
-    pKeyOn->SetLength(val < 1 ? 1 : val);
+    pKeyOn->SetLength(Value < 1 ? 1 : Value);
     pTrack->Kill(pEvent);
     pTrack->Put(pKeyOn);
   }
@@ -558,8 +574,8 @@ void tCmdLength::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 
 // ************************************************************************
 // tCmdSeqLength
-//    JAVE this command is supposed to stretch/contract a sequence of events in time
-//   by factor "scale" from starting point "startClock"
+//   This command is supposed to stretch/contract a sequence of events in
+// time by factor "scale" from starting point "startClock"
 // ************************************************************************
 
 tCmdSeqLength::tCmdSeqLength(JZFilter* pFilter, double scale)
@@ -1029,7 +1045,7 @@ void tCmdExchUpDown::ExecuteTrack(JZTrack* pTrack)
       tKeyOn* pKeyOn = (tKeyOn *)pEvent->Copy();
       int n_th = 0;
 
-      // the n'th key from bottom ..
+      // the n'th key from bottom 
       for (i = 0; i <= pKeyOn->GetKey(); i++)
       {
         n_th += Keys[i];

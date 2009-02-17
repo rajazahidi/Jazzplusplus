@@ -638,14 +638,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\ResourceDialog.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\ResourceDialog.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\Resources.h"
 				>
 			</File>

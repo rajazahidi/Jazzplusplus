@@ -94,4 +94,8 @@
 #define IDC_KB_VELOCITY_START                wxID_HIGHEST + 1201
 #define IDC_KB_VELOCITY_STOP                 wxID_HIGHEST + 1202
 
+// JZLengthDialog resource IDs.
+#define IDC_KB_LENGTH_START                  wxID_HIGHEST + 1301
+#define IDC_KB_LENGTH_STOP                   wxID_HIGHEST + 1302
+
 #endif // !defined(JZ_RESOURCES_H)

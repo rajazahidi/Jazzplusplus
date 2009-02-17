@@ -184,7 +184,6 @@ BEGIN_EVENT_TABLE(JZPianoFrame, wxFrame)
 //  EVT_MENU(ID_SEARCH_AND_REPLACE, JZPianoFrame::OnSearchReplace)
 //  EVT_MENU(ID_TRANSPOSE, JZPianoFrame::OnTranspose)
 //  EVT_MENU(ID_SET_CHANNEL, JZPianoFrame::OnSetChannel)
-  EVT_MENU(ID_VELOCITY, JZPianoFrame::OnActivateVelocityDialog)
 //  EVT_MENU(ID_LENGTH, JZPianoFrame::OnLength)
   EVT_MENU(MEN_MIDIDELAY, JZPianoFrame::OnActivateMidiDelayDialog)
   EVT_MENU(MEN_SEQLENGTH, JZPianoFrame::OnActivateSequenceLengthDialog)
@@ -766,11 +765,6 @@ void JZPianoFrame::OnActivateMidiDelayDialog(wxCommandEvent& Event)
 void JZPianoFrame::OnActivateSequenceLengthDialog(wxCommandEvent& Event)
 {
   mpPianoWindow->ActivateSequenceLengthDialog();
-}
-
-void JZPianoFrame::OnActivateVelocityDialog(wxCommandEvent& Event)
-{
-  mpPianoWindow->ActivateVelocityDialog();
 }
 
 void JZPianoFrame::ActClose(wxCommandEvent& Event)

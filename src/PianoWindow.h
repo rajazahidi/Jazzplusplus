@@ -187,8 +187,6 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     void ActivateSequenceLengthDialog();
 
-    void ActivateVelocityDialog();
-
   private:
 
     JZPianoFrame* mpPianoFrame;

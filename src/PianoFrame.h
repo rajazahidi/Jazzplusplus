@@ -95,7 +95,6 @@ class JZPianoFrame : public wxFrame
     void OnActivateSettingsDialog(wxCommandEvent& Event);
     void OnActivateMidiDelayDialog(wxCommandEvent& Event);
     void OnActivateSequenceLengthDialog(wxCommandEvent& Event);
-    void OnActivateVelocityDialog(wxCommandEvent& Event);
 
     void CtrlChannelAftertouchEdit(wxCommandEvent& Event);
     void OnCtrlPolyAftertouchEdit(wxCommandEvent& Event);

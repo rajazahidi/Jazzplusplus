@@ -3199,39 +3199,3 @@ void JZPianoWindow::ActivateSequenceLengthDialog()
     Refresh();
   }
 }
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZPianoWindow::ActivateVelocityDialog()
-{
-  int FromValue = 64;
-  int ToValue = 0;
-  int modes[] =
-  {
-    8,  // set
-    12,  // add
-    16,  // subtract
-    -1, // End of list
-  };
-
-  int Mode = modes[0];
-
-  if (!EventsSelected())
-  {
-    return;
-  }
-
-  jppResourceDialog dialog(this, "velocity");
-  dialog.Attach("start" ,&FromValue);
-  dialog.Attach("stop", &ToValue);
-  dialog.Attach("mode", &Mode, modes);
-
-  if (dialog.ShowModal() == wxID_OK)
-  {
-    //execute the command
-    tCmdVelocity cmd(mpFilter, FromValue, ToValue, Mode);
-    cmd.Execute();
-    SetScrollRanges();
-    Refresh();
-  }
-}

@@ -230,8 +230,8 @@ class tCmdQuantize : public tCommand
     int mQntClocks;
     bool mNoteStart;
     bool mNoteLength;
-    int mDelay;
     int mGroove;
+    int mDelay;
 };
 
 //*****************************************************************************

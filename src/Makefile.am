@@ -28,6 +28,8 @@ Dialogs/IntegerEdit.cpp \
 Dialogs/LengthDialog.cpp \
 Dialogs/KeyOnDialog.cpp \
 Dialogs/MetronomeSettingsDialog.cpp \
+Dialogs/MidiChannelDialog.cpp \
+Dialogs/QuantizeDialog.cpp \
 Dialogs/ShiftDialog.cpp \
 Dialogs/SynthesizerSettingsDialog.cpp \
 Dialogs/TrackDialog.cpp \
@@ -110,6 +112,8 @@ Dialogs/IntegerEdit.cpp \
 Dialogs/LengthDialog.cpp \
 Dialogs/KeyOnDialog.cpp \
 Dialogs/MetronomeSettingsDialog.cpp \
+Dialogs/MidiChannelDialog.cpp \
+Dialogs/QuantizeDialog.cpp \
 Dialogs/ShiftDialog.cpp \
 Dialogs/SynthesizerSettingsDialog.cpp \
 Dialogs/TrackDialog.cpp \
@@ -197,6 +201,8 @@ Dialogs/IntegerEdit.h \
 Dialogs/LengthDialog.h \
 Dialogs/KeyOnDialog.h \
 Dialogs/MetronomeSettingsDialog.h \
+Dialogs/MidiChannelDialog.h \
+Dialogs/QuantizeDialog.h \
 Dialogs/ShiftDialog.h \
 Dialogs/SynthesizerSettingsDialog.h \
 Dialogs/TrackDialog.h \

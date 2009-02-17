@@ -115,13 +115,13 @@ JZProject::JZProject()
 
   if (gQntSteps.empty())
   {
-    gQntSteps.push_back(make_pair("1/8",   8));
-    gQntSteps.push_back(make_pair("1/12", 12));
-    gQntSteps.push_back(make_pair("1/16", 16));
-    gQntSteps.push_back(make_pair("1/24", 24));
-    gQntSteps.push_back(make_pair("1/32", 32));
-    gQntSteps.push_back(make_pair("1/48", 48));
-    gQntSteps.push_back(make_pair("1/96", 96));
+    gQntSteps.insert(make_pair(8,  "1/8"));
+    gQntSteps.insert(make_pair(12, "1/12"));
+    gQntSteps.insert(make_pair(16, "1/16"));
+    gQntSteps.insert(make_pair(24, "1/24"));
+    gQntSteps.insert(make_pair(32, "1/32"));
+    gQntSteps.insert(make_pair(48, "1/48"));
+    gQntSteps.insert(make_pair(96, "1/96"));
   }
 
   if (gSynthesizerTypes.empty())

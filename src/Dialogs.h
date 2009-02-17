@@ -104,22 +104,6 @@ class tTransposeDlg : public tPropertyListDlg
     void OnHelp();
 };
 
-// SetChannel
-class tSetChannelDlg : public tPropertyListDlg
-{
-  public:
-
-    static int  NewChannel;        // 0
-
-    JZFilter *Filter;
-    JZSong   *Song;
-
-    tSetChannelDlg(JZFilter *f);
-    void AddProperties();
-    bool OnClose();
-    void OnHelp();
-};
-
 // seqLength
 class tSeqLengthDlg : public tPropertyListDlg
 {
@@ -174,28 +158,6 @@ class tSnapDlg : public tPropertyListDlg
     JZPianoWindow* mpPianoWindow;
 
     int* ptr;
-};
-
-class tQuantizeDlg : public tPropertyListDlg
-{
-  public:
-
-    static bool NoteStart;  // 1
-    static bool NoteLength; // 0
-    static int  QntStep;    // 1/16
-    static int  Groove;     // -x .. +x
-    static int  Delay;      // -x .. +x
-
-    JZFilter *Filter;
-    JZSong   *Song;
-
-    long Quantize(long);
-
-    tQuantizeDlg(JZEventWindow* w, JZFilter* pFilter);
-    void AddProperties();
-    //tNamedChoice Steps;
-    bool OnClose();
-    void OnHelp();
 };
 
 void EventDialog(

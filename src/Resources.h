@@ -91,11 +91,18 @@
 #define IDC_KB_CHANNEL                       wxID_HIGHEST + 1102
 
 // JZVelocityDialog resource IDs.
-#define IDC_KB_VELOCITY_START                wxID_HIGHEST + 1201
-#define IDC_KB_VELOCITY_STOP                 wxID_HIGHEST + 1202
+#define IDC_KB_VELOCITY_START                wxID_HIGHEST + 1200
+#define IDC_KB_VELOCITY_STOP                 wxID_HIGHEST + 1201
 
 // JZLengthDialog resource IDs.
-#define IDC_KB_LENGTH_START                  wxID_HIGHEST + 1301
-#define IDC_KB_LENGTH_STOP                   wxID_HIGHEST + 1302
+#define IDC_KB_LENGTH_START                  wxID_HIGHEST + 1210
+#define IDC_KB_LENGTH_STOP                   wxID_HIGHEST + 1211
+
+// JZMidiChannelDialog resource IDs.
+#define IDC_KB_MIDI_CHANNEL                  wxID_HIGHEST + 1220
+
+// JZQuantizeDialog resource IDs.
+#define IDC_KB_GROOVE                        wxID_HIGHEST + 1230
+#define IDC_KB_DELAY                         wxID_HIGHEST + 1231
 
 #endif // !defined(JZ_RESOURCES_H)

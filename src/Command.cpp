@@ -359,25 +359,33 @@ void tCmdErase::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 // tCmdQuantize
 // ************************************************************************
 
-tCmdQuantize::tCmdQuantize(JZFilter* pFilter, long clks, int grov, int dly)
-  : tCommand(pFilter)
+tCmdQuantize::tCmdQuantize(
+  JZFilter* pFilter,
+  int QntClocks,
+  bool NoteStart,
+  bool NoteLength,
+  int Groove,
+  int Delay)
+  : tCommand(pFilter),
+    mQntClocks(QntClocks),
+    mNoteStart(NoteStart),
+    mNoteLength(NoteLength),
+    mGroove(Groove),
+    mDelay(Delay)
 {
-  QntClocks = clks;
-  Groove    = grov;
-  Delay = dly;
-  NoteStart = 1;
-  NoteLength = 0;
 }
 
-long tCmdQuantize::Quantize(long Clock, int islen)
+long tCmdQuantize::Quantize(int Clock, int islen)
 {
-  Clock += QntClocks / 2;
-  Clock -= Clock % QntClocks;
-  if (!islen && (Clock % (2 * QntClocks) != 0))
-    Clock += Groove;
-  Clock += Delay;
-  long minclk = islen ? 2 : 0;
-  return Clock > minclk ? Clock : minclk;
+  Clock += mQntClocks / 2;
+  Clock -= Clock % mQntClocks;
+  if (!islen && (Clock % (2 * mQntClocks) != 0))
+  {
+    Clock += mGroove;
+  }
+  Clock += mDelay;
+  int MinClock = islen ? 2 : 0;
+  return Clock > MinClock ? Clock : MinClock;
 }
 
 void tCmdQuantize::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
@@ -386,11 +394,11 @@ void tCmdQuantize::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   if ((pKeyOn = pEvent->IsKeyOn()) != 0)
   {
     pKeyOn = (tKeyOn *)pEvent->Copy();
-    if (NoteStart)
+    if (mNoteStart)
     {
       pKeyOn->SetClock(Quantize(pKeyOn->GetClock(), 0));
     }
-    if (NoteLength)
+    if (mNoteLength)
     {
       pKeyOn->SetLength(Quantize(pKeyOn->GetEventLength(), 2));
     }
@@ -452,22 +460,22 @@ void tCmdTranspose::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 // tCmdSetChannel
 // ************************************************************************
 
-tCmdSetChannel::tCmdSetChannel(JZFilter* pFilter, int chan)
-  : tCommand(pFilter)
+tCmdSetChannel::tCmdSetChannel(JZFilter* pFilter, int NewChannel)
+  : tCommand(pFilter),
+    mNewChannel(NewChannel)
 {
-  NewChannel = chan;
 }
 
 void tCmdSetChannel::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tChannelEvent* c;
+  tChannelEvent* pChannelEvent;
 
-  if ((c = pEvent->IsChannelEvent()) != 0)
+  if ((pChannelEvent = pEvent->IsChannelEvent()) != 0)
   {
-    c = (tChannelEvent *)pEvent->Copy();
-    c->SetChannel(NewChannel);
+    pChannelEvent = (tChannelEvent *)pEvent->Copy();
+    pChannelEvent->SetChannel(mNewChannel);
     pTrack->Kill(pEvent);
-    pTrack->Put(c);
+    pTrack->Put(pChannelEvent);
   }
 }
 

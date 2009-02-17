@@ -875,6 +875,22 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Dialogs\MidiChannelDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\MidiChannelDialog.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\QuantizeDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\QuantizeDialog.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Dialogs\ShiftDialog.cpp"
 				>
 			</File>

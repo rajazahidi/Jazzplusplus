@@ -23,6 +23,7 @@
 #ifndef JZ_GLOBALS_H
 #define JZ_GLOBALS_H
 
+#include <map>
 #include <vector>
 #include <string>
 
@@ -55,7 +56,7 @@ extern std::vector<std::pair<std::string, int> > gModes;
 extern const int gScaleChromatic;
 extern const int gScaleSelected;
 extern std::vector<std::pair<std::string, int> > gScaleNames;
-extern std::vector<std::pair<std::string, int> > gQntSteps;
+extern std::map<int, std::string> gQntSteps;
 extern std::vector<std::pair<std::string, int> > gSynthesizerTypes;
 extern std::vector<std::pair<std::string, int> > gSynthesierTypeFiles;
 extern JZProject* gpProject;

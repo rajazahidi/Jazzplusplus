@@ -18,7 +18,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "LengthDialog.h"
+#include "QuantizeDialog.h"
 
 #include "../Globals.h"
 #include "../Help.h"
@@ -26,7 +26,8 @@
 #include "../Resources.h"
 
 #include <wx/button.h>
-#include <wx/radiobox.h>
+#include <wx/checkbox.h>
+#include <wx/combobox.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 
@@ -38,70 +39,60 @@ using namespace std;
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-BEGIN_EVENT_TABLE(JZLengthDialog, wxDialog)
+BEGIN_EVENT_TABLE(JZQuantizeDialog, wxDialog)
 
   EVT_KNOB_CHANGED(
-    IDC_KB_LENGTH_START,
-    JZLengthDialog::OnLengthStartChange)
+    IDC_KB_GROOVE,
+    JZQuantizeDialog::OnGrooveChange)
 
   EVT_KNOB_CHANGED(
-    IDC_KB_LENGTH_STOP,
-    JZLengthDialog::OnLengthStopChange)
+    IDC_KB_DELAY,
+    JZQuantizeDialog::OnDelayChange)
 
-  EVT_BUTTON(wxID_HELP, JZLengthDialog::OnHelp)
+  EVT_BUTTON(wxID_HELP, JZQuantizeDialog::OnHelp)
 
 END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZLengthDialog::JZLengthDialog(
-  wxWindow* pParent,
-  int TicksPerQuarter,
-  int& FromValue,
-  int& ToValue,
-  JEValueAlterationMode& Mode)
+JZQuantizeDialog::JZQuantizeDialog(
+  int& QuantizationStep,
+  bool& NoteStart,
+  bool& NoteLength,
+  int& Groove,
+  int& Delay,
+  wxWindow* pParent)
   : wxDialog(pParent, wxID_ANY, wxString("Length")),
-    mFromValue(FromValue),
-    mToValue(ToValue),
-    mMode(Mode),
-    mpLengthStartKnob(0),
-    mpLengthStartValue(0),
-    mpLengthStopKnob(0),
-    mpLengthStopValue(0),
-    mpModeRadioBox(0)
+    mQuantizationStep(QuantizationStep),
+    mNoteStart(NoteStart),
+    mNoteLength(NoteLength),
+    mGroove(Groove),
+    mDelay(Delay),
+    mpStepSizeComboBox(0),
+    mpNoteStartCheckBox(0),
+    mpNoteLengthCheckBox(0),
+    mpGrooveKnob(0),
+    mpGrooveValue(0),
+    mpDelayKnob(0),
+    mpDelayValue(0)
 {
-  mpLengthStartKnob = new JZKnob(
-    this,
-    IDC_KB_LENGTH_START,
-    0,
-    0,
-    4 * TicksPerQuarter);
-  mpLengthStartValue = new wxStaticText(this, wxID_ANY, "000");
+  mpStepSizeComboBox = new wxComboBox(this, wxID_ANY);
 
-  mpLengthStopKnob = new JZKnob(
-    this,
-    IDC_KB_LENGTH_STOP,
-    0,
-    0,
-    4 * TicksPerQuarter);
-  mpLengthStopValue = new wxStaticText(this, wxID_ANY, "000");
-
-  wxString Choices[] =
+  for (
+    map<int, string>::const_iterator iPair = gQntSteps.begin();
+    iPair != gQntSteps.end();
+    ++iPair)
   {
-    "Set Values",
-    "Add To Value",
-    "Subtract From Values"
-  };
-  mpModeRadioBox = new wxRadioBox(
-    this,
-    wxID_ANY,
-    "Value Application Mode",
-    wxDefaultPosition,
-    wxDefaultSize,
-    3,
-    Choices,
-    1,
-    wxRA_SPECIFY_COLS);
+    const string& String = iPair->second;
+    mpStepSizeComboBox->Append(String.c_str());
+  }
+
+  mpNoteStartCheckBox = new wxCheckBox(this, wxID_ANY, "Note Start");
+  mpNoteLengthCheckBox = new wxCheckBox(this, wxID_ANY, "Note Length");
+  mpGrooveKnob = new JZKnob(this, IDC_KB_GROOVE, 0, -100, 100);
+  mpGrooveValue = new wxStaticText(this, wxID_ANY, "-000");
+  mpDelayKnob = new JZKnob(this, IDC_KB_DELAY, 0, -100, 100);
+  mpDelayValue = new wxStaticText(this, wxID_ANY, "-000");
 
   wxButton* pOkButton = new wxButton(this, wxID_OK, "&OK");
   wxButton* pCancelButton = new wxButton(this, wxID_CANCEL, "Cancel");
@@ -110,50 +101,40 @@ JZLengthDialog::JZLengthDialog(
 
   wxBoxSizer* pTopSizer = new wxBoxSizer(wxVERTICAL);
 
-  wxString String;
-
-  String << "Ticks per Quarter: " << TicksPerQuarter;
-
-  pTopSizer->Add(
-    new wxStaticText(this, wxID_ANY, String),
-    0,
-    wxALIGN_CENTER | wxALL,
-    5);
-
-  wxFlexGridSizer* pFlexGridSizer = new wxFlexGridSizer(2, 3, 4, 2);
-
-  pFlexGridSizer->Add(
-    new wxStaticText(this, wxID_ANY, "Start Length:"),
-    0,
-    wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
-  pFlexGridSizer->Add(
-    mpLengthStartValue,
-    0,
-    wxALIGN_CENTER_VERTICAL | wxFIXED_MINSIZE);
-  pFlexGridSizer->Add(mpLengthStartKnob, 0, wxALIGN_CENTER_VERTICAL);
-
-  pFlexGridSizer->Add(
-    new wxStaticText(this, wxID_ANY, "Stop  Length:"),
-    0,
-    wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
-  pFlexGridSizer->Add(
-    mpLengthStopValue,
-    0,
-    wxALIGN_CENTER_VERTICAL | wxFIXED_MINSIZE);
-  pFlexGridSizer->Add(mpLengthStopKnob, 0, wxALIGN_CENTER_VERTICAL);
-
-  pTopSizer->Add(pFlexGridSizer, 0, wxALIGN_CENTER | wxALL, 5);
-
-  pTopSizer->Add(
-    mpModeRadioBox,
-    0,
-    wxALIGN_CENTER | wxALL,
-    5);
-
   wxBoxSizer* pButtonSizer = new wxBoxSizer(wxHORIZONTAL);
   pButtonSizer->Add(pOkButton, 0, wxALL, 5);
   pButtonSizer->Add(pCancelButton, 0, wxALL, 5);
   pButtonSizer->Add(pHelpButton, 0, wxALL, 5);
+
+  pTopSizer->Add(mpStepSizeComboBox, 0, wxALIGN_CENTER | wxALL, 6);
+
+  pTopSizer->Add(mpNoteStartCheckBox, 0, wxALIGN_CENTER | wxALL, 6);
+
+  pTopSizer->Add(mpNoteLengthCheckBox, 0, wxALIGN_CENTER | wxALL, 6);
+
+  wxFlexGridSizer* pFlexGridSizer = new wxFlexGridSizer(2, 3, 4, 2);
+
+  pFlexGridSizer->Add(
+    new wxStaticText(this, wxID_ANY, "Groove:"),
+    0,
+    wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
+  pFlexGridSizer->Add(
+    mpGrooveValue,
+    0,
+    wxALIGN_CENTER_VERTICAL | wxFIXED_MINSIZE);
+  pFlexGridSizer->Add(mpGrooveKnob, 0, wxALIGN_CENTER_VERTICAL);
+
+  pFlexGridSizer->Add(
+    new wxStaticText(this, wxID_ANY, "Delay:"),
+    0,
+    wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
+  pFlexGridSizer->Add(
+    mpDelayValue,
+    0,
+    wxALIGN_CENTER_VERTICAL | wxFIXED_MINSIZE);
+  pFlexGridSizer->Add(mpDelayKnob, 0, wxALIGN_CENTER_VERTICAL);
+
+  pTopSizer->Add(pFlexGridSizer, 0, wxALIGN_CENTER | wxALL, 5);
 
   pTopSizer->Add(pButtonSizer, 0, wxALIGN_CENTER | wxBOTTOM, 6);
 
@@ -166,85 +147,90 @@ JZLengthDialog::JZLengthDialog(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool JZLengthDialog::TransferDataToWindow()
+bool JZQuantizeDialog::TransferDataToWindow()
 {
+  int Selection = 0;
+  for (
+    map<int, string>::const_iterator iPair = gQntSteps.begin();
+    iPair != gQntSteps.end();
+    ++iPair)
+  {
+    const int& Value = iPair->first;
+    if (Value <= mQuantizationStep)
+    {
+      break;
+    }
+    ++Selection;
+  }
+  mpStepSizeComboBox->SetSelection(Selection);
+
+  mpNoteStartCheckBox->SetValue(mNoteStart);
+  mpNoteLengthCheckBox->SetValue(mNoteLength);
+
   ostringstream Oss;
 
-  Oss << mFromValue;
-  mpLengthStartValue->SetLabel(Oss.str().c_str());
-
-  mpLengthStartKnob->SetValue(mFromValue);
+  Oss << mGroove;
+  mpGrooveValue->SetLabel(Oss.str().c_str());
+  mpGrooveKnob->SetValue(mGroove);
 
   Oss.str("");
-  Oss << mToValue;
-  mpLengthStopValue->SetLabel(Oss.str().c_str());
-
-  mpLengthStopKnob->SetValue(mToValue);
-
-  switch (mMode)
-  {
-    case eSetValues:
-      mpModeRadioBox->SetSelection(0);
-      break;
-    case eAddValues:
-      mpModeRadioBox->SetSelection(1);
-      break;
-    case eSubtractValues:
-      mpModeRadioBox->SetSelection(2);
-      break;
-  }
+  Oss << mDelay;
+  mpDelayValue->SetLabel(Oss.str().c_str());
+  mpDelayKnob->SetValue(mDelay);
 
   return true;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool JZLengthDialog::TransferDataFromWindow()
+bool JZQuantizeDialog::TransferDataFromWindow()
 {
-  mFromValue = mpLengthStartKnob->GetValue();
+  wxString SelectedValue = mpStepSizeComboBox->GetValue();
+  string SelectedString = SelectedValue.c_str();
+  for (
+    map<int, string>::const_iterator iPair = gQntSteps.begin();
+    iPair != gQntSteps.end();
+    ++iPair)
+  {
+    const string& String = iPair->second;
+    if (SelectedString == String)
+    {
+      mQuantizationStep = iPair->first;
+      break;
+    }
+  }
 
-  mToValue = mpLengthStopKnob->GetValue();
-
-  int Selection = mpModeRadioBox->GetSelection();
-  if (Selection == 1)
-  {
-    mMode = eAddValues;
-  }
-  else if (Selection == 2)
-  {
-    mMode = eSubtractValues;
-  }
-  else
-  {
-    mMode = eSetValues;
-  }
+  mNoteStart = mpNoteStartCheckBox->GetValue();
+  mNoteLength = mpNoteLengthCheckBox->GetValue();
+  mGroove = mpGrooveKnob->GetValue();
+  mDelay = mpDelayKnob->GetValue();
 
   return true;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZLengthDialog::OnLengthStartChange(JZKnobEvent& Event)
+void JZQuantizeDialog::OnGrooveChange(JZKnobEvent& Event)
 {
   int Value = Event.GetValue();
   ostringstream Oss;
   Oss << Value;
-  mpLengthStartValue->SetLabel(Oss.str().c_str());
+  mpGrooveValue->SetLabel(Oss.str().c_str());
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZLengthDialog::OnLengthStopChange(JZKnobEvent& Event)
+void JZQuantizeDialog::OnDelayChange(JZKnobEvent& Event)
 {
   int Value = Event.GetValue();
   ostringstream Oss;
   Oss << Value;
-  mpLengthStopValue->SetLabel(Oss.str().c_str());
+  mpDelayValue->SetLabel(Oss.str().c_str());
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZLengthDialog::OnHelp(wxCommandEvent& Event)
+void JZQuantizeDialog::OnHelp(wxCommandEvent& Event)
 {
-  gpHelpInstance->ShowTopic("Length");
+  gpHelpInstance->ShowTopic("Quantize");
 }

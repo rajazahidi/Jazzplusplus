@@ -2762,8 +2762,8 @@ void JZPianoWindow::Quantize()
 {
   if (EventsSelected())
   {
-    tCmdQuantize cmd(mpFilter, SnapClocks(), 0, 0);
-    cmd.Execute(1);
+    tCmdQuantize QuantizeCommand(mpFilter, SnapClocks(), true, false, 0, 0);
+    QuantizeCommand.Execute(1);
     Refresh();
   }
 }

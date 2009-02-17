@@ -51,7 +51,7 @@ const int gScaleSelected  = 13;
 
 vector<pair<string, int> > gScaleNames;
 
-vector<pair<string, int> > gQntSteps;
+map<int, string> gQntSteps;
 
 vector<pair<string, int> > gSynthesizerTypes;
 

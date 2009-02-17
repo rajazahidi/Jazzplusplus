@@ -25,6 +25,8 @@
 #include "Command.h"
 #include "Dialogs/DeleteDialog.h"
 #include "Dialogs/LengthDialog.h"
+#include "Dialogs/MidiChannelDialog.h"
+#include "Dialogs/QuantizeDialog.h"
 #include "Dialogs/ShiftDialog.h"
 #include "Dialogs/VelocityDialog.h"
 #include "Dialogs.h"
@@ -161,13 +163,37 @@ void JZEventWindow::Quantize()
 {
   if (AreEventsSelected())
   {
-//    wxDialogBox *panel = new wxDialogBox(this, "Quantize", FALSE );
-    tQuantizeDlg* pQuantizeDlg = new tQuantizeDlg(this, mpFilter);
-    pQuantizeDlg->Create();
+    int QuantizationStep = 16;
+    bool NoteStart = true;
+    bool NoteLength = false;
+    int Delay = 0;
+    int Groove = 0;
 
-//    tCmdQuantize QuantizeCommand(mpFilter, SnapClocks(), 0, 0);
-//    QuantizeCommand.Execute(1);
-//    JZProjectManager::Instance()->UpdateAllViews();
+    JZQuantizeDialog QuantizeDialog(
+      QuantizationStep,
+      NoteStart,
+      NoteLength,
+      Groove,
+      Delay,
+      this);
+
+    if (QuantizeDialog.ShowModal() == wxID_OK)
+    {
+      int Step = mpSong->GetTicksPerQuarter() * 4 / QuantizationStep;
+
+      tCmdQuantize QuantizeCommand(
+        mpFilter,
+        QuantizationStep,
+        NoteStart,
+        NoteLength,
+        Groove * Step / 100,
+        Delay * Step / 100);
+
+      QuantizeCommand.Execute();
+//      QuantizeCommand.Execute(1);
+
+      JZProjectManager::Instance()->UpdateAllViews();
+    }
   }
 }
 
@@ -175,8 +201,15 @@ void JZEventWindow::Quantize()
 //-----------------------------------------------------------------------------
 void JZEventWindow::SetChannel()
 {
-  tSetChannelDlg * dlg = new tSetChannelDlg(mpFilter);
-  dlg->Create();
+  int NewChannel = 1;
+
+  JZMidiChannelDialog MidiChannelDialog(NewChannel, this);
+  if (MidiChannelDialog.ShowModal() == wxID_OK)
+  {
+    tCmdSetChannel SetMidiChannelCommand(mpFilter, NewChannel - 1);
+    SetMidiChannelCommand.Execute();
+    JZProjectManager::Instance()->UpdateAllViews();
+  }
 }
 
 //-----------------------------------------------------------------------------

@@ -209,15 +209,29 @@ class tCmdSearchReplace : public tCommand
 //*****************************************************************************
 class tCmdQuantize : public tCommand
 {
-    long Quantize(long Clock, int islen);
   public:
-    long QntClocks;
-    int NoteStart;     // yes
-    int NoteLength;    // no
-    int Delay;         // zero
-    int Groove;        // zero
-    tCmdQuantize(JZFilter* pFilter, long QntClocks, int groove, int delay);
+
+    tCmdQuantize(
+      JZFilter* pFilter,
+      int QntClocks,
+      bool NoteStart,
+      bool NoteLength,
+      int Groove,
+      int Delay);
+
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
+
+  private:
+
+    long Quantize(int Clock, int islen);
+
+  private:
+
+    int mQntClocks;
+    bool mNoteStart;
+    bool mNoteLength;
+    int mDelay;
+    int mGroove;
 };
 
 //*****************************************************************************
@@ -241,9 +255,14 @@ class tCmdTranspose : public tCommand
 class tCmdSetChannel : public tCommand
 {
   public:
-    int NewChannel;        // 0
+
     tCmdSetChannel(JZFilter* pFilter, int NewChannel);
+
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
+
+  private:
+
+    int mNewChannel;
 };
 
 //*****************************************************************************

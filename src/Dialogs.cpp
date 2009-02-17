@@ -282,51 +282,9 @@ void tTransposeDlg::AddProperties()
     "bool"));
 }
 
-//*****************************************************************************
-// SetChannel
-//*****************************************************************************
-
-int tSetChannelDlg::NewChannel = 1;
-
-tSetChannelDlg::tSetChannelDlg(JZFilter *f)
-: tPropertyListDlg("Set MIDI Channel")
-{
-  Filter = f;
-  Song = f->GetSong();
-}
 
 
 
-bool tSetChannelDlg::OnClose()
-{
-  if (NewChannel)
-  {
-    tCmdSetChannel exe(Filter, NewChannel - 1);
-    exe.Execute();
-  }
-  //tPropertyListDlg::OnClose();
-  return false;
-}
-
-void tSetChannelDlg::OnHelp()
-{
-  gpHelpInstance->ShowTopic("Set MIDI Channel");
-}
-
-
-void tSetChannelDlg::AddProperties()
-{
- //  Add(wxMakeFormShort("new Channel", &NewChannel, wxFORM_DEFAULT,
-//                        new wxList(wxMakeConstraintRange(1.0, 16.0), 0)));
-//   Add(wxMakeFormNewLine());
-  // AssociatePanel(panel);
-
-  sheet->AddProperty(new wxProperty(
-    "new Channel",
-    wxPropertyValue(&NewChannel),
-    "integer",
-    new wxIntegerListValidator(1, 16)));
-}
 
 
 
@@ -480,76 +438,6 @@ void tSnapDlg::AddProperties()
      new tNamedValueListValidator(gLimitSteps)));
 }
 
-
-//*****************************************************************************
-// Quantize
-//*****************************************************************************
-
-bool tQuantizeDlg::NoteStart = 1;
-bool tQuantizeDlg::NoteLength = 0;
-int tQuantizeDlg::QntStep = 16;
-int tQuantizeDlg::Delay = 0;
-int tQuantizeDlg::Groove = 0;
-
-//tQuantizeDlg::tQuantizeDlg(JZEventFrame *w, JZFilter *f)
-tQuantizeDlg::tQuantizeDlg(JZEventWindow *w, JZFilter *f)
-   : tPropertyListDlg("Quantize" )
-  //, Steps("steps", gQntSteps, &gQntStep)
-{
-  Filter = f;
-  Song = f->GetSong();
-}
-
-
-
-bool tQuantizeDlg::OnClose()
-{
-  //Steps.GetValue();
-  int step = Song->GetTicksPerQuarter() * 4 / QntStep;
-  tCmdQuantize qnt(Filter, step, Groove * step / 100, Delay * step / 100);
-  qnt.NoteStart = NoteStart;
-  qnt.NoteLength = NoteLength;
-  qnt.Execute();
-
-  JZProjectManager::Instance()->UpdateAllViews();
-
-  //tPropertyListDlg::OnClose();
-  return false;
-}
-
-void tQuantizeDlg::OnHelp()
-{
-//  if (mpEventWindow->NextWin)
-//  {
-//    gpHelpInstance->ShowTopic("Quantize");
-//  }
-//  else
-//  {
-//    gpHelpInstance->ShowTopic("Pianowin Quantize");
-//  }
-}
-
-void tQuantizeDlg::AddProperties()
-{
-  sheet->AddProperty(new wxProperty(
-    "Note start",
-    wxPropertyValue((bool*)&NoteStart),
-    "bool"));
-  sheet->AddProperty(new wxProperty(
-    "Note length",
-    wxPropertyValue((bool*)&NoteLength),
-    "bool"));
-  sheet->AddProperty(new wxProperty(
-    "Groove",
-    wxPropertyValue(&Groove),
-    "int",
-    new wxRealListValidator(-100, 100)));
-  sheet->AddProperty(new wxProperty(
-    "Delay",
-    wxPropertyValue(&Delay),
-    "int",
-    new wxRealListValidator(-100, 100)));
-}
 
 
 //*****************************************************************************

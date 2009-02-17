@@ -1,9 +1,7 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
-// Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008-2009 Peter J. Stieber
+// Copyright (C) 2009 Peter J. Stieber, all rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -56,9 +54,6 @@ class JZEventFrame : public wxFrame
     virtual void SetEventWindow(JZEventWindow* pEventWindow);
 
     virtual bool OnClose();
-
-    // Redraw - nach Aenderungen von Parametern, kein GUI-Event
-    virtual void Redraw();
 
   private:
 

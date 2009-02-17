@@ -90,4 +90,8 @@
 #define IDC_KB_OFF_VELOCITY                  wxID_HIGHEST + 1101
 #define IDC_KB_CHANNEL                       wxID_HIGHEST + 1102
 
+// JZVelocityDialog resource IDs.
+#define IDC_KB_VELOCITY_START                wxID_HIGHEST + 1201
+#define IDC_KB_VELOCITY_STOP                 wxID_HIGHEST + 1202
+
 #endif // !defined(JZ_RESOURCES_H)

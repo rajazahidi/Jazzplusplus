@@ -27,6 +27,7 @@
 
 class JZKnob;
 class JZKnobEvent;
+class wxRadioBox;
 class wxStaticText;
 
 //*****************************************************************************

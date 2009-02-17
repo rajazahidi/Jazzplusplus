@@ -24,6 +24,7 @@
 
 #include "Command.h"
 #include "Dialogs/DeleteDialog.h"
+#include "Dialogs/LengthDialog.h"
 #include "Dialogs/ShiftDialog.h"
 #include "Dialogs/VelocityDialog.h"
 #include "Dialogs.h"
@@ -222,8 +223,23 @@ void JZEventWindow::Velocity()
 //-----------------------------------------------------------------------------
 void JZEventWindow::Length()
 {
-  tLengthDlg * dlg = new tLengthDlg(this, mpFilter);
-  dlg->Create();
+  int FromValue = 30;
+  int ToValue = 0;
+  JEValueAlterationMode Mode = eSetValues;
+
+  JZLengthDialog LengthDialog(
+    this,
+    mpFilter->GetSong()->GetTicksPerQuarter(),
+    FromValue,
+    ToValue,
+    Mode);
+  if (LengthDialog.ShowModal() == wxID_OK)
+  {
+    tCmdLength LengthCommand(mpFilter, FromValue, ToValue, Mode);
+    LengthCommand.Execute();
+
+    JZProjectManager::Instance()->UpdateAllViews();
+  }
 }
 
 //-----------------------------------------------------------------------------

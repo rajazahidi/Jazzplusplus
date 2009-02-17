@@ -331,67 +331,6 @@ void tSetChannelDlg::AddProperties()
 
 
 //*****************************************************************************
-// Length
-//*****************************************************************************
-
-int tLengthDlg::FromValue = 30;
-int tLengthDlg::ToValue = 0;
-
-JEValueAlterationMode tLengthDlg::Mode;
-
-tLengthDlg::tLengthDlg(JZEventWindow* w, JZFilter *f)
-: tPropertyListDlg("Length")
-{
-  Filter = f;
-  Song = f->GetSong();
-}
-
-
-bool tLengthDlg::OnClose()
-{
-  tCmdLength cmd(Filter, FromValue, ToValue, Mode);
-  cmd.Execute();
-
-  JZProjectManager::Instance()->UpdateAllViews();
-
-  //tPropertyListDlg::OnClose();
-  return false;
-}
-
-void tLengthDlg::OnHelp()
-{
-  gpHelpInstance->ShowTopic("Length");
-}
-
-
-void tLengthDlg::AddProperties()
-{
-  sheet->AddProperty(new wxProperty(
-    "Ticks/Quarter",
-    wxPropertyValue((long)Song->GetTicksPerQuarter()),
-    "integer",
-    new wxIntegerListValidator(-16, 16)));  //r/o
-
-  sheet->AddProperty(new wxProperty(
-    "Start",
-    wxPropertyValue(&FromValue),
-    "integer",
-    new wxIntegerListValidator(0, Song->GetTicksPerQuarter() * 4)));
-  sheet->AddProperty(new wxProperty(
-    "Stop",
-    wxPropertyValue(&ToValue),
-    "integer",
-    new wxIntegerListValidator(0, Song->GetTicksPerQuarter() * 4)));
-//  sheet->AddProperty(new wxProperty(
-//    "Mode",
-//    tNamedValueListValue(&Mode, gModes),
-//    "props",
-//    new tNamedValueListValidator(gModes)));
-}
-
-
-
-//*****************************************************************************
 // seqLength
 //*****************************************************************************
 

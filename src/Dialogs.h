@@ -120,24 +120,6 @@ class tSetChannelDlg : public tPropertyListDlg
     void OnHelp();
 };
 
-// Length
-class tLengthDlg : public tPropertyListDlg
-{
-  public:
-
-    static int FromValue, ToValue;
-    static JEValueAlterationMode Mode;
-    static char *mode_str;
-
-    JZFilter   *Filter;
-    JZSong     *Song;
-
-    tLengthDlg(JZEventWindow* win, JZFilter *f);
-    void AddProperties();
-    bool OnClose();
-    void OnHelp();
-};
-
 // seqLength
 class tSeqLengthDlg : public tPropertyListDlg
 {

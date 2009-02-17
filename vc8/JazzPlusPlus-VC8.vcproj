@@ -859,6 +859,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Dialogs\LengthDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\LengthDialog.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Dialogs\MetronomeSettingsDialog.cpp"
 				>
 			</File>

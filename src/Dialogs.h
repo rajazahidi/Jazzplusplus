@@ -139,27 +139,6 @@ class tMidiDelayDlg : public tPropertyListDlg
     void OnHelp();
 };
 
-class tSnapDlg : public tPropertyListDlg
-{
-  public:
-
-    tSnapDlg(JZPianoWindow* pPianoWindow, int* snapptr);
-
-    void AddProperties();
-
-    //tNamedChoice Steps;
-
-    bool OnClose();
-
-    void OnHelp();
-
-  private:
-
-    JZPianoWindow* mpPianoWindow;
-
-    int* ptr;
-};
-
 void EventDialog(
   JZEvent*,
   JZPianoWindow*,

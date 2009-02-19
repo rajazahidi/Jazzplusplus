@@ -41,7 +41,7 @@ JZPlayer* gpMidiPlayer = 0;
 
 JZHelp* gpHelpInstance = 0;
 
-vector<pair<string, int> > gLimitSteps;
+map<int, string> gLimitSteps;
 
 vector<pair<string, int> > gModes;
 
@@ -51,7 +51,7 @@ const int gScaleSelected  = 13;
 
 vector<pair<string, int> > gScaleNames;
 
-map<int, string> gQntSteps;
+map<int, string> gQuantizationSteps;
 
 vector<pair<string, int> > gSynthesizerTypes;
 

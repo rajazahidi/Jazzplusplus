@@ -30,16 +30,16 @@ using namespace std;
 //-----------------------------------------------------------------------------
 tNamedValueChoice::tNamedValueChoice(
   wxWindow* pParent,
-  const vector<pair<string, int> >& Pairs)
+  const map<int, string>& Map)
   : wxChoice(pParent, wxID_ANY),
-    mPairs(Pairs)
+    mMap(Map)
 {
   for (
-    vector<pair<string, int> >::const_iterator iPair = mPairs.begin();
-    iPair != mPairs.end();
-    ++iPair)
+    map<int, string>::const_iterator iMap = mMap.begin();
+    iMap != mMap.end();
+    ++iMap)
   {
-    Append(iPair->first);
+    Append(iMap->second);
   }
 }
 
@@ -47,10 +47,20 @@ tNamedValueChoice::tNamedValueChoice(
 //-----------------------------------------------------------------------------
 int tNamedValueChoice::GetValue()
 {
-  int i = GetSelection();
-  if (i >= 0)
+  int Selection = GetSelection();
+  if (Selection >= 0)
   {
-    return mPairs[i].second;
+    int i = 0;
+    for (
+      map<int, string>::const_iterator iMap = mMap.begin();
+      iMap != mMap.end();
+      ++iMap, ++i)
+    {
+      if (i == Selection)
+      {
+        return iMap->first;
+      }
+    }
   }
   return 16;
 }
@@ -61,14 +71,14 @@ void tNamedValueChoice::SetValue(int Measure)
 {
   int i = 0;
   for (
-    vector<pair<string, int> >::const_iterator iPair = mPairs.begin();
-    iPair != mPairs.end();
-    ++iPair)
+    map<int, string>::const_iterator iMap = mMap.begin();
+    iMap != mMap.end();
+    ++iMap, ++i)
   {
-    if (iPair->second == Measure)
+    if (iMap->first == Measure)
     {
       SetSelection(i);
+      break;
     }
-    ++i;
   }
 }

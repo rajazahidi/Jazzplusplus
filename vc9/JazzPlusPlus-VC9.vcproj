@@ -917,6 +917,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Dialogs\SnapDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\SnapDialog.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Dialogs\SynthesizerSettingsDialog.cpp"
 				>
 			</File>

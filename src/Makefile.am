@@ -31,6 +31,7 @@ Dialogs/MetronomeSettingsDialog.cpp \
 Dialogs/MidiChannelDialog.cpp \
 Dialogs/QuantizeDialog.cpp \
 Dialogs/ShiftDialog.cpp \
+Dialogs/SnapDialog.cpp \
 Dialogs/SynthesizerSettingsDialog.cpp \
 Dialogs/TrackDialog.cpp \
 Dialogs/VelocityDialog.cpp \
@@ -115,6 +116,7 @@ Dialogs/MetronomeSettingsDialog.cpp \
 Dialogs/MidiChannelDialog.cpp \
 Dialogs/QuantizeDialog.cpp \
 Dialogs/ShiftDialog.cpp \
+Dialogs/SnapDialog.cpp \
 Dialogs/SynthesizerSettingsDialog.cpp \
 Dialogs/TrackDialog.cpp \
 Dialogs/VelocityDialog.cpp \
@@ -204,6 +206,7 @@ Dialogs/MetronomeSettingsDialog.h \
 Dialogs/MidiChannelDialog.h \
 Dialogs/QuantizeDialog.h \
 Dialogs/ShiftDialog.h \
+Dialogs/SnapDialog.h \
 Dialogs/SynthesizerSettingsDialog.h \
 Dialogs/TrackDialog.h \
 Dialogs/VelocityDialog.h \

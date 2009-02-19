@@ -163,17 +163,17 @@ void tCleanupDlg::AddProperties()
   // How it really ought to work (except the validator might ask the "value"
   // for the list of allowed values).
   // http://sourceforge.net/tracker/?group_id=9863&atid=109863 wx bugracker
-  tNamedValueListValue val1 = tNamedValueListValue(
-    &lowLimit,
-    gLimitSteps);
+//  tNamedValueListValue val1 = tNamedValueListValue(
+//    &lowLimit,
+//    gLimitSteps);
 
-  wxPropertyValue& val = val1;
-  cout << "little test:" << val.GetStringRepresentation() << endl;
-  sheet->AddProperty(new wxProperty(
-    "Delete shorther than",
-    (tNamedValueListValue&)val1,
-    "props",
-    new tNamedValueListValidator(gLimitSteps)));
+//  wxPropertyValue& val = val1;
+//  cout << "little test:" << val.GetStringRepresentation() << endl;
+//  sheet->AddProperty(new wxProperty(
+//    "Delete shorther than",
+//    (tNamedValueListValue&)val1,
+//    "props",
+//    new tNamedValueListValidator(gLimitSteps)));
 
   sheet->AddProperty(new wxProperty(
     "Shorten overlapping",
@@ -389,53 +389,6 @@ void tMidiDelayDlg::AddProperties()
   //   sheet->AddProperty(new wxProperty("Repeats",  wxPropertyValue((long*)&repeat), "integer", new wxIntegerListValidator(0, 100)));
 
   //System 3:
-}
-
-
-
-//*****************************************************************************
-// Snap
-//*****************************************************************************
-
-tSnapDlg::tSnapDlg(JZPianoWindow* pPianoWindow, int* snapptr)
-  : tPropertyListDlg("Snap:quantize cut/paste events"),
-    mpPianoWindow(pPianoWindow)
-{
-//, Steps("Snap value", limitSteps, snapptr)
-  //limitSteps lives in util.cpp
-   ptr = snapptr;
-}
-
-
-
-bool tSnapDlg::OnClose()
-{
-  //Steps.GetValue();
-  // toggle the tool buttons
-  mpPianoWindow->SetSnapDenom(*ptr);
-  //tPropertyListDlg::OnClose();
-  return false;
-}
-
-void tSnapDlg::OnHelp()
-{
-  gpHelpInstance->ShowTopic("Snap");
-}
-
-void tSnapDlg::AddProperties()
-{
-//   panel->SetLabelPosition(wxVERTICAL);
-//   Add(wxMakeFormMessage("quantize cut/paste events"));
-//   Add(wxMakeFormNewLine());
-//   Add(Steps.mkFormItem(100));
-//   Add(wxMakeFormNewLine());
-//   AssociatePanel(panel);
-
-   sheet->AddProperty(new wxProperty(
-     "Steps",
-     tNamedValueListValue(ptr, gLimitSteps),
-     "props",
-     new tNamedValueListValidator(gLimitSteps)));
 }
 
 

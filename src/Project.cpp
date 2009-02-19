@@ -78,14 +78,14 @@ JZProject::JZProject()
 {
   if (gLimitSteps.empty())
   {
-    gLimitSteps.push_back(make_pair( "1/8",    8));
-    gLimitSteps.push_back(make_pair( "1/12",  12));
-    gLimitSteps.push_back(make_pair( "1/16",  16));
-    gLimitSteps.push_back(make_pair( "1/24",  24));
-    gLimitSteps.push_back(make_pair( "1/32",  32));
-    gLimitSteps.push_back(make_pair( "1/48",  48));
-    gLimitSteps.push_back(make_pair( "1/96",  96));
-    gLimitSteps.push_back(make_pair("1/192", 192));
+    gLimitSteps.insert(make_pair(  8, "1/8"));
+    gLimitSteps.insert(make_pair( 12, "1/12"));
+    gLimitSteps.insert(make_pair( 16, "1/16"));
+    gLimitSteps.insert(make_pair( 24, "1/24"));
+    gLimitSteps.insert(make_pair( 32, "1/32"));
+    gLimitSteps.insert(make_pair( 48, "1/48"));
+    gLimitSteps.insert(make_pair( 96, "1/96"));
+    gLimitSteps.insert(make_pair(192, "1/192"));
   }
 
   if (gModes.empty())
@@ -113,15 +113,15 @@ JZProject::JZProject()
     gScaleNames.push_back(make_pair("Selected", gScaleSelected));
   }
 
-  if (gQntSteps.empty())
+  if (gQuantizationSteps.empty())
   {
-    gQntSteps.insert(make_pair(8,  "1/8"));
-    gQntSteps.insert(make_pair(12, "1/12"));
-    gQntSteps.insert(make_pair(16, "1/16"));
-    gQntSteps.insert(make_pair(24, "1/24"));
-    gQntSteps.insert(make_pair(32, "1/32"));
-    gQntSteps.insert(make_pair(48, "1/48"));
-    gQntSteps.insert(make_pair(96, "1/96"));
+    gQuantizationSteps.insert(make_pair(8,  "1/8"));
+    gQuantizationSteps.insert(make_pair(12, "1/12"));
+    gQuantizationSteps.insert(make_pair(16, "1/16"));
+    gQuantizationSteps.insert(make_pair(24, "1/24"));
+    gQuantizationSteps.insert(make_pair(32, "1/32"));
+    gQuantizationSteps.insert(make_pair(48, "1/48"));
+    gQuantizationSteps.insert(make_pair(96, "1/96"));
   }
 
   if (gSynthesizerTypes.empty())

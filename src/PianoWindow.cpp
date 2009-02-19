@@ -25,6 +25,7 @@
 #include "Command.h"
 #include "ControlEdit.h"
 #include "Dialogs.h"
+#include "Dialogs/SnapDialog.h"
 #include "Filter.h"
 #include "GuitarFrame.h"
 #include "Harmony.h"
@@ -3114,8 +3115,8 @@ int JZPianoWindow::Channel()
 //-----------------------------------------------------------------------------
 void JZPianoWindow::SnapDialog()
 {
-  tSnapDlg* pSnapDialog = new tSnapDlg(this, &mSnapDenomiator);
-  pSnapDialog->Create();
+  JZSnapDialog SnapDialog(mSnapDenomiator, this);
+  SnapDialog.ShowModal();
 }
 
 //-----------------------------------------------------------------------------

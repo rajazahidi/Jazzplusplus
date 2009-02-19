@@ -1,9 +1,7 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
-// Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Copyright (C) 2009 Peter J. Stieber, all rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,31 +18,36 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_NAMEDVALUECHOICE_H
-#define JZ_NAMEDVALUECHOICE_H
+#ifndef JZ_SNAPDIALOG_H
+#define JZ_SNAPDIALOG_H
 
-#include <wx/choice.h>
+#include <wx/dialog.h>
 
-#include <map>
-#include <string>
+class wxChoice;
 
 //*****************************************************************************
 //*****************************************************************************
-class tNamedValueChoice : public wxChoice
+class JZSnapDialog : public wxDialog
 {
   public:
 
-    tNamedValueChoice(
-      wxWindow* pParent,
-      const std::map<int, std::string>& Map);
-
-    int GetValue();
-
-    void SetValue(int Measure);
+    JZSnapDialog(int& SnapDenominator, wxWindow* pParent);
 
   private:
 
-    const std::map<int, std::string>& mMap;
+    bool TransferDataToWindow();
+
+    bool TransferDataFromWindow();
+
+    void OnHelp(wxCommandEvent& Event);
+
+  private:
+
+    int& mSnapDenominator;
+
+    wxChoice* mpSnapValueChoice;
+
+  DECLARE_EVENT_TABLE();
 };
 
-#endif // !defined(JZ_NAMEDVALUECHOICE_H)
+#endif // !defined(JZ_SNAPDIALOG_H)

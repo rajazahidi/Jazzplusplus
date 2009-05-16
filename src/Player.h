@@ -139,7 +139,7 @@ class JZPlayer : public wxTimer
     tPlayLoop* PlayLoop;
     // timer value for polling the record queue
     int poll_millisec;
-    JZRecordingInfo* rec_info;   // 0 == not recording
+    JZRecordingInfo* mpRecordingInfo;   // 0 == not recording
 
 
   public:
@@ -157,7 +157,7 @@ class JZPlayer : public wxTimer
     tEventArray mRecdBuffer;
     void SetRecordInfo(JZRecordingInfo* inf)
     {
-      rec_info = inf;
+      mpRecordingInfo = inf;
     }
 
     bool IsPlaying() const

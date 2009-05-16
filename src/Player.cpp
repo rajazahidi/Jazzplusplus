@@ -191,7 +191,7 @@ JZPlayer::JZPlayer(JZSong* pSong)
   Playing = false;
   PlayLoop = new tPlayLoop();
   AudioBuffer = 0;
-  rec_info = 0;
+  mpRecordingInfo = 0;
 }
 
 //-----------------------------------------------------------------------------

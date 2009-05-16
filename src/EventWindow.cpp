@@ -23,6 +23,7 @@
 #include "EventWindow.h"
 
 #include "Command.h"
+#include "Dialogs/CleanupDialog.h"
 #include "Dialogs/DeleteDialog.h"
 #include "Dialogs/LengthDialog.h"
 #include "Dialogs/MidiChannelDialog.h"
@@ -288,8 +289,24 @@ void JZEventWindow::ConvertToModulation()
 //-----------------------------------------------------------------------------
 void JZEventWindow::Cleanup()
 {
-  tCleanupDlg * dlg = new tCleanupDlg(this, mpFilter);
-  dlg->Create();
+  int ShortestNote = 48;
+  bool ShortenOverlappingNotes = false;
+
+  JZCleanupDialog CleanupDialog(ShortestNote, ShortenOverlappingNotes, this);
+  if (CleanupDialog.ShowModal() == wxID_OK)
+  {
+    int LengthLimit =
+      mpFilter->GetSong()->GetTicksPerQuarter() * 4 / ShortestNote;
+
+    tCmdCleanup CleanupCommand(
+      mpFilter,
+      LengthLimit,
+      ShortenOverlappingNotes);
+
+    CleanupCommand.Execute();
+
+    JZProjectManager::Instance()->UpdateAllViews();
+  }
 }
 
 //-----------------------------------------------------------------------------

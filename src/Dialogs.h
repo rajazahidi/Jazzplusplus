@@ -50,23 +50,6 @@ class JZEvent;
 //    void OnHelp();
 //};
 
-class tCleanupDlg : public tPropertyListDlg
-{
-  public:
-
-    static int lowLimit;          // 1/32
-    static bool shortenOverlaps;
-
-    JZFilter *Filter;
-    JZSong   *Song;
-
-    tCleanupDlg(JZEventWindow* w, JZFilter *f);
-    void AddProperties();
-    //tNamedChoice Steps;
-    bool OnClose();
-    void OnHelp();
-};
-
 class tSearchReplaceDlg : public tPropertyListDlg
 {
   public:

@@ -18,36 +18,44 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_DELETEDIALOG_H
-#define JZ_DELETEDIALOG_H
+#ifndef JZ_CLEANUPDIALOG_H
+#define JZ_CLEANUPDIALOG_H
 
 #include <wx/dialog.h>
 
+class wxChoice;
 class wxCheckBox;
 
 //*****************************************************************************
 //*****************************************************************************
-class JZDeleteDialog : public wxDialog
+class JZCleanupDialog : public wxDialog
 {
   public:
 
-    JZDeleteDialog(wxWindow* pParent, bool& LeaveSpace);
+    JZCleanupDialog(
+      int& ShortestNote,
+      bool& ShortenOverlappingNotes,
+      wxWindow* pParent);
 
   private:
 
-    virtual bool TransferDataToWindow();
+    bool TransferDataToWindow();
 
-    virtual bool TransferDataFromWindow();
+    bool TransferDataFromWindow();
 
     void OnHelp(wxCommandEvent& Event);
 
   private:
 
-    bool& mLeaveSpace;
+    int& mShortestNote;
 
-    wxCheckBox* mpLeaveSpaceCheckBox;
+    bool& mShortenOverlappingNotes;
+
+    wxChoice* mpShortestNoteChoice;
+
+    wxCheckBox* mpShortenOverlappingNotesCheckBox;
 
   DECLARE_EVENT_TABLE();
 };
 
-#endif // !defined(JZ_DELETEDIALOG_H)
+#endif // !defined(JZ_CLEANUPDIALOG_H)

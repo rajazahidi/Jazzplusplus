@@ -18,12 +18,13 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "SnapDialog.h"
+#include "CleanupDialog.h"
 
 #include "../Globals.h"
 #include "../Help.h"
 
 #include <wx/button.h>
+#include <wx/checkbox.h>
 #include <wx/choice.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
@@ -34,27 +35,37 @@ using namespace std;
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-BEGIN_EVENT_TABLE(JZSnapDialog, wxDialog)
+BEGIN_EVENT_TABLE(JZCleanupDialog, wxDialog)
 
-  EVT_BUTTON(wxID_HELP, JZSnapDialog::OnHelp)
+  EVT_BUTTON(wxID_HELP, JZCleanupDialog::OnHelp)
 
 END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZSnapDialog::JZSnapDialog(int& SnapDenominator, wxWindow* pParent)
-  : wxDialog(pParent, wxID_ANY, wxString("Snap")),
-    mSnapDenominator(SnapDenominator),
-    mpSnapValueChoice(0)
+JZCleanupDialog::JZCleanupDialog(
+    int& ShortestNote,
+    bool& ShortenOverlappingNotes,
+    wxWindow* pParent)
+  : wxDialog(pParent, wxID_ANY, wxString("Cleanup")),
+    mShortestNote(ShortestNote),
+    mShortenOverlappingNotes(ShortenOverlappingNotes),
+    mpShortestNoteChoice(0),
+    mpShortenOverlappingNotesCheckBox(0)
 {
-  mpSnapValueChoice = new wxChoice(this, wxID_ANY);
+  mpShortestNoteChoice = new wxChoice(this, wxID_ANY);
   for (
     map<int, string>::const_iterator iLimitSteps = gLimitSteps.begin();
     iLimitSteps != gLimitSteps.end();
     ++iLimitSteps)
   {
-    mpSnapValueChoice->Append(iLimitSteps->second);
+    mpShortestNoteChoice->Append(iLimitSteps->second);
   }
+
+  mpShortenOverlappingNotesCheckBox = new wxCheckBox(
+    this,
+    wxID_ANY,
+    "Shorten overlapping notes");
 
   wxButton* pOkButton = new wxButton(this, wxID_OK, "&OK");
   wxButton* pCancelButton = new wxButton(this, wxID_CANCEL, "Cancel");
@@ -64,12 +75,18 @@ JZSnapDialog::JZSnapDialog(int& SnapDenominator, wxWindow* pParent)
   wxBoxSizer* pTopSizer = new wxBoxSizer(wxVERTICAL);
 
   pTopSizer->Add(
-    new wxStaticText(this, wxID_ANY, "Quantize Cut and Paste Events"),
+    new wxStaticText(this, wxID_ANY, "Delete notes shorter than:"),
     0,
     wxALIGN_CENTER | wxALL,
     5);
 
-  pTopSizer->Add(mpSnapValueChoice, 0, wxALIGN_CENTER | wxALL, 5);
+  pTopSizer->Add(mpShortestNoteChoice, 0, wxALIGN_CENTER | wxALL, 5);
+
+  pTopSizer->Add(
+    mpShortenOverlappingNotesCheckBox,
+    0,
+    wxALIGN_CENTER | wxALL,
+    10);
 
   wxBoxSizer* pButtonSizer = new wxBoxSizer(wxHORIZONTAL);
   pButtonSizer->Add(pOkButton, 0, wxALL, 5);
@@ -87,7 +104,7 @@ JZSnapDialog::JZSnapDialog(int& SnapDenominator, wxWindow* pParent)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool JZSnapDialog::TransferDataToWindow()
+bool JZCleanupDialog::TransferDataToWindow()
 {
   int Selection = 0;
   for (
@@ -96,21 +113,23 @@ bool JZSnapDialog::TransferDataToWindow()
     ++iLimitSteps, ++Selection)
   {
     const int& Value = iLimitSteps->first;
-    if (Value >= mSnapDenominator)
+    if (Value >= mShortestNote)
     {
       break;
     }
   }
-  mpSnapValueChoice->SetSelection(Selection);
+  mpShortestNoteChoice->SetSelection(Selection);
+
+  mpShortenOverlappingNotesCheckBox->SetValue(mShortenOverlappingNotes);
 
   return true;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool JZSnapDialog::TransferDataFromWindow()
+bool JZCleanupDialog::TransferDataFromWindow()
 {
-  wxString SelectedValue = mpSnapValueChoice->GetStringSelection();
+  wxString SelectedValue = mpShortestNoteChoice->GetStringSelection();
   string SelectedString = SelectedValue.c_str();
   for (
     map<int, string>::const_iterator iLimitSteps = gLimitSteps.begin();
@@ -120,17 +139,19 @@ bool JZSnapDialog::TransferDataFromWindow()
     const string& String = iLimitSteps->second;
     if (SelectedString == String)
     {
-      mSnapDenominator = iLimitSteps->first;
+      mShortestNote = iLimitSteps->first;
       break;
     }
   }
+
+  mShortenOverlappingNotes = mpShortenOverlappingNotesCheckBox->GetValue();
 
   return true;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZSnapDialog::OnHelp(wxCommandEvent& Event)
+void JZCleanupDialog::OnHelp(wxCommandEvent& Event)
 {
-  gpHelpInstance->ShowTopic("Snap");
+  gpHelpInstance->ShowTopic("Cleanup");
 }

@@ -39,6 +39,9 @@ BEGIN_EVENT_TABLE(JZEventFrame, wxFrame)
   EVT_UPDATE_UI(ID_SHIFT, JZEventFrame::OnUpdateEventsSelected)
   EVT_MENU(ID_SHIFT, JZEventFrame::OnShift)
 
+  EVT_UPDATE_UI(ID_CLEANUP, JZEventFrame::OnUpdateEventsSelected)
+  EVT_MENU(ID_CLEANUP, JZEventFrame::OnCleanup)
+
   EVT_UPDATE_UI(ID_QUANTIZE, JZEventFrame::OnUpdateEventsSelected)
   EVT_MENU(ID_QUANTIZE, JZEventFrame::OnQuantize)
 

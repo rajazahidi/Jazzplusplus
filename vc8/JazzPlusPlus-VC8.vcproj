@@ -827,6 +827,14 @@
 			Name="Dialog Source Files"
 			>
 			<File
+				RelativePath="..\src\Dialogs\CleanupDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\CleanupDialog.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Dialogs\DeleteDialog.cpp"
 				>
 			</File>

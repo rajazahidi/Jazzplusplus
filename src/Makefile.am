@@ -22,6 +22,7 @@ DeprecatedStringUtils.cpp \
 DeprecatedWx/prop.cpp \
 DeprecatedWx/propform.cpp \
 DeprecatedWx/proplist.cpp \
+Dialogs/CleanupDialog.cpp \
 Dialogs/DeleteDialog.cpp \
 Dialogs/FilterDialog.cpp \
 Dialogs/IntegerEdit.cpp \
@@ -107,6 +108,7 @@ DeprecatedStringUtils.cpp \
 DeprecatedWx/prop.cpp \
 DeprecatedWx/propform.cpp \
 DeprecatedWx/proplist.cpp \
+Dialogs/CleanupDialog.cpp \
 Dialogs/DeleteDialog.cpp \
 Dialogs/FilterDialog.cpp \
 Dialogs/IntegerEdit.cpp \
@@ -197,6 +199,7 @@ DeprecatedWx/prop.h \
 DeprecatedWx/propform.h \
 DeprecatedWx/proplist.h \
 DeprecatedStringUtils.h \
+Dialogs/CleanupDialog.h \
 Dialogs/DeleteDialog.h \
 Dialogs/FilterDialog.h \
 Dialogs/IntegerEdit.h \

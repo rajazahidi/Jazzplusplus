@@ -61,7 +61,7 @@ class tAudioListener : public wxTimer
       mpPlayer->mpListener = this;
 
       // Indicate that we are not recording!
-      mpPlayer->rec_info = 0;
+      mpPlayer->mpRecordingInfo = 0;
 
       mChannels = mpPlayer->mSamples.GetChannels();
 
@@ -88,7 +88,7 @@ class tAudioListener : public wxTimer
       mpPlayer->mpListener = this;
 
       // Indicate that we are not recording!
-      mpPlayer->rec_info = 0;
+      mpPlayer->mpRecordingInfo = 0;
 
       mChannels = mpPlayer->mSamples.GetChannels();
 
@@ -633,10 +633,10 @@ void JZWindowsAudioPlayer::StopPlay()
   mSamples.StopPlay();
   if (RecordMode())
   {
-    long frc = rec_info->mFromClock;
+    long frc = mpRecordingInfo->mFromClock;
     if (frc < start_clock)
       frc = start_clock;
-    long toc = rec_info->mToClock;
+    long toc = mpRecordingInfo->mToClock;
     long play_clock = Time2Clock(mpState->play_time);
     if (toc > play_clock)
       toc = play_clock;
@@ -708,5 +708,5 @@ long JZWindowsAudioPlayer::GetListenerPlayPosition()
 //-----------------------------------------------------------------------------
 int JZWindowsAudioPlayer::RecordMode() const
 {
-  return rec_info != 0 && rec_info->mpTrack->GetAudioMode();
+  return mpRecordingInfo != 0 && mpRecordingInfo->mpTrack->GetAudioMode();
 }

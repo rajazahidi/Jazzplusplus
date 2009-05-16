@@ -102,9 +102,9 @@ class JZEventWindow : public wxWindow
 
     int SnapClock(int Clock, bool Up);
 
-    virtual void SnapSelStart(wxMouseEvent& MouseEvent);
+    virtual void SnapSelectionStart(wxMouseEvent& MouseEvent);
 
-    virtual void SnapSelStop(wxMouseEvent& MouseEvent);
+    virtual void SnapSelectionStop(wxMouseEvent& MouseEvent);
 
     void DrawVerticalLine(wxDC& Dc, int XPosition) const;
 

@@ -536,13 +536,13 @@ void JZEventWindow::LineText(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZEventWindow::SnapSelStart(wxMouseEvent& MouseEvent)
+void JZEventWindow::SnapSelectionStart(wxMouseEvent& MouseEvent)
 {
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZEventWindow::SnapSelStop(wxMouseEvent& MouseEvent)
+void JZEventWindow::SnapSelectionStop(wxMouseEvent& MouseEvent)
 {
 }
 
@@ -563,7 +563,7 @@ void JZEventWindow::OnMouseEvent(wxMouseEvent& MouseEvent)
       if (MouseEvent.LeftDown())
       {
         {
-          SnapSelStart(MouseEvent);
+          SnapSelectionStart(MouseEvent);
 
 //          if (mpSnapSel->IsSelected())
 //          {
@@ -587,7 +587,7 @@ void JZEventWindow::OnMouseEvent(wxMouseEvent& MouseEvent)
 
       if (mpMouseAction == mpSnapSel)
       {
-        SnapSelStop(MouseEvent);
+        SnapSelectionStop(MouseEvent);
 
         // inefficient, invalidate rect first instead.
         Refresh();

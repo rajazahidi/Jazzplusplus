@@ -113,10 +113,6 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     int SnapClock(int Clock, bool Up = false);
 
-    virtual void SnapSelStart(wxMouseEvent& MouseEvent);
-
-    virtual void SnapSelStop(wxMouseEvent& MouseEvent);
-
     int SnapClocks();
 
     void SetSnapDenom(int Value);
@@ -186,6 +182,12 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
     void ActivateMidiDelayDialog();
 
     void ActivateSequenceLengthDialog();
+
+  protected:
+
+    virtual void SnapSelectionStart(wxMouseEvent& MouseEvent);
+
+    virtual void SnapSelectionStop(wxMouseEvent& MouseEvent);
 
   private:
 

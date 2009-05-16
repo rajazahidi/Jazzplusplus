@@ -282,7 +282,7 @@ void JZTrackWindow::OnLeftButtonDown(wxMouseEvent& MouseEvent)
       mEventsY,
       mEventsWidth,
       mEventsHeight);
-    SnapSelStop(MouseEvent);
+    SnapSelectionStop(MouseEvent);
   }
   else if (
     Point.x >= mEventsX && Point.x < mEventsX + mEventsWidth &&

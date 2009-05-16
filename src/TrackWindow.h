@@ -85,9 +85,9 @@ class JZTrackWindow : public JZEventWindow
 
   protected:
 
-    virtual void SnapSelStop(wxMouseEvent& MouseEvent)
-    {
-    }
+    virtual void SnapSelectionStart(wxMouseEvent& MouseEvent);
+
+    virtual void SnapSelectionStop(wxMouseEvent& MouseEvent);
 
   private:
 
@@ -145,10 +145,6 @@ class JZTrackWindow : public JZEventWindow
     const char* GetCounterString();
 
     const char* GetNumberString() const;
-
-    void SnapSelectionStart(wxMouseEvent& MouseEvent);
-
-    void SnapSelectionStop(wxMouseEvent& MouseEvent);
 
     int x2xBar(int x);
 

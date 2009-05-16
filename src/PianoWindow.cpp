@@ -1827,7 +1827,7 @@ void JZPianoWindow::VerticalScroll(wxScrollWinEvent& Event)
 //-----------------------------------------------------------------------------
 // Snapper
 //-----------------------------------------------------------------------------
-void JZPianoWindow::SnapSelStop(wxMouseEvent& MouseEvent)
+void JZPianoWindow::SnapSelectionStop(wxMouseEvent& MouseEvent)
 {
   if (mpSnapSel->IsSelected())
   {
@@ -1885,7 +1885,7 @@ int JZPianoWindow::SnapClock(int Clock, bool Up)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZPianoWindow::SnapSelStart(wxMouseEvent& MouseEvent)
+void JZPianoWindow::SnapSelectionStart(wxMouseEvent& MouseEvent)
 {
   mSnapCount = 0;
   int clk = SnapClock(mFromClock, false);
@@ -2020,7 +2020,7 @@ int JZPianoWindow::OnEventWinMouseEvent(wxMouseEvent& MouseEvent)
       if (MouseEvent.LeftDown())
       {
         {
-          SnapSelStart(MouseEvent);
+          SnapSelectionStart(MouseEvent);
 
 //          if (mpSnapSel->IsSelected())
 //          {
@@ -2044,7 +2044,7 @@ int JZPianoWindow::OnEventWinMouseEvent(wxMouseEvent& MouseEvent)
 
       if (mpMouseAction == mpSnapSel)
       {
-        SnapSelStop(MouseEvent);
+        SnapSelectionStop(MouseEvent);
 
         // inefficient, invalidate rect first instead.
         Refresh();

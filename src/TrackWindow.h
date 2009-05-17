@@ -138,7 +138,7 @@ class JZTrackWindow : public JZEventWindow
       int h = -1,
       bool Down = false);
 
-    void Mark(int x, int y);
+//    void Mark(int x, int y);
 
     void UnMark();
 
@@ -146,9 +146,9 @@ class JZTrackWindow : public JZEventWindow
 
     const char* GetNumberString() const;
 
-    int x2xBar(int x);
+//    int x2xBar(int x);
 
-    int x2wBar(int x);
+//    int x2wBar(int x);
 
     int TrackIndex2y(int Track);
 

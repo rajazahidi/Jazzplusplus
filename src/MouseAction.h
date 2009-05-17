@@ -23,16 +23,16 @@
 #ifndef JZ_MOUSEACTION_H
 #define JZ_MOUSEACTION_H
 
-#ifndef wx_timerh
-#include <wx/timer.h>
-#endif
-
 #include "Rectangle.h"
 
 #include <vector>
 
+#include <wx/timer.h>
+
 class JZEventWindow;
 
+//*****************************************************************************
+//*****************************************************************************
 enum TEMousePlayMode
 {
   eMouse,
@@ -43,110 +43,115 @@ enum TEMousePlayMode
 };
 
 //*****************************************************************************
+// Description:
+//   This is the mouse mapper class declaration.  This class maps the state of
+// the mouse and certain keyboard keys into user defined integer codes.  There
+// are 12 possible mouse button / keyboard key combinations.  They are:
+//
+// 0,  1,  2 = left, middle, right down
+// 3,  4,  5 = left, middle, right down + shift
+// 6,  7,  8 = left, middle, right down + ctrl
+// 9, 10, 11 = left, middle, right down + ctrl + shift
+//
+// Note that combinations or mouse buttons are not considered.
+//   The function GetAction converts a wxWidgets mouse event into a user
+// defined code.  The default code for all mouse actions is 0.
 //*****************************************************************************
-class tMouseMapper
+class JZMouseMapper
 {
   public:
 
-    // actions
-    // 0..2 = left/middle/right down
-    // 3..5 = left/middle/right down + shift
-    // 6..8 = left/middle/right down + ctrl
-    // 9..11 = left/middle/right down + ctrl + shift
+    JZMouseMapper(const int Actions[12]);
 
-    tMouseMapper(const int actions[12]);
-
-    tMouseMapper();
-
-    enum Button
+    enum TEButton
     {
-      Left,
-      Middle,
-      Right
+      eLeft,
+      eMiddle,
+      eRight
     };
 
+    int GetAction(wxMouseEvent& MouseEvent);
+
     void SetAction(
-      int code,
-      Button but = Left,
-      bool shift = false,
-      bool ctrl = false);
+      int Action,
+      TEButton Button = eLeft,
+      bool Shift = false,
+      bool Ctrl = false);
 
-    int Action(wxMouseEvent& MouseEvent);
-
-    void SetLeftAction(int id = 0)
+    void SetLeftAction(int Action = 0)
     {
-      left_action = id;
+      mLeftAction = Action;
     }
 
   private:
 
-    int actions[12];
+    int mActions[12];
 
-    int left_action;
+    int mLeftAction;
 };
 
 //*****************************************************************************
 // Description:
-//   This is a base class for mouse actions.  The classes are instantiated in
-// the mouse handler of the event window, for example, to keep state during
-// mouse operations, like drag and drop and so on.
+//   This is the mouse action base class declaration.  Derived classes are
+// instantiated in the mouse handler of the event window, for example, to
+// retain state during mouse operations, like drag and drop and so on.
 //   The ProcessMouseEvent() function is used to determine what to do with an
-// incoming event.  Normally, if the event is a drag event, call the drag
-// function of the class, and so on.
+// incoming event.  Normally, if the event is a left button down event, call
+// the LeftDown function of the class, and so on.
 //*****************************************************************************
-class tMouseAction
+class JZMouseAction
 {
   public:
 
-    virtual ~tMouseAction()                          {}
-    virtual int Dragging(wxMouseEvent& MouseEvent)   { return 0; }
-    virtual int LeftDown(wxMouseEvent& MouseEvent)   { return 0; }
-    virtual int LeftUp(wxMouseEvent& MouseEvent)     { return 0; }
-    virtual int RightDown(wxMouseEvent& MouseEvent)  { return 0; }
-    virtual int RightUp(wxMouseEvent& MouseEvent)    { return 0; }
-    virtual int MiddleDown(wxMouseEvent& MouseEvent) { return 0; }
-    virtual int MiddleUp(wxMouseEvent& MouseEvent)   { return 0; }
-    virtual int ProcessMouseEvent(wxMouseEvent& MouseEvent)
-    {
-      if (MouseEvent.Dragging())
-      {
-        return Dragging(MouseEvent);
-      }
-      else if (MouseEvent.LeftDown())
-      {
-        return LeftDown(MouseEvent);
-      }
-      else if (MouseEvent.LeftUp())
-      {
-        return LeftUp(MouseEvent);
-      }
-      else if (MouseEvent.MiddleDown())
-      {
-        return MiddleDown(MouseEvent);
-      }
-      else if (MouseEvent.MiddleUp())
-      {
-        return MiddleUp(MouseEvent);
-      }
-      else if (MouseEvent.RightDown())
-      {
-        return RightDown(MouseEvent);
-      }
-      else if (MouseEvent.RightUp())
-      {
-        return RightUp(MouseEvent);
-      }
-      return 0;
-    }
-};
+    virtual ~JZMouseAction();
 
+    virtual int LeftDown(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
+
+    virtual int LeftUp(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
+
+    virtual int RightDown(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
+
+    virtual int RightUp(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
+
+    virtual int MiddleDown(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
+
+    virtual int MiddleUp(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
+
+    virtual int Dragging(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
+
+    virtual int ProcessMouseEvent(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
+};
 
 //*****************************************************************************
 // Description:
 //   This is the selection class declaration.  This class selects events using
 // the mouse and draws indicating the selected events.
 //*****************************************************************************
-class JZSelection : public tMouseAction
+class JZSelection : public JZMouseAction
 {
   public:
 
@@ -179,17 +184,34 @@ class JZSelection : public tMouseAction
       mRectangle = Rectangle;
     }
 
-    virtual void Snap(int& x, int& y, bool drag)
+    virtual void Snap(
+      int& x,
+      int& y,
+      int ScrolledX,
+      int ScrolledY,
+      bool Up)
     {
     }
 
-    virtual int Dragging(wxMouseEvent& MouseEvent);
+    virtual int Dragging(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
 
-    virtual int ProcessMouseEvent(wxMouseEvent& MouseEvent);
+    virtual int ProcessMouseEvent(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
 
-    virtual int ButtonDown(wxMouseEvent& MouseEvent);
+    virtual int ButtonDown(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
 
-    virtual int ButtonUp(wxMouseEvent& MouseEvent);
+    virtual int ButtonUp(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
 
     virtual void Draw(wxDC& Dc, int ScrolledX, int ScrolledY);
 
@@ -203,10 +225,7 @@ class JZSelection : public tMouseAction
       int ClipWidth,
       int ClipHeight);
 
-    // May not be called while dragging.
-    void Select(JZRectangle& rr, int x, int y, int w, int h);
-
-    void Select(JZRectangle& Rectangle);
+    void Select(const JZRectangle& Rectangle);
 
   private:
 
@@ -214,6 +233,7 @@ class JZSelection : public tMouseAction
 
     // The following indicates if the rectangle is valid.
     bool mSelected;
+
     JZRectangle mRectangle;
 
     wxWindow* mpWindow;
@@ -231,11 +251,16 @@ class JZSnapSelection : public JZSelection
 
     JZSnapSelection(wxWindow* pWindow);
 
-    virtual void Snap(int& x, int& y, bool Up);
+    virtual void Snap(
+      int& x,
+      int& y,
+      int ScrolledX,
+      int ScrolledY,
+      bool Up);
 
-    void SetXSnap(int XCount, int* pXVector);
+    void SetXSnap(int XCount, int* pXVector, int ScrolledX);
 
-    void SetYSnap(int YCount, int* pYVector);
+    void SetYSnap(int YCount, int* pYVector, int ScrolledY);
 
     void SetXSnap(int XMin, int XMax, int XStep);
 
@@ -246,6 +271,7 @@ class JZSnapSelection : public JZSelection
     static void SnapToVector(
       int& Coordinate,
       std::vector<int> Vector,
+      int Scrolled,
       bool Up);
 
     static void SnapMod(
@@ -253,6 +279,7 @@ class JZSnapSelection : public JZSelection
       int Min,
       int Max,
       int Step,
+      int Scrolled,
       bool Up);
 
   protected:
@@ -291,7 +318,7 @@ class tButtonLabelInterface
 //*****************************************************************************
 //  MouseCounter - let you enter numbers with left/right mouse button
 //*****************************************************************************
-class tMouseCounter : public wxTimer, public tMouseAction
+class tMouseCounter : public wxTimer, public JZMouseAction
 {
   public:
 
@@ -314,11 +341,28 @@ class tMouseCounter : public wxTimer, public tMouseAction
     int Wait;        // don't inc/dec at Init
     tButtonLabelInterface *win;
 
-    virtual int LeftDown(wxMouseEvent& MouseEvent);
-    virtual int LeftUp(wxMouseEvent& MouseEvent);
-    virtual int RightDown(wxMouseEvent& MouseEvent);
-    virtual int RightUp(wxMouseEvent& MouseEvent);
+    virtual int LeftDown(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
+
+    virtual int LeftUp(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
+
+    virtual int RightDown(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
+
+    virtual int RightUp(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
+
     virtual void Notify();
+
     virtual void ShowValue(bool down);
 };
 
@@ -326,26 +370,44 @@ class tMouseCounter : public wxTimer, public tMouseAction
 //*****************************************************************************
 // tMarkDestin - mark destination of some operation
 //*****************************************************************************
-class tMarkDestin : public tMouseAction
+class tMarkDestin : public JZMouseAction
 {
   public:
+
     int Aborted;
     float x, y;
 
-    virtual int LeftDown(wxMouseEvent& MouseEvent);
-    virtual int RightDown(wxMouseEvent& MouseEvent);
+    virtual int LeftDown(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
+
+    virtual int RightDown(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
+
     tMarkDestin(wxWindow* canvas, wxFrame* frame, int left);
 
   private:
+
     wxWindow *Canvas;
     wxFrame  *Frame;
-    int ButtonDown(wxMouseEvent& MouseEvent);
+
+    int ButtonDown(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
 };
 
+#if 0
+
 //*****************************************************************************
-// tMouseButton - simulate a 3D button
+// Description:
+//   This is the mouse button class declaration.  This class simulates a 3D
+// button.
 //*****************************************************************************
-class tMouseButton : public tMouseAction
+class tMouseButton : public JZMouseAction
 {
   public:
 
@@ -353,11 +415,14 @@ class tMouseButton : public tMouseAction
       JZEventWindow* pEventWindow,
       JZRectangle* pRectangle,
       const char* pDownString,
-      const char* upUpString = 0);
+      const char* pUpString = 0);
 
     virtual ~tMouseButton();
 
-    virtual int ProcessMouseEvent(wxMouseEvent& MouseEvent);
+    virtual int ProcessMouseEvent(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
 
   protected:
 
@@ -375,5 +440,88 @@ class tMouseButton : public tMouseAction
 
     wxString mUpString;
 };
+
+#endif
+
+//*****************************************************************************
+// Description:
+//  These are the mouse action class inline member functions.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZMouseAction::LeftDown(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
+{
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZMouseAction::LeftUp(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
+{
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZMouseAction::RightDown(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
+{
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZMouseAction::RightUp(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
+{
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZMouseAction::MiddleDown(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
+{
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZMouseAction::MiddleUp(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
+{
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+int JZMouseAction::Dragging(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
+{
+  return 0;
+}
 
 #endif // !defined(JZ_MOUSEACTION_H)

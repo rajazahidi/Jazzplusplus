@@ -42,7 +42,7 @@
 #include <wx/msgdlg.h>
 #include <wx/scrolbar.h>
 
-#include <iostream>
+//DEBUG#include <iostream>
 
 #define MEN_LOAD        1
 #define MEN_SAVE        2
@@ -158,6 +158,7 @@ class tSampleCnvs : public wxScrolledWindow
     int paint_length;
 
     JZSnapSelection snapsel;
+
     // sel_fr == 0: no selection and no insertion point
     // sel_fr >  0 && sel_fr == sel_to: insertion point
     // sel_fr >  0 && sel_fr <  sel_to: selected range
@@ -303,7 +304,7 @@ void tSampleCnvs::OnSize(int w, int h)
 {
   int cw, ch;
   GetClientSize(&cw, &ch);
-  //snapsel.SetYSnap(0, ch, ch / spl.GetChannels());
+// snapsel.SetYSnap(0, ch, ch / spl.GetChannels());
   snapsel.SetYSnap(0, ch, ch);
 
   AdjustScrollbars();
@@ -340,12 +341,12 @@ void tSampleCnvs::OnEvent(wxMouseEvent& MouseEvent)
     {
       mouse_up_sets_insertion_point = 1;
     }
-    snapsel.ProcessMouseEvent(MouseEvent);
+    snapsel.ProcessMouseEvent(MouseEvent, 0, 0);
   }
   else if (MouseEvent.LeftUp())
   {
     mouse_down = FALSE;
-    snapsel.ProcessMouseEvent(MouseEvent);
+    snapsel.ProcessMouseEvent(MouseEvent, 0, 0);
     if (snapsel.IsSelected())
     {
       snapsel.Draw(*pDc, 0, 0);
@@ -368,7 +369,7 @@ void tSampleCnvs::OnEvent(wxMouseEvent& MouseEvent)
   }
   else if (MouseEvent.Dragging() && mouse_down)
   {
-    snapsel.ProcessMouseEvent(MouseEvent);
+    snapsel.ProcessMouseEvent(MouseEvent, 0, 0);
   }
 }
 

@@ -65,7 +65,7 @@
 #include <wx/menu.h>
 #include <wx/msgdlg.h>
 
-#include <iostream>
+//DEBUG#include <iostream>
 
 using namespace std;
 

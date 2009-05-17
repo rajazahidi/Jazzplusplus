@@ -552,18 +552,6 @@ void JZEventWindow::LineText(
 }
 
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZEventWindow::SnapSelectionStart(wxMouseEvent& MouseEvent)
-{
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZEventWindow::SnapSelectionStop(wxMouseEvent& MouseEvent)
-{
-}
-
-//-----------------------------------------------------------------------------
 // Descriptions:
 //   This mouse handler delegates to the subclassed event window.
 //-----------------------------------------------------------------------------
@@ -588,7 +576,7 @@ void JZEventWindow::OnMouseEvent(wxMouseEvent& MouseEvent)
             // invalidate a rect).
             Refresh();
 //          }
-          mpSnapSel->ProcessMouseEvent(MouseEvent);
+          mpSnapSel->ProcessMouseEvent(MouseEvent, mScrolledX, mScrolledY);
           mpMouseAction = mpSnapSel;
         }
       }
@@ -598,7 +586,7 @@ void JZEventWindow::OnMouseEvent(wxMouseEvent& MouseEvent)
   {
     // mpMouseAction active
 
-    if (mpMouseAction->ProcessMouseEvent(MouseEvent))
+    if (mpMouseAction->ProcessMouseEvent(MouseEvent, mScrolledX, mScrolledY))
     {
       // mpMouseAction finished
 

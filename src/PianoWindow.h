@@ -305,8 +305,8 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     tCtrlEditBase* mpCtrlEdit;
 
-    tMouseMapper mMousePlay;
-    tMouseMapper mMouseEvent;
+    JZMouseMapper mMousePlay;
+    JZMouseMapper mMouseEvent;
 
     // Number of colors to use for velocity representation.
     enum

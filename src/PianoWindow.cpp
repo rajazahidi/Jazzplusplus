@@ -95,13 +95,18 @@ void JZListen::Notify()
 // Description:
 //   JZMousePlay - Click in pianoroll
 //*****************************************************************************
-class JZMousePlay : public tMouseAction
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+class JZMousePlay : public JZMouseAction
 {
   public:
 
     JZMousePlay(JZPianoWindow* pPianoWindow);
 
-    virtual int ProcessMouseEvent(wxMouseEvent& MouseEvent);
+    virtual int ProcessMouseEvent(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
 
   private:
 
@@ -123,7 +128,10 @@ JZMousePlay::JZMousePlay(JZPianoWindow* pPianoWindow)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZMousePlay::ProcessMouseEvent(wxMouseEvent& MouseEvent)
+int JZMousePlay::ProcessMouseEvent(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
 {
   int x, y;
   MouseEvent.GetPosition(&x, &y);
@@ -193,17 +201,26 @@ int JZMousePlay::ProcessMouseEvent(wxMouseEvent& MouseEvent)
 // Description:
 //   tKeyLengthDragger
 //*****************************************************************************
-class tKeyLengthDragger : public tMouseAction
+class tKeyLengthDragger : public JZMouseAction
 {
   public:
 
     tKeyLengthDragger(tKeyOn* pKeyOn, JZPianoWindow* pPianoWindow);
 
-    int Dragging(wxMouseEvent& MouseEvent);
+    int Dragging(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
 
-    int ButtonUp(wxMouseEvent& MouseEvent);
+    int ProcessMouseEvent(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
 
-    int ProcessMouseEvent(wxMouseEvent& MouseEvent);
+    int ButtonUp(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
 
   private:
 
@@ -237,22 +254,28 @@ tKeyLengthDragger::tKeyLengthDragger(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tKeyLengthDragger::ProcessMouseEvent(wxMouseEvent& MouseEvent)
+int tKeyLengthDragger::ProcessMouseEvent(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
 {
   if (MouseEvent.Dragging())
   {
-    return Dragging(MouseEvent);
+    return Dragging(MouseEvent, ScrolledX, ScrolledY);
   }
   else if (MouseEvent.ButtonUp())
   {
-    return ButtonUp(MouseEvent);
+    return ButtonUp(MouseEvent, ScrolledX, ScrolledY);
   }
   return 0;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tKeyLengthDragger::Dragging(wxMouseEvent& MouseEvent)
+int tKeyLengthDragger::Dragging(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
 {
   wxClientDC Dc(Win);
   Win->PrepareDC(Dc); //to translate scrolled coordinates
@@ -273,7 +296,10 @@ int tKeyLengthDragger::Dragging(wxMouseEvent& MouseEvent)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tKeyLengthDragger::ButtonUp(wxMouseEvent& MouseEvent)
+int tKeyLengthDragger::ButtonUp(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
 {
   // SN++ Key_Aftertouch
   if (Copy->GetEventLength() < mpKeyOn->GetEventLength())
@@ -325,17 +351,26 @@ int tKeyLengthDragger::ButtonUp(wxMouseEvent& MouseEvent)
 //   tPlayTrackLengthDragger JAVE this is just copied from tKeyLengthDragger,
 // the need to be inherited somehow
 //*****************************************************************************
-class tPlayTrackLengthDragger : public tMouseAction
+class tPlayTrackLengthDragger : public JZMouseAction
 {
   public:
 
     tPlayTrackLengthDragger(tPlayTrack* k, JZPianoWindow* pPianoWindow);
 
-    int Dragging(wxMouseEvent& MouseEvent);
+    int Dragging(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
 
-    int ButtonUp(wxMouseEvent& MouseEvent);
+    int ProcessMouseEvent(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
 
-    int ProcessMouseEvent(wxMouseEvent& MouseEvent);
+    int ButtonUp(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
 
   private:
     tPlayTrack* mpKeyOn;
@@ -365,22 +400,28 @@ tPlayTrackLengthDragger::tPlayTrackLengthDragger(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tPlayTrackLengthDragger::ProcessMouseEvent(wxMouseEvent& MouseEvent)
+int tPlayTrackLengthDragger::ProcessMouseEvent(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
 {
   if (MouseEvent.Dragging())
   {
-    return Dragging(MouseEvent);
+    return Dragging(MouseEvent, ScrolledX, ScrolledY);
   }
   else if (MouseEvent.ButtonUp())
   {
-    return ButtonUp(MouseEvent);
+    return ButtonUp(MouseEvent, ScrolledX, ScrolledY);
   }
   return 0;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tPlayTrackLengthDragger::Dragging(wxMouseEvent& MouseEvent)
+int tPlayTrackLengthDragger::Dragging(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
 {
   wxClientDC Dc(Win);
   Win->PrepareDC(Dc);
@@ -399,7 +440,10 @@ int tPlayTrackLengthDragger::Dragging(wxMouseEvent& MouseEvent)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tPlayTrackLengthDragger::ButtonUp(wxMouseEvent& MouseEvent)
+int tPlayTrackLengthDragger::ButtonUp(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
 {
   wxClientDC Dc(Win);
   Win->PrepareDC(Dc);
@@ -441,7 +485,10 @@ class tVelocCounter : public tMouseCounter
       Dc.SetFont(*(Win->GetFixedFont()));
     }
 
-    virtual int ProcessMouseEvent(wxMouseEvent& MouseEvent);
+    virtual int ProcessMouseEvent(
+      wxMouseEvent& MouseEvent,
+      int ScrolledX,
+      int ScrolledY);
 
   private:
 
@@ -452,9 +499,12 @@ class tVelocCounter : public tMouseCounter
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tVelocCounter::ProcessMouseEvent(wxMouseEvent& MouseEvent)
+int tVelocCounter::ProcessMouseEvent(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
 {
-  if (tMouseCounter::ProcessMouseEvent(MouseEvent))
+  if (tMouseCounter::ProcessMouseEvent(MouseEvent, ScrolledX, ScrolledY))
   {
     tKeyOn* pKeyOnCopy = (tKeyOn *)mpKeyOn->Copy();
     pKeyOnCopy->SetVelocity(Value);
@@ -538,24 +588,26 @@ enum
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-const int play_actions[12] =
+static const int PlayAreaActions[12] =
 {
+  // Depressed mouse button:
   // left        middle           right
   MA_PLAY,       MA_CYCLE,        0,            // plain
   MA_CYCLE,      0,               0,            // shift
   0,             0,               0,            // ctrl
-  0,             0,               0             // shift+ctrl
+  0,             0,               0             // shift + ctrl
 };
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-const int evnt_actions[12] =
+static const int EventAreaActions[12] =
 {
+  // Depressed mouse button:
   // left        middle          right
   MA_SELECT,     MA_CUTPASTE,    MA_LENGTH,      // plain
   MA_CONTSEL,    MA_COPY,        MA_LISTEN,      // shift
   MA_VELOCITY,   MA_DIALOG,      MA_VELOCITY,    // ctrl
-  MA_CUTPASTE,   0,              MA_COPY         // shift+ctrl
+  MA_CUTPASTE,   0,              MA_COPY         // shift + ctrl
 };
 
 
@@ -598,8 +650,8 @@ JZPianoWindow::JZPianoWindow(
     mpTrack(0),
     mTrackIndex(0),
     mpCtrlEdit(0),
-    mMousePlay(play_actions),
-    mMouseEvent(evnt_actions),
+    mMousePlay(PlayAreaActions),
+    mMouseEvent(EventAreaActions),
     mUseColors(true),
     mMouseLine(-1),
     mFontSize(12),
@@ -1653,7 +1705,7 @@ void JZPianoWindow::OnMouseEvent(wxMouseEvent& MouseEvent)
     else if (x > mEventsX)
     {
       // click in top line
-      int action = mMousePlay.Action(MouseEvent);
+      int action = mMousePlay.GetAction(MouseEvent);
 
       if (action)
       {
@@ -1897,11 +1949,11 @@ void JZPianoWindow::SnapSelectionStart(wxMouseEvent& MouseEvent)
   }
   if (mSnapCount < eMaxSnaps)
   {
-    mpSnapSel->SetXSnap(mSnapCount, mSnapsX);
+    mpSnapSel->SetXSnap(mSnapCount, mSnapsX, 0);
   }
   else
   {
-    mpSnapSel->SetXSnap(0,0,0);
+    mpSnapSel->SetXSnap(0, 0, 0);
   }
   mpSnapSel->SetYSnap(
     mFromLine * mTrackHeight + mTopInfoHeight,
@@ -2028,7 +2080,7 @@ int JZPianoWindow::OnEventWinMouseEvent(wxMouseEvent& MouseEvent)
             // invalidate a rect).
             Refresh();
 //          }
-          mpSnapSel->ProcessMouseEvent(MouseEvent);
+          mpSnapSel->ProcessMouseEvent(MouseEvent, mScrolledX, mScrolledY);
           mpMouseAction = mpSnapSel;
         }
       }
@@ -2038,7 +2090,7 @@ int JZPianoWindow::OnEventWinMouseEvent(wxMouseEvent& MouseEvent)
   {
     // mpMouseAction active
 
-    if (mpMouseAction->ProcessMouseEvent(MouseEvent))
+    if (mpMouseAction->ProcessMouseEvent(MouseEvent, mScrolledX, mScrolledY))
     {
       // mpMouseAction finished
 
@@ -2137,7 +2189,7 @@ void JZPianoWindow::MouseCutPaste(wxMouseEvent& MouseEvent, bool Cut)
 //-----------------------------------------------------------------------------
 void JZPianoWindow::MouseEvents(wxMouseEvent& MouseEvent)
 {
-  int action = mMouseEvent.Action(MouseEvent);
+  int action = mMouseEvent.GetAction(MouseEvent);
 
   if (action)
   {
@@ -2220,7 +2272,7 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& MouseEvent)
           r.SetHeight(mTopInfoHeight);
 
           tVelocCounter *VelocCounter = new tVelocCounter(this, &r, pKeyOn);
-          VelocCounter->ProcessMouseEvent(MouseEvent);
+          VelocCounter->ProcessMouseEvent(MouseEvent, mScrolledX, mScrolledY);
           mpMouseAction = VelocCounter;
         }
         break;
@@ -2236,7 +2288,8 @@ void JZPianoWindow::MousePiano(wxMouseEvent& MouseEvent)
   if (MouseEvent.ButtonDown())
   {
     mpMouseAction = new JZMousePlay(this);
-    int Status = mpMouseAction->ProcessMouseEvent(MouseEvent);
+    int Status =
+      mpMouseAction->ProcessMouseEvent(MouseEvent, mScrolledX, mScrolledY);
     if (Status == 1)
     {
       delete mpMouseAction;

@@ -24,52 +24,64 @@
 
 #include "EventWindow.h"
 
-#include <wx/dcclient.h>
 #include <wx/brush.h>
+#include <wx/dcclient.h>
+
+//DEBUG#include <iostream>
 
 using namespace std;
 
-// -----------------------------------------------------------------
-// tMouseMapper - map mouse button to Command-ID
-// -----------------------------------------------------------------
-
-tMouseMapper::tMouseMapper(const int a[12])
+//*****************************************************************************
+// Description:
+//   This is the mouse mapper class declaration.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZMouseMapper::JZMouseMapper(const int Actions[12])
+  : mActions(),
+    mLeftAction(0)
 {
   for (int i = 0; i < 12; i++)
-    actions[i] = a[i];
-  left_action = 0;
+  {
+    mActions[i] = Actions[i];
+  }
 }
 
-tMouseMapper::tMouseMapper()
-{
-  for (int i = 0; i < 12; i++)
-    actions[i] = 0;
-  left_action = 0;
-}
-
-void tMouseMapper::SetAction(int code, Button but, bool shift, bool ctrl)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZMouseMapper::SetAction(
+  int Action,
+  TEButton Button,
+  bool Shift,
+  bool Ctrl)
 {
   int i = 0;
-  switch (but)
+  switch (Button)
   {
-    case Left:
+    case eLeft:
       i = 0;
       break;
-    case Middle:
+    case eMiddle:
       i = 1;
       break;
-    case Right:
+    case eRight:
       i = 2;
       break;
   }
-  if (shift)
+  if (Shift)
+  {
     i += 3;
-  if (ctrl)
+  }
+  if (Ctrl)
+  {
     i += 6;
-  actions[i] = code;
+  }
+  mActions[i] = Action;
 }
 
-int tMouseMapper::Action(wxMouseEvent& MouseEvent)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZMouseMapper::GetAction(wxMouseEvent& MouseEvent)
 {
   if (!MouseEvent.ButtonDown())
   {
@@ -77,15 +89,16 @@ int tMouseMapper::Action(wxMouseEvent& MouseEvent)
   }
 
   if (
-    left_action > 0 &&
+    mLeftAction > 0 &&
     MouseEvent.LeftDown() &&
     !MouseEvent.ShiftDown() &&
     !MouseEvent.ControlDown())
   {
-    return left_action;
+    return mLeftAction;
   }
 
-  int i = 0;        // left down
+  // Assume the left button is down.
+  int i = 0;
   if (MouseEvent.MiddleDown())
   {
     i = 1;
@@ -99,11 +112,66 @@ int tMouseMapper::Action(wxMouseEvent& MouseEvent)
   {
     i += 3;
   }
+
   if (MouseEvent.ControlDown())
   {
     i += 6;
   }
-  return actions[i];
+
+  return mActions[i];
+}
+
+//*****************************************************************************
+// Description:
+//   This is the mouse action base class definition.  Derived classes are
+// instantiated in the mouse handler of the event window, for example, to
+// retain state during mouse operations, like drag and drop and so on.
+//   The ProcessMouseEvent() function is used to determine what to do with an
+// incoming event.    Normally, if the event is a left button down event, call
+// the LeftDown function of the class, and so on.
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZMouseAction::~JZMouseAction()
+{
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZMouseAction::ProcessMouseEvent(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
+{
+  if (MouseEvent.Dragging())
+  {
+    return Dragging(MouseEvent, ScrolledX, ScrolledY);
+  }
+  else if (MouseEvent.LeftDown())
+  {
+    return LeftDown(MouseEvent, ScrolledX, ScrolledY);
+  }
+  else if (MouseEvent.LeftUp())
+  {
+    return LeftUp(MouseEvent, ScrolledX, ScrolledY);
+  }
+  else if (MouseEvent.MiddleDown())
+  {
+    return MiddleDown(MouseEvent, ScrolledX, ScrolledY);
+  }
+  else if (MouseEvent.MiddleUp())
+  {
+    return MiddleUp(MouseEvent, ScrolledX, ScrolledY);
+  }
+  else if (MouseEvent.RightDown())
+  {
+    return RightDown(MouseEvent, ScrolledX, ScrolledY);
+  }
+  else if (MouseEvent.RightUp())
+  {
+    return RightUp(MouseEvent, ScrolledX, ScrolledY);
+  }
+  return 0;
 }
 
 //*****************************************************************************
@@ -132,26 +200,32 @@ JZSelection::~JZSelection()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZSelection::ProcessMouseEvent(wxMouseEvent& MouseEvent)
+int JZSelection::ProcessMouseEvent(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
 {
   if (MouseEvent.ButtonDown())
   {
-    return ButtonDown(MouseEvent);
+    return ButtonDown(MouseEvent, ScrolledX, ScrolledY);
   }
   else if (MouseEvent.ButtonUp())
   {
-    return ButtonUp(MouseEvent);
+    return ButtonUp(MouseEvent, ScrolledX, ScrolledY);
   }
   else if (MouseEvent.Dragging())
   {
-    return Dragging(MouseEvent);
+    return Dragging(MouseEvent, ScrolledX, ScrolledY);
   }
   return 0;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZSelection::ButtonDown(wxMouseEvent& MouseEvent)
+int JZSelection::ButtonDown(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
 {
   if (!mActive)
   {
@@ -161,14 +235,14 @@ int JZSelection::ButtonDown(wxMouseEvent& MouseEvent)
       // Continue selection
       JZRectangle Rectangle = mRectangle;
       Rectangle.SetNormal();
-      Dragging(MouseEvent);
+      Dragging(MouseEvent, ScrolledX, ScrolledY);
     }
     else
     {
       mSelected = false;
-      int x = MouseEvent.GetX();
-      int y = MouseEvent.GetY();
-      Snap(x, y, 0);
+      int x = MouseEvent.GetX() + ScrolledX;
+      int y = MouseEvent.GetY() + ScrolledY;
+      Snap(x, y, ScrolledX, ScrolledY, false);
       mRectangle.x = x;
       mRectangle.y = y;
       mRectangle.width = 1;
@@ -180,37 +254,10 @@ int JZSelection::ButtonDown(wxMouseEvent& MouseEvent)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZSelection::Dragging(wxMouseEvent& MouseEvent)
-{
-  if (!mActive)
-  {
-    ButtonDown(MouseEvent);
-  }
-
-  if (mActive)
-  {
-    int x = MouseEvent.GetX();
-    int y = MouseEvent.GetY();
-    if (x < 0)
-    {
-      x = 0;
-    }
-    if (y < 0)
-    {
-      y = 0;
-    }
-    Snap(x, y, 1);
-
-    mRectangle.width = x - mRectangle.x;
-    mRectangle.height = y - mRectangle.y;
-  }
-
-  return 0;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-int JZSelection::ButtonUp(wxMouseEvent& MouseEvent)
+int JZSelection::ButtonUp(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
 {
   if (mActive)
   {
@@ -227,9 +274,41 @@ int JZSelection::ButtonUp(wxMouseEvent& MouseEvent)
 }
 
 //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZSelection::Dragging(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
+{
+  if (!mActive)
+  {
+    ButtonDown(MouseEvent, ScrolledX, ScrolledY);
+  }
+
+  if (mActive)
+  {
+    int x = MouseEvent.GetX() + ScrolledX;
+    int y = MouseEvent.GetY() + ScrolledY;
+    if (x < 0)
+    {
+      x = 0;
+    }
+    if (y < 0)
+    {
+      y = 0;
+    }
+    Snap(x, y, ScrolledX, ScrolledY, true);
+
+    mRectangle.width = x - mRectangle.x;
+    mRectangle.height = y - mRectangle.y;
+  }
+
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
 // Description:
-//   Draw the selected rectangle, normally called from OnDraw
-// in the parent window.
+//   Draw the selected rectangle.
 //-----------------------------------------------------------------------------
 void JZSelection::Draw(wxDC& Dc, int ScrolledX, int ScrolledY)
 {
@@ -279,24 +358,13 @@ void JZSelection::Draw(
 // It did this by drawing directly in the device context.  This is bad, so I
 // tried changing it to invalidation instead.
 //-----------------------------------------------------------------------------
-void JZSelection::Select(JZRectangle& Rectangle, int x, int y, int w, int h)
+void JZSelection::Select(const JZRectangle& Rectangle)
 {
-  // clear old rectangle
-  //  Draw(x, y, w, h);
-  // make new one
   mRectangle = Rectangle;
   mSelected = true;
-  //  Draw(x, y, w, h);
 
   // Inefficient because should invalidate only the rectangle.
   mpWindow->Refresh();
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZSelection::Select(JZRectangle& Rectangle)
-{
-  Select(Rectangle, 0, 0, 3000, 3000);
 }
 
 //*****************************************************************************
@@ -320,47 +388,52 @@ JZSnapSelection::JZSnapSelection(wxWindow* pWindow)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZSnapSelection::Snap(int& x, int& y, bool drag)
+void JZSnapSelection::Snap(
+  int& x,
+  int& y,
+  int ScrolledX,
+  int ScrolledY,
+  bool Up)
 {
   if (!mXCoordinates.empty())
   {
-    SnapToVector(x, mXCoordinates, drag);
+    SnapToVector(x, mXCoordinates, ScrolledX, Up);
   }
   else if (mXStep)
   {
-    SnapMod(x, mXMin, mXMax, mXStep, drag);
+    SnapMod(x, mXMin, mXMax, mXStep, ScrolledX, Up);
   }
 
   if (!mYCoordinates.empty())
   {
-    SnapToVector(y, mYCoordinates, drag);
+    SnapToVector(y, mYCoordinates, ScrolledY, Up);
   }
   else if (mYStep)
   {
-    SnapMod(y, mYMin, mYMax, mYStep, drag);
+    SnapMod(y, mYMin, mYMax, mYStep, ScrolledY, Up);
   }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZSnapSelection::SetXSnap(int XCount, int* pXVector)
+void JZSnapSelection::SetXSnap(int XCount, int* pXVector, int ScrolledX)
 {
   mXCoordinates.clear();
   for (int i = 0; i < XCount; ++i)
   {
-    mXCoordinates.push_back(pXVector[i]);
+    mXCoordinates.push_back(pXVector[i] + ScrolledX);
   }
   mXStep = 0;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZSnapSelection::SetYSnap(int YCount, int* pYVector)
+void JZSnapSelection::SetYSnap(int YCount, int* pYVector, int ScrolledY)
 {
   mYCoordinates.clear();
   for (int i = 0; i < YCount; ++i)
   {
-    mXCoordinates.push_back(pYVector[i]);
+    mXCoordinates.push_back(pYVector[i] + ScrolledY);
   }
   mYStep = 0;
 }
@@ -390,8 +463,10 @@ void JZSnapSelection::SetYSnap(int YMin, int YMax, int YStep)
 void JZSnapSelection::SnapToVector(
   int& Coordinate,
   vector<int> Vector,
+  int Scrolled,
   bool Up)
 {
+//DEBUG  cout << "In: " << Coordinate;
   for (unsigned i = 0; i < Vector.size(); ++i)
   {
     if (Vector[i] > Coordinate)
@@ -404,9 +479,11 @@ void JZSnapSelection::SnapToVector(
       {
         Coordinate = Vector[i - 1];
       }
+//DEBUG      cout << "     Out: " << Coordinate  << endl;
       return;
     }
   }
+//DEBUG  cout << "     Out: " << Coordinate  << endl;
   Coordinate = Vector[Vector.size() - 1];
 }
 
@@ -417,8 +494,10 @@ void JZSnapSelection::SnapMod(
   int Min,
   int Max,
   int Step,
+  int Scrolled,
   bool Up)
 {
+//DEBUG  cout << "In: " << Coordinate;
   if (Coordinate <= Min)
   {
     Coordinate = Min;
@@ -427,13 +506,15 @@ void JZSnapSelection::SnapMod(
   if (Coordinate >= Max)
   {
     Coordinate = Max;
+//DEBUG    cout << "Max: " << Coordinate << endl;
     return;
   }
-  Coordinate -= (Coordinate - Min) % Step;
+  Coordinate -= (Coordinate - Min) % Step - (Scrolled % Step);
   if (Up)
   {
     Coordinate += Step;
   }
+//DEBUG  cout << "     Out: " << Coordinate  << endl;
 }
 
 
@@ -461,7 +542,10 @@ tMouseCounter::tMouseCounter(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tMouseCounter::LeftDown(wxMouseEvent& MouseEvent)
+int tMouseCounter::LeftDown(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
 {
   Delta = MouseEvent.ShiftDown() ? 10 : 1;
   Start(Timeout);
@@ -478,7 +562,10 @@ int tMouseCounter::LeftDown(wxMouseEvent& MouseEvent)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tMouseCounter::LeftUp(wxMouseEvent& MouseEvent)
+int tMouseCounter::LeftUp(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
 {
   Stop();
   ShowValue(FALSE);
@@ -487,7 +574,10 @@ int tMouseCounter::LeftUp(wxMouseEvent& MouseEvent)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tMouseCounter::RightDown(wxMouseEvent& MouseEvent)
+int tMouseCounter::RightDown(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
 {
   Delta = MouseEvent.ShiftDown() ? -10 :  -1;
   Start(Timeout);
@@ -505,7 +595,10 @@ int tMouseCounter::RightDown(wxMouseEvent& MouseEvent)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tMouseCounter::RightUp(wxMouseEvent& MouseEvent)
+int tMouseCounter::RightUp(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
 {
   Stop();
   ShowValue(FALSE);
@@ -558,7 +651,10 @@ tMarkDestin::tMarkDestin(wxWindow* canvas, wxFrame *frame, int left)
   //Frame->SetStatusText("Click Destination point");
 }
 
-int tMarkDestin::ButtonDown(wxMouseEvent& MouseEvent)
+int tMarkDestin::ButtonDown(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
 {
   wxCursor c =  wxCursor(wxCURSOR_ARROW);
   Canvas->SetCursor(c);
@@ -571,28 +667,38 @@ int tMarkDestin::ButtonDown(wxMouseEvent& MouseEvent)
 
   x=point.x;
   y=point.y;
-  //  cout<<"tMarkDestin::ButtonDown "<<x<<" "<<y<<endl;
+//DEBUG  cout << "tMarkDestin::ButtonDown " << x << ' ' << y <<endl;
   return 1;
 }
 
-int tMarkDestin::RightDown(wxMouseEvent& MouseEvent)
+int tMarkDestin::RightDown(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
 {
-  ButtonDown(MouseEvent);
+  ButtonDown(MouseEvent, ScrolledX, ScrolledY);
   Aborted = 1;
   //Frame->SetStatusText("Operation aborted");
   return 1;
 }
 
-int tMarkDestin::LeftDown(wxMouseEvent& MouseEvent)
+int tMarkDestin::LeftDown(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
 {
-  ButtonDown(MouseEvent);
+  ButtonDown(MouseEvent, ScrolledX, ScrolledY);
   Aborted = 0;
   //Frame->SetStatusText("");
   return 1;
 }
 
+#if 0
+
 //*****************************************************************************
-// tMouseButton - simulate a 3D button
+// Description:
+//   This is the mouse button class definition.  This class simulates a 3D
+// button.
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -640,7 +746,10 @@ tMouseButton::~tMouseButton()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tMouseButton::ProcessMouseEvent(wxMouseEvent& MouseEvent)
+int tMouseButton::ProcessMouseEvent(
+  wxMouseEvent& MouseEvent,
+  int ScrolledX,
+  int ScrolledY)
 {
   if (MouseEvent.ButtonUp())
   {
@@ -663,3 +772,5 @@ int tMouseButton::ProcessMouseEvent(wxMouseEvent& MouseEvent)
   }
   return 0;
 }
+
+#endif

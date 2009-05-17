@@ -109,7 +109,7 @@ void JZBarInfo::SetClock(int Clock)
       return;
     }
 
-    // Clock + Bar auf Anfang naechster Takt
+    // Clock + Bar at the beginning of the next cycle.
     mClock += mTicksPerBar;
     ++mBarIndex;
   }

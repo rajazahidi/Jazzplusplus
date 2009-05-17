@@ -26,7 +26,7 @@
 #include <wx/window.h>
 
 class JZFilter;
-class tMouseAction;
+class JZMouseAction;
 class JZSnapSelection;
 class JZSong;
 class wxDialog;
@@ -102,9 +102,9 @@ class JZEventWindow : public wxWindow
 
     int SnapClock(int Clock, bool Up);
 
-    virtual void SnapSelectionStart(wxMouseEvent& MouseEvent);
+    virtual void SnapSelectionStart(wxMouseEvent& MouseEvent) = 0;
 
-    virtual void SnapSelectionStop(wxMouseEvent& MouseEvent);
+    virtual void SnapSelectionStop(wxMouseEvent& MouseEvent) = 0;
 
     void DrawVerticalLine(wxDC& Dc, int XPosition) const;
 
@@ -126,7 +126,7 @@ class JZEventWindow : public wxWindow
 
     JZFilter* mpFilter;
 
-    tMouseAction* mpMouseAction;
+    JZMouseAction* mpMouseAction;
 
   protected:
 

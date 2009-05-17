@@ -33,9 +33,9 @@
 #include <wx/dcmemory.h>
 #include <wx/msgdlg.h>
 
-#include <iostream>
-#include <sstream>
 #include <iomanip>
+//DEBUG#include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -211,17 +211,17 @@ void JZTrackWindow::NewPlayPosition(int Clock)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZTrackWindow::Mark(int x, int y)
-{
-  Marked.SetX(x2xBar(x));
-  Marked.SetY(y2yLine(y));
-  Marked.SetWidth(x2wBar(x));
-  Marked.SetHeight(mTrackHeight);
-
-  wxDC* pDc = new wxClientDC(this);
-  LineText(*pDc, Marked.GetX(), Marked.GetY(), Marked.GetWidth(), ">");
-  delete pDc;
-}
+//void JZTrackWindow::Mark(int x, int y)
+//{
+//  Marked.SetX(x2xBar(x));
+//  Marked.SetY(y2yLine(y));
+//  Marked.SetWidth(x2wBar(x));
+//  Marked.SetHeight(mTrackHeight);
+//
+//  wxDC* pDc = new wxClientDC(this);
+//  LineText(*pDc, Marked.GetX(), Marked.GetY(), Marked.GetWidth(), ">");
+//  delete pDc;
+//}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -273,15 +273,11 @@ void JZTrackWindow::OnLeftButtonDown(wxMouseEvent& MouseEvent)
   {
     JZRectangle Rectangle(
       0,
-      y2yLine(Point.y),
-      Clock2x(mpSong->GetMaxQuarters() * mpSong->GetTicksPerQuarter()),
+      y2yLine(Point.y + mScrolledY),
+      Clock2x(mpSong->GetMaxQuarters() * mpSong->GetTicksPerQuarter()) +
+        mScrolledX,
       mTrackHeight);
-    mpSnapSel->Select(
-      Rectangle,
-      mEventsX,
-      mEventsY,
-      mEventsWidth,
-      mEventsHeight);
+    mpSnapSel->Select(Rectangle);
     SnapSelectionStop(MouseEvent);
   }
   else if (
@@ -289,7 +285,8 @@ void JZTrackWindow::OnLeftButtonDown(wxMouseEvent& MouseEvent)
     Point.y >= mEventsY && Point.y < mEventsY + mEventsHeight)
   {
     SnapSelectionStart(MouseEvent);
-    mpSnapSel->ButtonDown(MouseEvent);
+
+    mpSnapSel->ButtonDown(MouseEvent, mScrolledX, mScrolledY);
   }
 }
 
@@ -299,7 +296,7 @@ void JZTrackWindow::OnMouseMove(wxMouseEvent& MouseEvent)
 {
   if (MouseEvent.LeftIsDown())
   {
-    mpSnapSel->Dragging(MouseEvent);
+    mpSnapSel->Dragging(MouseEvent, mScrolledX, mScrolledY);
 //    SnapSelectionStop(MouseEvent);
     Refresh(false);
   }
@@ -410,7 +407,7 @@ void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& MouseEvent)
         Point.x >= mEventsX && Point.x < mEventsX + mEventsWidth &&
         Point.y >= mEventsY && Point.y < mEventsY + mEventsHeight)
       {
-        mpSnapSel->ButtonUp(MouseEvent);
+        mpSnapSel->ButtonUp(MouseEvent, mScrolledX, mScrolledY);
 
         // The point is in event area.
         SnapSelectionStop(MouseEvent);
@@ -585,8 +582,8 @@ void JZTrackWindow::Draw(wxDC& Dc)
   // Setup the brush that is used to clear the background.
   LocalDc.SetBackground(*wxWHITE_BRUSH);
 
-  // Clear the background using the brush that was just setup,
-  // in case the following drawing calls fail.
+  // Clear the background using the brush that was just setup, in case the
+  // following drawing calls fail.
   LocalDc.Clear();
 
   GetClientSize(&mCanvasWidth, &mCanvasHeight);
@@ -638,7 +635,6 @@ void JZTrackWindow::Draw(wxDC& Dc)
 //DEBUG      << "To X:                          " << Clock2x(mToClock) << '\n'
 //DEBUG      << endl;
 
-
     BarInfo.SetClock(mFromClock);
 
     mBarCount = 0;
@@ -689,6 +685,8 @@ void JZTrackWindow::Draw(wxDC& Dc)
         if (mBarCount < eMaxBars)
         {
           mBarX[mBarCount++] = x;
+//DEBUG          LocalDc.SetPen(*wxRED_PEN);
+//DEBUG          LocalDc.DrawLine(x, 0, x, mCanvasHeight);
         }
       }
       BarInfo.Next();
@@ -918,7 +916,6 @@ void JZTrackWindow::LineText(
   if (Height <= 0)
   {
     Height = mTrackHeight;
-    y = y2yLine(y);
   }
   if (Width && Height)
   {
@@ -1177,32 +1174,31 @@ const char* JZTrackWindow::GetNumberString() const
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZTrackWindow::x2xBar(int x)
-{
-  for (int i = 1; i < mBarCount; ++i)
-  {
-    if (x < mBarX[i])
-    {
-      return mBarX[i - 1];
-    }
-  }
-  return -1;
-}
-
+//int JZTrackWindow::x2xBar(int x)
+//{
+//  for (int i = 1; i < mBarCount; ++i)
+//  {
+//    if (x < mBarX[i])
+//    {
+//      return mBarX[i - 1];
+//    }
+//  }
+//  return -1;
+//}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZTrackWindow::x2wBar(int x)
-{
-  for (int i = 1; i < mBarCount; ++i)
-  {
-    if (x < mBarX[i])
-    {
-      return mBarX[i] - mBarX[i - 1];
-    }
-  }
-  return 0;
-}
+//int JZTrackWindow::x2wBar(int x)
+//{
+//  for (int i = 1; i < mBarCount; ++i)
+//  {
+//    if (x < mBarX[i])
+//    {
+//      return mBarX[i] - mBarX[i - 1];
+//    }
+//  }
+//  return 0;
+//}
 
 //-----------------------------------------------------------------------------
 // Description:
@@ -1437,10 +1433,10 @@ void JZTrackWindow::MousePlay(wxMouseEvent& MouseEvent, TEMousePlayMode Mode)
 //-----------------------------------------------------------------------------
 void JZTrackWindow::SnapSelectionStart(wxMouseEvent& MouseEvent)
 {
-  mpSnapSel->SetXSnap(mBarCount, mBarX);
+  mpSnapSel->SetXSnap(mBarCount, mBarX, mScrolledX);
   mpSnapSel->SetYSnap(
     TrackIndex2y(mFromLine),
-    mEventsY + mEventsHeight,
+    mEventsY + mEventsHeight + mScrolledY,
     mTrackHeight);
 }
 

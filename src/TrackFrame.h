@@ -55,7 +55,7 @@ class JZTrackFrame : public JZEventFrame, public tButtonLabelInterface
 
     void NewPlayPosition(int Clock);
 
-    // Overridden tButtonLabelInterface finction.
+    // Overridden tButtonLabelInterface function.
     virtual void ButtonLabelDisplay(const wxString& Text, bool IsButtonDown);
 
   private:

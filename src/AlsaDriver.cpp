@@ -56,7 +56,7 @@ class tAlsaAudioListener : public wxTimer
         mHardExit(true)
     {
       mpPlayer->mpListener = this;
-      mpPlayer->rec_info = 0;  // not recording!
+      mpPlayer->mpRecordingInfo = 0;  // not recording!
       mpPlayer->running_mode = 0;
 
       // SYNC seems not to work?? so add 8 more silent buffers
@@ -76,7 +76,7 @@ class tAlsaAudioListener : public wxTimer
         mHardExit(true)
     {
       mpPlayer->mpListener = this;
-      mpPlayer->rec_info = 0;  // not recording!
+      mpPlayer->mpRecordingInfo = 0;  // not recording!
       mpPlayer->running_mode = 0;
 
       mpPlayer->OpenDsp(tAlsaAudioPlayer::PLAYBACK, 0);
@@ -195,7 +195,7 @@ void tAlsaAudioPlayer::StartPlay(long clock, long loopClock, int cont)
   curr_speed  = midi_speed;
 
   running_mode = 0;
-  if (rec_info && rec_info->mpTrack->GetAudioMode())
+  if (mpRecordingInfo && mpRecordingInfo->mpTrack->GetAudioMode())
   {
     OpenDsp(CAPTURE, 1);
     recbuffers.ResetBufferSize(frag_byte_size[CAPTURE]);
@@ -623,12 +623,12 @@ void tAlsaAudioPlayer::StopPlay()
   CloseDsp(true);
   if (RecordMode())
   {
-    long frc = rec_info->mFromClock;
+    long frc = mpRecordingInfo->mFromClock;
     if (frc < audio_clock_offset)
     {
       frc = audio_clock_offset;
     }
-    long toc = rec_info->mToClock;
+    long toc = mpRecordingInfo->mToClock;
     if (toc > recd_clock)
     {
       toc = recd_clock;

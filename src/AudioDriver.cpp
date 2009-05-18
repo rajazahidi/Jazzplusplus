@@ -52,7 +52,7 @@ class tAudioListener : public wxTimer
     {
       mpPlayer->mpListener = this;
 
-      mpPlayer->rec_info = 0;  // not recording!
+      mpPlayer->mpRecordingInfo = 0;  // not recording!
 
       // SYNC seems not to work?? so add 8 more silent buffers
       // to hear the end of the sample too.
@@ -72,7 +72,7 @@ class tAudioListener : public wxTimer
         mHardExit(true)
     {
       mpPlayer->mpListener = this;
-      mpPlayer->rec_info = 0;  // not recording!
+      mpPlayer->mpRecordingInfo = 0;  // not recording!
 
       mCount = 8 + mpPlayer->mSamples.PrepareListen(&spl, fr_smpl, to_smpl);
       mpPlayer->OpenDsp();
@@ -184,7 +184,7 @@ int tAudioPlayer::LoadSamples(const char *filename)
 
 int tAudioPlayer::RecordMode() const
 {
-  return rec_info != 0 && rec_info->mpTrack->GetAudioMode();
+  return mpRecordingInfo != 0 && mpRecordingInfo->mpTrack->GetAudioMode();
 }
 
 void tAudioPlayer::StartAudio()
@@ -531,12 +531,12 @@ void tAudioPlayer::StopPlay()
   CloseDsp(true);
   if (RecordMode())
   {
-    long frc = rec_info->mFromClock;
+    long frc = mpRecordingInfo->mFromClock;
     if (frc < start_clock)
     {
       frc = start_clock;
     }
-    long toc = rec_info->mToClock;
+    long toc = mpRecordingInfo->mToClock;
     if (toc > recd_clock)
     {
       toc = recd_clock;

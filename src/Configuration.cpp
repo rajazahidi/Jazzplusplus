@@ -124,7 +124,7 @@ JZConfiguration::JZConfiguration()
   : mFileName(),
     mDrumNames(),
     mDrumSets(),
-    mCtrlNames(),
+    mControlNames(),
     mVoiceNames(),
     mBankTable()
 {
@@ -344,7 +344,7 @@ JZConfiguration::JZConfiguration()
 
   for (int i = 0; i < 130; ++i)
   {
-    mCtrlNames.push_back(make_pair("", i));
+    mControlNames.push_back(make_pair("", i));
   }
 
   mVoiceNames.push_back(make_pair(pNoneString, 0));
@@ -392,8 +392,8 @@ const pair<string, int>& JZConfiguration::GetVoiceName(unsigned Entry) const
 //-----------------------------------------------------------------------------
 const pair<string, int>& JZConfiguration::GetCtrlName(unsigned Entry) const
 {
-   assert((Entry >= 0) && (Entry < mCtrlNames.size()));
-   return mCtrlNames[Entry];
+   assert((Entry >= 0) && (Entry < mControlNames.size()));
+   return mControlNames[Entry];
 }
 
 //-----------------------------------------------------------------------------
@@ -795,7 +795,7 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
           pVector = &mDrumSets;
           break;
         case C_CtrlNames:
-          pVector = &mCtrlNames;
+          pVector = &mControlNames;
           break;
         case C_DrumNames:
           pVector = &mDrumNames;
@@ -916,7 +916,7 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
             << endl;
         }
       }
-      else if (pVector == &mCtrlNames)
+      else if (pVector == &mControlNames)
       {
         // Controller names.
 
@@ -924,10 +924,11 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
         Iss >> i;
         assert(0 <= i && i <= 127);
 
-        string ControllerName =
-          TNStringUtilities::TrimLeadingAndTrailingBlanks(Iss.str());
+        string ControllerName;
+        getline(Iss, ControllerName);
 
-        mCtrlNames[i + 1].first = ControllerName;
+        mControlNames[i + 1].first =
+          TNStringUtilities::TrimLeadingAndTrailingBlanks(ControllerName);
       }
       else if (pVector == &mDrumNames)
       {

@@ -270,7 +270,7 @@ class JZConfiguration
 
     std::vector<std::pair<std::string, int> > mDrumSets;
 
-    std::vector<std::pair<std::string, int> > mCtrlNames;
+    std::vector<std::pair<std::string, int> > mControlNames;
 
     std::vector<std::pair<std::string, int> > mVoiceNames;
 
@@ -323,7 +323,7 @@ inline
 const std::vector<std::pair<std::string, int> >&
 JZConfiguration::GetControlNames() const
 {
-  return mCtrlNames;
+  return mControlNames;
 }
 
 //-----------------------------------------------------------------------------

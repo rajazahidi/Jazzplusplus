@@ -127,11 +127,6 @@ bool tSearchReplaceDlg::OnClose()
   return false;
 }
 
-void tSearchReplaceDlg::OnHelp()
-{
-  gpHelpInstance->ShowTopic("Search Replace");
-}
-
 void tSearchReplaceDlg::AddProperties()
 {
   sheet->AddProperty(new wxProperty(
@@ -146,64 +141,6 @@ void tSearchReplaceDlg::AddProperties()
     "props",
     new tNamedValueListValidator(gpConfig->GetControlNames())));
 }
-
-
-
-
-//*****************************************************************************
-// Transpose
-//*****************************************************************************
-
-int tTransposeDlg::Notes = 0;
-int tTransposeDlg::Scale = gScaleChromatic;
-bool tTransposeDlg::FitIntoScale = 0;
-
-tTransposeDlg::tTransposeDlg(JZEventWindow* w, JZFilter *f)
-  : tPropertyListDlg("Transpose")
-{
-  Filter = f;
-  Song   = f->GetSong();
-}
-
-
-bool tTransposeDlg::OnClose()
-{
-  tCmdTranspose trn(Filter, Notes, Scale, FitIntoScale);
-  trn.Execute();
-
-  JZProjectManager::Instance()->UpdateAllViews();
-
-  return false;
-}
-
-void tTransposeDlg::OnHelp()
-{
-  gpHelpInstance->ShowTopic("Transpose");
-}
-
-
-void tTransposeDlg::AddProperties()
-{
-  int s = tScale::Analyze(Filter);
-
-  sheet->AddProperty(new wxProperty(
-    "selection looks like",
-    wxPropertyValue(gScaleNames[s + 2].first),
-    "string"));
-  sheet->AddProperty(new wxProperty(
-    "Amount",
-    wxPropertyValue(&Notes),
-    "integer",
-    new wxIntegerListValidator(-12, 12)));
-  sheet->AddProperty(new wxProperty(
-    "Fit into Scale",
-    wxPropertyValue((bool*)&FitIntoScale),
-    "bool"));
-}
-
-
-
-
 
 
 

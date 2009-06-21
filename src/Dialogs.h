@@ -68,25 +68,6 @@ class tSearchReplaceDlg : public tPropertyListDlg
     void OnHelp();
 };
 
-// Transpose
-class tTransposeDlg : public tPropertyListDlg
-{
-  public:
-
-    static int  Notes;        // 0
-    static bool FitIntoScale;
-    static int Scale;
-
-    JZFilter *Filter;
-    JZSong   *Song;
-
-    //tNamedChoice ScaleDlg;
-    tTransposeDlg(JZEventWindow* w, JZFilter *f);
-    void AddProperties();
-    bool OnClose();
-    void OnHelp();
-};
-
 // seqLength
 class tSeqLengthDlg : public tPropertyListDlg
 {

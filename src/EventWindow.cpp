@@ -28,7 +28,9 @@
 #include "Dialogs/LengthDialog.h"
 #include "Dialogs/MidiChannelDialog.h"
 #include "Dialogs/QuantizeDialog.h"
+#include "Dialogs/SearchAndReplaceDialog.h"
 #include "Dialogs/ShiftDialog.h"
+#include "Dialogs/TransposeDialog.h"
 #include "Dialogs/VelocityDialog.h"
 #include "Dialogs.h"
 #include "EventFrame.h"
@@ -217,8 +219,23 @@ void JZEventWindow::SetChannel()
 //-----------------------------------------------------------------------------
 void JZEventWindow::Transpose()
 {
-  tTransposeDlg * dlg = new tTransposeDlg(this, mpFilter);
-  dlg->Create();
+  int CurrentScale = tScale::Analyze(mpFilter);
+  int Notes = 0, Scale = gScaleChromatic;
+  bool FitIntoScale = false;
+
+  JZTransposeDialog TransposeDialog(
+    CurrentScale,
+    Notes,
+    Scale,
+    FitIntoScale,
+    this);
+  if (TransposeDialog.ShowModal() == wxID_OK)
+  {
+    tCmdTranspose TransposeCommand(mpFilter, Notes, Scale, FitIntoScale);
+    TransposeCommand.Execute();
+
+    JZProjectManager::Instance()->UpdateAllViews();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -313,8 +330,17 @@ void JZEventWindow::Cleanup()
 //-----------------------------------------------------------------------------
 void JZEventWindow::SearchReplace()
 {
-  tSearchReplaceDlg * dlg = new tSearchReplaceDlg(this, mpFilter);
-  dlg->Create();
+  short From = 1, To = 1;
+
+  JZSearchAndReplaceDialog SearchAndReplaceDialog(From, To, this);
+  if (SearchAndReplaceDialog.ShowModal() == wxID_OK)
+  {
+    tCmdSearchReplace SearchAndReplaceCommand(mpFilter, From - 1, To - 1);
+
+    SearchAndReplaceCommand.Execute();
+
+    JZProjectManager::Instance()->UpdateAllViews();
+  }
 }
 
 //-----------------------------------------------------------------------------

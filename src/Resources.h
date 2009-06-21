@@ -105,4 +105,7 @@
 #define IDC_KB_GROOVE                        wxID_HIGHEST + 1230
 #define IDC_KB_DELAY                         wxID_HIGHEST + 1231
 
+// JZTransposeDialog resource IDs.
+#define IDC_KB_AMOUNT                        wxID_HIGHEST + 1232
+
 #endif // !defined(JZ_RESOURCES_H)

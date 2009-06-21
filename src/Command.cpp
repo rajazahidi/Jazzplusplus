@@ -157,21 +157,21 @@ static const int CMajor[12] = { 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1 };
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tScale::Init(int ScaleNr, JZFilter* pFilter)
+void tScale::Init(int ScaleIndex, JZFilter* pFilter)
 {
   for (int i = 0; i < 12; ++i)
   {
     ScaleKeys[i] = 0;
   }
 
-  if (ScaleNr == gScaleChromatic)
+  if (ScaleIndex == gScaleChromatic)
   {
     for (int i = 0; i < 12; ++i)
     {
       ScaleKeys[i] = 1;
     }
   }
-  else if (ScaleNr == gScaleSelected)
+  else if (ScaleIndex == gScaleSelected)
   {
     bool Found = false;
     tSelectedKeys cmd(pFilter);
@@ -193,7 +193,7 @@ void tScale::Init(int ScaleNr, JZFilter* pFilter)
   {
     for (int i = 0; i < 12; ++i)
     {
-      ScaleKeys[ (i + ScaleNr) % 12 ] = CMajor[i];
+      ScaleKeys[ (i + ScaleIndex) % 12 ] = CMajor[i];
     }
   }
 }
@@ -318,6 +318,8 @@ tCmdShift::tCmdShift(JZFilter* pFilter, long DeltaClock)
 {
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tCmdShift::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
   JZEvent* pEventCopy = pEvent->Copy();
@@ -326,16 +328,19 @@ void tCmdShift::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   pTrack->Put(pEventCopy);
 }
 
-// ************************************************************************
+//*****************************************************************************
 // tCmdErase
-// ************************************************************************
-
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tCmdErase::tCmdErase(JZFilter* pFilter, int lvsp)
   : tCommand(pFilter)
 {
   LeaveSpace = lvsp;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tCmdErase::Execute(int NewUndo)
 {
   tCommand::Execute(NewUndo);
@@ -350,15 +355,18 @@ void tCmdErase::Execute(int NewUndo)
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tCmdErase::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
   pTrack->Kill(pEvent);
 }
 
-// ************************************************************************
+//*****************************************************************************
 // tCmdQuantize
-// ************************************************************************
-
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tCmdQuantize::tCmdQuantize(
   JZFilter* pFilter,
   int QntClocks,
@@ -375,6 +383,8 @@ tCmdQuantize::tCmdQuantize(
 {
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 long tCmdQuantize::Quantize(int Clock, int islen)
 {
   Clock += mQntClocks / 2;
@@ -388,6 +398,8 @@ long tCmdQuantize::Quantize(int Clock, int islen)
   return Clock > MinClock ? Clock : MinClock;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tCmdQuantize::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
   tKeyOn* pKeyOn;
@@ -407,32 +419,40 @@ void tCmdQuantize::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   }
 }
 
-// ************************************************************************
+//*****************************************************************************
 // tCmdTranspose
-// ************************************************************************
-
-tCmdTranspose::tCmdTranspose(JZFilter* pFilter, int notes, int ScaleNr, int fit)
-  : tCommand(pFilter)
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+tCmdTranspose::tCmdTranspose(
+  JZFilter* pFilter,
+  int Notes,
+  int ScaleIndex,
+  bool FitIntoScale)
+  : tCommand(pFilter),
+    mNotes(Notes),
+    mFitIntoScale(FitIntoScale),
+    mScale()
 {
-  Scale.Init(ScaleNr, mpFilter);
-  Notes = notes;
-  FitIntoScale = fit;
+  mScale.Init(ScaleIndex, mpFilter);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tCmdTranspose::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
   tKeyOn* pKeyOn;
   if (pEvent->IsKeyOn())
   {
     pKeyOn = (tKeyOn *)pEvent->Copy();
-    if (FitIntoScale)
+    if (mFitIntoScale)
     {
-      pKeyOn->SetKey(pKeyOn->GetKey() + Notes);
-      pKeyOn->SetKey(Scale.FitInto(pKeyOn->GetKey()));
+      pKeyOn->SetKey(pKeyOn->GetKey() + mNotes);
+      pKeyOn->SetKey(mScale.FitInto(pKeyOn->GetKey()));
     }
-    else if (Notes)
+    else if (mNotes)
     {
-      pKeyOn->SetKey(Scale.Transpose(pKeyOn->GetKey(), Notes));
+      pKeyOn->SetKey(mScale.Transpose(pKeyOn->GetKey(), mNotes));
     }
     pTrack->Kill(pEvent);
     pTrack->Put(pKeyOn);
@@ -442,30 +462,33 @@ void tCmdTranspose::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   if (pEvent->IsKeyPressure())
   {
     tKeyPressure* pKeyPressure = (tKeyPressure *)pEvent->Copy();
-    if (FitIntoScale)
+    if (mFitIntoScale)
     {
-      pKeyPressure->SetKey(pKeyPressure->GetKey() + Notes);
-      pKeyPressure->SetKey(Scale.FitInto(pKeyPressure->GetKey()));
+      pKeyPressure->SetKey(pKeyPressure->GetKey() + mNotes);
+      pKeyPressure->SetKey(mScale.FitInto(pKeyPressure->GetKey()));
     }
-    else if (Notes)
+    else if (mNotes)
     {
-      pKeyPressure->SetKey(Scale.Transpose(pKeyPressure->GetKey(), Notes));
+      pKeyPressure->SetKey(mScale.Transpose(pKeyPressure->GetKey(), mNotes));
     }
     pTrack->Kill(pEvent);
     pTrack->Put(pKeyPressure);
   }
 }
 
-// ************************************************************************
+//*****************************************************************************
 // tCmdSetChannel
-// ************************************************************************
-
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tCmdSetChannel::tCmdSetChannel(JZFilter* pFilter, int NewChannel)
   : tCommand(pFilter),
     mNewChannel(NewChannel)
 {
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tCmdSetChannel::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
   tChannelEvent* pChannelEvent;
@@ -479,10 +502,11 @@ void tCmdSetChannel::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   }
 }
 
-// ************************************************************************
+//*****************************************************************************
 // tCmdVelocity
-// ************************************************************************
-
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tCmdVelocity::tCmdVelocity(
   JZFilter* pFilter,
   int FromValue,
@@ -495,6 +519,8 @@ tCmdVelocity::tCmdVelocity(
 {
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tCmdVelocity::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
   tKeyOn* pKeyOn;
@@ -528,10 +554,11 @@ void tCmdVelocity::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   }
 }
 
-// ************************************************************************
+//*****************************************************************************
 // tCmdLength
-// ************************************************************************
-
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tCmdLength::tCmdLength(
   JZFilter* pFilter,
   int FromValue,
@@ -544,6 +571,8 @@ tCmdLength::tCmdLength(
 {
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tCmdLength::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
   tKeyOn* pKeyOn;
@@ -578,14 +607,13 @@ void tCmdLength::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   }
 }
 
-
-
-// ************************************************************************
+//*****************************************************************************
 // tCmdSeqLength
 //   This command is supposed to stretch/contract a sequence of events in
 // time by factor "scale" from starting point "startClock"
-// ************************************************************************
-
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tCmdSeqLength::tCmdSeqLength(JZFilter* pFilter, double scale)
   : tCommand(pFilter)
 {
@@ -593,8 +621,9 @@ tCmdSeqLength::tCmdSeqLength(JZFilter* pFilter, double scale)
   this->startClock=-1000;
 }
 
-/** move an event according to startclock and scale
- */
+//-----------------------------------------------------------------------------
+// move an event according to startclock and scale
+//-----------------------------------------------------------------------------
 void tCmdSeqLength::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
   // Make a copy of the current event.
@@ -613,21 +642,22 @@ void tCmdSeqLength::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   pTrack->Put(k);
 }
 
-
-
-// ************************************************************************
+//*****************************************************************************
 // tCmdConvertToModulation
 //    JAVE this command is supposed convert a midi note sequence
 // to a pitch bend/volume control sequence instead
-// ************************************************************************
-
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tCmdConvertToModulation::tCmdConvertToModulation(JZFilter* pFilter)
   : tCommand(pFilter)
 {
 }
 
-//need to override executetrack, since we have begin/end behaviour in this filter
-
+//-----------------------------------------------------------------------------
+//   need to override executetrack, since we have begin/end behaviour in this
+// filter
+//-----------------------------------------------------------------------------
 void tCmdConvertToModulation::ExecuteTrack(JZTrack* pTrack)
 {
   // JAVE:
@@ -714,11 +744,12 @@ void tCmdConvertToModulation::ExecuteTrack(JZTrack* pTrack)
   pTrack->Cleanup();
 }
 
-// ************************************************************************
+//*****************************************************************************
 // tMidiDelayDlg
 //    JAVE this is a simple midi delay line
-// ************************************************************************
-
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tCmdMidiDelay::tCmdMidiDelay(
   JZFilter* pFilter,
   double scale,
@@ -731,6 +762,8 @@ tCmdMidiDelay::tCmdMidiDelay(
   this->repeat=repeat;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tCmdMidiDelay::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
   tKeyOn* pKeyOn;
@@ -749,12 +782,11 @@ void tCmdMidiDelay::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   }
 }
 
-
-
-// ************************************************************************
+//*****************************************************************************
 // tCmdCleanup
-// ************************************************************************
-
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tCmdCleanup::tCmdCleanup(JZFilter* pFilter, long clks, int so)
   : tCommand(pFilter)
 {
@@ -762,12 +794,16 @@ tCmdCleanup::tCmdCleanup(JZFilter* pFilter, long clks, int so)
   shortenOverlaps = so;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tCmdCleanup::ExecuteTrack(JZTrack* pTrack)
 {
   memset(prev_note, 0, sizeof(prev_note));
   tCommand::ExecuteTrack(pTrack);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tCmdCleanup::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
   tKeyOn* pKeyOn;
@@ -799,36 +835,40 @@ void tCmdCleanup::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   }
 }
 
-// ************************************************************************
+//*****************************************************************************
 // tCmdSearchReplace
-// ************************************************************************
-
-tCmdSearchReplace::tCmdSearchReplace(JZFilter* pFilter, short sf, short st)
-  : tCommand(pFilter)
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+tCmdSearchReplace::tCmdSearchReplace(JZFilter* pFilter, short From, short To)
+  : tCommand(pFilter),
+    mFrom(From),
+    mTo(To)
 {
-  fr = sf;
-  to = st;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tCmdSearchReplace::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
   tControl* pControl = pEvent->IsControl();
   if (pControl)
   {
-    if (pControl->GetControl() == fr)
+    if (pControl->GetControl() == mFrom)
     {
       tControl* pControlCopy = (tControl *)pControl->Copy();
-      pControlCopy->SetControl(to);
+      pControlCopy->SetControl(mTo);
       pTrack->Kill(pControl);
       pTrack->Put(pControlCopy);
     }
   }
 }
 
-// ************************************************************************
+//*****************************************************************************
 // tCmdCopyToBuffer
-// ************************************************************************
-
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tCmdCopyToBuffer::tCmdCopyToBuffer(
   JZFilter* pFilter,
   tEventArray* pBuffer)
@@ -837,17 +877,18 @@ tCmdCopyToBuffer::tCmdCopyToBuffer(
   mpBuffer = pBuffer;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tCmdCopyToBuffer::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
   mpBuffer->Put(pEvent->Copy());
 }
 
-// **********************************************************************
+//*****************************************************************************
 // tCmdCopy
-// **********************************************************************
-
-
-
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tCmdCopy::tCmdCopy(JZFilter* pFilter, long dt, long dc)
   : tCommand(pFilter)
 {
@@ -867,8 +908,8 @@ tCmdCopy::tCmdCopy(JZFilter* pFilter, long dt, long dc)
   }
 }
 
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tCmdCopy::ExecuteTrack(JZTrack *s)
 {
   long StartClock, StopClock;
@@ -985,15 +1026,18 @@ void tCmdCopy::ExecuteTrack(JZTrack *s)
   }
 }
 
-// ************************************************************************
+//*****************************************************************************
 // tCmdExchLeftRight
-// ************************************************************************
-
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tCmdExchLeftRight::tCmdExchLeftRight(JZFilter* pFilter)
   : tCommand(pFilter)
 {
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tCmdExchLeftRight::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
   if (pEvent->IsKeyOn())
@@ -1006,16 +1050,18 @@ void tCmdExchLeftRight::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   }
 }
 
-
-// ************************************************************************
+//*****************************************************************************
 // tCmdExchUpDown
-// ************************************************************************
-
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 tCmdExchUpDown::tCmdExchUpDown(JZFilter* pFilter)
   : tCommand(pFilter)
 {
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void tCmdExchUpDown::ExecuteTrack(JZTrack* pTrack)
 {
   int i;

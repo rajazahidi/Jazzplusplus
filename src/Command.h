@@ -199,10 +199,15 @@ class tCmdCleanup : public tCommand
 //*****************************************************************************
 class tCmdSearchReplace : public tCommand
 {
-  short fr, to;
   public:
-    tCmdSearchReplace(JZFilter* pFilter, short fr, short to);
+
+    tCmdSearchReplace(JZFilter* pFilter, short From, short To);
+
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
+
+  private:
+
+    short mFrom, mTo;
 };
 
 //*****************************************************************************
@@ -239,15 +244,20 @@ class tCmdQuantize : public tCommand
 class tCmdTranspose : public tCommand
 {
   public:
-    int Notes;
-    int FitIntoScale;
-    tScale Scale;
+
     tCmdTranspose(
       JZFilter* pFilter,
       int Notes,
-      int ScaleNr = 0,
-      int FitIntoScale = 0);
+      int ScaleIndex = 0,
+      bool FitIntoScale = false);
+
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
+
+  private:
+
+    int mNotes;
+    int mFitIntoScale;
+    tScale mScale;
 };
 
 //*****************************************************************************

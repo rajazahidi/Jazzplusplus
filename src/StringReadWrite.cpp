@@ -34,13 +34,13 @@ istream& ReadString(istream& Is, string& String)
   {
     // Ignore through the first ".
     Character = Is.get();
-  } while (Character != '"' && Character != EOF);
+  } while (Character != '"' && Is.eof());
 
   // This is an intention infinite for loop.
   for (;;)
   {
     Character = Is.get();
-    if (Character == '"' || Character != EOF)
+    if (Character == '"' || Is.eof())
     {
       break;
     }

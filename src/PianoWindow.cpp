@@ -240,7 +240,7 @@ tKeyLengthDragger::tKeyLengthDragger(
   Copy  = pKeyOn->Copy()->IsKeyOn();
   Win   = pPianoWindow;
 
-  // SN++ BUG FIX: undo/redo
+  // BUG FIX: undo/redo
   Win->GetSong()->NewUndoBuffer();
 
   wxClientDC Dc(Win);
@@ -301,7 +301,7 @@ int tKeyLengthDragger::ButtonUp(
   int ScrolledX,
   int ScrolledY)
 {
-  // SN++ Key_Aftertouch
+  // Key_Aftertouch
   if (Copy->GetEventLength() < mpKeyOn->GetEventLength())
   {
     int key, channel;
@@ -336,10 +336,10 @@ int tKeyLengthDragger::ButtonUp(
 
   Win->mpMouseAction = 0;
 
-  // SN++ Veloc- oder Aftertouch-Editor updaten
+  // Velocity or aftertouch editor update.
   Win->UpdateControl();
 
-  // allways repaint
+  // always repaint
   Win->Refresh();
 
   delete this;
@@ -389,7 +389,7 @@ tPlayTrackLengthDragger::tPlayTrackLengthDragger(
   Copy  = k->Copy()->IsPlayTrack();
   Win   = pPianoWindow;
 
-  // SN++ BUG FIX: undo/redo
+  // BUG FIX: undo/redo
   Win->GetSong()->NewUndoBuffer();
   //
   wxClientDC Dc(Win);
@@ -454,10 +454,10 @@ int tPlayTrackLengthDragger::ButtonUp(
 
   Win->mpMouseAction = 0;
 
-  // SN++ Veloc- oder Aftertouch-Editor updaten
+  // Velocity or aftertouch editor update.
   Win->UpdateControl();
 
-  // allways repaint
+  // always repaint
   Win->Refresh();
 
   delete this;
@@ -478,7 +478,7 @@ class tVelocCounter : public tMouseCounter
       Win = pPianoWindow;
       mpKeyOn = pKeyOn;
 
-      // SN++ BUG FIX: undo/redo
+      // BUG FIX: undo/redo
       Win->GetSong()->NewUndoBuffer();
       //
       wxClientDC Dc(Win);
@@ -809,7 +809,7 @@ void JZPianoWindow::Draw(wxDC& Dc)
   mFromClock = mScrolledX * mClockTicsPerPixel;
   mToClock = x2Clock(mCanvasWidth);
 
-  // SN++ Because jazz has a ReDo function.  Fixes simultaneously update a
+  // Because jazz has a ReDo function.  Fixes simultaneously update a
   // small problem when multiple ZoomOut.  Active Ctrl draw new windows or
   // reinitialize.
 
@@ -1218,12 +1218,13 @@ void JZPianoWindow::NewPosition(int TrackIndex, int Clock)
     SetXScrollPosition(x);
   }
 
-// SN++ Is changed. OnPaint always draws new -> Bug Fix for ZoomOut!
-/*
+  // Is changed.  OnPaint always draws new -> Bug Fix for ZoomOut!
   // OnPaint() redraws only if clock has changed
-  if (mpCtrlEdit && TrackIndex >= 0)
-    mpCtrlEdit->ReInit(mpTrack, mFromClock, mClockTicsPerPixel);
-*/
+//  if (mpCtrlEdit && TrackIndex >= 0)
+//  {
+//    mpCtrlEdit->ReInit(mpTrack, mFromClock, mClockTicsPerPixel);
+//  }
+
   Refresh();
 }
 
@@ -1294,9 +1295,17 @@ void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
       if (IsBlack(Pitch))
       {
         Dc.DrawRectangle(0, y, wBlack, mTrackHeight);
-        Dc.DrawLine(wBlack, y + mTrackHeight/2, mPianoWidth, y + mTrackHeight/2);
+        Dc.DrawLine(
+          wBlack,
+          y + mTrackHeight / 2,
+          mPianoWidth,
+          y + mTrackHeight / 2);
         Dc.SetPen(*wxWHITE_PEN);
-        Dc.DrawLine(wBlack + 1, y + mTrackHeight/2+1, mPianoWidth, y + mTrackHeight/2+1);
+        Dc.DrawLine(
+          wBlack + 1,
+          y + mTrackHeight / 2 + 1,
+          mPianoWidth,
+          y + mTrackHeight / 2 + 1);
         Dc.DrawLine(0, y, wBlack, y);
         Dc.SetPen(*wxBLACK_PEN);
       }
@@ -1475,7 +1484,7 @@ void JZPianoWindow::DrawEvents(
   int FromPitch = 127 - mToLine;
   int ToPitch   = 127 - mFromLine;
 
-  // Coordinate for Linien
+  // Coordinate lines.
 
   int x0 = Clock2x(0);
   int y0 = TrackIndex2y(64);
@@ -1499,17 +1508,21 @@ void JZPianoWindow::DrawEvents(
 //        y1 = TrackIndex2y(127 - pEvent->IsPlayTrack()->track);
 //        // use pitch instead
 //      }
-      // event partially visible?
-      if (Clock + Length >= mFromClock && FromPitch < Pitch && Pitch <= ToPitch)
+
+      // Test to determine if the event is partially visible.
+      if (
+        Clock + Length >= mFromClock &&
+        FromPitch < Pitch && Pitch <= ToPitch)
       {
         int DrawLength = Length / mClockTicsPerPixel;
 
-        // do clipping ourselves
+        // Perform manual clipping.
         if (x1 < mEventsX)
         {
           DrawLength -= mEventsX - x1;
           x1 = mEventsX;
         }
+
         // Always draw at least two pixels to avoid invisible (behind a
         // vertical line) or zero-length events:
         if (DrawLength < 3)
@@ -1517,7 +1530,7 @@ void JZPianoWindow::DrawEvents(
           DrawLength = 3;
         }
 
-        // show velocity as colors
+        // Show velocity as colors.
         if (!force_color && mUseColors && pEvent->IsKeyOn())
         {
           int vel = pEvent->IsKeyOn()->GetVelocity();
@@ -1527,9 +1540,12 @@ void JZPianoWindow::DrawEvents(
         {
           Dc.SetBrush(*Brush);
         }
-        // end velocity colors
 
-        Dc.DrawRectangle(x1, y1 + mLittleBit, DrawLength, mTrackHeight - 2 * mLittleBit);
+        Dc.DrawRectangle(
+          x1,
+          y1 + mLittleBit,
+          DrawLength,
+          mTrackHeight - 2 * mLittleBit);
         //shouldnt it be in drawevent? odd.
 
         if (pEvent->IsPlayTrack())
@@ -1571,8 +1587,15 @@ void JZPianoWindow::DrawEvents(
 
           // Draw text labels drawn at top.
           int textlabely = mTopInfoHeight;
-          Dc.DrawRectangle(x1-textX, textlabely + mLittleBit, textX, textY);//mTrackHeight - 2 * mLittleBit);
-          Dc.DrawText(pEvent->IsText()->GetText(), x1-textX, textlabely + mLittleBit);
+          Dc.DrawRectangle(
+            x1 - textX,
+            textlabely + mLittleBit,
+            textX,
+            textY); //mTrackHeight - 2 * mLittleBit);
+          Dc.DrawText(
+            pEvent->IsText()->GetText(),
+            x1 - textX,
+            textlabely + mLittleBit);
         }
       }
 
@@ -1915,7 +1938,7 @@ void JZPianoWindow::SnapSelectionStop(wxMouseEvent& MouseEvent)
       mpSnapSel->GetRectangle().x + mpSnapSel->GetRectangle().width + 1)));
   }
 
-  // SN++ Veloc- oder Aftertouch-Editor updaten
+  // Velocity or aftertouch editor update.
   if (mpCtrlEdit)
   {
     mpCtrlEdit->UpDate();
@@ -2016,7 +2039,9 @@ int JZPianoWindow::EventsSelected(const char *msg)
   if (!mpSnapSel->IsSelected())
   {
     if (msg == 0)
+    {
       msg = "please select some events first";
+    }
     wxMessageBox((char *)msg, "Error", wxOK);
     return 0;
   }
@@ -2181,7 +2206,7 @@ void JZPianoWindow::MouseCutPaste(wxMouseEvent& MouseEvent, bool Cut)
     Paste(mpTrack, SnapClock(Clock), Pitch);
   }
 
-  // allways redraw
+  // always redraw
   Refresh();
 }
 
@@ -2349,8 +2374,8 @@ int JZPianoWindow::IsVisible(JZTrack* pTrack)
     return pTrack == mpTrack;
   }
 
-  return (
-    mpTrack->Channel == gpConfig->GetValue(C_DrumChannel)) ==
+  return
+    (mpTrack->Channel == gpConfig->GetValue(C_DrumChannel)) ==
     (pTrack->Channel == gpConfig->GetValue(C_DrumChannel));
 }
 
@@ -2438,9 +2463,10 @@ JZEvent *JZPianoWindow::FindEvent(JZTrack* pTrack, int Clock, int Pitch)
   {
     if (pEvent->GetClock() <= Clock)
     {
-      if ((pEvent->GetClock() + pEvent->GetLength() >= Clock)
-           && (pEvent->GetPitch() == Pitch || Pitch == -1)
-           && IsVisible(pEvent))
+      if (
+        (pEvent->GetClock() + pEvent->GetLength() >= Clock) &&
+        (pEvent->GetPitch() == Pitch || Pitch == -1) &&
+        IsVisible(pEvent))
       {
         return pEvent;
       }
@@ -3043,7 +3069,7 @@ void JZPianoWindow::Copy(JZTrack* pTrack, JZEvent* pEvent, int Kill)
   // Need a guitar window hint here.
   JZProjectManager::Instance()->UpdateAllViews();
 
-  // SN++ Veloc- oder Aftertouch-Editor updaten
+  // Velocity or aftertouch editor update.
   if (mpCtrlEdit)
   {
     mpCtrlEdit->UpDate();
@@ -3064,7 +3090,7 @@ void JZPianoWindow::Paste(JZTrack* pTrack, int Clock, int Pitch)
     tKeyOn* pEvent = new tKeyOn(0, 0, 64, 64, len);
     mPasteBuffer.Put(pEvent);
   }
-  // SN++
+
   if (GetKeyOnEventCount() > 1)
   {
     // don't change Pitch
@@ -3076,7 +3102,6 @@ void JZPianoWindow::Paste(JZTrack* pTrack, int Clock, int Pitch)
   JZEvent* pEvent = Iterator.First();
   if (pEvent)
   {
-    // SN++
     JZEvent *a = pEvent;
     while (a)
     {
@@ -3130,7 +3155,8 @@ void JZPianoWindow::Paste(JZTrack* pTrack, int Clock, int Pitch)
       pEvent = Iterator.Next();
     }
     pTrack->Cleanup();
-    // SN++ Veloc- oder Aftertouch-Editor updaten
+
+    // Velocity or aftertouch editor update.
     if (mpCtrlEdit)
     {
       mpCtrlEdit->UpDate();

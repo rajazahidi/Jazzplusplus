@@ -474,7 +474,7 @@ void JZTrackFrame::OnFileOpen(wxCommandEvent& Event)
     "Load MIDI File",
     "",
     "",
-    "*.mid",
+    "MIDI files (MID, MIDI)|*.mid;*.midi|All files (*.*)|*.*",
     wxFD_OPEN | wxFD_CHANGE_DIR);
   if (OpenDialog.ShowModal() == wxID_OK)
   {
@@ -501,7 +501,7 @@ void JZTrackFrame::OnFileSaveAs(wxCommandEvent& Event)
     "Save MIDI File",
     "",
     "",
-    "*.mid",
+    "MIDI files (MID, MIDI)|*.mid;*.midi|All files (*.*)|*.*",
     wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
   if (SaveAsDialog.ShowModal() == wxID_OK)
   {

@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-ACLOCAL_FLAGS=-I config
+ACLOCAL_AMFLAGS=-I m4
 
 SUBDIRS = src conf
 

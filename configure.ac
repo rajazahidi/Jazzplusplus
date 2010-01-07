@@ -1,6 +1,8 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT([jazzplusplus], [5.0.0], pstieber@verizon.net, [Jazz++])
 
+AC_CONFIG_MACRO_DIR([m4])
+
 dnl Change the location of the auxiliary configure files to config.
 AC_CONFIG_AUX_DIR([config])
 

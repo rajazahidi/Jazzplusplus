@@ -951,6 +951,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Dialogs\SysexDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\SysexDialog.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Dialogs\TrackDialog.cpp"
 				>
 			</File>

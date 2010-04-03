@@ -35,6 +35,7 @@ Dialogs/SearchAndReplaceDialog.cpp \
 Dialogs/ShiftDialog.cpp \
 Dialogs/SnapDialog.cpp \
 Dialogs/SynthesizerSettingsDialog.cpp \
+Dialogs/SysexDialog.cpp \
 Dialogs/TrackDialog.cpp \
 Dialogs/TransposeDialog.cpp \
 Dialogs/VelocityDialog.cpp \
@@ -123,6 +124,7 @@ Dialogs/SearchAndReplaceDialog.cpp \
 Dialogs/ShiftDialog.cpp \
 Dialogs/SnapDialog.cpp \
 Dialogs/SynthesizerSettingsDialog.cpp \
+Dialogs/SysexDialog.cpp \
 Dialogs/TrackDialog.cpp \
 Dialogs/TransposeDialog.cpp \
 Dialogs/VelocityDialog.cpp \
@@ -216,6 +218,7 @@ Dialogs/SearchAndReplaceDialog.h \
 Dialogs/ShiftDialog.h \
 Dialogs/SnapDialog.h \
 Dialogs/SynthesizerSettingsDialog.h \
+Dialogs/SysexDialog.h \
 Dialogs/TrackDialog.h \
 Dialogs/TransposeDialog.h \
 Dialogs/VelocityDialog.h \

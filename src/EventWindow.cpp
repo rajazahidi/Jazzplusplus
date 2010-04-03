@@ -39,7 +39,6 @@
 #include "Song.h"
 #include "Help.h"
 #include "ProjectManager.h"
-#include "PropertyListDialog.h"
 
 #include <wx/dc.h>
 #include <wx/msgdlg.h>

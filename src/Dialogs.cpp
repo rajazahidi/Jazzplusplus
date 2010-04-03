@@ -37,7 +37,6 @@
 #include "PianoWindow.h"
 #include "Player.h"
 #include "ProjectManager.h"
-#include "PropertyListDialog.h"
 #include "Song.h"
 #include "Synth.h"
 #include "Track.h"

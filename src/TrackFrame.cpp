@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008-2009 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -106,6 +106,8 @@ BEGIN_EVENT_TABLE(JZTrackFrame, JZEventFrame)
   EVT_MENU(ID_SETTINGS_SYNTHESIZER, JZTrackFrame::OnSettingsSynthesizerType)
 
   EVT_MENU(ID_SETTINGS_MIDI_DEVICE, JZTrackFrame::OnSettingsMidiDevice)
+
+  EVT_MENU(ID_AUDIO_GLOBAL_SETTINGS, JZTrackFrame::OnAudioGlobalSettings)
 
   EVT_MENU(wxID_HELP_CONTENTS, JZTrackFrame::OnHelpContents)
 
@@ -399,7 +401,7 @@ void JZTrackFrame::CreateMenu()
   pMenuBar->Append(pSettingMenu, "&Settings");
 
   wxMenu* pAudioMenu = new wxMenu;
-  pAudioMenu->Append(ID_AUDIO_GLOBAL, "&Global Settings...");
+  pAudioMenu->Append(ID_AUDIO_GLOBAL_SETTINGS, "&Global Settings...");
   pAudioMenu->Append(ID_AUDIO_SAMPLES, "Sample Se&ttings... ");
   pAudioMenu->Append(ID_AUDIO_LOAD, "&Load Set...");
   pAudioMenu->Append(ID_AUDIO_SAVE, "&Save Set");
@@ -636,6 +638,13 @@ void JZTrackFrame::OnSettingsMidiDevice(wxCommandEvent& Event)
     }
   }
 #endif
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnAudioGlobalSettings(wxCommandEvent& Event)
+{
+//  mpTrackWindow->EditAudioGlobalSettings(*this);
 }
 
 //-----------------------------------------------------------------------------

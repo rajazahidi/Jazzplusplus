@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@
 #define ID_SETTINGS_SYNTHESIZER              wxID_HIGHEST + 11
 #define ID_SETTINGS_MIDI_DEVICE              wxID_HIGHEST + 12
 
-#define ID_AUDIO_GLOBAL                      wxID_HIGHEST + 20
+#define ID_AUDIO_GLOBAL_SETTINGS             wxID_HIGHEST + 20
 #define ID_AUDIO_SAMPLES                     wxID_HIGHEST + 21
 #define ID_AUDIO_LOAD                        wxID_HIGHEST + 22
 #define ID_AUDIO_SAVE                        wxID_HIGHEST + 23

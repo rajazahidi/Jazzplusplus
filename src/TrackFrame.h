@@ -28,7 +28,7 @@
 
 #include "EventFrame.h"
 
-class JZSong;
+class JZProject;
 class JZToolBar;
 class JZTrackWindow;
 class JZPianoWindow;
@@ -42,7 +42,7 @@ class JZTrackFrame : public JZEventFrame, public tButtonLabelInterface
     JZTrackFrame(
       wxWindow* pParent,
       const wxString& Title,
-      JZSong* pSong,
+      JZProject* pProject,
       const wxPoint& Position = wxDefaultPosition,
       const wxSize& Size = wxDefaultSize);
 
@@ -115,6 +115,8 @@ class JZTrackFrame : public JZEventFrame, public tButtonLabelInterface
     wxMenu* mpEditMenu;
 
     wxMenu* mpToolsMenu;
+
+    JZProject* mpProject;
 
     JZTrackWindow* mpTrackWindow;
 

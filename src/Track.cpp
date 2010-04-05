@@ -1687,7 +1687,7 @@ int tEventArray::GetLastClock() const
   return Events[nEvents - 1]->GetClock();
 }
 
-int tEventArray::IsEmpty()
+bool tEventArray::IsEmpty() const
 {
   return nEvents == 0;
 }
@@ -1999,8 +1999,13 @@ void JZTrack::Merge(tEventArray *t)
   t->nEvents = 0;
 }
 
-
-void JZTrack::MergeRange(tEventArray *other, int FromClock, int ToClock, int Replace)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrack::MergeRange(
+  const tEventArray& Other,
+  int FromClock,
+  int ToClock,
+  int Replace)
 {
   // Erase destin
   if (Replace)
@@ -2015,7 +2020,7 @@ void JZTrack::MergeRange(tEventArray *other, int FromClock, int ToClock, int Rep
   }
 
   // Merge Recorded Events
-  tEventIterator Copy(other);
+  tEventIterator Copy(&Other);
   JZEvent* pEvent = Copy.Range(FromClock, ToClock);
   while (pEvent)
   {

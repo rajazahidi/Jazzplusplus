@@ -35,9 +35,9 @@
 #include "Dialogs.h"
 #include "EventFrame.h"
 #include "Filter.h"
-#include "MouseAction.h"
-#include "Song.h"
 #include "Help.h"
+#include "MouseAction.h"
+#include "Project.h"
 #include "ProjectManager.h"
 
 #include <wx/dc.h>
@@ -59,7 +59,7 @@ END_EVENT_TABLE()
 //-----------------------------------------------------------------------------
 JZEventWindow::JZEventWindow(
   wxFrame* pParent,
-  JZSong* pSong,
+  JZProject* pProject,
   const wxPoint& Position,
   const wxSize& Size)
   : wxWindow(
@@ -71,7 +71,7 @@ JZEventWindow::JZEventWindow(
     mpSnapSel(0),
     mpFilter(0),
     mpMouseAction(0),
-    mpSong(pSong),
+    mpProject(pProject),
     mpGreyColor(0),
     mpGreyBrush(0),
     mClockTicsPerPixel(36),
@@ -95,7 +95,7 @@ JZEventWindow::JZEventWindow(
 {
   mpSnapSel = new JZSnapSelection(this);
 
-  mpFilter = new JZFilter(mpSong);
+  mpFilter = new JZFilter(mpProject);
 
 #ifdef __WXMSW__
   mpGreyColor = new wxColor(192, 192, 192);
@@ -181,7 +181,7 @@ void JZEventWindow::Quantize()
 
     if (QuantizeDialog.ShowModal() == wxID_OK)
     {
-      int Step = mpSong->GetTicksPerQuarter() * 4 / QuantizationStep;
+      int Step = mpProject->GetTicksPerQuarter() * 4 / QuantizationStep;
 
       tCmdQuantize QuantizeCommand(
         mpFilter,
@@ -397,7 +397,7 @@ void JZEventWindow::GetVirtualEventSize(
   int& EventHeight) const
 {
   int TotalClockTics =
-    mpSong->GetMaxQuarters() * mpSong->GetTicksPerQuarter();
+    mpProject->GetMaxQuarters() * mpProject->GetTicksPerQuarter();
   EventWidth = TotalClockTics / mClockTicsPerPixel;
   EventHeight = 127 * mTrackHeight;
 }
@@ -469,7 +469,7 @@ int JZEventWindow::Clock2x(int Clock)
 int JZEventWindow::x2BarClock(int x, int Next)
 {
   int Clock = x2Clock(x);
-  JZBarInfo BarInfo(*mpSong);
+  JZBarInfo BarInfo(*mpProject);
   BarInfo.SetClock(Clock);
   while (Next--)
   {

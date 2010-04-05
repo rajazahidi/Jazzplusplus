@@ -66,7 +66,7 @@ JZTrackFrame* JZProjectManager::CreateTrackView()
     mpTrackFrame = new JZTrackFrame(
       0,
       "Jazz++",
-      gpSong,
+      gpProject,
       Position,
       Size);
   }
@@ -96,7 +96,7 @@ void JZProjectManager::CreatePianoView()
     mpPianoFrame = new JZPianoFrame(
       mpTrackFrame,
       "Piano",
-      gpSong,
+      gpProject,
       Position,
       Size);
   }

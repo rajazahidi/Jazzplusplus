@@ -23,14 +23,14 @@
 #ifndef JZ_PROJECT_H
 #define JZ_PROJECT_H
 
-class JZPlayer;
-class JZSynth;
-class JZFilter;
-
 #include "Song.h"
 #include "Metronome.h"
 
+class JZFilter;
+class JZPlayer;
 class JZRecordingInfo;
+class JZSynth;
+class wxWindow;
 
 //*****************************************************************************
 // Description:
@@ -155,6 +155,8 @@ class JZProject : public JZSong
 
     // Sets RecInfo, JZProject takes ownership of this object
     void SetRecInfo(JZRecordingInfo* pRecInfo);
+
+    void EditAudioGlobalSettings(wxWindow* pParent);
 
     JZPlayer* GetPlayer()
     {

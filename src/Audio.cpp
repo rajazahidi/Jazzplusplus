@@ -203,7 +203,7 @@ tSampleSet::tSampleSet(long tpm)
   adjust_audio_length = 1;
   has_changed  = false;
   spl_dialog   = 0;
-  glb_dialog   = 0;
+  mpGlobalSettingsDialog = 0;
   is_playing   = 0;
   softsync     = 1;
   dirty        = 0;
@@ -744,7 +744,7 @@ class tAudioGloblForm : public wxForm
       if (set.is_playing)
         return;
       wxBeginBusyCursor();
-      set.glb_dialog = 0;
+      set.mpGlobalSettingsDialog = 0;
       speed = atol(speedstr);
       set.SetSpeed(speed);
       set.SetChannels(stereo ? 2 : 1);
@@ -782,7 +782,7 @@ class tAudioGloblForm : public wxForm
     }
     void OnCancel()
     {
-      set.glb_dialog = 0;
+      set.mpGlobalSettingsDialog = 0;
       wxForm::OnCancel();
     }
   private:
@@ -811,16 +811,16 @@ void tSampleSet::GlobalSettingsDlg()
     return;
   }
 
-  if (glb_dialog == 0)
+  if (mpGlobalSettingsDialog == 0)
   {
 #ifdef OBSOLETE
-    glb_dialog = new wxDialogBox(gpTrackWindow, "Audio Settings", false);
+    mpGlobalSettingsDialog = new wxDialogBox(gpTrackWindow, "Audio Settings", false);
     tAudioGloblForm *form  = new tAudioGloblForm(*this);
-    form->AssociatePanel(glb_dialog);
-    glb_dialog->Fit();
+    form->AssociatePanel(mpGlobalSettingsDialog);
+    mpGlobalSettingsDialog->Fit();
 #endif // OBSOLETE
   }
-  glb_dialog->Show(true);
+  mpGlobalSettingsDialog->Show(true);
 }
 
 //-----------------------------------------------------------------------------
@@ -898,12 +898,12 @@ void tSampleSet::AddNote(const char *fname, long frc, long toc)
 
   // delete selection
 #ifdef OBSOLETE
-  JZSong       *song = gpProject->Song;
+  JZSong* pSong = gpProject->mpSong;
 #endif
   const JZRecordingInfo* info = gpProject->GetRecInfo();
   JZTrack* track = info->mpTrack;
 #ifdef OBSOLETE
-  song->NewUndoBuffer();
+  pSong->NewUndoBuffer();
 #endif
   tEventIterator iter(info->mpTrack);
   JZEvent *e = iter.Range(frc, toc);
@@ -1286,9 +1286,9 @@ void tSamplesDlg::ListClick(wxItem &itm, wxCommandEvent& event)
 //-----------------------------------------------------------------------------
 void tSampleSet::SamplesDlg()
 {
-  if (glb_dialog)
+  if (mpGlobalSettingsDialog)
   {
-    glb_dialog->Show(true);
+    mpGlobalSettingsDialog->Show(true);
     return;
   }
   if (spl_dialog == 0)
@@ -1363,7 +1363,7 @@ int tSampleSet::OnMenuCommand(int id)
       return 1;
 
     case ID_AUDIO_NEW:
-      if (spl_dialog == 0 && glb_dialog == 0)
+      if (spl_dialog == 0 && mpGlobalSettingsDialog == 0)
       {
         if (wxMessageBox("Clear Sample Set?", "Confirm", wxYES_NO) == wxNO)
         {

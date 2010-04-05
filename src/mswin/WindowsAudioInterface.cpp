@@ -157,7 +157,7 @@ JZWindowsAudioPlayer::JZWindowsAudioPlayer(JZSong* pSong)
   InitializeCriticalSection(&mutex);
 
   long dummy    = 0;
-  AudioBuffer   = new tEventArray();
+  mpAudioBuffer = new tEventArray();
   mInstalled    = false;
   dummy = gpConfig->GetValue(C_EnableAudio);
   audio_enabled = dummy;
@@ -201,7 +201,7 @@ JZWindowsAudioPlayer::JZWindowsAudioPlayer(JZSong* pSong)
 JZWindowsAudioPlayer::~JZWindowsAudioPlayer()
 {
   delete mpListener;
-  delete AudioBuffer;
+  delete mpAudioBuffer;
 
   // Close the device if it is open.
   CloseDsp();
@@ -523,7 +523,7 @@ void JZWindowsAudioPlayer::Notify()
 
     if (hout_open)
     {
-      mSamples.FillBuffers(OutClock);
+      mSamples.FillBuffers(mOutClock);
       if (play_buffers_needed > 0)  // dont trigger start play by accident
       {
         WriteBuffers();
@@ -611,15 +611,21 @@ void JZWindowsAudioPlayer::StartPlay(long Clock, long LoopClock, int Continue)
   JZWindowsIntPlayer::StartPlay(Clock, LoopClock, Continue);
 
   if (!audio_enabled)
+  {
     return;
+  }
 
   delete mpListener;
 
   start_clock = Clock;
   start_time = mpState->start_time;
 
-  mSamples.ResetBuffers(AudioBuffer, start_clock, mpState->ticks_per_minute);
-  mSamples.FillBuffers(OutClock);
+  mSamples.ResetBuffers(
+    mpAudioBuffer,
+    start_clock,
+    mpState->ticks_per_minute);
+
+  mSamples.FillBuffers(mOutClock);
 
   OpenDsp();
 }
@@ -655,7 +661,7 @@ void JZWindowsAudioPlayer::ListenAudio(int key, int start_stop_mode)
   }
 
   // Play the audio file from the piano roll.
-  if (Playing)
+  if (mPlaying)
   {
     return;
   }
@@ -681,15 +687,21 @@ void JZWindowsAudioPlayer::ListenAudio(int key, int start_stop_mode)
 void JZWindowsAudioPlayer::ListenAudio(tSample &spl, long fr_smpl, long to_smpl)
 {
   if (!audio_enabled)
+  {
     return;
+  }
 
-  if (Playing)
+  if (mPlaying)
+  {
     return;
-  // when already listening then stop listening
+  }
+
+  // When the code already listening, stop listening.
   if (mpListener)
   {
     delete mpListener;
   }
+
   mpListener = new tAudioListener(this, spl, fr_smpl, to_smpl);
 }
 

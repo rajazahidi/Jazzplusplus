@@ -49,13 +49,13 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tAlsaPlayer::tAlsaPlayer(JZSong *song)
-  : JZPlayer(song)
+tAlsaPlayer::tAlsaPlayer(JZSong* pSong)
+  : JZPlayer(pSong)
 {
   ithru = othru = 0;
 
   mInstalled = true;
-  poll_millisec = 25;
+  mPollMillisec = 25;
   recd_clock = 0;
   echo_clock = 0;
 
@@ -520,7 +520,7 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
 //-----------------------------------------------------------------------------
 void tAlsaPlayer::OutBreak()
 {
-  OutBreak(OutClock);
+  OutBreak(mOutClock);
 }
 
 //-----------------------------------------------------------------------------
@@ -610,48 +610,48 @@ void tAlsaPlayer::Notify()
     cout << "tAlsaPlayer::Notify rewind" << endl;
     ResetPlay(Now);
     mPlayBuffer.Clear();
-    OutClock = Now + FIRST_DELTACLOCK;
-    PlayLoop->PrepareOutput(&mPlayBuffer, Song, Now, OutClock, 0);
-    if (AudioBuffer)
+    mOutClock = Now + FIRST_DELTACLOCK;
+    mpPlayLoop->PrepareOutput(&mPlayBuffer, mpSong, Now, mOutClock, 0);
+    if (mpAudioBuffer)
     {
-      AudioBuffer->Clear();
-      PlayLoop->PrepareOutput(AudioBuffer, Song, Now, OutClock, 1);
+      mpAudioBuffer->Clear();
+      mpPlayLoop->PrepareOutput(mpAudioBuffer, mpSong, Now, mOutClock, 1);
     }
     mPlayBuffer.Length2Keyoff();
   }
   else
   {
     // time to put more events
-    if (Now >= (OutClock - ADVANCE_PLAY))
+    if (Now >= (mOutClock - ADVANCE_PLAY))
     {
-      PlayLoop->PrepareOutput(
+      mpPlayLoop->PrepareOutput(
         &mPlayBuffer,
-        Song,
-        OutClock,
+        mpSong,
+        mOutClock,
         Now + DELTACLOCK,
         0);
-      if (AudioBuffer)
+      if (mpAudioBuffer)
       {
-        PlayLoop->PrepareOutput(
-          AudioBuffer,
-          Song,
-          OutClock,
+        mpPlayLoop->PrepareOutput(
+          mpAudioBuffer,
+          mpSong,
+          mOutClock,
           Now + DELTACLOCK,
           1);
       }
-      OutClock = Now + DELTACLOCK;
+      mOutClock = Now + DELTACLOCK;
       mPlayBuffer.Length2Keyoff();
     }
   }
 
   play_clock = Now;
-  if (mPlayBuffer.nEvents && mPlayBuffer.Events[0]->GetClock() < OutClock)
+  if (mPlayBuffer.nEvents && mPlayBuffer.Events[0]->GetClock() < mOutClock)
   {
     FlushToDevice();
   }
   else
   {
-    OutBreak();        // does nothing unless OutClock has changed
+    OutBreak();        // does nothing unless mOutClock has changed
   }
 }
 
@@ -688,8 +688,8 @@ void tAlsaPlayer::set_event_header(
 //-----------------------------------------------------------------------------
 int tAlsaPlayer::start_timer(long clock)
 {
-  int time_base = Song->GetTicksPerQuarter();
-  int cur_speed = Song->GetTrack(0)->GetCurrentSpeed(clock);
+  int time_base = mpSong->GetTicksPerQuarter();
+  int cur_speed = mpSong->GetTrack(0)->GetCurrentSpeed(clock);
   init_queue_tempo(time_base, cur_speed);
   start_queue_timer(clock);
   return 0;
@@ -923,7 +923,7 @@ void tAlsaPlayer::recd_event(snd_seq_event_t* ev)
   {
     // Not all events are to be recorded.  Only those filtered out and put
     // into the event.
-    pEvent->SetClock(PlayLoop->Ext2IntClock(ev->time.tick));
+    pEvent->SetClock(mpPlayLoop->Ext2IntClock(ev->time.tick));
     mRecdBuffer.Put(pEvent);
   }
 }
@@ -947,7 +947,7 @@ long tAlsaPlayer::GetRealTimeClock()
   if (recd_clock != old_recd_clock)
   {
     JZProjectManager::Instance()->NewPlayPosition(
-      PlayLoop->Ext2IntClock(recd_clock / 48 * 48));
+      mpPlayLoop->Ext2IntClock(recd_clock / 48 * 48));
   }
   return recd_clock;
 }

@@ -241,7 +241,7 @@ tKeyLengthDragger::tKeyLengthDragger(
   Win   = pPianoWindow;
 
   // BUG FIX: undo/redo
-  Win->GetSong()->NewUndoBuffer();
+  Win->GetProject()->NewUndoBuffer();
 
   wxClientDC Dc(Win);
 
@@ -390,7 +390,7 @@ tPlayTrackLengthDragger::tPlayTrackLengthDragger(
   Win   = pPianoWindow;
 
   // BUG FIX: undo/redo
-  Win->GetSong()->NewUndoBuffer();
+  Win->GetProject()->NewUndoBuffer();
   //
   wxClientDC Dc(Win);
   Win->PrepareDC(Dc);
@@ -479,7 +479,7 @@ class tVelocCounter : public tMouseCounter
       mpKeyOn = pKeyOn;
 
       // BUG FIX: undo/redo
-      Win->GetSong()->NewUndoBuffer();
+      Win->GetProject()->NewUndoBuffer();
       //
       wxClientDC Dc(Win);
       Dc.SetFont(*(Win->GetFixedFont()));
@@ -639,10 +639,10 @@ JZListen JZPianoWindow::mListen;
 //-----------------------------------------------------------------------------
 JZPianoWindow::JZPianoWindow(
   JZPianoFrame* pPianoFrame,
-  JZSong* pSong,
+  JZProject* pProject,
   const wxPoint& Position,
   const wxSize& Size)
-  : JZEventWindow(pPianoFrame, pSong, Position, Size),
+  : JZEventWindow(pPianoFrame, pProject, Position, Size),
     mpPianoFrame(pPianoFrame),
     mPlayClock(-1),
     mSnapCount(0),
@@ -679,7 +679,7 @@ JZPianoWindow::JZPianoWindow(
 
   InitColors();
 
-  mpTrack = mpSong->GetTrack(mTrackIndex);
+  mpTrack = mpProject->GetTrack(mTrackIndex);
 
   mFontSize = mPianoFontSizes[1]; // Must be an entry in the array.
 
@@ -823,7 +823,7 @@ void JZPianoWindow::Draw(wxDC& Dc)
 
   mPianoX = 0;
 
-  JZBarInfo BarInfo(*mpSong);
+  JZBarInfo BarInfo(*mpProject);
 
 //DEBUG  cout
 //DEBUG    << "mLeftInfoWidth:                " << mLeftInfoWidth << '\n'
@@ -892,7 +892,7 @@ void JZPianoWindow::Draw(wxDC& Dc)
   BarInfo.SetClock(mFromClock);
   int StopClk = x2Clock(mCanvasWidth);
   int clk = BarInfo.GetClock();
-  int intro = mpSong->GetIntroLength();
+  int intro = mpProject->GetIntroLength();
   while (clk < StopClk)
   {
     clk = BarInfo.GetClock();
@@ -1010,9 +1010,9 @@ void JZPianoWindow::Draw(wxDC& Dc)
 
   if (mVisibleAllTracks)
   {
-    for (int i = 0; i < mpSong->GetTrackCount(); ++i)
+    for (int i = 0; i < mpProject->GetTrackCount(); ++i)
     {
-      JZTrack* pTrack = mpSong->GetTrack(i);
+      JZTrack* pTrack = mpProject->GetTrack(i);
       if (pTrack != mpTrack && IsVisible(pTrack))
       {
         DrawEvents(LocalDc, pTrack, StatKeyOn, wxLIGHT_GREY_BRUSH, TRUE);
@@ -1173,7 +1173,7 @@ bool JZPianoWindow::OnKeyEvent(wxKeyEvent& Event)
         }
         return true;
       case WXK_DOWN:
-        if (mTrackIndex < mpSong->GetTrackCount() - 1)
+        if (mTrackIndex < mpProject->GetTrackCount() - 1)
         {
           ++mTrackIndex;
           NewPosition(mTrackIndex, -1);
@@ -1204,7 +1204,7 @@ void JZPianoWindow::NewPosition(int TrackIndex, int Clock)
   if (TrackIndex >= 0)
   {
     mTrackIndex = TrackIndex;
-    mpTrack = mpSong->GetTrack(mTrackIndex);
+    mpTrack = mpProject->GetTrack(mTrackIndex);
     mpPianoFrame->SetTitle(mpTrack->GetName());
 
     SetYScrollPosition(TrackIndex2y(mFromLines[mTrackIndex]));
@@ -1732,7 +1732,7 @@ void JZPianoWindow::OnMouseEvent(wxMouseEvent& MouseEvent)
 
       if (action)
       {
-        if (!gpMidiPlayer->Playing)
+        if (!gpMidiPlayer->IsPlaying())
         {
           int Clock, LoopClock;
           if (action == MA_CYCLE)
@@ -2000,7 +2000,7 @@ void JZPianoWindow::NewPlayPosition(int Clock)
     // Avoid permenent redraws when end of scroll range is reached.
     if (
       Clock > mFromClock &&
-      mToClock >= mpSong->GetMaxQuarters() * mpSong->GetTicksPerQuarter())
+      mToClock >= mpProject->GetMaxQuarters() * mpProject->GetTicksPerQuarter())
     {
       return;
     }
@@ -2259,9 +2259,9 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& MouseEvent)
           else if (mVisibleAllTracks)
           {
             // event not found, maybe change to another Track
-            for (int i = 0; i < mpSong->GetTrackCount(); ++i)
+            for (int i = 0; i < mpProject->GetTrackCount(); ++i)
             {
-              JZTrack* pTrack = mpSong->GetTrack(i);
+              JZTrack* pTrack = mpProject->GetTrack(i);
               if (IsVisible(pTrack) && FindEvent(pTrack, Clock, Pitch))
               {
                 NewPosition(i, -1);
@@ -2387,7 +2387,7 @@ int JZPianoWindow::IsVisible(JZTrack* pTrack)
 //-----------------------------------------------------------------------------
 int JZPianoWindow::SnapClocks()
 {
-  int Clock = mpSong->GetTicksPerQuarter() * 4 / mSnapDenomiator;
+  int Clock = mpProject->GetTicksPerQuarter() * 4 / mSnapDenomiator;
   if (Clock < 1)
   {
     return 1;
@@ -2814,7 +2814,7 @@ void JZPianoWindow::CtrlPitch()
 //-----------------------------------------------------------------------------
 void JZPianoWindow::Redo()
 {
-  mpSong->Redo();
+  mpProject->Redo();
   Refresh();
   if (mpCtrlEdit && mpTrack >= 0)
   {
@@ -2827,7 +2827,7 @@ void JZPianoWindow::Redo()
 //-----------------------------------------------------------------------------
 void JZPianoWindow::Undo()
 {
-  mpSong->Undo();
+  mpProject->Undo();
   Refresh();
   if (mpCtrlEdit && mpTrack >= 0)
   {
@@ -3024,7 +3024,7 @@ void JZPianoWindow::Copy(JZTrack* pTrack, JZEvent* pEvent, int Kill)
     return;
   }
 
-  mpSong->NewUndoBuffer();
+  mpProject->NewUndoBuffer();
   mPasteBuffer.Clear();
   mPasteBuffer.Put(pEvent->Copy());
 
@@ -3097,7 +3097,7 @@ void JZPianoWindow::Paste(JZTrack* pTrack, int Clock, int Pitch)
     Pitch = -1;
   }
 
-  mpSong->NewUndoBuffer();
+  mpProject->NewUndoBuffer();
   tEventIterator Iterator(&mPasteBuffer);
   JZEvent* pEvent = Iterator.First();
   if (pEvent)

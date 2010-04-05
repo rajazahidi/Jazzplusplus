@@ -40,40 +40,6 @@ class JZRecordingInfo;
 
 //*****************************************************************************
 //*****************************************************************************
-class tPlayLoop
-{
-  public:
-
-    tPlayLoop();
-
-    void Set(long Start, long Stop);
-
-    void Reset();
-
-    // external clock -> internal clock where
-    //   external clock == physical clock
-    //   internal clock == song position
-    long Ext2IntClock(long Clock);
-
-    // the other way round
-    long Int2ExtClock(long Clock);
-
-    void PrepareOutput(
-      tEventArray* pEventArray,
-      JZSong* pSong,
-      long ExtFr,
-      long ExtTo,
-      int mode = 0);
-
-  private:
-
-    long mStartClock;
-
-    long mStopClock;
-};
-
-//*****************************************************************************
-//*****************************************************************************
 enum tClockSource
 {
   CsInt = 0,
@@ -131,102 +97,45 @@ class tDeviceList
 
 //*****************************************************************************
 //*****************************************************************************
+class tPlayLoop
+{
+  public:
+
+    tPlayLoop();
+
+    void Set(long Start, long Stop);
+
+    void Reset();
+
+    // external clock -> internal clock where
+    //   external clock == physical clock
+    //   internal clock == song position
+    long Ext2IntClock(long Clock);
+
+    // the other way round
+    long Int2ExtClock(long Clock);
+
+    void PrepareOutput(
+      tEventArray* pEventArray,
+      JZSong* pSong,
+      long ExtFr,
+      long ExtTo,
+      int mode = 0);
+
+  private:
+
+    long mStartClock;
+
+    long mStopClock;
+};
+
+//*****************************************************************************
+//*****************************************************************************
 class JZPlayer : public wxTimer
 {
-  protected:
-
-    long OutClock;
-    tPlayLoop* PlayLoop;
-    // timer value for polling the record queue
-    int poll_millisec;
-    JZRecordingInfo* mpRecordingInfo;   // 0 == not recording
-
-
   public:
 
-    bool Playing;        // successful StartPlay
-
-    // Tests if hardware found and successfully setup.
-    virtual bool IsInstalled() = 0;
-
-    // if unable to install, pop up a messagebox explaining why.
-    virtual void ShowError();
-
-    JZSong *Song;
-    tEventArray mPlayBuffer;
-    tEventArray mRecdBuffer;
-    void SetRecordInfo(JZRecordingInfo* inf)
-    {
-      mpRecordingInfo = inf;
-    }
-
-    bool IsPlaying() const
-    {
-      return Playing;
-    }
-
-    virtual int FindMidiDevice()
-    {
-      return -1;
-    }
-
-    virtual int SupportsMultipleDevices() { return 0; }
-    virtual tDeviceList & GetOutputDevices() { return DummyDeviceList; }
-    virtual tDeviceList & GetInputDevices() { return DummyDeviceList; }
-    virtual int GetThruInputDevice() { return 0; }
-    virtual int GetThruOutputDevice() { return 0; }
-
-    // Audio stuff
-    virtual void StartAudio() {}
-    tEventArray *AudioBuffer;
-    virtual int GetAudioEnabled() const { return 0; }
-    virtual void SetAudioEnabled(int) { }
-    virtual void ListenAudio(int key, int start_stop_mode = 1) {}
-    virtual void ListenAudio(tSample &spl, long fr_smpl, long to_smpl) {}
-    virtual bool IsListening() const { return 0; }
-
-    virtual int OnMenuCommand(int id)
-    {
-      if (Playing)
-      {
-        return 0;
-      }
-      return mSamples.OnMenuCommand(id);
-    }
-
-    virtual const char *GetSampleName(int i)
-    {
-      return mSamples.GetSampleName(i);
-    }
-
-    virtual void AdjustAudioLength(JZTrack *t)
-    {
-      long ticks_per_minute = Song->GetTicksPerQuarter() * Song->Speed();
-      mSamples.AdjustAudioLength(t, ticks_per_minute);
-    }
-
-    void EditSample(int key)
-    {
-      mSamples.Edit(key);
-    }
-
-    virtual long GetListenerPlayPosition()
-    {
-      return -1L;
-    }
-
-    void LoadDefaultSettings()
-    {
-      mSamples.LoadDefaultSettings();
-    }
-
-  protected:
-
-    tSampleSet mSamples;
-
-  public:
-
-    JZPlayer(JZSong *song);
+    JZPlayer(JZSong* pSong);
 
     virtual ~JZPlayer();
 
@@ -239,7 +148,7 @@ class JZPlayer : public wxTimer
 
     virtual void OutBreak() = 0;
 
-    // send event immediately ignoring clock
+    // Send event immediately ignoring the clock.
     void OutNow(JZTrack *t, JZEvent* pEvent)
     {
       pEvent->SetDevice(t->GetDevice());
@@ -252,7 +161,7 @@ class JZPlayer : public wxTimer
       OutNow(pEvent);
     }
 
-    void OutNow(JZTrack *t, tParam *r);
+    void OutNow(JZTrack* t, tParam* r);
 
     // what's played right now?
     virtual long GetRealTimeClock() = 0;
@@ -278,9 +187,143 @@ class JZPlayer : public wxTimer
       return 0;
     }
 
+    // Tests if hardware found and successfully setup.
+    virtual bool IsInstalled() = 0;
+
+    // if unable to install, pop up a messagebox explaining why.
+    virtual void ShowError();
+
+    const tEventArray& GetRecordBuffer() const
+    {
+      return mRecdBuffer;
+    }
+
+    void SetRecordInfo(JZRecordingInfo* pRecordingInfo)
+    {
+      mpRecordingInfo = pRecordingInfo;
+    }
+
+    bool IsRecordBufferEmpty() const
+    {
+      return mRecdBuffer.IsEmpty();
+    }
+
+    bool IsPlaying() const
+    {
+      return mPlaying;
+    }
+
+    virtual int FindMidiDevice()
+    {
+      return -1;
+    }
+
+    virtual int SupportsMultipleDevices()
+    {
+      return 0;
+    }
+    virtual tDeviceList& GetOutputDevices()
+    {
+      return DummyDeviceList;
+    }
+    virtual tDeviceList& GetInputDevices()
+    {
+      return DummyDeviceList;
+    }
+    virtual int GetThruInputDevice()
+    {
+      return 0;
+    }
+    virtual int GetThruOutputDevice()
+    {
+      return 0;
+    }
+
+    // Audio stuff
+    virtual void StartAudio()
+    {
+    }
+    virtual int GetAudioEnabled() const
+    {
+      return 0;
+    }
+    virtual void SetAudioEnabled(int)
+    {
+    }
+    virtual void ListenAudio(int key, int start_stop_mode = 1)
+    {
+    }
+    virtual void ListenAudio(tSample &spl, long fr_smpl, long to_smpl)
+    {
+    }
+    virtual bool IsListening() const
+    {
+      return 0;
+    }
+
+    virtual int OnMenuCommand(int id)
+    {
+      if (mPlaying)
+      {
+        return 0;
+      }
+      return mSamples.OnMenuCommand(id);
+    }
+
+    virtual const char *GetSampleName(int i)
+    {
+      return mSamples.GetSampleName(i);
+    }
+
+    virtual void AdjustAudioLength(JZTrack *t)
+    {
+      long ticks_per_minute = mpSong->GetTicksPerQuarter() * mpSong->Speed();
+      mSamples.AdjustAudioLength(t, ticks_per_minute);
+    }
+
+    void EditGlobalAudioSettings(wxWindow* pParent);
+
+    void EditSample(int key)
+    {
+      mSamples.Edit(key);
+    }
+
+    virtual long GetListenerPlayPosition()
+    {
+      return -1L;
+    }
+
+    void LoadDefaultSettings()
+    {
+      mSamples.LoadDefaultSettings();
+    }
+
   protected:
 
     virtual void OutNow(JZEvent* pEvent) = 0;
+
+  protected:
+
+    long mOutClock;
+
+    tPlayLoop* mpPlayLoop;
+
+    // This is the timer value for polling the record queue.
+    int mPollMillisec;
+
+     // If this value is 0, then not recording.
+    JZRecordingInfo* mpRecordingInfo;
+
+    bool mPlaying;
+
+    JZSong* mpSong;
+
+    tEventArray mPlayBuffer;
+    tEventArray mRecdBuffer;
+
+    tEventArray* mpAudioBuffer;
+
+    tSampleSet mSamples;
 
   private:
 
@@ -576,7 +619,7 @@ class tSeq2Player : public JZPlayer
   public:
 
     friend class tOSSThru;
-    tSeq2Player(JZSong *song);
+    tSeq2Player(JZSong* pSong);
     virtual bool IsInstalled();
     virtual ~tSeq2Player();
     int  OutEvent(JZEvent *e, int now);

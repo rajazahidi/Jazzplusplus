@@ -347,9 +347,9 @@ class tDrumInstrumentParameterList
     tDrumInstrumentParameter *NextElem( tDrumInstrumentParameter *cur );
     void DelElem( int pit );
     void Clear();
-    int IsEmpty()
+    bool IsEmpty() const
     {
-      return( list == 0 );
+      return list == 0;
     }
 
   private:
@@ -524,7 +524,7 @@ class tEventArray : public tSimpleEventArray
     void Write(JZWriteBase& Io);
 
     int GetLastClock() const;
-    int IsEmpty();
+    bool IsEmpty() const;
     int GetFirstClock();
 
     int State;    // tsXXX
@@ -586,11 +586,13 @@ class JZTrack : public tEventArray
     }
 
     void Merge(tEventArray *other);
+
     void MergeRange(
-      tEventArray *other,
+      const tEventArray& Other,
       int FromClock,
       int ToClock,
       int Replace = 0);
+
     void Undo();
     void Redo();
     void NewUndoBuffer();

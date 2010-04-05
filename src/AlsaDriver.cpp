@@ -125,7 +125,7 @@ class tAlsaAudioListener : public wxTimer
 tAlsaAudioPlayer::tAlsaAudioPlayer(JZSong* pSong)
   : tAlsaPlayer(pSong)
 {
-  AudioBuffer   = new tEventArray();
+  mpAudioBuffer = new tEventArray();
   mInstalled    = false;
   audio_enabled = 0;
   mpListener    = 0;
@@ -146,7 +146,7 @@ tAlsaAudioPlayer::tAlsaAudioPlayer(JZSong* pSong)
 tAlsaAudioPlayer::~tAlsaAudioPlayer()
 {
   delete mpListener;
-  delete AudioBuffer;
+  delete mpAudioBuffer;
   if (pcm[PLAYBACK])
   {
     snd_pcm_close(pcm[PLAYBACK]);
@@ -186,12 +186,12 @@ void tAlsaAudioPlayer::StartPlay(long clock, long loopClock, int cont)
     return;
   }
 
-  long ticks_per_minute = Song->GetTicksPerQuarter() * Song->Speed();
-  mSamples.ResetBuffers(AudioBuffer, clock, ticks_per_minute);
+  long ticks_per_minute = mpSong->GetTicksPerQuarter() * mpSong->Speed();
+  mSamples.ResetBuffers(mpAudioBuffer, clock, ticks_per_minute);
   last_scount = 0;
   cur_pos = 0;
   audio_clock_offset = clock;
-  midi_speed  = Song->Speed();
+  midi_speed  = mpSong->Speed();
   curr_speed  = midi_speed;
 
   running_mode = 0;
@@ -208,7 +208,7 @@ void tAlsaAudioPlayer::StartPlay(long clock, long loopClock, int cont)
   {
     OpenDsp(PLAYBACK, 1);
     mSamples.ResetBufferSize(frag_byte_size[PLAYBACK]);
-    mSamples.FillBuffers(OutClock);
+    mSamples.FillBuffers(mOutClock);
   }
 
   if (running_mode == 0)
@@ -412,7 +412,7 @@ void tAlsaAudioPlayer::Notify()
       WriteSamples();
 
       // The code may hang here when swapping in pages.
-      mSamples.FillBuffers(OutClock);
+      mSamples.FillBuffers(mOutClock);
 
       WriteSamples();
     }
@@ -521,8 +521,8 @@ void tAlsaAudioPlayer::ResetPlay(long clock)
   if (pcm[PLAYBACK])
   {
     snd_pcm_drop(pcm[PLAYBACK]);
-//    long ticks_per_minute = Song->GetTicksPerQuarter() * Song->Speed();
-//    mSamples.ResetBuffers(AudioBuffer, clock, ticks_per_minute);
+//    long ticks_per_minute = mpSong->GetTicksPerQuarter() * mpSong->Speed();
+//    mSamples.ResetBuffers(mpAudioBuffer, clock, ticks_per_minute);
   }
   audio_clock_offset = clock;
   cur_pos = 0;

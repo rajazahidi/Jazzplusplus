@@ -210,7 +210,7 @@ END_EVENT_TABLE()
 JZPianoFrame::JZPianoFrame(
   wxWindow* pParent,
   const wxString& Title,
-  JZSong* pSong,
+  JZProject* pProject,
   const wxPoint& Position,
   const wxSize& Size)
   : wxFrame(
@@ -223,7 +223,7 @@ JZPianoFrame::JZPianoFrame(
     mpPianoWindow(0),
 //    mpFileMenu(0),
 //    mpEditMenu(0)
-    mpSong(pSong),
+    mpProject(pProject),
     mpToolBar(0)
 {
   CreateToolBar();
@@ -242,7 +242,7 @@ JZPianoFrame::JZPianoFrame(
   mTrackIndex = 0;
   mpToolBar->ToggleTool(ID_SNAP_16, TRUE);
 
-  mpPianoWindow = new JZPianoWindow(this, pSong);
+  mpPianoWindow = new JZPianoWindow(this, pProject);
 }
 
 //-----------------------------------------------------------------------------

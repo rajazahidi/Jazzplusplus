@@ -28,7 +28,7 @@
 class JZFilter;
 class JZMouseAction;
 class JZSnapSelection;
-class JZSong;
+class JZProject;
 class wxDialog;
 
 //*****************************************************************************
@@ -42,14 +42,14 @@ class JZEventWindow : public wxWindow
 
     JZEventWindow(
       wxFrame* pParent,
-      JZSong* pSong,
+      JZProject* pProject,
       const wxPoint& Position = wxDefaultPosition,
       const wxSize& Size = wxDefaultSize);
 
     virtual ~JZEventWindow();
 
     // WARNING: non-constant access.
-    JZSong* GetSong() const;
+    JZProject* GetProject() const;
 
     bool AreEventsSelected();
 
@@ -130,7 +130,7 @@ class JZEventWindow : public wxWindow
 
   protected:
 
-    JZSong* mpSong;
+    JZProject* mpProject;
 
     wxColor* mpGreyColor;
     wxBrush* mpGreyBrush;
@@ -162,9 +162,9 @@ class JZEventWindow : public wxWindow
 // WARNING: non-constant access.
 //-----------------------------------------------------------------------------
 inline
-JZSong* JZEventWindow::GetSong() const
+JZProject* JZEventWindow::GetProject() const
 {
-  return mpSong;
+  return mpProject;
 }
 
 #endif // !defined(JZ_EVENTWINDOW_H)

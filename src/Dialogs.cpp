@@ -273,7 +273,7 @@ class tEventDlg : public tPropertyListDlg
 
 tEventDlg::tEventDlg(JZEvent *e, JZPianoWindow* w, JZTrack *t)
   : tPropertyListDlg( "Event" ),
-    ClockDlg(w->GetSong(), "Time ", e->GetClock())
+    ClockDlg(w->GetProject(), "Time ", e->GetClock())
 {
   Win   = w;
   Track = t;
@@ -954,7 +954,10 @@ void EventDialog(
 
     case StatSetTempo:
       str = "Set Tempo (for track 0)";
-      dlg = new tSetTempoDlg(e->IsSetTempo(), pPianoWindow, pPianoWindow->GetSong()->GetTrack(0) );
+      dlg = new tSetTempoDlg(
+        e->IsSetTempo(),
+        pPianoWindow,
+        pPianoWindow->GetProject()->GetTrack(0));
       break;
 
     case StatSysEx:
@@ -1024,8 +1027,8 @@ void tMeterChangeDlg::OnCancel()
 
 bool tMeterChangeDlg::OnClose()
 {
-  BarNr += mpEventWindow->GetSong()->GetIntroLength();
-  mpEventWindow->GetSong()->SetMeterChange(BarNr, Numerator, Denomiator);
+  BarNr += mpEventWindow->GetProject()->GetIntroLength();
+  mpEventWindow->GetProject()->SetMeterChange(BarNr, Numerator, Denomiator);
   mpEventWindow->Refresh();
   mpEventWindow->FinishMeterEdit();
   return false;

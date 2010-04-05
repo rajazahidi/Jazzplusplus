@@ -227,7 +227,7 @@ int JZPortMidiPlayer::Time2Clock(int time)
 void JZPortMidiPlayer::SetTempo(int bpm, int clock)
 {
   int t1 = Clock2Time(clock);
-  mTicksPerMinute = bpm * Song->GetTicksPerQuarter();
+  mTicksPerMinute = bpm * mpSong->GetTicksPerQuarter();
   int t2 = Clock2Time(clock);
   mStartTime += (t1 - t2);
 }
@@ -378,7 +378,7 @@ void JZPortMidiPlayer::StartPlay(int clock, int loopClock, int cont)
 
   mStartTime = Pt_Time() + 500;
   mStartClock = clock;
-  mTicksPerMinute  = Song->GetTicksPerQuarter() * Song->Speed();
+  mTicksPerMinute  = mpSong->GetTicksPerQuarter() * mpSong->Speed();
 
   JZPlayer::StartPlay(clock, loopClock, cont);
 }
@@ -406,7 +406,7 @@ long JZPortMidiPlayer::GetRealTimeClock()
   long t = Pt_Time();
 
   gpTrackWindow->NewPlayPosition(
-    PlayLoop->Ext2IntClock(Time2Clock(t) / 48 * 48));
+    mpPlayLoop->Ext2IntClock(Time2Clock(t) / 48 * 48));
 
   return Time2Clock(t);
 }

@@ -341,10 +341,8 @@ JZProject::JZProject()
     StartUpSong = mpConfig->GetStrValue(C_StartUpSong);
   }
 
-  FILE* pFd = fopen(StartUpSong.c_str(), "r");
-  if (pFd)
+  if (wxFileName::IsFileReadable(StartUpSong.c_str()))
   {
-    fclose(pFd);
     JZStandardRead Io;
     Read(Io, StartUpSong.c_str());
   }
@@ -620,6 +618,13 @@ bool JZProject::IsMetronomeOn() const
 JZRecordingInfo* JZProject::GetRecInfo()
 {
   return mpRecInfo;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZProject::EditAudioGlobalSettings(wxWindow* pParent)
+{
+  mpMidiPlayer->EditGlobalAudioSettings(pParent);
 }
 
 //-----------------------------------------------------------------------------

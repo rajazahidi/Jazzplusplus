@@ -30,12 +30,12 @@
 
 #include <wx/brush.h>
 
-class JZPianoFrame;
-class JZSong;
-class JZTrack;
+class tCtrlEditBase;
 class JZEvent;
 class JZFilter;
-class tCtrlEditBase;
+class JZPianoFrame;
+class JZProject;
+class JZTrack;
 
 //*****************************************************************************
 //*****************************************************************************
@@ -70,7 +70,7 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     JZPianoWindow(
       JZPianoFrame* pFrame,
-      JZSong* pSong,
+      JZProject* pProject,
       const wxPoint& Position = wxDefaultPosition,
       const wxSize& Size = wxDefaultSize);
 

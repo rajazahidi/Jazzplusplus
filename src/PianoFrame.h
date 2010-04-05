@@ -29,11 +29,11 @@
 #include <wx/frame.h>
 
 class JZGuitarFrame;
-class JZSong;
-class JZToolBar;
-class tCtrlEditBase;
-class JZTrack;
 class JZPianoWindow;
+class JZProject;
+class JZToolBar;
+class JZTrack;
+class tCtrlEditBase;
 
 //*****************************************************************************
 //*****************************************************************************
@@ -46,7 +46,7 @@ class JZPianoFrame : public wxFrame
     JZPianoFrame(
       wxWindow* pParent,
       const wxString& Title,
-      JZSong* pSong,
+      JZProject* pProject,
       const wxPoint& Position = wxDefaultPosition,
       const wxSize& Size = wxDefaultSize);
 
@@ -132,7 +132,7 @@ class JZPianoFrame : public wxFrame
     JZPianoWindow* mpPianoWindow;
 
     int mClockTicsPerPixel;
-    JZSong* mpSong;
+    JZProject* mpProject;
     wxDialog* mpDialogBox;
     wxDialog* MixerForm;
 

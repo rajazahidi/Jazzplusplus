@@ -122,7 +122,7 @@ tAudioPlayer::tAudioPlayer(JZSong* pSong)
   : tSeq2Player(pSong)
 {
   long dummy = 0;
-  AudioBuffer = new tEventArray();
+  mpAudioBuffer = new tEventArray();
   mInstalled = false;
   dummy = gpConfig->GetValue(C_EnableAudio);
   audio_enabled = dummy;
@@ -171,9 +171,11 @@ tAudioPlayer::tAudioPlayer(JZSong* pSong)
 tAudioPlayer::~tAudioPlayer()
 {
   delete mpListener;
-  delete AudioBuffer;
+  delete mpAudioBuffer;
   if (dev >= 0)
+  {
     close(dev);
+  }
 }
 
 
@@ -194,16 +196,16 @@ void tAudioPlayer::StartAudio()
     return;
   }
 
-  long ticks_per_minute = Song->GetTicksPerQuarter() * Song->Speed();
-  mSamples.ResetBuffers(AudioBuffer, start_clock, ticks_per_minute);
+  long ticks_per_minute = mpSong->GetTicksPerQuarter() * mpSong->Speed();
+  mSamples.ResetBuffers(mpAudioBuffer, start_clock, ticks_per_minute);
   if (PlaybackMode())
   {
-    mSamples.FillBuffers(OutClock);
+    mSamples.FillBuffers(mOutClock);
   }
 
   audio_bytes = 0;
   midi_clock  = 0;
-  midi_speed  = Song->Speed();
+  midi_speed  = mpSong->Speed();
   curr_speed  = midi_speed;
 
   OpenDsp();
@@ -351,7 +353,7 @@ void tAudioPlayer::Notify()
       WriteSamples();
 
       // here it may hang when swapping in pages
-      mSamples.FillBuffers(OutClock);
+      mSamples.FillBuffers(mOutClock);
 
       WriteSamples();
     }

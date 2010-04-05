@@ -120,14 +120,16 @@ END_EVENT_TABLE()
 JZTrackFrame::JZTrackFrame(
   wxWindow* pParent,
   const wxString& Title,
-  JZSong* pSong,
+  JZProject* pProject,
   const wxPoint& Position,
   const wxSize& Size)
-  : JZEventFrame(pParent, Title, pSong, Position, Size),
+  : JZEventFrame(pParent, Title, pProject, Position, Size),
     mpToolBar(0),
     mpFileMenu(0),
     mpEditMenu(0),
     mpToolsMenu(0),
+    mpProject(pProject),
+    mpTrackWindow(0),
     mPreviousClock(0),
     mPreviouslyRecording(false)
 {
@@ -137,7 +139,7 @@ JZTrackFrame::JZTrackFrame(
 
   mpTrackWindow = new JZTrackWindow(
     this,
-    pSong,
+    pProject,
     wxPoint(0, 0),
     wxSize(600, 120));
 
@@ -644,7 +646,7 @@ void JZTrackFrame::OnSettingsMidiDevice(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnAudioGlobalSettings(wxCommandEvent& Event)
 {
-//  mpTrackWindow->EditAudioGlobalSettings(*this);
+  mpProject->EditAudioGlobalSettings(this);
 }
 
 //-----------------------------------------------------------------------------

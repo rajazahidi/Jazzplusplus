@@ -221,6 +221,8 @@ class tAudioRecordBuffer
 
 class tSamplesDlg;
 
+//*****************************************************************************
+//*****************************************************************************
 class tSampleSet
 {
   private:
@@ -368,12 +370,23 @@ class tSampleSet
       return *samples[i];
     }
 
+    void GlobalSettingsDlg();
+
   protected:
 
     long SampleSize(long num_samples)
     {
       return channels * (bits == 8 ? 1L : 2L) * num_samples;
     }
+
+    long BufferClock(int i) const
+    {
+      return (long)(start_clock + i * clocks_per_buffer);
+    }
+
+    void SamplesDlg();
+
+  protected:
 
     long speed;    // samples / second
     int  channels; // mono = 1, stereo = 2
@@ -389,7 +402,6 @@ class tSampleSet
 
     int   event_index;
 
-
     unsigned int bufbytes;           // buffer size in byte
     unsigned int bufshorts;          // buffer size in short
     tAudioBuffer *buffers[BUFCOUNT]; // all the audio buffers
@@ -399,20 +411,18 @@ class tSampleSet
 
     // return the start clock for i-th free buffer
     long buffers_written;            // for computing buffers clock
-    long BufferClock(int i) const
+
+    wxDialog* mpGlobalSettingsDialog;
+    tSamplesDlg* spl_dialog;
+
+    tEventArray* events;
+
+    enum
     {
-      return (long)(start_clock + i * clocks_per_buffer);
-    }
+      MAXPOLY = 100
+    };
 
-    void GlobalSettingsDlg();
-    void SamplesDlg();
-    wxDialog *glb_dialog;
-    tSamplesDlg *spl_dialog;
-
-    tEventArray *events;
-
-    enum { MAXPOLY = 100 };
-    tSampleVoice * voices[MAXPOLY];
+    tSampleVoice* voices[MAXPOLY];
     int num_voices;
     int adjust_audio_length;
 

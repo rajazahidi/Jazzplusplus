@@ -67,10 +67,10 @@ END_EVENT_TABLE()
 //-----------------------------------------------------------------------------
 JZTrackWindow::JZTrackWindow(
   wxFrame* pParent,
-  JZSong* pSong,
+  JZProject* pProject,
   const wxPoint& Position,
   const wxSize& Size)
-  : JZEventWindow(pParent, pSong, Position, Size),
+  : JZEventWindow(pParent, pProject, Position, Size),
     mPlayClock(-1),
     mUseColors(true),
     mNumberWidth(),
@@ -177,7 +177,7 @@ void JZTrackWindow::NewPlayPosition(int Clock)
     // Avoid permanent redraws when end of scroll range is reached.
     if (
       Clock > mFromClock &&
-      mToClock >= mpSong->GetMaxQuarters() * mpSong->GetTicksPerQuarter())
+      mToClock >= mpProject->GetMaxQuarters() * mpProject->GetTicksPerQuarter())
     {
       return;
     }
@@ -274,7 +274,7 @@ void JZTrackWindow::OnLeftButtonDown(wxMouseEvent& MouseEvent)
     JZRectangle Rectangle(
       0,
       y2yLine(Point.y + mScrolledY),
-      Clock2x(mpSong->GetMaxQuarters() * mpSong->GetTicksPerQuarter()) +
+      Clock2x(mpProject->GetMaxQuarters() * mpProject->GetTicksPerQuarter()) +
         mScrolledX,
       mTrackHeight);
     mpSnapSel->Select(Rectangle);
@@ -618,9 +618,9 @@ void JZTrackWindow::Draw(wxDC& Dc)
   DrawHorizontalLine(LocalDc, mEventsY);
   DrawHorizontalLine(LocalDc, mEventsY - 1);
 
-  if (mpSong)
+  if (mpProject)
   {
-    JZBarInfo BarInfo(*mpSong);
+    JZBarInfo BarInfo(*mpProject);
 
 //DEBUG    cout
 //DEBUG      << "mLeftInfoWidth:                " << mLeftInfoWidth << '\n'
@@ -1026,12 +1026,12 @@ void JZTrackWindow::DrawCounters(wxDC& Dc)
 //-----------------------------------------------------------------------------
 void JZTrackWindow::DrawEvents(wxDC& Dc)
 {
-  if (!mpSong)
+  if (!mpProject)
   {
     return;
   }
 
-  JZBarInfo BarInfo(*mpSong);
+  JZBarInfo BarInfo(*mpProject);
 
   Dc.SetClippingRegion(mEventsX, mEventsY, mEventsWidth, mEventsHeight);
 
@@ -1220,7 +1220,7 @@ int JZTrackWindow::y2TrackIndex(int y)
 //-----------------------------------------------------------------------------
 JZTrack* JZTrackWindow::y2Track(int y)
 {
-  return mpSong->GetTrack(y2TrackIndex(y));
+  return mpProject->GetTrack(y2TrackIndex(y));
 }
 
 //-----------------------------------------------------------------------------
@@ -1386,7 +1386,7 @@ void JZTrackWindow::MousePlay(wxMouseEvent& MouseEvent, TEMousePlayMode Mode)
     gpProject->mStopTime = loop_clock;
     gpProject->Play();
 
-  } //if(!Midi->Playing)
+  }
   else
   {
     gpProject->Stop();
@@ -1408,18 +1408,21 @@ void JZTrackWindow::MousePlay(wxMouseEvent& MouseEvent, TEMousePlayMode Mode)
       }
       if (
         !pRecInfo->mpTrack->GetAudioMode() &&
-        !gpProject->GetPlayer()->mRecdBuffer.IsEmpty())
+        !gpProject->GetPlayer()->IsRecordBufferEmpty())
       {
         //int choice = wxMessageBox("Keep recorded events?", "You played", wxOK | wxCANCEL);
         //if (choice == wxOK)
         {
           wxBeginBusyCursor();
+
           gpProject->NewUndoBuffer();
+
           pRecInfo->mpTrack->MergeRange(
-            &gpProject->GetPlayer()->mRecdBuffer,
+            gpProject->GetPlayer()->GetRecordBuffer(),
             pRecInfo->mFromClock,
             pRecInfo->mToClock,
             pRecInfo->mIsMuted);
+
           wxEndBusyCursor();
 
           Refresh(false);

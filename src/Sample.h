@@ -256,14 +256,19 @@ class tSample {
       return length;
     }
 
-    int IsEmpty() const {
+    bool IsEmpty() const
+    {
       return length == 0;
     }
-    void SetExternal(int ext) {
+
+    void SetExternal(int ext)
+    {
       external_flag = ext;
       //external_time = 0;
     }
-    int GetExternal() const {
+
+    int GetExternal() const
+    {
       return external_flag;
     }
 

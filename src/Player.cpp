@@ -182,32 +182,121 @@ void tPlayLoop::PrepareOutput(
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZPlayer::JZPlayer(JZSong* pSong)
-  : mSamples(pSong->GetTicksPerQuarter() * pSong->Speed())
+  : mOutClock(0),
+    mpPlayLoop(0),
+    mPollMillisec(200),
+    mpRecordingInfo(0),
+    mPlaying(false),
+    mpSong(pSong),
+    mpAudioBuffer(0),
+    mSamples(pSong->GetTicksPerQuarter() * pSong->Speed())
 {
   DummyDeviceList.Add("default");
-  poll_millisec = 200;  // default
-  Song = pSong;
-  OutClock = 0;
-  Playing = false;
-  PlayLoop = new tPlayLoop();
-  AudioBuffer = 0;
-  mpRecordingInfo = 0;
+  mpPlayLoop = new tPlayLoop();
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZPlayer::~JZPlayer()
 {
-  delete PlayLoop;
+  delete mpPlayLoop;
   mPlayBuffer.Clear();
   mRecdBuffer.Clear();
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZPlayer::ShowError()
+void JZPlayer::Notify()
 {
-  wxMessageBox("could not install driver", "Error", wxOK);
+  // called by timer
+  long Now = GetRealTimeClock();
+
+#ifdef DEBUG_PLAYER_NOTIFY
+  cout << "JZPlayer::Notify " << Now << endl;
+#endif // DEBUG_PLAYER_NOTIFY
+  if (Now < 0)
+  {
+    return;
+  }
+
+  // time to put more events
+  if (Now >= (mOutClock - ADVANCE_PLAY))
+  {
+#ifdef DEBUG_PLAYER_NOTIFY
+    cout << "*** Notify: more events to playbuffer" << endl;
+#endif // DEBUG_PLAYER_NOTIFY
+
+    mpPlayLoop->PrepareOutput(
+      &mPlayBuffer,
+      mpSong,
+      mOutClock,
+      Now + DELTACLOCK,
+      0);
+    if (mpAudioBuffer)
+    {
+      mpPlayLoop->PrepareOutput(
+        mpAudioBuffer,
+        mpSong,
+        mOutClock,
+        Now + DELTACLOCK,
+        1);
+    }
+    mOutClock = Now + DELTACLOCK;
+    mPlayBuffer.Length2Keyoff();
+  }
+
+  // optimization:
+  //
+  // if (there are some events to be played)
+  //   send them to driver
+  // else
+  //   tell the driver that there is nothing to do at the moment
+  if (mPlayBuffer.nEvents && mPlayBuffer.Events[0]->GetClock() < mOutClock)
+  {
+    FlushToDevice();
+  }
+  else
+  {
+    // Does nothing unless mOutClock has changed.
+    OutBreak();
+  }
+}
+
+//-----------------------------------------------------------------------------
+// Description:
+//   Try to send all events up to mOutClock to device.
+//-----------------------------------------------------------------------------
+void JZPlayer::FlushToDevice()
+{
+  int BufferFull = 0;
+
+  tEventIterator Iterator(&mPlayBuffer);
+  JZEvent* pEvent = Iterator.Range(0, mOutClock);
+  while (!BufferFull && pEvent)
+  {
+    if (OutEvent(pEvent) != 0)
+      BufferFull = 1;
+    else
+    {
+      pEvent->Kill();
+      pEvent = Iterator.Next();
+    }
+  }
+
+  if (!BufferFull)
+    OutBreak();
+  mPlayBuffer.Cleanup(0);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPlayer::OutNow(JZTrack *t, tParam *r)
+{
+  OutNow(t, &r->mMsb);
+  OutNow(t, &r->mLsb);
+  OutNow(t, &r->mDataMsb);
+  OutNow(t, &r->mResetMsb);
+  OutNow(t, &r->mResetLsb);
 }
 
 //-----------------------------------------------------------------------------
@@ -222,19 +311,19 @@ void JZPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 
   if (LoopClock > 0)
   {
-    PlayLoop->Set(Clock, LoopClock);
+    mpPlayLoop->Set(Clock, LoopClock);
   }
   else
   {
-    PlayLoop->Reset();
+    mpPlayLoop->Reset();
   }
 
-  Clock = PlayLoop->Int2ExtClock(Clock);
+  Clock = mpPlayLoop->Int2ExtClock(Clock);
   mPlayBuffer.Clear();
   mRecdBuffer.Clear();
-  if (AudioBuffer)
+  if (mpAudioBuffer)
   {
-    AudioBuffer->Clear();
+    mpAudioBuffer->Clear();
   }
 
   JZTrack *t;
@@ -246,16 +335,16 @@ void JZPlayer::StartPlay(long Clock, long LoopClock, int Continue)
       ((Clock == 0) && (gpConfig->GetValue(C_SendSynthReset) == 1)))
     {
       // fixme: we should have different synths for each device
-      t = Song->GetTrack(0);
+      t = mpSong->GetTrack(0);
       JZEvent* mpResetEvent = gpSynth->CreateResetEvent();
       OutNow(t, mpResetEvent);
       delete mpResetEvent;
     }
 
     // Send Volume, Pan, Chorus, etc
-    for (i = 0; i < Song->GetTrackCount(); ++i)
+    for (i = 0; i < mpSong->GetTrackCount(); ++i)
     {
-      t = Song->GetTrack(i);
+      t = mpSong->GetTrack(i);
       if (t->mpBank)
       {
         OutNow(t, t->mpBank);
@@ -459,7 +548,7 @@ void JZPlayer::StartPlay(long Clock, long LoopClock, int Continue)
     } // for
   } // if !Continue
 
-  t = Song->GetTrack(0);
+  t = mpSong->GetTrack(0);
   JZEvent* pEvent = t->GetCurrentTempo(Clock);
   if (pEvent)
   {
@@ -481,23 +570,34 @@ void JZPlayer::StartPlay(long Clock, long LoopClock, int Continue)
     gpConfig->GetValue(C_ThruInput),
     gpConfig->GetValue(C_ThruOutput));
 
-  OutClock = Clock + FIRST_DELTACLOCK;
+  mOutClock = Clock + FIRST_DELTACLOCK;
 
   JZProjectManager::Instance()->NewPlayPosition(
-    PlayLoop->Ext2IntClock(Clock));
+    mpPlayLoop->Ext2IntClock(Clock));
 
-  PlayLoop->PrepareOutput(&mPlayBuffer, Song, Clock, Clock + FIRST_DELTACLOCK, 0);
-  if (AudioBuffer)
+  mpPlayLoop->PrepareOutput(
+    &mPlayBuffer,
+    mpSong,
+    Clock,
+    Clock + FIRST_DELTACLOCK,
+    0);
+
+  if (mpAudioBuffer)
   {
-    PlayLoop->PrepareOutput(AudioBuffer, Song, Clock, Clock + FIRST_DELTACLOCK, 1);
+    mpPlayLoop->PrepareOutput(
+      mpAudioBuffer,
+      mpSong,
+      Clock,
+      Clock + FIRST_DELTACLOCK,
+      1);
   }
   mPlayBuffer.Length2Keyoff();
 
   // Notify() has to be called very often because voxware
   // midi thru is done there
-  Start(poll_millisec);        // start wxTimer
+  Start(mPollMillisec);        // start wxTimer
 
-  Playing = true;
+  mPlaying = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -506,7 +606,7 @@ void JZPlayer::StopPlay()
 {
   // Stop the wxTimer.
   Stop();
-  Playing = false;
+  mPlaying = false;
 
   long Clock = GetRealTimeClock();
 
@@ -514,9 +614,9 @@ void JZPlayer::StopPlay()
   int ii;
   tKeyOff pKeyOff(0, 0, 0);
 
-  for (ii = 0; ii < Song->GetTrackCount(); ii++)
+  for (ii = 0; ii < mpSong->GetTrackCount(); ii++)
   {
-    JZTrack *Track = Song->GetTrack(ii);
+    JZTrack *Track = mpSong->GetTrack(ii);
     if (Track)
     {
       tEventIterator Iterator(Track);
@@ -539,80 +639,6 @@ void JZPlayer::StopPlay()
   }
 
   JZProjectManager::Instance()->NewPlayPosition(-1);
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZPlayer::Notify()
-{
-  // called by timer
-  long Now = GetRealTimeClock();
-
-#ifdef DEBUG_PLAYER_NOTIFY
-  cout << "JZPlayer::Notify " << Now << endl;
-#endif // DEBUG_PLAYER_NOTIFY
-  if (Now < 0)
-  {
-    return;
-  }
-
-  // time to put more events
-  if (Now >= (OutClock - ADVANCE_PLAY))
-  {
-#ifdef DEBUG_PLAYER_NOTIFY
-    cout << "*** Notify: more events to playbuffer" << endl;
-#endif // DEBUG_PLAYER_NOTIFY
-
-    PlayLoop->PrepareOutput(&mPlayBuffer, Song, OutClock, Now + DELTACLOCK, 0);
-    if (AudioBuffer)
-    {
-      PlayLoop->PrepareOutput(AudioBuffer, Song, OutClock, Now + DELTACLOCK, 1);
-    }
-    OutClock = Now + DELTACLOCK;
-    mPlayBuffer.Length2Keyoff();
-  }
-
-  // optimization:
-  //
-  // if (there are some events to be played)
-  //   send them to driver
-  // else
-  //   tell the driver that there is nothing to do at the moment
-  if (mPlayBuffer.nEvents && mPlayBuffer.Events[0]->GetClock() < OutClock)
-  {
-    FlushToDevice();
-  }
-  else
-  {
-    // Does nothing unless OutClock has changed.
-    OutBreak();
-  }
-}
-
-//-----------------------------------------------------------------------------
-// Description:
-//   Try to send all events up to OutClock to device.
-//-----------------------------------------------------------------------------
-void JZPlayer::FlushToDevice()
-{
-  int BufferFull = 0;
-
-  tEventIterator Iterator(&mPlayBuffer);
-  JZEvent* pEvent = Iterator.Range(0, OutClock);
-  while (!BufferFull && pEvent)
-  {
-    if (OutEvent(pEvent) != 0)
-      BufferFull = 1;
-    else
-    {
-      pEvent->Kill();
-      pEvent = Iterator.Next();
-    }
-  }
-
-  if (!BufferFull)
-    OutBreak();
-  mPlayBuffer.Cleanup(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -652,13 +678,16 @@ void JZPlayer::AllNotesOff(int Reset)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZPlayer::OutNow(JZTrack *t, tParam *r)
+void JZPlayer::ShowError()
 {
-  OutNow(t, &r->mMsb);
-  OutNow(t, &r->mLsb);
-  OutNow(t, &r->mDataMsb);
-  OutNow(t, &r->mResetMsb);
-  OutNow(t, &r->mResetLsb);
+  wxMessageBox("could not install driver", "Error", wxOK);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPlayer::EditGlobalAudioSettings(wxWindow* pParent)
+{
+  mSamples.GlobalSettingsDlg();
 }
 
 #ifdef DEV_MPU401
@@ -671,7 +700,7 @@ void JZPlayer::OutNow(JZTrack *t, tParam *r)
 tMpuPlayer::tMpuPlayer(JZSong* pSong)
   : JZPlayer(pSong)
 {
-  poll_millisec = 25;
+  mPollMillisec = 25;
   midinethost = getenv("MIDINETHOST");
   if (!midinethost || !strlen(midinethost))
   {
@@ -736,7 +765,7 @@ int dwrite(int dev, const char* buf, int size)
 //-----------------------------------------------------------------------------
 void tMpuPlayer::StartPlay(long IntClock, long LoopClock, int Continue)
 {
-  long ExtClock = PlayLoop->Int2ExtClock(IntClock);
+  long ExtClock = mpPlayLoop->Int2ExtClock(IntClock);
   char *play;
   int playsize;
 
@@ -794,7 +823,7 @@ void tMpuPlayer::StartPlay(long IntClock, long LoopClock, int Continue)
   // Setup Timebase
   char timebase[2];
   timebase[0] = CMD+1;
-  switch (Song->GetTicksPerQuarter())
+  switch (mpSong->GetTicksPerQuarter())
   {
     case  48: timebase[1] = 0xc2; break;
     case  72: timebase[1] = 0xc3; break;
@@ -1004,13 +1033,14 @@ int tMpuPlayer::OutEvent(JZEvent* pEvent)
 //-----------------------------------------------------------------------------
 void tMpuPlayer::OutBreak()
 {
-  // send a break to the driver starting at PlyBytes.GetClock() and ending at OutClock
+  // Send a break to the driver starting at PlyBytes.GetClock() and ending at
+  // mOutClock.
   if (!PlyBytes.WriteFile(dev))
   {
     return;
   }
 
-  (void)OutBreak(OutClock);
+  (void)OutBreak(mOutClock);
   PlyBytes.WriteFile(dev);
 }
 
@@ -1182,14 +1212,14 @@ long tMpuPlayer::GetRealTimeClock()
       if ((clock_to_host_counter % 32) == 0)
       {
         JZProjectManager::Instance()->NewPlayPosition(
-          PlayLoop->Ext2IntClock(playclock));
+          mpPlayLoop->Ext2IntClock(playclock));
       }
 #else
       // Update screen every 8'th note (120 ticks/beat).
       if ((clock_to_host_counter % 4) == 0)
       {
         JZProjectManager::Instance()->NewPlayPosition(
-          PlayLoop->Ext2IntClock(playclock));
+          mpPlayLoop->Ext2IntClock(playclock));
       }
 #endif
       FlushOutOfBand(playclock);
@@ -1225,7 +1255,7 @@ long tMpuPlayer::GetRealTimeClock()
         case 3:
           gpMidiPlayer->StopPlay();
           d1 = c;
-          ExtClock = (d0 + (128 * d1)) * (Song->GetTicksPerQuarter() / 4);
+          ExtClock = (d0 + (128 * d1)) * (mpSong->GetTicksPerQuarter() / 4);
           receiving_song_ptr = 0;
           d0 = d1 = 0;
           gpMidiPlayer->StartPlay(ExtClock, 0, 1);
@@ -1330,7 +1360,7 @@ long tMpuPlayer::GetRecordedData()
         }
         if (pEvent)
         {
-          pEvent->Clock = PlayLoop->Ext2IntClock(pEvent->Clock);
+          pEvent->Clock = mpPlayLoop->Ext2IntClock(pEvent->Clock);
           mRecdBuffer.Put(pEvent);
         }
       }
@@ -1464,8 +1494,8 @@ void tOSSThru::Notify()
 tSeq2Player::tSeq2Player(JZSong* pSong)
   : JZPlayer(pSong)
 {
-  // got to poll fast for midi thru
-  poll_millisec = 10;
+  // The code has to poll fast for MIDI thru.
+  mPollMillisec = 10;
 
   recd_clock   = 0;
   play_clock   = 0;
@@ -1820,7 +1850,7 @@ void tSeq2Player::OutBreak(long clock)
 //-----------------------------------------------------------------------------
 void tSeq2Player::OutBreak()
 {
-  OutBreak(OutClock);
+  OutBreak(mOutClock);
   seqbuf_dump();
 }
 
@@ -1877,7 +1907,7 @@ void tSeq2Player::StartPlay(long Clock, long LoopClock, int Continue)
   recd_clock   = Clock;
 
   JZProjectManager::Instance()->NewPlayPosition(
-    PlayLoop->Ext2IntClock(Clock));
+    mpPlayLoop->Ext2IntClock(Clock));
 
   // send initial program changes, controller etc
   SEQ_START_TIMER();
@@ -1889,8 +1919,8 @@ void tSeq2Player::StartPlay(long Clock, long LoopClock, int Continue)
   seqbuf_dump();
 
   // setup timebase and current speed
-  int time_base = Song->GetTicksPerQuarter();
-  int cur_speed = Song->GetTrack(0)->GetCurrentSpeed(Clock);
+  int time_base = mpSong->GetTicksPerQuarter();
+  int cur_speed = mpSong->GetTrack(0)->GetCurrentSpeed(Clock);
   if (ioctl(seqfd, SNDCTL_TMR_TIMEBASE, &time_base) < 0)
     perror("ioctl time_base");
   if (ioctl(seqfd, SNDCTL_TMR_TEMPO, &cur_speed) < 0)
@@ -1929,12 +1959,12 @@ void tSeq2Player::StopPlay()
 }
 
 //-----------------------------------------------------------------------------
-// try to send all events up to OutClock to device
+// try to send all events up to mOutClock to device
 //-----------------------------------------------------------------------------
 void tSeq2Player::FlushToDevice()
 {
   tEventIterator Iterator(&mPlayBuffer);
-  JZEvent* pEvent = Iterator.Range(0, OutClock);
+  JZEvent* pEvent = Iterator.Range(0, mOutClock);
   if (pEvent)
   {
     do
@@ -1946,7 +1976,7 @@ void tSeq2Player::FlushToDevice()
 
     mPlayBuffer.Cleanup(0);
   }
-  OutBreak(OutClock);
+  OutBreak(mOutClock);
   seqbuf_dump();
 }
 
@@ -2054,7 +2084,7 @@ long tSeq2Player::GetRealTimeClock()
 
       if (pEvent)
       {
-        pEvent->SetClock(PlayLoop->Ext2IntClock(recd_clock));
+        pEvent->SetClock(mpPlayLoop->Ext2IntClock(recd_clock));
         mRecdBuffer.Put(pEvent);
         pEvent = 0;
       }
@@ -2063,7 +2093,7 @@ long tSeq2Player::GetRealTimeClock()
   }
 
   JZProjectManager::Instance()->NewPlayPosition(
-    PlayLoop->Ext2IntClock(recd_clock/48 * 48));
+    mpPlayLoop->Ext2IntClock(recd_clock/48 * 48));
   return recd_clock;
 }
 

@@ -27,7 +27,7 @@
 #include "MouseAction.h"
 #include "Rectangle.h"
 
-class JZSong;
+class JZProject;
 class JZTrack;
 class JZFilter;
 class wxFont;
@@ -63,7 +63,7 @@ class JZTrackWindow : public JZEventWindow
 
     JZTrackWindow(
       wxFrame* pParent,
-      JZSong* pSong,
+      JZProject* pProject,
       const wxPoint& Position,
       const wxSize& Size);
 

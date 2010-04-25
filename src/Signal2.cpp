@@ -285,7 +285,7 @@ void tSplFilter::Init(Type t, float xsr, double f0, double bw)
   sr = xsr;
   delete filter;
   filter = 0;
-  switch(t)
+  switch (t)
   {
     case LOWPASS:
       filter = new tOpLowpass();

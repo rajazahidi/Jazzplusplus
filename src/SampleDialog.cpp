@@ -595,7 +595,7 @@ istream& operator >> (istream& Is, tSynthDlg &a)
 
 void tSynthDlg::OnMenuCommand(int id)
 {
-  switch(id)
+  switch (id)
   {
     case SYN_LOAD:
       {

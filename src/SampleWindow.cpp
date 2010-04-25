@@ -962,7 +962,7 @@ void tSampleWin::OnMenuCommand(int id)
     cnvs->playpos->StopListen();
   }
 
-  switch(id)
+  switch (id)
   {
     case MEN_EQUALIZER:
       if (equalizer == 0)

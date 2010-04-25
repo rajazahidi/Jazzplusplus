@@ -458,7 +458,7 @@ if (1)
         Stat  = RunningStatus & 0xF0;
         Channel = RunningStatus & 0x0F;
 
-      switch(Stat)
+      switch (Stat)
       {
         case StatKeyOff:  // SN++ added off veloc
           pEvent = new tKeyOff(Clock, Channel, cp[0],cp[1]);

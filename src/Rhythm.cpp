@@ -1200,7 +1200,7 @@ void tRhythmWin::Instrument2Win(int i)
   rhythm_edit->SetMeter(edit.steps_per_count, edit.count_per_bar, edit.n_bars);
   rand_checkbox->SetValue((bool)edit.randomize);
 
-  switch(edit.mode)
+  switch (edit.mode)
   {
     case MODE_CONTROL:
       veloc_edit->SetLabel("ctrl value");

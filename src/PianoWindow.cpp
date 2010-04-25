@@ -1183,7 +1183,7 @@ bool JZPianoWindow::OnKeyEvent(wxKeyEvent& Event)
   }
   else
   {
-    switch(Event.GetKeyCode())
+    switch (Event.GetKeyCode())
     {
       case WXK_DELETE:
         OnMenuCommand(wxID_DELETE);

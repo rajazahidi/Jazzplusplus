@@ -1992,7 +1992,7 @@ long tSeq2Player::GetRealTimeClock()
     while (i < size)
     {
       JZEvent* pEvent = 0;
-      switch(buf[i])
+      switch (buf[i])
       {
 
         case EV_TIMING:
@@ -2016,7 +2016,7 @@ long tSeq2Player::GetRealTimeClock()
             //unsigned char par = buf[i+5];
             short val = *(short *)&buf[i+6];
             //printf("got: chn %d, ctl %d, val %d\n", chn, ctl, val);
-            switch(buf[i+2]) {
+            switch (buf[i+2]) {
               case MIDI_CTL_CHANGE:
                 pEvent = new tControl(0, chn, ctl, val);
                 break;
@@ -2046,7 +2046,7 @@ long tSeq2Player::GetRealTimeClock()
             unsigned char chn = buf[i+3];
             unsigned char key = buf[i+4];
             unsigned char vel = buf[i+5];
-            switch(buf[i+2])
+            switch (buf[i+2])
             {
               case MIDI_NOTEOFF:  // SN++ added veloc
                 pEvent = new tKeyOff(0, chn, key, vel);

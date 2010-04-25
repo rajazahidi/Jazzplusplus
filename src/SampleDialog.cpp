@@ -354,11 +354,18 @@ void tDistortion::Action()
 #define N_HARM 40
 
 
-class tAddSynthArray {
+class tAddSynthArray
+{
   public:
     JZRndArray arr;
     tRhyArrayEdit *edit;
-    tAddSynthArray(wxFrame *parent, const char *label, int n, int ynul, int ymax, int style)
+    tAddSynthArray(
+      wxFrame *parent,
+      const char *label,
+      int n,
+      int ynul,
+      int ymax,
+      int style)
       : arr(n, 0, ymax)
     {
       int i;
@@ -368,8 +375,14 @@ class tAddSynthArray {
       edit = new tRhyArrayEdit(parent, arr, 10,10,10,10, style);
       edit->SetLabel(label);
     }
-    void Show(bool x) { edit->Show(x); }
-    void Init()       { edit->Init();  }
+    void Show(bool x)
+    {
+      edit->Show(x);
+    }
+    void Init()
+    {
+      edit->Init();
+    }
 };
 
 class tAddSynth
@@ -389,19 +402,22 @@ class tAddSynth
       fft.edit->SetXMinMax(1, N_HARM);
     }
 
-    void SetDuration(int durat) {
+    void SetDuration(int durat)
+    {
       vol.edit->SetXMinMax(0, durat);
       pan.edit->SetXMinMax(0, durat);
       frq.edit->SetXMinMax(0, durat);
     }
 
-    void Refresh() {
+    void Refresh()
+    {
       fft.edit->Refresh();
       vol.edit->Refresh();
       frq.edit->Refresh();
       pan.edit->Refresh();
     }
-    void Init() {
+    void Init()
+    {
       fft.edit->Init();
       vol.edit->Init();
       frq.edit->Init();
@@ -617,7 +633,8 @@ void tSynthDlg::OnMenuCommand(int id)
     case SYN_SAVE:
       {
         wxString fname = file_selector(default_filename, "Save Synth", 1, 0, "*.syn");
-        if (fname) {
+        if (fname)
+        {
           ofstream os(fname);
           os << *this;
         }
@@ -684,7 +701,8 @@ void tSynthDlg::AddItems()
 void tSynthDlg::AddEdits()
 {
   int i, k;
-  for (i = 0, k = 0; i < MAXSYNTHS; i++) {
+  for (i = 0, k = 0; i < MAXSYNTHS; i++)
+  {
     synths[i] = new tAddSynth(this);
     synths[i]->SetDuration(duration);
   }
@@ -794,27 +812,33 @@ void tSynthDlg::OnItem(wxItem& item, wxCommandEvent& event)
   else
 #endif
 
-  if (&item == chk_vol) {
+  if (&item == chk_vol)
+  {
     vol_enable = chk_vol->GetValue();
     resize = 1;
   }
-  else if (&item == chk_pan) {
+  else if (&item == chk_pan)
+  {
     pan_enable = chk_pan->GetValue();
     resize = 1;
   }
-  else if (&item == chk_frq) {
+  else if (&item == chk_frq)
+  {
     frq_enable = chk_frq->GetValue();
     resize = 1;
   }
-  else if (&item == chk_fft) {
+  else if (&item == chk_fft)
+  {
     fft_enable = chk_fft->GetValue();
     resize = 1;
   }
-  else if (&item == chk_noise) {
+  else if (&item == chk_noise)
+  {
     noise_enable = chk_noise->GetValue();
     resize = 1;
   }
-  else if (&item == num_synths_slider) {
+  else if (&item == num_synths_slider)
+  {
     int n = num_synths_slider->GetValue();
     if (n != num_synths)
     { // avoid flashing
@@ -822,9 +846,11 @@ void tSynthDlg::OnItem(wxItem& item, wxCommandEvent& event)
       resize = 1;
     }
   }
-  else if (&item == duration_slider) {
+  else if (&item == duration_slider)
+  {
     duration = duration_slider->GetValue();
-    for (int i = 0, k = 0; i < num_synths; i++) {
+    for (int i = 0, k = 0; i < num_synths; i++)
+    {
       tAddSynth &s = *synths[i];
       s.SetDuration(duration);
     }
@@ -833,14 +859,15 @@ void tSynthDlg::OnItem(wxItem& item, wxCommandEvent& event)
   else if (&item == midi_key_slider)
     midi_key = midi_key_slider->GetValue();
 
-  if (resize) {
+  if (resize)
+  {
     SetupEdits();
     int cw, ch;
     GetClientSize(&cw, &ch);
     OnSize(cw, ch);
   }
-
-  else if (redraw) {
+  else if (redraw)
+  {
     for (int i = 0; i < num_synths; i++)
       synths[i]->Refresh();
   }
@@ -852,7 +879,8 @@ void tSynthDlg::Action()
   int i;
   tSample &spl = win.GetSample();
   JZRndArray *arr[MAXSYNTHS][4];
-  for (i = 0; i < MAXSYNTHS; i++) {
+  for (i = 0; i < MAXSYNTHS; i++)
+  {
     arr[i][0] = &synths[i]->fft.arr;
     arr[i][1] = &synths[i]->vol.arr;
     arr[i][2] = &synths[i]->frq.arr;
@@ -1112,7 +1140,8 @@ void tSplFilterForm::EditForm(wxPanel *panel)
   double maxfreq = (int)(win.GetSample().GetSamplingRate() / 2);
   // watch order of enum in signali.h
   typestring = 0;
-  for (int i = 0; filter_types[i]; i++) {
+  for (int i = 0; filter_types[i]; i++)
+  {
     typelist.Append((wxObject *)filter_types[i]);  // ???
     if (i == (int)type)
       typestring = copystring(filter_types[i]);

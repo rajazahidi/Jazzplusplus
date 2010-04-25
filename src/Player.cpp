@@ -1278,9 +1278,10 @@ long tMpuPlayer::GetRecordedData()
   int numbytes = 0;
 
   numbytes = get_recbuf_mpu( &recbuf );
-  if (numbytes == 0) {
-        // No bytes in record buffer
-        return 0;
+  if (numbytes == 0)
+  {
+    // No bytes in record buffer
+    return 0;
   }
 
   // Go through the record buffer and create events
@@ -1996,7 +1997,8 @@ long tSeq2Player::GetRealTimeClock()
       {
 
         case EV_TIMING:
-          switch (buf[i+1]) {
+          switch (buf[i+1])
+          {
             case TMR_WAIT_ABS:
             case TMR_ECHO:
               recd_clock = *(unsigned long *)&buf[i+4] + start_clock;
@@ -2016,7 +2018,8 @@ long tSeq2Player::GetRealTimeClock()
             //unsigned char par = buf[i+5];
             short val = *(short *)&buf[i+6];
             //printf("got: chn %d, ctl %d, val %d\n", chn, ctl, val);
-            switch (buf[i+2]) {
+            switch (buf[i+2])
+            {
               case MIDI_CTL_CHANGE:
                 pEvent = new tControl(0, chn, ctl, val);
                 break;

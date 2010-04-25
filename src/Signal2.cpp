@@ -36,7 +36,8 @@ void tSigSynth::Run(tSigOutput &osig, tSigInput &isig, float add_seconds)
   const long N = isig.GetLength() + (long)(add_seconds * sampling_rate);
   osig.Resize(N);
   tSigValue val;
-  for (long i = 0; i < N; i++) {
+  for (long i = 0; i < N; i++)
+  {
     isig.GetSample(val);
     osig.Out(val);
     current++;
@@ -151,7 +152,8 @@ static void setup_wav_harmonics(tSigWaveOscil &wav, JZRndArray &arr)
   for (k = 0; k < N; k++)
     wav[k] = 0;
 
-  for (f = 0; f < arr.Size(); f++) {
+  for (f = 0; f < arr.Size(); f++)
+  {
     tLineMap<float>map(0, N, 0, 2*PI*(f+1));
     for (k = 0; k < N; k++)
       wav[k] += sin(map(k)) * (float)arr[f] * (float)arr[f];
@@ -175,7 +177,8 @@ static void setup_wav_control(tSigWaveCtrl &wav, JZRndArray &arr)
 {
   int i, k;
   //cout << arr.GetLabel() << endl;
-  for (i = 0; i < N; i++) {
+  for (i = 0; i < N; i++)
+  {
     cout << i << ' ';
     for (k = 0; k < tSigValue::MAXCHN; k++)
       cout << wav[i][k] << ' ';
@@ -272,11 +275,13 @@ void sig_wavsynth(
 //                     old Filter Interface
 // ---------------------------------------------------------------
 
-tSplFilter::tSplFilter() {
+tSplFilter::tSplFilter()
+{
   filter = 0;
 }
 
-tSplFilter::~tSplFilter() {
+tSplFilter::~tSplFilter()
+{
   delete filter;
 }
 
@@ -311,7 +316,8 @@ void tSplFilter::ReInit(double f0, double bw)
   filter->Setup(sr, f0, f0 * bw);
 }
 
-float tSplFilter::Loop(float sig) {
+float tSplFilter::Loop(float sig)
+{
   return filter->Loop(sig);
 }
 

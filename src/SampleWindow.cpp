@@ -92,11 +92,13 @@ class tSamplePlayPosition;
 
 class tInsertionPoint {
   public:
-    tInsertionPoint(wxScrolledWindow *c) : cnvs(c) {
+    tInsertionPoint(wxScrolledWindow *c) : cnvs(c)
+    {
       last_x = 0;
       visible = 0;
     };
-    void Draw(int x) {
+    void Draw(int x)
+    {
       last_x = x;
       visible ^= 1;
       wxDC *dc = new wxClientDC(cnvs);
@@ -108,7 +110,8 @@ class tInsertionPoint {
       dc->SetPen(*wxBLACK_PEN);
       dc->SetLogicalFunction(wxCOPY);
     }
-    void Draw() {
+    void Draw()
+    {
       Draw(last_x);
     }
     int IsVisible() const {
@@ -133,7 +136,8 @@ class tSampleCnvs : public wxScrolledWindow
   public:
     tSampleCnvs(tSampleWin *win, tSample &sample);
     virtual ~tSampleCnvs();
-    void Redraw() {
+    void Redraw()
+    {
       OnPaint();
     }
     virtual void OnPaint();
@@ -180,22 +184,28 @@ class tSmplWinSettingsForm : public wxForm
 {
   public:
     tSmplWinSettingsForm(tSampleWin &w)
-    : wxForm( USED_WXFORM_BUTTONS ), win(w) {}
-    void EditForm(wxPanel *panel) {
+      : wxForm( USED_WXFORM_BUTTONS ),
+        win(w)
+    {}
+    void EditForm(wxPanel *panel)
+    {
       Add(wxMakeFormBool("Show Midi Time", &win.cnvs->midi_time));
       Add(wxMakeFormNewLine());
       AssociatePanel(panel);
     }
-    void OnOk() {
+    void OnOk()
+    {
       win.settings = 0;
       win.Redraw();
       wxForm::OnOk();
     }
-    void OnCancel() {
+    void OnCancel()
+    {
       win.settings = 0;
       wxForm::OnCancel();
     }
-    void OnHelp() {
+    void OnHelp()
+    {
       gpHelpInstance->ShowTopic("Settings");
     }
   private:
@@ -214,13 +224,15 @@ class tSamplePlayPosition : public wxTimer
       x = 0;
     }
 
-    ~tSamplePlayPosition() {
+    ~tSamplePlayPosition()
+    {
       Stop();
       if (visible)
         Draw();
     }
 
-    void StopListen() {
+    void StopListen()
+    {
       Stop();
       if (gpMidiPlayer->IsListening())
         gpMidiPlayer->ListenAudio(-1);
@@ -256,7 +268,8 @@ class tSamplePlayPosition : public wxTimer
     virtual void Notify()
     {
       int pos = player->GetListenerPlayPosition();
-      if (pos < 0) {
+      if (pos < 0)
+      {
         StopListen();
         return;
       }
@@ -498,7 +511,8 @@ void tSampleCnvs::DrawTicks(int x, int y, int w)
   int sfr = win->GetPaintOffset();
   int sto = sfr + win->GetPaintLength();
 
-  if (!midi_time) {
+  if (!midi_time)
+  {
     // display time
     JZMapper Map(sfr, sto, x, x+w);
     int tfr = spl->Samples2Time(sfr) / 1000;
@@ -542,7 +556,8 @@ void tSampleCnvs::DrawTicks(int x, int y, int w)
           // draw a tickmark line
           dc->DrawLine(xx, y - 5, xx, y);
           // draw a text
-          if (j == 0) {
+          if (j == 0)
+          {
             char buf[50];
             sprintf(buf, "%d", i + 1);
             int fw, fh;
@@ -862,7 +877,8 @@ void tSampleWin::OnSize(int w, int h)
   cnvs->SetSize(xx, yy, ww, hi);
 
   hi = hh / nn;
-  for (int i = 0; i < num_params; i++) {
+  for (int i = 0; i < num_params; i++)
+  {
     int yi = yy + (i + spl.GetChannels()) * hh / nn;
     params[i]->SetSize(xx, yi, ww, hi);
   }
@@ -876,7 +892,8 @@ void tSampleWin::Redraw()
 
 bool tSampleWin::HaveInsertionPoint(int &offs, bool warn)
 {
-  if (cnvs->sel_fr == cnvs->sel_to && cnvs->sel_fr >= 0) {
+  if (cnvs->sel_fr == cnvs->sel_to && cnvs->sel_fr >= 0)
+  {
     offs = cnvs->sel_fr;
     return TRUE;
   }
@@ -890,7 +907,8 @@ bool tSampleWin::HaveInsertionPoint(int &offs, bool warn)
 
 bool tSampleWin::HaveSelection(int &fr_smpl, int &to_smpl, HaveSelectionMode mode)
 {
-  if (cnvs->sel_fr < cnvs->sel_to && cnvs->sel_fr >= 0) {
+  if (cnvs->sel_fr < cnvs->sel_to && cnvs->sel_fr >= 0)
+  {
     fr_smpl = cnvs->sel_fr;
     to_smpl = cnvs->sel_to;
     return TRUE;
@@ -921,7 +939,8 @@ void tSampleWin::AddParam(JZRndArray *array, const char *label)
 
 void tSampleWin::ClrParam()
 {
-  if (num_params > 0) {
+  if (num_params > 0)
+  {
     int n = num_params;
     num_params = 0;
     for (int i = 0; i < n; ++i)
@@ -1351,7 +1370,8 @@ void tSampleWin::OnMenuCommand(int id)
   }
 }
 
-void tSampleWin::PlaySample() {
+void tSampleWin::PlaySample()
+{
   cnvs->Play();
 }
 

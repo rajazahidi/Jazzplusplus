@@ -396,12 +396,14 @@ void tArrayEdit::DrawBar(wxDC *dc, int i, int black)
 
     ybar = ynul - hbar - hblk/2;
     hbar = hblk;
-    if (ybar < y) {
+    if (ybar < y)
+    {
       int d = y - ybar;
       ybar += d;
       hbar -= d;
     }
-    if (ybar + hbar > y + h) {
+    if (ybar + hbar > y + h)
+    {
       int d = (ybar + hbar) - (y + h);
       hbar -= d;
     }

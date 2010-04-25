@@ -322,12 +322,16 @@ void HBAnalyzer::GenerateMapping()
 
 class tChordMatrix {
   public:
-    tChordMatrix() {
+    tChordMatrix()
+    {
       for (int i = 0; i < 12; i++)
         for (int j = 0; j < 12; j++)
           mat[i][j] = 0;
     }
-    double* operator[](int i) { return mat[i]; }
+    double* operator[](int i)
+    {
+      return mat[i];i
+    }
   private:
     double mat[12][12];
 };

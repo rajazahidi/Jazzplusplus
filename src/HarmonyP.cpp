@@ -212,15 +212,19 @@ int HBChord::Iter(int key) const
 
 void HBChord::Rotate(int semis)
 {
-  if (semis > 0) {
-    while (semis--) {
+  if (semis > 0)
+  {
+    while (semis--)
+    {
       if (keys & 0x800)
         keys = ((keys & ~0x800) << 1) + 1;
       else keys <<= 1;
     }
   }
-  else if (semis < 0) {
-    while (semis++) {
+  else if (semis < 0)
+  {
+    while (semis++)
+    {
       if (keys & 1)
         keys = (keys >> 1) | 0x800;
       else keys >>= 1;

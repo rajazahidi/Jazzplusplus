@@ -93,7 +93,8 @@ wxString file_selector(
       wxString buf;
       //sprintf(buf, "overwrite %s?", (char*)s);
       buf << "overwrite "<<s<<"?";
-      if (wxMessageBox(buf, "Save ?", wxYES_NO) == wxNO) {
+      if (wxMessageBox(buf, "Save ?", wxYES_NO) == wxNO)
+      {
 
         s = wxEmptyString;
       }

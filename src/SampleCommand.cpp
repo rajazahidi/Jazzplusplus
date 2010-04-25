@@ -428,7 +428,8 @@ double tShifterCmd::rotate(float p[], int n_args, tFloatSample &sinp, tFloatSamp
     val2 = in[inchan] * x;
 
     out[0] = (val1 + val2);
-    if (chans > 1) {
+    if (chans > 1)
+    {
       out[1] = (1.0 - p[7]) * out[0];
       out[0] *= p[7];
     }
@@ -464,7 +465,8 @@ void tSplEqualizer::Prepare()
   type = array[0] > 0 ? tSplFilter::LOWPASS : tSplFilter::HIGHPASS;
   filters[0].Init(type, sr, Index2Hertz(0), 0);
   // some band pass filters
-  for (i = 1; i < nfilters-1; i++) {
+  for (i = 1; i < nfilters-1; i++)
+  {
     double f  = Index2Hertz(i);
     double f0 = Index2Hertz(i-1);
     double f1 = Index2Hertz(i+1);

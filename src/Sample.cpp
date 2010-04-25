@@ -71,7 +71,8 @@ void tSample::SetLabel(const char *str)
 
 void tSample::SetFilename(const char *fname)
 {
-  if (strcmp(filename, fname) != 0) {
+  if (strcmp(filename, fname) != 0)
+  {
     dirty = 1;
     char *s = copystring(fname);
     label = copystring(wxFileNameFromPath(s));
@@ -175,7 +176,8 @@ void tSample::SetSmooth(tFloatSample &fs, int offs, int fade)
 int tSample::LoadWav()
 {
   struct stat buf;
-  if (stat(filename, &buf) == -1) {
+  if (stat(filename, &buf) == -1)
+  {
     perror(filename);
     return 1;
   }
@@ -194,7 +196,8 @@ int tSample::LoadWav()
     //fprintf(stderr, "%s format not recognized\n", filename);
     return 2;
   }
-  if (wh.format != PCM_CODE) {
+  if (wh.format != PCM_CODE)
+  {
     //fprintf(stderr, "%s must be PCM_CODE\n", filename);
     return 3;
   }
@@ -316,13 +319,15 @@ int tSample::Convert(istream &is, int bytes, int channels, int bits, int speed)
   }
 
   // convert mono -> stereo
-  if (channels == 1 && set.channels == 2) {
+  if (channels == 1 && set.channels == 2)
+  {
     short *old = data;
     length = length * 2;
     data = new short [length];
     int i = 0;
     int j = 0;
-    while (i < length) {
+    while (i < length)
+    {
       data[i++] = old[j];
       data[i++] = old[j++];
     }
@@ -357,7 +362,8 @@ int tSample::Convert(istream &is, int bytes, int channels, int bits, int speed)
   }
 
   // apply volume and pan
-  if (volume != 127 || pan != 0) {
+  if (volume != 127 || pan != 0)
+  {
     int ch1 = volume;
     int ch2 = volume;
     int  ppan = (set.channels == 2) ? pan : 0;
@@ -380,7 +386,8 @@ int tSample::LoadRaw()
 {
   // determine file size
   struct stat buf;
-  if (stat(filename, &buf) == -1) {
+  if (stat(filename, &buf) == -1)
+  {
     perror(filename);
     return 1;
   }
@@ -400,7 +407,8 @@ int tSample::Load(int force)
   if (filename && filename[0] && !force && !dirty && external_flag)
   {
     struct stat buf;
-    if (stat(filename, &buf) == -1) {
+    if (stat(filename, &buf) == -1)
+    {
       perror(filename);
       return 1;
     }
@@ -411,7 +419,8 @@ int tSample::Load(int force)
   if (force || dirty)
   {
     FreeData();
-    if (filename && filename[0]) {
+    if (filename && filename[0])
+    {
       int rc = LoadWav();
       dirty = 0;
       return rc;

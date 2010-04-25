@@ -171,7 +171,7 @@ int tGetMidiBytes::Write(JZEvent* pEvent, unsigned char* pData, int Length)
       nBytes = 0;
 
       Buffer[nBytes++] = Stat | ((tChannelEvent *)pEvent)->GetChannel();
-      while(Length--)
+      while (Length--)
       {
         Buffer[nBytes++] = *pData++;
       }

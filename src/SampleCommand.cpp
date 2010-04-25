@@ -201,7 +201,7 @@ void tCMixCmd::setline(const float *p, short n_args,int length,float *array)
     }
   }
   i--;
-  while(++i < length)
+  while (++i < length)
   {
     array[i] = array[i-1];
   }

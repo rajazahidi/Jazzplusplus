@@ -435,7 +435,7 @@ void JZSong::MergePlayTrackEvent(
   // looplength will be used to loop the track, for the duration of
   // the playtrack event.
   loopLength = pTrack->GetLastClock();
-  while(f)
+  while (f)
   {
     if (f->IsEndOfTrack())
     {
@@ -455,7 +455,7 @@ void JZSong::MergePlayTrackEvent(
   // which start + length end up after the startloop.  Then we could move the
   // start of those to the beginning of the loop, and shorten the length.
   // There would still be a problem with playtracks not even bar length.
-  while(loopOffset < c->eventlength)
+  while (loopOffset < c->eventlength)
   {
     // No more events than the length of the playtrack!  and ensure the last
     // iteration is no longer than what is left.

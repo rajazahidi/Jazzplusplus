@@ -26,6 +26,7 @@
 #include "Command.h"
 #include "DeprecatedWx/proplist.h"
 #include "Dialogs/KeyOnDialog.h"
+#include "Dialogs/ProgramChangeDialog.h"
 //#include "EventFrame.h"
 #include "Events.h"
 #include "EventWindow.h"
@@ -590,11 +591,12 @@ void tEndOfTrackDlg::AddProperties()
 }
 
 
+#ifdef DEPRECATED
 // -------------------------------- Program ---------------------------
 
 class tProgramDlg : public tEventDlg
 {
- public:
+public:
 
   int Program;
   //  tNamedChoice Choice;
@@ -635,6 +637,7 @@ void tProgramDlg::AddProperties()
     "props",
     new tNamedValueListValidator(gpConfig->GetVoiceNames())));
 }
+#endif // DEPRECATED
 
 
 
@@ -948,8 +951,12 @@ void EventDialog(
       break;
 
     case StatProgram:
-      str = "Program Change";
-      dlg = new tProgramDlg(e->IsProgram(), pPianoWindow, t);
+      {
+//      str = "Program Change";
+//      dlg = new tProgramDlg(e->IsProgram(), pPianoWindow, t);
+      JZProgramChangeDialog ProgramChangeDialog(pPianoWindow);
+      ProgramChangeDialog.ShowModal();
+      }
       break;
 
     case StatSetTempo:

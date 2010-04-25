@@ -911,6 +911,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Dialogs\ProgramChangeDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\ProgramChangeDialog.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Dialogs\QuantizeDialog.cpp"
 				>
 			</File>
@@ -983,6 +991,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath="..\src\Makefile.am"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

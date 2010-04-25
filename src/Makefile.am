@@ -30,6 +30,7 @@ Dialogs/LengthDialog.cpp \
 Dialogs/KeyOnDialog.cpp \
 Dialogs/MetronomeSettingsDialog.cpp \
 Dialogs/MidiChannelDialog.cpp \
+Dialogs/ProgramChannelDialog.cpp \
 Dialogs/QuantizeDialog.cpp \
 Dialogs/SearchAndReplaceDialog.cpp \
 Dialogs/ShiftDialog.cpp \
@@ -119,6 +120,7 @@ Dialogs/LengthDialog.cpp \
 Dialogs/KeyOnDialog.cpp \
 Dialogs/MetronomeSettingsDialog.cpp \
 Dialogs/MidiChannelDialog.cpp \
+Dialogs/ProgramChannelDialog.cpp \
 Dialogs/QuantizeDialog.cpp \
 Dialogs/SearchAndReplaceDialog.cpp \
 Dialogs/ShiftDialog.cpp \
@@ -213,6 +215,7 @@ Dialogs/LengthDialog.h \
 Dialogs/KeyOnDialog.h \
 Dialogs/MetronomeSettingsDialog.h \
 Dialogs/MidiChannelDialog.h \
+Dialogs/ProgramChannelDialog.h \
 Dialogs/QuantizeDialog.h \
 Dialogs/SearchAndReplaceDialog.h \
 Dialogs/ShiftDialog.h \

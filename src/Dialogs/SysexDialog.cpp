@@ -22,8 +22,7 @@
 
 #include "../Events.h"
 #include "../Globals.h"
-#include "../KeyStringConverters.h"
-#include "../Knob.h"
+#include "../Help.h"
 #include "../Project.h"
 #include "../Resources.h"
 
@@ -42,46 +41,19 @@ using namespace std;
 //-----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(JZSysexDialog, wxDialog)
 
-  EVT_KNOB_CHANGED(IDC_KB_VELOCITY, JZSysexDialog::OnVelocityChange)
-
-  EVT_KNOB_CHANGED(IDC_KB_OFF_VELOCITY, JZSysexDialog::OnOffVelocityChange)
-
-  EVT_KNOB_CHANGED(IDC_KB_CHANNEL, JZSysexDialog::OnChannelChange)
-
   EVT_BUTTON(wxID_HELP, JZSysexDialog::OnHelp)
 
 END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZSysexDialog::JZSysexDialog(tKeyOn* pEvent, wxWindow* pParent)
-  : wxDialog(pParent, wxID_ANY, wxString("Key On")),
-    mpEvent(pEvent),
-    mpPitchEdit(0),
-    mpVelocityValue(0),
-    mpVelocityKnob(0),
-    mpOffVelocityValue(0),
-    mpOffVelocityKnob(0),
-    mpLengthEdit(0),
-    mpChannelValue(0),
-    mpChannelKnob(0),
+JZSysexDialog::JZSysexDialog(tSysEx* pEvent, wxWindow* pParent)
+  : wxDialog(pParent, wxID_ANY, wxString("System Exclusive")),
+    mpSysExEvent(pEvent),
+    mpSysExEdit(0),
     mpClockEdit(0)
 {
-  mpPitchEdit = new wxTextCtrl(this, wxID_ANY);
-
-  mpVelocityValue = new wxStaticText(this, wxID_ANY, "000");
-
-  mpVelocityKnob = new JZKnob(this, IDC_KB_VELOCITY, 0, 0, 127);
-
-  mpOffVelocityValue = new wxStaticText(this, wxID_ANY, "000");
-
-  mpOffVelocityKnob = new JZKnob(this, IDC_KB_OFF_VELOCITY, 0, 0, 127);
-
-  mpLengthEdit = new wxTextCtrl(this, wxID_ANY);
-
-  mpChannelValue = new wxStaticText(this, wxID_ANY, "00");
-
-  mpChannelKnob = new JZKnob(this, IDC_KB_CHANNEL, 0, 1, 16);
+  mpSysExEdit = new wxTextCtrl(this, wxID_ANY);
 
   mpClockEdit = new wxTextCtrl(this, wxID_ANY);
 
@@ -92,70 +64,36 @@ JZSysexDialog::JZSysexDialog(tKeyOn* pEvent, wxWindow* pParent)
 
   wxBoxSizer* pTopSizer = new wxBoxSizer(wxVERTICAL);
 
+  pTopSizer->Add(
+    new wxStaticText(
+      this,
+      wxID_ANY,
+      "Example input: f0 7f 7f 04 01 00 7f f7"),
+    0,
+    wxCENTER | wxALL,
+    5);
+
+  pTopSizer->Add(
+    new wxStaticText(
+      this,
+      wxID_ANY,
+      "Any DT1/RQ1 checksums will be corrected"),
+    0,
+    wxCENTER | wxALL,
+    5);
+
   wxFlexGridSizer* pFlexGridSizer;
 
-  pFlexGridSizer = new wxFlexGridSizer(1, 2, 4, 2);
+  pFlexGridSizer = new wxFlexGridSizer(2, 2, 4, 2);
 
   pFlexGridSizer->Add(
-    new wxStaticText(this, wxID_ANY, "Pitch:"),
+    new wxStaticText(this, wxID_ANY, "SysEx (hex):"),
     0,
     wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
-  pFlexGridSizer->Add(mpPitchEdit, 0, wxALIGN_CENTER_VERTICAL);
-
-  pTopSizer->Add(pFlexGridSizer, 0, wxCENTER | wxALL, 2);
-
-  pFlexGridSizer = new wxFlexGridSizer(2, 3, 4, 2);
+  pFlexGridSizer->Add(mpSysExEdit, 0, wxALIGN_CENTER_VERTICAL);
 
   pFlexGridSizer->Add(
-    new wxStaticText(this, wxID_ANY, "Velocity:"),
-    0,
-    wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
-  pFlexGridSizer->Add(
-    mpVelocityValue,
-    0,
-    wxALIGN_CENTER_VERTICAL | wxFIXED_MINSIZE);
-  pFlexGridSizer->Add(mpVelocityKnob, 0, wxALIGN_CENTER_VERTICAL);
-
-  pFlexGridSizer->Add(
-    new wxStaticText(this, wxID_ANY, "Off Velocity:"),
-    0,
-    wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
-  pFlexGridSizer->Add(
-    mpOffVelocityValue,
-    0,
-    wxALIGN_CENTER_VERTICAL | wxFIXED_MINSIZE);
-  pFlexGridSizer->Add(mpOffVelocityKnob, 0, wxALIGN_CENTER_VERTICAL);
-
-  pTopSizer->Add(pFlexGridSizer, 0, wxALIGN_CENTER);
-
-  pFlexGridSizer = new wxFlexGridSizer(1, 2, 4, 2);
-
-  pFlexGridSizer->Add(
-    new wxStaticText(this, wxID_ANY, "Length:"),
-    0,
-    wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
-  pFlexGridSizer->Add(mpLengthEdit, 0, wxALIGN_CENTER_VERTICAL);
-
-  pTopSizer->Add(pFlexGridSizer, 0, wxCENTER | wxALL, 2);
-
-  pFlexGridSizer = new wxFlexGridSizer(1, 3, 4, 2);
-
-  pFlexGridSizer->Add(
-    new wxStaticText(this, wxID_ANY, "Channel:"),
-    0,
-    wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
-  pFlexGridSizer->Add(
-    mpChannelValue,
-    0,
-    wxALIGN_CENTER_VERTICAL | wxFIXED_MINSIZE);
-  pFlexGridSizer->Add(mpChannelKnob, 0, wxALIGN_CENTER_VERTICAL);
-
-  pTopSizer->Add(pFlexGridSizer, 0, wxCENTER | wxALL, 2);
-
-  pFlexGridSizer = new wxFlexGridSizer(1, 2, 4, 2);
-
-  pFlexGridSizer->Add(
-    new wxStaticText(this, wxID_ANY, "Clock:"),
+    new wxStaticText(this, wxID_ANY, "Time:"),
     0,
     wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
   pFlexGridSizer->Add(mpClockEdit, 0, wxALIGN_CENTER_VERTICAL);
@@ -180,35 +118,24 @@ JZSysexDialog::JZSysexDialog(tKeyOn* pEvent, wxWindow* pParent)
 //-----------------------------------------------------------------------------
 bool JZSysexDialog::TransferDataToWindow()
 {
-  string KeyString;
-  KeyToString(mpEvent->GetKey(), KeyString);
-  mpPitchEdit->ChangeValue(KeyString.c_str());
+  const unsigned char* pSysExData = mpSysExEvent->GetData();
+  unsigned short Length = mpSysExEvent->GetDataLength();
 
   ostringstream Oss;
 
-  Oss << (int)mpEvent->GetVelocity();
-  mpVelocityValue->SetLabel(Oss.str().c_str());
+  for (unsigned short i = 0; i < Length; ++i)
+  {
+    Oss << hex << pSysExData[i];
+    if (i < Length - 1)
+    {
+      Oss << ' ';
+    }
+  }
 
-  mpVelocityKnob->SetValue(mpEvent->GetVelocity());
-
-  Oss.str("");
-  Oss << (int)mpEvent->GetOffVelocity();
-  mpOffVelocityValue->SetLabel(Oss.str().c_str());
-
-  mpOffVelocityKnob->SetValue(mpEvent->GetOffVelocity());
-
-  wxString LengthString;
-  LengthString << mpEvent->GetEventLength();
-  mpLengthEdit->ChangeValue(LengthString);
-
-  Oss.str("");
-  Oss << (int)mpEvent->GetChannel() + 1;
-  mpChannelValue->SetLabel(Oss.str().c_str());
-
-  mpChannelKnob->SetValue(mpEvent->GetChannel() + 1);
+  mpSysExEdit->ChangeValue(Oss.str().c_str());
 
   string ClockString;
-  gpProject->ClockToString(mpEvent->GetClock(), ClockString);
+  gpProject->ClockToString(mpSysExEvent->GetClock(), ClockString);
   mpClockEdit->ChangeValue(ClockString.c_str());
 
   return true;
@@ -218,61 +145,62 @@ bool JZSysexDialog::TransferDataToWindow()
 //-----------------------------------------------------------------------------
 bool JZSysexDialog::TransferDataFromWindow()
 {
-  wxString KeyString = mpPitchEdit->GetValue();
-  mpEvent->SetKey(StringToKey(KeyString.c_str()));
+  wxString KeyString = mpSysExEdit->GetValue();
 
-  mpEvent->SetVelocity(mpVelocityKnob->GetValue());
-
-  mpEvent->SetOffVelocity(mpOffVelocityKnob->GetValue());
-
-  wxString LengthString = mpLengthEdit->GetValue();
-  istringstream Iss(LengthString.c_str());
-  unsigned short Length;
-  Iss >> Length;
-  mpEvent->SetLength(Length);
-
-  mpEvent->SetChannel(mpChannelKnob->GetValue() - 1);
+  //TODO  Need to validate the SysEx message.  The Roland SysEx message is
+  // made up of nine parts.  All notation is in hex.
+  //
+  //  [1]  [2]  [3]  [4]  [5]  [6]      [7]  [8]  [9]
+  //  F0   41   10   42   12   40007F   00   41   F7
+  //
+  // Parts [1], [2] and [9] are part of the MIDI specification and are
+  // required by all SysEx messages.  What is in between is specific to the
+  // manufacturer, identified by part [2], which is 41h in Roland's case.
+  //
+  // Part [3] is known as the Device ID.  Most Roland MIDI devices use the
+  // default of 10h, but is provided for us to change as we see fit.  The idea
+  // behind the Device ID is that if you have more than one MIDI device of the
+  // same type in a daisy chain (connected to one another) you can change the
+  // Device ID on each of them so that you can send SysEx messages that will
+  // be accepted by only one of them, not all.
+  //
+  // Part [4] is the Model ID.  GS synthesizers will all respond to SysEx with
+  // a Model ID of 42h, however they generally have their own Model ID as well.
+  //
+  // Part [5] specifies whether we are sending (12h) or requesting (11h)
+  // information.  If a synth receives a SysEx message it recognizes, it will
+  // look this part to determine whether it needs to change an internal
+  // setting or reply (with its own SysEx message) with the value of a
+  // setting.
+  //
+  // Part [6] is the start address on which the SysEx intends to act.  It is
+  // at this address that you may wish to put a value (or values) or retrieve
+  // the current value(s).  It always contains three bytes.  Most synthesizer
+  // manuals will provide you with a long "address map" table which explains
+  // what lives at each address.  Although daunting on a first perusal, once
+  // you understand its function it becomes a wonderful resource.
+  //
+  // Part [7] has two functions.  If part [5] is 12h (sending data) then part
+  // [7] contains the data we are sending and can be one byte or many bytes
+  // in length.  If it is 11h (requesting data) then it is the number of bytes
+  // we want the synth to send us.
+  //
+  // Part [8] is the Roland checksum.
+  //
+  // Also need a function to set SysEx event data.
+//  gpSynth->FixSysexCheckSum(Copy->IsSysEx());
+//  mpSysExEvent->SetData(???);
 
   wxString ClockString = mpClockEdit->GetValue();
   int Clock = gpProject->StringToClock(ClockString.c_str());
-  mpEvent->SetClock(Clock);
+  mpSysExEvent->SetClock(Clock);
 
   return true;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZSysexDialog::OnVelocityChange(JZKnobEvent& Event)
-{
-  int Value = Event.GetValue();
-  ostringstream Oss;
-  Oss << Value;
-  mpVelocityValue->SetLabel(Oss.str().c_str());
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZSysexDialog::OnOffVelocityChange(JZKnobEvent& Event)
-{
-  int Value = Event.GetValue();
-  ostringstream Oss;
-  Oss << Value;
-  mpOffVelocityValue->SetLabel(Oss.str().c_str());
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZSysexDialog::OnChannelChange(JZKnobEvent& Event)
-{
-  int Value = Event.GetValue();
-  ostringstream Oss;
-  Oss << Value;
-  mpChannelValue->SetLabel(Oss.str().c_str());
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 void JZSysexDialog::OnHelp(wxCommandEvent& Event)
 {
-//  gpHelpInstance->ShowTopic("Sysex Dialog");
+  gpHelpInstance->ShowTopic("Sysex Dialog");
 }

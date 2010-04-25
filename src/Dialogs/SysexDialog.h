@@ -25,7 +25,7 @@
 
 class JZKnob;
 class JZKnobEvent;
-class tKeyOn;
+class tSysEx;
 class wxStaticText;
 class wxTextCtrl;
 
@@ -35,7 +35,7 @@ class JZSysexDialog : public wxDialog
 {
   public:
 
-    JZSysexDialog(tKeyOn* pEvent, wxWindow* pParent);
+    JZSysexDialog(tSysEx* pEvent, wxWindow* pParent);
 
   private:
 
@@ -43,26 +43,13 @@ class JZSysexDialog : public wxDialog
 
     virtual bool TransferDataFromWindow();
 
-    void OnVelocityChange(JZKnobEvent& Event);
-
-    void OnOffVelocityChange(JZKnobEvent& Event);
-
-    void OnChannelChange(JZKnobEvent& Event);
-
     void OnHelp(wxCommandEvent& Event);
 
   private:
 
-    tKeyOn* mpEvent;
+    tSysEx* mpSysExEvent;
 
-    wxTextCtrl* mpPitchEdit;
-    wxStaticText* mpVelocityValue;
-    JZKnob* mpVelocityKnob;
-    wxStaticText* mpOffVelocityValue;
-    JZKnob* mpOffVelocityKnob;
-    wxTextCtrl* mpLengthEdit;
-    wxStaticText* mpChannelValue;
-    JZKnob* mpChannelKnob;
+    wxTextCtrl* mpSysExEdit;
     wxTextCtrl* mpClockEdit;
 
   DECLARE_EVENT_TABLE();

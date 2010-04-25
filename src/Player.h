@@ -281,7 +281,7 @@ class JZPlayer : public wxTimer
       mSamples.AdjustAudioLength(t, ticks_per_minute);
     }
 
-    void EditGlobalAudioSettings(wxWindow* pParent);
+    void EditAudioGlobalSettings(wxWindow* pParent);
 
     void EditSample(int key)
     {

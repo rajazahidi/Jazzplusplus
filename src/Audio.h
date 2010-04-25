@@ -370,7 +370,7 @@ class tSampleSet
       return *samples[i];
     }
 
-    void GlobalSettingsDlg();
+    void EditAudioGlobalSettings(wxWindow* pParent);
 
   protected:
 

@@ -803,7 +803,7 @@ class tAudioGloblForm : public wxForm
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSampleSet::GlobalSettingsDlg()
+void tSampleSet::EditAudioGlobalSettings(wxWindow* pParent)
 {
   if (spl_dialog)
   {
@@ -813,8 +813,8 @@ void tSampleSet::GlobalSettingsDlg()
 
   if (mpGlobalSettingsDialog == 0)
   {
+    mpGlobalSettingsDialog = new wxDialog(pParent, wxID_ANY, "Audio Settings");
 #ifdef OBSOLETE
-    mpGlobalSettingsDialog = new wxDialogBox(gpTrackWindow, "Audio Settings", false);
     tAudioGloblForm *form  = new tAudioGloblForm(*this);
     form->AssociatePanel(mpGlobalSettingsDialog);
     mpGlobalSettingsDialog->Fit();
@@ -1353,10 +1353,6 @@ int tSampleSet::OnMenuCommand(int id)
         Save(mDefaultFileName);
         return 1;
       }
-
-    case ID_AUDIO_GLOBAL_SETTINGS:
-      GlobalSettingsDlg();
-      break;
 
     case ID_AUDIO_SAMPLES:
       SamplesDlg();

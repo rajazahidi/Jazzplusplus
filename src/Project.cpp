@@ -624,7 +624,7 @@ JZRecordingInfo* JZProject::GetRecInfo()
 //-----------------------------------------------------------------------------
 void JZProject::EditAudioGlobalSettings(wxWindow* pParent)
 {
-  mpMidiPlayer->EditGlobalAudioSettings(pParent);
+  mpMidiPlayer->EditAudioGlobalSettings(pParent);
 }
 
 //-----------------------------------------------------------------------------

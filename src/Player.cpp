@@ -685,9 +685,9 @@ void JZPlayer::ShowError()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZPlayer::EditGlobalAudioSettings(wxWindow* pParent)
+void JZPlayer::EditAudioGlobalSettings(wxWindow* pParent)
 {
-  mSamples.GlobalSettingsDlg();
+  mSamples.EditAudioGlobalSettings(pParent);
 }
 
 #ifdef DEV_MPU401

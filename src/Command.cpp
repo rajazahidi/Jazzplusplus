@@ -631,7 +631,7 @@ void tCmdSeqLength::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   k = (tKeyOn *)pEvent->Copy();
 
   //little hack, if clock is -1000 it means set startclock from the first event.
-  if(startClock==-1000)
+  if (startClock==-1000)
   {
     startClock = k->GetClock();
   }

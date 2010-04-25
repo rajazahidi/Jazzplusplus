@@ -157,8 +157,14 @@ float tCMixCmd::tablei(long nsample, float *array, float *tab)
 {
         register int loc1,loc2;
         float frac = ((float)(nsample)/(*tab)) * *(tab+1);
-        if(frac < 0) return(array[0]);
-        if(frac >= *(tab+1)) return(array[(int)*(tab+1)]);
+        if (frac < 0)
+        {
+          return(array[0]);
+        }
+        if (frac >= *(tab+1))
+        {
+          return(array[(int)*(tab+1)]);
+        }
         loc1 = (int)frac;
         loc2 = loc1+1;
         frac = frac - (float)loc1;
@@ -171,23 +177,34 @@ float tCMixCmd::tablei(long nsample, float *array, float *tab)
 
 void tCMixCmd::setline(const float *p, short n_args,int length,float *array)
 {
-        double increm;
-        int i,j,k,points;
+  double increm;
+  int i,j,k,points;
 
-        increm = (double)(p[n_args - 2] - p[0])/(double)length;
-        for(j=0,i=0; j < (n_args-2); j += 2) {
-                points = (int)((double)(p[j+2] - p[j]) / increm +.5);
-                if(p[j+2] != p[j]) {
-                        if(points <= 0) points = 1;
-                        for(k=0; k < points; k++) {
-                                array[i++] = ((float)k/(float)points)
-                                        * (p[j+3] - p[j+1]) + p[j+1];
-                                if(i == length) return;
-                        }
-                }
+  increm = (double)(p[n_args - 2] - p[0])/(double)length;
+  for(j=0,i=0; j < (n_args-2); j += 2)
+    {
+      points = (int)((double)(p[j+2] - p[j]) / increm +.5);
+      if (p[j+2] != p[j])
+      {
+        if (points <= 0)
+        {
+          points = 1;
         }
-        i--;
-        while(++i < length) array[i] = array[i-1];
+        for (k=0; k < points; k++)
+        {
+          array[i++] = ((float)k/(float)points) * (p[j+3] - p[j+1]) + p[j+1];
+          if (i == length)
+          {
+            return;
+          }
+        }
+    }
+  }
+  i--;
+  while(++i < length)
+  {
+    array[i] = array[i-1];
+  }
 }
 
 
@@ -395,12 +412,18 @@ double tShifterCmd::rotate(float p[], int n_args, tFloatSample &sinp, tFloatSamp
     k = (k+1) % reinit;
 
     samplenum1 = (float)i + (float)j * interval;
-    if(!sinp.GetSample(samplenum1, in)) break;
+    if (!sinp.GetSample(samplenum1, in))
+    {
+      break;
+    }
     x = wintable[(int)(((float)j/reinit) * wlen)];
     val1 = in[inchan] * x;
 
     samplenum2 = (float)(i) + (float)(k-off) * interval;
-    if(!sinp.GetSample(samplenum2, in)) break;
+    if (!sinp.GetSample(samplenum2, in))
+    {
+      break;
+    }
     x = wintable[(int)(((float)k/reinit) * wlen)];
     val2 = in[inchan] * x;
 

@@ -141,7 +141,7 @@ tCMixCmd::tCMixCmd(float sr)
 {
   int i;
   resetval = 1000;
-  for(i=0; i<SIZE; i++)
+  for (i = 0; i < SIZE; i++)
     array[i] = 1;
   lineset = 0;
 }
@@ -181,7 +181,7 @@ void tCMixCmd::setline(const float *p, short n_args,int length,float *array)
   int i,j,k,points;
 
   increm = (double)(p[n_args - 2] - p[0])/(double)length;
-  for(j=0,i=0; j < (n_args-2); j += 2)
+  for (j = 0, i = 0; j < (n_args - 2); j += 2)
     {
       points = (int)((double)(p[j+2] - p[j]) / increm +.5);
       if (p[j+2] != p[j])
@@ -406,8 +406,8 @@ double tShifterCmd::rotate(float p[], int n_args, tFloatSample &sinp, tFloatSamp
   chans = sout.GetChannels();
   inchan = (int)p[6];
   j = 0;
-  for(i = 0; i < nsamps; i++) {
-
+  for (i = 0; i < nsamps; i++)i
+  {
     j = (j+1) % reinit;
     k = (k+1) % reinit;
 

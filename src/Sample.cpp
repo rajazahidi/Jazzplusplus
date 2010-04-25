@@ -846,11 +846,13 @@ void tFloatSample::Normalize()
 {
   int j;
   float wmax, xmax = 0;
-  for(j = 0; j < length; j++) {
+  for (j = 0; j < length; j++)
+  {
     if ((wmax = (float)fabs(data[j])) > xmax)
       xmax = wmax;
   }
-  for(j = 0; j < length; j++) {
+  for (j = 0; j < length; j++)
+  {
     data[j] /= xmax;
   }
 }
@@ -886,14 +888,16 @@ tFloatSample::ExpSegments(int size, int nargs, float pval[])
   int j,k,l,i = 0;
 
   amp2 = pvals[0];
-  for(k = 1; k < nargs; k += 2) {
+  for (k = 1; k < nargs; k += 2)
+  {
     amp1 = amp2;
     amp2 = pvals[k+1];
     j = i + 1;
     data[i] = amp1;
     c = (float) pow((amp2/amp1),(1./ pvals[k]));
     i = (j - 1) + pvals[k];
-    for(l = j; l < i; l++) {
+    for (l = j; l < i; l++)
+    {
       if (l < size)
         data[l] = data[l-1] * c;
     }

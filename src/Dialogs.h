@@ -50,23 +50,23 @@ class JZEvent;
 //    void OnHelp();
 //};
 
-class tSearchReplaceDlg : public tPropertyListDlg
-{
-  public:
-
-    static int frCtrl;
-    static int toCtrl;
-/*     tNamedChoice frList; */
-/*     tNamedChoice toList; */
-
-    JZFilter *Filter;
-    JZSong   *Song;
-
-    tSearchReplaceDlg(JZEventWindow* w, JZFilter *f);
-    void AddProperties();
-    bool OnClose();
-    void OnHelp();
-};
+//class tSearchReplaceDlg : public tPropertyListDlg
+//{
+//  public:
+//
+//    static int frCtrl;
+//    static int toCtrl;
+///*     tNamedChoice frList; */
+///*     tNamedChoice toList; */
+//
+//    JZFilter *Filter;
+//    JZSong   *Song;
+//
+//    tSearchReplaceDlg(JZEventWindow* w, JZFilter *f);
+//    void AddProperties();
+//    bool OnClose();
+//    void OnHelp();
+//};
 
 // seqLength
 class tSeqLengthDlg : public tPropertyListDlg

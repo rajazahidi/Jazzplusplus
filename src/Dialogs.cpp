@@ -25,6 +25,7 @@
 #include "ClockDialog.h"
 #include "Command.h"
 #include "DeprecatedWx/proplist.h"
+#include "Dialogs/ControllerDialog.h"
 #include "Dialogs/KeyOnDialog.h"
 #include "Dialogs/ProgramChangeDialog.h"
 //#include "EventFrame.h"
@@ -107,40 +108,40 @@ using namespace std;
 // SearchReplace
 //*****************************************************************************
 
-int tSearchReplaceDlg::frCtrl = 1;
-int tSearchReplaceDlg::toCtrl = 1;
+//int tSearchReplaceDlg::frCtrl = 1;
+//int tSearchReplaceDlg::toCtrl = 1;
+//
+//tSearchReplaceDlg::tSearchReplaceDlg(JZEventWindow* w, JZFilter *f)
+//   : tPropertyListDlg("Search and replace controller types" )
+//{
+//  Filter = f;
+//  Song = f->GetSong();
+//}
 
-tSearchReplaceDlg::tSearchReplaceDlg(JZEventWindow* w, JZFilter *f)
-   : tPropertyListDlg("Search and replace controller types" )
-{
-  Filter = f;
-  Song = f->GetSong();
-}
+//bool tSearchReplaceDlg::OnClose()
+//{
+//  tCmdSearchReplace sr(Filter, frCtrl - 1, toCtrl-1);
+//  sr.Execute();
+//
+//  JZProjectManager::Instance()->UpdateAllViews();
+//
+//  return false;
+//}
 
-bool tSearchReplaceDlg::OnClose()
-{
-  tCmdSearchReplace sr(Filter, frCtrl - 1, toCtrl-1);
-  sr.Execute();
-
-  JZProjectManager::Instance()->UpdateAllViews();
-
-  return false;
-}
-
-void tSearchReplaceDlg::AddProperties()
-{
-  sheet->AddProperty(new wxProperty(
-    "Search",
-    tNamedValueListValue(&frCtrl, gpConfig->GetControlNames()),
-    "props",
-    new tNamedValueListValidator(gpConfig->GetControlNames())));
-
-  sheet->AddProperty(new wxProperty(
-    "Replace",
-    tNamedValueListValue(&toCtrl, gpConfig->GetControlNames()),
-    "props",
-    new tNamedValueListValidator(gpConfig->GetControlNames())));
-}
+//void tSearchReplaceDlg::AddProperties()
+//{
+//  sheet->AddProperty(new wxProperty(
+//    "Search",
+//    tNamedValueListValue(&frCtrl, gpConfig->GetControlNames()),
+//    "props",
+//    new tNamedValueListValidator(gpConfig->GetControlNames())));
+//
+//  sheet->AddProperty(new wxProperty(
+//    "Replace",
+//    tNamedValueListValue(&toCtrl, gpConfig->GetControlNames()),
+//    "props",
+//    new tNamedValueListValidator(gpConfig->GetControlNames())));
+//}
 
 
 
@@ -385,66 +386,6 @@ void tPitchDlg::AddProperties()
   tChEventDlg::AddProperties();
 }
 
-// -------------------------------- Controller ---------------------------
-
-class tControlDlg : public tChEventDlg
-{
- public:
-
-  int Value;
-  int Control;
-  //tNamedChoice Choice;
-
-  tControlDlg(tControl *e, JZPianoWindow* w, JZTrack *t);
-
-  void AddProperties();
-  bool OnClose();
-};
-
-
-tControlDlg::tControlDlg(tControl* pControl, JZPianoWindow* w, JZTrack *t)
-  : tChEventDlg(pControl, w, t)//,
-//    Choice("Controller", &gpConfig->GetCtrlName(0), &Control)
-{
-  Event = pControl;
-  Value = pControl->GetControlValue();
-  Control = pControl->GetControl() + 1;
-}
-
-
-bool tControlDlg::OnClose()
-{
-  ((tControl *)Copy)->SetControlValue(Value);
-  //  Choice.GetValue();
-  ((tControl *)Copy)->SetControl(Control - 1);
-  return tChEventDlg::OnClose();
-}
-
-void tControlDlg::AddProperties()
-{
-  //  Add(Choice.mkFormItem(300, 300));
-//  Choice("Controller", &gpConfig->GetCtrlName(0), &Control)
-  sheet->AddProperty(new wxProperty(
-    "Controller",
-    tNamedValueListValue(&Control, gpConfig->GetControlNames()),
-    "props",
-    new tNamedValueListValidator(gpConfig->GetControlNames())));
-
-  sheet->AddProperty(new wxProperty(
-    "Value",
-    wxPropertyValue(&Value),
-    "integer",
-    new wxIntegerListValidator(0, 127)));
-
-//  Add(wxMakeFormShort(
-//    "Value:",
-//    &Value,
-//    wxFORM_DEFAULT,
-//    new wxList(wxMakeConstraintRange(0.0, 127.0), 0)));
-
-  tChEventDlg::AddProperties();
-}
-
 // -------------------------------- Play track ---------------------------
 
 class tPlayTrackDlg : public tEventDlg
@@ -589,55 +530,6 @@ void tEndOfTrackDlg::AddProperties()
 {
   tEventDlg::AddProperties();
 }
-
-
-#ifdef DEPRECATED
-// -------------------------------- Program ---------------------------
-
-class tProgramDlg : public tEventDlg
-{
-public:
-
-  int Program;
-  //  tNamedChoice Choice;
-
-  tProgramDlg(tProgram *e, JZPianoWindow* w, JZTrack *t);
-
-  void AddProperties();
-  bool OnClose();
-};
-
-
-tProgramDlg::tProgramDlg(tProgram* pProgram, JZPianoWindow* w, JZTrack *t)
-  : tEventDlg(pProgram, w, t),
-    Program(pProgram->GetProgram() + 1)//,
-//    Choice("Program", &gpConfig->GetVoiceName(0), &Program)
-{
-  Event = pProgram;
-}
-
-
-bool tProgramDlg::OnClose()
-{
-//  Choice.GetValue();
-  if (Program <= 0)
-  {
-    Program = 1;
-  }
-  ((tProgram *)Copy)->SetProgram(Program - 1);
-  return tEventDlg::OnClose();
-}
-
-void tProgramDlg::AddProperties()
-{
-  //Add(Choice.mkFormItem(300, 300));
-  sheet->AddProperty(new wxProperty(
-    "Program",
-    tNamedValueListValue(&Program, gpConfig->GetVoiceNames()),
-    "props",
-    new tNamedValueListValidator(gpConfig->GetVoiceNames())));
-}
-#endif // DEPRECATED
 
 
 
@@ -946,16 +838,20 @@ void EventDialog(
       break;
 
     case StatControl:
-      str = "Controller";
-      dlg = new tControlDlg(e->IsControl(), pPianoWindow, t);
+//      str = "Controller";
+//      dlg = new tControlDlg(e->IsControl(), pPianoWindow, t);
+      {
+        JZControllerDialog ControllerDialog(pPianoWindow);
+        ControllerDialog.ShowModal();
+      }
       break;
 
     case StatProgram:
-      {
 //      str = "Program Change";
 //      dlg = new tProgramDlg(e->IsProgram(), pPianoWindow, t);
-      JZProgramChangeDialog ProgramChangeDialog(pPianoWindow);
-      ProgramChangeDialog.ShowModal();
+      {
+        JZProgramChangeDialog ProgramChangeDialog(pPianoWindow);
+        ProgramChangeDialog.ShowModal();
       }
       break;
 

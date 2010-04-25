@@ -855,6 +855,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Dialogs\ControllerDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\ControllerDialog.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Dialogs\DeleteDialog.cpp"
 				>
 			</File>

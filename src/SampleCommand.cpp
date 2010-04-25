@@ -406,7 +406,7 @@ double tShifterCmd::rotate(float p[], int n_args, tFloatSample &sinp, tFloatSamp
   chans = sout.GetChannels();
   inchan = (int)p[6];
   j = 0;
-  for (i = 0; i < nsamps; i++)i
+  for (i = 0; i < nsamps; i++)
   {
     j = (j+1) % reinit;
     k = (k+1) % reinit;

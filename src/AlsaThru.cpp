@@ -83,20 +83,23 @@ void tAlsaThru::disconnect(snd_seq_addr_t &src, snd_seq_addr_t &dest)
   snd_seq_port_subscribe_alloca(&subs);
   snd_seq_port_subscribe_set_sender(subs, &src);
   snd_seq_port_subscribe_set_dest(subs, &dest);
-  if (snd_seq_unsubscribe_port(handle, subs) < 0) {
+  if (snd_seq_unsubscribe_port(handle, subs) < 0)
+  {
     perror("unsubscribe");
   }
 }
 
 void tAlsaThru::initialize()
 {
-  if (snd_seq_open(&handle, "hw", SND_SEQ_OPEN_DUPLEX, 0 ) < 0) {
+  if (snd_seq_open(&handle, "hw", SND_SEQ_OPEN_DUPLEX, 0 ) < 0)
+  {
     perror("open");
     exit(1);
   }
   tAlsaPlayer::set_client_info(handle, "Jazz++ Midi Thru");
 
-  if (snd_seq_nonblock(handle, 0) < 0) {
+  if (snd_seq_nonblock(handle, 0) < 0)
+  {
     perror("blocking mode");
     exit(1);
   }
@@ -113,7 +116,8 @@ void tAlsaThru::initialize()
 #ifdef USE_DIRECT_CONNECTION
 void tAlsaThru::Start()
 {
-  if (! running) {
+  if (! running)
+  {
     initialize();
     connect(source, destin);
     running = 1;
@@ -138,8 +142,10 @@ void tAlsaThru::Stop()
 void tAlsaThru::loop()
 {
   snd_seq_event_t *ev;
-  while (snd_seq_event_input(handle, &ev) >= 0 && ev != 0) {
-    if (ev->source.client == source.client && ev->source.port == source.port) {
+  while (snd_seq_event_input(handle, &ev) >= 0 && ev != 0)
+  {
+    if (ev->source.client == source.client && ev->source.port == source.port)
+    {
       ev->flags &= ~SND_SEQ_TIME_STAMP_MASK;
       ev->flags |= SND_SEQ_TIME_STAMP_TICK;
       ev->time.tick = 0;
@@ -202,13 +208,16 @@ void tAlsaThru::stopworker(int sig)
 
 void tAlsaThru::Start()
 {
-  if (!running) {
+  if (!running)
+  {
     worker = fork();
-    if (worker < 0) {
+    if (worker < 0)
+    {
       perror("fork");
       exit(1);
     }
-    if (worker == 0) {
+    if (worker == 0)
+    {
       signal(SIGHUP, stopworker);
       initialize();
       loop();
@@ -223,7 +232,8 @@ void tAlsaThru::Start()
 
 void tAlsaThru::Stop()
 {
-  if (running) {
+  if (running)
+  {
     int status = 0;
     kill(worker, SIGHUP);
     wait(&status);

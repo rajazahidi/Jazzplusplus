@@ -90,9 +90,9 @@ void JZMetronomeInfo::ToggleIsOn()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tKeyOn* JZMetronomeInfo::CreateNormalEvent(int Clock) const
+JZKeyOnEvent* JZMetronomeInfo::CreateNormalEvent(int Clock) const
 {
-  return new tKeyOn(
+  return new JZKeyOnEvent(
     Clock,
     gpConfig->GetValue(C_DrumChannel) - 1,
     mKeyNormal,
@@ -102,9 +102,9 @@ tKeyOn* JZMetronomeInfo::CreateNormalEvent(int Clock) const
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tKeyOn* JZMetronomeInfo::CreateAccentedEvent(int Clock) const
+JZKeyOnEvent* JZMetronomeInfo::CreateAccentedEvent(int Clock) const
 {
-  return new tKeyOn(
+  return new JZKeyOnEvent(
     Clock,
     gpConfig->GetValue(C_DrumChannel) - 1,
     mKeyAccented,

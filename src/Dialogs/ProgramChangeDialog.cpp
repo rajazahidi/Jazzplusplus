@@ -39,7 +39,7 @@ END_EVENT_TABLE()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZProgramChangeDialog::JZProgramChangeDialog(
-  tProgram* pProgram,
+  JZProgramEvent* pProgram,
   JZTrack* pTrack,
   wxWindow* pParent)
   : wxDialog(pParent, wxID_ANY, wxString("Program Change")),

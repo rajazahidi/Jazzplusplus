@@ -39,7 +39,7 @@ END_EVENT_TABLE()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZControllerDialog::JZControllerDialog(
-  tControl* pControl,
+  JZControlEvent* pControl,
   JZTrack* pTrack,
   wxWindow* pParent)
   : wxDialog(pParent, wxID_ANY, wxString("Controller")),

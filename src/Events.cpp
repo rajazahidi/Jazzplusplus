@@ -150,11 +150,10 @@ void JZWriteBase::Close()
 }
 
 //*****************************************************************************
-// tGetMidiBytes
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tGetMidiBytes::Write(JZEvent* pEvent, unsigned char* pData, int Length)
+int JZGetMidiBytes::Write(JZEvent* pEvent, unsigned char* pData, int Length)
 {
   int Stat = pEvent->GetStat();
 
@@ -170,7 +169,7 @@ int tGetMidiBytes::Write(JZEvent* pEvent, unsigned char* pData, int Length)
     case StatPitch:
       nBytes = 0;
 
-      Buffer[nBytes++] = Stat | ((tChannelEvent *)pEvent)->GetChannel();
+      Buffer[nBytes++] = Stat | ((JZChannelEvent *)pEvent)->GetChannel();
       while (Length--)
       {
         Buffer[nBytes++] = *pData++;
@@ -190,7 +189,7 @@ int tGetMidiBytes::Write(JZEvent* pEvent, unsigned char* pData, int Length)
 // Description:
 //   This function fixed the checksum bytes at the end of the data stream.
 //-----------------------------------------------------------------------------
-void tMetaEvent::FixCheckSum()
+void JZMetaEvent::FixCheckSum()
 {
   unsigned char Sum = 0x00;
   for (unsigned short i = 4; i < (mLength - 2); ++i)
@@ -207,7 +206,7 @@ void tMetaEvent::FixCheckSum()
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tSysEx::GetPitch() const
+int JZSysExEvent::GetPitch() const
 {
   edb();
 

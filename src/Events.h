@@ -208,9 +208,8 @@ void JZWriteBase::NextTrack()
 }
 
 //*****************************************************************************
-// tGetMidiBytes
 //*****************************************************************************
-class tGetMidiBytes : public JZWriteBase
+class JZGetMidiBytes : public JZWriteBase
 {
   public:
 
@@ -288,32 +287,32 @@ class tGetMidiBytes : public JZWriteBase
 // Event-Classes
 
 class JZEvent;
-class tChannelEvent;
-class tMetaEvent;
-class tKeyOn;
-class tKeyOff;
-class tPitch;
-class tControl;
-class tProgram;
-class tSysEx;
-class tSongPtr;
-class tMidiClock;
-class tStartPlay;
-class tContPlay;
-class tStopPlay;
-class tText;
-class tCopyright;
-class tTrackName;
-class tMarker;
-class tSetTempo;
-class tMtcOffset;
-class tTimeSignat;
-class tKeySignat;
-class tKeyPressure;
-class tJazzMeta;
-class tChnPressure;
-class tPlayTrack;
-class tEndOfTrack;
+class JZChannelEvent;
+class JZMetaEvent;
+class JZKeyOnEvent;
+class JZKeyOffEvent;
+class JZPitchEvent;
+class JZControlEvent;
+class JZProgramEvent;
+class JZSysExEvent;
+class JZSongPtrEvent;
+class JZMidiClockEvent;
+class JZStartPlayEvent;
+class JZContPlayEvent;
+class JZStopPlayEvent;
+class JZTextEvent;
+class JZCopyrightEvent;
+class JZTrackNameEvent;
+class JZMarkerEvent;
+class JZSetTempoEvent;
+class JZMtcOffsetEvent;
+class JZTimeSignatEvent;
+class JZKeySignatEvent;
+class JZKeyPressureEvent;
+class JZJazzMetaEvent;
+class JZChnPressureEvent;
+class JZPlayTrackEvent;
+class JZEndOfTrackEvent;
 
 //*****************************************************************************
 // Description:
@@ -398,32 +397,32 @@ class JZEvent
       return (mClock & KILLED_CLOCK) != 0;
     }
 
-    virtual tMetaEvent*    IsMetaEvent()    { edb(); return 0; }
-    virtual tChannelEvent* IsChannelEvent() { edb(); return 0; }
-    virtual tKeyOn*        IsKeyOn()        { edb(); return 0; }
-    virtual tKeyOff*       IsKeyOff()       { edb(); return 0; }
-    virtual tPitch*        IsPitch()        { edb(); return 0; }
-    virtual tControl*      IsControl()      { edb(); return 0; }
-    virtual tProgram*      IsProgram()      { edb(); return 0; }
-    virtual tSysEx*        IsSysEx()        { edb(); return 0; }
-    virtual tSongPtr*      IsSongPtr()      { edb(); return 0; }
-    virtual tMidiClock*    IsMidiClock()    { edb(); return 0; }
-    virtual tStartPlay*    IsStartPlay()    { edb(); return 0; }
-    virtual tContPlay*     IsContPlay()     { edb(); return 0; }
-    virtual tStopPlay*     IsStopPlay()     { edb(); return 0; }
-    virtual tText*         IsText()         { edb(); return 0; }
-    virtual tCopyright*    IsCopyright()    { edb(); return 0; }
-    virtual tTrackName*    IsTrackName()    { edb(); return 0; }
-    virtual tMarker*       IsMarker()       { edb(); return 0; }
-    virtual tSetTempo*     IsSetTempo()     { edb(); return 0; }
-    virtual tMtcOffset*    IsMtcOffset()    { edb(); return 0; }
-    virtual tTimeSignat*   IsTimeSignat()   { edb(); return 0; }
-    virtual tKeySignat*    IsKeySignat()    { edb(); return 0; }
-    virtual tKeyPressure*  IsKeyPressure()  { edb(); return 0; }
-    virtual tJazzMeta*     IsJazzMeta()     { edb(); return 0; }
-    virtual tPlayTrack*    IsPlayTrack()    { edb(); return 0; }
-    virtual tEndOfTrack*   IsEndOfTrack()   { edb(); return 0; }
-    virtual tChnPressure*  IsChnPressure()  { edb(); return 0; }
+    virtual JZMetaEvent*        IsMetaEvent()    { edb(); return 0; }
+    virtual JZChannelEvent*     IsChannelEvent() { edb(); return 0; }
+    virtual JZKeyOnEvent*       IsKeyOn()        { edb(); return 0; }
+    virtual JZKeyOffEvent*      IsKeyOff()       { edb(); return 0; }
+    virtual JZPitchEvent*       IsPitch()        { edb(); return 0; }
+    virtual JZControlEvent*     IsControl()      { edb(); return 0; }
+    virtual JZProgramEvent*     IsProgram()      { edb(); return 0; }
+    virtual JZSysExEvent*       IsSysEx()        { edb(); return 0; }
+    virtual JZSongPtrEvent*     IsSongPtr()      { edb(); return 0; }
+    virtual JZMidiClockEvent*   IsMidiClock()    { edb(); return 0; }
+    virtual JZStartPlayEvent*   IsStartPlay()    { edb(); return 0; }
+    virtual JZContPlayEvent*    IsContPlay()     { edb(); return 0; }
+    virtual JZStopPlayEvent*    IsStopPlay()     { edb(); return 0; }
+    virtual JZTextEvent*        IsText()         { edb(); return 0; }
+    virtual JZCopyrightEvent*   IsCopyright()    { edb(); return 0; }
+    virtual JZTrackNameEvent*   IsTrackName()    { edb(); return 0; }
+    virtual JZMarkerEvent*      IsMarker()       { edb(); return 0; }
+    virtual JZSetTempoEvent*    IsSetTempo()     { edb(); return 0; }
+    virtual JZMtcOffsetEvent*   IsMtcOffset()    { edb(); return 0; }
+    virtual JZTimeSignatEvent*  IsTimeSignat()   { edb(); return 0; }
+    virtual JZKeySignatEvent*   IsKeySignat()    { edb(); return 0; }
+    virtual JZKeyPressureEvent* IsKeyPressure()  { edb(); return 0; }
+    virtual JZJazzMetaEvent*    IsJazzMeta()     { edb(); return 0; }
+    virtual JZPlayTrackEvent*   IsPlayTrack()    { edb(); return 0; }
+    virtual JZEndOfTrackEvent*  IsEndOfTrack()   { edb(); return 0; }
+    virtual JZChnPressureEvent* IsChnPressure()  { edb(); return 0; }
 
     virtual int Write(JZWriteBase& io)
     {
@@ -523,17 +522,17 @@ class JZEvent
 
 //*****************************************************************************
 //*****************************************************************************
-class tChannelEvent : public JZEvent
+class JZChannelEvent : public JZEvent
 {
   public:
 
-    tChannelEvent(int Clock, unsigned char sta, int Channel)
+    JZChannelEvent(int Clock, unsigned char sta, int Channel)
       : JZEvent(Clock, sta)
     {
       mChannel = Channel;
     }
 
-    virtual tChannelEvent* IsChannelEvent()
+    virtual JZChannelEvent* IsChannelEvent()
     {
       edb();
       return this;
@@ -542,7 +541,7 @@ class tChannelEvent : public JZEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tChannelEvent(*this);
+      return new JZChannelEvent(*this);
     }
 
     unsigned char GetChannel() const
@@ -562,17 +561,17 @@ class tChannelEvent : public JZEvent
 
 //*****************************************************************************
 //*****************************************************************************
-class tKeyOn : public tChannelEvent
+class JZKeyOnEvent : public JZChannelEvent
 {
   public:
 
-    tKeyOn(
+    JZKeyOnEvent(
       int Clock,
       int Channel,
       unsigned char Key,
       unsigned char Velocity,
       unsigned short Length = 0)
-      : tChannelEvent(Clock, StatKeyOn, Channel),
+      : JZChannelEvent(Clock, StatKeyOn, Channel),
         mKey(Key),
         mVelocity(Velocity),
         mLength(Length),
@@ -586,7 +585,7 @@ class tKeyOn : public tChannelEvent
       return io.Write(this, mKey, mVelocity);
     }
 
-    virtual tKeyOn* IsKeyOn()
+    virtual JZKeyOnEvent* IsKeyOn()
     {
       edb();
       return this;
@@ -595,7 +594,7 @@ class tKeyOn : public tChannelEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tKeyOn(*this);
+      return new JZKeyOnEvent(*this);
     }
 
     virtual int GetValue() const
@@ -679,7 +678,7 @@ class tKeyOn : public tChannelEvent
 
     unsigned char mVelocity;
 
-    // Length is 0 if a corresponding tKeyOff exists.
+    // Length is 0 if a corresponding JZKeyOffEvent exists.
     unsigned short mLength;
 
     unsigned short mOffVelocity;
@@ -687,15 +686,15 @@ class tKeyOn : public tChannelEvent
 
 //*****************************************************************************
 //*****************************************************************************
-class tKeyOff : public tChannelEvent
+class JZKeyOffEvent : public JZChannelEvent
 {
   public:
-    tKeyOff(
+    JZKeyOffEvent(
       int Clock,
       int Channel,
       unsigned char Key,
       unsigned char OffVelocity = 0)
-      : tChannelEvent(Clock, StatKeyOff, Channel),
+      : JZChannelEvent(Clock, StatKeyOff, Channel),
         mKey(Key),
         mOffVelocity(OffVelocity)
     {
@@ -707,7 +706,7 @@ class tKeyOff : public tChannelEvent
       return io.Write(this, mKey, mOffVelocity);
     }
 
-    virtual tKeyOff* IsKeyOff()
+    virtual JZKeyOffEvent* IsKeyOff()
     {
       edb();
       return this;
@@ -716,7 +715,7 @@ class tKeyOff : public tChannelEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tKeyOff(*this);
+      return new JZKeyOffEvent(*this);
     }
 
     unsigned char GetKey() const
@@ -743,23 +742,23 @@ class tKeyOff : public tChannelEvent
 
 //*****************************************************************************
 //*****************************************************************************
-class tPitch : public tChannelEvent
+class JZPitchEvent : public JZChannelEvent
 {
   public:
     short Value;
 
-    tPitch(
+    JZPitchEvent(
       int Clock,
       unsigned short Channel,
       unsigned char lo,
       unsigned char hi)
-      : tChannelEvent(Clock, StatPitch, Channel)
+      : JZChannelEvent(Clock, StatPitch, Channel)
     {
       Value  = ((hi << 7) | lo) - 8192;
     }
 
-    tPitch(int Clock, unsigned short Channel, short val)
-      : tChannelEvent(Clock, StatPitch, Channel)
+    JZPitchEvent(int Clock, unsigned short Channel, short val)
+      : JZChannelEvent(Clock, StatPitch, Channel)
     {
       Value  = val;
     }
@@ -770,7 +769,7 @@ class tPitch : public tChannelEvent
       edb(); return io.Write(this, (unsigned char)(v & 0x7F), (unsigned char)(v >> 7));
     }
 
-    virtual tPitch* IsPitch()
+    virtual JZPitchEvent* IsPitch()
     {
       edb();
       return this;
@@ -779,7 +778,7 @@ class tPitch : public tChannelEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tPitch(*this);
+      return new JZPitchEvent(*this);
     }
 
     virtual int GetValue() const
@@ -813,16 +812,16 @@ class tPitch : public tChannelEvent
 
 //*****************************************************************************
 //*****************************************************************************
-class tControl : public tChannelEvent
+class JZControlEvent : public JZChannelEvent
 {
   public:
 
-    tControl(
+    JZControlEvent(
       int Clock,
       int Channel,
       unsigned char Control,
       unsigned char Value)
-      : tChannelEvent(Clock, StatControl, Channel),
+      : JZChannelEvent(Clock, StatControl, Channel),
         mControl(Control),
         mValue(Value)
     {
@@ -834,7 +833,7 @@ class tControl : public tChannelEvent
       return io.Write(this, mControl, mValue);
     }
 
-    virtual tControl* IsControl()
+    virtual JZControlEvent* IsControl()
     {
       edb();
       return this;
@@ -843,7 +842,7 @@ class tControl : public tChannelEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tControl(*this);
+      return new JZControlEvent(*this);
     }
 
     virtual int GetValue() const
@@ -902,12 +901,12 @@ class tControl : public tChannelEvent
 
 //*****************************************************************************
 //*****************************************************************************
-class tProgram : public tChannelEvent
+class JZProgramEvent : public JZChannelEvent
 {
   public:
 
-    tProgram(int Clock, int Channel, unsigned char Program)
-      : tChannelEvent(Clock, StatProgram, Channel)
+    JZProgramEvent(int Clock, int Channel, unsigned char Program)
+      : JZChannelEvent(Clock, StatProgram, Channel)
     {
       mProgram = Program;
     }
@@ -917,7 +916,7 @@ class tProgram : public tChannelEvent
       edb(); return io.Write(this, mProgram);
     }
 
-    virtual tProgram* IsProgram()
+    virtual JZProgramEvent* IsProgram()
     {
       edb();
       return this;
@@ -926,7 +925,7 @@ class tProgram : public tChannelEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tProgram(*this);
+      return new JZProgramEvent(*this);
     }
 
     virtual int GetValue() const
@@ -974,11 +973,11 @@ class tProgram : public tChannelEvent
 
 //*****************************************************************************
 //*****************************************************************************
-class tMetaEvent : public JZEvent
+class JZMetaEvent : public JZEvent
 {
   public:
 
-    tMetaEvent(
+    JZMetaEvent(
       int Clock,
       unsigned char sta,
       unsigned char* pData,
@@ -995,7 +994,7 @@ class tMetaEvent : public JZEvent
       mpData[Length] = 0;
     }
 
-    virtual ~tMetaEvent()
+    virtual ~JZMetaEvent()
     {
       delete [] mpData;
     }
@@ -1006,7 +1005,7 @@ class tMetaEvent : public JZEvent
       return io.Write(this, mpData, mLength);
     }
 
-    virtual tMetaEvent* IsMetaEvent()
+    virtual JZMetaEvent* IsMetaEvent()
     {
       edb();
       return this;
@@ -1015,7 +1014,7 @@ class tMetaEvent : public JZEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tMetaEvent(mClock, mStat, mpData, mLength);
+      return new JZMetaEvent(mClock, mStat, mpData, mLength);
     }
 
     const unsigned char* GetData() const
@@ -1042,7 +1041,7 @@ class tMetaEvent : public JZEvent
 // should should not go into a track itself but is read/written from/to
 // the file.
 //*****************************************************************************
-class tJazzMeta : public tMetaEvent
+class JZJazzMetaEvent : public JZMetaEvent
 {
   public:
 
@@ -1051,13 +1050,13 @@ class tJazzMeta : public tMetaEvent
       DATALEN = 20
     };
 
-    tJazzMeta(int Clock, unsigned char* pData, unsigned short Length)
-      : tMetaEvent(Clock, StatJazzMeta, pData, Length)
+    JZJazzMetaEvent(int Clock, unsigned char* pData, unsigned short Length)
+      : JZMetaEvent(Clock, StatJazzMeta, pData, Length)
     {
     }
 
-    tJazzMeta()
-      : tMetaEvent(0, StatJazzMeta, 0, DATALEN)
+    JZJazzMetaEvent()
+      : JZMetaEvent(0, StatJazzMeta, 0, DATALEN)
     {
       memset(mpData, 0, DATALEN);
       memcpy(mpData, "JAZ2", 4);
@@ -1106,7 +1105,7 @@ class tJazzMeta : public tMetaEvent
       mpData[9] = x;
     }
 
-    virtual tJazzMeta* IsJazzMeta()
+    virtual JZJazzMetaEvent* IsJazzMeta()
     {
       edb();
       return this;
@@ -1115,22 +1114,22 @@ class tJazzMeta : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tJazzMeta(mClock, mpData, mLength);
+      return new JZJazzMetaEvent(mClock, mpData, mLength);
     }
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tSysEx : public tMetaEvent
+class JZSysExEvent : public JZMetaEvent
 {
   public:
 
-    tSysEx(int Clock, unsigned char* pData, unsigned short Length)
-      : tMetaEvent(Clock, StatSysEx, pData, Length)
+    JZSysExEvent(int Clock, unsigned char* pData, unsigned short Length)
+      : JZMetaEvent(Clock, StatSysEx, pData, Length)
     {
     }
 
-    virtual tSysEx* IsSysEx()
+    virtual JZSysExEvent* IsSysEx()
     {
       edb();
       return this;
@@ -1139,7 +1138,7 @@ class tSysEx : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tSysEx(mClock, mpData, mLength);
+      return new JZSysExEvent(mClock, mpData, mLength);
     }
 
     // todo
@@ -1148,16 +1147,16 @@ class tSysEx : public tMetaEvent
 
 //*****************************************************************************
 //*****************************************************************************
-class tSongPtr : public tMetaEvent
+class JZSongPtrEvent : public JZMetaEvent
 {
   public:
 
-    tSongPtr(int Clock, unsigned char* pData, unsigned short Length)
-      : tMetaEvent(Clock, StatSongPtr, pData, Length)
+    JZSongPtrEvent(int Clock, unsigned char* pData, unsigned short Length)
+      : JZMetaEvent(Clock, StatSongPtr, pData, Length)
     {
     }
 
-    virtual tSongPtr* IsSongPtr()
+    virtual JZSongPtrEvent* IsSongPtr()
     {
       edb();
       return this;
@@ -1166,26 +1165,26 @@ class tSongPtr : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tSongPtr(mClock, mpData, mLength);
+      return new JZSongPtrEvent(mClock, mpData, mLength);
     }
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tMidiClock : public tMetaEvent
+class JZMidiClockEvent : public JZMetaEvent
 {
   public:
-    tMidiClock(int Clock, unsigned char* pData, unsigned short Length)
-      : tMetaEvent(Clock, StatMidiClock, pData, Length)
+    JZMidiClockEvent(int Clock, unsigned char* pData, unsigned short Length)
+      : JZMetaEvent(Clock, StatMidiClock, pData, Length)
     {
     }
 
-    tMidiClock(int Clock)
-      : tMetaEvent(Clock, StatMidiClock, 0, 0)
+    JZMidiClockEvent(int Clock)
+      : JZMetaEvent(Clock, StatMidiClock, 0, 0)
     {
     }
 
-    virtual tMidiClock *IsMidiClock()
+    virtual JZMidiClockEvent *IsMidiClock()
     {
       edb();
       return this;
@@ -1194,27 +1193,27 @@ class tMidiClock : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tMidiClock(mClock, mpData, mLength);
+      return new JZMidiClockEvent(mClock, mpData, mLength);
     }
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tStartPlay : public tMetaEvent
+class JZStartPlayEvent : public JZMetaEvent
 {
   public:
 
-    tStartPlay(int Clock, unsigned char* pData, unsigned short Length)
-      : tMetaEvent(Clock, StatStartPlay, pData, Length)
+    JZStartPlayEvent(int Clock, unsigned char* pData, unsigned short Length)
+      : JZMetaEvent(Clock, StatStartPlay, pData, Length)
     {
     }
 
-    tStartPlay(int Clock)
-      : tMetaEvent(Clock, StatStartPlay, 0, 0)
+    JZStartPlayEvent(int Clock)
+      : JZMetaEvent(Clock, StatStartPlay, 0, 0)
     {
     }
 
-    virtual tStartPlay* IsStartPlay()
+    virtual JZStartPlayEvent* IsStartPlay()
     {
       edb();
       return this;
@@ -1223,27 +1222,27 @@ class tStartPlay : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tStartPlay(mClock, mpData, mLength);
+      return new JZStartPlayEvent(mClock, mpData, mLength);
     }
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tContPlay : public tMetaEvent
+class JZContPlayEvent : public JZMetaEvent
 {
   public:
 
-    tContPlay(int Clock, unsigned char* pData, unsigned short Length)
-      : tMetaEvent(Clock, StatContPlay, pData, Length)
+    JZContPlayEvent(int Clock, unsigned char* pData, unsigned short Length)
+      : JZMetaEvent(Clock, StatContPlay, pData, Length)
     {
     }
 
-    tContPlay(int Clock)
-      : tMetaEvent(Clock, StatContPlay, 0, 0)
+    JZContPlayEvent(int Clock)
+      : JZMetaEvent(Clock, StatContPlay, 0, 0)
     {
     }
 
-    virtual tContPlay* IsContPlay()
+    virtual JZContPlayEvent* IsContPlay()
     {
       edb();
       return this;
@@ -1252,27 +1251,27 @@ class tContPlay : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tContPlay(mClock, mpData, mLength);
+      return new JZContPlayEvent(mClock, mpData, mLength);
     }
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tStopPlay : public tMetaEvent
+class JZStopPlayEvent : public JZMetaEvent
 {
   public:
 
-    tStopPlay(int Clock, unsigned char* pData, unsigned short Length)
-      : tMetaEvent(Clock, StatStopPlay, pData, Length)
+    JZStopPlayEvent(int Clock, unsigned char* pData, unsigned short Length)
+      : JZMetaEvent(Clock, StatStopPlay, pData, Length)
     {
     }
 
-    tStopPlay(int Clock)
-      : tMetaEvent(Clock, StatStopPlay, 0, 0)
+    JZStopPlayEvent(int Clock)
+      : JZMetaEvent(Clock, StatStopPlay, 0, 0)
     {
     }
 
-    virtual tStopPlay* IsStopPlay()
+    virtual JZStopPlayEvent* IsStopPlay()
     {
       edb();
       return this;
@@ -1281,27 +1280,27 @@ class tStopPlay : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tStopPlay(mClock, mpData, mLength);
+      return new JZStopPlayEvent(mClock, mpData, mLength);
     }
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tText : public tMetaEvent
+class JZTextEvent : public JZMetaEvent
 {
   public:
 
-    tText(int Clock, unsigned char* pData, unsigned short Length)
-      : tMetaEvent(Clock, StatText, pData, Length)
+    JZTextEvent(int Clock, unsigned char* pData, unsigned short Length)
+      : JZMetaEvent(Clock, StatText, pData, Length)
     {
     }
 
-    tText(int Clock, unsigned char* pData)
-      : tMetaEvent(Clock, StatText, pData, strlen((const char*)pData))
+    JZTextEvent(int Clock, unsigned char* pData)
+      : JZMetaEvent(Clock, StatText, pData, strlen((const char*)pData))
     {
     }
 
-    virtual tText* IsText()
+    virtual JZTextEvent* IsText()
     {
       edb();
       return this;
@@ -1310,7 +1309,7 @@ class tText : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tText(mClock, mpData, mLength);
+      return new JZTextEvent(mClock, mpData, mLength);
     }
 
     virtual unsigned char* GetText()
@@ -1331,16 +1330,16 @@ class tText : public tMetaEvent
 
 //*****************************************************************************
 //*****************************************************************************
-class tCopyright : public tMetaEvent
+class JZCopyrightEvent : public JZMetaEvent
 {
   public:
 
-    tCopyright(int Clock, unsigned char* pData, unsigned short Length)
-      : tMetaEvent(Clock, StatCopyright, pData, Length)
+    JZCopyrightEvent(int Clock, unsigned char* pData, unsigned short Length)
+      : JZMetaEvent(Clock, StatCopyright, pData, Length)
     {
     }
 
-    virtual tCopyright* IsCopyright()
+    virtual JZCopyrightEvent* IsCopyright()
     {
       edb();
       return this;
@@ -1349,18 +1348,18 @@ class tCopyright : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tCopyright(mClock, mpData, mLength);
+      return new JZCopyrightEvent(mClock, mpData, mLength);
     }
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tTrackName : public tMetaEvent
+class JZTrackNameEvent : public JZMetaEvent
 {
   public:
 
-    tTrackName(int Clock, unsigned char* pData, unsigned short Length)
-      : tMetaEvent(Clock, StatTrackName, pData, Length)
+    JZTrackNameEvent(int Clock, unsigned char* pData, unsigned short Length)
+      : JZMetaEvent(Clock, StatTrackName, pData, Length)
     {
 // SN++ Diese Restriktion ist viel zu hart. Es genuegt, den Namen im Mixerdialog
 //                zu begrenzen!!!
@@ -1376,7 +1375,7 @@ class tTrackName : public tMetaEvent
 */
     }
 
-    virtual tTrackName* IsTrackName()
+    virtual JZTrackNameEvent* IsTrackName()
     {
       edb();
       return this;
@@ -1385,22 +1384,22 @@ class tTrackName : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tTrackName(mClock, mpData, mLength);
+      return new JZTrackNameEvent(mClock, mpData, mLength);
     }
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tMarker : public tMetaEvent
+class JZMarkerEvent : public JZMetaEvent
 {
   public:
 
-    tMarker(int Clock, unsigned char* pData, unsigned short Length)
-      : tMetaEvent(Clock, StatMarker, pData, Length)
+    JZMarkerEvent(int Clock, unsigned char* pData, unsigned short Length)
+      : JZMetaEvent(Clock, StatMarker, pData, Length)
     {
     }
 
-    virtual tMarker* IsMarker()
+    virtual JZMarkerEvent* IsMarker()
     {
       edb();
       return this;
@@ -1409,7 +1408,7 @@ class tMarker : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tMarker(mClock, mpData, mLength);
+      return new JZMarkerEvent(mClock, mpData, mLength);
     }
 };
 
@@ -1421,7 +1420,7 @@ class tMarker : public tMetaEvent
 //
 // Execution of the events takes place in song.cpp.
 //*****************************************************************************
-class tPlayTrack : public tMetaEvent
+class JZPlayTrackEvent : public JZMetaEvent
 {
   public:
 
@@ -1431,12 +1430,12 @@ class tPlayTrack : public tMetaEvent
     // How many steps to transpose the track.
     int transpose;
 
-    // The length of the event, confusing with the Length field of tMetaEvent,
+    // The length of the event, confusing with the Length field of JZMetaEvent,
     // that seems to be for serialization.
     int eventlength;
 
-    tPlayTrack(int Clock, unsigned char *chardat, unsigned short Length)
-      : tMetaEvent(Clock, StatPlayTrack, chardat, Length)
+    JZPlayTrackEvent(int Clock, unsigned char *chardat, unsigned short Length)
+      : JZMetaEvent(Clock, StatPlayTrack, chardat, Length)
     {
       int* pData = (int *)chardat;
 
@@ -1452,8 +1451,8 @@ class tPlayTrack : public tMetaEvent
       }
     }
 
-    tPlayTrack(int Clock, int track, int transpose, int eventlength)
-      : tMetaEvent(Clock, StatPlayTrack, 0, 0)
+    JZPlayTrackEvent(int Clock, int track, int transpose, int eventlength)
+      : JZMetaEvent(Clock, StatPlayTrack, 0, 0)
     {
       this->track=track;
       this->transpose=transpose;
@@ -1480,7 +1479,7 @@ class tPlayTrack : public tMetaEvent
       return io.Write(this, mpData, mLength);
     }
 
-    virtual tPlayTrack* IsPlayTrack()
+    virtual JZPlayTrackEvent* IsPlayTrack()
     {
       edb();
       return this;
@@ -1489,7 +1488,7 @@ class tPlayTrack : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tPlayTrack(mClock, track, transpose, eventlength);
+      return new JZPlayTrackEvent(mClock, track, transpose, eventlength);
     }
 
     // This event has no real "pitch" but the rest of jazz use the pitch.  In
@@ -1502,12 +1501,12 @@ class tPlayTrack : public tMetaEvent
 
 //*****************************************************************************
 //*****************************************************************************
-class tSetTempo : public JZEvent
+class JZSetTempoEvent : public JZEvent
 {
   public:
     int uSec;
 
-    tSetTempo(
+    JZSetTempoEvent(
       int Clock,
       unsigned char Character1,
       unsigned char Character2,
@@ -1520,7 +1519,7 @@ class tSetTempo : public JZEvent
         Character3;
     }
 
-    tSetTempo(int Clock, int bpm)
+    JZSetTempoEvent(int Clock, int bpm)
       : JZEvent(Clock, StatSetTempo)
     {
       SetBPM(bpm);
@@ -1549,7 +1548,7 @@ class tSetTempo : public JZEvent
       return io.Write(this, (char)(uSec >> 16), (char)(uSec >> 8), (char)uSec);
     }
 
-    virtual tSetTempo* IsSetTempo()
+    virtual JZSetTempoEvent* IsSetTempo()
     {
       edb();
       return this;
@@ -1558,21 +1557,21 @@ class tSetTempo : public JZEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tSetTempo(*this);
+      return new JZSetTempoEvent(*this);
     }
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tMtcOffset : public tMetaEvent
+class JZMtcOffsetEvent : public JZMetaEvent
 {
   public:
-    tMtcOffset(int Clock, unsigned char* pData, unsigned short Length)
-      : tMetaEvent(Clock, StatMtcOffset, pData, Length)
+    JZMtcOffsetEvent(int Clock, unsigned char* pData, unsigned short Length)
+      : JZMetaEvent(Clock, StatMtcOffset, pData, Length)
     {
     }
 
-    virtual tMtcOffset* IsMtcOffset()
+    virtual JZMtcOffsetEvent* IsMtcOffset()
     {
       edb();
       return this;
@@ -1581,19 +1580,19 @@ class tMtcOffset : public tMetaEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tMtcOffset(mClock, mpData, mLength);
+      return new JZMtcOffsetEvent(mClock, mpData, mLength);
     }
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tTimeSignat : public JZEvent
+class JZTimeSignatEvent : public JZEvent
 {
   public:
 
     unsigned char Numerator, Denomiator, Clocks, Quarter;
 
-    tTimeSignat(
+    JZTimeSignatEvent(
       int Clock,
       unsigned char Character1,
       unsigned char Character2,
@@ -1613,7 +1612,7 @@ class tTimeSignat : public JZEvent
       return io.Write(this, Numerator, Denomiator, Clocks, Quarter);
     }
 
-    virtual tTimeSignat* IsTimeSignat()
+    virtual JZTimeSignatEvent* IsTimeSignat()
     {
       edb();
       return this;
@@ -1631,18 +1630,18 @@ class tTimeSignat : public JZEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tTimeSignat(*this);
+      return new JZTimeSignatEvent(*this);
     }
 };
 
 //*****************************************************************************
 //   This is the end-of-track event.
 //*****************************************************************************
-class tEndOfTrack : public JZEvent
+class JZEndOfTrackEvent : public JZEvent
 {
   public:
 
-    tEndOfTrack(int Clock)
+    JZEndOfTrackEvent(int Clock)
       : JZEvent(Clock, StatEndOfTrack)
     {
     }
@@ -1652,7 +1651,7 @@ class tEndOfTrack : public JZEvent
       edb(); return io.Write(this);
     }
 
-    virtual tEndOfTrack* IsEndOfTrack()
+    virtual JZEndOfTrackEvent* IsEndOfTrack()
     {
       edb();
       return this;
@@ -1661,19 +1660,19 @@ class tEndOfTrack : public JZEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tEndOfTrack(this->GetClock());
+      return new JZEndOfTrackEvent(this->GetClock());
     }
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tKeySignat : public JZEvent
+class JZKeySignatEvent : public JZEvent
 {
   public:
     int Sharps;
     int Minor;
 
-    tKeySignat(int Clock, int Character1, int Character2)
+    JZKeySignatEvent(int Clock, int Character1, int Character2)
       : JZEvent(Clock, StatKeySignat)
     {
       Sharps = Character1;
@@ -1685,7 +1684,7 @@ class tKeySignat : public JZEvent
       edb(); return io.Write(this, Sharps, Minor);
     }
 
-    virtual tKeySignat* IsKeySignat()
+    virtual JZKeySignatEvent* IsKeySignat()
     {
       edb();
       return this;
@@ -1694,23 +1693,23 @@ class tKeySignat : public JZEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tKeySignat(*this);
+      return new JZKeySignatEvent(*this);
     }
 };
 
 //*****************************************************************************
 // Aftertouch
 //*****************************************************************************
-class tKeyPressure: public tChannelEvent
+class JZKeyPressureEvent: public JZChannelEvent
 {
   public:
 
-    tKeyPressure(
+    JZKeyPressureEvent(
       int Clock,
       unsigned short Channel,
       unsigned char Key,
       unsigned char Value)
-      : tChannelEvent(Clock, StatKeyPressure, Channel),
+      : JZChannelEvent(Clock, StatKeyPressure, Channel),
         mKey(Key),
         mValue(Value)
     {
@@ -1722,7 +1721,7 @@ class tKeyPressure: public tChannelEvent
       return io.Write(this, mKey, mValue);
     }
 
-    virtual tKeyPressure* IsKeyPressure()
+    virtual JZKeyPressureEvent* IsKeyPressure()
     {
       edb();
       return this;
@@ -1731,7 +1730,7 @@ class tKeyPressure: public tChannelEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tKeyPressure(*this);
+      return new JZKeyPressureEvent(*this);
     }
 
     virtual int GetValue() const
@@ -1781,13 +1780,13 @@ class tKeyPressure: public tChannelEvent
 //*****************************************************************************
 // Channel Pressure
 //*****************************************************************************
-class tChnPressure : public tChannelEvent
+class JZChnPressureEvent : public JZChannelEvent
 {
   public:
     unsigned char Value;
 
-    tChnPressure(int Clock, int Channel, unsigned char val)
-      : tChannelEvent(Clock, StatChnPressure, Channel)
+    JZChnPressureEvent(int Clock, int Channel, unsigned char val)
+      : JZChannelEvent(Clock, StatChnPressure, Channel)
     {
       Value = val;
     }
@@ -1797,7 +1796,7 @@ class tChnPressure : public tChannelEvent
       edb(); return io.Write(this, Value);
     }
 
-    virtual tChnPressure* IsChnPressure()
+    virtual JZChnPressureEvent* IsChnPressure()
     {
       edb();
       return this;
@@ -1806,7 +1805,7 @@ class tChnPressure : public tChannelEvent
     virtual JZEvent* Copy() const
     {
       edb();
-      return new tChnPressure(*this);
+      return new JZChnPressureEvent(*this);
     }
 
     virtual int GetValue() const

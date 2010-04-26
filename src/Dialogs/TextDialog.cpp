@@ -47,7 +47,7 @@ END_EVENT_TABLE()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZTextDialog::JZTextDialog(
-  tText* pTextEvent,
+  JZTextEvent* pTextEvent,
   JZTrack* pTrack,
   wxWindow * pParent)
   : wxDialog(pParent, wxID_ANY, wxString("Text")),

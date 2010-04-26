@@ -48,11 +48,11 @@ END_EVENT_TABLE()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZSysexDialog::JZSysexDialog(
-  tSysEx* pEvent,
+  JZSysExEvent* pSysExEvent,
   JZTrack* pTrack,
   wxWindow* pParent)
   : wxDialog(pParent, wxID_ANY, wxString("System Exclusive")),
-    mpSysExEvent(pEvent),
+    mpSysExEvent(pSysExEvent),
     mpSysExEdit(0),
     mpClockEdit(0)
 {

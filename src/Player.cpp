@@ -561,7 +561,7 @@ void JZPlayer::StartPlay(long Clock, long LoopClock, int Continue)
     unsigned char s[2];
     s[0] = Clock & 0x7f;
     s[1] = (Clock & 0x3fff) >> 7;
-    tSongPtr SongPtr(0, s, 2);
+    JZSongPtrEvent SongPtr(0, s, 2);
     OutNow(&SongPtr);
   }
 
@@ -612,7 +612,7 @@ void JZPlayer::StopPlay()
 
   // SN++ Patch: Notes off for not GM/GS devices
   int ii;
-  tKeyOff pKeyOff(0, 0, 0);
+  JZKeyOffEvent pKeyOff(0, 0, 0);
 
   for (ii = 0; ii < mpSong->GetTrackCount(); ii++)
   {
@@ -623,7 +623,7 @@ void JZPlayer::StopPlay()
       JZEvent* pEvent = Iterator.First();
       while (pEvent && pEvent->GetClock() < Clock + 100)
       {
-        tKeyOn* pKeyOn = pEvent->IsKeyOn();
+        JZKeyOnEvent* pKeyOn = pEvent->IsKeyOn();
         if (pKeyOn)
         {
           if (pKeyOn->GetClock() + pKeyOn->GetEventLength() >= Clock - 100)
@@ -645,9 +645,9 @@ void JZPlayer::StopPlay()
 //-----------------------------------------------------------------------------
 void JZPlayer::AllNotesOff(int Reset)
 {
-  tControl NoteOff(0, 0, 0x78, 0);
-  tPitch   Pitch  (0, 0, 0);
-  tControl CtrlRes(0, 0, 0x79, 0);
+  JZControlEvent NoteOff(0, 0, 0x78, 0);
+  JZPitchEvent Pitch    (0, 0, 0);
+  JZControlEvent CtrlRes(0, 0, 0x79, 0);
 
   tDeviceList &devs = gpMidiPlayer->GetOutputDevices();
   for (unsigned dev = 0; dev < devs.GetCount(); dev++)
@@ -936,9 +936,9 @@ int tMpuPlayer::OutEvent(JZEvent* pEvent)
     case StatChnPressure:
     case StatPitch:
     {
-      tGetMidiBytes midi;
+      JZGetMidiBytes midi;
       int i;
-      tChannelEvent *c;
+      JZChannelEvent *c;
 
       pEvent->Write(midi);
       Stat = midi.Buffer[0]; // Status + Channel
@@ -1075,7 +1075,7 @@ void tMpuPlayer::OutNow(JZEvent* pEvent)
   // in the play-queue.
 
   int i, n = 0;
-  tGetMidiBytes midi;
+  JZGetMidiBytes midi;
   if (pEvent->Write(midi) == 0)
   {
     char* buf = new char[midi.nBytes + 3];
@@ -1096,7 +1096,7 @@ void tMpuPlayer::OutNow(JZEvent* pEvent)
       case StatSetTempo:
         {
           char cmd[4];
-          tSetTempo *s = (tSetTempo *)pEvent;
+          JZSetTempoEvent* s = (JZSetTempoEvent *)pEvent;
           int bpm = s->GetBPM();
           cmd[0] = CMD+1;
           cmd[1] = 0xE0;
@@ -1108,7 +1108,7 @@ void tMpuPlayer::OutNow(JZEvent* pEvent)
       case StatSysEx:
         {
           n = 0;
-          tSysEx *s = (tSysEx *) pEvent;
+          JZSysExEvent* s = (JZSysExEvent *) pEvent;
           char *sysex = new char[s->Length+4];
           sysex[n++] = CMD+1;
           sysex[n++] = 0xdf;
@@ -1124,7 +1124,7 @@ void tMpuPlayer::OutNow(JZEvent* pEvent)
       case StatSongPtr:
         {
           n = 0;
-          tSongPtr *s = (tSongPtr *) pEvent;
+          JZSongPtrEvent *s = (JZSongPtrEvent *) pEvent;
           char *common = new char[s->Length+4];
           common[n++] = CMD+1;
           common[n++] = 0xdf;
@@ -1159,7 +1159,7 @@ void tMpuPlayer::FlushOutOfBand(long Clock)
       case StatSetTempo:
         {
           char cmd[4];
-          tSetTempo *s = (tSetTempo *)pEvent;
+          JZSetTempoEvent *s = (JZSetTempoEvent *)pEvent;
           int bpm = s->GetBPM();
           cmd[0] = CMD+1;
           cmd[1] = 0xE0;
@@ -1171,7 +1171,7 @@ void tMpuPlayer::FlushOutOfBand(long Clock)
       case StatSysEx:
         {
            int n = 0;
-           tSysEx *s = (tSysEx *) pEvent;
+           JZSysExEvent* s = (JZSysExEvent *) pEvent;
            char *sysex = new char[s->Length+4];
            sysex[n++] = CMD+1;
            sysex[n++] = 0xdf;
@@ -1315,43 +1315,43 @@ long tMpuPlayer::GetRecordedData()
         {
           case StatKeyOff:
             c2 = recbuf[i++];  // SN++ added veloc
-            pEvent = new tKeyOff(RecBytes.Clock, Channel, c1, c2);
-            pEvent = new tKeyOff(RecBytes.Clock, Channel, c1);
+            pEvent = new JZKeyOffEvent(RecBytes.Clock, Channel, c1, c2);
+            pEvent = new JZKeyOffEvent(RecBytes.Clock, Channel, c1);
             break;
 
           case StatKeyOn:
             c2 = recbuf[i++];
             if (!c2)
             {
-              pEvent = new tKeyOff(RecBytes.Clock, Channel, c1);
+              pEvent = new JZKeyOffEvent(RecBytes.Clock, Channel, c1);
             }
             else
             {
-              pEvent = new tKeyOn(RecBytes.Clock, Channel, c1, c2);
+              pEvent = new JZKeyOnEvent(RecBytes.Clock, Channel, c1, c2);
             }
             break;
 // #if 0
           case StatKeyPressure:
             c2 = recbuf[i++];
-            pEvent = new tKeyPressure(RecBytes.Clock, Channel, c1, c2);
+            pEvent = new JZKeyPressureEvent(RecBytes.Clock, Channel, c1, c2);
             break;
 
           case StatChnPressure:
-            pEvent = new tChnPressure(RecBytes.Clock, Channel, c1);
+            pEvent = new JZChnPressureEvent(RecBytes.Clock, Channel, c1);
             break;
 
           case StatControl:
             c2 = recbuf[i++];
-            pEvent = new tControl(RecBytes.Clock, Channel, c1, c2);
+            pEvent = new JZControlEvent(RecBytes.Clock, Channel, c1, c2);
             break;
 
           case StatProgram:
-            pEvent = new tProgram(RecBytes.Clock, Channel, c1);
+            pEvent = new JZProgramEvent(RecBytes.Clock, Channel, c1);
             break;
 
           case StatPitch:
             c2 = recbuf[i++];
-            pEvent = new tPitch(RecBytes.Clock, Channel, c1, c2);
+            pEvent = new JZPitchEvent(RecBytes.Clock, Channel, c1, c2);
             break;
 
           default:
@@ -1666,7 +1666,7 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
   {
     case StatKeyOn:
       {
-        tKeyOn* pKeyOn = pEvent->IsKeyOn();
+        JZKeyOnEvent* pKeyOn = pEvent->IsKeyOn();
         SEQ_START_NOTE(
           mididev,
           pKeyOn->GetChannel(),
@@ -1681,7 +1681,7 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
 
     case StatKeyOff:
       {
-        tKeyOff* pKeyOff = pEvent->IsKeyOff();
+        JZKeyOffEvent* pKeyOff = pEvent->IsKeyOff();
         SEQ_STOP_NOTE(
           mididev,
           pKeyOff->GetChannel(),
@@ -1695,7 +1695,7 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
       break;
     case StatProgram:
       {
-        tProgram* pProgram = pEvent->IsProgram();
+        JZProgramEvent* pProgram = pEvent->IsProgram();
         SEQ_SET_PATCH(mididev, pProgram->GetChannel(), pProgram->GetProgram());
         if (now)
         {
@@ -1707,7 +1707,7 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
 // SN++ Aftertouch
     case StatKeyPressure:
       {
-         tKeyPressure* pKeyPressure = pEvent->IsKeyPressure();
+         JZKeyPressureEvent* pKeyPressure = pEvent->IsKeyPressure();
 
          SEQ_KEY_PRESSURE(
            mididev,
@@ -1725,7 +1725,7 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
 
     case StatChnPressure:
       {
-         tChnPressure *k = pEvent->IsChnPressure();
+         JZChnPressureEvent *k = pEvent->IsChnPressure();
          SEQ_CHN_PRESSURE(mididev, k->GetChannel(), k->Value);
          if (now)
          {
@@ -1736,7 +1736,7 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
 
     case StatControl:
       {
-        tControl *k = pEvent->IsControl();
+        JZControlEvent* k = pEvent->IsControl();
         SEQ_CONTROL(mididev, k->GetChannel(), k->GetControl(), k->GetControlValue());
         if (now)
         {
@@ -1747,7 +1747,7 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
 
     case StatPitch:
       {
-        tPitch *k = pEvent->IsPitch();
+        JZPitchEvent *k = pEvent->IsPitch();
         SEQ_BENDER(mididev, k->GetChannel(), k->Value + 8192);
         if (now)
         {
@@ -1778,7 +1778,7 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
          if (now)
          {
             // todo
-            tSysEx *s = pEvent->IsSysEx();
+            JZSysExEvent* s = pEvent->IsSysEx();
             struct sysex_info *sysex = (struct sysex_info *)new char [
               sizeof(struct sysex_info) + s->GetDataLength() + 1];
 
@@ -1794,7 +1794,7 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
          else if (pEvent->GetClock() > 0)
          {
            // OSS wants small packets with max 6 bytes
-           tSysEx *sx = pEvent->IsSysEx();
+           JZSysExEvent* sx = pEvent->IsSysEx();
            const unsigned char* pData = pEvent->IsSysEx()->GetData();
            const int N = 6;
            int i, j;
@@ -2021,16 +2021,16 @@ long tSeq2Player::GetRealTimeClock()
             switch (buf[i+2])
             {
               case MIDI_CTL_CHANGE:
-                pEvent = new tControl(0, chn, ctl, val);
+                pEvent = new JZControlEvent(0, chn, ctl, val);
                 break;
               case MIDI_PGM_CHANGE:
-                pEvent = new tProgram(0, chn, ctl);
+                pEvent = new JZProgramEvent(0, chn, ctl);
                 break;
               case MIDI_CHN_PRESSURE:
-                 pEvent = new tChnPressure(0, chn, ctl);
+                 pEvent = new JZChnPressureEvent(0, chn, ctl);
                  break;
               case MIDI_PITCH_BEND:
-                pEvent = new tPitch(0, chn, val - 8192);
+                pEvent = new JZPitchEvent(0, chn, val - 8192);
                 break;
             }
 
@@ -2052,20 +2052,20 @@ long tSeq2Player::GetRealTimeClock()
             switch (buf[i+2])
             {
               case MIDI_NOTEOFF:  // SN++ added veloc
-                pEvent = new tKeyOff(0, chn, key, vel);
+                pEvent = new JZKeyOffEvent(0, chn, key, vel);
                 break;
               case MIDI_NOTEON:
                 if (vel == 0)
                 {
-                  pEvent = new tKeyOff(0, chn, key);
+                  pEvent = new JZKeyOffEvent(0, chn, key);
                 }
                 else
                 {
-                  pEvent = new tKeyOn(0, chn, key, vel);
+                  pEvent = new JZKeyOnEvent(0, chn, key, vel);
                 }
                 break;
               case MIDI_KEY_PRESSURE:
-                 pEvent = new tKeyPressure(0, chn, key, vel);
+                 pEvent = new JZKeyPressureEvent(0, chn, key, vel);
                  break;
             }
 

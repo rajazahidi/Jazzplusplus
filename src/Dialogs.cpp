@@ -321,7 +321,7 @@ class tChEventDlg : public tEventDlg
 
     int Channel;
 
-    tChEventDlg(tChannelEvent* pChannelEvent, JZPianoWindow* w, JZTrack *pTrack)
+    tChEventDlg(JZChannelEvent* pChannelEvent, JZPianoWindow* w, JZTrack *pTrack)
       : tEventDlg(pChannelEvent, w, pTrack)
     {
       Channel = pChannelEvent->GetChannel() + 1;                // 1..16
@@ -343,7 +343,7 @@ void tChEventDlg::AddProperties()
 
 bool tChEventDlg::OnClose()
 {
-  ((tChannelEvent *)Copy)->SetChannel(Channel - 1);
+  ((JZChannelEvent *)Copy)->SetChannel(Channel - 1);
   tEventDlg::OnClose();
   return false;
 }
@@ -356,14 +356,14 @@ class tPitchDlg : public tChEventDlg
 
   int Value;
 
-  tPitchDlg(tPitch* e, JZPianoWindow* w, JZTrack *pTrack);
+  tPitchDlg(JZPitchEvent* e, JZPianoWindow* w, JZTrack *pTrack);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tPitchDlg::tPitchDlg(tPitch *e, JZPianoWindow* w, JZTrack *pTrack)
+tPitchDlg::tPitchDlg(JZPitchEvent *e, JZPianoWindow* w, JZTrack *pTrack)
   : tChEventDlg(e, w, pTrack)
 {
   Event = e;
@@ -373,13 +373,12 @@ tPitchDlg::tPitchDlg(tPitch *e, JZPianoWindow* w, JZTrack *pTrack)
 
 bool tPitchDlg::OnClose()
 {
-  ((tPitch *)Copy)->Value = Value;
+  ((JZPitchEvent *)Copy)->Value = Value;
   return tChEventDlg::OnClose();
 }
 
 void tPitchDlg::AddProperties()
 {
-  //Add(wxMakeFormShort("Pitch:", &Value, wxFORM_DEFAULT, new wxList(wxMakeConstraintRange(-8191.0, 8191.0), 0)));
   sheet->AddProperty(new wxProperty(
     "Pitch:",
     wxPropertyValue(&Value),
@@ -401,14 +400,14 @@ class tPlayTrackDlg : public tEventDlg
 
   tNamedChoice Choice;
 
-  tPlayTrackDlg(tPlayTrack *e, JZPianoWindow* w, JZTrack *pTrack);
+  tPlayTrackDlg(JZPlayTrackEvent *e, JZPianoWindow* w, JZTrack *pTrack);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tPlayTrackDlg::tPlayTrackDlg(tPlayTrack *e, JZPianoWindow* w, JZTrack *pTrack)
+tPlayTrackDlg::tPlayTrackDlg(JZPlayTrackEvent *e, JZPianoWindow* w, JZTrack *pTrack)
   : tEventDlg(e, w, pTrack),
     Choice("playtrack", gpConfig->GetControlNames(), &track)
 {
@@ -421,7 +420,7 @@ tPlayTrackDlg::tPlayTrackDlg(tPlayTrack *e, JZPianoWindow* w, JZTrack *pTrack)
 
 bool tPlayTrackDlg::OnClose()
 {
-  tPlayTrack* p=(tPlayTrack*)Copy;
+  JZPlayTrackEvent* p=(JZPlayTrackEvent*)Copy;
 
   Choice.GetValue();
   p->track = track;
@@ -481,7 +480,7 @@ static JZEvent* CreateEventDialog(long Clock, int Channel, int Pitch)
     -1
   };
 
-  JZEvent *e = 0;
+  JZEvent* pEvent = 0;
 
   int i = ::wxGetSingleChoiceIndex(
     "Select event to create",
@@ -493,36 +492,36 @@ static JZEvent* CreateEventDialog(long Clock, int Channel, int Pitch)
     switch (Values[i])
     {
       case StatKeyOn:
-        e = new tKeyOn(Clock, Channel, Pitch, 64, 64);
+        pEvent = new JZKeyOnEvent(Clock, Channel, Pitch, 64, 64);
         break;
       case StatPitch:
-        e = new tPitch(Clock, Channel, 0);
-        e->SetPitch(Pitch);
+        pEvent = new JZPitchEvent(Clock, Channel, 0);
+        pEvent->SetPitch(Pitch);
         break;
       case StatControl:
-        e = new tControl(Clock, Channel, Pitch, 64);
+        pEvent = new JZControlEvent(Clock, Channel, Pitch, 64);
         break;
       case StatProgram:
-        e = new tProgram(Clock, Channel, Pitch);
+        pEvent = new JZProgramEvent(Clock, Channel, Pitch);
         break;
      case StatSetTempo:
-        e = new tSetTempo(Clock, 100);
+        pEvent = new JZSetTempoEvent(Clock, 100);
         break;
      case StatSysEx:
-        e = new tSysEx(Clock, (unsigned char*) "", 0);
+        pEvent = new JZSysExEvent(Clock, (unsigned char*) "", 0);
         break;
      case StatPlayTrack:
-        e = new tPlayTrack(Clock, 0, Pitch);
+        pEvent = new JZPlayTrackEvent(Clock, 0, Pitch);
         break;
      case StatEndOfTrack:
-        e = new tEndOfTrack(Clock);
+        pEvent = new JZEndOfTrackEvent(Clock);
         break;
      case StatText:
-        e = new tText(Clock, (unsigned char*)"");
+        pEvent = new JZTextEvent(Clock, (unsigned char*)"");
         break;
     }
   }
-  return e;
+  return pEvent;
 }
 
 //*****************************************************************************

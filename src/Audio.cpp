@@ -465,7 +465,7 @@ int tSampleSet::FillBuffers(long last_clock)
     }
     event_index++;
 
-    tKeyOn* pKeyOn = e->IsKeyOn();
+    JZKeyOnEvent* pKeyOn = e->IsKeyOn();
     if (pKeyOn && num_voices < MAXPOLY)
     {
       voices[num_voices++]->Start(samples[pKeyOn->GetKey()], pKeyOn->GetClock());
@@ -581,7 +581,7 @@ void tSampleSet::AdjustAudioLength(JZTrack *t, long tpm)
   JZEvent *e = it.First();
   while (e)
   {
-    tKeyOn* pKeyOn = e->IsKeyOn();
+    JZKeyOnEvent* pKeyOn = e->IsKeyOn();
     if (pKeyOn)
     {
       pKeyOn->SetLength(
@@ -913,7 +913,7 @@ void tSampleSet::AddNote(const char *fname, long frc, long toc)
     e = iter.Next();
   }
   // add a noteon
-  tKeyOn* pKeyOn = new tKeyOn(
+  JZKeyOnEvent* pKeyOn = new JZKeyOnEvent(
     frc,
     track->Channel - 1,
     key,

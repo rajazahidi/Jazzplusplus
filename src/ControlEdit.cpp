@@ -312,7 +312,7 @@ void tCtrlEditBase::OnApply()
     // edit mode: Erzeugt keine neuen Events sondern aendert den Wert
     // bestehender Events.
     // SN++
-    tControl* pControlCopy;
+    JZControlEvent* pControlCopy;
     while (pEvent)
     {
       if (IsCtrlEdit(pEvent))
@@ -441,7 +441,7 @@ int tPitchEdit::GetValue(JZEvent* pEvent)
 
 JZEvent * tPitchEdit::NewEvent(long clock, int val)
 {
-  return new tPitch(clock, track->Channel - 1, val);
+  return new JZPitchEvent(clock, track->Channel - 1, val);
 }
 
 // ------------------------------------------------------------------
@@ -475,7 +475,7 @@ int tCtrlEdit::Missing()
 
 int tCtrlEdit::IsCtrlEdit(JZEvent* pEvent)
 {
-  tControl* pControl = pEvent->IsControl();
+  JZControlEvent* pControl = pEvent->IsControl();
   return (pControl && pControl->GetControl() == ctrl_num);
 }
 
@@ -486,7 +486,7 @@ int tCtrlEdit::GetValue(JZEvent* pEvent)
 
 JZEvent * tCtrlEdit::NewEvent(long clock, int val)
 {
-  return new tControl(clock, track->Channel - 1, ctrl_num, val);
+  return new JZControlEvent(clock, track->Channel - 1, ctrl_num, val);
 }
 
 // ------------------------------------------------------------------
@@ -567,10 +567,10 @@ void tVelocEdit::OnApply()
       mpPianoWindow->GetFilter()->IsSelected(pEvent))
     {
 
-      tKeyOn* pKeyOn = pEvent->IsKeyOn();
+      JZKeyOnEvent* pKeyOn = pEvent->IsKeyOn();
       if (pKeyOn)
       {
-        tKeyOn* pKeyOnCopy = pKeyOn->Copy()->IsKeyOn();
+        JZKeyOnEvent* pKeyOnCopy = pKeyOn->Copy()->IsKeyOn();
 
         int i = Clock2i(pKeyOnCopy->GetClock());
         pKeyOnCopy->SetVelocity(array[i]);
@@ -634,7 +634,7 @@ int tPolyAfterEdit::IsCtrlEdit(JZEvent* pEvent)
 
 int tPolyAfterEdit::GetValue(JZEvent* pEvent)
 {
-  tKeyPressure* pKeyPressure = pEvent->IsKeyPressure();
+  JZKeyPressureEvent* pKeyPressure = pEvent->IsKeyPressure();
   if (pKeyPressure)
   {
     return pKeyPressure->GetPressureValue();
@@ -670,7 +670,7 @@ void tPolyAfterEdit::OnApply()
     from_clk = from_clock;
     to_clk   = to_clock;
   }
-  tKeyOn* pKeyOn;
+  JZKeyOnEvent* pKeyOn;
 
   if (!ctrlmode)
   {
@@ -684,7 +684,7 @@ void tPolyAfterEdit::OnApply()
         !mpPianoWindow->mpSnapSel->IsSelected() ||
         mpPianoWindow->GetFilter()->IsSelected(pEvent))
       {
-        tKeyPressure* pKeyPressure = pEvent->IsKeyPressure();
+        JZKeyPressureEvent* pKeyPressure = pEvent->IsKeyPressure();
         if (pKeyPressure)
         {
           track->Kill(pKeyPressure);
@@ -696,7 +696,7 @@ void tPolyAfterEdit::OnApply()
     long key_end(-1), key_clk(-1);
     int  key_val = -1;
     int  key_cha(-1);
-    tKeyPressure* pKeyPressure;
+    JZKeyPressureEvent* pKeyPressure;
     pEvent = iter.Range(from_clk, to_clk);
     while (pEvent)
     {
@@ -723,7 +723,11 @@ void tPolyAfterEdit::OnApply()
             //      und der Wert groesser als 0 ist.
             if (array[i] > 0 && array[i] != temp)
             {
-              pKeyPressure = new tKeyPressure(iclk, key_cha, key_val, array[i]);
+              pKeyPressure = new JZKeyPressureEvent(
+                iclk,
+                key_cha,
+                key_val,
+                array[i]);
               track->Put(pKeyPressure);
               temp = array[i];
             }
@@ -741,7 +745,7 @@ void tPolyAfterEdit::OnApply()
     // bestehender Events.
     // SN++
     pEvent = iter.Range(from_clk, to_clk);
-    tKeyPressure* pKeyPressureCopy;
+    JZKeyPressureEvent* pKeyPressureCopy;
     while (pEvent)
     {
       if (
@@ -805,7 +809,7 @@ int tChannelAfterEdit::GetValue(JZEvent* pEvent)
 
 JZEvent *tChannelAfterEdit::NewEvent(long clock, int val)
 {
-  return new tChnPressure(clock, track->Channel - 1, val);
+  return new JZChnPressureEvent(clock, track->Channel - 1, val);
 }
 
 void tChannelAfterEdit::UpDate()
@@ -871,7 +875,7 @@ void tChannelAfterEdit::OnApply()
     // edit mode: Erzeugt keine neuen Events sondern aendert den Wert
     // bestehender Events.
     // SN++
-    tChnPressure* pChnPressureCopy;
+    JZChnPressureEvent* pChnPressureCopy;
     while (pEvent)
     {
       if (IsCtrlEdit(pEvent))
@@ -929,5 +933,5 @@ int tTempoEdit::GetValue(JZEvent* pEvent)
 
 JZEvent * tTempoEdit::NewEvent(long clock, int val)
 {
-  return new tSetTempo(clock, val);
+  return new JZSetTempoEvent(clock, val);
 }

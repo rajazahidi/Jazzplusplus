@@ -125,7 +125,7 @@ class JZSong
       int mode = 0);
 
     void MergePlayTrackEvent(
-      tPlayTrack* c,
+      JZPlayTrackEvent* c,
       tEventArray *Destin,
       int recursionDepth);
 

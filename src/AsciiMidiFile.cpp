@@ -67,46 +67,46 @@ JZEvent* JZAsciiRead::Read()
       break;
 
     case StatKeyOff:
-      pEvent = new tKeyOff(Clock, cha, pBuffer[0]);
+      pEvent = new JZKeyOffEvent(Clock, cha, pBuffer[0]);
       break;
 
     case StatKeyOn:
-      pEvent = new tKeyOn(Clock, cha, pBuffer[0], pBuffer[1]);
+      pEvent = new JZKeyOnEvent(Clock, cha, pBuffer[0], pBuffer[1]);
       break;
 
     case StatControl:
-      pEvent = new tControl(Clock, cha, pBuffer[0], pBuffer[1]);
+      pEvent = new JZControlEvent(Clock, cha, pBuffer[0], pBuffer[1]);
       break;
 
     case StatPitch:
-      pEvent = new tPitch(Clock, cha, pBuffer[0], pBuffer[1]);
+      pEvent = new JZPitchEvent(Clock, cha, pBuffer[0], pBuffer[1]);
       break;
 
     case StatProgram:
-      pEvent = new tProgram(Clock, cha, pBuffer[0]);
+      pEvent = new JZProgramEvent(Clock, cha, pBuffer[0]);
       break;
 
     case StatText:
-      pEvent = new tText(Clock, pBuffer, Length);
+      pEvent = new JZTextEvent(Clock, pBuffer, Length);
       break;
 
     case StatTrackName:
-      pEvent = new tTrackName(Clock, pBuffer, Length);
+      pEvent = new JZTrackNameEvent(Clock, pBuffer, Length);
       break;
 
     case StatMarker:
-      pEvent = new tMarker(Clock, pBuffer, Length);
+      pEvent = new JZMarkerEvent(Clock, pBuffer, Length);
       break;
 
     case StatEndOfTrack:
       break;
 
     case StatSetTempo:
-      pEvent = new tSetTempo(Clock, pBuffer[0], pBuffer[1], pBuffer[2]);
+      pEvent = new JZSetTempoEvent(Clock, pBuffer[0], pBuffer[1], pBuffer[2]);
       break;
 
     case StatTimeSignat:
-      pEvent = new tTimeSignat(
+      pEvent = new JZTimeSignatEvent(
         Clock,
         pBuffer[0],
         pBuffer[1],
@@ -115,7 +115,7 @@ JZEvent* JZAsciiRead::Read()
       break;
 
     case StatSysEx:
-      pEvent = new tSysEx(Clock, pBuffer, Length);
+      pEvent = new JZSysExEvent(Clock, pBuffer, Length);
       break;
   }
 
@@ -160,7 +160,7 @@ int JZAsciiWrite::Open(
 //-----------------------------------------------------------------------------
 int JZAsciiWrite::Write(JZEvent* pEvent, unsigned char* pData, int Length)
 {
-  tChannelEvent* pChannelEvent;
+  JZChannelEvent* pChannelEvent;
 
   fprintf(mpFd, "%6d %02x ",  pEvent->GetClock(), pEvent->GetStat());
   if ((pChannelEvent = pEvent->IsChannelEvent()) != 0)

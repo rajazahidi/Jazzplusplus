@@ -73,7 +73,7 @@ void JZListen::KeyOn(
   {
     mPitch = Pitch;
     mChannel = Channel;
-    tKeyOn KeyOn(0, mChannel, Pitch, Velocity);
+    JZKeyOnEvent KeyOn(0, mChannel, Pitch, Velocity);
     gpMidiPlayer->OutNow(pTrack, &KeyOn);
     mActive = true;
     Start(MilliSeconds);
@@ -86,7 +86,7 @@ void JZListen::KeyOn(
 void JZListen::Notify()
 {
   Stop();
-  tKeyOff KeyOff(0, mChannel, mPitch);
+  JZKeyOffEvent KeyOff(0, mChannel, mPitch);
   gpMidiPlayer->OutNow(mpTrack, &KeyOff);
   mActive = false;
 }
@@ -177,14 +177,14 @@ int JZMousePlay::ProcessMouseEvent(
   {
     if (OldPitch && OldPitch != mPitch)
     {
-      tKeyOff KeyOff(0, mChannel, OldPitch);
+      JZKeyOffEvent KeyOff(0, mChannel, OldPitch);
       gpMidiPlayer->OutNow(mpPianoWindow->GetTrack(), &KeyOff);
       OldPitch = 0;
     }
 
     if (mPitch && mPitch != OldPitch)
     {
-      tKeyOn KeyOn(0, mChannel, mPitch, mVeloc);
+      JZKeyOnEvent KeyOn(0, mChannel, mPitch, mVeloc);
       gpMidiPlayer->OutNow(mpPianoWindow->GetTrack(), &KeyOn);
       OldPitch = 0;
     }
@@ -205,7 +205,7 @@ class tKeyLengthDragger : public JZMouseAction
 {
   public:
 
-    tKeyLengthDragger(tKeyOn* pKeyOn, JZPianoWindow* pPianoWindow);
+    tKeyLengthDragger(JZKeyOnEvent* pKeyOn, JZPianoWindow* pPianoWindow);
 
     int Dragging(
       wxMouseEvent& MouseEvent,
@@ -224,8 +224,8 @@ class tKeyLengthDragger : public JZMouseAction
 
   private:
 
-    tKeyOn* mpKeyOn;
-    tKeyOn    *Copy;
+    JZKeyOnEvent* mpKeyOn;
+    JZKeyOnEvent    *Copy;
     JZPianoWindow* Win;
     JZTrack* mpTrack;
 };
@@ -233,7 +233,7 @@ class tKeyLengthDragger : public JZMouseAction
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 tKeyLengthDragger::tKeyLengthDragger(
-  tKeyOn* pKeyOn,
+  JZKeyOnEvent* pKeyOn,
   JZPianoWindow* pPianoWindow)
 {
   mpKeyOn = pKeyOn;
@@ -309,7 +309,7 @@ int tKeyLengthDragger::ButtonUp(
     key = Copy->GetKey();
     channel = Copy->GetChannel();
 
-    tKeyPressure* pKeyPressure;
+    JZKeyPressureEvent* pKeyPressure;
 
     JZEvent* pEvent = iter.Range(
       Copy->GetClock() + Copy->GetEventLength(),
@@ -355,7 +355,7 @@ class tPlayTrackLengthDragger : public JZMouseAction
 {
   public:
 
-    tPlayTrackLengthDragger(tPlayTrack* k, JZPianoWindow* pPianoWindow);
+    tPlayTrackLengthDragger(JZPlayTrackEvent* k, JZPianoWindow* pPianoWindow);
 
     int Dragging(
       wxMouseEvent& MouseEvent,
@@ -373,8 +373,8 @@ class tPlayTrackLengthDragger : public JZMouseAction
       int ScrolledY);
 
   private:
-    tPlayTrack* mpKeyOn;
-    tPlayTrack* Copy;
+    JZPlayTrackEvent* mpKeyOn;
+    JZPlayTrackEvent* Copy;
     JZPianoWindow* Win;
     JZTrack* mpTrack;
 };
@@ -382,7 +382,7 @@ class tPlayTrackLengthDragger : public JZMouseAction
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 tPlayTrackLengthDragger::tPlayTrackLengthDragger(
-  tPlayTrack* k,
+  JZPlayTrackEvent* k,
   JZPianoWindow* pPianoWindow)
 {
   mpKeyOn = k;
@@ -472,7 +472,7 @@ class tVelocCounter : public tMouseCounter
     tVelocCounter(
       JZPianoWindow* pPianoWindow,
       JZRectangle* pRectangle,
-      tKeyOn* pKeyOn)
+      JZKeyOnEvent* pKeyOn)
       : tMouseCounter(pPianoWindow, pRectangle, pKeyOn->GetVelocity(), 1, 127)
     {
       Win = pPianoWindow;
@@ -494,7 +494,7 @@ class tVelocCounter : public tMouseCounter
 
     JZPianoWindow* Win;
 
-    tKeyOn* mpKeyOn;
+    JZKeyOnEvent* mpKeyOn;
 };
 
 //-----------------------------------------------------------------------------
@@ -506,7 +506,7 @@ int tVelocCounter::ProcessMouseEvent(
 {
   if (tMouseCounter::ProcessMouseEvent(MouseEvent, ScrolledX, ScrolledY))
   {
-    tKeyOn* pKeyOnCopy = (tKeyOn *)mpKeyOn->Copy();
+    JZKeyOnEvent* pKeyOnCopy = (JZKeyOnEvent *)mpKeyOn->Copy();
     pKeyOnCopy->SetVelocity(Value);
 
     Win->ApplyToTrack(mpKeyOn, pKeyOnCopy);
@@ -2224,8 +2224,8 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& MouseEvent)
     int Clock = x2Clock(x);
     int Pitch = y2Pitch(y);
     JZEvent* pEvent = FindEvent(mpTrack, Clock, Pitch);
-    tKeyOn* pKeyOn = 0;
-    tPlayTrack* pPlayTrack = 0;
+    JZKeyOnEvent* pKeyOn = 0;
+    JZPlayTrackEvent* pPlayTrack = 0;
     if (pEvent)
     {
       // both these events are drag length
@@ -2486,7 +2486,7 @@ void JZPianoWindow::kill_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
 {
   int key,channel;
   tEventIterator iter(pTrack);
-  tKeyOn* pKeyOn = pEvent->IsKeyOn();
+  JZKeyOnEvent* pKeyOn = pEvent->IsKeyOn();
   if (!pKeyOn)
   {
     return;
@@ -2498,7 +2498,7 @@ void JZPianoWindow::kill_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
   key = pKeyOn->GetKey();
   channel = pKeyOn->GetChannel();
 
-  tKeyPressure* pKeyPressure;
+  JZKeyPressureEvent* pKeyPressure;
   pEvent = iter.Range(
     pKeyOn->GetClock() + 1,
     pKeyOn->GetClock() + pKeyOn->GetEventLength());
@@ -2524,7 +2524,7 @@ void JZPianoWindow::paste_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
 {
   int key,channel;
   tEventIterator iter(pTrack);
-  tKeyOn* pKeyOn = pEvent->IsKeyOn();
+  JZKeyOnEvent* pKeyOn = pEvent->IsKeyOn();
   if (!pKeyOn)
   {
     return;
@@ -2536,7 +2536,7 @@ void JZPianoWindow::paste_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
   }
   key = pKeyOn->GetKey();
 
-  tKeyPressure* pKeyPressure;
+  JZKeyPressureEvent* pKeyPressure;
 
   pEvent = iter.Range(
     pKeyOn->GetClock() + 1,
@@ -2676,20 +2676,20 @@ void JZPianoWindow::CtrlTempo()
   mpTrack->Sort();
 
   JZEvent* pEvent = Iterator.Range(0, (unsigned) mpTrack->GetLastClock() + 1);
-  tSetTempo* pSetTempo;
+  JZSetTempoEvent* pSetTempoEvent;
   int Min = 240;
   int Max = 20;
   while (pEvent)
   {
-    if ((pSetTempo = pEvent->IsSetTempo()) != 0)
+    if ((pSetTempoEvent = pEvent->IsSetTempo()) != 0)
     {
-      if (pSetTempo->GetBPM() < Min)
+      if (pSetTempoEvent->GetBPM() < Min)
       {
-        Min = pSetTempo->GetBPM();
+        Min = pSetTempoEvent->GetBPM();
       }
-      if (pSetTempo->GetBPM() > Max)
+      if (pSetTempoEvent->GetBPM() > Max)
       {
-        Max = pSetTempo->GetBPM();
+        Max = pSetTempoEvent->GetBPM();
       }
     }
     pEvent = Iterator.Next();
@@ -3035,7 +3035,7 @@ void JZPianoWindow::Copy(JZTrack* pTrack, JZEvent* pEvent, int Kill)
 
   if (Kill)
   {
-    tKeyOn* pKeyOn = pEvent->IsKeyOn();
+    JZKeyOnEvent* pKeyOn = pEvent->IsKeyOn();
     if (pKeyOn)
     {
       kill_keys_aftertouch(pTrack, pEvent);
@@ -3087,7 +3087,7 @@ void JZPianoWindow::Paste(JZTrack* pTrack, int Clock, int Pitch)
     {
       len = 2;
     }
-    tKeyOn* pEvent = new tKeyOn(0, 0, 64, 64, len);
+    JZKeyOnEvent* pEvent = new JZKeyOnEvent(0, 0, 64, 64, len);
     mPasteBuffer.Put(pEvent);
   }
 
@@ -3131,7 +3131,7 @@ void JZPianoWindow::Paste(JZTrack* pTrack, int Clock, int Pitch)
       {
         c->IsChannelEvent()->SetChannel(pTrack->Channel - 1);
       }
-      tKeyOn* pKeyOn = c->IsKeyOn();
+      JZKeyOnEvent* pKeyOn = c->IsKeyOn();
       if (pKeyOn)
       {
         if (pTrack->GetAudioMode())

@@ -24,7 +24,7 @@
 #include <wx/dialog.h>
 
 class JZTrack;
-class tText;
+class JZTextEvent;
 class wxTextCtrl;
 
 //*****************************************************************************
@@ -33,7 +33,7 @@ class JZTextDialog : public wxDialog
 {
   public:
 
-    JZTextDialog(tText* pTextEvent, JZTrack* pTrack, wxWindow* pParent);
+    JZTextDialog(JZTextEvent* pTextEvent, JZTrack* pTrack, wxWindow* pParent);
 
   private:
 
@@ -45,7 +45,7 @@ class JZTextDialog : public wxDialog
 
   private:
 
-    tText* mpTextEvent;
+    JZTextEvent* mpTextEvent;
 
     wxTextCtrl* mpTextEdit;
     wxTextCtrl* mpClockEdit;

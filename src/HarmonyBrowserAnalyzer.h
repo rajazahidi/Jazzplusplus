@@ -26,7 +26,7 @@
 class JZFilter;
 class JZTrack;
 class HBContext;
-class tKeyOn;
+class JZKeyOnEvent;
 class HBChord;
 
 class HBAnalyzer
@@ -53,9 +53,9 @@ class HBAnalyzer
 
   private:
 
-    void IterateEvents(void (HBAnalyzer::*Action)(tKeyOn *on, JZTrack *t));
-    void CountEvent(tKeyOn *on, JZTrack *t);
-    void TransposeEvent(tKeyOn *on, JZTrack *t);
+    void IterateEvents(void (HBAnalyzer::*Action)(JZKeyOnEvent *on, JZTrack *t));
+    void CountEvent(JZKeyOnEvent *on, JZTrack *t);
+    void TransposeEvent(JZKeyOnEvent *on, JZTrack *t);
     void CreateChords();
     int NumCount(int i);
     int MaxCount(int i, const HBChord &done);

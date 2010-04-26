@@ -24,7 +24,7 @@
 
 #include <wx/dialog.h>
 
-class tControl;
+class JZControlEvent;
 class JZTrack;
 class wxListBox;
 
@@ -35,13 +35,13 @@ class JZControllerDialog : public wxDialog
   public:
 
     JZControllerDialog(
-      tControl* pControl,
+      JZControlEvent* pControl,
       JZTrack* pTrack,
       wxWindow* pParent);
 
   private:
 
-    tControl* mpControl;
+    JZControlEvent* mpControl;
 
     wxListBox* mpControllerListBox;
 

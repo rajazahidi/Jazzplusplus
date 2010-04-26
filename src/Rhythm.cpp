@@ -277,7 +277,7 @@ void tRhythm::GenerateEvent(JZTrack *track, long clock, short vel, short len)
   {
     for (int ii = 0; ii < n_keys; ii++)
     {
-      tKeyOn *k = new tKeyOn(clock, chan, keys[ii], vel, len);
+      JZKeyOnEvent *k = new JZKeyOnEvent(clock, chan, keys[ii], vel, len);
       track->Put(k);
     }
   }
@@ -286,14 +286,14 @@ void tRhythm::GenerateEvent(JZTrack *track, long clock, short vel, short len)
     int ii = (int)(rnd.asDouble() * n_keys);
     if (ii < n_keys)
     {
-      tKeyOn *k = new tKeyOn(clock, chan, keys[ii], vel, len);
+      JZKeyOnEvent *k = new JZKeyOnEvent(clock, chan, keys[ii], vel, len);
       track->Put(k);
     }
   }
   else if (mode == MODE_CONTROL)
   {
     // generate controller
-    tControl *c = new tControl(clock, chan, parm - 1, vel);
+    JZControlEvent* c = new JZControlEvent(clock, chan, parm - 1, vel);
     track->Put(c);
   }
   else
@@ -348,7 +348,7 @@ void tRhythm::Generate(JZTrack *track, long fr_clock, long to_clock, long ticks_
           }
           for (int j = 0; j < n_keys; j++)
           {
-            tKeyOn *k = new tKeyOn(clock, chan, keys[j], vel, len - clocks_per_step/2);
+            JZKeyOnEvent *k = new JZKeyOnEvent(clock, chan, keys[j], vel, len - clocks_per_step/2);
             track->Put(k);
           }
         }
@@ -360,10 +360,10 @@ void tRhythm::Generate(JZTrack *track, long fr_clock, long to_clock, long ticks_
         tEventArray &src = gpTrackWindow->GetPianoWindow()->PasteBuffer;
         for (int ii = 0; ii < src.nEvents; ii++)
         {
-          tKeyOn* pKeyOn = src.Events[ii]->IsKeyOn();
+          JZKeyOnEvent* pKeyOn = src.Events[ii]->IsKeyOn();
           if (pKeyOn)
           {
-            tKeyOn *k = new tKeyOn(clock, chan, pKeyOn->Key, vel, len - clocks_per_step / 2);
+            JZKeyOnEvent *k = new JZKeyOnEvent(clock, chan, pKeyOn->Key, vel, len - clocks_per_step / 2);
             track->Put(k);
           }
         }
@@ -372,13 +372,13 @@ void tRhythm::Generate(JZTrack *track, long fr_clock, long to_clock, long ticks_
       // generate controller
       else if (key == CONTROL_KEY)
       {
-        tControl *c = new tControl(clock, chan, parm - 1, vel);
+        JZControlEvent* c = new JZControlEvent(clock, chan, parm - 1, vel);
         track->Put(c);
       }
       // generate note on events
       else
       {
-        tKeyOn *k = new tKeyOn(clock, chan, key, vel, len - clocks_per_step/2);
+        JZKeyOnEvent *k = new JZKeyOnEvent(clock, chan, key, vel, len - clocks_per_step/2);
         track->Put(k);
       }
 
@@ -946,7 +946,7 @@ void tRhythmWin::AddInstrumentDlg()
 
       for (int ii = 0; ii < events.nEvents; ii++)
       {
-        tKeyOn* pKeyOn = events.Events[ii]->IsKeyOn();
+        JZKeyOnEvent* pKeyOn = events.Events[ii]->IsKeyOn();
         if (pKeyOn)
         {
           pRhythm->keys[pRhythm->n_keys++] = pKeyOn->GetKey();

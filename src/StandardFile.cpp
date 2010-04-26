@@ -359,7 +359,7 @@ JZEvent* JZStandardChunk::Get()
       case StatSysEx:          // Sysex
         ++ cp;
         len = GetVar();
-        pEvent = new tSysEx(Clock, cp, len);
+        pEvent = new JZSysExEvent(Clock, cp, len);
         cp += len;
         //RunningStatus = 0;
         return pEvent;
@@ -379,73 +379,76 @@ if (1)
         {
           case StatText:        // Text-Event
             len = GetVar();
-            pEvent = new tText(Clock, cp, len);
+            pEvent = new JZTextEvent(Clock, cp, len);
             cp += len;
             return pEvent;
 
           case StatTrackName:        // Track-Name
             len = GetVar();
-            pEvent = new tTrackName(Clock, cp, len);
+            pEvent = new JZTrackNameEvent(Clock, cp, len);
             cp += len;
             return pEvent;
 
           case StatPlayTrack:        // JAVE playtrack event
             len = GetVar();
             fprintf(stderr, "reading playtrack event\n");
-            pEvent = new tPlayTrack(Clock, cp, len);
+            pEvent = new JZPlayTrackEvent(Clock, cp, len);
             cp += len;
             return pEvent;
 
           case StatJazzMeta:        // Jazz Meta Event
             len = GetVar();
             if (memcmp(cp, "JAZ2", 4) == 0)
-              pEvent = new tJazzMeta(Clock, cp, len);
+            {
+              pEvent = new JZJazzMetaEvent(Clock, cp, len);
+            }
             else
-              pEvent = new tMetaEvent(Clock, Stat, cp, len);
+            {
+              pEvent = new JZMetaEvent(Clock, Stat, cp, len);
+            }
             cp += len;
             return pEvent;
 
           case StatCopyright:        // Copyright notice
             len = GetVar();
-            pEvent = new tCopyright(Clock, cp, len);
+            pEvent = new JZCopyrightEvent(Clock, cp, len);
             cp += len;
             return pEvent;
 
           case StatMarker:
             len = GetVar();
-            pEvent = new tMarker(Clock, cp, len);
+            pEvent = new JZMarkerEvent(Clock, cp, len);
             cp += len;
             return pEvent;
 
           case StatEndOfTrack:
             EofSeen = 1;
             cp += GetVar();
-            pEvent = new tEndOfTrack(Clock); //JAVE return an explicit event rather than 0
+            pEvent = new JZEndOfTrackEvent(Clock);
             return pEvent;
-            //return 0;                // EOF
 
           case StatSetTempo:
             len = GetVar();
-            pEvent = new tSetTempo(Clock, cp[0], cp[1], cp[2]);
+            pEvent = new JZSetTempoEvent(Clock, cp[0], cp[1], cp[2]);
             cp += len;
             return pEvent;
 
           case StatTimeSignat:
             len = GetVar();
-            pEvent = new tTimeSignat(Clock, cp[0], cp[1], cp[2], cp[3]);
+            pEvent = new JZTimeSignatEvent(Clock, cp[0], cp[1], cp[2], cp[3]);
             cp += len;
             return pEvent;
 
           case StatMtcOffset:                // MtcOffset
             len = GetVar();
-            pEvent = new tMtcOffset(Clock, cp, len);
+            pEvent = new JZMtcOffsetEvent(Clock, cp, len);
             cp += len;
             RunningStatus = 0;
             return pEvent;
 
           default:                // Text und andere ignorieren
             len = GetVar();
-            pEvent = new tMetaEvent(Clock, Stat, cp, len);
+            pEvent = new JZMetaEvent(Clock, Stat, cp, len);
             cp += len;
             return pEvent;
         }
@@ -461,40 +464,40 @@ if (1)
       switch (Stat)
       {
         case StatKeyOff:  // SN++ added off veloc
-          pEvent = new tKeyOff(Clock, Channel, cp[0],cp[1]);
+          pEvent = new JZKeyOffEvent(Clock, Channel, cp[0],cp[1]);
           cp += 2;
           return pEvent;
 
         case StatKeyOn:
           if (cp[1])
-            pEvent = new tKeyOn(Clock, Channel, cp[0], cp[1]);
+            pEvent = new JZKeyOnEvent(Clock, Channel, cp[0], cp[1]);
           else
-            pEvent = new tKeyOff(Clock, Channel, cp[0]);
+            pEvent = new JZKeyOffEvent(Clock, Channel, cp[0]);
           cp += 2;
           return pEvent;
 
         case StatKeyPressure:
-          pEvent = new tKeyPressure(Clock, Channel, cp[0], cp[1]);
+          pEvent = new JZKeyPressureEvent(Clock, Channel, cp[0], cp[1]);
           cp += 2;
           return pEvent;
 
         case StatControl:
-          pEvent = new tControl(Clock, Channel, cp[0], cp[1]);
+          pEvent = new JZControlEvent(Clock, Channel, cp[0], cp[1]);
           cp += 2;
           return pEvent;
 
         case StatPitch:
-          pEvent = new tPitch(Clock, Channel, cp[0], cp[1]);
+          pEvent = new JZPitchEvent(Clock, Channel, cp[0], cp[1]);
           cp += 2;
           return pEvent;
 
         case StatProgram:
-          pEvent = new tProgram(Clock, Channel, cp[0]);
+          pEvent = new JZProgramEvent(Clock, Channel, cp[0]);
           cp += 1;
           return pEvent;
 
         case StatChnPressure:
-          pEvent = new tChnPressure(Clock, Channel, cp[0]);
+          pEvent = new JZChnPressureEvent(Clock, Channel, cp[0]);
           cp += 1;
           return pEvent;
 

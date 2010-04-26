@@ -411,7 +411,7 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
   {
     case StatKeyOn:
       {
-        tKeyOn* pKeyOn = pEvent->IsKeyOn();
+        JZKeyOnEvent* pKeyOn = pEvent->IsKeyOn();
         set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_NOTEON);
         ev.data.note.channel = pKeyOn->GetChannel();
         ev.data.note.note = pKeyOn->GetKey();
@@ -422,7 +422,7 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
 
     case StatKeyOff:
       {
-        tKeyOff* pKeyOff = pEvent->IsKeyOff();
+        JZKeyOffEvent* pKeyOff = pEvent->IsKeyOff();
         set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_NOTEOFF);
         ev.data.note.channel = pKeyOff->GetChannel();
         ev.data.note.note = pKeyOff->GetKey();
@@ -433,7 +433,7 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
 
     case StatProgram:
       {
-        tProgram* pProgram = pEvent->IsProgram();
+        JZProgramEvent* pProgram = pEvent->IsProgram();
         set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_PGMCHANGE);
         ev.data.control.channel = pProgram->GetChannel();
         ev.data.control.value = pProgram->GetProgram();
@@ -443,7 +443,7 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
 
     case StatKeyPressure:
       {
-        tKeyPressure* pKeyPressure = pEvent->IsKeyPressure();
+        JZKeyPressureEvent* pKeyPressure = pEvent->IsKeyPressure();
         set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_KEYPRESS);
         ev.data.note.channel = pKeyPressure->GetChannel();
         ev.data.note.note = pKeyPressure->GetKey();
@@ -454,7 +454,7 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
 
     case StatChnPressure:
       {
-        tChnPressure *k = pEvent->IsChnPressure();
+        JZChnPressureEvent *k = pEvent->IsChnPressure();
         set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_CHANPRESS);
         ev.data.control.channel = k->GetChannel();
         ev.data.control.value = k->Value;
@@ -464,7 +464,7 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
 
     case StatControl:
       {
-        tControl *k = pEvent->IsControl();
+        JZControlEvent* k = pEvent->IsControl();
         set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_CONTROLLER);
         ev.data.control.channel = k->GetChannel();
         ev.data.control.param = k->GetControl();
@@ -475,7 +475,7 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
 
     case StatPitch:
       {
-        tPitch *k = pEvent->IsPitch();
+        JZPitchEvent *k = pEvent->IsPitch();
         set_event_header(&ev, pEvent->GetClock(), SND_SEQ_EVENT_PITCHBEND);
         ev.data.control.channel = k->GetChannel();
         ev.data.control.value = k->Value;
@@ -495,7 +495,7 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
 
     case StatSysEx:
       {
-        tSysEx* pSysEx = pEvent->IsSysEx();
+        JZSysExEvent* pSysEx = pEvent->IsSysEx();
         // prepend 0xf0
         char* pBuffer = new char[pSysEx->GetDataLength() + 1];
         pBuffer[0] = 0xF0;
@@ -841,7 +841,7 @@ void tAlsaPlayer::recd_event(snd_seq_event_t* ev)
     case SND_SEQ_EVENT_NOTEON:
       if (ev->data.note.velocity > 0)
       {
-        pEvent = new tKeyOn(
+        pEvent = new JZKeyOnEvent(
           0,
           ev->data.note.channel,
           ev->data.note.note,
@@ -849,12 +849,16 @@ void tAlsaPlayer::recd_event(snd_seq_event_t* ev)
       }
       else
       {
-        pEvent = new tKeyOff(0, ev->data.note.channel, ev->data.note.note, 0);
+        pEvent = new JZKeyOffEvent(
+          0,
+          ev->data.note.channel,
+          ev->data.note.note,
+          0);
       }
       break;
 
     case SND_SEQ_EVENT_NOTEOFF:
-      pEvent = new tKeyOff(
+      pEvent = new JZKeyOffEvent(
         0,
         ev->data.note.channel,
         ev->data.note.note,
@@ -862,14 +866,14 @@ void tAlsaPlayer::recd_event(snd_seq_event_t* ev)
       break;
 
     case SND_SEQ_EVENT_PGMCHANGE:
-      pEvent = new tProgram(
+      pEvent = new JZProgramEvent(
         0,
         ev->data.control.channel,
         ev->data.control.value);
       break;
 
     case SND_SEQ_EVENT_KEYPRESS:
-      pEvent = new tKeyPressure(
+      pEvent = new JZKeyPressureEvent(
         0,
         ev->data.note.channel,
         ev->data.note.note,
@@ -877,14 +881,14 @@ void tAlsaPlayer::recd_event(snd_seq_event_t* ev)
       break;
 
     case SND_SEQ_EVENT_CHANPRESS:
-      pEvent = new tChnPressure(
+      pEvent = new JZChnPressureEvent(
         0,
         ev->data.control.channel,
         ev->data.control.value);
       break;
 
     case SND_SEQ_EVENT_CONTROLLER:
-      pEvent = new tControl(
+      pEvent = new JZControlEvent(
         0,
         ev->data.control.channel,
         ev->data.control.param,
@@ -892,14 +896,14 @@ void tAlsaPlayer::recd_event(snd_seq_event_t* ev)
       break;
 
     case SND_SEQ_EVENT_PITCHBEND:
-      pEvent = new tPitch(
+      pEvent = new JZPitchEvent(
         0,
         ev->data.control.channel,
         ev->data.control.value);
       break;
 
     case SND_SEQ_EVENT_SYSEX:
-      pEvent = new tSysEx(
+      pEvent = new JZSysExEvent(
         0,
         ((unsigned char *)ev->data.ext.ptr) + 1,
         ev->data.ext.len - 1);

@@ -23,7 +23,7 @@
 
 #include <wx/dialog.h>
 
-class tEndOfTrack;
+class JZEndOfTrackEvent;
 class JZTrack;
 class wxTextCtrl;
 
@@ -34,7 +34,7 @@ class JZEndOfTrackDialog : public wxDialog
   public:
 
     JZEndOfTrackDialog(
-      tEndOfTrack* pEndOfTrackEvent,
+      JZEndOfTrackEvent* pEndOfTrackEvent,
       JZTrack* pTrack,
       wxWindow* pParent);
 
@@ -48,7 +48,7 @@ class JZEndOfTrackDialog : public wxDialog
 
   private:
 
-    tEndOfTrack* mpEndOfTrackEvent;
+    JZEndOfTrackEvent* mpEndOfTrackEvent;
 
     wxTextCtrl* mpClockEdit;
 

@@ -25,7 +25,7 @@
 
 class JZKnob;
 class JZKnobEvent;
-class tSysEx;
+class JZSysExEvent;
 class JZTrack;
 class wxStaticText;
 class wxTextCtrl;
@@ -36,7 +36,10 @@ class JZSysexDialog : public wxDialog
 {
   public:
 
-    JZSysexDialog(tSysEx* pEvent, JZTrack* pTrack, wxWindow* pParent);
+    JZSysexDialog(
+      JZSysExEvent* pSysExEvent,
+      JZTrack* pTrack,
+      wxWindow* pParent);
 
   private:
 
@@ -48,7 +51,7 @@ class JZSysexDialog : public wxDialog
 
   private:
 
-    tSysEx* mpSysExEvent;
+    JZSysExEvent* mpSysExEvent;
 
     wxTextCtrl* mpSysExEdit;
     wxTextCtrl* mpClockEdit;

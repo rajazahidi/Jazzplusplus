@@ -32,7 +32,7 @@ class JZSong;
 class tEventArray;
 class JZRndArray;
 class JZBarInfo;
-class tKeyOn;
+class JZKeyOnEvent;
 
 //*****************************************************************************
 //*****************************************************************************
@@ -188,7 +188,7 @@ class tCmdCleanup : public tCommand
 {
     long lengthLimit;
     int  shortenOverlaps;
-    tKeyOn *prev_note[16][128];
+    JZKeyOnEvent *prev_note[16][128];
   public:
     tCmdCleanup(JZFilter* pFilter, long limitClocks, int shortenOverlaps);
     virtual void ExecuteTrack(JZTrack* pTrack);

@@ -127,7 +127,7 @@ int HBAnalyzer::Transpose(JZFilter* pFilter, int qbc)
 }
 
 
-void HBAnalyzer::IterateEvents(void (HBAnalyzer::*Action)(tKeyOn*, JZTrack*))
+void HBAnalyzer::IterateEvents(void (HBAnalyzer::*Action)(JZKeyOnEvent*, JZTrack*))
 {
   JZTrackIterator Tracks(mpFilter);
   JZTrack *t = Tracks.First();
@@ -140,7 +140,7 @@ void HBAnalyzer::IterateEvents(void (HBAnalyzer::*Action)(tKeyOn*, JZTrack*))
         Events.Range(mpFilter->GetFromClock(), mpFilter->GetToClock());
       while (pEvent)
       {
-        tKeyOn* pKeyOn = pEvent->IsKeyOn();
+        JZKeyOnEvent* pKeyOn = pEvent->IsKeyOn();
         if (pKeyOn)
         {
           (this->*Action)(pKeyOn, t);
@@ -161,7 +161,7 @@ int HBAnalyzer::Step2Clock(int step)
   return (step * (to - fr)) / mSteps + fr;
 }
 
-void HBAnalyzer::CountEvent(tKeyOn* pKeyOn, JZTrack *t)
+void HBAnalyzer::CountEvent(JZKeyOnEvent* pKeyOn, JZTrack *t)
 {
   for (int i = 0; i < mSteps; i++)
   {
@@ -185,7 +185,7 @@ void HBAnalyzer::CountEvent(tKeyOn* pKeyOn, JZTrack *t)
 }
 
 
-void HBAnalyzer::TransposeEvent(tKeyOn* pKeyOn, JZTrack* pTrack)
+void HBAnalyzer::TransposeEvent(JZKeyOnEvent* pKeyOn, JZTrack* pTrack)
 {
   for (int i = 0; i < mSteps; i++)
   {
@@ -211,7 +211,7 @@ void HBAnalyzer::TransposeEvent(tKeyOn* pKeyOn, JZTrack* pTrack)
       // OR: it covers the whole step
       if (to - fr >= pKeyOn->GetEventLength() / 2 || (fr == start && to == stop))
       {
-        tKeyOn* pKeyOnCopy = (tKeyOn *)pKeyOn->Copy();
+        JZKeyOnEvent* pKeyOnCopy = (JZKeyOnEvent *)pKeyOn->Copy();
         pKeyOnCopy->SetKey(pKeyOnCopy->GetKey() + delta[i][pKeyOn->GetKey() % 12]);
         pTrack->Kill(pKeyOn);
         pTrack->Put(pKeyOnCopy);

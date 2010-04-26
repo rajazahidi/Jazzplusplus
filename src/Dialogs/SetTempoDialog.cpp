@@ -48,7 +48,7 @@ END_EVENT_TABLE()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZSetTempoDialog::JZSetTempoDialog(
-  tSetTempo* pSetTempoEvent,
+  JZSetTempoEvent* pSetTempoEvent,
   JZTrack* pTrack,
   wxWindow * pParent)
   : wxDialog(pParent, wxID_ANY, wxString("Set Tempo (for track 0)")),

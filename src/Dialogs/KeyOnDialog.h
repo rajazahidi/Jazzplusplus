@@ -25,7 +25,7 @@
 
 class JZKnob;
 class JZKnobEvent;
-class tKeyOn;
+class JZKeyOnEvent;
 class wxStaticText;
 class wxTextCtrl;
 
@@ -35,7 +35,7 @@ class JZKeyOnDialog : public wxDialog
 {
   public:
 
-    JZKeyOnDialog(tKeyOn* pEvent, wxWindow* pParent);
+    JZKeyOnDialog(JZKeyOnEvent* pEvent, wxWindow* pParent);
 
   private:
 
@@ -53,7 +53,7 @@ class JZKeyOnDialog : public wxDialog
 
   private:
 
-    tKeyOn* mpEvent;
+    JZKeyOnEvent* mpEvent;
 
     wxTextCtrl* mpPitchEdit;
     wxStaticText* mpVelocityValue;

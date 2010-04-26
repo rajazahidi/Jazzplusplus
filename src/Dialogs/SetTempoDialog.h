@@ -24,8 +24,8 @@
 #include <wx/dialog.h>
 
 class JZIntegerEdit;
+class JZSetTempoEvent;
 class JZTrack;
-class tSetTempo;
 class wxTextCtrl;
 
 //*****************************************************************************
@@ -35,7 +35,7 @@ class JZSetTempoDialog : public wxDialog
   public:
 
     JZSetTempoDialog(
-      tSetTempo* pSetTempoEvent,
+      JZSetTempoEvent* pSetTempoEvent,
       JZTrack* pTrack,
       wxWindow* pParent);
 
@@ -49,7 +49,7 @@ class JZSetTempoDialog : public wxDialog
 
   private:
 
-    tSetTempo* mpSetTempoEvent;
+    JZSetTempoEvent* mpSetTempoEvent;
 
     JZIntegerEdit* mpTempoEdit;
 

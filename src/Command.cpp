@@ -138,7 +138,7 @@ tSelectedKeys::tSelectedKeys(JZFilter* pFilter)
 //-----------------------------------------------------------------------------
 void tSelectedKeys::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tKeyOn* pKeyOn = pEvent->IsKeyOn();
+  JZKeyOnEvent* pKeyOn = pEvent->IsKeyOn();
   if (pKeyOn)
   {
     Keys[pKeyOn->GetKey()] += pKeyOn->GetEventLength();
@@ -402,10 +402,10 @@ long tCmdQuantize::Quantize(int Clock, int islen)
 //-----------------------------------------------------------------------------
 void tCmdQuantize::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tKeyOn* pKeyOn;
+  JZKeyOnEvent* pKeyOn;
   if ((pKeyOn = pEvent->IsKeyOn()) != 0)
   {
-    pKeyOn = (tKeyOn *)pEvent->Copy();
+    pKeyOn = (JZKeyOnEvent *)pEvent->Copy();
     if (mNoteStart)
     {
       pKeyOn->SetClock(Quantize(pKeyOn->GetClock(), 0));
@@ -441,10 +441,10 @@ tCmdTranspose::tCmdTranspose(
 //-----------------------------------------------------------------------------
 void tCmdTranspose::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tKeyOn* pKeyOn;
+  JZKeyOnEvent* pKeyOn;
   if (pEvent->IsKeyOn())
   {
-    pKeyOn = (tKeyOn *)pEvent->Copy();
+    pKeyOn = (JZKeyOnEvent *)pEvent->Copy();
     if (mFitIntoScale)
     {
       pKeyOn->SetKey(pKeyOn->GetKey() + mNotes);
@@ -461,7 +461,7 @@ void tCmdTranspose::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
   // After touch.
   if (pEvent->IsKeyPressure())
   {
-    tKeyPressure* pKeyPressure = (tKeyPressure *)pEvent->Copy();
+    JZKeyPressureEvent* pKeyPressure = (JZKeyPressureEvent *)pEvent->Copy();
     if (mFitIntoScale)
     {
       pKeyPressure->SetKey(pKeyPressure->GetKey() + mNotes);
@@ -491,11 +491,11 @@ tCmdSetChannel::tCmdSetChannel(JZFilter* pFilter, int NewChannel)
 //-----------------------------------------------------------------------------
 void tCmdSetChannel::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tChannelEvent* pChannelEvent;
+  JZChannelEvent* pChannelEvent;
 
   if ((pChannelEvent = pEvent->IsChannelEvent()) != 0)
   {
-    pChannelEvent = (tChannelEvent *)pEvent->Copy();
+    pChannelEvent = (JZChannelEvent *)pEvent->Copy();
     pChannelEvent->SetChannel(mNewChannel);
     pTrack->Kill(pEvent);
     pTrack->Put(pChannelEvent);
@@ -523,11 +523,11 @@ tCmdVelocity::tCmdVelocity(
 //-----------------------------------------------------------------------------
 void tCmdVelocity::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tKeyOn* pKeyOn;
+  JZKeyOnEvent* pKeyOn;
 
   if (pEvent->IsKeyOn() != 0)
   {
-    pKeyOn = (tKeyOn *)pEvent->Copy();
+    pKeyOn = (JZKeyOnEvent *)pEvent->Copy();
     int Value = 0;
     if (mToValue <= 0)
     {
@@ -575,11 +575,11 @@ tCmdLength::tCmdLength(
 //-----------------------------------------------------------------------------
 void tCmdLength::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tKeyOn* pKeyOn;
+  JZKeyOnEvent* pKeyOn;
 
   if (pEvent->IsKeyOn() != 0)
   {
-    pKeyOn = (tKeyOn *)pEvent->Copy();
+    pKeyOn = (JZKeyOnEvent *)pEvent->Copy();
     int Value = 0;
     if (mToValue <= 0)
     {
@@ -628,7 +628,7 @@ void tCmdSeqLength::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
   // Make a copy of the current event.
   JZEvent* k;
-  k = (tKeyOn *)pEvent->Copy();
+  k = (JZKeyOnEvent *)pEvent->Copy();
 
   //little hack, if clock is -1000 it means set startclock from the first event.
   if (startClock==-1000)
@@ -705,8 +705,8 @@ void tCmdConvertToModulation::ExecuteTrack(JZTrack* pTrack)
       }
       pitchdiff = pEvent->GetPitch()-previouspitch;
 
-      tPitch* pitchmodulation=0;
-      pitchmodulation = new tPitch(
+      JZPitchEvent* pitchmodulation=0;
+      pitchmodulation = new JZPitchEvent(
         pEvent->GetClock(),
         channel,
         pitchsteparray[pitchdiff + 4]);
@@ -715,12 +715,12 @@ void tCmdConvertToModulation::ExecuteTrack(JZTrack* pTrack)
 
       pTrack->Kill(pEvent); //remove the old event
 
-      pTrack->Put(new tControl(
+      pTrack->Put(new JZControlEvent(
         pEvent->GetClock(),
         channel,
         0x07,
         pEvent->IsKeyOn()->GetVelocity()));
-      pTrack->Put(new tControl(
+      pTrack->Put(new JZControlEvent(
         pEvent->GetClock() + pEvent->IsKeyOn()->GetEventLength(),
         channel,
         0x07,
@@ -734,7 +734,7 @@ void tCmdConvertToModulation::ExecuteTrack(JZTrack* pTrack)
     pEvent = Iterator.Next();
   }
   //now insert the new long event
-  tKeyOn* longevent = new tKeyOn(
+  JZKeyOnEvent* longevent = new JZKeyOnEvent(
     startclock,
     channel,
     startkey,
@@ -766,14 +766,14 @@ tCmdMidiDelay::tCmdMidiDelay(
 //-----------------------------------------------------------------------------
 void tCmdMidiDelay::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tKeyOn* pKeyOn;
+  JZKeyOnEvent* pKeyOn;
 
   for (int i = 1; i < repeat; ++i)
   {
     if (pEvent->IsKeyOn())
     {
       // Only echo note events.
-      pKeyOn = (tKeyOn *)pEvent->Copy();
+      pKeyOn = (JZKeyOnEvent *)pEvent->Copy();
       pKeyOn->SetClock(pKeyOn->GetClock()+ clockDelay * i);
       pKeyOn->SetVelocity(
         (unsigned char)(pow(scale, i) * pKeyOn->GetVelocity()));
@@ -806,7 +806,7 @@ void tCmdCleanup::ExecuteTrack(JZTrack* pTrack)
 //-----------------------------------------------------------------------------
 void tCmdCleanup::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tKeyOn* pKeyOn;
+  JZKeyOnEvent* pKeyOn;
   if ((pKeyOn = pEvent->IsKeyOn()) != 0)
   {
     if (pKeyOn->GetEventLength() < lengthLimit)
@@ -817,7 +817,7 @@ void tCmdCleanup::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
     else if (shortenOverlaps)
     {
       // Shorten length of overlapping notes.
-      tKeyOn* pPreviousKeyOn = prev_note[pKeyOn->GetChannel()][pKeyOn->GetKey()];
+      JZKeyOnEvent* pPreviousKeyOn = prev_note[pKeyOn->GetChannel()][pKeyOn->GetKey()];
       if (
         pPreviousKeyOn &&
         pPreviousKeyOn->GetClock() + pPreviousKeyOn->GetEventLength() >=
@@ -851,12 +851,12 @@ tCmdSearchReplace::tCmdSearchReplace(JZFilter* pFilter, short From, short To)
 //-----------------------------------------------------------------------------
 void tCmdSearchReplace::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tControl* pControl = pEvent->IsControl();
+  JZControlEvent* pControl = pEvent->IsControl();
   if (pControl)
   {
     if (pControl->GetControl() == mFrom)
     {
-      tControl* pControlCopy = (tControl *)pControl->Copy();
+      JZControlEvent* pControlCopy = (JZControlEvent *)pControl->Copy();
       pControlCopy->SetControl(mTo);
       pTrack->Kill(pControl);
       pTrack->Put(pControlCopy);
@@ -1042,7 +1042,7 @@ void tCmdExchLeftRight::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
   if (pEvent->IsKeyOn())
   {
-    tKeyOn* pKeyOn = (tKeyOn *)pEvent->Copy();
+    JZKeyOnEvent* pKeyOn = (JZKeyOnEvent *)pEvent->Copy();
     pKeyOn->SetClock(
       mpFilter->GetFromClock() + mpFilter->GetToClock() - pKeyOn->GetClock());
     pTrack->Kill(pEvent);
@@ -1082,7 +1082,7 @@ void tCmdExchUpDown::ExecuteTrack(JZTrack* pTrack)
   {
     if (mpFilter->IsSelected(pEvent) && pEvent->IsKeyOn())
     {
-      tKeyOn* pKeyOn = (tKeyOn *)pEvent;
+      JZKeyOnEvent* pKeyOn = (JZKeyOnEvent *)pEvent;
       Keys[pKeyOn->GetKey()] = 1;
     }
     pEvent = Iterator.Next();
@@ -1096,7 +1096,7 @@ void tCmdExchUpDown::ExecuteTrack(JZTrack* pTrack)
   {
     if (mpFilter->IsSelected(pEvent) && pEvent->IsKeyOn())
     {
-      tKeyOn* pKeyOn = (tKeyOn *)pEvent->Copy();
+      JZKeyOnEvent* pKeyOn = (JZKeyOnEvent *)pEvent->Copy();
       int n_th = 0;
 
       // the n'th key from bottom 
@@ -1157,7 +1157,7 @@ tCmdMapper::~tCmdMapper()
 //-----------------------------------------------------------------------------
 void tCmdMapper::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 {
-  tKeyOn* pKeyOn = pEvent->IsKeyOn();
+  JZKeyOnEvent* pKeyOn = pEvent->IsKeyOn();
   if (pKeyOn)
   {
     int sval = 0;
@@ -1224,7 +1224,7 @@ void tCmdMapper::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
         {
           sval = 1;
         }
-        tKeyOn* pKeyOnCopy = (tKeyOn *)pKeyOn->Copy();
+        JZKeyOnEvent* pKeyOnCopy = (JZKeyOnEvent *)pKeyOn->Copy();
         pTrack->Kill(pKeyOn);
         pKeyOnCopy->SetVelocity(sval);
         pTrack->Put(pKeyOnCopy);
@@ -1245,7 +1245,7 @@ void tCmdMapper::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
         {
           sval = 1;
         }
-        tKeyOn* pKeyOnCopy = (tKeyOn *)pKeyOn->Copy();
+        JZKeyOnEvent* pKeyOnCopy = (JZKeyOnEvent *)pKeyOn->Copy();
         pTrack->Kill(pKeyOn);
         pKeyOnCopy->SetKey(sval);
         pTrack->Put(pKeyOnCopy);
@@ -1262,7 +1262,7 @@ void tCmdMapper::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
         {
           sval = 1;
         }
-        tKeyOn* pKeyOnCopy = (tKeyOn *)pKeyOn->Copy();
+        JZKeyOnEvent* pKeyOnCopy = (JZKeyOnEvent *)pKeyOn->Copy();
         pTrack->Kill(pKeyOn);
         pKeyOnCopy->SetLength(sval);
         pTrack->Put(pKeyOnCopy);
@@ -1271,7 +1271,7 @@ void tCmdMapper::ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent)
 
       case clock:
       {
-        tKeyOn* pKeyOnCopy = (tKeyOn *)pKeyOn->Copy();
+        JZKeyOnEvent* pKeyOnCopy = (JZKeyOnEvent *)pKeyOn->Copy();
         pKeyOnCopy->SetClock(pKeyOnCopy->GetClock() + sval);
         if (pKeyOnCopy->GetClock() < 0)
         {

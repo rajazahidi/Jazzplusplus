@@ -98,7 +98,7 @@ static double gFramesPerSecond[] =
   30.0
 };
 
-tMtcTime::tMtcTime(tMtcOffset* pMtcOffset)
+tMtcTime::tMtcTime(JZMtcOffsetEvent* pMtcOffset)
 {
   const unsigned char* pData = pMtcOffset->GetData();
   type = (tMtcType) ((pData[0] & 0x60) >> 5);
@@ -183,7 +183,7 @@ void tMtcTime::ToString(string& String)
   String = Oss.str();
 }
 
-tMtcOffset *tMtcTime::ToOffset()
+JZMtcOffsetEvent *tMtcTime::ToOffset()
 {
   unsigned char *mess = new unsigned char[5];
   mess[0] = (unsigned char) hour | ((unsigned char) type << 5);
@@ -191,7 +191,7 @@ tMtcOffset *tMtcTime::ToOffset()
   mess[2] = (unsigned char) sec;
   mess[3] = (unsigned char) fm;
   mess[4] = 0x00;
-  tMtcOffset *s = new tMtcOffset(0, mess, 5);
+  JZMtcOffsetEvent *s = new JZMtcOffsetEvent(0, mess, 5);
   delete mess;
   return s;
 }
@@ -752,8 +752,8 @@ void tSimpleEventArray::Sort()
 void tEventArray::Cleanup(bool dont_delete_killed_events)
 {
   JZEvent* pEvent;
-  tControl* pControl;
-  tSysEx *s;
+  JZControlEvent* pControl;
+  JZSysExEvent* s;
   int i;
 
   Sort();  // moves all killed events to the end of array
@@ -1176,16 +1176,16 @@ void tEventArray::Length2Keyoff()
   int n = nEvents;
   for (int i = 0; i < n; i++)
   {
-    tKeyOn* pKeyOn;
+    JZKeyOnEvent* pKeyOn;
     if ((pKeyOn = Events[i]->IsKeyOn()) != 0 && pKeyOn->GetEventLength() != 0)
     {
-//      JZEvent* pKeyOff = new tKeyOff(
+//      JZEvent* pKeyOff = new JZKeyOffEvent(
 //        pKeyOn->GetClock() + pKeyOn->GetEventLength(),
 //        pKeyOn->Channel,
 //        pKeyOn->Key);
 
       // SN++ added off veloc
-      JZEvent* pKeyOff = new tKeyOff(
+      JZEvent* pKeyOff = new JZKeyOffEvent(
         pKeyOn->GetClock() + pKeyOn->GetEventLength(),
         pKeyOn->GetChannel(),
         pKeyOn->GetKey(),
@@ -1207,13 +1207,13 @@ void tEventArray::Keyoff2Length()
   int i;
   for (i = 1; i < nEvents; i++)
   {
-    tKeyOff* pKeyOff;
+    JZKeyOffEvent* pKeyOff;
     if ((pKeyOff = Events[i]->IsKeyOff()) != 0)
     {
       JZEvent** ppEvent = &Events[i - 1];
       while (ppEvent >= Events)
       {
-        tKeyOn* pKeyOn = (*ppEvent)->IsKeyOn();
+        JZKeyOnEvent* pKeyOn = (*ppEvent)->IsKeyOn();
         if (
           pKeyOn &&
           pKeyOn->Key == pKeyOff->Key &&
@@ -1236,7 +1236,7 @@ void tEventArray::Keyoff2Length()
   // kill all KeyOn's with non matching KeyOff's
   for (i = 0; i < nEvents; i++)
   {
-    tKeyOn *k = Events[i]->IsKeyOn();
+    JZKeyOnEvent *k = Events[i]->IsKeyOn();
     if (k && k->Length <= 0)
     {
       k->Kill();
@@ -1254,13 +1254,13 @@ void tEventArray::Keyoff2Length()
   int i;
   for (i = 0; i < nEvents; i++)
   {
-    tKeyOn* pKeyOn;
+    JZKeyOnEvent* pKeyOn;
     if ((pKeyOn = Events[i]->IsKeyOn()) != 0 && pKeyOn->GetEventLength() == 0)
     {
       int j;
       for (j = i + 1; j < nEvents; j++)
       {
-        tKeyOff* pKeyOff = Events[j]->IsKeyOff();
+        JZKeyOffEvent* pKeyOff = Events[j]->IsKeyOff();
         if (
           pKeyOff &&
           !pKeyOff->IsKilled() &&
@@ -1283,12 +1283,12 @@ void tEventArray::Keyoff2Length()
   // and kill all remaining KeyOff's
   for (i = 0; i < nEvents; i++)
   {
-    tKeyOn* pKeyOn = Events[i]->IsKeyOn();
+    JZKeyOnEvent* pKeyOn = Events[i]->IsKeyOn();
     if (pKeyOn && pKeyOn->GetEventLength() <= 0)
     {
       pKeyOn->Kill();
     }
-    tKeyOff* pKeyOff = Events[i]->IsKeyOff();
+    JZKeyOffEvent* pKeyOff = Events[i]->IsKeyOff();
     if (pKeyOff)
     {
       pKeyOff->Kill();
@@ -1327,7 +1327,7 @@ void tEventArray::Write(JZWriteBase& Io)
   }
 
   // Rpn / Nrpn:
-  // All these must be written in order (three tControl's in a row)
+  // All these must be written in order (three JZControlEvent's in a row)
   if (VibRate)
   {
     VibRate->Write(Io);
@@ -1395,7 +1395,7 @@ void tEventArray::Write(JZWriteBase& Io)
     mpPatch->Write(Io);
   }
 
-  tJazzMeta JazzMeta;
+  JZJazzMetaEvent JazzMeta;
   JazzMeta.SetAudioMode(audio_mode);
   JazzMeta.SetTrackState(State);
   JazzMeta.SetTrackDevice(Device);
@@ -1469,7 +1469,7 @@ void tEventArray::Read(JZReadBase& Io)
     SpecialEvent = false;
     if (pEvent->IsJazzMeta())
     {
-      tJazzMeta *j = pEvent->IsJazzMeta();
+      JZJazzMetaEvent* j = pEvent->IsJazzMeta();
       audio_mode = (int)j->GetAudioMode();
       State      = (int)j->GetTrackState();
       Device     = (int)j->GetTrackDevice();
@@ -1777,8 +1777,8 @@ void tTrackDlg::OnOk()
   trk->SetDevice(Device);
   if (trk->ForceChannel)
   {
-    tChannelEvent *c;
-    tSysEx *s;
+    JZChannelEvent *c;
+    JZSysExEvent* s;
     tEventIterator Iterator(trk);
     trk->Sort();
     JZEvent* pEvent = Iterator.Range(0, (unsigned) trk->GetLastClock() + 1);
@@ -1786,7 +1786,7 @@ void tTrackDlg::OnOk()
     {
       if ((c = pEvent->IsChannelEvent()) != 0)
       {
-        c = (tChannelEvent *)pEvent->Copy();
+        c = (JZChannelEvent *)pEvent->Copy();
         c->SetChannel(trk->Channel - 1);
         trk->Kill(pEvent);
         trk->Put(c);
@@ -1807,7 +1807,7 @@ void tTrackDlg::OnOk()
             *pChannel |= sysex_channel(trk->Channel);
           }
 
-          s = (tSysEx *) pEvent->Copy();
+          s = (JZSysExEvent *) pEvent->Copy();
           trk->Kill(pEvent);
           trk->Put(s);
         }
@@ -2027,7 +2027,7 @@ void JZTrack::MergeRange(
     JZEvent* c = pEvent->Copy();
     if (ForceChannel)
     {
-      tChannelEvent* pChannelEvent = c->IsChannelEvent();
+      JZChannelEvent* pChannelEvent = c->IsChannelEvent();
       if (pChannelEvent)
       {
         pChannelEvent->SetChannel(Channel - 1);
@@ -2159,7 +2159,7 @@ void JZTrack::SetCopyright(char *str)
     {
       len = strlen(str);
     }
-    Put(new tCopyright(0, (unsigned char *)str, len));
+    Put(new JZCopyrightEvent(0, (unsigned char *)str, len));
   }
   Cleanup();
 }
@@ -2175,8 +2175,6 @@ const char* JZTrack::GetName()
   return "";
 }
 
-
-
 void JZTrack::SetName(const char* pTrackName)
 {
   if (mpName)
@@ -2185,7 +2183,10 @@ void JZTrack::SetName(const char* pTrackName)
   }
   if (strlen(pTrackName))
   {
-    Put(new tTrackName(0, (unsigned char *)pTrackName, strlen(pTrackName)));
+    Put(new JZTrackNameEvent(
+      0,
+      (unsigned char *)pTrackName,
+      strlen(pTrackName)));
   }
   Cleanup();
 }
@@ -2209,7 +2210,7 @@ void JZTrack::SetVolume(int Value)
   }
   if (Value > 0)
   {
-    JZEvent* pEvent = new tControl(0, Channel - 1, 0x07, Value - 1);
+    JZEvent* pEvent = new JZControlEvent(0, Channel - 1, 0x07, Value - 1);
     Put(pEvent);
     gpMidiPlayer->OutNow(this, pEvent);
   }
@@ -2224,7 +2225,7 @@ bool JZTrack::DecreaseVolume()
 
     mpVolume->SetControlValue(mpVolume->GetControlValue() - 1);
 
-    JZEvent* pEvent = new tControl(
+    JZEvent* pEvent = new JZControlEvent(
       0,
       Channel - 1,
       0x07,
@@ -2247,7 +2248,7 @@ bool JZTrack::IncreaseVolume()
 
     mpVolume->SetControlValue(mpVolume->GetControlValue() + 1);
 
-    JZEvent* pEvent = new tControl(
+    JZEvent* pEvent = new JZControlEvent(
       0,
       Channel - 1,
       0x07,
@@ -2282,7 +2283,7 @@ void JZTrack::SetPan(int Value)
   }
   if (Value > 0)
   {
-    JZEvent* pEvent = new tControl(0, Channel - 1, 0x0a, Value - 1);
+    JZEvent* pEvent = new JZControlEvent(0, Channel - 1, 0x0a, Value - 1);
     Put(pEvent);
     gpMidiPlayer->OutNow(this, pEvent);
   }
@@ -2308,7 +2309,7 @@ void JZTrack::SetReverb(int Value)
   }
   if (Value > 0)
   {
-    JZEvent* pEvent = new tControl(0, Channel - 1, 0x5B, Value - 1);
+    JZEvent* pEvent = new JZControlEvent(0, Channel - 1, 0x5B, Value - 1);
     Put(pEvent);
     gpMidiPlayer->OutNow(this, pEvent);
   }
@@ -2334,7 +2335,7 @@ void JZTrack::SetChorus(int Value)
   }
   if (Value > 0)
   {
-    JZEvent* pEvent = new tControl(0, Channel - 1, 0x5D, Value - 1);
+    JZEvent* pEvent = new JZControlEvent(0, Channel - 1, 0x5D, Value - 1);
     Put(pEvent);
     gpMidiPlayer->OutNow(this, pEvent);
   }
@@ -2395,7 +2396,7 @@ void JZTrack::SetBank(int Value)
     {
       DEBUG(fprintf (stderr, "Single command bank select (Bank %d).\n",
             Value);)
-      mpBank = new tControl(
+      mpBank = new JZControlEvent(
         0,
         Channel - 1,
         gpConfig->GetValue(C_BankControlNumber),
@@ -2409,7 +2410,7 @@ void JZTrack::SetBank(int Value)
     }
     assert(gpConfig->BankEntry(Value).Command[0] >= 0);
     DEBUG(fprintf(stderr, "Double command bank select (Bank %d).\n",Value);)
-    mpBank  = new tControl(
+    mpBank  = new JZControlEvent(
       0,
       Channel - 1,
       gpConfig->GetValue(C_BankControlNumber),
@@ -2421,7 +2422,7 @@ void JZTrack::SetBank(int Value)
         "First bank select command: %d %d\n",
         mpBank->Control,
         mpBank->Value);)
-    mpBank2 = new tControl(
+    mpBank2 = new JZControlEvent(
       0,
       Channel - 1,
       gpConfig->GetValue(C_BankControlNumber2),
@@ -2459,7 +2460,7 @@ void JZTrack::SetPatch(int PatchNr)
   }
   if (PatchNr > 0)
   {
-    mpPatch = new tProgram(0, Channel - 1, PatchNr - 1);
+    mpPatch = new JZProgramEvent(0, Channel - 1, PatchNr - 1);
     gpMidiPlayer->OutNow(this, mpPatch);
     mChanged = true;
   }
@@ -3386,7 +3387,7 @@ int JZTrack::GetDefaultSpeed()
 
 void JZTrack::SetDefaultSpeed(int bpm)
 {
-  JZEvent* pEvent = new tSetTempo(0, bpm);
+  JZEvent* pEvent = new JZSetTempoEvent(0, bpm);
   if (mpSpeed)
   {
     Kill(mpSpeed);
@@ -3396,12 +3397,12 @@ void JZTrack::SetDefaultSpeed(int bpm)
   Cleanup();
 }
 
-tSetTempo *JZTrack::GetCurrentTempo(int clk)
+JZSetTempoEvent *JZTrack::GetCurrentTempo(int clk)
 {
   tEventIterator Iterator(this);
   Sort();
   JZEvent* pEvent = Iterator.Range(0, clk + 1);
-  tSetTempo* t = mpSpeed;
+  JZSetTempoEvent* t = mpSpeed;
   while (pEvent)
   {
     if (pEvent->IsSetTempo())
@@ -3416,7 +3417,7 @@ tSetTempo *JZTrack::GetCurrentTempo(int clk)
 
 int JZTrack::GetCurrentSpeed(int clk)
 {
-  tSetTempo *t = GetCurrentTempo(clk);
+  JZSetTempoEvent *t = GetCurrentTempo(clk);
   if (t)
   {
     return t->GetBPM();

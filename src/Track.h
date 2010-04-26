@@ -107,11 +107,11 @@ class tParam
       return mDataMsb.GetValue();
     }
 
-    tControl mMsb;
-    tControl mLsb;
-    tControl mDataMsb;
-    tControl mResetMsb;
-    tControl mResetLsb;
+    JZControlEvent mMsb;
+    JZControlEvent mLsb;
+    JZControlEvent mDataMsb;
+    JZControlEvent mResetMsb;
+    JZControlEvent mResetLsb;
 };
 
 //*****************************************************************************
@@ -377,12 +377,12 @@ class tMtcTime
     int sec;
     int fm;
 
-    tMtcTime( tMtcOffset *s ); // an mtc offset or mtc full message
-    tMtcTime( int millisek, tMtcType t );
-    tMtcTime( char *str, tMtcType t );
-    tMtcTime( unsigned h, unsigned m, unsigned s, unsigned f, unsigned t );
+    tMtcTime(JZMtcOffsetEvent* s); // an mtc offset or mtc full message
+    tMtcTime(int millisek, tMtcType t);
+    tMtcTime(char *str, tMtcType t);
+    tMtcTime(unsigned h, unsigned m, unsigned s, unsigned f, unsigned t);
     void ToString(std::string& String);
-    tMtcOffset* ToOffset();
+    JZMtcOffsetEvent* ToOffset();
     int ToMillisec();
 };
 
@@ -454,46 +454,46 @@ class tEventArray : public tSimpleEventArray
 
   public:
 
-    tTrackName* mpName;
-    tCopyright* mpCopyright;
-    tProgram* mpPatch;
-    tSetTempo* mpSpeed;
-    tControl* mpVolume;
-    tControl* mpPan;
-    tControl* mpReverb;
-    tControl* mpChorus;
-    tControl* mpBank;
-    tControl* mpBank2;
+    JZTrackNameEvent* mpName;
+    JZCopyrightEvent* mpCopyright;
+    JZProgramEvent* mpPatch;
+    JZSetTempoEvent* mpSpeed;
+    JZControlEvent* mpVolume;
+    JZControlEvent* mpPan;
+    JZControlEvent* mpReverb;
+    JZControlEvent* mpChorus;
+    JZControlEvent* mpBank;
+    JZControlEvent* mpBank2;
 
   public:
 
-    tSysEx* mpReset;
+    JZSysExEvent* mpReset;
 
-    tSysEx* ModulationSettings[mspModulationSysexParameters];
-    tSysEx* BenderSettings[bspBenderSysexParameters];
-    tSysEx* CAfSettings[cspCAfSysexParameters];
-    tSysEx* PAfSettings[pspPAfSysexParameters];
-    tSysEx* CC1Settings[cspCC1SysexParameters];
-    tSysEx* CC2Settings[cspCC2SysexParameters];
+    JZSysExEvent* ModulationSettings[mspModulationSysexParameters];
+    JZSysExEvent* BenderSettings[bspBenderSysexParameters];
+    JZSysExEvent* CAfSettings[cspCAfSysexParameters];
+    JZSysExEvent* PAfSettings[pspPAfSysexParameters];
+    JZSysExEvent* CC1Settings[cspCC1SysexParameters];
+    JZSysExEvent* CC2Settings[cspCC2SysexParameters];
 
-    tSysEx* CC1ControllerNr;
-    tSysEx* CC2ControllerNr;
+    JZSysExEvent* CC1ControllerNr;
+    JZSysExEvent* CC2ControllerNr;
 
-    tSysEx* ReverbType;
-    tSysEx* ChorusType;
-    tSysEx* EqualizerType;
+    JZSysExEvent* ReverbType;
+    JZSysExEvent* ChorusType;
+    JZSysExEvent* EqualizerType;
 
-    tSysEx* ReverbSettings[rspReverbSysexParameters];
-    tSysEx* ChorusSettings[cspChorusSysexParameters];
+    JZSysExEvent* ReverbSettings[rspReverbSysexParameters];
+    JZSysExEvent* ChorusSettings[cspChorusSysexParameters];
 
-    tSysEx* PartialReserve;
-    tSysEx* MasterVol;
-    tSysEx* MasterPan;
+    JZSysExEvent* PartialReserve;
+    JZSysExEvent* MasterVol;
+    JZSysExEvent* MasterPan;
 
-    tSysEx* RxChannel;
-    tSysEx* UseForRhythm;
+    JZSysExEvent* RxChannel;
+    JZSysExEvent* UseForRhythm;
 
-    tMtcOffset* MtcOffset;
+    JZMtcOffsetEvent* MtcOffset;
 
     tNrpn* VibRate;
     tNrpn* VibDepth;
@@ -709,7 +709,7 @@ class JZTrack : public tEventArray
 
     int  GetCurrentSpeed( int clk );  // beats per minute
 
-    tSetTempo *GetCurrentTempo( int clk );
+    JZSetTempoEvent *GetCurrentTempo( int clk );
 
     int  GetMasterVol();
     void SetMasterVol(int MasterVol);

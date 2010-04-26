@@ -217,37 +217,37 @@ JZEvent *JZWindowsPlayer::Dword2Event(DWORD dw)
   switch(u.c[0] & 0xf0)
   {
     case 0x80:
-      pEvent = new tKeyOff(0, u.c[0] & 0x0f, u.c[1]);
+      pEvent = new JZKeyOffEvent(0, u.c[0] & 0x0f, u.c[1]);
       break;
 
     case 0x90:
       if (u.c[2])
-        pEvent = new tKeyOn(0, u.c[0] & 0x0f, u.c[1], u.c[2], 0);
+        pEvent = new JZKeyOnEvent(0, u.c[0] & 0x0f, u.c[1], u.c[2], 0);
       else
-        pEvent = new tKeyOff(0, u.c[0] & 0x0f, u.c[1]);
+        pEvent = new JZKeyOffEvent(0, u.c[0] & 0x0f, u.c[1]);
       break;
 
     case 0xA0:
-      pEvent = new tKeyPressure(0, u.c[0] & 0x0f, u.c[1], u.c[2]);
+      pEvent = new JZKeyPressureEvent(0, u.c[0] & 0x0f, u.c[1], u.c[2]);
       break;
 
     case 0xB0:
       if (u.c[1] != 0x7b)
       {
-        pEvent = new tControl(0, u.c[0] & 0x0f, u.c[1], u.c[2]);
+        pEvent = new JZControlEvent(0, u.c[0] & 0x0f, u.c[1], u.c[2]);
       }
       break;
 
     case 0xC0:
-      pEvent = new tProgram(0, u.c[0] & 0x0f, u.c[1]);
+      pEvent = new JZProgramEvent(0, u.c[0] & 0x0f, u.c[1]);
       break;
 
     case 0xD0:
-      pEvent = new tChnPressure(0, u.c[0] & 0x0f, u.c[1]);
+      pEvent = new JZChnPressureEvent(0, u.c[0] & 0x0f, u.c[1]);
       break;
 
     case 0xE0:
-      pEvent = new tPitch(0, u.c[0] & 0x0f, u.c[1], u.c[2]);
+      pEvent = new JZPitchEvent(0, u.c[0] & 0x0f, u.c[1], u.c[2]);
       break;
   }
   return pEvent;
@@ -269,7 +269,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
   {
     case StatKeyOn:
       {
-        tKeyOn* pKeyOn = pEvent->IsKeyOn();
+        JZKeyOnEvent* pKeyOn = pEvent->IsKeyOn();
         u.c[0] = 0x90 | pKeyOn->GetChannel();
         u.c[1] = pKeyOn->GetKey();
         u.c[2] = pKeyOn->GetVelocity();
@@ -278,7 +278,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
 
     case StatKeyOff:
       {
-        tKeyOff* pKeyOff = pEvent->IsKeyOff();
+        JZKeyOffEvent* pKeyOff = pEvent->IsKeyOff();
         u.c[0] = 0x80 | pKeyOff->GetChannel();
         u.c[1] = pKeyOff->GetKey();
         u.c[2] = 0;
@@ -287,7 +287,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
 
     case StatProgram:
       {
-        tProgram* pProgram = pEvent->IsProgram();
+        JZProgramEvent* pProgram = pEvent->IsProgram();
         u.c[0] = 0xC0 | pProgram->GetChannel();
         u.c[1] = pProgram->GetProgram();
       }
@@ -295,7 +295,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
 
     case StatChnPressure:
       {
-        tChnPressure* k = pEvent->IsChnPressure();
+        JZChnPressureEvent* k = pEvent->IsChnPressure();
         u.c[0] = 0xC0 | k->GetChannel();
         u.c[1] = k->Value;
       }
@@ -303,7 +303,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
 
     case StatControl:
       {
-        tControl* pControl = pEvent->IsControl();
+        JZControlEvent* pControl = pEvent->IsControl();
         u.c[0] = 0xB0 | pControl->GetChannel();
         u.c[1] = pControl->GetControl();
         u.c[2] = pControl->GetControlValue();
@@ -312,7 +312,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
 
     case StatKeyPressure:
       {
-        tKeyPressure* pKeyPressure = pEvent->IsKeyPressure();
+        JZKeyPressureEvent* pKeyPressure = pEvent->IsKeyPressure();
         u.c[0] = 0xA0 | pKeyPressure->GetChannel();
         u.c[1] = pKeyPressure->GetKey();
         u.c[2] = pKeyPressure->GetPressureValue();
@@ -321,7 +321,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
 
     case StatPitch:
       {
-        tPitch *k = pEvent->IsPitch();
+        JZPitchEvent *k = pEvent->IsPitch();
         int     v = k->Value + 8192;
         u.c[0] = 0xE0 | k->GetChannel();
         u.c[1] = (unsigned char)(v & 0x7F);
@@ -343,7 +343,7 @@ DWORD JZWindowsPlayer::Event2Dword(JZEvent* pEvent)
 
     case StatSetTempo:
       {
-        tSetTempo *t = pEvent->IsSetTempo();
+        JZSetTempoEvent *t = pEvent->IsSetTempo();
         if (t && t->GetClock() > 0)
         {
           SetTempo( t->GetBPM(), t->GetClock() );
@@ -425,7 +425,7 @@ void JZWindowsPlayer::SetRealTimeTempo(long bpm, long clock)
 //-----------------------------------------------------------------------------
 int JZWindowsPlayer::OutSysex(JZEvent* pEvent, DWORD time)
 {
-  tSysEx *sx = pEvent->IsSysEx();
+  JZSysExEvent *sx = pEvent->IsSysEx();
   if (sx == 0)
     return 1;
 
@@ -491,7 +491,7 @@ void JZWindowsPlayer::OutNow(JZEvent* pEvent)
   }
   else if (pEvent->GetStat() == StatSysEx)
   {
-    tSysEx *s = pEvent->IsSysEx();
+    JZSysExEvent* s = pEvent->IsSysEx();
     if (s->GetDataLength() + 1 < maxSysLen)
     {
       pSysBuf[0] = 0xf0;
@@ -527,7 +527,7 @@ void JZWindowsPlayer::FillMidiClocks(long to)
 {
   while (midiClockOut <= to)
   {
-    tMidiClock* pEvent = new tMidiClock(midiClockOut);
+    JZMidiClockEvent* pEvent = new JZMidiClockEvent(midiClockOut);
     mPlayBuffer.Put(pEvent);
     midiClockOut = midiClockOut + mpState->ticks_per_signal;
   }
@@ -649,14 +649,14 @@ void JZWindowsPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 
   if (gpConfig->GetValue(C_RealTimeOut))
   {
-    tMetaEvent* pEvent;
+    JZMetaEvent* pEvent;
     if (!Continue)
     {
-      pEvent = new tStartPlay(0);
+      pEvent = new JZStartPlayEvent(0);
     }
     else
     {
-      pEvent = new tContPlay(0);
+      pEvent = new JZContPlayEvent(0);
     }
     OutNow(pEvent);
     FillMidiClocks(mPlayBuffer.GetLastClock()); // also does a sort
@@ -695,7 +695,12 @@ void JZWindowsPlayer::StartPlay(long Clock, long LoopClock, int Continue)
         lastValidMtcClock = Clock;
       }
       // mpState->playing = TRUE;
-      timeSetEvent(mpState->min_timer_period, mpState->min_timer_period, midiMtcTimerHandler, (DWORD)mpState, TIME_ONESHOT);
+      timeSetEvent(
+        mpState->min_timer_period,
+        mpState->min_timer_period,
+        midiMtcTimerHandler,
+        (DWORD)mpState,
+        TIME_ONESHOT);
       break;
     case CsInt:
     case CsFsk:
@@ -721,7 +726,7 @@ void JZWindowsPlayer::StopPlay()
   JZPlayer::StopPlay();
   if (gpConfig->GetValue(C_RealTimeOut))
   {
-    tStopPlay* pEvent = new tStopPlay(0);
+    JZStopPlayEvent* pEvent = new JZStopPlayEvent(0);
     OutNow(pEvent);
     delete pEvent;
   }
@@ -830,7 +835,7 @@ long JZWindowsIntPlayer::GetRealTimeClock()
       switch (pEvent->GetStat())
       {
         case StatSetTempo:
-          SetRealTimeTempo( ((tSetTempo *)pEvent)->GetBPM(), clock );
+          SetRealTimeTempo(((JZSetTempoEvent *)pEvent)->GetBPM(), clock);
           break;
         default:
           break;
@@ -969,7 +974,7 @@ long JZWindowsMtcPlayer::GetRealTimeClock()
       switch (pEvent->GetStat())
       {
         case StatSetTempo:
-          SetRealTimeTempo( ((tSetTempo *)pEvent)->GetBPM(), clock );
+          SetRealTimeTempo(((JZSetTempoEvent *)pEvent)->GetBPM(), clock);
           break;
         default:
           break;

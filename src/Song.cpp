@@ -213,7 +213,7 @@ void JZSong::Write(JZWriteBase& Io, const char* pFileName)
   if (!mTracks[0].mpReset)
   {
     JZEvent* pEvent = gpSynth->CreateResetEvent();
-    mTracks[0].mpReset = dynamic_cast<tSysEx*>(pEvent);
+    mTracks[0].mpReset = dynamic_cast<JZSysExEvent*>(pEvent);
   }
 
   int n = NumUsedTracks();
@@ -400,7 +400,7 @@ void JZSong::MergeTracks(
 // Should call recursively, so playtrack events will resolve playtrack events.
 //-----------------------------------------------------------------------------
 void JZSong::MergePlayTrackEvent(
-  tPlayTrack* c, //the playtrack event
+  JZPlayTrackEvent* c, //the playtrack event
   tEventArray* pDestin,
   int recursionDepth)
 {
@@ -570,7 +570,7 @@ void JZSong::SetTicksPerQuarter(int TicksPerQuarter)
     {
       JZEvent* pEvent = pTrack->Events[EventIndex];
       pEvent->SetClock((int)(f * pEvent->GetClock() + 0.5));
-      tKeyOn* pKeyOn = pEvent->IsKeyOn();
+      JZKeyOnEvent* pKeyOn = pEvent->IsKeyOn();
       if (pKeyOn)
       {
         pKeyOn->SetLength((int)(f * pKeyOn->GetEventLength() + 0.5));
@@ -621,7 +621,7 @@ int JZSong::SetMeterChange(int BarNr, int Numerator, int Denomiator)
     case 32: Shift = 5; break;
   }
 
-  pEvent = new tTimeSignat(FrClock, Numerator, Shift);
+  pEvent = new JZTimeSignatEvent(FrClock, Numerator, Shift);
   pTrack->Put(pEvent);
   pTrack->Cleanup();
   return 0;

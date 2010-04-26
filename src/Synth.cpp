@@ -485,7 +485,7 @@ tSynthSysex::~tSynthSysex()
   }
 }
 
-int tSynthSysex::GetId(const tSysEx* pSysEx) const
+int tSynthSysex::GetId(const JZSysExEvent* pSysEx) const
 {
   if (!pSysEx)
   {
@@ -722,7 +722,7 @@ int tSynthSysex::GetId(const tSysEx* pSysEx) const
 }
 
 
-const unsigned char* tSynthSysex::GetValPtr(const tSysEx* pSysEx) const
+const unsigned char* tSynthSysex::GetValPtr(const JZSysExEvent* pSysEx) const
 {
   if (!pSysEx)
   {
@@ -780,7 +780,7 @@ const unsigned char* tSynthSysex::GetValPtr(const tSysEx* pSysEx) const
 // Description:
 //   Return a pointer to the byte with the channel (if any).
 //-----------------------------------------------------------------------------
-const unsigned char* tSynthSysex::GetChaPtr(const tSysEx* pSysEx)
+const unsigned char* tSynthSysex::GetChaPtr(const JZSysExEvent* pSysEx)
 {
   if (!pSysEx)
   {
@@ -826,7 +826,7 @@ const unsigned char* tSynthSysex::GetChaPtr(const tSysEx* pSysEx)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSynthSysex::FixCheckSum(tSysEx* pSysEx)
+void tSynthSysex::FixCheckSum(JZSysExEvent* pSysEx)
 {
   const unsigned char* pData = pSysEx->GetData();
   if (
@@ -841,14 +841,14 @@ void tSynthSysex::FixCheckSum(tSysEx* pSysEx)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tSysEx* tSynthSysex::operator()(long clk, int id, unsigned char val)
+JZSysExEvent* tSynthSysex::operator()(long clk, int id, unsigned char val)
 {
   return (*this)(clk, id, -1, 1, &val);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tSysEx* tSynthSysex::operator()(
+JZSysExEvent* tSynthSysex::operator()(
   long clk,
   int id,
   int datalen,
@@ -859,7 +859,7 @@ tSysEx* tSynthSysex::operator()(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tSysEx* tSynthSysex::operator()(
+JZSysExEvent* tSynthSysex::operator()(
   long clk,
   int id,
   int channel,
@@ -878,7 +878,7 @@ tSysEx* tSynthSysex::operator()(
    int len = sxlen[id] + datalen - 1;
    unsigned char* sx = new unsigned char[len];
    memcpy(sx, sxdata[id], sxlen[id]);
-   tSysEx* pSysEx = 0;
+   JZSysExEvent* pSysEx = 0;
 
    if (id == SX_GM_MasterVol)
    {
@@ -888,7 +888,7 @@ tSysEx* tSynthSysex::operator()(
       else
         sx[4] = 0;
       sx[5] = val[0]; // MSB
-      pSysEx = new tSysEx(clk, sx, len);
+      pSysEx = new JZSysExEvent(clk, sx, len);
    }
    else if ((id > SX_GS_ON) && (id < SX_XG_ON))
    {
@@ -906,7 +906,7 @@ tSysEx* tSynthSysex::operator()(
         sum += sx[i];
       sx[len - 2] = (0x80 - (sum & 0x7f)) & 0x7f;
       sx[len-1] = 0xf7;
-      pSysEx = new tSysEx(clk, sx, len);
+      pSysEx = new JZSysExEvent(clk, sx, len);
    }
    else if (id > SX_XG_ON)
    {
@@ -921,7 +921,7 @@ tSysEx* tSynthSysex::operator()(
         sx[4] = channel - 1;
       }
       sx[len-1] = 0xf7;
-      pSysEx = new tSysEx(clk, sx, len);
+      pSysEx = new JZSysExEvent(clk, sx, len);
    }
 
    delete sx;

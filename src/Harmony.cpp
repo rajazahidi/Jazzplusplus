@@ -273,7 +273,7 @@ void HBPlayer::Paste(tEventArray &arr)
 {
   if (mBassEnabled)
   {
-    tKeyOn e(0, bass_channel - 1, bass_key, bass_veloc, note_length);
+    JZKeyOnEvent e(0, bass_channel - 1, bass_key, bass_veloc, note_length);
     arr.Put(e.Copy());
   }
 
@@ -281,7 +281,7 @@ void HBPlayer::Paste(tEventArray &arr)
   {
     for (int i = 0; i < n_chord_keys; i++)
     {
-      tKeyOn e(0, chord_channel - 1, chord_keys[i], chord_veloc, note_length);
+      JZKeyOnEvent e(0, chord_channel - 1, chord_keys[i], chord_veloc, note_length);
       arr.Put(e.Copy());
     }
   }
@@ -308,7 +308,7 @@ void HBPlayer::StartPlay(const HBContext& Context)
   // Generate KeyOn's
   if (mBassEnabled)
   {
-    tKeyOn e(0, bass_channel - 1, bass_key, bass_veloc);
+    JZKeyOnEvent e(0, bass_channel - 1, bass_key, bass_veloc);
     gpMidiPlayer->OutNow(device, &e);
   }
 
@@ -316,7 +316,7 @@ void HBPlayer::StartPlay(const HBContext& Context)
   {
     for (i = 0; i < n_chord_keys; i++)
     {
-      tKeyOn e(0, chord_channel - 1, chord_keys[i], chord_veloc);
+      JZKeyOnEvent e(0, chord_channel - 1, chord_keys[i], chord_veloc);
       gpMidiPlayer->OutNow(device, &e);
     }
   }
@@ -330,10 +330,10 @@ void HBPlayer::Notify()
 {
   if (mMeldyEnabled)
   {
-    tKeyOff of(0, meldy_channel - 1, meldy_keys[meldy_index]);
+    JZKeyOffEvent of(0, meldy_channel - 1, meldy_keys[meldy_index]);
     gpMidiPlayer->OutNow(device, &of);
     meldy_index = (meldy_index + 1) % n_meldy_keys;
-    tKeyOn pKeyOn(0, meldy_channel - 1, meldy_keys[meldy_index], meldy_veloc);
+    JZKeyOnEvent pKeyOn(0, meldy_channel - 1, meldy_keys[meldy_index], meldy_veloc);
     gpMidiPlayer->OutNow(device, &pKeyOn);
   }
 }
@@ -353,7 +353,7 @@ void HBPlayer::StopPlay()
   // Generate KeyOff's
   if (mBassEnabled)
   {
-    tKeyOff e(0, bass_channel - 1, bass_key);
+    JZKeyOffEvent e(0, bass_channel - 1, bass_key);
     gpMidiPlayer->OutNow(device, &e);
   }
 
@@ -361,7 +361,7 @@ void HBPlayer::StopPlay()
   {
     for (i = 0; i < n_chord_keys; i++)
     {
-      tKeyOff e(0, chord_channel - 1, chord_keys[i]);
+      JZKeyOffEvent e(0, chord_channel - 1, chord_keys[i]);
       gpMidiPlayer->OutNow(device, &e);
     }
   }
@@ -370,7 +370,7 @@ void HBPlayer::StopPlay()
   {
     for (i = 0; i < n_meldy_keys; i++)
     {
-      tKeyOff of(0, meldy_channel - 1, meldy_keys[i]);
+      JZKeyOffEvent of(0, meldy_channel - 1, meldy_keys[i]);
       gpMidiPlayer->OutNow(device, &of);
     }
   }
@@ -717,7 +717,7 @@ HBMatchMarkers::HBMatchMarkers(const HBContext& Context, HBCanvas* cv)
     tEventArray &buf = gpTrackFrame->GetPianoWindow()->mPasteBuffer;
     for (int i = 0; i < buf.nEvents; i++)
     {
-      tKeyOn* pKeyOn = buf.Events[i]->IsKeyOn();
+      JZKeyOnEvent* pKeyOn = buf.Events[i]->IsKeyOn();
       if (pKeyOn)
       {
         piano += pKeyOn->GetKey();

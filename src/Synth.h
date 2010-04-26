@@ -242,29 +242,34 @@ class tSynthSysex
     virtual ~tSynthSysex();
 
     // Find out what kind of sysex this is
-    int GetId(const tSysEx* s) const;
+    int GetId(const JZSysExEvent* s) const;
 
     // Get pointer to the data value (if any)
-    const unsigned char* GetValPtr(const tSysEx* pSysEx) const;
+    const unsigned char* GetValPtr(const JZSysExEvent* pSysEx) const;
 
     // Description:
     //   Return a pointer to the byte with the channel (if any).
-    const unsigned char* GetChaPtr(const tSysEx* pSysEx);
+    const unsigned char* GetChaPtr(const JZSysExEvent* pSysEx);
 
     // Fix checksum byte (if any)
-    void FixCheckSum( tSysEx *s );
+    void FixCheckSum(JZSysExEvent* s);
 
     // Constant sysexes like e.g. GM Midi On
-    tSysEx* operator()(long clk, int id)
+    JZSysExEvent* operator()(long clk, int id)
     {
       assert( (id >= 0) && (id < NumSysexIds) );
-      return( new tSysEx( clk, sxdata[id], sxlen[id] ) );
+      return new JZSysExEvent(clk, sxdata[id], sxlen[id]);
     }
 
     // Variable sysexes like e.g. MasterVol or DT1
-    tSysEx* operator()(long clk, int id, unsigned char val);
-    tSysEx* operator()(long clk, int id, int datalen, unsigned char val[]);
-    tSysEx* operator()(long clk, int id, int channel, int datalen, unsigned char val[]);
+    JZSysExEvent* operator()(long clk, int id, unsigned char val);
+    JZSysExEvent* operator()(long clk, int id, int datalen, unsigned char val[]);
+    JZSysExEvent* operator()(
+      long clk,
+      int id,
+      int channel,
+      int datalen,
+      unsigned char val[]);
 
     static const std::string& GetSysexName(unsigned i);
     static const std::string& GetSysexGroupName(unsigned i);
@@ -305,22 +310,22 @@ class JZSynth
       return 0;
     }
 
-    virtual int GetSysexId(const tSysEx* s) const
+    virtual int GetSysexId(const JZSysExEvent* s) const
     {
       return Sysex.GetId( s );
     }
 
-    virtual const unsigned char* GetSysexValPtr(tSysEx* pSysEx) const
+    virtual const unsigned char* GetSysexValPtr(JZSysExEvent* pSysEx) const
     {
       return Sysex.GetValPtr(pSysEx);
     }
 
-    virtual const unsigned char* GetSysexChaPtr(tSysEx* pSysEx)
+    virtual const unsigned char* GetSysexChaPtr(JZSysExEvent* pSysEx)
     {
       return Sysex.GetChaPtr(pSysEx);
     }
 
-    virtual void FixSysexCheckSum( tSysEx *s )
+    virtual void FixSysexCheckSum( JZSysExEvent *s )
     {
       Sysex.FixCheckSum( s );
     }

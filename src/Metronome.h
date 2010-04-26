@@ -23,7 +23,7 @@
 #ifndef JZ_METRONOME_H
 #define JZ_METRONOME_H
 
-class tKeyOn;
+class JZKeyOnEvent;
 
 //*****************************************************************************
 //*****************************************************************************
@@ -61,9 +61,9 @@ class JZMetronomeInfo
 
     void ToggleIsOn();
 
-    tKeyOn* CreateNormalEvent(int Clock) const;
+    JZKeyOnEvent* CreateNormalEvent(int Clock) const;
 
-    tKeyOn* CreateAccentedEvent(int Clock) const;
+    JZKeyOnEvent* CreateAccentedEvent(int Clock) const;
 
   private:
 

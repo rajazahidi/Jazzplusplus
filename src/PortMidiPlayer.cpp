@@ -254,7 +254,7 @@ int JZPortMidiPlayer::OutEvent(JZEvent* pEvent, int now)
   {
     case StatKeyOn:
     {
-      tKeyOn *k = pEvent->IsKeyOn();
+      JZKeyOnEvent *k = pEvent->IsKeyOn();
 
       WSHORT(k->GetKey(), k->GetVelocity());
     }
@@ -262,7 +262,7 @@ int JZPortMidiPlayer::OutEvent(JZEvent* pEvent, int now)
 
     case StatKeyOff:
     {
-      tKeyOff *k = pEvent->IsKeyOff();
+      JZKeyOffEvent *k = pEvent->IsKeyOff();
 
       WSHORT(k->GetKey(), k->GetOffVelocity());
     }
@@ -270,7 +270,7 @@ int JZPortMidiPlayer::OutEvent(JZEvent* pEvent, int now)
 
     case StatProgram:
     {
-      tProgram *k = pEvent->IsProgram();
+      JZProgramEvent* k = pEvent->IsProgram();
 
       WSHORT(k->GetProgram(), 0);
     }
@@ -278,7 +278,7 @@ int JZPortMidiPlayer::OutEvent(JZEvent* pEvent, int now)
 
     case StatKeyPressure:
     {
-      tKeyPressure *k = pEvent->IsKeyPressure();
+      JZKeyPressureEvent *k = pEvent->IsKeyPressure();
 
       WSHORT(k->GetKey(), k->GetValue());
     }
@@ -286,7 +286,7 @@ int JZPortMidiPlayer::OutEvent(JZEvent* pEvent, int now)
 
     case StatChnPressure:
     {
-      tChnPressure *k = pEvent->IsChnPressure();
+      JZChnPressureEvent *k = pEvent->IsChnPressure();
 
       WSHORT(k->GetValue(), 0);
     }
@@ -294,7 +294,7 @@ int JZPortMidiPlayer::OutEvent(JZEvent* pEvent, int now)
 
     case StatControl:
     {
-      tControl *k = pEvent->IsControl();
+      JZControlEvent* k = pEvent->IsControl();
 
       WSHORT(k->GetControl(), k->GetValue());
     }
@@ -302,7 +302,7 @@ int JZPortMidiPlayer::OutEvent(JZEvent* pEvent, int now)
 
     case StatPitch:
     {
-      tPitch *k = pEvent->IsPitch();
+      JZPitchEvent *k = pEvent->IsPitch();
 
       WSHORT(k->GetValue(), 0);
     }
@@ -310,7 +310,7 @@ int JZPortMidiPlayer::OutEvent(JZEvent* pEvent, int now)
 
     case StatSetTempo:
     {
-      tSetTempo *k = pEvent->IsSetTempo();
+      JZSetTempoEvent* k = pEvent->IsSetTempo();
       if (k->GetClock() > 0)
       {
         SetTempo(k->GetBPM(), k->GetClock());
@@ -320,7 +320,7 @@ int JZPortMidiPlayer::OutEvent(JZEvent* pEvent, int now)
 
     case StatSysEx:
     {
-      tSysEx *s = pEvent->IsSysEx();
+      JZSysExEvent* s = pEvent->IsSysEx();
 
       unsigned char *buf = new unsigned char[s->GetLength() + 2];
 

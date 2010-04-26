@@ -46,7 +46,7 @@ END_EVENT_TABLE()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZEndOfTrackDialog::JZEndOfTrackDialog(
-  tEndOfTrack* pEndOfTrackEvent,
+  JZEndOfTrackEvent* pEndOfTrackEvent,
   JZTrack* pTrack,
   wxWindow * pParent)
   : wxDialog(pParent, wxID_ANY, wxString("End of Track")),

@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -429,14 +429,6 @@ tSimpleEventArray::~tSimpleEventArray()
 void tSimpleEventArray::Clear()
 {
   int i;
-#ifdef E_DBUG
-  {
-    for (int i = 0; i < nEvents; i++)
-    {
-      Events[i]->edb();
-    }
-  }
-#endif
   for (i = 0; i < nEvents; i++)
   {
     delete Events[i];
@@ -448,17 +440,6 @@ void tSimpleEventArray::Clear()
 void tUndoBuffer::Clear()
 {
   int i;
-#ifdef E_DBUG
-  {
-    for (int i = 0; i < nEvents; i++)
-    {
-      if (bits(i))
-      {
-        Events[i]->edb();
-      }
-    }
-  }
-#endif
   for (i = 0; i < nEvents; i++)
   {
     if (bits(i))
@@ -536,15 +517,6 @@ void tSimpleEventArray::Put(JZEvent* pEvent)
     Resize();
   }
   Events[nEvents++] = pEvent;
-
-#ifdef E_DBUG
-  {
-    for (int i = 0; i < nEvents; i++)
-    {
-      Events[i]->edb();
-    }
-  }
-#endif
 }
 
 // Description:

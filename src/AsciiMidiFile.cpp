@@ -47,8 +47,15 @@ JZEvent* JZAsciiRead::Read()
   JZEvent* pEvent = 0;
 
   long Clock;
-  int sta, cha, Length;
-  if (fscanf(mpFd, "%6lu %02x %2d %d ", &Clock, &sta, &cha, &Length) != 4)
+  int StatusByte, Channel, Length;
+  if (
+    fscanf(
+      mpFd,
+      "%6lu %02x %2d %d ",
+      &Clock,
+      &StatusByte,
+      &Channel,
+      &Length) != 4)
   {
     return pEvent;
   }
@@ -61,29 +68,29 @@ JZEvent* JZAsciiRead::Read()
     pBuffer[i] = (unsigned char)d;
   }
 
-  switch (sta)
+  switch (StatusByte)
   {
     case StatUnknown:
       break;
 
     case StatKeyOff:
-      pEvent = new JZKeyOffEvent(Clock, cha, pBuffer[0]);
+      pEvent = new JZKeyOffEvent(Clock, Channel, pBuffer[0]);
       break;
 
     case StatKeyOn:
-      pEvent = new JZKeyOnEvent(Clock, cha, pBuffer[0], pBuffer[1]);
+      pEvent = new JZKeyOnEvent(Clock, Channel, pBuffer[0], pBuffer[1]);
       break;
 
     case StatControl:
-      pEvent = new JZControlEvent(Clock, cha, pBuffer[0], pBuffer[1]);
+      pEvent = new JZControlEvent(Clock, Channel, pBuffer[0], pBuffer[1]);
       break;
 
     case StatPitch:
-      pEvent = new JZPitchEvent(Clock, cha, pBuffer[0], pBuffer[1]);
+      pEvent = new JZPitchEvent(Clock, Channel, pBuffer[0], pBuffer[1]);
       break;
 
     case StatProgram:
-      pEvent = new JZProgramEvent(Clock, cha, pBuffer[0]);
+      pEvent = new JZProgramEvent(Clock, Channel, pBuffer[0]);
       break;
 
     case StatText:

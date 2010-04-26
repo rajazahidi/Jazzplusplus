@@ -317,7 +317,7 @@ class JZEvent
 
     unsigned char GetStat() const
     {
-      return mStat;
+      return mStatusByte;
     }
 
     int GetClock() const
@@ -337,8 +337,8 @@ class JZEvent
       BROADCAST_DEVICE = 0
     };
 
-    JZEvent(int Clock, unsigned char Stat)
-      : mStat(Stat),
+    JZEvent(int Clock, unsigned char StatusByte)
+      : mStatusByte(StatusByte),
         mClock(Clock),
         mDevice(BROADCAST_DEVICE)
     {
@@ -469,7 +469,7 @@ class JZEvent
 
   protected:
 
-    unsigned char mStat;
+    unsigned char mStatusByte;
 
     int mClock;
 
@@ -484,8 +484,8 @@ class JZChannelEvent : public JZEvent
 {
   public:
 
-    JZChannelEvent(int Clock, unsigned char sta, int Channel)
-      : JZEvent(Clock, sta)
+    JZChannelEvent(int Clock, unsigned char StatusByte, int Channel)
+      : JZEvent(Clock, StatusByte)
     {
       mChannel = Channel;
     }
@@ -909,10 +909,10 @@ class JZMetaEvent : public JZEvent
 
     JZMetaEvent(
       int Clock,
-      unsigned char sta,
+      unsigned char StatusByte,
       unsigned char* pData,
       unsigned short Length)
-      : JZEvent(Clock, sta),
+      : JZEvent(Clock, StatusByte),
         mpData(0),
         mLength(Length)
     {
@@ -941,7 +941,7 @@ class JZMetaEvent : public JZEvent
 
     virtual JZEvent* Copy() const
     {
-      return new JZMetaEvent(mClock, mStat, mpData, mLength);
+      return new JZMetaEvent(mClock, mStatusByte, mpData, mLength);
     }
 
     const unsigned char* GetData() const

@@ -1,7 +1,7 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// Copyright (C) 2009 Peter J. Stieber, all rights reserved.
+// Copyright (C) 2010 Peter J. Stieber, all rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,42 +18,39 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_SYSEXDIALOG_H
-#define JZ_SYSEXDIALOG_H
+#ifndef JZ_TEXTDIALOG_H
+#define JZ_TEXTDIALOG_H
 
 #include <wx/dialog.h>
 
-class JZKnob;
-class JZKnobEvent;
-class tSysEx;
 class JZTrack;
-class wxStaticText;
+class tText;
 class wxTextCtrl;
 
 //*****************************************************************************
 //*****************************************************************************
-class JZSysexDialog : public wxDialog
+class JZTextDialog : public wxDialog
 {
   public:
 
-    JZSysexDialog(tSysEx* pEvent, JZTrack* pTrack, wxWindow* pParent);
+    JZTextDialog(tText* pTextEvent, JZTrack* pTrack, wxWindow* pParent);
 
   private:
 
-    virtual bool TransferDataToWindow();
+    bool TransferDataToWindow();
 
-    virtual bool TransferDataFromWindow();
+    bool TransferDataFromWindow();
 
     void OnHelp(wxCommandEvent& Event);
 
   private:
 
-    tSysEx* mpSysExEvent;
+    tText* mpTextEvent;
 
-    wxTextCtrl* mpSysExEdit;
+    wxTextCtrl* mpTextEdit;
     wxTextCtrl* mpClockEdit;
 
   DECLARE_EVENT_TABLE();
 };
 
-#endif // !defined(JZ_SYSEXDIALOG_H)
+#endif // !defined(JZ_TEXTDIALOG_H)

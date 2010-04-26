@@ -1,7 +1,7 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// Copyright (C) 2009 Peter J. Stieber, all rights reserved.
+// Copyright (C) 2010 Peter J. Stieber, all rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,25 +18,25 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_SYSEXDIALOG_H
-#define JZ_SYSEXDIALOG_H
+#ifndef JZ_ENDOFTRACKDIALOG_H
+#define JZ_ENDOFTRACKDIALOG_H
 
 #include <wx/dialog.h>
 
-class JZKnob;
-class JZKnobEvent;
-class tSysEx;
+class tEndOfTrack;
 class JZTrack;
-class wxStaticText;
 class wxTextCtrl;
 
 //*****************************************************************************
 //*****************************************************************************
-class JZSysexDialog : public wxDialog
+class JZEndOfTrackDialog : public wxDialog
 {
   public:
 
-    JZSysexDialog(tSysEx* pEvent, JZTrack* pTrack, wxWindow* pParent);
+    JZEndOfTrackDialog(
+      tEndOfTrack* pEndOfTrackEvent,
+      JZTrack* pTrack,
+      wxWindow* pParent);
 
   private:
 
@@ -48,12 +48,11 @@ class JZSysexDialog : public wxDialog
 
   private:
 
-    tSysEx* mpSysExEvent;
+    tEndOfTrack* mpEndOfTrackEvent;
 
-    wxTextCtrl* mpSysExEdit;
     wxTextCtrl* mpClockEdit;
 
   DECLARE_EVENT_TABLE();
 };
 
-#endif // !defined(JZ_SYSEXDIALOG_H)
+#endif // !defined(JZ_ENDOFTRACKDIALOG_H)

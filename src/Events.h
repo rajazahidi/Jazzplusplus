@@ -1317,6 +1317,16 @@ class tText : public tMetaEvent
     {
       return mpData;
     }
+
+    void SetText(const char* pText)
+    {
+      if (pText && strlen(pText) > 0)
+      {
+        delete [] mpData;
+        mpData = new unsigned char[strlen(pText)];
+        memcpy(mpData, pText, strlen(pText));
+      }
+    }
 };
 
 //*****************************************************************************

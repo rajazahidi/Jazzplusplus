@@ -23,6 +23,8 @@
 
 #include <wx/dialog.h>
 
+class tProgram;
+class JZTrack;
 class wxListBox;
 
 //*****************************************************************************
@@ -31,9 +33,14 @@ class JZProgramChangeDialog : public wxDialog
 {
   public:
 
-    JZProgramChangeDialog(wxWindow* pParent);
+    JZProgramChangeDialog(
+      tProgram* pProgram,
+      JZTrack* pTrack,
+      wxWindow* pParent);
 
   private:
+
+    tProgram* mpProgram;
 
     wxListBox* mpProgramListBox;
 

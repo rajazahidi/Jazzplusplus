@@ -871,6 +871,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Dialogs\EndOfTrackDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\EndOfTrackDialog.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Dialogs\FilterDialog.cpp"
 				>
 			</File>
@@ -988,6 +996,14 @@
 			</File>
 			<File
 				RelativePath="..\src\Dialogs\SysexDialog.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\TextDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\TextDialog.h"
 				>
 			</File>
 			<File

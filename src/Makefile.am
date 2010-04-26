@@ -25,6 +25,7 @@ DeprecatedWx/proplist.cpp \
 Dialogs/CleanupDialog.cpp \
 Dialogs/ControllerDialog.cpp \
 Dialogs/DeleteDialog.cpp \
+Dialogs/EndOfTrackDialog.cpp \
 Dialogs/FilterDialog.cpp \
 Dialogs/IntegerEdit.cpp \
 Dialogs/LengthDialog.cpp \
@@ -40,6 +41,7 @@ Dialogs/ShiftDialog.cpp \
 Dialogs/SnapDialog.cpp \
 Dialogs/SynthesizerSettingsDialog.cpp \
 Dialogs/SysexDialog.cpp \
+Dialogs/TextDialog.cpp \
 Dialogs/TrackDialog.cpp \
 Dialogs/TransposeDialog.cpp \
 Dialogs/VelocityDialog.cpp \
@@ -118,6 +120,7 @@ DeprecatedWx/proplist.cpp \
 Dialogs/CleanupDialog.cpp \
 Dialogs/ControllerDialog.cpp \
 Dialogs/DeleteDialog.cpp \
+Dialogs/EndOfTrackDialog.cpp \
 Dialogs/FilterDialog.cpp \
 Dialogs/IntegerEdit.cpp \
 Dialogs/LengthDialog.cpp \
@@ -133,6 +136,7 @@ Dialogs/ShiftDialog.cpp \
 Dialogs/SnapDialog.cpp \
 Dialogs/SynthesizerSettingsDialog.cpp \
 Dialogs/SysexDialog.cpp \
+Dialogs/TextDialog.cpp \
 Dialogs/TrackDialog.cpp \
 Dialogs/TransposeDialog.cpp \
 Dialogs/VelocityDialog.cpp \
@@ -216,6 +220,7 @@ DeprecatedStringUtils.h \
 Dialogs/CleanupDialog.h \
 Dialogs/ControllerDialog.h \
 Dialogs/DeleteDialog.h \
+Dialogs/EndOfTrackDialog.h \
 Dialogs/FilterDialog.h \
 Dialogs/IntegerEdit.h \
 Dialogs/LengthDialog.h \
@@ -231,6 +236,7 @@ Dialogs/ShiftDialog.h \
 Dialogs/SnapDialog.h \
 Dialogs/SynthesizerSettingsDialog.h \
 Dialogs/SysexDialog.h \
+Dialogs/TextDialog.h \
 Dialogs/TrackDialog.h \
 Dialogs/TransposeDialog.h \
 Dialogs/VelocityDialog.h \

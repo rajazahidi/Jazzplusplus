@@ -26,11 +26,12 @@
 #include "Command.h"
 #include "DeprecatedWx/proplist.h"
 #include "Dialogs/ControllerDialog.h"
+#include "Dialogs/EndOfTrackDialog.h"
 #include "Dialogs/KeyOnDialog.h"
 #include "Dialogs/ProgramChangeDialog.h"
 #include "Dialogs/SetTempoDialog.h"
 #include "Dialogs/SysexDialog.h"
-//#include "EventFrame.h"
+#include "Dialogs/TextDialog.h"
 #include "Events.h"
 #include "EventWindow.h"
 #include "Filter.h"
@@ -425,7 +426,7 @@ bool tPlayTrackDlg::OnClose()
   Choice.GetValue();
   p->track = track;
   p->transpose = transpose;
-  p->eventlength=eventlength;
+  p->eventlength = eventlength;
   return tEventDlg::OnClose();
 }
 
@@ -446,90 +447,6 @@ void tPlayTrackDlg::AddProperties()
     wxPropertyValue(&eventlength),
     "integer",
     new wxIntegerListValidator(0, 127)));
-  tEventDlg::AddProperties();
-}
-
-// -------------------------------- text event ---------------------------
-
-class tTextDlg : public tEventDlg
-{
- public:
-
-  char* text;
-  int track;
-  tNamedChoice Choice;
-
-  tTextDlg(tText *e, JZPianoWindow* w, JZTrack *pTrack);
-
-  void AddProperties();
-  bool OnClose();
-};
-
-
-tTextDlg::tTextDlg(tText *e, JZPianoWindow* w, JZTrack *pTrack)
-  : tEventDlg(e, w, pTrack),
-    Choice("text", gpConfig->GetControlNames(), &track)
-{
-  Event = e;
-  text=new char[2048];
-  strcpy(text, (const char*)(e->GetText()));
-}
-
-
-bool tTextDlg::OnClose()
-{
-  tText* p;
-  p=new tText( ((tText*)Copy)->GetClock(), (unsigned char*)text, strlen(text));
-  delete Copy;
-  Copy=p;
-  fprintf(stderr,"text:%s",text);
-  Choice.GetValue();
-  delete text;
-  return tEventDlg::OnClose();
-}
-
-void tTextDlg::AddProperties()
-{
-  sheet->AddProperty(new wxProperty("Text", wxPropertyValue((char**)&text), "string"));
-  //  Add(wxMakeFormString("Text:", (char**)&text));
-  tEventDlg::AddProperties();
-}
-
-
-
-// -------------------------------- EOT ---------------------------
-
-class tEndOfTrackDlg : public tEventDlg
-{
- public:
-  int track;
-
-  tNamedChoice Choice;
-
-  tEndOfTrackDlg(tEndOfTrack *e, JZPianoWindow* w, JZTrack *pTrack);
-
-  void AddProperties();
-  bool OnClose();
-};
-
-
-tEndOfTrackDlg::tEndOfTrackDlg(tEndOfTrack *e, JZPianoWindow* w, JZTrack *pTrack)
-  : tEventDlg(e, w, pTrack),
-    Choice("End Of Track", gpConfig->GetControlNames(), &track)
-{
-
-}
-
-
-bool tEndOfTrackDlg::OnClose()
-{
-//  tEndOfTrack* p=(tEndOfTrack*)Copy;
-  Choice.GetValue();
-  return tEventDlg::OnClose();
-}
-
-void tEndOfTrackDlg::AddProperties()
-{
   tEventDlg::AddProperties();
 }
 
@@ -657,17 +574,21 @@ void EventDialog(
       break;
 
     case StatControl:
-//      pDialog = new tControlDlg(pEvent->IsControl(), pPianoWindow, pTrack);
       {
-        JZControllerDialog ControllerDialog(pPianoWindow);
+        JZControllerDialog ControllerDialog(
+          pEvent->IsControl(),
+          pTrack,
+          pPianoWindow);
         ControllerDialog.ShowModal();
       }
       break;
 
     case StatProgram:
-//      pDialog = new tProgramDlg(pEvent->IsProgram(), pPianoWindow, pTrack);
       {
-        JZProgramChangeDialog ProgramChangeDialog(pPianoWindow);
+        JZProgramChangeDialog ProgramChangeDialog(
+          pEvent->IsProgram(),
+          pTrack,
+          pPianoWindow);
         ProgramChangeDialog.ShowModal();
       }
       break;
@@ -683,9 +604,8 @@ void EventDialog(
       break;
 
     case StatSysEx:
-//      pDialog = new tSysexDlg(pEvent->IsSysEx(), pPianoWindow, pTrack);
       {
-        JZSysexDialog SysexDialog(pEvent->IsSysEx(), pPianoWindow);
+        JZSysexDialog SysexDialog(pEvent->IsSysEx(), pTrack, pPianoWindow);
         SysexDialog.ShowModal();
       }
       break;
@@ -696,15 +616,21 @@ void EventDialog(
       break;
 
     case StatEndOfTrack:
-      str = "End Of Track";
-      pDialog = new tEndOfTrackDlg(pEvent->IsEndOfTrack(), pPianoWindow, pTrack);
+      {
+        JZEndOfTrackDialog EndOfTrackDialog(
+          pEvent->IsEndOfTrack(),
+          pTrack,
+          pPianoWindow);
+        EndOfTrackDialog.ShowModal();
+      }
       break;
 
     case StatText:
-      str = "Text";
-      pDialog = new tTextDlg(pEvent->IsText(), pPianoWindow, pTrack);
+      {
+        JZTextDialog SysexDialog(pEvent->IsText(), pTrack, pPianoWindow);
+        SysexDialog.ShowModal();
+      }
       break;
-
 
     default:
       break;

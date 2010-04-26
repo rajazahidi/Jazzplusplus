@@ -18,14 +18,18 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include "ProgramChangeDialog.h"
+#include "EndOfTrackDialog.h"
 
-#include "../Configuration.h"
 #include "../Globals.h"
+#include "../Help.h"
+#include "../Project.h"
 
 #include <wx/button.h>
-#include <wx/listbox.h>
 #include <wx/sizer.h>
+#include <wx/stattext.h>
+#include <wx/textctrl.h>
+
+#include <string>
 
 using namespace std;
 
@@ -33,29 +37,23 @@ using namespace std;
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-BEGIN_EVENT_TABLE(JZProgramChangeDialog, wxDialog)
+BEGIN_EVENT_TABLE(JZEndOfTrackDialog, wxDialog)
+
+  EVT_BUTTON(wxID_HELP, JZEndOfTrackDialog::OnHelp)
+
 END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZProgramChangeDialog::JZProgramChangeDialog(
-  tProgram* pProgram,
+JZEndOfTrackDialog::JZEndOfTrackDialog(
+  tEndOfTrack* pEndOfTrackEvent,
   JZTrack* pTrack,
-  wxWindow* pParent)
-  : wxDialog(pParent, wxID_ANY, wxString("Program Change")),
-    mpProgram(pProgram),
-    mpProgramListBox(0)
+  wxWindow * pParent)
+  : wxDialog(pParent, wxID_ANY, wxString("End of Track")),
+    mpEndOfTrackEvent(pEndOfTrackEvent),
+    mpClockEdit(0)
 {
-  mpProgramListBox = new wxListBox(this, wxID_ANY);
-
-  const vector<pair<string, int> >& VoiceNames = gpConfig->GetVoiceNames();
-  for (
-    vector<pair<string, int> >::const_iterator iName = VoiceNames.begin();
-    iName != VoiceNames.end();
-    ++iName)
-  {
-    mpProgramListBox->Append(iName->first.c_str());
-  }
+  mpClockEdit = new wxTextCtrl(this, wxID_ANY);
 
   wxButton* pOkButton = new wxButton(this, wxID_OK, "&OK");
   wxButton* pCancelButton = new wxButton(this, wxID_CANCEL, "Cancel");
@@ -64,10 +62,19 @@ JZProgramChangeDialog::JZProgramChangeDialog(
 
   wxBoxSizer* pTopSizer = new wxBoxSizer(wxVERTICAL);
 
-  pTopSizer->Add(mpProgramListBox, 0, wxGROW | wxALL, 2);
+  wxFlexGridSizer* pFlexGridSizer;
+
+  pFlexGridSizer = new wxFlexGridSizer(1, 2, 4, 2);
+
+  pFlexGridSizer->Add(
+    new wxStaticText(this, wxID_ANY, "Time:"),
+    0,
+    wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
+  pFlexGridSizer->Add(mpClockEdit, 0, wxALIGN_CENTER_VERTICAL);
+
+  pTopSizer->Add(pFlexGridSizer, 0, wxCENTER | wxALL, 2);
 
   wxBoxSizer* pButtonSizer = new wxBoxSizer(wxHORIZONTAL);
-
   pButtonSizer->Add(pOkButton, 0, wxALL, 5);
   pButtonSizer->Add(pCancelButton, 0, wxALL, 5);
   pButtonSizer->Add(pHelpButton, 0, wxALL, 5);
@@ -81,3 +88,31 @@ JZProgramChangeDialog::JZProgramChangeDialog(
   pTopSizer->Fit(this);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZEndOfTrackDialog::TransferDataToWindow()
+{
+  string ClockString;
+  gpProject->ClockToString(mpEndOfTrackEvent->GetClock(), ClockString);
+  mpClockEdit->ChangeValue(ClockString.c_str());
+
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZEndOfTrackDialog::TransferDataFromWindow()
+{
+  wxString ClockString = mpClockEdit->GetValue();
+  int Clock = gpProject->StringToClock(ClockString.c_str());
+  mpEndOfTrackEvent->SetClock(Clock);
+
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZEndOfTrackDialog::OnHelp(wxCommandEvent& Event)
+{
+  gpHelpInstance->ShowTopic("Template");
+}

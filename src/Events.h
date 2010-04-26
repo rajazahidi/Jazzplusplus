@@ -229,8 +229,8 @@ class JZGetMidiBytes : public JZWriteBase
     // Get JZEvent's bytes.
     int Write(JZEvent* pEvent, unsigned char* pString, int Length);
 
-    unsigned char Buffer[10];
-    int nBytes;
+    unsigned char mBuffer[10];
+    int mByteCount;
 };
 
 // ********************************************************************

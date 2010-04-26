@@ -167,12 +167,12 @@ int JZGetMidiBytes::Write(JZEvent* pEvent, unsigned char* pData, int Length)
     case StatProgram:
     case StatChnPressure:
     case StatPitch:
-      nBytes = 0;
+      mByteCount = 0;
 
-      Buffer[nBytes++] = Stat | ((JZChannelEvent *)pEvent)->GetChannel();
+      mBuffer[mByteCount++] = Stat | ((JZChannelEvent *)pEvent)->GetChannel();
       while (Length--)
       {
-        Buffer[nBytes++] = *pData++;
+        mBuffer[mByteCount++] = *pData++;
       }
       return 0;
 

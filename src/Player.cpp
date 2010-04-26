@@ -941,7 +941,7 @@ int tMpuPlayer::OutEvent(JZEvent* pEvent)
       JZChannelEvent *c;
 
       pEvent->Write(midi);
-      Stat = midi.Buffer[0]; // Status + Channel
+      Stat = midi.mBuffer[0]; // Status + Channel
 
       OutBreak(pEvent->GetClock());
 
@@ -995,7 +995,7 @@ int tMpuPlayer::OutEvent(JZEvent* pEvent)
 
       if (Stat != TrackRunningStatus[ActiveTrack])
       {
-        PlyBytes.Put(TRK + midi.nBytes + 1 + 1);
+        PlyBytes.Put(TRK + midi.mByteCount + 1 + 1);
         PlyBytes.Put(ActiveTrack);
         PlyBytes.Put(Time);
         PlyBytes.Put(Stat);
@@ -1003,12 +1003,12 @@ int tMpuPlayer::OutEvent(JZEvent* pEvent)
       }
       else
       {
-        PlyBytes.Put(TRK + midi.nBytes + 1);
+        PlyBytes.Put(TRK + midi.mByteCount + 1);
         PlyBytes.Put(ActiveTrack);
         PlyBytes.Put(Time);
       }
-      for (i = 1; i < midi.nBytes; i++)
-        PlyBytes.Put(midi.Buffer[i]);
+      for (i = 1; i < midi.mByteCount; i++)
+        PlyBytes.Put(midi.mBuffer[i]);
 
       TrackClock[ActiveTrack] = pEvent->GetClock();
       return 0;
@@ -1078,13 +1078,13 @@ void tMpuPlayer::OutNow(JZEvent* pEvent)
   JZGetMidiBytes midi;
   if (pEvent->Write(midi) == 0)
   {
-    char* buf = new char[midi.nBytes + 3];
+    char* buf = new char[midi.mByteCount + 3];
     buf[n++] = CMD+1;
     buf[n++] = 0xd7;
-    buf[n++] = DAT+midi.nBytes;
-    for (i = 0; i < midi.nBytes; i++)
+    buf[n++] = DAT + midi.mByteCount;
+    for (i = 0; i < midi.mByteCount; i++)
     {
-      buf[n++] = midi.Buffer[i];
+      buf[n++] = midi.mBuffer[i];
     }
     write_noack_mpu(buf, n);
     delete[] buf;

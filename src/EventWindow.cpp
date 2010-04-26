@@ -26,6 +26,7 @@
 #include "Dialogs/CleanupDialog.h"
 #include "Dialogs/DeleteDialog.h"
 #include "Dialogs/LengthDialog.h"
+#include "Dialogs/MeterChangeDialog.h"
 #include "Dialogs/MidiChannelDialog.h"
 #include "Dialogs/QuantizeDialog.h"
 #include "Dialogs/SearchAndReplaceDialog.h"
@@ -90,8 +91,7 @@ JZEventWindow::JZEventWindow(
     mFromLine(0),
     mToLine(0),
     mScrolledX(0),
-    mScrolledY(0),
-    mpSettingsDialog(0)
+    mScrolledY(0)
 {
   mpSnapSel = new JZSnapSelection(this);
 
@@ -114,7 +114,6 @@ JZEventWindow::~JZEventWindow()
   delete mpFilter;
   delete mpGreyColor;
   delete mpGreyBrush;
-  FinishMeterEdit();
 }
 
 //-----------------------------------------------------------------------------
@@ -346,44 +345,8 @@ void JZEventWindow::SearchReplace()
 //-----------------------------------------------------------------------------
 void JZEventWindow::EditMeter()
 {
-  if (!IsEditingMeter())
-  {
-    if (!mpSettingsDialog)
-    {
-      mpSettingsDialog = new wxDialog(this, wxID_ANY, "Meter Change");
-    }
-    mpSettingsDialog->Show(true);
-  }
-  else
-  {
-    mpSettingsDialog->SetFocus();
-  }
-//  tMeterChangeDlg *dlg;
-//  dlg = new tMeterChangeDlg(this);
-//  dlg->Create();
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-bool JZEventWindow::IsEditingMeter() const
-{
-  if (mpSettingsDialog)
-  {
-    return (mpSettingsDialog->GetHandle() != 0);
-  }
-  return false;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZEventWindow::FinishMeterEdit()
-{
-  if (mpSettingsDialog)
-  {
-    // Mark the dialog for destruction during idle time processing.
-    mpSettingsDialog->Destroy();
-    mpSettingsDialog = 0;
-  }
+  JZMeterChangeDialog MeterChangeDialog(this);
+  MeterChangeDialog.ShowModal();
 }
 
 //-----------------------------------------------------------------------------

@@ -76,8 +76,6 @@ class JZEventWindow : public wxWindow
     void SearchReplace();
 
     void EditMeter();
-    bool IsEditingMeter() const;
-    void FinishMeterEdit();
 
     void LineText(
       wxDC& Dc,
@@ -147,9 +145,6 @@ class JZEventWindow : public wxWindow
     int mFromLine, mToLine;
 
     int mScrolledX, mScrolledY;
-
-    // Settings-Dialog
-    wxDialog* mpSettingsDialog;
 
   DECLARE_EVENT_TABLE()
 };

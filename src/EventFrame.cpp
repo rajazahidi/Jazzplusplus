@@ -63,7 +63,8 @@ BEGIN_EVENT_TABLE(JZEventFrame, wxFrame)
   EVT_UPDATE_UI(ID_LENGTH, JZEventFrame::OnUpdateEventsSelected)
   EVT_MENU(ID_LENGTH, JZEventFrame::OnLength)
 
-  EVT_MENU(ID_METER_CHANGE, JZEventFrame::OnMeterChange)
+  EVT_MENU(ID_MISC_METER_CHANGE, JZEventFrame::OnMeterChange)
+
 END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------

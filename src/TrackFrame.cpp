@@ -267,24 +267,22 @@ void JZTrackFrame::CreateMenu()
   mpEditMenu->Append(MEN_SELECTIONSUB, "Select (needs submenu)");
 
   mpEditMenu->AppendSeparator();
-
-
-  // Miscellaneous Menu is Stupid.
-  // Now it's a View Menu
-  misc_menu = new wxMenu;
-  misc_menu->Append(MEN_TMERGE,      "Mer&ge Tracks...");
-  misc_menu->Append(MEN_TSPLIT,      "&Split Tracks...");
-  misc_menu->Append(ID_METER_CHANGE, "&Meter Change...");
-  misc_menu->Append(MEN_RESET,       "&Reset Midi");
-  misc_menu->Append(MEN_HARMONY,     "&Harmony Browser...");
-  misc_menu->Append(MEN_RHYTHM,      "Random R&hythm...");
-  misc_menu->Append(MEN_SHUFFLE,     "Random Sh&uffle...");
-  misc_menu->Append(MEN_GENMELDY,    "Random Melod&y...");
-  misc_menu->Append(MEN_ARPEGGIO,    "Random Arpeggio...");
-  misc_menu->Append(MEN_MAPPER,      "Ma&pper...");
-  misc_menu->Append(MEN_EVENTLIST,   "Event &List...");
-  misc_menu->Append(MEN_COPYRIGHT,   "&Set Music Copyright...");
 #endif
+
+  wxMenu* pMiscMenu = new wxMenu;
+  pMiscMenu->Append(ID_MISC_TRACK_MERGE, "Mer&ge Tracks...");
+  pMiscMenu->Append(ID_MISC_SPLIT_TRACKS, "&Split Tracks...");
+  pMiscMenu->Append(ID_MISC_METER_CHANGE, "&Meter Change...");
+  pMiscMenu->Append(ID_MISC_RESET_MIDI, "&Reset Midi");
+#if 0
+  pMiscMenu->Append(MEN_RHYTHM,      "Random R&hythm...");
+  pMiscMenu->Append(MEN_SHUFFLE,     "Random Sh&uffle...");
+  pMiscMenu->Append(MEN_GENMELDY,    "Random Melod&y...");
+  pMiscMenu->Append(MEN_ARPEGGIO,    "Random Arpeggio...");
+  pMiscMenu->Append(MEN_MAPPER,      "Ma&pper...");
+  pMiscMenu->Append(MEN_EVENTLIST,   "Event &List...");
+#endif
+  pMiscMenu->Append(ID_MISC_SET_COPYRIGHT, "&Set Music Copyright...");
 
   mpToolsMenu = new wxMenu;
   mpToolsMenu->Append(ID_TOOLS_HARMONY_BROWSER,  "&Harmony Browser...");
@@ -393,14 +391,12 @@ void JZTrackFrame::CreateMenu()
   wxMenuBar* pMenuBar = new wxMenuBar();
   pMenuBar->Append(mpFileMenu, "&File");
   pMenuBar->Append(mpEditMenu, "&Edit");
-  pMenuBar->Append(mpToolsMenu, "&Tools");
-
 #if 0
-  pMenuBar->Append(misc_menu, "&View");
   pMenuBar->Append(parts_menu, "&Parts");
 #endif
-
+  pMenuBar->Append(mpToolsMenu, "&Tools");
   pMenuBar->Append(pSettingMenu, "&Settings");
+  pMenuBar->Append(pMiscMenu, "&Misc");
 
   wxMenu* pAudioMenu = new wxMenu;
   pAudioMenu->Append(ID_AUDIO_GLOBAL_SETTINGS, "&Global Settings...");

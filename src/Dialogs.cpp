@@ -28,6 +28,8 @@
 #include "Dialogs/ControllerDialog.h"
 #include "Dialogs/KeyOnDialog.h"
 #include "Dialogs/ProgramChangeDialog.h"
+#include "Dialogs/SetTempoDialog.h"
+#include "Dialogs/SysexDialog.h"
 //#include "EventFrame.h"
 #include "Events.h"
 #include "EventWindow.h"
@@ -112,7 +114,7 @@ using namespace std;
 //int tSearchReplaceDlg::toCtrl = 1;
 //
 //tSearchReplaceDlg::tSearchReplaceDlg(JZEventWindow* w, JZFilter *f)
-//   : tPropertyListDlg("Search and replace controller types" )
+//   : tPropertyListDlg("Search and replace controller types")
 //{
 //  Filter = f;
 //  Song = f->GetSong();
@@ -265,7 +267,7 @@ class tEventDlg : public tPropertyListDlg
     JZEvent    *Event;
     JZEvent    *Copy;
 
-    tEventDlg(JZEvent *e, JZPianoWindow* w, JZTrack *t);
+    tEventDlg(JZEvent *e, JZPianoWindow* w, JZTrack *pTrack);
     virtual void AddProperties();
     virtual bool OnClose();
     virtual void OnHelp();
@@ -273,12 +275,12 @@ class tEventDlg : public tPropertyListDlg
 };
 
 
-tEventDlg::tEventDlg(JZEvent *e, JZPianoWindow* w, JZTrack *t)
+tEventDlg::tEventDlg(JZEvent *e, JZPianoWindow* w, JZTrack *pTrack)
   : tPropertyListDlg( "Event" ),
     ClockDlg(w->GetProject(), "Time ", e->GetClock())
 {
   Win   = w;
-  Track = t;
+  Track = pTrack;
   Event = e;
   Copy  = e->Copy();
 }
@@ -318,8 +320,8 @@ class tChEventDlg : public tEventDlg
 
     int Channel;
 
-    tChEventDlg(tChannelEvent* pChannelEvent, JZPianoWindow* w, JZTrack *t)
-      : tEventDlg(pChannelEvent, w, t)
+    tChEventDlg(tChannelEvent* pChannelEvent, JZPianoWindow* w, JZTrack *pTrack)
+      : tEventDlg(pChannelEvent, w, pTrack)
     {
       Channel = pChannelEvent->GetChannel() + 1;                // 1..16
     }
@@ -353,15 +355,15 @@ class tPitchDlg : public tChEventDlg
 
   int Value;
 
-  tPitchDlg(tPitch* e, JZPianoWindow* w, JZTrack *t);
+  tPitchDlg(tPitch* e, JZPianoWindow* w, JZTrack *pTrack);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tPitchDlg::tPitchDlg(tPitch *e, JZPianoWindow* w, JZTrack *t)
-  : tChEventDlg(e, w, t)
+tPitchDlg::tPitchDlg(tPitch *e, JZPianoWindow* w, JZTrack *pTrack)
+  : tChEventDlg(e, w, pTrack)
 {
   Event = e;
   Value = e->Value;
@@ -398,15 +400,15 @@ class tPlayTrackDlg : public tEventDlg
 
   tNamedChoice Choice;
 
-  tPlayTrackDlg(tPlayTrack *e, JZPianoWindow* w, JZTrack *t);
+  tPlayTrackDlg(tPlayTrack *e, JZPianoWindow* w, JZTrack *pTrack);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tPlayTrackDlg::tPlayTrackDlg(tPlayTrack *e, JZPianoWindow* w, JZTrack *t)
-  : tEventDlg(e, w, t),
+tPlayTrackDlg::tPlayTrackDlg(tPlayTrack *e, JZPianoWindow* w, JZTrack *pTrack)
+  : tEventDlg(e, w, pTrack),
     Choice("playtrack", gpConfig->GetControlNames(), &track)
 {
   Event = e;
@@ -457,15 +459,15 @@ class tTextDlg : public tEventDlg
   int track;
   tNamedChoice Choice;
 
-  tTextDlg(tText *e, JZPianoWindow* w, JZTrack *t);
+  tTextDlg(tText *e, JZPianoWindow* w, JZTrack *pTrack);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tTextDlg::tTextDlg(tText *e, JZPianoWindow* w, JZTrack *t)
-  : tEventDlg(e, w, t),
+tTextDlg::tTextDlg(tText *e, JZPianoWindow* w, JZTrack *pTrack)
+  : tEventDlg(e, w, pTrack),
     Choice("text", gpConfig->GetControlNames(), &track)
 {
   Event = e;
@@ -504,15 +506,15 @@ class tEndOfTrackDlg : public tEventDlg
 
   tNamedChoice Choice;
 
-  tEndOfTrackDlg(tEndOfTrack *e, JZPianoWindow* w, JZTrack *t);
+  tEndOfTrackDlg(tEndOfTrack *e, JZPianoWindow* w, JZTrack *pTrack);
 
   void AddProperties();
   bool OnClose();
 };
 
 
-tEndOfTrackDlg::tEndOfTrackDlg(tEndOfTrack *e, JZPianoWindow* w, JZTrack *t)
-  : tEventDlg(e, w, t),
+tEndOfTrackDlg::tEndOfTrackDlg(tEndOfTrack *e, JZPianoWindow* w, JZTrack *pTrack)
+  : tEventDlg(e, w, pTrack),
     Choice("End Of Track", gpConfig->GetControlNames(), &track)
 {
 
@@ -532,211 +534,22 @@ void tEndOfTrackDlg::AddProperties()
 }
 
 
-
-// -------------------------------- Set Tempo -------------------------------
-
-class tSetTempoDlg : public tEventDlg
-{
- public:
-
-  int Value;
-
-  tSetTempoDlg(tSetTempo *e, JZPianoWindow* w, JZTrack *t);
-
-  void AddProperties();
-  bool OnClose();
-};
-
-
-tSetTempoDlg::tSetTempoDlg(tSetTempo *e, JZPianoWindow* w, JZTrack *t)
-  : tEventDlg(e, w, t)
-{
-  Event = e;
-  Value = e->GetBPM();
-}
-
-
-bool tSetTempoDlg::OnClose()
-{
-  ((tSetTempo *)Copy)->SetBPM( Value );
-  return tEventDlg::OnClose();
-}
-
-void tSetTempoDlg::AddProperties()
-{
-  //  Add(wxMakeFormShort("Tempo:", &Value, wxFORM_DEFAULT, new wxList(wxMakeConstraintRange(20.0, 240.0), 0)));
-  sheet->AddProperty(new wxProperty(
-    "Tempo",
-    wxPropertyValue(&Value),
-    "integer",
-    new wxIntegerListValidator(20, 240)));
-  tEventDlg::AddProperties();
-}
-
-// -------------------------------- Sysex Edit-------------------------------
-
-class tSysexDlg : public tEventDlg
-{
-  public:
-
-  char *str;
-
-  tSysexDlg(tSysEx *s, JZPianoWindow* w, JZTrack *t);
-
-  void AddProperties();
-  bool OnClose();
-};
-
-
-tSysexDlg::tSysexDlg(tSysEx* pSysEx, JZPianoWindow* w, JZTrack *t)
-  : tEventDlg(pSysEx, w, t)
-{
-  Event = pSysEx;
-  char hexbyte[10];
-
-  str = new char[256];
-  str[0] = 0;
-
-  if (pSysEx->GetDataLength())
-  {
-    strcat(str, "f0 ");
-  }
-
-  const unsigned char* pData = pSysEx->GetData();
-  for (int i = 0; i < pSysEx->GetDataLength(); i++)
-  {
-    sprintf(hexbyte, "%02x ", pData[i]);
-    strcat(str, hexbyte);
-  }
-}
-
-
-bool tSysexDlg::OnClose()
-{
-  int i;
-  int j;
-  int k;
-  int len;
-
-  unsigned char d[256];
-  memset( d, 0, 256 );
-
-  int jstop = strlen(str);
-
-  unsigned int TempInteger;
-  for (i = 0, j = 0; j <= jstop; j += k, ++i)
-  {
-    sscanf(str + j, "%02x %n", &TempInteger, &k);
-
-    d[i] = static_cast<unsigned char>(TempInteger);
-    if (d[i] == 0xf7)
-      break;
-  }
-
-  int found = 0;
-  for (i = 0; i < 256; i++)
-  {
-    if (d[i] == 0xf7)
-    {
-      found = 1;
-      break;
-    }
-  }
-
-  if (found)
-    len = i + 1;
-  else
-    len = 0;
-
-  long clk = ((tSysEx *)Copy)->GetClock();
-  delete Copy;
-  Copy = new tSysEx( clk, d + 1, len - 1 );
-
-  gpSynth->FixSysexCheckSum( Copy->IsSysEx() );
-
-#if 0
-  printf("Sysex:");
-  for (i = 0; i < ((tSysEx *)Copy)->Length; i++)
-  {
-    printf( "%02x ", ((tSysEx *)Copy)->Data[i] );
-  }
-  printf("\n");
-
-  gpMidiPlayer->OutNow( (tSysEx *)Copy );
-#endif
-
-  delete str;
-
-  tEventDlg::OnClose();
-  return false;
-}
-
-void tSysexDlg::AddProperties()
-{
-//  char label1[100];
-
-  if (Event->IsSysEx()->GetDataLength())
-  {
-//    sprintf(
-//      label1,
-//      "Loaded sysex: %s",
-//      tSynthSysex::GetSysexName(gpSynth->GetSysexId(Event->IsSysEx())));
-
-//    Add(wxMakeFormMessage(label1));
-
-    sheet->AddProperty(new wxProperty(
-      "Loaded sysex",
-      wxPropertyValue(tSynthSysex::GetSysexName(gpSynth->GetSysexId(
-        Event->IsSysEx()))),
-      "string"));//r/o
-
-    const unsigned char* pData = gpSynth->GetSysexValPtr(Event->IsSysEx());
-
-    if (pData)
-    {
-      ostringstream Oss;
-      Oss
-        << "First data byte is at offset "
-        << pData - Event->IsSysEx()->GetData() + 1 << ", value "
-        << setw(2) << hex << static_cast<int>(*pData)
-        << dec << " (" << static_cast<int>(*pData) << " decimal)";
-      sheet->AddProperty(new wxProperty(
-        Oss.str().c_str(),
-        wxPropertyValue((char*)""),
-        "string"));//r/o
-//      Add(wxMakeFormMessage(Oss.str().c_str()));
-    }
-  }
-  else
-  {
-//    Add(wxMakeFormMessage("Example input: f0 7f 7f 04 01 00 7f f7"));
-  }
-
-//  Add(wxMakeFormMessage("(any DT1/RQ1 checksums will be corrected)"));
-
-//  Add(wxMakeFormString("SysEx (hex):", &str, wxFORM_DEFAULT, NULL, NULL, wxVERTICAL, 300 ));
-  sheet->AddProperty(new wxProperty("SysEx (hex)", wxPropertyValue((char**)&str), "string"));//r/o
-
-  tEventDlg::AddProperties();
-}
-
-
-// --------------------------------------------------------------------------
-// create new event
-// --------------------------------------------------------------------------
-
-static JZEvent *CreateEventDialog(long Clock, int Channel, int Pitch)
+//*****************************************************************************
+// Description:
+//   Display a dialog box to select an event to be created.
+//*****************************************************************************
+static JZEvent* CreateEventDialog(long Clock, int Channel, int Pitch)
 {
   wxArrayString Names;
 
    Names.Add("Note On");
-   Names.Add( "Controller");
-   Names.Add( "Program Change");
-   Names.Add( "Set Tempo");
-   Names.Add( "SysEx");
-   Names.Add( "Play Track(experimental)");
+   Names.Add("Controller");
+   Names.Add("Program Change");
+   Names.Add("Set Tempo");
+   Names.Add("SysEx");
+   Names.Add("Play Track(experimental)");
    Names.Add("End Of Track");
-   Names.Add( "Text" );
+   Names.Add("Text");
 
   static long Values[] =
   {
@@ -795,51 +608,56 @@ static JZEvent *CreateEventDialog(long Clock, int Channel, int Pitch)
   return e;
 }
 
-
-
-
+//*****************************************************************************
+// Description:
+//   Display a dialog box to select an event to be created.
+//*****************************************************************************
 void EventDialog(
-  JZEvent* e,
+  JZEvent* pEvent,
   JZPianoWindow* pPianoWindow,
-  JZTrack* t,
+  JZTrack* pTrack,
   long Clock,
   int Channel,
   int Pitch)
 {
-  if (!e)
-    e = CreateEventDialog(Clock, Channel, Pitch);
-  if (!e)
-    return;
+  if (!pEvent)
+  {
+    pEvent = CreateEventDialog(Clock, Channel, Pitch);
+  }
 
-  tEventDlg *dlg = 0;
+  if (!pEvent)
+  {
+    return;
+  }
+
+  tEventDlg* pDialog = 0;
   const char* str = 0;
-  switch (e->GetStat())
+  switch (pEvent->GetStat())
   {
     case StatKeyOn:
-      if (t->GetAudioMode())
+      if (pTrack->GetAudioMode())
       {
         if (!gpMidiPlayer->IsPlaying())
         {
-          gpMidiPlayer->EditSample(e->IsKeyOn()->GetKey());
+          gpMidiPlayer->EditSample(pEvent->IsKeyOn()->GetKey());
         }
         break;
       }
-      str = "Key On";
-//      dlg = new tKeyOnDlg(e->IsKeyOn(), pPianoWindow, t);
+
+//      pDialog = new tKeyOnDlg(pEvent->IsKeyOn(), pPianoWindow, pTrack);
       {
-        JZKeyOnDialog KeyOnDialog(e->IsKeyOn(), pPianoWindow);
+        JZKeyOnDialog KeyOnDialog(pEvent->IsKeyOn(), pPianoWindow);
         KeyOnDialog.ShowModal();
       }
       break;
 
     case StatPitch:
       str = "Pitch Wheel";
-      dlg = new tPitchDlg(e->IsPitch(), pPianoWindow, t);
+      pDialog = new tPitchDlg(pEvent->IsPitch(), pPianoWindow, pTrack);
       break;
 
     case StatControl:
-//      str = "Controller";
-//      dlg = new tControlDlg(e->IsControl(), pPianoWindow, t);
+//      pDialog = new tControlDlg(pEvent->IsControl(), pPianoWindow, pTrack);
       {
         JZControllerDialog ControllerDialog(pPianoWindow);
         ControllerDialog.ShowModal();
@@ -847,8 +665,7 @@ void EventDialog(
       break;
 
     case StatProgram:
-//      str = "Program Change";
-//      dlg = new tProgramDlg(e->IsProgram(), pPianoWindow, t);
+//      pDialog = new tProgramDlg(pEvent->IsProgram(), pPianoWindow, pTrack);
       {
         JZProgramChangeDialog ProgramChangeDialog(pPianoWindow);
         ProgramChangeDialog.ShowModal();
@@ -856,88 +673,45 @@ void EventDialog(
       break;
 
     case StatSetTempo:
-      str = "Set Tempo (for track 0)";
-      dlg = new tSetTempoDlg(
-        e->IsSetTempo(),
-        pPianoWindow,
-        pPianoWindow->GetProject()->GetTrack(0));
+      {
+        JZSetTempoDialog SetTempoDialog(
+          pEvent->IsSetTempo(),
+          pPianoWindow->GetProject()->GetTrack(0),
+          pPianoWindow);
+        SetTempoDialog.ShowModal();
+      }
       break;
 
     case StatSysEx:
-      str = "System Exclusive";
-      dlg = new tSysexDlg(e->IsSysEx(), pPianoWindow, t );
+//      pDialog = new tSysexDlg(pEvent->IsSysEx(), pPianoWindow, pTrack);
+      {
+        JZSysexDialog SysexDialog(pEvent->IsSysEx(), pPianoWindow);
+        SysexDialog.ShowModal();
+      }
       break;
 
     case StatPlayTrack:
       str = "Play Track";
-      //dlg = new tPlayTrackDlg(e->IsPlayTrack(), pPianoWindow, t );
-      dlg = new tPlayTrackDlg(e->IsPlayTrack(), pPianoWindow, t );
+      pDialog = new tPlayTrackDlg(pEvent->IsPlayTrack(), pPianoWindow, pTrack);
       break;
+
     case StatEndOfTrack:
       str = "End Of Track";
-      dlg = new tEndOfTrackDlg(e->IsEndOfTrack(), pPianoWindow, t );
+      pDialog = new tEndOfTrackDlg(pEvent->IsEndOfTrack(), pPianoWindow, pTrack);
       break;
 
     case StatText:
       str = "Text";
-      dlg = new tTextDlg(e->IsText(), pPianoWindow, t );
+      pDialog = new tTextDlg(pEvent->IsText(), pPianoWindow, pTrack);
       break;
 
 
     default:
       break;
   }
-  if (dlg)
+
+  if (pDialog)
   {
-    dlg->Create();
+    pDialog->Create();
   }
-}
-
-//*****************************************************************************
-// MeterChange Dialog
-//*****************************************************************************
-
-int tMeterChangeDlg::Numerator = 4;
-int tMeterChangeDlg::Denomiator = 4;
-int tMeterChangeDlg::BarNr = 1;
-
-tMeterChangeDlg::tMeterChangeDlg(JZEventWindow* pEventWindow)
-  : tPropertyListDlg("Meter Change"),
-    mpEventWindow(pEventWindow)
-{
-}
-
-void tMeterChangeDlg::AddProperties()
-{
-  sheet->AddProperty(new wxProperty(
-    "BarNr",
-    wxPropertyValue(&BarNr),
-    "integer"));//JAVE validators here? problem is i dont know which ranges are valid FIXME
-  sheet->AddProperty(new wxProperty(
-    "Numerator",
-    wxPropertyValue(&Numerator),
-    "integer"));
-  sheet->AddProperty(new wxProperty(
-    "Denomiator(2,4,8,16,32)",
-    wxPropertyValue(&Denomiator),
-     "integer"));//JAVE should be a integer list instead FIXME
-}
-
-void tMeterChangeDlg::OnCancel()
-{
-  mpEventWindow->FinishMeterEdit();
-}
-
-bool tMeterChangeDlg::OnClose()
-{
-  BarNr += mpEventWindow->GetProject()->GetIntroLength();
-  mpEventWindow->GetProject()->SetMeterChange(BarNr, Numerator, Denomiator);
-  mpEventWindow->Refresh();
-  mpEventWindow->FinishMeterEdit();
-  return false;
-}
-
-void tMeterChangeDlg::OnHelp()
-{
-  gpHelpInstance->ShowTopic("Meterchange");
 }

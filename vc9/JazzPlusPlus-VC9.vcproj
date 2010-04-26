@@ -903,6 +903,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Dialogs\MeterChangeDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\MeterChangeDialog.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Dialogs\MetronomeSettingsDialog.cpp"
 				>
 			</File>
@@ -940,6 +948,14 @@
 			</File>
 			<File
 				RelativePath="..\src\Dialogs\SearchAndReplaceDialog.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\SetTempoDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\SetTempoDialog.h"
 				>
 			</File>
 			<File

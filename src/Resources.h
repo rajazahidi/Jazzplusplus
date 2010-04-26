@@ -60,16 +60,20 @@
 #define ID_METRONOME_TOGGLE                  wxID_HIGHEST + 43
 #define ID_VELOCITY                          wxID_HIGHEST + 44
 #define ID_LENGTH                            wxID_HIGHEST + 45
-#define ID_METER_CHANGE                      wxID_HIGHEST + 46
-#define ID_TRANSPOSE                         wxID_HIGHEST + 47
-#define ID_CLEANUP                           wxID_HIGHEST + 48
-#define ID_SEARCH_AND_REPLACE                wxID_HIGHEST + 49
+#define ID_MISC_TRACK_MERGE                  wxID_HIGHEST + 46
+#define ID_MISC_SPLIT_TRACKS                 wxID_HIGHEST + 47
+#define ID_MISC_METER_CHANGE                 wxID_HIGHEST + 48
+#define ID_MISC_RESET_MIDI                   wxID_HIGHEST + 49
+#define ID_MISC_SET_COPYRIGHT                wxID_HIGHEST + 50
+#define ID_TRANSPOSE                         wxID_HIGHEST + 51
+#define ID_CLEANUP                           wxID_HIGHEST + 52
+#define ID_SEARCH_AND_REPLACE                wxID_HIGHEST + 53
 
-#define ID_PLAY                              wxID_HIGHEST + 50
-#define ID_PLAY_LOOP                         wxID_HIGHEST + 51
-#define ID_RECORD                            wxID_HIGHEST + 52
+#define ID_PLAY                              wxID_HIGHEST + 60
+#define ID_PLAY_LOOP                         wxID_HIGHEST + 61
+#define ID_RECORD                            wxID_HIGHEST + 62
 
-#define ID_SELECT                            wxID_HIGHEST + 60
+#define ID_SELECT                            wxID_HIGHEST + 65
 
 #define ID_CHANGE_LENGTH                     wxID_HIGHEST + 70
 

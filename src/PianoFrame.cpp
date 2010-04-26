@@ -69,7 +69,6 @@ using namespace std;
 
 #define MEN_GUITAR                 29
 
-#define MEN_RESET                  36
 #define MEN_VIS_ALL_TRK            37
 
 #define ACT_CLOSE                  41
@@ -108,8 +107,8 @@ static JZToolDef tdefs[] =
   { wxID_ZOOM_OUT,   FALSE, zoomout_xpm,  "zoom out"},
   { wxID_UNDO,       FALSE, undo_xpm,     "undo"},
   { MEN_REDO,        FALSE, redo_xpm,     "redo"},
-  { MEN_RESET,       FALSE, panic_xpm,    "all notes off"},
-  { ID_HELP_PIANO_WINDOW,   FALSE, help_xpm,     "help"},
+  { ID_MISC_RESET_MIDI,   FALSE, panic_xpm,    "all notes off"},
+  { ID_HELP_PIANO_WINDOW, FALSE, help_xpm,     "help"},
   { JZToolBar::eToolBarEnd }
 };
 */
@@ -156,7 +155,7 @@ BEGIN_EVENT_TABLE(JZPianoFrame, wxFrame)
   EVT_MENU(ID_CUT_PASTE_EVENTS, JZPianoFrame::OnMCutPaste)
   EVT_MENU(MEN_GUITAR, JZPianoFrame::OnGuitar)
 
-  EVT_MENU(MEN_RESET, JZPianoFrame::OnReset)
+  EVT_MENU(ID_MISC_RESET_MIDI, JZPianoFrame::OnReset)
   EVT_MENU(MEN_VIS_ALL_TRK, JZPianoFrame::OnVisibleAllTracks)
   EVT_MENU(wxID_DELETE, JZPianoFrame::OnErase)
   EVT_MENU(wxID_CUT, JZPianoFrame::OnCut)
@@ -339,11 +338,11 @@ void JZPianoFrame::CreateMenu()
   edit_menu->Append(ID_SEARCH_AND_REPLACE, "&Search Replace...");
 
   wxMenu *setting_menu = new wxMenu("", wxMENU_TEAROFF);
-  setting_menu->Append(MEN_FILTER,      "&Filter...");
-  setting_menu->Append(ACT_SETTINGS,    "&Window...");
-  setting_menu->Append(MEN_VISIBLE,     "&Events...");
-  setting_menu->Append(ID_SNAP,         "&Snap...");
-  setting_menu->Append(ID_METER_CHANGE, "&Meter Change...");
+  setting_menu->Append(MEN_FILTER, "&Filter...");
+  setting_menu->Append(ACT_SETTINGS, "&Window...");
+  setting_menu->Append(MEN_VISIBLE, "&Events...");
+  setting_menu->Append(ID_SNAP, "&Snap...");
+  setting_menu->Append(ID_MISC_METER_CHANGE, "&Meter Change...");
 
   wxMenu *misc_menu = new wxMenu("",wxMENU_TEAROFF);
   misc_menu->Append(wxID_UNDO, "&Undo");
@@ -497,18 +496,6 @@ void JZPianoFrame::OnReset(wxCommandEvent& Event)
 {
   gpMidiPlayer->AllNotesOff(1);
 }
-
-//INSER_EVENT_HANDLER_HERE
-
-/*
-
-//these wont compile nicely
-
-case MEN_VISIBLE:   VisibleDialog(); break;
-
-case ID_METER_CHANGE:        OnMeterChange(); break;
-
-*/
 
 void JZPianoFrame::OnMSelect(wxCommandEvent& Event)
 {

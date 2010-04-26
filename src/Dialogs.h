@@ -111,25 +111,4 @@ void EventDialog(
   int Channel,
   int Pitch);
 
-//*****************************************************************************
-// MeterChange Dialog
-//*****************************************************************************
-class tMeterChangeDlg : public tPropertyListDlg
-{
-  public:
-
-    tMeterChangeDlg(JZEventWindow* pEventWindow);
-
-    void AddProperties();
-
-    virtual bool OnClose();
-    virtual void OnCancel();
-    virtual void OnHelp();
-
-    JZEventWindow* mpEventWindow;
-    static int Numerator;
-    static int Denomiator;
-    static int BarNr;
-};
-
 #endif // !defined(JZ_DIALOGS_H)

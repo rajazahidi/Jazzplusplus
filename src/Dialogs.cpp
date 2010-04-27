@@ -24,7 +24,9 @@
 
 #include "ClockDialog.h"
 #include "Command.h"
+#if 0
 #include "DeprecatedWx/proplist.h"
+#endif
 #include "Dialogs/ControllerDialog.h"
 #include "Dialogs/EndOfTrackDialog.h"
 #include "Dialogs/KeyOnDialog.h"
@@ -149,6 +151,7 @@ using namespace std;
 
 
 
+#if 0
 //*****************************************************************************
 // seqLength
 //*****************************************************************************
@@ -251,7 +254,7 @@ void tMidiDelayDlg::AddProperties()
 
   //System 3:
 }
-
+#endif
 
 
 //*****************************************************************************

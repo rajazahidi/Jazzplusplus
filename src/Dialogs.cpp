@@ -255,124 +255,120 @@ void tMidiDelayDlg::AddProperties()
 
 
 //*****************************************************************************
-// Event-Dialogue
+// Event-Dialog
 //*****************************************************************************
+//class tEventDlg : public tPropertyListDlg
+//{
+//  public:
+//
+//    JZTrack    *Track;
+//    JZClockDialog ClockDlg;
+//    JZPianoWindow* Win;
+//
+//    JZEvent    *Event;
+//    JZEvent    *Copy;
+//
+//    tEventDlg(JZEvent *e, JZPianoWindow* w, JZTrack *pTrack);
+//    virtual void AddProperties();
+//    virtual bool OnClose();
+//    virtual void OnHelp();
+//    virtual void OnCancel();
+//};
 
-class tEventDlg : public tPropertyListDlg
-{
-  public:
+//tEventDlg::tEventDlg(JZEvent *e, JZPianoWindow* w, JZTrack *pTrack)
+//  : tPropertyListDlg( "Event" ),
+//    ClockDlg(w->GetProject(), "Time ", e->GetClock())
+//{
+//  Win   = w;
+//  Track = pTrack;
+//  Event = e;
+//  Copy  = e->Copy();
+//}
 
-    JZTrack    *Track;
-    JZClockDialog ClockDlg;
-    JZPianoWindow* Win;
+//void tEventDlg::AddProperties()
+//{
+//  sheet->AddProperty(ClockDlg.mkProperty());
+//}
 
-    JZEvent    *Event;
-    JZEvent    *Copy;
+//void tEventDlg::OnCancel()
+//{
+//  delete Copy;
+//  //tPropertyListDlg::OnCancel();
+//}
 
-    tEventDlg(JZEvent *e, JZPianoWindow* w, JZTrack *pTrack);
-    virtual void AddProperties();
-    virtual bool OnClose();
-    virtual void OnHelp();
-    virtual void OnCancel();
-};
+//bool tEventDlg::OnClose()
+//{
+//  Copy->SetClock(ClockDlg.GetClock());
+//  Track->Kill(Event);
+//  Track->Put(Copy);
+//  Track->Cleanup();
+//  Win->Refresh();
+//  return tPropertyListDlg::OnClose();
+//}
 
-
-tEventDlg::tEventDlg(JZEvent *e, JZPianoWindow* w, JZTrack *pTrack)
-  : tPropertyListDlg( "Event" ),
-    ClockDlg(w->GetProject(), "Time ", e->GetClock())
-{
-  Win   = w;
-  Track = pTrack;
-  Event = e;
-  Copy  = e->Copy();
-}
-
-void tEventDlg::AddProperties()
-{
-  sheet->AddProperty(ClockDlg.mkProperty());
-}
-
-void tEventDlg::OnCancel()
-{
-  delete Copy;
-  //tPropertyListDlg::OnCancel();
-}
-
-bool tEventDlg::OnClose()
-{
-  Copy->SetClock(ClockDlg.GetClock());
-  Track->Kill(Event);
-  Track->Put(Copy);
-  Track->Cleanup();
-  Win->Refresh();
-  return tPropertyListDlg::OnClose();
-}
-
-void tEventDlg::OnHelp()
-{
-  gpHelpInstance->ShowTopic("Piano Window");
-}
+//void tEventDlg::OnHelp()
+//{
+//  gpHelpInstance->ShowTopic("Piano Window");
+//}
 
 // -------------------------------- Play track ---------------------------
 
-class tPlayTrackDlg : public tEventDlg
-{
- public:
+//class tPlayTrackDlg : public tEventDlg
+//{
+// public:
+//
+//  int transpose;
+//  int track;
+//  int eventlength;
+//
+//  tNamedChoice Choice;
+//
+//  tPlayTrackDlg(JZPlayTrackEvent *e, JZPianoWindow* w, JZTrack *pTrack);
+//
+//  void AddProperties();
+//  bool OnClose();
+//};
 
-  int transpose;
-  int track;
-  int eventlength;
+//tPlayTrackDlg::tPlayTrackDlg(JZPlayTrackEvent *e, JZPianoWindow* w, JZTrack *pTrack)
+//  : tEventDlg(e, w, pTrack),
+//    Choice("playtrack", gpConfig->GetControlNames(), &track)
+//{
+//  Event = e;
+//  track = e->track;
+//  transpose=e->transpose;
+//  eventlength=e->eventlength;
+//}
 
-  tNamedChoice Choice;
+//bool tPlayTrackDlg::OnClose()
+//{
+//  JZPlayTrackEvent* p=(JZPlayTrackEvent*)Copy;
+//
+//  Choice.GetValue();
+//  p->track = track;
+//  p->transpose = transpose;
+//  p->eventlength = eventlength;
+//  return tEventDlg::OnClose();
+//}
 
-  tPlayTrackDlg(JZPlayTrackEvent *e, JZPianoWindow* w, JZTrack *pTrack);
-
-  void AddProperties();
-  bool OnClose();
-};
-
-
-tPlayTrackDlg::tPlayTrackDlg(JZPlayTrackEvent *e, JZPianoWindow* w, JZTrack *pTrack)
-  : tEventDlg(e, w, pTrack),
-    Choice("playtrack", gpConfig->GetControlNames(), &track)
-{
-  Event = e;
-  track = e->track;
-  transpose=e->transpose;
-  eventlength=e->eventlength;
-}
-
-
-bool tPlayTrackDlg::OnClose()
-{
-  JZPlayTrackEvent* p=(JZPlayTrackEvent*)Copy;
-
-  Choice.GetValue();
-  p->track = track;
-  p->transpose = transpose;
-  p->eventlength = eventlength;
-  return tEventDlg::OnClose();
-}
-
-void tPlayTrackDlg::AddProperties()
-{
-  sheet->AddProperty(new wxProperty(
-    "Track",
-    wxPropertyValue(&track),
-    "integer",
-    new wxIntegerListValidator(0, 127)));
-  sheet->AddProperty(new wxProperty(
-    "Transpose",
-    wxPropertyValue(&transpose),
-    "integer",
-    new wxIntegerListValidator(-127, 127)));
-  sheet->AddProperty(new wxProperty(
-    "Length",
-    wxPropertyValue(&eventlength),
-    "integer",
-    new wxIntegerListValidator(0, 127)));
-  tEventDlg::AddProperties();
-}
+//void tPlayTrackDlg::AddProperties()
+//{
+//  sheet->AddProperty(new wxProperty(
+//    "Track",
+//    wxPropertyValue(&track),
+//    "integer",
+//    new wxIntegerListValidator(0, 127)));
+//  sheet->AddProperty(new wxProperty(
+//    "Transpose",
+//    wxPropertyValue(&transpose),
+//    "integer",
+//    new wxIntegerListValidator(-127, 127)));
+//  sheet->AddProperty(new wxProperty(
+//    "Length",
+//    wxPropertyValue(&eventlength),
+//    "integer",
+//    new wxIntegerListValidator(0, 127)));
+//  tEventDlg::AddProperties();
+//}
 
 
 //*****************************************************************************
@@ -471,8 +467,8 @@ void EventDialog(
     return;
   }
 
-  tEventDlg* pDialog = 0;
-  const char* str = 0;
+//  tEventDlg* pDialog = 0;
+//  const char* str = 0;
   switch (pEvent->GetStat())
   {
     case StatKeyOn:
@@ -539,8 +535,8 @@ void EventDialog(
       break;
 
     case StatPlayTrack:
-      str = "Play Track";
-      pDialog = new tPlayTrackDlg(pEvent->IsPlayTrack(), pPianoWindow, pTrack);
+//      str = "Play Track";
+//      pDialog = new tPlayTrackDlg(pEvent->IsPlayTrack(), pPianoWindow, pTrack);
       break;
 
     case StatEndOfTrack:
@@ -564,8 +560,8 @@ void EventDialog(
       break;
   }
 
-  if (pDialog)
-  {
-    pDialog->Create();
-  }
+//  if (pDialog)
+//  {
+//    pDialog->Create();
+//  }
 }

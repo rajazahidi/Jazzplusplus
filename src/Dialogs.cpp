@@ -313,42 +313,6 @@ void tEventDlg::OnHelp()
   gpHelpInstance->ShowTopic("Piano Window");
 }
 
-// --------------------------- ChannelEvent ----------------------------
-
-
-class tChEventDlg : public tEventDlg
-{
-  public:
-
-    int Channel;
-
-    tChEventDlg(JZChannelEvent* pChannelEvent, JZPianoWindow* w, JZTrack *pTrack)
-      : tEventDlg(pChannelEvent, w, pTrack)
-    {
-      Channel = pChannelEvent->GetChannel() + 1;                // 1..16
-    }
-    void AddProperties();
-    bool OnClose();
-};
-
-void tChEventDlg::AddProperties()
-{
-  sheet->AddProperty(new wxProperty(
-    "Channel",
-    wxPropertyValue(&Channel),
-    "integer",
-    new wxIntegerListValidator(1, 16)));
-  tEventDlg::AddProperties();
-}
-
-
-bool tChEventDlg::OnClose()
-{
-  ((JZChannelEvent *)Copy)->SetChannel(Channel - 1);
-  tEventDlg::OnClose();
-  return false;
-}
-
 // -------------------------------- Play track ---------------------------
 
 class tPlayTrackDlg : public tEventDlg

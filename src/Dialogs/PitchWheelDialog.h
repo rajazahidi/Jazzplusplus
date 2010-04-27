@@ -1,7 +1,7 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// Copyright (C) 2008 Peter J. Stieber, all rights reserved.
+// Copyright (C) 2010 Peter J. Stieber, all rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,25 +18,24 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_KEYONDIALOG_H
-#define JZ_KEYONDIALOG_H
+#ifndef JZ_PITCHWHEELDIALOG_H
+#define JZ_PITCHWHEELDIALOG_H
+
+class JZPitchEvent;
+class JZTrack;
 
 #include <wx/dialog.h>
 
-class JZKnob;
-class JZKnobEvent;
-class JZKeyOnEvent;
-class JZTrack;
-class wxStaticText;
-class wxTextCtrl;
-
 //*****************************************************************************
 //*****************************************************************************
-class JZKeyOnDialog : public wxDialog
+class JZPitchWheelDialog : public wxDialog
 {
   public:
 
-    JZKeyOnDialog(JZKeyOnEvent* pEvent, JZTrack* pTrack, wxWindow* pParent);
+    JZPitchWheelDialog(
+      JZPitchEvent* pPitchEvent,
+      JZTrack* pTrack,
+      wxWindow* pParent);
 
   private:
 
@@ -44,29 +43,11 @@ class JZKeyOnDialog : public wxDialog
 
     virtual bool TransferDataFromWindow();
 
-    void OnVelocityChange(JZKnobEvent& Event);
-
-    void OnOffVelocityChange(JZKnobEvent& Event);
-
-    void OnChannelChange(JZKnobEvent& Event);
-
     void OnHelp(wxCommandEvent& Event);
 
   private:
 
-    JZKeyOnEvent* mpEvent;
-
-    wxTextCtrl* mpPitchEdit;
-    wxStaticText* mpVelocityValue;
-    JZKnob* mpVelocityKnob;
-    wxStaticText* mpOffVelocityValue;
-    JZKnob* mpOffVelocityKnob;
-    wxTextCtrl* mpLengthEdit;
-    wxStaticText* mpChannelValue;
-    JZKnob* mpChannelKnob;
-    wxTextCtrl* mpClockEdit;
-
   DECLARE_EVENT_TABLE();
 };
 
-#endif // !defined(JZ_KEYONDIALOG_H)
+#endif // !defined(JZ_PITCHWHEELDIALOG_H)

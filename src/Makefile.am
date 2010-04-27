@@ -33,6 +33,7 @@ Dialogs/KeyOnDialog.cpp \
 Dialogs/MeterChangeDialog.cpp \
 Dialogs/MetronomeSettingsDialog.cpp \
 Dialogs/MidiChannelDialog.cpp \
+Dialogs/PitchWheelDialog.cpp \
 Dialogs/ProgramChangeDialog.cpp \
 Dialogs/QuantizeDialog.cpp \
 Dialogs/SearchAndReplaceDialog.cpp \
@@ -128,6 +129,7 @@ Dialogs/KeyOnDialog.cpp \
 Dialogs/MeterChangeDialog.cpp \
 Dialogs/MetronomeSettingsDialog.cpp \
 Dialogs/MidiChannelDialog.cpp \
+Dialogs/PitchWheelDialog.cpp \
 Dialogs/ProgramChangeDialog.cpp \
 Dialogs/QuantizeDialog.cpp \
 Dialogs/SearchAndReplaceDialog.cpp \
@@ -228,6 +230,7 @@ Dialogs/KeyOnDialog.h \
 Dialogs/MeterChangeDialog.h \
 Dialogs/MetronomeSettingsDialog.h \
 Dialogs/MidiChannelDialog.h \
+Dialogs/PitchWheelDialog.h \
 Dialogs/ProgramChangeDialog.h \
 Dialogs/QuantizeDialog.h \
 Dialogs/SearchAndReplaceDialog.h \

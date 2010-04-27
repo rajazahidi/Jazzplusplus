@@ -28,6 +28,7 @@
 #include "Dialogs/ControllerDialog.h"
 #include "Dialogs/EndOfTrackDialog.h"
 #include "Dialogs/KeyOnDialog.h"
+#include "Dialogs/PitchWheelDialog.h"
 #include "Dialogs/ProgramChangeDialog.h"
 #include "Dialogs/SetTempoDialog.h"
 #include "Dialogs/SysexDialog.h"
@@ -348,46 +349,6 @@ bool tChEventDlg::OnClose()
   return false;
 }
 
-// -------------------------------- Pitch -------------------------------
-
-class tPitchDlg : public tChEventDlg
-{
- public:
-
-  int Value;
-
-  tPitchDlg(JZPitchEvent* e, JZPianoWindow* w, JZTrack *pTrack);
-
-  void AddProperties();
-  bool OnClose();
-};
-
-
-tPitchDlg::tPitchDlg(JZPitchEvent *e, JZPianoWindow* w, JZTrack *pTrack)
-  : tChEventDlg(e, w, pTrack)
-{
-  Event = e;
-  Value = e->Value;
-}
-
-
-bool tPitchDlg::OnClose()
-{
-  ((JZPitchEvent *)Copy)->Value = Value;
-  return tChEventDlg::OnClose();
-}
-
-void tPitchDlg::AddProperties()
-{
-  sheet->AddProperty(new wxProperty(
-    "Pitch:",
-    wxPropertyValue(&Value),
-    "integer",
-    new wxIntegerListValidator(-8191, 8191)));
-
-  tChEventDlg::AddProperties();
-}
-
 // -------------------------------- Play track ---------------------------
 
 class tPlayTrackDlg : public tEventDlg
@@ -560,16 +521,20 @@ void EventDialog(
         break;
       }
 
-//      pDialog = new tKeyOnDlg(pEvent->IsKeyOn(), pPianoWindow, pTrack);
       {
-        JZKeyOnDialog KeyOnDialog(pEvent->IsKeyOn(), pPianoWindow);
+        JZKeyOnDialog KeyOnDialog(pEvent->IsKeyOn(), pTrack, pPianoWindow);
         KeyOnDialog.ShowModal();
       }
       break;
 
     case StatPitch:
-      str = "Pitch Wheel";
-      pDialog = new tPitchDlg(pEvent->IsPitch(), pPianoWindow, pTrack);
+      {
+        JZPitchWheelDialog PitchWheelDialog(
+          pEvent->IsPitch(),
+          pTrack,
+          pPianoWindow);
+        PitchWheelDialog.ShowModal();
+      }
       break;
 
     case StatControl:

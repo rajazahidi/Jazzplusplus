@@ -935,6 +935,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Dialogs\PitchWheelDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\PitchWheelDialog.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Dialogs\ProgramChangeDialog.cpp"
 				>
 			</File>

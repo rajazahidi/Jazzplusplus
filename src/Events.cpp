@@ -222,8 +222,5 @@ int JZSysExEvent::GetPitch() const
   {
     return SX_GROUP_XG;
   }
-  else
-  {
-    return SX_GROUP_UNKNOWN;
-  }
+  return SX_GROUP_UNKNOWN;
 }

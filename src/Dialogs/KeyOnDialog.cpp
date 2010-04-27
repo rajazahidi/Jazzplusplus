@@ -54,7 +54,10 @@ END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZKeyOnDialog::JZKeyOnDialog(JZKeyOnEvent* pEvent, wxWindow* pParent)
+JZKeyOnDialog::JZKeyOnDialog(
+  JZKeyOnEvent* pEvent,
+  JZTrack* pTrack,
+  wxWindow* pParent)
   : wxDialog(pParent, wxID_ANY, wxString("Key On")),
     mpEvent(pEvent),
     mpPitchEdit(0),

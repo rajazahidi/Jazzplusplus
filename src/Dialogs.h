@@ -23,16 +23,18 @@
 #ifndef JZ_DIALOGS_H
 #define JZ_DIALOGS_H
 
+#if 0
 #include "CommandUtilities.h"
 #include "PropertyListDialog.h"
+#endif
 
-class JZPianoWindow;
-class JZFilter;
-class JZSong;
-class JZEventFrame;
-class JZEventWindow;
-class JZTrack;
+//class JZFilter;
 class JZEvent;
+//class JZEventFrame;
+//class JZEventWindow;
+class JZPianoWindow;
+//class JZSong;
+class JZTrack;
 
 //class tShiftDlg : public tPropertyListDlg
 //{
@@ -68,6 +70,7 @@ class JZEvent;
 //    void OnHelp();
 //};
 
+#if 0
 // seqLength
 class tSeqLengthDlg : public tPropertyListDlg
 {
@@ -102,6 +105,7 @@ class tMidiDelayDlg : public tPropertyListDlg
     bool OnClose();
     void OnHelp();
 };
+#endif
 
 void EventDialog(
   JZEvent*,

@@ -160,7 +160,7 @@ void FAR PASCAL midiIntInputHandler(
 
     now = (long)timeGetTime();
 
-    switch(wMsg)
+    switch (wMsg)
     {
         case MIM_DATA:
           // ignore active sensing and real time messages except midi stop
@@ -271,7 +271,7 @@ void FAR PASCAL midiMidiInputHandler(
 
     now = (long)timeGetTime();
 
-    switch(wMsg)
+    switch (wMsg)
     {
         case MIM_DATA:
           if ( dwParam1 == 0xf8 )
@@ -399,7 +399,7 @@ void FAR PASCAL midiMtcInputHandler(
 
     now = (long)timeGetTime();
 
-    switch(wMsg)
+    switch (wMsg)
     {
         case MIM_DATA:
 

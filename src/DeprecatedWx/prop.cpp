@@ -896,13 +896,15 @@ bool *wxPropertyValue::BoolValuePtr(void) const
   return m_value.boolPtr;
 }
 
-wxChar *wxPropertyValue::StringValue(void) const {
-    if (m_type == wxPropertyValueString)
-      return m_value.string;
-    else if (m_type == wxPropertyValueStringPtr)
-      return *(m_value.stringPtr);
-    else return NULL;
-  }
+wxChar *wxPropertyValue::StringValue(void) const
+{
+  if (m_type == wxPropertyValueString)
+    return m_value.string;
+  else if (m_type == wxPropertyValueStringPtr)
+    return *(m_value.stringPtr);
+  else
+    return NULL;
+}
 
 wxChar **wxPropertyValue::StringValuePtr(void) const
 {
@@ -1107,10 +1109,13 @@ wxProperty *wxPropertySheet::GetProperty(const wxString& Name) const
 bool wxPropertySheet::SetProperty(const wxString& Name, const wxPropertyValue& value)
 {
   wxProperty* prop = GetProperty(Name);
-  if(prop){
+  if (prop)
+  {
     prop->SetValue(value);
     return true;
-  }else{
+  }
+  else
+  {
     return false;
   }
 }

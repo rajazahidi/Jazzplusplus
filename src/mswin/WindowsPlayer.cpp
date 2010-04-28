@@ -214,7 +214,7 @@ JZEvent *JZWindowsPlayer::Dword2Event(DWORD dw)
 
   JZEvent* pEvent = 0;
 
-  switch(u.c[0] & 0xf0)
+  switch (u.c[0] & 0xf0)
   {
     case 0x80:
       pEvent = new JZKeyOffEvent(0, u.c[0] & 0x0f, u.c[1]);

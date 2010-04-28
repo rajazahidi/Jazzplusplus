@@ -109,6 +109,16 @@ BEGIN_EVENT_TABLE(JZTrackFrame, JZEventFrame)
 
   EVT_MENU(ID_AUDIO_GLOBAL_SETTINGS, JZTrackFrame::OnAudioGlobalSettings)
 
+  EVT_MENU(ID_AUDIO_SAMPLE_SETTINGS, JZTrackFrame::OnAudioSampleSettings)
+
+  EVT_MENU(ID_AUDIO_LOAD_SAMPLE_SET, JZTrackFrame::OnAudioLoadSampleSet)
+
+  EVT_MENU(ID_AUDIO_SAVE_SAMPLE_SET, OnAudioSaveSampleSet)
+
+  EVT_MENU(ID_AUDIO_SAVE_SAMPLE_SET_AS, OnAudioSaveSampleSetAs)
+
+  EVT_MENU(ID_AUDIO_NEW_SAMPLE_SET, OnAudioNewSampleSet)
+
   EVT_MENU(wxID_HELP_CONTENTS, JZTrackFrame::OnHelpContents)
 
   EVT_MENU(wxID_ABOUT, JZTrackFrame::OnHelpAbout)
@@ -380,6 +390,14 @@ void JZTrackFrame::CreateMenu()
   pSettingMenu->Append(MEN_SAVE_SET, "&Save settings", save_settings_menu );
 #endif
 
+  wxMenu* pAudioMenu = new wxMenu;
+  pAudioMenu->Append(ID_AUDIO_GLOBAL_SETTINGS, "&Global Audio Settings...");
+  pAudioMenu->Append(ID_AUDIO_SAMPLE_SETTINGS, "Sample Set Se&ttings... ");
+  pAudioMenu->Append(ID_AUDIO_LOAD_SAMPLE_SET, "&Load Sample Set...");
+  pAudioMenu->Append(ID_AUDIO_SAVE_SAMPLE_SET, "&Save Sample Set");
+  pAudioMenu->Append(ID_AUDIO_SAVE_SAMPLE_SET_AS, "Save Sample Set &As");
+  pAudioMenu->Append(ID_AUDIO_NEW_SAMPLE_SET, "&New Sample Set");
+
   wxMenu* mpHelpMenu = new wxMenu;
   mpHelpMenu->Append(wxID_HELP_CONTENTS, "&Contents");
 //  mpHelpMenu->Append(MEN_HELP_JAZZ, "&Jazz");
@@ -397,17 +415,7 @@ void JZTrackFrame::CreateMenu()
   pMenuBar->Append(mpToolsMenu, "&Tools");
   pMenuBar->Append(pSettingMenu, "&Settings");
   pMenuBar->Append(pMiscMenu, "&Misc");
-
-  wxMenu* pAudioMenu = new wxMenu;
-  pAudioMenu->Append(ID_AUDIO_GLOBAL_SETTINGS, "&Global Settings...");
-  pAudioMenu->Append(ID_AUDIO_SAMPLES, "Sample Se&ttings... ");
-  pAudioMenu->Append(ID_AUDIO_LOAD, "&Load Set...");
-  pAudioMenu->Append(ID_AUDIO_SAVE, "&Save Set");
-  pAudioMenu->Append(ID_AUDIO_SAVE_AS, "Save Set &As");
-  pAudioMenu->Append(ID_AUDIO_NEW, "&New Set");
-
   pMenuBar->Append(pAudioMenu, "&Audio");
-
   pMenuBar->Append(mpHelpMenu , "&Help");
 
   SetMenuBar(pMenuBar);
@@ -643,6 +651,38 @@ void JZTrackFrame::OnSettingsMidiDevice(wxCommandEvent& Event)
 void JZTrackFrame::OnAudioGlobalSettings(wxCommandEvent& Event)
 {
   mpProject->EditAudioGlobalSettings(this);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnAudioSampleSettings(wxCommandEvent& Event)
+{
+  mpProject->EditAudioSamples(this);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnAudioLoadSampleSet(wxCommandEvent& Event)
+{
+  mpProject->LoadSampleSet(this);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnAudioSaveSampleSet(wxCommandEvent& Event)
+{
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnAudioSaveSampleSetAs(wxCommandEvent& Event)
+{
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnAudioNewSampleSet(wxCommandEvent& Event)
+{
 }
 
 //-----------------------------------------------------------------------------

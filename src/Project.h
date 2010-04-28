@@ -158,6 +158,16 @@ class JZProject : public JZSong
 
     void EditAudioGlobalSettings(wxWindow* pParent);
 
+    void EditAudioSamples(wxWindow* pParent);
+
+    void LoadSampleSet(wxWindow* pParent);
+
+    void SaveSampleSetAs(wxWindow* pParent);
+
+    void SaveSampleSet(wxWindow* pParent);
+
+    void ClearSampleSet(wxWindow* pParent);
+
     JZPlayer* GetPlayer()
     {
       return mpMidiPlayer;

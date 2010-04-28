@@ -100,6 +100,16 @@ class JZTrackFrame : public JZEventFrame, public tButtonLabelInterface
 
     void OnAudioGlobalSettings(wxCommandEvent& Event);
 
+    void OnAudioSampleSettings(wxCommandEvent& Event);
+
+    void OnAudioLoadSampleSet(wxCommandEvent& Event);
+
+    void OnAudioSaveSampleSet(wxCommandEvent& Event);
+
+    void OnAudioSaveSampleSetAs(wxCommandEvent& Event);
+
+    void OnAudioNewSampleSet(wxCommandEvent& Event);
+
     void OnHelpContents(wxCommandEvent& Event);
 
     void OnHelpAbout(wxCommandEvent& Event);

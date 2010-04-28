@@ -628,6 +628,41 @@ void JZProject::EditAudioGlobalSettings(wxWindow* pParent)
 }
 
 //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZProject::EditAudioSamples(wxWindow* pParent)
+{
+  mpMidiPlayer->EditAudioSamples(pParent);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZProject::LoadSampleSet(wxWindow* pParent)
+{
+  mpMidiPlayer->LoadSampleSet(pParent);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZProject::SaveSampleSetAs(wxWindow* pParent)
+{
+  mpMidiPlayer->SaveSampleSetAs(pParent);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZProject::SaveSampleSet(wxWindow* pParent)
+{
+  mpMidiPlayer->SaveSampleSet(pParent);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZProject::ClearSampleSet(wxWindow* pParent)
+{
+  mpMidiPlayer->ClearSampleSet(pParent);
+}
+
+//-----------------------------------------------------------------------------
 // Description:
 //   Sets the internal mpRecInfo, used for recording apparently.
 // JZProject will take ownership of this pointer, so don't delete it after

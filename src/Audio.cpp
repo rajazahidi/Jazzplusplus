@@ -188,7 +188,13 @@ class tSampleVoice
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 tSampleSet::tSampleSet(long tpm)
-  : mDefaultFileName("noname.spl"),
+  : speed(22050),
+    channels(1),
+    bits(16),        // dont change!!
+    softsync(1),
+    mpGlobalSettingsDialog(0),
+    mpSampleDialog(0),
+    mDefaultFileName("noname.spl"),
     mRecordFileName("noname.wav")
 {
   int i;
@@ -202,20 +208,14 @@ tSampleSet::tSampleSet(long tpm)
 
   adjust_audio_length = 1;
   has_changed  = false;
-  spl_dialog   = 0;
-  mpGlobalSettingsDialog = 0;
   is_playing   = 0;
-  softsync     = 1;
   dirty        = 0;
 
   for (i = 0; i < MAXSMPL; i++)
   {
-    samples[i] = new tSample(*this);
-    samplewin[i] = 0;
+    mSamples[i] = new tSample(*this);
+    mSampleWindows[i] = 0;
   }
-  speed    = 22050;
-  channels = 1;
-  bits     = 16;        // dont change!!
 
   for (i = 0; i < MAXPOLY; i++)
   {
@@ -231,8 +231,8 @@ tSampleSet::~tSampleSet()
   int i;
   for (i = 0; i < MAXSMPL; i++)
   {
-    delete samples[i];
-    delete samplewin[i];
+    delete mSamples[i];
+    delete mSampleWindows[i];
   }
   for (i = 0; i < MAXPOLY; i++)
   {
@@ -248,14 +248,17 @@ tSampleSet::~tSampleSet()
 //-----------------------------------------------------------------------------
 void tSampleSet::Edit(int key)
 {
-  if (samplewin[key] == 0)
+  if (mSampleWindows[key] == 0)
   {
-    tSample* spl = samples[key];
+    tSample* spl = mSamples[key];
 
-    samplewin[key] = new tSampleWin(gpTrackWindow, &samplewin[key], *spl);
+    mSampleWindows[key] = new tSampleWin(
+      gpTrackWindow,
+      &mSampleWindows[key],
+      *spl);
   }
-  samplewin[key]->Show(true);
-  samplewin[key]->Redraw();
+  mSampleWindows[key]->Show(true);
+  mSampleWindows[key]->Redraw();
 }
 
 //-----------------------------------------------------------------------------
@@ -279,7 +282,7 @@ int tSampleSet::Load(const wxString& FileName)
   wxBeginBusyCursor();
   for (int i = 0; i < MAXSMPL; i++)
   {
-    samples[i]->Clear();
+    mSamples[i]->Clear();
   }
 
   // Get the path of the sample file.
@@ -317,23 +320,23 @@ int tSampleSet::Load(const wxString& FileName)
       continue;
     }
     assert(0 <= key && key < MAXSMPL);
-    samples[key]->SetFilename(SplFilePath.c_str());
-    samples[key]->SetLabel(Label.c_str());
-    samples[key]->SetVolume(vol);
-    samples[key]->SetPan(pan);
-    samples[key]->SetPitch(pitch);
-    if (samples[key]->Load())
+    mSamples[key]->SetFilename(SplFilePath.c_str());
+    mSamples[key]->SetLabel(Label.c_str());
+    mSamples[key]->SetVolume(vol);
+    mSamples[key]->SetPan(pan);
+    mSamples[key]->SetPitch(pitch);
+    if (mSamples[key]->Load())
     {
       wxString String;
       String
         << "Could not load: \""
-        << samples[key]->GetFilename()
+        << mSamples[key]->GetFilename()
         << '"';
       ::wxMessageBox(String, "Error", wxOK);
     }
-    if (samplewin[key])
+    if (mSampleWindows[key])
     {
-      samplewin[key]->Redraw();
+      mSampleWindows[key]->Redraw();
     }
   }
   wxEndBusyCursor();
@@ -346,7 +349,9 @@ int tSampleSet::Load(const wxString& FileName)
 void tSampleSet::ReloadSamples()
 {
   for (int i = 0; i < MAXSMPL; i++)
-    samples[i]->Load(dirty);
+  {
+    mSamples[i]->Load(dirty);
+  }
   dirty = 0;
 }
 
@@ -358,7 +363,7 @@ int tSampleSet::Save(const wxString& FileName)
   os << 1 << " " << speed << " " << channels << " " << softsync << endl;
   for (int i = 0; i < MAXSMPL; i++)
   {
-    tSample *spl = samples[i];
+    tSample *spl = mSamples[i];
     const char *fname = spl->GetFilename();
     const char* pLabel = spl->GetLabel();
     int vol = spl->GetVolume();
@@ -382,7 +387,7 @@ const char* tSampleSet::GetSampleName(int i)
 {
   if (0 <= i && i < MAXSMPL)
   {
-    return samples[i]->GetLabel();
+    return mSamples[i]->GetLabel();
   }
   return "";
 }
@@ -468,7 +473,9 @@ int tSampleSet::FillBuffers(long last_clock)
     JZKeyOnEvent* pKeyOn = e->IsKeyOn();
     if (pKeyOn && num_voices < MAXPOLY)
     {
-      voices[num_voices++]->Start(samples[pKeyOn->GetKey()], pKeyOn->GetClock());
+      voices[num_voices++]->Start(
+        mSamples[pKeyOn->GetKey()],
+        pKeyOn->GetClock());
     }
   }
 
@@ -542,7 +549,7 @@ int tSampleSet::PrepareListen(tSample *spl, long fr_smpl, long to_smpl)
 //-----------------------------------------------------------------------------
 int tSampleSet::PrepareListen(int key, long fr_smpl, long to_smpl)
 {
-  tSample *spl = samples[key];
+  tSample *spl = mSamples[key];
   return PrepareListen(spl, fr_smpl, to_smpl);
 }
 
@@ -585,7 +592,7 @@ void tSampleSet::AdjustAudioLength(JZTrack *t, long tpm)
     if (pKeyOn)
     {
       pKeyOn->SetLength(
-        (int)Samples2Ticks(samples[pKeyOn->GetKey()]->GetLength()));
+        (int)Samples2Ticks(mSamples[pKeyOn->GetKey()]->GetLength()));
 
       // Is the event visble?
       if (pKeyOn->GetEventLength() < 15)
@@ -606,7 +613,7 @@ void tSampleSet::StartPlay(long clock)
   // touch all playback sample data, so they may get swapped into memory
   for (int i = 0; i < MAXSMPL; i++)
   {
-    tSample *spl = samples[i];
+    tSample *spl = mSamples[i];
     spl->GotoRAM();
   }
 
@@ -627,9 +634,13 @@ void tSampleSet::StopPlay()
 class tSamplesDlg : public wxDialog
 {
   friend class tSampleSet;
+
   public:
-    tSamplesDlg(wxWindow* pParent, tSampleSet &set);
+
+    tSamplesDlg(wxWindow* pParent, tSampleSet& SampleSet);
+
     ~tSamplesDlg();
+
 #ifdef OBSOLETE
     static void CloseButton(wxItem &item, wxCommandEvent& event);
     static void PlayButton(wxItem &item, wxCommandEvent& event);
@@ -639,6 +650,7 @@ class tSamplesDlg : public wxDialog
     static void HelpButton(wxItem &item, wxCommandEvent& event);
     static void ListClick(wxItem &item, wxCommandEvent& event);
 #endif // OBSOLETE
+
     void OnCloseButton();
     void OnPlayButton();
     void OnEditButton();
@@ -648,13 +660,13 @@ class tSamplesDlg : public wxDialog
     void OnListClick();
 
   private:
-    tSampleSet &set;
-    char **names;
 
-    wxListBox *list;
-    wxSlider  *pan;
-    wxSlider  *vol;
-    wxSlider  *pitch;
+    tSampleSet &set;
+
+    wxListBox* mpListBox;
+    wxSlider* mpPanSlider;
+    wxSlider* mpVolumeSlider;
+    wxSlider* mpPitchSlider;
 #ifdef OBSOLETE
     wxText* pLabel;
     wxText* pFile;
@@ -805,9 +817,9 @@ class tAudioGloblForm : public wxForm
 //-----------------------------------------------------------------------------
 void tSampleSet::EditAudioGlobalSettings(wxWindow* pParent)
 {
-  if (spl_dialog)
+  if (mpSampleDialog)
   {
-    spl_dialog->Show(true);
+    mpSampleDialog->Show(true);
     return;
   }
 
@@ -821,6 +833,77 @@ void tSampleSet::EditAudioGlobalSettings(wxWindow* pParent)
 #endif // OBSOLETE
   }
   mpGlobalSettingsDialog->Show(true);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void tSampleSet::EditAudioSamples(wxWindow* pParent)
+{
+  SamplesDlg();
+}
+
+//-----------------------------------------------------------------------------
+// case ID_AUDIO_LOAD_SAMPLE_SET:
+//-----------------------------------------------------------------------------
+void tSampleSet::LoadSampleSet(wxWindow* pParent)
+{
+  wxString fname = file_selector(
+    mDefaultFileName,
+    "Load Sample Set",
+    false,
+    has_changed,
+    "*.spl");
+  if (fname)
+  {
+    Load(fname);
+  }
+}
+
+//-----------------------------------------------------------------------------
+// case ID_AUDIO_SAVE_SAMPLE_SET_AS:
+//-----------------------------------------------------------------------------
+void tSampleSet::SaveSampleSetAs(wxWindow* pParent)
+{
+  wxString fname = file_selector(
+    mDefaultFileName,
+    "Save Sample Set",
+    true,
+    has_changed,
+    "*.spl");
+  if (fname)
+  {
+    Save(fname);
+  }
+}
+
+//-----------------------------------------------------------------------------
+// case ID_AUDIO_SAVE_SAMPLE_SET:
+//-----------------------------------------------------------------------------
+void tSampleSet::SaveSampleSet(wxWindow* pParent)
+{
+  if (mDefaultFileName == "noname.spl")
+  {
+    return SaveSampleSetAs(pParent);
+  }
+  Save(mDefaultFileName);
+}
+
+//-----------------------------------------------------------------------------
+// case ID_AUDIO_NEW_SAMPLE_SET:
+//-----------------------------------------------------------------------------
+void tSampleSet::ClearSampleSet(wxWindow* pParent)
+{
+  if (mpSampleDialog == 0 && mpGlobalSettingsDialog == 0)
+  {
+    if (wxMessageBox("Clear Sample Set?", "Confirm", wxYES_NO) == wxNO)
+    {
+      return;
+    }
+    for (int i = 0; i < MAXSMPL; ++i)
+    {
+      mSamples[i]->Clear();
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -870,7 +953,7 @@ void tSampleSet::AddNote(const char *fname, long frc, long toc)
   // see if fname is already present in sample list
   for (i = 0; i < MAXSMPL; i++)
   {
-    spl = samples[i];
+    spl = mSamples[i];
     if (strcmp(spl->GetFilename(), fname) == 0)
       break;
   }
@@ -881,7 +964,7 @@ void tSampleSet::AddNote(const char *fname, long frc, long toc)
     // start somewhere near the top of the list
     for (i = 15; i < MAXSMPL; i++)
     {
-      spl = samples[i];
+      spl = mSamples[i];
       if (spl->GetFilename()[0] == 0)
         break;
     }
@@ -1044,12 +1127,14 @@ tSamplesDlg::tSamplesDlg(wxWindow* pParent, tSampleSet &s)
     set(s)
 {
   if (path == 0)
+  {
     path = copystring("*.wav");
+  }
 
-  names = new char * [tSampleSet::MAXSMPL];
+  wxArrayString SampleNames;
   for (int i = 0; i < tSampleSet::MAXSMPL; i++)
   {
-    names[i] = ListEntry(i);
+    SampleNames.Add(ListEntry(i));
   }
 
   // buttons
@@ -1067,29 +1152,31 @@ tSamplesDlg::tSamplesDlg(wxWindow* pParent, tSampleSet &s)
   // list box
   int y = 80;
   SetLabelPosition(wxVERTICAL);
-  list = new wxListBox(this, (wxFunction)ListClick, "Samples", wxLB_SINGLE, 10, y, 300, 200, tSampleSet::MAXSMPL, names, wxNEEDED_SB);
+#endif // OBSOLETE
 
-  NewLine();
+  mpListBox = new wxListBox(
+    this,
+    wxID_ANY,
+    wxDefaultPosition,
+    wxDefaultSize,
+    SampleNames,
+    wxLB_SINGLE);
+
+#ifdef OBSOLETE
   SetLabelPosition(wxHORIZONTAL);
+#endif // OBSOLETE
 
   // Sliders
-  vol = new wxSlider(this, (wxFunction)0, " ", 64,  0, 127,    200);
-  (void) new wxMessage(this, "Volume");
-  NewLine();
-  pan = new wxSlider(this, (wxFunction)0, " ",  0, -63, 63,    200);
-  (void) new wxMessage(this, "Panpot");
-  NewLine();
-  pitch = new wxSlider(this, (wxFunction)0, " ",  0, -12, 12,    200);
-  (void) new wxMessage(this, "Pitch");
-  NewLine();
+  mpVolumeSlider = new wxSlider(this, wxID_ANY, 64,  0, 127);
+  mpPanSlider = new wxSlider(this, wxID_ANY, 0, -63, 63);
+  mpPitchSlider = new wxSlider(this, wxID_ANY, 0, -12, 12);
+#ifdef OBSOLETE
   pLabel = new wxText(this, (wxFunction)0, "Label", "", -1, -1, 300);
-  NewLine();
   file = new wxText(this, (wxFunction)0, "File", "", -1, -1, 300);
-  NewLine();
 #endif // OBSOLETE
   Fit();
   Sample2Win(current);
-  list->SetSelection(current, true);
+  mpListBox->SetSelection(current);
   Show(true);
 }
 
@@ -1098,7 +1185,7 @@ tSamplesDlg::tSamplesDlg(wxWindow* pParent, tSampleSet &s)
 char *tSamplesDlg::ListEntry(int i)
 {
   ostringstream Oss;
-  Oss << i + 1 << ' ' << set.samples[i]->GetLabel();
+  Oss << i + 1 << ' ' << set.mSamples[i]->GetLabel();
 //  KeyToString(i, buf + strlen(buf));
   return copystring(Oss.str().c_str());
 }
@@ -1107,10 +1194,10 @@ char *tSamplesDlg::ListEntry(int i)
 //-----------------------------------------------------------------------------
 void tSamplesDlg::Sample2Win(int i)
 {
-  tSample *spl = set.samples[i];
-  vol->SetValue(spl->GetVolume());
-  pitch->SetValue(spl->GetPitch());
-  pan->SetValue(spl->GetPan());
+  tSample *spl = set.mSamples[i];
+  mpVolumeSlider->SetValue(spl->GetVolume());
+  mpPitchSlider->SetValue(spl->GetPitch());
+  mpPanSlider->SetValue(spl->GetPan());
 #ifdef OBSOLETE
   pLabel->SetValue((char *)spl->GetLabel());
   file->SetValue((char *)spl->GetFilename());
@@ -1121,10 +1208,10 @@ void tSamplesDlg::Sample2Win(int i)
 //-----------------------------------------------------------------------------
 void tSamplesDlg::Win2Sample(int i)
 {
-  tSample *spl = set.samples[i];
-  spl->SetPitch(pitch->GetValue());
-  spl->SetVolume(vol->GetValue());
-  spl->SetPan(pan->GetValue());
+  tSample *spl = set.mSamples[i];
+  spl->SetPitch(mpPitchSlider->GetValue());
+  spl->SetVolume(mpVolumeSlider->GetValue());
+  spl->SetPan(mpPanSlider->GetValue());
 #ifdef OBSOLETE
   spl->SetLabel(pLabel->GetValue());
   spl->SetFilename(file->GetValue());
@@ -1138,8 +1225,8 @@ void tSamplesDlg::SetCurrentListEntry(int i)
   if (i >= 0)
   {
     current = i;
-    list->SetString(current, ListEntry(current));
-    list->SetSelection(current, true);
+    mpListBox->SetString(current, ListEntry(current));
+    mpListBox->SetSelection(current, true);
   }
 }
 
@@ -1147,9 +1234,6 @@ void tSamplesDlg::SetCurrentListEntry(int i)
 //-----------------------------------------------------------------------------
 tSamplesDlg::~tSamplesDlg()
 {
-  for (int i = 0; i < tSampleSet::MAXSMPL; i++)
-    delete [] names[i];
-  delete [] names;
 }
 
 //-----------------------------------------------------------------------------
@@ -1162,7 +1246,7 @@ void tSamplesDlg::OnCloseButton()
   wxBeginBusyCursor();
   set.ReloadSamples();
   wxEndBusyCursor();
-  set.spl_dialog = 0;
+  set.mpSampleDialog = 0;
 //  DELETE_THIS();
   Destroy();
 }
@@ -1190,7 +1274,7 @@ void tSamplesDlg::OnEditButton()
   wxBeginBusyCursor();
   Win2Sample(current);
   SetCurrentListEntry(current);
-  tSample *spl = set.samples[current];
+  tSample *spl = set.mSamples[current];
   spl->Load();
   wxEndBusyCursor();
 
@@ -1212,7 +1296,7 @@ void tSamplesDlg::OnPlayButton()
   }
   Win2Sample(current);
   SetCurrentListEntry(current);
-  tSample *spl = set.samples[current];
+  tSample *spl = set.mSamples[current];
   wxBeginBusyCursor();
   spl->Load();
   gpMidiPlayer->ListenAudio(current);
@@ -1223,7 +1307,7 @@ void tSamplesDlg::OnPlayButton()
 //-----------------------------------------------------------------------------
 void tSamplesDlg::OnClrButton()
 {
-  tSample *spl = set.samples[current];
+  tSample *spl = set.mSamples[current];
   spl->Clear();
   SetCurrentListEntry(current);
   Sample2Win(current);
@@ -1241,7 +1325,7 @@ void tSamplesDlg::OnHelpButton()
 void tSamplesDlg::OnListClick()
 {
   Win2Sample(current);
-  int i = list->GetSelection();
+  int i = mpListBox->GetSelection();
   if (i >= 0)
   {
     current = i;
@@ -1291,87 +1375,19 @@ void tSampleSet::SamplesDlg()
     mpGlobalSettingsDialog->Show(true);
     return;
   }
-  if (spl_dialog == 0)
-    spl_dialog = new tSamplesDlg(gpTrackWindow, *this);
-  spl_dialog->Show(true);
+  if (mpSampleDialog == 0)
+  {
+    mpSampleDialog = new tSamplesDlg(gpTrackWindow, *this);
+  }
+  mpSampleDialog->Show(true);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void tSampleSet::RefreshDialogs()
 {
-  if (spl_dialog)
-    spl_dialog->Sample2Win(spl_dialog->current);
-}
-
-// -----------------------------------------------------------------
-// -------------------------------- menu ---------------------------
-// -----------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-int tSampleSet::OnMenuCommand(int id)
-{
-  switch (id)
+  if (mpSampleDialog)
   {
-    case ID_AUDIO_LOAD:
-      {
-        wxString fname = file_selector(
-          mDefaultFileName,
-          "Load Sample Set",
-          false,
-          has_changed,
-          "*.spl");
-        if (fname)
-        {
-          Load(fname);
-        }
-        return 1;
-      }
-
-    case ID_AUDIO_SAVE_AS:
-      {
-        wxString fname = file_selector(
-          mDefaultFileName,
-          "Save Sample Set",
-          true,
-          has_changed,
-          "*.spl");
-        if (fname)
-        {
-          Save(fname);
-        }
-        return 1;
-      }
-
-    case ID_AUDIO_SAVE:
-      {
-        if (mDefaultFileName == "noname.spl")
-        {
-          return OnMenuCommand(ID_AUDIO_SAVE_AS);
-        }
-        Save(mDefaultFileName);
-        return 1;
-      }
-
-    case ID_AUDIO_SAMPLES:
-      SamplesDlg();
-      return 1;
-
-    case ID_AUDIO_NEW:
-      if (spl_dialog == 0 && mpGlobalSettingsDialog == 0)
-      {
-        if (wxMessageBox("Clear Sample Set?", "Confirm", wxYES_NO) == wxNO)
-        {
-          return 1;
-        }
-        for (int i = 0; i < MAXSMPL; i++)
-        {
-          samples[i]->Clear();
-        }
-      }
-      return 1;
-
+    mpSampleDialog->Sample2Win(mpSampleDialog->current);
   }
-  return 0;
 }

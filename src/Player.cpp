@@ -690,6 +690,41 @@ void JZPlayer::EditAudioGlobalSettings(wxWindow* pParent)
   mSamples.EditAudioGlobalSettings(pParent);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPlayer::EditAudioSamples(wxWindow* pParent)
+{
+  mSamples.EditAudioSamples(pParent);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPlayer::LoadSampleSet(wxWindow* pParent)
+{
+  mSamples.LoadSampleSet(pParent);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPlayer::SaveSampleSetAs(wxWindow* pParent)
+{
+  mSamples.SaveSampleSetAs(pParent);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPlayer::SaveSampleSet(wxWindow* pParent)
+{
+  mSamples.SaveSampleSet(pParent);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPlayer::ClearSampleSet(wxWindow* pParent)
+{
+  mSamples.ClearSampleSet(pParent);
+}
+
 #ifdef DEV_MPU401
 
 //*****************************************************************************

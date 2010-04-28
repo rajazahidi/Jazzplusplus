@@ -340,8 +340,6 @@ class tSampleSet
 
     virtual const char *GetSampleName(int i);
 
-    int OnMenuCommand(int id);
-
     void StartPlay(long clock);
 
     void StopPlay();
@@ -367,10 +365,20 @@ class tSampleSet
 
     tSample &operator[](int i)
     {
-      return *samples[i];
+      return *mSamples[i];
     }
 
     void EditAudioGlobalSettings(wxWindow* pParent);
+
+    void EditAudioSamples(wxWindow* pParent);
+
+    void LoadSampleSet(wxWindow* pParent);
+
+    void SaveSampleSetAs(wxWindow* pParent);
+
+    void SaveSampleSet(wxWindow* pParent);
+
+    void ClearSampleSet(wxWindow* pParent);
 
   protected:
 
@@ -388,19 +396,23 @@ class tSampleSet
 
   protected:
 
-    long speed;    // samples / second
-    int  channels; // mono = 1, stereo = 2
-    int  bits;     // must be 16!
-    bool softsync;      // enable software midi/audio sync
-    enum { MAXSMPL = 128 };
-    tSample *samples[MAXSMPL];
-    tSampleWin *samplewin[MAXSMPL];
+    long speed;     // samples / second
+    int channels;   // mono = 1, stereo = 2
+    int bits;       // must be 16!
+    bool softsync;  // enable software midi/audio sync
 
-    long    ticks_per_minute;  // midi speed for audio/midi sync
-    double  clocks_per_buffer;
-    long    start_clock;       // when did play start
+    enum
+    {
+      MAXSMPL = 128
+    };
+    tSample* mSamples[MAXSMPL];
+    tSampleWin* mSampleWindows[MAXSMPL];
 
-    int   event_index;
+    long   ticks_per_minute;  // midi speed for audio/midi sync
+    double clocks_per_buffer;
+    long   start_clock;       // when did play start
+
+    int event_index;
 
     unsigned int bufbytes;           // buffer size in byte
     unsigned int bufshorts;          // buffer size in short
@@ -413,7 +425,7 @@ class tSampleSet
     long buffers_written;            // for computing buffers clock
 
     wxDialog* mpGlobalSettingsDialog;
-    tSamplesDlg* spl_dialog;
+    tSamplesDlg* mpSampleDialog;
 
     tEventArray* events;
 

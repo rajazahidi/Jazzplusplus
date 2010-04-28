@@ -261,15 +261,6 @@ class JZPlayer : public wxTimer
       return 0;
     }
 
-    virtual int OnMenuCommand(int id)
-    {
-      if (mPlaying)
-      {
-        return 0;
-      }
-      return mSamples.OnMenuCommand(id);
-    }
-
     virtual const char *GetSampleName(int i)
     {
       return mSamples.GetSampleName(i);
@@ -282,6 +273,16 @@ class JZPlayer : public wxTimer
     }
 
     void EditAudioGlobalSettings(wxWindow* pParent);
+
+    void EditAudioSamples(wxWindow* pParent);
+
+    void LoadSampleSet(wxWindow* pParent);
+
+    void SaveSampleSetAs(wxWindow* pParent);
+
+    void SaveSampleSet(wxWindow* pParent);
+
+    void ClearSampleSet(wxWindow* pParent);
 
     void EditSample(int key)
     {

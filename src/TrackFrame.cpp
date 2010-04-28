@@ -113,11 +113,11 @@ BEGIN_EVENT_TABLE(JZTrackFrame, JZEventFrame)
 
   EVT_MENU(ID_AUDIO_LOAD_SAMPLE_SET, JZTrackFrame::OnAudioLoadSampleSet)
 
-  EVT_MENU(ID_AUDIO_SAVE_SAMPLE_SET, OnAudioSaveSampleSet)
+  EVT_MENU(ID_AUDIO_SAVE_SAMPLE_SET, JZTrackFrame::OnAudioSaveSampleSet)
 
-  EVT_MENU(ID_AUDIO_SAVE_SAMPLE_SET_AS, OnAudioSaveSampleSetAs)
+  EVT_MENU(ID_AUDIO_SAVE_SAMPLE_SET_AS, JZTrackFrame::OnAudioSaveSampleSetAs)
 
-  EVT_MENU(ID_AUDIO_NEW_SAMPLE_SET, OnAudioNewSampleSet)
+  EVT_MENU(ID_AUDIO_NEW_SAMPLE_SET, JZTrackFrame::OnAudioNewSampleSet)
 
   EVT_MENU(wxID_HELP_CONTENTS, JZTrackFrame::OnHelpContents)
 

@@ -65,7 +65,10 @@ class JZWindowsPlayer : public JZPlayer
 
     static void SettingsDlg(int& InputDevice, int& OutputDevice);
 
-    enum { MAX_MIDI_DEVS = 10 };
+    enum
+    {
+      MAX_MIDI_DEVS = 10
+    };
 
   protected:
 

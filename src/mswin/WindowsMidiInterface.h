@@ -270,7 +270,8 @@ class tMidiQueue
       wr = (wr + 1) % MIDI_BUFFER_SIZE;
     }
 
-    int empty() const {
+    int empty() const
+    {
       return rd == wr;
     }
 

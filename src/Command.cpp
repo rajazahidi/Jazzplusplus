@@ -1099,7 +1099,7 @@ void tCmdExchUpDown::ExecuteTrack(JZTrack* pTrack)
       JZKeyOnEvent* pKeyOn = (JZKeyOnEvent *)pEvent->Copy();
       int n_th = 0;
 
-      // the n'th key from bottom 
+      // the n'th key from bottom
       for (i = 0; i <= pKeyOn->GetKey(); i++)
       {
         n_th += Keys[i];

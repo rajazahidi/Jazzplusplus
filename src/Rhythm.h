@@ -197,7 +197,10 @@ class tRhythmWin : public wxFrame
     tArrayEdit    *veloc_edit;
     tRhyArrayEdit *rhythm_edit;
 
-    enum       { MAX_INSTRUMENTS = 20 };
+    enum
+    {
+      MAX_INSTRUMENTS = 20
+    };
     tRhythm    *instruments[MAX_INSTRUMENTS];
     int        n_instruments;
     int        act_instrument;        // -1 if none

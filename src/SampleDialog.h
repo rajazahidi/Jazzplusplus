@@ -135,7 +135,10 @@ class tSynthDlg : public tSliderWin
     wxSlider   *midi_key_slider;
     wxSlider   *duration_slider;
 
-    enum { MAXSYNTHS = 6 };
+    enum
+    {
+      MAXSYNTHS = 6
+    };
     tAddSynth *synths[MAXSYNTHS];
     static int num_synths;
     static int midi_key;

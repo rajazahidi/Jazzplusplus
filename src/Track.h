@@ -609,11 +609,20 @@ class JZTrack : public tEventArray
     void SetState(int NewState);
     void ToggleState(int Direction);   // +1 = next, -1 = prev
 
-    int  GetChannel() { return Channel; }
+    int  GetChannel()
+    {
+      return Channel;
+    }
     void SetChannel(int NewChannel);
 
-    int  GetDevice() const { return Device; }
-    void SetDevice(int d) { Device = d; }
+    int GetDevice() const
+    {
+      return Device;
+    }
+    void SetDevice(int d)
+    {
+      Device = d;
+    }
 
     int  GetPatch();
     void SetPatch(int PatchNr);

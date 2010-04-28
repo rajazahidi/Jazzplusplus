@@ -624,8 +624,15 @@ class tSeq2Player : public JZPlayer
     virtual bool IsInstalled();
     virtual ~tSeq2Player();
     int  OutEvent(JZEvent *e, int now);
-    int  OutEvent(JZEvent *e) { OutEvent(e, 0); return 0; }
-    void OutNow(JZEvent *e)   { OutEvent(e, 1); }
+    int  OutEvent(JZEvent *e)
+    {
+      OutEvent(e, 0);
+      return 0;
+    }
+    void OutNow(JZEvent *e)
+    {
+      OutEvent(e, 1);
+    }
     void OutBreak();
     void OutBreak(long BreakOver);
     void StartPlay(long Clock, long LoopClock = 0, int Continue = 0);
@@ -634,7 +641,6 @@ class tSeq2Player : public JZPlayer
     virtual void FlushToDevice();
     void SetSoftThru(int on, int idev, int odev);
     int     FindMidiDevice();
-
 
   protected:
 

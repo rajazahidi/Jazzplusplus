@@ -112,15 +112,22 @@ class wxPropertyView: public wxEvtHandler
     ~wxPropertyView();
 
     // Associates and shows the view
-    virtual void ShowView(wxPropertySheet *WXUNUSED(propertySheet), wxWindow *WXUNUSED(panel)) {}
+    virtual void ShowView(wxPropertySheet *WXUNUSED(propertySheet), wxWindow *WXUNUSED(panel))
+    {
+    }
 
     // Update this view of the viewed object, called e.g. by
     // the object itself.
-    virtual bool OnUpdateView() {return false;};
+    virtual bool OnUpdateView()
+    {
+      return false;
+    }
 
     // Override this to do something as soon as the property changed,
     // if the view and validators support it.
-    virtual void OnPropertyChanged(wxProperty *WXUNUSED(property)) {}
+    virtual void OnPropertyChanged(wxProperty *WXUNUSED(property))
+    {
+    }
 
     virtual void AddRegistry(wxPropertyValidatorRegistry *registry);
     inline
@@ -175,9 +182,18 @@ class wxPropertyValidator: public wxEvtHandler
     wxPropertyValidator(long flags = 0);
     ~wxPropertyValidator();
 
-    inline long GetFlags() const { return m_validatorFlags; }
-    inline void SetValidatorProperty(wxProperty *prop) { m_validatorProperty = prop; }
-    inline wxProperty *GetValidatorProperty(void) const { return m_validatorProperty; }
+    inline long GetFlags() const
+    {
+      return m_validatorFlags;
+    }
+    inline void SetValidatorProperty(wxProperty *prop)
+    {
+      m_validatorProperty = prop;
+    }
+    inline wxProperty *GetValidatorProperty(void) const
+    {
+      return m_validatorProperty;
+    }
 
     virtual bool StringToFloat (wxChar *s, float *number);
     virtual bool StringToDouble (wxChar *s, double *number);
@@ -226,19 +242,20 @@ class wxPropertyValidatorRegistry
  * Property value class
  */
 
-typedef enum {
-    wxPropertyValueNull,
-    wxPropertyValueInteger,
-    wxPropertyValueReal,
-    wxPropertyValuebool,
-    wxPropertyValueString,
-    wxPropertyValueList,
-    wxPropertyValueIntegerPtr,
-    wxPropertyValueLongPtr,
-    wxPropertyValueRealPtr,
-    wxPropertyValueDoublePtr,
-    wxPropertyValueboolPtr,
-    wxPropertyValueStringPtr
+typedef enum
+{
+  wxPropertyValueNull,
+  wxPropertyValueInteger,
+  wxPropertyValueReal,
+  wxPropertyValuebool,
+  wxPropertyValueString,
+  wxPropertyValueList,
+  wxPropertyValueIntegerPtr,
+  wxPropertyValueLongPtr,
+  wxPropertyValueRealPtr,
+  wxPropertyValueDoublePtr,
+  wxPropertyValueboolPtr,
+  wxPropertyValueStringPtr
 } wxPropertyValueType;
 
 class wxPropertyValue: public wxObject
@@ -266,8 +283,14 @@ class wxPropertyValue: public wxObject
 
   ~wxPropertyValue(void);
 
-  virtual inline wxPropertyValueType Type(void) const { return m_type; }
-  virtual inline void SetType(wxPropertyValueType typ) { m_type = typ; }
+  virtual inline wxPropertyValueType Type(void) const
+  {
+    return m_type;
+  }
+  virtual inline void SetType(wxPropertyValueType typ)
+  {
+    m_type = typ;
+  }
   virtual long IntegerValue(void) const;
   virtual float RealValue(void) const;
   virtual bool BoolValue(void) const;
@@ -316,13 +339,25 @@ class wxPropertyValue: public wxObject
   // Clear list
   virtual void ClearList(void);
 
-  virtual inline void SetClientData(wxObject *data) { m_clientData = data; }
-  virtual inline wxObject *GetClientData(void) { return m_clientData; }
+  virtual inline void SetClientData(wxObject *data)
+  {
+    m_clientData = data;
+  }
+  virtual inline wxObject *GetClientData(void)
+  {
+    return m_clientData;
+  }
 
   virtual wxString GetStringRepresentation(void);
 
-  inline void SetModified(bool flag = true) { m_modifiedFlag = flag; }
-  inline bool GetModified(void) { return m_modifiedFlag; }
+  inline void SetModified(bool flag = true)
+  {
+    m_modifiedFlag = flag;
+  }
+  inline bool GetModified(void)
+  {
+    return m_modifiedFlag;
+  }
 
   // Operators
   void operator=(const wxPropertyValue& val);
@@ -343,7 +378,8 @@ class wxPropertyValue: public wxObject
   wxPropertyValueType   m_type;
   bool                  m_modifiedFlag;
 
-  union {
+  union
+  {
     long integer; // Also doubles as bool
     wxChar* string;
     float real;
@@ -392,11 +428,23 @@ class wxProperty: public wxObject
     virtual void SetName(wxString& nm);
     virtual void SetRole(wxString& role);
     void operator=(const wxPropertyValue& val);
-    virtual inline void SetWindow(wxWindow *win) { m_propertyWindow = win; }
-    virtual inline wxWindow *GetWindow(void) const { return m_propertyWindow; }
+    virtual inline void SetWindow(wxWindow *win)
+    {
+      m_propertyWindow = win;
+    }
+    virtual inline wxWindow *GetWindow(void) const
+    {
+      return m_propertyWindow;
+    }
 
-    inline void Enable(bool en) { m_enabled = en; }
-    inline bool IsEnabled(void) const { return m_enabled; }
+    inline void Enable(bool en)
+    {
+      m_enabled = en;
+    }
+    inline bool IsEnabled(void) const
+    {
+      return m_enabled;
+    }
 };
 
 inline

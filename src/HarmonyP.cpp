@@ -576,7 +576,8 @@ int main()
 
 #if 0
 #include <ctype.h>
-struct scdef {
+struct scdef
+{
   const char *name;
   const char *def;
 };

@@ -20,7 +20,8 @@
 **
 */
 
-enum {
+enum
+{
     MEN_LOAD =1,
     MEN_SAVE =2,
     MEN_QUIT =3,
@@ -125,4 +126,3 @@ enum {
     MEN_SELECTIONSUB=107,
     MEN_PIANOWIN2=108
 };
-

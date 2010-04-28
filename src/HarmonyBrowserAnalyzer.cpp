@@ -320,7 +320,8 @@ void HBAnalyzer::GenerateMapping()
 
 #else
 
-class tChordMatrix {
+class tChordMatrix
+{
   public:
     tChordMatrix()
     {

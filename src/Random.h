@@ -57,32 +57,58 @@ class JZRndArray
 
   public:
 
-    int Null()                                { return nul; }
-    void SetNull(int n)                        { nul = n; }
+    int Null()
+    {
+      return nul;
+    }
+    void SetNull(int n)
+    {
+      nul = n;
+    }
     JZRndArray(int n, int min, int max);
     JZRndArray & operator = (const JZRndArray &);
     JZRndArray(JZRndArray const &);
 
     virtual ~JZRndArray();
-    int &operator[] (int i)                 { return mArray[i]; }
-    int  operator[] (int i) const         { return mArray[i]; }
+    int &operator[] (int i)
+    {
+      return mArray[i];
+    }
+    int  operator[] (int i) const
+    {
+      return mArray[i];
+    }
     /* PAT - The following ifdef was removed due to changes in gcc 3.x.  If it
        needs to be put back for compatibility purposes, it will need to return
        in an alternate form. */
     /*#ifdef FOR_MSW*/
     double operator[](double f);
-    float operator[](float f) {
+    float operator[](float f)
+    {
       /*#else
     double operator[](double f) const;
-    float operator[](float f) const {
+    float operator[](float f) const
+    {
     #endif*/
       return (float)operator[]((double)f);
     }
-    int Size() const                         { return n; }
-    int Min() const                        { return min; }
-    int Max() const                        { return max; }
+    int Size() const
+    {
+      return n;
+    }
+    int Min() const
+    {
+      return min;
+    }
+    int Max() const
+    {
+      return max;
+    }
     void SetMinMax(int min, int max);
-    void Resize(int nn)                 { n = nn; }
+    void Resize(int nn)
+    {
+      n = nn;
+    }
 
     friend std::ostream & operator << (std::ostream &, JZRndArray const &);
     friend std::istream & operator >> (std::istream &, JZRndArray &);
@@ -175,14 +201,22 @@ class tArrayEdit : public wxScrolledWindow
 
     virtual void SetLabel(char const *llabel);
     void Enable(int enable = 1);
-    void SetStyle(int style) { style_bits = style; }
+    void SetStyle(int style)
+    {
+      style_bits = style;
+    }
     // min and max value in array (both values inclusive)
     void SetYMinMax(int min, int max);
     // for display x-axis only, does not resize the array (both values inclusive)
     void SetXMinMax(int xmin, int xmax);
     void DrawBarLine (wxDC *dc, int xx);
-    void SetDrawBars(tArrayEditDrawBars *x) { draw_bars = x; }
-    void Init() {}
+    void SetDrawBars(tArrayEditDrawBars *x)
+    {
+      draw_bars = x;
+    }
+    void Init()
+    {
+    }
 
   DECLARE_EVENT_TABLE()
 };

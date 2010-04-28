@@ -110,7 +110,10 @@ class tFloatSample // : public tCMIX
     float Peak(int fr = -1, int to = -1);
     void Rescale(float maxval = 32766.0, int fr = -1, int to = -1);
     void RescaleToShort(int fr = -1, int to = -1);
-    float &operator[](int i) { return data[i]; }
+    float &operator[](int i)
+    {
+      return data[i];
+    }
     void Initialize(int size = 0);
     void PasteMix(tFloatSample &src, int offs = 0);
     void PasteMix(tSample &src, int offs = 0);
@@ -197,7 +200,8 @@ class tFloatSample // : public tCMIX
  * that is offs % set.GetChannels() == 0.
  */
 
-class tSample {
+class tSample
+{
   friend class tFloatSample;
   friend class tSplPan;
   friend class tSplPitch;
@@ -216,43 +220,52 @@ class tSample {
 
     // Properties
     void SetLabel(const char *str);
-    const char *GetLabel() const {
+    const char *GetLabel() const
+    {
       return label;
     }
 
-    void SetVolume(int vol) {
+    void SetVolume(int vol)
+    {
       dirty |= (vol != volume);
       volume = vol;
     }
 
-    int GetVolume() const {
+    int GetVolume() const
+    {
       return volume;
     }
 
-    void SetPan(int p) {
+    void SetPan(int p)
+    {
       dirty |= (p != pan);
       pan = p;
     }
 
-    int GetPan() const {
+    int GetPan() const
+    {
       return pan;
     }
 
-    void SetPitch(int p) {
+    void SetPitch(int p)
+    {
       dirty |= (p != pitch);
       pitch = p;
     }
 
-    int GetPitch() const {
+    int GetPitch() const
+    {
       return pitch;
     }
 
     void SetFilename(const char *fname);
-    const char *GetFilename() const {
+    const char *GetFilename() const
+    {
       return filename;
     }
 
-    int GetLength() const {
+    int GetLength() const
+    {
       return length;
     }
 
@@ -274,14 +287,16 @@ class tSample {
 
     void Clear();
 
-    void GotoRAM() {
+    void GotoRAM()
+    {
       // Try to swap this sample into memory.
       volatile short dummy;
       for (int i = 0; i < length; i++)
         dummy = data[i];
     }
 
-    short *GetData() {
+    short *GetData()
+    {
       return data;
     }
 
@@ -290,11 +305,13 @@ class tSample {
      * access global adustments from tSampleSet
      */
 
-    tSampleSet &SampleSet() {
+    tSampleSet &SampleSet()
+    {
       return set;
     }
 
-    tSampleSet *operator->() {
+    tSampleSet *operator->()
+    {
       return &set;
     }
 

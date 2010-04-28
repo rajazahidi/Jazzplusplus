@@ -47,8 +47,14 @@ class tAlsaAudioPlayer : public tAlsaPlayer
     {
       return mInstalled && tAlsaPlayer::IsInstalled();
     }
-    virtual int GetAudioEnabled() const { return audio_enabled; }
-    virtual void SetAudioEnabled(int x) { audio_enabled = x; }
+    virtual int GetAudioEnabled() const
+    {
+      return audio_enabled;
+    }
+    virtual void SetAudioEnabled(int x)
+    {
+      audio_enabled = x;
+    }
     virtual void ListenAudio(int key, int start_stop_mode = 1);
     virtual void ListenAudio(tSample &spl, long fr_smpl, long to_smpl);
     virtual bool IsListening() const

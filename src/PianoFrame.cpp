@@ -563,7 +563,11 @@ class tVisibleDlg : public wxForm
   JZPianoFrame *pPianoWindow;
   public:
 
-    tVisibleDlg(JZPianoFrame *p) : wxForm( USED_WXFORM_BUTTONS ), pPianoWindow(p) {}
+    tVisibleDlg(JZPianoFrame *p)
+      : wxForm( USED_WXFORM_BUTTONS ),
+        pPianoWindow(p)
+    {
+    }
     void EditForm(wxPanel *panel);
     virtual void OnOk();
     virtual void OnHelp();

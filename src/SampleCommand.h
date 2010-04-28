@@ -38,13 +38,19 @@ class tSplFilter;
 class tPaintableCommand
 {
   public:
-    tPaintableCommand(tSample &s) : spl(s) {}
+    tPaintableCommand(tSample &s) : spl(s)
+    {
+    }
     virtual int NumArrays() = 0;
     virtual JZRndArray & GetArray(int i) = 0;
     virtual const char * GetLabel(int i) = 0;
     virtual void Execute(long fr, long to) = 0;
-    virtual void Initialize() {}
-    virtual ~tPaintableCommand() {}
+    virtual void Initialize()
+    {
+    }
+    virtual ~tPaintableCommand()
+    {
+    }
   protected:
     tSample &spl;
 };
@@ -57,9 +63,18 @@ class tPaintableCommand1 : public tPaintableCommand
 {
   public:
     tPaintableCommand1(tSample &s, int num, int min, int max)
-      : tPaintableCommand(s), arr(num, min, max) { }
-    virtual int NumArrays()             { return 1; }
-    virtual JZRndArray & GetArray(int i) { return arr; }
+      : tPaintableCommand(s),
+        arr(num, min, max)
+    {
+    }
+    virtual int NumArrays()
+    {
+      return 1;
+    }
+    virtual JZRndArray & GetArray(int i)
+    {
+      return arr;
+    }
     virtual void Initialize();
   protected:
     JZRndArray arr;
@@ -69,27 +84,46 @@ class tPaintableCommand1 : public tPaintableCommand
 class tSplVolume : public tPaintableCommand1
 {
   public:
-    const char * GetLabel(int i) { return "volume"; }
-    tSplVolume(tSample &s) : tPaintableCommand1(s, 200, -100, 100) { }
+    const char * GetLabel(int i)
+    {
+      return "volume";
+    }
+    tSplVolume(tSample &s) : tPaintableCommand1(s, 200, -100, 100)
+    {
+    }
     void Execute(long fr, long to);
 };
 
 class tSplPan : public tPaintableCommand1
 {
   public:
-    const char * GetLabel(int i) { return "pan"; }
-    tSplPan(tSample &s) : tPaintableCommand1(s, 200, -100, 100) { }
+    const char * GetLabel(int i)
+    {
+      return "pan";
+    }
+    tSplPan(tSample &s) : tPaintableCommand1(s, 200, -100, 100)
+    {
+    }
     void Execute(long fr, long to);
 };
 
 class tSplPitch : public tPaintableCommand1
 {
   public:
-    const char * GetLabel(int i) { return "pitch"; }
-    tSplPitch(tSample &s) : tPaintableCommand1(s, 200, -100, 100) { range = 1.2f; }
+    const char * GetLabel(int i)
+    {
+      return "pitch";
+    }
+    tSplPitch(tSample &s) : tPaintableCommand1(s, 200, -100, 100)
+    {
+      range = 1.2f;
+    }
     void Execute(long fr, long to);
     // range = frequency factor, e.g. 2 will transpose on octave up or down
-    void SetRange(float r) { range = r; }
+    void SetRange(float r)
+    {
+      range = r;
+    }
   private:
     float range;
 };
@@ -119,7 +153,10 @@ class tCMixCmd
     float SR;
     int resetval;
 
-    enum { SIZE = 512 };
+    enum
+    {
+      SIZE = 512
+    };
     float array[SIZE];
     float tabs[2];        /* for lineset */
     int lineset;
@@ -131,7 +168,8 @@ class tWahWah : public tPaintableCommand1
   friend class tWahSettingsForm;
   public:
     tWahWah(tSample &s);
-    virtual const char * GetLabel(int i) {
+    virtual const char * GetLabel(int i)
+    {
       return "freq";
     }
     virtual void Execute(long fr, long to);

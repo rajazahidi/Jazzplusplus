@@ -65,7 +65,8 @@ void tMidiThruDlg::OnOk()
 
 void tMidiThruDlg::EditForm(wxPanel *panel)
 {
-  if (Midi->SupportsMultipleDevices()) {
+  if (Midi->SupportsMultipleDevices())
+  {
     Add(InputDeviceChoice.mkFormItem(300, 50));
     Add(wxMakeFormNewLine());
     Add(OutputDeviceChoice.mkFormItem(300, 50));

@@ -337,32 +337,79 @@ class JZSynth
       return Sysex(clk, SX_GM_MasterVol, vol );
     }
 
-    virtual JZEvent* MasterPanSX( long clk, unsigned char pan ) { return 0; }
+    virtual JZEvent* MasterPanSX( long clk, unsigned char pan )
+    {
+      return 0;
+    }
 
-    virtual JZEvent* ModSX( int index, long clk, int cha, unsigned char val ) { return 0; }
+    virtual JZEvent* ModSX( int index, long clk, int cha, unsigned char val )
+    {
+      return 0;
+    }
 
-    virtual JZEvent* BendSX( int index, long clk, int cha, unsigned char val) { return 0; }
+    virtual JZEvent* BendSX( int index, long clk, int cha, unsigned char val)
+    {
+      return 0;
+    }
 
-    virtual JZEvent* CafSX( int index, long clk, int cha, unsigned char val ) { return 0; }
+    virtual JZEvent* CafSX( int index, long clk, int cha, unsigned char val )
+    {
+      return 0;
+    }
 
-    virtual JZEvent* PafSX( int index, long clk, int cha, unsigned char val ) { return 0; }
+    virtual JZEvent* PafSX( int index, long clk, int cha, unsigned char val )
+    {
+      return 0;
+    }
 
-    virtual JZEvent* CC1SX( int index, long clk, int cha, unsigned char val ) { return 0; }
+    virtual JZEvent* CC1SX( int index, long clk, int cha, unsigned char val )
+    {
+      return 0;
+    }
 
-    virtual JZEvent* CC2SX( int index, long clk, int cha, unsigned char val ) { return 0; }
+    virtual JZEvent* CC2SX( int index, long clk, int cha, unsigned char val )
+    {
+      return 0;
+    }
 
-    virtual JZEvent* PartialReserveSX( long clk, int cha, unsigned char *valptr ) { return 0; }
-    virtual JZEvent* RxChannelSX( long clk, int cha, unsigned char val ) { return 0; }
-    virtual JZEvent* UseForRhythmSX( long clk, int cha, unsigned char val ) { return 0; }
+    virtual JZEvent* PartialReserveSX( long clk, int cha, unsigned char *valptr )
+    {
+      return 0;
+    }
+    virtual JZEvent* RxChannelSX( long clk, int cha, unsigned char val )
+    {
+      return 0;
+    }
+    virtual JZEvent* UseForRhythmSX( long clk, int cha, unsigned char val )
+    {
+      return 0;
+    }
 
-    virtual JZEvent* ControllerNumberSX( int ctrlno, long clk, int cha, unsigned char val ) { return 0; }
+    virtual JZEvent* ControllerNumberSX( int ctrlno, long clk, int cha, unsigned char val )
+    {
+      return 0;
+    }
 
-    virtual JZEvent* ReverbMacroSX( long clk, unsigned char val, unsigned char lsb = 0 ) { return 0; }
-    virtual JZEvent* ReverbParamSX( int index, long clk, unsigned char val ) { return 0; }
-    virtual JZEvent* ChorusMacroSX( long clk, unsigned char val, unsigned char lsb = 0 ) { return 0; }
-    virtual JZEvent* ChorusParamSX( int index, long clk, unsigned char val ) { return 0; }
+    virtual JZEvent* ReverbMacroSX( long clk, unsigned char val, unsigned char lsb = 0 )
+    {
+      return 0;
+    }
+    virtual JZEvent* ReverbParamSX( int index, long clk, unsigned char val )
+    {
+      return 0;
+    }
+    virtual JZEvent* ChorusMacroSX( long clk, unsigned char val, unsigned char lsb = 0 )
+    {
+      return 0;
+    }
+    virtual JZEvent* ChorusParamSX( int index, long clk, unsigned char val )
+    {
+      return 0; }
 
-    virtual JZEvent* EqualizerMacroSX( long clk, unsigned char val ) { return 0; }
+    virtual JZEvent* EqualizerMacroSX( long clk, unsigned char val )
+    {
+      return 0;
+    }
 
   protected:
 

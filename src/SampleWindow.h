@@ -52,13 +52,19 @@ class tSampleWin : public wxFrame
     virtual void OnMenuCommand(int id);
     void Redraw();
     bool HaveInsertionPoint(int &offs, bool warn = TRUE);
-    enum HaveSelectionMode { SelWarn, SelNoWarn, SelAll} ;
+    enum HaveSelectionMode
+    {
+      SelWarn,
+      SelNoWarn,
+      SelAll
+    };
     bool HaveSelection(int &fr_smpl, int &to_smpl, HaveSelectionMode = SelAll);
 
     void AddParam(JZRndArray *array, const char *label);
     void ClrParam();
     void ClearSelection();
-    tSample &GetSample() {
+    tSample &GetSample()
+    {
       return spl;
     }
     void PlaySample();
@@ -85,7 +91,10 @@ class tSampleWin : public wxFrame
 
     static tSample *copy_buffer;
 
-    enum { MAXPARAM = 4 };
+    enum
+    {
+      MAXPARAM = 4
+    };
     tArrayEdit *params[MAXPARAM];
     int        num_params;
 

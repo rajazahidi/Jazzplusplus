@@ -363,32 +363,110 @@ class JZEvent
       return (mClock & KILLED_CLOCK) != 0;
     }
 
-    virtual JZMetaEvent*        IsMetaEvent()    { return 0; }
-    virtual JZChannelEvent*     IsChannelEvent() { return 0; }
-    virtual JZKeyOnEvent*       IsKeyOn()        { return 0; }
-    virtual JZKeyOffEvent*      IsKeyOff()       { return 0; }
-    virtual JZPitchEvent*       IsPitch()        { return 0; }
-    virtual JZControlEvent*     IsControl()      { return 0; }
-    virtual JZProgramEvent*     IsProgram()      { return 0; }
-    virtual JZSysExEvent*       IsSysEx()        { return 0; }
-    virtual JZSongPtrEvent*     IsSongPtr()      { return 0; }
-    virtual JZMidiClockEvent*   IsMidiClock()    { return 0; }
-    virtual JZStartPlayEvent*   IsStartPlay()    { return 0; }
-    virtual JZContPlayEvent*    IsContPlay()     { return 0; }
-    virtual JZStopPlayEvent*    IsStopPlay()     { return 0; }
-    virtual JZTextEvent*        IsText()         { return 0; }
-    virtual JZCopyrightEvent*   IsCopyright()    { return 0; }
-    virtual JZTrackNameEvent*   IsTrackName()    { return 0; }
-    virtual JZMarkerEvent*      IsMarker()       { return 0; }
-    virtual JZSetTempoEvent*    IsSetTempo()     { return 0; }
-    virtual JZMtcOffsetEvent*   IsMtcOffset()    { return 0; }
-    virtual JZTimeSignatEvent*  IsTimeSignat()   { return 0; }
-    virtual JZKeySignatEvent*   IsKeySignat()    { return 0; }
-    virtual JZKeyPressureEvent* IsKeyPressure()  { return 0; }
-    virtual JZJazzMetaEvent*    IsJazzMeta()     { return 0; }
-    virtual JZPlayTrackEvent*   IsPlayTrack()    { return 0; }
-    virtual JZEndOfTrackEvent*  IsEndOfTrack()   { return 0; }
-    virtual JZChnPressureEvent* IsChnPressure()  { return 0; }
+    virtual JZMetaEvent* IsMetaEvent()
+    {
+      return 0;
+    }
+    virtual JZChannelEvent* IsChannelEvent()
+    {
+      return 0;
+    }
+    virtual JZKeyOnEvent* IsKeyOn()
+    {
+      return 0;
+    }
+    virtual JZKeyOffEvent* IsKeyOff()
+    {
+      return 0;
+    }
+    virtual JZPitchEvent* IsPitch()
+    {
+      return 0;
+    }
+    virtual JZControlEvent* IsControl()
+    {
+      return 0;
+    }
+    virtual JZProgramEvent* IsProgram()
+    {
+      return 0;
+    }
+    virtual JZSysExEvent* IsSysEx()
+    {
+      return 0;
+    }
+    virtual JZSongPtrEvent* IsSongPtr()
+    {
+      return 0;
+    }
+    virtual JZMidiClockEvent* IsMidiClock()
+    {
+      return 0;
+    }
+    virtual JZStartPlayEvent* IsStartPlay()
+    {
+      return 0;
+    }
+    virtual JZContPlayEvent* IsContPlay()
+    {
+      return 0;
+    }
+    virtual JZStopPlayEvent* IsStopPlay()
+    {
+      return 0;
+    }
+    virtual JZTextEvent* IsText()
+    {
+      return 0;
+    }
+    virtual JZCopyrightEvent* IsCopyright()
+    {
+      return 0;
+    }
+    virtual JZTrackNameEvent* IsTrackName()
+    {
+      return 0;
+    }
+    virtual JZMarkerEvent* IsMarker()
+    {
+      return 0;
+    }
+    virtual JZSetTempoEvent* IsSetTempo()
+    {
+      return 0;
+    }
+    virtual JZMtcOffsetEvent* IsMtcOffset()
+    {
+      return 0;
+    }
+    virtual JZTimeSignatEvent* IsTimeSignat()
+    {
+      return 0;
+    }
+    virtual JZKeySignatEvent* IsKeySignat()
+    {
+      return 0;
+    }
+    virtual JZKeyPressureEvent* IsKeyPressure()
+    {
+      return 0;
+    }
+    virtual JZJazzMetaEvent* IsJazzMeta()
+    {
+      return 0;
+    }
+    virtual JZPlayTrackEvent* IsPlayTrack()
+    {
+      return 0;
+    }
+    virtual JZEndOfTrackEvent* IsEndOfTrack()
+    {
+      return 0;
+    }
+    virtual JZChnPressureEvent* IsChnPressure()
+    {
+      return 0;
+    }
 
     virtual int Write(JZWriteBase& io)
     {

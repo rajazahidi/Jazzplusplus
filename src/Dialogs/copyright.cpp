@@ -52,7 +52,8 @@ void tCopyrightDlg::AddProperties()
    sheet->AddProperty(copyrightProp);
  }
 
-bool tCopyrightDlg::OnClose(){
+bool tCopyrightDlg::OnClose()
+{
    song->GetTrack(0)->SetCopyright(copyrightProp->GetValue().StringValue() );
    return FALSE;
 }

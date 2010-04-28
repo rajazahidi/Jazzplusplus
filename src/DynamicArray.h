@@ -216,8 +216,14 @@ class JZBitset
     JZIntArray mArray;
 
     // this works for sizeof(int) >= 4
-    int index(int i)  { return i >> 5; }
-    int mask(int i)   { return 1 << (i & 31); }
+    int index(int i)
+    {
+      return i >> 5;
+    }
+    int mask(int i)
+    {
+      return 1 << (i & 31);
+    }
 };
 
 

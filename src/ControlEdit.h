@@ -98,7 +98,10 @@ class tCtrlEditBase : public tArrayEditDrawBars
 
     virtual int GetValue(JZEvent *e) = 0;
 
-    virtual JZEvent* NewEvent(long clock, int val) { return 0; }
+    virtual JZEvent* NewEvent(long clock, int val)
+    {
+      return 0;
+    }
 
     virtual void OnApply();
     virtual void OnRevert();

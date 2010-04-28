@@ -37,10 +37,11 @@
 
 using namespace std;
 
-#define SXDECL(id,len,arr) do {\
-  sxlen[id] = len; \
-  sxdata[id] = new unsigned char[len]; \
-  memcpy(sxdata[id], arr, len); \
+#define SXDECL(id,len,arr) do\
+{\
+  sxlen[id] = len;\
+  sxdata[id] = new unsigned char[len];\
+  memcpy(sxdata[id], arr, len);\
 } while (0)
 
 

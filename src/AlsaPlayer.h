@@ -52,8 +52,14 @@ class tAlsaPlayer : public JZPlayer
     void Notify();
     bool IsInstalled();
     int  OutEvent(JZEvent *e, int now);
-    int  OutEvent(JZEvent *e) { return OutEvent(e, 0); }
-    void OutNow(JZEvent *e)   { OutEvent(e, 1); }
+    int  OutEvent(JZEvent *e)
+    {
+      return OutEvent(e, 0);
+    }
+    void OutNow(JZEvent *e)
+    {
+      OutEvent(e, 1);
+    }
     void OutNow(tParam *r);
     void OutBreak();
     void OutBreak(long BreakOver);
@@ -61,11 +67,26 @@ class tAlsaPlayer : public JZPlayer
     void StopPlay();
     long GetRealTimeClock();
     virtual void SetSoftThru(int on, int idev, int odev);
-    virtual int SupportsMultipleDevices() { return 1; }
-    virtual tDeviceList & GetOutputDevices() { return oaddr; }
-    virtual tDeviceList & GetInputDevices() { return iaddr; }
-    virtual int GetThruInputDevice() { return ithru; }
-    virtual int GetThruOutputDevice() { return othru; }
+    virtual int SupportsMultipleDevices()
+    {
+      return 1;
+    }
+    virtual tDeviceList & GetOutputDevices()
+    {
+      return oaddr;
+    }
+    virtual tDeviceList & GetInputDevices()
+    {
+      return iaddr;
+    }
+    virtual int GetThruInputDevice()
+    {
+      return ithru;
+    }
+    virtual int GetThruOutputDevice()
+    {
+      return othru;
+    }
     int FindMidiDevice();
 
   protected:
@@ -94,7 +115,11 @@ class tAlsaPlayer : public JZPlayer
       unsigned DeviceCapabilities);
     int select_list(tAlsaDeviceList &list, const char *title, int def_device);
     int  start_timer(long clock);
-    int write(snd_seq_event_t *ev) { return write(ev, 0); } // 0 == ok
+    int write(snd_seq_event_t *ev)
+    {
+      // 0 == ok
+      return write(ev, 0);
+    }
     int write(snd_seq_event_t *ev, int now); // 0 == ok
     void set_event_header(snd_seq_event_t *ev, long clock, int type);
     void set_event_header(snd_seq_event_t *ev, long clock, int len, void *ptr);

@@ -273,7 +273,8 @@ class tSamplePlayPosition : public wxTimer
       Start(100);
     }
 
-    bool IsListening() const {
+    bool IsListening() const
+    {
       return gpMidiPlayer->IsListening();
     }
 
@@ -931,7 +932,8 @@ bool tSampleWin::HaveInsertionPoint(int &offs, bool warn)
     offs = cnvs->sel_fr;
     return TRUE;
   }
-  else {
+  else
+  {
     offs = -1;
     if (warn)
       wxMessageBox("please set insertion point first", "Error", wxOK);

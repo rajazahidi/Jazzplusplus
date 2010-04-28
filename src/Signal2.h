@@ -82,8 +82,11 @@ template <class T>
 class tExpoMap
 {
   public:
-    tExpoMap(T x, T y) : map(-x, x, -log(y), log(y)) { }
-    T operator()(T x) {
+    tExpoMap(T x, T y) : map(-x, x, -log(y), log(y))
+    {
+    }
+    T operator()(T x)
+    {
       return exp(map(x));
     }
   private:
@@ -351,11 +354,14 @@ class tSigInput
       current = -1;
     }
 
-    virtual ~tSigInput() {}
+    virtual ~tSigInput()
+    {
+    }
 
     void GetSample(tSigValue &ret)
     {
-      if (synth.current >= current) {
+      if (synth.current >= current)
+      {
         current = synth.current + 1;
         NextValue();
       }
@@ -364,7 +370,8 @@ class tSigInput
 
     float GetControl()
     {
-      if (synth.current >= current) {
+      if (synth.current >= current)
+      {
         current = synth.current + 100;
         NextValue();
         ctl = 0;
@@ -375,15 +382,21 @@ class tSigInput
       return ctl;
     }
 
-    int HasChanged() const {
+    int HasChanged() const
+    {
       return synth.current >= current;
     }
 
-    virtual void Init() { // called once before performance starts
+    virtual void Init()
+    {
+      // called once before performance starts
       current = -1;
     }
 
-    virtual long GetLength() { return 0; }
+    virtual long GetLength()
+    {
+      return 0;
+    }
     virtual void NextValue() = 0;
 
   protected:
@@ -401,7 +414,9 @@ class tSigInput
 class tSigOutput : public tSigInput
 {
   public:
-    tSigOutput(tSigSynth &synth) : tSigInput(synth) {}
+    tSigOutput(tSigSynth &synth) : tSigInput(synth)
+    {
+    }
     virtual void Out(const tSigValue &v) = 0;
     virtual void Resize(long)            = 0;
 };
@@ -595,28 +610,34 @@ class tSigWaveOscil : public tSignalModifier
       have_freq_control = 0;
     }
 
-    virtual void Init() {
+    virtual void Init()
+    {
       tSignalModifier::Init();
       have_freq_control = (controls.size() != 0);
     }
 
-    tSigValue & operator[](int i) {
+    tSigValue & operator[](int i)
+    {
       return array[i];
     }
 
-    const tSigValue & operator[](int i) const {
+    const tSigValue & operator[](int i) const
+    {
       return array[i];
     }
 
-    void NextValue() {
-      if (have_freq_control && controls[0]->HasChanged()) {
+    void NextValue()
+    {
+      if (have_freq_control && controls[0]->HasChanged())
+      {
         dx = array.Size() / SR * freq * fmap(controls[0]->GetControl());
       }
       array.CyclicInterpolate(val, x);
       x += dx;
     }
 
-    long Size() const {
+    long Size() const
+    {
       return array.Size();
     }
 
@@ -643,19 +664,23 @@ class tSigWaveCtrl : public tSigInput
     {
     }
 
-    tSigValue & operator[](int i) {
+    tSigValue & operator[](int i)
+    {
       return array[i];
     }
 
-    const tSigValue & operator[](int i) const {
+    const tSigValue & operator[](int i) const
+    {
       return array[i];
     }
 
-    void NextValue() {
+    void NextValue()
+    {
       array.Interpolate(val, xmap(current));
     }
 
-    long Size() const {
+    long Size() const
+    {
       return array.Size();
     }
 
@@ -674,7 +699,8 @@ class tSigNoise : public tSigInput
     {
     }
 
-    void NextValue() {
+    void NextValue()
+    {
       for (int i = 0; i < channels; i++)
         val[i] = ((rnd.asDouble() * 2.0) - 1.0) * 32000.0;
     }
@@ -694,7 +720,9 @@ class tSigConst : public tSigInput
         val[i] = x;
     }
 
-    virtual void NextValue() {}
+    virtual void NextValue()
+    {
+    }
 };
 
 
@@ -712,7 +740,8 @@ class tSigSine : public tSigInput
       map.Initialize(0, plen, phi, phi + 2 * PI);
       ampl = amp;
     }
-    void NextValue() {
+    void NextValue()
+    {
       float y = ampl * sin(map((double)current));
       for (int i = 0; i < channels; i++)
         val[i] = y;
@@ -732,8 +761,11 @@ class tSigSine : public tSigInput
 class tSigVolume : public tSignalModifier
 {
   public:
-    tSigVolume(tSigSynth &synth) : tSignalModifier(synth) {}
-    void NextValue() {
+    tSigVolume(tSigSynth &synth) : tSignalModifier(synth)
+    {
+    }
+    void NextValue()
+    {
       float vol = controls[0]->GetControl();
       inputs[0]->GetSample(val);
       for (int i = 0; i < channels; i++)
@@ -749,8 +781,11 @@ class tSigVolume : public tSignalModifier
 class tSigPanpot : public tSignalModifier
 {
   public:
-    tSigPanpot(tSigSynth &synth) : tSignalModifier(synth) {}
-    void NextValue() {
+    tSigPanpot(tSigSynth &synth) : tSignalModifier(synth)
+    {
+    }
+    void NextValue()
+    {
       float p = controls[0]->GetControl();
       inputs[0]->GetSample(val);
       if (p > 0)
@@ -840,12 +875,14 @@ class tOpHighpass : public tOpFilter
     virtual ~tOpHighpass()
     {
     }
-    virtual void Setup(float sr, float hp, float dummy) {
+    virtual void Setup(float sr, float hp, float dummy)
+    {
       double b = 2.0 - cos(hp * 2.0 * PI / sr);
       c2 = b - sqrt(b * b - 1.0);
       c1 = 1.0 - c2;
     }
-    virtual float Loop(float sig) {
+    virtual float Loop(float sig)
+    {
       float tmp = y1 = c2 * (y1 + sig);
       y1 -= sig;
       return tmp;
@@ -928,12 +965,15 @@ class tSigFilter : public tSignalModifier
       this->freq = freq;
       this->bandw = bandw;
     }
-    virtual void Init() {
+    virtual void Init()
+    {
       tSignalModifier::Init();
       have_control = (controls.size() == 1);
     }
-    void NextValue() {
-      if (have_control && controls[0]->HasChanged()) {
+    void NextValue()
+    {
+      if (have_control && controls[0]->HasChanged())
+      {
         float f = freq * fmap(controls[0]->GetControl());
         for (int i = 0; i < channels; i++)
           filter[i].Setup(sr, f, bandw);
@@ -942,7 +982,8 @@ class tSigFilter : public tSignalModifier
       for (int i = 0; i < channels; i++)
         val[i] = filter[i].FILTER::Loop(val[i]);
     }
-    tSigValue operator()(const tSigValue &sig) {
+    tSigValue operator()(const tSigValue &sig)
+    {
       for (int i = 0; i < channels; i++)
         val[i] = filter[i].FILTER::Loop(sig[i]);
       return val;
@@ -965,7 +1006,8 @@ class tSigLowpass : public tSignalModifier
 {
   public:
 
-    tSigLowpass(tSigSynth &synth, float fg) : tSignalModifier(synth) {
+    tSigLowpass(tSigSynth &synth, float fg) : tSignalModifier(synth)
+    {
       fg = fg / sampling_rate;
       a0 = 2 * PI * fg;
       // b1 = a0 - 1.0; // approx
@@ -979,7 +1021,8 @@ class tSigLowpass : public tSignalModifier
       val = sig * a0 - val * b1;
     }
 
-    tSigValue operator()(const tSigValue &sig) {
+    tSigValue operator()(const tSigValue &sig)
+    {
       val = sig * a0 - val * b1;
       return val;
     }
@@ -1075,7 +1118,11 @@ class tSigAlpass : public tSigComb
 class tSigReverb : public tSignalModifier
 {
   public:
-    enum { COMBS = 4, ALPAS = 2 };
+    enum
+    {
+      COMBS = 4,
+      ALPAS = 2
+    };
     tSigReverb(
       tSigSynth &synth,
       float reverb_time = 0.7,
@@ -1136,11 +1183,13 @@ class tSigStereoSpread : public tSignalModifier
     {
       lfo.Init(*this);
     }
-    virtual int operator()(tSigValue &val) {
+    virtual int operator()(tSigValue &val)
+    {
       if (!sig(val))
         return 0;
       float a = (lfo() + 1)/2; // map to 0..1
-      if (channels > 1) {
+      if (channels > 1)
+      {
         float tmp = val[0];
         val[0] -= a * val[1];
         val[1] -= a * tmp;
@@ -1160,15 +1209,19 @@ class tSigStereoSpread : public tSignalModifier
 class tSigMix2 : public tSignalModifier
 {
   public:
-    tSigMix2(tSigSynth &synth) : tSignalModifier(synth) {}
+    tSigMix2(tSigSynth &synth) : tSignalModifier(synth)
+    {
+    }
 
-    void Init() {
+    void Init()
+    {
       tSignalModifier::Init();  // initialize sources
       len1 = inputs[0]->GetLength();
       len2 = inputs[1]->GetLength();
     }
 
-    void NextValue() {
+    void NextValue()
+    {
       tSigValue v1;
       tSigValue v2;
       inputs[0]->GetSample(v1);

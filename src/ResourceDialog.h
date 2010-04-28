@@ -202,19 +202,28 @@ class jppResourceDialog
       If the function returns true, the Attached data will be set and the
       dialog will be hidden. */
 
-  virtual bool OnOk() { return true; }
+  virtual bool OnOk()
+  {
+    return true;
+  }
 
   /// Cancel event handler
   /** Called when a dialog produced by Show() has caused a wxID_CANCEL event.
       If the function returns true, the dialog will be hidden. */
 
-  virtual bool OnCancel() { return true; }
+  virtual bool OnCancel()
+  {
+    return true;
+  }
 
   /// Apply event handler
   /** Called when a dialog produced by Show() has caused a wxID_APPLY event.
       If the function returns true, the Attached data will be set. */
 
-  virtual bool OnApply() { return true; }
+  virtual bool OnApply()
+  {
+    return true;
+  }
 
 
  private:

@@ -1226,20 +1226,24 @@ wxPropertyValidator::wxPropertyValidator(long flags)
 wxPropertyValidator::~wxPropertyValidator(void)
 {}
 
-bool wxPropertyValidator::StringToFloat (wxChar *s, float *number) {
+bool wxPropertyValidator::StringToFloat (wxChar *s, float *number)
+{
     double num;
     bool ok = StringToDouble (s, &num);
     *number = (float) num;
     return ok;
 }
 
-bool wxPropertyValidator::StringToDouble (wxChar *s, double *number) {
+bool wxPropertyValidator::StringToDouble (wxChar *s, double *number)
+{
     bool ok = true;
     wxChar *value_ptr;
     *number = wxStrtod (s, &value_ptr);
-    if (value_ptr) {
+    if (value_ptr)
+    {
         int len = wxStrlen (value_ptr);
-        for (int i = 0; i < len; i++) {
+        for (int i = 0; i < len; i++)
+        {
             ok = (wxIsspace (value_ptr[i]) != 0);
             if (!ok) return false;
         }
@@ -1247,20 +1251,24 @@ bool wxPropertyValidator::StringToDouble (wxChar *s, double *number) {
     return ok;
 }
 
-bool wxPropertyValidator::StringToInt (wxChar *s, int *number) {
+bool wxPropertyValidator::StringToInt (wxChar *s, int *number)
+{
     long num;
     bool ok = StringToLong (s, &num);
     *number = (int) num;
     return ok;
 }
 
-bool wxPropertyValidator::StringToLong (wxChar *s, long *number) {
+bool wxPropertyValidator::StringToLong (wxChar *s, long *number)
+{
     bool ok = true;
     wxChar *value_ptr;
     *number = wxStrtol (s, &value_ptr, 10);
-    if (value_ptr) {
+    if (value_ptr)
+    {
         int len = wxStrlen (value_ptr);
-        for (int i = 0; i < len; i++) {
+        for (int i = 0; i < len; i++)
+        {
             ok = (wxIsspace (value_ptr[i]) != 0);
             if (!ok) return false;
         }
@@ -1268,26 +1276,30 @@ bool wxPropertyValidator::StringToLong (wxChar *s, long *number) {
     return ok;
 }
 
-wxChar *wxPropertyValidator::FloatToString (float number) {
+wxChar *wxPropertyValidator::FloatToString (float number)
+{
     static wxChar buf[20];
     wxSnprintf (buf, 20, wxT("%.6g"), number);
     return buf;
 }
 
-wxChar *wxPropertyValidator::DoubleToString (double number) {
+wxChar *wxPropertyValidator::DoubleToString (double number)
+{
     static wxChar buf[20];
     wxSnprintf (buf, 20, wxT("%.6g"), number);
     return buf;
 }
 
-wxChar *wxPropertyValidator::IntToString (int number) {
+wxChar *wxPropertyValidator::IntToString (int number)
+{
     static wxChar buf[20];
 
     wxSprintf (buf, wxT("%d"), number);
     return buf;
 }
 
-wxChar *wxPropertyValidator::LongToString (long number) {
+wxChar *wxPropertyValidator::LongToString (long number)
+{
     static wxChar buf[20];
 
     wxSprintf (buf, wxT("%ld"), number);

@@ -74,15 +74,36 @@ class WXDLLIMPEXP_DEPRECATED wxPropertyFormView: public wxPropertyView
   // Extend event processing to process OnCommand
   virtual bool ProcessEvent(wxEvent& event);
 
-  inline virtual void AssociatePanel(wxWindow *win) { m_propertyWindow = win; }
-  inline virtual wxWindow *GetPanel(void) const { return m_propertyWindow; }
+  inline virtual void AssociatePanel(wxWindow *win)
+  {
+    m_propertyWindow = win;
+  }
+  inline virtual wxWindow *GetPanel(void) const
+  {
+    return m_propertyWindow;
+  }
 
-  inline virtual void SetManagedWindow(wxWindow *win) { m_managedWindow = win; }
-  inline virtual wxWindow *GetManagedWindow(void) const { return m_managedWindow; }
+  inline virtual void SetManagedWindow(wxWindow *win)
+  {
+    m_managedWindow = win;
+  }
+  inline virtual wxWindow *GetManagedWindow(void) const
+  {
+    return m_managedWindow;
+  }
 
-  inline virtual wxButton *GetWindowCloseButton() const { return m_windowCloseButton; }
-  inline virtual wxButton *GetWindowCancelButton() const { return m_windowCancelButton; }
-  inline virtual wxButton *GetHelpButton() const { return m_windowHelpButton; }
+  inline virtual wxButton *GetWindowCloseButton() const
+  {
+    return m_windowCloseButton;
+  }
+  inline virtual wxButton *GetWindowCancelButton() const
+  {
+    return m_windowCancelButton;
+  }
+  inline virtual wxButton *GetHelpButton() const
+  {
+    return m_windowHelpButton;
+  }
 
 public:
   static bool sm_dialogCancelled;
@@ -121,13 +142,20 @@ class WXDLLIMPEXP_DEPRECATED wxPropertyFormValidator: public wxPropertyValidator
   DECLARE_DYNAMIC_CLASS(wxPropertyFormValidator)
  protected:
  public:
-  wxPropertyFormValidator(long flags = 0): wxPropertyValidator(flags) { }
-  ~wxPropertyFormValidator(void) {}
+  wxPropertyFormValidator(long flags = 0): wxPropertyValidator(flags)
+  {
+  }
+  ~wxPropertyFormValidator(void)
+  {
+  }
 
    // Called to check value is OK (e.g. when OK is pressed)
    // Return false if value didn't check out; signal to restore old value.
    virtual bool OnCheckValue( wxProperty *WXUNUSED(property), wxPropertyFormView *WXUNUSED(view),
-     wxWindow *WXUNUSED(parentWindow) ) { return true; }
+     wxWindow *WXUNUSED(parentWindow) )
+   {
+     return true;
+   }
 
    // Does the transferance from the property editing area to the property itself.
    // Called by the view, e.g. when closing the window.
@@ -137,13 +165,21 @@ class WXDLLIMPEXP_DEPRECATED wxPropertyFormValidator: public wxPropertyValidator
    virtual bool OnDisplayValue(wxProperty *property, wxPropertyFormView *view, wxWindow *parentWindow) = 0;
 
   virtual void OnDoubleClick( wxProperty *WXUNUSED(property), wxPropertyFormView *WXUNUSED(view),
-     wxWindow *WXUNUSED(parentWindow) ) { }
+     wxWindow *WXUNUSED(parentWindow) )
+  {
+  }
   virtual void OnSetFocus( wxProperty *WXUNUSED(property), wxPropertyFormView *WXUNUSED(view),
-     wxWindow *WXUNUSED(parentWindow) ) { }
+     wxWindow *WXUNUSED(parentWindow) )
+  {
+  }
   virtual void OnKillFocus( wxProperty *WXUNUSED(property), wxPropertyFormView *WXUNUSED(view),
-     wxWindow *WXUNUSED(parentWindow) ) { }
+     wxWindow *WXUNUSED(parentWindow) )
+  {
+  }
   virtual void OnCommand( wxProperty *WXUNUSED(property), wxPropertyFormView *WXUNUSED(view),
-     wxWindow *WXUNUSED(parentWindow), wxCommandEvent& WXUNUSED(event) ) {}
+     wxWindow *WXUNUSED(parentWindow), wxCommandEvent& WXUNUSED(event) )
+  {
+  }
 private:
 };
 
@@ -160,7 +196,9 @@ class WXDLLIMPEXP_DEPRECATED wxRealFormValidator: public wxPropertyFormValidator
    {
      m_realMin = min; m_realMax = max;
    }
-   ~wxRealFormValidator(void) {}
+   ~wxRealFormValidator(void)
+   {
+   }
 
    bool OnCheckValue(wxProperty *property, wxPropertyFormView *view, wxWindow *parentWindow);
    bool OnRetrieveValue(wxProperty *property, wxPropertyFormView *view, wxWindow *parentWindow);
@@ -181,7 +219,9 @@ class WXDLLIMPEXP_DEPRECATED wxIntegerFormValidator: public wxPropertyFormValida
    {
      m_integerMin = min; m_integerMax = max;
    }
-   ~wxIntegerFormValidator(void) {}
+   ~wxIntegerFormValidator(void)
+   {
+   }
 
    bool OnCheckValue(wxProperty *property, wxPropertyFormView *view, wxWindow *parentWindow);
    bool OnRetrieveValue(wxProperty *property, wxPropertyFormView *view, wxWindow *parentWindow);
@@ -200,7 +240,9 @@ class WXDLLIMPEXP_DEPRECATED wxBoolFormValidator: public wxPropertyFormValidator
    wxBoolFormValidator(long flags = 0):wxPropertyFormValidator(flags)
    {
    }
-   ~wxBoolFormValidator(void) {}
+   ~wxBoolFormValidator(void)
+   {
+   }
 
    bool OnCheckValue(wxProperty *property, wxPropertyFormView *view, wxWindow *parentWindow);
    bool OnRetrieveValue(wxProperty *property, wxPropertyFormView *view, wxWindow *parentWindow);
@@ -278,8 +320,14 @@ public:
 
     // Extend event processing to search the view's event table
     virtual bool ProcessEvent(wxEvent& event);
-    void SetView(wxPropertyFormView* view) { m_view = view; }
-    wxPropertyFormView* GetView() const { return m_view; }
+    void SetView(wxPropertyFormView* view)
+    {
+      m_view = view;
+    }
+    wxPropertyFormView* GetView() const
+    {
+      return m_view;
+    }
 
 private:
     wxPropertyFormView*       m_view;
@@ -311,7 +359,10 @@ public:
     // Must call this to create panel and associate view
     virtual bool Initialize(void);
     virtual wxPanel *OnCreatePanel(wxFrame *parent, wxPropertyFormView *v);
-    inline virtual wxPanel *GetPropertyPanel(void) const { return m_propertyPanel; }
+    inline virtual wxPanel *GetPropertyPanel(void) const
+    {
+      return m_propertyPanel;
+    }
 
 private:
     wxPropertyFormView*       m_view;

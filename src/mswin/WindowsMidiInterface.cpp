@@ -578,10 +578,12 @@ void CALLBACK MidiOutProc(
   DWORD dwParam2
 )
 {
-  if (wMsg == MOM_DONE) {
+  if (wMsg == MOM_DONE)
+  {
     MIDIHDR *hdr = (MIDIHDR *)dwParam1;
     tWinSysexBuffer *buf = (tWinSysexBuffer *)hdr->dwUser;
-    if (buf != 0) {  // ignore OutNow() buffers
+    if (buf != 0)
+    {  // ignore OutNow() buffers
       buf->Release();
       OutputDebugString("release\n");
     }

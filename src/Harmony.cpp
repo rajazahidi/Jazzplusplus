@@ -382,7 +382,9 @@ void HBPlayer::StopPlay()
 class tHBPlayerForm : public wxForm
 {
   public:
-    tHBPlayerForm() : wxForm( USED_WXFORM_BUTTONS ) {}
+    tHBPlayerForm() : wxForm( USED_WXFORM_BUTTONS )
+    {
+    }
     void OnHelp()
     {
       gpHelpInstance->ShowTopic("Harmony browser");
@@ -1164,9 +1166,15 @@ class HBSettingsForm : public wxForm
 {
   public:
     HBSettingsForm(HBCanvas *c)
-        : wxForm( USED_WXFORM_BUTTONS )
-    { mpHbWindow = c; }
-    virtual void OnOk() { mpHbWindow->OnPaint(); wxForm::OnOk(); }
+      : wxForm( USED_WXFORM_BUTTONS )
+    {
+      mpHbWindow = c;
+    }
+    virtual void OnOk()
+    {
+      mpHbWindow->OnPaint();
+      wxForm::OnOk();
+    }
     virtual void OnHelp();
   private:
     HBCanvas *mpHbWindow;
@@ -1637,8 +1645,14 @@ class HBContextDlg : public wxDialog
     HBChord    scale;
     int        chord_key;
     int        scale_key;
-    int               ChordKey(int i = 0) const { return (chord_key + i) % 12; }
-    int               ScaleKey(int i = 0) const { return (chord_key + i) % 12; } // yes, its chord_key!
+    int ChordKey(int i = 0) const
+    {
+      return (chord_key + i) % 12;
+    }
+    int ScaleKey(int i = 0) const
+    {
+      return (chord_key + i) % 12;
+    }
     HBContext  *pcontext;
 
     HBPlayer   player;

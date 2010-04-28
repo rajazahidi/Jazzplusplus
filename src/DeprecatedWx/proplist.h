@@ -144,23 +144,65 @@ public:
   void OnEdit(wxCommandEvent& event);
   void OnText(wxCommandEvent& event);
 
-  inline virtual wxListBox *GetPropertyScrollingList() const { return m_propertyScrollingList; }
-  inline virtual wxListBox *GetValueList() const { return m_valueList; }
-  inline virtual wxTextCtrl *GetValueText() const { return m_valueText; }
-  inline virtual wxButton *GetConfirmButton() const { return m_confirmButton; }
-  inline virtual wxButton *GetCancelButton() const { return m_cancelButton; }
-  inline virtual wxButton *GetEditButton() const { return m_editButton; }
-  inline virtual bool GetDetailedEditing(void) const { return m_detailedEditing; }
+  inline virtual wxListBox *GetPropertyScrollingList() const
+  {
+    return m_propertyScrollingList;
+  }
+  inline virtual wxListBox *GetValueList() const
+  {
+    return m_valueList;
+  }
+  inline virtual wxTextCtrl *GetValueText() const
+  {
+    return m_valueText;
+  }
+  inline virtual wxButton *GetConfirmButton() const
+  {
+    return m_confirmButton;
+  }
+  inline virtual wxButton *GetCancelButton() const
+  {
+    return m_cancelButton;
+  }
+  inline virtual wxButton *GetEditButton() const
+  {
+    return m_editButton;
+  }
+  inline virtual bool GetDetailedEditing(void) const
+  {
+    return m_detailedEditing;
+  }
 
-  inline virtual void AssociatePanel(wxPanel *win) { m_propertyWindow = win; }
-  inline virtual wxPanel *GetPanel(void) const { return m_propertyWindow; }
+  inline virtual void AssociatePanel(wxPanel *win)
+  {
+    m_propertyWindow = win;
+  }
+  inline virtual wxPanel *GetPanel(void) const
+  {
+    return m_propertyWindow;
+  }
 
-  inline virtual void SetManagedWindow(wxWindow *win) { m_managedWindow = win; }
-  inline virtual wxWindow *GetManagedWindow(void) const { return m_managedWindow; }
+  inline virtual void SetManagedWindow(wxWindow *win)
+  {
+    m_managedWindow = win;
+  }
+  inline virtual wxWindow *GetManagedWindow(void) const
+  {
+    return m_managedWindow;
+  }
 
-  inline virtual wxButton *GetWindowCloseButton() const { return m_windowCloseButton; }
-  inline virtual wxButton *GetWindowCancelButton() const { return m_windowCancelButton; }
-  inline virtual wxButton *GetHelpButton() const { return m_windowHelpButton; }
+  inline virtual wxButton *GetWindowCloseButton() const
+  {
+    return m_windowCloseButton;
+  }
+  inline virtual wxButton *GetWindowCancelButton() const
+  {
+    return m_windowCancelButton;
+  }
+  inline virtual wxButton *GetHelpButton() const
+  {
+    return m_windowHelpButton;
+  }
 
   bool OnClose(void);
 
@@ -223,8 +265,12 @@ private:
 class WXDLLIMPEXP_DEPRECATED wxPropertyListValidator: public wxPropertyValidator
 {
 public:
-   wxPropertyListValidator(long flags = wxPROP_ALLOW_TEXT_EDITING): wxPropertyValidator(flags) { }
-   ~wxPropertyListValidator() {}
+   wxPropertyListValidator(long flags = wxPROP_ALLOW_TEXT_EDITING): wxPropertyValidator(flags)
+   {
+   }
+   ~wxPropertyListValidator()
+   {
+   }
 
    // Called when the property is selected or deselected: typically displays the value
    // in the edit control (having chosen a suitable control to display: (non)editable text or listbox)
@@ -329,8 +375,14 @@ public:
     ~wxPropertyListPanel();
     void OnDefaultAction(wxControl *item);
 
-    inline void SetView(wxPropertyListView* v) { m_view = v; }
-    inline wxPropertyListView* GetView() const { return m_view; }
+    inline void SetView(wxPropertyListView* v)
+    {
+      m_view = v;
+    }
+    inline wxPropertyListView* GetView() const
+    {
+      return m_view;
+    }
 
     // Extend event processing to search the view's event table
     virtual bool ProcessEvent(wxEvent& event);
@@ -370,8 +422,14 @@ public:
     // Must call this to create panel and associate view
     virtual bool Initialize(void);
     virtual wxPropertyListPanel *OnCreatePanel(wxFrame *parent, wxPropertyListView *v);
-    inline virtual wxPropertyListPanel *GetPropertyPanel(void) const { return m_propertyPanel; }
-    inline wxPropertyListView* GetView() const { return m_view; }
+    inline virtual wxPropertyListPanel *GetPropertyPanel(void) const
+    {
+      return m_propertyPanel;
+    }
+    inline wxPropertyListView* GetView() const
+    {
+      return m_view;
+    }
 
 private:
     wxPropertyListView*       m_view;
@@ -392,7 +450,9 @@ public:
     // 0.0, 0.0 means no range
     wxRealListValidator(float min = 0.0, float max = 0.0, long flags = wxPROP_ALLOW_TEXT_EDITING):wxPropertyListValidator(flags)
         { m_realMin = min; m_realMax = max; }
-    ~wxRealListValidator() {}
+    ~wxRealListValidator()
+    {
+    }
 
     bool OnPrepareControls(wxProperty *property, wxPropertyListView *view, wxWindow *parentWindow);
 
@@ -421,7 +481,9 @@ public:
    {
      m_integerMin = min; m_integerMax = max;
    }
-   ~wxIntegerListValidator() {}
+   ~wxIntegerListValidator()
+   {
+   }
 
    bool OnPrepareControls(wxProperty *property, wxPropertyListView *view, wxWindow *parentWindow);
 
@@ -445,8 +507,12 @@ private:
 class WXDLLIMPEXP_DEPRECATED wxBoolListValidator: public wxPropertyListValidator
 {
 public:
-    wxBoolListValidator(long flags = 0):wxPropertyListValidator(flags) {}
-    ~wxBoolListValidator() {}
+    wxBoolListValidator(long flags = 0):wxPropertyListValidator(flags)
+    {
+    }
+    ~wxBoolListValidator()
+    {
+    }
 
     bool OnPrepareControls(wxProperty *property, wxPropertyListView *view, wxWindow *parentWindow);
     bool OnPrepareDetailControls(wxProperty *property, wxPropertyListView *view, wxWindow *parentWindow);
@@ -562,7 +628,9 @@ class WXDLLIMPEXP_DEPRECATED wxListOfStringsListValidator: public wxPropertyList
 {
 public:
     wxListOfStringsListValidator(long flags = 0);
-    ~wxListOfStringsListValidator() {}
+    ~wxListOfStringsListValidator()
+    {
+    }
 
     bool OnPrepareControls(wxProperty *property, wxPropertyListView *view, wxWindow *parentWindow);
 

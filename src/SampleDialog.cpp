@@ -336,7 +336,8 @@ void tDistortion::Action()
       double fy = ymap.XToY(arr[(float)fx]);
       data[i] = (short)fy;
     }
-    else {
+    else
+    {
       x = -x;
       double fx = xmap.XToY(x);
       double fy = ymap.XToY(arr[(float)fx]);

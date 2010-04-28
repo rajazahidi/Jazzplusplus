@@ -37,8 +37,8 @@
 //#include <unistd.h>
 #include <cassert>
 #include <cstdlib>
-
-#include <string.h>
+#include <cstring>
+#include <iostream>
 #include <errno.h>
 
 #ifndef _MSC_VER

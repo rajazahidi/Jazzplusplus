@@ -37,6 +37,8 @@
 #define ID_SETTINGS_SYNTHESIZER              wxID_HIGHEST + 11
 #define ID_SETTINGS_MIDI_DEVICE              wxID_HIGHEST + 12
 
+#define ID_EDIT_PASTE_MERGE                  wxID_HIGHEST + 15
+
 #define ID_AUDIO_GLOBAL_SETTINGS             wxID_HIGHEST + 20
 #define ID_AUDIO_SAMPLE_SETTINGS             wxID_HIGHEST + 21
 #define ID_AUDIO_LOAD_SAMPLE_SET             wxID_HIGHEST + 22

@@ -29,6 +29,7 @@
 #include "Mapper.h"
 #include "MouseAction.h"
 #include "Player.h"
+#include "Resources.h"
 #include "Rhythm.h"
 #include "Sample.h"
 #include "SampleCommand.h"
@@ -52,10 +53,6 @@
 #define MEN_SAVEAS      6
 #define MEN_REVERT      7
 
-#define MEN_PASTE       12
-#define MEN_PASTE_MIX   15
-
-
 #define MEN_VOLUME_MAX  19
 #define MEN_VOLUME_PNT  20
 
@@ -78,7 +75,6 @@
 #define MEN_REVERB      47
 #define MEN_SHIFTER     48
 #define MEN_REVERSE     49
-#define MEN_SETTINGS    50
 #define MEN_FILTER      51
 #define MEN_CHORUS      52
 #define MEN_STEREO      53
@@ -90,13 +86,17 @@
 
 class tSamplePlayPosition;
 
-class tInsertionPoint {
+class tInsertionPoint
+{
   public:
-    tInsertionPoint(wxScrolledWindow *c) : cnvs(c)
+
+    tInsertionPoint(wxScrolledWindow *c)
+      : cnvs(c)
     {
       last_x = 0;
       visible = 0;
-    };
+    }
+
     void Draw(int x)
     {
       last_x = x;
@@ -110,53 +110,75 @@ class tInsertionPoint {
       dc->SetPen(*wxBLACK_PEN);
       dc->SetLogicalFunction(wxCOPY);
     }
+
     void Draw()
     {
       Draw(last_x);
     }
-    int IsVisible() const {
+
+    int IsVisible() const
+    {
       return visible;
     }
-    float GetX() const {
+
+    float GetX() const
+    {
       return last_x;
     }
+
   private:
+
     int last_x;
     int visible;
     wxScrolledWindow *cnvs;
 };
 
 
-
-
 class tSampleCnvs : public wxScrolledWindow
 {
   friend class tSampleWin;
   friend class tSmplWinSettingsForm;
+
   public:
+
     tSampleCnvs(tSampleWin *win, tSample &sample);
+
     virtual ~tSampleCnvs();
+
     void Redraw()
     {
       OnPaint();
     }
+
     virtual void OnPaint();
+
     virtual void OnSize(int w, int h);
+
     virtual void OnEvent(wxMouseEvent& MouseEvent);
+
     void ClearSelection();
+
     void SetInsertionPoint(int offs);
+
     void SetSelection(int fr, int to);
 
     int Sample2Pixel(int sample);
+
     int Pixel2Sample(float pixel);
+
     void Play();
 
+  private:
+
+    void DrawSample(int channel, int x, int y, int w, int h);
+
+    void DrawTicks(int x, int y, int w);
 
   private:
-    void DrawSample(int channel, int x, int y, int w, int h);
+
     tSampleWin *win;
+
     tSample &spl;
-    void DrawTicks(int x, int y, int w);
 
     int paint_offset;
     int paint_length;
@@ -217,8 +239,11 @@ class tSmplWinSettingsForm : public wxForm
 class tSamplePlayPosition : public wxTimer
 {
   public:
+
     tSamplePlayPosition(tSampleCnvs &c, JZPlayer *p, tSample &s)
-      : cnvs(c), player(p), spl(s)
+      : cnvs(c),
+        player(p),
+        spl(s)
     {
       visible = FALSE;
       x = 0;
@@ -703,7 +728,7 @@ tSampleWin::tSampleWin(wxWindow* pParent, tSampleWin **ref, tSample &sample)
   in_constructor = TRUE;
 
   cnvs         = 0;
-  mpToolBar     = 0;
+  mpToolBar    = 0;
   scrol_panel  = 0;
   pos_scrol    = 0;
   zoom_scrol   = 0;
@@ -727,63 +752,72 @@ tSampleWin::tSampleWin(wxWindow* pParent, tSampleWin **ref, tSample &sample)
 
   mpToolBar = new JZToolBar(this, tdefs);
 
-  wxMenuBar *menu_bar = new wxMenuBar;
-  wxMenu    *menu = new wxMenu;
-  menu->Append(MEN_REVERT,      "&Revert to Saved");
-  menu->Append(MEN_LOAD,        "&Load...");
-  menu->Append(wxID_SAVE,       "&Save");
-  menu->Append(wxID_SAVEAS,     "&Save As...");
-  menu->Append(MEN_CLOSE,       "&Close");
-  menu_bar->Append(menu,        "&File");
+  // Create a menu bar, the various menus with entries, and attach them to the
+  // menu bar.
 
-  menu = new wxMenu;
-  menu->Append(wxID_CUT,        "&Cut");
-  menu->Append(wxID_COPY,        "Co&py");
+  wxMenu* pMenu = 0;
+  wxMenu* pSubMenu = 0;
+  wxMenuBar* pMenuBar = new wxMenuBar;
 
-  menu->Append(MEN_PASTE,       "&Paste");
-  menu->Append(MEN_PASTE_MIX,   "Paste &Merge");
-  wxMenu *sub = new wxMenu;
-  sub->Append(MEN_SILENCE_OVR,  "&Replace");
-  sub->Append(MEN_SILENCE_INS,  "&Insert");
-  sub->Append(MEN_SILENCE_APP,  "&Append");
-  menu->Append(MEN_SILENCE,     "&Silence", sub);
-  sub = new wxMenu;
-  sub->Append(MEN_FLIP_LEFT,    "Left");
-  sub->Append(MEN_FLIP_RIGHT,   "Right");
-  menu->Append(MEN_FLIP,        "In&vert Phase", sub);
-  menu->Append(MEN_VOLUME_MAX,  "&Maximize Volume");
-  menu_bar->Append(menu,        "&Edit");
+  // Create and populate the File menu.
+  pMenu = new wxMenu;
 
-  menu = new wxMenu;
-  menu->Append(MEN_VOLUME_PNT,   "&Volume...");
-  menu->Append(MEN_PAN_PNT,      "&Panpot...");
-  menu->Append(MEN_TRANSP_PNT,   "&Pitch...");
-  menu->Append(MEN_WAHWAH,       "&Filter...");
-  menu->Append(MEN_CANCEL,       "&None...");
-  menu_bar->Append(menu,         "&Painters");
+  pMenu->Append(MEN_REVERT, "&Revert to Saved");
+  pMenu->Append(MEN_LOAD, "&Load...");
+  pMenu->Append(wxID_SAVE, "&Save");
+  pMenu->Append(wxID_SAVEAS, "&Save As...");
+  pMenu->Append(MEN_CLOSE, "&Close");
 
-  menu = new wxMenu;
-  menu->Append(MEN_EQUALIZER,    "&Equalizer...");
-  menu->Append(MEN_FILTER,       "&Filter...");
-  menu->Append(MEN_DISTORTION,   "&Distortion...");
-  menu->Append(MEN_REVERB,       "&Reverb...");
-  menu->Append(MEN_ECHO,         "&Echo...");
-  menu->Append(MEN_CHORUS,       "&Chorus...");
-  menu->Append(MEN_SHIFTER,      "&Pitch shifter...");
-  menu->Append(MEN_STRETCHER,    "&Time stretcher...");
-  menu->Append(MEN_REVERSE,      "Re&verse");
-  menu->Append(MEN_SYNTH,        "&Synth...");
-  menu_bar->Append(menu,         "&Effects");
+  pMenuBar->Append(pMenu, "&File");
 
-  menu = new wxMenu;
-  menu->Append(MEN_TRANSP_SET,   "&Pitch Painter...");
-  menu->Append(MEN_WAHSETTINGS,  "&Filter Painter...");
-//  menu->Append(wxID_ZOOM_IN,     "Zoom &In");
-//  menu->Append(wxID_ZOOM_OUT,     "Zoom &Out");
-  menu->Append(MEN_SETTINGS,     "&View Settings...");
-  menu_bar->Append(menu,         "&Settings");
+  // Create and populate the Edit menu.
+  pMenu = new wxMenu;
+  pMenu->Append(wxID_CUT, "&Cut");
+  pMenu->Append(wxID_COPY, "Co&py");
+  pMenu->Append(wxID_PASTE, "&Paste");
+  pMenu->Append(ID_EDIT_PASTE_MERGE, "Paste &Merge");
+  pSubMenu = new wxMenu;
+  pSubMenu->Append(MEN_SILENCE_OVR, "&Replace");
+  pSubMenu->Append(MEN_SILENCE_INS, "&Insert");
+  pSubMenu->Append(MEN_SILENCE_APP, "&Append");
+  pMenu->Append(MEN_SILENCE, "&Silence", pSubMenu);
+  pSubMenu = new wxMenu;
+  pSubMenu->Append(MEN_FLIP_LEFT, "Left");
+  pSubMenu->Append(MEN_FLIP_RIGHT, "Right");
+  pMenu->Append(MEN_FLIP, "In&vert Phase", pSubMenu);
+  pMenu->Append(MEN_VOLUME_MAX,  "&Maximize Volume");
+  pMenuBar->Append(pMenu,        "&Edit");
 
-  SetMenuBar(menu_bar);
+  pMenu = new wxMenu;
+  pMenu->Append(MEN_VOLUME_PNT,   "&Volume...");
+  pMenu->Append(MEN_PAN_PNT, "&Panpot...");
+  pMenu->Append(MEN_TRANSP_PNT, "&Pitch...");
+  pMenu->Append(MEN_WAHWAH, "&Filter...");
+  pMenu->Append(MEN_CANCEL, "&None...");
+  pMenuBar->Append(pMenu, "&Painters");
+
+  pMenu = new wxMenu;
+  pMenu->Append(MEN_EQUALIZER,    "&Equalizer...");
+  pMenu->Append(MEN_FILTER,       "&Filter...");
+  pMenu->Append(MEN_DISTORTION,   "&Distortion...");
+  pMenu->Append(MEN_REVERB,       "&Reverb...");
+  pMenu->Append(MEN_ECHO,         "&Echo...");
+  pMenu->Append(MEN_CHORUS,       "&Chorus...");
+  pMenu->Append(MEN_SHIFTER,      "&Pitch shifter...");
+  pMenu->Append(MEN_STRETCHER,    "&Time stretcher...");
+  pMenu->Append(MEN_REVERSE,      "Re&verse");
+  pMenu->Append(MEN_SYNTH,        "&Synth...");
+  pMenuBar->Append(pMenu,         "&Effects");
+
+  pMenu = new wxMenu;
+  pMenu->Append(MEN_TRANSP_SET,   "&Pitch Painter...");
+  pMenu->Append(MEN_WAHSETTINGS,  "&Filter Painter...");
+//  pMenu->Append(wxID_ZOOM_IN,     "Zoom &In");
+//  pMenu->Append(wxID_ZOOM_OUT,     "Zoom &Out");
+  pMenu->Append(MEN_SETTINGS,     "&View Settings...");
+  pMenuBar->Append(pMenu,         "&Settings");
+
+  SetMenuBar(pMenuBar);
 
   // construct a panel containing the scrollbars
   cnvs = new tSampleCnvs(this, spl);
@@ -1220,7 +1254,7 @@ void tSampleWin::OnMenuCommand(int id)
       on_accept = new tCommandPainter(*this, pan_command);
       break;
 
-    case MEN_PASTE_MIX:
+    case ID_EDIT_PASTE_MERGE:
       {
         int offs;
         if (HaveInsertionPoint(offs))
@@ -1232,7 +1266,7 @@ void tSampleWin::OnMenuCommand(int id)
       }
       break;
 
-    case MEN_PASTE:
+    case wxID_PASTE:
       {
         int offs, fr, to;
         if (HaveInsertionPoint(offs, FALSE))

@@ -22,22 +22,23 @@
 
 #include "Harmony.h"
 
+#include "FileSelector.h"
+#include "Filter.h"
+#include "Globals.h"
+#include "GuitarFrame.h"
+#include "HarmonyBrowserAnalyzer.h"
 #include "HarmonyP.h"
-#include "ProjectManager.h"
-#include "Player.h"
-#include "TrackFrame.h"
-#include "TrackWindow.h"
+#include "Help.h"
 #include "PianoFrame.h"
 #include "PianoWindow.h"
-#include "GuitarFrame.h"
-#include "Song.h"
-#include "Filter.h"
-#include "ToolBar.h"
-#include "HarmonyBrowserAnalyzer.h"
-#include "FileSelector.h"
+#include "Player.h"
+#include "ProjectManager.h"
 #include "Rectangle.h"
-#include "Globals.h"
-#include "Help.h"
+#include "Resources.h"
+#include "Song.h"
+#include "ToolBar.h"
+#include "TrackFrame.h"
+#include "TrackWindow.h"
 
 #include <wx/button.h>
 #include <wx/checkbox.h>
@@ -49,8 +50,8 @@
 #include <wx/stattext.h>
 #include <wx/toolbar.h>
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 using namespace std;
 
@@ -78,7 +79,6 @@ using namespace std;
 #define MEN_HAUNSCH     23
 #define MEN_ANALYZE     24
 #define MEN_IONSCALE    25
-#define MEN_SETTINGS    26
 
 
 #include "Bitmaps/open.xpm"
@@ -1492,7 +1492,7 @@ void HBCanvas::MenuCommand(int MenuId, wxToolBar* pToolBar)
       TransposeSelection();
       break;
 
-    case MEN_SETTINGS:
+    case ID_VIEW_SETTINGS:
       SettingsDialog();
       break;
 
@@ -2000,7 +2000,7 @@ BEGIN_EVENT_TABLE(HBFrame, wxFrame)
 
 //  EVT_MENU(MEN_ANALYZE,
 //  EVT_MENU(MEN_TRANSPOSE,
-//  EVT_MENU(MEN_SETTINGS,
+//  EVT_MENU(ID_VIEW_SETTINGS,
 
 END_EVENT_TABLE()
 
@@ -2028,7 +2028,7 @@ HBFrame::HBFrame()
 
   wxMenu* pSettingsMenu = new wxMenu;
   pSettingsMenu->Append(MEN_EDIT, "&Chord");
-  pSettingsMenu->Append(MEN_SETTINGS, "&Global");
+  pSettingsMenu->Append(ID_VIEW_SETTINGS, "&Global");
   pSettingsMenu->Append(MEN_MIDI, "&Midi");
   pSettingsMenu->Append(
     MEN_HAUNSCH,

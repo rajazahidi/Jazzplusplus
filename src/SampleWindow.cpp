@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008-2009 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -45,41 +45,15 @@
 
 //DEBUG#include <iostream>
 
-#define MEN_LOAD        1
-#define MEN_SAVE        2
-#define MEN_CLOSE       3
-#define MEN_PLAY        4
 #define MEN_HELP        5
-#define MEN_SAVEAS      6
-#define MEN_REVERT      7
-
-#define MEN_VOLUME_MAX  19
-#define MEN_VOLUME_PNT  20
 
 #define MEN_SILENCE     21
 #define MEN_SILENCE_INS 22
 #define MEN_SILENCE_APP 23
 #define MEN_SILENCE_OVR 24
-#define MEN_WAHWAH      25
-#define MEN_WAHSETTINGS 26
-
-#define MEN_PAN_PNT     27
-#define MEN_TRANSP_PNT  28
-#define MEN_TRANSP_SET  29
 
 #define MEN_ACCEPT      42
-#define MEN_CANCEL      43
-#define MEN_ECHO        44
-#define MEN_DISTORTION  45
-#define MEN_EQUALIZER   46
-#define MEN_REVERB      47
-#define MEN_SHIFTER     48
-#define MEN_REVERSE     49
-#define MEN_FILTER      51
-#define MEN_CHORUS      52
-#define MEN_STEREO      53
-#define MEN_STRETCHER   54
-#define MEN_SYNTH       55
+
 #define MEN_FLIP        56
 #define MEN_FLIP_LEFT   57
 #define MEN_FLIP_RIGHT  58
@@ -692,22 +666,29 @@ void tSampleCnvs::Play()
 #include "Bitmaps/zoomin.xpm"
 #include "Bitmaps/zoomout.xpm"
 
-static JZToolDef tdefs[] = {
-  { MEN_LOAD,     FALSE, open_xpm,    "open wave file" },
-  { MEN_SAVE,     FALSE, save_xpm,    "save wave file" },
+static JZToolDef tdefs[] =
+{
+  { wxID_OPEN,     FALSE, open_xpm,    "open wave file" },
+  { wxID_SAVE,     FALSE, save_xpm,    "save wave file" },
   { JZToolBar::eToolBarSeparator },
   { wxID_ZOOM_IN,  FALSE, zoomin_xpm,  "zoom to selection" },
   { wxID_ZOOM_OUT, FALSE, zoomout_xpm, "zoom out" },
   { MEN_ACCEPT,   FALSE, accept_xpm,  "accept painting" },
-  { MEN_CANCEL,   FALSE, cancel_xpm,  "cancel painting" },
+  { ID_PAINTER_NONE,   FALSE, cancel_xpm,  "cancel painting" },
   { JZToolBar::eToolBarSeparator },
-  { MEN_PLAY,     FALSE, play_xpm,    "play sample" },
+  { ID_PLAY,     FALSE, play_xpm,    "play sample" },
   { MEN_HELP,     FALSE, help_xpm,    "help" },
   { JZToolBar::eToolBarEnd }
 };
 
 
-int tSampleWin::geo[4] = { 30, 30, 600, 300 };
+int tSampleWin::geo[4] =
+{
+  30,
+  30,
+  600,
+  300
+};
 
 tSample *tSampleWin::copy_buffer;
 
@@ -763,11 +744,11 @@ tSampleWin::tSampleWin(wxWindow* pParent, tSampleWin **ref, tSample &sample)
   // Create and populate the File menu.
   pMenu = new wxMenu;
 
-  pMenu->Append(MEN_REVERT, "&Revert to Saved");
-  pMenu->Append(MEN_LOAD, "&Load...");
+  pMenu->Append(ID_FILE_REVERT_TO_SAVED, "&Revert to Saved");
+  pMenu->Append(wxID_OPEN, "&Load...");
   pMenu->Append(wxID_SAVE, "&Save");
   pMenu->Append(wxID_SAVEAS, "&Save As...");
-  pMenu->Append(MEN_CLOSE, "&Close");
+  pMenu->Append(wxID_CLOSE, "&Close");
 
   pMenuBar->Append(pMenu, "&File");
 
@@ -786,37 +767,37 @@ tSampleWin::tSampleWin(wxWindow* pParent, tSampleWin **ref, tSample &sample)
   pSubMenu->Append(MEN_FLIP_LEFT, "Left");
   pSubMenu->Append(MEN_FLIP_RIGHT, "Right");
   pMenu->Append(MEN_FLIP, "In&vert Phase", pSubMenu);
-  pMenu->Append(MEN_VOLUME_MAX,  "&Maximize Volume");
-  pMenuBar->Append(pMenu,        "&Edit");
+  pMenu->Append(ID_EDIT_MAXIMIZE_VOLUME, "&Maximize Volume");
+  pMenuBar->Append(pMenu, "&Edit");
 
   pMenu = new wxMenu;
-  pMenu->Append(MEN_VOLUME_PNT,   "&Volume...");
-  pMenu->Append(MEN_PAN_PNT, "&Panpot...");
-  pMenu->Append(MEN_TRANSP_PNT, "&Pitch...");
-  pMenu->Append(MEN_WAHWAH, "&Filter...");
-  pMenu->Append(MEN_CANCEL, "&None...");
+  pMenu->Append(ID_PAINTERS_VOLUME, "&Volume...");
+  pMenu->Append(ID_PAINTER_PAN, "&Panpot...");
+  pMenu->Append(ID_PAINTER_PITCH, "&Pitch...");
+  pMenu->Append(ID_PAINTER_WAHWAH, "&Filter...");
+  pMenu->Append(ID_PAINTER_NONE, "&None...");
   pMenuBar->Append(pMenu, "&Painters");
 
   pMenu = new wxMenu;
-  pMenu->Append(MEN_EQUALIZER,    "&Equalizer...");
-  pMenu->Append(MEN_FILTER,       "&Filter...");
-  pMenu->Append(MEN_DISTORTION,   "&Distortion...");
-  pMenu->Append(MEN_REVERB,       "&Reverb...");
-  pMenu->Append(MEN_ECHO,         "&Echo...");
-  pMenu->Append(MEN_CHORUS,       "&Chorus...");
-  pMenu->Append(MEN_SHIFTER,      "&Pitch shifter...");
-  pMenu->Append(MEN_STRETCHER,    "&Time stretcher...");
-  pMenu->Append(MEN_REVERSE,      "Re&verse");
-  pMenu->Append(MEN_SYNTH,        "&Synth...");
+  pMenu->Append(ID_EFFECTS_EQUALIZER, "&Equalizer...");
+  pMenu->Append(ID_EFFECTS_FILTER, "&Filter...");
+  pMenu->Append(ID_EFFECTS_DISTORTION, "&Distortion...");
+  pMenu->Append(ID_EFFECTS_REVERB, "&Reverb...");
+  pMenu->Append(ID_EFFECTS_ECHO, "&Echo...");
+  pMenu->Append(ID_EFFECTS_CHORUS, "&Chorus...");
+  pMenu->Append(ID_EFFECTS_PITCH_SHIFTER, "&Pitch shifter...");
+  pMenu->Append(ID_EFFECTS_STRETCHER, "&Time stretcher...");
+  pMenu->Append(ID_EFFECTS_REVERSE, "Re&verse");
+  pMenu->Append(ID_EFFECTS_SYNTH, "&Synth...");
   pMenuBar->Append(pMenu,         "&Effects");
 
   pMenu = new wxMenu;
-  pMenu->Append(MEN_TRANSP_SET,   "&Pitch Painter...");
-  pMenu->Append(MEN_WAHSETTINGS,  "&Filter Painter...");
+  pMenu->Append(ID_SETTINGS_PITCH_PAINTER, "&Pitch Painter...");
+  pMenu->Append(ID_SETTINGS_WAHWAH, "&Filter Painter...");
 //  pMenu->Append(wxID_ZOOM_IN,     "Zoom &In");
 //  pMenu->Append(wxID_ZOOM_OUT,     "Zoom &Out");
-  pMenu->Append(MEN_SETTINGS,     "&View Settings...");
-  pMenuBar->Append(pMenu,         "&Settings");
+  pMenu->Append(ID_VIEW_SETTINGS, "&View Settings...");
+  pMenuBar->Append(pMenu, "&Settings");
 
   SetMenuBar(pMenuBar);
 
@@ -1012,14 +993,14 @@ void tSampleWin::OnMenuCommand(int id)
   }
 
   // Player crashes if data disappear.
-  if (id != MEN_PLAY)
+  if (id != ID_PLAY)
   {
     cnvs->playpos->StopListen();
   }
 
   switch (id)
   {
-    case MEN_EQUALIZER:
+    case ID_EFFECTS_EQUALIZER:
       if (equalizer == 0)
         equalizer = new tEqualizer(*this);
       equalizer->Show(TRUE);
@@ -1032,13 +1013,13 @@ void tSampleWin::OnMenuCommand(int id)
       spl.Flip(1);
       break;
 
-    case MEN_DISTORTION:
+    case ID_EFFECTS_DISTORTION:
       if (distortion == 0)
         distortion = new tDistortion(*this);
       distortion->Show(TRUE);
       break;
 
-    case MEN_REVERB:
+    case ID_EFFECTS_REVERB:
 #ifdef OBSOLETE
       if (reverb == 0)
       {
@@ -1054,7 +1035,7 @@ void tSampleWin::OnMenuCommand(int id)
 #endif
       break;
 
-    case MEN_REVERSE:
+    case ID_EFFECTS_REVERSE:
       {
         int fr, to;
         if (HaveSelection(fr, to))
@@ -1065,7 +1046,7 @@ void tSampleWin::OnMenuCommand(int id)
       }
       break;
 
-    case MEN_SHIFTER:
+    case ID_EFFECTS_PITCH_SHIFTER:
 #ifdef OBSOLETE
       if (shifter == 0)
       {
@@ -1080,7 +1061,7 @@ void tSampleWin::OnMenuCommand(int id)
 #endif
       break;
 
-    case MEN_STRETCHER:
+    case ID_EFFECTS_STRETCHER:
 #ifdef OBSOLETE
       if (stretcher == 0)
       {
@@ -1095,7 +1076,7 @@ void tSampleWin::OnMenuCommand(int id)
 #endif
       break;
 
-    case MEN_FILTER:
+    case ID_EFFECTS_FILTER:
 #ifdef OBSOLETE
       if (filter == 0)
       {
@@ -1108,7 +1089,7 @@ void tSampleWin::OnMenuCommand(int id)
 #endif
       break;
 
-    case MEN_SETTINGS:
+    case ID_VIEW_SETTINGS:
 #ifdef OBSOLETE
       if (settings == 0)
       {
@@ -1121,7 +1102,7 @@ void tSampleWin::OnMenuCommand(int id)
 #endif
       break;
 
-    case MEN_ECHO:
+    case ID_EFFECTS_ECHO:
 #ifdef OBSOLETE
       if (echo == 0)
       {
@@ -1136,7 +1117,7 @@ void tSampleWin::OnMenuCommand(int id)
 #endif
       break;
 
-    case MEN_CHORUS:
+    case ID_EFFECTS_CHORUS:
 #ifdef OBSOLETE
       if (chorus == 0)
       {
@@ -1151,7 +1132,7 @@ void tSampleWin::OnMenuCommand(int id)
 #endif
       break;
 
-    case MEN_SYNTH:
+    case ID_EFFECTS_SYNTH:
       if (synth == 0)
         synth = new tSynthDlg(*this);
       synth->Show(TRUE);
@@ -1168,7 +1149,7 @@ void tSampleWin::OnMenuCommand(int id)
       }
       break;
 
-    case MEN_CANCEL:
+    case ID_PAINTER_NONE:
       if (on_accept)
       {
         delete on_accept;
@@ -1209,22 +1190,22 @@ void tSampleWin::OnMenuCommand(int id)
       SetViewPos(0, spl.GetLength());
       break;
 
-    case MEN_VOLUME_MAX:
+    case ID_EDIT_MAXIMIZE_VOLUME:
       spl.Rescale();
       Redraw();
       break;
 
-    case MEN_VOLUME_PNT:
+    case ID_PAINTERS_VOLUME:
       delete on_accept;
       on_accept = new tCommandPainter(*this, vol_command);
       break;
 
-    case MEN_WAHWAH:
+    case ID_PAINTER_WAHWAH:
       delete on_accept;
       on_accept = new tCommandPainter(*this, wah_command);
       break;
 
-    case MEN_WAHSETTINGS:
+    case ID_SETTINGS_WAHWAH:
 #ifdef OBSOLETE
       if (wah_settings == 0)
       {
@@ -1237,7 +1218,7 @@ void tSampleWin::OnMenuCommand(int id)
 #endif
       break;
 
-    case MEN_TRANSP_SET:
+    case ID_SETTINGS_PITCH_PAINTER:
 #ifdef OBSOLETE
       if (pitch_settings == 0)
       {
@@ -1251,7 +1232,7 @@ void tSampleWin::OnMenuCommand(int id)
       break;
 
 
-    case MEN_PAN_PNT:
+    case ID_PAINTER_PAN:
       delete on_accept;
       on_accept = new tCommandPainter(*this, pan_command);
       break;
@@ -1319,39 +1300,46 @@ void tSampleWin::OnMenuCommand(int id)
       }
       break;
 
-    case MEN_TRANSP_PNT:
+    case ID_PAINTER_PITCH:
       delete on_accept;
       SetViewPos(0, spl.GetLength());
       on_accept = new tCommandPainter(*this, pitch_command);
       break;
 
-    case MEN_REVERT:
+    case ID_FILE_REVERT_TO_SAVED:
       cnvs->ClearSelection();
       if (spl.Load(TRUE))
         LoadError(spl);
       Redraw();
       break;
 
-    case MEN_CLOSE:
+    case wxID_CLOSE:
 //      DELETE_THIS();
       Destroy();
       break;
 
-    case MEN_PLAY:
+    case ID_PLAY:
       cnvs->Play();
       break;
 
-    case MEN_LOAD:
+    case wxID_OPEN:
       {
         char *defname = copystring(spl.GetFilename());
-        wxString fname = file_selector(defname, "Load Sample", FALSE, FALSE, "*.wav");
+        wxString fname = file_selector(
+          defname,
+          "Load Sample",
+          FALSE,
+          FALSE,
+          "*.wav");
         if (!fname.empty())
         {
           wxBeginBusyCursor();
           cnvs->ClearSelection();
           spl.SetFilename(fname);
           if (spl.Load(TRUE))
+          {
             LoadError(spl);
+          }
           spl->RefreshDialogs();
           SetTitle(fname);
           Redraw();
@@ -1361,14 +1349,19 @@ void tSampleWin::OnMenuCommand(int id)
       }
       break;
 
-    case MEN_SAVEAS:
+    case wxID_SAVEAS:
       {
         char *defname = copystring(spl.GetFilename());
-        wxString fname = file_selector(defname, "Save Sample", TRUE, FALSE, "*.wav");
+        wxString fname = file_selector(
+          defname,
+          "Save Sample",
+          TRUE,
+          FALSE,
+          "*.wav");
         if (!fname.empty())
         {
           spl.SetFilename(fname);
-          OnMenuCommand(MEN_SAVE);
+          OnMenuCommand(wxID_SAVE);
           spl->RefreshDialogs();
           SetTitle(fname);
         }
@@ -1376,11 +1369,11 @@ void tSampleWin::OnMenuCommand(int id)
       }
       break;
 
-    case MEN_SAVE:
+    case wxID_SAVE:
       {
         if (spl.GetFilename()[0] == 0)
         {
-          OnMenuCommand(MEN_SAVEAS);
+          OnMenuCommand(wxID_SAVEAS);
         }
         else
         {

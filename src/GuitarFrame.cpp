@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ BEGIN_EVENT_TABLE(JZGuitarFrame, wxFrame)
 
   EVT_MENU(MEN_CLEAR, JZGuitarFrame::OnClear)
 
-  EVT_MENU(MEN_SETTINGS, JZGuitarFrame::OnSettings)
+  EVT_MENU(ID_VIEW_SETTINGS, JZGuitarFrame::OnSettings)
 
   EVT_MENU(wxID_HELP, JZGuitarFrame::OnHelp)
 
@@ -68,14 +68,21 @@ JZGuitarFrame::JZGuitarFrame(wxWindow* pParent)
   // set the frame icon
 //  SetIcon(wxICON(mondrian));
 
-  wxMenu* pMenu = new wxMenu;
-  pMenu->Append(MEN_CLEAR,    "C&lear");
-  pMenu->Append(MEN_SETTINGS, "&Settings");
-  pMenu->Append(wxID_HELP,    "&Help");
-  pMenu->Append(wxID_CLOSE,   "&Close");
-
+  wxMenu* pMenu = 0;
   wxMenuBar* pMenuBar = new wxMenuBar;
-  pMenuBar->Append(pMenu, "&Menu");
+
+  pMenu = new wxMenu;
+  pMenu->Append(wxID_CLOSE, "&Close");
+  pMenuBar->Append(pMenu, "&File");
+
+  pMenu = new wxMenu;
+  pMenu->Append(MEN_CLEAR, "C&lear");
+  pMenu->Append(ID_VIEW_SETTINGS, "&Settings");
+  pMenuBar->Append(pMenu, "&View");
+
+  pMenu = new wxMenu;
+  pMenu->Append(wxID_HELP, "&Help");
+  pMenuBar->Append(pMenu, "&Help");
 
   SetMenuBar(pMenuBar);
 

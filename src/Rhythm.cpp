@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -496,9 +496,6 @@ void tRhythm::Generate(
 // ============================ tRhythmWin ==============================
 
 
-#define MEN_CLOSE 1
-#define MEN_LOAD  2
-#define MEN_SAVE  3
 #define MEN_HELP  4
 #define MEN_ADD   5
 #define MEN_DEL   6
@@ -538,8 +535,8 @@ tRhythmWin::tRhythmWin(JZEventWindow* pEventWindow, JZSong* pSong)
 
   JZToolDef tdefs[] =
   {
-    { MEN_LOAD, FALSE, open_xpm,    "open rhythm file" },
-    { MEN_SAVE, FALSE, save_xpm,    "save into rhythm file" },
+    { wxID_OPEN, FALSE, open_xpm,    "open rhythm file" },
+    { wxID_SAVE, FALSE, save_xpm,    "save into rhythm file" },
     { JZToolBar::eToolBarSeparator },
     { MEN_ADD,  FALSE, rrgadd_xpm,  "add instrument" },
     { MEN_DEL,  FALSE, rrgdel_xpm,  "remove instrument" },
@@ -562,9 +559,9 @@ tRhythmWin::tRhythmWin(JZEventWindow* pEventWindow, JZSong* pSong)
 
   wxMenuBar *menu_bar = new wxMenuBar;
   wxMenu    *menu = new wxMenu;
-  menu->Append(MEN_LOAD,  "&Load");
-  menu->Append(MEN_SAVE,  "&Save");
-  menu->Append(MEN_CLOSE, "&Close");
+  menu->Append(wxID_OPEN,  "&Load");
+  menu->Append(wxID_SAVE,  "&Save");
+  menu->Append(wxID_CLOSE, "&Close");
   menu_bar->Append(menu,  "&File");
 
   menu = new wxMenu;
@@ -756,14 +753,14 @@ void tRhythmWin::OnMenuCommand(int id)
       Help();
       break;
 
-    case MEN_CLOSE:
+    case wxID_CLOSE:
         // motif crashes, when Show(FALSE) is called before destructor!
       // Show(FALSE);
 //        DELETE_THIS();
         Destroy();
         break;
 
-    case MEN_LOAD:
+    case wxID_OPEN:
       {
         wxString fname = file_selector(
           default_filename,
@@ -780,7 +777,7 @@ void tRhythmWin::OnMenuCommand(int id)
       }
       break;
 
-    case MEN_SAVE:
+    case wxID_SAVE:
       {
         Win2Instrument();
         wxString fname = file_selector(

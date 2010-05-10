@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -148,7 +148,7 @@ static inline void outsysex(tWinPlayerState *state)
 
 
 // handle incoming midi data (internal clock)
-void FAR PASCAL midiIntInputHandler(
+void CALLBACK midiIntInputHandler(
   HMIDIIN hMidiIn,
   WORD wMsg,
   DWORD dwInstance,
@@ -186,12 +186,13 @@ void FAR PASCAL midiIntInputHandler(
     }
 }
 
-
-
-
-
 // play output (internal clock)
-void FAR PASCAL midiIntTimerHandler(UINT wTimerId, UINT wMsg, DWORD dwUser, DWORD dw1, DWORD dw2)
+void CALLBACK midiIntTimerHandler(
+  UINT wTimerId,
+  UINT wMsg,
+  DWORD dwUser,
+  DWORD dw1,
+  DWORD dw2)
 {
   tWinPlayerState *state = (tWinPlayerState *)dwUser;
   if ( !state->playing )
@@ -203,7 +204,12 @@ void FAR PASCAL midiIntTimerHandler(UINT wTimerId, UINT wMsg, DWORD dwUser, DWOR
     midi_event *m = state->thru_buffer.peek();
     if (midiOutShortMsg(state->hout, m->data) == MIDIERR_NOTREADY)
     {
-      timeSetEvent(state->min_timer_period, state->min_timer_period * 5, midiIntTimerHandler, (DWORD)state, TIME_ONESHOT);
+      timeSetEvent(
+        state->min_timer_period,
+        state->min_timer_period * 5,
+        (LPTIMECALLBACK) midiIntTimerHandler,
+        (DWORD) state,
+        TIME_ONESHOT);
       return;
     }
     (void)state->thru_buffer.get();
@@ -233,7 +239,12 @@ void FAR PASCAL midiIntTimerHandler(UINT wTimerId, UINT wMsg, DWORD dwUser, DWOR
       if (midiOutShortMsg(state->hout, m->data) == MIDIERR_NOTREADY)
       {
         // try again later
-        timeSetEvent(state->min_timer_period, state->min_timer_period * 5, midiIntTimerHandler, (DWORD)state, TIME_ONESHOT);
+        timeSetEvent(
+          state->min_timer_period,
+          state->min_timer_period * 5,
+          (LPTIMECALLBACK) midiIntTimerHandler,
+          (DWORD) state,
+          TIME_ONESHOT);
         return;
       }
     }
@@ -251,15 +262,16 @@ void FAR PASCAL midiIntTimerHandler(UINT wTimerId, UINT wMsg, DWORD dwUser, DWOR
     delay = (long)state->min_timer_period;
   else if (delay > (long)state->max_timer_period)
     delay = (long)state->max_timer_period;
-  timeSetEvent((UINT)delay, state->min_timer_period, midiIntTimerHandler, (DWORD)state, TIME_ONESHOT);
+  timeSetEvent(
+    (UINT) delay,
+    state->min_timer_period,
+    (LPTIMECALLBACK) midiIntTimerHandler,
+    (DWORD) state,
+    TIME_ONESHOT);
 }
 
-
-
-
-
 // handle incoming midi data (midi clock source) (songpointer)
-void FAR PASCAL midiMidiInputHandler(
+void CALLBACK midiMidiInputHandler(
   HMIDIIN hMidiIn,
   WORD wMsg,
   DWORD dwInstance,
@@ -307,12 +319,13 @@ void FAR PASCAL midiMidiInputHandler(
     }
 }
 
-
-
-
-
 // play output (midi clock source) (songpointer)
-void FAR PASCAL midiMidiTimerHandler(UINT wTimerId, UINT wMsg, DWORD dwUser, DWORD dw1, DWORD dw2)
+void CALLBACK midiMidiTimerHandler(
+  UINT wTimerId,
+  UINT wMsg,
+  DWORD dwUser,
+  DWORD dw1,
+  DWORD dw2)
 {
   tWinPlayerState *state = (tWinPlayerState *)dwUser;
   if ( !state->playing )
@@ -324,7 +337,12 @@ void FAR PASCAL midiMidiTimerHandler(UINT wTimerId, UINT wMsg, DWORD dwUser, DWO
     midi_event *m = state->thru_buffer.peek();
     if (midiOutShortMsg(state->hout, m->data) == MIDIERR_NOTREADY)
     {
-      timeSetEvent(state->min_timer_period, state->min_timer_period * 5, midiMidiTimerHandler, (DWORD)state, TIME_ONESHOT);
+      timeSetEvent(
+        state->min_timer_period,
+        state->min_timer_period * 5,
+        (LPTIMECALLBACK) midiMidiTimerHandler,
+        (DWORD) state,
+        TIME_ONESHOT);
       return;
     }
     (void)state->thru_buffer.get();
@@ -359,7 +377,12 @@ void FAR PASCAL midiMidiTimerHandler(UINT wTimerId, UINT wMsg, DWORD dwUser, DWO
       if (midiOutShortMsg(state->hout, m->data) == MIDIERR_NOTREADY)
       {
         // try again later
-        timeSetEvent(state->min_timer_period, state->min_timer_period * 5, midiMidiTimerHandler, (DWORD)state, TIME_ONESHOT);
+        timeSetEvent(
+          state->min_timer_period,
+          state->min_timer_period * 5,
+          (LPTIMECALLBACK) midiMidiTimerHandler,
+          (DWORD) state,
+          TIME_ONESHOT);
         return;
       }
     }
@@ -379,15 +402,16 @@ void FAR PASCAL midiMidiTimerHandler(UINT wTimerId, UINT wMsg, DWORD dwUser, DWO
   else if (delay > (long)state->max_timer_period)
     delay = (long)state->max_timer_period;
 
-  timeSetEvent((UINT)delay, state->min_timer_period, midiMidiTimerHandler, (DWORD)state, TIME_ONESHOT);
+  timeSetEvent(
+    (UINT) delay,
+    state->min_timer_period,
+    (LPTIMECALLBACK) midiMidiTimerHandler,
+    (DWORD) state,
+    TIME_ONESHOT);
 }
 
-
-
-
-
 // handle incoming midi data (MTC clock source)
-void FAR PASCAL midiMtcInputHandler(
+void CALLBACK midiMtcInputHandler(
   HMIDIIN hMidiIn,
   WORD wMsg,
   DWORD dwInstance,
@@ -494,11 +518,13 @@ void FAR PASCAL midiMtcInputHandler(
     }
 }
 
-
-
-
 // play output (MTC clock source)
-void FAR PASCAL midiMtcTimerHandler(UINT wTimerId, UINT wMsg, DWORD dwUser, DWORD dw1, DWORD dw2)
+void CALLBACK midiMtcTimerHandler(
+  UINT wTimerId,
+  UINT wMsg,
+  DWORD dwUser,
+  DWORD dw1,
+  DWORD dw2)
 {
   tWinPlayerState *state = (tWinPlayerState *)dwUser;
   if ( !state->playing )
@@ -512,7 +538,12 @@ void FAR PASCAL midiMtcTimerHandler(UINT wTimerId, UINT wMsg, DWORD dwUser, DWOR
     midi_event *m = state->thru_buffer.peek();
     if (midiOutShortMsg(state->hout, m->data) == MIDIERR_NOTREADY)
     {
-      timeSetEvent(state->min_timer_period, state->min_timer_period * 5, midiMtcTimerHandler, (DWORD)state, TIME_ONESHOT);
+      timeSetEvent(
+        state->min_timer_period,
+        state->min_timer_period * 5,
+        (LPTIMECALLBACK) midiMtcTimerHandler,
+        (DWORD) state,
+        TIME_ONESHOT);
       return;
     }
     (void)state->thru_buffer.get();
@@ -547,7 +578,12 @@ void FAR PASCAL midiMtcTimerHandler(UINT wTimerId, UINT wMsg, DWORD dwUser, DWOR
       if (midiOutShortMsg(state->hout, m->data) == MIDIERR_NOTREADY)
       {
         // try again later
-        timeSetEvent(state->min_timer_period, state->min_timer_period * 5, midiMtcTimerHandler, (DWORD)state, TIME_ONESHOT);
+        timeSetEvent(
+          state->min_timer_period,
+          state->min_timer_period * 5,
+          (LPTIMECALLBACK) midiMtcTimerHandler,
+          (DWORD) state,
+          TIME_ONESHOT);
         return;
       }
     }
@@ -565,10 +601,13 @@ void FAR PASCAL midiMtcTimerHandler(UINT wTimerId, UINT wMsg, DWORD dwUser, DWOR
     delay = (long)state->min_timer_period;
   else if (delay > (long)state->max_timer_period)
     delay = (long)state->max_timer_period;
-  timeSetEvent((UINT)delay, state->min_timer_period, midiMtcTimerHandler, (DWORD)state, TIME_ONESHOT);
+  timeSetEvent(
+    (UINT) delay,
+    state->min_timer_period,
+    (LPTIMECALLBACK) midiMtcTimerHandler,
+    (DWORD) state,
+    TIME_ONESHOT);
 }
-
-
 
 void CALLBACK MidiOutProc(
   HMIDIOUT hmo,

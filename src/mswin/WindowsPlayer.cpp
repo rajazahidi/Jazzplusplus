@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -669,7 +669,12 @@ void JZWindowsPlayer::StartPlay(long Clock, long LoopClock, int Continue)
       mpState->virtual_clock = Clock - mpState->ticks_per_signal;
       mpState->signal_time = mpState->start_time - 5000L;
       // mpState->playing = TRUE;
-      timeSetEvent(mpState->min_timer_period, mpState->min_timer_period, midiMidiTimerHandler, (DWORD)mpState, TIME_ONESHOT);
+      timeSetEvent(
+        mpState->min_timer_period,
+        mpState->min_timer_period,
+        (LPTIMECALLBACK) midiMidiTimerHandler,
+        (DWORD) mpState,
+        TIME_ONESHOT);
       break;
     case CsMtc:
       if (!Continue)
@@ -698,8 +703,8 @@ void JZWindowsPlayer::StartPlay(long Clock, long LoopClock, int Continue)
       timeSetEvent(
         mpState->min_timer_period,
         mpState->min_timer_period,
-        midiMtcTimerHandler,
-        (DWORD)mpState,
+        (LPTIMECALLBACK) midiMtcTimerHandler,
+        (DWORD) mpState,
         TIME_ONESHOT);
       break;
     case CsInt:
@@ -709,8 +714,8 @@ void JZWindowsPlayer::StartPlay(long Clock, long LoopClock, int Continue)
       timeSetEvent(
         mpState->min_timer_period,
         mpState->min_timer_period,
-        midiIntTimerHandler,
-        (DWORD)mpState,
+        (LPTIMECALLBACK) midiIntTimerHandler,
+        (DWORD) mpState,
         TIME_ONESHOT);
       break;
   }

@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,13 +29,12 @@ struct tWinPlayerState;
 
 extern "C"
 {
-// in win-3.x this has to be in a dll!
-void FAR PASCAL midiIntInputHandler(HMIDIIN, WORD, DWORD, DWORD, DWORD);
-void FAR PASCAL midiMidiInputHandler(HMIDIIN, WORD, DWORD, DWORD, DWORD);
-void FAR PASCAL midiMtcInputHandler(HMIDIIN, WORD, DWORD, DWORD, DWORD);
-void FAR PASCAL midiIntTimerHandler(UINT, UINT, DWORD, DWORD, DWORD);
-void FAR PASCAL midiMidiTimerHandler(UINT, UINT, DWORD, DWORD, DWORD);
-void FAR PASCAL midiMtcTimerHandler(UINT, UINT, DWORD, DWORD, DWORD);
+void CALLBACK midiIntInputHandler(HMIDIIN, WORD, DWORD, DWORD, DWORD);
+void CALLBACK midiMidiInputHandler(HMIDIIN, WORD, DWORD, DWORD, DWORD);
+void CALLBACK midiMtcInputHandler(HMIDIIN, WORD, DWORD, DWORD, DWORD);
+void CALLBACK midiIntTimerHandler(UINT, UINT, DWORD, DWORD, DWORD);
+void CALLBACK midiMidiTimerHandler(UINT, UINT, DWORD, DWORD, DWORD);
+void CALLBACK midiMtcTimerHandler(UINT, UINT, DWORD, DWORD, DWORD);
 tWinPlayerState FAR * FAR PASCAL NewWinPlayerState();
 void FAR PASCAL DeleteWinPlayerState(tWinPlayerState FAR * state);
 

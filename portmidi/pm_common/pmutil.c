@@ -8,7 +8,7 @@
 #include "pmutil.h"
 #include "pminternal.h"
 
-#ifdef WIN32
+#ifdef _MSC_VER
 #define bzero(addr, siz) memset(addr, 0, siz)
 #endif
 

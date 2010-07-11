@@ -219,7 +219,7 @@ class tSamplePlayPosition : public wxTimer
         player(p),
         spl(s)
     {
-      visible = FALSE;
+      visible = false;
       x = 0;
     }
 
@@ -301,7 +301,7 @@ tSampleCnvs::tSampleCnvs(tSampleWin *win, tSample &sample)
   sel_fr = sel_to = -1;
   mouse_up_sets_insertion_point = 0;
   playpos = new tSamplePlayPosition(*this, gpMidiPlayer, spl);
-  midi_time = TRUE;
+  midi_time = true;
   midi_offs = 0;
   mouse_down = 0;
 }
@@ -340,7 +340,7 @@ void tSampleCnvs::OnEvent(wxMouseEvent& MouseEvent)
   if (MouseEvent.LeftDown())
   {
     mouse_up_sets_insertion_point = 0;
-    mouse_down = TRUE;
+    mouse_down = true;
     if (snapsel.IsSelected())
     {
       snapsel.Draw(*pDc, 0, 0);
@@ -358,7 +358,7 @@ void tSampleCnvs::OnEvent(wxMouseEvent& MouseEvent)
   }
   else if (MouseEvent.LeftUp())
   {
-    mouse_down = FALSE;
+    mouse_down = false;
     snapsel.ProcessMouseEvent(MouseEvent, 0, 0);
     if (snapsel.IsSelected())
     {
@@ -668,16 +668,16 @@ void tSampleCnvs::Play()
 
 static JZToolDef tdefs[] =
 {
-  { wxID_OPEN,     FALSE, open_xpm,    "open wave file" },
-  { wxID_SAVE,     FALSE, save_xpm,    "save wave file" },
+  { wxID_OPEN,     false, open_xpm,    "open wave file" },
+  { wxID_SAVE,     false, save_xpm,    "save wave file" },
   { JZToolBar::eToolBarSeparator },
-  { wxID_ZOOM_IN,  FALSE, zoomin_xpm,  "zoom to selection" },
-  { wxID_ZOOM_OUT, FALSE, zoomout_xpm, "zoom out" },
-  { MEN_ACCEPT,   FALSE, accept_xpm,  "accept painting" },
-  { ID_PAINTER_NONE,   FALSE, cancel_xpm,  "cancel painting" },
+  { wxID_ZOOM_IN,  false, zoomin_xpm,  "zoom to selection" },
+  { wxID_ZOOM_OUT, false, zoomout_xpm, "zoom out" },
+  { MEN_ACCEPT,   false, accept_xpm,  "accept painting" },
+  { ID_PAINTER_NONE,   false, cancel_xpm,  "cancel painting" },
   { JZToolBar::eToolBarSeparator },
-  { ID_PLAY,     FALSE, play_xpm,    "play sample" },
-  { MEN_HELP,     FALSE, help_xpm,    "help" },
+  { ID_PLAY,     false, play_xpm,    "play sample" },
+  { MEN_HELP,     false, help_xpm,    "help" },
   { JZToolBar::eToolBarEnd }
 };
 
@@ -692,11 +692,11 @@ int tSampleWin::geo[4] =
 
 tSample *tSampleWin::copy_buffer;
 
-tSampleWin::tSampleWin(wxWindow* pParent, tSampleWin **ref, tSample &sample)
+tSampleWin::tSampleWin(wxWindow* pParent, tSampleWin **ref, tSample& sample)
   : wxFrame(
       pParent,
       wxID_ANY,
-      (char *)sample.GetFilename(),
+      sample.GetFileName(),
       wxPoint(geo[0], geo[1]),
       wxSize(geo[2], geo[3])),
     spl(sample),
@@ -707,7 +707,7 @@ tSampleWin::tSampleWin(wxWindow* pParent, tSampleWin **ref, tSample &sample)
 {
   this->ref = ref;
 
-  in_constructor = TRUE;
+  in_constructor = true;
 
   cnvs         = 0;
   mpToolBar    = 0;
@@ -820,7 +820,7 @@ tSampleWin::tSampleWin(wxWindow* pParent, tSampleWin **ref, tSample &sample)
 //  zoom_scrol->SetValue(0);
   zoom_scrol->SetScrollbar(0, 10, 1000, 100);
 
-  in_constructor = FALSE;
+  in_constructor = false;
 
   // now force a resize for motif
   int cw, ch;
@@ -858,7 +858,7 @@ tSampleWin::~tSampleWin()
 
 bool tSampleWin::OnClose()
 {
-  return TRUE;
+  return true;
 }
 
 
@@ -911,14 +911,14 @@ bool tSampleWin::HaveInsertionPoint(int &offs, bool warn)
   if (cnvs->sel_fr == cnvs->sel_to && cnvs->sel_fr >= 0)
   {
     offs = cnvs->sel_fr;
-    return TRUE;
+    return true;
   }
   else
   {
     offs = -1;
     if (warn)
       wxMessageBox("please set insertion point first", "Error", wxOK);
-    return FALSE;
+    return false;
   }
 }
 
@@ -928,18 +928,18 @@ bool tSampleWin::HaveSelection(int &fr_smpl, int &to_smpl, HaveSelectionMode mod
   {
     fr_smpl = cnvs->sel_fr;
     to_smpl = cnvs->sel_to;
-    return TRUE;
+    return true;
   }
   else if (mode == SelAll)
   {
     fr_smpl = 0;
     to_smpl = spl.GetLength();
-    return TRUE;
+    return true;
   }
   fr_smpl = to_smpl = -1;
   if (mode == SelWarn)
     wxMessageBox("please select samples first", "Error", wxOK);
-  return FALSE;
+  return false;
 }
 
 
@@ -979,7 +979,7 @@ void tSampleWin::ClearSelection()
 void tSampleWin::LoadError(tSample &spl)
 {
   char buf[500];
-  sprintf(buf, "could not load \"%s\"", spl.GetFilename());
+  sprintf(buf, "could not load \"%s\"", spl.GetFileName());
   wxMessageBox(buf, "Error", wxOK);
 }
 
@@ -1003,7 +1003,7 @@ void tSampleWin::OnMenuCommand(int id)
     case ID_EFFECTS_EQUALIZER:
       if (equalizer == 0)
         equalizer = new tEqualizer(*this);
-      equalizer->Show(TRUE);
+      equalizer->Show(true);
       break;
 
     case MEN_FLIP_LEFT:
@@ -1016,7 +1016,7 @@ void tSampleWin::OnMenuCommand(int id)
     case ID_EFFECTS_DISTORTION:
       if (distortion == 0)
         distortion = new tDistortion(*this);
-      distortion->Show(TRUE);
+      distortion->Show(true);
       break;
 
     case ID_EFFECTS_REVERB:
@@ -1031,7 +1031,7 @@ void tSampleWin::OnMenuCommand(int id)
       }
       ClearSelection();
       SetViewPos(0, spl.GetLength());
-      reverb->Show(TRUE);
+      reverb->Show(true);
 #endif
       break;
 
@@ -1050,14 +1050,14 @@ void tSampleWin::OnMenuCommand(int id)
 #ifdef OBSOLETE
       if (shifter == 0)
       {
-        shifter = new wxDialogBox(this, "Shifter", FALSE );
+        shifter = new wxDialogBox(this, "Shifter", false );
         tShifterForm *form = new tShifterForm(*this);
         form->EditForm(shifter);
         shifter->Fit();
       }
       ClearSelection();
       SetViewPos(0, spl.GetLength());
-      shifter->Show(TRUE);
+      shifter->Show(true);
 #endif
       break;
 
@@ -1065,14 +1065,14 @@ void tSampleWin::OnMenuCommand(int id)
 #ifdef OBSOLETE
       if (stretcher == 0)
       {
-        stretcher = new wxDialogBox(this, "Stretcher", FALSE );
+        stretcher = new wxDialogBox(this, "Stretcher", false );
         tStretcherForm *form = new tStretcherForm(*this);
         form->EditForm(stretcher);
         stretcher->Fit();
       }
       ClearSelection();
       SetViewPos(0, spl.GetLength());
-      stretcher->Show(TRUE);
+      stretcher->Show(true);
 #endif
       break;
 
@@ -1080,12 +1080,12 @@ void tSampleWin::OnMenuCommand(int id)
 #ifdef OBSOLETE
       if (filter == 0)
       {
-        filter = new wxDialogBox(this, "Filter", FALSE );
+        filter = new wxDialogBox(this, "Filter", false );
         tSplFilterForm *form = new tSplFilterForm(*this);
         form->EditForm(filter);
         filter->Fit();
       }
-      filter->Show(TRUE);
+      filter->Show(true);
 #endif
       break;
 
@@ -1093,12 +1093,12 @@ void tSampleWin::OnMenuCommand(int id)
 #ifdef OBSOLETE
       if (settings == 0)
       {
-        settings = new wxDialogBox(this, "Settings", FALSE );
+        settings = new wxDialogBox(this, "Settings", false );
         tSmplWinSettingsForm *form = new tSmplWinSettingsForm(*this);
         form->EditForm(settings);
         settings->Fit();
       }
-      settings->Show(TRUE);
+      settings->Show(true);
 #endif
       break;
 
@@ -1106,14 +1106,14 @@ void tSampleWin::OnMenuCommand(int id)
 #ifdef OBSOLETE
       if (echo == 0)
       {
-        echo = new wxDialogBox(this, "Echo", FALSE );
+        echo = new wxDialogBox(this, "Echo", false );
         tEchoForm *form = new tEchoForm(*this);
         form->EditForm(echo);
         echo->Fit();
       }
       ClearSelection();
       SetViewPos(0, spl.GetLength());
-      echo->Show(TRUE);
+      echo->Show(true);
 #endif
       break;
 
@@ -1121,21 +1121,21 @@ void tSampleWin::OnMenuCommand(int id)
 #ifdef OBSOLETE
       if (chorus == 0)
       {
-        chorus = new wxDialogBox(this, "Chorus", FALSE );
+        chorus = new wxDialogBox(this, "Chorus", false );
         tChorusForm *form = new tChorusForm(*this);
         form->EditForm(chorus);
         chorus->Fit();
       }
       ClearSelection();
       SetViewPos(0, spl.GetLength());
-      chorus->Show(TRUE);
+      chorus->Show(true);
 #endif
       break;
 
     case ID_EFFECTS_SYNTH:
       if (synth == 0)
         synth = new tSynthDlg(*this);
-      synth->Show(TRUE);
+      synth->Show(true);
       break;
 
     case MEN_ACCEPT:
@@ -1209,12 +1209,12 @@ void tSampleWin::OnMenuCommand(int id)
 #ifdef OBSOLETE
       if (wah_settings == 0)
       {
-        wah_settings = new wxDialogBox(this, "Filter Painter", FALSE);
+        wah_settings = new wxDialogBox(this, "Filter Painter", false);
         tWahSettingsForm *form = new tWahSettingsForm(*this);
         form->EditForm(wah_settings);
         wah_settings->Fit();
       }
-      wah_settings->Show(TRUE);
+      wah_settings->Show(true);
 #endif
       break;
 
@@ -1227,7 +1227,7 @@ void tSampleWin::OnMenuCommand(int id)
         form->EditForm(pitch_settings);
         pitch_settings->Fit();
       }
-      pitch_settings->Show(TRUE);
+      pitch_settings->Show(true);
 #endif
       break;
 
@@ -1252,7 +1252,7 @@ void tSampleWin::OnMenuCommand(int id)
     case wxID_PASTE:
       {
         int offs, fr, to;
-        if (HaveInsertionPoint(offs, FALSE))
+        if (HaveInsertionPoint(offs, false))
         {
           spl.PasteIns(*copy_buffer, offs);
           cnvs->SetSelection(offs, offs + copy_buffer->GetLength());
@@ -1308,7 +1308,7 @@ void tSampleWin::OnMenuCommand(int id)
 
     case ID_FILE_REVERT_TO_SAVED:
       cnvs->ClearSelection();
-      if (spl.Load(TRUE))
+      if (spl.Load(true))
         LoadError(spl);
       Redraw();
       break;
@@ -1324,54 +1324,50 @@ void tSampleWin::OnMenuCommand(int id)
 
     case wxID_OPEN:
       {
-        char *defname = copystring(spl.GetFilename());
-        wxString fname = file_selector(
-          defname,
+        wxString FileName = file_selector(
+          spl.GetFileName(),
           "Load Sample",
-          FALSE,
-          FALSE,
+          false,
+          false,
           "*.wav");
-        if (!fname.empty())
+        if (!FileName.empty())
         {
           wxBeginBusyCursor();
           cnvs->ClearSelection();
-          spl.SetFilename(fname);
-          if (spl.Load(TRUE))
+          spl.SetFileName(FileName);
+          if (spl.Load(true))
           {
             LoadError(spl);
           }
           spl->RefreshDialogs();
-          SetTitle(fname);
+          SetTitle(FileName);
           Redraw();
           wxEndBusyCursor();
         }
-        delete [] defname;
       }
       break;
 
     case wxID_SAVEAS:
       {
-        char *defname = copystring(spl.GetFilename());
-        wxString fname = file_selector(
-          defname,
+        wxString FileName = file_selector(
+          spl.GetFileName(),
           "Save Sample",
-          TRUE,
-          FALSE,
+          true,
+          false,
           "*.wav");
-        if (!fname.empty())
+        if (!FileName.empty())
         {
-          spl.SetFilename(fname);
+          spl.SetFileName(FileName);
           OnMenuCommand(wxID_SAVE);
           spl->RefreshDialogs();
-          SetTitle(fname);
+          SetTitle(FileName);
         }
-        delete [] defname;
       }
       break;
 
     case wxID_SAVE:
       {
-        if (spl.GetFilename()[0] == 0)
+        if (spl.GetFileName().empty())
         {
           OnMenuCommand(wxID_SAVEAS);
         }

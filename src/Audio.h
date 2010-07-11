@@ -363,7 +363,7 @@ class tSampleSet
       long toc,
       tAudioRecordBuffer &buf);
 
-    void AddNote(const char *fname, long frc, long toc);
+    void AddNote(const std::string& FileName, long frc, long toc);
 
     void RefreshDialogs();
 

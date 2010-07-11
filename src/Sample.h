@@ -258,10 +258,10 @@ class tSample
       return pitch;
     }
 
-    void SetFilename(const char *fname);
-    const char *GetFilename() const
+    void SetFileName(const std::string& FileName);
+    const std::string& GetFileName() const
     {
-      return filename;
+      return mFileName;
     }
 
     int GetLength() const
@@ -412,7 +412,7 @@ class tSample
     tSampleSet& set;
 
     std::string mLabel;
-    char* filename;
+    std::string mFileName;
     int volume;
     int pan;
     int pitch;  // delta pitch

@@ -40,13 +40,13 @@ using namespace std;
 
 tSample::tSample(tSampleSet &s)
   : set(s),
-    mLabel()
+    mLabel(),
+    mFileName()
 {
   data     = 0;
   length   = 0;
   external_flag = 1;  // auto reload when file changes on disk
   external_time = 0;
-  filename = copystring("");
   volume   = 127;
   pan      = 0;
   pitch    = 0;
@@ -57,7 +57,6 @@ tSample::tSample(tSampleSet &s)
 tSample::~tSample()
 {
   delete [] data;
-  delete [] filename;
 }
 
 void tSample::SetLabel(const std::string& Label)
@@ -65,25 +64,21 @@ void tSample::SetLabel(const std::string& Label)
   mLabel = Label;
 }
 
-void tSample::SetFilename(const char *fname)
+void tSample::SetFileName(const string& FileName)
 {
-  if (strcmp(filename, fname) != 0)
+  if (mFileName != FileName)
   {
     dirty = 1;
-    char *s = copystring(fname);
-    mLabel = wxFileNameFromPath(s);
-    delete [] s;
+    mLabel = wxFileNameFromPath(FileName.c_str());
   }
-  delete [] filename;
-  filename = copystring(fname);
+  mFileName = FileName;
 }
 
 void tSample::Clear()
 {
   FreeData();
   mLabel.clear();
-  delete [] filename;
-  filename = copystring("");
+  mFileName.clear();
   volume = 127;
   pan    = 0;
   pitch  = 0;
@@ -171,15 +166,15 @@ void tSample::SetSmooth(tFloatSample &fs, int offs, int fade)
 int tSample::LoadWav()
 {
   struct stat buf;
-  if (stat(filename, &buf) == -1)
+  if (stat(mFileName.c_str(), &buf) == -1)
   {
-    perror(filename);
+    perror(mFileName.c_str());
     return 1;
   }
   external_time = buf.st_mtime;
 
   // read and check header info
-  ifstream is(filename, ios::binary | ios::in);
+  ifstream is(mFileName.c_str(), ios::binary | ios::in);
   WaveHeader wh;
   memset(&wh, 0, sizeof(wh));
   is.read((char *)&wh, sizeof(wh));
@@ -188,12 +183,12 @@ int tSample::LoadWav()
     || wh.sub_chunk  != FMT
     || wh.data_chunk != DATA)
   {
-    //fprintf(stderr, "%s format not recognized\n", filename);
+    //fprintf(stderr, "%s format not recognized\n", mFileName.c_str());
     return 2;
   }
   if (wh.format != PCM_CODE)
   {
-    //fprintf(stderr, "%s must be PCM_CODE\n", filename);
+    //fprintf(stderr, "%s must be PCM_CODE\n", mFileName.c_str());
     return 3;
   }
 
@@ -230,9 +225,9 @@ typedef struct
 int tSample::LoadWav()
 {
   struct stat buf;
-  if (stat(filename, &buf) == -1)
+  if (stat(mFileName.c_str(), &buf) == -1)
   {
-    perror(filename);
+    perror(mFileName.c_str());
     return 1;
   }
   external_time = buf.st_mtime;
@@ -240,7 +235,7 @@ int tSample::LoadWav()
   ChunkHeader ch;
 
   // read and check header info
-  ifstream is(filename, ios::binary | ios::in);
+  ifstream is(mFileName.c_str(), ios::binary | ios::in);
   RIFFHeader rh;
   is.read((char *)&rh, sizeof(rh));
   if (strncmp(rh.main_type, "RIFF", 4) || strncmp(rh.sub_type, "WAVE", 4))
@@ -381,15 +376,15 @@ int tSample::LoadRaw()
 {
   // determine file size
   struct stat buf;
-  if (stat(filename, &buf) == -1)
+  if (stat(mFileName.c_str(), &buf) == -1)
   {
-    perror(filename);
+    perror(mFileName.c_str());
     return 1;
   }
   length = buf.st_size/2;
   external_time = buf.st_mtime;
 
-  ifstream is(filename, ios::binary | ios::in);
+  ifstream is(mFileName.c_str(), ios::binary | ios::in);
   data = new short [length];
   is.read((char *)data, length * 2);
   return 0;
@@ -399,12 +394,12 @@ int tSample::LoadRaw()
 int tSample::Load(int force)
 {
   // sample modified on disk?
-  if (filename && filename[0] && !force && !dirty && external_flag)
+  if (!mFileName.empty() && !force && !dirty && external_flag)
   {
     struct stat buf;
-    if (stat(filename, &buf) == -1)
+    if (stat(mFileName.c_str(), &buf) == -1)
     {
-      perror(filename);
+      perror(mFileName.c_str());
       return 1;
     }
     if (external_time != buf.st_mtime)
@@ -414,7 +409,7 @@ int tSample::Load(int force)
   if (force || dirty)
   {
     FreeData();
-    if (filename && filename[0])
+    if (!mFileName.empty())
     {
       int rc = LoadWav();
       dirty = 0;
@@ -703,9 +698,9 @@ int tSample::SaveWave()
   wh.length        = wh.data_length + sizeof(WaveHeader);
 
 #ifdef __WXMSW__
-  unlink(filename); // buggy, sigh!
+  unlink(mFileName.c_str()); // buggy, sigh!
 #endif
-  ofstream os(filename, ios::out | ios::binary | ios::trunc);
+  ofstream os(mFileName.c_str(), ios::out | ios::binary | ios::trunc);
 
   os.write((char *)&wh, sizeof(wh));
   os.write((char *)data, length * sizeof(short));

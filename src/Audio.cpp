@@ -321,7 +321,7 @@ int tSampleSet::Load(const wxString& FileName)
       continue;
     }
     assert(0 <= key && key < eSampleCount);
-    mSamples[key]->SetFilename(SplFilePath.c_str());
+    mSamples[key]->SetFileName(SplFilePath.c_str());
     mSamples[key]->SetLabel(Label.c_str());
     mSamples[key]->SetVolume(vol);
     mSamples[key]->SetPan(pan);
@@ -331,7 +331,7 @@ int tSampleSet::Load(const wxString& FileName)
       wxString String;
       String
         << "Could not load: \""
-        << mSamples[key]->GetFilename()
+        << mSamples[key]->GetFileName()
         << '"';
       ::wxMessageBox(String, "Error", wxOK);
     }
@@ -365,14 +365,14 @@ int tSampleSet::Save(const wxString& FileName)
   for (int i = 0; i < eSampleCount; i++)
   {
     tSample* pSample = mSamples[i];
-    const char* fname = pSample->GetFilename();
+    const string& FileName = pSample->GetFileName();
     int vol = pSample->GetVolume();
     int pan = pSample->GetPan();
     int pitch = pSample->GetPitch();
-    if (fname[0])
+    if (!FileName.empty())
     {
       Ofs << i << ' ';
-      WriteString(Ofs, fname);
+      WriteString(Ofs, FileName);
       Ofs << ' ';
       WriteString(Ofs, pSample->GetLabel());
       Ofs << ' ' << pan << ' ' << vol << ' ' << pitch << endl;
@@ -850,15 +850,15 @@ void tSampleSet::EditAudioSamples(wxWindow* pParent)
 //-----------------------------------------------------------------------------
 void tSampleSet::LoadSampleSet(wxWindow* pParent)
 {
-  wxString fname = file_selector(
+  wxString FileName = file_selector(
     mDefaultFileName,
     "Load Sample Set",
     false,
     has_changed,
     "*.spl");
-  if (fname)
+  if (FileName)
   {
-    Load(fname);
+    Load(FileName);
   }
 }
 
@@ -867,15 +867,15 @@ void tSampleSet::LoadSampleSet(wxWindow* pParent)
 //-----------------------------------------------------------------------------
 void tSampleSet::SaveSampleSetAs(wxWindow* pParent)
 {
-  wxString fname = file_selector(
+  wxString FileName = file_selector(
     mDefaultFileName,
     "Save Sample Set",
     true,
     has_changed,
     "*.spl");
-  if (fname)
+  if (FileName)
   {
-    Save(fname);
+    Save(FileName);
   }
 }
 
@@ -948,17 +948,19 @@ void tSampleSet::SaveRecordingDlg(long frc, long toc, tAudioRecordBuffer &buf)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSampleSet::AddNote(const char *fname, long frc, long toc)
+void tSampleSet::AddNote(const string& FileName, long frc, long toc)
 {
   int i;
   tSample *spl;
 
-  // see if fname is already present in sample list
+  // See if the file name is already present in sample list.
   for (i = 0; i < eSampleCount; i++)
   {
     spl = mSamples[i];
-    if (strcmp(spl->GetFilename(), fname) == 0)
+    if (spl->GetFileName() == FileName)
+    {
       break;
+    }
   }
 
   // if no entry is there, add an entry
@@ -968,8 +970,10 @@ void tSampleSet::AddNote(const char *fname, long frc, long toc)
     for (i = 15; i < eSampleCount; i++)
     {
       spl = mSamples[i];
-      if (spl->GetFilename()[0] == 0)
+      if (spl->GetFileName()[0] == 0)
+      {
         break;
+      }
     }
   }
 
@@ -978,8 +982,8 @@ void tSampleSet::AddNote(const char *fname, long frc, long toc)
 
   int key = i;
   spl->Clear();   // reset everything to defaults
-  spl->SetFilename(fname);
-  spl->SetLabel(wxFileNameFromPath((char *)fname));
+  spl->SetFileName(FileName);
+  spl->SetLabel(wxFileNameFromPath(FileName));
   spl->Load();   // reload data
 
   // delete selection
@@ -1203,7 +1207,7 @@ void tSamplesDlg::Sample2Win(int i)
   mpPanSlider->SetValue(spl->GetPan());
 #ifdef OBSOLETE
   pLabel->SetValue((char *)spl->GetLabel());
-  file->SetValue((char *)spl->GetFilename());
+  file->SetValue((char *)spl->GetFileName());
 #endif
 }
 
@@ -1217,7 +1221,7 @@ void tSamplesDlg::Win2Sample(int i)
   spl->SetPan(mpPanSlider->GetValue());
 #ifdef OBSOLETE
   spl->SetLabel(pLabel->GetValue());
-  spl->SetFilename(file->GetValue());
+  spl->SetFileName(file->GetValue());
 #endif
 }
 

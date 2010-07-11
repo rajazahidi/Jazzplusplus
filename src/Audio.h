@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -219,7 +219,7 @@ class tAudioRecordBuffer
 //                            tSampleSet
 // =============================================================
 
-class tSamplesDlg;
+class JZSamplesDialog;
 
 //*****************************************************************************
 //*****************************************************************************
@@ -230,12 +230,16 @@ class tSampleSet
     friend class tSampleVoice;
     friend class tSample;
     friend class tAudioGloblForm;
-    friend class tSamplesDlg;
     friend class JZWindowsAudioPlayer;
     friend class tAudioPlayer;
     friend class tAlsaAudioPlayer;
 
   public:
+
+    enum TESampleSize
+    {
+      eSampleCount = 128
+    };
 
     tSampleSet(long ticks_per_minute);
 
@@ -338,7 +342,7 @@ class tSampleSet
       return (long)(0.001 * time * speed * channels);
     }
 
-    virtual const char *GetSampleName(int i);
+    virtual const std::string& GetSampleLabel(int Index);
 
     void StartPlay(long clock);
 
@@ -401,12 +405,8 @@ class tSampleSet
     int bits;       // must be 16!
     bool softsync;  // enable software midi/audio sync
 
-    enum
-    {
-      MAXSMPL = 128
-    };
-    tSample* mSamples[MAXSMPL];
-    tSampleWin* mSampleWindows[MAXSMPL];
+    tSample* mSamples[eSampleCount];
+    tSampleWin* mSampleWindows[eSampleCount];
 
     long   ticks_per_minute;  // midi speed for audio/midi sync
     double clocks_per_buffer;
@@ -425,7 +425,7 @@ class tSampleSet
     long buffers_written;            // for computing buffers clock
 
     wxDialog* mpGlobalSettingsDialog;
-    tSamplesDlg* mpSampleDialog;
+    JZSamplesDialog* mpSampleDialog;
 
     tEventArray* events;
 

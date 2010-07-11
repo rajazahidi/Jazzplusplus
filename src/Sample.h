@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,12 +25,12 @@
 
 class tSampleSet;
 
-#include <iostream>
 #include <cmath>
+#include <cstring>
+#include <iostream>
+#include <string>
 
-#include <assert.h>
 #include <sys/stat.h>
-#include <string.h>
 
 #include "SignalInterface.h"
 
@@ -219,10 +219,10 @@ class tSample
     int Save();
 
     // Properties
-    void SetLabel(const char *str);
-    const char *GetLabel() const
+    void SetLabel(const std::string& Label);
+    const std::string& GetLabel() const
     {
-      return label;
+      return mLabel;
     }
 
     void SetVolume(int vol)
@@ -400,12 +400,18 @@ class tSample
     void FreeData();
     void MakeData(int length, int zero = 1);
 
-    int Convert(std::istream& is, int byte_count, int channels, int bits, int speed);
+    int Convert(
+      std::istream& is,
+      int byte_count,
+      int channels,
+      int bits,
+      int speed);
+
     int length;  // number of shorts
     short* data;  // signed shorts
     tSampleSet& set;
 
-    char* label;   // msvc cannot delete 'const char *' ????
+    std::string mLabel;
     char* filename;
     int volume;
     int pan;
@@ -421,7 +427,6 @@ class tSample
 
     int external_flag;  // reload on disk change?
     int external_time;  // last modified on disk
-
 };
 
 #endif // !defined(JZ_SAMPLE_H)

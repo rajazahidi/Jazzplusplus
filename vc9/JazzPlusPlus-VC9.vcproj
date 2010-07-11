@@ -1241,6 +1241,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Dialogs\SamplesDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\SamplesDialog.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Dialogs\SearchAndReplaceDialog.cpp"
 				>
 			</File>

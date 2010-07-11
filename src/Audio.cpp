@@ -22,6 +22,7 @@
 
 #include "Audio.h"
 
+#include "Dialogs/SamplesDialog.h"
 #include "Sample.h"
 #include "Events.h"
 #include "RecordingInfo.h"
@@ -211,7 +212,7 @@ tSampleSet::tSampleSet(long tpm)
   is_playing   = 0;
   dirty        = 0;
 
-  for (i = 0; i < MAXSMPL; i++)
+  for (i = 0; i < eSampleCount; i++)
   {
     mSamples[i] = new tSample(*this);
     mSampleWindows[i] = 0;
@@ -229,7 +230,7 @@ tSampleSet::tSampleSet(long tpm)
 tSampleSet::~tSampleSet()
 {
   int i;
-  for (i = 0; i < MAXSMPL; i++)
+  for (i = 0; i < eSampleCount; i++)
   {
     delete mSamples[i];
     delete mSampleWindows[i];
@@ -280,7 +281,7 @@ int tSampleSet::Load(const wxString& FileName)
   gpMidiPlayer->SetAudioEnabled(true);
 
   wxBeginBusyCursor();
-  for (int i = 0; i < MAXSMPL; i++)
+  for (int i = 0; i < eSampleCount; i++)
   {
     mSamples[i]->Clear();
   }
@@ -319,7 +320,7 @@ int tSampleSet::Load(const wxString& FileName)
       ::wxMessageBox(String, "Error", wxOK);
       continue;
     }
-    assert(0 <= key && key < MAXSMPL);
+    assert(0 <= key && key < eSampleCount);
     mSamples[key]->SetFilename(SplFilePath.c_str());
     mSamples[key]->SetLabel(Label.c_str());
     mSamples[key]->SetVolume(vol);
@@ -348,7 +349,7 @@ int tSampleSet::Load(const wxString& FileName)
 //-----------------------------------------------------------------------------
 void tSampleSet::ReloadSamples()
 {
-  for (int i = 0; i < MAXSMPL; i++)
+  for (int i = 0; i < eSampleCount; i++)
   {
     mSamples[i]->Load(dirty);
   }
@@ -359,23 +360,22 @@ void tSampleSet::ReloadSamples()
 //-----------------------------------------------------------------------------
 int tSampleSet::Save(const wxString& FileName)
 {
-  ofstream os(FileName.c_str());
-  os << 1 << " " << speed << " " << channels << " " << softsync << endl;
-  for (int i = 0; i < MAXSMPL; i++)
+  ofstream Ofs(FileName.c_str());
+  Ofs << 1 << ' ' << speed << ' ' << channels << ' ' << softsync << endl;
+  for (int i = 0; i < eSampleCount; i++)
   {
-    tSample *spl = mSamples[i];
-    const char *fname = spl->GetFilename();
-    const char* pLabel = spl->GetLabel();
-    int vol = spl->GetVolume();
-    int pan = spl->GetPan();
-    int pitch = spl->GetPitch();
+    tSample* pSample = mSamples[i];
+    const char* fname = pSample->GetFilename();
+    int vol = pSample->GetVolume();
+    int pan = pSample->GetPan();
+    int pitch = pSample->GetPitch();
     if (fname[0])
     {
-      os << i << " ";
-      WriteString(os, fname);
-      os << " ";
-      WriteString(os, pLabel);
-      os << " " << pan << " " << vol << " " << pitch << endl;
+      Ofs << i << ' ';
+      WriteString(Ofs, fname);
+      Ofs << ' ';
+      WriteString(Ofs, pSample->GetLabel());
+      Ofs << ' ' << pan << ' ' << vol << ' ' << pitch << endl;
     }
   }
   return 0;
@@ -383,13 +383,14 @@ int tSampleSet::Save(const wxString& FileName)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-const char* tSampleSet::GetSampleName(int i)
+const string& tSampleSet::GetSampleLabel(int Index)
 {
-  if (0 <= i && i < MAXSMPL)
+  if (Index >= 0 && Index < eSampleCount)
   {
-    return mSamples[i]->GetLabel();
+    return mSamples[Index]->GetLabel();
   }
-  return "";
+  static string EmptyString;
+  return EmptyString;
 }
 
 //-----------------------------------------------------------------------------
@@ -611,7 +612,7 @@ void tSampleSet::StartPlay(long clock)
   ReloadSamples();
 
   // touch all playback sample data, so they may get swapped into memory
-  for (int i = 0; i < MAXSMPL; i++)
+  for (int i = 0; i < eSampleCount; i++)
   {
     tSample *spl = mSamples[i];
     spl->GotoRAM();
@@ -627,6 +628,7 @@ void tSampleSet::StopPlay()
   is_playing = 0;
 }
 
+#if 0
 //*****************************************************************************
 // Description:
 //   This is the sample dialog.
@@ -672,7 +674,7 @@ class tSamplesDlg : public wxDialog
     wxText* pFile;
 #endif // OBSOLETE
 
-    static char *path;
+    static char* mpSamplePath;
     static int  current;
 
     char *ListEntry(int i);
@@ -680,6 +682,7 @@ class tSamplesDlg : public wxDialog
     void Win2Sample(int index);
     void SetCurrentListEntry(int i);
 };
+#endif
 
 // -----------------------------------------------------------------
 // ------------------------ global settings ------------------------
@@ -899,7 +902,7 @@ void tSampleSet::ClearSampleSet(wxWindow* pParent)
     {
       return;
     }
-    for (int i = 0; i < MAXSMPL; ++i)
+    for (int i = 0; i < eSampleCount; ++i)
     {
       mSamples[i]->Clear();
     }
@@ -951,7 +954,7 @@ void tSampleSet::AddNote(const char *fname, long frc, long toc)
   tSample *spl;
 
   // see if fname is already present in sample list
-  for (i = 0; i < MAXSMPL; i++)
+  for (i = 0; i < eSampleCount; i++)
   {
     spl = mSamples[i];
     if (strcmp(spl->GetFilename(), fname) == 0)
@@ -959,10 +962,10 @@ void tSampleSet::AddNote(const char *fname, long frc, long toc)
   }
 
   // if no entry is there, add an entry
-  if (i >= MAXSMPL)
+  if (i >= eSampleCount)
   {
     // start somewhere near the top of the list
-    for (i = 15; i < MAXSMPL; i++)
+    for (i = 15; i < eSampleCount; i++)
     {
       spl = mSamples[i];
       if (spl->GetFilename()[0] == 0)
@@ -970,7 +973,7 @@ void tSampleSet::AddNote(const char *fname, long frc, long toc)
     }
   }
 
-  if (i >= MAXSMPL)
+  if (i >= eSampleCount)
     return;
 
   int key = i;
@@ -1114,11 +1117,11 @@ tAudioBuffer * tAudioRecordBuffer::RequestBuffer()
 // ------------------------ sample settings ------------------------
 // -----------------------------------------------------------------
 
-
+#if 0
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-char * tSamplesDlg::path = 0;
-int    tSamplesDlg::current = 0;
+char* tSamplesDlg::mpSamplePath = 0;
+int   tSamplesDlg::current = 0;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -1126,13 +1129,13 @@ tSamplesDlg::tSamplesDlg(wxWindow* pParent, tSampleSet &s)
   : wxDialog(pParent, wxID_ANY, wxString("Sample Settings")),
     set(s)
 {
-  if (path == 0)
+  if (mpSamplePath == 0)
   {
-    path = copystring("*.wav");
+    mpSamplePath = copystring("*.wav");
   }
 
   wxArrayString SampleNames;
-  for (int i = 0; i < tSampleSet::MAXSMPL; i++)
+  for (int i = 0; i < tSampleSet::eSampleCount; ++i)
   {
     SampleNames.Add(ListEntry(i));
   }
@@ -1182,7 +1185,7 @@ tSamplesDlg::tSamplesDlg(wxWindow* pParent, tSampleSet &s)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-char *tSamplesDlg::ListEntry(int i)
+char* tSamplesDlg::ListEntry(int i)
 {
   ostringstream Oss;
   Oss << i + 1 << ' ' << set.mSamples[i]->GetLabel();
@@ -1241,7 +1244,9 @@ tSamplesDlg::~tSamplesDlg()
 void tSamplesDlg::OnCloseButton()
 {
   if (set.is_playing)
+  {
     return;
+  }
   Win2Sample(current);
   wxBeginBusyCursor();
   set.ReloadSamples();
@@ -1255,12 +1260,18 @@ void tSamplesDlg::OnCloseButton()
 //-----------------------------------------------------------------------------
 void tSamplesDlg::OnAddButton()
 {
-  wxString fname = file_selector(path, "Load Sample", false, false, "*.wav");
-  if (fname)
+  wxString FileName = file_selector(
+    mpSamplePath,
+    "Load Sample",
+    false,
+    false,
+    "*.wav");
+
+  if (FileName)
   {
 #ifdef OBSOLETE
-    file->SetValue(fname);
-    pLabel->SetValue(wxFileNameFromPath(fname));
+    file->SetValue(FileName);
+    pLabel->SetValue(wxFileNameFromPath(FileName));
 #endif
     Win2Sample(current);
     SetCurrentListEntry(current);
@@ -1365,6 +1376,7 @@ void tSamplesDlg::ListClick(wxItem &itm, wxCommandEvent& event)
   ((tSamplesDlg *)itm.GetParent())->OnListClick();
 }
 #endif // OBSOLETE
+#endif
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -1377,7 +1389,7 @@ void tSampleSet::SamplesDlg()
   }
   if (mpSampleDialog == 0)
   {
-    mpSampleDialog = new tSamplesDlg(gpTrackWindow, *this);
+    mpSampleDialog = new JZSamplesDialog(gpTrackWindow, *this);
   }
   mpSampleDialog->Show(true);
 }
@@ -1388,6 +1400,6 @@ void tSampleSet::RefreshDialogs()
 {
   if (mpSampleDialog)
   {
-    mpSampleDialog->Sample2Win(mpSampleDialog->current);
+//    mpSampleDialog->Sample2Win(mpSampleDialog->current);
   }
 }

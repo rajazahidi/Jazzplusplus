@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -261,9 +261,9 @@ class JZPlayer : public wxTimer
       return 0;
     }
 
-    virtual const char *GetSampleName(int i)
+    virtual const std::string& GetSampleLabel(int Index)
     {
-      return mSamples.GetSampleName(i);
+      return mSamples.GetSampleLabel(Index);
     }
 
     virtual void AdjustAudioLength(JZTrack *t)

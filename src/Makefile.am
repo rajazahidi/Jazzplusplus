@@ -36,6 +36,7 @@ Dialogs/MidiChannelDialog.cpp \
 Dialogs/PitchWheelDialog.cpp \
 Dialogs/ProgramChangeDialog.cpp \
 Dialogs/QuantizeDialog.cpp \
+Dialogs/SamplesDialog.cpp \
 Dialogs/SearchAndReplaceDialog.cpp \
 Dialogs/SetTempoDialog.cpp \
 Dialogs/ShiftDialog.cpp \
@@ -132,6 +133,7 @@ Dialogs/MidiChannelDialog.cpp \
 Dialogs/PitchWheelDialog.cpp \
 Dialogs/ProgramChangeDialog.cpp \
 Dialogs/QuantizeDialog.cpp \
+Dialogs/SamplesDialog.cpp \
 Dialogs/SearchAndReplaceDialog.cpp \
 Dialogs/SetTempoDialog.cpp \
 Dialogs/ShiftDialog.cpp \
@@ -233,6 +235,7 @@ Dialogs/MidiChannelDialog.h \
 Dialogs/PitchWheelDialog.h \
 Dialogs/ProgramChangeDialog.h \
 Dialogs/QuantizeDialog.h \
+Dialogs/SamplesDialog.h \
 Dialogs/SearchAndReplaceDialog.h \
 Dialogs/SetTempoDialog.h \
 Dialogs/ShiftDialog.h \

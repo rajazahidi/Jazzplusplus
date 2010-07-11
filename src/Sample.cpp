@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,26 +28,24 @@
 #include "DeprecatedStringUtils.h"
 #include "Mapper.h"
 
-#include <cstdlib>
-#include <iostream>
-#include <fstream>
+#include <cassert>
 #include <cmath>
+#include <cstdlib>
+#include <cstring>
+#include <fstream>
+
+#include <sys/stat.h>
 
 using namespace std;
 
-#include <assert.h>
-#include <sys/stat.h>
-#include <string.h>
-
-
 tSample::tSample(tSampleSet &s)
-  : set(s)
+  : set(s),
+    mLabel()
 {
   data     = 0;
   length   = 0;
   external_flag = 1;  // auto reload when file changes on disk
   external_time = 0;
-  label    = copystring("");
   filename = copystring("");
   volume   = 127;
   pan      = 0;
@@ -59,14 +57,12 @@ tSample::tSample(tSampleSet &s)
 tSample::~tSample()
 {
   delete [] data;
-  delete [] label;
   delete [] filename;
 }
 
-void tSample::SetLabel(const char *str)
+void tSample::SetLabel(const std::string& Label)
 {
-  delete [] label;
-  label = copystring(str);
+  mLabel = Label;
 }
 
 void tSample::SetFilename(const char *fname)
@@ -75,7 +71,7 @@ void tSample::SetFilename(const char *fname)
   {
     dirty = 1;
     char *s = copystring(fname);
-    label = copystring(wxFileNameFromPath(s));
+    mLabel = wxFileNameFromPath(s);
     delete [] s;
   }
   delete [] filename;
@@ -85,8 +81,7 @@ void tSample::SetFilename(const char *fname)
 void tSample::Clear()
 {
   FreeData();
-  delete [] label;
-  label = copystring("");
+  mLabel.clear();
   delete [] filename;
   filename = copystring("");
   volume = 127;

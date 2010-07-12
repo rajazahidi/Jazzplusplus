@@ -47,13 +47,13 @@ class tAlsaAudioPlayer : public tAlsaPlayer
     {
       return mInstalled && tAlsaPlayer::IsInstalled();
     }
-    virtual int GetAudioEnabled() const
+    virtual bool GetAudioEnabled() const
     {
-      return audio_enabled;
+      return mAudioEnabled;
     }
-    virtual void SetAudioEnabled(int x)
+    virtual void SetAudioEnabled(bool AudioEnabled)
     {
-      audio_enabled = x;
+      mAudioEnabled = AudioEnabled;
     }
     virtual void ListenAudio(int key, int start_stop_mode = 1);
     virtual void ListenAudio(tSample &spl, long fr_smpl, long to_smpl);
@@ -100,7 +100,9 @@ class tAlsaAudioPlayer : public tAlsaPlayer
     int running_mode;
     int  midi_speed;  // start speed in bpm
     int  curr_speed;  // actual speed in bpm
-    int  audio_enabled; // 0 means midi only
+
+    // False means MIDI only.
+    bool mAudioEnabled;
 
     int card; // card number in config
     std::string mDeviceNames[2]; // device names

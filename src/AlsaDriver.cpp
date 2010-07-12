@@ -127,7 +127,7 @@ tAlsaAudioPlayer::tAlsaAudioPlayer(JZSong* pSong)
 {
   mpAudioBuffer = new tEventArray();
   mInstalled    = false;
-  audio_enabled = 0;
+  mAudioEnabled = false;
   mpListener    = 0;
   mCanDuplex    = 0;    // no duplex yet.
   pcm[PLAYBACK] = NULL;
@@ -139,7 +139,7 @@ tAlsaAudioPlayer::tAlsaAudioPlayer(JZSong* pSong)
   // FIXME
   mCanDuplex = 1;
   mInstalled = true;
-  audio_enabled = 1;
+  mAudioEnabled = true;
 }
 
 
@@ -181,7 +181,7 @@ void tAlsaAudioPlayer::StartPlay(long clock, long loopClock, int cont)
   mSamples.StartPlay(clock);
 
   tAlsaPlayer::StartPlay(clock, loopClock, cont);
-  if (!audio_enabled)
+  if (!mAudioEnabled)
   {
     return;
   }
@@ -213,7 +213,7 @@ void tAlsaAudioPlayer::StartPlay(long clock, long loopClock, int cont)
 
   if (running_mode == 0)
   {
-    audio_enabled = 0;
+    mAudioEnabled = false;
     return;
   }
 
@@ -241,7 +241,7 @@ void tAlsaAudioPlayer::StartAudio()
 
 void tAlsaAudioPlayer::OpenDsp(int mode, int sync_mode)
 {
-  if (!audio_enabled)
+  if (!mAudioEnabled)
   {
     return;
   }
@@ -260,7 +260,7 @@ void tAlsaAudioPlayer::OpenDsp(int mode, int sync_mode)
     format = SND_PCM_FORMAT_S16_LE;
     frame_shift[mode]++;
   }
-  channels =  mSamples.GetChannels();
+  channels =  mSamples.GetChannelCount();
   if (channels > 1)
   {
     frame_shift[mode]++;
@@ -276,7 +276,7 @@ void tAlsaAudioPlayer::OpenDsp(int mode, int sync_mode)
       SND_PCM_NONBLOCK) < 0)
   {
     perror("snd_pcm_open");
-    audio_enabled = 0;
+    mAudioEnabled = false;
     return;
   }
 
@@ -298,9 +298,11 @@ void tAlsaAudioPlayer::OpenDsp(int mode, int sync_mode)
     perror("cannot set audio channels");
     goto __error;
   }
-  if (snd_pcm_hw_params_set_rate(pcm[mode], hw, mSamples.GetSpeed(), 0) < 0)
+  if (
+    snd_pcm_hw_params_set_rate(pcm[mode], hw, mSamples.GetSamplingRate(), 0) <
+    0)
   {
-    cerr  << "cannot set audio rate: " << mSamples.GetSpeed() << endl;
+    cerr  << "cannot set audio rate: " << mSamples.GetSamplingRate() << endl;
     goto __error;
   }
 
@@ -354,7 +356,7 @@ void tAlsaAudioPlayer::OpenDsp(int mode, int sync_mode)
 __error:
   snd_pcm_close(pcm[mode]);
   pcm[mode] = NULL;
-  audio_enabled = 0;
+  mAudioEnabled = false;
   return;
 }
 
@@ -405,7 +407,7 @@ void tAlsaAudioPlayer::CloseDsp(bool Reset)
 
 void tAlsaAudioPlayer::Notify()
 {
-  if (audio_enabled)
+  if (mAudioEnabled)
   {
     if (pcm[PLAYBACK])
     {
@@ -446,7 +448,7 @@ int tAlsaAudioPlayer::GetFreeSpace(int mode)
 
 int tAlsaAudioPlayer::WriteSamples()
 {
-  if (!audio_enabled || pcm[PLAYBACK] == NULL)
+  if (!mAudioEnabled || pcm[PLAYBACK] == NULL)
   {
     return 0;
   }
@@ -495,7 +497,7 @@ int tAlsaAudioPlayer::WriteSamples()
 
 void tAlsaAudioPlayer::ReadSamples()
 {
-  if (!audio_enabled || pcm[CAPTURE] == NULL)
+  if (!mAudioEnabled || pcm[CAPTURE] == NULL)
   {
     return;
   }
@@ -535,7 +537,7 @@ long tAlsaAudioPlayer::GetCurrentPosition(int mode)
 
 void tAlsaAudioPlayer::MidiSync()
 {
-  if (!audio_enabled)
+  if (!mAudioEnabled)
   {
     return;
   }
@@ -615,7 +617,7 @@ void tAlsaAudioPlayer::StopPlay()
 {
   mSamples.StopPlay();
   tAlsaPlayer::StopPlay();
-  if (!audio_enabled)
+  if (!mAudioEnabled)
   {
     return;
   }
@@ -640,7 +642,7 @@ void tAlsaAudioPlayer::StopPlay()
 
 void tAlsaAudioPlayer::ListenAudio(int key, int start_stop_mode)
 {
-  if (!audio_enabled)
+  if (!mAudioEnabled)
   {
     return;
   }
@@ -670,7 +672,7 @@ void tAlsaAudioPlayer::ListenAudio(int key, int start_stop_mode)
 
 void tAlsaAudioPlayer::ListenAudio(tSample& spl, long fr_smpl, long to_smpl)
 {
-  if (!audio_enabled)
+  if (!mAudioEnabled)
   {
     return;
   }

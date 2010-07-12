@@ -65,14 +65,14 @@ class tAudioPlayer : public tSeq2Player
       return mInstalled && tSeq2Player::IsInstalled();
     }
 
-    virtual int GetAudioEnabled() const
+    virtual bool GetAudioEnabled() const
     {
-      return audio_enabled;
+      return mAudioEnabled;
     }
 
-    virtual void SetAudioEnabled(int x)
+    virtual void SetAudioEnabled(bool AudioEnabled)
     {
-      audio_enabled = x;
+      mAudioEnabled = AudioEnabled;
     }
 
     virtual void ListenAudio(int key, int start_stop_mode = 1);
@@ -113,7 +113,9 @@ class tAudioPlayer : public tSeq2Player
     long audio_bytes;
     int midi_speed;  // start speed in bpm
     int curr_speed;  // actual speed in bpm
-    int audio_enabled; // 0 means midi only
+
+    // False means MIDI only.
+    int mAudioEnabled;
 
     tAudioListener* mpListener;
     tAudioRecordBuffer recbuffers;

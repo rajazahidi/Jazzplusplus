@@ -121,11 +121,9 @@ class tAudioListener : public wxTimer
 tAudioPlayer::tAudioPlayer(JZSong* pSong)
   : tSeq2Player(pSong)
 {
-  long dummy = 0;
   mpAudioBuffer = new tEventArray();
   mInstalled = false;
-  dummy = gpConfig->GetValue(C_EnableAudio);
-  audio_enabled = dummy;
+  mAudioEnabled = (gpConfig->GetValue(C_EnableAudio) != 0);
   mpListener = 0;
   mCanDuplex = 0;    // no duplex yet.
   dev = -1;
@@ -164,7 +162,7 @@ tAudioPlayer::tAudioPlayer(JZSong* pSong)
   }
 
   dev = -1;  // closed
-  audio_enabled = audio_enabled && mInstalled;
+  mAudioEnabled = mAudioEnabled && mInstalled;
 }
 
 
@@ -191,7 +189,7 @@ int tAudioPlayer::RecordMode() const
 
 void tAudioPlayer::StartAudio()
 {
-  if (!audio_enabled)
+  if (!mAudioEnabled)
   {
     return;
   }
@@ -233,7 +231,7 @@ void tAudioPlayer::OpenDsp()
 {
   int tmp;
 
-  if (!audio_enabled)
+  if (!mAudioEnabled)
   {
     return;
   }
@@ -269,7 +267,7 @@ void tAudioPlayer::OpenDsp()
   if (dev < 0)
   {
     perror(AUDIO_DEVICE);
-    audio_enabled = 0;
+    mAudioEnabled = false;
     return;
   }
 
@@ -291,13 +289,13 @@ void tAudioPlayer::OpenDsp()
     cerr << "Unable to set the sample size" << endl;
   }
 
-  tmp = (mSamples.GetChannels() == 1) ? 0 : 1;
+  tmp = (mSamples.GetChannelCount() == 1) ? 0 : 1;
   if (ioctl (dev, SNDCTL_DSP_STEREO, &tmp) == -1)
   {
     cerr << "Unable to set mono/stereo" << endl;
   }
 
-  tmp = mSamples.GetSpeed();
+  tmp = mSamples.GetSamplingRate();
   if (ioctl (dev, SNDCTL_DSP_SPEED, &tmp) == -1)
   {
     perror("ioctl DSP_SPEED");
@@ -346,7 +344,7 @@ void tAudioPlayer::CloseDsp(bool Reset)
 
 void tAudioPlayer::Notify()
 {
-  if (audio_enabled)
+  if (mAudioEnabled)
   {
     if (PlaybackMode())
     {
@@ -373,7 +371,7 @@ void tAudioPlayer::Notify()
 
 int tAudioPlayer::WriteSamples()
 {
-  if (!audio_enabled)
+  if (!mAudioEnabled)
   {
     return 0;
   }
@@ -451,7 +449,7 @@ void tAudioPlayer::MidiSync()
   // everything works.  In OSS, there are no docs and if it works
   // with kernel x it wont with kernel y.
 
-  if (!audio_enabled)
+  if (!mAudioEnabled)
   {
     return;
   }
@@ -525,7 +523,7 @@ void tAudioPlayer::StopPlay()
 {
   mSamples.StopPlay();
   tSeq2Player::StopPlay();
-  if (!audio_enabled)
+  if (!mAudioEnabled)
   {
     return;
   }
@@ -552,7 +550,7 @@ void tAudioPlayer::StopPlay()
 
 void tAudioPlayer::ListenAudio(int key, int start_stop_mode)
 {
-  if (!audio_enabled)
+  if (!mAudioEnabled)
   {
     return;
   }
@@ -582,7 +580,7 @@ void tAudioPlayer::ListenAudio(int key, int start_stop_mode)
 
 void tAudioPlayer::ListenAudio(tSample &spl, long fr_smpl, long to_smpl)
 {
-  if (!audio_enabled)
+  if (!mAudioEnabled)
   {
     return;
   }

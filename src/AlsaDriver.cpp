@@ -251,7 +251,7 @@ void tAlsaAudioPlayer::OpenDsp(int mode, int sync_mode)
   snd_pcm_uframes_t buffer_size, period_size;
 
   frame_shift[mode] = 0;
-  if (mSamples.BitsPerSample() == 8)
+  if (mSamples.GetBitsPerSample() == 8)
   {
     format = SND_PCM_FORMAT_U8;
   }

@@ -282,9 +282,9 @@ void tAudioPlayer::OpenDsp()
     perror("ioctl DSP_SETFRAGMENT");
   }
 
-  tmp = mSamples.BitsPerSample();
+  tmp = mSamples.GetBitsPerSample();
   ioctl(dev, SNDCTL_DSP_SAMPLESIZE, &tmp);
-  if (tmp != mSamples.BitsPerSample())
+  if (tmp != mSamples.GetBitsPerSample())
   {
     cerr << "Unable to set the sample size" << endl;
   }

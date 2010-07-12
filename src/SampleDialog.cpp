@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -111,7 +111,7 @@ tEqualizer::tEqualizer(tSampleWin &w)
     spl(w.GetSample())
 {
   int i;
-  channels = spl.GetChannels();
+  channels = spl.GetChannelCount();
   for (i = 0; i < array.Size(); ++i)
   {
     array[i] = 0;
@@ -172,7 +172,7 @@ void tEqualizer::Action()
   float oldpeak = fs.Peak();
 
   int i = 0;
-  int channels = fs.GetChannels();
+  int channels = fs.GetChannelCount();
   int n = to - fr;
   float *data = fs.GetData();
 
@@ -991,7 +991,7 @@ void tEchoForm::OnOk()
   float peak = fs.Peak();
   if (rand)
   {
-    if (fs.GetChannels() == 2)
+    if (fs.GetChannelCount() == 2)
       fs.RndEchoStereo(num_echos, dmap(delay), (float)amap(ampl));
     else
       fs.RndEcho(num_echos, dmap(delay), (float)amap(ampl));
@@ -1073,7 +1073,7 @@ void tShifterForm::OnOk()
   {
     JZMapper wmap(0, 100, 0.05, 0.3);
     tFloatSample inp(spl);
-    tFloatSample out(inp.GetChannels(), inp.GetSamplingRate());
+    tFloatSample out(inp.GetChannelCount(), inp.GetSamplingRate());
     //float peak = inp.Peak();
 
     tShifterCmd shifter(inp, out);
@@ -1088,7 +1088,7 @@ void tShifterForm::OnOk()
     p[6] = 0;
     p[7] = 0;
     shifter.rotate(p, 8);
-    if (inp.GetChannels() == 2)
+    if (inp.GetChannelCount() == 2)
     {
       p[6] = 1;
       p[7] = 1;

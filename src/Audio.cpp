@@ -22,22 +22,23 @@
 
 #include "Audio.h"
 
+#include "Dialogs/AudioSettingsDialog.h"
 #include "Dialogs/SamplesDialog.h"
-#include "Sample.h"
 #include "Events.h"
-#include "RecordingInfo.h"
-#include "Track.h"
+#include "FileSelector.h"
+#include "FindFile.h"
 #include "Globals.h"
+#include "Help.h"
 #include "Player.h"
+#include "Random.h"
+#include "RecordingInfo.h"
+#include "Resources.h"
+#include "Sample.h"
+#include "SampleWindow.h"
+#include "StringReadWrite.h"
+#include "Track.h"
 #include "TrackFrame.h"
 #include "TrackWindow.h"
-#include "SampleWindow.h"
-#include "Random.h"
-#include "FindFile.h"
-#include "FileSelector.h"
-#include "StringReadWrite.h"
-#include "Help.h"
-#include "Resources.h"
 
 #include <wx/filename.h>
 #include <wx/listbox.h>
@@ -56,18 +57,17 @@
 
 using namespace std;
 
-#define db(a) cout << #a << " = " << a << endl
-
 //*****************************************************************************
+// Description:
+//   This is the sample voice class declaration.  This class is activated via a
+// MIDI note on signal.  The class copies data from a tSample object to the
+// output buffer as needed by the driver.
 //*****************************************************************************
 class tSampleVoice
 {
-  // Activated on note on.  Copies data from a tSample object to the output
-  // buffer as needed by the driver.
-
   public:
 
-    tSampleVoice(tSampleSet &s)
+    tSampleVoice(tSampleSet& s)
       : set(s)
     {
     }
@@ -189,11 +189,10 @@ class tSampleVoice
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 tSampleSet::tSampleSet(long tpm)
-  : speed(22050),
-    channels(1),
+  : mSamplingRate(22050),
+    mChannelCount(1),
     bits(16),        // dont change!!
     softsync(1),
-    mpGlobalSettingsDialog(0),
     mpSampleDialog(0),
     mDefaultFileName("noname.spl"),
     mRecordFileName("noname.wav")
@@ -291,7 +290,7 @@ int tSampleSet::Load(const wxString& FileName)
 
   ifstream Is(FileName.c_str());
   int Version;
-  Is >> Version >> speed >> channels >> softsync;
+  Is >> Version >> mSamplingRate >> mChannelCount >> softsync;
   while (Is)
   {
     int key, pan, vol, pitch;
@@ -361,7 +360,9 @@ void tSampleSet::ReloadSamples()
 int tSampleSet::Save(const wxString& FileName)
 {
   ofstream Ofs(FileName.c_str());
-  Ofs << 1 << ' ' << speed << ' ' << channels << ' ' << softsync << endl;
+  Ofs
+    << 1 << ' ' << mSamplingRate << ' ' << mChannelCount << ' ' << softsync
+    << endl;
   for (int i = 0; i < eSampleCount; i++)
   {
     tSample* pSample = mSamples[i];
@@ -518,8 +519,8 @@ int tSampleSet::FillBuffers(long last_clock)
 }
 
 //-----------------------------------------------------------------------------
-// returns the number of buffers containing sound. Fills as many
-// buffers as possible, the last buffers may contain silence only.
+//   Returns the number of buffers containing sound.  Fills as many buffers as
+// possible, the last buffers may contain silence only.
 //-----------------------------------------------------------------------------
 int tSampleSet::PrepareListen(tSample *spl, long fr_smpl, long to_smpl)
 {
@@ -684,9 +685,6 @@ class tSamplesDlg : public wxDialog
 };
 #endif
 
-// -----------------------------------------------------------------
-// ------------------------ global settings ------------------------
-// -----------------------------------------------------------------
 #ifdef OBSOLETE
 
 class tAudioGloblForm : public wxForm
@@ -694,7 +692,7 @@ class tAudioGloblForm : public wxForm
   public:
     tAudioGloblForm(tSampleSet &s)
     : wxForm( USED_WXFORM_BUTTONS ),
-      set(s)
+      mSampleSet(s)
     {
 
       ossbug1      = gpConfig->GetValue(C_OssBug1);
@@ -709,7 +707,7 @@ class tAudioGloblForm : public wxForm
         "44100",
         0
       };
-      speed    = set.GetSpeed();
+      speed    = mSampleSet.GetSamplingRate();
       speedstr = 0;
       for (int i = 0; speedtxt[i]; i++)
       {
@@ -725,8 +723,8 @@ class tAudioGloblForm : public wxForm
       }
 
       enable = gpMidiPlayer->GetAudioEnabled();
-      stereo = (set.GetChannels() == 2);
-      softsync = set.GetSoftSync();
+      stereo = (mSampleSet.GetChannelCount() == 2);
+      softsync = mSampleSet.GetSoftSync();
 
       Add(wxMakeFormBool("Enable Audio", &enable));
       Add(wxMakeFormNewLine());
@@ -756,14 +754,14 @@ class tAudioGloblForm : public wxForm
 
     void OnOk()
     {
-      if (set.is_playing)
+      if (mSampleSet.is_playing)
         return;
       wxBeginBusyCursor();
-      set.mpGlobalSettingsDialog = 0;
+      mSampleSet.mpGlobalSettingsDialog = 0;
       speed = atol(speedstr);
-      set.SetSpeed(speed);
-      set.SetChannels(stereo ? 2 : 1);
-      set.SetSoftSync(softsync);
+      mSampleSet.SetSamplingRate(speed);
+      mSampleSet.SetChannelCount(stereo ? 2 : 1);
+      mSampleSet.SetSoftSync(softsync);
       gpMidiPlayer->SetAudioEnabled(enable);
 
       if (gpConfig->GetValue(C_EnableAudio) != enable)
@@ -791,17 +789,17 @@ class tAudioGloblForm : public wxForm
       }
 
       if (enable)
-        set.ReloadSamples();
+        mSampleSet.ReloadSamples();
       wxEndBusyCursor();
       wxForm::OnOk();
     }
     void OnCancel()
     {
-      set.mpGlobalSettingsDialog = 0;
+      mSampleSet.mpGlobalSettingsDialog = 0;
       wxForm::OnCancel();
     }
   private:
-    tSampleSet &set;
+    tSampleSet& mSampleSet;
     wxList  strlist;
 
     long speed;
@@ -826,16 +824,8 @@ void tSampleSet::EditAudioGlobalSettings(wxWindow* pParent)
     return;
   }
 
-  if (mpGlobalSettingsDialog == 0)
-  {
-    mpGlobalSettingsDialog = new wxDialog(pParent, wxID_ANY, "Audio Settings");
-#ifdef OBSOLETE
-    tAudioGloblForm *form  = new tAudioGloblForm(*this);
-    form->AssociatePanel(mpGlobalSettingsDialog);
-    mpGlobalSettingsDialog->Fit();
-#endif // OBSOLETE
-  }
-  mpGlobalSettingsDialog->Show(true);
+  JZAudioSettingsDialog AudioSettingsDialog(pParent, *this);
+  AudioSettingsDialog.ShowModal();
 }
 
 //-----------------------------------------------------------------------------
@@ -896,7 +886,7 @@ void tSampleSet::SaveSampleSet(wxWindow* pParent)
 //-----------------------------------------------------------------------------
 void tSampleSet::ClearSampleSet(wxWindow* pParent)
 {
-  if (mpSampleDialog == 0 && mpGlobalSettingsDialog == 0)
+  if (mpSampleDialog == 0)
   {
     if (wxMessageBox("Clear Sample Set?", "Confirm", wxYES_NO) == wxNO)
     {
@@ -1031,11 +1021,11 @@ void tSampleSet::SaveWave(
   wh.sub_chunk  = FMT;
   wh.data_chunk = DATA;
   wh.format     = PCM_CODE;
-  wh.modus      = channels;
+  wh.modus      = mChannelCount;
   wh.sc_len     = 16;
-  wh.sample_fq  = speed;
+  wh.sample_fq  = mSamplingRate;
   wh.bit_p_spl  = bits;
-  wh.byte_p_spl = channels * (bits > 8 ? 2 : 1);
+  wh.byte_p_spl = mChannelCount * (bits > 8 ? 2 : 1);
   wh.byte_p_sec = wh.byte_p_spl * wh.sample_fq;
 
 
@@ -1386,11 +1376,6 @@ void tSamplesDlg::ListClick(wxItem &itm, wxCommandEvent& event)
 //-----------------------------------------------------------------------------
 void tSampleSet::SamplesDlg()
 {
-  if (mpGlobalSettingsDialog)
-  {
-    mpGlobalSettingsDialog->Show(true);
-    return;
-  }
   if (mpSampleDialog == 0)
   {
     mpSampleDialog = new JZSamplesDialog(gpTrackWindow, *this);

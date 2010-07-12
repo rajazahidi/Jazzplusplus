@@ -22,6 +22,7 @@ DeprecatedStringUtils.cpp \
 DeprecatedWx/prop.cpp \
 DeprecatedWx/propform.cpp \
 DeprecatedWx/proplist.cpp \
+Dialogs/AudioSettingsDialog.cpp \
 Dialogs/CleanupDialog.cpp \
 Dialogs/ControllerDialog.cpp \
 Dialogs/DeleteDialog.cpp \
@@ -119,6 +120,7 @@ DeprecatedStringUtils.cpp \
 DeprecatedWx/prop.cpp \
 DeprecatedWx/propform.cpp \
 DeprecatedWx/proplist.cpp \
+Dialogs/AudioSettingsDialog.cpp \
 Dialogs/CleanupDialog.cpp \
 Dialogs/ControllerDialog.cpp \
 Dialogs/DeleteDialog.cpp \
@@ -221,6 +223,7 @@ DeprecatedWx/prop.h \
 DeprecatedWx/propform.h \
 DeprecatedWx/proplist.h \
 DeprecatedStringUtils.h \
+Dialogs/AudioSettingsDialog.h \
 Dialogs/CleanupDialog.h \
 Dialogs/ControllerDialog.h \
 Dialogs/DeleteDialog.h \

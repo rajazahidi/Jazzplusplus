@@ -153,7 +153,7 @@ class tFloatSample // : public tCMIX
 
     void AssureLength(int new_length);
 
-    int GetChannels() const
+    int GetChannelCount() const
     {
       return channels;
     }
@@ -195,9 +195,9 @@ class tFloatSample // : public tCMIX
  *   data[n+1] == 2nd value for left channel
  *   ...
  * all length values mean number of shorts and
- * should be multiples of of set.GetChannels().
+ * should be multiples of of set.GetChannelCount().
  * Offsets should start on channel boundaries,
- * that is offs % set.GetChannels() == 0.
+ * that is offs % set.GetChannelCount() == 0.
  */
 
 class tSample
@@ -315,7 +315,8 @@ class tSample
       return &set;
     }
 
-    int GetChannels() const;
+    int GetChannelCount() const;
+
     int GetSamplingRate() const;
 
     /**

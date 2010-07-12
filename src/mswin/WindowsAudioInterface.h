@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -71,14 +71,14 @@ class JZWindowsAudioPlayer : public JZWindowsIntPlayer
       return mInstalled && JZWindowsIntPlayer::IsInstalled();
     }
 
-    virtual int GetAudioEnabled() const
+    virtual bool GetAudioEnabled() const
     {
-      return audio_enabled;
+      return mAudioEnabled;
     }
 
-    virtual void SetAudioEnabled(int x)
+    virtual void SetAudioEnabled(bool AudioEnabled)
     {
-      audio_enabled = x;
+      mAudioEnabled = AudioEnabled;
     }
 
     virtual void ListenAudio(int key, int start_stop_mode = 1);
@@ -123,6 +123,11 @@ class JZWindowsAudioPlayer : public JZWindowsIntPlayer
 
     void AudioCallback(UINT msg);
 
+    int OpenDsp();    // 0 = ok
+    int CloseDsp();   // 0 = ok
+
+  private:
+
     TEErrorCode mErrorCode;
 
     // Indicates if full duplex record/play is possible.
@@ -131,11 +136,11 @@ class JZWindowsAudioPlayer : public JZWindowsIntPlayer
     // Indicates if the  exact output play position can be determined.
     bool mCanSynchronize;
 
-    int OpenDsp();    // 0 = ok
-    int CloseDsp();   // 0 = ok
-
     bool mInstalled;
-    int audio_enabled;        // 0 means midi only
+
+    // A value of false means MIDI only.
+    bool mAudioEnabled;
+
     long blocks_played;       // # of blocks written to device
     int play_buffers_needed;  // driver requests more output buffers
 

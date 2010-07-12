@@ -309,7 +309,7 @@ int tSample::Convert(istream &is, int bytes, int channels, int bits, int speed)
   }
 
   // convert mono -> stereo
-  if (channels == 1 && set.channels == 2)
+  if (channels == 1 && set.GetChannelCount() == 2)
   {
     short *old = data;
     length = length * 2;
@@ -325,7 +325,7 @@ int tSample::Convert(istream &is, int bytes, int channels, int bits, int speed)
     channels = 2;
   }
   // convert stereo -> mono
-  else if (channels == 2 && set.channels == 1)
+  else if (channels == 2 && set.GetChannelCount() == 1)
   {
     short *old = data;
     length = length / 2;
@@ -345,9 +345,9 @@ int tSample::Convert(istream &is, int bytes, int channels, int bits, int speed)
   // convert sampling speed
   if (pitch != 0)
     speed = (int)(speed * pow(FSEMI, pitch));
-  if (speed != set.speed)
+  if (speed != set.GetSamplingRate())
   {
-    float f = (float)speed / (float)set.speed;
+    float f = (float)speed / (float)set.GetSamplingRate();
     Transpose(f);
   }
 
@@ -356,7 +356,7 @@ int tSample::Convert(istream &is, int bytes, int channels, int bits, int speed)
   {
     int ch1 = volume;
     int ch2 = volume;
-    int  ppan = (set.channels == 2) ? pan : 0;
+    int  ppan = (set.GetChannelCount() == 2) ? pan : 0;
     if (ppan > 0)
       ch1 = (int)volume * (63L - ppan) / 64L;
     else if (ppan < 0)
@@ -426,7 +426,7 @@ int tSample::Align(int offs) const
     offs = 0;
   else if (offs > length)
     offs = length;
-  return offs & -(int)set.channels;
+  return offs & - set.GetChannelCount();
 }
 
 
@@ -528,7 +528,7 @@ void tSample::Reverse(int fr, int to)
 void tSample::Flip(int ch)
 {
   int i = ch;
-  int step = set.GetChannels();
+  int step = set.GetChannelCount();
   while (i < length)
   {
     data[i] = -data[i];
@@ -553,13 +553,13 @@ void tSample::AssureLength(int new_len)
 
 int tSample::GetSamplingRate() const
 {
-  return set.GetSpeed();
+  return set.GetSamplingRate();
 }
 
 
-int tSample::GetChannels() const
+int tSample::GetChannelCount() const
 {
-  return set.GetChannels();
+  return set.GetChannelCount();
 }
 
 
@@ -603,7 +603,7 @@ void tSample::TransposeSemis(float semis)
 
 void tSample::Transpose(float f)
 {
-  int channels   = set.GetChannels();
+  int channels   = set.GetChannelCount();
   int new_length = ((int)((double)length / (double)f) & (-channels));
   short *new_data = new short [new_length];
 
@@ -629,13 +629,23 @@ void tSample::Transpose(float f)
 
 int tSample::Seconds2Samples(float time)
 {
-  JZMapper Map(0.0, 1.0, 0.0, (double)set.speed * set.channels);
+  JZMapper Map(
+    0.0,
+    1.0,
+    0.0,
+    (double)set.GetSamplingRate() * set.GetChannelCount());
+
   return static_cast<int>(Map.XToY(time));
 }
 
 float tSample::Samples2Seconds(int samples)
 {
-  JZMapper Map(0.0, (double)set.speed * set.channels, 0.0, 1.0);
+  JZMapper Map(
+    0.0,
+    (double)set.GetSamplingRate() * set.GetChannelCount(),
+    0.0,
+    1.0);
+
   return (float)Map.XToY(samples);
 }
 
@@ -683,19 +693,19 @@ int tSample::Save()
 int tSample::SaveWave()
 {
   WaveHeader wh;
-  wh.main_chunk = RIFF;
-  wh.chunk_type = WAVE;
-  wh.sub_chunk  = FMT;
-  wh.data_chunk = DATA;
-  wh.format     = PCM_CODE;
-  wh.modus      = set.channels;
-  wh.sc_len     = 16;
-  wh.sample_fq  = set.speed;
-  wh.bit_p_spl  = set.bits;
-  wh.byte_p_spl = set.channels * (set.bits > 8 ? 2 : 1);
-  wh.byte_p_sec = wh.byte_p_spl * wh.sample_fq;
-  wh.data_length   = length * sizeof(short);
-  wh.length        = wh.data_length + sizeof(WaveHeader);
+  wh.main_chunk  = RIFF;
+  wh.chunk_type  = WAVE;
+  wh.sub_chunk   = FMT;
+  wh.data_chunk  = DATA;
+  wh.format      = PCM_CODE;
+  wh.modus       = set.GetChannelCount();
+  wh.sc_len      = 16;
+  wh.sample_fq   = set.GetSamplingRate();
+  wh.bit_p_spl   = set.bits;
+  wh.byte_p_spl  = set.GetChannelCount() * (set.bits > 8 ? 2 : 1);
+  wh.byte_p_sec  = wh.byte_p_spl * wh.sample_fq;
+  wh.data_length = length * sizeof(short);
+  wh.length      = wh.data_length + sizeof(WaveHeader);
 
 #ifdef __WXMSW__
   unlink(mFileName.c_str()); // buggy, sigh!
@@ -719,8 +729,8 @@ tFloatSample::tFloatSample(tSample &spl)
   data   = new float [length];
   for (int i = 0; i < length; i++)
     data[i] = (float)spl.data[i];
-  channels = spl->GetChannels();
-  sampling_rate = spl->GetSpeed();
+  channels = spl->GetChannelCount();
+  sampling_rate = spl->GetSamplingRate();
 }
 
 tFloatSample::tFloatSample(tSample &spl, int fr, int to)
@@ -730,8 +740,8 @@ tFloatSample::tFloatSample(tSample &spl, int fr, int to)
   data   = new float [length];
   for (int i = 0; i < length; i++)
     data[i] = (float)spl.data[i + fr];
-  channels = spl->GetChannels();
-  sampling_rate = spl->GetSpeed();
+  channels = spl->GetChannelCount();
+  sampling_rate = spl->GetSamplingRate();
 }
 
 tFloatSample::tFloatSample(int ch, int sr)

@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -100,7 +100,7 @@ void tSplPitch::Execute(long fr, long to)
   if (n <= 0)
     return; // no data
 
-  long channels = spl.GetChannels();
+  long channels = spl.GetChannelCount();
   float N       = spl.length / channels - 2;
   short *data   = spl.data;
 
@@ -238,7 +238,7 @@ void tWahWah::Initialize()
 void tWahWah::Execute(long fr, long to)
 {
   tFloatSample *out = new tFloatSample(spl);
-  for (int c = 0; c < out->GetChannels(); c++)
+  for (int c = 0; c < out->GetChannelCount(); c++)
     Wah(c, *out);
   out->Rescale();
   spl.Set(*out);
@@ -251,7 +251,7 @@ void tWahWah::Wah(int channel, tFloatSample &out)
 {
   long N = spl.GetLength();
   float SR = spl.GetSamplingRate();
-  long channels = spl.GetChannels();
+  long channels = spl.GetChannelCount();
   JZMapper XMap(0, N, 0, arr.Size());
   JZMapper fmap(0, 100, lo_freq, hi_freq);
 
@@ -297,7 +297,7 @@ void tShifterCmd::ShiftPitch(tSample &spl, float semis,  bool keep_length, float
   {
     JZMapper wmap(0, 100, 0.05, 0.3);
     tFloatSample inp(spl);
-    tFloatSample out(inp.GetChannels(), inp.GetSamplingRate());
+    tFloatSample out(inp.GetChannelCount(), inp.GetSamplingRate());
     float p[8];
     p[0] = 0;
     p[1] = 0;
@@ -308,7 +308,7 @@ void tShifterCmd::ShiftPitch(tSample &spl, float semis,  bool keep_length, float
     p[6] = 0;
     p[7] = 0;
     rotate(p, 8, inp, out);
-    if (inp.GetChannels() == 2)
+    if (inp.GetChannelCount() == 2)
     {
       p[6] = 1;
       p[7] = 1;
@@ -337,7 +337,7 @@ void tShifterCmd::StretchLength(tSample &spl, long newlen, bool keep_pitch, floa
   {
     JZMapper wmap(0, 100, 0.05, 0.3);
     tFloatSample inp(spl);
-    tFloatSample out(inp.GetChannels(), inp.GetSamplingRate());
+    tFloatSample out(inp.GetChannelCount(), inp.GetSamplingRate());
     float p[8];
     p[0] = 0;
     p[1] = 0;
@@ -348,7 +348,7 @@ void tShifterCmd::StretchLength(tSample &spl, long newlen, bool keep_pitch, floa
     p[6] = 0;
     p[7] = 0;
     rotate(p, 8, inp, out);
-    if (inp.GetChannels() == 2)
+    if (inp.GetChannelCount() == 2)
     {
       p[6] = 1;
       p[7] = 1;
@@ -403,7 +403,7 @@ double tShifterCmd::rotate(float p[], int n_args, tFloatSample &sinp, tFloatSamp
   reinit = (int)(p[5] * SR);
   off = reinit/2;
   k = off;
-  chans = sout.GetChannels();
+  chans = sout.GetChannelCount();
   inchan = (int)p[6];
   j = 0;
   for (i = 0; i < nsamps; i++)

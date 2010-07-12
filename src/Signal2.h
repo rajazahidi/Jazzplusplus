@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -314,7 +314,7 @@ class tSigSynth
       generators.push_back(&gen);
     }
 
-    int GetChannels() const
+    int GetChannelCount() const
     {
       return channels;
     }
@@ -349,7 +349,7 @@ class tSigInput
     tSigInput(tSigSynth &parent) : synth(parent)
     {
       synth.AddGenerator(*this);
-      channels = synth.GetChannels();
+      channels = synth.GetChannelCount();
       sampling_rate = synth.GetSamplingRate();
       current = -1;
     }
@@ -506,8 +506,8 @@ class tSampleResizingIterator : public tSampleIterator<T, SPL>
       {
         Resize(this->GetLength() * 2);
       }
-      long idata = this->GetCurrent() * this->GetChannels();
-      for (int i = 0; i < this->GetChannels(); i++)
+      long idata = this->GetCurrent() * this->GetChannelCount();
+      for (int i = 0; i < this->GetChannelCount(); i++)
       {
         this->data[idata++] = (T)v[i];
       }
@@ -599,7 +599,7 @@ class tSigWaveOscil : public tSignalModifier
   public:
     tSigWaveOscil(tSigSynth &synth, int N, double f, double ffact = FSEMI)
       : tSignalModifier(synth),
-        array(N, synth.GetChannels()),
+        array(N, synth.GetChannelCount()),
         freq(f),
         SR(synth.GetSamplingRate()),
         frqfact(ffact)
@@ -659,7 +659,7 @@ class tSigWaveCtrl : public tSigInput
   public:
     tSigWaveCtrl(tSigSynth &synth, int N, double durat)
       : tSigInput(synth),
-        array(N, synth.GetChannels()),
+        array(N, synth.GetChannelCount()),
         xmap(0, synth.GetSamplingRate() * durat, 0, N)
     {
     }
@@ -806,7 +806,7 @@ class tSigDelay : public tSignalModifier
     tSigDelay(tSigSynth &synth, float time)
       : tSignalModifier(synth),
         size((long)(time * sampling_rate) + 2),
-        array(size, synth.GetChannels())
+        array(size, synth.GetChannelCount())
     {
       map.Initialize(-1, 1, 0, -size+1);
     }
@@ -1045,7 +1045,7 @@ class tSigComb : public tSignalModifier
     tSigComb(tSigSynth &synth, float loop_time, float reverb_time)
       : tSignalModifier(synth),
         size((long)(loop_time * synth.GetSamplingRate())),
-        array(size+2, synth.GetChannels())
+        array(size+2, synth.GetChannelCount())
     {
       coeff = exp((double)(log001 * loop_time / reverb_time));
     }

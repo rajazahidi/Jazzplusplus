@@ -317,7 +317,7 @@ void tSampleCnvs::OnSize(int w, int h)
 {
   int cw, ch;
   GetClientSize(&cw, &ch);
-// snapsel.SetYSnap(0, ch, ch / spl.GetChannels());
+// snapsel.SetYSnap(0, ch, ch / spl.GetChannelCount());
   snapsel.SetYSnap(0, ch, ch);
 
   AdjustScrollbars();
@@ -467,7 +467,7 @@ void tSampleCnvs::OnPaint()
 
   int cw, ch;
   GetClientSize(&cw, &ch);
-  int n = spl.GetChannels();
+  int n = spl.GetChannelCount();
   for (int i = 0; i < n; ++i)
   {
     int x = 0;
@@ -579,7 +579,7 @@ void tSampleCnvs::DrawSample(int channel, int x, int y, int w, int h)
 {
   const short* data = spl.GetData();
   int length = spl.GetLength();
-  int step = spl.GetChannels();
+  int step = spl.GetChannelCount();
 
   // compute display range from position scrollbar
   int xfr = paint_offset + channel;
@@ -887,15 +887,15 @@ void tSampleWin::OnSize(int w, int h)
   int yy = ToolBarSize.GetHeight();
   int ww = cw;
   int hh = ch - ToolBarSize.GetHeight() - zh - ph;
-  int nn = spl.GetChannels() + num_params;
+  int nn = spl.GetChannelCount() + num_params;
 
-  int hi = hh * spl.GetChannels() / nn;
+  int hi = hh * spl.GetChannelCount() / nn;
   cnvs->SetSize(xx, yy, ww, hi);
 
   hi = hh / nn;
   for (int i = 0; i < num_params; i++)
   {
-    int yi = yy + (i + spl.GetChannels()) * hh / nn;
+    int yi = yy + (i + spl.GetChannelCount()) * hh / nn;
     params[i]->SetSize(xx, yi, ww, hi);
   }
 }

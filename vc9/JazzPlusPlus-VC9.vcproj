@@ -1129,6 +1129,14 @@
 			Name="Dialog Source Files"
 			>
 			<File
+				RelativePath="..\src\Dialogs\AudioSettingsDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Dialogs\AudioSettingsDialog.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Dialogs\CleanupDialog.cpp"
 				>
 			</File>

@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ void sig_reverb(
   float room_val)    // echo delay
 {
   long sr = spl.GetSamplingRate();
-  long ch = spl.GetChannels();
+  long ch = spl.GetChannelCount();
   tSigSynth synth(sr, ch);
 
   tShortIter isig(synth, spl);
@@ -115,7 +115,7 @@ void sig_chorus(
   float  volume)        // 0..1
 {
   long sr = spl.GetSamplingRate();
-  long ch = spl.GetChannels();
+  long ch = spl.GetChannelCount();
   tSigSynth synth(sr, ch);
 
   tShortIter isig(synth, spl);
@@ -200,7 +200,7 @@ void sig_wavsynth(
 )
 {
   long sr = spl.GetSamplingRate();
-  long ch = spl.GetChannels();
+  long ch = spl.GetChannelCount();
   tSigSynth synth(sr, ch);
   FreqTab ft;
   double freq = ft.freq(midi_key);

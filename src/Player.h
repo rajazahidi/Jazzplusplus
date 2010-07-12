@@ -243,13 +243,16 @@ class JZPlayer : public wxTimer
     virtual void StartAudio()
     {
     }
-    virtual int GetAudioEnabled() const
+
+    virtual bool GetAudioEnabled() const
     {
-      return 0;
+      return false;
     }
-    virtual void SetAudioEnabled(int)
+
+    virtual void SetAudioEnabled(bool AudioEnabled)
     {
     }
+
     virtual void ListenAudio(int key, int start_stop_mode = 1)
     {
     }

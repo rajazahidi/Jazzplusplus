@@ -29,29 +29,30 @@
 #include <wx/app.h>
 #include <wx/string.h>
 
-class tEventArray;
+class JZSamplesDialog;
 class JZTrack;
-struct tAudioBuffer;
 class tAudioBufferQueue;
 class tAudioRecordBuffer;
-class tSampleWin;
+class tEventArray;
 class tSample;
 class tSampleVoice;
+class tSampleWin;
+struct tAudioBuffer;
 
-// these should be variables and queried from the driver!
+// These should be variables and queried from the driver!
 //
-// there is still a bug somewhere:
+// There is still a bug somewhere:
 //   FRAGBITS 13
 //   BUFCOUNT 64
-//   midi-speed 114 (trackwin)
-// does not work, sounds like it skips a buffer after 18 bars
+//   MIDI-speed 114 (trackwin)
+// Does not work, sounds like it skips a buffer after 18 bars.
 //
 // 1MB of buffer data seems to be reasonable.
 
 
 #ifdef __WXMSW__
 
-// mswin has big buffers, good!
+// Microsoft Windows has big buffers.
 
 #define FRAGBITS   14
 #define FRAGBYTES  (1 << FRAGBITS)  // # bytes
@@ -62,8 +63,8 @@ class tSampleVoice;
 
 #else
 
-// linux only has 64K buffers and wastes one fragment. So keep
-// fragments small
+// Linux only has 64K buffers and wastes one fragment, so keep the fragments
+// small.
 
 #define FRAGBITS   13
 #define FRAGBYTES  (1 << FRAGBITS)  // # bytes
@@ -72,17 +73,14 @@ class tSampleVoice;
 #define BUFBYTES   FRAGBYTES
 #define BUFCOUNT   128               // # buffers
 
-#endif
-
-
-// =============================================================
-//                            AudioBuffers
-// =============================================================
-
-#ifndef __WXMSW__
 #define WAVEHDR char
+
 #endif
 
+//*****************************************************************************
+// Description:
+//   This is the audio buffer structure declaration.
+//*****************************************************************************
 struct tAudioBuffer
 {
   // This is a Microsoft Windows for mswin wavehdr
@@ -118,7 +116,8 @@ struct tAudioBuffer
 
 DECLARE_ARRAY(tAudioBufferArray, tAudioBuffer*)
 
-
+//*****************************************************************************
+//*****************************************************************************
 class tAudioBufferQueue
 {
   public:
@@ -177,8 +176,8 @@ class tAudioBufferQueue
     int read, written;
 };
 
-
-
+//*****************************************************************************
+//*****************************************************************************
 class tAudioRecordBuffer
 {
   friend class tSampleSet;
@@ -215,13 +214,10 @@ class tAudioRecordBuffer
 };
 
 
-// =============================================================
-//                            tSampleSet
-// =============================================================
-
-class JZSamplesDialog;
-
 //*****************************************************************************
+// Description:
+//   This is the sample set class declaration.  This class holds a collection
+// of audio samples that are played when a particular MIDI signal is received.
 //*****************************************************************************
 class tSampleSet
 {
@@ -229,7 +225,6 @@ class tSampleSet
 
     friend class tSampleVoice;
     friend class tSample;
-    friend class tAudioGloblForm;
     friend class JZWindowsAudioPlayer;
     friend class tAudioPlayer;
     friend class tAlsaAudioPlayer;
@@ -256,26 +251,26 @@ class tSampleSet
 
     void Edit(int key);
 
-    int GetSpeed() const
+    int GetSamplingRate() const
     {
-      return speed;
+      return mSamplingRate;
     }
 
-    void SetSpeed(int x)
+    void SetSamplingRate(int SamplingRate)
     {
-      dirty |= (speed != x);
-      speed = x;
+      dirty |= (mSamplingRate != SamplingRate);
+      mSamplingRate = SamplingRate;
     }
 
-    int GetChannels() const
+    int GetChannelCount() const
     {
-      return channels;
+      return mChannelCount;
     }
 
-    void SetChannels(int x)
+    void SetChannelCount(int ChannelCount)
     {
-      dirty |= (channels != x);
-      channels = x;
+      dirty |= (mChannelCount != ChannelCount);
+      mChannelCount = ChannelCount;
     }
 
     int BitsPerSample() const
@@ -309,16 +304,18 @@ class tSampleSet
 
     long Ticks2Samples(long ticks) const
     {
-      long spl =
-        (long)(60.0 * ticks * speed * channels / (double)ticks_per_minute);
+      long spl = (long)(
+        60.0 * ticks * mSamplingRate * mChannelCount /
+        (double)ticks_per_minute);
 
       // Align to the first channel.
-      return spl & -channels;
+      return spl & -mChannelCount;
     }
 
     double Samples2Ticks(long samples) const
     {
-      return (double)samples * ticks_per_minute / 60.0 / speed / channels;
+      return (double)
+        samples * ticks_per_minute / 60.0 / mSamplingRate / mChannelCount;
     }
 
     // time in millisec
@@ -334,12 +331,12 @@ class tSampleSet
 
     long Samples2Time(long samples) const
     {
-      return (long)(1000.0 * samples / speed / channels);
+      return (long)(1000.0 * samples / mSamplingRate / mChannelCount);
     }
 
     long Time2Samples(long time) const
     {
-      return (long)(0.001 * time * speed * channels);
+      return (long)(0.001 * time * mSamplingRate * mChannelCount);
     }
 
     virtual const std::string& GetSampleLabel(int Index);
@@ -388,7 +385,7 @@ class tSampleSet
 
     long SampleSize(long num_samples)
     {
-      return channels * (bits == 8 ? 1L : 2L) * num_samples;
+      return mChannelCount * (bits == 8 ? 1L : 2L) * num_samples;
     }
 
     long BufferClock(int i) const
@@ -400,15 +397,19 @@ class tSampleSet
 
   protected:
 
-    long speed;     // samples / second
-    int channels;   // mono = 1, stereo = 2
+    // Sampling rate in samples per second or Hz.
+    int mSamplingRate;
+
+    // mono  = 1, stereo = 2
+    int mChannelCount;
+
     int bits;       // must be 16!
     bool softsync;  // enable software midi/audio sync
 
     tSample* mSamples[eSampleCount];
     tSampleWin* mSampleWindows[eSampleCount];
 
-    long   ticks_per_minute;  // midi speed for audio/midi sync
+    long   ticks_per_minute;  // MIDI sampling rate for audio/midi sync.
     double clocks_per_buffer;
     long   start_clock;       // when did play start
 
@@ -424,7 +425,6 @@ class tSampleSet
     // return the start clock for i-th free buffer
     long buffers_written;            // for computing buffers clock
 
-    wxDialog* mpGlobalSettingsDialog;
     JZSamplesDialog* mpSampleDialog;
 
     tEventArray* events;

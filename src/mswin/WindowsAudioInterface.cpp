@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ class tAudioListener : public wxTimer
       // Indicate that we are not recording!
       mpPlayer->mpRecordingInfo = 0;
 
-      mChannels = mpPlayer->mSamples.GetChannels();
+      mChannels = mpPlayer->mSamples.GetChannelCount();
 
       mCount = mpPlayer->mSamples.PrepareListen(key);
 
@@ -90,7 +90,7 @@ class tAudioListener : public wxTimer
       // Indicate that we are not recording!
       mpPlayer->mpRecordingInfo = 0;
 
-      mChannels = mpPlayer->mSamples.GetChannels();
+      mChannels = mpPlayer->mSamples.GetChannelCount();
 
       mCount = mpPlayer->mSamples.PrepareListen(&spl, fr_smpl, to_smpl);
 
@@ -150,17 +150,20 @@ JZWindowsAudioPlayer::JZWindowsAudioPlayer(JZSong* pSong)
     mErrorCode(NoError),
     mCanDuplex(false),
     mCanSynchronize(true),
+    mInstalled(false),
+    mAudioEnabled(false),
+    blocks_played(0),
+    play_buffers_needed(0),
+    start_clock(0),
+    start_time(0),
     mpListener(0)
 {
   mpState->audio_player = this;
 
   InitializeCriticalSection(&mutex);
 
-  long dummy    = 0;
   mpAudioBuffer = new tEventArray();
-  mInstalled    = false;
-  dummy = gpConfig->GetValue(C_EnableAudio);
-  audio_enabled = dummy;
+  mAudioEnabled = (gpConfig->GetValue(C_EnableAudio) != 0);
   hout_open     = 0;
   hinp_open     = 0;
 
@@ -193,7 +196,7 @@ JZWindowsAudioPlayer::JZWindowsAudioPlayer(JZSong* pSong)
     }
   }
   recbuffers.Clear();
-  audio_enabled = (audio_enabled && mInstalled);
+  mAudioEnabled = (mAudioEnabled && mInstalled);
 }
 
 //-----------------------------------------------------------------------------
@@ -264,7 +267,7 @@ int JZWindowsAudioPlayer::OpenDsp()
 
   mErrorCode = NoError;  // everything ok for now.
 
-  if (!audio_enabled)
+  if (!mAudioEnabled)
   {
     return 0;
   }
@@ -275,9 +278,9 @@ int JZWindowsAudioPlayer::OpenDsp()
   WAVEFORMATEX fmt;
   memset(&fmt, 0, sizeof(fmt));
   fmt.wFormatTag      = WAVE_FORMAT_PCM;
-  fmt.nChannels       = mSamples.GetChannels();
-  fmt.nSamplesPerSec  = mSamples.GetSpeed();
-  fmt.nBlockAlign     = mSamples.GetChannels() * sizeof(short);
+  fmt.nChannels       = mSamples.GetChannelCount();
+  fmt.nSamplesPerSec  = mSamples.GetSamplingRate();
+  fmt.nBlockAlign     = mSamples.GetChannelCount() * sizeof(short);
   fmt.nAvgBytesPerSec = fmt.nBlockAlign * fmt.nSamplesPerSec;
   fmt.wBitsPerSample  = 16;
   fmt.cbSize          = 0;
@@ -490,7 +493,7 @@ void JZWindowsAudioPlayer::StartAudio()
 //-----------------------------------------------------------------------------
 void JZWindowsAudioPlayer::WriteBuffers()
 {
-  if (audio_enabled && hout_open)
+  if (mAudioEnabled && hout_open)
   {
     tAudioBuffer* pAudioBuffer;
     while ((pAudioBuffer = mSamples.full_buffers.Get()) != 0)
@@ -517,7 +520,7 @@ void JZWindowsAudioPlayer::WriteBuffers()
 //-----------------------------------------------------------------------------
 void JZWindowsAudioPlayer::Notify()
 {
-  if (audio_enabled)
+  if (mAudioEnabled)
   {
     EnterCriticalSection(&mutex);
 
@@ -539,8 +542,9 @@ void JZWindowsAudioPlayer::Notify()
         if (res == MMSYSERR_NOERROR && mmtime.wType == TIME_SAMPLES)
         {
           long time_now = (long)timeGetTime();
-          long audio_now =
-            (long)((double)start_time + 1000.0 * mmtime.u.sample / mSamples.speed);
+          long audio_now = (long)(
+            (double)start_time + 1000.0 * mmtime.u.sample /
+            mSamples.GetSamplingRate());
 
           // low pass filter for time-correction (not really necessary)
           const long low = 50;
@@ -588,9 +592,11 @@ void JZWindowsAudioPlayer::Notify()
         if (res == MMSYSERR_NOERROR && mmtime.wType == TIME_SAMPLES)
         {
           long time_now  = (long)timeGetTime();
-          long audio_now =
-            (long)((double)mpState->start_time + 1000.0 * mmtime.u.sample / mSamples.speed);
-          // low pass filter for time-correction (not really necessary)
+          long audio_now = (long)(
+            (double)mpState->start_time + 1000.0 * mmtime.u.sample /
+            mSamples.GetSamplingRate());
+
+          // Low pass filter for time-correction (not really necessary).
           const long low = 50;
           mpState->time_correction = (low * mpState->time_correction + (100 - low) * (audio_now - time_now) ) / 100L;
         }
@@ -598,7 +604,7 @@ void JZWindowsAudioPlayer::Notify()
     }
 
     LeaveCriticalSection(&mutex);
-  }  // if (audio_enabled)
+  }  // if (mAudioEnabled)
 
   JZWindowsIntPlayer::Notify();
 }
@@ -610,7 +616,7 @@ void JZWindowsAudioPlayer::StartPlay(long Clock, long LoopClock, int Continue)
   mSamples.StartPlay(Clock);
   JZWindowsIntPlayer::StartPlay(Clock, LoopClock, Continue);
 
-  if (!audio_enabled)
+  if (!mAudioEnabled)
   {
     return;
   }
@@ -655,7 +661,7 @@ void JZWindowsAudioPlayer::StopPlay()
 //-----------------------------------------------------------------------------
 void JZWindowsAudioPlayer::ListenAudio(int key, int start_stop_mode)
 {
-  if (!audio_enabled)
+  if (!mAudioEnabled)
   {
     return;
   }
@@ -684,9 +690,12 @@ void JZWindowsAudioPlayer::ListenAudio(int key, int start_stop_mode)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZWindowsAudioPlayer::ListenAudio(tSample &spl, long fr_smpl, long to_smpl)
+void JZWindowsAudioPlayer::ListenAudio(
+  tSample &spl,
+  long fr_smpl,
+  long to_smpl)
 {
-  if (!audio_enabled)
+  if (!mAudioEnabled)
   {
     return;
   }

@@ -90,7 +90,7 @@ class tSampleVoice
         return;
 
       // not this buffer
-      if (buffer_clock + set.clocks_per_buffer <= clock)
+      if (buffer_clock + set.GetClocksPerBuffer() <= clock)
         return;
 
       // compute offset in buffer
@@ -191,7 +191,10 @@ class tSampleVoice
 tSampleSet::tSampleSet(long tpm)
   : mSamplingRate(22050),
     mChannelCount(1),
-    bits(16),        // dont change!!
+
+    // Dont change!!!
+    mBitsPerSample(16),
+
     softsync(1),
     mpSampleDialog(0),
     mDefaultFileName("noname.spl"),
@@ -413,7 +416,7 @@ int tSampleSet::ResetBuffers(tEventArray *evnt_arr, long clock, long tpm)
   ticks_per_minute  = tpm;
   event_index       = 0;
   bufshorts = BUFSHORTS;
-  clocks_per_buffer = Samples2Ticks(bufshorts);
+  mClocksPerBuffer = Samples2Ticks(bufshorts);
   num_voices        = 0;
   return 0;
 }
@@ -428,7 +431,7 @@ int tSampleSet::ResetBufferSize(unsigned int bufsize)
     return 1;
   }
   bufshorts = bufsize / 2;
-  clocks_per_buffer = Samples2Ticks(bufshorts);
+  mClocksPerBuffer = Samples2Ticks(bufshorts);
   return 0;
 }
 
@@ -454,7 +457,8 @@ int tSampleSet::FillBuffers(long last_clock)
   }
   else
   {
-    nfree = (int)((last_clock - start_clock) / clocks_per_buffer) - buffers_written;
+    nfree = (int)(
+      (last_clock - start_clock) / mClocksPerBuffer) - buffers_written;
   }
 
   if (nfree <= 0)
@@ -1024,8 +1028,8 @@ void tSampleSet::SaveWave(
   wh.modus      = mChannelCount;
   wh.sc_len     = 16;
   wh.sample_fq  = mSamplingRate;
-  wh.bit_p_spl  = bits;
-  wh.byte_p_spl = mChannelCount * (bits > 8 ? 2 : 1);
+  wh.bit_p_spl  = mBitsPerSample;
+  wh.byte_p_spl = mChannelCount * (mBitsPerSample > 8 ? 2 : 1);
   wh.byte_p_sec = wh.byte_p_spl * wh.sample_fq;
 
 

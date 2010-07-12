@@ -223,8 +223,6 @@ class tSampleSet
 {
   private:
 
-    friend class tSampleVoice;
-    friend class tSample;
     friend class JZWindowsAudioPlayer;
     friend class tAudioPlayer;
     friend class tAlsaAudioPlayer;
@@ -273,9 +271,14 @@ class tSampleSet
       mChannelCount = ChannelCount;
     }
 
-    int BitsPerSample() const
+    int GetBitsPerSample() const
     {
-      return bits;
+      return mBitsPerSample;
+    }
+
+    double GetClocksPerBuffer() const
+    {
+      return mClocksPerBuffer;
     }
 
     bool GetSoftSync() const
@@ -385,12 +388,12 @@ class tSampleSet
 
     long SampleSize(long num_samples)
     {
-      return mChannelCount * (bits == 8 ? 1L : 2L) * num_samples;
+      return mChannelCount * (mBitsPerSample == 8 ? 1L : 2L) * num_samples;
     }
 
     long BufferClock(int i) const
     {
-      return (long)(start_clock + i * clocks_per_buffer);
+      return (long)(start_clock + i * mClocksPerBuffer);
     }
 
     void SamplesDlg();
@@ -403,14 +406,16 @@ class tSampleSet
     // mono  = 1, stereo = 2
     int mChannelCount;
 
-    int bits;       // must be 16!
+    // This must be 16!
+    int mBitsPerSample;
+
     bool softsync;  // enable software midi/audio sync
 
     tSample* mSamples[eSampleCount];
     tSampleWin* mSampleWindows[eSampleCount];
 
     long   ticks_per_minute;  // MIDI sampling rate for audio/midi sync.
-    double clocks_per_buffer;
+    double mClocksPerBuffer;
     long   start_clock;       // when did play start
 
     int event_index;

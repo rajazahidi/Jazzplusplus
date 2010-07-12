@@ -693,19 +693,20 @@ int tSample::Save()
 int tSample::SaveWave()
 {
   WaveHeader wh;
-  wh.main_chunk  = RIFF;
-  wh.chunk_type  = WAVE;
-  wh.sub_chunk   = FMT;
-  wh.data_chunk  = DATA;
-  wh.format      = PCM_CODE;
-  wh.modus       = set.GetChannelCount();
-  wh.sc_len      = 16;
-  wh.sample_fq   = set.GetSamplingRate();
-  wh.bit_p_spl   = set.bits;
-  wh.byte_p_spl  = set.GetChannelCount() * (set.bits > 8 ? 2 : 1);
-  wh.byte_p_sec  = wh.byte_p_spl * wh.sample_fq;
+  wh.main_chunk = RIFF;
+  wh.chunk_type = WAVE;
+  wh.sub_chunk = FMT;
+  wh.data_chunk = DATA;
+  wh.format = PCM_CODE;
+  wh.modus = set.GetChannelCount();
+  wh.sc_len = 16;
+  wh.sample_fq = set.GetSamplingRate();
+  wh.bit_p_spl = set.GetBitsPerSample();
+  wh.byte_p_spl =
+    set.GetChannelCount() * (set.GetBitsPerSample() > 8 ? 2 : 1);
+  wh.byte_p_sec = wh.byte_p_spl * wh.sample_fq;
   wh.data_length = length * sizeof(short);
-  wh.length      = wh.data_length + sizeof(WaveHeader);
+  wh.length = wh.data_length + sizeof(WaveHeader);
 
 #ifdef __WXMSW__
   unlink(mFileName.c_str()); // buggy, sigh!

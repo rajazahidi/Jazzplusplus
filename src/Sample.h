@@ -44,7 +44,7 @@ class tSampleSet;
 // --------------- stolen from vplay ----------------------
 // --------------------------------------------------------
 
-/* Definitions for Microsoft WAVE format */
+// Definitions for Microsoft WAVE format.
 
 #define RIFF            0x46464952
 #define WAVE            0x45564157
@@ -61,21 +61,26 @@ class tSampleSet;
 // 'old' format for writing .wav files
 typedef struct _waveheader
 {
-  unsigned main_chunk;        /* 'RIFF' */
-  unsigned length;                /* filelen */
-  unsigned chunk_type;        /* 'WAVE' */
+  // 'RIFF'
+  unsigned main_chunk;
 
-  unsigned sub_chunk;        /* 'fmt ' */
-  unsigned sc_len;                /* length of sub_chunk, =16 */
-  unsigned short format;                /* should be 1 for PCM-code */
-  unsigned short modus;                /* 1 Mono, 2 Stereo */
-  unsigned sample_fq;        /* frequence of sample */
+  // File length
+  unsigned length;
+
+  // 'WAVE'
+  unsigned chunk_type;
+
+  unsigned sub_chunk;         // 'fmt '
+  unsigned sc_len;            // length of sub_chunk, = 16
+  unsigned short format;      // should be 1 for PCM-code
+  unsigned short modus;       // 1 Mono, 2 Stereo
+  unsigned sample_fq;
   unsigned byte_p_sec;
-  unsigned short byte_p_spl;        /* samplesize; 1 or 2 bytes */
-  unsigned short bit_p_spl;        /* 8, 12 or 16 bit */
+  unsigned short byte_p_spl;  // samplesize; 1 or 2 bytes
+  unsigned short bit_p_spl;   // 8, 12 or 16 bit
 
-  unsigned data_chunk;        /* 'data' */
-  unsigned data_length;        /* # sample bytes */
+  unsigned data_chunk;
+  unsigned data_length;       // # sample bytes
 } WaveHeader;
 
 
@@ -83,22 +88,20 @@ typedef struct _waveheader
 
 
 
-/* ----------------------------------------------------------
+//*****************************************************************************
+// There are two different kinds of samples, short and float.
+// The class hierarchy is a little buggy, they should have been
+// derived from a common base. Most of the functionality is in
+// the short version. Some functionality is duplicated in
+// both classes.
+//*****************************************************************************
 
-There are two different kinds of samples, short and float.
-The class hierarchy is a little buggy, they should have been
-derived from a common base. Most of the functionality is in
-the short version. Some functionality is duplicated in
-both classes.
----------------------------------------------------------- */
-
-/**
- * floating point representation of a sample. This simplifies
- * algorithms because there is no need to take care of overruns.
- *
- * used for the 'big' CMIX interface too.
- */
-
+//*****************************************************************************
+//   This is the floating-point representation of a sample.  This simplifies
+// algorithms because there is no need to take care of overruns.
+//
+// used for the 'big' CMIX interface too.
+//*****************************************************************************
 class tFloatSample // : public tCMIX
 {
   friend class tSample;
@@ -142,14 +145,16 @@ class tFloatSample // : public tCMIX
     void RndEcho(int num_echos, int delay, float ampl);
     void RndEchoStereo(int num_echos, int delay, float ampl);
 
-    /**
-     * see args of tSplFilter::Setup() for this.
-     */
-    void Filter(int fr, int to, tSplFilter::Type type, int order, double freq, double bw);
+    // see args of tSplFilter::Setup() for this.
+    void Filter(
+      int fr,
+      int to,
+      tSplFilter::Type type,
+      int order,
+      double freq,
+      double bw);
 
-    /**
-     * signal template classes interface
-     */
+    // signal template classes interface
 
     void AssureLength(int new_length);
 
@@ -174,7 +179,7 @@ class tFloatSample // : public tCMIX
     }
 
   protected:
-    float *data;
+    float* data;
     int length;
     int channels;
     int sampling_rate;
@@ -184,22 +189,18 @@ class tFloatSample // : public tCMIX
 };
 
 
-// ----------------------------------------------------------
-
-/**
- * contains data for one sample. For fastest playback access
- * samples are stored as signed shorts.
- *   data[0]   == 1st value for left channel
- *   data[1]   == 1st value for right channel
- *   data[n]   == 1st value for n-th channel
- *   data[n+1] == 2nd value for left channel
- *   ...
- * all length values mean number of shorts and
- * should be multiples of of set.GetChannelCount().
- * Offsets should start on channel boundaries,
- * that is offs % set.GetChannelCount() == 0.
- */
-
+//*****************************************************************************
+//   This class contains the data for one sample.  For fastest playback access
+// samples are stored as signed shorts.
+//   data[0]   == 1st value for left channel
+//   data[1]   == 1st value for right channel
+//   data[n]   == 1st value for n-th channel
+//   data[n+1] == 2nd value for left channel
+//   ...
+// All length values mean the number of shorts and should be multiples of
+// set.GetChannelCount().  Offsets should start on channel boundaries, that is
+// offs % set.GetChannelCount() == 0.
+//*****************************************************************************
 class tSample
 {
   friend class tFloatSample;
@@ -301,9 +302,7 @@ class tSample
     }
 
 
-    /**
-     * access global adustments from tSampleSet
-     */
+    // access global adustments from tSampleSet
 
     tSampleSet &SampleSet()
     {
@@ -319,38 +318,26 @@ class tSample
 
     int GetSamplingRate() const;
 
-    /**
-     * align offset to channel boundary
-     */
+    // align offset to channel boundary
     int Align(int offs) const;
 
-    /**
-     * copy part of the data into another tSample o. If o
-     * contains other data these will be erased.
-     */
+    // copy part of the data into another tSample o. If o
+    // contains other data these will be erased.
 
     void Copy(tSample &dst, int fr_smpl = -1, int to_smpl = -1);
 
-    /**
-     * like Copy but deletes the source selection afterwards.
-     */
+    // like Copy but deletes the source selection afterwards.
 
     void Cut(tSample &dst, int fr_smpl = -1, int to_smpl = -1);
 
-    /**
-     * delete part of this sample.
-     */
+    // delete part of this sample.
     void Delete(int fr_smpl = -1, int to_smpl = -1);
 
-    /**
-     * paste some data into this sample, data are inserted
-     */
+    // paste some data into this sample, data are inserted
     void PasteIns(tSample &src, int offs);
 
-    /**
-     * paste some data into this sample, data are mixed with
-     * the current contents.
-     */
+    // paste some data into this sample, data are mixed with
+    // the current contents.
     void PasteMix(tSample &src, int offs);
     void PasteOvr(tSample &src, int fr, int to);
     void ReplaceSilence(int offs, int len);
@@ -358,37 +345,27 @@ class tSample
     void Reverse(int fr, int to);
     int Peak();
 
-    /**
-     * flip phase of left/right channel
-     */
-     void Flip(int ch);
+    // flip phase of left/right channel
+    void Flip(int ch);
 
 
     void Transpose(float freq_factor);
     void TransposeSemis(float semis);
 
-    /**
-     * inserts some zero values at pos
-     */
+    // inserts some zero values at pos
 
     void InsertSilence(int pos, int length);
 
-    /**
-     * initialize length and data from the float sample
-     */
+    // initialize length and data from the float sample
 
     void Set(tFloatSample &fs);
 
-    /**
-     * replace part of the data with the data in fs,
-     * original data are overwritten.
-     */
+    // replace part of the data with the data in fs,
+    // original data are overwritten.
 
     void Set(tFloatSample &fs, int offs);
 
-    /**
-     * like Set() but try to make a smooth transition
-     */
+    // like Set() but try to make a smooth transition
     void SetSmooth(tFloatSample &fs, int offs, int fade_len = -1);
 
     int Seconds2Samples(float time);
@@ -409,7 +386,7 @@ class tSample
       int speed);
 
     int length;  // number of shorts
-    short* data;  // signed shorts
+    short* data; // signed shorts
     tSampleSet& set;
 
     std::string mLabel;

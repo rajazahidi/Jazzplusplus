@@ -60,12 +60,14 @@
 
 class JZSamplePlayPosition;
 
+//*****************************************************************************
+//*****************************************************************************
 class JZInsertionPoint
 {
   public:
 
-    JZInsertionPoint(wxScrolledWindow *c)
-      : cnvs(c)
+    JZInsertionPoint(wxScrolledWindow* pScrolledWindow)
+      : mpScrolledWindow(pScrolledWindow)
     {
       last_x = 0;
       visible = 0;
@@ -75,9 +77,9 @@ class JZInsertionPoint
     {
       last_x = x;
       visible ^= 1;
-      wxDC *dc = new wxClientDC(cnvs);
+      wxDC *dc = new wxClientDC(mpScrolledWindow);
       int cw, ch;
-      cnvs->GetClientSize(&cw, &ch);
+      mpScrolledWindow->GetClientSize(&cw, &ch);
       dc->SetPen(*wxRED_PEN);
       dc->SetLogicalFunction(wxXOR);
       dc->DrawLine(x, 0, x, ch);
@@ -104,10 +106,11 @@ class JZInsertionPoint
 
     int last_x;
     int visible;
-    wxScrolledWindow *cnvs;
+    wxScrolledWindow* mpScrolledWindow;
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 class JZSampleWindow : public wxScrolledWindow
 {
   friend class JZSampleFrame;
@@ -115,7 +118,7 @@ class JZSampleWindow : public wxScrolledWindow
 
   public:
 
-    JZSampleWindow(JZSampleFrame *win, JZSample &sample);
+    JZSampleWindow(JZSampleFrame* pSampleFrame, JZSample& Sample);
 
     virtual ~JZSampleWindow();
 
@@ -150,9 +153,9 @@ class JZSampleWindow : public wxScrolledWindow
 
   private:
 
-    JZSampleFrame *win;
+    JZSampleFrame* mpSampleFrame;
 
-    JZSample &spl;
+    JZSample& spl;
 
     int paint_offset;
     int paint_length;
@@ -175,29 +178,30 @@ class JZSampleWindow : public wxScrolledWindow
 };
 
 #ifdef OBSOLETE
-
+//*****************************************************************************
+//*****************************************************************************
 class JZSmplWinSettingsForm : public wxForm
 {
   public:
-    JZSmplWinSettingsForm(JZSampleFrame &w)
+    JZSmplWinSettingsForm(JZSampleFrame& SampleFrame)
       : wxForm( USED_WXFORM_BUTTONS ),
-        win(w)
+        mpSampleFrame(w)
     {}
     void EditForm(wxPanel *panel)
     {
-      Add(wxMakeFormBool("Show Midi Time", &win.cnvs->midi_time));
+      Add(wxMakeFormBool("Show Midi Time", &mpSampleFrame.cnvs->midi_time));
       Add(wxMakeFormNewLine());
       AssociatePanel(panel);
     }
     void OnOk()
     {
-      win.settings = 0;
-      win.Redraw();
+      mpSampleFrame.settings = 0;
+      mpSampleFrame.Redraw();
       wxForm::OnOk();
     }
     void OnCancel()
     {
-      win.settings = 0;
+      mpSampleFrame.settings = 0;
       wxForm::OnCancel();
     }
     void OnHelp()
@@ -205,19 +209,23 @@ class JZSmplWinSettingsForm : public wxForm
       gpHelpInstance->ShowTopic("Settings");
     }
   private:
-    JZSampleFrame &win;
+    JZSampleFrame& mpSampleFrame;
 };
-
 #endif
 
+//*****************************************************************************
+//*****************************************************************************
 class JZSamplePlayPosition : public wxTimer
 {
   public:
 
-    JZSamplePlayPosition(JZSampleWindow &c, JZPlayer *p, JZSample &s)
-      : cnvs(c),
-        player(p),
-        spl(s)
+    JZSamplePlayPosition(
+      JZSampleWindow& SampleWindow,
+      JZPlayer* pPlayer,
+      JZSample& Sample)
+      : cnvs(SampleWindow),
+        mpPlayer(pPlayer),
+        spl(Sample)
     {
       visible = false;
       x = 0;
@@ -267,7 +275,7 @@ class JZSamplePlayPosition : public wxTimer
 
     virtual void Notify()
     {
-      int pos = player->GetListenerPlayPosition();
+      int pos = mpPlayer->GetListenerPlayPosition();
       if (pos < 0)
       {
         StopListen();
@@ -280,24 +288,26 @@ class JZSamplePlayPosition : public wxTimer
     }
 
   private:
-    JZSampleWindow &cnvs;
-    JZPlayer *player;
-    JZSample &spl;
+    JZSampleWindow& cnvs;
+    JZPlayer* mpPlayer;
+    JZSample& spl;
     bool visible;
   int x;
     int fr_smpl;
     int to_smpl;
 };
 
-
-
-JZSampleWindow::JZSampleWindow(JZSampleFrame *win, JZSample &sample)
-  : wxScrolledWindow(win),
-    spl(sample),
+//*****************************************************************************
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZSampleWindow::JZSampleWindow(JZSampleFrame* pSampleFrame, JZSample& Sample)
+  : wxScrolledWindow(pSampleFrame),
+    mpSampleFrame(pSampleFrame),
+    spl(Sample),
     snapsel(this),
     inspt(this)
 {
-  this->win = win;
   sel_fr = sel_to = -1;
   mouse_up_sets_insertion_point = 0;
   playpos = new JZSamplePlayPosition(*this, gpMidiPlayer, spl);
@@ -306,13 +316,15 @@ JZSampleWindow::JZSampleWindow(JZSampleFrame *win, JZSample &sample)
   mouse_down = 0;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZSampleWindow::~JZSampleWindow()
 {
   delete playpos;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSampleWindow::OnSize(int w, int h)
 {
   int cw, ch;
@@ -323,13 +335,13 @@ void JZSampleWindow::OnSize(int w, int h)
   AdjustScrollbars();
 }
 
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSampleWindow::OnEvent(wxMouseEvent& MouseEvent)
 {
   // dont accept mouse events as long as the
   // array edit is up
-  if (win->on_accept)
+  if (mpSampleFrame->on_accept)
   {
     return;
   }
@@ -386,7 +398,8 @@ void JZSampleWindow::OnEvent(wxMouseEvent& MouseEvent)
   }
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSampleWindow::ClearSelection()
 {
   if (snapsel.IsSelected())
@@ -402,7 +415,8 @@ void JZSampleWindow::ClearSelection()
   sel_fr = sel_to = -1;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSampleWindow::SetInsertionPoint(int offs)
 {
   ClearSelection();
@@ -411,7 +425,8 @@ void JZSampleWindow::SetInsertionPoint(int offs)
   inspt.Draw(x);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSampleWindow::SetSelection(int fr, int to)
 {
   ClearSelection();
@@ -430,22 +445,24 @@ void JZSampleWindow::SetSelection(int fr, int to)
   snapsel.Draw(*pDc, 0, 0);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZSampleWindow::Sample2Pixel(int sample)
 {
-  int offs   = win->GetPaintOffset();
-  int length = win->GetPaintLength();
+  int offs   = mpSampleFrame->GetPaintOffset();
+  int length = mpSampleFrame->GetPaintLength();
   int cw, ch;
   GetClientSize(&cw, &ch);
   JZMapper Map(offs, offs + length, 0, cw);
   return static_cast<int>(Map.XToY(sample));
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZSampleWindow::Pixel2Sample(float pixel)
 {
-  int offs   = win->GetPaintOffset();
-  int length = win->GetPaintLength();
+  int offs   = mpSampleFrame->GetPaintOffset();
+  int length = mpSampleFrame->GetPaintLength();
   int cw, ch;
   GetClientSize(&cw, &ch);
   JZMapper Map(0, cw, offs, offs + length);
@@ -453,13 +470,14 @@ int JZSampleWindow::Pixel2Sample(float pixel)
   return spl.Align(ofs);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSampleWindow::OnPaint()
 {
-  paint_offset = win->GetPaintOffset();
-  paint_length = win->GetPaintLength();
+  paint_offset = mpSampleFrame->GetPaintOffset();
+  paint_length = mpSampleFrame->GetPaintLength();
 
-  wxDC *dc = new wxPaintDC(win);
+  wxDC *dc = new wxPaintDC(mpSampleFrame);
 //OBSOLETE  dc->BeginDrawing();
   if (inspt.IsVisible())
     inspt.Draw();  // clear insertion point if there
@@ -501,15 +519,16 @@ void JZSampleWindow::OnPaint()
 //OBSOLETE  dc->EndDrawing();
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSampleWindow::DrawTicks(int x, int y, int w)
 {
   wxDC *dc = new wxClientDC(this);
   wxFont f = dc->GetFont();
   dc->SetFont(*wxSMALL_FONT);
 
-  int sfr = win->GetPaintOffset();
-  int sto = sfr + win->GetPaintLength();
+  int sfr = mpSampleFrame->GetPaintOffset();
+  int sto = sfr + mpSampleFrame->GetPaintLength();
 
   if (!midi_time)
   {
@@ -525,12 +544,13 @@ void JZSampleWindow::DrawTicks(int x, int y, int w)
         int xx = static_cast<int>(Map.XToY(t));
         // draw a tickmark line
         dc->DrawLine(xx, y - 5, xx, y);
+
         // draw a text
-        char buf[50];
-        sprintf(buf, "%d.%d", sec, mil/100);
+        wxString Time;
+        Time << sec << '.' << mil / 100;
         int fw, fh;
-        dc->GetTextExtent(buf, &fw, &fh);
-        dc->DrawText(buf, xx - fw/2, y + 2);
+        dc->GetTextExtent(Time, &fw, &fh);
+        dc->DrawText(Time, xx - fw/2, y + 2);
       }
     }
   }
@@ -555,14 +575,15 @@ void JZSampleWindow::DrawTicks(int x, int y, int w)
           int xx = static_cast<int>(Map.XToY(clock));
           // draw a tickmark line
           dc->DrawLine(xx, y - 5, xx, y);
+
           // draw a text
           if (j == 0)
           {
-            char buf[50];
-            sprintf(buf, "%d", i + 1);
+            wxString String;
+            String << i + 1;
             int fw, fh;
-            dc->GetTextExtent(buf, &fw, &fh);
-            dc->DrawText(buf, xx - fw/2, y + 2);
+            dc->GetTextExtent(String, &fw, &fh);
+            dc->DrawText(String, xx - fw/2, y + 2);
           }
         }
       }
@@ -574,7 +595,8 @@ void JZSampleWindow::DrawTicks(int x, int y, int w)
   dc->SetFont(f);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSampleWindow::DrawSample(int channel, int x, int y, int w, int h)
 {
   const short* data = spl.GetData();
@@ -638,7 +660,8 @@ void JZSampleWindow::DrawSample(int channel, int x, int y, int w, int h)
   }
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSampleWindow::Play()
 {
   if (playpos->IsListening())
@@ -681,7 +704,6 @@ static JZToolDef tdefs[] =
   { JZToolBar::eToolBarEnd }
 };
 
-
 int JZSampleFrame::geo[4] =
 {
   30,
@@ -692,18 +714,23 @@ int JZSampleFrame::geo[4] =
 
 JZSample *JZSampleFrame::copy_buffer;
 
-JZSampleFrame::JZSampleFrame(wxWindow* pParent, JZSampleFrame **ref, JZSample& sample)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZSampleFrame::JZSampleFrame(
+  wxWindow* pParent,
+  JZSampleFrame **ref,
+  JZSample& Sample)
   : wxFrame(
       pParent,
       wxID_ANY,
-      sample.GetFileName(),
+      Sample.GetFileName(),
       wxPoint(geo[0], geo[1]),
       wxSize(geo[2], geo[3])),
-    spl(sample),
-    vol_command(sample),
-    pan_command(sample),
-    pitch_command(sample),
-    wah_command(sample)
+    spl(Sample),
+    vol_command(Sample),
+    pan_command(Sample),
+    pitch_command(Sample),
+    wah_command(Sample)
 {
   this->ref = ref;
 
@@ -828,7 +855,8 @@ JZSampleFrame::JZSampleFrame(wxWindow* pParent, JZSampleFrame **ref, JZSample& s
   OnSize(cw, ch);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZSampleFrame::~JZSampleFrame()
 {
   *ref = 0;
@@ -855,13 +883,15 @@ JZSampleFrame::~JZSampleFrame()
   delete pitch_settings;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 bool JZSampleFrame::OnClose()
 {
   return true;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSampleFrame::OnSize(int w, int h)
 {
   // constructor finished?
@@ -900,12 +930,15 @@ void JZSampleFrame::OnSize(int w, int h)
   }
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSampleFrame::Redraw()
 {
   cnvs->Redraw();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 bool JZSampleFrame::HaveInsertionPoint(int &offs, bool warn)
 {
   if (cnvs->sel_fr == cnvs->sel_to && cnvs->sel_fr >= 0)
@@ -922,7 +955,12 @@ bool JZSampleFrame::HaveInsertionPoint(int &offs, bool warn)
   }
 }
 
-bool JZSampleFrame::HaveSelection(int &fr_smpl, int &to_smpl, HaveSelectionMode mode)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZSampleFrame::HaveSelection(
+  int& fr_smpl,
+  int& to_smpl,
+  HaveSelectionMode mode)
 {
   if (cnvs->sel_fr < cnvs->sel_to && cnvs->sel_fr >= 0)
   {
@@ -942,7 +980,8 @@ bool JZSampleFrame::HaveSelection(int &fr_smpl, int &to_smpl, HaveSelectionMode 
   return false;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSampleFrame::AddParam(JZRndArray *array, const char *label)
 {
   params[num_params] = new JZArrayEdit(this, *array, 0, 0, 10, 10, 0);
@@ -953,7 +992,8 @@ void JZSampleFrame::AddParam(JZRndArray *array, const char *label)
   OnSize(cw, ch);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSampleFrame::ClrParam()
 {
   if (num_params > 0)
@@ -970,21 +1010,28 @@ void JZSampleFrame::ClrParam()
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSampleFrame::ClearSelection()
 {
   cnvs->ClearSelection();
 }
 
-
-void JZSampleFrame::LoadError(JZSample &spl)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZSampleFrame::LoadError(JZSample& Sample)
 {
-  char buf[500];
-  sprintf(buf, "could not load \"%s\"", spl.GetFileName());
-  wxMessageBox(buf, "Error", wxOK);
+  wxString Message;
+  Message << "Could not load " << Sample.GetFileName();
+  ::wxMessageBox(Message, "Error", wxOK);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 extern int effect(JZSample &spl);
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSampleFrame::OnMenuCommand(int id)
 {
   if (gpMidiPlayer->IsPlaying())
@@ -1395,11 +1442,15 @@ void JZSampleFrame::OnMenuCommand(int id)
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSampleFrame::PlaySample()
 {
   cnvs->Play();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZSampleFrame::GetPaintLength()
 {
   // return the visible amount of sample data
@@ -1409,7 +1460,8 @@ int JZSampleFrame::GetPaintLength()
   return spl.Align(len);
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZSampleFrame::GetPaintOffset()
 {
   // return the visible Offset in sample data
@@ -1419,6 +1471,8 @@ int JZSampleFrame::GetPaintOffset()
   return spl.Align(ofs);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSampleFrame::SetViewPos(int fr, int to)
 {
   JZMapper Map(0, spl.GetLength(), 0, 1000);
@@ -1441,6 +1495,8 @@ void JZSampleFrame::SetViewPos(int fr, int to)
 }
 
 #ifdef OBSOLETE
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSampleFrame::OnScroll(wxItem &item)
 {
   int  zval   = zoom_scrol->GetValue();
@@ -1456,6 +1512,8 @@ void JZSampleFrame::OnScroll(wxItem &item)
   Redraw();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZSampleFrame::ScrollCallback(wxItem &itm, wxCommandEvent& Event)
 {
   ((JZSampleFrame *)(itm.GetParent()->GetParent()))->OnScroll(itm);

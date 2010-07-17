@@ -39,13 +39,17 @@ class JZSynthDlg;
 class wxDialog;
 class wxScrollBar;
 
+//*****************************************************************************
+//*****************************************************************************
 class JZSampleFrame : public wxFrame
 {
   friend class JZSampleWindow;
   friend class JZCommandPainter;
   friend class JZSmplWinSettingsForm;
+
   public:
-    JZSampleFrame(wxWindow* pParent, JZSampleFrame **ref, JZSample &);
+
+    JZSampleFrame(wxWindow* pParent, JZSampleFrame** ref, JZSample& Sample);
     ~JZSampleFrame();
     virtual void OnSize(int w, int h);
     virtual bool OnClose();
@@ -70,6 +74,7 @@ class JZSampleFrame : public wxFrame
     void PlaySample();
 
   private:
+
     int GetPaintLength();
     int GetPaintOffset();
 #ifdef OBSOLETE
@@ -79,43 +84,45 @@ class JZSampleFrame : public wxFrame
     void SetViewPos(int fr, int to);
     void LoadError(JZSample &spl);
 
-    JZSample     &spl;
-    JZSampleWindow *cnvs;
-    wxPanel     *scrol_panel;
-    wxScrollBar *pos_scrol;
-    wxScrollBar *zoom_scrol;
+  private:
+
+    JZSample& spl;
+    JZSampleWindow* cnvs;
+    wxPanel* scrol_panel;
+    wxScrollBar* pos_scrol;
+    wxScrollBar* zoom_scrol;
     JZToolBar* mpToolBar;
-    int         in_constructor;
-    JZSampleFrame  **ref;
+    int in_constructor;
+    JZSampleFrame** ref;
     static int geo[4];
 
-    static JZSample *copy_buffer;
+    static JZSample* copy_buffer;
 
     enum
     {
       MAXPARAM = 4
     };
-    JZArrayEdit *params[MAXPARAM];
-    int        num_params;
+    JZArrayEdit* params[MAXPARAM];
+    int num_params;
 
-    JZCommandPainter  *on_accept;
+    JZCommandPainter* on_accept;
     JZSplVolume vol_command;
-    JZSplPan    pan_command;
-    JZSplPitch  pitch_command;
-    JZWahWah    wah_command;
+    JZSplPan pan_command;
+    JZSplPitch pitch_command;
+    JZWahWah wah_command;
 
-    JZEqualizer *equalizer;
-    JZDistortion *distortion;
-    JZSynthDlg   *synth;
-    wxDialog *reverb;
-    wxDialog *echo;
-    wxDialog *chorus;
-    wxDialog *shifter;
-    wxDialog *stretcher;
-    wxDialog *filter;
-    wxDialog *settings;
-    wxDialog *wah_settings;
-    wxDialog *pitch_settings;
+    JZEqualizer* equalizer;
+    JZDistortion* distortion;
+    JZSynthDlg* synth;
+    wxDialog* reverb;
+    wxDialog* echo;
+    wxDialog* chorus;
+    wxDialog* shifter;
+    wxDialog* stretcher;
+    wxDialog* filter;
+    wxDialog* settings;
+    wxDialog* wah_settings;
+    wxDialog* pitch_settings;
 };
 
 #endif // !defined(JZ_SAMPLEWINDOW_H)

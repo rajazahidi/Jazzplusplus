@@ -34,7 +34,7 @@
 #include "RecordingInfo.h"
 #include "Resources.h"
 #include "Sample.h"
-#include "SampleWindow.h"
+#include "SampleFrame.h"
 #include "StringReadWrite.h"
 #include "Track.h"
 #include "TrackFrame.h"

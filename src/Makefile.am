@@ -89,9 +89,10 @@ Random.cpp \
 RecordingInfo.cpp \
 Rectangle.cpp \
 Rhythm.cpp \
-SampleCommand.cpp \
 Sample.cpp \
+SampleCommand.cpp \
 SampleDialog.cpp \
+SampleFrame.cpp \
 SampleWindow.cpp \
 SelectControllerDialog.cpp \
 Signal2.cpp \
@@ -188,9 +189,10 @@ Random.cpp \
 RecordingInfo.cpp \
 Rectangle.cpp \
 Rhythm.cpp \
-SampleCommand.cpp \
 Sample.cpp \
+SampleCommand.cpp \
 SampleDialog.cpp \
+SampleFrame.cpp \
 SampleWindow.cpp \
 SelectControllerDialog.cpp \
 Signal2.cpp \
@@ -292,9 +294,10 @@ RecordingInfo.h \
 Rectangle.h \
 Resources.h \
 Rhythm.h \
+Sample.h \
 SampleCommand.h \
 SampleDialog.h \
-Sample.h \
+SampleFrame.h \
 SampleWindow.h \
 SelectControllerDialog.h \
 Signal2.h \

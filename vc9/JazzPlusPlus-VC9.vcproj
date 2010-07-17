@@ -938,6 +938,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\SampleFrame.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\SampleFrame.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\SampleWindow.cpp"
 				>
 			</File>

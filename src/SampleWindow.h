@@ -23,106 +23,163 @@
 #ifndef JZ_SAMPLEWINDOW_H
 #define JZ_SAMPLEWINDOW_H
 
-#include "SampleCommand.h"
+#include "MouseAction.h"
 
-#include <wx/frame.h>
+#include <wx/scrolwin.h>
 
-class JZRndArray;
-class JZToolBar;
-class JZArrayEdit;
-class JZCommandPainter;
-class JZDistortion;
-class JZEqualizer;
+class JZPlayer;
 class JZSample;
+class JZSampleFrame;
 class JZSampleWindow;
-class JZSynthDlg;
-class wxDialog;
-class wxScrollBar;
 
 //*****************************************************************************
 //*****************************************************************************
-class JZSampleFrame : public wxFrame
+class JZInsertionPoint
 {
-  friend class JZSampleWindow;
-  friend class JZCommandPainter;
+  public:
+
+    JZInsertionPoint(wxScrolledWindow* pScrolledWindow)
+      : mpScrolledWindow(pScrolledWindow)
+    {
+      last_x = 0;
+      visible = 0;
+    }
+
+    void Draw(int x);
+
+    void Draw()
+    {
+      Draw(last_x);
+    }
+
+    int IsVisible() const
+    {
+      return visible;
+    }
+
+    float GetX() const
+    {
+      return last_x;
+    }
+
+  private:
+
+    int last_x;
+    int visible;
+    wxScrolledWindow* mpScrolledWindow;
+};
+
+//*****************************************************************************
+//*****************************************************************************
+class JZSamplePlayPosition : public wxTimer
+{
+  public:
+
+    JZSamplePlayPosition(
+      JZSampleWindow& SampleWindow,
+      JZPlayer* pPlayer,
+      JZSample& Sample)
+      : cnvs(SampleWindow),
+        mpPlayer(pPlayer),
+        spl(Sample)
+    {
+      visible = false;
+      x = 0;
+    }
+
+    ~JZSamplePlayPosition()
+    {
+      Stop();
+      if (visible)
+        Draw();
+    }
+
+    void StopListen();
+
+    void StartListen(int fr, int to);
+
+    bool IsListening() const;
+
+    void Draw();
+
+    virtual void Notify();
+
+  private:
+    JZSampleWindow& cnvs;
+    JZPlayer* mpPlayer;
+    JZSample& spl;
+    bool visible;
+  int x;
+    int fr_smpl;
+    int to_smpl;
+};
+
+//*****************************************************************************
+//*****************************************************************************
+class JZSampleWindow : public wxScrolledWindow
+{
+  friend class JZSampleFrame;
   friend class JZSmplWinSettingsForm;
 
   public:
 
-    JZSampleFrame(wxWindow* pParent, JZSampleFrame** ref, JZSample& Sample);
-    ~JZSampleFrame();
-    virtual void OnSize(int w, int h);
-    virtual bool OnClose();
-    virtual void OnMenuCommand(int id);
-    void Redraw();
-    bool HaveInsertionPoint(int &offs, bool warn = TRUE);
-    enum HaveSelectionMode
-    {
-      SelWarn,
-      SelNoWarn,
-      SelAll
-    };
-    bool HaveSelection(int &fr_smpl, int &to_smpl, HaveSelectionMode = SelAll);
+    JZSampleWindow(JZSampleFrame* pSampleFrame, JZSample& Sample);
 
-    void AddParam(JZRndArray *array, const char *label);
-    void ClrParam();
-    void ClearSelection();
-    JZSample &GetSample()
+    virtual ~JZSampleWindow();
+
+    void Redraw()
     {
-      return spl;
+      OnPaint();
     }
-    void PlaySample();
+
+    virtual void OnPaint();
+
+    virtual void OnSize(int w, int h);
+
+    virtual void OnEvent(wxMouseEvent& MouseEvent);
+
+    void ClearSelection();
+
+    void SetInsertionPoint(int offs);
+
+    void SetSelection(int fr, int to);
+
+    int Sample2Pixel(int sample);
+
+    int Pixel2Sample(float pixel);
+
+    void Play();
 
   private:
 
-    int GetPaintLength();
-    int GetPaintOffset();
-#ifdef OBSOLETE
-    static void ScrollCallback(wxItem &itm, wxCommandEvent& event);
-    void OnScroll(wxItem &item);
-#endif
-    void SetViewPos(int fr, int to);
-    void LoadError(JZSample &spl);
+    void DrawSample(int channel, int x, int y, int w, int h);
+
+    void DrawTicks(int x, int y, int w);
 
   private:
+
+    JZSampleFrame* mpSampleFrame;
 
     JZSample& spl;
-    JZSampleWindow* cnvs;
-    wxPanel* scrol_panel;
-    wxScrollBar* pos_scrol;
-    wxScrollBar* zoom_scrol;
-    JZToolBar* mpToolBar;
-    int in_constructor;
-    JZSampleFrame** ref;
-    static int geo[4];
 
-    static JZSample* copy_buffer;
+    int paint_offset;
+    int paint_length;
 
-    enum
-    {
-      MAXPARAM = 4
-    };
-    JZArrayEdit* params[MAXPARAM];
-    int num_params;
+    JZSnapSelection snapsel;
 
-    JZCommandPainter* on_accept;
-    JZSplVolume vol_command;
-    JZSplPan pan_command;
-    JZSplPitch pitch_command;
-    JZWahWah wah_command;
+    // sel_fr == 0: no selection and no insertion point
+    // sel_fr >  0 && sel_fr == sel_to: insertion point
+    // sel_fr >  0 && sel_fr <  sel_to: selected range
+    int sel_fr, sel_to;
+    JZInsertionPoint inspt;
+    int mouse_up_sets_insertion_point;
+    JZSamplePlayPosition *playpos;
 
-    JZEqualizer* equalizer;
-    JZDistortion* distortion;
-    JZSynthDlg* synth;
-    wxDialog* reverb;
-    wxDialog* echo;
-    wxDialog* chorus;
-    wxDialog* shifter;
-    wxDialog* stretcher;
-    wxDialog* filter;
-    wxDialog* settings;
-    wxDialog* wah_settings;
-    wxDialog* pitch_settings;
+    // for tickmark display
+    bool midi_time;
+    int midi_offs;
+
+    bool mouse_down;
 };
 
 #endif // !defined(JZ_SAMPLEWINDOW_H)

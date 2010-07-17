@@ -23,7 +23,7 @@
 #include "SampleDialog.h"
 
 #include "Sample.h"
-#include "SampleWindow.h"
+#include "SampleFrame.h"
 #include "Mapper.h"
 #include "Audio.h"
 #include "SignalInterface.h"
@@ -44,8 +44,10 @@
 
 using namespace std;
 
-JZCommandPainter::JZCommandPainter(JZSampleFrame &w, JZPaintableCommand &c)
-  : win(w),
+JZCommandPainter::JZCommandPainter(
+  JZSampleFrame& SampleFrame,
+  JZPaintableCommand &c)
+  : win(SampleFrame),
     cmd(c)
 {
   c.Initialize();
@@ -104,11 +106,11 @@ const char* JZEquArrayEdit::GetXText(int val)
 
 int JZEqualizer::geo[4] = { 50, 80, 350, 200 };
 
-JZEqualizer::JZEqualizer(JZSampleFrame &w)
-  : JZSliderWindow(&w, "Equalizer", geo),
+JZEqualizer::JZEqualizer(JZSampleFrame& SampleFrame)
+  : JZSliderWindow(&SampleFrame, "Equalizer", geo),
     array(12, -100, 100),
-    win(w),
-    spl(w.GetSample())
+    win(SampleFrame),
+    spl(SampleFrame.GetSample())
 {
   int i;
   channels = spl.GetChannelCount();
@@ -215,10 +217,10 @@ static const char* cv_strings[] =
 
 int JZDistortion::geo[4] = { 50, 80, 300, 320 };
 
-JZDistortion::JZDistortion(JZSampleFrame &w)
-: JZSliderWindow(&w, "Distortion", geo),
-  arr(200, 0, 100),
-  win(w)
+JZDistortion::JZDistortion(JZSampleFrame& SampleFrame)
+  : JZSliderWindow(&SampleFrame, "Distortion", geo),
+    arr(200, 0, 100),
+    win(SampleFrame)
 {
   N = 200;
   ymin = 0;
@@ -320,7 +322,9 @@ void JZDistortion::Action()
 {
   int fr, to;
   if (!win.HaveSelection(fr, to))
+  {
     return;
+  }
 
   wxBeginBusyCursor();
   JZSample &spl = win.GetSample();
@@ -491,9 +495,9 @@ static JZToolDef syn_tdefs[] = {
 };
 
 
-JZSynthDlg::JZSynthDlg(JZSampleFrame &w)
-: JZSliderWindow(&w, "Additive Synthesis", geo, syn_tdefs),
-  win(w)
+JZSynthDlg::JZSynthDlg(JZSampleFrame& SampleFrame)
+: JZSliderWindow(&SampleFrame, "Additive Synthesis", geo, syn_tdefs),
+  win(SampleFrame)
 {
   Initialize();
   default_filename = copystring("noname.syn");
@@ -902,9 +906,9 @@ int JZReverbForm::brightness = 20;  // lowpass freq
 int JZReverbForm::volume     = 20;  // effect volume
 int JZReverbForm::rvbtime    = 30;  // echo absorbtion
 
-JZReverbForm::JZReverbForm(JZSampleFrame &w)
+JZReverbForm::JZReverbForm(JZSampleFrame& SampleFrame)
   : wxForm( USED_WXFORM_BUTTONS ),
-    win(w)
+    win(SampleFrame)
 {
 }
 
@@ -974,9 +978,9 @@ int JZEchoForm::ampl        = 25;  // percent
 bool JZEchoForm::rand       = false;
 
 
-JZEchoForm::JZEchoForm(JZSampleFrame &w)
-: wxForm( USED_WXFORM_BUTTONS ),
-  win(w)
+JZEchoForm::JZEchoForm(JZSampleFrame& SampleFrame)
+  : wxForm(USED_WXFORM_BUTTONS),
+    win(SampleFrame)
 {
   wxForm::OnCancel();
 }
@@ -1019,9 +1023,9 @@ int JZShifterForm::shift_frac   = 0;
 bool JZShifterForm::keep_length = 1;
 
 
-JZShifterForm::JZShifterForm(JZSampleFrame &w)
-: wxForm( USED_WXFORM_BUTTONS ),
-  win(w)
+JZShifterForm::JZShifterForm(JZSampleFrame& SampleFrame)
+  : wxForm( USED_WXFORM_BUTTONS ),
+    win(SampleFrame)
 {
 }
 
@@ -1119,12 +1123,19 @@ int JZSplFilterForm::freq                = 1000;
 int JZSplFilterForm::lo_freq                = 400;
 int JZSplFilterForm::hi_freq                = 2000;
 int JZSplFilterForm::band_width          = 20;  // in % of corner freq
-static const char *filter_types[] = { "Low Pass", "High Pass", "Band Pass", "Band Stop", 0 };
+static const char *filter_types[] =
+{
+  "Low Pass",
+  "High Pass",
+  "Band Pass",
+  "Band Stop",
+  0
+};
 
 
-JZSplFilterForm::JZSplFilterForm(JZSampleFrame &w, bool p)
-: wxForm( USED_WXFORM_BUTTONS ),
-  win(w)
+JZSplFilterForm::JZSplFilterForm(JZSampleFrame& SampleFrame, bool p)
+  : wxForm( USED_WXFORM_BUTTONS ),
+    win(SampleFrame)
 {
   painter = p;
 }
@@ -1231,9 +1242,11 @@ void JZSplFilterForm::OnOk()
 //                        filter painter settings
 // -------------------------------------------------------------------------
 
-JZWahSettingsForm::JZWahSettingsForm(JZSampleFrame &win, JZWahWah &w)
-  : JZSplFilterForm(win, true),
-    wah(w)
+JZWahSettingsForm::JZWahSettingsForm(
+  JZSampleFrame& SampleFrame,
+  JZWahWah& WahWah)
+  : JZSplFilterForm(SampleFrame, true),
+    wah(WahWah)
 {
   type = (int)wah.filter_type;
 }
@@ -1260,10 +1273,10 @@ void JZWahSettingsForm::OnOk()
 
 int JZSplPitchForm::range = 1;
 
-JZSplPitchForm::JZSplPitchForm(JZSampleFrame &w, JZSplPitch &p)
-: wxForm( USED_WXFORM_BUTTONS ),
-  win(w),
-  pitch(p)
+JZSplPitchForm::JZSplPitchForm(JZSampleFrame& SampleFrame, JZSplPitch& p)
+  : wxForm(USED_WXFORM_BUTTONS),
+    win(SampleFrame),
+    pitch(p)
 {
 }
 
@@ -1302,9 +1315,9 @@ int JZChorusForm::pan_freq      = 20;
 int JZChorusForm::pan_spread    = 50;
 int JZChorusForm::volume        = 50;
 
-JZChorusForm::JZChorusForm(JZSampleFrame &w)
-: wxForm( USED_WXFORM_BUTTONS ),
-  win(w)
+JZChorusForm::JZChorusForm(JZSampleFrame& SampleFrame)
+  : wxForm( USED_WXFORM_BUTTONS ),
+    win(SampleFrame)
 {
 }
 
@@ -1383,9 +1396,9 @@ void JZChorusForm::OnHelp()
 int JZStereoForm::delay         = 10;  // millisec
 int JZStereoForm::stereo_spread = 50;
 
-JZStereoForm::JZStereoForm(JZSampleFrame &w)
-: wxForm( USED_WXFORM_BUTTONS ),
-  win(w)
+JZStereoForm::JZStereoForm(JZSampleFrame& SampleFrame)
+  : wxForm(USED_WXFORM_BUTTONS),
+    win(SampleFrame)
 {
 }
 
@@ -1444,10 +1457,10 @@ int JZStretcherForm::newspeed    = 0;
 bool JZStretcherForm::keep_pitch = 1;
 
 
-JZStretcherForm::JZStretcherForm(JZSampleFrame &w)
-: wxForm( USED_WXFORM_BUTTONS ),
-  win(w),
-  spl(w.GetSample())
+JZStretcherForm::JZStretcherForm(JZSampleFrame& SampleFrame)
+  : wxForm( USED_WXFORM_BUTTONS ),
+    win(SampleFrame),
+    spl(SampleFrame.GetSample())
 {
 }
 

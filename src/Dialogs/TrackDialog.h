@@ -26,6 +26,7 @@
 class JZKnob;
 class JZKnobEvent;
 class JZTrack;
+class wxCheckBox;
 class wxListBox;
 class wxStaticText;
 class wxTextCtrl;
@@ -63,6 +64,8 @@ class JZTrackDialog : public wxDialog
     wxStaticText* mpChannelValue;
 
     JZKnob* mpChannelKnob;
+
+    wxCheckBox* mpAudioModeCheckBox;
 
   DECLARE_EVENT_TABLE();
 };

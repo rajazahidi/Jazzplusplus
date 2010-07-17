@@ -27,6 +27,7 @@
 #include "../Track.h"
 
 #include <wx/button.h>
+#include <wx/checkbox.h>
 #include <wx/listbox.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
@@ -57,7 +58,8 @@ JZTrackDialog::JZTrackDialog(JZTrack& Track, wxWindow* pParent)
     mpTrackNameEdit(0),
     mpPatchListBox(0),
     mpChannelValue(0),
-    mpChannelKnob(0)
+    mpChannelKnob(0),
+    mpAudioModeCheckBox(0)
 {
   mpTrackNameEdit = new wxTextCtrl(this, wxID_ANY);
 
@@ -67,6 +69,8 @@ JZTrackDialog::JZTrackDialog(JZTrack& Track, wxWindow* pParent)
   mpChannelValue = new wxStaticText(this, wxID_ANY, "00");
 
   mpChannelKnob = new JZKnob(this, IDC_KB_CHANNEL, 0, 1, 16);
+
+  mpAudioModeCheckBox = new wxCheckBox(this, wxID_ANY, "Audio Track");
 
   wxButton* pOkButton = new wxButton(this, wxID_OK, "&OK");
   wxButton* pCancelButton = new wxButton(this, wxID_CANCEL, "Cancel");
@@ -103,6 +107,7 @@ JZTrackDialog::JZTrackDialog(JZTrack& Track, wxWindow* pParent)
 
   pTopSizer->Add(pFlexGridSizer, 0, wxCENTER | wxALL, 2);
 
+  pTopSizer->Add(mpAudioModeCheckBox, 0, wxALL, 2);
 
   wxBoxSizer* pButtonSizer = new wxBoxSizer(wxHORIZONTAL);
   pButtonSizer->Add(pOkButton, 0, wxALL, 5);
@@ -176,6 +181,8 @@ bool JZTrackDialog::TransferDataToWindow()
 
   mpChannelKnob->SetValue(mTrack.Channel);
 
+  mpAudioModeCheckBox->SetValue(mTrack.GetAudioMode());
+
   return true;
 }
 
@@ -194,6 +201,7 @@ bool JZTrackDialog::TransferDataFromWindow()
     mTrack.SetPatch(Patch);
     mTrack.SetBank(Bank);
     mTrack.Channel = mpChannelKnob->GetValue();
+    mTrack.SetAudioMode(mpAudioModeCheckBox->GetValue());
   }
 
   return true;

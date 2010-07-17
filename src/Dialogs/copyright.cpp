@@ -28,12 +28,12 @@
 // Copyright dialog
 // ******************************************************************
 
-tCopyrightDlg::tCopyrightDlg(tSong* song):tPropertyListDlg("Music Copyright")
+JZCopyrightDlg::JZCopyrightDlg(JZSong* song):JZPropertyListDlg("Music Copyright")
 {
   this->song=song;
 }
 
-void tCopyrightDlg::AddProperties()
+void JZCopyrightDlg::AddProperties()
 {
   copyrightProp=new wxProperty("Copyright notice","string","string");
   char *cs = song->GetTrack(0)->GetCopyright();
@@ -52,7 +52,7 @@ void tCopyrightDlg::AddProperties()
    sheet->AddProperty(copyrightProp);
  }
 
-bool tCopyrightDlg::OnClose()
+bool JZCopyrightDlg::OnClose()
 {
    song->GetTrack(0)->SetCopyright(copyrightProp->GetValue().StringValue() );
    return FALSE;

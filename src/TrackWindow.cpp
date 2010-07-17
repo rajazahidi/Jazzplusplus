@@ -1044,7 +1044,7 @@ void JZTrackWindow::DrawEvents(wxDC& Dc)
     JZTrack *Track = gpProject->GetTrack(TrackNumber);
     if (Track)
     {
-      tEventIterator Iterator(Track);
+      JZEventIterator Iterator(Track);
       int StopClk = x2Clock(mCanvasWidth);
       JZEvent* pEvent = Iterator.Range(mFromClock, StopClk);
       int y0 = y + mLittleBit;

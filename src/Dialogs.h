@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ class JZPianoWindow;
 //class JZSong;
 class JZTrack;
 
-//class tShiftDlg : public tPropertyListDlg
+//class JZShiftDlg : public JZPropertyListDlg
 //{
 //  public:
 //
@@ -46,25 +46,25 @@ class JZTrack;
 //    JZFilter* mpFilter;
 //    JZSong* mpSong;
 //
-//    tShiftDlg(JZEventFrame* pEventWindow, JZFilter* pFilter, long Unit);
+//    JZShiftDlg(JZEventFrame* pEventWindow, JZFilter* pFilter, long Unit);
 //    void AddProperties();
 //    bool OnClose();
 //    void OnHelp();
 //};
 
-//class tSearchReplaceDlg : public tPropertyListDlg
+//class JZSearchReplaceDlg : public JZPropertyListDlg
 //{
 //  public:
 //
 //    static int frCtrl;
 //    static int toCtrl;
-///*     tNamedChoice frList; */
-///*     tNamedChoice toList; */
+///*     JZNamedChoice frList; */
+///*     JZNamedChoice toList; */
 //
 //    JZFilter *Filter;
 //    JZSong   *Song;
 //
-//    tSearchReplaceDlg(JZEventWindow* w, JZFilter *f);
+//    JZSearchReplaceDlg(JZEventWindow* w, JZFilter *f);
 //    void AddProperties();
 //    bool OnClose();
 //    void OnHelp();
@@ -72,7 +72,7 @@ class JZTrack;
 
 #if 0
 // seqLength
-class tSeqLengthDlg : public tPropertyListDlg
+class JZSeqLengthDlg : public JZPropertyListDlg
 {
   public:
 
@@ -82,14 +82,14 @@ class tSeqLengthDlg : public tPropertyListDlg
     JZFilter   *Filter;
     JZSong     *Song;
 
-    tSeqLengthDlg(JZEventFrame *win, JZFilter *f);
+    JZSeqLengthDlg(JZEventFrame *win, JZFilter *f);
     void AddProperties();
     bool OnClose();
     void OnHelp();
 };
 
 // midiDelay
-class tMidiDelayDlg : public tPropertyListDlg
+class JZMidiDelayDlg : public JZPropertyListDlg
 {
   public:
 
@@ -100,7 +100,7 @@ class tMidiDelayDlg : public tPropertyListDlg
     JZFilter   *Filter;
     JZSong     *Song;
 
-    tMidiDelayDlg(JZEventFrame *win, JZFilter *f);
+    JZMidiDelayDlg(JZEventFrame *win, JZFilter *f);
     void AddProperties();
     bool OnClose();
     void OnHelp();

@@ -31,13 +31,13 @@
 
 class JZSamplesDialog;
 class JZTrack;
-class tAudioBufferQueue;
-class tAudioRecordBuffer;
-class tEventArray;
-class tSample;
-class tSampleVoice;
-class tSampleWin;
-struct tAudioBuffer;
+class JZAudioBufferQueue;
+class JZAudioRecordBuffer;
+class JZEventArray;
+class JZSample;
+class JZSampleVoice;
+class JZSampleFrame;
+struct JZAudioBuffer;
 
 // These should be variables and queried from the driver!
 //
@@ -81,13 +81,13 @@ struct tAudioBuffer;
 // Description:
 //   This is the audio buffer structure declaration.
 //*****************************************************************************
-struct tAudioBuffer
+struct JZAudioBuffer
 {
   // This is a Microsoft Windows for mswin wavehdr
   WAVEHDR* hdr;
   short* data;
 
-  tAudioBuffer(int dummy)
+  JZAudioBuffer(int dummy)
     : hdr(0),
       data(0)
   {
@@ -96,7 +96,7 @@ struct tAudioBuffer
     memset(data, 0, BUFBYTES);
   }
 
-  ~tAudioBuffer()
+  ~JZAudioBuffer()
   {
     delete hdr;
     delete [] data;
@@ -114,20 +114,20 @@ struct tAudioBuffer
 };
 
 
-DECLARE_ARRAY(tAudioBufferArray, tAudioBuffer*)
+DECLARE_ARRAY(JZAudioBufferArray, JZAudioBuffer*)
 
 //*****************************************************************************
 //*****************************************************************************
-class tAudioBufferQueue
+class JZAudioBufferQueue
 {
   public:
 
-    tAudioBufferQueue()
+    JZAudioBufferQueue()
     {
       Clear();
     }
 
-    ~tAudioBufferQueue()
+    ~JZAudioBufferQueue()
     {
     }
 
@@ -150,12 +150,12 @@ class tAudioBufferQueue
       return written == read;
     }
 
-    void Put(tAudioBuffer *buf)
+    void Put(JZAudioBuffer *buf)
     {
       array[written++ % BUFCOUNT] = buf;
     }
 
-    tAudioBuffer* Get()
+    JZAudioBuffer* Get()
     {
       if (written == read)
       {
@@ -164,39 +164,39 @@ class tAudioBufferQueue
       return(array[read++ % BUFCOUNT]);
     }
 
-    void UnGet(tAudioBuffer* buf)
+    void UnGet(JZAudioBuffer* buf)
     {
       array[ --read % BUFCOUNT ] = buf;
     }
 
   private:
 
-    tAudioBuffer* array[BUFCOUNT];
+    JZAudioBuffer* array[BUFCOUNT];
 
     int read, written;
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tAudioRecordBuffer
+class JZAudioRecordBuffer
 {
-  friend class tSampleSet;
+  friend class JZSampleSet;
   friend class JZWindowsAudioPlayer;
 
   public:
 
-    tAudioRecordBuffer()
+    JZAudioRecordBuffer()
     {
       num_buffers = 0;
     }
 
-    ~tAudioRecordBuffer()
+    ~JZAudioRecordBuffer()
     {
       Clear();
     }
 
     void Clear();
-    tAudioBuffer * RequestBuffer();
+    JZAudioBuffer * RequestBuffer();
     void UndoRequest()
     {
       --num_buffers;
@@ -208,7 +208,7 @@ class tAudioRecordBuffer
 
   private:
 
-    tAudioBufferArray buffers;
+    JZAudioBufferArray buffers;
     int num_buffers;
     int bufbytes;
 };
@@ -219,13 +219,13 @@ class tAudioRecordBuffer
 //   This is the sample set class declaration.  This class holds a collection
 // of audio samples that are played when a particular MIDI signal is received.
 //*****************************************************************************
-class tSampleSet
+class JZSampleSet
 {
   private:
 
     friend class JZWindowsAudioPlayer;
-    friend class tAudioPlayer;
-    friend class tAlsaAudioPlayer;
+    friend class JZAudioPlayer;
+    friend class JZAlsaAudioPlayer;
 
   public:
 
@@ -234,9 +234,9 @@ class tSampleSet
       eSampleCount = 128
     };
 
-    tSampleSet(long ticks_per_minute);
+    JZSampleSet(long ticks_per_minute);
 
-    virtual ~tSampleSet();
+    virtual ~JZSampleSet();
 
     int Load(const wxString& FileName);
 
@@ -291,13 +291,13 @@ class tSampleSet
       softsync = x;
     }
 
-    int ResetBuffers(tEventArray *, long start_clock, long ticks_per_minute);
+    int ResetBuffers(JZEventArray *, long start_clock, long ticks_per_minute);
 
     int ResetBufferSize(unsigned int bytes);
 
     int FillBuffers(long last_clock);
 
-    tAudioBuffer *GetBuffer(int i) const
+    JZAudioBuffer *GetBuffer(int i) const
     {
       // 0 < i < BUFCOUNT
       return buffers[i];
@@ -351,23 +351,23 @@ class tSampleSet
     // returns number of buffers prepared. Output starts at offs.
     int PrepareListen(int key, long fr_smpl = -1, long to_smpl = -1);
 
-    int PrepareListen(tSample *spl, long fr_smpl = -1, long to_smpl = -1);
+    int PrepareListen(JZSample *spl, long fr_smpl = -1, long to_smpl = -1);
 
     int ContinueListen(); // return number of buffers
 
-    void SaveRecordingDlg(long frc, long toc, tAudioRecordBuffer &buf);
+    void SaveRecordingDlg(long frc, long toc, JZAudioRecordBuffer &buf);
 
     void SaveWave(
       const char *fname,
       long frc,
       long toc,
-      tAudioRecordBuffer &buf);
+      JZAudioRecordBuffer &buf);
 
     void AddNote(const std::string& FileName, long frc, long toc);
 
     void RefreshDialogs();
 
-    tSample &operator[](int i)
+    JZSample &operator[](int i)
     {
       return *mSamples[i];
     }
@@ -411,8 +411,8 @@ class tSampleSet
 
     bool softsync;  // enable software midi/audio sync
 
-    tSample* mSamples[eSampleCount];
-    tSampleWin* mSampleWindows[eSampleCount];
+    JZSample* mSamples[eSampleCount];
+    JZSampleFrame* mSampleFrames[eSampleCount];
 
     long   ticks_per_minute;  // MIDI sampling rate for audio/midi sync.
     double mClocksPerBuffer;
@@ -422,24 +422,24 @@ class tSampleSet
 
     unsigned int bufbytes;           // buffer size in byte
     unsigned int bufshorts;          // buffer size in short
-    tAudioBuffer *buffers[BUFCOUNT]; // all the audio buffers
-    tAudioBufferQueue free_buffers;  // to be filled with data
-    tAudioBufferQueue full_buffers;  // to be played by driver
-    tAudioBufferQueue driv_buffers;  // actually played by driver
+    JZAudioBuffer *buffers[BUFCOUNT]; // all the audio buffers
+    JZAudioBufferQueue free_buffers;  // to be filled with data
+    JZAudioBufferQueue full_buffers;  // to be played by driver
+    JZAudioBufferQueue driv_buffers;  // actually played by driver
 
     // return the start clock for i-th free buffer
     long buffers_written;            // for computing buffers clock
 
     JZSamplesDialog* mpSampleDialog;
 
-    tEventArray* events;
+    JZEventArray* events;
 
     enum
     {
       MAXPOLY = 100
     };
 
-    tSampleVoice* voices[MAXPOLY];
+    JZSampleVoice* voices[MAXPOLY];
     int num_voices;
     int adjust_audio_length;
 
@@ -451,7 +451,7 @@ class tSampleSet
     int dirty;  // needs reloading
 
     // to communicate between PrepareListen and ContinueListen
-    tSample* listen_sample;
+    JZSample* listen_sample;
 };
 
 #endif // !defined(JZ_AUDIO_H)

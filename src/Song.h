@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ class JZBarInfo
     int mCountsPerBar;
     int mTicksPerQuarter;
     int mTicksPerBar;
-    tEventIterator mIterator;
+    JZEventIterator mIterator;
     JZEvent* mpEvent;
 
 };
@@ -119,14 +119,14 @@ class JZSong
     void MergeTracks(
       int FrClock,
       int ToClock,
-      tEventArray *Destin,
+      JZEventArray *Destin,
       const JZMetronomeInfo& MetronomeInfo,
       int DeltaClock = 0,
       int mode = 0);
 
     void MergePlayTrackEvent(
       JZPlayTrackEvent* c,
-      tEventArray *Destin,
+      JZEventArray *Destin,
       int recursionDepth);
 
     int SetMeterChange(
@@ -139,7 +139,7 @@ class JZSong
     void MakeMetronome(
       int FrClock,
       int ToClock,
-      tEventArray *Destin,
+      JZEventArray *Destin,
       const JZMetronomeInfo& MetronomeInfo,
       int delta = 0);
 

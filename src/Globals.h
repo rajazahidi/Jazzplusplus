@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -32,13 +32,13 @@
 
 class JZConfiguration;
 class JZSong;
-class JZSynth;
+class JZSynthesizer;
 class JZPlayer;
 class JZHelp;
 class JZProject;
 class JZTrackFrame;
 class JZTrackWindow;
-class tHBInterface;
+class JZHarmonyBrowserInterface;
 
 enum TESizes
 {
@@ -48,7 +48,7 @@ enum TESizes
 
 extern JZConfiguration* gpConfig;
 extern JZSong* gpSong;
-extern JZSynth* gpSynth;
+extern JZSynthesizer* gpSynth;
 extern JZPlayer* gpMidiPlayer;
 extern JZHelp* gpHelpInstance;
 extern std::map<int, std::string> gLimitSteps;
@@ -62,7 +62,7 @@ extern std::vector<std::pair<std::string, int> > gSynthesierTypeFiles;
 extern JZProject* gpProject;
 extern JZTrackFrame* gpTrackFrame;
 extern JZTrackWindow* gpTrackWindow;
-extern tHBInterface* gpHarmonyBrowser;
+extern JZHarmonyBrowserInterface* gpHarmonyBrowser;
 extern const double gDegreesToRadians;
 extern const double gRadiansToDegrees;
 

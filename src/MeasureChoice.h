@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,11 +29,11 @@ class JZSong;
 
 //*****************************************************************************
 //*****************************************************************************
-class tMeasureChoice : public tNamedValueChoice
+class JZMeasureChoice : public JZNamedValueChoice
 {
   public:
 
-    tMeasureChoice(wxWindow* pParent);
+    JZMeasureChoice(wxWindow* pParent);
 
     int GetMeasure();
 
@@ -43,13 +43,13 @@ class tMeasureChoice : public tNamedValueChoice
 };
 
 inline
-int tMeasureChoice::GetMeasure()
+int JZMeasureChoice::GetMeasure()
 {
   return GetValue();
 }
 
 inline
-void tMeasureChoice::SetMeasure(int Measure)
+void JZMeasureChoice::SetMeasure(int Measure)
 {
   SetValue(Measure);
 }

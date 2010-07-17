@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -74,11 +74,11 @@ enum
 
 //*****************************************************************************
 //*****************************************************************************
-class tParam
+class JZParam
 {
   public:
 
-    tParam(
+    JZParam(
       int clk,
       int cha,
       unsigned char id1,
@@ -94,7 +94,7 @@ class tParam
     {
     }
 
-    virtual ~tParam()
+    virtual ~JZParam()
     {
     }
 
@@ -116,34 +116,34 @@ class tParam
 
 //*****************************************************************************
 //*****************************************************************************
-class tNrpn : public tParam
+class JZNrpn : public JZParam
 {
   public:
 
-    tNrpn(
+    JZNrpn(
       int clk,
       int cha,
       unsigned char msb,
       unsigned char lsb,
       unsigned char msbval)
-      : tParam(clk, cha, 0x63, msb, 0x62, lsb, msbval)
+      : JZParam(clk, cha, 0x63, msb, 0x62, lsb, msbval)
     {
     }
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tRpn : public tParam
+class JZRpn : public JZParam
 {
   public:
 
-    tRpn(
+    JZRpn(
       int clk,
       int cha,
       unsigned char msb,
       unsigned char lsb,
       unsigned char msbval)
-      : tParam(clk, cha, 0x65, msb, 0x64, lsb, msbval)
+      : JZParam(clk, cha, 0x65, msb, 0x64, lsb, msbval)
     {
     }
 };
@@ -306,45 +306,45 @@ enum DrumInstrumentParameterIndex
 int drumParam2Index(int par);
 int drumIndex2Param(int index);
 
-class tDrumInstrumentParameterList;
+class JZDrumInstrumentParameterList;
 
 //*****************************************************************************
 //*****************************************************************************
-class tDrumInstrumentParameter
+class JZDrumInstrumentParameter
 {
-    friend class tDrumInstrumentParameterList;
+    friend class JZDrumInstrumentParameterList;
 
   public:
 
-    tDrumInstrumentParameter( tNrpn *par );
-    tNrpn *Get( int index );
-    void Put( tNrpn *par );
-    tDrumInstrumentParameter *Next();
+    JZDrumInstrumentParameter( JZNrpn *par );
+    JZNrpn *Get( int index );
+    void Put( JZNrpn *par );
+    JZDrumInstrumentParameter *Next();
     int Pitch();
 
   private:
 
     int mPitch;
-    tNrpn* param[numDrumParameters];
-    tDrumInstrumentParameter* mpNext;
+    JZNrpn* param[numDrumParameters];
+    JZDrumInstrumentParameter* mpNext;
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tDrumInstrumentParameterList
+class JZDrumInstrumentParameterList
 {
   public:
 
-    tDrumInstrumentParameterList()
+    JZDrumInstrumentParameterList()
       : list(0)
     {
     }
-    tDrumInstrumentParameter *GetElem( int pit );
-    tNrpn *GetParam( int pit, int index );
-    void PutParam( tNrpn *par );
+    JZDrumInstrumentParameter *GetElem( int pit );
+    JZNrpn *GetParam( int pit, int index );
+    void PutParam( JZNrpn *par );
     void DelParam( int pit, int index );
-    tDrumInstrumentParameter *FirstElem();
-    tDrumInstrumentParameter *NextElem( tDrumInstrumentParameter *cur );
+    JZDrumInstrumentParameter *FirstElem();
+    JZDrumInstrumentParameter *NextElem( JZDrumInstrumentParameter *cur );
     void DelElem( int pit );
     void Clear();
     bool IsEmpty() const
@@ -354,7 +354,7 @@ class tDrumInstrumentParameterList
 
   private:
 
-    tDrumInstrumentParameter* list;
+    JZDrumInstrumentParameter* list;
 };
 
 enum tMtcType
@@ -367,7 +367,7 @@ enum tMtcType
 
 //*****************************************************************************
 //*****************************************************************************
-class tMtcTime
+class JZMtcTime
 {
   public:
 
@@ -377,10 +377,10 @@ class tMtcTime
     int sec;
     int fm;
 
-    tMtcTime(JZMtcOffsetEvent* s); // an mtc offset or mtc full message
-    tMtcTime(int millisek, tMtcType t);
-    tMtcTime(char *str, tMtcType t);
-    tMtcTime(unsigned h, unsigned m, unsigned s, unsigned f, unsigned t);
+    JZMtcTime(JZMtcOffsetEvent* s); // an mtc offset or mtc full message
+    JZMtcTime(int millisek, tMtcType t);
+    JZMtcTime(char *str, tMtcType t);
+    JZMtcTime(unsigned h, unsigned m, unsigned s, unsigned f, unsigned t);
     void ToString(std::string& String);
     JZMtcOffsetEvent* ToOffset();
     int ToMillisec();
@@ -389,7 +389,7 @@ class tMtcTime
 
 //*****************************************************************************
 //*****************************************************************************
-class tSimpleEventArray : public wxObject
+class JZSimpleEventArray : public wxObject
 {
   public:
 
@@ -408,13 +408,13 @@ class tSimpleEventArray : public wxObject
 
     void Put(JZEvent* pEvent);
 
-    void GrabData(tSimpleEventArray &src);
+    void GrabData(JZSimpleEventArray &src);
 
-    void Copy(tSimpleEventArray& src, int frclk, int toclk);
+    void Copy(JZSimpleEventArray& src, int frclk, int toclk);
 
-    tSimpleEventArray();
+    JZSimpleEventArray();
 
-    virtual ~tSimpleEventArray();
+    virtual ~JZSimpleEventArray();
 
     void Sort();
 
@@ -424,7 +424,7 @@ class tSimpleEventArray : public wxObject
 
 //*****************************************************************************
 //*****************************************************************************
-class tUndoBuffer : public tSimpleEventArray
+class JZUndoBuffer : public JZSimpleEventArray
 {
   friend class JZTrack;
 
@@ -435,7 +435,7 @@ class tUndoBuffer : public tSimpleEventArray
     void Put(JZEvent* pEvent, int killed)
     {
       bits.set(nEvents, killed);
-      tSimpleEventArray::Put(pEvent);
+      JZSimpleEventArray::Put(pEvent);
     }
 
   private:
@@ -446,10 +446,10 @@ class tUndoBuffer : public tSimpleEventArray
 
 //*****************************************************************************
 //*****************************************************************************
-class tEventArray : public tSimpleEventArray
+class JZEventArray : public JZSimpleEventArray
 {
-    friend class tEventIterator;
-    friend class tTrackDlg;
+    friend class JZEventIterator;
+    friend class JZTrackDlg;
     friend class JZTrack;
 
   public:
@@ -495,17 +495,17 @@ class tEventArray : public tSimpleEventArray
 
     JZMtcOffsetEvent* MtcOffset;
 
-    tNrpn* VibRate;
-    tNrpn* VibDepth;
-    tNrpn* VibDelay;
-    tNrpn* Cutoff;
-    tNrpn* Resonance;
-    tNrpn* EnvAttack;
-    tNrpn* EnvDecay;
-    tNrpn* EnvRelease;
-    tRpn* BendPitchSens;
+    JZNrpn* VibRate;
+    JZNrpn* VibDepth;
+    JZNrpn* VibDelay;
+    JZNrpn* Cutoff;
+    JZNrpn* Resonance;
+    JZNrpn* EnvAttack;
+    JZNrpn* EnvDecay;
+    JZNrpn* EnvRelease;
+    JZRpn* BendPitchSens;
 
-    tDrumInstrumentParameterList DrumParams;
+    JZDrumInstrumentParameterList DrumParams;
 
     int Channel;  // 1..16, set from first ChannelEvent, 0 = multichannel/nochannel
     int Device;   // 0 for tSeq2/Mpu401
@@ -517,8 +517,8 @@ class tEventArray : public tSimpleEventArray
     void Keyoff2Length();
     void Length2Keyoff();
 
-    tEventArray();
-    virtual ~tEventArray();
+    JZEventArray();
+    virtual ~JZEventArray();
 
     void Read(JZReadBase& Io);
     void Write(JZWriteBase& Io);
@@ -553,7 +553,7 @@ class tEventArray : public tSimpleEventArray
 // Description:
 //   This is the track class declaration.
 //*****************************************************************************
-class JZTrack : public tEventArray
+class JZTrack : public JZEventArray
 {
   public:
 
@@ -574,7 +574,7 @@ class JZTrack : public tEventArray
     void Put(JZEvent* pEvent)
     {
       mChanged = true;
-      tEventArray::Put(pEvent);
+      JZEventArray::Put(pEvent);
       mUndoBuffers[mUndoIndex].Put(pEvent, 0);
     }
 
@@ -585,10 +585,10 @@ class JZTrack : public tEventArray
       mUndoBuffers[mUndoIndex].Put(pEvent, 1);
     }
 
-    void Merge(tEventArray *other);
+    void Merge(JZEventArray *other);
 
     void MergeRange(
-      const tEventArray& Other,
+      const JZEventArray& Other,
       int FromClock,
       int ToClock,
       int Replace = 0);
@@ -732,8 +732,8 @@ class JZTrack : public tEventArray
     int  GetModeSysex( int param );
     void SetModeSysex( int param, int value);
 
-    tMtcTime* GetMtcOffset();
-    void SetMtcOffset( tMtcTime* mtc );
+    JZMtcTime* GetMtcOffset();
+    void SetMtcOffset( JZMtcTime* mtc );
 
   private:
 
@@ -746,7 +746,7 @@ class JZTrack : public tEventArray
     // Current number of possible undo's.
     int mUndoCount;
 
-    tUndoBuffer mUndoBuffers[MaxUndo];
+    JZUndoBuffer mUndoBuffers[MaxUndo];
 
     wxDialog* mpDialog;
 };
@@ -756,11 +756,11 @@ class JZTrack : public tEventArray
 // Description:
 //   This is the event iterator class declaration.
 //*****************************************************************************
-class tEventIterator
+class JZEventIterator
 {
   public:
 
-    tEventIterator(const tSimpleEventArray* pTrack)
+    JZEventIterator(const JZSimpleEventArray* pTrack)
     {
       mpTrack = pTrack;
       mStart  = 0;
@@ -837,7 +837,7 @@ class tEventIterator
 
   private:
 
-    const tSimpleEventArray* mpTrack;
+    const JZSimpleEventArray* mpTrack;
     int mStart, mStop, mActual;
 };
 

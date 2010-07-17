@@ -40,7 +40,7 @@ class JZRecordingInfo;
 
 //*****************************************************************************
 //*****************************************************************************
-enum tClockSource
+enum JZClockSource
 {
   CsInt = 0,
   CsFsk,
@@ -50,13 +50,13 @@ enum tClockSource
 
 //*****************************************************************************
 //*****************************************************************************
-class tDeviceList
+class JZDeviceList
 {
   public:
 
-    tDeviceList();
+    JZDeviceList();
 
-    virtual ~tDeviceList();
+    virtual ~JZDeviceList();
 
     unsigned GetCount() const
     {
@@ -91,17 +91,17 @@ class tDeviceList
   private:
 
     // Prevent accidental copy or assignment.
-    tDeviceList(const tDeviceList &);
-    tDeviceList& operator = (const tDeviceList &);
+    JZDeviceList(const JZDeviceList &);
+    JZDeviceList& operator = (const JZDeviceList &);
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tPlayLoop
+class JZPlayLoop
 {
   public:
 
-    tPlayLoop();
+    JZPlayLoop();
 
     void Set(long Start, long Stop);
 
@@ -116,7 +116,7 @@ class tPlayLoop
     long Int2ExtClock(long Clock);
 
     void PrepareOutput(
-      tEventArray* pEventArray,
+      JZEventArray* pEventArray,
       JZSong* pSong,
       long ExtFr,
       long ExtTo,
@@ -161,7 +161,7 @@ class JZPlayer : public wxTimer
       OutNow(pEvent);
     }
 
-    void OutNow(JZTrack* t, tParam* r);
+    void OutNow(JZTrack* t, JZParam* r);
 
     // what's played right now?
     virtual long GetRealTimeClock() = 0;
@@ -182,7 +182,7 @@ class JZPlayer : public wxTimer
     {
     }
 
-    virtual tMtcTime* FreezeMtcRec()
+    virtual JZMtcTime* FreezeMtcRec()
     {
       return 0;
     }
@@ -193,7 +193,7 @@ class JZPlayer : public wxTimer
     // if unable to install, pop up a messagebox explaining why.
     virtual void ShowError();
 
-    const tEventArray& GetRecordBuffer() const
+    const JZEventArray& GetRecordBuffer() const
     {
       return mRecdBuffer;
     }
@@ -222,11 +222,11 @@ class JZPlayer : public wxTimer
     {
       return 0;
     }
-    virtual tDeviceList& GetOutputDevices()
+    virtual JZDeviceList& GetOutputDevices()
     {
       return DummyDeviceList;
     }
-    virtual tDeviceList& GetInputDevices()
+    virtual JZDeviceList& GetInputDevices()
     {
       return DummyDeviceList;
     }
@@ -256,7 +256,7 @@ class JZPlayer : public wxTimer
     virtual void ListenAudio(int key, int start_stop_mode = 1)
     {
     }
-    virtual void ListenAudio(tSample &spl, long fr_smpl, long to_smpl)
+    virtual void ListenAudio(JZSample &spl, long fr_smpl, long to_smpl)
     {
     }
     virtual bool IsListening() const
@@ -310,7 +310,7 @@ class JZPlayer : public wxTimer
 
     long mOutClock;
 
-    tPlayLoop* mpPlayLoop;
+    JZPlayLoop* mpPlayLoop;
 
     // This is the timer value for polling the record queue.
     int mPollMillisec;
@@ -322,16 +322,16 @@ class JZPlayer : public wxTimer
 
     JZSong* mpSong;
 
-    tEventArray mPlayBuffer;
-    tEventArray mRecdBuffer;
+    JZEventArray mPlayBuffer;
+    JZEventArray mRecdBuffer;
 
-    tEventArray* mpAudioBuffer;
+    JZEventArray* mpAudioBuffer;
 
-    tSampleSet mSamples;
+    JZSampleSet mSamples;
 
   private:
 
-    tDeviceList DummyDeviceList;
+    JZDeviceList DummyDeviceList;
 };
 
 extern char *midinethost;
@@ -347,7 +347,7 @@ extern char *midinethost;
 
 //*****************************************************************************
 //*****************************************************************************
-class tBuffer : public tWriteBase
+class JZBuffer : public JZWriteBase
 {
 
     char Buffer[2000];
@@ -365,7 +365,7 @@ class tBuffer : public tWriteBase
       RunningStatus = 0;
     }
 
-    tBuffer()
+    JZBuffer()
     {
       Clear();
     }
@@ -500,11 +500,11 @@ class tBuffer : public tWriteBase
 
 //*****************************************************************************
 //*****************************************************************************
-class tMpuPlayer : public JZPlayer
+class JZMpuPlayer : public JZPlayer
 {
     int  dev;
-    tBuffer PlyBytes;
-    tBuffer RecBytes;
+    JZBuffer PlyBytes;
+    JZBuffer RecBytes;
     long playclock;
     int clock_to_host_counter;
 
@@ -512,12 +512,12 @@ class tMpuPlayer : public JZPlayer
     long TrackClock[ACTIVE_TRACKS];
     int TrackRunningStatus[ACTIVE_TRACKS];
 
-    tEventArray OutOfBandEvents;
+    JZEventArray OutOfBandEvents;
 
   public:
 
-    tMpuPlayer(JZSong *song);
-    virtual ~tMpuPlayer();
+    JZMpuPlayer(JZSong *song);
+    virtual ~JZMpuPlayer();
     int  OutEvent(JZEvent *e);
     void OutNow(JZEvent *e);
     void OutBreak();
@@ -546,11 +546,11 @@ class tMpuPlayer : public JZPlayer
 // Description:
 //   This is the null driver class declaration.
 //*****************************************************************************
-class tNullPlayer : public JZPlayer
+class JZNullPlayer : public JZPlayer
 {
   public:
 
-    tNullPlayer(JZSong* pSong)
+    JZNullPlayer(JZSong* pSong)
       : JZPlayer(pSong)
     {
     }
@@ -560,7 +560,7 @@ class tNullPlayer : public JZPlayer
       return true;
     }
 
-    virtual ~tNullPlayer()
+    virtual ~JZNullPlayer()
     {
     }
 
@@ -608,24 +608,24 @@ void seqbuf_flush_last_event();
 
 //*****************************************************************************
 //*****************************************************************************
-class tOSSThru : public wxTimer
+class JZOssThru : public wxTimer
 {
   public:
     virtual void Notify();
-    tOSSThru();
-    ~tOSSThru();
+    JZOssThru();
+    ~JZOssThru();
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tSeq2Player : public JZPlayer
+class JZSeq2Player : public JZPlayer
 {
   public:
 
-    friend class tOSSThru;
-    tSeq2Player(JZSong* pSong);
+    friend class JZOssThru;
+    JZSeq2Player(JZSong* pSong);
     virtual bool IsInstalled();
-    virtual ~tSeq2Player();
+    virtual ~JZSeq2Player();
     int  OutEvent(JZEvent *e, int now);
     int  OutEvent(JZEvent *e)
     {
@@ -652,7 +652,7 @@ class tSeq2Player : public JZPlayer
     long    start_clock;
     long    echo_clock;
 
-    tOSSThru *through;
+    JZOssThru *through;
     int     card_id;
 };
 

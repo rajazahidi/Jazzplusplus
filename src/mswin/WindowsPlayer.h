@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ class JZWindowsPlayer : public JZPlayer
     virtual int OutEvent(JZEvent* e);
     virtual int OutSysex(JZEvent* e, DWORD time);
     void OutNow(JZEvent *e);
-    void OutNow(tParam *r);
+    void OutNow(JZParam *r);
     void OutBreak();
     virtual void OutBreak(long BreakOver);
     void StartPlay(long Clock, long LoopClock = 0, int Continue = 0);
@@ -58,7 +58,7 @@ class JZWindowsPlayer : public JZPlayer
     {
     }
 
-    virtual tMtcTime* FreezeMtcRec()
+    virtual JZMtcTime* FreezeMtcRec()
     {
       return 0;
     }
@@ -84,7 +84,7 @@ class JZWindowsPlayer : public JZPlayer
     void FillMidiClocks(long to);
     void FlushToDevice(long clock);
 
-    tEventArray OutOfBandEvents;
+    JZEventArray OutOfBandEvents;
     long RealTimeClock2Time(long clock);
     long Time2RealTimeClock(long time);
     void SetRealTimeTempo(long bpm, long clock);
@@ -141,7 +141,7 @@ class JZWindowsMtcPlayer : public JZWindowsPlayer
 
     virtual long GetRealTimeClock();
     virtual void InitMtcRec();
-    virtual tMtcTime* FreezeMtcRec();
+    virtual JZMtcTime* FreezeMtcRec();
 };
 
 #endif // !defined(JZ_WINDOWSPLAYER_H)

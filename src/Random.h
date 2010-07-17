@@ -47,7 +47,7 @@ extern JZRandomGenerator rnd;
 
 class JZRndArray
 {
-  friend class tArrayEdit;
+  friend class JZArrayEdit;
 
   protected:
 
@@ -136,11 +136,11 @@ class JZRndArray
 #define ARED_LINES      64
 
 
-class tArrayEditDrawBars
+class JZArrayEditDrawBars
 {
   public:
 
-    virtual ~tArrayEditDrawBars()
+    virtual ~JZArrayEditDrawBars()
     {
     }
 
@@ -148,7 +148,7 @@ class tArrayEditDrawBars
 };
 
 
-class tArrayEdit : public wxScrolledWindow
+class JZArrayEdit : public wxScrolledWindow
 {
   protected:
 
@@ -162,7 +162,7 @@ class tArrayEdit : public wxScrolledWindow
     JZRndArray& mArray;
     int &n, &min, &max, &nul;        // shorthand for mArray.n, mArray.min, ...
     wxString mLabel;
-    tArrayEditDrawBars *draw_bars;
+    JZArrayEditDrawBars *draw_bars;
 
     // array size is mapped to this range for x-tick marks
     int xmin, xmax;
@@ -181,7 +181,7 @@ class tArrayEdit : public wxScrolledWindow
 
   public:
 
-    tArrayEdit(
+    JZArrayEdit(
       wxFrame* pParent,
       JZRndArray& Array,
       int xx,
@@ -190,7 +190,7 @@ class tArrayEdit : public wxScrolledWindow
       int hh,
       int style_bits = (ARED_GAP | ARED_XTICKS));
 
-    virtual ~tArrayEdit();
+    virtual ~JZArrayEdit();
 
     virtual void OnDraw(wxDC& indc);
     virtual void OnSize(wxSizeEvent& event);
@@ -210,7 +210,7 @@ class tArrayEdit : public wxScrolledWindow
     // for display x-axis only, does not resize the array (both values inclusive)
     void SetXMinMax(int xmin, int xmax);
     void DrawBarLine (wxDC *dc, int xx);
-    void SetDrawBars(tArrayEditDrawBars *x)
+    void SetDrawBars(JZArrayEditDrawBars *x)
     {
       draw_bars = x;
     }
@@ -223,11 +223,11 @@ class tArrayEdit : public wxScrolledWindow
 
 
 
-class tRhyArrayEdit : public tArrayEdit
+class JZRhyArrayEdit : public JZArrayEdit
 {
   public:
 
-    tRhyArrayEdit(
+    JZRhyArrayEdit(
       wxFrame *parent,
       JZRndArray& Array,
       int xx,

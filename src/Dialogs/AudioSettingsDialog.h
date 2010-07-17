@@ -23,7 +23,7 @@
 
 #include <wx/dialog.h>
 
-class tSampleSet;
+class JZSampleSet;
 class wxCheckBox;
 class wxComboBox;
 
@@ -33,11 +33,11 @@ class JZAudioSettingsDialog : public wxDialog
 {
   public:
 
-    JZAudioSettingsDialog(wxWindow* pParent, tSampleSet& SampleSet);
+    JZAudioSettingsDialog(wxWindow* pParent, JZSampleSet& SampleSet);
 
   private:
 
-    tSampleSet& mSampleSet;
+    JZSampleSet& mSampleSet;
 
     wxCheckBox* mpEnableAudioCheckBox;
     wxComboBox* mpSamplingRateComboBox;

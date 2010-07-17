@@ -27,7 +27,7 @@
 
 using namespace std;
 
-void tSigSynth::Run(tSigOutput &osig, tSigInput &isig, float add_seconds)
+void JZSigSynth::Run(JZSigOutput &osig, JZSigInput &isig, float add_seconds)
 {
   isig.Init();
   osig.Init();
@@ -35,7 +35,7 @@ void tSigSynth::Run(tSigOutput &osig, tSigInput &isig, float add_seconds)
   // add 1 second to length
   const long N = isig.GetLength() + (long)(add_seconds * sampling_rate);
   osig.Resize(N);
-  tSigValue val;
+  JZSigValue val;
   for (long i = 0; i < N; i++)
   {
     isig.GetSample(val);
@@ -44,7 +44,7 @@ void tSigSynth::Run(tSigOutput &osig, tSigInput &isig, float add_seconds)
   }
 }
 
-void tSigSynth::DeleteAllGenerators()
+void JZSigSynth::DeleteAllGenerators()
 {
   for (unsigned i = 0; i < generators.size(); ++i)
   {
@@ -52,15 +52,15 @@ void tSigSynth::DeleteAllGenerators()
   }
 
   //generators.clear();
-  generators = vector<tSigInput*>();
+  generators = vector<JZSigInput*>();
 }
 
-const float tSigReverb::comb_times[COMBS] =
+const float JZSigReverb::comb_times[COMBS] =
 {
   0.0297f, 0.0371f, 0.0411f, 0.0437f
 };
 
-const float tSigReverb::alpas_times[ALPAS] =
+const float JZSigReverb::alpas_times[ALPAS] =
 {
   0.005f, 0.0017f // , 0.013f
 };
@@ -70,7 +70,7 @@ const float tSigReverb::alpas_times[ALPAS] =
 // ----------------------------------------------------------------
 
 void sig_reverb(
-  tSample &spl,
+  JZSample &spl,
   float rvbtime_val, // echo absorbtion
   float bright_val,  // lowpass filter freq
   float volume_val,  // effect volume
@@ -78,13 +78,13 @@ void sig_reverb(
 {
   long sr = spl.GetSamplingRate();
   long ch = spl.GetChannelCount();
-  tSigSynth synth(sr, ch);
+  JZSigSynth synth(sr, ch);
 
   tShortIter isig(synth, spl);
-  tFloatSample obuf(ch, sr);
+  JZFloatSample obuf(ch, sr);
   tFloatIter osig(synth, obuf);
 
-  tSigReverb comb(synth, rvbtime_val, bright_val, volume_val, room_val);
+  JZSigReverb comb(synth, rvbtime_val, bright_val, volume_val, room_val);
   comb.AddInput(isig);
   synth.Run(osig, comb, rvbtime_val);
 
@@ -107,7 +107,7 @@ void sig_reverb(
 */
 
 void sig_chorus(
-  tSample &spl,
+  JZSample &spl,
   float  pitch_freq,    // pitch modification freq
   float  pitch_range,   // variable delay in seconds
   float  pan_freq,      // pan freq in Hz
@@ -116,24 +116,24 @@ void sig_chorus(
 {
   long sr = spl.GetSamplingRate();
   long ch = spl.GetChannelCount();
-  tSigSynth synth(sr, ch);
+  JZSigSynth synth(sr, ch);
 
   tShortIter isig(synth, spl);
-  tFloatSample obuf(ch, sr);
+  JZFloatSample obuf(ch, sr);
   tFloatIter osig(synth, obuf);
 
-  tSigDelay delay(synth, pitch_range);
-  tSigSine  lfo_delay(synth, pitch_freq, 1, -PI/2);
+  JZSigDelay delay(synth, pitch_range);
+  JZSigSine  lfo_delay(synth, pitch_freq, 1, -PI/2);
   delay.AddInput(isig);
   delay.AddControl(lfo_delay);
 
-  tSigPanpot pan(synth);
-  tSigSine lfo_pan(synth, pan_freq, pan_spread, 0);
+  JZSigPanpot pan(synth);
+  JZSigSine lfo_pan(synth, pan_freq, pan_spread, 0);
   pan.AddInput(delay);
   pan.AddControl(lfo_pan);
 
-  tSigMix2 mixer(synth);
-  tSigConst mix_balance(synth, volume);
+  JZSigMix2 mixer(synth);
+  JZSigConst mix_balance(synth, volume);
   mixer.AddInput(pan);
   mixer.AddInput(isig);
   mixer.AddControl(mix_balance);
@@ -145,7 +145,7 @@ void sig_chorus(
   spl.Set(obuf);
 }
 
-static void setup_wav_harmonics(tSigWaveOscil &wav, JZRndArray &arr)
+static void setup_wav_harmonics(JZSigWaveOscil &wav, JZRndArray &arr)
 {
   int k, f;
   const int N = wav.Size();
@@ -154,21 +154,21 @@ static void setup_wav_harmonics(tSigWaveOscil &wav, JZRndArray &arr)
 
   for (f = 0; f < arr.Size(); f++)
   {
-    tLineMap<float>map(0, N, 0, 2*PI*(f+1));
+    JZLineMap<float>map(0, N, 0, 2*PI*(f+1));
     for (k = 0; k < N; k++)
       wav[k] += sin(map(k)) * (float)arr[f] * (float)arr[f];
   }
 }
 
 
-static void setup_wav_control(tSigWaveCtrl &wav, JZRndArray &arr)
+static void setup_wav_control(JZSigWaveCtrl &wav, JZRndArray &arr)
 {
   int i;
 
   const int N = wav.Size();
 
-  tLineMap<float>xmap(0, N, 0, arr.Size() - 1);
-  tLineMap<float>ymap(arr.Min(), arr.Max(), -1, 1);
+  JZLineMap<float>xmap(0, N, 0, arr.Size() - 1);
+  JZLineMap<float>ymap(arr.Min(), arr.Max(), -1, 1);
   for (i = 0; i < N; i++)
     /* PAT - Original line:  wav[i] = ymap(arr[xmap(i)]); */
     wav[i] = ymap(arr[xmap(i)]);
@@ -180,7 +180,7 @@ static void setup_wav_control(tSigWaveCtrl &wav, JZRndArray &arr)
   for (i = 0; i < N; i++)
   {
     cout << i << ' ';
-    for (k = 0; k < tSigValue::MAXCHN; k++)
+    for (k = 0; k < JZSigValue::MAXCHN; k++)
       cout << wav[i][k] << ' ';
     cout << endl;
   }
@@ -190,7 +190,7 @@ static void setup_wav_control(tSigWaveCtrl &wav, JZRndArray &arr)
 }
 
 void sig_wavsynth(
-  tSample &spl,                // destin
+  JZSample &spl,                // destin
   double duration,        // length in seconds
   int midi_key,                // base frequency
   double fshift,        // frequeny modulation factor, 0 = off
@@ -201,26 +201,26 @@ void sig_wavsynth(
 {
   long sr = spl.GetSamplingRate();
   long ch = spl.GetChannelCount();
-  tSigSynth synth(sr, ch);
+  JZSigSynth synth(sr, ch);
   FreqTab ft;
   double freq = ft.freq(midi_key);
 
-  tFloatSample obuf(ch, sr);
+  JZFloatSample obuf(ch, sr);
   tFloatIter *osig = new tFloatIter(synth, obuf);
 
   int i;
-  tSigMixer *mix = new tSigMixer(synth);
+  JZSigMixer *mix = new JZSigMixer(synth);
   for (i = 0; i < ntables; i++)
   {
-    tSigInput *inp;
+    JZSigInput *inp;
     if (!noisegen || i > 0)
     {
       // create wavetable synth
-      tSigWaveOscil *wav = new tSigWaveOscil(synth, 1000, freq);
+      JZSigWaveOscil *wav = new JZSigWaveOscil(synth, 1000, freq);
       setup_wav_harmonics(*wav, *arr[i][0]);
 
       // create a pitch control signal
-      tSigWaveCtrl *frq = new tSigWaveCtrl(synth, 200, duration);
+      JZSigWaveCtrl *frq = new JZSigWaveCtrl(synth, 200, duration);
       setup_wav_control(*frq, *arr[i][2]);
 
       // connect freq control to wavetable
@@ -231,14 +231,14 @@ void sig_wavsynth(
     else
     {
       // create a noise generator
-      tSigNoise *noise = new tSigNoise(synth);
+      JZSigNoise *noise = new JZSigNoise(synth);
 
       // create a filter control signal from harmonics
-      tSigWaveCtrl *ctl = new tSigWaveCtrl(synth, 200, duration);
+      JZSigWaveCtrl *ctl = new JZSigWaveCtrl(synth, 200, duration);
       setup_wav_control(*ctl, *arr[i][0]);
 
       // create the filter modifier
-      tSigFilter<tOpBandpass> *flt = new tSigFilter<tOpBandpass>(synth, 1000, 100, 10);
+      JZSigFilter<JZOpBandpass> *flt = new JZSigFilter<JZOpBandpass>(synth, 1000, 100, 10);
       flt->AddInput(*noise);
       flt->AddControl(*ctl);
 
@@ -246,12 +246,12 @@ void sig_wavsynth(
     }
 
     // create volume control signal
-    tSigWaveCtrl *vol = new tSigWaveCtrl(synth, 200, duration);
+    JZSigWaveCtrl *vol = new JZSigWaveCtrl(synth, 200, duration);
     setup_wav_control(*vol, *arr[i][1]);
 
     // make a panpot object
-    tSigPanpot *pan = new tSigPanpot(synth);
-    tSigWaveCtrl *ppan = new tSigWaveCtrl(synth, 200, duration);
+    JZSigPanpot *pan = new JZSigPanpot(synth);
+    JZSigWaveCtrl *ppan = new JZSigWaveCtrl(synth, 200, duration);
     setup_wav_control(*ppan, *arr[i][3]);
     pan->AddControl(*ppan);
 
@@ -275,17 +275,17 @@ void sig_wavsynth(
 //                     old Filter Interface
 // ---------------------------------------------------------------
 
-tSplFilter::tSplFilter()
+JZSplFilter::JZSplFilter()
 {
   filter = 0;
 }
 
-tSplFilter::~tSplFilter()
+JZSplFilter::~JZSplFilter()
 {
   delete filter;
 }
 
-void tSplFilter::Init(Type t, float xsr, double f0, double bw)
+void JZSplFilter::Init(Type t, float xsr, double f0, double bw)
 {
   sr = xsr;
   delete filter;
@@ -293,30 +293,30 @@ void tSplFilter::Init(Type t, float xsr, double f0, double bw)
   switch (t)
   {
     case LOWPASS:
-      filter = new tOpLowpass();
+      filter = new JZOpLowpass();
       break;
 
     case HIGHPASS:
-      filter = new tOpHighpass();
+      filter = new JZOpHighpass();
       break;
 
     case BANDPASS:
-      filter = new tOpBandpass();
+      filter = new JZOpBandpass();
       break;
 
     case BANDSTOP:
-      filter = new tOpBandstop();
+      filter = new JZOpBandstop();
       break;
   }
   filter->Setup(sr, f0, f0 * bw);
 }
 
-void tSplFilter::ReInit(double f0, double bw)
+void JZSplFilter::ReInit(double f0, double bw)
 {
   filter->Setup(sr, f0, f0 * bw);
 }
 
-float tSplFilter::Loop(float sig)
+float JZSplFilter::Loop(float sig)
 {
   return filter->Loop(sig);
 }

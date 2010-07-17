@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -40,11 +40,11 @@ using namespace std;
 
 //*****************************************************************************
 //*****************************************************************************
-class tAudioListener : public wxTimer
+class JZAudioListener : public wxTimer
 {
   public:
 
-    tAudioListener(tAudioPlayer* pPlayer, int key)
+    JZAudioListener(JZAudioPlayer* pPlayer, int key)
       : wxTimer(),
         mpPlayer(pPlayer),
         mCount(0),
@@ -61,9 +61,9 @@ class tAudioListener : public wxTimer
       Start(20);
     }
 
-    tAudioListener(
-      tAudioPlayer* pPlayer,
-      tSample& spl,
+    JZAudioListener(
+      JZAudioPlayer* pPlayer,
+      JZSample& spl,
       long fr_smpl,
       long to_smpl)
       : wxTimer(),
@@ -79,7 +79,7 @@ class tAudioListener : public wxTimer
       Start(20);
     }
 
-    ~tAudioListener()
+    ~JZAudioListener()
     {
       Stop();
       mpPlayer->CloseDsp(mHardExit);
@@ -109,7 +109,7 @@ class tAudioListener : public wxTimer
 
   private:
 
-    tAudioPlayer* mpPlayer;
+    JZAudioPlayer* mpPlayer;
 
     int mCount;
 
@@ -118,10 +118,10 @@ class tAudioListener : public wxTimer
 
 //*****************************************************************************
 //*****************************************************************************
-tAudioPlayer::tAudioPlayer(JZSong* pSong)
-  : tSeq2Player(pSong)
+JZAudioPlayer::JZAudioPlayer(JZSong* pSong)
+  : JZSeq2Player(pSong)
 {
-  mpAudioBuffer = new tEventArray();
+  mpAudioBuffer = new JZEventArray();
   mInstalled = false;
   mAudioEnabled = (gpConfig->GetValue(C_EnableAudio) != 0);
   mpListener = 0;
@@ -166,7 +166,7 @@ tAudioPlayer::tAudioPlayer(JZSong* pSong)
 }
 
 
-tAudioPlayer::~tAudioPlayer()
+JZAudioPlayer::~JZAudioPlayer()
 {
   delete mpListener;
   delete mpAudioBuffer;
@@ -177,17 +177,17 @@ tAudioPlayer::~tAudioPlayer()
 }
 
 
-int tAudioPlayer::LoadSamples(const char *filename)
+int JZAudioPlayer::LoadSamples(const char *filename)
 {
   return mSamples.Load(filename);
 }
 
-int tAudioPlayer::RecordMode() const
+int JZAudioPlayer::RecordMode() const
 {
   return mpRecordingInfo != 0 && mpRecordingInfo->mpTrack->GetAudioMode();
 }
 
-void tAudioPlayer::StartAudio()
+void JZAudioPlayer::StartAudio()
 {
   if (!mAudioEnabled)
   {
@@ -227,7 +227,7 @@ void tAudioPlayer::StartAudio()
 }
 
 
-void tAudioPlayer::OpenDsp()
+void JZAudioPlayer::OpenDsp()
 {
   int tmp;
 
@@ -318,7 +318,7 @@ void tAudioPlayer::OpenDsp()
 }
 
 
-void tAudioPlayer::CloseDsp(bool Reset)
+void JZAudioPlayer::CloseDsp(bool Reset)
 {
   if (dev >= 0)
   {
@@ -342,7 +342,7 @@ void tAudioPlayer::CloseDsp(bool Reset)
 }
 
 
-void tAudioPlayer::Notify()
+void JZAudioPlayer::Notify()
 {
   if (mAudioEnabled)
   {
@@ -365,11 +365,11 @@ void tAudioPlayer::Notify()
       MidiSync();
     }
   }
-  tSeq2Player::Notify();
+  JZSeq2Player::Notify();
 }
 
 
-int tAudioPlayer::WriteSamples()
+int JZAudioPlayer::WriteSamples()
 {
   if (!mAudioEnabled)
   {
@@ -408,7 +408,7 @@ int tAudioPlayer::WriteSamples()
 }
 
 
-void tAudioPlayer::ReadSamples()
+void JZAudioPlayer::ReadSamples()
 {
   audio_buf_info info;
   if (ioctl(dev, SNDCTL_DSP_GETISPACE, &info) == -1)
@@ -443,7 +443,7 @@ void tAudioPlayer::ReadSamples()
 }
 
 
-void tAudioPlayer::MidiSync()
+void JZAudioPlayer::MidiSync()
 {
   // OSS is buggy!  In Win32 SDK you read the docs, hack away and
   // everything works.  In OSS, there are no docs and if it works
@@ -512,17 +512,17 @@ void tAudioPlayer::MidiSync()
   }
 }
 
-void tAudioPlayer::StartPlay(long Clock, long LoopClock, int Continue)
+void JZAudioPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 {
   delete mpListener;
   mSamples.StartPlay(Clock);
-  tSeq2Player::StartPlay(Clock, LoopClock, Continue);
+  JZSeq2Player::StartPlay(Clock, LoopClock, Continue);
 }
 
-void tAudioPlayer::StopPlay()
+void JZAudioPlayer::StopPlay()
 {
   mSamples.StopPlay();
-  tSeq2Player::StopPlay();
+  JZSeq2Player::StopPlay();
   if (!mAudioEnabled)
   {
     return;
@@ -548,7 +548,7 @@ void tAudioPlayer::StopPlay()
 
 
 
-void tAudioPlayer::ListenAudio(int key, int start_stop_mode)
+void JZAudioPlayer::ListenAudio(int key, int start_stop_mode)
 {
   if (!mAudioEnabled)
   {
@@ -575,10 +575,10 @@ void tAudioPlayer::ListenAudio(int key, int start_stop_mode)
     return;
   }
 
-  mpListener = new tAudioListener(this, key);
+  mpListener = new JZAudioListener(this, key);
 }
 
-void tAudioPlayer::ListenAudio(tSample &spl, long fr_smpl, long to_smpl)
+void JZAudioPlayer::ListenAudio(JZSample &spl, long fr_smpl, long to_smpl)
 {
   if (!mAudioEnabled)
   {
@@ -595,10 +595,10 @@ void tAudioPlayer::ListenAudio(tSample &spl, long fr_smpl, long to_smpl)
   {
     return;
   }
-  mpListener = new tAudioListener(this, spl, fr_smpl, to_smpl);
+  mpListener = new JZAudioListener(this, spl, fr_smpl, to_smpl);
 }
 
-long tAudioPlayer::GetListenerPlayPosition()
+long JZAudioPlayer::GetListenerPlayPosition()
 {
   if (!mpListener)
   {

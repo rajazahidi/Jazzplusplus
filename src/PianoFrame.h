@@ -33,7 +33,7 @@ class JZPianoWindow;
 class JZProject;
 class JZToolBar;
 class JZTrack;
-class tCtrlEditBase;
+class JZCtrlEditBase;
 
 //*****************************************************************************
 //*****************************************************************************
@@ -83,7 +83,7 @@ class JZPianoFrame : public wxFrame
     void PressRadio(int id = 0);
     void SetVisibleAllTracks(bool value);
 // SN++ made public for mouse keylength dragger
-    tCtrlEditBase* mpCtrlEdit;
+    JZCtrlEditBase* mpCtrlEdit;
     void CutOrCopy(int id);
 
     void OnFilter(wxCommandEvent& Event);

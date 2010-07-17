@@ -34,18 +34,18 @@
 // Midi thru dialog
 // ******************************************************************
 
-class tMidiThruDlg : public wxForm
+class JZMidiThruDlg : public wxForm
 {
  public:
   tEventWin *EventWin;
-  tMidiThruDlg(tEventWin *w);
+  JZMidiThruDlg(tEventWin *w);
   void EditForm(wxPanel *panel);
   virtual void OnOk();
   virtual void OnCancel();
   virtual void OnHelp();
 
-  tNamedChoice InputDeviceChoice;
-  tNamedChoice OutputDeviceChoice;
+  JZNamedChoice InputDeviceChoice;
+  JZNamedChoice OutputDeviceChoice;
   long InputDevice;
   long OutputDevice;
 };

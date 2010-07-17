@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ JZConfiguration* gpConfig = 0;
 
 JZSong* gpSong = 0;
 
-JZSynth* gpSynth = 0;
+JZSynthesizer* gpSynth = 0;
 
 JZPlayer* gpMidiPlayer = 0;
 
@@ -63,7 +63,7 @@ JZTrackFrame* gpTrackFrame = 0;
 
 JZTrackWindow* gpTrackWindow = 0;
 
-tHBInterface* gpHarmonyBrowser = 0;
+JZHarmonyBrowserInterface* gpHarmonyBrowser = 0;
 
 const double gDegreesToRadians = 0.01745329251994330212;
 const double gRadiansToDegrees = 57.2957795130823;

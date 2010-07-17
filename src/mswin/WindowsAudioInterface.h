@@ -29,13 +29,13 @@
 #include "Audio.h"
 #include "WindowsMidiInterface.h"
 
-class tSample;
+class JZSample;
 
 //*****************************************************************************
 //*****************************************************************************
 class JZWindowsAudioPlayer : public JZWindowsIntPlayer
 {
-  friend class tAudioListener;
+  friend class JZAudioListener;
 
   public:
 
@@ -83,7 +83,7 @@ class JZWindowsAudioPlayer : public JZWindowsIntPlayer
 
     virtual void ListenAudio(int key, int start_stop_mode = 1);
 
-    virtual void ListenAudio(tSample &spl, long fr_smpl, long to_smpl);
+    virtual void ListenAudio(JZSample &spl, long fr_smpl, long to_smpl);
 
     virtual long GetListenerPlayPosition();
 
@@ -146,14 +146,14 @@ class JZWindowsAudioPlayer : public JZWindowsIntPlayer
 
     long start_clock;     // when did play start
     long start_time;      // play start time (not altered by SetTempo)
-    tAudioListener* mpListener;
+    JZAudioListener* mpListener;
 
     HWAVEOUT hout;
     HWAVEIN hinp;
     int hout_open;        // true = playback device opended successful
     int hinp_open;        // true = recording device opended successful
 
-    tAudioRecordBuffer recbuffers;
+    JZAudioRecordBuffer recbuffers;
     int record_buffers_needed;  // driver needs more buffers
 
     // a semaphor for thread synchronization. Since Notify() and

@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,19 +30,19 @@
 class JZPianoWindow;
 class JZTrack;
 class JZEvent;
-class tCtrlEditBase;
+class JZCtrlEditBase;
 class wxButton;
 
-// to access tCtrlEditBase from Buttons etc
+// to access JZCtrlEditBase from Buttons etc
 
-class tCtrlPanel : public wxPanel
+class JZControlPanel : public wxPanel
 {
   public:
 
-    friend class tCtrlEditBase;
+    friend class JZCtrlEditBase;
 
-    tCtrlPanel(
-      tCtrlEditBase* e,
+    JZControlPanel(
+      JZCtrlEditBase* e,
       wxWindow* pParent,
       int x=-1,
       int y=-1,
@@ -55,21 +55,21 @@ class tCtrlPanel : public wxPanel
       edit = e;
     }
 
-    tCtrlEditBase *edit;
+    JZCtrlEditBase *edit;
 };
 
 
 
 
-class tCtrlEditBase : public tArrayEditDrawBars
+class JZCtrlEditBase : public JZArrayEditDrawBars
 {
   public:
 
-    tCtrlEditBase(
+    JZCtrlEditBase(
       int min,
       int max,
       JZPianoWindow* pPianoWindow,
-      char const *label,
+      char const* pLabel,
       int xoff,
       int x,
       int y,
@@ -77,7 +77,7 @@ class tCtrlEditBase : public tArrayEditDrawBars
       int h,
       int mode = 0);
 
-    virtual ~tCtrlEditBase();
+    virtual ~JZCtrlEditBase();
 
     void SetSize(int xoff, int x, int y, int w, int h);
 
@@ -123,13 +123,20 @@ class tCtrlEditBase : public tArrayEditDrawBars
     long   clocks_per_pixel;
     JZRndArray  array;
 
-    tArrayEdit* edit;
+    JZArrayEdit* edit;
     JZPianoWindow* mpPianoWindow;
-    tCtrlPanel* panel;
+    JZControlPanel* panel;
 
   private:
 
-    void Create(JZPianoWindow* p, char const *label, int dx, int x, int y, int w, int h);
+    void Create(
+      JZPianoWindow* p,
+      char const* pLabel,
+      int dx,
+      int x,
+      int y,
+      int w,
+      int h);
 
     static void Apply(wxButton& but, wxCommandEvent& event);
     static void Revert(wxButton& but, wxCommandEvent& event);
@@ -139,11 +146,21 @@ class tCtrlEditBase : public tArrayEditDrawBars
     void DrawBars(wxDC* dc);
 };
 
-class tPitchEdit : public tCtrlEditBase
+class JZPitchEdit : public JZCtrlEditBase
 {
   public:
-    tPitchEdit(JZPianoWindow* pPianoWindow, char const *label, int xoff, int x, int y, int w, int h);
+
+    JZPitchEdit(
+      JZPianoWindow* pPianoWindow,
+      char const* pLabel,
+      int xoff,
+      int x,
+      int y,
+      int w,
+      int h);
+
   protected:
+
     virtual int Missing();
     virtual int IsCtrlEdit(JZEvent *e);
     virtual int GetValue(JZEvent *e);
@@ -151,51 +168,13 @@ class tPitchEdit : public tCtrlEditBase
 };
 
 // SN++ Key Aftertouch
-class tPolyAfterEdit : public tCtrlEditBase
-{
-  public:
-    tPolyAfterEdit(JZPianoWindow* pPianoWindow, char const *label, int xoff, int x, int y, int w, int h);
-  protected:
-    virtual int Missing();
-    virtual int IsCtrlEdit(JZEvent *e);
-    virtual int GetValue(JZEvent *e);
-    virtual void OnApply();
-};
-
-// SN++ Channel Aftertouch
-class tChannelAfterEdit : public tCtrlEditBase
-{
-  public:
-    tChannelAfterEdit(JZPianoWindow* pPianoWindow, char const *label, int xoff, int x, int y, int w, int h);
-  protected:
-    virtual int Missing();
-    virtual int IsCtrlEdit(JZEvent *e);
-    virtual int GetValue(JZEvent *e);
-    virtual JZEvent * NewEvent(long clock, int val);
-    virtual void OnApply();
-    virtual void UpDate();
-};
-
-class tCtrlEdit : public tCtrlEditBase
-{
-  public:
-    tCtrlEdit(int CtrlNum, JZPianoWindow* pPianoWindow, char const *label, int xoff, int x, int y, int w, int h);
-  protected:
-    virtual int Missing();
-    virtual int IsCtrlEdit(JZEvent *e);
-    virtual int GetValue(JZEvent *e);
-    virtual JZEvent * NewEvent(long clock, int val);
-  private:
-    int ctrl_num;
-};
-
-class tVelocEdit : public tCtrlEditBase
+class JZPolyAfterEdit : public JZCtrlEditBase
 {
   public:
 
-    tVelocEdit(
+    JZPolyAfterEdit(
       JZPianoWindow* pPianoWindow,
-      char const* label,
+      char const* pLabel,
       int xoff,
       int x,
       int y,
@@ -210,15 +189,84 @@ class tVelocEdit : public tCtrlEditBase
     virtual void OnApply();
 };
 
-class tTempoEdit : public tCtrlEditBase
+// SN++ Channel Aftertouch
+class JZChannelAftertouchEdit : public JZCtrlEditBase
 {
   public:
 
-    tTempoEdit(
+    JZChannelAftertouchEdit(
+      JZPianoWindow* pPianoWindow,
+      char const* pLabel,
+      int xoff,
+      int x,
+      int y,
+      int w,
+      int h);
+
+  protected:
+
+    virtual int Missing();
+    virtual int IsCtrlEdit(JZEvent *e);
+    virtual int GetValue(JZEvent *e);
+    virtual JZEvent * NewEvent(long clock, int val);
+    virtual void OnApply();
+    virtual void UpDate();
+};
+
+class JZControlEdit : public JZCtrlEditBase
+{
+  public:
+
+    JZControlEdit(
+      int CtrlNum,
+      JZPianoWindow* pPianoWindow,
+      char const* pLabel,
+      int xoff,
+      int x,
+      int y,
+      int w,
+      int h);
+
+  protected:
+
+    virtual int Missing();
+    virtual int IsCtrlEdit(JZEvent *e);
+    virtual int GetValue(JZEvent *e);
+    virtual JZEvent * NewEvent(long clock, int val);
+  private:
+    int ctrl_num;
+};
+
+class JZVelocityEdit : public JZCtrlEditBase
+{
+  public:
+
+    JZVelocityEdit(
+      JZPianoWindow* pPianoWindow,
+      char const* pLabel,
+      int xoff,
+      int x,
+      int y,
+      int w,
+      int h);
+
+  protected:
+
+    virtual int Missing();
+    virtual int IsCtrlEdit(JZEvent *e);
+    virtual int GetValue(JZEvent *e);
+    virtual void OnApply();
+};
+
+class JZTempoEdit : public JZCtrlEditBase
+{
+  public:
+
+    JZTempoEdit(
       int min,
       int max,
       JZPianoWindow* pPianoWindow,
-      char const *label,
+      char const* pLabel,
       int xoff,
       int x,
       int y,

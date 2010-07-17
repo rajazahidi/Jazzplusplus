@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 JZAudioSettingsDialog::JZAudioSettingsDialog(
   wxWindow* pParent,
-  tSampleSet& SampleSet)
+  JZSampleSet& SampleSet)
   : wxDialog(pParent, wxID_ANY, wxString("Audio Settings")),
     mSampleSet(SampleSet),
     mpEnableAudioCheckBox(0),

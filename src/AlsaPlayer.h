@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 
 #include <string>
 
-class tAlsaDeviceList : public tDeviceList
+class JZAlsaDeviceList : public JZDeviceList
 {
   public:
     unsigned add(const char* pName, const snd_seq_addr_t& a);
@@ -42,12 +42,12 @@ class tAlsaDeviceList : public tDeviceList
 
 
 
-class tAlsaPlayer : public JZPlayer
+class JZAlsaPlayer : public JZPlayer
 {
-  friend class tAlsaThru;
+  friend class JZAlsaThru;
   public:
-    tAlsaPlayer(JZSong *song);
-    virtual ~tAlsaPlayer();
+    JZAlsaPlayer(JZSong *song);
+    virtual ~JZAlsaPlayer();
 
     void Notify();
     bool IsInstalled();
@@ -60,7 +60,7 @@ class tAlsaPlayer : public JZPlayer
     {
       OutEvent(e, 1);
     }
-    void OutNow(tParam *r);
+    void OutNow(JZParam *r);
     void OutBreak();
     void OutBreak(long BreakOver);
     void StartPlay(long Clock, long LoopClock = 0, int Continue = 0);
@@ -71,11 +71,11 @@ class tAlsaPlayer : public JZPlayer
     {
       return 1;
     }
-    virtual tDeviceList & GetOutputDevices()
+    virtual JZDeviceList & GetOutputDevices()
     {
       return oaddr;
     }
-    virtual tDeviceList & GetInputDevices()
+    virtual JZDeviceList & GetInputDevices()
     {
       return iaddr;
     }
@@ -91,8 +91,8 @@ class tAlsaPlayer : public JZPlayer
 
   protected:
     snd_seq_t *handle;
-    tAlsaDeviceList iaddr;        // addresses of input devices
-    tAlsaDeviceList oaddr;        // addresses of output devices
+    JZAlsaDeviceList iaddr;        // addresses of input devices
+    JZAlsaDeviceList oaddr;        // addresses of output devices
     int client;            // me
     snd_seq_addr_t self;   // my address
     int queue;             // queue
@@ -111,9 +111,9 @@ class tAlsaPlayer : public JZPlayer
     void thru_connect();
     void thru_disconnect();
     void scan_clients(
-      tAlsaDeviceList& Devicelist,
+      JZAlsaDeviceList& Devicelist,
       unsigned DeviceCapabilities);
-    int select_list(tAlsaDeviceList &list, const char *title, int def_device);
+    int select_list(JZAlsaDeviceList &list, const char *title, int def_device);
     int  start_timer(long clock);
     int write(snd_seq_event_t *ev)
     {
@@ -144,7 +144,7 @@ class tAlsaPlayer : public JZPlayer
     long recd_clock;  // clock received so far from recorded events or echo events
     long echo_clock;  // echo events have been sent up to this clock
 
-    tAlsaThru *thru;
+    JZAlsaThru *thru;
     int ithru, othru;  // index in iaddr, oaddr of source/target device
 };
 

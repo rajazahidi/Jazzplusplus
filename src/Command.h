@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,14 +29,14 @@ class JZFilter;
 class JZEvent;
 class JZTrack;
 class JZSong;
-class tEventArray;
+class JZEventArray;
 class JZRndArray;
 class JZBarInfo;
 class JZKeyOnEvent;
 
 //*****************************************************************************
 //*****************************************************************************
-class tScale
+class JZScale
 {
   public:
     void Init(int ScaleNr, JZFilter* pFilter = 0);
@@ -56,13 +56,13 @@ class tScale
 
 //*****************************************************************************
 //*****************************************************************************
-class tCommand
+class JZCommand
 {
   public:
 
-    tCommand(JZFilter* pFilter);
+    JZCommand(JZFilter* pFilter);
 
-    virtual ~tCommand();
+    virtual ~JZCommand();
 
     virtual void Execute(int NewUndo = 1);
 
@@ -81,11 +81,11 @@ class tCommand
 
 //*****************************************************************************
 //*****************************************************************************
-class tCmdShift : public tCommand
+class JZCommandShift : public JZCommand
 {
   public:
 
-    tCmdShift(JZFilter* pFilter, long DeltaClock);
+    JZCommandShift(JZFilter* pFilter, long DeltaClock);
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 
   private:
@@ -95,22 +95,22 @@ class tCmdShift : public tCommand
 
 //*****************************************************************************
 //*****************************************************************************
-class tCmdErase : public tCommand
+class JZCommandErase : public JZCommand
 {
   public:
     int LeaveSpace;
-    tCmdErase(JZFilter* pFilter, int LeaveSpace = 1);
+    JZCommandErase(JZFilter* pFilter, int LeaveSpace = 1);
     virtual void Execute(int NewUndo = 1);
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tCmdVelocity : public tCommand
+class JZtCommandVelocity : public JZCommand
 {
   public:
 
-    tCmdVelocity(
+    JZtCommandVelocity(
       JZFilter* pFilter,
       int From,
       int To,
@@ -126,11 +126,11 @@ class tCmdVelocity : public tCommand
 
 //*****************************************************************************
 //*****************************************************************************
-class tCmdLength : public tCommand
+class JZCommandLength : public JZCommand
 {
   public:
 
-    tCmdLength(
+    JZCommandLength(
       JZFilter* pFilter,
       int FromValue,
       int ToValue,
@@ -146,25 +146,25 @@ class tCmdLength : public tCommand
 
 //*****************************************************************************
 //*****************************************************************************
-class tCmdSeqLength : public tCommand
+class JZCommandSequenceLength : public JZCommand
 {
   public:
   double scale;
   long startClock;
-    tCmdSeqLength(JZFilter* pFilter, double scale);
+    JZCommandSequenceLength(JZFilter* pFilter, double scale);
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tCmdMidiDelay : public tCommand
+class JZCommandMidiDelay : public JZCommand
 {
   public:
   double scale;
   long clockDelay;
   int repeat;
 
-    tCmdMidiDelay(
+    JZCommandMidiDelay(
       JZFilter* pFilter,
       double scale,
       long clockDelay,
@@ -174,34 +174,34 @@ class tCmdMidiDelay : public tCommand
 
 //*****************************************************************************
 //*****************************************************************************
-class tCmdConvertToModulation : public tCommand
+class JZCommandConvertToModulation : public JZCommand
 {
   public:
 
-  tCmdConvertToModulation(JZFilter* pFilter);
+  JZCommandConvertToModulation(JZFilter* pFilter);
   virtual void ExecuteTrack(JZTrack* pTrack);
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tCmdCleanup : public tCommand
+class JZCommandCleanup : public JZCommand
 {
     long lengthLimit;
     int  shortenOverlaps;
     JZKeyOnEvent *prev_note[16][128];
   public:
-    tCmdCleanup(JZFilter* pFilter, long limitClocks, int shortenOverlaps);
+    JZCommandCleanup(JZFilter* pFilter, long limitClocks, int shortenOverlaps);
     virtual void ExecuteTrack(JZTrack* pTrack);
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tCmdSearchReplace : public tCommand
+class JZCommandSearchReplace : public JZCommand
 {
   public:
 
-    tCmdSearchReplace(JZFilter* pFilter, short From, short To);
+    JZCommandSearchReplace(JZFilter* pFilter, short From, short To);
 
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 
@@ -212,11 +212,11 @@ class tCmdSearchReplace : public tCommand
 
 //*****************************************************************************
 //*****************************************************************************
-class tCmdQuantize : public tCommand
+class JZCommandQuantize : public JZCommand
 {
   public:
 
-    tCmdQuantize(
+    JZCommandQuantize(
       JZFilter* pFilter,
       int QntClocks,
       bool NoteStart,
@@ -241,11 +241,11 @@ class tCmdQuantize : public tCommand
 
 //*****************************************************************************
 //*****************************************************************************
-class tCmdTranspose : public tCommand
+class JZCommandTranspose : public JZCommand
 {
   public:
 
-    tCmdTranspose(
+    JZCommandTranspose(
       JZFilter* pFilter,
       int Notes,
       int ScaleIndex = 0,
@@ -257,16 +257,16 @@ class tCmdTranspose : public tCommand
 
     int mNotes;
     int mFitIntoScale;
-    tScale mScale;
+    JZScale mScale;
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tCmdSetChannel : public tCommand
+class JZCommandSetChannel : public JZCommand
 {
   public:
 
-    tCmdSetChannel(JZFilter* pFilter, int NewChannel);
+    JZCommandSetChannel(JZFilter* pFilter, int NewChannel);
 
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 
@@ -277,22 +277,22 @@ class tCmdSetChannel : public tCommand
 
 //*****************************************************************************
 //*****************************************************************************
-class tCmdCopyToBuffer : public tCommand
+class JZCommandCopyToBuffer : public JZCommand
 {
   public:
 
-    tCmdCopyToBuffer(JZFilter* pFilter, tEventArray *Buffer);
+    JZCommandCopyToBuffer(JZFilter* pFilter, JZEventArray *Buffer);
 
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 
   private:
 
-    tEventArray* mpBuffer;
+    JZEventArray* mpBuffer;
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tCmdCopy : public tCommand
+class JZCommandCopy : public JZCommand
 {
   public:
     int  DestTrack;
@@ -303,31 +303,31 @@ class tCmdCopy : public tCommand
     int InsertSpace;        // no
     long RepeatClock;        // -1L
 
-    tCmdCopy(JZFilter* pFilter, long DestTrack, long DestClock);
+    JZCommandCopy(JZFilter* pFilter, long DestTrack, long DestClock);
     virtual void ExecuteTrack(JZTrack* pTrack);
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tCmdExchLeftRight : public tCommand
+class JZCommandExchangeLeftRight : public JZCommand
 {
   public:
-    tCmdExchLeftRight(JZFilter* pFilter);
+    JZCommandExchangeLeftRight(JZFilter* pFilter);
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tCmdExchUpDown : public tCommand
+class JZCommandExchangeUpDown : public JZCommand
 {
   public:
-    tCmdExchUpDown(JZFilter* pFilter);
+    JZCommandExchangeUpDown(JZFilter* pFilter);
     virtual void ExecuteTrack(JZTrack* pTrack);
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class tCmdMapper : public tCommand
+class JZCommandMapper : public JZCommand
 {
   public:
 
@@ -346,7 +346,7 @@ class tCmdMapper : public tCommand
       clock
     };
 
-    tCmdMapper(
+    JZCommandMapper(
       JZFilter* pFilter,
       prop Destination,
       prop dst,
@@ -354,7 +354,7 @@ class tCmdMapper : public tCommand
       int BarCount,
       bool Add);
 
-    virtual ~tCmdMapper();
+    virtual ~JZCommandMapper();
 
     virtual void ExecuteEvent(JZTrack* pTrack, JZEvent* pEvent);
 

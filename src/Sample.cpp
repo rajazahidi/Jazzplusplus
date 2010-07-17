@@ -38,7 +38,7 @@
 
 using namespace std;
 
-tSample::tSample(tSampleSet &s)
+JZSample::JZSample(JZSampleSet &s)
   : set(s),
     mLabel(),
     mFileName()
@@ -54,17 +54,17 @@ tSample::tSample(tSampleSet &s)
 }
 
 
-tSample::~tSample()
+JZSample::~JZSample()
 {
   delete [] data;
 }
 
-void tSample::SetLabel(const std::string& Label)
+void JZSample::SetLabel(const std::string& Label)
 {
   mLabel = Label;
 }
 
-void tSample::SetFileName(const string& FileName)
+void JZSample::SetFileName(const string& FileName)
 {
   if (mFileName != FileName)
   {
@@ -74,7 +74,7 @@ void tSample::SetFileName(const string& FileName)
   mFileName = FileName;
 }
 
-void tSample::Clear()
+void JZSample::Clear()
 {
   FreeData();
   mLabel.clear();
@@ -85,7 +85,7 @@ void tSample::Clear()
   dirty  = 0;
 }
 
-void tSample::FreeData()
+void JZSample::FreeData()
 {
   delete [] data;
   data   = 0;
@@ -93,7 +93,7 @@ void tSample::FreeData()
   dirty  = 1;
 }
 
-void tSample::MakeData(int new_length, int zero)
+void JZSample::MakeData(int new_length, int zero)
 {
   delete [] data;
   length = new_length;
@@ -103,7 +103,7 @@ void tSample::MakeData(int new_length, int zero)
 }
 
 
-void tSample::Set(tFloatSample &fs)
+void JZSample::Set(JZFloatSample &fs)
 {
   MakeData(fs.GetLength());
   for (int i = 0; i < length; i++)
@@ -113,7 +113,7 @@ void tSample::Set(tFloatSample &fs)
 }
 
 
-void tSample::Set(tFloatSample &fs, int offs)
+void JZSample::Set(JZFloatSample &fs, int offs)
 {
   int len = fs.GetLength();
   AssureLength(offs + len);
@@ -124,10 +124,10 @@ void tSample::Set(tFloatSample &fs, int offs)
 }
 
 /**
- * like Set(tFloatSample, ofs) but makes a smooth fade in / fade out
+ * like Set(JZFloatSample, ofs) but makes a smooth fade in / fade out
  */
 
-void tSample::SetSmooth(tFloatSample &fs, int offs, int fade)
+void JZSample::SetSmooth(JZFloatSample &fs, int offs, int fade)
 {
   int len = fs.GetLength();
   AssureLength(offs + len);
@@ -163,7 +163,7 @@ void tSample::SetSmooth(tFloatSample &fs, int offs, int fade)
 }
 
 #if 0
-int tSample::LoadWav()
+int JZSample::LoadWav()
 {
   struct stat buf;
   if (stat(mFileName.c_str(), &buf) == -1)
@@ -222,7 +222,7 @@ typedef struct
 } FmtChunk;
 
 
-int tSample::LoadWav()
+int JZSample::LoadWav()
 {
   struct stat buf;
   if (stat(mFileName.c_str(), &buf) == -1)
@@ -287,7 +287,7 @@ int tSample::LoadWav()
 
 
 
-int tSample::Convert(istream &is, int bytes, int channels, int bits, int speed)
+int JZSample::Convert(istream &is, int bytes, int channels, int bits, int speed)
 {
 
   // load the file
@@ -372,7 +372,7 @@ int tSample::Convert(istream &is, int bytes, int channels, int bits, int speed)
 }
 
 
-int tSample::LoadRaw()
+int JZSample::LoadRaw()
 {
   // determine file size
   struct stat buf;
@@ -391,7 +391,7 @@ int tSample::LoadRaw()
 }
 
 
-int tSample::Load(int force)
+int JZSample::Load(int force)
 {
   // sample modified on disk?
   if (!mFileName.empty() && !force && !dirty && external_flag)
@@ -420,7 +420,7 @@ int tSample::Load(int force)
   return 0;
 }
 
-int tSample::Align(int offs) const
+int JZSample::Align(int offs) const
 {
   if (offs < 0)
     offs = 0;
@@ -430,7 +430,7 @@ int tSample::Align(int offs) const
 }
 
 
-void tSample::Copy(tSample &dst, int fr_smpl, int to_smpl)
+void JZSample::Copy(JZSample &dst, int fr_smpl, int to_smpl)
 {
   fr_smpl = (fr_smpl < 0) ? 0 : fr_smpl;
   to_smpl = (to_smpl < 0) ? length : to_smpl;
@@ -440,7 +440,7 @@ void tSample::Copy(tSample &dst, int fr_smpl, int to_smpl)
 }
 
 
-void tSample::Delete(int fr_smpl, int to_smpl)
+void JZSample::Delete(int fr_smpl, int to_smpl)
 {
   fr_smpl = (fr_smpl < 0) ? 0 : fr_smpl;
   to_smpl = (to_smpl < 0) ? length : to_smpl;
@@ -459,13 +459,13 @@ void tSample::Delete(int fr_smpl, int to_smpl)
   length = new_length;
 }
 
-void tSample::Cut(tSample &dst, int fr_smpl, int to_smpl)
+void JZSample::Cut(JZSample &dst, int fr_smpl, int to_smpl)
 {
   Copy(dst, fr_smpl, to_smpl);
   Delete(fr_smpl, to_smpl);
 }
 
-void tSample::InsertSilence(int pos, int len)
+void JZSample::InsertSilence(int pos, int len)
 {
   int new_length = length + len;
   short *new_data = new short [new_length];
@@ -483,24 +483,24 @@ void tSample::InsertSilence(int pos, int len)
 }
 
 
-void tSample::ReplaceSilence(int offs, int len)
+void JZSample::ReplaceSilence(int offs, int len)
 {
   AssureLength(offs + len);
   while (len-- > 0)
     data[offs++] = 0;
 }
 
-void tSample::PasteIns(tSample &src, int offs)
+void JZSample::PasteIns(JZSample &src, int offs)
 {
   InsertSilence(offs, src.length);
   memcpy(data + offs, src.data, src.length * sizeof(short));
 }
 
 
-void tSample::PasteMix(tSample &src, int offs)
+void JZSample::PasteMix(JZSample &src, int offs)
 {
   AssureLength(offs + src.length);
-  tFloatSample fs(*this);
+  JZFloatSample fs(*this);
   for (int i = 0; i < src.length; i++)
   {
     fs[offs + i] += src.data[i];
@@ -509,7 +509,7 @@ void tSample::PasteMix(tSample &src, int offs)
   Set(fs);
 }
 
-void tSample::Reverse(int fr, int to)
+void JZSample::Reverse(int fr, int to)
 {
   // maybe swaps channels too
   if (to >= length)
@@ -525,7 +525,7 @@ void tSample::Reverse(int fr, int to)
 }
 
 // swap phase on left/right channel
-void tSample::Flip(int ch)
+void JZSample::Flip(int ch)
 {
   int i = ch;
   int step = set.GetChannelCount();
@@ -537,33 +537,33 @@ void tSample::Flip(int ch)
 }
 
 
-void tSample::PasteOvr(tSample &src, int fr, int to)
+void JZSample::PasteOvr(JZSample &src, int fr, int to)
 {
   Delete(fr, to);
   PasteIns(src, fr);
 }
 
 
-void tSample::AssureLength(int new_len)
+void JZSample::AssureLength(int new_len)
 {
   if (new_len > length)
     InsertSilence(length, new_len - length);
 }
 
 
-int tSample::GetSamplingRate() const
+int JZSample::GetSamplingRate() const
 {
   return set.GetSamplingRate();
 }
 
 
-int tSample::GetChannelCount() const
+int JZSample::GetChannelCount() const
 {
   return set.GetChannelCount();
 }
 
 
-int tSample::Peak()
+int JZSample::Peak()
 {
   int peak = 0;
   for (int i = 0; i < length; i++)
@@ -575,7 +575,7 @@ int tSample::Peak()
   return peak;
 }
 
-void tSample::Rescale(short maxval)
+void JZSample::Rescale(short maxval)
 {
   float peak = (float)Peak();
   if (peak > 0.0)
@@ -587,10 +587,10 @@ void tSample::Rescale(short maxval)
 }
 
 
-void tSample::TransposeSemis(float semis)
+void JZSample::TransposeSemis(float semis)
 {
   /* PAT - The following error prompted the addition of the casts to double.
-     sample.cpp: In member function `void tSample::TransposeSemis(float)':
+     sample.cpp: In member function `void JZSample::TransposeSemis(float)':
                  choosing `double pow(double, double)' over `float
                  std::pow(float, float)'
                  because worst conversion for the former is better than worst
@@ -601,7 +601,7 @@ void tSample::TransposeSemis(float semis)
 }
 
 
-void tSample::Transpose(float f)
+void JZSample::Transpose(float f)
 {
   int channels   = set.GetChannelCount();
   int new_length = ((int)((double)length / (double)f) & (-channels));
@@ -627,7 +627,7 @@ void tSample::Transpose(float f)
 }
 
 
-int tSample::Seconds2Samples(float time)
+int JZSample::Seconds2Samples(float time)
 {
   JZMapper Map(
     0.0,
@@ -638,7 +638,7 @@ int tSample::Seconds2Samples(float time)
   return static_cast<int>(Map.XToY(time));
 }
 
-float tSample::Samples2Seconds(int samples)
+float JZSample::Samples2Seconds(int samples)
 {
   JZMapper Map(
     0.0,
@@ -658,7 +658,7 @@ float tSample::Samples2Seconds(int samples)
  *   bw      : bandwith as fraction of freq in 0..1
  */
 
-void tFloatSample::Filter(int fr, int to, tSplFilter::Type type, int order, double freq, double bw)
+void JZFloatSample::Filter(int fr, int to, JZSplFilter::Type type, int order, double freq, double bw)
 {
   int i;
   if (fr < 0)
@@ -667,7 +667,7 @@ void tFloatSample::Filter(int fr, int to, tSplFilter::Type type, int order, doub
     to = length;
 
   //double a0 = freq / (double)sampling_rate;
-  tSplFilter *filters = new tSplFilter[channels];
+  JZSplFilter *filters = new JZSplFilter[channels];
   for (i = 0; i < channels; i++)
     filters[i].Init(type, (float)sampling_rate, freq, bw);
   for (i = fr; i < to; i += channels)
@@ -678,7 +678,7 @@ void tFloatSample::Filter(int fr, int to, tSplFilter::Type type, int order, doub
   delete [] filters;
 }
 
-int tSample::Save()
+int JZSample::Save()
 {
   int err = SaveWave();  // the only format supported yet
   if (!err)
@@ -690,7 +690,7 @@ int tSample::Save()
   return err;
 }
 
-int tSample::SaveWave()
+int JZSample::SaveWave()
 {
   WaveHeader wh;
   wh.main_chunk = RIFF;
@@ -720,10 +720,10 @@ int tSample::SaveWave()
 }
 
 //*************************************************************
-//                  tFloatSample
+//                  JZFloatSample
 //*************************************************************
 
-tFloatSample::tFloatSample(tSample &spl)
+JZFloatSample::JZFloatSample(JZSample &spl)
 {
   current = 0;
   length = spl.length;
@@ -734,7 +734,7 @@ tFloatSample::tFloatSample(tSample &spl)
   sampling_rate = spl->GetSamplingRate();
 }
 
-tFloatSample::tFloatSample(tSample &spl, int fr, int to)
+JZFloatSample::JZFloatSample(JZSample &spl, int fr, int to)
 {
   current = 0;
   length = to - fr;
@@ -745,7 +745,7 @@ tFloatSample::tFloatSample(tSample &spl, int fr, int to)
   sampling_rate = spl->GetSamplingRate();
 }
 
-tFloatSample::tFloatSample(int ch, int sr)
+JZFloatSample::JZFloatSample(int ch, int sr)
 {
   current = 0;
   channels = ch;
@@ -756,13 +756,13 @@ tFloatSample::tFloatSample(int ch, int sr)
 }
 
 
-tFloatSample::~tFloatSample()
+JZFloatSample::~JZFloatSample()
 {
   delete [] data;
 }
 
 
-float tFloatSample::Peak(int fr, int to)
+float JZFloatSample::Peak(int fr, int to)
 {
   if (fr < 0)
     fr = 0;
@@ -779,7 +779,7 @@ float tFloatSample::Peak(int fr, int to)
 }
 
 
-void tFloatSample::Rescale(float maxval, int fr, int to)
+void JZFloatSample::Rescale(float maxval, int fr, int to)
 {
   if (fr < 0)
     fr = 0;
@@ -795,7 +795,7 @@ void tFloatSample::Rescale(float maxval, int fr, int to)
 }
 
 
-void tFloatSample::RescaleToShort(int fr, int to)
+void JZFloatSample::RescaleToShort(int fr, int to)
 {
   if (fr < 0)
     fr = 0;
@@ -811,7 +811,7 @@ void tFloatSample::RescaleToShort(int fr, int to)
 }
 
 
-void tFloatSample::Initialize(int size)
+void JZFloatSample::Initialize(int size)
 {
   delete [] data;
   length = 0;
@@ -824,14 +824,14 @@ void tFloatSample::Initialize(int size)
 }
 
 
-void tFloatSample::PasteMix(tFloatSample &src, int offs)
+void JZFloatSample::PasteMix(JZFloatSample &src, int offs)
 {
   AssureLength(offs + src.length);
   for (int i = 0; i < src.length; i++)
     data[offs + i] += src.data[i];
 }
 
-void tFloatSample::RemoveTrailingSilence(float peak)
+void JZFloatSample::RemoveTrailingSilence(float peak)
 {
   int len1 = length - channels;  // last value
   while (len1 > 0 && fabs(data[len1]) < peak)
@@ -840,7 +840,7 @@ void tFloatSample::RemoveTrailingSilence(float peak)
 }
 
 
-void tFloatSample::PasteMix(tSample &src, int offs)
+void JZFloatSample::PasteMix(JZSample &src, int offs)
 {
   AssureLength(offs + src.length);
   for (int i = 0; i < src.length; i++)
@@ -852,7 +852,7 @@ void tFloatSample::PasteMix(tSample &src, int offs)
 //                CMIX Wavetable functions
 // ----------------------------------------------------------
 
-void tFloatSample::Normalize()
+void JZFloatSample::Normalize()
 {
   int j;
   float wmax, xmax = 0;
@@ -868,7 +868,7 @@ void tFloatSample::Normalize()
 }
 
 // gen25 1
-void tFloatSample::HanningWindow(int size)
+void JZFloatSample::HanningWindow(int size)
 {
   channels = 1;
   Initialize(size);
@@ -880,7 +880,7 @@ void tFloatSample::HanningWindow(int size)
 #if 0
 
 // gen25 2
-void tFloatSample::HammingWindow(int size)
+void JZFloatSample::HammingWindow(int size)
 {
   channels = 1;
   Initialize(size);
@@ -890,7 +890,7 @@ void tFloatSample::HammingWindow(int size)
 }
 
 // gen5(gen)
-tFloatSample::ExpSegments(int size, int nargs, float pval[])
+JZFloatSample::ExpSegments(int size, int nargs, float pval[])
 {
   channels = 1;
   Initialize(size);
@@ -916,7 +916,7 @@ tFloatSample::ExpSegments(int size, int nargs, float pval[])
 }
 
 // gen6
-tFloatSample::LineSegments(int size, int nargs, float pval[])
+JZFloatSample::LineSegments(int size, int nargs, float pval[])
 {
   channels = 1;
   Initialize(size);
@@ -931,26 +931,26 @@ tFloatSample::LineSegments(int size, int nargs, float pval[])
 //                         CMIX Interface
 // **********************************************************
 
-int tFloatSample::Seconds2Samples(float time)
+int JZFloatSample::Seconds2Samples(float time)
 {
   JZMapper Map(0.0, 1.0, 0.0, (double)sampling_rate * channels);
   return static_cast<int>(Map.XToY(time));
 }
 
-float tFloatSample::Samples2Seconds(int samples)
+float JZFloatSample::Samples2Seconds(int samples)
 {
   JZMapper Map(0.0, (double)sampling_rate * channels, 0.0, 1.0);
   return (float)Map.XToY(samples);
 }
 
-void tFloatSample::AssureLength(int new_len)
+void JZFloatSample::AssureLength(int new_len)
 {
   if (new_len > length)
     InsertSilence(length, new_len - length);
 }
 
 
-void tFloatSample::InsertSilence(int pos, int len)
+void JZFloatSample::InsertSilence(int pos, int len)
 {
   int new_length = length + len;
   float *new_data = new float [new_length];
@@ -968,7 +968,7 @@ void tFloatSample::InsertSilence(int pos, int len)
 }
 
 
-int tFloatSample::SetNote(float foffs, float durat)
+int JZFloatSample::SetNote(float foffs, float durat)
 {
   int offs;
   int size;
@@ -988,19 +988,19 @@ int tFloatSample::SetNote(float foffs, float durat)
 }
 
 
-void tFloatSample::EndNote()
+void JZFloatSample::EndNote()
 {
 }
 
 /// in case the cmix function does not fill up the output buffer
-void tFloatSample::ClipToCurrent()
+void JZFloatSample::ClipToCurrent()
 {
   if (current < length)
     length = current;
 }
 
 
-int tFloatSample::AddOut(float *p)
+int JZFloatSample::AddOut(float *p)
 {
   if (current >= length)
     AssureLength(length * 2);
@@ -1010,7 +1010,7 @@ int tFloatSample::AddOut(float *p)
 }
 
 
-int tFloatSample::GetIn(float *p)
+int JZFloatSample::GetIn(float *p)
 {
   for (int i = 0; i < channels; i++)
     p[i] = data[current++];
@@ -1022,7 +1022,7 @@ int tFloatSample::GetIn(float *p)
  * 0 < x < length/channels. interpoates the values.
  * @return TRUE if x < length/channels, FALSE if x > end of samples.
  */
-int tFloatSample::GetSample(float x, float *p)
+int JZFloatSample::GetSample(float x, float *p)
 {
   float ofs = floor(x);
   float rem = x - ofs;
@@ -1039,7 +1039,7 @@ int tFloatSample::GetSample(float x, float *p)
 }
 
 
-void tFloatSample::Convert2Mono()
+void JZFloatSample::Convert2Mono()
 {
   // convert this sample to mono
   if (channels != 2)  // only stereo so far
@@ -1052,7 +1052,7 @@ void tFloatSample::Convert2Mono()
 }
 
 
-void tFloatSample::Echo(int num_echos, int delay, float ampl)
+void JZFloatSample::Echo(int num_echos, int delay, float ampl)
 {
   delay = (delay & -channels);
   AssureLength(length + num_echos * delay);
@@ -1070,7 +1070,7 @@ void tFloatSample::Echo(int num_echos, int delay, float ampl)
   }
 }
 
-void tFloatSample::RndEcho(int num_echos, int delay, float ampl)
+void JZFloatSample::RndEcho(int num_echos, int delay, float ampl)
 {
   int i;
 
@@ -1099,7 +1099,7 @@ void tFloatSample::RndEcho(int num_echos, int delay, float ampl)
   delete [] delays;
 }
 
-void tFloatSample::RndEchoStereo(int num_echos, int delay, float ampl)
+void JZFloatSample::RndEchoStereo(int num_echos, int delay, float ampl)
 {
   int i;
   assert(channels == 2);

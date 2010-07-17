@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -52,13 +52,13 @@
 ** with wxwin) that copies from input to output.
 */
 
-tAlsaThru::tAlsaThru()
+JZAlsaThru::JZAlsaThru()
 {
   running = 0;
 }
 
 
-tAlsaThru::~tAlsaThru()
+JZAlsaThru::~JZAlsaThru()
 {
   // Calling Stop() caused the creation of an unkillable process on Mandriva
   // 2008.0.
@@ -67,7 +67,7 @@ tAlsaThru::~tAlsaThru()
 }
 
 
-void tAlsaThru::connect(snd_seq_addr_t &src, snd_seq_addr_t &dest)
+void JZAlsaThru::connect(snd_seq_addr_t &src, snd_seq_addr_t &dest)
 {
   snd_seq_port_subscribe_t *subs;
   snd_seq_port_subscribe_alloca(&subs);
@@ -77,7 +77,7 @@ void tAlsaThru::connect(snd_seq_addr_t &src, snd_seq_addr_t &dest)
     perror("subscribe");
 }
 
-void tAlsaThru::disconnect(snd_seq_addr_t &src, snd_seq_addr_t &dest)
+void JZAlsaThru::disconnect(snd_seq_addr_t &src, snd_seq_addr_t &dest)
 {
   snd_seq_port_subscribe_t* subs;
   snd_seq_port_subscribe_alloca(&subs);
@@ -89,14 +89,14 @@ void tAlsaThru::disconnect(snd_seq_addr_t &src, snd_seq_addr_t &dest)
   }
 }
 
-void tAlsaThru::initialize()
+void JZAlsaThru::initialize()
 {
   if (snd_seq_open(&handle, "hw", SND_SEQ_OPEN_DUPLEX, 0 ) < 0)
   {
     perror("open");
     exit(1);
   }
-  tAlsaPlayer::set_client_info(handle, "Jazz++ Midi Thru");
+  JZAlsaPlayer::set_client_info(handle, "Jazz++ Midi Thru");
 
   if (snd_seq_nonblock(handle, 0) < 0)
   {
@@ -105,7 +105,7 @@ void tAlsaThru::initialize()
   }
 
   self.client  = snd_seq_client_id(handle);
-  self.port    = tAlsaPlayer::create_port(handle, "Input/Output");
+  self.port    = JZAlsaPlayer::create_port(handle, "Input/Output");
 #ifndef USE_DIRECT_CONNECTION
   connect(source, self);
   connect(self, destin);
@@ -114,7 +114,7 @@ void tAlsaThru::initialize()
 
 
 #ifdef USE_DIRECT_CONNECTION
-void tAlsaThru::Start()
+void JZAlsaThru::Start()
 {
   if (! running)
   {
@@ -126,7 +126,7 @@ void tAlsaThru::Start()
 }
 
 // disconnect midi-thru
-void tAlsaThru::Stop()
+void JZAlsaThru::Stop()
 {
   if (running)
   {
@@ -139,7 +139,7 @@ void tAlsaThru::Stop()
 
 #else // USE_DIRECT_CONNECTION
 
-void tAlsaThru::loop()
+void JZAlsaThru::loop()
 {
   snd_seq_event_t *ev;
   while (snd_seq_event_input(handle, &ev) >= 0 && ev != 0)
@@ -162,7 +162,7 @@ void tAlsaThru::loop()
 
 // thread version
 
-void tAlsaThru::stopworker(int sig)
+void JZAlsaThru::stopworker(int sig)
 {
   running = 0;
   snd_seq_close(handle);
@@ -170,23 +170,23 @@ void tAlsaThru::stopworker(int sig)
 }
 
 
-void * tAlsaThru::startworker(void *p)
+void * JZAlsaThru::startworker(void *p)
 {
   running = 1;
   signal(SIGHUP, stopworker);
-  tAlsaThru *thru = (tAlsaThru *)p;
+  JZAlsaThru *thru = (JZAlsaThru *)p;
   thru->initialize();
   thru->loop();
   return 0;
 }
 
-void tAlsaThru::Start()
+void JZAlsaThru::Start()
 {
   if (!running)
     pthread_create(&worker, (void *)0, startworker, (void *)this);
 }
 
-void tAlsaThru::Stop()
+void JZAlsaThru::Stop()
 {
   if (running)
     pthread_kill(worker, SIGHUP);
@@ -200,13 +200,13 @@ void tAlsaThru::Stop()
 
 static snd_seq_t *static_handle;  // ugly!!
 
-void tAlsaThru::stopworker(int sig)
+void JZAlsaThru::stopworker(int sig)
 {
   snd_seq_close(static_handle);
   exit(0);
 }
 
-void tAlsaThru::Start()
+void JZAlsaThru::Start()
 {
   if (!running)
   {
@@ -230,7 +230,7 @@ void tAlsaThru::Start()
   }
 }
 
-void tAlsaThru::Stop()
+void JZAlsaThru::Stop()
 {
   if (running)
   {

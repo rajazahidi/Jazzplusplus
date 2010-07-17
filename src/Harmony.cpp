@@ -137,17 +137,17 @@ static JZToolDef tdefs[] =
 // Description:
 //   This class handles the playing of the harmony.
 //*****************************************************************************
-class HBPlayer : public wxTimer
+class JZHarmonyBrowserPlayer : public wxTimer
 {
-    friend class HBCanvas;
+    friend class JZHarmonyBrowserCanvas;
 
   public:
 
-    HBPlayer();
+    JZHarmonyBrowserPlayer();
 
-    void StartPlay(const HBContext &);
+    void StartPlay(const JZHarmonyBrowserContext &);
 
-    void Paste(tEventArray &);
+    void Paste(JZEventArray &);
 
     void StopPlay();
 
@@ -158,22 +158,22 @@ class HBPlayer : public wxTimer
       return playing;
     }
 
-    const HBContext& Context()
+    const JZHarmonyBrowserContext& Context()
     {
       return mContext;
     }
 
     virtual void Notify();
 
-    int GetChordKeys(int *out, const HBContext &);
+    int GetChordKeys(int *out, const JZHarmonyBrowserContext &);
 
-    int GetMeldyKeys(int *out, const HBContext &);
+    int GetMeldyKeys(int *out, const JZHarmonyBrowserContext &);
 
-    int GetBassKey(const HBContext &);
+    int GetBassKey(const JZHarmonyBrowserContext &);
 
   private:
 
-    HBContext mContext;
+    JZHarmonyBrowserContext mContext;
 
     static int bass_channel, bass_veloc;
 
@@ -199,24 +199,24 @@ class HBPlayer : public wxTimer
 
 };
 
-bool HBPlayer::mBassEnabled = true;
-int HBPlayer::bass_channel  = 1;
-int HBPlayer::bass_veloc    = 90;
-int HBPlayer::bass_pitch    = 40;
+bool JZHarmonyBrowserPlayer::mBassEnabled = true;
+int JZHarmonyBrowserPlayer::bass_channel  = 1;
+int JZHarmonyBrowserPlayer::bass_veloc    = 90;
+int JZHarmonyBrowserPlayer::bass_pitch    = 40;
 
-bool HBPlayer::mChordEnabled = true;
-int HBPlayer::chord_channel  = 2;
-int HBPlayer::chord_veloc    = 90;
-int HBPlayer::chord_pitch    = 60;
+bool JZHarmonyBrowserPlayer::mChordEnabled = true;
+int JZHarmonyBrowserPlayer::chord_channel  = 2;
+int JZHarmonyBrowserPlayer::chord_veloc    = 90;
+int JZHarmonyBrowserPlayer::chord_pitch    = 60;
 
-bool HBPlayer::mMeldyEnabled = false;
-int HBPlayer::meldy_channel  = 3;
-int HBPlayer::meldy_veloc    = 90;
-int HBPlayer::meldy_pitch    = 70;
-int HBPlayer::meldy_speed    = 100;
+bool JZHarmonyBrowserPlayer::mMeldyEnabled = false;
+int JZHarmonyBrowserPlayer::meldy_channel  = 3;
+int JZHarmonyBrowserPlayer::meldy_veloc    = 90;
+int JZHarmonyBrowserPlayer::meldy_pitch    = 70;
+int JZHarmonyBrowserPlayer::meldy_speed    = 100;
 
 
-HBPlayer::HBPlayer()
+JZHarmonyBrowserPlayer::JZHarmonyBrowserPlayer()
 {
   playing = 0;
   bass_key = n_chord_keys = n_meldy_keys = 0;
@@ -226,10 +226,10 @@ HBPlayer::HBPlayer()
 }
 
 
-int HBPlayer::GetChordKeys(int *out, const HBContext& Context)
+int JZHarmonyBrowserPlayer::GetChordKeys(int *out, const JZHarmonyBrowserContext& Context)
 {
   // build chord keys
-  HBChord chord = Context.Chord();
+  JZHarmonyBrowserChord chord = Context.Chord();
   int key = chord.Iter(chord_pitch - 1);
   int n   = chord.Count();
   for (int i = 0; i < n; i++)
@@ -241,7 +241,7 @@ int HBPlayer::GetChordKeys(int *out, const HBContext& Context)
 }
 
 
-int HBPlayer::GetBassKey(const HBContext& Context)
+int JZHarmonyBrowserPlayer::GetBassKey(const JZHarmonyBrowserContext& Context)
 {
   // build bass note
   int key = Context.ChordKey() + bass_pitch - bass_pitch % 12;
@@ -253,10 +253,10 @@ int HBPlayer::GetBassKey(const HBContext& Context)
 }
 
 
-int HBPlayer::GetMeldyKeys(int *out, const HBContext &Context)
+int JZHarmonyBrowserPlayer::GetMeldyKeys(int *out, const JZHarmonyBrowserContext &Context)
 {
   // build melody keys
-  HBChord scale = Context.Scale();
+  JZHarmonyBrowserChord scale = Context.Scale();
   int n = scale.Count();
 
   int key = scale.Iter(meldy_pitch);
@@ -269,7 +269,7 @@ int HBPlayer::GetMeldyKeys(int *out, const HBContext &Context)
   return n;
 }
 
-void HBPlayer::Paste(tEventArray &arr)
+void JZHarmonyBrowserPlayer::Paste(JZEventArray &arr)
 {
   if (mBassEnabled)
   {
@@ -288,7 +288,7 @@ void HBPlayer::Paste(tEventArray &arr)
 }
 
 
-void HBPlayer::StartPlay(const HBContext& Context)
+void JZHarmonyBrowserPlayer::StartPlay(const JZHarmonyBrowserContext& Context)
 {
   int i;
 
@@ -326,7 +326,7 @@ void HBPlayer::StartPlay(const HBContext& Context)
 }
 
 
-void HBPlayer::Notify()
+void JZHarmonyBrowserPlayer::Notify()
 {
   if (mMeldyEnabled)
   {
@@ -339,7 +339,7 @@ void HBPlayer::Notify()
 }
 
 
-void HBPlayer::StopPlay()
+void JZHarmonyBrowserPlayer::StopPlay()
 {
   if (!playing)
   {
@@ -379,10 +379,10 @@ void HBPlayer::StopPlay()
 #ifdef OBSOLETE
 
 /** harmony browser playing form*/
-class tHBPlayerForm : public wxForm
+class JZHarmonyBrowserPlayerForm : public wxForm
 {
   public:
-    tHBPlayerForm() : wxForm( USED_WXFORM_BUTTONS )
+    JZHarmonyBrowserPlayerForm() : wxForm( USED_WXFORM_BUTTONS )
     {
     }
     void OnHelp()
@@ -394,11 +394,11 @@ class tHBPlayerForm : public wxForm
 
 
 /** show settings dialog for harmony browser*/
-void HBPlayer::SettingsDialog(wxFrame *parent)
+void JZHarmonyBrowserPlayer::SettingsDialog(wxFrame *parent)
 {
 #ifdef OBSOLETE
   wxDialogBox *panel = new wxDialogBox(pParent, "MIDI settings", false );
-  tHBPlayerForm      *form  = new tHBPlayerForm;
+  JZHarmonyBrowserPlayerForm      *form  = new JZHarmonyBrowserPlayerForm;
 
   form->Add(wxMakeFormMessage("Note Length for paste into piano window"));
   form->Add(wxMakeFormNewLine());
@@ -449,13 +449,16 @@ void HBPlayer::SettingsDialog(wxFrame *parent)
 // Description:
 //   This is the harmony browser match markers class declaration.
 //*****************************************************************************
-class HBMatchMarkers : public HBMatch
+class JZHarmonyBrowserMatchMarkers : public JZHarmonyBrowserMatch
 {
   public:
 
-    HBMatchMarkers(const HBContext& Context, HBCanvas *cv);
+    JZHarmonyBrowserMatchMarkers(
+      const JZHarmonyBrowserContext& HarmonyBrowserContext,
+      JZHarmonyBrowserCanvas* pHarmonyBrowserCanvas);
 
-    virtual bool operator()(const HBContext &);
+    virtual bool operator()(
+      const JZHarmonyBrowserContext &HarmonyBrowserContext);
 
     const char * GetText()
     {
@@ -465,39 +468,39 @@ class HBMatchMarkers : public HBMatch
 
   private:
 
-    HBCanvas* mpHbWindow;
-    HBContext mContext;
-    HBChord   chord;
-    HBChord   scale;
-    int       n_chord;
-    int       chord_key;
+    JZHarmonyBrowserCanvas* mpHbWindow;
+    JZHarmonyBrowserContext mContext;
+    JZHarmonyBrowserChord chord;
+    JZHarmonyBrowserChord scale;
+    int n_chord;
+    int chord_key;
 
-    int       tritone;
-    HBChord   piano;
-    int       key251;
+    int tritone;
+    JZHarmonyBrowserChord piano;
+    int key251;
 
-    char      msg[100];
+    char msg[100];
 };
 
 //*****************************************************************************
 // Description:
 //   This is the harmony browser window class declaration.
 //*****************************************************************************
-class HBCanvas : public wxScrolledWindow
+class JZHarmonyBrowserCanvas : public wxScrolledWindow
 {
-    friend class HBSettingsDlg;
-    friend class HBFrame;
-    friend class HBMatchMarkers;
-    friend ostream & operator << (ostream &os, HBCanvas const &a);
-    friend istream & operator >> (istream &is, HBCanvas &a);
+    friend class JZHarmonyBrowserSettingsDlg;
+    friend class JZHarmonyBrowserFrame;
+    friend class JZHarmonyBrowserMatchMarkers;
+    friend ostream & operator << (ostream &os, JZHarmonyBrowserCanvas const &a);
+    friend istream & operator >> (istream &is, JZHarmonyBrowserCanvas &a);
 
   public:
 
     static TEScaleType GetScaleType();
 
-    HBCanvas(wxFrame* pParent, int x, int y, int w, int h);
+    JZHarmonyBrowserCanvas(wxFrame* pParent, int x, int y, int w, int h);
 
-    virtual ~HBCanvas();
+    virtual ~JZHarmonyBrowserCanvas();
 
     bool GetMark4Common() const;
     bool GetMark3Common() const;
@@ -512,7 +515,7 @@ class HBCanvas : public wxScrolledWindow
 
     virtual void OnDraw(wxDC& Dc);
 
-    void DrawMarkers(wxDC& Dc, const HBContext& Context);
+    void DrawMarkers(wxDC& Dc, const JZHarmonyBrowserContext& Context);
 
     void ClearSequence();
 
@@ -543,26 +546,26 @@ class HBCanvas : public wxScrolledWindow
 
     void TransposeSelection();
 
-    HBPlayer player;
+    JZHarmonyBrowserPlayer player;
 
     enum
     {
       SEQMAX = 256
     };
 
-    HBAnalyzer* GetAnalyzer();
+    JZHarmonyBrowserAnalyzer* GetAnalyzer();
 
   protected:
 
     static const int ScFa;
 
-    void ChordRect(JZRectangle& Rectangle, const HBContext& Context);
+    void ChordRect(JZRectangle& Rectangle, const JZHarmonyBrowserContext& Context);
 
-    void DrawChord(wxDC& Dc, const HBContext& Context);
+    void DrawChord(wxDC& Dc, const JZHarmonyBrowserContext& Context);
 
-    void UnDrawChord(wxDC& Dc, const HBContext& Context);
+    void UnDrawChord(wxDC& Dc, const JZHarmonyBrowserContext& Context);
 
-    bool Find(float x, float y, HBContext &out);
+    bool Find(float x, float y, JZHarmonyBrowserContext &out);
 
   private:
 
@@ -584,7 +587,7 @@ class HBCanvas : public wxScrolledWindow
 
     int mMargin;
 
-    HBContext* mSequence[SEQMAX];
+    JZHarmonyBrowserContext* mSequence[SEQMAX];
 
     int mSequenceCount;
 
@@ -592,7 +595,7 @@ class HBCanvas : public wxScrolledWindow
 
     bool mHasChanged;
 
-    HBContext mMouseContext;
+    JZHarmonyBrowserContext mMouseContext;
 
     bool mHaunschildLayout;
 
@@ -622,67 +625,67 @@ class HBCanvas : public wxScrolledWindow
 };
 
 inline
-bool HBCanvas::IsUsingHaunschildLayout() const
+bool JZHarmonyBrowserCanvas::IsUsingHaunschildLayout() const
 {
   return mHaunschildLayout;
 }
 
 inline
-bool HBCanvas::GetMark4Common() const
+bool JZHarmonyBrowserCanvas::GetMark4Common() const
 {
   return mMark4Common;
 }
 
 inline
-bool HBCanvas::GetMark3Common() const
+bool JZHarmonyBrowserCanvas::GetMark3Common() const
 {
   return mMark3Common;
 }
 
 inline
-bool HBCanvas::GetMark2Common() const
+bool JZHarmonyBrowserCanvas::GetMark2Common() const
 {
   return mMark2Common;
 }
 
 inline
-bool HBCanvas::GetMark1Common() const
+bool JZHarmonyBrowserCanvas::GetMark1Common() const
 {
   return mMark1Common;
 }
 
 inline
-bool HBCanvas::GetMarkBCommon() const
+bool JZHarmonyBrowserCanvas::GetMarkBCommon() const
 {
   return mMarkBCommon;
 }
 
 inline
-bool HBCanvas::GetMark0Common() const
+bool JZHarmonyBrowserCanvas::GetMark0Common() const
 {
   return mMark0Common;
 }
 
 inline
-bool HBCanvas::GetMark1Semi() const
+bool JZHarmonyBrowserCanvas::GetMark1Semi() const
 {
   return mMark1Semi;
 }
 
 inline
-bool HBCanvas::GetMark251() const
+bool JZHarmonyBrowserCanvas::GetMark251() const
 {
   return mMark251;
 }
 
 inline
-bool HBCanvas::GetMarkTritone() const
+bool JZHarmonyBrowserCanvas::GetMarkTritone() const
 {
   return mMarkTritone;
 }
 
 inline
-bool HBCanvas::GetMarkPiano() const
+bool JZHarmonyBrowserCanvas::GetMarkPiano() const
 {
   return mMarkPiano;
 }
@@ -693,10 +696,12 @@ bool HBCanvas::GetMarkPiano() const
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-HBMatchMarkers::HBMatchMarkers(const HBContext& Context, HBCanvas* cv)
-  : HBMatch(),
-    mpHbWindow(cv),
-    mContext(Context),
+JZHarmonyBrowserMatchMarkers::JZHarmonyBrowserMatchMarkers(
+  const JZHarmonyBrowserContext& HarmonyBrowserContext,
+  JZHarmonyBrowserCanvas* pHarmonyBrowserCanvas)
+  : JZHarmonyBrowserMatch(),
+    mpHbWindow(pHarmonyBrowserCanvas),
+    mContext(HarmonyBrowserContext),
     chord(mContext.Chord()),
     scale(mContext.Scale()),
     n_chord(chord.Count()),
@@ -708,7 +713,10 @@ HBMatchMarkers::HBMatchMarkers(const HBContext& Context, HBCanvas* cv)
 
   {
     // 251-move
-    HBContext tmp(Context.ScaleNr(), Context.ChordNr() + 3, Context.ScaleType());
+    JZHarmonyBrowserContext tmp(
+      HarmonyBrowserContext.ScaleNr(),
+      HarmonyBrowserContext.ChordNr() + 3,
+      HarmonyBrowserContext.ScaleType());
     key251 = tmp.ChordKey();
   }
 
@@ -716,7 +724,7 @@ HBMatchMarkers::HBMatchMarkers(const HBContext& Context, HBCanvas* cv)
 
   if (mpHbWindow->mMarkPiano && gpTrackFrame->GetPianoWindow())
   {
-    tEventArray &buf = gpTrackFrame->GetPianoWindow()->mPasteBuffer;
+    JZEventArray &buf = gpTrackFrame->GetPianoWindow()->mPasteBuffer;
     for (int i = 0; i < buf.nEvents; i++)
     {
       JZKeyOnEvent* pKeyOn = buf.Events[i]->IsKeyOn();
@@ -730,12 +738,13 @@ HBMatchMarkers::HBMatchMarkers(const HBContext& Context, HBCanvas* cv)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool HBMatchMarkers::operator()(const HBContext &o_context)
+bool JZHarmonyBrowserMatchMarkers::operator()(
+  const JZHarmonyBrowserContext& o_context)
 {
-  HBChord o_chord = o_context.Chord();
+  JZHarmonyBrowserChord o_chord = o_context.Chord();
   int     o_chord_key = o_context.ChordKey();
 
-  HBChord common = (chord & o_chord);
+  JZHarmonyBrowserChord common = (chord & o_chord);
   int n_common = common.Count();
 
   msg[0] = 0;
@@ -773,7 +782,7 @@ bool HBMatchMarkers::operator()(const HBContext &o_context)
 
   if (mpHbWindow->mMark1Semi && n_common == n_chord - 1)
   {
-    HBChord delta = chord ^ o_chord;
+    JZHarmonyBrowserChord delta = chord ^ o_chord;
     int key = delta.Iter(0);
     if (delta.Contains(key + 1) || delta.Contains(key - 1))
     {
@@ -805,29 +814,29 @@ bool HBMatchMarkers::operator()(const HBContext &o_context)
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-TEScaleType HBCanvas::mScaleType = Major;
-const int HBCanvas::ScFa = 50;
-int HBCanvas::transpose_res = 8;
-int HBCanvas::analyze_res = 8;
+TEScaleType JZHarmonyBrowserCanvas::mScaleType = Major;
+const int JZHarmonyBrowserCanvas::ScFa = 50;
+int JZHarmonyBrowserCanvas::transpose_res = 8;
+int JZHarmonyBrowserCanvas::analyze_res = 8;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-TEScaleType HBCanvas::GetScaleType()
+TEScaleType JZHarmonyBrowserCanvas::GetScaleType()
 {
   return mScaleType;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-BEGIN_EVENT_TABLE(HBCanvas, wxScrolledWindow)
+BEGIN_EVENT_TABLE(JZHarmonyBrowserCanvas, wxScrolledWindow)
 
-  EVT_MOUSE_EVENTS(HBCanvas::OnMouseEvent)
+  EVT_MOUSE_EVENTS(JZHarmonyBrowserCanvas::OnMouseEvent)
 
 END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-HBCanvas::HBCanvas(wxFrame* pParent, int x, int y, int w, int h)
+JZHarmonyBrowserCanvas::JZHarmonyBrowserCanvas(wxFrame* pParent, int x, int y, int w, int h)
   : wxScrolledWindow(pParent, wxID_ANY, wxPoint(x, y), wxSize(w, h))
 {
   mSequenceCount  = 0;
@@ -847,7 +856,7 @@ HBCanvas::HBCanvas(wxFrame* pParent, int x, int y, int w, int h)
 
   for (int i = 0; i < SEQMAX; i++)
   {
-    mSequence[i] = new HBContext();
+    mSequence[i] = new JZHarmonyBrowserContext();
   }
 
   wxClientDC Dc(this);
@@ -875,7 +884,7 @@ HBCanvas::HBCanvas(wxFrame* pParent, int x, int y, int w, int h)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-HBCanvas::~HBCanvas()
+JZHarmonyBrowserCanvas::~JZHarmonyBrowserCanvas()
 {
   if (player.IsPlaying())
   {
@@ -889,7 +898,7 @@ HBCanvas::~HBCanvas()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-ostream & operator << (ostream& Os, HBCanvas const &a)
+ostream & operator << (ostream& Os, JZHarmonyBrowserCanvas const &a)
 {
   int i;
   Os << 1 << endl;
@@ -903,7 +912,7 @@ ostream & operator << (ostream& Os, HBCanvas const &a)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-istream& operator >> (istream& Is, HBCanvas &a)
+istream& operator >> (istream& Is, JZHarmonyBrowserCanvas &a)
 {
   int i, version;
   Is >> version;
@@ -923,7 +932,7 @@ istream& operator >> (istream& Is, HBCanvas &a)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBCanvas::SetMarker(int MenuId, wxToolBar* pToolBar)
+void JZHarmonyBrowserCanvas::SetMarker(int MenuId, wxToolBar* pToolBar)
 {
   if (MenuId != mActiveMarker)
   {
@@ -990,7 +999,7 @@ void HBCanvas::SetMarker(int MenuId, wxToolBar* pToolBar)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int HBCanvas::GetChordKeys(int *out, int step, int n_steps)
+int JZHarmonyBrowserCanvas::GetChordKeys(int *out, int step, int n_steps)
 {
   if (mSequenceCount == 0)
   {
@@ -1002,21 +1011,21 @@ int HBCanvas::GetChordKeys(int *out, int step, int n_steps)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int HBCanvas::GetSelectedChord(int *out)
+int JZHarmonyBrowserCanvas::GetSelectedChord(int *out)
 {
   return player.GetChordKeys(out, mMouseContext);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int HBCanvas::GetSelectedScale(int *out)
+int JZHarmonyBrowserCanvas::GetSelectedScale(int *out)
 {
   return player.GetMeldyKeys(out, mMouseContext);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int HBCanvas::GetBassKeys(int *out, int step, int n_steps)
+int JZHarmonyBrowserCanvas::GetBassKeys(int *out, int step, int n_steps)
 {
   if (mSequenceCount == 0)
   {
@@ -1029,7 +1038,7 @@ int HBCanvas::GetBassKeys(int *out, int step, int n_steps)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBCanvas::ChordRect(JZRectangle& Rectangle, const HBContext& Context)
+void JZHarmonyBrowserCanvas::ChordRect(JZRectangle& Rectangle, const JZHarmonyBrowserContext& Context)
 {
   if (Context.SeqNr())
   {
@@ -1057,7 +1066,7 @@ void HBCanvas::ChordRect(JZRectangle& Rectangle, const HBContext& Context)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBCanvas::DrawChord(wxDC& Dc, const HBContext& Context)
+void JZHarmonyBrowserCanvas::DrawChord(wxDC& Dc, const JZHarmonyBrowserContext& Context)
 {
   // Draw the surrounding box.
   JZRectangle Rectangle;
@@ -1081,7 +1090,7 @@ void HBCanvas::DrawChord(wxDC& Dc, const HBContext& Context)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBCanvas::UnDrawChord(wxDC& Dc, const HBContext& Context)
+void JZHarmonyBrowserCanvas::UnDrawChord(wxDC& Dc, const JZHarmonyBrowserContext& Context)
 {
   // draw surrounding box
   JZRectangle Rectangle;
@@ -1098,7 +1107,7 @@ void HBCanvas::UnDrawChord(wxDC& Dc, const HBContext& Context)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBCanvas::OnDraw(wxDC& Dc)
+void JZHarmonyBrowserCanvas::OnDraw(wxDC& Dc)
 {
   Dc.Clear();
 
@@ -1111,12 +1120,12 @@ void HBCanvas::OnDraw(wxDC& Dc)
     (mSequenceCount % 8 ? mChordHeight : 0) +
     mChordHeight;
 
-  HBContextIterator iter;
+  JZHarmonyBrowserContextIterator iter;
   iter.SetSequence(mSequence, mSequenceCount);
   iter.SetScaleType(mScaleType);
   while (iter())
   {
-    const HBContext& Context = iter.Context();
+    const JZHarmonyBrowserContext& Context = iter.Context();
     DrawChord(Dc, Context);
     if (Context.ChordNr() == 0 && Context.SeqNr() == 0)
     {
@@ -1133,7 +1142,7 @@ void HBCanvas::OnDraw(wxDC& Dc)
     int TextWidth, TextHeight;
     for (int j = 0; j < 7; ++j)
     {
-      HBContext Context(0, j, mScaleType);
+      JZHarmonyBrowserContext Context(0, j, mScaleType);
 
       JZRectangle Rectangle;
       ChordRect(Rectangle, Context);
@@ -1160,12 +1169,12 @@ void HBCanvas::OnDraw(wxDC& Dc)
 
 #ifdef OBSOLETE
 //*****************************************************************************
-// HBSettingsForm
+// JZHarmonyBowserSettingsForm
 //*****************************************************************************
-class HBSettingsForm : public wxForm
+class JZHarmonyBowserSettingsForm : public wxForm
 {
   public:
-    HBSettingsForm(HBCanvas *c)
+    JZHarmonyBowserSettingsForm(JZHarmonyBrowserCanvas *c)
       : wxForm( USED_WXFORM_BUTTONS )
     {
       mpHbWindow = c;
@@ -1177,17 +1186,17 @@ class HBSettingsForm : public wxForm
     }
     virtual void OnHelp();
   private:
-    HBCanvas *mpHbWindow;
+    JZHarmonyBrowserCanvas *mpHbWindow;
 };
 #endif
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBCanvas::SettingsDialog()
+void JZHarmonyBrowserCanvas::SettingsDialog()
 {
 #ifdef OBSOLETE
   wxDialogBox *panel = new wxDialogBox(this, "settings", false );
-  wxForm      *form  = new HBSettingsForm(this);
+  wxForm      *form  = new JZHarmonyBowserSettingsForm(this);
 
   panel->SetLabelPosition(wxHORIZONTAL);
 
@@ -1208,13 +1217,15 @@ void HBCanvas::SettingsDialog()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBCanvas::DrawMarkers(wxDC& Dc, const HBContext& Context)
+void JZHarmonyBrowserCanvas::DrawMarkers(
+  wxDC& Dc,
+  const JZHarmonyBrowserContext& Context)
 {
   JZRectangle Rectangle;
   Dc.SetLogicalFunction(wxINVERT);
   Dc.SetBrush(*wxTRANSPARENT_BRUSH);
-  HBMatchMarkers match(Context, this);
-  HBContextIterator iter(match);
+  JZHarmonyBrowserMatchMarkers match(Context, this);
+  JZHarmonyBrowserContextIterator iter(match);
   iter.SetSequence(mSequence, mSequenceCount);
   iter.SetScaleType(mScaleType);
   while (iter())
@@ -1243,7 +1254,7 @@ void HBCanvas::DrawMarkers(wxDC& Dc, const HBContext& Context)
       Rectangle.height);
     if (Context.SeqNr() > 0)
     {
-      HBContext c(Context);
+      JZHarmonyBrowserContext c(Context);
       c.SetSeqNr(0);
       ChordRect(Rectangle, c);
       Dc.DrawRectangle(
@@ -1260,9 +1271,9 @@ void HBCanvas::DrawMarkers(wxDC& Dc, const HBContext& Context)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool HBCanvas::Find(float x, float y, HBContext &out)
+bool JZHarmonyBrowserCanvas::Find(float x, float y, JZHarmonyBrowserContext &out)
 {
-  HBContextIterator iter;
+  JZHarmonyBrowserContextIterator iter;
   iter.SetSequence(mSequence, mSequenceCount);
   iter.SetScaleType(mScaleType);
   while (iter())
@@ -1280,7 +1291,7 @@ bool HBCanvas::Find(float x, float y, HBContext &out)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBCanvas::ToggleHaunschildLayout()
+void JZHarmonyBrowserCanvas::ToggleHaunschildLayout()
 {
   mHaunschildLayout = !mHaunschildLayout;
   Refresh();
@@ -1288,7 +1299,7 @@ void HBCanvas::ToggleHaunschildLayout()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBCanvas::ClearSequence()
+void JZHarmonyBrowserCanvas::ClearSequence()
 {
   mSequenceCount = 0;
   mMouseContext.SetSeqNr(0);
@@ -1297,7 +1308,7 @@ void HBCanvas::ClearSequence()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
+void JZHarmonyBrowserCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
 {
   wxClientDC Dc(this);
 
@@ -1305,7 +1316,7 @@ void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
 
   Dc.SetFont(*wxNORMAL_FONT);
 
-  HBContext Context;
+  JZHarmonyBrowserContext Context;
   int x, y;
   MouseEvent.GetPosition(&x, &y);
   if (Find(x, y, Context))
@@ -1366,7 +1377,7 @@ void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
       // paste to PianoWin buffer
       if (!mMarkPiano && gpTrackFrame->GetPianoWindow())
       {
-        tEventArray &buf = gpTrackFrame->GetPianoWindow()->mPasteBuffer;
+        JZEventArray &buf = gpTrackFrame->GetPianoWindow()->mPasteBuffer;
         buf.Clear();
         player.Paste(buf);
         gpTrackFrame->GetPianoWindow()->Refresh();
@@ -1387,7 +1398,7 @@ void HBCanvas::OnMouseEvent(wxMouseEvent& MouseEvent)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBCanvas::SetScaleType(
+void JZHarmonyBrowserCanvas::SetScaleType(
   int MenuId,
   TEScaleType ScaleType,
   wxToolBar* pToolBar)
@@ -1403,7 +1414,7 @@ void HBCanvas::SetScaleType(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBCanvas::TransposeSelection()
+void JZHarmonyBrowserCanvas::TransposeSelection()
 {
   if (!IsSequenceDefined())
   {
@@ -1413,7 +1424,7 @@ void HBCanvas::TransposeSelection()
   if (gpTrackWindow->EventsSelected("please select destination range in track window"))
   {
     wxBeginBusyCursor();
-    HBAnalyzer analyzer(mSequence, mSequenceCount);
+    JZHarmonyBrowserAnalyzer analyzer(mSequence, mSequenceCount);
     analyzer.Transpose(gpTrackWindow->mpFilter, transpose_res);
     wxEndBusyCursor();
   }
@@ -1421,7 +1432,7 @@ void HBCanvas::TransposeSelection()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBCanvas::FileLoad()
+void JZHarmonyBrowserCanvas::FileLoad()
 {
   wxString FileName = file_selector(
     mDefaultFileName.c_str(),
@@ -1439,7 +1450,7 @@ void HBCanvas::FileLoad()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBCanvas::FileSaveAs()
+void JZHarmonyBrowserCanvas::FileSaveAs()
 {
   wxString FileName = file_selector(
     mDefaultFileName.c_str(),
@@ -1457,7 +1468,7 @@ void HBCanvas::FileSaveAs()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBCanvas::MenuCommand(int MenuId, wxToolBar* pToolBar)
+void JZHarmonyBrowserCanvas::MenuCommand(int MenuId, wxToolBar* pToolBar)
 {
   switch (MenuId)
   {
@@ -1481,7 +1492,7 @@ void HBCanvas::MenuCommand(int MenuId, wxToolBar* pToolBar)
       if (gpTrackWindow->EventsSelected("please select source range in track window"))
       {
         wxBeginBusyCursor();
-        HBAnalyzer analyzer(mSequence, (int)SEQMAX);
+        JZHarmonyBrowserAnalyzer analyzer(mSequence, (int)SEQMAX);
         mSequenceCount = analyzer.Analyze(gpTrackWindow->mpFilter, analyze_res);
         Refresh();
         wxEndBusyCursor();
@@ -1504,11 +1515,11 @@ void HBCanvas::MenuCommand(int MenuId, wxToolBar* pToolBar)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-HBAnalyzer * HBCanvas::GetAnalyzer()
+JZHarmonyBrowserAnalyzer * JZHarmonyBrowserCanvas::GetAnalyzer()
 {
   if (mSequenceCount > 0 && gpTrackWindow->mpSnapSel->IsSelected())
   {
-    HBAnalyzer *analyzer = new HBAnalyzer(mSequence, mSequenceCount);
+    JZHarmonyBrowserAnalyzer *analyzer = new JZHarmonyBrowserAnalyzer(mSequence, mSequenceCount);
     analyzer->Init(gpTrackWindow->mpFilter, transpose_res);
     return analyzer;
   }
@@ -1523,7 +1534,7 @@ HBAnalyzer * HBCanvas::GetAnalyzer()
 
 
 // ---------------------------------------------------------
-// HBContextDlg
+// JZHarmonyBrowserContextDlg
 // ---------------------------------------------------------
 
 struct tNamedChord
@@ -1601,11 +1612,11 @@ tNamedChord mScaleNames[n_scale_names] =
   { "blues scale",                    0x4f9},
 };
 
-class HBContextDlg : public wxDialog
+class JZHarmonyBrowserContextDlg : public wxDialog
 {
   public:
-    HBContextDlg(HBCanvas *c, wxFrame *parent, HBContext *pcontext);
-    ~HBContextDlg();
+    JZHarmonyBrowserContextDlg(JZHarmonyBrowserCanvas *c, wxFrame *parent, JZHarmonyBrowserContext *pcontext);
+    ~JZHarmonyBrowserContextDlg();
   /*    static void OkButton(wxButton &but, wxCommandEvent& event);
     static void CancelButton(wxButton &but, wxCommandEvent& event);
     static void PlayButton(wxButton &but, wxCommandEvent& event);
@@ -1629,7 +1640,7 @@ class HBContextDlg : public wxDialog
 
   private:
 
-    HBCanvas* mpHbWindow;
+    JZHarmonyBrowserCanvas* mpHbWindow;
     wxCheckBox* chord_chk[12];
     wxCheckBox* scale_chk[12];
     wxListBox* chord_lst;
@@ -1641,8 +1652,8 @@ class HBContextDlg : public wxDialog
     wxButton   *play_but;
     wxButton   *help_but;
 
-    HBChord    chord;
-    HBChord    scale;
+    JZHarmonyBrowserChord    chord;
+    JZHarmonyBrowserChord    scale;
     int        chord_key;
     int        scale_key;
     int ChordKey(int i = 0) const
@@ -1653,14 +1664,14 @@ class HBContextDlg : public wxDialog
     {
       return (chord_key + i) % 12;
     }
-    HBContext  *pcontext;
+    JZHarmonyBrowserContext  *pcontext;
 
-    HBPlayer   player;
+    JZHarmonyBrowserPlayer   player;
     void       RestartPlayer();
 };
 
 
-HBContextDlg::HBContextDlg(HBCanvas *c, wxFrame *parent, HBContext *pct)
+JZHarmonyBrowserContextDlg::JZHarmonyBrowserContextDlg(JZHarmonyBrowserCanvas *c, wxFrame *parent, JZHarmonyBrowserContext *pct)
   : wxDialog(parent, wxID_ANY, wxString("Edit chord/scale"))
 {
   int i;
@@ -1719,7 +1730,7 @@ HBContextDlg::HBContextDlg(HBCanvas *c, wxFrame *parent, HBContext *pct)
     new wxStaticText(
       this,
       wxID_ANY,
-      HBChord::ScaleName(i + chord_key),
+      JZHarmonyBrowserChord::ScaleName(i + chord_key),
       wxPoint(x, y + 0 * h));
   }
   y += 4*h;
@@ -1762,7 +1773,7 @@ HBContextDlg::HBContextDlg(HBCanvas *c, wxFrame *parent, HBContext *pct)
   ShowValues();
 }
 
-HBContextDlg::~HBContextDlg()
+JZHarmonyBrowserContextDlg::~JZHarmonyBrowserContextDlg()
 {
   if (player.IsPlaying())
   {
@@ -1771,7 +1782,7 @@ HBContextDlg::~HBContextDlg()
 }
 
 
-void HBContextDlg::ShowValues()
+void JZHarmonyBrowserContextDlg::ShowValues()
 {
   // show single notes
   int i;
@@ -1785,7 +1796,7 @@ void HBContextDlg::ShowValues()
   }
 
   // update chord list if necessary
-  HBChord c = chord;
+  JZHarmonyBrowserChord c = chord;
   c.Rotate(-ChordKey());
   i = chord_lst->GetSelection();
   if (i < 0 || c.Keys() != chord_names[i].bits)
@@ -1801,7 +1812,7 @@ void HBContextDlg::ShowValues()
   }
 
   // update scale list
-  HBChord s = scale;
+  JZHarmonyBrowserChord s = scale;
   s.Rotate(-ScaleKey());
   i = chord_lst->GetSelection();
   if (i < 0 || s.Keys() != mScaleNames[i].bits)
@@ -1818,7 +1829,7 @@ void HBContextDlg::ShowValues()
 
 }
 
-void HBContextDlg::OnOkButton()
+void JZHarmonyBrowserContextDlg::OnOkButton()
 {
   chord.Clear();
   scale.Clear();
@@ -1840,13 +1851,13 @@ void HBContextDlg::OnOkButton()
   Destroy();
 }
 
-void HBContextDlg::OnCancelButton()
+void JZHarmonyBrowserContextDlg::OnCancelButton()
 {
 //  DELETE_THIS();
   Destroy();
 }
 
-void HBContextDlg::OnPlayButton()
+void JZHarmonyBrowserContextDlg::OnPlayButton()
 {
   if (player.IsPlaying())
   {
@@ -1855,7 +1866,7 @@ void HBContextDlg::OnPlayButton()
   }
   else
   {
-    HBContext Context(*pcontext);
+    JZHarmonyBrowserContext Context(*pcontext);
     *Context.PChord() = chord;
     *Context.PScale() = scale;
     player.StartPlay(Context);
@@ -1863,25 +1874,25 @@ void HBContextDlg::OnPlayButton()
   }
 }
 
-void HBContextDlg::OnHelp()
+void JZHarmonyBrowserContextDlg::OnHelp()
 {
   gpHelpInstance->ShowTopic("Edit chord");
 }
 
 
-void HBContextDlg::RestartPlayer()
+void JZHarmonyBrowserContextDlg::RestartPlayer()
 {
   if (player.IsPlaying())
   {
     player.StopPlay();
-    HBContext Context(*pcontext);
+    JZHarmonyBrowserContext Context(*pcontext);
     *Context.PChord() = chord;
     *Context.PScale() = scale;
     player.StartPlay(Context);
   }
 }
 
-void HBContextDlg::OnChordCheck()
+void JZHarmonyBrowserContextDlg::OnChordCheck()
 {
   chord.Clear();
   for (int i = 0; i < 12; i++)
@@ -1898,7 +1909,7 @@ void HBContextDlg::OnChordCheck()
 }
 
 
-void HBContextDlg::OnScaleCheck()
+void JZHarmonyBrowserContextDlg::OnScaleCheck()
 {
   scale.Clear();
   for (int i = 0; i < 12; i++)
@@ -1911,12 +1922,12 @@ void HBContextDlg::OnScaleCheck()
   RestartPlayer();
 }
 
-void HBContextDlg::OnChordList()
+void JZHarmonyBrowserContextDlg::OnChordList()
 {
   int i = chord_lst->GetSelection();
   if (i >= 0)
   {
-    HBChord c(chord_names[i].bits);
+    JZHarmonyBrowserChord c(chord_names[i].bits);
     c.Rotate(ChordKey());
     chord = c;
     ShowValues();
@@ -1925,12 +1936,12 @@ void HBContextDlg::OnChordList()
 }
 
 
-void HBContextDlg::OnScaleList()
+void JZHarmonyBrowserContextDlg::OnScaleList()
 {
   int i = scale_lst->GetSelection();
   if (i >= 0)
   {
-    HBChord s(mScaleNames[i].bits);
+    JZHarmonyBrowserChord s(mScaleNames[i].bits);
     s.Rotate(ScaleKey());
     scale = s;
     ShowValues();
@@ -1942,61 +1953,61 @@ void HBContextDlg::OnScaleList()
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-BEGIN_EVENT_TABLE(HBFrame, wxFrame)
+BEGIN_EVENT_TABLE(JZHarmonyBrowserFrame, wxFrame)
 
-  EVT_CLOSE(HBFrame::OnClose)
+  EVT_CLOSE(JZHarmonyBrowserFrame::OnClose)
 
-  EVT_MENU(wxID_CLOSE, HBFrame::OnCloseWindow)
+  EVT_MENU(wxID_CLOSE, JZHarmonyBrowserFrame::OnCloseWindow)
 
-  EVT_UPDATE_UI(MEN_MAJSCALE, HBFrame::OnUpdateMajorScale)
-  EVT_MENU(MEN_MAJSCALE, HBFrame::OnToolBarSelect)
+  EVT_UPDATE_UI(MEN_MAJSCALE, JZHarmonyBrowserFrame::OnUpdateMajorScale)
+  EVT_MENU(MEN_MAJSCALE, JZHarmonyBrowserFrame::OnToolBarSelect)
 
-  EVT_UPDATE_UI(MEN_HARSCALE, HBFrame::OnUpdateHarmonicMinorScale)
-  EVT_MENU(MEN_HARSCALE, HBFrame::OnToolBarSelect)
+  EVT_UPDATE_UI(MEN_HARSCALE, JZHarmonyBrowserFrame::OnUpdateHarmonicMinorScale)
+  EVT_MENU(MEN_HARSCALE, JZHarmonyBrowserFrame::OnToolBarSelect)
 
-  EVT_UPDATE_UI(MEN_MELSCALE, HBFrame::OnUpdateMelodicMinorScale)
-  EVT_MENU(MEN_MELSCALE, HBFrame::OnToolBarSelect)
+  EVT_UPDATE_UI(MEN_MELSCALE, JZHarmonyBrowserFrame::OnUpdateMelodicMinorScale)
+  EVT_MENU(MEN_MELSCALE, JZHarmonyBrowserFrame::OnToolBarSelect)
 
-  EVT_UPDATE_UI(MEN_IONSCALE, HBFrame::OnUpdateIonicScale)
-  EVT_MENU(MEN_IONSCALE, HBFrame::OnToolBarSelect)
+  EVT_UPDATE_UI(MEN_IONSCALE, JZHarmonyBrowserFrame::OnUpdateIonicScale)
+  EVT_MENU(MEN_IONSCALE, JZHarmonyBrowserFrame::OnToolBarSelect)
 
-  EVT_UPDATE_UI(MEN_EQ4, HBFrame::OnUpdateFourEqualNotes)
-  EVT_MENU(MEN_EQ4, HBFrame::OnToolBarSelect)
+  EVT_UPDATE_UI(MEN_EQ4, JZHarmonyBrowserFrame::OnUpdateFourEqualNotes)
+  EVT_MENU(MEN_EQ4, JZHarmonyBrowserFrame::OnToolBarSelect)
 
-  EVT_UPDATE_UI(MEN_EQ3, HBFrame::OnUpdateThreeEqualNotes)
-  EVT_MENU(MEN_EQ3, HBFrame::OnToolBarSelect)
+  EVT_UPDATE_UI(MEN_EQ3, JZHarmonyBrowserFrame::OnUpdateThreeEqualNotes)
+  EVT_MENU(MEN_EQ3, JZHarmonyBrowserFrame::OnToolBarSelect)
 
-  EVT_UPDATE_UI(MEN_EQ2, HBFrame::OnUpdateTwoEqualNotes)
-  EVT_MENU(MEN_EQ2, HBFrame::OnToolBarSelect)
+  EVT_UPDATE_UI(MEN_EQ2, JZHarmonyBrowserFrame::OnUpdateTwoEqualNotes)
+  EVT_MENU(MEN_EQ2, JZHarmonyBrowserFrame::OnToolBarSelect)
 
-  EVT_UPDATE_UI(MEN_EQ1, HBFrame::OnUpdateOneEqualNotes)
-  EVT_MENU(MEN_EQ1, HBFrame::OnToolBarSelect)
+  EVT_UPDATE_UI(MEN_EQ1, JZHarmonyBrowserFrame::OnUpdateOneEqualNotes)
+  EVT_MENU(MEN_EQ1, JZHarmonyBrowserFrame::OnToolBarSelect)
 
-  EVT_UPDATE_UI(MEN_EQ1, HBFrame::OnUpdateZeroEqualNotes)
-  EVT_MENU(MEN_EQ0, HBFrame::OnToolBarSelect)
+  EVT_UPDATE_UI(MEN_EQ1, JZHarmonyBrowserFrame::OnUpdateZeroEqualNotes)
+  EVT_MENU(MEN_EQ0, JZHarmonyBrowserFrame::OnToolBarSelect)
 
-  EVT_MENU(MEN_EQH, HBFrame::OnToolBarSelect)
-  EVT_MENU(MEN_251, HBFrame::OnToolBarSelect)
-  EVT_MENU(MEN_EQB, HBFrame::OnToolBarSelect)
-  EVT_MENU(MEN_TRITONE, HBFrame::OnToolBarSelect)
-  EVT_MENU(MEN_PIANO, HBFrame::OnToolBarSelect)
+  EVT_MENU(MEN_EQH, JZHarmonyBrowserFrame::OnToolBarSelect)
+  EVT_MENU(MEN_251, JZHarmonyBrowserFrame::OnToolBarSelect)
+  EVT_MENU(MEN_EQB, JZHarmonyBrowserFrame::OnToolBarSelect)
+  EVT_MENU(MEN_TRITONE, JZHarmonyBrowserFrame::OnToolBarSelect)
+  EVT_MENU(MEN_PIANO, JZHarmonyBrowserFrame::OnToolBarSelect)
 
-  EVT_MENU(wxID_OPEN, HBFrame::OnFileLoad)
+  EVT_MENU(wxID_OPEN, JZHarmonyBrowserFrame::OnFileLoad)
 
-  EVT_MENU(wxID_SAVEAS, HBFrame::OnFileSaveAs)
+  EVT_MENU(wxID_SAVEAS, JZHarmonyBrowserFrame::OnFileSaveAs)
 
-  EVT_MENU(MEN_EDIT, HBFrame::OnSettingsChord)
+  EVT_MENU(MEN_EDIT, JZHarmonyBrowserFrame::OnSettingsChord)
 
-  EVT_MENU(MEN_MIDI, HBFrame::OnSettingsMidi)
+  EVT_MENU(MEN_MIDI, JZHarmonyBrowserFrame::OnSettingsMidi)
 
-  EVT_UPDATE_UI(MEN_MAJSCALE, HBFrame::OnUpdateHaunschildLayout)
-  EVT_MENU(MEN_HAUNSCH, HBFrame::OnSettingsHaunschild)
+  EVT_UPDATE_UI(MEN_MAJSCALE, JZHarmonyBrowserFrame::OnUpdateHaunschildLayout)
+  EVT_MENU(MEN_HAUNSCH, JZHarmonyBrowserFrame::OnSettingsHaunschild)
 
-  EVT_MENU(MEN_CLEARSEQ, HBFrame::OnActionClearSequence)
+  EVT_MENU(MEN_CLEARSEQ, JZHarmonyBrowserFrame::OnActionClearSequence)
 
-  EVT_MENU(MEN_MOUSE, HBFrame::OnMouseHelp)
+  EVT_MENU(MEN_MOUSE, JZHarmonyBrowserFrame::OnMouseHelp)
 
-  EVT_MENU(MEN_HELP, HBFrame::OnHelp)
+  EVT_MENU(MEN_HELP, JZHarmonyBrowserFrame::OnHelp)
 
 //  EVT_MENU(MEN_ANALYZE,
 //  EVT_MENU(MEN_TRANSPOSE,
@@ -2006,7 +2017,7 @@ END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-HBFrame::HBFrame()
+JZHarmonyBrowserFrame::JZHarmonyBrowserFrame()
   : wxFrame(
       0,
       wxID_ANY,
@@ -2131,14 +2142,14 @@ HBFrame::HBFrame()
 
   int w, h;
   GetClientSize(&w, &h);
-  mpHbWindow = new HBCanvas(this, 0, 0, w, h);
+  mpHbWindow = new JZHarmonyBrowserCanvas(this, 0, 0, w, h);
 
   mpToolBar->ToggleTool(MEN_MAJSCALE, true);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-HBFrame::~HBFrame()
+JZHarmonyBrowserFrame::~JZHarmonyBrowserFrame()
 {
   int XPosition, YPosition;
   GetPosition(&XPosition, &YPosition);
@@ -2152,14 +2163,14 @@ HBFrame::~HBFrame()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool HBFrame::IsSequenceDefined()
+bool JZHarmonyBrowserFrame::IsSequenceDefined()
 {
   return mpHbWindow->IsSequenceDefined();
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int HBFrame::SeqSelected()
+int JZHarmonyBrowserFrame::SeqSelected()
 {
   if (
     mpHbWindow->mSequenceCount == 0 ||
@@ -2173,112 +2184,112 @@ int HBFrame::SeqSelected()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int HBFrame::GetChordKeys(int* out, int step, int n_steps)
+int JZHarmonyBrowserFrame::GetChordKeys(int* out, int step, int n_steps)
 {
   return mpHbWindow->GetChordKeys(out, step, n_steps);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int HBFrame::GetSelectedChord(int* out)
+int JZHarmonyBrowserFrame::GetSelectedChord(int* out)
 {
   return mpHbWindow->GetSelectedChord(out);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int HBFrame::GetSelectedScale(int* out)
+int JZHarmonyBrowserFrame::GetSelectedScale(int* out)
 {
   return mpHbWindow->GetSelectedScale(out);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int HBFrame::GetBassKeys(int* out, int step, int n_steps)
+int JZHarmonyBrowserFrame::GetBassKeys(int* out, int step, int n_steps)
 {
   return mpHbWindow->GetBassKeys(out, step, n_steps);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnClose(wxCloseEvent& Event)
+void JZHarmonyBrowserFrame::OnClose(wxCloseEvent& Event)
 {
   Event.Skip();
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnCloseWindow(wxCommandEvent& Event)
+void JZHarmonyBrowserFrame::OnCloseWindow(wxCommandEvent& Event)
 {
   Close();
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnUpdateMajorScale(wxUpdateUIEvent& Event)
+void JZHarmonyBrowserFrame::OnUpdateMajorScale(wxUpdateUIEvent& Event)
 {
-  Event.Check(HBCanvas::GetScaleType() == Major);
+  Event.Check(JZHarmonyBrowserCanvas::GetScaleType() == Major);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnUpdateHarmonicMinorScale(wxUpdateUIEvent& Event)
+void JZHarmonyBrowserFrame::OnUpdateHarmonicMinorScale(wxUpdateUIEvent& Event)
 {
-  Event.Check(HBCanvas::GetScaleType() == Harmon);
+  Event.Check(JZHarmonyBrowserCanvas::GetScaleType() == Harmon);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnUpdateMelodicMinorScale(wxUpdateUIEvent& Event)
+void JZHarmonyBrowserFrame::OnUpdateMelodicMinorScale(wxUpdateUIEvent& Event)
 {
-  Event.Check(HBCanvas::GetScaleType() == Melod);
+  Event.Check(JZHarmonyBrowserCanvas::GetScaleType() == Melod);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnUpdateIonicScale(wxUpdateUIEvent& Event)
+void JZHarmonyBrowserFrame::OnUpdateIonicScale(wxUpdateUIEvent& Event)
 {
-  Event.Check(HBCanvas::GetScaleType() == Ionb13);
+  Event.Check(JZHarmonyBrowserCanvas::GetScaleType() == Ionb13);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnUpdateFourEqualNotes(wxUpdateUIEvent& Event)
+void JZHarmonyBrowserFrame::OnUpdateFourEqualNotes(wxUpdateUIEvent& Event)
 {
   Event.Check(mpHbWindow->GetMark4Common());
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnUpdateThreeEqualNotes(wxUpdateUIEvent& Event)
+void JZHarmonyBrowserFrame::OnUpdateThreeEqualNotes(wxUpdateUIEvent& Event)
 {
   Event.Check(mpHbWindow->GetMark3Common());
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnUpdateTwoEqualNotes(wxUpdateUIEvent& Event)
+void JZHarmonyBrowserFrame::OnUpdateTwoEqualNotes(wxUpdateUIEvent& Event)
 {
   Event.Check(mpHbWindow->GetMark2Common());
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnUpdateOneEqualNotes(wxUpdateUIEvent& Event)
+void JZHarmonyBrowserFrame::OnUpdateOneEqualNotes(wxUpdateUIEvent& Event)
 {
   Event.Check(mpHbWindow->GetMark1Common());
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnUpdateZeroEqualNotes(wxUpdateUIEvent& Event)
+void JZHarmonyBrowserFrame::OnUpdateZeroEqualNotes(wxUpdateUIEvent& Event)
 {
   Event.Check(mpHbWindow->GetMark0Common());
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnToolBarSelect(wxCommandEvent& Event)
+void JZHarmonyBrowserFrame::OnToolBarSelect(wxCommandEvent& Event)
 {
   mpHbWindow->MenuCommand(
     Event.GetId(),
@@ -2287,13 +2298,13 @@ void HBFrame::OnToolBarSelect(wxCommandEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnSettingsChord(wxCommandEvent& Event)
+void JZHarmonyBrowserFrame::OnSettingsChord(wxCommandEvent& Event)
 {
   if (!SeqSelected())
   {
     return;
   }
-  (void) new HBContextDlg(
+  (void) new JZHarmonyBrowserContextDlg(
     mpHbWindow,
     this,
     mpHbWindow->mSequence[mpHbWindow->mMouseContext.SeqNr() - 1]);
@@ -2301,49 +2312,49 @@ void HBFrame::OnSettingsChord(wxCommandEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnSettingsMidi(wxCommandEvent& Event)
+void JZHarmonyBrowserFrame::OnSettingsMidi(wxCommandEvent& Event)
 {
   mpHbWindow->player.SettingsDialog(this);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnUpdateHaunschildLayout(wxUpdateUIEvent& Event)
+void JZHarmonyBrowserFrame::OnUpdateHaunschildLayout(wxUpdateUIEvent& Event)
 {
   Event.Check(mpHbWindow->IsUsingHaunschildLayout());
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnSettingsHaunschild(wxCommandEvent& Event)
+void JZHarmonyBrowserFrame::OnSettingsHaunschild(wxCommandEvent& Event)
 {
   mpHbWindow->ToggleHaunschildLayout();
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnFileLoad(wxCommandEvent& Event)
+void JZHarmonyBrowserFrame::OnFileLoad(wxCommandEvent& Event)
 {
   mpHbWindow->FileLoad();
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnFileSaveAs(wxCommandEvent& Event)
+void JZHarmonyBrowserFrame::OnFileSaveAs(wxCommandEvent& Event)
 {
   mpHbWindow->FileSaveAs();
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnActionClearSequence(wxCommandEvent& Event)
+void JZHarmonyBrowserFrame::OnActionClearSequence(wxCommandEvent& Event)
 {
   mpHbWindow->ClearSequence();
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnMouseHelp(wxCommandEvent& Event)
+void JZHarmonyBrowserFrame::OnMouseHelp(wxCommandEvent& Event)
 {
   wxMessageBox(
     "left: select chord\n"
@@ -2354,21 +2365,21 @@ void HBFrame::OnMouseHelp(wxCommandEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::OnHelp(wxCommandEvent& Event)
+void JZHarmonyBrowserFrame::OnHelp(wxCommandEvent& Event)
 {
 //  gpHelpInstance->ShowTopic("Harmony browser");
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-HBAnalyzer* HBFrame::GetAnalyzer()
+JZHarmonyBrowserAnalyzer* JZHarmonyBrowserFrame::GetAnalyzer()
 {
   return mpHbWindow->GetAnalyzer();
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void HBFrame::TransposeSelection()
+void JZHarmonyBrowserFrame::TransposeSelection()
 {
   mpHbWindow->TransposeSelection();
 }
@@ -2377,7 +2388,7 @@ void CreateHarmonyBrowser()
 {
   if (!gpHarmonyBrowser)
   {
-    gpHarmonyBrowser = new HBFrame();
+    gpHarmonyBrowser = new JZHarmonyBrowserFrame();
   }
-  ((HBFrame *)gpHarmonyBrowser)->Show(true);
+  ((JZHarmonyBrowserFrame *)gpHarmonyBrowser)->Show(true);
 }

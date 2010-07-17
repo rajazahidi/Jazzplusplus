@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ using namespace std;
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tNamedValueChoice::tNamedValueChoice(
+JZNamedValueChoice::JZNamedValueChoice(
   wxWindow* pParent,
   const map<int, string>& Map)
   : wxChoice(pParent, wxID_ANY),
@@ -45,7 +45,7 @@ tNamedValueChoice::tNamedValueChoice(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tNamedValueChoice::GetValue()
+int JZNamedValueChoice::GetValue()
 {
   int Selection = GetSelection();
   if (Selection >= 0)
@@ -67,7 +67,7 @@ int tNamedValueChoice::GetValue()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tNamedValueChoice::SetValue(int Measure)
+void JZNamedValueChoice::SetValue(int Measure)
 {
   int i = 0;
   for (

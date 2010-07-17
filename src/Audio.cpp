@@ -60,19 +60,19 @@ using namespace std;
 //*****************************************************************************
 // Description:
 //   This is the sample voice class declaration.  This class is activated via a
-// MIDI note on signal.  The class copies data from a tSample object to the
+// MIDI note on signal.  The class copies data from a JZSample object to the
 // output buffer as needed by the driver.
 //*****************************************************************************
-class tSampleVoice
+class JZSampleVoice
 {
   public:
 
-    tSampleVoice(tSampleSet& s)
+    JZSampleVoice(JZSampleSet& s)
       : set(s)
     {
     }
 
-    void Start(tSample *s, long c)
+    void Start(JZSample *s, long c)
     {
       spl    = s;
       clock  = c;
@@ -175,9 +175,9 @@ class tSampleVoice
     }
 
   private:
-    tSampleSet& set;
+    JZSampleSet& set;
     long        clock;
-    tSample*    spl;
+    JZSample*    spl;
     short*      data;
     int         first;
     long        length;
@@ -188,7 +188,7 @@ class tSampleVoice
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tSampleSet::tSampleSet(long tpm)
+JZSampleSet::JZSampleSet(long tpm)
   : mSamplingRate(22050),
     mChannelCount(1),
 
@@ -206,7 +206,7 @@ tSampleSet::tSampleSet(long tpm)
 
   for (i = 0; i < BUFCOUNT; i++)
   {
-    buffers[i] = new tAudioBuffer(0);
+    buffers[i] = new JZAudioBuffer(0);
   }
 
   adjust_audio_length = 1;
@@ -216,26 +216,26 @@ tSampleSet::tSampleSet(long tpm)
 
   for (i = 0; i < eSampleCount; i++)
   {
-    mSamples[i] = new tSample(*this);
-    mSampleWindows[i] = 0;
+    mSamples[i] = new JZSample(*this);
+    mSampleFrames[i] = 0;
   }
 
   for (i = 0; i < MAXPOLY; i++)
   {
-    voices[i] = new tSampleVoice(*this);
+    voices[i] = new JZSampleVoice(*this);
   }
   num_voices = 0;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tSampleSet::~tSampleSet()
+JZSampleSet::~JZSampleSet()
 {
   int i;
   for (i = 0; i < eSampleCount; i++)
   {
     delete mSamples[i];
-    delete mSampleWindows[i];
+    delete mSampleFrames[i];
   }
   for (i = 0; i < MAXPOLY; i++)
   {
@@ -249,24 +249,24 @@ tSampleSet::~tSampleSet()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSampleSet::Edit(int key)
+void JZSampleSet::Edit(int key)
 {
-  if (mSampleWindows[key] == 0)
+  if (mSampleFrames[key] == 0)
   {
-    tSample* spl = mSamples[key];
+    JZSample* spl = mSamples[key];
 
-    mSampleWindows[key] = new tSampleWin(
+    mSampleFrames[key] = new JZSampleFrame(
       gpTrackWindow,
-      &mSampleWindows[key],
+      &mSampleFrames[key],
       *spl);
   }
-  mSampleWindows[key]->Show(true);
-  mSampleWindows[key]->Redraw();
+  mSampleFrames[key]->Show(true);
+  mSampleFrames[key]->Redraw();
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSampleSet::LoadDefaultSettings()
+void JZSampleSet::LoadDefaultSettings()
 {
   wxString FileName = FindFile("jazz.spl");
   if (!FileName.empty())
@@ -277,7 +277,7 @@ void tSampleSet::LoadDefaultSettings()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tSampleSet::Load(const wxString& FileName)
+int JZSampleSet::Load(const wxString& FileName)
 {
   // Enable audio when loading a sample set.
   gpMidiPlayer->SetAudioEnabled(true);
@@ -337,9 +337,9 @@ int tSampleSet::Load(const wxString& FileName)
         << '"';
       ::wxMessageBox(String, "Error", wxOK);
     }
-    if (mSampleWindows[key])
+    if (mSampleFrames[key])
     {
-      mSampleWindows[key]->Redraw();
+      mSampleFrames[key]->Redraw();
     }
   }
   wxEndBusyCursor();
@@ -349,7 +349,7 @@ int tSampleSet::Load(const wxString& FileName)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSampleSet::ReloadSamples()
+void JZSampleSet::ReloadSamples()
 {
   for (int i = 0; i < eSampleCount; i++)
   {
@@ -360,7 +360,7 @@ void tSampleSet::ReloadSamples()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tSampleSet::Save(const wxString& FileName)
+int JZSampleSet::Save(const wxString& FileName)
 {
   ofstream Ofs(FileName.c_str());
   Ofs
@@ -368,7 +368,7 @@ int tSampleSet::Save(const wxString& FileName)
     << endl;
   for (int i = 0; i < eSampleCount; i++)
   {
-    tSample* pSample = mSamples[i];
+    JZSample* pSample = mSamples[i];
     const string& FileName = pSample->GetFileName();
     int vol = pSample->GetVolume();
     int pan = pSample->GetPan();
@@ -387,7 +387,7 @@ int tSampleSet::Save(const wxString& FileName)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-const string& tSampleSet::GetSampleLabel(int Index)
+const string& JZSampleSet::GetSampleLabel(int Index)
 {
   if (Index >= 0 && Index < eSampleCount)
   {
@@ -399,7 +399,7 @@ const string& tSampleSet::GetSampleLabel(int Index)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tSampleSet::ResetBuffers(tEventArray *evnt_arr, long clock, long tpm)
+int JZSampleSet::ResetBuffers(JZEventArray *evnt_arr, long clock, long tpm)
 {
   int i;
   free_buffers.Clear();
@@ -423,7 +423,7 @@ int tSampleSet::ResetBuffers(tEventArray *evnt_arr, long clock, long tpm)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tSampleSet::ResetBufferSize(unsigned int bufsize)
+int JZSampleSet::ResetBufferSize(unsigned int bufsize)
 {
   if (bufsize == 0 || bufsize > BUFBYTES || (bufsize & 1))
   {
@@ -437,7 +437,7 @@ int tSampleSet::ResetBufferSize(unsigned int bufsize)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tSampleSet::FillBuffers(long last_clock)
+int JZSampleSet::FillBuffers(long last_clock)
 {
   // check if last_clock is bigger than free buffer space
   // and compute the count of buffers that can be filled
@@ -488,7 +488,7 @@ int tSampleSet::FillBuffers(long last_clock)
   // add remaining sample data to the buffers
   for (i = 0; i < nfree; i++)
   {
-    tAudioBuffer *buf = free_buffers.Get();
+    JZAudioBuffer* buf = free_buffers.Get();
     buf->Clear();
     long buffer_clock = BufferClock(buffers_written + i);
 
@@ -509,7 +509,7 @@ int tSampleSet::FillBuffers(long last_clock)
   {
     if (voices[i]->Finished())
     {
-      tSampleVoice *v = voices[i];
+      JZSampleVoice *v = voices[i];
       voices[i] = voices[num_voices-1];
       voices[num_voices-1] = v;
       num_voices--;
@@ -526,7 +526,7 @@ int tSampleSet::FillBuffers(long last_clock)
 //   Returns the number of buffers containing sound.  Fills as many buffers as
 // possible, the last buffers may contain silence only.
 //-----------------------------------------------------------------------------
-int tSampleSet::PrepareListen(tSample *spl, long fr_smpl, long to_smpl)
+int JZSampleSet::PrepareListen(JZSample *spl, long fr_smpl, long to_smpl)
 {
   listen_sample = spl;
 
@@ -538,7 +538,7 @@ int tSampleSet::PrepareListen(tSample *spl, long fr_smpl, long to_smpl)
 
   for (int i = 0; i < nfree; i++)
   {
-    tAudioBuffer *buf = free_buffers.Get();
+    JZAudioBuffer* buf = free_buffers.Get();
     buf->Clear();
     if (!voices[0]->Finished())
     {
@@ -553,22 +553,22 @@ int tSampleSet::PrepareListen(tSample *spl, long fr_smpl, long to_smpl)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tSampleSet::PrepareListen(int key, long fr_smpl, long to_smpl)
+int JZSampleSet::PrepareListen(int key, long fr_smpl, long to_smpl)
 {
-  tSample *spl = mSamples[key];
+  JZSample *spl = mSamples[key];
   return PrepareListen(spl, fr_smpl, to_smpl);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tSampleSet::ContinueListen()
+int JZSampleSet::ContinueListen()
 {
   int nfree = free_buffers.Count();
   int sound_buffers = 0;
 
   for (int i = 0; i < nfree; i++)
   {
-    tAudioBuffer *buf = free_buffers.Get();
+    JZAudioBuffer* buf = free_buffers.Get();
     buf->Clear();
     if (!voices[0]->Finished())
     {
@@ -583,14 +583,14 @@ int tSampleSet::ContinueListen()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSampleSet::AdjustAudioLength(JZTrack *t, long tpm)
+void JZSampleSet::AdjustAudioLength(JZTrack *t, long tpm)
 {
   if (!t->GetAudioMode() || !adjust_audio_length)
     return;
 
   ticks_per_minute = tpm;
 
-  tEventIterator it(t);
+  JZEventIterator it(t);
   JZEvent *e = it.First();
   while (e)
   {
@@ -612,14 +612,14 @@ void tSampleSet::AdjustAudioLength(JZTrack *t, long tpm)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSampleSet::StartPlay(long clock)
+void JZSampleSet::StartPlay(long clock)
 {
   ReloadSamples();
 
   // touch all playback sample data, so they may get swapped into memory
   for (int i = 0; i < eSampleCount; i++)
   {
-    tSample *spl = mSamples[i];
+    JZSample *spl = mSamples[i];
     spl->GotoRAM();
   }
 
@@ -628,7 +628,7 @@ void tSampleSet::StartPlay(long clock)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSampleSet::StopPlay()
+void JZSampleSet::StopPlay()
 {
   is_playing = 0;
 }
@@ -638,15 +638,15 @@ void tSampleSet::StopPlay()
 // Description:
 //   This is the sample dialog.
 //*****************************************************************************
-class tSamplesDlg : public wxDialog
+class JZSamplesDlg : public wxDialog
 {
-  friend class tSampleSet;
+  friend class JZSampleSet;
 
   public:
 
-    tSamplesDlg(wxWindow* pParent, tSampleSet& SampleSet);
+    JZSamplesDlg(wxWindow* pParent, JZSampleSet& SampleSet);
 
-    ~tSamplesDlg();
+    ~JZSamplesDlg();
 
 #ifdef OBSOLETE
     static void CloseButton(wxItem &item, wxCommandEvent& event);
@@ -668,7 +668,7 @@ class tSamplesDlg : public wxDialog
 
   private:
 
-    tSampleSet &set;
+    JZSampleSet &set;
 
     wxListBox* mpListBox;
     wxSlider* mpPanSlider;
@@ -691,10 +691,10 @@ class tSamplesDlg : public wxDialog
 
 #ifdef OBSOLETE
 
-class tAudioGloblForm : public wxForm
+class JZAudioGloblForm : public wxForm
 {
   public:
-    tAudioGloblForm(tSampleSet &s)
+    JZAudioGloblForm(JZSampleSet &s)
     : wxForm( USED_WXFORM_BUTTONS ),
       mSampleSet(s)
     {
@@ -803,7 +803,7 @@ class tAudioGloblForm : public wxForm
       wxForm::OnCancel();
     }
   private:
-    tSampleSet& mSampleSet;
+    JZSampleSet& mSampleSet;
     wxList  strlist;
 
     long speed;
@@ -820,7 +820,7 @@ class tAudioGloblForm : public wxForm
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSampleSet::EditAudioGlobalSettings(wxWindow* pParent)
+void JZSampleSet::EditAudioGlobalSettings(wxWindow* pParent)
 {
   if (mpSampleDialog)
   {
@@ -834,7 +834,7 @@ void tSampleSet::EditAudioGlobalSettings(wxWindow* pParent)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSampleSet::EditAudioSamples(wxWindow* pParent)
+void JZSampleSet::EditAudioSamples(wxWindow* pParent)
 {
   SamplesDlg();
 }
@@ -842,7 +842,7 @@ void tSampleSet::EditAudioSamples(wxWindow* pParent)
 //-----------------------------------------------------------------------------
 // case ID_AUDIO_LOAD_SAMPLE_SET:
 //-----------------------------------------------------------------------------
-void tSampleSet::LoadSampleSet(wxWindow* pParent)
+void JZSampleSet::LoadSampleSet(wxWindow* pParent)
 {
   wxString FileName = file_selector(
     mDefaultFileName,
@@ -859,7 +859,7 @@ void tSampleSet::LoadSampleSet(wxWindow* pParent)
 //-----------------------------------------------------------------------------
 // case ID_AUDIO_SAVE_SAMPLE_SET_AS:
 //-----------------------------------------------------------------------------
-void tSampleSet::SaveSampleSetAs(wxWindow* pParent)
+void JZSampleSet::SaveSampleSetAs(wxWindow* pParent)
 {
   wxString FileName = file_selector(
     mDefaultFileName,
@@ -876,7 +876,7 @@ void tSampleSet::SaveSampleSetAs(wxWindow* pParent)
 //-----------------------------------------------------------------------------
 // case ID_AUDIO_SAVE_SAMPLE_SET:
 //-----------------------------------------------------------------------------
-void tSampleSet::SaveSampleSet(wxWindow* pParent)
+void JZSampleSet::SaveSampleSet(wxWindow* pParent)
 {
   if (mDefaultFileName == "noname.spl")
   {
@@ -888,7 +888,7 @@ void tSampleSet::SaveSampleSet(wxWindow* pParent)
 //-----------------------------------------------------------------------------
 // case ID_AUDIO_NEW_SAMPLE_SET:
 //-----------------------------------------------------------------------------
-void tSampleSet::ClearSampleSet(wxWindow* pParent)
+void JZSampleSet::ClearSampleSet(wxWindow* pParent)
 {
   if (mpSampleDialog == 0)
   {
@@ -905,7 +905,7 @@ void tSampleSet::ClearSampleSet(wxWindow* pParent)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSampleSet::SaveRecordingDlg(long frc, long toc, tAudioRecordBuffer &buf)
+void JZSampleSet::SaveRecordingDlg(long frc, long toc, JZAudioRecordBuffer &buf)
 {
   if (frc >= toc)
   {
@@ -942,10 +942,10 @@ void tSampleSet::SaveRecordingDlg(long frc, long toc, tAudioRecordBuffer &buf)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSampleSet::AddNote(const string& FileName, long frc, long toc)
+void JZSampleSet::AddNote(const string& FileName, long frc, long toc)
 {
   int i;
-  tSample *spl;
+  JZSample *spl;
 
   // See if the file name is already present in sample list.
   for (i = 0; i < eSampleCount; i++)
@@ -989,7 +989,7 @@ void tSampleSet::AddNote(const string& FileName, long frc, long toc)
 #ifdef OBSOLETE
   pSong->NewUndoBuffer();
 #endif
-  tEventIterator iter(info->mpTrack);
+  JZEventIterator iter(info->mpTrack);
   JZEvent *e = iter.Range(frc, toc);
   while (e != 0)
   {
@@ -1013,11 +1013,11 @@ void tSampleSet::AddNote(const string& FileName, long frc, long toc)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSampleSet::SaveWave(
+void JZSampleSet::SaveWave(
   const char *fname,
   long frc,
   long toc,
-  tAudioRecordBuffer &buf)
+  JZAudioRecordBuffer &buf)
 {
   WaveHeader wh;
   wh.main_chunk = RIFF;
@@ -1082,11 +1082,11 @@ void tSampleSet::SaveWave(
 // ------------------------------- record  ------------------------
 // -----------------------------------------------------------------
 
-DEFINE_ARRAY(tAudioBufferArray, tAudioBuffer *)
+DEFINE_ARRAY(JZAudioBufferArray, JZAudioBuffer *)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tAudioRecordBuffer::Clear()
+void JZAudioRecordBuffer::Clear()
 {
   int n = buffers.GetSize();
   for (int i = 0; i < n; i++)
@@ -1099,10 +1099,10 @@ void tAudioRecordBuffer::Clear()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tAudioBuffer * tAudioRecordBuffer::RequestBuffer()
+JZAudioBuffer * JZAudioRecordBuffer::RequestBuffer()
 {
   if (buffers[num_buffers] == 0)
-    buffers[num_buffers] = new tAudioBuffer(0);
+    buffers[num_buffers] = new JZAudioBuffer(0);
   if (buffers[num_buffers] == 0)
   {
     Clear();
@@ -1118,12 +1118,12 @@ tAudioBuffer * tAudioRecordBuffer::RequestBuffer()
 #if 0
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-char* tSamplesDlg::mpSamplePath = 0;
-int   tSamplesDlg::current = 0;
+char* JZSamplesDlg::mpSamplePath = 0;
+int   JZSamplesDlg::current = 0;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tSamplesDlg::tSamplesDlg(wxWindow* pParent, tSampleSet &s)
+JZSamplesDlg::JZSamplesDlg(wxWindow* pParent, JZSampleSet &s)
   : wxDialog(pParent, wxID_ANY, wxString("Sample Settings")),
     set(s)
 {
@@ -1133,7 +1133,7 @@ tSamplesDlg::tSamplesDlg(wxWindow* pParent, tSampleSet &s)
   }
 
   wxArrayString SampleNames;
-  for (int i = 0; i < tSampleSet::eSampleCount; ++i)
+  for (int i = 0; i < JZSampleSet::eSampleCount; ++i)
   {
     SampleNames.Add(ListEntry(i));
   }
@@ -1183,7 +1183,7 @@ tSamplesDlg::tSamplesDlg(wxWindow* pParent, tSampleSet &s)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-char* tSamplesDlg::ListEntry(int i)
+char* JZSamplesDlg::ListEntry(int i)
 {
   ostringstream Oss;
   Oss << i + 1 << ' ' << set.mSamples[i]->GetLabel();
@@ -1193,9 +1193,9 @@ char* tSamplesDlg::ListEntry(int i)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSamplesDlg::Sample2Win(int i)
+void JZSamplesDlg::Sample2Win(int i)
 {
-  tSample *spl = set.mSamples[i];
+  JZSample *spl = set.mSamples[i];
   mpVolumeSlider->SetValue(spl->GetVolume());
   mpPitchSlider->SetValue(spl->GetPitch());
   mpPanSlider->SetValue(spl->GetPan());
@@ -1207,9 +1207,9 @@ void tSamplesDlg::Sample2Win(int i)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSamplesDlg::Win2Sample(int i)
+void JZSamplesDlg::Win2Sample(int i)
 {
-  tSample *spl = set.mSamples[i];
+  JZSample *spl = set.mSamples[i];
   spl->SetPitch(mpPitchSlider->GetValue());
   spl->SetVolume(mpVolumeSlider->GetValue());
   spl->SetPan(mpPanSlider->GetValue());
@@ -1221,7 +1221,7 @@ void tSamplesDlg::Win2Sample(int i)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSamplesDlg::SetCurrentListEntry(int i)
+void JZSamplesDlg::SetCurrentListEntry(int i)
 {
   if (i >= 0)
   {
@@ -1233,13 +1233,13 @@ void tSamplesDlg::SetCurrentListEntry(int i)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tSamplesDlg::~tSamplesDlg()
+JZSamplesDlg::~JZSamplesDlg()
 {
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSamplesDlg::OnCloseButton()
+void JZSamplesDlg::OnCloseButton()
 {
   if (set.is_playing)
   {
@@ -1256,7 +1256,7 @@ void tSamplesDlg::OnCloseButton()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSamplesDlg::OnAddButton()
+void JZSamplesDlg::OnAddButton()
 {
   wxString FileName = file_selector(
     mpSamplePath,
@@ -1278,12 +1278,12 @@ void tSamplesDlg::OnAddButton()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSamplesDlg::OnEditButton()
+void JZSamplesDlg::OnEditButton()
 {
   wxBeginBusyCursor();
   Win2Sample(current);
   SetCurrentListEntry(current);
-  tSample *spl = set.mSamples[current];
+  JZSample *spl = set.mSamples[current];
   spl->Load();
   wxEndBusyCursor();
 
@@ -1292,7 +1292,7 @@ void tSamplesDlg::OnEditButton()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSamplesDlg::OnPlayButton()
+void JZSamplesDlg::OnPlayButton()
 {
   if (set.is_playing)
   {
@@ -1305,7 +1305,7 @@ void tSamplesDlg::OnPlayButton()
   }
   Win2Sample(current);
   SetCurrentListEntry(current);
-  tSample *spl = set.mSamples[current];
+  JZSample *spl = set.mSamples[current];
   wxBeginBusyCursor();
   spl->Load();
   gpMidiPlayer->ListenAudio(current);
@@ -1314,9 +1314,9 @@ void tSamplesDlg::OnPlayButton()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSamplesDlg::OnClrButton()
+void JZSamplesDlg::OnClrButton()
 {
-  tSample *spl = set.mSamples[current];
+  JZSample *spl = set.mSamples[current];
   spl->Clear();
   SetCurrentListEntry(current);
   Sample2Win(current);
@@ -1324,14 +1324,14 @@ void tSamplesDlg::OnClrButton()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSamplesDlg::OnHelpButton()
+void JZSamplesDlg::OnHelpButton()
 {
   gpHelpInstance->ShowTopic("Sample Settings");
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSamplesDlg::OnListClick()
+void JZSamplesDlg::OnListClick()
 {
   Win2Sample(current);
   int i = mpListBox->GetSelection();
@@ -1345,40 +1345,40 @@ void tSamplesDlg::OnListClick()
 
 #ifdef OBSOLETE
 
-void tSamplesDlg::CloseButton(wxItem &itm, wxCommandEvent& event)
+void JZSamplesDlg::CloseButton(wxItem &itm, wxCommandEvent& event)
 {
-  ((tSamplesDlg *)itm.GetParent())->OnCloseButton();
+  ((JZSamplesDlg *)itm.GetParent())->OnCloseButton();
 }
-void tSamplesDlg::PlayButton(wxItem &itm, wxCommandEvent& event)
+void JZSamplesDlg::PlayButton(wxItem &itm, wxCommandEvent& event)
 {
-  ((tSamplesDlg *)itm.GetParent())->OnPlayButton();
+  ((JZSamplesDlg *)itm.GetParent())->OnPlayButton();
 }
-void tSamplesDlg::EditButton(wxItem &itm, wxCommandEvent& event)
+void JZSamplesDlg::EditButton(wxItem &itm, wxCommandEvent& event)
 {
-  ((tSamplesDlg *)itm.GetParent())->OnEditButton();
+  ((JZSamplesDlg *)itm.GetParent())->OnEditButton();
 }
-void tSamplesDlg::AddButton(wxItem &itm, wxCommandEvent& event)
+void JZSamplesDlg::AddButton(wxItem &itm, wxCommandEvent& event)
 {
-  ((tSamplesDlg *)itm.GetParent())->OnAddButton();
+  ((JZSamplesDlg *)itm.GetParent())->OnAddButton();
 }
-void tSamplesDlg::ClrButton(wxItem &itm, wxCommandEvent& event)
+void JZSamplesDlg::ClrButton(wxItem &itm, wxCommandEvent& event)
 {
-  ((tSamplesDlg *)itm.GetParent())->OnClrButton();
+  ((JZSamplesDlg *)itm.GetParent())->OnClrButton();
 }
-void tSamplesDlg::HelpButton(wxItem &itm, wxCommandEvent& event)
+void JZSamplesDlg::HelpButton(wxItem &itm, wxCommandEvent& event)
 {
-  ((tSamplesDlg *)itm.GetParent())->OnHelpButton();
+  ((JZSamplesDlg *)itm.GetParent())->OnHelpButton();
 }
-void tSamplesDlg::ListClick(wxItem &itm, wxCommandEvent& event)
+void JZSamplesDlg::ListClick(wxItem &itm, wxCommandEvent& event)
 {
-  ((tSamplesDlg *)itm.GetParent())->OnListClick();
+  ((JZSamplesDlg *)itm.GetParent())->OnListClick();
 }
 #endif // OBSOLETE
 #endif
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSampleSet::SamplesDlg()
+void JZSampleSet::SamplesDlg()
 {
   if (mpSampleDialog == 0)
   {
@@ -1389,7 +1389,7 @@ void tSampleSet::SamplesDlg()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSampleSet::RefreshDialogs()
+void JZSampleSet::RefreshDialogs()
 {
   if (mpSampleDialog)
   {

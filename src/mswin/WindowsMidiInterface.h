@@ -56,13 +56,13 @@ class JZWindowsAudioPlayer;
 
 
 
-class tWinSysexBuffer
+class JZWinSysexBuffer
 {
-    friend class tWinSysexBufferArray;
+    friend class JZWinSysexBufferArray;
 
   public:
 
-    tWinSysexBuffer(tWinSysexBufferArray *array)
+    JZWinSysexBuffer(JZWinSysexBufferArray *array)
       : parent(array)
     {
       maxsize = 0;
@@ -148,28 +148,28 @@ class tWinSysexBuffer
     int size;
     int maxsize;
     int prepared;
-    tWinSysexBuffer *next_free;
-    tWinSysexBufferArray *parent;
+    JZWinSysexBuffer *next_free;
+    JZWinSysexBufferArray *parent;
 };
 
 
 
-class tWinSysexBufferArray
+class JZWinSysexBufferArray
 {
   public:
 
-    tWinSysexBufferArray()
+    JZWinSysexBufferArray()
     {
       size = 0;
       next_free = 0;
     }
 
-    ~tWinSysexBufferArray()
+    ~JZWinSysexBufferArray()
     {
       int n = Size();
       for (int i = 0; i < n; i++)
       {
-        delete (tWinSysexBuffer *)array[i];
+        delete (JZWinSysexBuffer *)array[i];
       }
     }
 
@@ -178,25 +178,25 @@ class tWinSysexBufferArray
       return size;
     }
 
-    tWinSysexBuffer * At(int i) const
+    JZWinSysexBuffer * At(int i) const
     {
-      return (tWinSysexBuffer *)array[i];
+      return (JZWinSysexBuffer *)array[i];
     }
 
-    tWinSysexBuffer * AllocBuffer()
+    JZWinSysexBuffer * AllocBuffer()
     {
       if (next_free == 0)
       {
-        tWinSysexBuffer *buf = new tWinSysexBuffer(this);
+        JZWinSysexBuffer *buf = new JZWinSysexBuffer(this);
         array[size++] = (void *)buf;
         return buf;
       }
-      tWinSysexBuffer *buf = next_free;
+      JZWinSysexBuffer *buf = next_free;
       next_free = buf->next_free;
       return buf;
     }
 
-    void ReleaseBuffer(tWinSysexBuffer *buf)
+    void ReleaseBuffer(JZWinSysexBuffer *buf)
     {
       buf->next_free = next_free;
       next_free = buf;
@@ -208,7 +208,7 @@ class tWinSysexBufferArray
       int n = Size();
       for (int i = 0; i < n; i++)
       {
-        tWinSysexBuffer *buf = At(i);
+        JZWinSysexBuffer *buf = At(i);
         buf->next_free = next_free;
         next_free = buf;
       }
@@ -218,12 +218,12 @@ class tWinSysexBufferArray
 
     JZVoidPtrArray array;
     int size;
-    tWinSysexBuffer *next_free;
+    JZWinSysexBuffer *next_free;
 };
 
 
 inline
-void tWinSysexBuffer::Release()
+void JZWinSysexBuffer::Release()
 {
   parent->ReleaseBuffer(this);
 }
@@ -239,7 +239,7 @@ struct midi_event
 };
 
 
-class tMidiQueue
+class JZMidiQueue
 {
   public:
 
@@ -285,7 +285,7 @@ class tMidiQueue
       rd = wr = 0;
     }
 
-    tMidiQueue()
+    JZMidiQueue()
     {
       clear();
     }
@@ -344,15 +344,15 @@ struct tWinPlayerState
   BOOL soft_thru;
   BOOL doing_mtc_rec;
 
-  tMidiQueue recd_buffer;
-  tMidiQueue play_buffer;
-  tMidiQueue thru_buffer;
+  JZMidiQueue recd_buffer;
+  JZMidiQueue play_buffer;
+  JZMidiQueue thru_buffer;
 
   JZWindowsAudioPlayer* audio_player;
   long time_correction;
 
-  tWinSysexBufferArray* isx_buffers;
-  tWinSysexBufferArray* osx_buffers;
+  JZWinSysexBufferArray* isx_buffers;
+  JZWinSysexBufferArray* osx_buffers;
   int sysex_found;
 };
 

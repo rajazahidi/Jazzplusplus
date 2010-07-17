@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,11 +26,14 @@
 #include "MouseAction.h"
 
 class JZTrackFrame;
-class tMarkDestin;
-class tCopyDlg;
+class JZMarkDestination;
+class JZCopyDlg;
 
-// this class handles the gui copy operation
-class tCopyCommand : public wxObject, public tMouseAction
+//*****************************************************************************
+// Description:
+//   This class handles the GUI copy operation.
+//*****************************************************************************
+class JZCopyCommand : public wxObject, public JZMouseAction
 {
   public:
 
@@ -40,7 +43,7 @@ class tCopyCommand : public wxObject, public tMouseAction
     static bool InsertSpace;
 
     int Event(wxMouseEvent& e);
-    tCopyCommand(JZTrackFrame* t);
+    JZCopyCommand(JZTrackFrame* t);
     void EditForm(wxPanel* panel);
     void OnOk();
     void OnCancel();
@@ -52,8 +55,8 @@ class tCopyCommand : public wxObject, public tMouseAction
     int MarkRepeat;
     float StartX, StartY, StopX, StopY;
 
-    tMarkDestin* Mouse;
-    tCopyDlg* CopyDlg;
+    JZMarkDestination* Mouse;
+    JZCopyDlg* CopyDlg;
 };
 
 #endif // Copycommand

@@ -293,7 +293,7 @@ class JZSnapSelection : public JZSelection
 
 
 //*****************************************************************************
-//  tButtonLabelInterface
+//  JZButtonLabelInterface
 //
 //  Specifies an interface for displaying a text string within another widget.
 //  The other widget would inherit from this interface and implement the Display
@@ -301,11 +301,11 @@ class JZSnapSelection : public JZSelection
 //  indicates if the text should be displayed in a depressed button or a normal
 //  button.
 //*****************************************************************************
-class tButtonLabelInterface
+class JZButtonLabelInterface
 {
   public:
 
-    virtual ~tButtonLabelInterface()
+    virtual ~JZButtonLabelInterface()
     {
     }
 
@@ -318,7 +318,7 @@ class tButtonLabelInterface
 //*****************************************************************************
 //  MouseCounter - let you enter numbers with left/right mouse button
 //*****************************************************************************
-class tMouseCounter : public wxTimer, public JZMouseAction
+class JZMouseCounter : public wxTimer, public JZMouseAction
 {
   public:
 
@@ -326,8 +326,8 @@ class tMouseCounter : public wxTimer, public JZMouseAction
 
     int Value;
 
-    tMouseCounter(
-      tButtonLabelInterface *win,
+    JZMouseCounter(
+      JZButtonLabelInterface *win,
       JZRectangle *rec,
       int val,
       int min,
@@ -339,7 +339,7 @@ class tMouseCounter : public wxTimer, public JZMouseAction
     int Min, Max, Delta;
     int Timeout;
     int Wait;        // don't inc/dec at Init
-    tButtonLabelInterface *win;
+    JZButtonLabelInterface *win;
 
     virtual int LeftDown(
       wxMouseEvent& MouseEvent,
@@ -368,9 +368,9 @@ class tMouseCounter : public wxTimer, public JZMouseAction
 
 
 //*****************************************************************************
-// tMarkDestin - mark destination of some operation
+// JZMarkDestination - mark destination of some operation
 //*****************************************************************************
-class tMarkDestin : public JZMouseAction
+class JZMarkDestination : public JZMouseAction
 {
   public:
 
@@ -387,7 +387,7 @@ class tMarkDestin : public JZMouseAction
       int ScrolledX,
       int ScrolledY);
 
-    tMarkDestin(wxWindow* canvas, wxFrame* frame, int left);
+    JZMarkDestination(wxWindow* canvas, wxFrame* frame, int left);
 
   private:
 
@@ -407,17 +407,17 @@ class tMarkDestin : public JZMouseAction
 //   This is the mouse button class declaration.  This class simulates a 3D
 // button.
 //*****************************************************************************
-class tMouseButton : public JZMouseAction
+class JZMouseButton : public JZMouseAction
 {
   public:
 
-    tMouseButton(
+    JZMouseButton(
       JZEventWindow* pEventWindow,
       JZRectangle* pRectangle,
       const char* pDownString,
       const char* pUpString = 0);
 
-    virtual ~tMouseButton();
+    virtual ~JZMouseButton();
 
     virtual int ProcessMouseEvent(
       wxMouseEvent& MouseEvent,

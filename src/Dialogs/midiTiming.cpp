@@ -24,22 +24,22 @@
 
 #ifndef __PORTING
 
-void tTimingDlg::OkFunc( tMidiButton& button, wxCommandEvent& event )
+void JZTimingDlg::OkFunc( JZMidiButton& button, wxCommandEvent& event )
 {
   button.OnOk();
 }
 
-void tTimingDlg::CancelFunc( tMidiButton& button, wxCommandEvent& event )
+void JZTimingDlg::CancelFunc( JZMidiButton& button, wxCommandEvent& event )
 {
   button.OnCancel();
 }
 
-void tTimingDlg::HelpFunc( tMidiButton& button, wxCommandEvent& event )
+void JZTimingDlg::HelpFunc( JZMidiButton& button, wxCommandEvent& event )
 {
   button.OnHelp();
 }
 
-void tTimingDlg::MtcRecFunc( tMidiButton& button, wxCommandEvent& event )
+void JZTimingDlg::MtcRecFunc( JZMidiButton& button, wxCommandEvent& event )
 {
   if ( !strcmp( button.GetLabel(), "Start" ) )
   {
@@ -53,7 +53,7 @@ void tTimingDlg::MtcRecFunc( tMidiButton& button, wxCommandEvent& event )
   }
 }
 
-void tTimingDlg::MtcInitRec()
+void JZTimingDlg::MtcInitRec()
 {
 #ifdef __WXMSW__
   if (Config(C_ClockSource) != CsMtc)
@@ -65,16 +65,16 @@ void tTimingDlg::MtcInitRec()
     if (!Midi->IsInstalled())
     {
       wxMessageBox("no MIDI driver installed", "Error", wxOK);
-      Midi = new tNullPlayer(EventWin->Song);
+      Midi = new JZNullPlayer(EventWin->Song);
     }
   }
 #endif
   Midi->InitMtcRec();
 }
 
-void tTimingDlg::MtcFreezeRec()
+void JZTimingDlg::MtcFreezeRec()
 {
-  tMtcTime *offs = Midi->FreezeMtcRec();
+  JZMtcTime *offs = Midi->FreezeMtcRec();
   if (offs)
   {
     char str[80];
@@ -85,7 +85,7 @@ void tTimingDlg::MtcFreezeRec()
   }
 }
 
-tTimingDlg::tTimingDlg(tEventWin *w)
+JZTimingDlg::JZTimingDlg(tEventWin *w)
 : wxForm( USED_WXFORM_BUTTONS )
 {
   EventWin = w;
@@ -103,7 +103,7 @@ tTimingDlg::tTimingDlg(tEventWin *w)
   MtcOffsetEntry = 0;
 }
 
-void tTimingDlg::CloseWindow()
+void JZTimingDlg::CloseWindow()
 {
   EventWin->DialogBox->Show( FALSE );
   delete EventWin->DialogBox;
@@ -112,7 +112,7 @@ void tTimingDlg::CloseWindow()
 }
 
 
-void tTimingDlg::OnOk()
+void JZTimingDlg::OnOk()
 {
   int i;
   char *str = copystring( ClkSrcListBox->GetStringSelection() );
@@ -129,7 +129,7 @@ void tTimingDlg::OnOk()
 
   if (i != Config(C_ClockSource))
   {
-    Config(C_ClockSource) = (tClockSource) i;
+    Config(C_ClockSource) = (JZClockSource) i;
 #ifdef __WXMSW__
     // Re-install the midi device
     delete Midi;
@@ -152,7 +152,7 @@ void tTimingDlg::OnOk()
     if (!Midi->IsInstalled())
     {
       wxMessageBox("no MIDI driver installed", "Error", wxOK);
-      Midi = new tNullPlayer(EventWin->Song);
+      Midi = new JZNullPlayer(EventWin->Song);
     }
 #endif
   }
@@ -170,7 +170,7 @@ void tTimingDlg::OnOk()
   delete str;
   if (i > 3)
     MtcType = Mtc30Ndf;
-  tMtcTime *offs = new tMtcTime( MtcOffsetEntry->GetValue(), MtcType );
+  JZMtcTime *offs = new JZMtcTime( MtcOffsetEntry->GetValue(), MtcType );
   EventWin->Song->GetTrack(0)->SetMtcOffset( offs );
   delete offs;
 
@@ -179,19 +179,19 @@ void tTimingDlg::OnOk()
   CloseWindow();
 }
 
-void tTimingDlg::OnHelp()
+void JZTimingDlg::OnHelp()
 {
   HelpInstance->ShowTopic("Timing");
 }
 
 
 
-void tTimingDlg::EditForm(wxPanel *panel)
+void JZTimingDlg::EditForm(wxPanel *panel)
 {
 
-  (void) new tMidiButton( this, panel, (wxFunction) OkFunc, "Ok" );
-  (void) new tMidiButton( this, panel, (wxFunction) CancelFunc, "Cancel" );
-  (void) new tMidiButton( this, panel, (wxFunction) HelpFunc, "Help" );
+  (void) new JZMidiButton( this, panel, (wxFunction) OkFunc, "Ok" );
+  (void) new JZMidiButton( this, panel, (wxFunction) CancelFunc, "Cancel" );
+  (void) new JZMidiButton( this, panel, (wxFunction) HelpFunc, "Help" );
   panel->NewLine();
 
   panel->SetLabelPosition(wxVERTICAL);
@@ -227,7 +227,7 @@ void tTimingDlg::EditForm(wxPanel *panel)
 
   tTrack *t = EventWin->Song->GetTrack(0);
   char str[80];
-  tMtcTime *offs = t->GetMtcOffset();
+  JZMtcTime *offs = t->GetMtcOffset();
   offs->ToString( str );
   MtcOffsetEntry = new wxText(
     panel,
@@ -242,7 +242,7 @@ void tTimingDlg::EditForm(wxPanel *panel)
 
 #ifdef __WXMSW__
   (void) new wxMessage( panel, "Record MTC offset: " );
-  (void) new tMidiButton( this, panel, (wxFunction) MtcRecFunc, "Start" );
+  (void) new JZMidiButton( this, panel, (wxFunction) MtcRecFunc, "Start" );
   panel->NewLine();
 #endif
 

@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,14 +24,14 @@
 #define JZ_SIGNALINTERFACE_H
 
 class JZRndArray;
-class tSample;
+class JZSample;
 
 //*****************************************************************************
 // interface header for signal library
 //*****************************************************************************
 
 void sig_chorus(
-  tSample& spl,
+  JZSample& spl,
   float pitch_freq,   // pitch modification speed
   float pitch_range,  // 1 = one octave
   float pan_freq,     // in Hz
@@ -40,14 +40,14 @@ void sig_chorus(
 );
 
 void sig_reverb(
-  tSample& spl,
+  JZSample& spl,
   float rvbtime_val, // echo absorbtion
   float bright_val,  // lowpass filter freq
   float volume_val,  // effect volume
   float room_val);   // echo delay
 
 void sig_wavsynth(
-  tSample& spl,         // destin
+  JZSample& spl,         // destin
   double durat,         // length in seconds
   int midi_key,         // base freq
   double fshift,        // frequeny modulation factor
@@ -57,17 +57,17 @@ void sig_wavsynth(
 );
 
 
-// virtual version of tOpLowpass, tOpHighpass, etc classes
+// virtual version of JZOpLowpass, JZOpHighpass, etc classes
 
-class tOpFilter;
+class JZOpFilter;
 
-class tSplFilter
+class JZSplFilter
 {
   public:
 
-    tSplFilter();
+    JZSplFilter();
 
-    ~tSplFilter();
+    ~JZSplFilter();
 
     enum Type
     {
@@ -84,7 +84,7 @@ class tSplFilter
 
   protected:
 
-    tOpFilter* filter;
+    JZOpFilter* filter;
     float sr;
 };
 

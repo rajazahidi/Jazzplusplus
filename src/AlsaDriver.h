@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,22 +30,22 @@
 
 #include <sys/time.h>
 
-class tSample;
-class tAlsaAudioListener;
+class JZSample;
+class JZAlsaAudioListener;
 
-class tAlsaAudioPlayer : public tAlsaPlayer
+class JZAlsaAudioPlayer : public JZAlsaPlayer
 {
-  friend class tAlsaAudioListener;
+  friend class JZAlsaAudioListener;
   public:
-    tAlsaAudioPlayer(JZSong *song);
-    virtual ~tAlsaAudioPlayer();
+    JZAlsaAudioPlayer(JZSong *song);
+    virtual ~JZAlsaAudioPlayer();
     int LoadSamples(const char *filename);
     virtual void Notify();
     virtual void StartPlay(long Clock, long LoopClock = 0, int Continue = 0);
     virtual void StopPlay();
     virtual bool IsInstalled()
     {
-      return mInstalled && tAlsaPlayer::IsInstalled();
+      return mInstalled && JZAlsaPlayer::IsInstalled();
     }
     virtual bool GetAudioEnabled() const
     {
@@ -56,7 +56,7 @@ class tAlsaAudioPlayer : public tAlsaPlayer
       mAudioEnabled = AudioEnabled;
     }
     virtual void ListenAudio(int key, int start_stop_mode = 1);
-    virtual void ListenAudio(tSample &spl, long fr_smpl, long to_smpl);
+    virtual void ListenAudio(JZSample &spl, long fr_smpl, long to_smpl);
     virtual bool IsListening() const
     {
       return mpListener != 0;
@@ -111,8 +111,8 @@ class tAlsaAudioPlayer : public tAlsaPlayer
     int frame_shift[2];
     long frame_boundary[2];
 
-    tAlsaAudioListener* mpListener;
-    tAudioRecordBuffer recbuffers;
+    JZAlsaAudioListener* mpListener;
+    JZAudioRecordBuffer recbuffers;
 };
 
 #endif // !defined(JZ_ALSADRIVER_H)

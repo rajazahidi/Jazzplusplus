@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,15 +26,15 @@
 #include <string>
 
 //*****************************************************************************
-// tNamedValue is a name/value pair array.
+// JZNamedValue is a name/value pair array.
 //*****************************************************************************
-class tNamedValue
+class JZNamedValue
 {
   public:
 
-    tNamedValue();
+    JZNamedValue();
 
-    tNamedValue(const char* pName, long Value);
+    JZNamedValue(const char* pName, long Value);
 
     const std::string& GetName() const
     {

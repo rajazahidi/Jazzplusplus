@@ -23,7 +23,7 @@
 
 #include <wx/dialog.h>
 
-class tSampleSet;
+class JZSampleSet;
 class wxButton;
 class wxListBox;
 class wxSlider;
@@ -37,7 +37,7 @@ class JZSamplesDialog : public wxDialog
 {
   public:
 
-    JZSamplesDialog(wxWindow* pParent, tSampleSet& SampleSet);
+    JZSamplesDialog(wxWindow* pParent, JZSampleSet& SampleSet);
 
   private:
 

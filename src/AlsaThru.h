@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -41,12 +41,12 @@
 // does not work together with wxwin $%!
 // #include <pthread.h>
 
-class tAlsaThru
+class JZAlsaThru
 {
   public:
 
-    tAlsaThru();
-    virtual ~tAlsaThru();
+    JZAlsaThru();
+    virtual ~JZAlsaThru();
 
     void SetSource(int client, int port)
     {

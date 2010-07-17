@@ -111,7 +111,7 @@ int JZPortMidiPlayer::SupportsMultipleDevices()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tDeviceList& JZPortMidiPlayer::GetOutputDevices()
+JZDeviceList& JZPortMidiPlayer::GetOutputDevices()
 {
   bool NeedToTerminate = InitPM();
   int Count = Pm_CountDevices();
@@ -142,7 +142,7 @@ tDeviceList& JZPortMidiPlayer::GetOutputDevices()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tDeviceList& JZPortMidiPlayer::GetInputDevices()
+JZDeviceList& JZPortMidiPlayer::GetInputDevices()
 {
   bool NeedToTerminate = InitPM();
   int Count = Pm_CountDevices();

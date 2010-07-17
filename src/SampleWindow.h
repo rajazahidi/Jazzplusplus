@@ -29,24 +29,24 @@
 
 class JZRndArray;
 class JZToolBar;
-class tArrayEdit;
-class tCommandPainter;
-class tDistortion;
-class tEqualizer;
-class tSample;
-class tSampleCnvs;
-class tSynthDlg;
+class JZArrayEdit;
+class JZCommandPainter;
+class JZDistortion;
+class JZEqualizer;
+class JZSample;
+class JZSampleWindow;
+class JZSynthDlg;
 class wxDialog;
 class wxScrollBar;
 
-class tSampleWin : public wxFrame
+class JZSampleFrame : public wxFrame
 {
-  friend class tSampleCnvs;
-  friend class tCommandPainter;
-  friend class tSmplWinSettingsForm;
+  friend class JZSampleWindow;
+  friend class JZCommandPainter;
+  friend class JZSmplWinSettingsForm;
   public:
-    tSampleWin(wxWindow* pParent, tSampleWin **ref, tSample &);
-    ~tSampleWin();
+    JZSampleFrame(wxWindow* pParent, JZSampleFrame **ref, JZSample &);
+    ~JZSampleFrame();
     virtual void OnSize(int w, int h);
     virtual bool OnClose();
     virtual void OnMenuCommand(int id);
@@ -63,7 +63,7 @@ class tSampleWin : public wxFrame
     void AddParam(JZRndArray *array, const char *label);
     void ClrParam();
     void ClearSelection();
-    tSample &GetSample()
+    JZSample &GetSample()
     {
       return spl;
     }
@@ -77,36 +77,36 @@ class tSampleWin : public wxFrame
     void OnScroll(wxItem &item);
 #endif
     void SetViewPos(int fr, int to);
-    void LoadError(tSample &spl);
+    void LoadError(JZSample &spl);
 
-    tSample     &spl;
-    tSampleCnvs *cnvs;
+    JZSample     &spl;
+    JZSampleWindow *cnvs;
     wxPanel     *scrol_panel;
     wxScrollBar *pos_scrol;
     wxScrollBar *zoom_scrol;
     JZToolBar* mpToolBar;
     int         in_constructor;
-    tSampleWin  **ref;
+    JZSampleFrame  **ref;
     static int geo[4];
 
-    static tSample *copy_buffer;
+    static JZSample *copy_buffer;
 
     enum
     {
       MAXPARAM = 4
     };
-    tArrayEdit *params[MAXPARAM];
+    JZArrayEdit *params[MAXPARAM];
     int        num_params;
 
-    tCommandPainter  *on_accept;
-    tSplVolume vol_command;
-    tSplPan    pan_command;
-    tSplPitch  pitch_command;
-    tWahWah    wah_command;
+    JZCommandPainter  *on_accept;
+    JZSplVolume vol_command;
+    JZSplPan    pan_command;
+    JZSplPitch  pitch_command;
+    JZWahWah    wah_command;
 
-    tEqualizer *equalizer;
-    tDistortion *distortion;
-    tSynthDlg   *synth;
+    JZEqualizer *equalizer;
+    JZDistortion *distortion;
+    JZSynthDlg   *synth;
     wxDialog *reverb;
     wxDialog *echo;
     wxDialog *chorus;

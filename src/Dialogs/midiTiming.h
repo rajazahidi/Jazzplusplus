@@ -32,13 +32,13 @@
 // Midi Timing Dialog
 // ******************************************************************
 
-class tMidiButton;
+class JZMidiButton;
 
-class tTimingDlg : public wxForm
+class JZTimingDlg : public wxForm
 {
  public:
   tEventWin *EventWin;
-  tTimingDlg(tEventWin *w);
+  JZTimingDlg(tEventWin *w);
   void EditForm(wxPanel *panel);
   virtual void OnOk();
   virtual void CloseWindow();
@@ -51,17 +51,17 @@ class tTimingDlg : public wxForm
   wxText *MtcOffsetEntry;
   void MtcInitRec();
   void MtcFreezeRec();
-  static void MtcRecFunc( tMidiButton& button, wxCommandEvent& event );
-  static void OkFunc( tMidiButton& button, wxCommandEvent& event );
-  static void CancelFunc( tMidiButton& button, wxCommandEvent& event );
-  static void HelpFunc( tMidiButton& button, wxCommandEvent& event );
+  static void MtcRecFunc( JZMidiButton& button, wxCommandEvent& event );
+  static void OkFunc( JZMidiButton& button, wxCommandEvent& event );
+  static void CancelFunc( JZMidiButton& button, wxCommandEvent& event );
+  static void HelpFunc( JZMidiButton& button, wxCommandEvent& event );
 };
 
-class tMidiButton : public wxButton
+class JZMidiButton : public wxButton
 {
   public:
-    tMidiButton(
-      tTimingDlg *dlg,
+    JZMidiButton(
+      JZTimingDlg *dlg,
       wxPanel *panel,
       wxFunction func,
       char *label,
@@ -101,7 +101,7 @@ class tMidiButton : public wxButton
       midiDlg->MtcFreezeRec();
     }
   private:
-    tTimingDlg *midiDlg;
+    JZTimingDlg *midiDlg;
 };
 
 

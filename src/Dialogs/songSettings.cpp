@@ -22,8 +22,8 @@
 
 #include "songSettings.h"
 
-tSongSettingsDlg::tSongSettingsDlg(tEventWin *w)
-: tPropertyListDlg("Song Settings" )
+JZSongSettingsDlg::JZSongSettingsDlg(tEventWin *w)
+: JZPropertyListDlg("Song Settings" )
 {
   EventWin = w;
   TicksPerQuarter = EventWin->Song->TicksPerQuarter;
@@ -31,7 +31,7 @@ tSongSettingsDlg::tSongSettingsDlg(tEventWin *w)
   IntroLength     = EventWin->Song->GetIntroLength();
 }
 
-bool tSongSettingsDlg::OnClose()
+bool JZSongSettingsDlg::OnClose()
 {
   EventWin->Song->SetTicksPerQuarter(TicksPerQuarter);
   EventWin->Song->MaxQuarters = SongLength * 4;
@@ -44,7 +44,7 @@ bool tSongSettingsDlg::OnClose()
   return FALSE;
 }
 
-void tSongSettingsDlg::AddProperties()
+void JZSongSettingsDlg::AddProperties()
 {
   sheet->AddProperty(new wxProperty("Ticks per Quarter Note: 48, 72, 96, 120, 144, 168, 192", wxPropertyValue(&TicksPerQuarter), "integer", new wxIntegerListValidator(1, 200)));
   sheet->AddProperty(new wxProperty("Song length in Bars", wxPropertyValue(&SongLength), "integer", new wxIntegerListValidator(50, 500)));

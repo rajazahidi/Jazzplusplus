@@ -36,7 +36,7 @@ using namespace std;
 #define db(a) cout << #a << " = " << a << endl
 
 
-void tPaintableCommand1::Initialize()
+void JZPaintableCommand1::Initialize()
 {
   for (int i = 0; i < arr.Size(); i++)
     arr[i] = 0;
@@ -47,13 +47,13 @@ void tPaintableCommand1::Initialize()
  * new volume may exceed 32767
  */
 
-void tSplVolume::Execute(long fr, long to)
+void JZSplVolume::Execute(long fr, long to)
 {
   long n = to - fr;
   if (n <= 0)
     return; // no data
 
-  tFloatSample fs(spl);
+  JZFloatSample fs(spl);
   float i_fact  = (float)arr.Size() / (float)n;
   for (long i = 0; i < n; i++)
   {
@@ -70,7 +70,7 @@ void tSplVolume::Execute(long fr, long to)
  * one channel.
  */
 
-void tSplPan::Execute(long fr, long to)
+void JZSplPan::Execute(long fr, long to)
 {
   long n = to - fr;
   if (n <= 0)
@@ -94,7 +94,7 @@ void tSplPan::Execute(long fr, long to)
  * adjust pitch graphically
  */
 
-void tSplPitch::Execute(long fr, long to)
+void JZSplPitch::Execute(long fr, long to)
 {
   long n = to - fr;
   if (n <= 0)
@@ -104,7 +104,7 @@ void tSplPitch::Execute(long fr, long to)
   float N       = spl.length / channels - 2;
   short *data   = spl.data;
 
-  tFloatSample out(channels, spl.GetSamplingRate());
+  JZFloatSample out(channels, spl.GetSamplingRate());
   out.SetNote(0, 0);
 
   float p[10];
@@ -136,7 +136,7 @@ void tSplPitch::Execute(long fr, long to)
 //                       small CMIX interface
 // ----------------------------------------------------------------
 
-tCMixCmd::tCMixCmd(float sr)
+JZCMixCmd::JZCMixCmd(float sr)
   : SR(sr)
 {
   int i;
@@ -146,14 +146,14 @@ tCMixCmd::tCMixCmd(float sr)
   lineset = 0;
 }
 
-void tCMixCmd::tableset(float dur, int size, float *tab)
+void JZCMixCmd::tableset(float dur, int size, float *tab)
 {
   *tab = (long)(dur * SR  -.9999);
   *(tab+1) = size - 1;
 }
 
 
-float tCMixCmd::tablei(long nsample, float *array, float *tab)
+float JZCMixCmd::tablei(long nsample, float *array, float *tab)
 {
         register int loc1,loc2;
         float frac = ((float)(nsample)/(*tab)) * *(tab+1);
@@ -175,7 +175,7 @@ float tCMixCmd::tablei(long nsample, float *array, float *tab)
  * arguments is n_args, result is stuffed into array array of length length
  */
 
-void tCMixCmd::setline(const float *p, short n_args,int length,float *array)
+void JZCMixCmd::setline(const float *p, short n_args,int length,float *array)
 {
   double increm;
   int i,j,k,points;
@@ -208,7 +208,7 @@ void tCMixCmd::setline(const float *p, short n_args,int length,float *array)
 }
 
 
-float tCMixCmd::cpspch(float pch)
+float JZCMixCmd::cpspch(float pch)
 {
   int oct = (int)pch;
   return (float) ((pow(2.,oct+8.333333*(pch-oct))*1.021975));
@@ -216,12 +216,12 @@ float tCMixCmd::cpspch(float pch)
 
 // ------------------------ wahwah ------------------------
 
-tWahWah::tWahWah(tSample &s)
-: tPaintableCommand1(s, 200, 0, 100)
+JZWahWah::JZWahWah(JZSample &s)
+: JZPaintableCommand1(s, 200, 0, 100)
 {
   for (int i = 0; i < arr.Size(); i++)
     arr[i]  = i * 100 / arr.Size();
-  filter_type = tSplFilter::BANDPASS;
+  filter_type = JZSplFilter::BANDPASS;
   order       = 2;
   lo_freq     = 400;
   hi_freq     = 2000;
@@ -230,14 +230,14 @@ tWahWah::tWahWah(tSample &s)
 
 
 
-void tWahWah::Initialize()
+void JZWahWah::Initialize()
 {
 }
 
 
-void tWahWah::Execute(long fr, long to)
+void JZWahWah::Execute(long fr, long to)
 {
-  tFloatSample *out = new tFloatSample(spl);
+  JZFloatSample *out = new JZFloatSample(spl);
   for (int c = 0; c < out->GetChannelCount(); c++)
     Wah(c, *out);
   out->Rescale();
@@ -247,7 +247,7 @@ void tWahWah::Execute(long fr, long to)
 
 
 
-void tWahWah::Wah(int channel, tFloatSample &out)
+void JZWahWah::Wah(int channel, JZFloatSample &out)
 {
   long N = spl.GetLength();
   float SR = spl.GetSamplingRate();
@@ -255,7 +255,7 @@ void tWahWah::Wah(int channel, tFloatSample &out)
   JZMapper XMap(0, N, 0, arr.Size());
   JZMapper fmap(0, 100, lo_freq, hi_freq);
 
-  tSplFilter flt;
+  JZSplFilter flt;
   {
     float f = fmap.XToY(arr[0]);
     flt.Init(filter_type, SR, f, band_width);
@@ -278,8 +278,8 @@ void tWahWah::Wah(int channel, tFloatSample &out)
 
 // ------------------------ rotater ------------------------
 
-tShifterCmd::tShifterCmd(long sampling_rate)
-  : tCMixCmd(sampling_rate)
+JZShifterCmd::JZShifterCmd(long sampling_rate)
+  : JZCMixCmd(sampling_rate)
 {
 }
 
@@ -288,7 +288,7 @@ tShifterCmd::tShifterCmd(long sampling_rate)
  * be in 0..100
  */
 
-void tShifterCmd::ShiftPitch(tSample &spl, float semis,  bool keep_length, float winsize)
+void JZShifterCmd::ShiftPitch(JZSample &spl, float semis,  bool keep_length, float winsize)
 {
   if (semis == 0)
     return;
@@ -296,8 +296,8 @@ void tShifterCmd::ShiftPitch(tSample &spl, float semis,  bool keep_length, float
   if (keep_length)
   {
     JZMapper wmap(0, 100, 0.05, 0.3);
-    tFloatSample inp(spl);
-    tFloatSample out(inp.GetChannelCount(), inp.GetSamplingRate());
+    JZFloatSample inp(spl);
+    JZFloatSample out(inp.GetChannelCount(), inp.GetSamplingRate());
     float p[8];
     p[0] = 0;
     p[1] = 0;
@@ -321,7 +321,7 @@ void tShifterCmd::ShiftPitch(tSample &spl, float semis,  bool keep_length, float
     spl.TransposeSemis(semis);
 }
 
-void tShifterCmd::StretchLength(tSample &spl, long newlen, bool keep_pitch, float winsize)
+void JZShifterCmd::StretchLength(JZSample &spl, long newlen, bool keep_pitch, float winsize)
 {
   long oldlen = spl.GetLength();
   if (oldlen == newlen)
@@ -336,8 +336,8 @@ void tShifterCmd::StretchLength(tSample &spl, long newlen, bool keep_pitch, floa
   if (keep_pitch)
   {
     JZMapper wmap(0, 100, 0.05, 0.3);
-    tFloatSample inp(spl);
-    tFloatSample out(inp.GetChannelCount(), inp.GetSamplingRate());
+    JZFloatSample inp(spl);
+    JZFloatSample out(inp.GetChannelCount(), inp.GetSamplingRate());
     float p[8];
     p[0] = 0;
     p[1] = 0;
@@ -378,7 +378,7 @@ void tShifterCmd::StretchLength(tSample &spl, long newlen, bool keep_pitch, floa
 */
 
 
-double tShifterCmd::rotate(float p[], int n_args, tFloatSample &sinp, tFloatSample &sout)
+double JZShifterCmd::rotate(float p[], int n_args, JZFloatSample &sinp, JZFloatSample &sout)
 {
   float samplenum1,samplenum2,x,interval;
   float val1,val2,in[2],out[2];
@@ -391,7 +391,7 @@ double tShifterCmd::rotate(float p[], int n_args, tFloatSample &sinp, tFloatSamp
   sinp.SetNote(p[0], p[2]);
   nsamps = sout.SetNote(p[1], p[2]);
 
-  tFloatSample hanning(1, sout.GetSamplingRate());
+  JZFloatSample hanning(1, sout.GetSamplingRate());
   hanning.HanningWindow(1000);
   wlen = 1000;
   wintable = hanning.GetData();
@@ -446,23 +446,23 @@ double tShifterCmd::rotate(float p[], int n_args, tFloatSample &sinp, tFloatSamp
 //                        2-nd nogo equalizer
 // -------------------------------------------------------------------------
 
-tSplEqualizer::tSplEqualizer(JZRndArray &arr, long sr)
+JZSplEqualizer::JZSplEqualizer(JZRndArray &arr, long sr)
   : array(arr),
     sampling_rate(sr)
 {
   nfilters = array.Size();
-  filters = new tSplFilter[nfilters];
+  filters = new JZSplFilter[nfilters];
 }
 
-void tSplEqualizer::Prepare()
+void JZSplEqualizer::Prepare()
 {
   int i;
 
-  tSplFilter::Type type;
+  JZSplFilter::Type type;
   double sr = (double)sampling_rate;
 
   // first one is lowpass/highpass
-  type = array[0] > 0 ? tSplFilter::LOWPASS : tSplFilter::HIGHPASS;
+  type = array[0] > 0 ? JZSplFilter::LOWPASS : JZSplFilter::HIGHPASS;
   filters[0].Init(type, sr, Index2Hertz(0), 0);
   // some band pass filters
   for (i = 1; i < nfilters-1; i++)
@@ -472,29 +472,29 @@ void tSplEqualizer::Prepare()
     double f1 = Index2Hertz(i+1);
     //double bw = (1 - f0/f1) / (1 + f0/f1);
     double bw = (f1 - f0) / f;
-    type = array[i] > 0 ? tSplFilter::BANDPASS : tSplFilter::BANDSTOP;
+    type = array[i] > 0 ? JZSplFilter::BANDPASS : JZSplFilter::BANDSTOP;
     filters[i].Init(type, sr, f, bw);
   }
   // last one is high/low pass
-  type = array[nfilters-1] > 0 ? tSplFilter::HIGHPASS : tSplFilter::LOWPASS;
+  type = array[nfilters-1] > 0 ? JZSplFilter::HIGHPASS : JZSplFilter::LOWPASS;
   filters[nfilters-1].Init(type, sr, Index2Hertz(nfilters-1), 0);
 }
 
 
-tSplEqualizer::~tSplEqualizer()
+JZSplEqualizer::~JZSplEqualizer()
 {
   delete [] filters;
 }
 
 
-float tSplEqualizer::Index2Hertz(float index)
+float JZSplEqualizer::Index2Hertz(float index)
 {
   JZMapper XMap(0, nfilters, -1, 1);
   JZExponentialMapper ExponentialMapper(1, 10);
   return 2000.0 * ExponentialMapper.XToY(XMap.XToY(index));
 }
 
-float tSplEqualizer::operator()(float x)
+float JZSplEqualizer::operator()(float x)
 {
   // add all the outputs
   double y = x;

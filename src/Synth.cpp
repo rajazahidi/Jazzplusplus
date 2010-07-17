@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ using namespace std;
 #define XG_NAT 0x43,0x10,0x4c
 #define XG_NAT_LEN 8 // no command ID or checksum for XG native!
 
-JZSynth* NewSynth(const string& Type)
+JZSynthesizer* NewSynth(const string& Type)
 {
   int i;
   for (i = 0; i < NumSynthTypes; i++)
@@ -64,22 +64,22 @@ JZSynth* NewSynth(const string& Type)
   switch (i)
   {
     case SynthTypeGM:
-      return new tGM;
+      return new JZSynthesizerGm;
     case SynthTypeGS:
-      return new tGS;
+      return new JZSynthesizerGs;
     case SynthTypeXG:
-      return new tXG;
+      return new JZSynthesizerXg;
     case SynthTypeOther:
     default:
-      return new tGM;
+      return new JZSynthesizerGm;
   }
 }
 
-vector<string> tSynthSysex::mSysexNames;
+vector<string> JZSynthesizerSysex::mSysexNames;
 
-vector<string> tSynthSysex::mSysexGroupNames;
+vector<string> JZSynthesizerSysex::mSysexGroupNames;
 
-const string& tSynthSysex::GetSysexName(unsigned i)
+const string& JZSynthesizerSysex::GetSysexName(unsigned i)
 {
   if (i < mSysexNames.size())
   {
@@ -90,7 +90,7 @@ const string& tSynthSysex::GetSysexName(unsigned i)
   return Unkown;
 }
 
-const string& tSynthSysex::GetSysexGroupName(unsigned i)
+const string& JZSynthesizerSysex::GetSysexGroupName(unsigned i)
 {
   if (i < mSysexGroupNames.size())
   {
@@ -101,7 +101,7 @@ const string& tSynthSysex::GetSysexGroupName(unsigned i)
   return Unkown;
 }
 
-tSynthSysex::tSynthSysex()
+JZSynthesizerSysex::JZSynthesizerSysex()
 {
   int i;
 
@@ -478,7 +478,7 @@ tSynthSysex::tSynthSysex()
   SXDECL(SX_XG_EqualizerMacro, XG_NAT_LEN, xg_multiEQ);
 }
 
-tSynthSysex::~tSynthSysex()
+JZSynthesizerSysex::~JZSynthesizerSysex()
 {
   for (int i = 0; i < NumSysexIds; i++)
   {
@@ -486,7 +486,7 @@ tSynthSysex::~tSynthSysex()
   }
 }
 
-int tSynthSysex::GetId(const JZSysExEvent* pSysEx) const
+int JZSynthesizerSysex::GetId(const JZSysExEvent* pSysEx) const
 {
   if (!pSysEx)
   {
@@ -723,7 +723,7 @@ int tSynthSysex::GetId(const JZSysExEvent* pSysEx) const
 }
 
 
-const unsigned char* tSynthSysex::GetValPtr(const JZSysExEvent* pSysEx) const
+const unsigned char* JZSynthesizerSysex::GetValPtr(const JZSysExEvent* pSysEx) const
 {
   if (!pSysEx)
   {
@@ -781,7 +781,7 @@ const unsigned char* tSynthSysex::GetValPtr(const JZSysExEvent* pSysEx) const
 // Description:
 //   Return a pointer to the byte with the channel (if any).
 //-----------------------------------------------------------------------------
-const unsigned char* tSynthSysex::GetChaPtr(const JZSysExEvent* pSysEx)
+const unsigned char* JZSynthesizerSysex::GetChaPtr(const JZSysExEvent* pSysEx)
 {
   if (!pSysEx)
   {
@@ -827,7 +827,7 @@ const unsigned char* tSynthSysex::GetChaPtr(const JZSysExEvent* pSysEx)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSynthSysex::FixCheckSum(JZSysExEvent* pSysEx)
+void JZSynthesizerSysex::FixCheckSum(JZSysExEvent* pSysEx)
 {
   const unsigned char* pData = pSysEx->GetData();
   if (
@@ -842,14 +842,14 @@ void tSynthSysex::FixCheckSum(JZSysExEvent* pSysEx)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZSysExEvent* tSynthSysex::operator()(long clk, int id, unsigned char val)
+JZSysExEvent* JZSynthesizerSysex::operator()(long clk, int id, unsigned char val)
 {
   return (*this)(clk, id, -1, 1, &val);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZSysExEvent* tSynthSysex::operator()(
+JZSysExEvent* JZSynthesizerSysex::operator()(
   long clk,
   int id,
   int datalen,
@@ -860,7 +860,7 @@ JZSysExEvent* tSynthSysex::operator()(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZSysExEvent* tSynthSysex::operator()(
+JZSysExEvent* JZSynthesizerSysex::operator()(
   long clk,
   int id,
   int channel,
@@ -930,62 +930,62 @@ JZSysExEvent* tSynthSysex::operator()(
 }
 
 
-JZEvent* tGS::MasterVolSX(long clk, unsigned char vol)
+JZEvent* JZSynthesizerGs::MasterVolSX(long clk, unsigned char vol)
 {
    return Sysex(clk, SX_GS_MasterVol, vol);
 }
 
-JZEvent* tGS::MasterPanSX(long clk, unsigned char pan)
+JZEvent* JZSynthesizerGs::MasterPanSX(long clk, unsigned char pan)
 {
    return Sysex(clk, SX_GS_MasterPan, pan);
 }
 
-JZEvent* tGS::ModSX(int index, long clk, int cha, unsigned char val)
+JZEvent* JZSynthesizerGs::ModSX(int index, long clk, int cha, unsigned char val)
 {
    return Sysex(clk, SX_GS_ModPitch + index, cha, 1, &val);
 }
 
-JZEvent* tGS::BendSX(int index, long clk, int cha, unsigned char val)
+JZEvent* JZSynthesizerGs::BendSX(int index, long clk, int cha, unsigned char val)
 {
    return Sysex(clk, SX_GS_BendPitch + index, cha, 1, &val);
 }
 
-JZEvent* tGS::CafSX(int index, long clk, int cha, unsigned char val)
+JZEvent* JZSynthesizerGs::CafSX(int index, long clk, int cha, unsigned char val)
 {
    return Sysex(clk, SX_GS_CafPitch + index, cha, 1, &val);
 }
 
-JZEvent* tGS::PafSX(int index, long clk, int cha, unsigned char val)
+JZEvent* JZSynthesizerGs::PafSX(int index, long clk, int cha, unsigned char val)
 {
    return Sysex(clk, SX_GS_PafPitch + index, cha, 1, &val);
 }
 
-JZEvent* tGS::CC1SX(int index, long clk, int cha, unsigned char val)
+JZEvent* JZSynthesizerGs::CC1SX(int index, long clk, int cha, unsigned char val)
 {
    return Sysex(clk, SX_GS_CC1Pitch + index, cha, 1, &val);
 }
 
-JZEvent* tGS::CC2SX(int index, long clk, int cha, unsigned char val)
+JZEvent* JZSynthesizerGs::CC2SX(int index, long clk, int cha, unsigned char val)
 {
    return Sysex(clk, SX_GS_CC2Pitch + index, cha, 1, &val);
 }
 
-JZEvent* tGS::PartialReserveSX(long clk, int cha, unsigned char *valptr)
+JZEvent* JZSynthesizerGs::PartialReserveSX(long clk, int cha, unsigned char *valptr)
 {
    return Sysex(clk, SX_GS_PartialReserve, 16, valptr);
 }
 
-JZEvent* tGS::RxChannelSX(long clk, int cha, unsigned char val)
+JZEvent* JZSynthesizerGs::RxChannelSX(long clk, int cha, unsigned char val)
 {
    return Sysex(clk, SX_GS_RxChannel, cha, 1, &val);
 }
 
-JZEvent* tGS::UseForRhythmSX(long clk, int cha, unsigned char val)
+JZEvent* JZSynthesizerGs::UseForRhythmSX(long clk, int cha, unsigned char val)
 {
    return Sysex(clk, SX_GS_UseForRhythm, cha, 1, &val);
 }
 
-JZEvent* tGS::ControllerNumberSX(int ctrlno, long clk, int cha, unsigned char val)
+JZEvent* JZSynthesizerGs::ControllerNumberSX(int ctrlno, long clk, int cha, unsigned char val)
 {
   if (ctrlno == 1)
     return Sysex(clk, SX_GS_CC1CtrlNo, cha, 1, &val);
@@ -995,22 +995,22 @@ JZEvent* tGS::ControllerNumberSX(int ctrlno, long clk, int cha, unsigned char va
     return 0;
 }
 
-JZEvent* tGS::ReverbMacroSX(long clk, unsigned char val, unsigned char lsb)
+JZEvent* JZSynthesizerGs::ReverbMacroSX(long clk, unsigned char val, unsigned char lsb)
 {
    return Sysex(clk, SX_GS_ReverbMacro, val);
 }
 
-JZEvent* tGS::ReverbParamSX(int index, long clk, unsigned char val)
+JZEvent* JZSynthesizerGs::ReverbParamSX(int index, long clk, unsigned char val)
 {
    return Sysex(clk, SX_GS_RevCharacter + index, val);
 }
 
-JZEvent* tGS::ChorusMacroSX(long clk, unsigned char val, unsigned char lsb)
+JZEvent* JZSynthesizerGs::ChorusMacroSX(long clk, unsigned char val, unsigned char lsb)
 {
    return Sysex(clk, SX_GS_ChorusMacro, val);
 }
 
-JZEvent* tGS::ChorusParamSX(int index, long clk, unsigned char val)
+JZEvent* JZSynthesizerGs::ChorusParamSX(int index, long clk, unsigned char val)
 {
    return Sysex(clk, SX_GS_ChoPreLpf + index, val);
 }
@@ -1019,7 +1019,7 @@ JZEvent* tGS::ChorusParamSX(int index, long clk, unsigned char val)
 
 // XG:
 
-JZEvent* tXG::ModSX(int index, long clk, int cha, unsigned char val)
+JZEvent* JZSynthesizerXg::ModSX(int index, long clk, int cha, unsigned char val)
 {
    if ((index >= 0) && (index <= 2))
       return Sysex(clk, SX_XG_ModPitch + index, cha, 1, &val);
@@ -1029,7 +1029,7 @@ JZEvent* tXG::ModSX(int index, long clk, int cha, unsigned char val)
       return 0;
 }
 
-JZEvent* tXG::BendSX(int index, long clk, int cha, unsigned char val)
+JZEvent* JZSynthesizerXg::BendSX(int index, long clk, int cha, unsigned char val)
 {
    if ((index >= 0) && (index <= 2))
       return Sysex(clk, SX_XG_BendPitch + index, cha, 1, &val);
@@ -1039,7 +1039,7 @@ JZEvent* tXG::BendSX(int index, long clk, int cha, unsigned char val)
       return 0;
 }
 
-JZEvent* tXG::CafSX(int index, long clk, int cha, unsigned char val)
+JZEvent* JZSynthesizerXg::CafSX(int index, long clk, int cha, unsigned char val)
 {
    if ((index >= 0) && (index <= 2))
       return Sysex(clk, SX_XG_CafPitch + index, cha, 1, &val);
@@ -1049,7 +1049,7 @@ JZEvent* tXG::CafSX(int index, long clk, int cha, unsigned char val)
       return 0;
 }
 
-JZEvent* tXG::PafSX(int index, long clk, int cha, unsigned char val)
+JZEvent* JZSynthesizerXg::PafSX(int index, long clk, int cha, unsigned char val)
 {
    if ((index >= 0) && (index <= 2))
       return Sysex(clk, SX_XG_PafPitch + index, cha, 1, &val);
@@ -1059,7 +1059,7 @@ JZEvent* tXG::PafSX(int index, long clk, int cha, unsigned char val)
       return 0;
 }
 
-JZEvent* tXG::CC1SX(int index, long clk, int cha, unsigned char val)
+JZEvent* JZSynthesizerXg::CC1SX(int index, long clk, int cha, unsigned char val)
 {
    if ((index >= 0) && (index <= 2))
       return Sysex(clk, SX_XG_CC1Pitch + index, cha, 1, &val);
@@ -1069,7 +1069,7 @@ JZEvent* tXG::CC1SX(int index, long clk, int cha, unsigned char val)
       return 0;
 }
 
-JZEvent* tXG::CC2SX(int index, long clk, int cha, unsigned char val)
+JZEvent* JZSynthesizerXg::CC2SX(int index, long clk, int cha, unsigned char val)
 {
    if ((index >= 0) && (index <= 2))
       return Sysex(clk, SX_XG_CC2Pitch + index, cha, 1, &val);
@@ -1079,17 +1079,17 @@ JZEvent* tXG::CC2SX(int index, long clk, int cha, unsigned char val)
       return 0;
 }
 
-JZEvent* tXG::RxChannelSX(long clk, int cha, unsigned char val)
+JZEvent* JZSynthesizerXg::RxChannelSX(long clk, int cha, unsigned char val)
 {
    return Sysex(clk, SX_XG_RxChannel, cha, 1, &val);
 }
 
-JZEvent* tXG::UseForRhythmSX(long clk, int cha, unsigned char val)
+JZEvent* JZSynthesizerXg::UseForRhythmSX(long clk, int cha, unsigned char val)
 {
    return Sysex(clk, SX_XG_UseForRhythm, cha, 1, &val);
 }
 
-JZEvent* tXG::ControllerNumberSX(int ctrlno, long clk, int cha, unsigned char val)
+JZEvent* JZSynthesizerXg::ControllerNumberSX(int ctrlno, long clk, int cha, unsigned char val)
 {
    if (ctrlno == 1)
       return Sysex(clk, SX_XG_CC1CtrlNo, cha, 1, &val);
@@ -1099,7 +1099,7 @@ JZEvent* tXG::ControllerNumberSX(int ctrlno, long clk, int cha, unsigned char va
       return 0;
 }
 
-JZEvent* tXG::ReverbMacroSX(long clk, unsigned char val, unsigned char lsb)
+JZEvent* JZSynthesizerXg::ReverbMacroSX(long clk, unsigned char val, unsigned char lsb)
 {
    unsigned char valp[2];
    valp[0] = val;
@@ -1108,7 +1108,7 @@ JZEvent* tXG::ReverbMacroSX(long clk, unsigned char val, unsigned char lsb)
    return Sysex(clk, SX_XG_ReverbMacro, 2, valp);
 }
 
-JZEvent* tXG::ChorusMacroSX(long clk, unsigned char val, unsigned char lsb)
+JZEvent* JZSynthesizerXg::ChorusMacroSX(long clk, unsigned char val, unsigned char lsb)
 {
   unsigned char valp[2];
   valp[0] = val;
@@ -1117,7 +1117,7 @@ JZEvent* tXG::ChorusMacroSX(long clk, unsigned char val, unsigned char lsb)
   return Sysex(clk, SX_XG_ChorusMacro, 2, valp);
 }
 
-JZEvent* tXG::EqualizerMacroSX(long clk, unsigned char val)
+JZEvent* JZSynthesizerXg::EqualizerMacroSX(long clk, unsigned char val)
 {
   return Sysex(clk, SX_XG_EqualizerMacro, val);
 }

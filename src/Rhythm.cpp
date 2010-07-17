@@ -51,7 +51,7 @@
 
 using namespace std;
 
-tRhythmWin* rhythm_win = 0;
+JZRhythmWindow* rhythm_win = 0;
 
 void tRhyGroup::write(ostream& Os) const
 {
@@ -65,7 +65,7 @@ void tRhyGroup::read(istream& Is, int version)
   Is >> contrib;
 }
 
-void tRhyGroups::write(ostream& Os) const
+void JZRhythmGroups::write(ostream& Os) const
 {
   for (int i = 0; i < MAX_GROUPS; i++)
   {
@@ -74,7 +74,7 @@ void tRhyGroups::write(ostream& Os) const
   Os << endl;
 }
 
-void tRhyGroups::read(istream& Is, int version)
+void JZRhythmGroups::read(istream& Is, int version)
 {
   for (int i = 0; i < MAX_GROUPS; i++)
   {
@@ -91,7 +91,7 @@ static const int MODE_PIANO     = -3;
 static const int MODE_CONTROL   = -4;
 
 
-tRhythm::tRhythm(int k)
+JZRhythm::JZRhythm(int k)
   : mLabel("random rhythm"),
     rhythm(64, 0, 100),
     length( 8, 0, 100),
@@ -108,7 +108,7 @@ tRhythm::tRhythm(int k)
   randomize       = true;
 }
 
-tRhythm::tRhythm(const tRhythm& Other)
+JZRhythm::JZRhythm(const JZRhythm& Other)
   : rhythm(Other.rhythm),
     length(Other.length),
     veloc (Other.veloc),
@@ -131,7 +131,7 @@ tRhythm::tRhythm(const tRhythm& Other)
   mLabel = Other.mLabel;
 }
 
-tRhythm& tRhythm::operator = (const tRhythm& Rhs)
+JZRhythm& JZRhythm::operator = (const JZRhythm& Rhs)
 {
   if (this != &Rhs)
   {
@@ -159,12 +159,12 @@ tRhythm& tRhythm::operator = (const tRhythm& Rhs)
 }
 
 
-tRhythm::~tRhythm()
+JZRhythm::~JZRhythm()
 {
 }
 
 
-void tRhythm::write(ostream& Os) const
+void JZRhythm::write(ostream& Os) const
 {
   Os << rhythm;
   Os << length;
@@ -187,7 +187,7 @@ void tRhythm::write(ostream& Os) const
 }
 
 
-void tRhythm::read(istream& Is, int version)
+void JZRhythm::read(istream& Is, int version)
 {
   Is >> rhythm;
   Is >> length;
@@ -224,25 +224,25 @@ void tRhythm::read(istream& Is, int version)
   }
 }
 
-void tRhythm::SetLabel(const string& Label)
+void JZRhythm::SetLabel(const string& Label)
 {
   mLabel = Label;
 }
 
 
-int tRhythm::Clock2i(long clock, const JZBarInfo& BarInfo) const
+int JZRhythm::Clock2i(long clock, const JZBarInfo& BarInfo) const
 {
   int clocks_per_step = BarInfo.GetTicksPerBar() / (steps_per_count * count_per_bar);
   return (int)(((clock - start_clock) / clocks_per_step) % rhythm.Size());
 }
 
-int tRhythm::ClocksPerStep(const JZBarInfo& BarInfo) const
+int JZRhythm::ClocksPerStep(const JZBarInfo& BarInfo) const
 {
   return BarInfo.GetTicksPerBar() / (steps_per_count * count_per_bar);
 }
 
 
-void tRhythm::GenInit(long frc)
+void JZRhythm::GenInit(long frc)
 {
   int i;
   start_clock = frc;
@@ -268,7 +268,7 @@ void tRhythm::GenInit(long frc)
 }
 
 
-void tRhythm::GenerateEvent(JZTrack *track, long clock, short vel, short len)
+void JZRhythm::GenerateEvent(JZTrack *track, long clock, short vel, short len)
 {
   int chan = track->Channel - 1;
 
@@ -304,7 +304,7 @@ void tRhythm::GenerateEvent(JZTrack *track, long clock, short vel, short len)
 
 
 #if 0
-void tRhythm::Generate(JZTrack *track, long fr_clock, long to_clock, long ticks_per_bar)
+void JZRhythm::Generate(JZTrack *track, long fr_clock, long to_clock, long ticks_per_bar)
 {
   int chan   = track->Channel - 1;
   long clock = fr_clock;
@@ -357,7 +357,7 @@ void tRhythm::Generate(JZTrack *track, long fr_clock, long to_clock, long ticks_
       // paste pianowin buffer
       else if (key == PASTE_KEY)
       {
-        tEventArray &src = gpTrackWindow->GetPianoWindow()->PasteBuffer;
+        JZEventArray &src = gpTrackWindow->GetPianoWindow()->PasteBuffer;
         for (int ii = 0; ii < src.nEvents; ii++)
         {
           JZKeyOnEvent* pKeyOn = src.Events[ii]->IsKeyOn();
@@ -392,11 +392,11 @@ void tRhythm::Generate(JZTrack *track, long fr_clock, long to_clock, long ticks_
 
 
 
-void tRhythm::GenGroup(
+void JZRhythm::GenGroup(
   JZRndArray& out,
   int grp,
   const JZBarInfo& BarInfo,
-  tRhythm *rhy[],
+  JZRhythm *rhy[],
   int n_rhy)
 {
   out.Clear();
@@ -405,7 +405,7 @@ void tRhythm::GenGroup(
 
   for (int ri = 0; ri < n_rhy; ri++)
   {
-    tRhythm* pRhythm = rhy[ri];
+    JZRhythm* pRhythm = rhy[ri];
     int fuzz = pRhythm->groups[grp].contrib;
     if (fuzz && pRhythm != this)
     {
@@ -425,10 +425,10 @@ void tRhythm::GenGroup(
 }
 
 
-void tRhythm::Generate(
+void JZRhythm::Generate(
   JZTrack* track,
   const JZBarInfo& BarInfo,
-  tRhythm* rhy[],
+  JZRhythm* rhy[],
   int n_rhy)
 {
   JZRndArray rrg(rhythm);
@@ -493,7 +493,7 @@ void tRhythm::Generate(
 }
 
 
-// ============================ tRhythmWin ==============================
+// ============================ JZRhythmWindow ==============================
 
 
 #define MEN_HELP  4
@@ -513,7 +513,7 @@ void tRhythm::Generate(
 //#include "Bitmaps/rrggen.xpm"
 //#include "Bitmaps/help.xpm"
 
-tRhythmWin::tRhythmWin(JZEventWindow* pEventWindow, JZSong* pSong)
+JZRhythmWindow::JZRhythmWindow(JZEventWindow* pEventWindow, JZSong* pSong)
   : wxFrame(
       0,
       wxID_ANY,
@@ -657,15 +657,15 @@ tRhythmWin::tRhythmWin(JZEventWindow* pEventWindow, JZSong* pSong)
 
   // RndArray Edits
                                                    //    x    y      w    h
-  length_edit = new tArrayEdit   (this,  edit.length,    x,   y+h/2, w/2, h/4-4);
+  length_edit = new JZArrayEdit   (this,  edit.length,    x,   y+h/2, w/2, h/4-4);
   length_edit->SetXMinMax(1, 8);
   length_edit->SetLabel("length/interval");
 
-  veloc_edit = new tArrayEdit    (this,  edit.veloc,     x+w/2, y+h/2, w/2, h/4-4);
+  veloc_edit = new JZArrayEdit    (this,  edit.veloc,     x+w/2, y+h/2, w/2, h/4-4);
   veloc_edit->SetXMinMax(1, 127);
   veloc_edit->SetLabel("velocity");
 
-  rhythm_edit = new tRhyArrayEdit(this,  edit.rhythm,     x, y+3*h/4, w, h/4-4);
+  rhythm_edit = new JZRhyArrayEdit(this,  edit.rhythm,     x, y+3*h/4, w, h/4-4);
   rhythm_edit->SetMeter(edit.steps_per_count, edit.count_per_bar, edit.n_bars);
   rhythm_edit->SetLabel("rhythm");
 
@@ -729,7 +729,7 @@ tRhythmWin::tRhythmWin(JZEventWindow* pEventWindow, JZSong* pSong)
 
 }
 
-void tRhythmWin::OnSize(int w, int h)
+void JZRhythmWindow::OnSize(int w, int h)
 {
  // wxFrame::OnSize(w, h);
   if (!in_create && mpToolBar)
@@ -745,7 +745,7 @@ void tRhythmWin::OnSize(int w, int h)
   }
 }
 
-void tRhythmWin::OnMenuCommand(int id)
+void JZRhythmWindow::OnMenuCommand(int id)
 {
   switch (id)
   {
@@ -816,30 +816,30 @@ void tRhythmWin::OnMenuCommand(int id)
   }
 }
 
-void tRhythmWin::SelectInstr(wxListBox& list, wxCommandEvent& event)
+void JZRhythmWindow::SelectInstr(wxListBox& list, wxCommandEvent& event)
 {
-  tRhythmWin *win = (tRhythmWin *)list.GetParent()->GetParent();
+  JZRhythmWindow *win = (JZRhythmWindow *)list.GetParent()->GetParent();
   win->Win2Instrument();
   win->act_instrument = win->instrument_list->GetSelection();
   win->Instrument2Win();
   win->OnPaint();
 }
 
-void tRhythmWin::SelectGroup(wxListBox& list, wxCommandEvent& event)
+void JZRhythmWindow::SelectGroup(wxListBox& list, wxCommandEvent& event)
 {
-  tRhythmWin *win = (tRhythmWin *)list.GetParent()->GetParent();
+  JZRhythmWindow *win = (JZRhythmWindow *)list.GetParent()->GetParent();
   win->Win2Instrument();
   win->act_group = list.GetSelection();
   win->Instrument2Win();
 }
 
-void tRhythmWin::Add(wxButton &but, wxCommandEvent& event)
+void JZRhythmWindow::Add(wxButton &but, wxCommandEvent& event)
 {
-  tRhythmWin *win = (tRhythmWin *)but.GetParent()->GetParent();
+  JZRhythmWindow *win = (JZRhythmWindow *)but.GetParent()->GetParent();
   win->AddInstrumentDlg();
 }
 
-void tRhythmWin::AddInstrumentDlg()
+void JZRhythmWindow::AddInstrumentDlg()
 {
   if (n_instruments >= MAX_INSTRUMENTS)
   {
@@ -892,14 +892,14 @@ void tRhythmWin::AddInstrumentDlg()
   {
     Win2Instrument(); // save actual values
 
-    tRhythm* pRhythm = 0;
+    JZRhythm* pRhythm = 0;
     if (act_instrument >= 0)
     {
-      pRhythm = new tRhythm(*instruments[act_instrument]);
+      pRhythm = new JZRhythm(*instruments[act_instrument]);
     }
     else
     {
-      pRhythm = new tRhythm(keys[i]);
+      pRhythm = new JZRhythm(keys[i]);
     }
 
     // drum key?
@@ -937,8 +937,8 @@ void tRhythmWin::AddInstrumentDlg()
       }
       pRhythm->n_keys = 0;
       pRhythm->mode   = keys[i];
-      tEventArray events;
-      tCmdCopyToBuffer cmd(gpTrackFrame->GetPianoWindow()->GetFilter(), &events);
+      JZEventArray events;
+      JZCommandCopyToBuffer cmd(gpTrackFrame->GetPianoWindow()->GetFilter(), &events);
       cmd.Execute(0);   // no UNDO
 
       for (int ii = 0; ii < events.nEvents; ii++)
@@ -977,7 +977,7 @@ void tRhythmWin::AddInstrumentDlg()
   }
 }
 
-void tRhythmWin::AddInstrument(tRhythm* pRhythm)
+void JZRhythmWindow::AddInstrument(JZRhythm* pRhythm)
 {
   act_instrument = n_instruments++;
   instruments[act_instrument] = pRhythm;
@@ -989,11 +989,11 @@ void tRhythmWin::AddInstrument(tRhythm* pRhythm)
 }
 
 
-void tRhythmWin::UpInstrument()
+void JZRhythmWindow::UpInstrument()
 {
   if (act_instrument >= 1)
   {
-    tRhythm *tmp = instruments[act_instrument];
+    JZRhythm *tmp = instruments[act_instrument];
     instruments[act_instrument] = instruments[act_instrument-1];
     instruments[act_instrument-1] = tmp;
     act_instrument--;
@@ -1001,11 +1001,11 @@ void tRhythmWin::UpInstrument()
   }
 }
 
-void tRhythmWin::DownInstrument()
+void JZRhythmWindow::DownInstrument()
 {
   if (act_instrument >= 0 && act_instrument < n_instruments-1)
   {
-    tRhythm *tmp = instruments[act_instrument];
+    JZRhythm *tmp = instruments[act_instrument];
     instruments[act_instrument] = instruments[act_instrument+1];
     instruments[act_instrument+1] = tmp;
     act_instrument++;
@@ -1013,7 +1013,7 @@ void tRhythmWin::DownInstrument()
   }
 }
 
-void tRhythmWin::InitInstrumentList()
+void JZRhythmWindow::InitInstrumentList()
 {
   instrument_list->Clear();
   for (int i = 0; i < n_instruments; i++)
@@ -1026,14 +1026,14 @@ void tRhythmWin::InitInstrumentList()
   }
 }
 
-void tRhythmWin::Del(wxButton &but, wxCommandEvent& event)
+void JZRhythmWindow::Del(wxButton &but, wxCommandEvent& event)
 {
-  tRhythmWin *win = (tRhythmWin *)but.GetParent()->GetParent();
+  JZRhythmWindow *win = (JZRhythmWindow *)but.GetParent()->GetParent();
   win->DelInstrument();
 }
 
 
-void tRhythmWin::DelInstrument()
+void JZRhythmWindow::DelInstrument()
 {
   int i = act_instrument;
   if (i >= 0)
@@ -1054,17 +1054,17 @@ void tRhythmWin::DelInstrument()
 }
 
 
-void tRhythmWin::Generate(wxButton &but, wxCommandEvent& event)
+void JZRhythmWindow::Generate(wxButton &but, wxCommandEvent& event)
 {
   wxBeginBusyCursor();
-  tRhythmWin *win = (tRhythmWin *)but.GetParent()->GetParent();
+  JZRhythmWindow *win = (JZRhythmWindow *)but.GetParent()->GetParent();
   win->Win2Instrument();
   win->GenRhythm();
   wxEndBusyCursor();
 }
 
 
-void tRhythmWin::GenRhythm()
+void JZRhythmWindow::GenRhythm()
 {
   if (
     !mpEventWindow->EventsSelected(
@@ -1093,7 +1093,7 @@ void tRhythmWin::GenRhythm()
 //      "Replace",
 //      wxYES_NO) == wxYES)
   {
-    tCmdErase erase(pFilter, 1);
+    JZCommandErase erase(pFilter, 1);
     erase.Execute(0);
   }
 
@@ -1125,16 +1125,16 @@ void tRhythmWin::GenRhythm()
 }
 
 
-void tRhythmWin::Help()
+void JZRhythmWindow::Help()
 {
   gpHelpInstance->ShowTopic("Random rhythm generator");
 }
 
 #ifdef OBSOLETE
 
-void tRhythmWin::ItemCallback(wxItem& item, wxCommandEvent& event)
+void JZRhythmWindow::ItemCallback(wxItem& item, wxCommandEvent& event)
 {
-  tRhythmWin *win = (tRhythmWin *)item.GetParent()->GetParent();
+  JZRhythmWindow *win = (JZRhythmWindow *)item.GetParent()->GetParent();
   win->Win2Instrument();
   win->RndEnable();
   win->OnPaint();
@@ -1143,7 +1143,7 @@ void tRhythmWin::ItemCallback(wxItem& item, wxCommandEvent& event)
 
 
 
-void tRhythmWin::Win2Instrument(int i)
+void JZRhythmWindow::Win2Instrument(int i)
 {
   if (in_create)
   {
@@ -1174,7 +1174,7 @@ void tRhythmWin::Win2Instrument(int i)
 }
 
 
-void tRhythmWin::Instrument2Win(int i)
+void JZRhythmWindow::Instrument2Win(int i)
 {
   if (in_create)
   {
@@ -1217,7 +1217,7 @@ void tRhythmWin::Instrument2Win(int i)
 }
 
 
-void tRhythmWin::RndEnable()
+void JZRhythmWindow::RndEnable()
 {
   length_edit->Enable(edit.randomize);
   veloc_edit->Enable(edit.randomize);
@@ -1225,7 +1225,7 @@ void tRhythmWin::RndEnable()
 }
 
 
-tRhythmWin::~tRhythmWin()
+JZRhythmWindow::~JZRhythmWindow()
 {
   int XPixel, YPixel;
   GetPosition(&XPixel, &YPixel);
@@ -1240,13 +1240,13 @@ tRhythmWin::~tRhythmWin()
   rhythm_win = 0;
 }
 
-bool tRhythmWin::OnClose()
+bool JZRhythmWindow::OnClose()
 {
   return true;
 }
 
 
-void tRhythmWin::OnPaint()
+void JZRhythmWindow::OnPaint()
 {
   if (in_create)
   {
@@ -1260,7 +1260,7 @@ void tRhythmWin::OnPaint()
   rhythm_edit->Refresh();
 }
 
-ostream & operator << (ostream& Os, tRhythmWin const &a)
+ostream & operator << (ostream& Os, JZRhythmWindow const &a)
 {
   int i;
   Os << 2 << endl;
@@ -1272,7 +1272,7 @@ ostream & operator << (ostream& Os, tRhythmWin const &a)
   return Os;
 }
 
-istream & operator >> (istream& Is, tRhythmWin& a)
+istream & operator >> (istream& Is, JZRhythmWindow& a)
 {
   int version;
   Is >> version;
@@ -1292,7 +1292,7 @@ istream & operator >> (istream& Is, tRhythmWin& a)
   Is >> n;
   for (i = 0; i < n; i++)
   {
-    tRhythm* pRhythm = new tRhythm(0);
+    JZRhythm* pRhythm = new JZRhythm(0);
     pRhythm->read(Is, version);
     a.AddInstrument(pRhythm);
   }

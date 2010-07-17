@@ -20,11 +20,11 @@ class JZPortMidiPlayer : public JZPlayer
     virtual bool IsInstalled();
     int SupportsMultipleDevices();
 
-    virtual tDeviceList& GetInputDevices();
+    virtual JZDeviceList& GetInputDevices();
     wxString GetInputDeviceName();
     void SetInputDevice(const wxString& Name);
 
-    virtual tDeviceList& GetOutputDevices();
+    virtual JZDeviceList& GetOutputDevices();
     wxString GetOutputDeviceName();
     void SetOutputDevice(const wxString& Name);
 
@@ -51,8 +51,8 @@ class JZPortMidiPlayer : public JZPlayer
 
   private:
 
-    tDeviceList mInputDevices;
-    tDeviceList mOutputDevices;
+    JZDeviceList mInputDevices;
+    JZDeviceList mOutputDevices;
 
     PortMidiStream* mpStream;
 

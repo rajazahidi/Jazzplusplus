@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 
 #include <cmath>
 
-HBAnalyzer::HBAnalyzer(HBContext **s, int n)
+JZHarmonyBrowserAnalyzer::JZHarmonyBrowserAnalyzer(JZHarmonyBrowserContext **s, int n)
   : seq(s),
     max_seq(n),
     start_clock(0),
@@ -45,13 +45,13 @@ HBAnalyzer::HBAnalyzer(HBContext **s, int n)
 }
 
 
-HBAnalyzer::~HBAnalyzer()
+JZHarmonyBrowserAnalyzer::~JZHarmonyBrowserAnalyzer()
 {
   Exit();
 }
 
 
-void HBAnalyzer::Init(JZFilter* pFilter, int epc)
+void JZHarmonyBrowserAnalyzer::Init(JZFilter* pFilter, int epc)
 {
   Exit();        // cleanup from previous run
 
@@ -89,7 +89,7 @@ void HBAnalyzer::Init(JZFilter* pFilter, int epc)
 }
 
 
-void HBAnalyzer::Exit()
+void JZHarmonyBrowserAnalyzer::Exit()
 {
   for (int i = 0; i < mSteps; i++)
   {
@@ -104,30 +104,30 @@ void HBAnalyzer::Exit()
 }
 
 
-int HBAnalyzer::Analyze(JZFilter* pFilter, int qbc)
+int JZHarmonyBrowserAnalyzer::Analyze(JZFilter* pFilter, int qbc)
 {
   Init(pFilter, qbc);
   if (mSteps < max_seq)
   {
-    IterateEvents(&HBAnalyzer::CountEvent);
+    IterateEvents(&JZHarmonyBrowserAnalyzer::CountEvent);
     CreateChords();
     return mSteps;
   }
   return 0;
 }
 
-int HBAnalyzer::Transpose(JZFilter* pFilter, int qbc)
+int JZHarmonyBrowserAnalyzer::Transpose(JZFilter* pFilter, int qbc)
 {
   pFilter->GetSong()->NewUndoBuffer();
   Init(pFilter, qbc);
-  IterateEvents(&HBAnalyzer::CountEvent);
+  IterateEvents(&JZHarmonyBrowserAnalyzer::CountEvent);
   GenerateMapping();
-  IterateEvents(&HBAnalyzer::TransposeEvent);
+  IterateEvents(&JZHarmonyBrowserAnalyzer::TransposeEvent);
   return 0;
 }
 
 
-void HBAnalyzer::IterateEvents(void (HBAnalyzer::*Action)(JZKeyOnEvent*, JZTrack*))
+void JZHarmonyBrowserAnalyzer::IterateEvents(void (JZHarmonyBrowserAnalyzer::*Action)(JZKeyOnEvent*, JZTrack*))
 {
   JZTrackIterator Tracks(mpFilter);
   JZTrack *t = Tracks.First();
@@ -135,7 +135,7 @@ void HBAnalyzer::IterateEvents(void (HBAnalyzer::*Action)(JZKeyOnEvent*, JZTrack
   {
     if (!t->IsDrumTrack())
     {
-      tEventIterator Events(t);
+      JZEventIterator Events(t);
       JZEvent* pEvent =
         Events.Range(mpFilter->GetFromClock(), mpFilter->GetToClock());
       while (pEvent)
@@ -154,14 +154,14 @@ void HBAnalyzer::IterateEvents(void (HBAnalyzer::*Action)(JZKeyOnEvent*, JZTrack
 }
 
 
-int HBAnalyzer::Step2Clock(int step)
+int JZHarmonyBrowserAnalyzer::Step2Clock(int step)
 {
   int fr = mpFilter->GetFromClock();
   int to = mpFilter->GetToClock();
   return (step * (to - fr)) / mSteps + fr;
 }
 
-void HBAnalyzer::CountEvent(JZKeyOnEvent* pKeyOn, JZTrack *t)
+void JZHarmonyBrowserAnalyzer::CountEvent(JZKeyOnEvent* pKeyOn, JZTrack *t)
 {
   for (int i = 0; i < mSteps; i++)
   {
@@ -185,7 +185,7 @@ void HBAnalyzer::CountEvent(JZKeyOnEvent* pKeyOn, JZTrack *t)
 }
 
 
-void HBAnalyzer::TransposeEvent(JZKeyOnEvent* pKeyOn, JZTrack* pTrack)
+void JZHarmonyBrowserAnalyzer::TransposeEvent(JZKeyOnEvent* pKeyOn, JZTrack* pTrack)
 {
   for (int i = 0; i < mSteps; i++)
   {
@@ -224,7 +224,7 @@ void HBAnalyzer::TransposeEvent(JZKeyOnEvent* pKeyOn, JZTrack* pTrack)
 }
 
 
-int HBAnalyzer::NumCount(int i)
+int JZHarmonyBrowserAnalyzer::NumCount(int i)
 {
   // count the notes of step i
   int  n = 0;
@@ -237,7 +237,7 @@ int HBAnalyzer::NumCount(int i)
 }
 
 
-int HBAnalyzer::MaxCount(int i, const HBChord &done)
+int JZHarmonyBrowserAnalyzer::MaxCount(int i, const JZHarmonyBrowserChord &done)
 {
   // find the most used note in step i
   int imax = 0;
@@ -255,7 +255,7 @@ int HBAnalyzer::MaxCount(int i, const HBChord &done)
 
 
 #if 1
-void HBAnalyzer::GenerateMapping()
+void JZHarmonyBrowserAnalyzer::GenerateMapping()
 {
   int step;
   for (step = 0; step < mSteps; step++)
@@ -263,12 +263,12 @@ void HBAnalyzer::GenerateMapping()
     int j;
 
     int iseq = step % max_seq;
-    HBChord chord = seq[iseq]->Chord();
-    HBChord scale = seq[iseq]->Scale();
+    JZHarmonyBrowserChord chord = seq[iseq]->Chord();
+    JZHarmonyBrowserChord scale = seq[iseq]->Scale();
     int notes_remaining = NumCount(step);
 
-    HBChord c;
-    HBChord done;
+    JZHarmonyBrowserChord c;
+    JZHarmonyBrowserChord done;
     int     n;
 
     done.Clear();
@@ -320,10 +320,10 @@ void HBAnalyzer::GenerateMapping()
 
 #else
 
-class tChordMatrix
+class JZChordMatrix
 {
   public:
-    tChordMatrix()
+    JZChordMatrix()
     {
       for (int i = 0; i < 12; i++)
         for (int j = 0; j < 12; j++)
@@ -338,18 +338,18 @@ class tChordMatrix
 };
 
 
-void HBAnalyzer::GenerateMapping()
+void JZHarmonyBrowserAnalyzer::GenerateMapping()
 {
   int step;
   for (step = 0; step < mSteps; step++)
   {
     int i, j;
 
-    tChordMatrix mat;
+    JZChordMatrix mat;
 
     int iseq = step % max_seq;
-    HBChord chord = seq[iseq]->Chord();
-    HBChord scale = seq[iseq]->Scale();
+    JZHarmonyBrowserChord chord = seq[iseq]->Chord();
+    JZHarmonyBrowserChord scale = seq[iseq]->Scale();
 
     int not_in_chord_costs = 50;
     int not_in_scale_costs = 100;
@@ -395,7 +395,7 @@ void HBAnalyzer::GenerateMapping()
 #endif
 
 
-void HBAnalyzer::CreateChords()
+void JZHarmonyBrowserAnalyzer::CreateChords()
 {
   int* pBest = new int[mSteps];
   for (int i = 0; i < mSteps; i++)
@@ -403,12 +403,12 @@ void HBAnalyzer::CreateChords()
     pBest[i] = -1;
   }
 
-  HBContextIterator iter;
+  JZHarmonyBrowserContextIterator iter;
   while (iter())
   {
-    const HBContext &ct = iter.Context();
-    const HBChord chord = ct.Chord();
-    const HBChord scale = ct.Scale();
+    const JZHarmonyBrowserContext &ct = iter.Context();
+    const JZHarmonyBrowserChord chord = ct.Chord();
+    const JZHarmonyBrowserChord scale = ct.Scale();
     for (int i = 0; i < mSteps; i++)
     {
       int err = 0;

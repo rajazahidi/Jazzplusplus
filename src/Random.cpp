@@ -255,12 +255,12 @@ istream & operator >> (istream &is, JZRndArray &a)
 }
 
 
-// --------------------------------- tArrayEdit -------------------------------------
+// --------------------------------- JZArrayEdit -------------------------------------
 
 // length of tickmark line
 #define TICK_LINE 0
 
-tArrayEdit::tArrayEdit(wxFrame *frame, JZRndArray &ar, int xx, int yy, int ww, int hh, int sty)
+JZArrayEdit::JZArrayEdit(wxFrame *frame, JZRndArray &ar, int xx, int yy, int ww, int hh, int sty)
   : wxScrolledWindow(frame, wxID_ANY, wxPoint(xx, yy), wxSize(ww, hh)),
     mArray(ar),
     n(ar.n),
@@ -304,13 +304,13 @@ tArrayEdit::tArrayEdit(wxFrame *frame, JZRndArray &ar, int xx, int yy, int ww, i
   ynul = y + h - h * (nul - min) / (max - min);
 }
 
-BEGIN_EVENT_TABLE(tArrayEdit, wxScrolledWindow)
-  EVT_SIZE    (           tArrayEdit::OnSize)
-  EVT_MOUSE_EVENTS(tArrayEdit::OnMouseEvent)
+BEGIN_EVENT_TABLE(JZArrayEdit, wxScrolledWindow)
+  EVT_SIZE    (           JZArrayEdit::OnSize)
+  EVT_MOUSE_EVENTS(JZArrayEdit::OnMouseEvent)
 END_EVENT_TABLE()
 
 
-void tArrayEdit::OnSize(wxSizeEvent& event)
+void JZArrayEdit::OnSize(wxSizeEvent& event)
 {
   w = event.GetSize().GetWidth();
   h = event.GetSize().GetHeight();
@@ -333,11 +333,11 @@ void tArrayEdit::OnSize(wxSizeEvent& event)
   ynul = y + h - h * (nul - min) / (max - min);
 }
 
-tArrayEdit::~tArrayEdit()
+JZArrayEdit::~JZArrayEdit()
 {
 }
 
-void tArrayEdit::DrawBar(wxDC *dc, int i, int black)
+void JZArrayEdit::DrawBar(wxDC *dc, int i, int black)
 {
   if (style_bits & ARED_LINES)
   {
@@ -437,21 +437,21 @@ void tArrayEdit::DrawBar(wxDC *dc, int i, int black)
   }
 }
 
-const char *tArrayEdit::GetXText(int xval)
+const char *JZArrayEdit::GetXText(int xval)
 {
   static char buf[8];
   sprintf(buf, "%d", xval);
   return buf;
 }
 
-const char *tArrayEdit::GetYText(int yval)
+const char *JZArrayEdit::GetYText(int yval)
 {
   static char buf[8];
   sprintf(buf, "%d", yval);
   return buf;
 }
 
-void tArrayEdit::DrawXTicks(wxDC* dc)
+void JZArrayEdit::DrawXTicks(wxDC* dc)
 {
   int tw, th;
 
@@ -487,7 +487,7 @@ void tArrayEdit::DrawXTicks(wxDC* dc)
 }
 
 
-void tArrayEdit::DrawYTicks(wxDC* dc)
+void JZArrayEdit::DrawYTicks(wxDC* dc)
 {
 
   dc->SetFont(*wxSMALL_FONT);
@@ -533,7 +533,7 @@ void tArrayEdit::DrawYTicks(wxDC* dc)
 
 }
 
-void tArrayEdit::DrawLabel(wxDC* dc)
+void JZArrayEdit::DrawLabel(wxDC* dc)
 {
   dc->SetFont(*wxSMALL_FONT);
   if (!mLabel.empty())
@@ -545,7 +545,7 @@ void tArrayEdit::DrawLabel(wxDC* dc)
 
 
 
-void tArrayEdit::OnDraw(wxDC& indc)
+void JZArrayEdit::OnDraw(wxDC& indc)
 {
   int i;
   wxDC *dc = &indc; //just lazy...
@@ -575,7 +575,7 @@ void tArrayEdit::OnDraw(wxDC& indc)
 
 
 
-void tArrayEdit::DrawNull(wxDC* dc)
+void JZArrayEdit::DrawNull(wxDC* dc)
 {
 
   dc->SetPen(*wxCYAN_PEN);
@@ -593,13 +593,13 @@ void tArrayEdit::DrawNull(wxDC* dc)
 
 
 
-void tArrayEdit::SetXMinMax(int xmi, int xma)
+void JZArrayEdit::SetXMinMax(int xmi, int xma)
 {
   xmin = xmi;
   xmax = xma;
 }
 
-int tArrayEdit::Index(wxMouseEvent& MouseEvent)
+int JZArrayEdit::Index(wxMouseEvent& MouseEvent)
 {
   int ex, ey;
   MouseEvent.GetPosition(&ex, &ey);
@@ -609,7 +609,7 @@ int tArrayEdit::Index(wxMouseEvent& MouseEvent)
   return i;
 }
 
-int tArrayEdit::Dragging(wxMouseEvent& MouseEvent)
+int JZArrayEdit::Dragging(wxMouseEvent& MouseEvent)
 {
   if (!dragging)
   {
@@ -684,7 +684,7 @@ int tArrayEdit::Dragging(wxMouseEvent& MouseEvent)
   return 0;
 }
 
-int tArrayEdit::ButtonDown(wxMouseEvent& MouseEvent)
+int JZArrayEdit::ButtonDown(wxMouseEvent& MouseEvent)
 {
 #ifdef __WXMSW__
   CaptureMouse();
@@ -695,7 +695,7 @@ int tArrayEdit::ButtonDown(wxMouseEvent& MouseEvent)
   return 0;
 }
 
-int tArrayEdit::ButtonUp(wxMouseEvent& MouseEvent)
+int JZArrayEdit::ButtonUp(wxMouseEvent& MouseEvent)
 {
 #ifdef __WXMSW__
   ReleaseMouse();
@@ -711,7 +711,7 @@ int tArrayEdit::ButtonUp(wxMouseEvent& MouseEvent)
 }
 
 
-void tArrayEdit::OnMouseEvent(wxMouseEvent& MouseEvent)
+void JZArrayEdit::OnMouseEvent(wxMouseEvent& MouseEvent)
 {
   if (!enabled)
   {
@@ -731,23 +731,23 @@ void tArrayEdit::OnMouseEvent(wxMouseEvent& MouseEvent)
   }
 }
 
-void tArrayEdit::Enable(int e)
+void JZArrayEdit::Enable(int e)
 {
   enabled = e;
 }
 
-void tArrayEdit::SetLabel(char const* pLabel)
+void JZArrayEdit::SetLabel(char const* pLabel)
 {
   mLabel = pLabel;
 }
 
-void tArrayEdit::SetYMinMax(int mi, int ma)
+void JZArrayEdit::SetYMinMax(int mi, int ma)
 {
   mArray.SetMinMax(mi, ma);
   ynul = y + h - h * (nul - min) / (max - min);
 }
 
-void tArrayEdit::DrawBarLine (wxDC *dc, int xx)
+void JZArrayEdit::DrawBarLine (wxDC *dc, int xx)
 {
   //  wxDC *dc = new wxClientDC(this);//GetDC();
   //  fprintf(stderr,"x: %ld, xx: %ld\n",x,xx);
@@ -761,7 +761,7 @@ void tArrayEdit::DrawBarLine (wxDC *dc, int xx)
 
 
 
-tRhyArrayEdit::tRhyArrayEdit(
+JZRhyArrayEdit::JZRhyArrayEdit(
   wxFrame *parent,
   JZRndArray& Array,
   int xx,
@@ -769,14 +769,14 @@ tRhyArrayEdit::tRhyArrayEdit(
   int ww,
   int hh,
   int sty)
-  : tArrayEdit(parent, Array, xx, yy, ww, hh, sty)
+  : JZArrayEdit(parent, Array, xx, yy, ww, hh, sty)
 {
   steps_per_count = 4;
   count_per_bar   = 4;
   n_bars          = 4;
 }
 
-void tRhyArrayEdit::SetMeter(int s, int c, int b)
+void JZRhyArrayEdit::SetMeter(int s, int c, int b)
 {
   steps_per_count = s;
   count_per_bar   = c;
@@ -786,11 +786,11 @@ void tRhyArrayEdit::SetMeter(int s, int c, int b)
 }
 
 
-void tRhyArrayEdit::DrawXTicks(wxDC* dc)
+void JZRhyArrayEdit::DrawXTicks(wxDC* dc)
 {
   if (!(style_bits & ARED_RHYTHM))
   {
-    tArrayEdit::DrawXTicks(dc);
+    JZArrayEdit::DrawXTicks(dc);
     return;
   }
 

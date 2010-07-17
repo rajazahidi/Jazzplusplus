@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@
 static const long wbar = 2;
 static int bars_state = 2;  // from ArrayEdit
 
-tCtrlEditBase::tCtrlEditBase(
+JZCtrlEditBase::JZCtrlEditBase(
   int min,
   int max,
   JZPianoWindow* p,
@@ -52,7 +52,7 @@ tCtrlEditBase::tCtrlEditBase(
   Create(p, label, dx, x, y, w, h);
 }
 
-void tCtrlEditBase::Create(
+void JZCtrlEditBase::Create(
   JZPianoWindow* pPianoWindow,
   char const *label,
   int dx,
@@ -70,7 +70,7 @@ void tCtrlEditBase::Create(
   clocks_per_pixel = 0;
   sticky = 1;
 
-  panel = new tCtrlPanel(this, mpPianoWindow, x, y, dx, h, 0, "Controller Edit");
+  panel = new JZControlPanel(this, mpPianoWindow, x, y, dx, h, 0, "Controller Edit");
   //(void) new wxMessage(panel, (char *)label);
   //panel->NewLine();
 
@@ -100,7 +100,7 @@ void tCtrlEditBase::Create(
   // ab hier dient ctrlmode zur Unterscheidung zwischen
   // Apply und Edit.
 
-  edit = new tArrayEdit((wxFrame *)mpPianoWindow, array, x+dx, y, w - dx, h, 0);
+  edit = new JZArrayEdit((wxFrame *)mpPianoWindow, array, x+dx, y, w - dx, h, 0);
   edit->SetLabel(label);
   edit->SetDrawBars(this);
 
@@ -112,14 +112,14 @@ void tCtrlEditBase::Create(
 }
 
 
-tCtrlEditBase::~tCtrlEditBase()
+JZCtrlEditBase::~JZCtrlEditBase()
 {
   delete panel;
   delete edit;
 }
 
 // SN++
-void tCtrlEditBase::UpDate()
+void JZCtrlEditBase::UpDate()
 {
   if (!selectable)
   {
@@ -129,7 +129,7 @@ void tCtrlEditBase::UpDate()
 }
 //
 
-void tCtrlEditBase::SetSize(int dx, int x, int y, int w, int h)
+void JZCtrlEditBase::SetSize(int dx, int x, int y, int w, int h)
 {
   array.Resize((long)(w-dx) / wbar);
   // av-- edit->array_val.Resize((long)(w-dx) / wbar);
@@ -139,7 +139,7 @@ void tCtrlEditBase::SetSize(int dx, int x, int y, int w, int h)
 }
 
 
-void tCtrlEditBase::ReInit(JZTrack *t, long fc, long cpp)
+void JZCtrlEditBase::ReInit(JZTrack *t, long fc, long cpp)
 {
   int w, h;
   edit->GetSize(&w, &h);
@@ -152,17 +152,17 @@ void tCtrlEditBase::ReInit(JZTrack *t, long fc, long cpp)
 
 }
 
-long tCtrlEditBase::Clock2i(long clock)
+long JZCtrlEditBase::Clock2i(long clock)
 {
   return (clock - from_clock) / clocks_per_pixel / wbar;
 }
 
-long tCtrlEditBase::i2Clock(long i)
+long JZCtrlEditBase::i2Clock(long i)
 {
   return i * clocks_per_pixel * wbar + from_clock;
 }
 
-int tCtrlEditBase::Clock2Val(long clock)
+int JZCtrlEditBase::Clock2Val(long clock)
 {
   long i = Clock2i(clock);
   if (i >= i_max-1)
@@ -191,11 +191,11 @@ int tCtrlEditBase::Clock2Val(long clock)
 #endif
 }
 
-void tCtrlEditBase::OnRevert()
+void JZCtrlEditBase::OnRevert()
 {
   int i;
 
-  tEventIterator iter(track);
+  JZEventIterator iter(track);
   int val = Missing();
 
   if (sticky && !selectable)
@@ -248,21 +248,21 @@ void tCtrlEditBase::OnRevert()
 }
 
 
-/*void tCtrlEditBase::Revert(wxButton &but, wxCommandEvent& event)
+/*void JZCtrlEditBase::Revert(wxButton &but, wxCommandEvent& event)
 {
-  tCtrlPanel *panel = (tCtrlPanel *)but.GetParent();
+  JZControlPanel *panel = (JZControlPanel *)but.GetParent();
   panel->edit->OnRevert();
 }
 */
 
 
-void tCtrlEditBase::OnApply()
+void JZCtrlEditBase::OnApply()
 {
   wxBeginBusyCursor();
   mpPianoWindow->GetProject()->NewUndoBuffer();
   // delete old events, but skip clock 0 to preserve track defaults:
   // (dirty but might work...)
-  tEventIterator iter(track);
+  JZEventIterator iter(track);
   JZEvent* pEvent = iter.Range(std::max(1L, from_clock), to_clock);
   int old_val = Missing();
 
@@ -341,12 +341,12 @@ void tCtrlEditBase::OnApply()
 }
 
 // SN++
-void tCtrlEditBase::Bars(wxButton &but, wxCommandEvent& event)
+void JZCtrlEditBase::Bars(wxButton &but, wxCommandEvent& event)
 {
-  ((tCtrlPanel *)but.GetParent())->edit->OnBars();
+  ((JZControlPanel *)but.GetParent())->edit->OnBars();
 }
 
-void tCtrlEditBase::OnBars()
+void JZCtrlEditBase::OnBars()
 {
   // Bars und Werte updaten
   if (bars_state < 2)
@@ -360,19 +360,19 @@ void tCtrlEditBase::OnBars()
   edit->Refresh();
 }
 
-/*void tCtrlEditBase::Apply(wxButton &but, wxCommandEvent& event)
+/*void JZCtrlEditBase::Apply(wxButton &but, wxCommandEvent& event)
 {
-  ((tCtrlPanel *)but.GetParent())->edit->OnApply();
+  ((JZControlPanel *)but.GetParent())->edit->OnApply();
 }
 
 
-void tCtrlEditBase::Edit(wxButton &but, wxCommandEvent& event)
+void JZCtrlEditBase::Edit(wxButton &but, wxCommandEvent& event)
 {
-  ((tCtrlPanel *)but.GetParent())->edit->OnEdit();
+  ((JZControlPanel *)but.GetParent())->edit->OnEdit();
 }
 */
 
-void tCtrlEditBase::OnEdit()
+void JZCtrlEditBase::OnEdit()
 {
   ctrlmode = 1;  // edit current events
   OnApply();
@@ -380,8 +380,8 @@ void tCtrlEditBase::OnEdit()
 }
 
 // SN++ Has 3 Modes (bars_state)  0: no Bars, 1,2: draw Bars
-// av: called by tArrayEdit::OnPaint
-void tCtrlEditBase::DrawBars(wxDC* dc)
+// av: called by JZArrayEdit::OnPaint
+void JZCtrlEditBase::DrawBars(wxDC* dc)
 {
   JZBarInfo BarInfo(*mpPianoWindow->GetProject());
   BarInfo.SetClock(from_clock);
@@ -412,7 +412,7 @@ void tCtrlEditBase::DrawBars(wxDC* dc)
 
 // ------------------------------------------------------------------
 
-tPitchEdit::tPitchEdit(
+JZPitchEdit::JZPitchEdit(
   JZPianoWindow* pPianoWindow,
   char const *label,
   int xoff,
@@ -420,33 +420,33 @@ tPitchEdit::tPitchEdit(
   int y,
   int w,
   int h)
-  : tCtrlEditBase(-8191, 8191, pPianoWindow, label, xoff, x, y, w, h)
+  : JZCtrlEditBase(-8191, 8191, pPianoWindow, label, xoff, x, y, w, h)
 {
 }
 
-int tPitchEdit::Missing()
+int JZPitchEdit::Missing()
 {
   return 0;
 }
 
-int tPitchEdit::IsCtrlEdit(JZEvent* pEvent)
+int JZPitchEdit::IsCtrlEdit(JZEvent* pEvent)
 {
   return pEvent->IsPitch() != 0;
 }
 
-int tPitchEdit::GetValue(JZEvent* pEvent)
+int JZPitchEdit::GetValue(JZEvent* pEvent)
 {
   return pEvent->IsPitch()->Value;
 }
 
-JZEvent * tPitchEdit::NewEvent(long clock, int val)
+JZEvent * JZPitchEdit::NewEvent(long clock, int val)
 {
   return new JZPitchEvent(clock, track->Channel - 1, val);
 }
 
 // ------------------------------------------------------------------
 
-tCtrlEdit::tCtrlEdit(
+JZControlEdit::JZControlEdit(
   int CtrlNum,
   JZPianoWindow* pPianoWindow,
   char const *label,
@@ -455,7 +455,7 @@ tCtrlEdit::tCtrlEdit(
   int y,
   int w,
   int h)
-  : tCtrlEditBase(0, 127, pPianoWindow, label, xoff, x, y, w, h, 1)
+  : JZCtrlEditBase(0, 127, pPianoWindow, label, xoff, x, y, w, h, 1)
 {
   ctrl_num = CtrlNum;
   if (ctrl_num == 10)  // panpot
@@ -464,7 +464,7 @@ tCtrlEdit::tCtrlEdit(
   }
 }
 
-int tCtrlEdit::Missing()
+int JZControlEdit::Missing()
 {
   if (ctrl_num == 10)
   {
@@ -473,25 +473,25 @@ int tCtrlEdit::Missing()
   return 0;
 }
 
-int tCtrlEdit::IsCtrlEdit(JZEvent* pEvent)
+int JZControlEdit::IsCtrlEdit(JZEvent* pEvent)
 {
   JZControlEvent* pControl = pEvent->IsControl();
   return (pControl && pControl->GetControl() == ctrl_num);
 }
 
-int tCtrlEdit::GetValue(JZEvent* pEvent)
+int JZControlEdit::GetValue(JZEvent* pEvent)
 {
   return pEvent->IsControl()->GetControlValue();
 }
 
-JZEvent * tCtrlEdit::NewEvent(long clock, int val)
+JZEvent * JZControlEdit::NewEvent(long clock, int val)
 {
   return new JZControlEvent(clock, track->Channel - 1, ctrl_num, val);
 }
 
 // ------------------------------------------------------------------
 
-tVelocEdit::tVelocEdit(
+JZVelocityEdit::JZVelocityEdit(
   JZPianoWindow* pParent,
   char const *label,
   int xoff,
@@ -499,18 +499,18 @@ tVelocEdit::tVelocEdit(
   int y,
   int w,
   int h)
-  : tCtrlEditBase(1, 127, pParent, label, xoff, x, y, w, h)
+  : JZCtrlEditBase(1, 127, pParent, label, xoff, x, y, w, h)
 {
   sticky = 0;
   selectable = 1;
 }
 
-int tVelocEdit::Missing()
+int JZVelocityEdit::Missing()
 {
   return 1;
 }
 
-int tVelocEdit::IsCtrlEdit(JZEvent* pEvent)
+int JZVelocityEdit::IsCtrlEdit(JZEvent* pEvent)
 {
   // SN++ Falls im PianoWin Events selektiert sind, werden nur diese
   //      Events geaendert
@@ -531,19 +531,19 @@ int tVelocEdit::IsCtrlEdit(JZEvent* pEvent)
   return 0;
 }
 
-int tVelocEdit::GetValue(JZEvent* pEvent)
+int JZVelocityEdit::GetValue(JZEvent* pEvent)
 {
   return pEvent->IsKeyOn()->GetVelocity();
 }
 
-void tVelocEdit::OnApply()
+void JZVelocityEdit::OnApply()
 {
   static long from_clk, to_clk;
 
   wxBeginBusyCursor();
   mpPianoWindow->GetProject()->NewUndoBuffer();
 
-  tEventIterator iter(track);
+  JZEventIterator iter(track);
 
   if (mpPianoWindow->mpSnapSel->IsSelected())
   {
@@ -590,7 +590,7 @@ void tVelocEdit::OnApply()
 
 // ------------------------------------------------------------------
 
-tPolyAfterEdit::tPolyAfterEdit(
+JZPolyAfterEdit::JZPolyAfterEdit(
   JZPianoWindow* pPianoWindow,
   char const *label,
   int xoff,
@@ -598,19 +598,19 @@ tPolyAfterEdit::tPolyAfterEdit(
   int y,
   int w,
   int h)
-  : tCtrlEditBase(0, 127, pPianoWindow, label, xoff, x, y, w, h, 1)
+  : JZCtrlEditBase(0, 127, pPianoWindow, label, xoff, x, y, w, h, 1)
 {
   sticky = 0;  // SN must be set for proper editing!
   selectable = 1;
 }
 
 
-int tPolyAfterEdit::Missing()
+int JZPolyAfterEdit::Missing()
 {
   return 0;
 }
 
-int tPolyAfterEdit::IsCtrlEdit(JZEvent* pEvent)
+int JZPolyAfterEdit::IsCtrlEdit(JZEvent* pEvent)
 {
   // SN++ Falls im PianoWin Events selektiert sind, werden nur diese
   //      Events geaendert
@@ -632,7 +632,7 @@ int tPolyAfterEdit::IsCtrlEdit(JZEvent* pEvent)
   return 0;
 }
 
-int tPolyAfterEdit::GetValue(JZEvent* pEvent)
+int JZPolyAfterEdit::GetValue(JZEvent* pEvent)
 {
   JZKeyPressureEvent* pKeyPressure = pEvent->IsKeyPressure();
   if (pKeyPressure)
@@ -643,7 +643,7 @@ int tPolyAfterEdit::GetValue(JZEvent* pEvent)
 }
 
 
-void tPolyAfterEdit::OnApply()
+void JZPolyAfterEdit::OnApply()
 {
   static long from_clk, to_clk;
   JZEvent* pEvent;
@@ -658,7 +658,7 @@ void tPolyAfterEdit::OnApply()
   wxBeginBusyCursor();
   mpPianoWindow->GetProject()->NewUndoBuffer();
 
-  tEventIterator iter(track);
+  JZEventIterator iter(track);
 
   if (mpPianoWindow->mpSnapSel->IsSelected())
   {
@@ -778,7 +778,7 @@ void tPolyAfterEdit::OnApply()
 
 // ----------------------------------------------------------------------
 
-tChannelAfterEdit::tChannelAfterEdit(
+JZChannelAftertouchEdit::JZChannelAftertouchEdit(
   JZPianoWindow* pPianoWindow,
   char const *label,
   int xoff,
@@ -786,46 +786,46 @@ tChannelAfterEdit::tChannelAfterEdit(
   int y,
   int w,
   int h)
-  : tCtrlEditBase(0, 127, pPianoWindow, label, xoff, x, y, w, h, 1)
+  : JZCtrlEditBase(0, 127, pPianoWindow, label, xoff, x, y, w, h, 1)
 {
 }
 
 
-int tChannelAfterEdit::Missing()
+int JZChannelAftertouchEdit::Missing()
 {
   return 0;
 }
 
-int tChannelAfterEdit::IsCtrlEdit(JZEvent* pEvent)
+int JZChannelAftertouchEdit::IsCtrlEdit(JZEvent* pEvent)
 {
   return pEvent->IsChnPressure() != 0;
 }
 
-int tChannelAfterEdit::GetValue(JZEvent* pEvent)
+int JZChannelAftertouchEdit::GetValue(JZEvent* pEvent)
 {
   return pEvent->IsChnPressure()->Value;
 }
 
 
-JZEvent *tChannelAfterEdit::NewEvent(long clock, int val)
+JZEvent *JZChannelAftertouchEdit::NewEvent(long clock, int val)
 {
   return new JZChnPressureEvent(clock, track->Channel - 1, val);
 }
 
-void tChannelAfterEdit::UpDate()
+void JZChannelAftertouchEdit::UpDate()
 {
   OnRevert();
 }
 
 
-void tChannelAfterEdit::OnApply()
+void JZChannelAftertouchEdit::OnApply()
 {
   wxBeginBusyCursor();
   mpPianoWindow->GetProject()->NewUndoBuffer();
 
   // delete old events, but skip clock 0 to preserve track defaults:
   // (dirty but might work...)
-  tEventIterator iter(track);
+  JZEventIterator iter(track);
   JZEvent* pEvent = iter.Range(std::max(1L, from_clock), to_clock);
   int old_val = Missing();
 
@@ -902,7 +902,7 @@ void tChannelAfterEdit::OnApply()
 
 // ------------------------------------------------------------------
 
-tTempoEdit::tTempoEdit(
+JZTempoEdit::JZTempoEdit(
   int min,
   int max,
   JZPianoWindow* pPianoWindow,
@@ -912,26 +912,26 @@ tTempoEdit::tTempoEdit(
   int y,
   int w,
   int h)
-  : tCtrlEditBase(min, max, pPianoWindow, label, xoff, x, y, w, h)
+  : JZCtrlEditBase(min, max, pPianoWindow, label, xoff, x, y, w, h)
 {
 }
 
-int tTempoEdit::Missing()
+int JZTempoEdit::Missing()
 {
   return track->GetDefaultSpeed();
 }
 
-int tTempoEdit::IsCtrlEdit(JZEvent* pEvent)
+int JZTempoEdit::IsCtrlEdit(JZEvent* pEvent)
 {
   return pEvent->IsSetTempo() != 0;
 }
 
-int tTempoEdit::GetValue(JZEvent* pEvent)
+int JZTempoEdit::GetValue(JZEvent* pEvent)
 {
   return pEvent->IsSetTempo()->GetBPM();
 }
 
-JZEvent * tTempoEdit::NewEvent(long clock, int val)
+JZEvent * JZTempoEdit::NewEvent(long clock, int val)
 {
   return new JZSetTempoEvent(clock, val);
 }

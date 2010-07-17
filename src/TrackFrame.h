@@ -35,7 +35,7 @@ class JZPianoWindow;
 
 //*****************************************************************************
 //*****************************************************************************
-class JZTrackFrame : public JZEventFrame, public tButtonLabelInterface
+class JZTrackFrame : public JZEventFrame, public JZButtonLabelInterface
 {
   public:
 
@@ -55,7 +55,7 @@ class JZTrackFrame : public JZEventFrame, public tButtonLabelInterface
 
     void NewPlayPosition(int Clock);
 
-    // Overridden tButtonLabelInterface function.
+    // Overridden JZButtonLabelInterface function.
     virtual void ButtonLabelDisplay(const wxString& Text, bool IsButtonDown);
 
   private:

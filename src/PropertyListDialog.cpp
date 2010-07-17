@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class myproplistview : public wxPropertyListView
 {
   public:
 
-    myproplistview(tPropertyListDlg* parent);
+    myproplistview(JZPropertyListDlg* parent);
 
     // The OnOk and OnClose handlers are never called, only OnClose, which is
     // bad.  OnClose and OnOk are wrongly documented i think, these are the
@@ -57,7 +57,7 @@ class myproplistview : public wxPropertyListView
     // since event tables don't seem to be inherited.
 
     // This means all OnClose methods should be renamed onok. this should be
-    // called from the tPropertyListDlg::onok, so then there wouldnt be need
+    // called from the JZPropertyListDlg::onok, so then there wouldnt be need
     // for the myproplist class, for this purpose at least
 
     // or it might be possible to still override here, with the proper evt tbl
@@ -69,11 +69,11 @@ class myproplistview : public wxPropertyListView
 
   protected:
 
-    tPropertyListDlg* parent;
+    JZPropertyListDlg* parent;
 
 };
 
-myproplistview::myproplistview(tPropertyListDlg* pParent)
+myproplistview::myproplistview(JZPropertyListDlg* pParent)
   : wxPropertyListView(
       NULL,
       wxPROP_BUTTON_OK | wxPROP_BUTTON_CANCEL | wxPROP_BUTTON_CHECK_CROSS |
@@ -112,17 +112,17 @@ bool myproplistview::OnClose()
   return false;
 }
 
-void tPropertyListDlg::OnPropertyChanged(wxProperty* pProperty)
+void JZPropertyListDlg::OnPropertyChanged(wxProperty* pProperty)
 {
-  cout << "tPropertyListDlg::OnPropertyChanged parent propchange" << endl;
+  cout << "JZPropertyListDlg::OnPropertyChanged parent propchange" << endl;
 }
 
 // PAT - Started adding CreateModal.  It doesn't end the modal dialog anywhere
 // yet.  When the dialog is closed, it appears to call
-// myproplistview::OnClose, but it doesn't call tPropertyListDlg::OnClose for
+// myproplistview::OnClose, but it doesn't call JZPropertyListDlg::OnClose for
 // some reason.
 
-void tPropertyListDlg::CreateModal()
+void JZPropertyListDlg::CreateModal()
 {
   sheet = new wxPropertySheet;
   view = new myproplistview(this);
@@ -144,7 +144,7 @@ void tPropertyListDlg::CreateModal()
   propDialog->ShowModal();
 }
 
-void tPropertyListDlg::Create()
+void JZPropertyListDlg::Create()
 {
   sheet = new wxPropertySheet;
   view = new myproplistview(this);
@@ -182,12 +182,12 @@ void tPropertyListDlg::Create()
   propFrame->Show(true);
 }
 
-tPropertyListDlg::tPropertyListDlg(wxString title)
+JZPropertyListDlg::JZPropertyListDlg(wxString title)
 {
   this->title = title;
 
   // The validators can be registered once for all.
-//  tPropertyListDlg::myListValidatorRegistry = 0;
+//  JZPropertyListDlg::myListValidatorRegistry = 0;
 
 //  if (myListValidatorRegistry == 0)
 //  {
@@ -210,16 +210,16 @@ tPropertyListDlg::tPropertyListDlg(wxString title)
 //  }
 }
 
-bool tPropertyListDlg::OnClose()
+bool JZPropertyListDlg::OnClose()
 {
-  cout << "tPropertyListDlg::OnClose" << endl;
+  cout << "JZPropertyListDlg::OnClose" << endl;
   return false;
 }
 
 // add properties in subclasses here
-void tPropertyListDlg::AddProperties()
+void JZPropertyListDlg::AddProperties()
 {
   cout
-    << "tPropertyListDlg::AddProperties should never be called, override!"
+    << "JZPropertyListDlg::AddProperties should never be called, override!"
     << endl;
 }

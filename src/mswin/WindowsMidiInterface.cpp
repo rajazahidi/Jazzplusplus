@@ -70,8 +70,8 @@ tWinPlayerState FAR * FAR PASCAL NewWinPlayerState()
   memset(state, 0, sizeof(tWinPlayerState));
   state->hmem = hMem;
 
-  state->isx_buffers = new tWinSysexBufferArray();
-  state->osx_buffers = new tWinSysexBufferArray();
+  state->isx_buffers = new JZWinSysexBufferArray();
+  state->osx_buffers = new JZWinSysexBufferArray();
 
   return state;
 }
@@ -139,7 +139,7 @@ static inline void outsysex(tWinPlayerState *state)
   (void) state->play_buffer.get();
   // next entry is the actual data
   midi_event *m = state->play_buffer.peek();
-  tWinSysexBuffer *buf = (tWinSysexBuffer *)m->data;
+  JZWinSysexBuffer *buf = (JZWinSysexBuffer *)m->data;
   MIDIHDR *hdr = buf->MidiHdr();
   midiOutLongMsg(state->hout, hdr, sizeof(MIDIHDR));
   // dont care about returncodes because the SYSEX_EVENT was already
@@ -217,7 +217,7 @@ void CALLBACK midiIntTimerHandler(
 
   state->play_time = (long)timeGetTime() + state->time_correction;
 
-  midi_event *m = state->play_buffer.peek();
+  midi_event* m = state->play_buffer.peek();
   while (m)
   {
     if (m->ref > state->play_time)
@@ -620,7 +620,7 @@ void CALLBACK MidiOutProc(
   if (wMsg == MOM_DONE)
   {
     MIDIHDR *hdr = (MIDIHDR *)dwParam1;
-    tWinSysexBuffer *buf = (tWinSysexBuffer *)hdr->dwUser;
+    JZWinSysexBuffer *buf = (JZWinSysexBuffer *)hdr->dwUser;
     if (buf != 0)
     {  // ignore OutNow() buffers
       buf->Release();

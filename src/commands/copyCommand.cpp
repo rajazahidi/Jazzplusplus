@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,21 +25,21 @@
 #include "TrackFrame.h"
 #include "Command.h"
 
-bool tCopyCommand::EraseDestin = 1;
-bool tCopyCommand::RepeatCopy = 0;
-bool tCopyCommand::EraseSource = 0;
-bool tCopyCommand::InsertSpace = 0;
+bool JZCopyCommand::EraseDestin = 1;
+bool JZCopyCommand::RepeatCopy = 0;
+bool JZCopyCommand::EraseSource = 0;
+bool JZCopyCommand::InsertSpace = 0;
 
-tCopyCommand::tCopyCommand(JZTrackFrame *t)
+JZCopyCommand::JZCopyCommand(JZTrackFrame *t)
 {
   tw = t;
   MarkRepeat = 0;
-  Mouse = new tMarkDestin(tw->Canvas, tw, 0);
+  Mouse = new JZMarkDestination(tw->Canvas, tw, 0);
   CopyDlg = 0;
 }
 
 
-int tCopyCommand::Event(wxMouseEvent& e)
+int JZCopyCommand::Event(wxMouseEvent& e)
 {
 #ifdef OBSOLETE
   if (!CopyDlg && Mouse && Mouse->Event(e))
@@ -60,7 +60,7 @@ int tCopyCommand::Event(wxMouseEvent& e)
       e.Position(&StartX, &StartY);
       tw->Mark((long)StartX, (long)StartY);
       wxDialogBox *panel = new wxDialogBox(tw, "Replicate", FALSE );
-      CopyDlg = new tCopyDlg(this);
+      CopyDlg = new JZCopyDlg(this);
       CopyDlg->EditForm(panel);
       panel->Fit();
       panel->Show(TRUE);
@@ -76,13 +76,13 @@ int tCopyCommand::Event(wxMouseEvent& e)
 }
 
 
-void tCopyCommand::OnOk()
+void JZCopyCommand::OnOk()
 {
   CopyDlg = 0;
   if (RepeatCopy)
   {
     delete Mouse;
-    Mouse = new tMarkDestin(tw->Canvas, tw, 1);
+    Mouse = new JZMarkDestination(tw->Canvas, tw, 1);
     MarkRepeat = 1;
   }
   else
@@ -90,21 +90,21 @@ void tCopyCommand::OnOk()
 }
 
 
-void tCopyCommand::OnCancel()
+void JZCopyCommand::OnCancel()
 {
   CopyDlg = 0;
   Execute(0);
 }
 
 
-void tCopyCommand::Execute(int doit)
+void JZCopyCommand::Execute(int doit)
 {
 
   if (doit)
   {
     long DestTrack = tw->y2Line((long)StartY);
     long DestClock = tw->x2BarClock((long)StartX);
-    tCmdCopy cpy(tw->mpFilter, DestTrack, DestClock);
+    JZCommandCopy cpy(tw->mpFilter, DestTrack, DestClock);
 
     if (RepeatCopy)
       cpy.RepeatClock = tw->x2BarClock((long)StopX, 1);

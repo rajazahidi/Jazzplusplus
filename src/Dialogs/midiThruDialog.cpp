@@ -24,7 +24,7 @@
 
 #ifndef __PORTING
 
-tMidiThruDlg::tMidiThruDlg(tEventWin *w)
+JZMidiThruDlg::JZMidiThruDlg(tEventWin *w)
 : wxForm( USED_WXFORM_BUTTONS ),
   InputDeviceChoice("Input Device", Midi->GetInputDevices().AsNamedValue(), &InputDevice),
   OutputDeviceChoice("Output Device", Midi->GetOutputDevices().AsNamedValue(), &OutputDevice)
@@ -35,20 +35,20 @@ tMidiThruDlg::tMidiThruDlg(tEventWin *w)
 }
 
 
-void tMidiThruDlg::OnHelp()
+void JZMidiThruDlg::OnHelp()
 {
   HelpInstance->ShowTopic("Midi Thru");
 }
 
 
-void tMidiThruDlg::OnCancel()
+void JZMidiThruDlg::OnCancel()
 {
   EventWin->DialogBox = 0;
   wxForm::OnCancel();
 }
 
 
-void tMidiThruDlg::OnOk()
+void JZMidiThruDlg::OnOk()
 {
   InputDeviceChoice.GetValue();
   OutputDeviceChoice.GetValue();
@@ -63,7 +63,7 @@ void tMidiThruDlg::OnOk()
 
 
 
-void tMidiThruDlg::EditForm(wxPanel *panel)
+void JZMidiThruDlg::EditForm(wxPanel *panel)
 {
   if (Midi->SupportsMultipleDevices())
   {

@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -34,16 +34,16 @@ class wxStringListValidator;
 // Description:
 //   This class presents a dialog with the values to choose from.
 //*****************************************************************************
-class tNamedChoice : public wxObject
+class JZNamedChoice : public wxObject
 {
   public:
 
-    tNamedChoice(
+    JZNamedChoice(
       const char* pTitle,
       const std::vector<std::pair<std::string, int> >& Pairs,
       int* pResult);
 
-    virtual ~tNamedChoice();
+    virtual ~JZNamedChoice();
 
 //    wxFormItem *mkFormItem(int w = 100, int h = 100);
 

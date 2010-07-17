@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -341,7 +341,7 @@ int JZSong::StringToClock(const string& ClockString) const
 void JZSong::MergeTracks(
   int FrClock,
   int ToClock,
-  tEventArray* pDestin,
+  JZEventArray* pDestin,
   const JZMetronomeInfo& MetronomeInfo,
   int delta,
   int mode)
@@ -376,7 +376,7 @@ void JZSong::MergeTracks(
         continue;
       }
 
-      tEventIterator Iterator(&mTracks[i]);
+      JZEventIterator Iterator(&mTracks[i]);
       JZEvent* pEvent = Iterator.Range(FrClock, ToClock);
       while (pEvent)
       {
@@ -401,7 +401,7 @@ void JZSong::MergeTracks(
 //-----------------------------------------------------------------------------
 void JZSong::MergePlayTrackEvent(
   JZPlayTrackEvent* c, //the playtrack event
-  tEventArray* pDestin,
+  JZEventArray* pDestin,
   int recursionDepth)
 {
   // Recursion might be simple, but we have the infinite loop problem, if a
@@ -419,7 +419,7 @@ void JZSong::MergePlayTrackEvent(
   JZTrack* pTrack = &mTracks[c->track]; // the track we want to play
 
   // Get an iterator of all events the playtrack is pointing to.
-  tEventIterator IteratorPL(pTrack);
+  JZEventIterator IteratorPL(pTrack);
   JZEvent* f;
 
   // FIXME this is just to test the idea.  It would be good to modify
@@ -429,7 +429,7 @@ void JZSong::MergePlayTrackEvent(
   int loopLength = 0;
 
   // Get an iterator of all events the playtrack is pointing to.
-  tEventIterator IteratorEOT(pTrack);
+  JZEventIterator IteratorEOT(pTrack);
   f = IteratorEOT.Range(0, pTrack->GetLastClock());
 
   // looplength will be used to loop the track, for the duration of
@@ -485,7 +485,7 @@ void JZSong::MergePlayTrackEvent(
 void JZSong::MakeMetronome(
   int FrClock,
   int ToClock,
-  tEventArray* pDestin,
+  JZEventArray* pDestin,
   const JZMetronomeInfo& MetronomeInfo,
   int delta)
 {
@@ -597,7 +597,7 @@ int JZSong::SetMeterChange(int BarNr, int Numerator, int Denomiator)
   // evtl vorhandene TimeSignatures loeschen
 
   JZTrack* pTrack = &mTracks[0];
-  tEventIterator Iterator(pTrack);
+  JZEventIterator Iterator(pTrack);
   JZEvent* pEvent = Iterator.Range(FrClock, ToClock);
   while (pEvent)
   {

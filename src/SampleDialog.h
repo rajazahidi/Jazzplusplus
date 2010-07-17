@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,36 +28,36 @@
 #include "SampleCommand.h"
 #include "PropertyListDialog.h"
 
-class tPaintableCommand;
-class tSampleWin;
-class tSigEqualizer;
+class JZPaintableCommand;
+class JZSampleFrame;
+class JZSigEqualizer;
 class wxButton;
 class wxCheckBox;
 class wxChoice;
 class wxSlider;
 
 /**
- * controls a tPaintableCommand, that is shows the parameter arrays
+ * controls a JZPaintableCommand, that is shows the parameter arrays
  * in samplwin and processes OnAction.
  */
 
-class tCommandPainter
+class JZCommandPainter
 {
   public:
-    tCommandPainter(tSampleWin &w, tPaintableCommand &cmd);
-    virtual ~tCommandPainter();
+    JZCommandPainter(JZSampleFrame &w, JZPaintableCommand &cmd);
+    virtual ~JZCommandPainter();
     virtual void OnAccept(int fr, int to);
   protected:
-    tSampleWin &win;
-    tPaintableCommand &cmd;
+    JZSampleFrame &win;
+    JZPaintableCommand &cmd;
 };
 
 
-class tEqualizer : public tSliderWin
+class JZEqualizer : public JZSliderWindow
 {
   public:
-    tEqualizer(tSampleWin &win);
-    virtual ~tEqualizer();
+    JZEqualizer(JZSampleFrame &win);
+    virtual ~JZEqualizer();
     virtual void AddItems();
     virtual void AddEdits();
 #ifdef OBSOLETE
@@ -67,19 +67,19 @@ class tEqualizer : public tSliderWin
   private:
     void Action();
     JZRndArray array;
-    tSplEqualizer **equ;
-    tSampleWin &win;
-    tSample    &spl;
+    JZSplEqualizer **equ;
+    JZSampleFrame &win;
+    JZSample    &spl;
     wxButton *action;
     wxButton *cancel;
     static int geo[4];
     int channels;
 };
 
-class tDistortion : public tSliderWin
+class JZDistortion : public JZSliderWindow
 {
   public:
-    tDistortion(tSampleWin &win);
+    JZDistortion(JZSampleFrame &win);
     virtual void AddItems();
     virtual void AddEdits();
 #ifdef OBSOLETE
@@ -91,7 +91,7 @@ class tDistortion : public tSliderWin
     void MakeExpo(int degree);
     void MakeSine(int degree);
     JZRndArray arr;
-    tSampleWin &win;
+    JZSampleFrame &win;
     wxButton *action;
     wxButton *cancel;
     wxChoice *curve;
@@ -101,29 +101,29 @@ class tDistortion : public tSliderWin
 
 // ----------------------- additive synthesis ---------------------
 
-class tAddSynth;
-class tRhyArrayEdit;
+class JZAddSynth;
+class JZRhyArrayEdit;
 
-class tSynthDlg : public tSliderWin
+class JZSynthDlg : public JZSliderWindow
 {
   public:
-    tSynthDlg(tSampleWin &win);
-    virtual ~tSynthDlg();
+    JZSynthDlg(JZSampleFrame &win);
+    virtual ~JZSynthDlg();
     virtual void AddItems();
     virtual void AddEdits();
 #ifdef OBSOLETE
     virtual void OnItem(wxItem& item, wxCommandEvent& event);
 #endif
     virtual void OnMenuCommand(int id);
-    friend std::ostream& operator << (std::ostream& os, tSynthDlg const &a);
-    friend std::istream& operator >> (std::istream& is, tSynthDlg &a);
+    friend std::ostream& operator << (std::ostream& os, JZSynthDlg const &a);
+    friend std::istream& operator >> (std::istream& is, JZSynthDlg &a);
 
   private:
 
     void Action();
     void SetupEdits();
 
-    tSampleWin &win;
+    JZSampleFrame &win;
     wxButton *action;
     wxButton *cancel;
     wxCheckBox *chk_vol;
@@ -139,7 +139,7 @@ class tSynthDlg : public tSliderWin
     {
       MAXSYNTHS = 6
     };
-    tAddSynth *synths[MAXSYNTHS];
+    JZAddSynth *synths[MAXSYNTHS];
     static int num_synths;
     static int midi_key;
     static int duration;
@@ -157,10 +157,10 @@ class tSynthDlg : public tSliderWin
 // --------------------------- reverb ----------------------------
 
 
-class tReverbForm : public tPropertyListDlg
+class JZReverbForm : public JZPropertyListDlg
 {
   public:
-    tReverbForm(tSampleWin &win);
+    JZReverbForm(JZSampleFrame &win);
     void EditForm(wxPanel *panel);
     void OnOk();
     void OnCancel();
@@ -172,14 +172,14 @@ class tReverbForm : public tPropertyListDlg
     static int rvbtime;
     static int volume;
 
-    tSampleWin &win;
+    JZSampleFrame &win;
 };
 
 
-class tEchoForm : public tPropertyListDlg
+class JZEchoForm : public JZPropertyListDlg
 {
   public:
-    tEchoForm(tSampleWin &win);
+    JZEchoForm(JZSampleFrame &win);
     void EditForm(wxPanel *panel);
     void OnOk();
     void OnCancel();
@@ -189,13 +189,13 @@ class tEchoForm : public tPropertyListDlg
     static int delay;
     static int ampl;
     static bool rand;
-    tSampleWin &win;
+    JZSampleFrame &win;
 };
 
-class tShifterForm : public tPropertyListDlg
+class JZShifterForm : public JZPropertyListDlg
 {
   public:
-    tShifterForm(tSampleWin &win);
+    JZShifterForm(JZSampleFrame &win);
     void EditForm(wxPanel *panel);
     void OnOk();
     void OnCancel();
@@ -205,14 +205,14 @@ class tShifterForm : public tPropertyListDlg
     static int shift_frac;
     static bool keep_length;
     static int winsize;
-    tSampleWin &win;
+    JZSampleFrame &win;
 };
 
 
-class tStretcherForm : public tPropertyListDlg
+class JZStretcherForm : public JZPropertyListDlg
 {
   public:
-    tStretcherForm(tSampleWin &win);
+    JZStretcherForm(JZSampleFrame &win);
     void EditForm(wxPanel *panel);
     void OnOk();
     void OnCancel();
@@ -224,15 +224,15 @@ class tStretcherForm : public tPropertyListDlg
     static int oldspeed;
     static int newspeed;
     static bool keep_pitch;
-    tSampleWin &win;
-    tSample    &spl;
+    JZSampleFrame &win;
+    JZSample    &spl;
 };
 
 
-class tSplFilterForm : public tPropertyListDlg
+class JZSplFilterForm : public JZPropertyListDlg
 {
   public:
-    tSplFilterForm(tSampleWin &win, bool painter = FALSE);
+    JZSplFilterForm(JZSampleFrame &win, bool painter = FALSE);
     void EditForm(wxPanel *panel);
     void OnOk();
     void OnCancel();
@@ -245,50 +245,50 @@ class tSplFilterForm : public tPropertyListDlg
     static int lo_freq;
     static int hi_freq;
     static int band_width;
-    tSampleWin &win;
+    JZSampleFrame &win;
     wxList  typelist;
     char    *typestring;
     bool    painter;
 };
 
 
-class tWahWah;
-class tWahSettingsForm : public tSplFilterForm
+class JZWahWah;
+class JZWahSettingsForm : public JZSplFilterForm
 {
   public:
-    tWahSettingsForm(tSampleWin &win, tWahWah &wah);
+    JZWahSettingsForm(JZSampleFrame &win, JZWahWah &wah);
     void OnOk();
     void OnHelp();
   private:
-    tWahWah &wah;
+    JZWahWah &wah;
 };
 
-class tSplPitch;
-class tSplPitchForm : public tPropertyListDlg
+class JZSplPitch;
+class JZSplPitchForm : public JZPropertyListDlg
 {
   public:
-    tSplPitchForm(tSampleWin &win, tSplPitch &pitch_painter);
+    JZSplPitchForm(JZSampleFrame &win, JZSplPitch &pitch_painter);
     void EditForm(wxPanel *panel);
     void OnOk();
     void OnCancel();
     void OnHelp();
   protected:
     static int range;
-    tSampleWin &win;
-    tSplPitch  &pitch;
+    JZSampleFrame &win;
+    JZSplPitch  &pitch;
 };
 
 
-class tChorusForm : public tPropertyListDlg
+class JZChorusForm : public JZPropertyListDlg
 {
   public:
-    tChorusForm(tSampleWin &win);
+    JZChorusForm(JZSampleFrame &win);
     void EditForm(wxPanel *panel);
     void OnOk();
     void OnCancel();
     void OnHelp();
   private:
-    tSampleWin &win;
+    JZSampleFrame &win;
 
     static int pitch_freq;
     static int pitch_range;
@@ -298,16 +298,16 @@ class tChorusForm : public tPropertyListDlg
 };
 
 #if 0
-class tStereoForm : public tPropertyListDlg
+class JZStereoForm : public JZPropertyListDlg
 {
   public:
-    tStereoForm(tSampleWin &win);
+    JZStereoForm(JZSampleFrame &win);
     void EditForm(wxPanel *panel);
     void OnOk();
     void OnCancel();
     void OnHelp();
   private:
-    tSampleWin &win;
+    JZSampleFrame &win;
 
     static int delay;
     static int stereo_spread;

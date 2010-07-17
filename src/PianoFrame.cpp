@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -558,12 +558,12 @@ void JZPianoFrame::OnSnap16D(wxCommandEvent& Event)
 
 #ifdef OBSOLETE
 
-class tVisibleDlg : public wxForm
+class JZVisibleDlg : public wxForm
 {
   JZPianoFrame *pPianoWindow;
   public:
 
-    tVisibleDlg(JZPianoFrame *p)
+    JZVisibleDlg(JZPianoFrame *p)
       : wxForm( USED_WXFORM_BUTTONS ),
         pPianoWindow(p)
     {
@@ -573,20 +573,20 @@ class tVisibleDlg : public wxForm
     virtual void OnHelp();
 };
 
-void tVisibleDlg::OnOk()
+void JZVisibleDlg::OnOk()
 {
   pPianoWindow->SetVisibleAllTracks(pPianoWindow->VisibleAllTracks);
   // pPianoWindow->Redraw();
   wxForm::OnOk();
 }
 
-void tVisibleDlg::OnHelp()
+void JZVisibleDlg::OnHelp()
 {
   gpHelpInstance->ShowTopic("Events");
 }
 
 
-void tVisibleDlg::EditForm(wxPanel *panel)
+void JZVisibleDlg::EditForm(wxPanel *panel)
 {
   Add(wxMakeFormMessage("Select Events to be shown"));
   Add(wxMakeFormNewLine());
@@ -610,7 +610,7 @@ void tVisibleDlg::EditForm(wxPanel *panel)
 void JZPianoFrame::VisibleDialog()
 {
   wxDialogBox *panel = new wxDialogBox(this, "Select Events", FALSE );
-  tVisibleDlg * dlg = new tVisibleDlg(this);
+  JZVisibleDlg * dlg = new JZVisibleDlg(this);
   dlg->EditForm(panel);
   panel->Fit();
   panel->Show(TRUE);
@@ -745,7 +745,7 @@ void JZPianoFrame::OnActivateSettingsDialog(wxCommandEvent& Event)
 }
 
 // This is a test to see how to implement a dialog with Patrick's system.
-// It replaces tMidiDelayDlg, which isnt necesarily a good idea.
+// It replaces JZMidiDelayDlg, which isnt necesarily a good idea.
 void JZPianoFrame::OnActivateMidiDelayDialog(wxCommandEvent& Event)
 {
   mpPianoWindow->ActivateMidiDelayDialog();

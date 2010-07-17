@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,17 +28,17 @@
 #include <wx/frame.h>
 
 class wxObject;
-class HBAnalyzer;
-class HBCanvas;
-class tGenMelody;
+class JZHarmonyBrowserAnalyzer;
+class JZHarmonyBrowserCanvas;
+class JZGenMelody;
 
 //*****************************************************************************
 //*****************************************************************************
-class tHBInterface
+class JZHarmonyBrowserInterface
 {
   public:
 
-    virtual ~tHBInterface()
+    virtual ~JZHarmonyBrowserInterface()
     {
     }
 
@@ -55,20 +55,20 @@ class tHBInterface
 
     virtual int GetSelectedScale(int* out) = 0; // returns # keys
 
-    virtual HBAnalyzer* GetAnalyzer() = 0;
+    virtual JZHarmonyBrowserAnalyzer* GetAnalyzer() = 0;
 
     virtual void TransposeSelection() = 0;
 };
 
 //*****************************************************************************
 //*****************************************************************************
-class HBFrame : public wxFrame, public tHBInterface
+class JZHarmonyBrowserFrame : public wxFrame, public JZHarmonyBrowserInterface
 {
   public:
 
-    HBFrame();
+    JZHarmonyBrowserFrame();
 
-    ~HBFrame();
+    ~JZHarmonyBrowserFrame();
 
     bool IsSequenceDefined();
 
@@ -80,7 +80,7 @@ class HBFrame : public wxFrame, public tHBInterface
 
     int GetBassKeys(int* out, int step, int n_steps);
 
-    HBAnalyzer* GetAnalyzer();
+    JZHarmonyBrowserAnalyzer* GetAnalyzer();
 
     void TransposeSelection();
 
@@ -126,11 +126,11 @@ class HBFrame : public wxFrame, public tHBInterface
 
   private:
 
-    HBCanvas* mpHbWindow;
+    JZHarmonyBrowserCanvas* mpHbWindow;
 
     JZToolBar* mpToolBar;
 
-    tGenMelody* genmeldy;
+    JZGenMelody* genmeldy;
 
   DECLARE_EVENT_TABLE()
 };

@@ -30,7 +30,7 @@
 
 #include <wx/brush.h>
 
-class tCtrlEditBase;
+class JZCtrlEditBase;
 class JZEvent;
 class JZFilter;
 class JZPianoFrame;
@@ -64,7 +64,7 @@ class JZListen : public wxTimer
 
 //*****************************************************************************
 //*****************************************************************************
-class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
+class JZPianoWindow : public JZEventWindow, public JZButtonLabelInterface
 {
   public:
 
@@ -208,7 +208,7 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     int mSnapsX[eMaxSnaps];
 
-    tEventArray mPasteBuffer;
+    JZEventArray mPasteBuffer;
 
   public:
 
@@ -292,7 +292,7 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     void Draw(wxDC& Dc);
 
-    // Overridden tButtonLabelInterface function.
+    // Overridden JZButtonLabelInterface function.
     void ButtonLabelDisplay(const wxString& Text, bool IsButtonDown);
 
   private:
@@ -303,7 +303,7 @@ class JZPianoWindow : public JZEventWindow, public tButtonLabelInterface
 
     int mTrackIndex;
 
-    tCtrlEditBase* mpCtrlEdit;
+    JZCtrlEditBase* mpCtrlEdit;
 
     JZMouseMapper mMousePlay;
     JZMouseMapper mMouseEvent;

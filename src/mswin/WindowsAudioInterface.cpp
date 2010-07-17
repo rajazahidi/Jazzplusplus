@@ -45,13 +45,13 @@
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-class tAudioListener : public wxTimer
+class JZAudioListener : public wxTimer
 {
   // play a sample from piano roll
 
   public:
 
-    tAudioListener(JZWindowsAudioPlayer* pPlayer, int key)
+    JZAudioListener(JZWindowsAudioPlayer* pPlayer, int key)
       : wxTimer(),
         mpPlayer(pPlayer),
         mCount(0),
@@ -74,9 +74,9 @@ class tAudioListener : public wxTimer
       Start(200);
     }
 
-    tAudioListener(
+    JZAudioListener(
       JZWindowsAudioPlayer* pPlayer,
-      tSample& spl,
+      JZSample& spl,
       long fr_smpl,
       long to_smpl)
       : wxTimer(),
@@ -101,7 +101,7 @@ class tAudioListener : public wxTimer
       Start(200);
     }
 
-    ~tAudioListener()
+    ~JZAudioListener()
     {
       Stop();
 
@@ -162,7 +162,7 @@ JZWindowsAudioPlayer::JZWindowsAudioPlayer(JZSong* pSong)
 
   InitializeCriticalSection(&mutex);
 
-  mpAudioBuffer = new tEventArray();
+  mpAudioBuffer = new JZEventArray();
   mAudioEnabled = (gpConfig->GetValue(C_EnableAudio) != 0);
   hout_open     = 0;
   hinp_open     = 0;
@@ -310,7 +310,7 @@ int JZWindowsAudioPlayer::OpenDsp()
     // prepare headers
     for (i = 0; i < BUFCOUNT; i++)
     {
-      tAudioBuffer *buf = mSamples.GetBuffer(i);
+      JZAudioBuffer* buf = mSamples.GetBuffer(i);
       WAVEHDR *hdr = new WAVEHDR;
       memset(hdr, 0, sizeof(WAVEHDR));
       buf->hdr = hdr;
@@ -346,7 +346,7 @@ int JZWindowsAudioPlayer::OpenDsp()
       WAVEHDR *hdr = new WAVEHDR;
       memset(hdr, 0, sizeof(WAVEHDR));
 
-      tAudioBuffer *buf = recbuffers.RequestBuffer();
+      JZAudioBuffer* buf = recbuffers.RequestBuffer();
       buf->hdr       = hdr;
 
       hdr->lpData           = (LPSTR)buf->data;
@@ -390,7 +390,7 @@ int JZWindowsAudioPlayer::CloseDsp()
     // unprepare headers
     for (i = 0; i < BUFCOUNT; i++)
     {
-      tAudioBuffer *buf = mSamples.GetBuffer(i);
+      JZAudioBuffer* buf = mSamples.GetBuffer(i);
       WAVEHDR *hdr = (WAVEHDR *)buf->hdr;
 
       res = waveOutUnprepareHeader(hout, hdr, sizeof(WAVEHDR));
@@ -415,7 +415,7 @@ int JZWindowsAudioPlayer::CloseDsp()
     int n = recbuffers.buffers.GetSize();
     for (i = 0; i < n; i++)
     {
-      tAudioBuffer *buf = recbuffers.buffers[i];
+      JZAudioBuffer* buf = recbuffers.buffers[i];
       if (buf == 0)
         break;
       res = waveInUnprepareHeader(hinp, (WAVEHDR *)buf->hdr, sizeof(WAVEHDR));
@@ -460,7 +460,7 @@ void JZWindowsAudioPlayer::AudioCallback(UINT wMsg)
   {
     blocks_played ++;
     play_buffers_needed ++;
-    tAudioBuffer *buf = mSamples.driv_buffers.Get();
+    JZAudioBuffer* buf = mSamples.driv_buffers.Get();
     mSamples.free_buffers.Put(buf);
   }
   if (hinp_open && wMsg == MM_WIM_DATA)
@@ -495,7 +495,7 @@ void JZWindowsAudioPlayer::WriteBuffers()
 {
   if (mAudioEnabled && hout_open)
   {
-    tAudioBuffer* pAudioBuffer;
+    JZAudioBuffer* pAudioBuffer;
     while ((pAudioBuffer = mSamples.full_buffers.Get()) != 0)
     {
       if (
@@ -564,7 +564,7 @@ void JZWindowsAudioPlayer::Notify()
         WAVEHDR *hdr = new WAVEHDR;
         memset(hdr, 0, sizeof(WAVEHDR));
 
-        tAudioBuffer *buf = recbuffers.RequestBuffer();
+        JZAudioBuffer* buf = recbuffers.RequestBuffer();
         buf->hdr = hdr;
 
         hdr->lpData         = (LPSTR)buf->data;
@@ -685,13 +685,13 @@ void JZWindowsAudioPlayer::ListenAudio(int key, int start_stop_mode)
   {
     return;
   }
-  mpListener = new tAudioListener(this, key);
+  mpListener = new JZAudioListener(this, key);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZWindowsAudioPlayer::ListenAudio(
-  tSample &spl,
+  JZSample &spl,
   long fr_smpl,
   long to_smpl)
 {
@@ -711,7 +711,7 @@ void JZWindowsAudioPlayer::ListenAudio(
     delete mpListener;
   }
 
-  mpListener = new tAudioListener(this, spl, fr_smpl, to_smpl);
+  mpListener = new JZAudioListener(this, spl, fr_smpl, to_smpl);
 }
 
 //-----------------------------------------------------------------------------

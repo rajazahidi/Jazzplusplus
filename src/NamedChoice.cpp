@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 
 using namespace std;
 
-tNamedChoice::tNamedChoice(
+JZNamedChoice::JZNamedChoice(
   const char* pTitle,
   const std::vector<std::pair<std::string, int> >& Pairs,
   int* pResult)
@@ -39,12 +39,12 @@ tNamedChoice::tNamedChoice(
 {
 }
 
-tNamedChoice::~tNamedChoice()
+JZNamedChoice::~JZNamedChoice()
 {
 }
 
 #ifdef OBSOLETE
-wxFormItem *tNamedChoice::mkFormItem(int w, int h)
+wxFormItem *JZNamedChoice::mkFormItem(int w, int h)
 {
   SetValue();
 
@@ -68,7 +68,7 @@ wxFormItem *tNamedChoice::mkFormItem(int w, int h)
 #endif
 
 // Return a string list validator to use in the wxproplist dialogs.
-wxStringListValidator* tNamedChoice::GetStringListValidator()
+wxStringListValidator* JZNamedChoice::GetStringListValidator()
 {
   wxStringList* StringList = new wxStringList();
   for (
@@ -85,7 +85,7 @@ wxStringListValidator* tNamedChoice::GetStringListValidator()
   return new wxStringListValidator(StringList);
 }
 
-void tNamedChoice::GetValue()
+void JZNamedChoice::GetValue()
 {
   for (
     vector<pair<string, int> >::const_iterator iPair = mPairs.begin();
@@ -100,7 +100,7 @@ void tNamedChoice::GetValue()
   }
 }
 
-void tNamedChoice::SetValue()
+void JZNamedChoice::SetValue()
 {
   for (
     vector<pair<string, int> >::const_iterator iPair = mPairs.begin();

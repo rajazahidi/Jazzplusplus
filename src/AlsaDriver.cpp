@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -46,11 +46,11 @@ using namespace std;
 
 #define MAX_FRAGS  16  // enough large?
 
-class tAlsaAudioListener : public wxTimer
+class JZAlsaAudioListener : public wxTimer
 {
   public:
 
-    tAlsaAudioListener(tAlsaAudioPlayer* pPlayer, int key)
+    JZAlsaAudioListener(JZAlsaAudioPlayer* pPlayer, int key)
       : wxTimer(),
         mpPlayer(pPlayer),
         mHardExit(true)
@@ -61,14 +61,14 @@ class tAlsaAudioListener : public wxTimer
 
       // SYNC seems not to work?? so add 8 more silent buffers
       // to hear the end of the sample too.
-      mpPlayer->OpenDsp(tAlsaAudioPlayer::PLAYBACK, 0);
+      mpPlayer->OpenDsp(JZAlsaAudioPlayer::PLAYBACK, 0);
       mCount = 8 + mpPlayer->mSamples.PrepareListen(key);
       Start(20);
     }
 
-    tAlsaAudioListener(
-      tAlsaAudioPlayer* pPlayer,
-      tSample& spl,
+    JZAlsaAudioListener(
+      JZAlsaAudioPlayer* pPlayer,
+      JZSample& spl,
       long fr_smpl,
       long to_smpl)
       : wxTimer(),
@@ -79,17 +79,17 @@ class tAlsaAudioListener : public wxTimer
       mpPlayer->mpRecordingInfo = 0;  // not recording!
       mpPlayer->running_mode = 0;
 
-      mpPlayer->OpenDsp(tAlsaAudioPlayer::PLAYBACK, 0);
+      mpPlayer->OpenDsp(JZAlsaAudioPlayer::PLAYBACK, 0);
 
       mpPlayer->mSamples.ResetBufferSize(
-        mpPlayer->frag_byte_size[tAlsaAudioPlayer::PLAYBACK]);
+        mpPlayer->frag_byte_size[JZAlsaAudioPlayer::PLAYBACK]);
 
       mCount = 8 + mpPlayer->mSamples.PrepareListen(&spl, fr_smpl, to_smpl);
 
       Start(20);
     }
 
-    ~tAlsaAudioListener()
+    ~JZAlsaAudioListener()
     {
       Stop();
       mpPlayer->CloseDsp(mHardExit);
@@ -109,12 +109,12 @@ class tAlsaAudioListener : public wxTimer
 
     long GetPlayPosition()
     {
-      return mpPlayer->GetCurrentPosition(tAlsaAudioPlayer::PLAYBACK);
+      return mpPlayer->GetCurrentPosition(JZAlsaAudioPlayer::PLAYBACK);
     }
 
   private:
 
-    tAlsaAudioPlayer* mpPlayer;
+    JZAlsaAudioPlayer* mpPlayer;
 
     int mCount;
 
@@ -122,10 +122,10 @@ class tAlsaAudioListener : public wxTimer
 };
 
 
-tAlsaAudioPlayer::tAlsaAudioPlayer(JZSong* pSong)
-  : tAlsaPlayer(pSong)
+JZAlsaAudioPlayer::JZAlsaAudioPlayer(JZSong* pSong)
+  : JZAlsaPlayer(pSong)
 {
-  mpAudioBuffer = new tEventArray();
+  mpAudioBuffer = new JZEventArray();
   mInstalled    = false;
   mAudioEnabled = false;
   mpListener    = 0;
@@ -143,7 +143,7 @@ tAlsaAudioPlayer::tAlsaAudioPlayer(JZSong* pSong)
 }
 
 
-tAlsaAudioPlayer::~tAlsaAudioPlayer()
+JZAlsaAudioPlayer::~JZAlsaAudioPlayer()
 {
   delete mpListener;
   delete mpAudioBuffer;
@@ -160,27 +160,27 @@ tAlsaAudioPlayer::~tAlsaAudioPlayer()
 }
 
 
-int tAlsaAudioPlayer::LoadSamples(const char *filename)
+int JZAlsaAudioPlayer::LoadSamples(const char *filename)
 {
   return mSamples.Load(filename);
 }
 
-int tAlsaAudioPlayer::RecordMode() const
+int JZAlsaAudioPlayer::RecordMode() const
 {
   return running_mode & (1 << CAPTURE);
 }
 
-int tAlsaAudioPlayer::PlayBackMode() const
+int JZAlsaAudioPlayer::PlayBackMode() const
 {
   return running_mode & (1 << PLAYBACK);
 }
 
-void tAlsaAudioPlayer::StartPlay(long clock, long loopClock, int cont)
+void JZAlsaAudioPlayer::StartPlay(long clock, long loopClock, int cont)
 {
   delete mpListener;
   mSamples.StartPlay(clock);
 
-  tAlsaPlayer::StartPlay(clock, loopClock, cont);
+  JZAlsaPlayer::StartPlay(clock, loopClock, cont);
   if (!mAudioEnabled)
   {
     return;
@@ -226,7 +226,7 @@ void tAlsaAudioPlayer::StartPlay(long clock, long loopClock, int cont)
 }
 
 
-void tAlsaAudioPlayer::StartAudio()
+void JZAlsaAudioPlayer::StartAudio()
 {
   if (pcm[PLAYBACK])
   {
@@ -239,7 +239,7 @@ void tAlsaAudioPlayer::StartAudio()
 }
 
 
-void tAlsaAudioPlayer::OpenDsp(int mode, int sync_mode)
+void JZAlsaAudioPlayer::OpenDsp(int mode, int sync_mode)
 {
   if (!mAudioEnabled)
   {
@@ -361,7 +361,7 @@ __error:
 }
 
 
-void tAlsaAudioPlayer::CloseDsp(bool Reset)
+void JZAlsaAudioPlayer::CloseDsp(bool Reset)
 {
   if (pcm)
   {
@@ -405,7 +405,7 @@ void tAlsaAudioPlayer::CloseDsp(bool Reset)
   }
 }
 
-void tAlsaAudioPlayer::Notify()
+void JZAlsaAudioPlayer::Notify()
 {
   if (mAudioEnabled)
   {
@@ -429,11 +429,11 @@ void tAlsaAudioPlayer::Notify()
       MidiSync();
     }
   }
-  tAlsaPlayer::Notify();
+  JZAlsaPlayer::Notify();
 }
 
 // number of frames (or bytes) free
-int tAlsaAudioPlayer::GetFreeSpace(int mode)
+int JZAlsaAudioPlayer::GetFreeSpace(int mode)
 {
   snd_pcm_status_t *info;
   snd_pcm_status_alloca(&info);
@@ -446,7 +446,7 @@ int tAlsaAudioPlayer::GetFreeSpace(int mode)
 }
 
 
-int tAlsaAudioPlayer::WriteSamples()
+int JZAlsaAudioPlayer::WriteSamples()
 {
   if (!mAudioEnabled || pcm[PLAYBACK] == NULL)
   {
@@ -460,7 +460,7 @@ int tAlsaAudioPlayer::WriteSamples()
 
   for (; room > frag_size[PLAYBACK]; room -= frag_size[PLAYBACK])
   {
-    tAudioBuffer *buf = mSamples.full_buffers.Get();
+    JZAudioBuffer* buf = mSamples.full_buffers.Get();
     if (buf == 0)
     {
       break;
@@ -495,7 +495,7 @@ int tAlsaAudioPlayer::WriteSamples()
 }
 
 
-void tAlsaAudioPlayer::ReadSamples()
+void JZAlsaAudioPlayer::ReadSamples()
 {
   if (!mAudioEnabled || pcm[CAPTURE] == NULL)
   {
@@ -517,9 +517,9 @@ void tAlsaAudioPlayer::ReadSamples()
 }
 
 
-void tAlsaAudioPlayer::ResetPlay(long clock)
+void JZAlsaAudioPlayer::ResetPlay(long clock)
 {
-  tAlsaPlayer::ResetPlay(clock);
+  JZAlsaPlayer::ResetPlay(clock);
   if (pcm[PLAYBACK])
   {
     snd_pcm_drop(pcm[PLAYBACK]);
@@ -530,12 +530,12 @@ void tAlsaAudioPlayer::ResetPlay(long clock)
   cur_pos = 0;
 }
 
-long tAlsaAudioPlayer::GetCurrentPosition(int mode)
+long JZAlsaAudioPlayer::GetCurrentPosition(int mode)
 {
   return cur_scount;
 }
 
-void tAlsaAudioPlayer::MidiSync()
+void JZAlsaAudioPlayer::MidiSync()
 {
   if (!mAudioEnabled)
   {
@@ -613,10 +613,10 @@ void tAlsaAudioPlayer::MidiSync()
   }
 }
 
-void tAlsaAudioPlayer::StopPlay()
+void JZAlsaAudioPlayer::StopPlay()
 {
   mSamples.StopPlay();
-  tAlsaPlayer::StopPlay();
+  JZAlsaPlayer::StopPlay();
   if (!mAudioEnabled)
   {
     return;
@@ -640,7 +640,7 @@ void tAlsaAudioPlayer::StopPlay()
   recbuffers.Clear();
 }
 
-void tAlsaAudioPlayer::ListenAudio(int key, int start_stop_mode)
+void JZAlsaAudioPlayer::ListenAudio(int key, int start_stop_mode)
 {
   if (!mAudioEnabled)
   {
@@ -667,10 +667,10 @@ void tAlsaAudioPlayer::ListenAudio(int key, int start_stop_mode)
     return;
   }
 
-  mpListener = new tAlsaAudioListener(this, key);
+  mpListener = new JZAlsaAudioListener(this, key);
 }
 
-void tAlsaAudioPlayer::ListenAudio(tSample& spl, long fr_smpl, long to_smpl)
+void JZAlsaAudioPlayer::ListenAudio(JZSample& spl, long fr_smpl, long to_smpl)
 {
   if (!mAudioEnabled)
   {
@@ -688,10 +688,10 @@ void tAlsaAudioPlayer::ListenAudio(tSample& spl, long fr_smpl, long to_smpl)
   {
     return;
   }
-  mpListener = new tAlsaAudioListener(this, spl, fr_smpl, to_smpl);
+  mpListener = new JZAlsaAudioListener(this, spl, fr_smpl, to_smpl);
 }
 
-long tAlsaAudioPlayer::GetListenerPlayPosition()
+long JZAlsaAudioPlayer::GetListenerPlayPosition()
 {
   if (!mpListener)
   {

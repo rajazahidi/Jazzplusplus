@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tAlsaPlayer::tAlsaPlayer(JZSong* pSong)
+JZAlsaPlayer::JZAlsaPlayer(JZSong* pSong)
   : JZPlayer(pSong)
 {
   ithru = othru = 0;
@@ -77,7 +77,7 @@ tAlsaPlayer::tAlsaPlayer(JZSong* pSong)
   snd_seq_poll_descriptors(handle, &pfds, 1, POLLIN|POLLOUT);
 
   //JAVE seqfd doesnt seem to be used for anything, not here nor in the base
-  // class JZPlayer(but heavily in tSeq2Player)
+  // class JZPlayer(but heavily in JZSeq2Player)
 //  seqfd = pfds.fd;
 
   // create my input/output port
@@ -192,7 +192,7 @@ tAlsaPlayer::tAlsaPlayer(JZSong* pSong)
 
   if (mInstalled)
   {
-    thru = new tAlsaThru();
+    thru = new JZAlsaThru();
     SetSoftThru(
       gpConfig->GetValue(C_SoftThru),
       gpConfig->GetValue(C_ThruInput),
@@ -202,14 +202,14 @@ tAlsaPlayer::tAlsaPlayer(JZSong* pSong)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::clear_input_queue()
+void JZAlsaPlayer::clear_input_queue()
 {
   snd_seq_drop_input(handle);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::set_pool_sizes()
+void JZAlsaPlayer::set_pool_sizes()
 {
   if (snd_seq_set_client_pool_output(handle, 2000) < 0)
   {
@@ -227,7 +227,7 @@ void tAlsaPlayer::set_pool_sizes()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::SetSoftThru(int on, int idev, int odev)
+void JZAlsaPlayer::SetSoftThru(int on, int idev, int odev)
 {
   if (idev != ithru || odev != othru)
   {
@@ -285,7 +285,7 @@ void tAlsaPlayer::SetSoftThru(int on, int idev, int odev)
 // Description:
 //   Connect output addrs/queue with my client/oport.
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::subscribe_out(int outp)
+void JZAlsaPlayer::subscribe_out(int outp)
 {
   if (
     snd_seq_connect_to(
@@ -302,7 +302,7 @@ void tAlsaPlayer::subscribe_out(int outp)
 // Description:
 //   Connect input addrs/queue with my client/iport
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::subscribe_inp(int inp)
+void JZAlsaPlayer::subscribe_inp(int inp)
 {
   snd_seq_port_subscribe_t* subs;
   snd_seq_port_subscribe_alloca(&subs);
@@ -320,7 +320,7 @@ void tAlsaPlayer::subscribe_inp(int inp)
 // Description:
 //   Disconnect output addrs/queue with my client/oport.
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::unsubscribe_out(int outp)
+void JZAlsaPlayer::unsubscribe_out(int outp)
 {
   if (
     snd_seq_disconnect_to(
@@ -337,7 +337,7 @@ void tAlsaPlayer::unsubscribe_out(int outp)
 // Description:
 //   Connect input addrs/queue with my client/iport
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::unsubscribe_inp(int inp)
+void JZAlsaPlayer::unsubscribe_inp(int inp)
 {
   snd_seq_port_subscribe_t *subs;
   snd_seq_port_subscribe_alloca(&subs);
@@ -355,7 +355,7 @@ void tAlsaPlayer::unsubscribe_inp(int inp)
 // Description:
 //   Set the name of this client.
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::set_client_info(snd_seq_t *handle, const char *name)
+void JZAlsaPlayer::set_client_info(snd_seq_t *handle, const char *name)
 {
   if (snd_seq_set_client_name(handle, (char *)name) < 0)
   {
@@ -367,7 +367,7 @@ void tAlsaPlayer::set_client_info(snd_seq_t *handle, const char *name)
 // Description:
 //   Create a new port.
 //-----------------------------------------------------------------------------
-int tAlsaPlayer::create_port(snd_seq_t *handle, const char *name)
+int JZAlsaPlayer::create_port(snd_seq_t *handle, const char *name)
 {
   return snd_seq_create_simple_port(
     handle,
@@ -381,14 +381,14 @@ int tAlsaPlayer::create_port(snd_seq_t *handle, const char *name)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool tAlsaPlayer::IsInstalled()
+bool JZAlsaPlayer::IsInstalled()
 {
   return mInstalled;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tAlsaPlayer::~tAlsaPlayer()
+JZAlsaPlayer::~JZAlsaPlayer()
 {
   if (thru)
   {
@@ -402,7 +402,7 @@ tAlsaPlayer::~tAlsaPlayer()
 // 0 = event successfully sent to driver
 // 1 = try again later
 //-----------------------------------------------------------------------------
-int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
+int JZAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
 {
   int rc = 0;
   snd_seq_event_t ev;
@@ -518,7 +518,7 @@ int tAlsaPlayer::OutEvent(JZEvent* pEvent, int now)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::OutBreak()
+void JZAlsaPlayer::OutBreak()
 {
   OutBreak(mOutClock);
 }
@@ -528,7 +528,7 @@ void tAlsaPlayer::OutBreak()
 //   "echos" are used to synchronize.  They are supposed to be read later by
 // the Notify call chain.
 //-----------------------------------------------------------------------------
-int tAlsaPlayer::compose_echo(int clock, unsigned int arg)
+int JZAlsaPlayer::compose_echo(int clock, unsigned int arg)
 {
   snd_seq_event_t ev;
   memset(&ev, 0, sizeof(ev));
@@ -543,7 +543,7 @@ int tAlsaPlayer::compose_echo(int clock, unsigned int arg)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::OutBreak(long clock)
+void JZAlsaPlayer::OutBreak(long clock)
 {
   while (echo_clock + 48 < clock)
   {
@@ -559,7 +559,7 @@ void tAlsaPlayer::OutBreak(long clock)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::StartPlay(long clock, long loopClock, int cont)
+void JZAlsaPlayer::StartPlay(long clock, long loopClock, int cont)
 {
   recd_clock = clock;
   echo_clock = clock;
@@ -573,7 +573,7 @@ void tAlsaPlayer::StartPlay(long clock, long loopClock, int cont)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::ResetPlay(long clock)
+void JZAlsaPlayer::ResetPlay(long clock)
 {
   // Purge queues.
   snd_seq_drop_output_buffer(handle);
@@ -591,12 +591,12 @@ void tAlsaPlayer::ResetPlay(long clock)
 //   Notify is periodically called by the timer.  It will output events to the
 // output buffer, and update play_clock and recd_clock
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::Notify()
+void JZAlsaPlayer::Notify()
 {
   // called by timer
   long Now = GetRealTimeClock();
 
-  cout << "tAlsaPlayer::Notify " << Now << ' ' << play_clock << endl;
+  cout << "JZAlsaPlayer::Notify " << Now << ' ' << play_clock << endl;
 
   if (Now < 0)
   {
@@ -607,7 +607,7 @@ void tAlsaPlayer::Notify()
   {
     // rewind..
     // clear and rebuild
-    cout << "tAlsaPlayer::Notify rewind" << endl;
+    cout << "JZAlsaPlayer::Notify rewind" << endl;
     ResetPlay(Now);
     mPlayBuffer.Clear();
     mOutClock = Now + FIRST_DELTACLOCK;
@@ -657,7 +657,7 @@ void tAlsaPlayer::Notify()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::set_event_header(snd_seq_event_t *ev, long clock, int type)
+void JZAlsaPlayer::set_event_header(snd_seq_event_t *ev, long clock, int type)
 {
   memset(ev, 0, sizeof(*ev));
   snd_seq_ev_set_source(ev, self.port);
@@ -669,7 +669,7 @@ void tAlsaPlayer::set_event_header(snd_seq_event_t *ev, long clock, int type)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::set_event_header(
+void JZAlsaPlayer::set_event_header(
   snd_seq_event_t *ev,
   long clock,
   int len,
@@ -686,7 +686,7 @@ void tAlsaPlayer::set_event_header(
 // Description:
 //   Initialize the alsa timer.
 //-----------------------------------------------------------------------------
-int tAlsaPlayer::start_timer(long clock)
+int JZAlsaPlayer::start_timer(long clock)
 {
   int time_base = mpSong->GetTicksPerQuarter();
   int cur_speed = mpSong->GetTrack(0)->GetCurrentSpeed(clock);
@@ -699,7 +699,7 @@ int tAlsaPlayer::start_timer(long clock)
 // Description:
 //   Set initial tempo.
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::init_queue_tempo(int time_base, int bpm)
+void JZAlsaPlayer::init_queue_tempo(int time_base, int bpm)
 {
   snd_seq_queue_tempo_t *qtempo;
   snd_seq_queue_tempo_alloca(&qtempo);
@@ -716,7 +716,7 @@ void tAlsaPlayer::init_queue_tempo(int time_base, int bpm)
 //   Immediately start the alsa queue timer.  Do this by sending an "start"
 // event to the queue.
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::start_queue_timer(long clock)
+void JZAlsaPlayer::start_queue_timer(long clock)
 {
   stop_queue_timer(); // to be sure
 
@@ -729,17 +729,17 @@ void tAlsaPlayer::start_queue_timer(long clock)
   rv = write(&ev, 1);
   if (rv < 0)
   {
-    cout << "tAlsaPlayer::start_queue_timer write failed" << endl;
+    cout << "JZAlsaPlayer::start_queue_timer write failed" << endl;
   }
   snd_seq_ev_set_queue_continue(&ev, queue);
   rv = write(&ev, 1);
   if (rv < 0)
   {
-    cout << "tAlsaPlayer::start_queue_timer write failed" << endl;
+    cout << "JZAlsaPlayer::start_queue_timer write failed" << endl;
   }
 
   cout
-    << "tAlsaPlayer::start_queue_timer added trial-and-error start_queue"
+    << "JZAlsaPlayer::start_queue_timer added trial-and-error start_queue"
     << endl;
 
   snd_seq_start_queue(handle, queue, NULL);
@@ -749,7 +749,7 @@ void tAlsaPlayer::start_queue_timer(long clock)
 // Description:
 //   Immediately stop the timer, by sending a stop event to the alsa queue.
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::stop_queue_timer()
+void JZAlsaPlayer::stop_queue_timer()
 {
   snd_seq_event_t ev;
   memset(&ev, 0, sizeof(ev));
@@ -767,7 +767,7 @@ void tAlsaPlayer::stop_queue_timer()
 //   int:
 //     returns a negative value on failure.
 //-----------------------------------------------------------------------------
-int tAlsaPlayer::write(snd_seq_event_t *ev, int now)
+int JZAlsaPlayer::write(snd_seq_event_t *ev, int now)
 {
   if (now)
   {
@@ -784,14 +784,14 @@ int tAlsaPlayer::write(snd_seq_event_t *ev, int now)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::flush_output()
+void JZAlsaPlayer::flush_output()
 {
   snd_seq_drain_output(handle);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tAlsaPlayer::set_blocking_mode(int enable)
+int JZAlsaPlayer::set_blocking_mode(int enable)
 {
   int rc;
 
@@ -805,7 +805,7 @@ int tAlsaPlayer::set_blocking_mode(int enable)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::StopPlay()
+void JZAlsaPlayer::StopPlay()
 {
   JZPlayer::StopPlay();
   ResetPlay(0);
@@ -818,7 +818,7 @@ void tAlsaPlayer::StopPlay()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::StartAudio()
+void JZAlsaPlayer::StartAudio()
 {
 }
 
@@ -827,12 +827,12 @@ void tAlsaPlayer::StartAudio()
 //   Called from GetRealTimeClock.  Parses events in the queue.  Sets
 // recd_clock, from event time stamps.
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::recd_event(snd_seq_event_t* ev)
+void JZAlsaPlayer::recd_event(snd_seq_event_t* ev)
 {
   JZEvent* pEvent = 0;
 
   cout
-    << "tAlsaPlayer::recd_event got " << (int)ev->type
+    << "JZAlsaPlayer::recd_event got " << (int)ev->type
     << " (echo is " << SND_SEQ_EVENT_ECHO << ')'
     << endl;
 
@@ -938,7 +938,7 @@ void tAlsaPlayer::recd_event(snd_seq_event_t* ev)
 // looking at time stamps on events in the queue, and also updates the
 // display, so the name is not well chosen.
 //-----------------------------------------------------------------------------
-long tAlsaPlayer::GetRealTimeClock()
+long JZAlsaPlayer::GetRealTimeClock()
 {
   // input recorded events (including my echo events)
   snd_seq_event_t *ie;
@@ -960,8 +960,8 @@ long tAlsaPlayer::GetRealTimeClock()
 // Description:
 //   This function goes through each client, and each port on each client.
 //-----------------------------------------------------------------------------
-void tAlsaPlayer::scan_clients(
-  tAlsaDeviceList& DeviceList,
+void JZAlsaPlayer::scan_clients(
+  JZAlsaDeviceList& DeviceList,
   unsigned DeviceCapabilities)
 {
   snd_seq_client_info_t *cinfo;
@@ -1001,7 +1001,7 @@ void tAlsaPlayer::scan_clients(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tAlsaPlayer::FindMidiDevice()
+int JZAlsaPlayer::FindMidiDevice()
 {
   if (mInputDeviceIndex != -1)
   {
@@ -1035,8 +1035,8 @@ int tAlsaPlayer::FindMidiDevice()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tAlsaPlayer::select_list(
-  tAlsaDeviceList& list,
+int JZAlsaPlayer::select_list(
+  JZAlsaDeviceList& list,
   const char* title,
   int def_device)
 {
@@ -1076,7 +1076,7 @@ int tAlsaPlayer::select_list(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tAlsaDeviceList::AsciiWrite(const string& Message)
+void JZAlsaDeviceList::AsciiWrite(const string& Message)
 {
   cout << Message << endl;
   int i = 0;
@@ -1094,7 +1094,7 @@ void tAlsaDeviceList::AsciiWrite(const string& Message)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-unsigned tAlsaDeviceList::add(const char* pName, const snd_seq_addr_t& a)
+unsigned JZAlsaDeviceList::add(const char* pName, const snd_seq_addr_t& a)
 {
   mDeviceNames.push_back(pName);
   addr.push_back(a);
@@ -1103,7 +1103,7 @@ unsigned tAlsaDeviceList::add(const char* pName, const snd_seq_addr_t& a)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-snd_seq_addr_t& tAlsaDeviceList::operator[](unsigned i)
+snd_seq_addr_t& JZAlsaDeviceList::operator[](unsigned i)
 {
   if (i >= addr.size())
   {

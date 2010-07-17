@@ -199,13 +199,13 @@ int JZMousePlay::ProcessMouseEvent(
 
 //*****************************************************************************
 // Description:
-//   tKeyLengthDragger
+//   JZKeyLengthDragger
 //*****************************************************************************
-class tKeyLengthDragger : public JZMouseAction
+class JZKeyLengthDragger : public JZMouseAction
 {
   public:
 
-    tKeyLengthDragger(JZKeyOnEvent* pKeyOn, JZPianoWindow* pPianoWindow);
+    JZKeyLengthDragger(JZKeyOnEvent* pKeyOn, JZPianoWindow* pPianoWindow);
 
     int Dragging(
       wxMouseEvent& MouseEvent,
@@ -232,7 +232,7 @@ class tKeyLengthDragger : public JZMouseAction
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tKeyLengthDragger::tKeyLengthDragger(
+JZKeyLengthDragger::JZKeyLengthDragger(
   JZKeyOnEvent* pKeyOn,
   JZPianoWindow* pPianoWindow)
 {
@@ -254,7 +254,7 @@ tKeyLengthDragger::tKeyLengthDragger(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tKeyLengthDragger::ProcessMouseEvent(
+int JZKeyLengthDragger::ProcessMouseEvent(
   wxMouseEvent& MouseEvent,
   int ScrolledX,
   int ScrolledY)
@@ -272,7 +272,7 @@ int tKeyLengthDragger::ProcessMouseEvent(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tKeyLengthDragger::Dragging(
+int JZKeyLengthDragger::Dragging(
   wxMouseEvent& MouseEvent,
   int ScrolledX,
   int ScrolledY)
@@ -296,7 +296,7 @@ int tKeyLengthDragger::Dragging(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tKeyLengthDragger::ButtonUp(
+int JZKeyLengthDragger::ButtonUp(
   wxMouseEvent& MouseEvent,
   int ScrolledX,
   int ScrolledY)
@@ -305,7 +305,7 @@ int tKeyLengthDragger::ButtonUp(
   if (Copy->GetEventLength() < mpKeyOn->GetEventLength())
   {
     int key, channel;
-    tEventIterator iter(Win->GetTrack());
+    JZEventIterator iter(Win->GetTrack());
     key = Copy->GetKey();
     channel = Copy->GetChannel();
 
@@ -348,14 +348,14 @@ int tKeyLengthDragger::ButtonUp(
 
 //*****************************************************************************
 // Description:
-//   tPlayTrackLengthDragger JAVE this is just copied from tKeyLengthDragger,
+//   JZPlayTrackLengthDragger JAVE this is just copied from JZKeyLengthDragger,
 // the need to be inherited somehow
 //*****************************************************************************
-class tPlayTrackLengthDragger : public JZMouseAction
+class JZPlayTrackLengthDragger : public JZMouseAction
 {
   public:
 
-    tPlayTrackLengthDragger(JZPlayTrackEvent* k, JZPianoWindow* pPianoWindow);
+    JZPlayTrackLengthDragger(JZPlayTrackEvent* k, JZPianoWindow* pPianoWindow);
 
     int Dragging(
       wxMouseEvent& MouseEvent,
@@ -381,7 +381,7 @@ class tPlayTrackLengthDragger : public JZMouseAction
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tPlayTrackLengthDragger::tPlayTrackLengthDragger(
+JZPlayTrackLengthDragger::JZPlayTrackLengthDragger(
   JZPlayTrackEvent* k,
   JZPianoWindow* pPianoWindow)
 {
@@ -400,7 +400,7 @@ tPlayTrackLengthDragger::tPlayTrackLengthDragger(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tPlayTrackLengthDragger::ProcessMouseEvent(
+int JZPlayTrackLengthDragger::ProcessMouseEvent(
   wxMouseEvent& MouseEvent,
   int ScrolledX,
   int ScrolledY)
@@ -418,7 +418,7 @@ int tPlayTrackLengthDragger::ProcessMouseEvent(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tPlayTrackLengthDragger::Dragging(
+int JZPlayTrackLengthDragger::Dragging(
   wxMouseEvent& MouseEvent,
   int ScrolledX,
   int ScrolledY)
@@ -440,7 +440,7 @@ int tPlayTrackLengthDragger::Dragging(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tPlayTrackLengthDragger::ButtonUp(
+int JZPlayTrackLengthDragger::ButtonUp(
   wxMouseEvent& MouseEvent,
   int ScrolledX,
   int ScrolledY)
@@ -466,14 +466,14 @@ int tPlayTrackLengthDragger::ButtonUp(
 
 //*****************************************************************************
 //*****************************************************************************
-class tVelocCounter : public tMouseCounter
+class JZVelocityCounter : public JZMouseCounter
 {
   public:
-    tVelocCounter(
+    JZVelocityCounter(
       JZPianoWindow* pPianoWindow,
       JZRectangle* pRectangle,
       JZKeyOnEvent* pKeyOn)
-      : tMouseCounter(pPianoWindow, pRectangle, pKeyOn->GetVelocity(), 1, 127)
+      : JZMouseCounter(pPianoWindow, pRectangle, pKeyOn->GetVelocity(), 1, 127)
     {
       Win = pPianoWindow;
       mpKeyOn = pKeyOn;
@@ -499,12 +499,12 @@ class tVelocCounter : public tMouseCounter
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tVelocCounter::ProcessMouseEvent(
+int JZVelocityCounter::ProcessMouseEvent(
   wxMouseEvent& MouseEvent,
   int ScrolledX,
   int ScrolledY)
 {
-  if (tMouseCounter::ProcessMouseEvent(MouseEvent, ScrolledX, ScrolledY))
+  if (JZMouseCounter::ProcessMouseEvent(MouseEvent, ScrolledX, ScrolledY))
   {
     JZKeyOnEvent* pKeyOnCopy = (JZKeyOnEvent *)mpKeyOn->Copy();
     pKeyOnCopy->SetVelocity(Value);
@@ -930,7 +930,7 @@ void JZPianoWindow::Draw(wxDC& Dc)
   // Draw chords from harmony-browser.
   if (mVisibleHBChord && gpHarmonyBrowser && !mpTrack->IsDrumTrack())
   {
-    HBAnalyzer* pAnalyzer = gpHarmonyBrowser->GetAnalyzer();
+    JZHarmonyBrowserAnalyzer* pAnalyzer = gpHarmonyBrowser->GetAnalyzer();
     if (pAnalyzer != 0)
     {
       wxBrush cbrush = *wxBLUE_BRUSH;
@@ -955,9 +955,9 @@ void JZPianoWindow::Draw(wxDC& Dc)
         if (stop > mFromClock && start < mToClock)
         {
           // this chord is visible
-          HBContext *context = pAnalyzer->GetContext(step);
-          HBChord chord = context->Chord();
-          HBChord scale = context->Scale();
+          JZHarmonyBrowserContext *context = pAnalyzer->GetContext(step);
+          JZHarmonyBrowserChord chord = context->Chord();
+          JZHarmonyBrowserChord scale = context->Scale();
 
           int x = Clock2x(start);
           if (x < mEventsX)        // clip to left border
@@ -1393,7 +1393,7 @@ void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
       while (Pitch >= 0 && y < mEventsY + mEventsHeight)
       {
         Dc.DrawText(
-          tSynthSysex::GetSysexGroupName(Pitch + 1),
+          JZSynthesizerSysex::GetSysexGroupName(Pitch + 1),
           mLittleBit,
           y);
         y += mTrackHeight;
@@ -1479,7 +1479,7 @@ void JZPianoWindow::DrawEvents(
 //  Dc.SetClippingRegion(mEventsX, mEventsY, mEventsWidth, mEventsHeight);
   Dc.SetBrush(*Brush);
 
-  tEventIterator Iterator(pTrack);
+  JZEventIterator Iterator(pTrack);
   JZEvent* pEvent = Iterator.First();
   int FromPitch = 127 - mToLine;
   int ToPitch   = 127 - mFromLine;
@@ -2247,14 +2247,14 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& MouseEvent)
         {
           if (!mpTrack->GetAudioMode())
           {
-            mpMouseAction = new tKeyLengthDragger(pKeyOn, this);
+            mpMouseAction = new JZKeyLengthDragger(pKeyOn, this);
           }
         }
         else
         {
           if (pPlayTrack)
           {
-            mpMouseAction = new tPlayTrackLengthDragger(pPlayTrack, this);
+            mpMouseAction = new JZPlayTrackLengthDragger(pPlayTrack, this);
           }
           else if (mVisibleAllTracks)
           {
@@ -2296,7 +2296,7 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& MouseEvent)
           r.SetWidth(mPianoWidth - 2 * mLittleBit);
           r.SetHeight(mTopInfoHeight);
 
-          tVelocCounter *VelocCounter = new tVelocCounter(this, &r, pKeyOn);
+          JZVelocityCounter *VelocCounter = new JZVelocityCounter(this, &r, pKeyOn);
           VelocCounter->ProcessMouseEvent(MouseEvent, mScrolledX, mScrolledY);
           mpMouseAction = VelocCounter;
         }
@@ -2324,7 +2324,7 @@ void JZPianoWindow::MousePiano(wxMouseEvent& MouseEvent)
 }
 
 //-----------------------------------------------------------------------------
-// This is an event handler for tMouseCounter.
+// This is an event handler for JZMouseCounter.
 //-----------------------------------------------------------------------------
 void JZPianoWindow::ButtonLabelDisplay(const wxString& Text, bool IsButtonDown)
 {
@@ -2457,7 +2457,7 @@ int JZPianoWindow::Pitch2y(int Pitch)
 //-----------------------------------------------------------------------------
 JZEvent *JZPianoWindow::FindEvent(JZTrack* pTrack, int Clock, int Pitch)
 {
-  tEventIterator Iterator(pTrack);
+  JZEventIterator Iterator(pTrack);
   JZEvent* pEvent = Iterator.First();
   while (pEvent)
   {
@@ -2485,7 +2485,7 @@ JZEvent *JZPianoWindow::FindEvent(JZTrack* pTrack, int Clock, int Pitch)
 void JZPianoWindow::kill_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
 {
   int key,channel;
-  tEventIterator iter(pTrack);
+  JZEventIterator iter(pTrack);
   JZKeyOnEvent* pKeyOn = pEvent->IsKeyOn();
   if (!pKeyOn)
   {
@@ -2523,7 +2523,7 @@ void JZPianoWindow::kill_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
 void JZPianoWindow::paste_keys_aftertouch(JZTrack* pTrack, JZEvent* pEvent)
 {
   int key,channel;
-  tEventIterator iter(pTrack);
+  JZEventIterator iter(pTrack);
   JZKeyOnEvent* pKeyOn = pEvent->IsKeyOn();
   if (!pKeyOn)
   {
@@ -2600,7 +2600,7 @@ void JZPianoWindow::CtrlVelocity()
 
   delete mpCtrlEdit;
 
-  mpCtrlEdit = new tVelocEdit(
+  mpCtrlEdit = new JZVelocityEdit(
     this,
     "Velocity",
     mPianoWidth,
@@ -2623,7 +2623,7 @@ void JZPianoWindow::CtrlChannelAftertouchEdit()
 
   delete mpCtrlEdit;
 
-  mpCtrlEdit = new tChannelAfterEdit(
+  mpCtrlEdit = new JZChannelAftertouchEdit(
     this,
     "Channel Aftertouch",
     mPianoWidth,
@@ -2645,7 +2645,7 @@ void JZPianoWindow::CtrlPolyAftertouchEdit()
 
   delete mpCtrlEdit;
 
-  mpCtrlEdit = new tPolyAfterEdit(
+  mpCtrlEdit = new JZPolyAfterEdit(
     this,
     "Key Aftertouch",
     mPianoWidth,
@@ -2671,7 +2671,7 @@ void JZPianoWindow::CtrlNone()
 //-----------------------------------------------------------------------------
 void JZPianoWindow::CtrlTempo()
 {
-  tEventIterator Iterator(mpTrack);
+  JZEventIterator Iterator(mpTrack);
 
   mpTrack->Sort();
 
@@ -2716,7 +2716,7 @@ void JZPianoWindow::CtrlTempo()
 
   delete mpCtrlEdit;
 
-  mpCtrlEdit = new tTempoEdit(
+  mpCtrlEdit = new JZTempoEdit(
     Min,
     Max,
     this,
@@ -2750,7 +2750,7 @@ void JZPianoWindow::SelectController()
 
     delete mpCtrlEdit;
 
-    mpCtrlEdit = new tCtrlEdit(
+    mpCtrlEdit = new JZControlEdit(
       i - 1,
       this,
       gpConfig->GetCtrlName(i).first.c_str(),
@@ -2774,7 +2774,7 @@ void JZPianoWindow::CtrlModulation()
 
   delete mpCtrlEdit;
 
-  mpCtrlEdit = new tCtrlEdit(
+  mpCtrlEdit = new JZControlEdit(
     1,
     this,
     "Modulation",
@@ -2797,7 +2797,7 @@ void JZPianoWindow::CtrlPitch()
 
   delete mpCtrlEdit;
 
-  mpCtrlEdit = new tPitchEdit(
+  mpCtrlEdit = new JZPitchEdit(
     this,
     "Pitch",
     mPianoWidth,
@@ -2842,7 +2842,7 @@ void JZPianoWindow::Quantize()
 {
   if (EventsSelected())
   {
-    tCmdQuantize QuantizeCommand(mpFilter, SnapClocks(), true, false, 0, 0);
+    JZCommandQuantize QuantizeCommand(mpFilter, SnapClocks(), true, false, 0, 0);
     QuantizeCommand.Execute(1);
     Refresh();
   }
@@ -2855,7 +2855,7 @@ void JZPianoWindow::ExchangeUpDown()
 {
   if (EventsSelected())
   {
-    tCmdExchUpDown cmd(mpFilter);
+    JZCommandExchangeUpDown cmd(mpFilter);
     cmd.Execute(1);
     Refresh();
   }
@@ -2868,7 +2868,7 @@ void JZPianoWindow::ExchangeLeftRight()
 {
   if (EventsSelected())
   {
-    tCmdExchLeftRight cmd(mpFilter);
+    JZCommandExchangeLeftRight cmd(mpFilter);
     cmd.Execute(1);
     Refresh();
   }
@@ -2882,7 +2882,7 @@ void JZPianoWindow::ShiftLeft()
   if (EventsSelected())
   {
     int steps = -SnapClocks();
-    tCmdShift cmd(mpFilter, steps);
+    JZCommandShift cmd(mpFilter, steps);
     cmd.Execute();
     Refresh();
   }
@@ -2896,7 +2896,7 @@ void JZPianoWindow::ShiftRight()
   if (EventsSelected())
   {
     int steps = SnapClocks();
-    tCmdShift cmd(mpFilter, steps);
+    JZCommandShift cmd(mpFilter, steps);
     cmd.Execute();
     Refresh();
   }
@@ -2910,12 +2910,12 @@ void JZPianoWindow::CutOrCopy(int Id)
   if (EventsSelected())
   {
     mPasteBuffer.Clear();
-    tCmdCopyToBuffer cmd(mpFilter, &mPasteBuffer);
+    JZCommandCopyToBuffer cmd(mpFilter, &mPasteBuffer);
     mpFilter->SetOtherSelected(mVisibleTempo);
     cmd.Execute(0);        // no UNDO
     if (Id == wxID_CUT)
     {
-      tCmdErase cmd(mpFilter);
+      JZCommandErase cmd(mpFilter);
       cmd.Execute(1);        // with UNDO
       Refresh();
     }
@@ -2936,7 +2936,7 @@ void JZPianoWindow::Erase()
 {
   if (EventsSelected())
   {
-    tCmdErase cmd(mpFilter);
+    JZCommandErase cmd(mpFilter);
     cmd.Execute(1);        // with UNDO
     Refresh();
   }
@@ -3098,7 +3098,7 @@ void JZPianoWindow::Paste(JZTrack* pTrack, int Clock, int Pitch)
   }
 
   mpProject->NewUndoBuffer();
-  tEventIterator Iterator(&mPasteBuffer);
+  JZEventIterator Iterator(&mPasteBuffer);
   JZEvent* pEvent = Iterator.First();
   if (pEvent)
   {
@@ -3170,7 +3170,7 @@ int JZPianoWindow::GetKeyOnEventCount()
 {
   int Count = 0;
 
-  tEventIterator Iterator(&mPasteBuffer);
+  JZEventIterator Iterator(&mPasteBuffer);
   JZEvent* pEvent = Iterator.First();
   while (pEvent)
   {
@@ -3227,7 +3227,7 @@ void JZPianoWindow::ActivateSettingsDialog()
 
 //-----------------------------------------------------------------------------
 // This is a test to see how to implement a dialog with Patrick's system.
-// It replaces tMidiDelayDlg, which isnt necesarily a good idea.
+// It replaces JZMidiDelayDlg, which isnt necesarily a good idea.
 //-----------------------------------------------------------------------------
 void JZPianoWindow::ActivateMidiDelayDialog()
 {
@@ -3250,7 +3250,7 @@ void JZPianoWindow::ActivateMidiDelayDialog()
   if (dialog.ShowModal() == wxID_OK)
   {
     //execute the command
-    tCmdMidiDelay cmd(mpFilter, scale / 100.0, clockDelay, repeat);
+    JZCommandMidiDelay cmd(mpFilter, scale / 100.0, clockDelay, repeat);
     cmd.Execute();
     SetScrollRanges();
     Refresh();
@@ -3277,7 +3277,7 @@ void JZPianoWindow::ActivateSequenceLengthDialog()
   if (dialog.ShowModal() == wxID_OK)
   {
     //execute the command
-    tCmdSeqLength cmd(mpFilter, scale / 100.0);
+    JZCommandSequenceLength cmd(mpFilter, scale / 100.0);
     cmd.Execute();
     SetScrollRanges();
     Refresh();

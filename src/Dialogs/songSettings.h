@@ -30,11 +30,11 @@
 //song settings
 //////////////////////////////////////////////////////////////////////////////
 
-class tSongSettingsDlg : public tPropertyListDlg
+class JZSongSettingsDlg : public JZPropertyListDlg
 {
  public:
 
-  tSongSettingsDlg(tEventWin *w);
+  JZSongSettingsDlg(tEventWin *w);
   virtual bool OnClose();
   virtual void AddProperties();
 protected:

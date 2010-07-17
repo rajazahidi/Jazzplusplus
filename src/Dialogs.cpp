@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -61,8 +61,8 @@ using namespace std;
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-//tShiftDlg::tShiftDlg(JZEventFrame* pEventWindow, JZFilter* pFilter, long unit)
-//  : tPropertyListDlg("Shift events left/right"),
+//JZShiftDlg::JZShiftDlg(JZEventFrame* pEventWindow, JZFilter* pFilter, long unit)
+//  : JZPropertyListDlg("Shift events left/right"),
 //    mSteps(0),
 //    mUnit(unit),
 //    mpFilter(pFilter),
@@ -72,10 +72,10 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-//bool tShiftDlg::OnClose()
+//bool JZShiftDlg::OnClose()
 //{
-//  cout << "tShiftDlg::OnClose " << mSteps << endl;
-//  tCmdShift cmd(mpFilter, mSteps * mUnit);
+//  cout << "JZShiftDlg::OnClose " << mSteps << endl;
+//  JZCommandShift cmd(mpFilter, mSteps * mUnit);
 //  cmd.Execute();
 //
 //  JZProjectManager::Instance()->UpdateAllViews();
@@ -86,14 +86,14 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-//void tShiftDlg::OnHelp()
+//void JZShiftDlg::OnHelp()
 //{
 //  gpHelpInstance->ShowTopic("Shift");
 //}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-//void tShiftDlg::AddProperties()
+//void JZShiftDlg::AddProperties()
 //{
 ////send wxPropertyValue REFERENCE not POINTER
 //  sheet->AddProperty(new wxProperty(
@@ -114,19 +114,19 @@ using namespace std;
 // SearchReplace
 //*****************************************************************************
 
-//int tSearchReplaceDlg::frCtrl = 1;
-//int tSearchReplaceDlg::toCtrl = 1;
+//int JZSearchReplaceDlg::frCtrl = 1;
+//int JZSearchReplaceDlg::toCtrl = 1;
 //
-//tSearchReplaceDlg::tSearchReplaceDlg(JZEventWindow* w, JZFilter *f)
-//   : tPropertyListDlg("Search and replace controller types")
+//JZSearchReplaceDlg::JZSearchReplaceDlg(JZEventWindow* w, JZFilter *f)
+//   : JZPropertyListDlg("Search and replace controller types")
 //{
 //  Filter = f;
 //  Song = f->GetSong();
 //}
 
-//bool tSearchReplaceDlg::OnClose()
+//bool JZSearchReplaceDlg::OnClose()
 //{
-//  tCmdSearchReplace sr(Filter, frCtrl - 1, toCtrl-1);
+//  JZCommandSearchReplace sr(Filter, frCtrl - 1, toCtrl-1);
 //  sr.Execute();
 //
 //  JZProjectManager::Instance()->UpdateAllViews();
@@ -134,7 +134,7 @@ using namespace std;
 //  return false;
 //}
 
-//void tSearchReplaceDlg::AddProperties()
+//void JZSearchReplaceDlg::AddProperties()
 //{
 //  sheet->AddProperty(new wxProperty(
 //    "Search",
@@ -156,36 +156,36 @@ using namespace std;
 // seqLength
 //*****************************************************************************
 
-double tSeqLengthDlg::scale = 1.0;
+double JZSeqLengthDlg::scale = 1.0;
 
 
 
-tSeqLengthDlg::tSeqLengthDlg(JZEventFrame *w, JZFilter *f)
-: tPropertyListDlg("stretch/contract by scale from start of selected sequence" )
+JZSeqLengthDlg::JZSeqLengthDlg(JZEventFrame *w, JZFilter *f)
+: JZPropertyListDlg("stretch/contract by scale from start of selected sequence" )
 {
   Filter = f;
   Song = f->GetSong();
 }
 
 
-bool tSeqLengthDlg::OnClose()
+bool JZSeqLengthDlg::OnClose()
 {
-  tCmdSeqLength cmd(Filter, scale);
+  JZCommandSequenceLength cmd(Filter, scale);
   cmd.Execute();
 
   JZProjectManager::Instance()->UpdateAllViews();
 
-  //tPropertyListDlg::OnClose();
+  //JZPropertyListDlg::OnClose();
   return false;
 }
 
-void tSeqLengthDlg::OnHelp()
+void JZSeqLengthDlg::OnHelp()
 {
   gpHelpInstance->ShowTopic("SeqLength");
 }
 
 
-void tSeqLengthDlg::AddProperties()
+void JZSeqLengthDlg::AddProperties()
 {
   sheet->AddProperty(new wxProperty(
     "Scale",
@@ -199,37 +199,37 @@ void tSeqLengthDlg::AddProperties()
 // midiDelay
 //*****************************************************************************
 
-double tMidiDelayDlg::scale = 0.5;
-long tMidiDelayDlg::clockDelay = 10;
-int tMidiDelayDlg::repeat = 6;
+double JZMidiDelayDlg::scale = 0.5;
+long JZMidiDelayDlg::clockDelay = 10;
+int JZMidiDelayDlg::repeat = 6;
 
-tMidiDelayDlg::tMidiDelayDlg(JZEventFrame *w, JZFilter *f)
-: tPropertyListDlg("MIDI delay line" )
+JZMidiDelayDlg::JZMidiDelayDlg(JZEventFrame *w, JZFilter *f)
+: JZPropertyListDlg("MIDI delay line" )
 {
   Filter = f;
   Song = f->GetSong();
 }
 
 
-bool tMidiDelayDlg::OnClose()
+bool JZMidiDelayDlg::OnClose()
 {
 
-  tCmdMidiDelay cmd(Filter, scale,clockDelay,repeat);
+  JZCommandMidiDelay cmd(Filter, scale,clockDelay,repeat);
   cmd.Execute();
 
   JZProjectManager::Instance()->UpdateAllViews();
 
-  //tPropertyListDlg::OnClose();
+  //JZPropertyListDlg::OnClose();
   return false;
 }
 
-void tMidiDelayDlg::OnHelp()
+void JZMidiDelayDlg::OnHelp()
 {
   gpHelpInstance->ShowTopic("MidiDelay");
 }
 
 
-void tMidiDelayDlg::AddProperties()
+void JZMidiDelayDlg::AddProperties()
 {
 
   // Old system:
@@ -260,7 +260,7 @@ void tMidiDelayDlg::AddProperties()
 //*****************************************************************************
 // Event-Dialog
 //*****************************************************************************
-//class tEventDlg : public tPropertyListDlg
+//class JZEventDlg : public JZPropertyListDlg
 //{
 //  public:
 //
@@ -271,15 +271,15 @@ void tMidiDelayDlg::AddProperties()
 //    JZEvent    *Event;
 //    JZEvent    *Copy;
 //
-//    tEventDlg(JZEvent *e, JZPianoWindow* w, JZTrack *pTrack);
+//    JZEventDlg(JZEvent *e, JZPianoWindow* w, JZTrack *pTrack);
 //    virtual void AddProperties();
 //    virtual bool OnClose();
 //    virtual void OnHelp();
 //    virtual void OnCancel();
 //};
 
-//tEventDlg::tEventDlg(JZEvent *e, JZPianoWindow* w, JZTrack *pTrack)
-//  : tPropertyListDlg( "Event" ),
+//JZEventDlg::JZEventDlg(JZEvent *e, JZPianoWindow* w, JZTrack *pTrack)
+//  : JZPropertyListDlg( "Event" ),
 //    ClockDlg(w->GetProject(), "Time ", e->GetClock())
 //{
 //  Win   = w;
@@ -288,35 +288,35 @@ void tMidiDelayDlg::AddProperties()
 //  Copy  = e->Copy();
 //}
 
-//void tEventDlg::AddProperties()
+//void JZEventDlg::AddProperties()
 //{
 //  sheet->AddProperty(ClockDlg.mkProperty());
 //}
 
-//void tEventDlg::OnCancel()
+//void JZEventDlg::OnCancel()
 //{
 //  delete Copy;
-//  //tPropertyListDlg::OnCancel();
+//  //JZPropertyListDlg::OnCancel();
 //}
 
-//bool tEventDlg::OnClose()
+//bool JZEventDlg::OnClose()
 //{
 //  Copy->SetClock(ClockDlg.GetClock());
 //  Track->Kill(Event);
 //  Track->Put(Copy);
 //  Track->Cleanup();
 //  Win->Refresh();
-//  return tPropertyListDlg::OnClose();
+//  return JZPropertyListDlg::OnClose();
 //}
 
-//void tEventDlg::OnHelp()
+//void JZEventDlg::OnHelp()
 //{
 //  gpHelpInstance->ShowTopic("Piano Window");
 //}
 
 // -------------------------------- Play track ---------------------------
 
-//class tPlayTrackDlg : public tEventDlg
+//class JZPlayTrackDlg : public JZEventDlg
 //{
 // public:
 //
@@ -324,16 +324,16 @@ void tMidiDelayDlg::AddProperties()
 //  int track;
 //  int eventlength;
 //
-//  tNamedChoice Choice;
+//  JZNamedChoice Choice;
 //
-//  tPlayTrackDlg(JZPlayTrackEvent *e, JZPianoWindow* w, JZTrack *pTrack);
+//  JZPlayTrackDlg(JZPlayTrackEvent *e, JZPianoWindow* w, JZTrack *pTrack);
 //
 //  void AddProperties();
 //  bool OnClose();
 //};
 
-//tPlayTrackDlg::tPlayTrackDlg(JZPlayTrackEvent *e, JZPianoWindow* w, JZTrack *pTrack)
-//  : tEventDlg(e, w, pTrack),
+//JZPlayTrackDlg::JZPlayTrackDlg(JZPlayTrackEvent *e, JZPianoWindow* w, JZTrack *pTrack)
+//  : JZEventDlg(e, w, pTrack),
 //    Choice("playtrack", gpConfig->GetControlNames(), &track)
 //{
 //  Event = e;
@@ -342,7 +342,7 @@ void tMidiDelayDlg::AddProperties()
 //  eventlength=e->eventlength;
 //}
 
-//bool tPlayTrackDlg::OnClose()
+//bool JZPlayTrackDlg::OnClose()
 //{
 //  JZPlayTrackEvent* p=(JZPlayTrackEvent*)Copy;
 //
@@ -350,10 +350,10 @@ void tMidiDelayDlg::AddProperties()
 //  p->track = track;
 //  p->transpose = transpose;
 //  p->eventlength = eventlength;
-//  return tEventDlg::OnClose();
+//  return JZEventDlg::OnClose();
 //}
 
-//void tPlayTrackDlg::AddProperties()
+//void JZPlayTrackDlg::AddProperties()
 //{
 //  sheet->AddProperty(new wxProperty(
 //    "Track",
@@ -370,7 +370,7 @@ void tMidiDelayDlg::AddProperties()
 //    wxPropertyValue(&eventlength),
 //    "integer",
 //    new wxIntegerListValidator(0, 127)));
-//  tEventDlg::AddProperties();
+//  JZEventDlg::AddProperties();
 //}
 
 
@@ -470,7 +470,7 @@ void EventDialog(
     return;
   }
 
-//  tEventDlg* pDialog = 0;
+//  JZEventDlg* pDialog = 0;
 //  const char* str = 0;
   switch (pEvent->GetStat())
   {
@@ -539,7 +539,7 @@ void EventDialog(
 
     case StatPlayTrack:
 //      str = "Play Track";
-//      pDialog = new tPlayTrackDlg(pEvent->IsPlayTrack(), pPianoWindow, pTrack);
+//      pDialog = new JZPlayTrackDlg(pEvent->IsPlayTrack(), pPianoWindow, pTrack);
       break;
 
     case StatEndOfTrack:

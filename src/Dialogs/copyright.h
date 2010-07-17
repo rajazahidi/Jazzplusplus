@@ -25,18 +25,20 @@
 
 #include "proplistdlg.h"
 
-/** new tCopyrightDlg using new baseclass tPropertyListDlg*/
-class tCopyrightDlg : public tPropertyListDlg
+// new JZCopyrightDlg using new baseclass JZPropertyListDlg
+class JZCopyrightDlg : public JZPropertyListDlg
 {
-public:
-  tCopyrightDlg(tSong* song);
-  virtual void AddProperties();
-  virtual bool OnClose();
+  public:
 
-protected:
-  tSong* song;
-  wxProperty* copyrightProp;
-  char* String;
+    JZCopyrightDlg(JZSong* song);
+    virtual void AddProperties();
+    virtual bool OnClose();
+
+  protected:
+
+    JZSong* pSong;
+    wxProperty* pCopyrightProp;
+    char* pString;
 };
 
 #endif //COPYRIGHTDIALOG

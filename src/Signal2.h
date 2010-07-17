@@ -35,21 +35,20 @@
 
 const float log001 = -6.9078f;       // log(.001)
 
-// ---------------------------------------------------------------------
-//                                 utils
-// ---------------------------------------------------------------------
+//*****************************************************************************
+// Description:
+//   This is a linear mapping template class that maps the range [x0, x1] to
+// [y0,y1].
+//*****************************************************************************
 template <class T>
-class tLineMap
+class JZLineMap
 {
   public:
-    /**
-     * construct a mapper, that maps the range [x0,x1] to [y0,y1].
-     */
-    tLineMap(T x0, T x1, T y0, T y1)
+    JZLineMap(T x0, T x1, T y0, T y1)
     {
       Initialize(x0, x1, y0, y1);
     }
-    tLineMap()
+    JZLineMap()
     {
       x0 = 0;
       y0 = 0;
@@ -73,16 +72,16 @@ class tLineMap
 };
 
 
-/**
- * maps the range -x .. +x to the range 1/y ... y using the exp()
- * function (i.e. map(0) == 1).
- */
-
+//*****************************************************************************
+// Description:
+//   Maps the range -x .. +x to the range 1/y ... y using the exp()
+// function (i.e. map(0) == 1).
+//*****************************************************************************
 template <class T>
-class tExpoMap
+class JZExpoMap
 {
   public:
-    tExpoMap(T x, T y) : map(-x, x, -log(y), log(y))
+    JZExpoMap(T x, T y) : map(-x, x, -log(y), log(y))
     {
     }
     T operator()(T x)
@@ -90,7 +89,7 @@ class tExpoMap
       return exp(map(x));
     }
   private:
-    tLineMap<T> map;
+    JZLineMap<T> map;
 };
 
 
@@ -102,7 +101,7 @@ class tExpoMap
  * describes a sample
  */
 
-class tSigValue
+class JZSigValue
 {
   public:
 
@@ -119,7 +118,7 @@ class tSigValue
     {
       return val[i];
     }
-    tSigValue()
+    JZSigValue()
     {
       for (int i = 0; i < MAXCHN; i++)
         val[i] = 0;
@@ -139,58 +138,58 @@ class tSigValue
       for (int i = 0; i < MAXCHN; i++)
         val[i] *= f;
     }
-    void operator += (const tSigValue &f)
+    void operator += (const JZSigValue &f)
     {
       for (int i = 0; i < MAXCHN; i++)
         val[i] += f[i];
     }
-    void operator -= (const tSigValue &f)
+    void operator -= (const JZSigValue &f)
     {
       for (int i = 0; i < MAXCHN; i++)
         val[i] -= f[i];
     }
-    void operator *= (const tSigValue &f)
+    void operator *= (const JZSigValue &f)
     {
       for (int i = 0; i < MAXCHN; i++)
         val[i] *= f[i];
     }
-    tSigValue operator +(float f) const
+    JZSigValue operator +(float f) const
     {
-      tSigValue tmp(*this);
+      JZSigValue tmp(*this);
       tmp += f;
       return tmp;
     }
-    tSigValue operator -(float f) const
+    JZSigValue operator -(float f) const
     {
-      tSigValue tmp(*this);
+      JZSigValue tmp(*this);
       tmp -= f;
       return tmp;
     }
-    tSigValue operator *(float f) const
+    JZSigValue operator *(float f) const
     {
-      tSigValue tmp(*this);
+      JZSigValue tmp(*this);
       tmp *= f;
       return tmp;
     }
-    tSigValue operator +(const tSigValue &f) const
+    JZSigValue operator +(const JZSigValue &f) const
     {
-      tSigValue tmp(*this);
+      JZSigValue tmp(*this);
       tmp += f;
       return tmp;
     }
-    tSigValue operator -(const tSigValue &f) const
+    JZSigValue operator -(const JZSigValue &f) const
     {
-      tSigValue tmp(*this);
+      JZSigValue tmp(*this);
       tmp -= f;
       return tmp;
     }
-    tSigValue operator *(const tSigValue &f) const
+    JZSigValue operator *(const JZSigValue &f) const
     {
-      tSigValue tmp(*this);
+      JZSigValue tmp(*this);
       tmp *= f;
       return tmp;
     }
-    tSigValue &operator=(float x)
+    JZSigValue &operator=(float x)
     {
       for (int i = 0; i < MAXCHN; i++)
         val[i] = x;
@@ -206,49 +205,49 @@ class tSigValue
  * an array of samples
  */
 
-class tSigValArray
+class JZSigValArray
 {
   public:
-    tSigValArray(long length, int channels)
+    JZSigValArray(long length, int channels)
     {
       this->size     = length;
       this->channels = channels;
-      array = new tSigValue [length];
+      array = new JZSigValue [length];
     }
-    virtual ~tSigValArray()
+    virtual ~JZSigValArray()
     {
       delete [] array;
     }
-    tSigValArray(const tSigValArray &o)
+    JZSigValArray(const JZSigValArray &o)
     {
       size = o.size;
       channels = o.channels;
-      array = new tSigValue[size];
+      array = new JZSigValue[size];
       for (int i = 0; i < size; i++)
         array[i] = o.array[i];
     }
-    tSigValArray & operator = (tSigValArray &o)
+    JZSigValArray & operator = (JZSigValArray &o)
     {
       if (&o == this)
         return *this;
       delete [] array;
       size = o.size;
       channels = o.channels;
-      array = new tSigValue[size];
+      array = new JZSigValue[size];
       for (int i = 0; i < size; i++)
         array[i] = o.array[i];
       return *this;
     }
 
-    tSigValue & operator[](int i)
+    JZSigValue & operator[](int i)
     {
       return array[i % size];
     }
-    const tSigValue & operator[](int i) const
+    const JZSigValue & operator[](int i) const
     {
       return array[i % size];
     }
-    void Interpolate(tSigValue &val, float x) const
+    void Interpolate(JZSigValue &val, float x) const
     {
       long  ofs = (long)x;
       if (ofs >= size-1)
@@ -257,23 +256,23 @@ class tSigValArray
         return;
       }
       float rem = x - ofs;
-      tSigValue &v1 = array[ofs];
-      tSigValue &v2 = array[ofs+1];
+      JZSigValue &v1 = array[ofs];
+      JZSigValue &v2 = array[ofs+1];
       for (int i = 0; i < channels; i++)
       {
-        tLineMap<float> map(0, 1, v1[i], v2[i]);
+        JZLineMap<float> map(0, 1, v1[i], v2[i]);
         val[i] = map(rem);
       }
     }
-    void CyclicInterpolate(tSigValue &val, float x) const
+    void CyclicInterpolate(JZSigValue &val, float x) const
     {
       long  ofs = (long)x;
       float rem = x - ofs;
-      tSigValue &v1 = array[ofs % size];
-      tSigValue &v2 = array[(ofs+1) % size];
+      JZSigValue &v1 = array[ofs % size];
+      JZSigValue &v2 = array[(ofs+1) % size];
       for (int i = 0; i < channels; i++)
       {
-        tLineMap<float> map(0, 1, v1[i], v2[i]);
+        JZLineMap<float> map(0, 1, v1[i], v2[i]);
         val[i] = map(rem);
       }
     }
@@ -283,7 +282,7 @@ class tSigValArray
     }
 
   private:
-    tSigValue *array;
+    JZSigValue *array;
     int channels;
     long size;
 };
@@ -293,15 +292,15 @@ class tSigValArray
 //                                parent
 // -----------------------------------------------------------------------
 
-class tSigInput;
-class tSigOutput;
+class JZSigInput;
+class JZSigOutput;
 
-class tSigSynth
+class JZSigSynth
 {
-  friend class tSigInput;
+  friend class JZSigInput;
   public:
 
-    tSigSynth(long sr, int ch)
+    JZSigSynth(long sr, int ch)
       : generators(),
         channels(ch),
         sampling_rate(sr),
@@ -309,7 +308,7 @@ class tSigSynth
     {
     }
 
-    void AddGenerator(tSigInput &gen)
+    void AddGenerator(JZSigInput &gen)
     {
       generators.push_back(&gen);
     }
@@ -328,25 +327,25 @@ class tSigSynth
     {
       return current;
     }
-    void Run(tSigOutput &osig, tSigInput &isig, float add_seconds);
+    void Run(JZSigOutput &osig, JZSigInput &isig, float add_seconds);
 
     void DeleteAllGenerators();
 
   protected:
 
-    std::vector<tSigInput *> generators;
+    std::vector<JZSigInput *> generators;
     int channels;
     long sampling_rate;
     long current;
 };
 
 
-class tSigInput
+class JZSigInput
 {
 
   public:
 
-    tSigInput(tSigSynth &parent) : synth(parent)
+    JZSigInput(JZSigSynth &parent) : synth(parent)
     {
       synth.AddGenerator(*this);
       channels = synth.GetChannelCount();
@@ -354,11 +353,11 @@ class tSigInput
       current = -1;
     }
 
-    virtual ~tSigInput()
+    virtual ~JZSigInput()
     {
     }
 
-    void GetSample(tSigValue &ret)
+    void GetSample(JZSigValue &ret)
     {
       if (synth.current >= current)
       {
@@ -400,10 +399,10 @@ class tSigInput
     virtual void NextValue() = 0;
 
   protected:
-    tSigSynth &synth;
-    tSigValue val;
+    JZSigSynth &synth;
+    JZSigValue val;
     float     ctl;
-    tSigValue nul;  // empty signal value
+    JZSigValue nul;  // empty signal value
     long current;
     long channels;
     long sampling_rate;
@@ -411,28 +410,28 @@ class tSigInput
 
 
 
-class tSigOutput : public tSigInput
+class JZSigOutput : public JZSigInput
 {
   public:
-    tSigOutput(tSigSynth &synth) : tSigInput(synth)
+    JZSigOutput(JZSigSynth &synth) : JZSigInput(synth)
     {
     }
-    virtual void Out(const tSigValue &v) = 0;
+    virtual void Out(const JZSigValue &v) = 0;
     virtual void Resize(long)            = 0;
 };
 
 
 
 /**
- * adaptor class for tSample and tFloatSample
+ * adaptor class for JZSample and JZFloatSample
  */
 
 template <class T, class SPL>
-class tSampleIterator : public tSigOutput
+class JZSampleIterator : public JZSigOutput
 {
   public:
-    tSampleIterator(tSigSynth &synth, SPL &s)
-      : tSigOutput(synth),
+    JZSampleIterator(JZSigSynth &synth, SPL &s)
+      : JZSigOutput(synth),
         spl(s)
     {
       length = spl.GetLength() / channels;
@@ -441,7 +440,7 @@ class tSampleIterator : public tSigOutput
 
     virtual void Init()
     {
-      tSigOutput::Init();
+      JZSigOutput::Init();
       length = spl.GetLength() / channels;
       data   = spl.GetData();
     }
@@ -460,7 +459,7 @@ class tSampleIterator : public tSigOutput
       }
     }
 
-    virtual void Out(const tSigValue &val)
+    virtual void Out(const JZSigValue &val)
     {
       long idata = channels * synth.GetCurrent();
       for (int i = 0; i < channels; i++)
@@ -487,20 +486,20 @@ class tSampleIterator : public tSigOutput
     long length;
 };
 
-typedef tSampleIterator<short, tSample>      tShortIter;
-typedef tSampleIterator<float, tFloatSample> tFloatIter;
+typedef JZSampleIterator<short, JZSample>      tShortIter;
+typedef JZSampleIterator<float, JZFloatSample> tFloatIter;
 
 
 template <class T, class SPL>
-class tSampleResizingIterator : public tSampleIterator<T, SPL>
+class JZSampleResizingIterator : public JZSampleIterator<T, SPL>
 {
   public:
-    tSampleResizingIterator(tSigSynth &synth, SPL &s)
-      : tSampleIterator<T, SPL>(synth, s)
+    JZSampleResizingIterator(JZSigSynth &synth, SPL &s)
+      : JZSampleIterator<T, SPL>(synth, s)
     {
     }
 
-    virtual void Out(const tSigValue &v)
+    virtual void Out(const JZSigValue &v)
     {
       if (this->GetCurrent() >= this->GetLength())
       {
@@ -514,27 +513,27 @@ class tSampleResizingIterator : public tSampleIterator<T, SPL>
     }
 };
 
-typedef tSampleResizingIterator<short, tSample>      tResizingShortIter;
-typedef tSampleResizingIterator<float, tFloatSample> tResizingFloatIter;
+typedef JZSampleResizingIterator<short, JZSample>      tResizingShortIter;
+typedef JZSampleResizingIterator<float, JZFloatSample> tResizingFloatIter;
 
 
 
-class tSignalModifier : public tSigInput
+class JZSignalModifier : public JZSigInput
 {
   public:
-    tSignalModifier(tSigSynth &synth)
-      : tSigInput(synth),
+    JZSignalModifier(JZSigSynth &synth)
+      : JZSigInput(synth),
         recurse_init(false),
         recurse_length(0)
     {
     }
 
-    void AddInput(tSigInput &sig)
+    void AddInput(JZSigInput &sig)
     {
       inputs.push_back(&sig);
     }
 
-    void AddControl(tSigInput &sig)
+    void AddControl(JZSigInput &sig)
     {
       controls.push_back(&sig);
     }
@@ -557,7 +556,7 @@ class tSignalModifier : public tSigInput
 
     virtual void Init()
     {
-      tSigInput::Init();
+      JZSigInput::Init();
 
       if (recurse_init)
       {
@@ -582,8 +581,8 @@ class tSignalModifier : public tSigInput
 
   protected:
 
-    std::vector<tSigInput *>inputs;
-    std::vector<tSigInput *>controls;
+    std::vector<JZSigInput *>inputs;
+    std::vector<JZSigInput *>controls;
     bool recurse_init;
     int recurse_length;
 };
@@ -593,12 +592,12 @@ class tSignalModifier : public tSigInput
 //                        Wavetable Synth
 // -----------------------------------------------------------------------
 
-class tSigWaveOscil : public tSignalModifier
+class JZSigWaveOscil : public JZSignalModifier
 {
   // wave table oscillator. Cannot be used for Control Signals!!
   public:
-    tSigWaveOscil(tSigSynth &synth, int N, double f, double ffact = FSEMI)
-      : tSignalModifier(synth),
+    JZSigWaveOscil(JZSigSynth &synth, int N, double f, double ffact = FSEMI)
+      : JZSignalModifier(synth),
         array(N, synth.GetChannelCount()),
         freq(f),
         SR(synth.GetSamplingRate()),
@@ -612,16 +611,16 @@ class tSigWaveOscil : public tSignalModifier
 
     virtual void Init()
     {
-      tSignalModifier::Init();
+      JZSignalModifier::Init();
       have_freq_control = (controls.size() != 0);
     }
 
-    tSigValue & operator[](int i)
+    JZSigValue & operator[](int i)
     {
       return array[i];
     }
 
-    const tSigValue & operator[](int i) const
+    const JZSigValue & operator[](int i) const
     {
       return array[i];
     }
@@ -642,34 +641,34 @@ class tSigWaveOscil : public tSignalModifier
     }
 
   protected:
-    tSigValArray array;
+    JZSigValArray array;
     double freq;
     double SR;
     double x;
     double dx;
     double frqfact;
     int have_freq_control;
-    tLineMap<double>fmap;
+    JZLineMap<double>fmap;
 };
 
 
-class tSigWaveCtrl : public tSigInput
+class JZSigWaveCtrl : public JZSigInput
 {
   // control signal from wave table
   public:
-    tSigWaveCtrl(tSigSynth &synth, int N, double durat)
-      : tSigInput(synth),
+    JZSigWaveCtrl(JZSigSynth &synth, int N, double durat)
+      : JZSigInput(synth),
         array(N, synth.GetChannelCount()),
         xmap(0, synth.GetSamplingRate() * durat, 0, N)
     {
     }
 
-    tSigValue & operator[](int i)
+    JZSigValue & operator[](int i)
     {
       return array[i];
     }
 
-    const tSigValue & operator[](int i) const
+    const JZSigValue & operator[](int i) const
     {
       return array[i];
     }
@@ -685,17 +684,17 @@ class tSigWaveCtrl : public tSigInput
     }
 
   protected:
-    tSigValArray array;
-    tLineMap<float>xmap;
+    JZSigValArray array;
+    JZLineMap<float>xmap;
 };
 
 
-class tSigNoise : public tSigInput
+class JZSigNoise : public JZSigInput
 {
   // control signal from wave table
   public:
-    tSigNoise(tSigSynth &synth)
-      : tSigInput(synth)
+    JZSigNoise(JZSigSynth &synth)
+      : JZSigInput(synth)
     {
     }
 
@@ -710,11 +709,11 @@ class tSigNoise : public tSigInput
 //                               LFO's
 // -----------------------------------------------------------------------
 
-class tSigConst : public tSigInput
+class JZSigConst : public JZSigInput
 {
   public:
-    tSigConst(tSigSynth &synth, float x)
-      : tSigInput(synth)
+    JZSigConst(JZSigSynth &synth, float x)
+      : JZSigInput(synth)
     {
       for (int i = 0; i < channels; i++)
         val[i] = x;
@@ -730,11 +729,11 @@ class tSigConst : public tSigInput
  * a sine oscillator.
  */
 
-class tSigSine : public tSigInput
+class JZSigSine : public JZSigInput
 {
   public:
-    tSigSine(tSigSynth &synth, double freq, double amp = 1.0, double phi = 0)
-      : tSigInput(synth)
+    JZSigSine(JZSigSynth &synth, double freq, double amp = 1.0, double phi = 0)
+      : JZSigInput(synth)
     {
       double plen = synth.GetSamplingRate() / freq;
       map.Initialize(0, plen, phi, phi + 2 * PI);
@@ -747,7 +746,7 @@ class tSigSine : public tSigInput
         val[i] = y;
     }
   protected:
-    tLineMap<double> map;
+    JZLineMap<double> map;
     double ampl;
 };
 
@@ -758,10 +757,10 @@ class tSigSine : public tSigInput
  * will change the volume by factor 0..2
  */
 
-class tSigVolume : public tSignalModifier
+class JZSigVolume : public JZSignalModifier
 {
   public:
-    tSigVolume(tSigSynth &synth) : tSignalModifier(synth)
+    JZSigVolume(JZSigSynth &synth) : JZSignalModifier(synth)
     {
     }
     void NextValue()
@@ -778,10 +777,10 @@ class tSigVolume : public tSignalModifier
  * modify panpot controlled by a lfo
  */
 
-class tSigPanpot : public tSignalModifier
+class JZSigPanpot : public JZSignalModifier
 {
   public:
-    tSigPanpot(tSigSynth &synth) : tSignalModifier(synth)
+    JZSigPanpot(JZSigSynth &synth) : JZSignalModifier(synth)
     {
     }
     void NextValue()
@@ -796,15 +795,12 @@ class tSigPanpot : public tSignalModifier
 };
 
 
-/**
- * delay a signal for a variable number of samples
- */
-
-class tSigDelay : public tSignalModifier
+// Delay a signal for a variable number of samples
+class JZSigDelay : public JZSignalModifier
 {
   public:
-    tSigDelay(tSigSynth &synth, float time)
-      : tSignalModifier(synth),
+    JZSigDelay(JZSigSynth &synth, float time)
+      : JZSignalModifier(synth),
         size((long)(time * sampling_rate) + 2),
         array(size, synth.GetChannelCount())
     {
@@ -814,15 +810,15 @@ class tSigDelay : public tSignalModifier
     void NextValue()
     {
       inputs[0]->GetSample(array[current % size]);
-      tSigValue ctl;
+      JZSigValue ctl;
       controls[0]->GetSample(ctl);
       float x = size + map(ctl[0]) + current;
       array.CyclicInterpolate(val, x);
     }
   protected:
     long size;
-    tSigValArray array;
-    tLineMap<float> map;
+    JZSigValArray array;
+    JZLineMap<float> map;
 };
 
 
@@ -830,24 +826,24 @@ class tSigDelay : public tSignalModifier
 //                           filters
 // -----------------------------------------------------------------
 
-class tOpFilter
+class JZOpFilter
 {
   public:
-    virtual ~tOpFilter()
+    virtual ~JZOpFilter()
     {
     }
     virtual void Setup(float sr, float hp, float dummy) = 0;
     virtual float Loop(float sig) = 0;
 };
 
-class tOpLowpass : public tOpFilter
+class JZOpLowpass : public JZOpFilter
 {
   public:
-    tOpLowpass()
+    JZOpLowpass()
     {
       y1 = 0;
     }
-    virtual ~tOpLowpass()
+    virtual ~JZOpLowpass()
     {
     }
     virtual void Setup(float sr, float hp, float dummy)
@@ -865,14 +861,14 @@ class tOpLowpass : public tOpFilter
     float c1, c2, y1;
 };
 
-class tOpHighpass : public tOpFilter
+class JZOpHighpass : public JZOpFilter
 {
   public:
-    tOpHighpass()
+    JZOpHighpass()
     {
       y1 = 0;
     }
-    virtual ~tOpHighpass()
+    virtual ~JZOpHighpass()
     {
     }
     virtual void Setup(float sr, float hp, float dummy)
@@ -891,14 +887,14 @@ class tOpHighpass : public tOpFilter
     float c1, c2, y1;
 };
 
-class tOpBandpass : public tOpFilter
+class JZOpBandpass : public JZOpFilter
 {
   public:
-    tOpBandpass()
+    JZOpBandpass()
     {
       y1 = y2 = 0;
     }
-    virtual ~tOpBandpass()
+    virtual ~JZOpBandpass()
     {
     }
     // bw = Hz = upper - lower half power point
@@ -920,14 +916,14 @@ class tOpBandpass : public tOpFilter
     float c1, c2, c3, y1, y2;
 };
 
-class tOpBandstop : public tOpFilter
+class JZOpBandstop : public JZOpFilter
 {
   public:
-    tOpBandstop()
+    JZOpBandstop()
     {
       y1 = y2 = 0;
     }
-    virtual ~tOpBandstop()
+    virtual ~JZOpBandstop()
     {
     }
     virtual void Setup(float sr, float cf, float bw)
@@ -950,12 +946,12 @@ class tOpBandstop : public tOpFilter
 
 
 template <class FILTER>
-class tSigFilter : public tSignalModifier
+class JZSigFilter : public JZSignalModifier
 {
   public:
     // freq_factor : control will change freq from freq/factor ... freq*factor
-    tSigFilter(tSigSynth &synth, float freq, float bandw = 0, float freq_factor = 2) :
-      tSignalModifier(synth),
+    JZSigFilter(JZSigSynth &synth, float freq, float bandw = 0, float freq_factor = 2) :
+      JZSignalModifier(synth),
       fmap(1, freq_factor)
     {
       sr = (float)sampling_rate;
@@ -967,7 +963,7 @@ class tSigFilter : public tSignalModifier
     }
     virtual void Init()
     {
-      tSignalModifier::Init();
+      JZSignalModifier::Init();
       have_control = (controls.size() == 1);
     }
     void NextValue()
@@ -982,7 +978,7 @@ class tSigFilter : public tSignalModifier
       for (int i = 0; i < channels; i++)
         val[i] = filter[i].FILTER::Loop(val[i]);
     }
-    tSigValue operator()(const tSigValue &sig)
+    JZSigValue operator()(const JZSigValue &sig)
     {
       for (int i = 0; i < channels; i++)
         val[i] = filter[i].FILTER::Loop(sig[i]);
@@ -990,23 +986,23 @@ class tSigFilter : public tSignalModifier
     }
 
   protected:
-    FILTER filter[tSigValue::MAXCHN];
+    FILTER filter[JZSigValue::MAXCHN];
     bool have_control;
     float freq;
     float sr;
     float bandw;
-    tExpoMap<float> fmap;
+    JZExpoMap<float> fmap;
 };
 
 
 
 #if 0
-class tSigLowpass : public tSignalModifier
+class JZSigLowpass : public JZSignalModifier
 // old and probably buggy
 {
   public:
 
-    tSigLowpass(tSigSynth &synth, float fg) : tSignalModifier(synth)
+    JZSigLowpass(JZSigSynth &synth, float fg) : JZSignalModifier(synth)
     {
       fg = fg / sampling_rate;
       a0 = 2 * PI * fg;
@@ -1016,12 +1012,12 @@ class tSigLowpass : public tSignalModifier
 
     void NextValue()
     {
-      tSigValue sig;
+      JZSigValue sig;
       inputs[0]->GetSample(sig);
       val = sig * a0 - val * b1;
     }
 
-    tSigValue operator()(const tSigValue &sig)
+    JZSigValue operator()(const JZSigValue &sig)
     {
       val = sig * a0 - val * b1;
       return val;
@@ -1039,11 +1035,11 @@ class tSigLowpass : public tSignalModifier
  * by reverb_time.
  */
 
-class tSigComb : public tSignalModifier
+class JZSigComb : public JZSignalModifier
 {
   public:
-    tSigComb(tSigSynth &synth, float loop_time, float reverb_time)
-      : tSignalModifier(synth),
+    JZSigComb(JZSigSynth &synth, float loop_time, float reverb_time)
+      : JZSignalModifier(synth),
         size((long)(loop_time * synth.GetSamplingRate())),
         array(size+2, synth.GetChannelCount())
     {
@@ -1054,12 +1050,12 @@ class tSigComb : public tSignalModifier
     {
       val = array[current];
       array[current] *= coeff;
-      tSigValue tmp;
+      JZSigValue tmp;
       inputs[0]->GetSample(tmp);
       array[current] += tmp;
     }
 
-    tSigValue operator()(const tSigValue &inp)
+    JZSigValue operator()(const JZSigValue &inp)
     {
       current++;
       val = array[current];
@@ -1070,7 +1066,7 @@ class tSigComb : public tSignalModifier
 
   protected:
     long size;
-    tSigValArray array;
+    JZSigValArray array;
 
     float coeff;
 };
@@ -1081,26 +1077,26 @@ class tSigComb : public tSignalModifier
  * by reverb_time.
  */
 
-class tSigAlpass : public tSigComb
+class JZSigAllpass : public JZSigComb
 {
   public:
-    tSigAlpass(tSigSynth &synth, float loop_time, float reverb_time)
-      : tSigComb(synth, loop_time, reverb_time)
+    JZSigAllpass(JZSigSynth &synth, float loop_time, float reverb_time)
+      : JZSigComb(synth, loop_time, reverb_time)
     {
     }
 
     void NextValue()
     {
-      tSigValue y, z, sig;
+      JZSigValue y, z, sig;
       inputs[0]->GetSample(sig);
       y = array[current];
       array[current] = z = y * coeff + sig;
       val = y - z * coeff;
     }
 
-    tSigValue operator()(const tSigValue &sig)
+    JZSigValue operator()(const JZSigValue &sig)
     {
-      tSigValue y, z;
+      JZSigValue y, z;
       current++;
       y = array[current];
       array[current] = z = y * coeff + sig;
@@ -1115,7 +1111,7 @@ class tSigAlpass : public tSigComb
  * reverb ("room"), csound reverb algorithm with lowpass filter added
  */
 
-class tSigReverb : public tSignalModifier
+class JZSigReverb : public JZSignalModifier
 {
   public:
     enum
@@ -1123,23 +1119,23 @@ class tSigReverb : public tSignalModifier
       COMBS = 4,
       ALPAS = 2
     };
-    tSigReverb(
-      tSigSynth &synth,
+    JZSigReverb(
+      JZSigSynth &synth,
       float reverb_time = 0.7,
       float lowpass_freq = 5000,
       float effect_volume = 0.5,
       float loop_fact = 1.0)
-      : tSignalModifier(synth),
+      : JZSignalModifier(synth),
         lowp(synth, lowpass_freq),
         balance(effect_volume)
     {
       int i;
       for (i = 0; i < COMBS; i++)
-        combs[i] = new tSigComb(synth, comb_times[i] * loop_fact, reverb_time);
+        combs[i] = new JZSigComb(synth, comb_times[i] * loop_fact, reverb_time);
       for (i = 0; i < ALPAS; i++)
-        alpas[i] = new tSigAlpass(synth, alpas_times[i] * loop_fact, reverb_time);
+        alpas[i] = new JZSigAllpass(synth, alpas_times[i] * loop_fact, reverb_time);
     }
-    ~tSigReverb()
+    ~JZSigReverb()
     {
       int i;
       for (i = 0; i < COMBS; i++)
@@ -1151,7 +1147,7 @@ class tSigReverb : public tSignalModifier
     void NextValue()
     {
       int i;
-      tSigValue inp;
+      JZSigValue inp;
       inputs[0]->GetSample(inp);
       val = nul;
       for (i = 0; i < COMBS; i++)
@@ -1163,9 +1159,9 @@ class tSigReverb : public tSignalModifier
     }
 
   protected:
-    tSigComb   *combs[COMBS];
-    tSigAlpass *alpas[ALPAS];
-    tSigFilter<tOpLowpass> lowp;
+    JZSigComb   *combs[COMBS];
+    JZSigAllpass *alpas[ALPAS];
+    JZSigFilter<JZOpLowpass> lowp;
     static const float comb_times[COMBS];
     static const float alpas_times[ALPAS];
     float balance;
@@ -1175,15 +1171,15 @@ class tSigReverb : public tSignalModifier
  * spread stereo by mixing the inverse of the other channel
  */
 #if 0
-class tSigStereoSpread : public tSignalModifier
+class JZSigStereoSpread : public JZSignalModifier
 {
   public:
-    tSigStereoSpread(tSigInput &sig, tLFO &val)
-      : tSignalModifier(sig), lfo(val)
+    JZSigStereoSpread(JZSigInput &sig, tLFO &val)
+      : JZSignalModifier(sig), lfo(val)
     {
       lfo.Init(*this);
     }
-    virtual int operator()(tSigValue &val)
+    virtual int operator()(JZSigValue &val)
     {
       if (!sig(val))
         return 0;
@@ -1206,24 +1202,24 @@ class tSigStereoSpread : public tSignalModifier
  * mix 2 signals controlled by a balance lfo
  */
 
-class tSigMix2 : public tSignalModifier
+class JZSigMix2 : public JZSignalModifier
 {
   public:
-    tSigMix2(tSigSynth &synth) : tSignalModifier(synth)
+    JZSigMix2(JZSigSynth &synth) : JZSignalModifier(synth)
     {
     }
 
     void Init()
     {
-      tSignalModifier::Init();  // initialize sources
+      JZSignalModifier::Init();  // initialize sources
       len1 = inputs[0]->GetLength();
       len2 = inputs[1]->GetLength();
     }
 
     void NextValue()
     {
-      tSigValue v1;
-      tSigValue v2;
+      JZSigValue v1;
+      JZSigValue v2;
       inputs[0]->GetSample(v1);
       inputs[1]->GetSample(v2);
       float p = controls[0]->GetControl();
@@ -1240,12 +1236,12 @@ class tSigMix2 : public tSignalModifier
 };
 
 
-class tSigMixer : public tSignalModifier
+class JZSigMixer : public JZSignalModifier
 {
   public:
 
-    tSigMixer(tSigSynth &synth, float minctl = -1, float maxctl = 1)
-      : tSignalModifier(synth),
+    JZSigMixer(JZSigSynth &synth, float minctl = -1, float maxctl = 1)
+      : JZSignalModifier(synth),
         map(minctl, maxctl, 0, 1)
     {
     }
@@ -1256,7 +1252,7 @@ class tSigMixer : public tSignalModifier
       unsigned ControlCount = controls.size();
       for (unsigned i = 0; i < inputs.size(); i++)
       {
-        tSigValue v;
+        JZSigValue v;
         inputs[i]->GetSample(v);
         if (i < ControlCount)
         {
@@ -1270,7 +1266,7 @@ class tSigMixer : public tSignalModifier
 
   private:
 
-    tLineMap<float> map;
+    JZLineMap<float> map;
 };
 
 #endif // !defined(JZ_SIGNAL2_H)

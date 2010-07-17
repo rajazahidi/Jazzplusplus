@@ -433,7 +433,7 @@ int JZWindowsPlayer::OutSysex(JZEvent* pEvent, DWORD time)
     return 1;
 
   mpState->sysex_found = TRUE;
-  tWinSysexBuffer *buf = mpState->osx_buffers->AllocBuffer();
+  JZWinSysexBuffer *buf = mpState->osx_buffers->AllocBuffer();
   buf->PrepareOut(mpState->hout, sx->GetData(), sx->GetLength() - 1);
   mpState->play_buffer.put(SYSEX_EVENT, time);
   mpState->play_buffer.put((DWORD)buf, time);
@@ -512,7 +512,7 @@ void JZWindowsPlayer::OutNow(JZEvent* pEvent)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZWindowsPlayer::OutNow(tParam *r)
+void JZWindowsPlayer::OutNow(JZParam *r)
 {
   OutNow(&r->mMsb);
   OutNow(&r->mLsb);
@@ -618,7 +618,7 @@ void JZWindowsPlayer::StartPlay(long Clock, long LoopClock, int Continue)
     }
     if (!Continue)
     {
-      tMtcTime *offs = mpSong->GetTrack(0)->GetMtcOffset();
+      JZMtcTime *offs = mpSong->GetTrack(0)->GetMtcOffset();
       mpState->start_time = offs->ToMillisec();
       real_start_time = mpState->start_time;
       mpState->mtc_start.type = offs->type;
@@ -745,7 +745,7 @@ void JZWindowsPlayer::StopPlay()
     int n = mpState->osx_buffers->Size();
     for (int i = 0; i < n; ++i)
     {
-      tWinSysexBuffer *buf = mpState->osx_buffers->At(i);
+      JZWinSysexBuffer *buf = mpState->osx_buffers->At(i);
       if (buf->IsPrepared())
       {
         buf->UnprepareOut(mpState->hout);
@@ -763,7 +763,7 @@ void JZWindowsPlayer::StopPlay()
     int n = mpState->isx_buffers->Size();
     for (int i = 0; i < n; ++i)
     {
-      tWinSysexBuffer *buf = mpState->isx_buffers->At(i);
+      JZWinSysexBuffer *buf = mpState->isx_buffers->At(i);
       if (buf->IsPrepared())
       {
         buf->UnprepareIn(mpState->hinp);
@@ -793,7 +793,7 @@ void JZWindowsPlayer::FlushToDevice()
 //-----------------------------------------------------------------------------
 void JZWindowsPlayer::FlushToDevice(long clock)
 {
-  tEventIterator Iterator(&mPlayBuffer);
+  JZEventIterator Iterator(&mPlayBuffer);
   JZEvent* pEvent = Iterator.Range(0, clock);
   if (pEvent)
   {
@@ -833,7 +833,7 @@ long JZWindowsIntPlayer::GetRealTimeClock()
 
   if ( !OutOfBandEvents.IsEmpty() )
   {
-    tEventIterator Iterator(&OutOfBandEvents);
+    JZEventIterator Iterator(&OutOfBandEvents);
     JZEvent* pEvent = Iterator.Range(0, clock);
     while (pEvent)
     {
@@ -972,7 +972,7 @@ long JZWindowsMtcPlayer::GetRealTimeClock()
 
   if ( !OutOfBandEvents.IsEmpty() )
   {
-    tEventIterator Iterator(&OutOfBandEvents);
+    JZEventIterator Iterator(&OutOfBandEvents);
     JZEvent* pEvent = Iterator.Range(0, clock);
     while (pEvent)
     {
@@ -1003,11 +1003,11 @@ void JZWindowsMtcPlayer::InitMtcRec()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tMtcTime* JZWindowsMtcPlayer::FreezeMtcRec()
+JZMtcTime* JZWindowsMtcPlayer::FreezeMtcRec()
 {
   StopPlay();
   mpState->doing_mtc_rec = FALSE;
-  return(new tMtcTime(
+  return(new JZMtcTime(
     (long) GetMtcTime(mpState),
     (tMtcType) mpState->mtc_start.type));
 }

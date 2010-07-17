@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -77,14 +77,14 @@ using namespace std;
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tDeviceList::tDeviceList()
+JZDeviceList::JZDeviceList()
   : mDeviceNames()
 {
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tDeviceList::~tDeviceList()
+JZDeviceList::~JZDeviceList()
 {
 }
 
@@ -92,7 +92,7 @@ tDeviceList::~tDeviceList()
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tPlayLoop::tPlayLoop()
+JZPlayLoop::JZPlayLoop()
   : mStartClock(0),
     mStopClock(0)
 {
@@ -100,14 +100,14 @@ tPlayLoop::tPlayLoop()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tPlayLoop::Reset()
+void JZPlayLoop::Reset()
 {
   mStartClock = mStopClock = 0;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tPlayLoop::Set(long Start, long Stop)
+void JZPlayLoop::Set(long Start, long Stop)
 {
   mStartClock = Start;
   mStopClock = Stop;
@@ -115,7 +115,7 @@ void tPlayLoop::Set(long Start, long Stop)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long tPlayLoop::Ext2IntClock(long Clock)
+long JZPlayLoop::Ext2IntClock(long Clock)
 {
   if (mStopClock)
   {
@@ -126,7 +126,7 @@ long tPlayLoop::Ext2IntClock(long Clock)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long tPlayLoop::Int2ExtClock(long Clock)
+long JZPlayLoop::Int2ExtClock(long Clock)
 {
   return Clock;
 }
@@ -135,8 +135,8 @@ long tPlayLoop::Int2ExtClock(long Clock)
 // Description:
 //   Copy events from the passed song to output buffer.
 //-----------------------------------------------------------------------------
-void tPlayLoop::PrepareOutput(
-  tEventArray* pEventArray,
+void JZPlayLoop::PrepareOutput(
+  JZEventArray* pEventArray,
   JZSong* pSong,
   long ExtFr,
   long ExtTo,
@@ -192,7 +192,7 @@ JZPlayer::JZPlayer(JZSong* pSong)
     mSamples(pSong->GetTicksPerQuarter() * pSong->Speed())
 {
   DummyDeviceList.Add("default");
-  mpPlayLoop = new tPlayLoop();
+  mpPlayLoop = new JZPlayLoop();
 }
 
 //-----------------------------------------------------------------------------
@@ -270,7 +270,7 @@ void JZPlayer::FlushToDevice()
 {
   int BufferFull = 0;
 
-  tEventIterator Iterator(&mPlayBuffer);
+  JZEventIterator Iterator(&mPlayBuffer);
   JZEvent* pEvent = Iterator.Range(0, mOutClock);
   while (!BufferFull && pEvent)
   {
@@ -290,7 +290,7 @@ void JZPlayer::FlushToDevice()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZPlayer::OutNow(JZTrack *t, tParam *r)
+void JZPlayer::OutNow(JZTrack *t, JZParam *r)
 {
   OutNow(t, &r->mMsb);
   OutNow(t, &r->mLsb);
@@ -409,7 +409,7 @@ void JZPlayer::StartPlay(long Clock, long LoopClock, int Continue)
       int j;
       if (!t->DrumParams.IsEmpty())
       {
-        tDrumInstrumentParameter *dpar = t->DrumParams.FirstElem();
+        JZDrumInstrumentParameter *dpar = t->DrumParams.FirstElem();
         while (dpar)
         {
           for (j = drumPitchIndex; j < numDrumParameters; j++)
@@ -619,7 +619,7 @@ void JZPlayer::StopPlay()
     JZTrack *Track = mpSong->GetTrack(ii);
     if (Track)
     {
-      tEventIterator Iterator(Track);
+      JZEventIterator Iterator(Track);
       JZEvent* pEvent = Iterator.First();
       while (pEvent && pEvent->GetClock() < Clock + 100)
       {
@@ -649,7 +649,7 @@ void JZPlayer::AllNotesOff(int Reset)
   JZPitchEvent Pitch    (0, 0, 0);
   JZControlEvent CtrlRes(0, 0, 0x79, 0);
 
-  tDeviceList &devs = gpMidiPlayer->GetOutputDevices();
+  JZDeviceList &devs = gpMidiPlayer->GetOutputDevices();
   for (unsigned dev = 0; dev < devs.GetCount(); dev++)
   {
     for (int c = 0; c < 16; c++)
@@ -732,7 +732,7 @@ void JZPlayer::ClearSampleSet(wxWindow* pParent)
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tMpuPlayer::tMpuPlayer(JZSong* pSong)
+JZMpuPlayer::JZMpuPlayer(JZSong* pSong)
   : JZPlayer(pSong)
 {
   mPollMillisec = 25;
@@ -751,14 +751,14 @@ tMpuPlayer::tMpuPlayer(JZSong* pSong)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tMpuPlayer::~tMpuPlayer()
+JZMpuPlayer::~JZMpuPlayer()
 {
   close(dev);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool tMpuPlayer::IsInstalled()
+bool JZMpuPlayer::IsInstalled()
 {
   return dev >= 0;
 }
@@ -798,7 +798,7 @@ int dwrite(int dev, const char* buf, int size)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tMpuPlayer::StartPlay(long IntClock, long LoopClock, int Continue)
+void JZMpuPlayer::StartPlay(long IntClock, long LoopClock, int Continue)
 {
   long ExtClock = mpPlayLoop->Int2ExtClock(IntClock);
   char *play;
@@ -919,7 +919,7 @@ void tMpuPlayer::StartPlay(long IntClock, long LoopClock, int Continue)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tMpuPlayer::StopPlay()
+void JZMpuPlayer::StopPlay()
 {
   static const char stop = RES;
   JZPlayer::StopPlay();
@@ -935,7 +935,7 @@ void tMpuPlayer::StopPlay()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tMpuPlayer::SetHardThru(int on, int idummy, int odummy)
+void JZMpuPlayer::SetHardThru(int on, int idummy, int odummy)
 {
   char midithru[2];
   midithru[0] = CMD+1;
@@ -952,7 +952,7 @@ void tMpuPlayer::SetHardThru(int on, int idummy, int odummy)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tMpuPlayer::OutEvent(JZEvent* pEvent)
+int JZMpuPlayer::OutEvent(JZEvent* pEvent)
 {
   if (!PlyBytes.WriteFile(dev))
   {
@@ -1066,7 +1066,7 @@ int tMpuPlayer::OutEvent(JZEvent* pEvent)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tMpuPlayer::OutBreak()
+void JZMpuPlayer::OutBreak()
 {
   // Send a break to the driver starting at PlyBytes.GetClock() and ending at
   // mOutClock.
@@ -1081,7 +1081,7 @@ void tMpuPlayer::OutBreak()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tMpuPlayer::OutBreak(long BreakOver)
+void JZMpuPlayer::OutBreak(long BreakOver)
 {
   int OverFlow = 1;
 
@@ -1104,7 +1104,7 @@ void tMpuPlayer::OutBreak(long BreakOver)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tMpuPlayer::OutNow(JZEvent* pEvent)
+void JZMpuPlayer::OutNow(JZEvent* pEvent)
 {
   // send event to driver immediately regardless of events remaining
   // in the play-queue.
@@ -1183,9 +1183,9 @@ void tMpuPlayer::OutNow(JZEvent* pEvent)
 //-----------------------------------------------------------------------------
 // try to send all out of band events up to Clock to device
 //-----------------------------------------------------------------------------
-void tMpuPlayer::FlushOutOfBand(long Clock)
+void JZMpuPlayer::FlushOutOfBand(long Clock)
 {
-  tEventIterator Iterator(&OutOfBandEvents);
+  JZEventIterator Iterator(&OutOfBandEvents);
   JZEvent* pEvent = Iterator.Range(0, Clock);
   while (pEvent)
   {
@@ -1229,7 +1229,7 @@ void tMpuPlayer::FlushOutOfBand(long Clock)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long tMpuPlayer::GetRealTimeClock()
+long JZMpuPlayer::GetRealTimeClock()
 {
   static int receiving_song_ptr = 0;
   static long d0, d1;
@@ -1306,7 +1306,7 @@ long tMpuPlayer::GetRealTimeClock()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long tMpuPlayer::GetRecordedData()
+long JZMpuPlayer::GetRecordedData()
 {
   int c, i;
   unsigned char *recbuf = NULL;
@@ -1473,7 +1473,7 @@ void seqbuf_flush_last_event()
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tOSSThru::tOSSThru()
+JZOssThru::JZOssThru()
 {
   int time_base = 120;
   int tempo     = 120;
@@ -1488,7 +1488,7 @@ tOSSThru::tOSSThru()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tOSSThru::~tOSSThru()
+JZOssThru::~JZOssThru()
 {
   Stop();
   SEQ_STOP_TIMER();
@@ -1497,7 +1497,7 @@ tOSSThru::~tOSSThru()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tOSSThru::Notify()
+void JZOssThru::Notify()
 {
   unsigned char buf[128];
   int size;
@@ -1527,7 +1527,7 @@ void tOSSThru::Notify()
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tSeq2Player::tSeq2Player(JZSong* pSong)
+JZSeq2Player::JZSeq2Player(JZSong* pSong)
   : JZPlayer(pSong)
 {
   // The code has to poll fast for MIDI thru.
@@ -1577,20 +1577,20 @@ tSeq2Player::tSeq2Player(JZSong* pSong)
 
   if (gpConfig->GetValue(C_SoftThru))
   {
-    through = new tOSSThru();
+    through = new JZOssThru();
   }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool tSeq2Player::IsInstalled()
+bool JZSeq2Player::IsInstalled()
 {
   return seqfd >= 0 && mididev >= 0;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tSeq2Player::~tSeq2Player()
+JZSeq2Player::~JZSeq2Player()
 {
   delete through;
    if (seqfd > 0)
@@ -1600,7 +1600,7 @@ tSeq2Player::~tSeq2Player()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tSeq2Player::FindMidiDevice()
+int JZSeq2Player::FindMidiDevice()
 {
   struct synth_info si;
   int i, nrsynths, ninp;
@@ -1667,14 +1667,14 @@ int tSeq2Player::FindMidiDevice()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSeq2Player::SetSoftThru(int on, int idummy, int odummy)
+void JZSeq2Player::SetSoftThru(int on, int idummy, int odummy)
 {
   gpConfig->Put(C_SoftThru, on);
   if (on)
   {
     if (!through)
     {
-      through = new tOSSThru();
+      through = new JZOssThru();
     }
   }
   else
@@ -1689,7 +1689,7 @@ void tSeq2Player::SetSoftThru(int on, int idummy, int odummy)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
+int JZSeq2Player::OutEvent(JZEvent* pEvent, int now)
 {
   if (!now)
   {
@@ -1862,7 +1862,7 @@ int tSeq2Player::OutEvent(JZEvent* pEvent, int now)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSeq2Player::OutBreak(long clock)
+void JZSeq2Player::OutBreak(long clock)
 {
   if (play_clock < clock)
   {
@@ -1884,7 +1884,7 @@ void tSeq2Player::OutBreak(long clock)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSeq2Player::OutBreak()
+void JZSeq2Player::OutBreak()
 {
   OutBreak(mOutClock);
   seqbuf_dump();
@@ -1892,10 +1892,10 @@ void tSeq2Player::OutBreak()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSeq2Player::StartPlay(long Clock, long LoopClock, int Continue)
+void JZSeq2Player::StartPlay(long Clock, long LoopClock, int Continue)
 {
   char buf[512];
-  cout<<"tSeq2Player::StartPlay"<<endl;
+  cout<<"JZSeq2Player::StartPlay"<<endl;
   if (through)
   {
     delete through;
@@ -1971,7 +1971,7 @@ void tSeq2Player::StartPlay(long Clock, long LoopClock, int Continue)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tSeq2Player::StopPlay()
+void JZSeq2Player::StopPlay()
 {
   seqbuf_clear();
   SEQ_STOP_TIMER();
@@ -1988,7 +1988,7 @@ void tSeq2Player::StopPlay()
 
   if (gpConfig->GetValue(C_SoftThru))
   {
-    through = new tOSSThru();
+    through = new JZOssThru();
   }
   JZProjectManager::Instance()->NewPlayPosition(-1);
   mRecdBuffer.Keyoff2Length();
@@ -1997,9 +1997,9 @@ void tSeq2Player::StopPlay()
 //-----------------------------------------------------------------------------
 // try to send all events up to mOutClock to device
 //-----------------------------------------------------------------------------
-void tSeq2Player::FlushToDevice()
+void JZSeq2Player::FlushToDevice()
 {
-  tEventIterator Iterator(&mPlayBuffer);
+  JZEventIterator Iterator(&mPlayBuffer);
   JZEvent* pEvent = Iterator.Range(0, mOutClock);
   if (pEvent)
   {
@@ -2018,7 +2018,7 @@ void tSeq2Player::FlushToDevice()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long tSeq2Player::GetRealTimeClock()
+long JZSeq2Player::GetRealTimeClock()
 {
   unsigned char buf[256];
   int  size;

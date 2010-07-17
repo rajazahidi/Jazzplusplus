@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -170,65 +170,65 @@ JZProject::JZProject()
   if (gpConfig->GetValue(C_MidiDriver) == eMidiDriverOss)
   {
 #ifdef DEV_SEQUENCER2
-    mpMidiPlayer = new tAudioPlayer(this);
+    mpMidiPlayer = new JZAudioPlayer(this);
     if (!mpMidiPlayer->IsInstalled())
     {
-      cerr << "tAudioPlayer didn't install." << endl;
+      cerr << "JZAudioPlayer didn't install." << endl;
 
       delete mpMidiPlayer;
-      mpMidiPlayer = new tSeq2Player(this);
+      mpMidiPlayer = new JZSeq2Player(this);
     }
     if (!mpMidiPlayer->IsInstalled())
     {
-      cerr << "tSeq2Player didn't install." << endl;
+      cerr << "JZSeq2Player didn't install." << endl;
 
       perror("/dev/music");
 
       cerr << "Jazz will start with no play/record ability." << endl;
       delete mpMidiPlayer;
-      mpMidiPlayer = new tNullPlayer(this);
+      mpMidiPlayer = new JZNullPlayer(this);
     }
 #else
     cerr << "This programm lacks OSS driver support." << endl;
     cerr << "Jazz will start with no play/record ability." << endl;
-    mpMidiPlayer = new tNullPlayer(this);
+    mpMidiPlayer = new JZNullPlayer(this);
 #endif // DEV_SEQUENCER2
   }
   else if (gpConfig->GetValue(C_MidiDriver) == eMidiDriverAlsa)
   {
 #ifdef DEV_ALSA
-    mpMidiPlayer = new tAlsaAudioPlayer(this);
+    mpMidiPlayer = new JZAlsaAudioPlayer(this);
     if (!mpMidiPlayer->IsInstalled())
     {
-      cerr << "tAlsaAudioPlayer didn't install." << endl;
+      cerr << "JZAlsaAudioPlayer didn't install." << endl;
 
       delete mpMidiPlayer;
-      mpMidiPlayer = new tAlsaPlayer(this);
+      mpMidiPlayer = new JZAlsaPlayer(this);
     }
     if (!mpMidiPlayer->IsInstalled())
     {
-      cerr << "tAlsaPlayer didn't install." << endl;
+      cerr << "JZAlsaPlayer didn't install." << endl;
 
       cerr
         << "Could not install alsa driver." << '\n'
         << "Jazz will start with no play/record ability."
         << endl;
       delete mpMidiPlayer;
-      mpMidiPlayer = new tNullPlayer(this);
+      mpMidiPlayer = new JZNullPlayer(this);
     }
 #else
     cerr << "This programm lacks ALSA driver support" << endl;
     cerr << "Jazz will start with no play/record ability." << endl;
-    mpMidiPlayer = new tNullPlayer(this);
+    mpMidiPlayer = new JZNullPlayer(this);
 #endif
   }
   else if (gpConfig->GetValue(C_MidiDriver) == eMidiDriverJazz)
   {
 #ifdef DEV_MPU401
-    mpMidiPlayer = new tMpuPlayer(this);
+    mpMidiPlayer = new JZMpuPlayer(this);
     if (!mpMidiPlayer->IsInstalled())
     {
-      cerr << "tMpuPlayer didn't install." << endl;
+      cerr << "JZMpuPlayer didn't install." << endl;
 
       cerr
         << "Could not connect to midinet server at host \""
@@ -236,12 +236,12 @@ JZProject::JZProject()
         << "Jazz will start with no play/record ability."
         << endl;
       delete mpMidiPlayer;
-      mpMidiPlayer = new tNullPlayer(this);
+      mpMidiPlayer = new JZNullPlayer(this);
     }
 #else
     cerr << "This programm lacks JAZZ/MPU401 driver support" << endl;
     cerr << "Jazz will start with no play/record ability." << endl;
-    mpMidiPlayer = new tNullPlayer(this);
+    mpMidiPlayer = new JZNullPlayer(this);
 #endif
   }
   else
@@ -282,7 +282,7 @@ JZProject::JZProject()
   {
     mpMidiPlayer->ShowError();
     delete mpMidiPlayer;
-    mpMidiPlayer = new tNullPlayer(this);
+    mpMidiPlayer = new JZNullPlayer(this);
   }
 #endif // __WXMSW__
 
@@ -303,7 +303,7 @@ JZProject::JZProject()
 
   if (!mpMidiPlayer)
   {
-    mpMidiPlayer = new tNullPlayer(this);
+    mpMidiPlayer = new JZNullPlayer(this);
   }
 
   gpMidiPlayer = mpMidiPlayer;

@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,12 +25,12 @@
 #include "Song.h"
 #include "Globals.h"
 
-tMeasureChoice::tMeasureChoice(wxWindow* pParent)
-  : tNamedValueChoice(pParent, gLimitSteps)
+JZMeasureChoice::JZMeasureChoice(wxWindow* pParent)
+  : JZNamedValueChoice(pParent, gLimitSteps)
 {
 }
 
-int tMeasureChoice::GetTicks(JZSong* pSong)
+int JZMeasureChoice::GetTicks(JZSong* pSong)
 {
   int m = GetMeasure();
   if (m < 0)

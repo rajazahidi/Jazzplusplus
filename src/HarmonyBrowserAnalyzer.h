@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,18 +24,20 @@
 #define JZ_HARMONYBROWSERANALYZER_H
 
 class JZFilter;
-class JZTrack;
-class HBContext;
+class JZHarmonyBrowserChord;
+class JZHarmonyBrowserContext;
 class JZKeyOnEvent;
-class HBChord;
+class JZTrack;
 
-class HBAnalyzer
+//*****************************************************************************
+//*****************************************************************************
+class JZHarmonyBrowserAnalyzer
 {
   public:
 
-    HBAnalyzer(HBContext **seq, int n_seq);
+    JZHarmonyBrowserAnalyzer(JZHarmonyBrowserContext **seq, int n_seq);
 
-    ~HBAnalyzer();
+    ~JZHarmonyBrowserAnalyzer();
 
     int Analyze(JZFilter *f, int eighth_per_chord = 8);
 
@@ -49,21 +51,22 @@ class HBAnalyzer
 
     int Step2Clock(int step);
 
-    HBContext* GetContext(int step) const;
+    JZHarmonyBrowserContext* GetContext(int step) const;
 
   private:
 
-    void IterateEvents(void (HBAnalyzer::*Action)(JZKeyOnEvent *on, JZTrack *t));
+    void IterateEvents(
+      void (JZHarmonyBrowserAnalyzer::*Action)(JZKeyOnEvent *on, JZTrack *t));
     void CountEvent(JZKeyOnEvent *on, JZTrack *t);
     void TransposeEvent(JZKeyOnEvent *on, JZTrack *t);
     void CreateChords();
     int NumCount(int i);
-    int MaxCount(int i, const HBChord &done);
+    int MaxCount(int i, const JZHarmonyBrowserChord &done);
     void GenerateMapping();
 
   private:
 
-    HBContext** seq;
+    JZHarmonyBrowserContext** seq;
     int max_seq;
 
     int start_clock, stop_clock;
@@ -76,14 +79,20 @@ class HBAnalyzer
     int** delta;
 };
 
+//*****************************************************************************
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 inline
-int HBAnalyzer::Steps() const
+int JZHarmonyBrowserAnalyzer::Steps() const
 {
   return mSteps;
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 inline
-HBContext* HBAnalyzer::GetContext(int step) const
+JZHarmonyBrowserContext* JZHarmonyBrowserAnalyzer::GetContext(int step) const
 {
   return seq[step % max_seq];
 }

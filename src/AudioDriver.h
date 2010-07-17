@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -37,18 +37,18 @@
 #include "Audio.h"
 
 
-class tSample;
-class tAudioListener;
+class JZSample;
+class JZAudioListener;
 
-class tAudioPlayer : public tSeq2Player
+class JZAudioPlayer : public JZSeq2Player
 {
-  friend class tAudioListener;
+  friend class JZAudioListener;
 
   public:
 
-    tAudioPlayer(JZSong *song);
+    JZAudioPlayer(JZSong *song);
 
-    virtual ~tAudioPlayer();
+    virtual ~JZAudioPlayer();
 
     int LoadSamples(const char *filename);
 
@@ -62,7 +62,7 @@ class tAudioPlayer : public tSeq2Player
 
     virtual int IsIsInstalled()
     {
-      return mInstalled && tSeq2Player::IsInstalled();
+      return mInstalled && JZSeq2Player::IsInstalled();
     }
 
     virtual bool GetAudioEnabled() const
@@ -77,7 +77,7 @@ class tAudioPlayer : public tSeq2Player
 
     virtual void ListenAudio(int key, int start_stop_mode = 1);
 
-    virtual void ListenAudio(tSample &spl, long fr_smpl, long to_smpl);
+    virtual void ListenAudio(JZSample &spl, long fr_smpl, long to_smpl);
 
     virtual bool IsListening() const
     {
@@ -117,8 +117,8 @@ class tAudioPlayer : public tSeq2Player
     // False means MIDI only.
     int mAudioEnabled;
 
-    tAudioListener* mpListener;
-    tAudioRecordBuffer recbuffers;
+    JZAudioListener* mpListener;
+    JZAudioRecordBuffer recbuffers;
 
     // Needed by buggy audio driver ...
     int force_read;

@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 #include <string>
 
 // ------------------------------------------------------------------
-// HBChord
+// JZHarmonyBrowserChord
 // ------------------------------------------------------------------
 
 enum TEScaleType
@@ -40,24 +40,24 @@ enum TEScaleType
 };
 
 
-class HBChord
+class JZHarmonyBrowserChord
 {
-    friend std::ostream& operator << (std::ostream& os, HBChord const &a);
-    friend std::istream& operator >> (std::istream& is, HBChord &a);
+    friend std::ostream& operator << (std::ostream& os, JZHarmonyBrowserChord const &a);
+    friend std::istream& operator >> (std::istream& is, JZHarmonyBrowserChord &a);
 
   public:
 
-    HBChord()
+    JZHarmonyBrowserChord()
     {
       keys = 0;
     }
 
-    HBChord(int k)
+    JZHarmonyBrowserChord(int k)
     {
       keys = k;
     }
 
-    HBChord(
+    JZHarmonyBrowserChord(
       int a,
       int b,
       int c = -1,
@@ -90,95 +90,95 @@ class HBChord
       return ((1L << ((key + 240) % 12)) & keys) != 0;
     }
 
-    bool Contains(HBChord const &o) const
+    bool Contains(JZHarmonyBrowserChord const &o) const
     {
       return (keys & o.keys) == o.keys;
     }
 
-    HBChord & operator += (int key)
+    JZHarmonyBrowserChord & operator += (int key)
     {
       keys |= (1L << ((key + 240) % 12));
       return *this;
     }
 
-    HBChord & operator -= (int key)
+    JZHarmonyBrowserChord & operator -= (int key)
     {
       keys &= ~(1L << ((key + 240) % 12));
       return *this;
     }
 
-    HBChord & operator -= (const HBChord &o)
+    JZHarmonyBrowserChord & operator -= (const JZHarmonyBrowserChord &o)
     {
       keys &= ~o.keys;
       return *this;
     }
 
-    HBChord operator - (const HBChord &o) const
+    JZHarmonyBrowserChord operator - (const JZHarmonyBrowserChord &o) const
     {
-      HBChord ret(*this);
+      JZHarmonyBrowserChord ret(*this);
       ret.keys &= ~o.keys;
       return ret;
     }
 
-    HBChord & operator &= (const HBChord & sc)
+    JZHarmonyBrowserChord & operator &= (const JZHarmonyBrowserChord & sc)
     {
       keys &= sc.keys;
       return *this;
     }
 
-    HBChord & operator |= (const HBChord &sc)
+    JZHarmonyBrowserChord & operator |= (const JZHarmonyBrowserChord &sc)
     {
       keys |= sc.keys;
       return *this;
     }
 
-    HBChord & operator ^= (const HBChord &sc)
+    JZHarmonyBrowserChord & operator ^= (const JZHarmonyBrowserChord &sc)
     {
       keys ^= sc.keys;
       return *this;
     }
 
-    HBChord operator & (const HBChord &sc) const
+    JZHarmonyBrowserChord operator & (const JZHarmonyBrowserChord &sc) const
     {
-      HBChord ret(*this);
+      JZHarmonyBrowserChord ret(*this);
       ret &= sc;
       return ret;
     }
 
-    HBChord operator | (const HBChord &sc) const
+    JZHarmonyBrowserChord operator | (const JZHarmonyBrowserChord &sc) const
     {
-      HBChord ret(*this);
+      JZHarmonyBrowserChord ret(*this);
       ret |= sc;
       return ret;
     }
 
-    HBChord operator ^ (const HBChord &sc) const
+    JZHarmonyBrowserChord operator ^ (const JZHarmonyBrowserChord &sc) const
     {
-      HBChord ret(*this);
+      JZHarmonyBrowserChord ret(*this);
       ret ^= sc;
       return ret;
     }
 
-    HBChord operator + (int key)
+    JZHarmonyBrowserChord operator + (int key)
     {
-      HBChord ret(*this);
+      JZHarmonyBrowserChord ret(*this);
       ret += key;
       return ret;
     }
 
-    HBChord operator - (int key)
+    JZHarmonyBrowserChord operator - (int key)
     {
-      HBChord ret(*this);
+      JZHarmonyBrowserChord ret(*this);
       ret -= key;
       return ret;
     }
 
-    bool operator == (const HBChord &o) const
+    bool operator == (const JZHarmonyBrowserChord &o) const
     {
       return (keys == o.keys);
     }
 
-    bool operator != (const HBChord &o) const
+    bool operator != (const JZHarmonyBrowserChord &o) const
     {
       return (keys != o.keys);
     }
@@ -210,13 +210,13 @@ class HBChord
     static const std::string mScaleNames[2][12];
 };
 
-inline std::ostream& operator << (std::ostream& os, HBChord const &a)
+inline std::ostream& operator << (std::ostream& os, JZHarmonyBrowserChord const &a)
 {
   os << a.keys << std::endl;
   return os;
 }
 
-inline std::istream& operator >> (std::istream& is, HBChord &a)
+inline std::istream& operator >> (std::istream& is, JZHarmonyBrowserChord &a)
 {
   is >> a.keys;
   return is;
@@ -224,68 +224,68 @@ inline std::istream& operator >> (std::istream& is, HBChord &a)
 
 
 // scales, msb = highest note
-const HBChord major_scale       (0xab5L);
-const HBChord harmonic_scale         (0x9adL);
-const HBChord melodic_scale         (0xaadL);
-const HBChord ionb13_scale         (0x9b5L);
+const JZHarmonyBrowserChord major_scale       (0xab5L);
+const JZHarmonyBrowserChord harmonic_scale         (0x9adL);
+const JZHarmonyBrowserChord melodic_scale         (0xaadL);
+const JZHarmonyBrowserChord ionb13_scale         (0x9b5L);
 
-const HBChord altered_scale        (0, 1, 3, 4, 6, 8, 10);
-const HBChord dimin_scale       (0xb6dL);
-const HBChord chromatic_scale         (0xfffL);
+const JZHarmonyBrowserChord altered_scale        (0, 1, 3, 4, 6, 8, 10);
+const JZHarmonyBrowserChord dimin_scale       (0xb6dL);
+const JZHarmonyBrowserChord chromatic_scale         (0xfffL);
 
 // chords, based to C
-const HBChord Cj7        (0,4,7,11);
-const HBChord Cj7b5        (0,4,6,11);
-const HBChord Cj7s5        (0,4,8,11);
+const JZHarmonyBrowserChord Cj7        (0,4,7,11);
+const JZHarmonyBrowserChord Cj7b5        (0,4,6,11);
+const JZHarmonyBrowserChord Cj7s5        (0,4,8,11);
 
-const HBChord C7        (0,4,7,10);
-const HBChord C7b5        (0,4,6,10);
-const HBChord C7s5        (0,4,8,10);
+const JZHarmonyBrowserChord C7        (0,4,7,10);
+const JZHarmonyBrowserChord C7b5        (0,4,6,10);
+const JZHarmonyBrowserChord C7s5        (0,4,8,10);
 
-const HBChord Cm7        (0,3,7,10);
-const HBChord Cm7b5        (0,3,6,10);
-const HBChord Cm7s5        (0,3,8,10);
+const JZHarmonyBrowserChord Cm7        (0,3,7,10);
+const JZHarmonyBrowserChord Cm7b5        (0,3,6,10);
+const JZHarmonyBrowserChord Cm7s5        (0,3,8,10);
 
-const HBChord Cmj7        (0,3,7,11);
-const HBChord Cmj7b5        (0,3,6,11);
-const HBChord Cmj7s5        (0,3,8,11);
+const JZHarmonyBrowserChord Cmj7        (0,3,7,11);
+const JZHarmonyBrowserChord Cmj7b5        (0,3,6,11);
+const JZHarmonyBrowserChord Cmj7s5        (0,3,8,11);
 
-const HBChord C0        (0,3,6,9);
+const JZHarmonyBrowserChord C0        (0,3,6,9);
 
 // ------------------------------------------------------------------
-// HBContext
+// JZHarmonyBrowserContext
 // ------------------------------------------------------------------
 
 #define NAME_TABLE 0
 
-class HBContext
+class JZHarmonyBrowserContext
 {
-    friend class HBContextIterator;
-    friend std::ostream& operator << (std::ostream& os, HBContext const &a);
-    friend std::istream& operator >> (std::istream& is, HBContext &a);
+    friend class JZHarmonyBrowserContextIterator;
+    friend std::ostream& operator << (std::ostream& os, JZHarmonyBrowserContext const &a);
+    friend std::istream& operator >> (std::istream& is, JZHarmonyBrowserContext &a);
 
   public:
 
-    HBContext(int sn, int cn = 0, TEScaleType st = Major);
+    JZHarmonyBrowserContext(int sn, int cn = 0, TEScaleType st = Major);
 
-    HBContext();
+    JZHarmonyBrowserContext();
 
-    HBChord *PScale()
+    JZHarmonyBrowserChord *PScale()
     {
       return &scale;
     }
 
-    HBChord Scale() const
+    JZHarmonyBrowserChord Scale() const
     {
       return scale;
     }
 
-    HBChord *PChord()
+    JZHarmonyBrowserChord *PChord()
     {
       return &chord;
     }
 
-    HBChord Chord() const
+    JZHarmonyBrowserChord Chord() const
     {
       return chord;
     }
@@ -341,7 +341,7 @@ class HBContext
 
     const char* ScaleTypeName() const;            // "major"
 
-    int operator == (const HBContext& Rhs) const
+    int operator == (const JZHarmonyBrowserContext& Rhs) const
     {
       return
         scale_type == Rhs.scale_type &&
@@ -349,7 +349,7 @@ class HBContext
         chord_nr   == Rhs.chord_nr;
     }
 
-    int operator != (const HBContext& Rhs) const
+    int operator != (const JZHarmonyBrowserContext& Rhs) const
     {
       return !operator == (Rhs);
     }
@@ -358,9 +358,9 @@ class HBContext
 
     void Initialize();
 
-    HBChord MakeScale() const;
+    JZHarmonyBrowserChord MakeScale() const;
 
-    HBChord MakeChord() const;
+    JZHarmonyBrowserChord MakeChord() const;
 
     int MakeChordKey() const;
 
@@ -372,9 +372,9 @@ class HBContext
 
     int seq_nr;
 
-    HBChord chord;
+    JZHarmonyBrowserChord chord;
 
-    HBChord scale;
+    JZHarmonyBrowserChord scale;
 
     int chord_key;
 
@@ -390,49 +390,49 @@ class HBContext
 
 
 // ------------------------------------------------------------------
-// HBContextIterator
+// JZHarmonyBrowserContextIterator
 // ------------------------------------------------------------------
 
-class HBMatch
+class JZHarmonyBrowserMatch
 {
   public:
 
-    virtual ~HBMatch()
+    virtual ~JZHarmonyBrowserMatch()
     {
     }
 
-    virtual bool operator()(const HBContext &)
+    virtual bool operator()(const JZHarmonyBrowserContext &)
     {
       return true;
     }
 };
 
-class HBMatchContains : public HBMatch
+class JZHarmonyBrowserMatchContains : public JZHarmonyBrowserMatch
 {
   public:
 
-    HBMatchContains(HBChord c)
+    JZHarmonyBrowserMatchContains(JZHarmonyBrowserChord c)
       : chord(c)
     {
     }
 
-    virtual bool operator()(const HBContext &iter);
+    virtual bool operator()(const JZHarmonyBrowserContext &iter);
 
   private:
 
-    HBChord chord;
+    JZHarmonyBrowserChord chord;
 };
 
 
-class HBContextIterator
+class JZHarmonyBrowserContextIterator
 {
   public:
 
-    HBContextIterator();
+    JZHarmonyBrowserContextIterator();
 
-    HBContextIterator(HBMatch &);
+    JZHarmonyBrowserContextIterator(JZHarmonyBrowserMatch &);
 
-    void SetSequence(HBContext *s[], int n)
+    void SetSequence(JZHarmonyBrowserContext *s[], int n)
     {
       seq = s;
       n_seq = n;
@@ -445,25 +445,25 @@ class HBContextIterator
 
     bool operator()();
 
-    const HBContext *operator->() const
+    const JZHarmonyBrowserContext *operator->() const
     {
       return &context;
     }
 
-    const HBContext& Context() const
+    const JZHarmonyBrowserContext& Context() const
     {
       return context;
     }
 
   private:
 
-    HBContext context;
+    JZHarmonyBrowserContext context;
 
-    HBMatch& match;
+    JZHarmonyBrowserMatch& match;
 
-    HBMatch def_match;
+    JZHarmonyBrowserMatch def_match;
 
-    HBContext** seq;
+    JZHarmonyBrowserContext** seq;
 
     int i_seq, n_seq;
 

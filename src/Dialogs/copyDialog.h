@@ -27,12 +27,12 @@
 
 #ifndef __PORTING
 
-class tCopyDlg : public wxForm
+class JZCopyDlg : public wxForm
 {
-  tCopyCommand *cp;
+  JZCopyCommand *cp;
 
   public:
-    tCopyDlg(tCopyCommand *c)
+    JZCopyDlg(JZCopyCommand *c)
       : wxForm( USED_WXFORM_BUTTONS )
     {
       cp = c;

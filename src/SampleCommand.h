@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,18 +27,18 @@
 #include "SignalInterface.h"
 #include "Sample.h"
 
-class tSample;
-class tFloatSample;
-class tSplFilter;
+class JZSample;
+class JZFloatSample;
+class JZSplFilter;
 
 /**
  * a paintable command with n array arguments
  */
 
-class tPaintableCommand
+class JZPaintableCommand
 {
   public:
-    tPaintableCommand(tSample &s) : spl(s)
+    JZPaintableCommand(JZSample &s) : spl(s)
     {
     }
     virtual int NumArrays() = 0;
@@ -48,22 +48,22 @@ class tPaintableCommand
     virtual void Initialize()
     {
     }
-    virtual ~tPaintableCommand()
+    virtual ~JZPaintableCommand()
     {
     }
   protected:
-    tSample &spl;
+    JZSample &spl;
 };
 
 /**
  * a paintable command with 1 array
  */
 
-class tPaintableCommand1 : public tPaintableCommand
+class JZPaintableCommand1 : public JZPaintableCommand
 {
   public:
-    tPaintableCommand1(tSample &s, int num, int min, int max)
-      : tPaintableCommand(s),
+    JZPaintableCommand1(JZSample &s, int num, int min, int max)
+      : JZPaintableCommand(s),
         arr(num, min, max)
     {
     }
@@ -81,40 +81,40 @@ class tPaintableCommand1 : public tPaintableCommand
 };
 
 
-class tSplVolume : public tPaintableCommand1
+class JZSplVolume : public JZPaintableCommand1
 {
   public:
     const char * GetLabel(int i)
     {
       return "volume";
     }
-    tSplVolume(tSample &s) : tPaintableCommand1(s, 200, -100, 100)
+    JZSplVolume(JZSample &s) : JZPaintableCommand1(s, 200, -100, 100)
     {
     }
     void Execute(long fr, long to);
 };
 
-class tSplPan : public tPaintableCommand1
+class JZSplPan : public JZPaintableCommand1
 {
   public:
     const char * GetLabel(int i)
     {
       return "pan";
     }
-    tSplPan(tSample &s) : tPaintableCommand1(s, 200, -100, 100)
+    JZSplPan(JZSample &s) : JZPaintableCommand1(s, 200, -100, 100)
     {
     }
     void Execute(long fr, long to);
 };
 
-class tSplPitch : public tPaintableCommand1
+class JZSplPitch : public JZPaintableCommand1
 {
   public:
     const char * GetLabel(int i)
     {
       return "pitch";
     }
-    tSplPitch(tSample &s) : tPaintableCommand1(s, 200, -100, 100)
+    JZSplPitch(JZSample &s) : JZPaintableCommand1(s, 200, -100, 100)
     {
       range = 1.2f;
     }
@@ -141,10 +141,10 @@ class tSplPitch : public tPaintableCommand1
 #define      M_PI_2 (PI/2.0)
 #endif
 
-class tCMixCmd
+class JZCMixCmd
 {
   public:
-    tCMixCmd(float sr);   // sampling rate
+    JZCMixCmd(float sr);   // sampling rate
     float cpspch(float pch);
     void tableset(float dur, int size, float *tab);
     float tablei(long nsample, float *array, float *tab);
@@ -163,11 +163,11 @@ class tCMixCmd
 };
 
 
-class tWahWah : public tPaintableCommand1
+class JZWahWah : public JZPaintableCommand1
 {
-  friend class tWahSettingsForm;
+  friend class JZWahSettingsForm;
   public:
-    tWahWah(tSample &s);
+    JZWahWah(JZSample &s);
     virtual const char * GetLabel(int i)
     {
       return "freq";
@@ -175,8 +175,8 @@ class tWahWah : public tPaintableCommand1
     virtual void Execute(long fr, long to);
     virtual void Initialize();
   protected:
-    void Wah(int channel, tFloatSample &fs);
-    tSplFilter::Type filter_type;
+    void Wah(int channel, JZFloatSample &fs);
+    JZSplFilter::Type filter_type;
     int order;
     double lo_freq;
     double hi_freq;
@@ -184,31 +184,31 @@ class tWahWah : public tPaintableCommand1
 };
 
 
-class tShifterCmd : public tCMixCmd
+class JZShifterCmd : public JZCMixCmd
 {
   public:
-    tShifterCmd(long sampling_rate);
+    JZShifterCmd(long sampling_rate);
 
-    void ShiftPitch(tSample &spl, float semis,  bool keep_length, float winsize);
-    void StretchLength(tSample &spl, long newlen, bool keep_pitch, float winsize);
+    void ShiftPitch(JZSample &spl, float semis,  bool keep_length, float winsize);
+    void StretchLength(JZSample &spl, long newlen, bool keep_pitch, float winsize);
 
   protected:
-    double rotate(float p[], int n_args, tFloatSample &sinp, tFloatSample &sout);
+    double rotate(float p[], int n_args, JZFloatSample &sinp, JZFloatSample &sout);
 };
 
 
 // 2-nd nogo equalizer
-class tSplEqualizer
+class JZSplEqualizer
 {
   public:
-    tSplEqualizer(JZRndArray &amps, long sampling_rate);
-    virtual ~tSplEqualizer();
+    JZSplEqualizer(JZRndArray &amps, long sampling_rate);
+    virtual ~JZSplEqualizer();
     float operator()(float sample);
     float Index2Hertz(float index);
     void  Prepare();
   private:
     JZRndArray  &array;
-    tSplFilter *filters;
+    JZSplFilter *filters;
     int       nfilters;
     long      sampling_rate;
 

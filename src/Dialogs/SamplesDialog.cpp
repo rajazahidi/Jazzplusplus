@@ -33,7 +33,7 @@
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZSamplesDialog::JZSamplesDialog(wxWindow* pParent, tSampleSet& SampleSet)
+JZSamplesDialog::JZSamplesDialog(wxWindow* pParent, JZSampleSet& SampleSet)
   : wxDialog(pParent, wxID_ANY, wxString("Samples Settings")),
     mpListBox(0),
     mpLabelEdit(0),
@@ -44,7 +44,7 @@ JZSamplesDialog::JZSamplesDialog(wxWindow* pParent, tSampleSet& SampleSet)
     mpPitchSlider(0)
 {
   wxArrayString SampleNames;
-  for (int Index = 0; Index < tSampleSet::eSampleCount; ++Index)
+  for (int Index = 0; Index < JZSampleSet::eSampleCount; ++Index)
   {
     wxString Entry;
     Entry << Index + 1 << ' ' << SampleSet.GetSampleLabel(Index);

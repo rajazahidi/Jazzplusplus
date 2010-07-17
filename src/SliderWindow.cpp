@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@
 #include <iostream>
 using namespace std;
 
-tSliderWin::tSliderWin(
+JZSliderWindow::JZSliderWindow(
   wxWindow* pParent,
   const wxString& Title,
   int geo[4],
@@ -53,7 +53,7 @@ tSliderWin::tSliderWin(
     mpToolBar = 0;
 }
 
-void tSliderWin::Initialize()
+void JZSliderWindow::Initialize()
 {
   AddItems();
   panel->Fit();
@@ -69,7 +69,7 @@ void tSliderWin::Initialize()
 }
 
 
-tSliderWin::~tSliderWin()
+JZSliderWindow::~JZSliderWindow()
 {
   GetPosition(&geo[0], &geo[1]);
   GetSize(&geo[2], &geo[3]);
@@ -80,8 +80,8 @@ tSliderWin::~tSliderWin()
 }
 
 
-BEGIN_EVENT_TABLE(tSliderWin, wxFrame)
-  EVT_SIZE(tSliderWin::OnSize)
+BEGIN_EVENT_TABLE(JZSliderWindow, wxFrame)
+  EVT_SIZE(JZSliderWindow::OnSize)
 END_EVENT_TABLE()
 
   /**called from the event table whenever the window is resized
@@ -90,9 +90,9 @@ END_EVENT_TABLE()
 
 
 */
-void tSliderWin::OnSize(wxSizeEvent& Event)
+void JZSliderWindow::OnSize(wxSizeEvent& Event)
 {
-  cout <<"tSliderWin::OnSize "<<in_constructor<<endl;
+  cout <<"JZSliderWindow::OnSize "<<in_constructor<<endl;
   wxSize sz = Event.GetSize();
 
   if (in_constructor)
@@ -143,13 +143,13 @@ void tSliderWin::OnSize(wxSizeEvent& Event)
 
 }
 
-bool tSliderWin::OnClose()
+bool JZSliderWindow::OnClose()
 {
   return true;
 }
 
 
-void tSliderWin::AddItems()
+void JZSliderWindow::AddItems()
 {
 #ifdef OBSOLETE
  (void)new wxButton(panel, (wxFunction)ItemCallback, "MyButton") ;
@@ -157,28 +157,28 @@ void tSliderWin::AddItems()
 }
 
 
-void tSliderWin::AddEdits()
+void JZSliderWindow::AddEdits()
 {
   n_sliders = 2;
   sliders_per_row = 2;
   for (int i = 0; i < n_sliders; i++)
-    sliders[i] = new tRhyArrayEdit(this, *new JZRndArray(20, 0, 100), 10, 10, 10, 10, (ARED_GAP | ARED_XTICKS));
+    sliders[i] = new JZRhyArrayEdit(this, *new JZRndArray(20, 0, 100), 10, 10, 10, 10, (ARED_GAP | ARED_XTICKS));
 }
 
 #ifdef OBSOLETE
-void tSliderWin::OnItem(wxItem& item, wxCommandEvent& event)
+void JZSliderWindow::OnItem(wxItem& item, wxCommandEvent& event)
 {
 }
 
 
-void tSliderWin::ItemCallback(wxItem& item, wxCommandEvent& event)
+void JZSliderWindow::ItemCallback(wxItem& item, wxCommandEvent& event)
 {
-  ((tSliderWin *)(item.GetParent()->GetParent()))->OnItem(item, event);
+  ((JZSliderWindow *)(item.GetParent()->GetParent()))->OnItem(item, event);
 }
 
 #endif
 
-void tSliderWin::ForceRepaint()
+void JZSliderWindow::ForceRepaint()
 {
 #ifdef OBSOLETE
   int cw, ch;

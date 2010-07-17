@@ -23,7 +23,7 @@
 #ifndef JZ_SAMPLE_H
 #define JZ_SAMPLE_H
 
-class tSampleSet;
+class JZSampleSet;
 
 #include <cmath>
 #include <cstring>
@@ -102,14 +102,14 @@ typedef struct _waveheader
 //
 // used for the 'big' CMIX interface too.
 //*****************************************************************************
-class tFloatSample // : public tCMIX
+class JZFloatSample // : public tCMIX
 {
-  friend class tSample;
+  friend class JZSample;
   public:
-    tFloatSample(tSample &spl);
-    tFloatSample(tSample &spl, int fr, int to);
-    tFloatSample(int ch, int sr);
-    virtual ~tFloatSample();
+    JZFloatSample(JZSample &spl);
+    JZFloatSample(JZSample &spl, int fr, int to);
+    JZFloatSample(int ch, int sr);
+    virtual ~JZFloatSample();
     float Peak(int fr = -1, int to = -1);
     void Rescale(float maxval = 32766.0, int fr = -1, int to = -1);
     void RescaleToShort(int fr = -1, int to = -1);
@@ -118,8 +118,8 @@ class tFloatSample // : public tCMIX
       return data[i];
     }
     void Initialize(int size = 0);
-    void PasteMix(tFloatSample &src, int offs = 0);
-    void PasteMix(tSample &src, int offs = 0);
+    void PasteMix(JZFloatSample &src, int offs = 0);
+    void PasteMix(JZSample &src, int offs = 0);
     void RemoveTrailingSilence(float peak = 50);
 
     // CMIX Interface functions
@@ -145,11 +145,11 @@ class tFloatSample // : public tCMIX
     void RndEcho(int num_echos, int delay, float ampl);
     void RndEchoStereo(int num_echos, int delay, float ampl);
 
-    // see args of tSplFilter::Setup() for this.
+    // see args of JZSplFilter::Setup() for this.
     void Filter(
       int fr,
       int to,
-      tSplFilter::Type type,
+      JZSplFilter::Type type,
       int order,
       double freq,
       double bw);
@@ -201,16 +201,16 @@ class tFloatSample // : public tCMIX
 // set.GetChannelCount().  Offsets should start on channel boundaries, that is
 // offs % set.GetChannelCount() == 0.
 //*****************************************************************************
-class tSample
+class JZSample
 {
-  friend class tFloatSample;
-  friend class tSplPan;
-  friend class tSplPitch;
+  friend class JZFloatSample;
+  friend class JZSplPan;
+  friend class JZSplPitch;
   public:
-    friend class tSampleSet;
-    friend class tSampleVoice;
-    tSample(tSampleSet &s);
-    virtual ~tSample();
+    friend class JZSampleSet;
+    friend class JZSampleVoice;
+    JZSample(JZSampleSet &s);
+    virtual ~JZSample();
 
     int Load(int force = 0);
     int LoadWav();
@@ -302,14 +302,14 @@ class tSample
     }
 
 
-    // access global adustments from tSampleSet
+    // access global adustments from JZSampleSet
 
-    tSampleSet &SampleSet()
+    JZSampleSet &SampleSet()
     {
       return set;
     }
 
-    tSampleSet *operator->()
+    JZSampleSet *operator->()
     {
       return &set;
     }
@@ -321,25 +321,25 @@ class tSample
     // align offset to channel boundary
     int Align(int offs) const;
 
-    // copy part of the data into another tSample o. If o
+    // copy part of the data into another JZSample o. If o
     // contains other data these will be erased.
 
-    void Copy(tSample &dst, int fr_smpl = -1, int to_smpl = -1);
+    void Copy(JZSample &dst, int fr_smpl = -1, int to_smpl = -1);
 
     // like Copy but deletes the source selection afterwards.
 
-    void Cut(tSample &dst, int fr_smpl = -1, int to_smpl = -1);
+    void Cut(JZSample &dst, int fr_smpl = -1, int to_smpl = -1);
 
     // delete part of this sample.
     void Delete(int fr_smpl = -1, int to_smpl = -1);
 
     // paste some data into this sample, data are inserted
-    void PasteIns(tSample &src, int offs);
+    void PasteIns(JZSample &src, int offs);
 
     // paste some data into this sample, data are mixed with
     // the current contents.
-    void PasteMix(tSample &src, int offs);
-    void PasteOvr(tSample &src, int fr, int to);
+    void PasteMix(JZSample &src, int offs);
+    void PasteOvr(JZSample &src, int fr, int to);
     void ReplaceSilence(int offs, int len);
     void Rescale(short maxval = 32766);
     void Reverse(int fr, int to);
@@ -358,15 +358,15 @@ class tSample
 
     // initialize length and data from the float sample
 
-    void Set(tFloatSample &fs);
+    void Set(JZFloatSample &fs);
 
     // replace part of the data with the data in fs,
     // original data are overwritten.
 
-    void Set(tFloatSample &fs, int offs);
+    void Set(JZFloatSample &fs, int offs);
 
     // like Set() but try to make a smooth transition
-    void SetSmooth(tFloatSample &fs, int offs, int fade_len = -1);
+    void SetSmooth(JZFloatSample &fs, int offs, int fade_len = -1);
 
     int Seconds2Samples(float time);
     float Samples2Seconds(int samples);
@@ -387,7 +387,7 @@ class tSample
 
     int length;  // number of shorts
     short* data; // signed shorts
-    tSampleSet& set;
+    JZSampleSet& set;
 
     std::string mLabel;
     std::string mFileName;

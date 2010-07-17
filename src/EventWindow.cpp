@@ -149,7 +149,7 @@ void JZEventWindow::Shift(int Units)
 
     if (ShiftDialog.ShowModal() == wxID_OK && Shift != 0)
     {
-      tCmdShift ShiftCommand(mpFilter, Shift * Unit);
+      JZCommandShift ShiftCommand(mpFilter, Shift * Unit);
       ShiftCommand.Execute();
 
       JZProjectManager::Instance()->UpdateAllViews();
@@ -182,7 +182,7 @@ void JZEventWindow::Quantize()
     {
       int Step = mpProject->GetTicksPerQuarter() * 4 / QuantizationStep;
 
-      tCmdQuantize QuantizeCommand(
+      JZCommandQuantize QuantizeCommand(
         mpFilter,
         QuantizationStep,
         NoteStart,
@@ -207,7 +207,7 @@ void JZEventWindow::SetChannel()
   JZMidiChannelDialog MidiChannelDialog(NewChannel, this);
   if (MidiChannelDialog.ShowModal() == wxID_OK)
   {
-    tCmdSetChannel SetMidiChannelCommand(mpFilter, NewChannel - 1);
+    JZCommandSetChannel SetMidiChannelCommand(mpFilter, NewChannel - 1);
     SetMidiChannelCommand.Execute();
     JZProjectManager::Instance()->UpdateAllViews();
   }
@@ -217,7 +217,7 @@ void JZEventWindow::SetChannel()
 //-----------------------------------------------------------------------------
 void JZEventWindow::Transpose()
 {
-  int CurrentScale = tScale::Analyze(mpFilter);
+  int CurrentScale = JZScale::Analyze(mpFilter);
   int Notes = 0, Scale = gScaleChromatic;
   bool FitIntoScale = false;
 
@@ -229,7 +229,7 @@ void JZEventWindow::Transpose()
     this);
   if (TransposeDialog.ShowModal() == wxID_OK)
   {
-    tCmdTranspose TransposeCommand(mpFilter, Notes, Scale, FitIntoScale);
+    JZCommandTranspose TransposeCommand(mpFilter, Notes, Scale, FitIntoScale);
     TransposeCommand.Execute();
 
     JZProjectManager::Instance()->UpdateAllViews();
@@ -246,7 +246,7 @@ void JZEventWindow::Delete()
 
   if (DeleteDialog.ShowModal() == wxID_OK)
   {
-    tCmdErase EraseCommand(mpFilter, LeaveSpace);
+    JZCommandErase EraseCommand(mpFilter, LeaveSpace);
     EraseCommand.Execute();
     JZProjectManager::Instance()->UpdateAllViews();
   }
@@ -263,7 +263,7 @@ void JZEventWindow::Velocity()
   JZVelocityDialog VelocityDialog(this, FromValue, ToValue, Mode);
   if (VelocityDialog.ShowModal() == wxID_OK)
   {
-    tCmdVelocity VelocityCommand(mpFilter, FromValue, ToValue, Mode);
+    JZtCommandVelocity VelocityCommand(mpFilter, FromValue, ToValue, Mode);
     VelocityCommand.Execute();
   }
 }
@@ -284,7 +284,7 @@ void JZEventWindow::Length()
     Mode);
   if (LengthDialog.ShowModal() == wxID_OK)
   {
-    tCmdLength LengthCommand(mpFilter, FromValue, ToValue, Mode);
+    JZCommandLength LengthCommand(mpFilter, FromValue, ToValue, Mode);
     LengthCommand.Execute();
 
     JZProjectManager::Instance()->UpdateAllViews();
@@ -295,7 +295,7 @@ void JZEventWindow::Length()
 //-----------------------------------------------------------------------------
 void JZEventWindow::ConvertToModulation()
 {
-  tCmdConvertToModulation cmd(mpFilter);
+  JZCommandConvertToModulation cmd(mpFilter);
   cmd.Execute();
   Refresh();
 }
@@ -313,7 +313,7 @@ void JZEventWindow::Cleanup()
     int LengthLimit =
       mpFilter->GetSong()->GetTicksPerQuarter() * 4 / ShortestNote;
 
-    tCmdCleanup CleanupCommand(
+    JZCommandCleanup CleanupCommand(
       mpFilter,
       LengthLimit,
       ShortenOverlappingNotes);
@@ -333,7 +333,7 @@ void JZEventWindow::SearchReplace()
   JZSearchAndReplaceDialog SearchAndReplaceDialog(From, To, this);
   if (SearchAndReplaceDialog.ShowModal() == wxID_OK)
   {
-    tCmdSearchReplace SearchAndReplaceCommand(mpFilter, From - 1, To - 1);
+    JZCommandSearchReplace SearchAndReplaceCommand(mpFilter, From - 1, To - 1);
 
     SearchAndReplaceCommand.Execute();
 

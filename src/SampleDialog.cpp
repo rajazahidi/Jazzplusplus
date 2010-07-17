@@ -44,7 +44,7 @@
 
 using namespace std;
 
-tCommandPainter::tCommandPainter(tSampleWin &w, tPaintableCommand &c)
+JZCommandPainter::JZCommandPainter(JZSampleFrame &w, JZPaintableCommand &c)
   : win(w),
     cmd(c)
 {
@@ -57,12 +57,12 @@ tCommandPainter::tCommandPainter(tSampleWin &w, tPaintableCommand &c)
   }
 }
 
-tCommandPainter::~tCommandPainter()
+JZCommandPainter::~JZCommandPainter()
 {
   win.ClrParam();
 }
 
-void tCommandPainter::OnAccept(int fr, int to)
+void JZCommandPainter::OnAccept(int fr, int to)
 {
   wxBeginBusyCursor();
   cmd.Execute(fr, to);
@@ -72,12 +72,12 @@ void tCommandPainter::OnAccept(int fr, int to)
 // ------------------------------ Equalizer --------------------------------
 
 
-class tEquArrayEdit : public tRhyArrayEdit
+class JZEquArrayEdit : public JZRhyArrayEdit
 {
   public:
 
-    tEquArrayEdit(tEqualizer *parent, JZRndArray &arr, int style)
-      : tRhyArrayEdit(parent, arr, 10, 10, 10, 10, style),
+    JZEquArrayEdit(JZEqualizer *parent, JZRndArray &arr, int style)
+      : JZRhyArrayEdit(parent, arr, 10, 10, 10, 10, style),
         equ(*parent)
     {
     }
@@ -86,10 +86,10 @@ class tEquArrayEdit : public tRhyArrayEdit
 
   private:
 
-    tEqualizer &equ;
+    JZEqualizer &equ;
 };
 
-const char* tEquArrayEdit::GetXText(int val)
+const char* JZEquArrayEdit::GetXText(int val)
 {
   if (val == 0)
   {
@@ -102,10 +102,10 @@ const char* tEquArrayEdit::GetXText(int val)
   return buf;
 }
 
-int tEqualizer::geo[4] = { 50, 80, 350, 200 };
+int JZEqualizer::geo[4] = { 50, 80, 350, 200 };
 
-tEqualizer::tEqualizer(tSampleWin &w)
-  : tSliderWin(&w, "Equalizer", geo),
+JZEqualizer::JZEqualizer(JZSampleFrame &w)
+  : JZSliderWindow(&w, "Equalizer", geo),
     array(12, -100, 100),
     win(w),
     spl(w.GetSample())
@@ -116,35 +116,35 @@ tEqualizer::tEqualizer(tSampleWin &w)
   {
     array[i] = 0;
   }
-  equ = new tSplEqualizer * [channels];
+  equ = new JZSplEqualizer * [channels];
   for (i = 0; i < channels; ++i)
   {
-    equ[i] = new tSplEqualizer(array, spl.GetSamplingRate());
+    equ[i] = new JZSplEqualizer(array, spl.GetSamplingRate());
   }
   Initialize();
 }
 
-tEqualizer::~tEqualizer()
+JZEqualizer::~JZEqualizer()
 {
   for (int i = 0; i < channels; i++)
     delete equ[i];
   delete [] equ;
 }
 
-void tEqualizer::AddItems()
+void JZEqualizer::AddItems()
 {
   action = new wxButton(panel,  -1, "Ok") ;     //(wxFunction)ItemCallback,
   cancel = new wxButton(panel,  -1, "Cancel") ; //(wxFunction)ItemCallback,
 }
 
-void tEqualizer::AddEdits()
+void JZEqualizer::AddEdits()
 {
   n_sliders = 1;
-  sliders[0] = new tEquArrayEdit(this, array, (ARED_GAP | ARED_XTICKS));
+  sliders[0] = new JZEquArrayEdit(this, array, (ARED_GAP | ARED_XTICKS));
 }
 
 #ifdef OBSOLETE
-void tEqualizer::OnItem(wxItem& item, wxCommandEvent& event)
+void JZEqualizer::OnItem(wxItem& item, wxCommandEvent& event)
 {
   if (&item == action)
   {
@@ -156,19 +156,19 @@ void tEqualizer::OnItem(wxItem& item, wxCommandEvent& event)
 }
 #endif
 
-double tEqualizer::Index2Hertz(int index)
+double JZEqualizer::Index2Hertz(int index)
 {
   return equ[0]->Index2Hertz(index);
 }
 
-void tEqualizer::Action()
+void JZEqualizer::Action()
 {
   int fr, to;
   if (!win.HaveSelection(fr, to))
     return;
 
 
-  tFloatSample fs(spl, fr, to);
+  JZFloatSample fs(spl, fr, to);
   float oldpeak = fs.Peak();
 
   int i = 0;
@@ -213,10 +213,10 @@ static const char* cv_strings[] =
   0
 };
 
-int tDistortion::geo[4] = { 50, 80, 300, 320 };
+int JZDistortion::geo[4] = { 50, 80, 300, 320 };
 
-tDistortion::tDistortion(tSampleWin &w)
-: tSliderWin(&w, "Distortion", geo),
+JZDistortion::JZDistortion(JZSampleFrame &w)
+: JZSliderWindow(&w, "Distortion", geo),
   arr(200, 0, 100),
   win(w)
 {
@@ -229,7 +229,7 @@ tDistortion::tDistortion(tSampleWin &w)
 
 
 
-void tDistortion::AddItems()
+void JZDistortion::AddItems()
 {
   action = new wxButton(panel, wxID_ANY, "Ok");      //(wxFunction)ItemCallback,
   cancel = new wxButton(panel, wxID_ANY, "Cancel");  //(wxFunction)ItemCallback,
@@ -241,14 +241,14 @@ void tDistortion::AddItems()
   }
 }
 
-void tDistortion::AddEdits()
+void JZDistortion::AddEdits()
 {
   n_sliders = 1;
-  sliders[0] = new tRhyArrayEdit(this, arr, 10,10,10,10, ARED_LINES);
+  sliders[0] = new JZRhyArrayEdit(this, arr, 10,10,10,10, ARED_LINES);
 }
 
 #ifdef OBSOLETE
-void tDistortion::OnItem(wxItem& item, wxCommandEvent& event)
+void JZDistortion::OnItem(wxItem& item, wxCommandEvent& event)
 {
   if (&item == action)
   {
@@ -265,7 +265,7 @@ void tDistortion::OnItem(wxItem& item, wxCommandEvent& event)
 }
 #endif
 
-void tDistortion::MakeCurve(int cvtype)
+void JZDistortion::MakeCurve(int cvtype)
 {
   switch (cvtype)
   {
@@ -288,7 +288,7 @@ void tDistortion::MakeCurve(int cvtype)
   }
 }
 
-void tDistortion::MakeExpo(int degree)
+void JZDistortion::MakeExpo(int degree)
 {
   JZMapper xmap(0, N, 0, -degree);
   JZMapper ymap(
@@ -306,7 +306,7 @@ void tDistortion::MakeExpo(int degree)
 #define PI M_PI
 #endif
 
-void tDistortion::MakeSine(int degree)
+void JZDistortion::MakeSine(int degree)
 {
   double x0 = -PI/2;
   double x1 = x0 + 2 * degree * PI;
@@ -316,14 +316,14 @@ void tDistortion::MakeSine(int degree)
     arr[i] = (int)(ymap.XToY(sin(xmap.XToY(i))));
 }
 
-void tDistortion::Action()
+void JZDistortion::Action()
 {
   int fr, to;
   if (!win.HaveSelection(fr, to))
     return;
 
   wxBeginBusyCursor();
-  tSample &spl = win.GetSample();
+  JZSample &spl = win.GetSample();
   short *data = spl.GetData();
   JZMapper xmap(0, 32767, 0, 100);
   JZMapper ymap(0, 100, 0, 32767);
@@ -355,12 +355,12 @@ void tDistortion::Action()
 #define N_HARM 40
 
 
-class tAddSynthArray
+class JZAddSynthArray
 {
   public:
     JZRndArray arr;
-    tRhyArrayEdit *edit;
-    tAddSynthArray(
+    JZRhyArrayEdit *edit;
+    JZAddSynthArray(
       wxFrame *parent,
       const char *label,
       int n,
@@ -373,7 +373,7 @@ class tAddSynthArray
       arr.SetNull(ynul);
       for (i = 0; i < n; i++)
         arr[i] = ynul;
-      edit = new tRhyArrayEdit(parent, arr, 10,10,10,10, style);
+      edit = new JZRhyArrayEdit(parent, arr, 10,10,10,10, style);
       edit->SetLabel(label);
     }
     void Show(bool x)
@@ -386,15 +386,15 @@ class tAddSynthArray
     }
 };
 
-class tAddSynth
+class JZAddSynth
 {
   public:
-    tAddSynthArray fft;
-    tAddSynthArray vol;
-    tAddSynthArray frq;
-    tAddSynthArray pan;
+    JZAddSynthArray fft;
+    JZAddSynthArray vol;
+    JZAddSynthArray frq;
+    JZAddSynthArray pan;
 
-    tAddSynth(wxFrame *parent) :
+    JZAddSynth(wxFrame *parent) :
       fft(parent, "Harmonics",   N_HARM, 0, 100, ARED_XTICKS | ARED_GAP),
       vol(parent, "Envelope",    100,  0, 100, ARED_XTICKS | ARED_LINES),
       frq(parent, "Pitch",       100, 50, 100, ARED_XTICKS | ARED_LINES),
@@ -424,11 +424,11 @@ class tAddSynth
       frq.edit->Init();
       pan.edit->Init();
     }
-    friend std::ostream& operator << (std::ostream& os, tAddSynth const &a);
-    friend std::istream& operator >> (std::istream& is, tAddSynth &a);
+    friend std::ostream& operator << (std::ostream& os, JZAddSynth const &a);
+    friend std::istream& operator >> (std::istream& is, JZAddSynth &a);
 };
 
-std::ostream& operator << (std::ostream& os, tAddSynth const &a)
+std::ostream& operator << (std::ostream& os, JZAddSynth const &a)
 {
   os << a.fft.arr << endl;
   os << a.vol.arr << endl;
@@ -437,7 +437,7 @@ std::ostream& operator << (std::ostream& os, tAddSynth const &a)
   return os;
 }
 
-std::istream& operator >> (std::istream& is, tAddSynth &a)
+std::istream& operator >> (std::istream& is, JZAddSynth &a)
 {
   is >> a.fft.arr;
   is >> a.vol.arr;
@@ -448,22 +448,22 @@ std::istream& operator >> (std::istream& is, tAddSynth &a)
 }
 
 
-int tSynthDlg::geo[4] =
+int JZSynthDlg::geo[4] =
 {
   50,
   80,
   800,
   400
 };
-int tSynthDlg::num_synths = 1;
-int tSynthDlg::midi_key   = 30;
-int tSynthDlg::duration   = 50;
+int JZSynthDlg::num_synths = 1;
+int JZSynthDlg::midi_key   = 30;
+int JZSynthDlg::duration   = 50;
 
-bool tSynthDlg::fft_enable = 1;
-bool tSynthDlg::vol_enable = 1;
-bool tSynthDlg::pan_enable = 0;
-bool tSynthDlg::frq_enable = 0;
-bool tSynthDlg::noise_enable = 1;
+bool JZSynthDlg::fft_enable = 1;
+bool JZSynthDlg::vol_enable = 1;
+bool JZSynthDlg::pan_enable = 0;
+bool JZSynthDlg::frq_enable = 0;
+bool JZSynthDlg::noise_enable = 1;
 
 static const int SYN_LOAD = 1;
 static const int SYN_SAVE = 2;
@@ -491,15 +491,15 @@ static JZToolDef syn_tdefs[] = {
 };
 
 
-tSynthDlg::tSynthDlg(tSampleWin &w)
-: tSliderWin(&w, "Additive Synthesis", geo, syn_tdefs),
+JZSynthDlg::JZSynthDlg(JZSampleFrame &w)
+: JZSliderWindow(&w, "Additive Synthesis", geo, syn_tdefs),
   win(w)
 {
   Initialize();
   default_filename = copystring("noname.syn");
 }
 
-tSynthDlg::~tSynthDlg()
+JZSynthDlg::~JZSynthDlg()
 {
   int i;
   for (i = 0; i < MAXSYNTHS; i++)
@@ -507,7 +507,7 @@ tSynthDlg::~tSynthDlg()
   delete [] default_filename;
 }
 
-ostream& operator << (ostream& Os, tSynthDlg const &a)
+ostream& operator << (ostream& Os, JZSynthDlg const &a)
 {
   Os << 1000 << '\n';
   Os << a.num_synths << ' ';
@@ -527,7 +527,7 @@ ostream& operator << (ostream& Os, tSynthDlg const &a)
 }
 
 
-istream& operator >> (istream& Is, tSynthDlg &a)
+istream& operator >> (istream& Is, JZSynthDlg &a)
 {
   int Version;
   Is >> Version;
@@ -610,7 +610,7 @@ istream& operator >> (istream& Is, tSynthDlg &a)
 }
 
 
-void tSynthDlg::OnMenuCommand(int id)
+void JZSynthDlg::OnMenuCommand(int id)
 {
   switch (id)
   {
@@ -664,7 +664,7 @@ void tSynthDlg::OnMenuCommand(int id)
   }
 }
 
-void tSynthDlg::AddItems()
+void JZSynthDlg::AddItems()
 {
   //action = new wxButton(panel, (wxFunction)ItemCallback, "Synth");
   //cancel = new wxButton(panel, (wxFunction)ItemCallback, "Close");
@@ -699,18 +699,18 @@ void tSynthDlg::AddItems()
 }
 
 
-void tSynthDlg::AddEdits()
+void JZSynthDlg::AddEdits()
 {
   int i, k;
   for (i = 0, k = 0; i < MAXSYNTHS; i++)
   {
-    synths[i] = new tAddSynth(this);
+    synths[i] = new JZAddSynth(this);
     synths[i]->SetDuration(duration);
   }
   SetupEdits();
 }
 
-void tSynthDlg::SetupEdits()
+void JZSynthDlg::SetupEdits()
 {
   int i, k;
 
@@ -730,7 +730,7 @@ void tSynthDlg::SetupEdits()
 
   for (i = 0, k = 0; i < num_synths; i++)
   {
-    tAddSynth &s = *synths[i];
+    JZAddSynth &s = *synths[i];
     if (fft_enable)
     {
       sliders[k++] = s.fft.edit;
@@ -774,7 +774,7 @@ void tSynthDlg::SetupEdits()
 
   for (; i < MAXSYNTHS; i++)
   {
-    tAddSynth &s = *synths[i];
+    JZAddSynth &s = *synths[i];
     s.fft.Show(false);
     s.vol.Show(false);
     s.pan.Show(false);
@@ -795,7 +795,7 @@ void tSynthDlg::SetupEdits()
 
 
 #ifdef OBSOLETE
-void tSynthDlg::OnItem(wxItem& item, wxCommandEvent& event)
+void JZSynthDlg::OnItem(wxItem& item, wxCommandEvent& event)
 {
   int redraw = 0;
   int resize = 0;
@@ -852,7 +852,7 @@ void tSynthDlg::OnItem(wxItem& item, wxCommandEvent& event)
     duration = duration_slider->GetValue();
     for (int i = 0, k = 0; i < num_synths; i++)
     {
-      tAddSynth &s = *synths[i];
+      JZAddSynth &s = *synths[i];
       s.SetDuration(duration);
     }
     redraw = 1;
@@ -875,10 +875,10 @@ void tSynthDlg::OnItem(wxItem& item, wxCommandEvent& event)
 }
 #endif
 
-void tSynthDlg::Action()
+void JZSynthDlg::Action()
 {
   int i;
-  tSample &spl = win.GetSample();
+  JZSample &spl = win.GetSample();
   JZRndArray *arr[MAXSYNTHS][4];
   for (i = 0; i < MAXSYNTHS; i++)
   {
@@ -897,25 +897,25 @@ void tSynthDlg::Action()
 #ifdef OBSOLETE
 
 // space params
-int tReverbForm::roomsize   = 50;  // echo density
-int tReverbForm::brightness = 20;  // lowpass freq
-int tReverbForm::volume     = 20;  // effect volume
-int tReverbForm::rvbtime    = 30;  // echo absorbtion
+int JZReverbForm::roomsize   = 50;  // echo density
+int JZReverbForm::brightness = 20;  // lowpass freq
+int JZReverbForm::volume     = 20;  // effect volume
+int JZReverbForm::rvbtime    = 30;  // echo absorbtion
 
-tReverbForm::tReverbForm(tSampleWin &w)
+JZReverbForm::JZReverbForm(JZSampleFrame &w)
   : wxForm( USED_WXFORM_BUTTONS ),
     win(w)
 {
 }
 
 
-void tReverbForm::OnHelp()
+void JZReverbForm::OnHelp()
 {
   gpHelpInstance->ShowTopic("Reverb");
 }
 
 
-void tReverbForm::EditForm(wxPanel *panel)
+void JZReverbForm::EditForm(wxPanel *panel)
 {
   Add(wxMakeFormShort(" ",   &roomsize, wxFORM_DEFAULT, new wxList(wxMakeConstraintRange(1.0, 100.0), 0)));
   Add(wxMakeFormMessage("Room Size"));
@@ -933,15 +933,15 @@ void tReverbForm::EditForm(wxPanel *panel)
   AssociatePanel(panel);
 }
 
-void tReverbForm::OnCancel()
+void JZReverbForm::OnCancel()
 {
   wxForm::OnCancel();
 }
 
 
-void tReverbForm::OnOk()
+void JZReverbForm::OnOk()
 {
-  tSample &spl = win.GetSample();
+  JZSample &spl = win.GetSample();
   wxBeginBusyCursor();
 
   float sr = spl.GetSamplingRate();
@@ -968,26 +968,26 @@ void tReverbForm::OnOk()
 // -------------------------------------------------------------------------
 
 
-int tEchoForm::num_echos   = 3;
-int tEchoForm::delay       = 50;  // millisec
-int tEchoForm::ampl        = 25;  // percent
-bool tEchoForm::rand       = false;
+int JZEchoForm::num_echos   = 3;
+int JZEchoForm::delay       = 50;  // millisec
+int JZEchoForm::ampl        = 25;  // percent
+bool JZEchoForm::rand       = false;
 
 
-tEchoForm::tEchoForm(tSampleWin &w)
+JZEchoForm::JZEchoForm(JZSampleFrame &w)
 : wxForm( USED_WXFORM_BUTTONS ),
   win(w)
 {
   wxForm::OnCancel();
 }
 
-void tEchoForm::OnOk()
+void JZEchoForm::OnOk()
 {
-  tSample &spl = win.GetSample();
+  JZSample &spl = win.GetSample();
   wxBeginBusyCursor();
   JZMapper dmap(0, 100, 0, spl.Seconds2Samples(1));
   JZMapper amap(0, 100, 0.05, 1);
-  tFloatSample fs(spl);
+  JZFloatSample fs(spl);
   float peak = fs.Peak();
   if (rand)
   {
@@ -1013,26 +1013,26 @@ void tEchoForm::OnOk()
 // -------------------------------------------------------------------------
 
 
-int tShifterForm::winsize      = 10;  // 0.1 .. 0.2 ??
-int tShifterForm::shift_semis  = 0;
-int tShifterForm::shift_frac   = 0;
-bool tShifterForm::keep_length = 1;
+int JZShifterForm::winsize      = 10;  // 0.1 .. 0.2 ??
+int JZShifterForm::shift_semis  = 0;
+int JZShifterForm::shift_frac   = 0;
+bool JZShifterForm::keep_length = 1;
 
 
-tShifterForm::tShifterForm(tSampleWin &w)
+JZShifterForm::JZShifterForm(JZSampleFrame &w)
 : wxForm( USED_WXFORM_BUTTONS ),
   win(w)
 {
 }
 
 
-void tShifterForm::OnHelp()
+void JZShifterForm::OnHelp()
 {
   gpHelpInstance->ShowTopic("Pitch shifter");
 }
 
 
-void tShifterForm::EditForm(wxPanel *panel)
+void JZShifterForm::EditForm(wxPanel *panel)
 {
   Add(wxMakeFormMessage("Changes pitch of the sample"));
   Add(wxMakeFormNewLine());
@@ -1054,17 +1054,17 @@ void tShifterForm::EditForm(wxPanel *panel)
   AssociatePanel(panel);
 }
 
-void tShifterForm::OnCancel()
+void JZShifterForm::OnCancel()
 {
   wxForm::OnCancel();
 }
 
-void tShifterForm::OnOk()
+void JZShifterForm::OnOk()
 {
-  tSample &spl = win.GetSample();
+  JZSample &spl = win.GetSample();
   wxBeginBusyCursor();
 #if 1
-  tShifterCmd shifter(spl.GetSamplingRate());
+  JZShifterCmd shifter(spl.GetSamplingRate());
   float semis = (float)shift_semis + (float)shift_frac/100.0;
   shifter.ShiftPitch(spl, semis,  keep_length, winsize);
 
@@ -1072,11 +1072,11 @@ void tShifterForm::OnOk()
   if (shift_semis != 0 || shift_frac != 0)
   {
     JZMapper wmap(0, 100, 0.05, 0.3);
-    tFloatSample inp(spl);
-    tFloatSample out(inp.GetChannelCount(), inp.GetSamplingRate());
+    JZFloatSample inp(spl);
+    JZFloatSample out(inp.GetChannelCount(), inp.GetSamplingRate());
     //float peak = inp.Peak();
 
-    tShifterCmd shifter(inp, out);
+    JZShifterCmd shifter(inp, out);
 
     float p[8];
     p[0] = 0;
@@ -1113,16 +1113,16 @@ void tShifterForm::OnOk()
 // -------------------------------------------------------------------------
 
 
-int tSplFilterForm::type                = 0;
-int tSplFilterForm::order                 = 2;
-int tSplFilterForm::freq                = 1000;
-int tSplFilterForm::lo_freq                = 400;
-int tSplFilterForm::hi_freq                = 2000;
-int tSplFilterForm::band_width          = 20;  // in % of corner freq
+int JZSplFilterForm::type                = 0;
+int JZSplFilterForm::order                 = 2;
+int JZSplFilterForm::freq                = 1000;
+int JZSplFilterForm::lo_freq                = 400;
+int JZSplFilterForm::hi_freq                = 2000;
+int JZSplFilterForm::band_width          = 20;  // in % of corner freq
 static const char *filter_types[] = { "Low Pass", "High Pass", "Band Pass", "Band Stop", 0 };
 
 
-tSplFilterForm::tSplFilterForm(tSampleWin &w, bool p)
+JZSplFilterForm::JZSplFilterForm(JZSampleFrame &w, bool p)
 : wxForm( USED_WXFORM_BUTTONS ),
   win(w)
 {
@@ -1130,13 +1130,13 @@ tSplFilterForm::tSplFilterForm(tSampleWin &w, bool p)
 }
 
 
-void tSplFilterForm::OnHelp()
+void JZSplFilterForm::OnHelp()
 {
   gpHelpInstance->ShowTopic("Filter");
 }
 
 
-void tSplFilterForm::EditForm(wxPanel *panel)
+void JZSplFilterForm::EditForm(wxPanel *panel)
 {
   double maxfreq = (int)(win.GetSample().GetSamplingRate() / 2);
   // watch order of enum in signali.h
@@ -1176,14 +1176,14 @@ void tSplFilterForm::EditForm(wxPanel *panel)
   AssociatePanel(panel);
 }
 
-void tSplFilterForm::OnCancel()
+void JZSplFilterForm::OnCancel()
 {
   wxForm::OnCancel();
 }
 
-void tSplFilterForm::ScanResults()
+void JZSplFilterForm::ScanResults()
 {
-  type = (int)tSplFilter::LOWPASS;
+  type = (int)JZSplFilter::LOWPASS;
   for (int i = 0; filter_types[i]; i++)
     if (strcmp(typestring, filter_types[i]) == 0)
       type = i;
@@ -1204,21 +1204,21 @@ void tSplFilterForm::ScanResults()
     lo_freq = hi_freq - 1;
 }
 
-void tSplFilterForm::OnOk()
+void JZSplFilterForm::OnOk()
 {
   int fr, to;
 
   if (!win.HaveSelection(fr, to))
     return;
 
-  tSample &spl = win.GetSample();
+  JZSample &spl = win.GetSample();
   wxBeginBusyCursor();
   ScanResults();
 
-  tFloatSample fs(spl, fr, to);
+  JZFloatSample fs(spl, fr, to);
   float peak = fs.Peak();
 
-  fs.Filter(-1, -1, (tSplFilter::Type)type, order, (double)freq, (double)band_width / 100.0);
+  fs.Filter(-1, -1, (JZSplFilter::Type)type, order, (double)freq, (double)band_width / 100.0);
 //cout << "old peak: " << peak << ", new peak: " << fs.Peak() << endl;
   fs.Rescale(peak);
   spl.SetSmooth(fs, fr);
@@ -1231,22 +1231,22 @@ void tSplFilterForm::OnOk()
 //                        filter painter settings
 // -------------------------------------------------------------------------
 
-tWahSettingsForm::tWahSettingsForm(tSampleWin &win, tWahWah &w)
-  : tSplFilterForm(win, true),
+JZWahSettingsForm::JZWahSettingsForm(JZSampleFrame &win, JZWahWah &w)
+  : JZSplFilterForm(win, true),
     wah(w)
 {
   type = (int)wah.filter_type;
 }
 
-void tWahSettingsForm::OnHelp()
+void JZWahSettingsForm::OnHelp()
 {
   gpHelpInstance->ShowTopic("Settings");
 }
 
-void tWahSettingsForm::OnOk()
+void JZWahSettingsForm::OnOk()
 {
   ScanResults();
-  wah.filter_type = (tSplFilter::Type)type;
+  wah.filter_type = (JZSplFilter::Type)type;
   wah.lo_freq     = lo_freq;
   wah.hi_freq     = hi_freq;
   wah.order       = 2; // order;
@@ -1258,35 +1258,35 @@ void tWahSettingsForm::OnOk()
 //                        pitch painter settings
 // -------------------------------------------------------------------------
 
-int tSplPitchForm::range = 1;
+int JZSplPitchForm::range = 1;
 
-tSplPitchForm::tSplPitchForm(tSampleWin &w, tSplPitch &p)
+JZSplPitchForm::JZSplPitchForm(JZSampleFrame &w, JZSplPitch &p)
 : wxForm( USED_WXFORM_BUTTONS ),
   win(w),
   pitch(p)
 {
 }
 
-void tSplPitchForm::EditForm(wxPanel *panel)
+void JZSplPitchForm::EditForm(wxPanel *panel)
 {
   Add(wxMakeFormShort(" ",  &range, wxFORM_DEFAULT, new wxList(wxMakeConstraintRange(1.0, 12.0), 0)));
   Add(wxMakeFormMessage("Range in Semitones"));
   AssociatePanel(panel);
 }
 
-void tSplPitchForm::OnOk()
+void JZSplPitchForm::OnOk()
 {
   float frange = pow(FSEMI, range);
   pitch.SetRange(frange);
   wxForm::OnOk();
 }
 
-void tSplPitchForm::OnCancel()
+void JZSplPitchForm::OnCancel()
 {
   wxForm::OnOk();
 }
 
-void tSplPitchForm::OnHelp()
+void JZSplPitchForm::OnHelp()
 {
   gpHelpInstance->ShowTopic("Settings");
 }
@@ -1296,19 +1296,19 @@ void tSplPitchForm::OnHelp()
 //                                chorus
 // -----------------------------------------------------------------------
 
-int tChorusForm::pitch_freq    = 20;  // Hz/10
-int tChorusForm::pitch_range   = 20;
-int tChorusForm::pan_freq      = 20;
-int tChorusForm::pan_spread    = 50;
-int tChorusForm::volume        = 50;
+int JZChorusForm::pitch_freq    = 20;  // Hz/10
+int JZChorusForm::pitch_range   = 20;
+int JZChorusForm::pan_freq      = 20;
+int JZChorusForm::pan_spread    = 50;
+int JZChorusForm::volume        = 50;
 
-tChorusForm::tChorusForm(tSampleWin &w)
+JZChorusForm::JZChorusForm(JZSampleFrame &w)
 : wxForm( USED_WXFORM_BUTTONS ),
   win(w)
 {
 }
 
-void tChorusForm::EditForm(wxPanel *panel)
+void JZChorusForm::EditForm(wxPanel *panel)
 {
   Add(wxMakeFormMessage("This mixes a transposed signal to left and right channels"));
   Add(wxMakeFormNewLine());
@@ -1332,9 +1332,9 @@ void tChorusForm::EditForm(wxPanel *panel)
 };
 
 
-void tChorusForm::OnOk()
+void JZChorusForm::OnOk()
 {
-  tSample &spl           = win.GetSample();
+  JZSample &spl           = win.GetSample();
   JZMapper map;
 
   map.Initialize(0, 100, 0.1, 10.0);
@@ -1364,12 +1364,12 @@ void tChorusForm::OnOk()
   wxForm::OnOk();
 }
 
-void tChorusForm::OnCancel()
+void JZChorusForm::OnCancel()
 {
   wxForm::OnCancel();
 }
 
-void tChorusForm::OnHelp()
+void JZChorusForm::OnHelp()
 {
   gpHelpInstance->ShowTopic("Chorus");
 }
@@ -1380,16 +1380,16 @@ void tChorusForm::OnHelp()
 
 #if 0
 
-int tStereoForm::delay         = 10;  // millisec
-int tStereoForm::stereo_spread = 50;
+int JZStereoForm::delay         = 10;  // millisec
+int JZStereoForm::stereo_spread = 50;
 
-tStereoForm::tStereoForm(tSampleWin &w)
+JZStereoForm::JZStereoForm(JZSampleFrame &w)
 : wxForm( USED_WXFORM_BUTTONS ),
   win(w)
 {
 }
 
-void tStereoForm::EditForm(wxPanel *panel)
+void JZStereoForm::EditForm(wxPanel *panel)
 {
   Add(wxMakeFormShort(" ",   &delay, wxFORM_DEFAULT, new wxList(wxMakeConstraintRange(0.0, 20.0), 0)));
   Add(wxMakeFormMessage("Delay"));
@@ -1403,9 +1403,9 @@ void tStereoForm::EditForm(wxPanel *panel)
 };
 
 
-void tStereoForm::OnOk()
+void JZStereoForm::OnOk()
 {
-  tSample &spl           = win.GetSample();
+  JZSample &spl           = win.GetSample();
   int    xdelay         = spl.Seconds2Samples(delay/1000.0);
   double  xstereo_spread = stereo_spread / 100.0;
 
@@ -1421,12 +1421,12 @@ void tStereoForm::OnOk()
   wxForm::OnOk();
 }
 
-void tStereoForm::OnCancel()
+void JZStereoForm::OnCancel()
 {
   wxForm::OnCancel();
 }
 
-void tStereoForm::OnHelp()
+void JZStereoForm::OnHelp()
 {
 }
 
@@ -1436,15 +1436,15 @@ void tStereoForm::OnHelp()
 //                             time stretching
 // -------------------------------------------------------------------------
 
-int tStretcherForm::winsize     = 10;  // 0.1 .. 0.2 ??
-int tStretcherForm::seconds     = 0;
-int tStretcherForm::centies     = 0;
-int tStretcherForm::oldspeed    = 120;
-int tStretcherForm::newspeed    = 0;
-bool tStretcherForm::keep_pitch = 1;
+int JZStretcherForm::winsize     = 10;  // 0.1 .. 0.2 ??
+int JZStretcherForm::seconds     = 0;
+int JZStretcherForm::centies     = 0;
+int JZStretcherForm::oldspeed    = 120;
+int JZStretcherForm::newspeed    = 0;
+bool JZStretcherForm::keep_pitch = 1;
 
 
-tStretcherForm::tStretcherForm(tSampleWin &w)
+JZStretcherForm::JZStretcherForm(JZSampleFrame &w)
 : wxForm( USED_WXFORM_BUTTONS ),
   win(w),
   spl(w.GetSample())
@@ -1452,13 +1452,13 @@ tStretcherForm::tStretcherForm(tSampleWin &w)
 }
 
 
-void tStretcherForm::OnHelp()
+void JZStretcherForm::OnHelp()
 {
   gpHelpInstance->ShowTopic("Time Stretcher");
 }
 
 
-void tStretcherForm::EditForm(wxPanel *panel)
+void JZStretcherForm::EditForm(wxPanel *panel)
 {
   char buf[500];
   Add(wxMakeFormMessage("Changes length of the sample"));
@@ -1494,14 +1494,14 @@ void tStretcherForm::EditForm(wxPanel *panel)
   AssociatePanel(panel);
 }
 
-void tStretcherForm::OnCancel()
+void JZStretcherForm::OnCancel()
 {
   wxForm::OnCancel();
 }
 
-void tStretcherForm::OnOk()
+void JZStretcherForm::OnOk()
 {
-  tSample &spl = win.GetSample();
+  JZSample &spl = win.GetSample();
   wxBeginBusyCursor();
 
   double length = spl.GetLength();
@@ -1510,7 +1510,7 @@ void tStretcherForm::OnOk()
 
   length = length * (double)oldspeed / (double)newspeed;
 
-  tShifterCmd shifter(spl.GetSamplingRate());
+  JZShifterCmd shifter(spl.GetSamplingRate());
   shifter.StretchLength(spl, length, keep_pitch, winsize);
 
   win.Redraw();

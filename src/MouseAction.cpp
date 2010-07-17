@@ -519,12 +519,12 @@ void JZSnapSelection::SnapMod(
 
 
 // *************************************************************************
-// tMouseCounter
+// JZMouseCounter
 // *************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tMouseCounter::tMouseCounter(
-  tButtonLabelInterface* wwin,
+JZMouseCounter::JZMouseCounter(
+  JZButtonLabelInterface* wwin,
   JZRectangle* Rectangle,
   int val,
   int min,
@@ -542,7 +542,7 @@ tMouseCounter::tMouseCounter(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tMouseCounter::LeftDown(
+int JZMouseCounter::LeftDown(
   wxMouseEvent& MouseEvent,
   int ScrolledX,
   int ScrolledY)
@@ -562,7 +562,7 @@ int tMouseCounter::LeftDown(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tMouseCounter::LeftUp(
+int JZMouseCounter::LeftUp(
   wxMouseEvent& MouseEvent,
   int ScrolledX,
   int ScrolledY)
@@ -574,7 +574,7 @@ int tMouseCounter::LeftUp(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tMouseCounter::RightDown(
+int JZMouseCounter::RightDown(
   wxMouseEvent& MouseEvent,
   int ScrolledX,
   int ScrolledY)
@@ -595,7 +595,7 @@ int tMouseCounter::RightDown(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tMouseCounter::RightUp(
+int JZMouseCounter::RightUp(
   wxMouseEvent& MouseEvent,
   int ScrolledX,
   int ScrolledY)
@@ -607,7 +607,7 @@ int tMouseCounter::RightUp(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tMouseCounter::Notify()
+void JZMouseCounter::Notify()
 {
   Value += Delta;
   if (Value > Max)
@@ -625,7 +625,7 @@ void tMouseCounter::Notify()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void tMouseCounter::ShowValue(bool down)
+void JZMouseCounter::ShowValue(bool down)
 {
   char buf[20];
   sprintf(buf, "%3d", Value);
@@ -633,11 +633,11 @@ void tMouseCounter::ShowValue(bool down)
 }
 
 // -------------------------------------------------------------------------
-// tMarkDestin
+// JZMarkDestination
 // -------------------------------------------------------------------------
 
 
-tMarkDestin::tMarkDestin(wxWindow* canvas, wxFrame *frame, int left)
+JZMarkDestination::JZMarkDestination(wxWindow* canvas, wxFrame *frame, int left)
 {
   wxCursor c;
   Canvas = canvas;
@@ -651,7 +651,7 @@ tMarkDestin::tMarkDestin(wxWindow* canvas, wxFrame *frame, int left)
   //Frame->SetStatusText("Click Destination point");
 }
 
-int tMarkDestin::ButtonDown(
+int JZMarkDestination::ButtonDown(
   wxMouseEvent& MouseEvent,
   int ScrolledX,
   int ScrolledY)
@@ -667,11 +667,11 @@ int tMarkDestin::ButtonDown(
 
   x=point.x;
   y=point.y;
-//DEBUG  cout << "tMarkDestin::ButtonDown " << x << ' ' << y <<endl;
+//DEBUG  cout << "JZMarkDestination::ButtonDown " << x << ' ' << y <<endl;
   return 1;
 }
 
-int tMarkDestin::RightDown(
+int JZMarkDestination::RightDown(
   wxMouseEvent& MouseEvent,
   int ScrolledX,
   int ScrolledY)
@@ -682,7 +682,7 @@ int tMarkDestin::RightDown(
   return 1;
 }
 
-int tMarkDestin::LeftDown(
+int JZMarkDestination::LeftDown(
   wxMouseEvent& MouseEvent,
   int ScrolledX,
   int ScrolledY)
@@ -702,7 +702,7 @@ int tMarkDestin::LeftDown(
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tMouseButton::tMouseButton(
+JZMouseButton::JZMouseButton(
   JZEventWindow* pEventWindow,
   JZRectangle* pRectangle,
   const char* pDownString,
@@ -740,13 +740,13 @@ tMouseButton::tMouseButton(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-tMouseButton::~tMouseButton()
+JZMouseButton::~JZMouseButton()
 {
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int tMouseButton::ProcessMouseEvent(
+int JZMouseButton::ProcessMouseEvent(
   wxMouseEvent& MouseEvent,
   int ScrolledX,
   int ScrolledY)

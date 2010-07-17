@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -35,19 +35,19 @@ struct JZToolDef;
  * a window containing a panel on the top and some ArrayEdits below
  */
 
-class tRhyArrayEdit;
+class JZRhyArrayEdit;
 
-class tSliderWin : public wxFrame
+class JZSliderWindow : public wxFrame
 {
   public:
 
-    tSliderWin(
+    JZSliderWindow(
       wxWindow* pParent,
       const wxString& Title,
       int geo[4],
       JZToolDef *tdefs = NULL);
 
-    virtual ~tSliderWin();
+    virtual ~JZSliderWindow();
 
     void Initialize();
     virtual void OnSize(wxSizeEvent& event);
@@ -72,7 +72,7 @@ class tSliderWin : public wxFrame
 
     wxPanel* panel;
 
-//    tRhyArrayEdit *edits[100];
+//    JZRhyArrayEdit *edits[100];
 
     wxWindow* sliders[100];
     int n_sliders;

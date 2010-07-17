@@ -24,13 +24,13 @@
 
 #ifndef __PORTING
 
-void tCopyDlg::OnHelp()
+void JZCopyDlg::OnHelp()
 {
   HelpInstance->ShowTopic("Replicate");
 }
 
 
-void tCopyDlg::EditForm(wxPanel *panel)
+void JZCopyDlg::EditForm(wxPanel *panel)
 {
     Add(wxMakeFormBool("Erase Destin", &cp->EraseDestin));
     Add(wxMakeFormBool("Repeat Copy", &cp->RepeatCopy));

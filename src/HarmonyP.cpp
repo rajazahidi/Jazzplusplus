@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,17 +30,17 @@
 using namespace std;
 
 // ========================================================================
-// HBChord
+// JZHarmonyBrowserChord
 // ========================================================================
 
-const string HBChord::mScaleNames[2][12] =
+const string JZHarmonyBrowserChord::mScaleNames[2][12] =
 {
   { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" },
   { "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B" }
 };
 
 
-HBChord::HBChord(int a, int b, int c, int d, int e, int f, int g, int h, int i, int k, int l)
+JZHarmonyBrowserChord::JZHarmonyBrowserChord(int a, int b, int c, int d, int e, int f, int g, int h, int i, int k, int l)
 {
   keys = 0L;
   if (a >= 0) operator += (a);
@@ -56,9 +56,9 @@ HBChord::HBChord(int a, int b, int c, int d, int e, int f, int g, int h, int i, 
   if (l >= 0) operator += (l);
 }
 
-void HBChord::CreateName(string& ChordName, int key, int flat)
+void JZHarmonyBrowserChord::CreateName(string& ChordName, int key, int flat)
 {
-  HBChord c = *this;
+  JZHarmonyBrowserChord c = *this;
   ChordName = ScaleName(key, flat);
 
   // Transpose to C.
@@ -190,7 +190,7 @@ void HBChord::CreateName(string& ChordName, int key, int flat)
 }
 
 
-int HBChord::Count() const
+int JZHarmonyBrowserChord::Count() const
 {
   int i, n = 0;
   for (i = 0; i < 12; i++)
@@ -200,7 +200,7 @@ int HBChord::Count() const
 }
 
 
-int HBChord::Iter(int key) const
+int JZHarmonyBrowserChord::Iter(int key) const
 {
   assert(keys);
   key++;
@@ -210,7 +210,7 @@ int HBChord::Iter(int key) const
 }
 
 
-void HBChord::Rotate(int semis)
+void JZHarmonyBrowserChord::Rotate(int semis)
 {
   if (semis > 0)
   {
@@ -233,7 +233,7 @@ void HBChord::Rotate(int semis)
 }
 
 
-int HBChord::Fit(int key)
+int JZHarmonyBrowserChord::Fit(int key)
 {
   assert(keys);
   for (int i = 1; !Contains(key) && i < 12; i++)
@@ -247,11 +247,11 @@ int HBChord::Fit(int key)
 }
 
 // ========================================================================
-// HBContext
+// JZHarmonyBrowserContext
 // ========================================================================
 
 #if NAME_TABLE
-const char *const HBContext::chord_names[nScaleTypes][7] = {
+const char *const JZHarmonyBrowserContext::chord_names[nScaleTypes][7] = {
 // major
   { "j7", "m7", "m7", "j7", "7", "m7", "m75-"},
 // harm
@@ -264,14 +264,14 @@ const char *const HBContext::chord_names[nScaleTypes][7] = {
 };
 #endif
 
-const int HBContext::flat_keys[12] =
+const int JZHarmonyBrowserContext::flat_keys[12] =
 //  c     d     e  f     g     a     b
   { 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0 };
 
-const char *const HBContext::chord_nr_names[7] =
+const char *const JZHarmonyBrowserContext::chord_nr_names[7] =
   { "I", "II", "III", "IV", "V", "VI", "VII"};
 
-const char *const HBContext::context_names[nScaleTypes][7] =
+const char *const JZHarmonyBrowserContext::context_names[nScaleTypes][7] =
 {
   {
     "ion",
@@ -311,7 +311,7 @@ const char *const HBContext::context_names[nScaleTypes][7] =
   },
 };
 
-const char* const HBContext::scale_type_names[nScaleTypes] =
+const char* const JZHarmonyBrowserContext::scale_type_names[nScaleTypes] =
 {
   "J",
   "HM",
@@ -320,7 +320,7 @@ const char* const HBContext::scale_type_names[nScaleTypes] =
 };
 
 
-HBContext::HBContext(int sn, int cn, TEScaleType st)
+JZHarmonyBrowserContext::JZHarmonyBrowserContext(int sn, int cn, TEScaleType st)
 {
   scale_type = st;
   scale_nr   = sn % 12;
@@ -329,7 +329,7 @@ HBContext::HBContext(int sn, int cn, TEScaleType st)
   Initialize();
 }
 
-HBContext::HBContext()
+JZHarmonyBrowserContext::JZHarmonyBrowserContext()
 {
   scale_type = Major;
   scale_nr   = 0;
@@ -338,34 +338,34 @@ HBContext::HBContext()
   Initialize();
 }
 
-string HBContext::GetChordName() const
+string JZHarmonyBrowserContext::GetChordName() const
 {
 #if NAME_TABLE
   // Use the table of chord names (fast).
   int chord_key = ChordKey();
-  string ChordName = HBChord::ScaleName(chord_key, flat_keys[scale_nr]);
+  string ChordName = JZHarmonyBrowserChord::ScaleName(chord_key, flat_keys[scale_nr]);
   ChordName.append(chord_names[scale_type][chord_nr]);
   return ChordName;
 #else
   // Compute the chord name (slow, but flexible).
   int chord_key = ChordKey();
-  HBChord chord = Chord();
+  JZHarmonyBrowserChord chord = Chord();
   string ChordName;
   chord.CreateName(ChordName, chord_key, flat_keys[chord_key]);
   return ChordName;
 #endif
 }
 
-const char * HBContext::ChordNrName() const
+const char * JZHarmonyBrowserContext::ChordNrName() const
 {
   return chord_nr_names[chord_nr];        // "IV"
 }
 
-const string& HBContext::GetScaleName() const
+const string& JZHarmonyBrowserContext::GetScaleName() const
 {
   static string ScaleName;
   //strcpy(buf, scale_names[flat_keys[scale_nr]][scale_nr]);
-  ScaleName = HBChord::ScaleName(scale_nr, flat_keys[scale_nr]);
+  ScaleName = JZHarmonyBrowserChord::ScaleName(scale_nr, flat_keys[scale_nr]);
 #if 0
   strcat(buf, "/");
   strcat(buf, scale_type_names[scale_type]);
@@ -373,15 +373,15 @@ const string& HBContext::GetScaleName() const
   return ScaleName;
 }
 
-const char * HBContext::ScaleTypeName() const
+const char * JZHarmonyBrowserContext::ScaleTypeName() const
 {
   return scale_type_names[scale_type];
 }
 
 
-HBChord HBContext::MakeScale() const
+JZHarmonyBrowserChord JZHarmonyBrowserContext::MakeScale() const
 {
-  HBChord scale;
+  JZHarmonyBrowserChord scale;
   switch (scale_type)
   {
     case Major:
@@ -405,10 +405,10 @@ HBChord HBContext::MakeScale() const
 }
 
 
-HBChord HBContext::MakeChord() const
+JZHarmonyBrowserChord JZHarmonyBrowserContext::MakeChord() const
 {
   int i, j;
-  HBChord chord;
+  JZHarmonyBrowserChord chord;
   int key = scale_nr;
   for (i = 0; i < chord_nr; i++)
   {
@@ -427,7 +427,7 @@ HBChord HBContext::MakeChord() const
 }
 
 
-int HBContext::MakeChordKey() const
+int JZHarmonyBrowserContext::MakeChordKey() const
 {
   int key = scale_nr;
   for (int i = 0; i < chord_nr; i++)
@@ -438,14 +438,14 @@ int HBContext::MakeChordKey() const
 }
 
 
-void HBContext::Initialize()
+void JZHarmonyBrowserContext::Initialize()
 {
   scale      = MakeScale();
   chord      = MakeChord();
   chord_key  = MakeChordKey();
 }
 
-ostream & operator << (ostream &os, HBContext const &a)
+ostream & operator << (ostream &os, JZHarmonyBrowserContext const &a)
 {
   os << (int) a.scale_type << " ";
   os << a.scale_nr << " ";
@@ -456,7 +456,7 @@ ostream & operator << (ostream &os, HBContext const &a)
   return os;
 }
 
-istream & operator >> (istream &is, HBContext &a)
+istream & operator >> (istream &is, JZHarmonyBrowserContext &a)
 {
   int sc;
   is >> sc >> a.scale_nr >> a.chord_nr >> a.seq_nr >> a.chord_key;
@@ -466,15 +466,15 @@ istream & operator >> (istream &is, HBContext &a)
 }
 
 // ========================================================================
-// HBContextIterator
+// JZHarmonyBrowserContextIterator
 // ========================================================================
 
-bool HBMatchContains::operator()(const HBContext &context)
+bool JZHarmonyBrowserMatchContains::operator()(const JZHarmonyBrowserContext &context)
 {
   return context.Chord().Contains(chord);
 }
 
-HBContextIterator::HBContextIterator()
+JZHarmonyBrowserContextIterator::JZHarmonyBrowserContextIterator()
   : match(def_match)
 {
   context.scale_type = (TEScaleType)0;
@@ -484,7 +484,7 @@ HBContextIterator::HBContextIterator()
   scale_type = nScaleTypes;
 }
 
-HBContextIterator::HBContextIterator(HBMatch &m)
+JZHarmonyBrowserContextIterator::JZHarmonyBrowserContextIterator(JZHarmonyBrowserMatch &m)
   : match(m)
 {
   context.scale_type = (TEScaleType)0;
@@ -496,7 +496,7 @@ HBContextIterator::HBContextIterator(HBMatch &m)
 // PAT - Changed this to bool since it seemed more consistent with what it was
 // returning.  There was previously a conflict with the prototype in
 // harmonyp.h due to the commenting of #define bool int.
-bool HBContextIterator::operator()()
+bool JZHarmonyBrowserContextIterator::operator()()
 {
   while (!i_seq && context.scale_type < nScaleTypes)
   {
@@ -539,7 +539,7 @@ bool HBContextIterator::operator()()
 #if 0
 int main()
 {
-  HBContextIterator iter;
+  JZHarmonyBrowserContextIterator iter;
   while (iter())
   {
     cout << "ScaleName  : " << iter->ScaleName() << endl
@@ -552,7 +552,7 @@ int main()
 #endif
 
 #if 0
-void db(const HBChord c)
+void db(const JZHarmonyBrowserChord c)
 {
   for (int i = 0; i < 12; i++)
     if (c.Contains(i))
@@ -651,7 +651,7 @@ scdef chords[] =  {
 
 int scansc(const char *s)
 {
-  HBChord res(0);
+  JZHarmonyBrowserChord res(0);
   while (*s)
   {
     while (isspace(*s))

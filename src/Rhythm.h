@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008 Peter J. Stieber
+// Modifications Copyright (C) 2008-2010 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ struct tRhyGroup
 };
 
 
-struct tRhyGroups
+struct JZRhythmGroups
 {
   tRhyGroup g[MAX_GROUPS];
   tRhyGroup& operator [] (int i)
@@ -73,9 +73,9 @@ struct tRhyGroups
 };
 
 
-class tRhythm
+class JZRhythm
 {
-    friend class tRhythmWin;
+    friend class JZRhythmWindow;
 
   private:
 
@@ -96,7 +96,7 @@ class tRhythm
     int parm;
 
     bool randomize;
-    tRhyGroups groups;
+    JZRhythmGroups groups;
     JZRndArray history;
 
     // set by GenInit()
@@ -107,7 +107,7 @@ class tRhythm
       JZRndArray& out,
       int grp,
       const JZBarInfo& BarInfo,
-      tRhythm* rhy[],
+      JZRhythm* rhy[],
       int n_rhy);
 
     int Clock2i(long clock, const JZBarInfo& BarInfo) const;
@@ -116,10 +116,10 @@ class tRhythm
 
   public:
 
-    tRhythm(int key);
-    tRhythm(const tRhythm& Other);
-    tRhythm & operator= (const tRhythm &o);
-    virtual ~tRhythm();
+    JZRhythm(int key);
+    JZRhythm(const JZRhythm& Other);
+    JZRhythm & operator= (const JZRhythm &o);
+    virtual ~JZRhythm();
 
     const std::string& GetLabel() const
     {
@@ -137,7 +137,7 @@ class tRhythm
     void Generate(
       JZTrack* pTrack,
       const JZBarInfo& BarInfo,
-      tRhythm* rhy[],
+      JZRhythm* rhy[],
       int n_rhy);
 
     void GenInit(long start_clock);
@@ -154,13 +154,13 @@ class tRhythm
 };
 
 
-class tRhythmWin : public wxFrame
+class JZRhythmWindow : public wxFrame
 {
   public:
 
-    tRhythmWin(JZEventWindow* pEventWindow, JZSong* pSong);
+    JZRhythmWindow(JZEventWindow* pEventWindow, JZSong* pSong);
 
-    virtual ~tRhythmWin();
+    virtual ~JZRhythmWindow();
 
     virtual void OnMenuCommand(int id);
 
@@ -174,8 +174,8 @@ class tRhythmWin : public wxFrame
 
   private:
 
-    friend std::ostream& operator << (std::ostream& os, tRhythmWin const& a);
-    friend std::istream& operator >> (std::istream& Is, tRhythmWin& a);
+    friend std::ostream& operator << (std::ostream& os, JZRhythmWindow const& a);
+    friend std::istream& operator >> (std::istream& Is, JZRhythmWindow& a);
 
     wxPanel    *inst_panel;
 #ifdef OBSOLETE
@@ -193,20 +193,20 @@ class tRhythmWin : public wxFrame
     wxSlider   *group_listen;
     int        act_group;
 
-    tArrayEdit    *length_edit;
-    tArrayEdit    *veloc_edit;
-    tRhyArrayEdit *rhythm_edit;
+    JZArrayEdit    *length_edit;
+    JZArrayEdit    *veloc_edit;
+    JZRhyArrayEdit *rhythm_edit;
 
     enum
     {
       MAX_INSTRUMENTS = 20
     };
-    tRhythm    *instruments[MAX_INSTRUMENTS];
+    JZRhythm    *instruments[MAX_INSTRUMENTS];
     int        n_instruments;
     int        act_instrument;        // -1 if none
 
     // this one is edited and copied from/to instruments[i]
-    tRhythm    edit;
+    JZRhythm    edit;
 
     // ignore Updates while creating the window (motif)
     bool in_create;
@@ -225,7 +225,7 @@ class tRhythmWin : public wxFrame
     void Instrument2Win(int i = -1);        // instrument[act_instrument] -> win
     void Win2Instrument(int i = -1);        // win -> instrument[act_instrument]
     void AddInstrumentDlg();
-    void AddInstrument(tRhythm *r);
+    void AddInstrument(JZRhythm *r);
     void DelInstrument();
 
     JZEventWindow* mpEventWindow;
@@ -244,6 +244,6 @@ class tRhythmWin : public wxFrame
 
 };
 
-extern tRhythmWin *rhythm_win;
+extern JZRhythmWindow *rhythm_win;
 
 #endif // !defined(JZ_RHYTHM_H)

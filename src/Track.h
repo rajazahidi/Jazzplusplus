@@ -567,7 +567,7 @@ class JZTrack : public JZEventArray
 
   public:
 
-    void Dialog(JZTrackWindow* pParent);
+    void Edit(JZTrackWindow* pParent);
 
     bool IsEditing() const;
 

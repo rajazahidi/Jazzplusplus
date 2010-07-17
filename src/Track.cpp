@@ -1902,7 +1902,7 @@ void JZTrackDlg::EditForm(wxPanel *panel)
 
 #endif // OBSOLETE
 
-void JZTrack::Dialog(JZTrackWindow* pParent)
+void JZTrack::Edit(JZTrackWindow* pParent)
 {
   JZTrackDialog TrackDialog(*this, pParent);
   TrackDialog.ShowModal();

@@ -369,7 +369,7 @@ void JZAudioPlayer::Notify()
       ReadSamples();
     }
 
-    if (mSamples.softsync)
+    if (mSamples.GetSoftSync())
     {
       MidiSync();
     }
@@ -401,7 +401,7 @@ int JZAudioPlayer::WriteSamples()
 
   for (int i = 0; i < info.fragments - 1; i++)
   {
-    JZAudioBuffer* buf = mSamples.full_buffers.Get();
+    JZAudioBuffer* buf = mSamples.mFullBuffers.Get();
     if (buf == 0)
     {
       break;
@@ -411,7 +411,7 @@ int JZAudioPlayer::WriteSamples()
       perror("write");
     }
     blocks_written ++;
-    mSamples.free_buffers.Put(buf);
+    mSamples.mFreeBuffers.Put(buf);
   }
 
   return blocks_written;

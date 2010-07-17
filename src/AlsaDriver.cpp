@@ -424,7 +424,7 @@ void JZAlsaAudioPlayer::Notify()
       ReadSamples();
     }
 
-    if (pcm[PLAYBACK] && mSamples.softsync)
+    if (pcm[PLAYBACK] && mSamples.GetSoftSync())
     {
       MidiSync();
     }
@@ -460,7 +460,7 @@ int JZAlsaAudioPlayer::WriteSamples()
 
   for (; room > frag_size[PLAYBACK]; room -= frag_size[PLAYBACK])
   {
-    JZAudioBuffer* buf = mSamples.GetFullBuffers().Get();
+    JZAudioBuffer* buf = mSamples.mFullBuffers.Get();
     if (buf == 0)
     {
       break;
@@ -488,7 +488,7 @@ int JZAlsaAudioPlayer::WriteSamples()
       cur_scount += written;
     }
     blocks_written++;
-    mSamples.free_buffers.Put(buf);
+    mSamples.mFreeBuffers.Put(buf);
   }
 
   return blocks_written;

@@ -391,7 +391,7 @@ int JZAudioPlayer::WriteSamples()
 
   for (int i = 0; i < info.fragments - 1; i++)
   {
-    tAudioBuffer *buf = mSamples.full_buffers.Get();
+    JZAudioBuffer *buf = mSamples.full_buffers.Get();
     if (buf == 0)
     {
       break;

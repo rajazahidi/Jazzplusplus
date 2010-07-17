@@ -590,35 +590,3 @@ void JZEventWindow::OnMouseEvent(wxMouseEvent& MouseEvent)
     }
   }
 }
-
-
-// JAVE the OnChar method seems to be gone in wxwin232, but its documented, so
-// I don't know what happened.  The OnCharHook should do the same thing
-// basically.  It was there from the start.  OnChar seemd redundant.
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-// void JZEventWindow::OnChar(wxKeyEvent& KeyEvent)
-// {
-//   if (!EventWin->OnKeyEvent(KeyEvent))
-//   {
-//     wxWindow::OnChar(KeyEvent);
-//   }
-// }
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-// void JZEventWindow::OnChar(wxKeyEvent& KeyEvent)
-// {
-//   if (!OnKeyEvent(KeyEvent))
-//   {
-//     wxFrame::OnChar(KeyEvent);
-//   }
-// }
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//bool JZEventWindow::OnCharHook(wxKeyEvent& KeyEvent)
-//{
-//  return EventWin->OnKeyEvent(KeyEvent);
-//}

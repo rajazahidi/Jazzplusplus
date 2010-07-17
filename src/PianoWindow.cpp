@@ -625,6 +625,8 @@ BEGIN_EVENT_TABLE(JZPianoWindow, JZEventWindow)
 
   EVT_PAINT(JZPianoWindow::OnPaint)
 
+  EVT_CHAR(JZPianoWindow::OnChar)
+
   EVT_MOUSE_EVENTS(JZPianoWindow::OnMouseEvent)
 
   EVT_SCROLLWIN(JZPianoWindow::OnScroll)
@@ -1122,13 +1124,6 @@ void JZPianoWindow::OnSize(wxSizeEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool JZPianoWindow::OnCharHook(wxKeyEvent& Event)
-{
-  return OnKeyEvent(Event);
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 void JZPianoWindow::OnMenuCommand(int Id)
 {
   switch (Id)
@@ -1141,7 +1136,7 @@ void JZPianoWindow::OnMenuCommand(int Id)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool JZPianoWindow::OnKeyEvent(wxKeyEvent& Event)
+void JZPianoWindow::OnChar(wxKeyEvent& Event)
 {
   if (Event.ControlDown())
   {
@@ -1149,17 +1144,17 @@ bool JZPianoWindow::OnKeyEvent(wxKeyEvent& Event)
     {
       case 'Z':
         OnMenuCommand(wxID_UNDO);
-        return true;
+        return;
       case 'Y':
         OnMenuCommand(wxID_REDO);
-        return true;
+        return;
       case 'X':
         OnMenuCommand(wxID_CUT);
-        return true;
+        return;
       case 'C':
       case WXK_INSERT:
         OnMenuCommand(wxID_COPY);
-        return true;
+        return;
     }
   }
   else if (Event.ShiftDown())
@@ -1172,14 +1167,14 @@ bool JZPianoWindow::OnKeyEvent(wxKeyEvent& Event)
           --mTrackIndex;
           NewPosition(mTrackIndex, -1);
         }
-        return true;
+        return;
       case WXK_DOWN:
         if (mTrackIndex < mpProject->GetTrackCount() - 1)
         {
           ++mTrackIndex;
           NewPosition(mTrackIndex, -1);
         }
-        return true;
+        return;
     }
   }
   else
@@ -1188,11 +1183,11 @@ bool JZPianoWindow::OnKeyEvent(wxKeyEvent& Event)
     {
       case WXK_DELETE:
         OnMenuCommand(wxID_DELETE);
-        return true;
+        return;
     }
   }
 
-  return false;
+  Event.Skip();
 }
 
 //-----------------------------------------------------------------------------

@@ -280,11 +280,7 @@ class JZPianoWindow : public JZEventWindow, public JZButtonLabelInterface
 
     void MousePiano(wxMouseEvent& MouseEvent);
 
-    bool OnCharHook(wxKeyEvent& Event);
-
     void OnChar(wxKeyEvent& Event);
-
-    bool OnKeyEvent(wxKeyEvent& Event);
 
     void OnMenuCommand(int Id);
 

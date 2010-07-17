@@ -238,7 +238,6 @@ JZPianoFrame::JZPianoFrame(
 
   mClockTicsPerPixel = 4;
 
-  mTrackIndex = 0;
   mpToolBar->ToggleTool(ID_SNAP_16, TRUE);
 
   mpPianoWindow = new JZPianoWindow(this, pProject);

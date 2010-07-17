@@ -72,10 +72,6 @@ class JZPianoFrame : public wxFrame
 
     void OnSnapDlg(wxCommandEvent& Event);
 
-    // Current track.
-    int mTrackIndex;
-    JZTrack* Track;
-
     void MouseCutPaste(wxMouseEvent& MouseEvent, bool cut);
 
     bool OnClose();

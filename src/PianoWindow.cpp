@@ -681,9 +681,10 @@ JZPianoWindow::JZPianoWindow(
 
   mpTrack = mpProject->GetTrack(mTrackIndex);
 
-  mFontSize = mPianoFontSizes[1]; // Must be an entry in the array.
+  // Must be an entry in the array.
+  mFontSize = mPianoFontSizes[1];
 
-  for (int i = 0; i < eMaxTrackCount; i++)
+  for (int i = 0; i < eMaxTrackCount; ++i)
   {
     mFromLines[i] = 64;
   }

@@ -822,9 +822,9 @@ class JZAudioGloblForm : public wxForm
 //-----------------------------------------------------------------------------
 void JZSampleSet::EditAudioGlobalSettings(wxWindow* pParent)
 {
-  if (mpSampleDialog)
+  if (mpSampleDialog->IsShown())
   {
-    mpSampleDialog->Show(true);
+    mpSampleDialog->SetFocus();
     return;
   }
 

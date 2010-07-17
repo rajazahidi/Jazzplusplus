@@ -165,7 +165,8 @@ JZAudioPlayer::JZAudioPlayer(JZSong* pSong)
   mAudioEnabled = mAudioEnabled && mInstalled;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZAudioPlayer::~JZAudioPlayer()
 {
   delete mpListener;
@@ -176,17 +177,22 @@ JZAudioPlayer::~JZAudioPlayer()
   }
 }
 
-
-int JZAudioPlayer::LoadSamples(const char *filename)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZAudioPlayer::LoadSamples(const char* pFileName)
 {
-  return mSamples.Load(filename);
+  return mSamples.Load(pFileName);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZAudioPlayer::RecordMode() const
 {
   return mpRecordingInfo != 0 && mpRecordingInfo->mpTrack->GetAudioMode();
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZAudioPlayer::StartAudio()
 {
   if (!mAudioEnabled)
@@ -226,7 +232,8 @@ void JZAudioPlayer::StartAudio()
   force_read = 1;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZAudioPlayer::OpenDsp()
 {
   int tmp;
@@ -239,14 +246,14 @@ void JZAudioPlayer::OpenDsp()
   mCanDuplex = gpConfig->GetValue(C_DuplexAudio);
 
   // linux driver seems to need some real free memory, which sometimes
-  // is not available when operating with big samples. So allocate
+  // is not available when operating with big samples.  So allocate
   // some memory here, touch it and free it. Hopefully libc returns it
-  // to the system and the driver grabs it on open(). NOT TESTED!
+  // to the system and the driver grabs it on open().  NOT TESTED!
   {
     const int size = 0x10000; // 64K
-    char *mem = (char *)malloc(size);
-    memset(mem, 0, size);
-    free(mem);
+    char* pMemory = (char *)malloc(size);
+    memset(pMemory, 0, size);
+    free(pMemory);
   }
 
   int mode = 0;
@@ -317,7 +324,8 @@ void JZAudioPlayer::OpenDsp()
   }
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZAudioPlayer::CloseDsp(bool Reset)
 {
   if (dev >= 0)
@@ -341,7 +349,8 @@ void JZAudioPlayer::CloseDsp(bool Reset)
   }
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZAudioPlayer::Notify()
 {
   if (mAudioEnabled)
@@ -368,7 +377,8 @@ void JZAudioPlayer::Notify()
   JZSeq2Player::Notify();
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZAudioPlayer::WriteSamples()
 {
   if (!mAudioEnabled)
@@ -385,13 +395,13 @@ int JZAudioPlayer::WriteSamples()
     perror("SNDCTL_DSP_GETOSPACE");
   }
 
-  // todo: this is a bug in the audiodriver in newer kernels (2.1.28)
-  // and the oss/linux for 2.0.29 it should be
-  // for (int i = 0; i < info.fragments; i++)
+  // TODO:  This is a bug in the audiodriver in newer kernels (2.1.28)
+  // and the OSS/Linux for 2.0.29 it should be
+  // for (int i = 0; i < info.fragments; ++i)
 
   for (int i = 0; i < info.fragments - 1; i++)
   {
-    JZAudioBuffer *buf = mSamples.full_buffers.Get();
+    JZAudioBuffer* buf = mSamples.full_buffers.Get();
     if (buf == 0)
     {
       break;
@@ -407,7 +417,8 @@ int JZAudioPlayer::WriteSamples()
   return blocks_written;
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZAudioPlayer::ReadSamples()
 {
   audio_buf_info info;
@@ -425,12 +436,12 @@ void JZAudioPlayer::ReadSamples()
   }
   force_read = 0;
 
-  for (int i = 0; i < info.fragments; i++)
+  for (int i = 0; i < info.fragments; ++i)
   {
-    short *b = recbuffers.RequestBuffer()->data;
+    short* b = recbuffers.RequestBuffer()->data;
     if (read(dev, b, BUFBYTES) != BUFBYTES)
     {
-      // oss bug? It send EINTR?? on first read..
+      // OSS bug?  It returns EINTR?? on first read.
       if (errno != EINTR && errno != EAGAIN)
       {
         perror("read");
@@ -439,10 +450,10 @@ void JZAudioPlayer::ReadSamples()
       break;
     }
   }
-
 }
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZAudioPlayer::MidiSync()
 {
   // OSS is buggy!  In Win32 SDK you read the docs, hack away and
@@ -512,6 +523,8 @@ void JZAudioPlayer::MidiSync()
   }
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZAudioPlayer::StartPlay(long Clock, long LoopClock, int Continue)
 {
   delete mpListener;
@@ -519,6 +532,8 @@ void JZAudioPlayer::StartPlay(long Clock, long LoopClock, int Continue)
   JZSeq2Player::StartPlay(Clock, LoopClock, Continue);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZAudioPlayer::StopPlay()
 {
   mSamples.StopPlay();
@@ -546,8 +561,8 @@ void JZAudioPlayer::StopPlay()
   recbuffers.Clear();
 }
 
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZAudioPlayer::ListenAudio(int key, int start_stop_mode)
 {
   if (!mAudioEnabled)
@@ -578,6 +593,8 @@ void JZAudioPlayer::ListenAudio(int key, int start_stop_mode)
   mpListener = new JZAudioListener(this, key);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZAudioPlayer::ListenAudio(JZSample &spl, long fr_smpl, long to_smpl)
 {
   if (!mAudioEnabled)
@@ -598,6 +615,8 @@ void JZAudioPlayer::ListenAudio(JZSample &spl, long fr_smpl, long to_smpl)
   mpListener = new JZAudioListener(this, spl, fr_smpl, to_smpl);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 long JZAudioPlayer::GetListenerPlayPosition()
 {
   if (!mpListener)

@@ -188,23 +188,21 @@ class JZSampleVoice
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZSampleSet::JZSampleSet(long tpm)
+JZSampleSet::JZSampleSet(long TicksPerMinute)
   : mSamplingRate(22050),
     mChannelCount(1),
 
     // Dont change!!!
     mBitsPerSample(16),
 
-    softsync(1),
+    mSoftwareSynchonization(true),
+    mTicksPerMinute(TicksPerMinute),
     mpSamplesDialog(0),
     mDefaultFileName("noname.spl"),
     mRecordFileName("noname.wav")
 {
   int i;
-
-  ticks_per_minute = tpm;
-
-  for (i = 0; i < BUFCOUNT; i++)
+  for (i = 0; i < BUFCOUNT; ++i)
   {
     buffers[i] = new JZAudioBuffer(0);
   }
@@ -293,7 +291,7 @@ int JZSampleSet::Load(const wxString& FileName)
 
   ifstream Is(FileName.c_str());
   int Version;
-  Is >> Version >> mSamplingRate >> mChannelCount >> softsync;
+  Is >> Version >> mSamplingRate >> mChannelCount >> mSoftwareSynchonization;
   while (Is)
   {
     int key, pan, vol, pitch;
@@ -364,7 +362,10 @@ int JZSampleSet::Save(const wxString& FileName)
 {
   ofstream Ofs(FileName.c_str());
   Ofs
-    << 1 << ' ' << mSamplingRate << ' ' << mChannelCount << ' ' << softsync
+    << 1
+    << ' ' << mSamplingRate
+    << ' ' << mChannelCount
+    << ' ' << mSoftwareSynchonization
     << endl;
   for (int i = 0; i < eSampleCount; i++)
   {
@@ -399,21 +400,24 @@ const string& JZSampleSet::GetSampleLabel(int Index)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZSampleSet::ResetBuffers(JZEventArray *evnt_arr, long clock, long tpm)
+int JZSampleSet::ResetBuffers(
+  JZEventArray *evnt_arr,
+  long clock,
+  long TicksPerMinute)
 {
   int i;
-  free_buffers.Clear();
-  full_buffers.Clear();
-  driv_buffers.Clear();
+  mFreeBuffers.Clear();
+  mFullBuffers.Clear();
+  mDriverBuffers.Clear();
   for (i = 0; i < BUFCOUNT; i++)
   {
-    free_buffers.Put(buffers[i]);
+    mFreeBuffers.Put(buffers[i]);
   }
   buffers_written   = 0;
 
   events            = evnt_arr;
   start_clock       = clock;
-  ticks_per_minute  = tpm;
+  mTicksPerMinute  = TicksPerMinute;
   event_index       = 0;
   bufshorts = BUFSHORTS;
   mClocksPerBuffer = Samples2Ticks(bufshorts);
@@ -443,7 +447,7 @@ int JZSampleSet::FillBuffers(long last_clock)
   // and compute the count of buffers that can be filled
   int i;
 
-  int nfree = free_buffers.Count();
+  int nfree = mFreeBuffers.Count();
   if (nfree <= 0)
   {
     return 0;
@@ -469,14 +473,14 @@ int JZSampleSet::FillBuffers(long last_clock)
   // iterate the events and add sounding voices
   while (event_index < events->nEvents)
   {
-    JZEvent *e = events->Events[event_index];
-    if (e->GetClock() >= last_clock)
+    JZEvent* pEvent = events->Events[event_index];
+    if (pEvent->GetClock() >= last_clock)
     {
       break;
     }
     event_index++;
 
-    JZKeyOnEvent* pKeyOn = e->IsKeyOn();
+    JZKeyOnEvent* pKeyOn = pEvent->IsKeyOn();
     if (pKeyOn && num_voices < MAXPOLY)
     {
       voices[num_voices++]->Start(
@@ -488,7 +492,7 @@ int JZSampleSet::FillBuffers(long last_clock)
   // add remaining sample data to the buffers
   for (i = 0; i < nfree; i++)
   {
-    JZAudioBuffer* buf = free_buffers.Get();
+    JZAudioBuffer* buf = mFreeBuffers.Get();
     buf->Clear();
     long buffer_clock = BufferClock(buffers_written + i);
 
@@ -501,7 +505,7 @@ int JZSampleSet::FillBuffers(long last_clock)
     {
       voices[k]->AddBuffer(buf->data, buffer_clock, bufshorts);
     }
-    full_buffers.Put(buf);
+    mFullBuffers.Put(buf);
   }
 
   // delete finished voices
@@ -530,22 +534,22 @@ int JZSampleSet::PrepareListen(JZSample *spl, long fr_smpl, long to_smpl)
 {
   listen_sample = spl;
 
-  assert(ticks_per_minute);
-  ResetBuffers(0, 0, ticks_per_minute);
+  assert(mTicksPerMinute);
+  ResetBuffers(0, 0, mTicksPerMinute);
   voices[0]->Start(spl, 0);
-  int nfree = free_buffers.Count();
+  int nfree = mFreeBuffers.Count();
   int sound_buffers = 0;
 
   for (int i = 0; i < nfree; i++)
   {
-    JZAudioBuffer* buf = free_buffers.Get();
+    JZAudioBuffer* buf = mFreeBuffers.Get();
     buf->Clear();
     if (!voices[0]->Finished())
     {
       voices[0]->AddListen(buf->Data(), fr_smpl, to_smpl, bufshorts);
       sound_buffers++;
     }
-    full_buffers.Put(buf);
+    mFullBuffers.Put(buf);
   }
   buffers_written = nfree;
   return sound_buffers;
@@ -563,19 +567,19 @@ int JZSampleSet::PrepareListen(int key, long fr_smpl, long to_smpl)
 //-----------------------------------------------------------------------------
 int JZSampleSet::ContinueListen()
 {
-  int nfree = free_buffers.Count();
+  int nfree = mFreeBuffers.Count();
   int sound_buffers = 0;
 
   for (int i = 0; i < nfree; i++)
   {
-    JZAudioBuffer* buf = free_buffers.Get();
+    JZAudioBuffer* buf = mFreeBuffers.Get();
     buf->Clear();
     if (!voices[0]->Finished())
     {
       voices[0]->AddListen(buf->Data(), -1, -1, bufshorts);
       sound_buffers++;
     }
-    full_buffers.Put(buf);
+    mFullBuffers.Put(buf);
   }
   buffers_written += nfree;
   return sound_buffers;
@@ -583,18 +587,20 @@ int JZSampleSet::ContinueListen()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZSampleSet::AdjustAudioLength(JZTrack *t, long tpm)
+void JZSampleSet::AdjustAudioLength(JZTrack* pTrack, long TicksPerMinute)
 {
-  if (!t->GetAudioMode() || !adjust_audio_length)
-    return;
-
-  ticks_per_minute = tpm;
-
-  JZEventIterator it(t);
-  JZEvent *e = it.First();
-  while (e)
+  if (!pTrack->GetAudioMode() || !adjust_audio_length)
   {
-    JZKeyOnEvent* pKeyOn = e->IsKeyOn();
+    return;
+  }
+
+  mTicksPerMinute = TicksPerMinute;
+
+  JZEventIterator it(pTrack);
+  JZEvent* pEvent = it.First();
+  while (pEvent)
+  {
+    JZKeyOnEvent* pKeyOn = pEvent->IsKeyOn();
     if (pKeyOn)
     {
       pKeyOn->SetLength(
@@ -606,7 +612,7 @@ void JZSampleSet::AdjustAudioLength(JZTrack *t, long tpm)
         pKeyOn->SetLength(15);
       }
     }
-    e = it.Next();
+    pEvent = it.Next();
   }
 }
 
@@ -728,7 +734,7 @@ class JZAudioGloblForm : public wxForm
 
       enable = gpMidiPlayer->GetAudioEnabled();
       stereo = (mSampleSet.GetChannelCount() == 2);
-      softsync = mSampleSet.GetSoftSync();
+      mSoftwareSynchonization = mSampleSet.GetSoftSync();
 
       Add(wxMakeFormBool("Enable Audio", &enable));
       Add(wxMakeFormNewLine());
@@ -738,7 +744,7 @@ class JZAudioGloblForm : public wxForm
       Add(wxMakeFormNewLine());
       Add(wxMakeFormBool("Stereo", &stereo));
       Add(wxMakeFormNewLine());
-      Add(wxMakeFormBool("Software Midi/Audio Sync", &softsync));
+      Add(wxMakeFormBool("Software Midi/Audio Sync", &mSoftwareSynchonization));
 
       #ifdef wx_x
       Add(wxMakeFormNewLine());
@@ -765,7 +771,7 @@ class JZAudioGloblForm : public wxForm
       speed = atol(speedstr);
       mSampleSet.SetSamplingRate(speed);
       mSampleSet.SetChannelCount(stereo ? 2 : 1);
-      mSampleSet.SetSoftSync(softsync);
+      mSampleSet.SetSoftSync(mSoftwareSynchonization);
       gpMidiPlayer->SetAudioEnabled(enable);
 
       if (gpConfig->GetValue(C_EnableAudio) != enable)
@@ -810,7 +816,7 @@ class JZAudioGloblForm : public wxForm
     const char *speedstr;
     bool enable;
     bool stereo;
-    bool softsync;
+    bool mSoftwareSynchonization;
     bool ossbug1;
     bool ossbug2;
     bool duplex_audio;
@@ -905,7 +911,10 @@ void JZSampleSet::ClearSampleSet(wxWindow* pParent)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZSampleSet::SaveRecordingDlg(long frc, long toc, JZAudioRecordBuffer &buf)
+void JZSampleSet::SaveRecordingDlg(
+  long frc,
+  long toc,
+  JZAudioRecordBuffer& buf)
 {
   if (frc >= toc)
   {
@@ -990,11 +999,11 @@ void JZSampleSet::AddNote(const string& FileName, long frc, long toc)
   pSong->NewUndoBuffer();
 #endif
   JZEventIterator iter(info->mpTrack);
-  JZEvent *e = iter.Range(frc, toc);
-  while (e != 0)
+  JZEvent* pEvent = iter.Range(frc, toc);
+  while (pEvent != 0)
   {
-    track->Kill(e);
-    e = iter.Next();
+    track->Kill(pEvent);
+    pEvent = iter.Next();
   }
   // add a noteon
   JZKeyOnEvent* pKeyOn = new JZKeyOnEvent(
@@ -1057,8 +1066,11 @@ void JZSampleSet::SaveWave(
   int end_buffer   = end_index / bufsize;
   int end_length   = end_index % bufsize;
 
-  // save part of first buffer
-  os.write((char *)&buf.buffers[start_buffer]->data[start_offs], 2 * start_length);
+  // Save part of first buffer.
+  os.write(
+    (char *)&buf.buffers[start_buffer]->data[start_offs],
+    2 * start_length);
+
   // write some complete buffers
   for (int i = start_buffer + 1; i < end_buffer; i++)
     os.write((char *)buf.buffers[i]->data, bufsize * 2);

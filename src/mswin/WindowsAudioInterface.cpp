@@ -460,8 +460,8 @@ void JZWindowsAudioPlayer::AudioCallback(UINT wMsg)
   {
     blocks_played ++;
     play_buffers_needed ++;
-    JZAudioBuffer* buf = mSamples.driv_buffers.Get();
-    mSamples.free_buffers.Put(buf);
+    JZAudioBuffer* buf = mSamples.mDriverBuffers.Get();
+    mSamples.mFreeBuffers.Put(buf);
   }
   if (hinp_open && wMsg == MM_WIM_DATA)
   {
@@ -496,7 +496,7 @@ void JZWindowsAudioPlayer::WriteBuffers()
   if (mAudioEnabled && hout_open)
   {
     JZAudioBuffer* pAudioBuffer;
-    while ((pAudioBuffer = mSamples.full_buffers.Get()) != 0)
+    while ((pAudioBuffer = mSamples.mFullBuffers.Get()) != 0)
     {
       if (
         waveOutWrite(
@@ -504,12 +504,12 @@ void JZWindowsAudioPlayer::WriteBuffers()
           pAudioBuffer->hdr,
           sizeof(WAVEHDR)) == MMSYSERR_NOERROR)
       {
-        mSamples.driv_buffers.Put(pAudioBuffer);
+        mSamples.mDriverBuffers.Put(pAudioBuffer);
         --play_buffers_needed;
       }
       else
       {
-        mSamples.full_buffers.UnGet(pAudioBuffer);
+        mSamples.mFullBuffers.UnGet(pAudioBuffer);
         break;
       }
     }
@@ -533,7 +533,7 @@ void JZWindowsAudioPlayer::Notify()
       }
 
       // midi time correction
-      if (mCanSynchronize && mSamples.softsync)
+      if (mCanSynchronize && mSamples.GetSoftSync())
       {
         MMTIME mmtime;
         MMRESULT res;
@@ -582,7 +582,7 @@ void JZWindowsAudioPlayer::Notify()
         }
       }
 
-      if (mCanSynchronize && mSamples.softsync && !hout_open)
+      if (mCanSynchronize && mSamples.GetSoftSync() && !hout_open)
       {
         // midi time correction
         MMTIME mmtime;

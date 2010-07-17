@@ -234,7 +234,7 @@ class JZSampleSet
       eSampleCount = 128
     };
 
-    JZSampleSet(long ticks_per_minute);
+    JZSampleSet(long TicksPerMinute);
 
     virtual ~JZSampleSet();
 
@@ -283,15 +283,15 @@ class JZSampleSet
 
     bool GetSoftSync() const
     {
-      return softsync;
+      return mSoftwareSynchonization;
     }
 
-    void SetSoftSync(bool x)
+    void SetSoftSync(bool SoftwareSynchonization)
     {
-      softsync = x;
+      mSoftwareSynchonization = SoftwareSynchonization;
     }
 
-    int ResetBuffers(JZEventArray *, long start_clock, long ticks_per_minute);
+    int ResetBuffers(JZEventArray *, long start_clock, long TicksPerMinute);
 
     int ResetBufferSize(unsigned int bytes);
 
@@ -303,13 +303,13 @@ class JZSampleSet
       return buffers[i];
     }
 
-    void AdjustAudioLength(JZTrack *t, long ticks_per_minute);
+    void AdjustAudioLength(JZTrack *t, long TicksPerMinute);
 
     long Ticks2Samples(long ticks) const
     {
       long spl = (long)(
         60.0 * ticks * mSamplingRate * mChannelCount /
-        (double)ticks_per_minute);
+        (double)mTicksPerMinute);
 
       // Align to the first channel.
       return spl & -mChannelCount;
@@ -318,18 +318,18 @@ class JZSampleSet
     double Samples2Ticks(long samples) const
     {
       return (double)
-        samples * ticks_per_minute / 60.0 / mSamplingRate / mChannelCount;
+        samples * mTicksPerMinute / 60.0 / mSamplingRate / mChannelCount;
     }
 
     // time in millisec
     long Ticks2Time(long ticks) const
     {
-      return (long)(60000.0 * ticks / ticks_per_minute);
+      return (long)(60000.0 * ticks / mTicksPerMinute);
     }
 
     long Time2Ticks(long time) const
     {
-      return (long)((double)time * ticks_per_minute / 60000.0);
+      return (long)((double)time * mTicksPerMinute / 60000.0);
     }
 
     long Samples2Time(long samples) const
@@ -384,6 +384,8 @@ class JZSampleSet
 
     void ClearSampleSet(wxWindow* pParent);
 
+    const JZAudioBufferQueue& GetFullBuffers() const;
+
   protected:
 
     long SampleSize(long num_samples)
@@ -409,12 +411,15 @@ class JZSampleSet
     // This must be 16!
     int mBitsPerSample;
 
-    bool softsync;  // enable software midi/audio sync
+    // Indicates if software MIDI/audio synchronization is on.
+    bool mSoftwareSynchonization;
 
     JZSample* mSamples[eSampleCount];
     JZSampleFrame* mSampleFrames[eSampleCount];
 
-    long   ticks_per_minute;  // MIDI sampling rate for audio/midi sync.
+    // MIDI sampling rate for audio/midi sync.
+    long mTicksPerMinute;
+
     double mClocksPerBuffer;
     long   start_clock;       // when did play start
 
@@ -423,9 +428,9 @@ class JZSampleSet
     unsigned int bufbytes;           // buffer size in byte
     unsigned int bufshorts;          // buffer size in short
     JZAudioBuffer *buffers[BUFCOUNT]; // all the audio buffers
-    JZAudioBufferQueue free_buffers;  // to be filled with data
-    JZAudioBufferQueue full_buffers;  // to be played by driver
-    JZAudioBufferQueue driv_buffers;  // actually played by driver
+    JZAudioBufferQueue mFreeBuffers;  // to be filled with data
+    JZAudioBufferQueue mFullBuffers;  // to be played by driver
+    JZAudioBufferQueue mDriverBuffers;  // actually played by driver
 
     // return the start clock for i-th free buffer
     long buffers_written;            // for computing buffers clock
@@ -453,5 +458,13 @@ class JZSampleSet
     // to communicate between PrepareListen and ContinueListen
     JZSample* listen_sample;
 };
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+inline
+const JZAudioBufferQueue& JZSampleSet::GetFullBuffers() const
+{
+  return mFullBuffers;
+}
 
 #endif // !defined(JZ_AUDIO_H)

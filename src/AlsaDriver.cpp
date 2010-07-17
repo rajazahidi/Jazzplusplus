@@ -460,7 +460,7 @@ int JZAlsaAudioPlayer::WriteSamples()
 
   for (; room > frag_size[PLAYBACK]; room -= frag_size[PLAYBACK])
   {
-    JZAudioBuffer* buf = mSamples.full_buffers.Get();
+    JZAudioBuffer* buf = mSamples.GetFullBuffers().Get();
     if (buf == 0)
     {
       break;

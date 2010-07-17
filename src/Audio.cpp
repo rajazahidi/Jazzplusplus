@@ -196,7 +196,7 @@ JZSampleSet::JZSampleSet(long tpm)
     mBitsPerSample(16),
 
     softsync(1),
-    mpSampleDialog(0),
+    mpSamplesDialog(0),
     mDefaultFileName("noname.spl"),
     mRecordFileName("noname.wav")
 {
@@ -822,9 +822,9 @@ class JZAudioGloblForm : public wxForm
 //-----------------------------------------------------------------------------
 void JZSampleSet::EditAudioGlobalSettings(wxWindow* pParent)
 {
-  if (mpSampleDialog->IsShown())
+  if (mpSamplesDialog->IsShown())
   {
-    mpSampleDialog->SetFocus();
+    mpSamplesDialog->SetFocus();
     return;
   }
 
@@ -890,7 +890,7 @@ void JZSampleSet::SaveSampleSet(wxWindow* pParent)
 //-----------------------------------------------------------------------------
 void JZSampleSet::ClearSampleSet(wxWindow* pParent)
 {
-  if (mpSampleDialog == 0)
+  if (mpSamplesDialog == 0)
   {
     if (wxMessageBox("Clear Sample Set?", "Confirm", wxYES_NO) == wxNO)
     {
@@ -1249,7 +1249,7 @@ void JZSamplesDlg::OnCloseButton()
   wxBeginBusyCursor();
   set.ReloadSamples();
   wxEndBusyCursor();
-  set.mpSampleDialog = 0;
+  set.mpSamplesDialog = 0;
 //  DELETE_THIS();
   Destroy();
 }
@@ -1380,19 +1380,19 @@ void JZSamplesDlg::ListClick(wxItem &itm, wxCommandEvent& event)
 //-----------------------------------------------------------------------------
 void JZSampleSet::SamplesDlg()
 {
-  if (mpSampleDialog == 0)
+  if (mpSamplesDialog == 0)
   {
-    mpSampleDialog = new JZSamplesDialog(gpTrackWindow, *this);
+    mpSamplesDialog = new JZSamplesDialog(gpTrackWindow, *this);
   }
-  mpSampleDialog->Show(true);
+  mpSamplesDialog->Show(true);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZSampleSet::RefreshDialogs()
 {
-  if (mpSampleDialog)
+  if (mpSamplesDialog)
   {
-//    mpSampleDialog->Sample2Win(mpSampleDialog->current);
+//    mpSamplesDialog->Sample2Win(mpSamplesDialog->current);
   }
 }

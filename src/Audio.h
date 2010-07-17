@@ -430,7 +430,7 @@ class JZSampleSet
     // return the start clock for i-th free buffer
     long buffers_written;            // for computing buffers clock
 
-    JZSamplesDialog* mpSampleDialog;
+    JZSamplesDialog* mpSamplesDialog;
 
     JZEventArray* events;
 

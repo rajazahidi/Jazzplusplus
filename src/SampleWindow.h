@@ -20,8 +20,8 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef samplwin_h
-#define samplwin_h
+#ifndef JZ_SAMPLEWINDOW_H
+#define JZ_SAMPLEWINDOW_H
 
 #include "SampleCommand.h"
 
@@ -118,5 +118,4 @@ class JZSampleFrame : public wxFrame
     wxDialog *pitch_settings;
 };
 
-#endif
-
+#endif // !defined(JZ_SAMPLEWINDOW_H)

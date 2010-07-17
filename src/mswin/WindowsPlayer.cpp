@@ -114,9 +114,9 @@ JZWindowsPlayer::JZWindowsPlayer(JZSong* pSong)
     }
     if (rc)
     {
-      char errtxt[200];
-      midiInGetErrorText(rc, (LPSTR)errtxt, sizeof(errtxt));
-      wxMessageBox(errtxt, "open midi input", wxOK);
+      char ErrorMessage[MAXERRORLENGTH];
+      midiInGetErrorText(rc, (LPSTR)ErrorMessage, sizeof(ErrorMessage));
+      ::wxMessageBox(ErrorMessage, "Open MIDI Input", wxOK);
     }
   }
 
@@ -128,12 +128,17 @@ JZWindowsPlayer::JZWindowsPlayer(JZSong* pSong)
       dev = MIDI_MAPPER;
 
     //UINT rc = midiOutOpen(&mpState->hout, dev, 0L, 0L, 0L);
-    UINT rc = midiOutOpen(&mpState->hout, dev, (DWORD)MidiOutProc, (DWORD)mpState, CALLBACK_FUNCTION);
+    UINT rc = midiOutOpen(
+      &mpState->hout,
+      dev,
+      (DWORD)MidiOutProc,
+      (DWORD)mpState,
+      CALLBACK_FUNCTION);
     if (rc)
     {
-      char errtxt[200];
-      midiOutGetErrorText(rc, (LPSTR)errtxt, sizeof(errtxt));
-      wxMessageBox(errtxt, "open midi output", wxOK);
+      char ErrorMessage[MAXERRORLENGTH];
+      midiOutGetErrorText(rc, (LPSTR)ErrorMessage, sizeof(ErrorMessage));
+      ::wxMessageBox(ErrorMessage, "Open MIDI Output", wxOK);
     }
   }
 
@@ -148,7 +153,9 @@ JZWindowsPlayer::JZWindowsPlayer(JZSong* pSong)
         timer_installed = TRUE;
     }
     if (!timer_installed)
-      wxMessageBox("could not install timer", "midi timer", wxOK);
+    {
+      ::wxMessageBox("Could not install timer", "MIDI timer", wxOK);
+    }
   }
 
 

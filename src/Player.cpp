@@ -140,7 +140,7 @@ void JZPlayLoop::PrepareOutput(
   JZSong* pSong,
   long ExtFr,
   long ExtTo,
-  int Mode)
+  bool AudioMode)
 {
   if (pEventArray == 0)
   {
@@ -158,7 +158,7 @@ void JZPlayLoop::PrepareOutput(
       pEventArray,
       gpProject->GetMetronomeInfo(),
       Delta,
-      Mode);
+      AudioMode);
 
     Size  -= mStopClock - From;
     From   = mStartClock;
@@ -173,7 +173,7 @@ void JZPlayLoop::PrepareOutput(
       pEventArray,
       gpProject->GetMetronomeInfo(),
       Delta,
-      Mode);
+      AudioMode);
   }
 }
 
@@ -231,7 +231,7 @@ void JZPlayer::Notify()
       mpSong,
       mOutClock,
       Now + DELTACLOCK,
-      0);
+      false);
     if (mpAudioBuffer)
     {
       mpPlayLoop->PrepareOutput(
@@ -239,7 +239,7 @@ void JZPlayer::Notify()
         mpSong,
         mOutClock,
         Now + DELTACLOCK,
-        1);
+        true);
     }
     mOutClock = Now + DELTACLOCK;
     mPlayBuffer.Length2Keyoff();
@@ -580,7 +580,7 @@ void JZPlayer::StartPlay(long Clock, long LoopClock, int Continue)
     mpSong,
     Clock,
     Clock + FIRST_DELTACLOCK,
-    0);
+    false);
 
   if (mpAudioBuffer)
   {
@@ -589,7 +589,7 @@ void JZPlayer::StartPlay(long Clock, long LoopClock, int Continue)
       mpSong,
       Clock,
       Clock + FIRST_DELTACLOCK,
-      1);
+      true);
   }
   mPlayBuffer.Length2Keyoff();
 

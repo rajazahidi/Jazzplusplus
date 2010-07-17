@@ -561,7 +561,8 @@ JZEventArray::JZEventArray()
     mpChorus(0),
     mpBank(0),
     mpBank2(0),
-    mpReset(0)
+    mpReset(0),
+    mAudioMode(false)
 {
   nEvents = 0;
 
@@ -571,7 +572,6 @@ JZEventArray::JZEventArray()
   Device = 0;
   ForceChannel = 0;
   State = tsPlay;
-  audio_mode = 0;
 
   Clear();
 }
@@ -693,7 +693,7 @@ void JZEventArray::Clear()
   MaxEvents = 0;
 
   State = tsPlay;
-  audio_mode = 0;
+  mAudioMode = false;
 }
 
 
@@ -1368,7 +1368,7 @@ void JZEventArray::Write(JZWriteBase& Io)
   }
 
   JZJazzMetaEvent JazzMeta;
-  JazzMeta.SetAudioMode(audio_mode);
+  JazzMeta.SetAudioMode(mAudioMode);
   JazzMeta.SetTrackState(State);
   JazzMeta.SetTrackDevice(Device);
   JazzMeta.SetIntroLength(gpSong->GetIntroLength());
@@ -1441,12 +1441,12 @@ void JZEventArray::Read(JZReadBase& Io)
     SpecialEvent = false;
     if (pEvent->IsJazzMeta())
     {
-      JZJazzMetaEvent* j = pEvent->IsJazzMeta();
-      audio_mode = (int)j->GetAudioMode();
-      State      = (int)j->GetTrackState();
-      Device     = (int)j->GetTrackDevice();
-      gpSong->SetIntroLength((int)j->GetIntroLength());
-      delete j;
+      JZJazzMetaEvent* pJazzMetaEvent = pEvent->IsJazzMeta();
+      mAudioMode = pJazzMetaEvent->GetAudioMode();
+      State      = (int)pJazzMetaEvent->GetTrackState();
+      Device     = (int)pJazzMetaEvent->GetTrackDevice();
+      gpSong->SetIntroLength((int)pJazzMetaEvent->GetIntroLength());
+      delete pJazzMetaEvent;
       continue;
     }
     if (pEvent->IsControl())

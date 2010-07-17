@@ -122,7 +122,7 @@ class JZSong
       JZEventArray *Destin,
       const JZMetronomeInfo& MetronomeInfo,
       int DeltaClock = 0,
-      int mode = 0);
+      bool AudioMode = false);
 
     void MergePlayTrackEvent(
       JZPlayTrackEvent* c,

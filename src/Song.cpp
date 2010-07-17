@@ -344,7 +344,7 @@ void JZSong::MergeTracks(
   JZEventArray* pDestin,
   const JZMetronomeInfo& MetronomeInfo,
   int delta,
-  int mode)
+  bool AudioMode)
 {
   // Make metronome
   if (MetronomeInfo.IsOn())
@@ -371,7 +371,7 @@ void JZSong::MergeTracks(
       pTrack->State == tsSolo ||
       (!DoSoloTracksExist && pTrack->State == tsPlay))
     {
-      if (pTrack->GetAudioMode() != mode)
+      if (pTrack->GetAudioMode() != AudioMode)
       {
         continue;
       }

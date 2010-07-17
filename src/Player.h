@@ -120,7 +120,7 @@ class JZPlayLoop
       JZSong* pSong,
       long ExtFr,
       long ExtTo,
-      int mode = 0);
+      bool AudioMode = false);
 
   private:
 

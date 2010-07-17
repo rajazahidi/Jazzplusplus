@@ -531,19 +531,19 @@ class JZEventArray : public JZSimpleEventArray
 
   public:
 
-    int GetAudioMode() const
+    bool GetAudioMode() const
     {
-      return audio_mode;
+      return mAudioMode;
     }
 
-    void SetAudioMode(int x)
+    void SetAudioMode(bool AudioMode)
     {
-      audio_mode = x;
+      mAudioMode = AudioMode;
     }
 
   protected:
 
-    int audio_mode;
+    bool mAudioMode;
 };
 
 

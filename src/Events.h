@@ -1068,14 +1068,14 @@ class JZJazzMetaEvent : public JZMetaEvent
       mpData[4] = 1; // version or so
     }
 
-    char GetAudioMode() const
+    bool GetAudioMode() const
     {
-      return mpData[5];
+      return mpData[5] != 0;
     }
 
-    void SetAudioMode(char c)
+    void SetAudioMode(bool AudioMode)
     {
-      mpData[5] = c;
+      mpData[5] = AudioMode;
     }
 
     char GetTrackState() const

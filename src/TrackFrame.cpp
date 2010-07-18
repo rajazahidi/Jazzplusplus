@@ -671,18 +671,21 @@ void JZTrackFrame::OnAudioLoadSampleSet(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnAudioSaveSampleSet(wxCommandEvent& Event)
 {
+  mpProject->SaveSampleSet(this);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnAudioSaveSampleSetAs(wxCommandEvent& Event)
 {
+  mpProject->SaveSampleSetAs(this);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnAudioNewSampleSet(wxCommandEvent& Event)
 {
+  mpProject->ClearSampleSet(this);
 }
 
 //-----------------------------------------------------------------------------

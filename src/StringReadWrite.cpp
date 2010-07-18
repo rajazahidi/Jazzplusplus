@@ -29,17 +29,17 @@ using namespace std;
 //*****************************************************************************
 istream& ReadString(istream& Is, string& String)
 {
-  int Character;
+  char Character;
   do
   {
-    // Ignore through the first ".
-    Character = Is.get();
+    // Ignore through the first quote (") character.
+    Is >> Character;
   } while (Character != '"' && Is.eof());
 
-  // This is an intention infinite for loop.
+  // This is an intentional infinite loop.
   for (;;)
   {
-    Character = Is.get();
+    Is >> Character;
     if (Character == '"' || Is.eof())
     {
       break;

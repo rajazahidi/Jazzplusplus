@@ -292,11 +292,15 @@ int JZSampleSet::Load(const wxString& FileName)
   ifstream Is(FileName.c_str());
   int Version;
   Is >> Version >> mSamplingRate >> mChannelCount >> mSoftwareSynchonization;
-  while (Is)
+  while (Is && !Is.eof())
   {
     int key, pan, vol, pitch;
     wxFileName SampleFileName;
     Is >> key;
+    if (Is.fail())
+    {
+      break;
+    }
     string FileNameString;
     ReadString(Is, FileNameString);
     SampleFileName.Assign(FileNameString);
@@ -321,7 +325,7 @@ int JZSampleSet::Load(const wxString& FileName)
       continue;
     }
     assert(0 <= key && key < eSampleCount);
-    mSamples[key]->SetFileName(SplFilePath.c_str());
+    mSamples[key]->SetFileName(SampleFileName.GetFullPath().c_str());
     mSamples[key]->SetLabel(Label.c_str());
     mSamples[key]->SetVolume(vol);
     mSamples[key]->SetPan(pan);

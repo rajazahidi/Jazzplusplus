@@ -304,7 +304,7 @@ class JZSample
 
     // access global adustments from JZSampleSet
 
-    JZSampleSet &SampleSet()
+    JZSampleSet& SampleSet()
     {
       return set;
     }

@@ -208,20 +208,21 @@ typedef struct
 typedef struct
 {
   char type[4];         // 'fmt '
-  ios::pos_type length; // length of sub_chunk, = 16
+  unsigned int length; // length of sub_chunk, = 16
 } ChunkHeader;
 
 typedef struct
 {
   unsigned short format;     // should be 1 for PCM-code
   unsigned short modus;      // 1 Mono, 2 Stereo
-  unsigned sample_fq;        // frequence of sample
-  unsigned byte_p_sec;
+  unsigned int sample_fq;        // frequence of sample
+  unsigned int byte_p_sec;
   unsigned short byte_p_spl; // samplesize; 1 or 2 bytes
   unsigned short bit_p_spl;  // 8, 12 or 16 bit
 } FmtChunk;
 
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZSample::LoadWav()
 {
   struct stat buf;
@@ -235,30 +236,32 @@ int JZSample::LoadWav()
   ChunkHeader ch;
 
   // read and check header info
-  ifstream is(mFileName.c_str(), ios::binary | ios::in);
+  ifstream Ifs(mFileName.c_str(), ios::binary | ios::in);
   RIFFHeader rh;
-  is.read((char *)&rh, sizeof(rh));
+  Ifs.read((char *)&rh, sizeof(rh));
   if (strncmp(rh.main_type, "RIFF", 4) || strncmp(rh.sub_type, "WAVE", 4))
     return 2;
 
-  int channels      = 0;
-  int data_length   = 0;
+  int channels = 0;
+  int data_length = 0;
   unsigned short bit_p_spl = 0;
   unsigned short sample_fq = 0;
 
   while (rh.length > 0)
   {
-    is.read((char *)&ch, sizeof(ch));
+    Ifs.read((char *)&ch, sizeof(ch));
     rh.length -= sizeof(ch);
-    ios::pos_type pos = is.tellg();
+    ios::pos_type Position = Ifs.tellg();
 
     // "fmt " chunk
     if (strncmp(ch.type, "fmt ", 4) == 0)
     {
       FmtChunk fc;
-      is.read((char *)&fc, sizeof(fc));
+      Ifs.read((char *)&fc, sizeof(fc));
       if (fc.format != PCM_CODE)
+      {
         return 2;
+      }
       channels = (fc.modus == WAVE_STEREO) ? 2 : 1;
       bit_p_spl = fc.bit_p_spl;
       sample_fq = fc.sample_fq;
@@ -273,21 +276,27 @@ int JZSample::LoadWav()
 
     // skip to beginning of next chunk
     rh.length -= ch.length;
-    is.seekg(pos + ch.length);
+    Position += ch.length;
+    Ifs.seekg(Position);
   }
 
-
   if (!data_length || !bit_p_spl)
+  {
     return 2;
+  }
 
-  return Convert(is, data_length, channels, bit_p_spl, sample_fq);
+  return Convert(Ifs, data_length, channels, bit_p_spl, sample_fq);
 }
 
 #endif
 
 
-
-int JZSample::Convert(istream &is, int bytes, int channels, int bits, int speed)
+int JZSample::Convert(
+  istream& is,
+  int bytes,
+  int channels,
+  int bits,
+  int speed)
 {
 
   // load the file
@@ -303,8 +312,10 @@ int JZSample::Convert(istream &is, int bytes, int channels, int bits, int speed)
     char *tmp = (char *)data;
     length = bytes;
     data = new short [length];
-    for (i = 0; i < length; i++)
+    for (i = 0; i < length; ++i)
+    {
       data[i] = ((short) ((signed char)tmp[i] ^ (signed char)0x80)) << 8;
+    }
     delete [] tmp;
   }
 
@@ -358,9 +369,13 @@ int JZSample::Convert(istream &is, int bytes, int channels, int bits, int speed)
     int ch2 = volume;
     int  ppan = (set.GetChannelCount() == 2) ? pan : 0;
     if (ppan > 0)
+    {
       ch1 = (int)volume * (63L - ppan) / 64L;
+    }
     else if (ppan < 0)
+    {
       ch2 = (int)volume * (63L + ppan) / 64L;
+    }
     for (int i = 0; i < length-1; i += 2)
     {
       data[i]   = (short)((int)data[i]   * ch1 >> 7);

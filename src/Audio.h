@@ -297,7 +297,7 @@ class JZSampleSet
 
     int FillBuffers(long last_clock);
 
-    JZAudioBuffer *GetBuffer(int i) const
+    JZAudioBuffer* GetBuffer(int i) const
     {
       // 0 < i < BUFCOUNT
       return buffers[i];
@@ -367,7 +367,7 @@ class JZSampleSet
 
     void RefreshDialogs();
 
-    JZSample &operator[](int i)
+    JZSample& operator[](int i)
     {
       return *mSamples[i];
     }

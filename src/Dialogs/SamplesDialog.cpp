@@ -21,8 +21,12 @@
 #include "SamplesDialog.h"
 
 #include "../Audio.h"
+#include "../Resources.h"
+#include "../Sample.h"
 
 #include <wx/button.h>
+#include <wx/filedlg.h>
+#include <wx/filename.h>
 #include <wx/listbox.h>
 #include <wx/sizer.h>
 #include <wx/slider.h>
@@ -33,8 +37,15 @@
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+BEGIN_EVENT_TABLE(JZSamplesDialog, wxDialog)
+  EVT_BUTTON(IDC_BN_SD_FILE_SELECT_BROWSE, OnSelectSampleFile)
+END_EVENT_TABLE()
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZSamplesDialog::JZSamplesDialog(wxWindow* pParent, JZSampleSet& SampleSet)
   : wxDialog(pParent, wxID_ANY, wxString("Samples Settings")),
+    mSampleSet(SampleSet),
     mpListBox(0),
     mpLabelEdit(0),
     mpFileNameEdit(0),
@@ -65,8 +76,7 @@ JZSamplesDialog::JZSamplesDialog(wxWindow* pParent, JZSampleSet& SampleSet)
 
   mpFileNameBrowseButton = new wxButton(
     this,
-    wxID_ANY,
-//    IDC_BN_SD_FILE_SELECT_BROWSE,
+    IDC_BN_SD_FILE_SELECT_BROWSE,
     "Browse...");
 
   mpVolumeSlider = new wxSlider(
@@ -178,4 +188,31 @@ JZSamplesDialog::JZSamplesDialog(wxWindow* pParent, JZSampleSet& SampleSet)
 
   pTopSizer->SetSizeHints(this);
   pTopSizer->Fit(this);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZSamplesDialog::OnSelectSampleFile(wxCommandEvent& Event)
+{
+  int Selection = mpListBox->GetSelection();
+  if (Selection != wxNOT_FOUND)
+  {
+    wxFileDialog FileOpenDialog(
+      this,
+      "Choose a sound file",
+      wxEmptyString,
+      wxEmptyString,
+      "WAV files (*.wav)|*.wav",
+      wxFD_OPEN | wxFD_CHANGE_DIR);
+    if (FileOpenDialog.ShowModal() == wxID_OK)
+    {
+      wxFileName FileName = FileOpenDialog.GetPath();
+      mSampleSet[Selection].SetFileName(FileName.GetFullPath());
+      mpFileNameEdit->ChangeValue(FileName.GetFullPath());
+      mpLabelEdit->ChangeValue(FileName.GetName());
+      wxString Label;
+      Label << Selection + 1 << ' ' << FileName.GetFullName();
+      mpListBox->SetString(Selection, Label);
+    }
+  }
 }

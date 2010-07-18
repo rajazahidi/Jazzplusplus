@@ -136,4 +136,7 @@
 // JZTransposeDialog resource IDs.
 #define IDC_KB_AMOUNT                        wxID_HIGHEST + 1232
 
+// JZSamplesDialog resource IDs.
+#define IDC_BN_SD_FILE_SELECT_BROWSE         wxID_HIGHEST + 1240
+
 #endif // !defined(JZ_RESOURCES_H)

@@ -41,6 +41,12 @@ class JZSamplesDialog : public wxDialog
 
   private:
 
+    void OnSelectSampleFile(wxCommandEvent& Event);
+
+  private:
+
+    JZSampleSet& mSampleSet;
+
     wxListBox* mpListBox;
     wxTextCtrl* mpLabelEdit;
     wxTextCtrl* mpFileNameEdit;
@@ -48,6 +54,8 @@ class JZSamplesDialog : public wxDialog
     wxSlider* mpVolumeSlider;
     wxSlider* mpPanSlider;
     wxSlider* mpPitchSlider;
+
+  DECLARE_EVENT_TABLE()
 };
 
 #endif // !defined(JZ_SAMPLESDIALOG_H)

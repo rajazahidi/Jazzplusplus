@@ -513,14 +513,14 @@ void JZProject::OpenSong(const wxString& SongFileName)
 // exists!
 //
 // Inputs:
-//   const wxString& SongFileName:
+//   const wxString& MidiFileName:
 //     Song path and file name.
 //-----------------------------------------------------------------------------
-void JZProject::Save(const wxString& SongFileName)
+void JZProject::ExportMidiFile(const wxString& MidiFileName)
 {
   JZStandardWrite Io;
-  Write(Io, SongFileName);
-  mpConfig->Put(C_StartUpSong, SongFileName.c_str());
+  Write(Io, MidiFileName);
+  mpConfig->Put(C_StartUpSong, MidiFileName.c_str());
 }
 
 //-----------------------------------------------------------------------------

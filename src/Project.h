@@ -118,9 +118,9 @@ class JZProject : public JZSong
     // already exists!
     //
     // Inputs:
-    //   const wxString& SongFileName:
-    //     Song path and file name.
-    void Save(const wxString& SongFileName);
+    //   const wxString& MidiFileName:
+    //     MIDI file path and file name.
+    void ExportMidiFile(const wxString& MidiFileName);
 
     // Here is the new play interface.  For now it just acts as a layer
     // between the Project and the GUI.

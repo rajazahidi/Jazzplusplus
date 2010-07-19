@@ -32,8 +32,9 @@
 
 #define ID_FILE_REVERT_TO_SAVED              wxID_HIGHEST + 1
 
-#define ID_EXPORT_MIDI                       wxID_HIGHEST + 2
-#define ID_EXPORT_SELECTION_AS_MIDI          wxID_HIGHEST + 3
+#define ID_IMPORT_MIDI                       wxID_HIGHEST + 2
+#define ID_EXPORT_MIDI                       wxID_HIGHEST + 3
+#define ID_EXPORT_SELECTION_AS_MIDI          wxID_HIGHEST + 4
 
 #define ID_SETTINGS_METRONOME                wxID_HIGHEST + 10
 #define ID_SETTINGS_SYNTHESIZER              wxID_HIGHEST + 11

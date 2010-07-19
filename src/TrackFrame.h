@@ -72,9 +72,17 @@ class JZTrackFrame : public JZEventFrame, public JZButtonLabelInterface
 
     void OnFileNew(wxCommandEvent& Event);
 
-    void OnFileOpen(wxCommandEvent& Event);
+    void OnFileOpenProject(wxCommandEvent& Event);
 
-    void OnFileSaveAs(wxCommandEvent& Event);
+    void OnFileProjectSave(wxCommandEvent& Event);
+
+    void OnFileProjectSaveAs(wxCommandEvent& Event);
+
+    void OnFileImportMidi(wxCommandEvent& Event);
+
+    void OnFileExportMidi(wxCommandEvent& Event);
+
+    void OnFileExportSelectionAsMidi(wxCommandEvent& Event);
 
     void OnFileExit(wxCommandEvent& Event);
 

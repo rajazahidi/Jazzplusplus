@@ -79,9 +79,19 @@ BEGIN_EVENT_TABLE(JZTrackFrame, JZEventFrame)
 
   EVT_MENU(wxID_NEW, JZTrackFrame::OnFileNew)
 
-  EVT_MENU(wxID_OPEN, JZTrackFrame::OnFileOpen)
+  EVT_MENU(wxID_OPEN, JZTrackFrame::OnFileOpenProject)
 
-  EVT_MENU(wxID_SAVEAS, JZTrackFrame::OnFileSaveAs)
+  EVT_MENU(wxID_SAVE, JZTrackFrame::OnFileProjectSave)
+
+  EVT_MENU(wxID_SAVEAS, JZTrackFrame::OnFileProjectSaveAs)
+
+  EVT_MENU(ID_IMPORT_MIDI, JZTrackFrame::OnFileImportMidi)
+
+  EVT_MENU(ID_EXPORT_MIDI, JZTrackFrame::OnFileExportMidi)
+
+  EVT_MENU(
+    ID_EXPORT_SELECTION_AS_MIDI,
+    JZTrackFrame::OnFileExportSelectionAsMidi)
 
   EVT_MENU(wxID_EXIT, JZTrackFrame::OnFileExit)
 
@@ -218,17 +228,19 @@ void JZTrackFrame::CreateMenu()
   mpFileMenu = new wxMenu;
 
   mpFileMenu->Append(wxID_NEW, "&New");
-  mpFileMenu->Append(wxID_OPEN, "&Open...");
+  mpFileMenu->Append(wxID_OPEN, "&Open Project...");
   mpFileMenu->Append(wxID_CLOSE, "&Close");
   mpFileMenu->Append(wxID_SAVE, "&Save Project");
   mpFileMenu->Append(wxID_SAVEAS, "Save Project &As...");
 
   mpFileMenu->AppendSeparator();
 
-  mpFileMenu->Append(ID_EXPORT_MIDI, "Export as Midi...");
+  mpFileMenu->Append(ID_IMPORT_MIDI, "Import MIDI...");
+
+  mpFileMenu->Append(ID_EXPORT_MIDI, "Export as MIDI...");
   mpFileMenu->Append(
     ID_EXPORT_SELECTION_AS_MIDI,
-    "Export Selection as Midi...");
+    "Export Selection as MIDI...");
 
   mpFileMenu->AppendSeparator();
 
@@ -472,11 +484,26 @@ void JZTrackFrame::OnFileNew(wxCommandEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZTrackFrame::OnFileOpen(wxCommandEvent& Event)
+void JZTrackFrame::OnFileOpenProject(wxCommandEvent& Event)
 {
-  // Use an open dialog to find the Jazz++ configuration file.
-  // wxFD_CHANGE_DIR - Change the current working directory to the directory
-  // where the file(s) chosen by the user are.
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnFileProjectSave(wxCommandEvent& Event)
+{
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnFileProjectSaveAs(wxCommandEvent& Event)
+{
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnFileImportMidi(wxCommandEvent& Event)
+{
   wxFileDialog OpenDialog(
     0,
     "Load MIDI File",
@@ -486,9 +513,9 @@ void JZTrackFrame::OnFileOpen(wxCommandEvent& Event)
     wxFD_OPEN | wxFD_CHANGE_DIR);
   if (OpenDialog.ShowModal() == wxID_OK)
   {
-    wxString FileName = OpenDialog.GetPath();
-    gpProject->OpenSong(FileName);
-    SetTitle(FileName);
+    wxString MidiFileName = OpenDialog.GetPath();
+    gpProject->OpenSong(MidiFileName);
+    SetTitle(MidiFileName);
 //    NextWin->NewPosition(1, 0);
     mpTrackWindow->SetScrollRanges();
 //    mpTrackWindow->SetScrollPosition(0, 0);
@@ -500,7 +527,7 @@ void JZTrackFrame::OnFileOpen(wxCommandEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZTrackFrame::OnFileSaveAs(wxCommandEvent& Event)
+void JZTrackFrame::OnFileExportMidi(wxCommandEvent& Event)
 {
   // wxFD_OVERWRITE_PROMPT - For save dialog only: prompt for a confirmation
   // if a file will be overwritten.
@@ -514,9 +541,15 @@ void JZTrackFrame::OnFileSaveAs(wxCommandEvent& Event)
   if (SaveAsDialog.ShowModal() == wxID_OK)
   {
     wxString FileName = SaveAsDialog.GetPath();
-    gpProject->Save(FileName);
+    gpProject->ExportMidiFile(FileName);
     SetTitle(FileName);
   }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnFileExportSelectionAsMidi(wxCommandEvent& Event)
+{
 }
 
 //-----------------------------------------------------------------------------

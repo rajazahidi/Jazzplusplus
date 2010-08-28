@@ -493,7 +493,7 @@ void JZPianoFrame::OnVisibleAllTracks(wxCommandEvent& Event)
 //  Send a midi reset.
 void JZPianoFrame::OnReset(wxCommandEvent& Event)
 {
-  gpMidiPlayer->AllNotesOff(1);
+  gpMidiPlayer->AllNotesOff(true);
 }
 
 void JZPianoFrame::OnMSelect(wxCommandEvent& Event)

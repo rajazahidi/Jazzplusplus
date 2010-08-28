@@ -643,7 +643,7 @@ void JZPlayer::StopPlay()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZPlayer::AllNotesOff(int Reset)
+void JZPlayer::AllNotesOff(bool Reset)
 {
   JZControlEvent NoteOff(0, 0, 0x78, 0);
   JZPitchEvent Pitch    (0, 0, 0);

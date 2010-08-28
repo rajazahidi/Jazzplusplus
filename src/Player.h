@@ -168,7 +168,7 @@ class JZPlayer : public wxTimer
 
     virtual void StartPlay(long Clock, long LoopClock = 0, int Continue = 0);
     virtual void StopPlay();
-    virtual void AllNotesOff(int Reset = 0);
+    virtual void AllNotesOff(bool Reset = false);
 
     virtual void SetSoftThru(int on, int idev, int odev)
     {

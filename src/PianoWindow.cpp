@@ -2271,6 +2271,7 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& MouseEvent)
 
       case MA_DIALOG:
         EventDialog(pEvent, this, mpTrack, Clock, mpTrack->Channel - 1, Pitch);
+        Refresh();
         break;
 
 

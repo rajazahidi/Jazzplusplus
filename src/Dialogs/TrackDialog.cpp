@@ -196,7 +196,7 @@ bool JZTrackDialog::TransferDataFromWindow()
   int Selection = mpPatchListBox->GetSelection();
   if (Selection != wxNOT_FOUND)
   {
-    int Patch = Selection & 0x000000ff;;
+    int Patch = Selection & 0x000000ff;
     int Bank = (Selection & 0x0000ff00) >> 8;
     mTrack.SetPatch(Patch);
     mTrack.SetBank(Bank);

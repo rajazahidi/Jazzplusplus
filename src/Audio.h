@@ -358,7 +358,7 @@ class JZSampleSet
     void SaveRecordingDlg(long frc, long toc, JZAudioRecordBuffer &buf);
 
     void SaveWave(
-      const char *fname,
+      const wxString& FileName,
       long frc,
       long toc,
       JZAudioRecordBuffer &buf);

@@ -325,7 +325,7 @@ int JZSampleSet::Load(const wxString& FileName)
       continue;
     }
     assert(0 <= key && key < eSampleCount);
-    mSamples[key]->SetFileName(SampleFileName.GetFullPath().c_str());
+    mSamples[key]->SetFileName(SampleFileName.GetFullPath());
     mSamples[key]->SetLabel(Label.c_str());
     mSamples[key]->SetVolume(vol);
     mSamples[key]->SetPan(pan);
@@ -860,7 +860,7 @@ void JZSampleSet::LoadSampleSet(wxWindow* pParent)
     false,
     has_changed,
     "*.spl");
-  if (FileName)
+  if (!FileName.empty())
   {
     Load(FileName);
   }
@@ -877,7 +877,7 @@ void JZSampleSet::SaveSampleSetAs(wxWindow* pParent)
     true,
     has_changed,
     "*.spl");
-  if (FileName)
+  if (!FileName.empty())
   {
     Save(FileName);
   }
@@ -1027,7 +1027,7 @@ void JZSampleSet::AddNote(const string& FileName, long frc, long toc)
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZSampleSet::SaveWave(
-  const char* pFileName,
+  const wxString& FileName,
   long frc,
   long toc,
   JZAudioRecordBuffer& buf)
@@ -1060,7 +1060,7 @@ void JZSampleSet::SaveWave(
   wh.data_length   = (end_index - start_index) * sizeof(short);
   wh.length        = wh.data_length + sizeof(WaveHeader);
 
-  ofstream os(pFileName, ios::out | ios::binary | ios::trunc);
+  ofstream os(FileName.c_str(), ios::out | ios::binary | ios::trunc);
 
   os.write((char*)&wh, sizeof(wh));
 

@@ -543,7 +543,7 @@ const int& JZConfiguration::GetValue(int Index) const
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool JZConfiguration::Get(int Entry, char* value)
+bool JZConfiguration::Get(int Entry, string& Value)
 {
   assert((Entry >= 0) && (Entry < NumConfigNames));
 
@@ -553,42 +553,64 @@ bool JZConfiguration::Get(int Entry, char* value)
     return false;
   }
 
-  FILE *fd = fopen(FileName.c_str(), "r");
-  const string& name = GetName(Entry);
-
-  int len = name.length();
-  char buf[1000];
-  bool found = false;
-  while (!found && fgets(buf, sizeof(buf), fd) != NULL)
+  ifstream Ifs(FileName.c_str());
+  if (!Ifs)
   {
-    if (strncmp(buf, name.c_str(), len) == 0)
+    return false;
+  }
+
+  const string& Name = GetName(Entry);
+
+  string::size_type Length = Name.length();
+
+  string Line;
+
+  bool Found = false;
+  while (!Found && !Ifs.eof() && getline(Ifs, Line))
+  {
+    // Search the beginning of the string for the name.
+    string::size_type Start = Line.find(Name);
+    if (Start == 0)
     {
-      while (isspace(buf[len]))
+      // Skip white space to find the value.
+      Start += Length;
+      while (isspace(Line[Start]))
       {
-        len++;
+        ++Start;
       }
-      int end = strlen(buf) - 1;
-      while (end > 0 && isspace(buf[end]))
+
+      // Find the end of the value.
+      string::size_type End = Line.length() - 1;
+      while (End > 0 && isspace(Line[End]))
       {
-        buf[end--] = 0;
+        --End;
       }
-      strcpy(value, buf + len);
-      found = true;
+
+      Value = Line.substr(Start, End - Start + 1);
+
+      // Indicate a value was found.
+      Found = true;
     }
   }
-  fclose(fd);
-  return found;
+
+  Ifs.close();
+
+  return Found;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool JZConfiguration::Get(int Entry, int& value)
+bool JZConfiguration::Get(int Entry, int& Value)
 {
-  char buf[512];
-  if (Get(Entry, buf))
+  string String;
+  if (Get(Entry, String))
   {
-    sscanf(buf, " %d ", &value);
-    return true;
+    istringstream Iss(String);
+    Iss >> Value;
+    if (!Iss.fail())
+    {
+      return true;
+    }
   }
   return false;
 }
@@ -615,35 +637,39 @@ bool JZConfiguration::Put(int Index, const string& ValueString)
   string TempFileName(FileName);
   TempFileName.append(".tmp");
   ofstream Os(TempFileName.c_str());
-//  ofstream Os(TempFileName.GetFullPath());
   if (!Os)
   {
     return false;
   }
 
-  FILE* inp = fopen(FileName.c_str(), "r");
+  ifstream Ifs(FileName.c_str());
+  if (!Ifs)
+  {
+    return false;
+  }
+
   const string& ValueName = GetName(Index);
 
-  int len = ValueName.length();
-  char buf[1000];
-  bool found = false;
-  while (fgets(buf, sizeof(buf), inp) != NULL)
+  string Line;
+  bool Found = false;
+  while (!Ifs.eof() && getline(Ifs, Line))
   {
-    if (strncmp(buf, ValueName.c_str(), len) == 0)
+    string::size_type Start = Line.find(ValueName);
+    if (Start == 0)
     {
       Os << ValueName << ' ' << ValueString << endl;
-      found = true;
+      Found = true;
     }
     else
     {
-      Os << buf;
+      Os << Line << endl;
     }
   }
-  if (!found)
+  if (!Found)
   {
     Os << ValueName << ' ' << ValueString << endl;
   }
-  fclose(inp);
+  Ifs.close();
   Os.close();
 
   ::wxRemoveFile(FileName.c_str());
@@ -845,7 +871,7 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
     }
     else if (pVector && isdigit(InputLine[0]))
     {
-      // Read named value entries.
+      // Read named entries.
 
       // Voice names
       if (pVector == &mVoiceNames)

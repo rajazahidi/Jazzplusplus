@@ -239,7 +239,7 @@ class JZConfiguration
     const int& GetValue(const char* pName) const;
     const int& GetValue(int Index) const;
 
-    bool Get(int Entry, char* pValue);
+    bool Get(int Entry, std::string& Value);
     bool Get(int Entry, int& Value);
 
     bool Put(int Entry, const std::string& ValueString);

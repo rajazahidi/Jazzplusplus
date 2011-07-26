@@ -115,7 +115,7 @@ class JZFloatSample // : public tCMIX
     void RescaleToShort(int fr = -1, int to = -1);
     float &operator[](int i)
     {
-      return data[i];
+      return mpData[i];
     }
     void Initialize(int size = 0);
     void PasteMix(JZFloatSample &src, int offs = 0);
@@ -168,9 +168,9 @@ class JZFloatSample // : public tCMIX
       return sampling_rate;
     }
 
-    float *GetData()
+    float* GetData()
     {
-      return data;
+      return mpData;
     }
 
     int GetLength() const
@@ -179,23 +179,23 @@ class JZFloatSample // : public tCMIX
     }
 
   protected:
-    float* data;
+    float* mpData;
     int length;
     int channels;
     int sampling_rate;
 
     // CMIX-IO position
-    int  current;
+    int current;
 };
 
 
 //*****************************************************************************
 //   This class contains the data for one sample.  For fastest playback access
 // samples are stored as signed shorts.
-//   data[0]   == 1st value for left channel
-//   data[1]   == 1st value for right channel
-//   data[n]   == 1st value for n-th channel
-//   data[n+1] == 2nd value for left channel
+//   mpData[0]   == 1st value for left channel
+//   mpData[1]   == 1st value for right channel
+//   mpData[n]   == 1st value for n-th channel
+//   mpData[n+1] == 2nd value for left channel
 //   ...
 // All length values mean the number of shorts and should be multiples of
 // set.GetChannelCount().  Offsets should start on channel boundaries, that is
@@ -293,12 +293,12 @@ class JZSample
       // Try to swap this sample into memory.
       volatile short dummy;
       for (int i = 0; i < length; i++)
-        dummy = data[i];
+        dummy = mpData[i];
     }
 
     short *GetData()
     {
-      return data;
+      return mpData;
     }
 
 
@@ -386,7 +386,7 @@ class JZSample
       int speed);
 
     int length;  // number of shorts
-    short* data; // signed shorts
+    short* mpData; // signed shorts
     JZSampleSet& set;
 
     std::string mLabel;

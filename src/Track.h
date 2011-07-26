@@ -393,15 +393,15 @@ class JZSimpleEventArray : public wxObject
 {
   public:
 
-    // Actual number of events in **Events.
+    // Actual number of events in **mppEvents.
     int nEvents;
 
-    // Memory allocated in **Events
+    // Memory allocated in **mppEvents
     int MaxEvents;
 
-    JZEvent** Events;
+    JZEvent** mppEvents;
 
-    // Resize **Events
+    // Resize **mppEvents
     void Resize();
 
     virtual void Clear();
@@ -776,7 +776,7 @@ class JZEventIterator
       while (Lo < Hi)
       {
         mActual  = (Hi + Lo) / 2;
-        TestClock = mpTrack->Events[mActual]->GetClock();
+        TestClock = mpTrack->mppEvents[mActual]->GetClock();
         if (TestClock < Clock)
         {
           Lo = mActual + 1;
@@ -788,11 +788,11 @@ class JZEventIterator
       }
       if (mActual < mStop - 1 && TestClock < Clock)
       {
-        TestClock = mpTrack->Events[++mActual]->GetClock();
+        TestClock = mpTrack->mppEvents[++mActual]->GetClock();
       }
       if (mActual < mStop && TestClock >= Clock)
       {
-        return mpTrack->Events[mActual];
+        return mpTrack->mppEvents[mActual];
       }
       return 0;
     }
@@ -818,7 +818,7 @@ class JZEventIterator
         mStop = mActual;
       }
       mActual = mStart;
-      return (mActual < mStop ? mpTrack->Events[mActual] : 0);
+      return (mActual < mStop ? mpTrack->mppEvents[mActual] : 0);
     }
 
     JZEvent* Next()
@@ -827,7 +827,7 @@ class JZEventIterator
       {
         ++mActual;
       }
-      return (mActual < mStop ? mpTrack->Events[mActual] : 0);
+      return (mActual < mStop ? mpTrack->mppEvents[mActual] : 0);
     }
 
     int EventsLeft()

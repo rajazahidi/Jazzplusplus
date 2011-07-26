@@ -77,15 +77,15 @@ void JZSplPan::Execute(long fr, long to)
     return; // no data
 
   float i_fact  = (float)arr.Size() / (float)n;
-  short *data = spl.data;
+  short* pData = spl.mpData;
   for (long i = 0; i < n-1; i += 2)
   {
     float x = (float)i * i_fact;
     float p = arr[x];
     if (p < 0)
-      data[fr+i]   = (short)((float)data[fr+i]   * (100 + p) / 100);
+      pData[fr+i]   = (short)((float)pData[fr+i]   * (100 + p) / 100);
     else
-      data[fr+i+1] = (short)((float)data[fr+i+1] * (100 - p) / 100);
+      pData[fr+i+1] = (short)((float)pData[fr+i+1] * (100 - p) / 100);
   }
 }
 
@@ -102,7 +102,7 @@ void JZSplPitch::Execute(long fr, long to)
 
   long channels = spl.GetChannelCount();
   float N       = spl.length / channels - 2;
-  short *data   = spl.data;
+  short* pData   = spl.mpData;
 
   JZFloatSample out(channels, spl.GetSamplingRate());
   out.SetNote(0, 0);
@@ -120,7 +120,7 @@ void JZSplPitch::Execute(long fr, long to)
     long i = (long)ofs * channels;
     for (long c = 0; c < channels; c++)
     {
-      JZMapper Mapper(0, 1, data[i + c], data[i + channels + c]);
+      JZMapper Mapper(0, 1, pData[i + c], pData[i + channels + c]);
       p[c] = Mapper.XToY(rem);
     }
     out.AddOut(p);
@@ -261,7 +261,7 @@ void JZWahWah::Wah(int channel, JZFloatSample &out)
     flt.Init(filter_type, SR, f, band_width);
   }
   int j = 0;
-  short *data = spl.GetData();
+  short* pData = spl.GetData();
   for (long i = channel; i < N; i += channels)
   {
     if (j-- == 0)
@@ -271,7 +271,7 @@ void JZWahWah::Wah(int channel, JZFloatSample &out)
       flt.ReInit(f, band_width);
       j = 100;
     }
-    out[i] = flt.Loop(data[i]);
+    out[i] = flt.Loop(pData[i]);
   }
 }
 

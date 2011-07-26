@@ -251,7 +251,7 @@ void JZPlayer::Notify()
   //   send them to driver
   // else
   //   tell the driver that there is nothing to do at the moment
-  if (mPlayBuffer.nEvents && mPlayBuffer.Events[0]->GetClock() < mOutClock)
+  if (mPlayBuffer.nEvents && mPlayBuffer.mppEvents[0]->GetClock() < mOutClock)
   {
     FlushToDevice();
   }

@@ -78,7 +78,7 @@ class JZSampleVoice
       clock  = c;
       first  = 1;
       length = spl->length;
-      data   = spl->data;
+      mpData = spl->mpData;
       prev   = 0;
     }
 
@@ -105,7 +105,7 @@ class JZSampleVoice
         {
           // output starts somewhere in the middle of a sample
           long data_offs = set.Ticks2Samples(buffer_clock - clock);
-          data += data_offs;
+          mpData += data_offs;
           length -= data_offs;
           if (length <= 0)
             return;
@@ -123,7 +123,7 @@ class JZSampleVoice
       b += offset;
       while (count--)
       {
-        *b++ += *data++;
+        *b++ += *mpData++;
       }
     }
 
@@ -145,7 +145,7 @@ class JZSampleVoice
 
         if (fr_smpl > 0 && fr_smpl < length)
         {
-          data += fr_smpl;
+          mpData += fr_smpl;
           length -= fr_smpl;
         }
         first = false;
@@ -165,7 +165,7 @@ class JZSampleVoice
       length -= count;
       while (count--)
       {
-        *b++ += *data++;
+        *b++ += *mpData++;
       }
     }
 
@@ -176,12 +176,12 @@ class JZSampleVoice
 
   private:
     JZSampleSet& set;
-    long        clock;
+    long         clock;
     JZSample*    spl;
-    short*      data;
-    int         first;
-    long        length;
-    short       prev;
+    short*       mpData;
+    int          first;
+    long         length;
+    short        prev;
 };
 
 //*****************************************************************************
@@ -477,7 +477,7 @@ int JZSampleSet::FillBuffers(long last_clock)
   // iterate the events and add sounding voices
   while (event_index < events->nEvents)
   {
-    JZEvent* pEvent = events->Events[event_index];
+    JZEvent* pEvent = events->mppEvents[event_index];
     if (pEvent->GetClock() >= last_clock)
     {
       break;
@@ -1089,7 +1089,7 @@ void JZSampleSet::SaveWave(
   {
     int bi = i / bufsize;
     int di = i % bufsize;
-    slow.write((char*)&buf.buffers[bi]->data[di], sizeof(short));
+    slow.write((char*)&buf.buffers[bi]->mpData[di], sizeof(short));
   }
 #endif
 }

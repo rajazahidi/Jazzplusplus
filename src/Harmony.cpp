@@ -727,7 +727,7 @@ JZHarmonyBrowserMatchMarkers::JZHarmonyBrowserMatchMarkers(
     JZEventArray &buf = gpTrackFrame->GetPianoWindow()->mPasteBuffer;
     for (int i = 0; i < buf.nEvents; i++)
     {
-      JZKeyOnEvent* pKeyOn = buf.Events[i]->IsKeyOn();
+      JZKeyOnEvent* pKeyOn = buf.mppEvents[i]->IsKeyOn();
       if (pKeyOn)
       {
         piano += pKeyOn->GetKey();

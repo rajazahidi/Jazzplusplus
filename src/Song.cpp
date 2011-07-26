@@ -568,7 +568,7 @@ void JZSong::SetTicksPerQuarter(int TicksPerQuarter)
     JZTrack* pTrack = &mTracks[TrackIndex];
     for (int EventIndex = 0; EventIndex < pTrack->nEvents; ++EventIndex)
     {
-      JZEvent* pEvent = pTrack->Events[EventIndex];
+      JZEvent* pEvent = pTrack->mppEvents[EventIndex];
       pEvent->SetClock((int)(f * pEvent->GetClock() + 0.5));
       JZKeyOnEvent* pKeyOn = pEvent->IsKeyOn();
       if (pKeyOn)

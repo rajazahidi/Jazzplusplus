@@ -415,15 +415,15 @@ JZSimpleEventArray::JZSimpleEventArray()
   : wxObject(),
     nEvents(0),
     MaxEvents(0),
-    Events(0)
+    mppEvents(0)
 {
 }
 
 JZSimpleEventArray::~JZSimpleEventArray()
 {
   Clear();
-  delete [] Events;
-  Events = 0;
+  delete [] mppEvents;
+  mppEvents = 0;
 }
 
 void JZSimpleEventArray::Clear()
@@ -431,7 +431,7 @@ void JZSimpleEventArray::Clear()
   int i;
   for (i = 0; i < nEvents; i++)
   {
-    delete Events[i];
+    delete mppEvents[i];
   }
   nEvents = 0;
 }
@@ -444,7 +444,7 @@ void JZUndoBuffer::Clear()
   {
     if (bits(i))
     {
-      delete Events[i];
+      delete mppEvents[i];
     }
   }
   nEvents = 0;
@@ -460,7 +460,7 @@ void JZSimpleEventArray::Resize()
   // Copy the previuosly existing event pointers.
   for (i = 0; i < nEvents; ++i)
   {
-    ppEvents[i] = Events[i];
+    ppEvents[i] = mppEvents[i];
   }
 
   // Initialize the new event pointers to 0.
@@ -470,10 +470,10 @@ void JZSimpleEventArray::Resize()
   }
 
   // Delete the old event pointers
-  delete [] Events;
+  delete [] mppEvents;
 
   // Set the data member to the new storage location.
-  Events = ppEvents;
+  mppEvents = ppEvents;
 }
 
 //   Remove any end of track (EOT) events from the track.  There can only be
@@ -484,9 +484,9 @@ void JZSimpleEventArray::RemoveEOT()
   int newnEvents = nEvents;
   for (int i = 0; i < nEvents; ++i)
   {
-    if (Events[i] != 0 && Events[i]->IsEndOfTrack())
+    if (mppEvents[i] != 0 && mppEvents[i]->IsEndOfTrack())
     {
-      delete Events[i];
+      delete mppEvents[i];
       ++j;
       --newnEvents;
     }
@@ -494,13 +494,13 @@ void JZSimpleEventArray::RemoveEOT()
     JZEvent* item;
     if (j <= MaxEvents)
     {
-      item = Events[j++];
+      item = mppEvents[j++];
     }
     else
     {
       item = 0;
     }
-    Events[i] = item;
+    mppEvents[i] = item;
   }
   nEvents = newnEvents;
 }
@@ -516,7 +516,7 @@ void JZSimpleEventArray::Put(JZEvent* pEvent)
   {
     Resize();
   }
-  Events[nEvents++] = pEvent;
+  mppEvents[nEvents++] = pEvent;
 }
 
 // Description:
@@ -525,13 +525,13 @@ void JZSimpleEventArray::GrabData(JZSimpleEventArray& src)
 {
   Clear();
 
-  delete [] Events;
+  delete [] mppEvents;
 
-  Events = src.Events;
+  mppEvents = src.mppEvents;
   nEvents = src.nEvents;
   MaxEvents = src.MaxEvents;
 
-  src.Events = 0;
+  src.mppEvents = 0;
   src.nEvents = 0;
   src.MaxEvents = 0;
 }
@@ -567,7 +567,7 @@ JZEventArray::JZEventArray()
   nEvents = 0;
 
   MaxEvents = 0;
-  Events = 0;
+  mppEvents = 0;
   Channel = 0;
   Device = 0;
   ForceChannel = 0;
@@ -685,11 +685,11 @@ void JZEventArray::Clear()
 
   DrumParams.Clear();
 
-  if (Events)
+  if (mppEvents)
   {
-    delete [] Events;
+    delete [] mppEvents;
   }
-  Events = 0;
+  mppEvents = 0;
   MaxEvents = 0;
 
   State = tsPlay;
@@ -716,7 +716,7 @@ static int compare(const void *p1, const void *p2)
 
 void JZSimpleEventArray::Sort()
 {
-  qsort(Events, nEvents, sizeof(JZEvent *), compare);
+  qsort(mppEvents, nEvents, sizeof(JZEvent *), compare);
 }
 
 
@@ -802,13 +802,13 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
 
   for (i = 0; i < nEvents; i++)
   {
-    if ((pEvent = Events[i])->IsKilled())
+    if ((pEvent = mppEvents[i])->IsKilled())
     {
       if (!dont_delete_killed_events)
       {
         for (int j = i; j < nEvents; j++)
         {
-          delete Events[j];
+          delete mppEvents[j];
         }
       }
       nEvents = i;
@@ -1149,7 +1149,7 @@ void JZEventArray::Length2Keyoff()
   for (int i = 0; i < n; i++)
   {
     JZKeyOnEvent* pKeyOn;
-    if ((pKeyOn = Events[i]->IsKeyOn()) != 0 && pKeyOn->GetEventLength() != 0)
+    if ((pKeyOn = mppEvents[i]->IsKeyOn()) != 0 && pKeyOn->GetEventLength() != 0)
     {
 //      JZEvent* pKeyOff = new JZKeyOffEvent(
 //        pKeyOn->GetClock() + pKeyOn->GetEventLength(),
@@ -1180,10 +1180,10 @@ void JZEventArray::Keyoff2Length()
   for (i = 1; i < nEvents; i++)
   {
     JZKeyOffEvent* pKeyOff;
-    if ((pKeyOff = Events[i]->IsKeyOff()) != 0)
+    if ((pKeyOff = mppEvents[i]->IsKeyOff()) != 0)
     {
-      JZEvent** ppEvent = &Events[i - 1];
-      while (ppEvent >= Events)
+      JZEvent** ppEvent = &mppEvents[i - 1];
+      while (ppEvent >= mppEvents)
       {
         JZKeyOnEvent* pKeyOn = (*ppEvent)->IsKeyOn();
         if (
@@ -1208,7 +1208,7 @@ void JZEventArray::Keyoff2Length()
   // kill all KeyOn's with non matching KeyOff's
   for (i = 0; i < nEvents; i++)
   {
-    JZKeyOnEvent *k = Events[i]->IsKeyOn();
+    JZKeyOnEvent *k = mppEvents[i]->IsKeyOn();
     if (k && k->Length <= 0)
     {
       k->Kill();
@@ -1227,12 +1227,12 @@ void JZEventArray::Keyoff2Length()
   for (i = 0; i < nEvents; i++)
   {
     JZKeyOnEvent* pKeyOn;
-    if ((pKeyOn = Events[i]->IsKeyOn()) != 0 && pKeyOn->GetEventLength() == 0)
+    if ((pKeyOn = mppEvents[i]->IsKeyOn()) != 0 && pKeyOn->GetEventLength() == 0)
     {
       int j;
       for (j = i + 1; j < nEvents; j++)
       {
-        JZKeyOffEvent* pKeyOff = Events[j]->IsKeyOff();
+        JZKeyOffEvent* pKeyOff = mppEvents[j]->IsKeyOff();
         if (
           pKeyOff &&
           !pKeyOff->IsKilled() &&
@@ -1255,12 +1255,12 @@ void JZEventArray::Keyoff2Length()
   // and kill all remaining KeyOff's
   for (i = 0; i < nEvents; i++)
   {
-    JZKeyOnEvent* pKeyOn = Events[i]->IsKeyOn();
+    JZKeyOnEvent* pKeyOn = mppEvents[i]->IsKeyOn();
     if (pKeyOn && pKeyOn->GetEventLength() <= 0)
     {
       pKeyOn->Kill();
     }
-    JZKeyOffEvent* pKeyOff = Events[i]->IsKeyOff();
+    JZKeyOffEvent* pKeyOff = mppEvents[i]->IsKeyOff();
     if (pKeyOff)
     {
       pKeyOff->Kill();
@@ -1376,7 +1376,7 @@ void JZEventArray::Write(JZWriteBase& Io)
 
   for (int i = 0; i < nEvents; i++)
   {
-    pEvent = Events[i];
+    pEvent = mppEvents[i];
     WrittenBefore = 0;
     if (pEvent->IsControl())
     {
@@ -1656,7 +1656,7 @@ int JZEventArray::GetLastClock() const
   {
     return 0;
   }
-  return Events[nEvents - 1]->GetClock();
+  return mppEvents[nEvents - 1]->GetClock();
 }
 
 bool JZEventArray::IsEmpty() const
@@ -1668,7 +1668,7 @@ int JZEventArray::GetFirstClock()
 {
   if (nEvents)
   {
-    return Events[0]->GetClock();
+    return mppEvents[0]->GetClock();
   }
   return LAST_CLOCK;
 }
@@ -1966,7 +1966,7 @@ void JZTrack::Merge(JZEventArray *t)
 {
   for (int i = 0; i < t->nEvents; i++)
   {
-    Put(t->Events[i]);
+    Put(t->mppEvents[i]);
   }
   t->nEvents = 0;
 }
@@ -1991,7 +1991,7 @@ void JZTrack::MergeRange(
     }
   }
 
-  // Merge Recorded Events
+  // Merge Recorded mppEvents
   JZEventIterator Copy(&Other);
   JZEvent* pEvent = Copy.Range(FromClock, ToClock);
   while (pEvent)
@@ -2030,7 +2030,7 @@ void JZTrack::Undo()
     JZUndoBuffer *undo = &mUndoBuffers[mUndoIndex];
     for (int i = undo->nEvents - 1; i >= 0; i--)
     {
-      JZEvent* pEvent = undo->Events[i];
+      JZEvent* pEvent = undo->mppEvents[i];
       if (undo->bits(i))
       {
         undo->bits.set(i, 0);
@@ -2060,7 +2060,7 @@ void JZTrack::Redo()
     JZUndoBuffer *undo = &mUndoBuffers[mUndoIndex];
     for (int i = 0; i < undo->nEvents; i++)
     {
-      JZEvent* pEvent = undo->Events[i];
+      JZEvent* pEvent = undo->mppEvents[i];
       if (undo->bits(i))
       {
         undo->bits.set(i, 0);

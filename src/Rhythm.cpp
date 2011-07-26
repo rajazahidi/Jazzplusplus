@@ -943,7 +943,7 @@ void JZRhythmWindow::AddInstrumentDlg()
 
       for (int ii = 0; ii < events.nEvents; ii++)
       {
-        JZKeyOnEvent* pKeyOn = events.Events[ii]->IsKeyOn();
+        JZKeyOnEvent* pKeyOn = events.mppEvents[ii]->IsKeyOn();
         if (pKeyOn)
         {
           pRhythm->keys[pRhythm->n_keys++] = pKeyOn->GetKey();

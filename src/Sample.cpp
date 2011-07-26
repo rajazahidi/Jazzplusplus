@@ -43,7 +43,7 @@ JZSample::JZSample(JZSampleSet &s)
     mLabel(),
     mFileName()
 {
-  data     = 0;
+  mpData   = 0;
   length   = 0;
   external_flag = 1;  // auto reload when file changes on disk
   external_time = 0;
@@ -56,7 +56,7 @@ JZSample::JZSample(JZSampleSet &s)
 
 JZSample::~JZSample()
 {
-  delete [] data;
+  delete [] mpData;
 }
 
 void JZSample::SetLabel(const std::string& Label)
@@ -87,19 +87,19 @@ void JZSample::Clear()
 
 void JZSample::FreeData()
 {
-  delete [] data;
-  data   = 0;
+  delete [] mpData;
+  mpData = 0;
   length = 0;
   dirty  = 1;
 }
 
 void JZSample::MakeData(int new_length, int zero)
 {
-  delete [] data;
+  delete [] mpData;
   length = new_length;
-  data = new short[length];
+  mpData = new short[length];
   if (zero)
-    memset(data, 0, length * sizeof(short));
+    memset(mpData, 0, length * sizeof(short));
 }
 
 
@@ -108,7 +108,7 @@ void JZSample::Set(JZFloatSample &fs)
   MakeData(fs.GetLength());
   for (int i = 0; i < length; i++)
   {
-    data[i] = (short)fs[i];
+    mpData[i] = (short)fs[i];
   }
 }
 
@@ -119,7 +119,7 @@ void JZSample::Set(JZFloatSample &fs, int offs)
   AssureLength(offs + len);
   for (int i = 0; i < len; i++)
   {
-    data[offs + i] = (short)fs[i];
+    mpData[offs + i] = (short)fs[i];
   }
 }
 
@@ -147,17 +147,17 @@ void JZSample::SetSmooth(JZFloatSample &fs, int offs, int fade)
 
   while (i < ofs1)
   {
-    data[offs + i] = (short)(fi.XToY(i) * fs[i] + fo.XToY(i) * data[offs + i]);
+    mpData[offs + i] = (short)(fi.XToY(i) * fs[i] + fo.XToY(i) * mpData[offs + i]);
     i++;
   }
   while (i < ofs2)
   {
-    data[offs + i] = (short)fs[i];
+    mpData[offs + i] = (short)fs[i];
     i++;
   }
   while (i < ofs3)
   {
-    data[offs + i] = (short)(fo.XToY(i-ofs2) * fs[i] + fi.XToY(i-ofs2) * data[offs + i]);
+    mpData[offs + i] = (short)(fo.XToY(i-ofs2) * fs[i] + fi.XToY(i-ofs2) * mpData[offs + i]);
     i++;
   }
 }
@@ -301,20 +301,20 @@ int JZSample::Convert(
 
   // load the file
   length = bytes / 2;
-  delete [] data;
-  data = new short [length];
-  is.read((char *)data, length * 2);
+  delete [] mpData;
+  mpData = new short [length];
+  is.read((char *)mpData, length * 2);
 
   // convert 8 -> 16 bit
   if (bits == 8)
   {
     int i;
-    char *tmp = (char *)data;
+    char *tmp = (char *)mpData;
     length = bytes;
-    data = new short [length];
+    mpData = new short [length];
     for (i = 0; i < length; ++i)
     {
-      data[i] = ((short) ((signed char)tmp[i] ^ (signed char)0x80)) << 8;
+      mpData[i] = ((short) ((signed char)tmp[i] ^ (signed char)0x80)) << 8;
     }
     delete [] tmp;
   }
@@ -322,15 +322,15 @@ int JZSample::Convert(
   // convert mono -> stereo
   if (channels == 1 && set.GetChannelCount() == 2)
   {
-    short *old = data;
+    short *old = mpData;
     length = length * 2;
-    data = new short [length];
+    mpData = new short [length];
     int i = 0;
     int j = 0;
     while (i < length)
     {
-      data[i++] = old[j];
-      data[i++] = old[j++];
+      mpData[i++] = old[j];
+      mpData[i++] = old[j++];
     }
     delete [] old;
     channels = 2;
@@ -338,15 +338,15 @@ int JZSample::Convert(
   // convert stereo -> mono
   else if (channels == 2 && set.GetChannelCount() == 1)
   {
-    short *old = data;
+    short *old = mpData;
     length = length / 2;
-    data = new short [length];
+    mpData = new short [length];
     int i = 0;
     int j = 0;
     while (i < length)
     {
       int val = ((int)old[j] + old[j+1]) / 2;
-      data[i++] = (short)val;
+      mpData[i++] = (short)val;
       j += 2;
     }
     delete [] old;
@@ -378,8 +378,8 @@ int JZSample::Convert(
     }
     for (int i = 0; i < length-1; i += 2)
     {
-      data[i]   = (short)((int)data[i]   * ch1 >> 7);
-      data[i+1] = (short)((int)data[i+1] * ch2 >> 7);
+      mpData[i]   = (short)((int)mpData[i]   * ch1 >> 7);
+      mpData[i+1] = (short)((int)mpData[i+1] * ch2 >> 7);
     }
   }
 
@@ -400,8 +400,8 @@ int JZSample::LoadRaw()
   external_time = buf.st_mtime;
 
   ifstream is(mFileName.c_str(), ios::binary | ios::in);
-  data = new short [length];
-  is.read((char *)data, length * 2);
+  mpData = new short [length];
+  is.read((char *)mpData, length * 2);
   return 0;
 }
 
@@ -451,7 +451,7 @@ void JZSample::Copy(JZSample &dst, int fr_smpl, int to_smpl)
   to_smpl = (to_smpl < 0) ? length : to_smpl;
   int count = to_smpl - fr_smpl;
   dst.MakeData(count);
-  memcpy(dst.data, data + fr_smpl, count * sizeof(short));
+  memcpy(dst.mpData, mpData + fr_smpl, count * sizeof(short));
 }
 
 
@@ -463,14 +463,14 @@ void JZSample::Delete(int fr_smpl, int to_smpl)
   short *new_data = new short [new_length];
 
   int fr_offs = fr_smpl * sizeof(short);
-  memcpy(new_data, data, fr_offs);
+  memcpy(new_data, mpData, fr_offs);
   memcpy(
     new_data + fr_smpl,
-    data + to_smpl,
+    mpData + to_smpl,
     (length - to_smpl) * sizeof(short));
 
-  delete [] data;
-  data = new_data;
+  delete [] mpData;
+  mpData = new_data;
   length = new_length;
 }
 
@@ -488,12 +488,12 @@ void JZSample::InsertSilence(int pos, int len)
   int bytes1 = pos * sizeof(short);
   int bytes2 = len * sizeof(short);
   int bytes3 = (length - pos) * sizeof(short);
-  memcpy(new_data, data, bytes1);
+  memcpy(new_data, mpData, bytes1);
   memset(new_data + pos, 0, bytes2);
-  memcpy(new_data + pos + len, data + pos, bytes3);
+  memcpy(new_data + pos + len, mpData + pos, bytes3);
 
-  delete [] data;
-  data = new_data;
+  delete [] mpData;
+  mpData = new_data;
   length = new_length;
 }
 
@@ -502,13 +502,13 @@ void JZSample::ReplaceSilence(int offs, int len)
 {
   AssureLength(offs + len);
   while (len-- > 0)
-    data[offs++] = 0;
+    mpData[offs++] = 0;
 }
 
 void JZSample::PasteIns(JZSample &src, int offs)
 {
   InsertSilence(offs, src.length);
-  memcpy(data + offs, src.data, src.length * sizeof(short));
+  memcpy(mpData + offs, src.mpData, src.length * sizeof(short));
 }
 
 
@@ -518,7 +518,7 @@ void JZSample::PasteMix(JZSample &src, int offs)
   JZFloatSample fs(*this);
   for (int i = 0; i < src.length; i++)
   {
-    fs[offs + i] += src.data[i];
+    fs[offs + i] += src.mpData[i];
   }
   fs.RescaleToShort();
   Set(fs);
@@ -531,9 +531,9 @@ void JZSample::Reverse(int fr, int to)
     to = length - 1;
   while (to > fr)
   {
-    short tmp = data[fr];
-    data[fr] = data[to];
-    data[to] = tmp;
+    short tmp = mpData[fr];
+    mpData[fr] = mpData[to];
+    mpData[to] = tmp;
     to--;
     fr++;
   }
@@ -546,7 +546,7 @@ void JZSample::Flip(int ch)
   int step = set.GetChannelCount();
   while (i < length)
   {
-    data[i] = -data[i];
+    mpData[i] = -mpData[i];
     i += step;
   }
 }
@@ -583,7 +583,7 @@ int JZSample::Peak()
   int peak = 0;
   for (int i = 0; i < length; i++)
   {
-    int d = abs(data[i]);
+    int d = abs(mpData[i]);
     if (d > peak)
       peak = d;
   }
@@ -597,7 +597,7 @@ void JZSample::Rescale(short maxval)
   {
     float f = maxval / peak;
     for (int i = 0; i < length; i++)
-      data[i] = (short)(f * data[i]);
+      mpData[i] = (short)(f * mpData[i]);
   }
 }
 
@@ -632,12 +632,12 @@ void JZSample::Transpose(float f)
     int k = i * channels;
     for (int c = 0; c < channels; c++)
     {
-      JZMapper Map(0, 1, data[j + c], data[j + channels + c]);
+      JZMapper Map(0, 1, mpData[j + c], mpData[j + channels + c]);
       new_data[k + c] = (short)Map.XToY(rem);
     }
   }
-  delete data;
-  data = new_data;
+  delete mpData;
+  mpData = new_data;
   length = new_length;
 }
 
@@ -688,7 +688,7 @@ void JZFloatSample::Filter(int fr, int to, JZSplFilter::Type type, int order, do
   for (i = fr; i < to; i += channels)
   {
     for (int c = 0; c < channels; c++)
-      data[i + c] = filters[c].Loop(data[i + c]);
+      mpData[i + c] = filters[c].Loop(mpData[i + c]);
   }
   delete [] filters;
 }
@@ -729,7 +729,7 @@ int JZSample::SaveWave()
   ofstream os(mFileName.c_str(), ios::out | ios::binary | ios::trunc);
 
   os.write((char *)&wh, sizeof(wh));
-  os.write((char *)data, length * sizeof(short));
+  os.write((char *)mpData, length * sizeof(short));
 
   return os.bad();
 }
@@ -742,9 +742,9 @@ JZFloatSample::JZFloatSample(JZSample &spl)
 {
   current = 0;
   length = spl.length;
-  data   = new float [length];
+  mpData = new float [length];
   for (int i = 0; i < length; i++)
-    data[i] = (float)spl.data[i];
+    mpData[i] = (float)spl.mpData[i];
   channels = spl->GetChannelCount();
   sampling_rate = spl->GetSamplingRate();
 }
@@ -753,9 +753,9 @@ JZFloatSample::JZFloatSample(JZSample &spl, int fr, int to)
 {
   current = 0;
   length = to - fr;
-  data   = new float [length];
+  mpData   = new float [length];
   for (int i = 0; i < length; i++)
-    data[i] = (float)spl.data[i + fr];
+    mpData[i] = (float)spl.mpData[i + fr];
   channels = spl->GetChannelCount();
   sampling_rate = spl->GetSamplingRate();
 }
@@ -766,14 +766,14 @@ JZFloatSample::JZFloatSample(int ch, int sr)
   channels = ch;
   sampling_rate = sr;
   length = 1000;
-  data = new float [length];
-  memset(data, 0, length * sizeof(float));
+  mpData = new float [length];
+  memset(mpData, 0, length * sizeof(float));
 }
 
 
 JZFloatSample::~JZFloatSample()
 {
-  delete [] data;
+  delete [] mpData;
 }
 
 
@@ -786,7 +786,7 @@ float JZFloatSample::Peak(int fr, int to)
   float peak = 0;
   for (int i = fr; i < to; i++)
   {
-    float d = fabs(data[i]);
+    float d = fabs(mpData[i]);
     if (d > peak)
       peak = d;
   }
@@ -805,7 +805,7 @@ void JZFloatSample::Rescale(float maxval, int fr, int to)
   {
     float f = maxval / peak;
     for (int i = fr; i < to; i++)
-      data[i] *= f;
+      mpData[i] *= f;
   }
 }
 
@@ -821,20 +821,20 @@ void JZFloatSample::RescaleToShort(int fr, int to)
   {
     float f = 32767.0 / peak;
     for (int i = fr; i < to; i++)
-      data[i] *= f;
+      mpData[i] *= f;
   }
 }
 
 
 void JZFloatSample::Initialize(int size)
 {
-  delete [] data;
+  delete [] mpData;
   length = 0;
   if (size > 0)
   {
     length = size;
-    data = new float [length];
-    memset(data, 0, length * sizeof(float));
+    mpData = new float [length];
+    memset(mpData, 0, length * sizeof(float));
   }
 }
 
@@ -843,13 +843,13 @@ void JZFloatSample::PasteMix(JZFloatSample &src, int offs)
 {
   AssureLength(offs + src.length);
   for (int i = 0; i < src.length; i++)
-    data[offs + i] += src.data[i];
+    mpData[offs + i] += src.mpData[i];
 }
 
 void JZFloatSample::RemoveTrailingSilence(float peak)
 {
   int len1 = length - channels;  // last value
-  while (len1 > 0 && fabs(data[len1]) < peak)
+  while (len1 > 0 && fabs(mpData[len1]) < peak)
     len1 -= channels;
   length = len1 + channels;
 }
@@ -859,7 +859,7 @@ void JZFloatSample::PasteMix(JZSample &src, int offs)
 {
   AssureLength(offs + src.length);
   for (int i = 0; i < src.length; i++)
-    data[offs + i] += src.data[i];
+    mpData[offs + i] += src.mpData[i];
 }
 
 
@@ -873,12 +873,12 @@ void JZFloatSample::Normalize()
   float wmax, xmax = 0;
   for (j = 0; j < length; j++)
   {
-    if ((wmax = (float)fabs(data[j])) > xmax)
+    if ((wmax = (float)fabs(mpData[j])) > xmax)
       xmax = wmax;
   }
   for (j = 0; j < length; j++)
   {
-    data[j] /= xmax;
+    mpData[j] /= xmax;
   }
 }
 
@@ -888,7 +888,7 @@ void JZFloatSample::HanningWindow(int size)
   channels = 1;
   Initialize(size);
   for (int i = 0; i < length; i++)
-    data[i] = -cos(2.0*M_PI * (float)i/(float)(length)) * 0.5 + 0.5;
+    mpData[i] = -cos(2.0*M_PI * (float)i/(float)(length)) * 0.5 + 0.5;
   Normalize();
 }
 
@@ -900,7 +900,7 @@ void JZFloatSample::HammingWindow(int size)
   channels = 1;
   Initialize(size);
   for (int i = 0; i < length; i++)
-    data[i] = 0.54 - 0.46*cos(2.0*M_PI * (float)i/(float)(length));
+    mpData[i] = 0.54 - 0.46*cos(2.0*M_PI * (float)i/(float)(length));
   Normalize();
 }
 
@@ -918,13 +918,13 @@ JZFloatSample::ExpSegments(int size, int nargs, float pval[])
     amp1 = amp2;
     amp2 = pvals[k+1];
     j = i + 1;
-    data[i] = amp1;
+    mpData[i] = amp1;
     c = (float) pow((amp2/amp1),(1./ pvals[k]));
     i = (j - 1) + pvals[k];
     for (l = j; l < i; l++)
     {
       if (l < size)
-        data[l] = data[l-1] * c;
+        mpData[l] = mpData[l-1] * c;
     }
   }
   Normalize();
@@ -936,7 +936,7 @@ JZFloatSample::LineSegments(int size, int nargs, float pval[])
   channels = 1;
   Initialize(size);
   CMixCmd cmix(sampling_rate);
-  cmix.setline(pvals, nargs, size, data);
+  cmix.setline(pvals, nargs, size, mpData);
   Normalize();
 }
 #endif
@@ -973,12 +973,12 @@ void JZFloatSample::InsertSilence(int pos, int len)
   int bytes1 = pos * sizeof(float);
   int bytes2 = len * sizeof(float);
   int bytes3 = (length - pos) * sizeof(float);
-  memcpy(new_data, data, bytes1);
+  memcpy(new_data, mpData, bytes1);
   memset(new_data + pos, 0, bytes2);
-  memcpy(new_data + pos + len, data + pos, bytes3);
+  memcpy(new_data + pos + len, mpData + pos, bytes3);
 
-  delete [] data;
-  data = new_data;
+  delete [] mpData;
+  mpData = new_data;
   length = new_length;
 }
 
@@ -1020,7 +1020,7 @@ int JZFloatSample::AddOut(float *p)
   if (current >= length)
     AssureLength(length * 2);
   for (int i = 0; i < channels; i++)
-    data[current++] += p[i];
+    mpData[current++] += p[i];
   return 1;
 }
 
@@ -1028,7 +1028,7 @@ int JZFloatSample::AddOut(float *p)
 int JZFloatSample::GetIn(float *p)
 {
   for (int i = 0; i < channels; i++)
-    p[i] = data[current++];
+    p[i] = mpData[current++];
   return current < length;
 }
 
@@ -1047,7 +1047,7 @@ int JZFloatSample::GetSample(float x, float *p)
     return 0;
   for (int c = 0; c < channels; c++)
   {
-    JZMapper Map(0, 1, data[i + c], data[i + channels + c]);
+    JZMapper Map(0, 1, mpData[i + c], mpData[i + channels + c]);
     p[c] = Map.XToY(rem);
   }
   return 1;
@@ -1059,9 +1059,9 @@ void JZFloatSample::Convert2Mono()
   // convert this sample to mono
   if (channels != 2)  // only stereo so far
     return;
-  float *dst = data;
+  float *dst = mpData;
   for (int i = 0; i < length - 1; i += 2)
-    *dst++ = (data[i] + data[i+1]) / 2.0;
+    *dst++ = (mpData[i] + mpData[i+1]) / 2.0;
   length = length / 2;
   channels = 1;
 }
@@ -1078,7 +1078,7 @@ void JZFloatSample::Echo(int num_echos, int delay, float ampl)
     int k = i - delay;
     for (int j = 0; k >= 0 && j < num_echos; j++)
     {
-      data[i] += data[k] * a;
+      mpData[i] += mpData[k] * a;
       a *= ampl;
       k -= delay;
     }
@@ -1106,7 +1106,7 @@ void JZFloatSample::RndEcho(int num_echos, int delay, float ampl)
     int k = i - delay;
     for (int j = 0; k >= 0 && j < num_echos; j++)
     {
-      data[i] += data[k] * a;
+      mpData[i] += mpData[k] * a;
       a *= ampl;
       k -= delays[j];
     }
@@ -1142,10 +1142,10 @@ void JZFloatSample::RndEchoStereo(int num_echos, int delay, float ampl)
     {
       float ipan = ipans[j];
       float opan = opans[j];
-      float val = a * ( ipan * data[k] + (1.0 - ipan) * data[k+1] );
-      data[i]   += opan * val;
-      data[i+1] += (1.0 - opan) * val;
-      //data[i] += data[k] * a;
+      float val = a * ( ipan * mpData[k] + (1.0 - ipan) * mpData[k+1] );
+      mpData[i]   += opan * val;
+      mpData[i+1] += (1.0 - opan) * val;
+      //mpData[i] += mpData[k] * a;
       a *= ampl;
       k -= delays[j];
     }

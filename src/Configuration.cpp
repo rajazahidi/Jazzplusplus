@@ -917,6 +917,10 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
           int Value;
           istringstream Iss(InputLine);
           Iss >> Value;
+          if (Iss.fail())
+          {
+            cout << "Unable to read index." << endl;
+          }
 
           if (gpConfig->GetValue(C_UseTwoCommandBankSelect))
           {
@@ -927,6 +931,9 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
             assert(0 <= Value && Value <= 32639);
           }
           mDrumSets[DrumsetIndex + 1].second = Value + 1;
+
+          string SetName;
+          Iss >> SetName;
 
           string DrumSetName =
             TNStringUtilities::TrimLeadingAndTrailingBlanks(Iss.str());

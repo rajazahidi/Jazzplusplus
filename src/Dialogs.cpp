@@ -382,14 +382,14 @@ static JZEvent* CreateEventDialog(long Clock, int Channel, int Pitch)
 {
   wxArrayString Names;
 
-   Names.Add("Note On");
-   Names.Add("Controller");
-   Names.Add("Program Change");
-   Names.Add("Set Tempo");
-   Names.Add("SysEx");
-   Names.Add("Play Track(experimental)");
-   Names.Add("End Of Track");
-   Names.Add("Text");
+  Names.Add("Note On");
+  Names.Add("Controller");
+  Names.Add("Program Change");
+  Names.Add("Set Tempo");
+  Names.Add("SysEx");
+  Names.Add("Play Track(experimental)");
+  Names.Add("End Of Track");
+  Names.Add("Text");
 
   static long Values[] =
   {
@@ -453,7 +453,7 @@ static JZEvent* CreateEventDialog(long Clock, int Channel, int Pitch)
 //   Display a dialog box to select an event to be created.
 //*****************************************************************************
 void EventDialog(
-  JZEvent* pEvent,
+  JZEvent*& pEvent,
   JZPianoWindow* pPianoWindow,
   JZTrack* pTrack,
   long Clock,

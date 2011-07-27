@@ -108,7 +108,7 @@ class JZMidiDelayDlg : public JZPropertyListDlg
 #endif
 
 void EventDialog(
-  JZEvent*,
+  JZEvent*&,
   JZPianoWindow*,
   JZTrack*,
   long Clock,

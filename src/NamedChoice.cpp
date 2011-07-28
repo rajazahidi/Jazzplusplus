@@ -23,7 +23,6 @@
 #include "NamedChoice.h"
 
 #include "NamedValue.h"
-#include "DeprecatedStringUtils.h"
 #include "DeprecatedWx/proplist.h"
 
 using namespace std;
@@ -49,12 +48,17 @@ wxFormItem *JZNamedChoice::mkFormItem(int w, int h)
   SetValue();
 
   // following adapted from wxwin/src/base/wb_form.cc
-  wxList *list = new wxList;
+  wxList* pList = new wxList;
   for (int i = 0; mpValues[i].Name; i++)
-    if (*mpValues[i].Name)        // omit empty entries
-      list->Append((wxObject *)copystring(mpValues[i].Name));
+  {
+    // Omit empty entries.
+    if (*mpValues[i].Name)
+    {
+      pList->Append((wxObject *)copystring(mpValues[i].Name));
+    }
+  }
 
-  wxFormItemConstraint *constraint = wxMakeConstraintStrings(list);
+  wxFormItemConstraint *constraint = wxMakeConstraintStrings(pList);
   return wxMakeFormString(
      mpTitle,
      &mpSelection,

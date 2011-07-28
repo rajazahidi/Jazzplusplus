@@ -645,7 +645,7 @@ void JZAlsaPlayer::Notify()
   }
 
   play_clock = Now;
-  if (mPlayBuffer.nEvents && mPlayBuffer.Events[0]->GetClock() < mOutClock)
+  if (mPlayBuffer.nEvents && mPlayBuffer.mppEvents[0]->GetClock() < mOutClock)
   {
     FlushToDevice();
   }

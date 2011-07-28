@@ -716,8 +716,7 @@ int JZSample::SaveWave()
   wh.sc_len = 16;
   wh.sample_fq = set.GetSamplingRate();
   wh.bit_p_spl = set.GetBitsPerSample();
-  wh.byte_p_spl =
-    set.GetChannelCount() * (set.GetBitsPerSample() > 8 ? 2 : 1);
+  wh.byte_p_spl = set.GetChannelCount() * (set.GetBitsPerSample() > 8 ? 2 : 1);
   wh.byte_p_sec = wh.byte_p_spl * wh.sample_fq;
   wh.data_length = length * sizeof(short);
   wh.length = wh.data_length + sizeof(WaveHeader);

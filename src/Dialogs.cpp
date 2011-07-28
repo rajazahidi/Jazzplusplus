@@ -22,7 +22,6 @@
 
 #include "Dialogs.h"
 
-#include "ClockDialog.h"
 #include "Command.h"
 #if 0
 #include "DeprecatedWx/proplist.h"

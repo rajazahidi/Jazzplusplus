@@ -14,7 +14,6 @@ AlsaThru.cpp \
 AsciiMidiFile.cpp \
 Audio.cpp \
 AudioDriver.cpp \
-ClockDialog.cpp \
 Command.cpp \
 Configuration.cpp \
 ControlEdit.cpp \
@@ -112,7 +111,6 @@ jazz_SOURCES = \
 AboutDialog.cpp \
 AsciiMidiFile.cpp \
 Audio.cpp \
-ClockDialog.cpp \
 Command.cpp \
 Configuration.cpp \
 ControlEdit.cpp \
@@ -215,7 +213,6 @@ AlsaThru.h \
 AsciiMidiFile.h \
 Audio.h \
 AudioDriver.h \
-ClockDialog.h \
 Command.h \
 Configuration.h \
 ControlEdit.h \

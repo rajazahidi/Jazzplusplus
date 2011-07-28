@@ -25,7 +25,6 @@
 #include "Audio.h"
 #include "Random.h"
 #include "SampleCommand.h"
-#include "DeprecatedStringUtils.h"
 #include "Mapper.h"
 
 #include <cassert>

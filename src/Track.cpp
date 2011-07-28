@@ -1682,7 +1682,7 @@ class JZTrackDlg : public wxForm
 {
   JZTrackWindow* TrackWin;
   JZTrack *trk;
-  char *TrackName;
+  std::string& mTrackName;
   JZNamedChoice PatchChoice;
   JZNamedChoice DeviceChoice;
   int PatchNr;
@@ -1733,13 +1733,13 @@ void JZTrackDlg::OnOk()
   if (ClearTrack)
   {
     trk->Clear();
-    delete TrackName;
+    mTrackName.clear();
     TrackWin->Redraw();
     wxForm::OnOk();
     return;
   }
-  trk->SetName(TrackName);
-  delete TrackName;
+  trk->SetName(mTrackName);
+  mTrackName.clear();
   PatchChoice.GetValue();
   DeviceChoice.GetValue();
   BankNr = (PatchNr & 0x0000ff00) >> 8;

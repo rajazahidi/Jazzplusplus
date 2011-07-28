@@ -28,9 +28,9 @@
 // Description:
 //   Add a supplied extension to a file name if the file name doesn't already
 // have an extension.
-//   ext is assumed to have a leading dot. (.mid for example)
+//   Extension is assumed to have a leading dot. (.mid for example)
 //*****************************************************************************
-wxString add_default_ext(const wxString fn, const wxString ext)
+wxString add_default_ext(const wxString fn, const wxString Extension)
 
 {
   // Is any extension already there?
@@ -45,7 +45,7 @@ wxString add_default_ext(const wxString fn, const wxString ext)
 
   // Otherwise append the supplied extension and return
   wxString RevisedFileName = fn;
-  RevisedFileName += ext;
+  RevisedFileName += Extension;
   return RevisedFileName;
 }
 
@@ -60,29 +60,29 @@ wxString add_default_ext(const wxString fn, const wxString ext)
 //     This is the file name.
 //*****************************************************************************
 wxString file_selector(
-  wxString deffile,
+  wxString DefaultFileName,
   const wxString title,
   bool save,
   bool changed,
-  const wxString ext)
+  const wxString Extension)
 {
    wxString file;
    wxString path;
 
    if (save)
    {
-     file = wxFileNameFromPath(deffile);
+     file = wxFileNameFromPath(DefaultFileName);
    }
 
-   path = wxPathOnly(deffile);
+   path = wxPathOnly(DefaultFileName);
 
    int flags = save ? wxFD_SAVE : wxFD_OPEN;
-   wxString s = wxFileSelector(title, path, file, 0, ext, flags);
+   wxString s = wxFileSelector(title, path, file, 0, Extension, flags);
 
   // add extension if missing
-   if (!s.empty() && ext)
+   if (!s.empty() && Extension)
   {
-    s = add_default_ext(s, ext);
+    s = add_default_ext(s, Extension);
   }
 
   // warn if overwriting existent file
@@ -104,7 +104,7 @@ wxString file_selector(
   if (s && !save && changed)
   {
     wxString buf;
-    buf<<deffile;
+    buf << DefaultFileName;
     buf <<" has changed. Load anyway?";
     if (wxMessageBox(buf, "Load ?", wxYES_NO) == wxNO)
     {
@@ -124,11 +124,10 @@ wxString file_selector(
     }
   }
 
-  if (s!=wxEmptyString)
+  if (s != wxEmptyString)
   {
-    //delete [] deffile;
-    //deffile = s;
-    //return deffile;
+    //DefaultFileName = s;
+    //return DefaultFileName;
     //i dont understand the point of the above original construct
 //     wxString rv=*(new wxString(s));
 //     return rv;//copy the local string and return it

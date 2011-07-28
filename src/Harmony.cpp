@@ -591,7 +591,7 @@ class JZHarmonyBrowserCanvas : public wxScrolledWindow
 
     int mSequenceCount;
 
-    std::string mDefaultFileName;
+    wxString mDefaultFileName;
 
     bool mHasChanged;
 
@@ -836,8 +836,15 @@ END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZHarmonyBrowserCanvas::JZHarmonyBrowserCanvas(wxFrame* pParent, int x, int y, int w, int h)
-  : wxScrolledWindow(pParent, wxID_ANY, wxPoint(x, y), wxSize(w, h))
+JZHarmonyBrowserCanvas::JZHarmonyBrowserCanvas(
+  wxFrame* pParent,
+  int x,
+  int y,
+  int w,
+  int h)
+  : wxScrolledWindow(pParent, wxID_ANY, wxPoint(x, y), wxSize(w, h)),
+    mDefaultFileName("noname.har")
+
 {
   mSequenceCount  = 0;
 
@@ -876,7 +883,6 @@ JZHarmonyBrowserCanvas::JZHarmonyBrowserCanvas(wxFrame* pParent, int x, int y, i
   }
 
 
-  mDefaultFileName = "noname.har";
   mHasChanged      = false;
 
   SetScrollbars(0, (int)(mChordHeight + 0.5), 0, 12 + SEQMAX / 8 + 2, 0, 0);
@@ -1435,7 +1441,7 @@ void JZHarmonyBrowserCanvas::TransposeSelection()
 void JZHarmonyBrowserCanvas::FileLoad()
 {
   wxString FileName = file_selector(
-    mDefaultFileName.c_str(),
+    mDefaultFileName,
     "Load Harmonies",
     false,
     mHasChanged,
@@ -1453,7 +1459,7 @@ void JZHarmonyBrowserCanvas::FileLoad()
 void JZHarmonyBrowserCanvas::FileSaveAs()
 {
   wxString FileName = file_selector(
-    mDefaultFileName.c_str(),
+    mDefaultFileName,
     "Save Harmonies",
     true,
     mHasChanged,

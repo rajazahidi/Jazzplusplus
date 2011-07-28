@@ -233,7 +233,7 @@ class JZRhythmWindow : public wxFrame
 
     void RndEnable();
 
-    char *default_filename;
+    wxString mDefaultFileName;
     bool has_changed;
     wxToolBar* mpToolBar;
     float tb_width, tb_height;

@@ -542,14 +542,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\DeprecatedStringUtils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\DeprecatedStringUtils.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\Dialogs.cpp"
 				>
 			</File>
@@ -776,10 +768,26 @@
 			<File
 				RelativePath="..\src\NamedChoice.cpp"
 				>
+				<FileConfiguration
+					Name="Debug GUI VC9|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\src\NamedChoice.h"
 				>
+				<FileConfiguration
+					Name="Debug GUI VC9|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\src\NamedValue.cpp"

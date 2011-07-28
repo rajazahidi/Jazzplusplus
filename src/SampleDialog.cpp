@@ -30,7 +30,6 @@
 #include "Song.h"   // Speed()
 #include "ToolBar.h"
 #include "FileSelector.h"
-#include "DeprecatedStringUtils.h"
 #include "Help.h"
 
 #include <wx/checkbox.h>
@@ -496,11 +495,11 @@ static JZToolDef syn_tdefs[] = {
 
 
 JZSynthDlg::JZSynthDlg(JZSampleFrame& SampleFrame)
-: JZSliderWindow(&SampleFrame, "Additive Synthesis", geo, syn_tdefs),
-  win(SampleFrame)
+  : JZSliderWindow(&SampleFrame, "Additive Synthesis", geo, syn_tdefs),
+    win(SampleFrame),
+    mDefaultFileName("noname.syn")
 {
   Initialize();
-  default_filename = copystring("noname.syn");
 }
 
 JZSynthDlg::~JZSynthDlg()
@@ -508,7 +507,6 @@ JZSynthDlg::~JZSynthDlg()
   int i;
   for (i = 0; i < MAXSYNTHS; i++)
     delete synths[i];
-  delete [] default_filename;
 }
 
 ostream& operator << (ostream& Os, JZSynthDlg const &a)
@@ -620,7 +618,12 @@ void JZSynthDlg::OnMenuCommand(int id)
   {
     case SYN_LOAD:
       {
-        wxString fname = file_selector(default_filename, "Load Synth", 0, 0, "*.syn");
+        wxString fname = file_selector(
+          mDefaultFileName,
+          "Load Synth",
+          0,
+          0,
+          "*.syn");
         if (fname)
         {
           ifstream is(fname);
@@ -637,7 +640,12 @@ void JZSynthDlg::OnMenuCommand(int id)
 
     case SYN_SAVE:
       {
-        wxString fname = file_selector(default_filename, "Save Synth", 1, 0, "*.syn");
+        wxString fname = file_selector(
+          mDefaultFileName,
+          "Save Synth",
+          1,
+          0,
+          "*.syn");
         if (fname)
         {
           ofstream os(fname);

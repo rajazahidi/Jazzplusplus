@@ -689,10 +689,10 @@ class JZSamplesDlg : public wxDialog
     wxText* pFile;
 #endif // OBSOLETE
 
-    static char* mpSamplePath;
+    static wxString mSamplePath;
     static int  current;
 
-    char* ListEntry(int i);
+    std::string ListEntry(int i);
     void Sample2Win(int index);
     void Win2Sample(int index);
     void SetCurrentListEntry(int i);
@@ -721,19 +721,18 @@ class JZAudioGloblForm : public wxForm
         "44100",
         0
       };
-      speed    = mSampleSet.GetSamplingRate();
-      speedstr = 0;
+      speed = mSampleSet.GetSamplingRate();
       for (int i = 0; speedtxt[i]; i++)
       {
         strlist.Append((wxObject*)speedtxt[i]);  // ???
         if (atol(speedtxt[i]) == speed)
         {
-          speedstr = copystring(speedtxt[i]);
+          mSpeedString = speedtxt[i];
         }
       }
-      if (!speedstr)
+      if (mSpeedString.empty())
       {
-        speedstr = copystring(speedtxt[0]);
+        mSpeedString = speedtxt[0];
       }
 
       enable = gpMidiPlayer->GetAudioEnabled();
@@ -742,8 +741,8 @@ class JZAudioGloblForm : public wxForm
 
       Add(wxMakeFormBool("Enable Audio", &enable));
       Add(wxMakeFormNewLine());
-      //Add(wxMakeFormString("Sample Freq", (char**)&speedstr, wxFORM_CHOICE,
-      Add(wxMakeFormString("Sample Freq", (char**)&speedstr, wxFORM_DEFAULT,
+      //Add(wxMakeFormString("Sample Freq", (char**)&mSpeedString, wxFORM_CHOICE,
+      Add(wxMakeFormString("Sample Freq", (char**)&mSpeedString.c_str(), wxFORM_DEFAULT,
           new wxList(wxMakeConstraintStrings(&strlist), 0), NULL, wxHORIZONTAL));
       Add(wxMakeFormNewLine());
       Add(wxMakeFormBool("Stereo", &stereo));
@@ -772,7 +771,8 @@ class JZAudioGloblForm : public wxForm
         return;
       wxBeginBusyCursor();
       mSampleSet.mpGlobalSettingsDialog = 0;
-      speed = atol(speedstr);
+      istringstream Iss(mSpeedString);
+      Iss >> speed;
       mSampleSet.SetSamplingRate(speed);
       mSampleSet.SetChannelCount(stereo ? 2 : 1);
       mSampleSet.SetSoftSync(mSoftwareSynchonization);
@@ -817,7 +817,7 @@ class JZAudioGloblForm : public wxForm
     wxList  strlist;
 
     long speed;
-    const char* speedstr;
+    const std::string mSpeedString;
     bool enable;
     bool stereo;
     bool mSoftwareSynchonization;
@@ -1134,7 +1134,7 @@ JZAudioBuffer* JZAudioRecordBuffer::RequestBuffer()
 #if 0
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-char* JZSamplesDlg::mpSamplePath = 0;
+wxString JZSamplesDlg::mSamplePath;
 int   JZSamplesDlg::current = 0;
 
 //-----------------------------------------------------------------------------
@@ -1143,9 +1143,9 @@ JZSamplesDlg::JZSamplesDlg(wxWindow* pParent, JZSampleSet& s)
   : wxDialog(pParent, wxID_ANY, wxString("Sample Settings")),
     set(s)
 {
-  if (mpSamplePath == 0)
+  if (mSamplePath.empty())
   {
-    mpSamplePath = copystring("*.wav");
+    mSamplePath = "*.wav";
   }
 
   wxArrayString SampleNames;
@@ -1199,12 +1199,12 @@ JZSamplesDlg::JZSamplesDlg(wxWindow* pParent, JZSampleSet& s)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-char* JZSamplesDlg::ListEntry(int i)
+string JZSamplesDlg::ListEntry(int i)
 {
   ostringstream Oss;
   Oss << i + 1 << ' ' << set.mSamples[i]->GetLabel();
 //  KeyToString(i, buf + strlen(buf));
-  return copystring(Oss.str().c_str());
+  return Oss.str();
 }
 
 //-----------------------------------------------------------------------------
@@ -1241,9 +1241,8 @@ void JZSamplesDlg::SetCurrentListEntry(int i)
 {
   if (i >= 0)
   {
-    current = i;
-    mpListBox->SetString(current, ListEntry(current));
-    mpListBox->SetSelection(current, true);
+    mpListBox->SetString(current, ListEntry(i));
+    mpListBox->SetSelection(i, true);
   }
 }
 
@@ -1275,7 +1274,7 @@ void JZSamplesDlg::OnCloseButton()
 void JZSamplesDlg::OnAddButton()
 {
   wxString FileName = file_selector(
-    mpSamplePath,
+    mSamplePath,
     "Load Sample",
     false,
     false,

@@ -24,7 +24,7 @@
 #define JZ_FILESELECTOR_H
 
 wxString file_selector(
-  wxString DefaultFile,
+  wxString DefaultFileName,
   const wxString Title,
   bool Sve,
   bool Changed,

@@ -23,7 +23,6 @@
 #include "Rhythm.h"
 
 #include "Command.h"
-#include "DeprecatedStringUtils.h"
 #include "EventWindow.h"
 #include "FileSelector.h"
 #include "Filter.h"
@@ -524,13 +523,13 @@ JZRhythmWindow::JZRhythmWindow(JZEventWindow* pEventWindow, JZSong* pSong)
       wxSize(640, 580)),
     edit(0),
     mpEventWindow(pEventWindow),
-    mpSong(pSong)
+    mpSong(pSong),
+    mDefaultFileName("noname.rhy")
 {
 #ifdef OBSOLETE
   in_create        = 1;
   n_instruments    = 0;
   act_instrument   = -1;
-  default_filename = copystring("noname.rhy");
   has_changed      = false;
 
   JZToolDef tdefs[] =
@@ -763,7 +762,7 @@ void JZRhythmWindow::OnMenuCommand(int id)
     case wxID_OPEN:
       {
         wxString fname = file_selector(
-          default_filename,
+          mDefaultFileName,
           "Load Rhythm",
           false,
           has_changed,
@@ -781,7 +780,7 @@ void JZRhythmWindow::OnMenuCommand(int id)
       {
         Win2Instrument();
         wxString fname = file_selector(
-          default_filename,
+          mDefaultFileName,
           "Save Rhythm",
           true,
           has_changed,

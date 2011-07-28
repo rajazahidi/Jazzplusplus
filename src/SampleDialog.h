@@ -150,7 +150,7 @@ class JZSynthDlg : public JZSliderWindow
     static bool noise_enable;
 
     static int geo[4];
-    char *default_filename;
+    wxString mDefaultFileName;
 };
 
 

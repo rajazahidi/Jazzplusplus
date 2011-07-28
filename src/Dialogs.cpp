@@ -40,7 +40,7 @@
 #include "Filter.h"
 #include "Globals.h"
 #include "Help.h"
-#include "NamedChoice.h"
+//#include "NamedChoice.h"
 #include "PianoFrame.h"
 #include "PianoWindow.h"
 #include "Player.h"
@@ -475,14 +475,14 @@ void EventDialog(
   switch (pEvent->GetStat())
   {
     case StatKeyOn:
-      if (pTrack->GetAudioMode())
-      {
-        if (!gpMidiPlayer->IsPlaying())
-        {
-          gpMidiPlayer->EditSample(pEvent->IsKeyOn()->GetKey());
-        }
-        break;
-      }
+//      if (pTrack->GetAudioMode())
+//      {
+//        if (!gpMidiPlayer->IsPlaying())
+//        {
+//          gpMidiPlayer->EditSample(pEvent->IsKeyOn()->GetKey());
+//        }
+//        break;
+//      }
 
       {
         JZKeyOnDialog KeyOnDialog(pEvent->IsKeyOn(), pTrack, pPianoWindow);

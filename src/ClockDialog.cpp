@@ -38,9 +38,7 @@ using namespace std;
 //-----------------------------------------------------------------------------
 JZClockDialog::JZClockDialog(JZSong* pSong, const char* pTitle, int Clock)
 {
-  string ClockString;
-  pSong->ClockToString(Clock, ClockString);
-  mpString = copystring(ClockString.c_str());
+  pSong->ClockToString(Clock, mString);
   mpTitle = pTitle;
   mpSong = pSong;
 }
@@ -49,7 +47,6 @@ JZClockDialog::JZClockDialog(JZSong* pSong, const char* pTitle, int Clock)
 //-----------------------------------------------------------------------------
 JZClockDialog::~JZClockDialog()
 {
-  delete mpString;
 }
 
 //-----------------------------------------------------------------------------
@@ -58,7 +55,7 @@ wxProperty* JZClockDialog::mkProperty()
 {
   return new wxProperty(
     mpTitle,
-    wxPropertyValue((char**)&mpString),
+    wxPropertyValue((char**)&mString.c_str()),
     "string");
 }
 
@@ -66,5 +63,5 @@ wxProperty* JZClockDialog::mkProperty()
 //-----------------------------------------------------------------------------
 int JZClockDialog::GetClock()
 {
-  return mpSong->StringToClock(mpString);
+  return mpSong->StringToClock(mString.c_str());
 }

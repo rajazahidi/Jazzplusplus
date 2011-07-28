@@ -38,7 +38,7 @@
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(JZSamplesDialog, wxDialog)
-  EVT_BUTTON(IDC_BN_SD_FILE_SELECT_BROWSE, OnSelectSampleFile)
+  EVT_BUTTON(IDC_BN_SD_FILE_SELECT_BROWSE, JZSamplesDialog::OnSelectSampleFile)
 END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------

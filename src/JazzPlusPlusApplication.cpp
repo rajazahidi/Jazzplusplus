@@ -210,7 +210,7 @@ void JZJazzPlusPlusApplication::ConfigureHelp()
       Is.open(HelpFileNameAndPath.c_str());
       if (!Is)
       {
-        wxString Message = "Failed to add the IPVT book " + mHelpFileName;
+        wxString Message = "Failed to add the Jazz++ book " + mHelpFileName;
         ::wxMessageBox(Message);
       }
       else
@@ -233,7 +233,7 @@ void JZJazzPlusPlusApplication::ConfigureHelp()
 
   if (HelpFileFound)
   {
-    // Add the IPVT help file the the help system.
+    // Add the Jazz++ help file the the help system.
     mHelp.AddBook(HelpFileNameAndPath);
 
     if (!WasHelpPathRead && pConfig)

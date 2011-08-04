@@ -295,7 +295,7 @@ private:
     wxPropertyFormView*       m_view;
 
     DECLARE_EVENT_TABLE()
-    DECLARE_CLASS(wxPropertyFormDialog)
+    DECLARE_DYNAMIC_CLASS(wxPropertyFormDialog)
 };
 
 /*
@@ -332,7 +332,7 @@ public:
 private:
     wxPropertyFormView*       m_view;
 
-    DECLARE_CLASS(wxPropertyFormPanel)
+    DECLARE_DYNAMIC_CLASS(wxPropertyFormPanel)
 };
 
 /*
@@ -369,7 +369,7 @@ private:
     wxPanel*                  m_propertyPanel;
 
     DECLARE_EVENT_TABLE()
-    DECLARE_CLASS(wxPropertyFormFrame)
+    DECLARE_DYNAMIC_CLASS(wxPropertyFormFrame)
 };
 
 #endif

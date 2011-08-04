@@ -1,10 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "A JazzPlusPlus Application", "JazzPlusPlus-VC10.vcxproj", "{8C82269C-4753-428B-B9B1-D21B46C6AD83}"
-	ProjectSection(ProjectDependencies) = postProject
-		{33E3B196-B9F4-4D0A-85E1-31C7BBD4967A} = {33E3B196-B9F4-4D0A-85E1-31C7BBD4967A}
-		{338224B8-D575-408D-BACF-95C557B429BE} = {338224B8-D575-408D-BACF-95C557B429BE}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "portmidi", "..\portmidi\pm_win\portmidi-VC10.vcxproj", "{33E3B196-B9F4-4D0A-85E1-31C7BBD4967A}"
 EndProject

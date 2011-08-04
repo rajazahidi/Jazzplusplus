@@ -107,7 +107,7 @@ bool JZTextDialog::TransferDataToWindow()
 
   string ClockString;
   gpProject->ClockToString(mpTextEvent->GetClock(), ClockString);
-  mpClockEdit->ChangeValue(ClockString.c_str());
+  mpClockEdit->ChangeValue(ClockString);
 
   return true;
 }
@@ -117,10 +117,10 @@ bool JZTextDialog::TransferDataToWindow()
 bool JZTextDialog::TransferDataFromWindow()
 {
   wxString Text = mpTextEdit->GetValue();
-  mpTextEvent->SetText(Text.c_str());
+  mpTextEvent->SetText(Text);
 
   wxString ClockString = mpClockEdit->GetValue();
-  int Clock = gpProject->StringToClock(ClockString.c_str());
+  int Clock = gpProject->StringToClock(ClockString);
   mpTextEvent->SetClock(Clock);
 
   return true;

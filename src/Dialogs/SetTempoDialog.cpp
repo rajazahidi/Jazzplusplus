@@ -112,7 +112,7 @@ bool JZSetTempoDialog::TransferDataToWindow()
 
   string ClockString;
   gpProject->ClockToString(mpSetTempoEvent->GetClock(), ClockString);
-  mpClockEdit->ChangeValue(ClockString.c_str());
+  mpClockEdit->ChangeValue(ClockString);
 
   return true;
 }
@@ -127,7 +127,7 @@ bool JZSetTempoDialog::TransferDataFromWindow()
     mpSetTempoEvent->SetBPM(BeatsPerMinute);
 
     wxString ClockString = mpClockEdit->GetValue();
-    int Clock = gpProject->StringToClock(ClockString.c_str());
+    int Clock = gpProject->StringToClock(ClockString);
     mpSetTempoEvent->SetClock(Clock);
 
     return true;

@@ -135,11 +135,11 @@ bool JZSysexDialog::TransferDataToWindow()
     }
   }
 
-  mpSysExEdit->ChangeValue(Oss.str().c_str());
+  mpSysExEdit->ChangeValue(Oss.str());
 
   string ClockString;
   gpProject->ClockToString(mpSysExEvent->GetClock(), ClockString);
-  mpClockEdit->ChangeValue(ClockString.c_str());
+  mpClockEdit->ChangeValue(ClockString);
 
   return true;
 }
@@ -195,7 +195,7 @@ bool JZSysexDialog::TransferDataFromWindow()
 //  mpSysExEvent->SetData(???);
 
   wxString ClockString = mpClockEdit->GetValue();
-  int Clock = gpProject->StringToClock(ClockString.c_str());
+  int Clock = gpProject->StringToClock(ClockString);
   mpSysExEvent->SetClock(Clock);
 
   return true;

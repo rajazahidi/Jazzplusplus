@@ -27,10 +27,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -70,6 +72,8 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|x64'">BuildDir\$(Platform)\$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|x64'">BuildDir\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|x64'">false</LinkIncremental>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|Win32'">JazzPlusPlus</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|Win32'">JazzPlusPlus</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|Win32'">
     <Midl>
@@ -107,7 +111,7 @@
       <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.2-VC10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>wxmsw28d_xrc.lib;wxbase28d_xml.lib;wxexpatd.lib;wxmsw28d_core.lib;wxmsw28d_adv.lib;wxmsw28d_html.lib;wxbase28d.lib;wxpngd.lib;wxzlibd.lib;wxjpegd.lib;wxtiffd.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;winmm.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxmsw29ud_xrc.lib;wxbase29ud_xml.lib;wxexpatd.lib;wxmsw29ud_core.lib;wxmsw29ud_adv.lib;wxmsw29ud_html.lib;wxbase29ud.lib;wxpngd.lib;wxzlibd.lib;wxjpegd.lib;wxtiffd.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;winmm.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\$(OutDir)JazzPlusPlus.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(EXT_PKGS)\wxMSW-2.9.2-VC10\lib\vc_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -209,7 +213,7 @@
       <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.2-VC10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>wxmsw28_xrc.lib;wxbase28_xml.lib;wxexpat.lib;wxmsw28_core.lib;wxmsw28_adv.lib;wxmsw28_html.lib;wxbase28.lib;wxpng.lib;wxzlib.lib;wxjpeg.lib;wxtiff.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;winmm.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxmsw29u_xrc.lib;wxbase29u_xml.lib;wxexpat.lib;wxmsw29u_core.lib;wxmsw29u_adv.lib;wxmsw29u_html.lib;wxbase29u.lib;wxpng.lib;wxzlib.lib;wxjpeg.lib;wxtiff.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;winmm.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\$(OutDir)JazzPlusPlus.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(EXT_PKGS)\wxMSW-2.9.2-VC10\lib\vc_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -288,6 +292,8 @@
     <ClCompile Include="..\src\Configuration.cpp" />
     <ClCompile Include="..\src\ControlEdit.cpp" />
     <ClCompile Include="..\src\Dialogs.cpp" />
+    <ClCompile Include="..\src\Dialogs\AudioSettingsDialog.cpp" />
+    <ClCompile Include="..\src\Dialogs\SamplesDialog.cpp" />
     <ClCompile Include="..\src\DynamicArray.cpp" />
     <ClCompile Include="..\src\ErrorMessage.cpp" />
     <ClCompile Include="..\src\EventFrame.cpp" />
@@ -335,6 +341,7 @@
     <ClCompile Include="..\src\Sample.cpp" />
     <ClCompile Include="..\src\SampleCommand.cpp" />
     <ClCompile Include="..\src\SampleDialog.cpp" />
+    <ClCompile Include="..\src\SampleFrame.cpp" />
     <ClCompile Include="..\src\SampleWindow.cpp" />
     <ClCompile Include="..\src\SelectControllerDialog.cpp" />
     <ClCompile Include="..\src\Signal2.cpp" />
@@ -391,6 +398,8 @@
     <ClInclude Include="..\src\Configuration.h" />
     <ClInclude Include="..\src\ControlEdit.h" />
     <ClInclude Include="..\src\Dialogs.h" />
+    <ClInclude Include="..\src\Dialogs\AudioSettingsDialog.h" />
+    <ClInclude Include="..\src\Dialogs\SamplesDialog.h" />
     <ClInclude Include="..\src\DynamicArray.h" />
     <ClInclude Include="..\src\ErrorMessage.h" />
     <ClInclude Include="..\src\EventFrame.h" />
@@ -439,6 +448,7 @@
     <ClInclude Include="..\src\Sample.h" />
     <ClInclude Include="..\src\SampleCommand.h" />
     <ClInclude Include="..\src\SampleDialog.h" />
+    <ClInclude Include="..\src\SampleFrame.h" />
     <ClInclude Include="..\src\SampleWindow.h" />
     <ClInclude Include="..\src\SelectControllerDialog.h" />
     <ClInclude Include="..\src\DeprecatedWx\setup.h" />
@@ -515,8 +525,12 @@ $(EXT_PKGS)\wxMSW-2.9.2-VC10\bin\tex2rtf "%(Filename).tex" "%(Filename).html" -h
     <None Include="..\src\Makefile.am" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="JazzPlusPlus-VC10.vcxproj">
-      <Project>{8c82269c-4753-428b-b9b1-d21b46c6ad83}</Project>
+    <ProjectReference Include="..\portmidi\pm_win\portmidi-VC10.vcxproj">
+      <Project>{33e3b196-b9f4-4d0a-85e1-31c7bbd4967a}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\portmidi\porttime\porttime-VC10.vcxproj">
+      <Project>{338224b8-d575-408d-bacf-95c557b429be}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>

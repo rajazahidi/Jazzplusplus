@@ -185,18 +185,18 @@ bool JZKeyOnDialog::TransferDataToWindow()
 {
   string KeyString;
   KeyToString(mpEvent->GetKey(), KeyString);
-  mpPitchEdit->ChangeValue(KeyString.c_str());
+  mpPitchEdit->ChangeValue(KeyString);
 
   ostringstream Oss;
 
   Oss << (int)mpEvent->GetVelocity();
-  mpVelocityValue->SetLabel(Oss.str().c_str());
+  mpVelocityValue->SetLabel(Oss.str());
 
   mpVelocityKnob->SetValue(mpEvent->GetVelocity());
 
   Oss.str("");
   Oss << (int)mpEvent->GetOffVelocity();
-  mpOffVelocityValue->SetLabel(Oss.str().c_str());
+  mpOffVelocityValue->SetLabel(Oss.str());
 
   mpOffVelocityKnob->SetValue(mpEvent->GetOffVelocity());
 
@@ -206,13 +206,13 @@ bool JZKeyOnDialog::TransferDataToWindow()
 
   Oss.str("");
   Oss << (int)mpEvent->GetChannel() + 1;
-  mpChannelValue->SetLabel(Oss.str().c_str());
+  mpChannelValue->SetLabel(Oss.str());
 
   mpChannelKnob->SetValue(mpEvent->GetChannel() + 1);
 
   string ClockString;
   gpProject->ClockToString(mpEvent->GetClock(), ClockString);
-  mpClockEdit->ChangeValue(ClockString.c_str());
+  mpClockEdit->ChangeValue(ClockString);
 
   return true;
 }
@@ -222,14 +222,14 @@ bool JZKeyOnDialog::TransferDataToWindow()
 bool JZKeyOnDialog::TransferDataFromWindow()
 {
   wxString KeyString = mpPitchEdit->GetValue();
-  mpEvent->SetKey(StringToKey(KeyString.c_str()));
+  mpEvent->SetKey(StringToKey(KeyString));
 
   mpEvent->SetVelocity(mpVelocityKnob->GetValue());
 
   mpEvent->SetOffVelocity(mpOffVelocityKnob->GetValue());
 
   wxString LengthString = mpLengthEdit->GetValue();
-  istringstream Iss(LengthString.c_str());
+  istringstream Iss(LengthString);
   unsigned short Length;
   Iss >> Length;
   mpEvent->SetLength(Length);
@@ -237,7 +237,7 @@ bool JZKeyOnDialog::TransferDataFromWindow()
   mpEvent->SetChannel(mpChannelKnob->GetValue() - 1);
 
   wxString ClockString = mpClockEdit->GetValue();
-  int Clock = gpProject->StringToClock(ClockString.c_str());
+  int Clock = gpProject->StringToClock(ClockString);
   mpEvent->SetClock(Clock);
 
   return true;
@@ -250,7 +250,7 @@ void JZKeyOnDialog::OnVelocityChange(JZKnobEvent& Event)
   int Value = Event.GetValue();
   ostringstream Oss;
   Oss << Value;
-  mpVelocityValue->SetLabel(Oss.str().c_str());
+  mpVelocityValue->SetLabel(Oss.str());
 }
 
 //-----------------------------------------------------------------------------
@@ -260,7 +260,7 @@ void JZKeyOnDialog::OnOffVelocityChange(JZKnobEvent& Event)
   int Value = Event.GetValue();
   ostringstream Oss;
   Oss << Value;
-  mpOffVelocityValue->SetLabel(Oss.str().c_str());
+  mpOffVelocityValue->SetLabel(Oss.str());
 }
 
 //-----------------------------------------------------------------------------
@@ -270,7 +270,7 @@ void JZKeyOnDialog::OnChannelChange(JZKnobEvent& Event)
   int Value = Event.GetValue();
   ostringstream Oss;
   Oss << Value;
-  mpChannelValue->SetLabel(Oss.str().c_str());
+  mpChannelValue->SetLabel(Oss.str());
 }
 
 //-----------------------------------------------------------------------------

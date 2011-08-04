@@ -117,7 +117,7 @@ bool JZTextDialog::TransferDataToWindow()
 bool JZTextDialog::TransferDataFromWindow()
 {
   wxString Text = mpTextEdit->GetValue();
-  mpTextEvent->SetText(Text);
+  mpTextEvent->SetText(Text.c_str());
 
   wxString ClockString = mpClockEdit->GetValue();
   int Clock = gpProject->StringToClock(ClockString);

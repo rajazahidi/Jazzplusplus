@@ -479,10 +479,10 @@ bool wxRealFormValidator::OnCheckValue( wxProperty *property, wxPropertyFormView
     wxString value(((wxTextCtrl *)m_propertyWindow)->GetValue());
 
     float val = 0.0;
-    if (!StringToFloat(WXSTRINGCAST value, &val))
+    if (!StringToFloat(value, &val))
     {
         wxChar buf[200];
-        wxSprintf(buf, wxT("Value %s is not a valid real number!"), (const wxChar *)value);
+        wxSprintf(buf, wxT("Value %s is not a valid real number!"), value);
         wxMessageBox(buf, wxT("Property value error"), wxOK | wxICON_EXCLAMATION, parentWindow);
         return false;
     }
@@ -510,7 +510,7 @@ bool wxRealFormValidator::OnRetrieveValue(wxProperty *property, wxPropertyFormVi
     if (value.Length() == 0)
         return false;
 
-    float f = (float)wxAtof((const wxChar *)value);
+    float f = (float)wxAtof(value);
     property->GetValue() = f;
     return true;
 }
@@ -550,10 +550,10 @@ bool wxIntegerFormValidator::OnCheckValue(wxProperty *property, wxPropertyFormVi
     {
         wxString value(((wxTextCtrl *)m_propertyWindow)->GetValue());
 
-        if (!StringToLong(WXSTRINGCAST value, &val))
+        if (!StringToLong(value, &val))
         {
             wxChar buf[200];
-            wxSprintf(buf, wxT("Value %s is not a valid integer!"), (const wxChar *)value);
+            wxSprintf(buf, wxT("Value %s is not a valid integer!"), value);
             wxMessageBox(buf, wxT("Property value error"), wxOK | wxICON_EXCLAMATION, parentWindow);
             return false;
         }
@@ -590,7 +590,7 @@ bool wxIntegerFormValidator::OnRetrieveValue(wxProperty *property, wxPropertyFor
         if (value.Length() == 0)
             return false;
 
-        long i = wxAtol((const wxChar *)value);
+        long i = wxAtol(value);
         property->GetValue() = i;
     }
     else if (m_propertyWindow->IsKindOf(CLASSINFO(wxSlider)))

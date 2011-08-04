@@ -637,7 +637,7 @@ void wxPropertyValue::operator=(const wxPropertyValue& val)
 // void wxPropertyValue::operator=(const char *val)
 void wxPropertyValue::operator=(const wxString& val1)
 {
-  const wxChar *val = (const wxChar *)val1;
+  const wxChar *val = val1.c_str();
 
   m_modifiedFlag = true;
 
@@ -1226,7 +1226,7 @@ wxPropertyValidator::wxPropertyValidator(long flags)
 wxPropertyValidator::~wxPropertyValidator(void)
 {}
 
-bool wxPropertyValidator::StringToFloat (wxChar *s, float *number)
+bool wxPropertyValidator::StringToFloat (const wxString& s, float *number)
 {
     double num;
     bool ok = StringToDouble (s, &num);
@@ -1234,7 +1234,7 @@ bool wxPropertyValidator::StringToFloat (wxChar *s, float *number)
     return ok;
 }
 
-bool wxPropertyValidator::StringToDouble (wxChar *s, double *number)
+bool wxPropertyValidator::StringToDouble (const wxString& s, double *number)
 {
     bool ok = true;
     wxChar *value_ptr;
@@ -1251,7 +1251,7 @@ bool wxPropertyValidator::StringToDouble (wxChar *s, double *number)
     return ok;
 }
 
-bool wxPropertyValidator::StringToInt (wxChar *s, int *number)
+bool wxPropertyValidator::StringToInt (const wxString& s, int *number)
 {
     long num;
     bool ok = StringToLong (s, &num);
@@ -1259,7 +1259,7 @@ bool wxPropertyValidator::StringToInt (wxChar *s, int *number)
     return ok;
 }
 
-bool wxPropertyValidator::StringToLong (wxChar *s, long *number)
+bool wxPropertyValidator::StringToLong (const wxString& s, long *number)
 {
     bool ok = true;
     wxChar *value_ptr;

@@ -195,10 +195,10 @@ class wxPropertyValidator: public wxEvtHandler
       return m_validatorProperty;
     }
 
-    virtual bool StringToFloat (wxChar *s, float *number);
-    virtual bool StringToDouble (wxChar *s, double *number);
-    virtual bool StringToInt (wxChar *s, int *number);
-    virtual bool StringToLong (wxChar *s, long *number);
+    virtual bool StringToFloat (const wxString& s, float *number);
+    virtual bool StringToDouble (const wxString& s, double *number);
+    virtual bool StringToInt (const wxString& s, int *number);
+    virtual bool StringToLong (const wxString& s, long *number);
     virtual wxChar *FloatToString (float number);
     virtual wxChar *DoubleToString (double number);
     virtual wxChar *IntToString (int number);

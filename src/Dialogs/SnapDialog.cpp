@@ -110,15 +110,14 @@ bool JZSnapDialog::TransferDataToWindow()
 //-----------------------------------------------------------------------------
 bool JZSnapDialog::TransferDataFromWindow()
 {
-  wxString SelectedValue = mpSnapValueChoice->GetStringSelection();
-  string SelectedString = SelectedValue.c_str();
+  string SelectedValue = mpSnapValueChoice->GetStringSelection();
   for (
     map<int, string>::const_iterator iLimitSteps = gLimitSteps.begin();
     iLimitSteps != gLimitSteps.end();
     ++iLimitSteps)
   {
     const string& String = iLimitSteps->second;
-    if (SelectedString == String)
+    if (SelectedValue == String)
     {
       mSnapDenominator = iLimitSteps->first;
       break;

@@ -26,7 +26,6 @@
 #include <wx/dialog.h>
 
 #include <vector>
-#include <string>
 
 class wxListBox;
 
@@ -39,7 +38,7 @@ class JZMidiDeviceDialog : public wxDialog
   public:
 
     JZMidiDeviceDialog(
-      const std::vector<std::pair<std::string, int> >& MidiDevices,
+      const std::vector<std::pair<wxString, int> >& MidiDevices,
       int& DeviceIndex,
       wxWindow* pParent = 0,
       const wxString& Title = wxEmptyString);

@@ -41,7 +41,7 @@ END_EVENT_TABLE()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZMidiDeviceDialog::JZMidiDeviceDialog(
-  const vector<pair<string, int> >& MidiDevices,
+  const vector<pair<wxString, int> >& MidiDevices,
   int& DeviceIndex,
   wxWindow* pParent,
   const wxString& Title)
@@ -52,13 +52,13 @@ JZMidiDeviceDialog::JZMidiDeviceDialog(
   mpMidiDeviceListBox = new wxListBox(this, wxID_ANY);
 
   for (
-    vector<pair<string, int> >::const_iterator iMidiDevice =
+    vector<pair<wxString, int> >::const_iterator iMidiDevice =
       MidiDevices.begin();
     iMidiDevice != MidiDevices.end();
     ++iMidiDevice)
   {
-    const string& MidiDeviceName = iMidiDevice->first;
-    mpMidiDeviceListBox->Append(MidiDeviceName.c_str());
+    const wxString& MidiDeviceName = iMidiDevice->first;
+    mpMidiDeviceListBox->Append(MidiDeviceName);
   }
 
   if (mDeviceIndex < static_cast<int>(mpMidiDeviceListBox->GetCount()))

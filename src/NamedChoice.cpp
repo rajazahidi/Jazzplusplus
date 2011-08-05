@@ -29,7 +29,7 @@ using namespace std;
 
 JZNamedChoice::JZNamedChoice(
   const char* pTitle,
-  const std::vector<std::pair<std::string, int> >& Pairs,
+  const std::vector<std::pair<wxString, int> >& Pairs,
   int* pResult)
   : //mpTitle(pTitle),
     mPairs(Pairs),
@@ -74,16 +74,16 @@ wxFormItem *JZNamedChoice::mkFormItem(int w, int h)
 // Return a string list validator to use in the wxproplist dialogs.
 wxStringListValidator* JZNamedChoice::GetStringListValidator()
 {
-  wxStringList* StringList = new wxStringList();
+  wxArrayString* StringList = new wxArrayString();
   for (
-    vector<pair<string, int> >::const_iterator iPair = mPairs.begin();
+    vector<pair<wxString, int> >::const_iterator iPair = mPairs.begin();
     iPair != mPairs.end();
     ++iPair)
   {
     // Omit empty entries.
     if (!iPair->first.empty())
     {
-      StringList->Add(wxString(iPair->first.c_str()));
+      StringList->Add(iPair->first);
     }
   }
   return new wxStringListValidator(StringList);
@@ -92,7 +92,7 @@ wxStringListValidator* JZNamedChoice::GetStringListValidator()
 void JZNamedChoice::GetValue()
 {
   for (
-    vector<pair<string, int> >::const_iterator iPair = mPairs.begin();
+    vector<pair<wxString, int> >::const_iterator iPair = mPairs.begin();
     iPair != mPairs.end();
     ++iPair)
   {
@@ -107,7 +107,7 @@ void JZNamedChoice::GetValue()
 void JZNamedChoice::SetValue()
 {
   for (
-    vector<pair<string, int> >::const_iterator iPair = mPairs.begin();
+    vector<pair<wxString, int> >::const_iterator iPair = mPairs.begin();
     iPair != mPairs.end();
     ++iPair)
   {

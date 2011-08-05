@@ -40,7 +40,7 @@ class JZNamedChoice : public wxObject
 
     JZNamedChoice(
       const char* pTitle,
-      const std::vector<std::pair<std::string, int> >& Pairs,
+      const std::vector<std::pair<wxString, int> >& Pairs,
       int* pResult);
 
     virtual ~JZNamedChoice();
@@ -57,7 +57,7 @@ class JZNamedChoice : public wxObject
 
 //    char* mpTitle;
 
-    const std::vector<std::pair<std::string, int> >& mPairs;
+    const std::vector<std::pair<wxString, int> >& mPairs;
 
     std::string mSelection;
 

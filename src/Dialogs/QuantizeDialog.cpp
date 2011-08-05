@@ -184,15 +184,14 @@ bool JZQuantizeDialog::TransferDataToWindow()
 //-----------------------------------------------------------------------------
 bool JZQuantizeDialog::TransferDataFromWindow()
 {
-  wxString SelectedValue = mpStepSizeComboBox->GetValue();
-  string SelectedString = SelectedValue.c_str();
+  string SelectedValue = mpStepSizeComboBox->GetValue();
   for (
     map<int, string>::const_iterator iPair = gQuantizationSteps.begin();
     iPair != gQuantizationSteps.end();
     ++iPair)
   {
     const string& String = iPair->second;
-    if (SelectedString == String)
+    if (SelectedValue == String)
     {
       mQuantizationStep = iPair->first;
       break;

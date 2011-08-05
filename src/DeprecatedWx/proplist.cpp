@@ -1822,8 +1822,6 @@ void wxPropertyStringListEditorDialog::OnDelete(wxCommandEvent& event)
     }
 
     m_listBox->Delete(sel);
-    delete[] (const wxChar *)(*node)->GetData();
-    delete node;
     m_currentSelection = -1;
     m_stringText->SetValue(wxEmptyString);
 }
@@ -1899,11 +1897,10 @@ void wxPropertyStringListEditorDialog::ShowCurrentSelection()
     m_stringText->SetValue(wxEmptyString);
     return;
   }
-  wxStringList::compatibility_iterator* node =
-   (wxStringList::compatibility_iterator*)
+  list<wxString>::iterator* piString =
+    (list<wxString>::iterator*)
      m_listBox->wxListBox::GetClientData(m_currentSelection);
-  const wxChar* txt = (const wxChar *)(*node)->GetData();
-  m_stringText->SetValue(txt);
+  m_stringText->SetValue(**piString);
   m_stringText->Enable();
 }
 

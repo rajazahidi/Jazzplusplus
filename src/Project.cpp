@@ -503,8 +503,8 @@ void JZProject::OpenSong(const wxString& SongFileName)
 {
   JZStandardRead Io;
   Clear();
-  Read(Io, SongFileName);
-  mpConfig->Put(C_StartUpSong, SongFileName.c_str());
+  Read(Io, SongFileName.c_str());
+  mpConfig->Put(C_StartUpSong, SongFileName);
 }
 
 //-----------------------------------------------------------------------------
@@ -519,8 +519,8 @@ void JZProject::OpenSong(const wxString& SongFileName)
 void JZProject::ExportMidiFile(const wxString& MidiFileName)
 {
   JZStandardWrite Io;
-  Write(Io, MidiFileName);
-  mpConfig->Put(C_StartUpSong, MidiFileName.c_str());
+  Write(Io, MidiFileName.c_str());
+  mpConfig->Put(C_StartUpSong, MidiFileName);
 }
 
 //-----------------------------------------------------------------------------

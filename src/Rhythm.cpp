@@ -761,15 +761,15 @@ void JZRhythmWindow::OnMenuCommand(int id)
 
     case wxID_OPEN:
       {
-        wxString fname = file_selector(
+        wxString FileName = file_selector(
           mDefaultFileName,
           "Load Rhythm",
           false,
           has_changed,
           "*.rhy");
-        if (fname)
+        if (!FileName.empty())
         {
-          ifstream Is(fname);
+          ifstream Is(FileName.wx_str());
           Is >> *this;
           OnPaint();
         }
@@ -779,15 +779,15 @@ void JZRhythmWindow::OnMenuCommand(int id)
     case wxID_SAVE:
       {
         Win2Instrument();
-        wxString fname = file_selector(
+        wxString FileName = file_selector(
           mDefaultFileName,
           "Save Rhythm",
           true,
           has_changed,
           "*.rhy");
-        if (fname)
+        if (!FileName.empty())
         {
-          ofstream Os(fname);
+          ofstream Os(FileName.wx_str());
           Os << *this;
         }
       }
@@ -907,7 +907,7 @@ void JZRhythmWindow::AddInstrumentDlg()
       pRhythm->n_keys  = 1;
       pRhythm->keys[0] = keys[i];
       pRhythm->mode    = MODE_ALL_OF;
-      pRhythm->SetLabel(names[i].c_str());
+      pRhythm->SetLabel(names[i]);
     }
 
     // choose controller?

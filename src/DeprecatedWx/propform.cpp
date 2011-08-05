@@ -673,7 +673,7 @@ bool wxBoolFormValidator::OnDisplayValue(wxProperty *property, wxPropertyFormVie
 ///
 IMPLEMENT_DYNAMIC_CLASS(wxStringFormValidator, wxPropertyFormValidator)
 
-wxStringFormValidator::wxStringFormValidator(wxStringList *list, long flags):
+wxStringFormValidator::wxStringFormValidator(wxArrayString *list, long flags):
 wxPropertyFormValidator(flags)
 {
     m_strings = list;
@@ -692,7 +692,7 @@ bool wxStringFormValidator::OnCheckValue(wxProperty *property, wxPropertyFormVie
     if (m_propertyWindow->IsKindOf(CLASSINFO(wxTextCtrl)))
     {
         wxTextCtrl *text = (wxTextCtrl *)m_propertyWindow;
-        if (!m_strings->Member(text->GetValue()))
+        if (m_strings->Index(text->GetValue()) == wxNOT_FOUND)
         {
             wxString str( wxT("Value ") );
             str += text->GetValue();
@@ -765,12 +765,13 @@ bool wxStringFormValidator::OnDisplayValue(wxProperty *property, wxPropertyFormV
         if (lbox->GetCount() == 0 && m_strings)
         {
             // Try to initialize the listbox from 'strings'
-            wxStringList::compatibility_iterator node = m_strings->GetFirst();
-            while (node)
+            for (
+              wxArrayString::iterator iString = m_strings->begin();
+              iString != m_strings->end();
+              ++iString)
             {
-                const wxChar* s = node->GetData();
+                const wxString& s = *iString;
                 lbox->Append(s);
-                node = node->GetNext();
             }
         }
         lbox->SetStringSelection(property->GetValue().StringValue());
@@ -789,12 +790,13 @@ bool wxStringFormValidator::OnDisplayValue(wxProperty *property, wxPropertyFormV
         {
             // Try to initialize the choice item from 'strings'
             // XView doesn't allow this kind of thing.
-            wxStringList::compatibility_iterator node = m_strings->GetFirst();
-            while (node)
+            for (
+              wxArrayString::iterator iString = m_strings->begin();
+              iString != m_strings->end();
+              ++iString)
             {
-                const wxChar* s = node->GetData();
+                const wxString& s = *iString;
                 choice->Append(s);
-                node = node->GetNext();
             }
         }
         choice->SetStringSelection(property->GetValue().StringValue());

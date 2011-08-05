@@ -253,7 +253,7 @@ class WXDLLIMPEXP_DEPRECATED wxStringFormValidator: public wxPropertyFormValidat
 {
   DECLARE_DYNAMIC_CLASS(wxStringFormValidator)
  public:
-   wxStringFormValidator(wxStringList *list = NULL, long flags = 0);
+   wxStringFormValidator(wxArrayString *list = NULL, long flags = 0);
 
    ~wxStringFormValidator(void)
    {
@@ -266,7 +266,7 @@ class WXDLLIMPEXP_DEPRECATED wxStringFormValidator: public wxPropertyFormValidat
    bool OnDisplayValue(wxProperty *property, wxPropertyFormView *view, wxWindow *parentWindow);
 
  protected:
-  wxStringList*     m_strings;
+  wxArrayString*     m_strings;
 };
 
 /*

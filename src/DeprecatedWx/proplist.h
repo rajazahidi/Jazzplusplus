@@ -539,7 +539,7 @@ private:
 class WXDLLIMPEXP_DEPRECATED wxStringListValidator: public wxPropertyListValidator
 {
 public:
-   wxStringListValidator(wxStringList *list = NULL, long flags = 0);
+   wxStringListValidator(wxArrayString *list = NULL, long flags = 0);
 
     ~wxStringListValidator()
     {
@@ -566,7 +566,7 @@ public:
     bool OnDoubleClick(wxProperty *property, wxPropertyListView *view, wxWindow *parentWindow);
 
 protected:
-    wxStringList*     m_strings;
+    wxArrayString*     m_strings;
 
 private:
     DECLARE_DYNAMIC_CLASS(wxStringListValidator)

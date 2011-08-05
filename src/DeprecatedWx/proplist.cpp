@@ -57,11 +57,6 @@
 
 using namespace std;
 
-#if !WXWIN_COMPATIBILITY_2_4
-static inline wxChar* copystring(const wxChar* s)
-    { return wxStrcpy(new wxChar[wxStrlen(s) + 1], s); }
-#endif
-
 // ----------------------------------------------------------------------------
 // Property text edit control
 // ----------------------------------------------------------------------------
@@ -911,7 +906,7 @@ bool wxRealListValidator::OnCheckValue(
   wxString value(view->GetValueText()->GetValue());
 
   float val = 0.0;
-  if (!StringToFloat(WXSTRINGCAST value, &val))
+  if (!StringToFloat(value, &val))
   {
     wxChar buf[200];
     wxSprintf(buf, wxT("Value %s is not a valid real number!"), value.GetData());
@@ -974,7 +969,7 @@ bool wxIntegerListValidator::OnCheckValue(wxProperty *property, wxPropertyListVi
   wxString value(view->GetValueText()->GetValue());
 
   long val = 0;
-  if (!StringToLong(WXSTRINGCAST value, &val))
+  if (!StringToLong(value, &val))
   {
     wxChar buf[200];
     wxSprintf(buf, wxT("Value %s is not a valid integer!"), value.GetData());
@@ -1093,9 +1088,7 @@ bool wxBoolListValidator::OnPrepareDetailControls(wxProperty *WXUNUSED(property)
 
     view->GetValueList()->Append(wxT("True"));
     view->GetValueList()->Append(wxT("False"));
-    wxChar *currentString = copystring(view->GetValueText()->GetValue());
-    view->GetValueList()->SetStringSelection(currentString);
-    delete[] currentString;
+    view->GetValueList()->SetStringSelection(view->GetValueText()->GetValue());
   }
   return true;
 }
@@ -1132,7 +1125,7 @@ bool wxBoolListValidator::OnDoubleClick(wxProperty *property, wxPropertyListView
 ///
 IMPLEMENT_DYNAMIC_CLASS(wxStringListValidator, wxPropertyListValidator)
 
-wxStringListValidator::wxStringListValidator(wxStringList *list, long flags):
+wxStringListValidator::wxStringListValidator(wxArrayString *list, long flags):
   wxPropertyListValidator(flags)
 {
   m_strings = list;
@@ -1150,7 +1143,7 @@ bool wxStringListValidator::OnCheckValue(wxProperty *WXUNUSED(property), wxPrope
     return false;
   wxString value(view->GetValueText()->GetValue());
 
-  if (!m_strings->Member(value.GetData()))
+  if (m_strings->Index(value.GetData()) == wxNOT_FOUND)
   {
     wxString str( wxT("Value ") );
     str += value.GetData();
@@ -1227,12 +1220,13 @@ bool wxStringListValidator::OnPrepareDetailControls( wxProperty *property,
   {
     view->ShowListBoxControl(true);
     view->GetValueList()->Enable();
-    wxStringList::compatibility_iterator node = m_strings->GetFirst();
-    while (node)
+    for (
+      wxArrayString::iterator iString = m_strings->begin();
+      iString != m_strings->end();
+      ++iString)
     {
-      const wxChar* s = node->GetData();
+      const wxString& s = *iString;
       view->GetValueList()->Append(s);
-      node = node->GetNext();
     }
     wxChar *currentString = property->GetValue().StringValue();
     view->GetValueList()->SetStringSelection(currentString);
@@ -1267,25 +1261,33 @@ bool wxStringListValidator::OnDoubleClick( wxProperty *property,
   if (!m_strings)
     return false;
 
-  wxStringList::compatibility_iterator node = m_strings->GetFirst();
+  wxArrayString::iterator iString = m_strings->begin();
   wxChar* currentString = property->GetValue().StringValue();
-  while (node)
+  while (iString != m_strings->end())
   {
-    const wxChar* s = node->GetData();
+    const wxString& s = *iString;
     if (wxStrcmp(s, currentString) == 0)
     {
       const wxChar *nextString;
-      if (node->GetNext())
-        nextString = node->GetNext()->GetData();
+      ++iString;
+      if (iString != m_strings->end())
+      {
+        nextString = *iString;
+      }
       else
-        nextString = m_strings->GetFirst()->GetData();
+      {
+        nextString = *m_strings->begin();
+      }
       property->GetValue() = wxString(nextString);
       view->DisplayProperty(property);
       view->UpdatePropertyDisplayInList(property);
       view->OnPropertyChanged(property);
       return true;
     }
-    else node = node->GetNext();
+    else
+    {
+      ++iString;
+    }
   }
   return true;
 }
@@ -1366,7 +1368,7 @@ void wxFilenameListValidator::OnEdit(wxProperty *property, wxPropertyListView *v
         m_filenameMessage.GetData(),
         wxPathOnly(property->GetValue().StringValue()),
         wxFileNameFromPath(property->GetValue().StringValue()),
-        NULL,
+        wxEmptyString,
         m_filenameWildCard.GetData(),
         0,
         parentWindow);
@@ -1811,11 +1813,13 @@ void wxPropertyStringListEditorDialog::OnDelete(wxCommandEvent& event)
     if (sel == wxNOT_FOUND)
         return;
 
-  wxStringList::compatibility_iterator* node =
-    (wxStringList::compatibility_iterator*)
+    wxStringList::compatibility_iterator* node =
+      (wxStringList::compatibility_iterator*)
       m_listBox->wxListBox::GetClientData(sel);
     if (!node)
+    {
         return;
+    }
 
     m_listBox->Delete(sel);
     delete[] (const wxChar *)(*node)->GetData();
@@ -1875,18 +1879,17 @@ void wxPropertyStringListEditorDialog::SaveCurrentSelection()
   if (m_currentSelection == -1)
     return;
 
-  wxStringList::compatibility_iterator* node =
-   (wxStringList::compatibility_iterator*)
-     m_listBox->wxListBox::GetClientData(m_currentSelection);
-  if (!node)
+  list<wxString>::iterator* piString =
+    (list<wxString>::iterator*)
+    m_listBox->wxListBox::GetClientData(m_currentSelection);
+  if (!piString)
+  {
     return;
+  }
 
-  wxString txt(m_stringText->GetValue());
-  if ((*node)->GetData())
-    delete[] (const wxChar *)(*node)->GetData();
-  (*node)->SetData(wxStrdup(txt));
+  **piString = m_stringText->GetValue();
 
-  m_listBox->SetString(m_currentSelection, (const wxChar *)(*node)->GetData());
+  m_listBox->SetString(m_currentSelection, **piString);
 }
 
 void wxPropertyStringListEditorDialog::ShowCurrentSelection()

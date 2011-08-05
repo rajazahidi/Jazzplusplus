@@ -80,7 +80,7 @@ wxString FindFile(const wxString& FileName)
 
   // Look where the executable was started.
   FoundFileName = "";
-  Home = wxPathOnly((const char *)wxTheApp->argv[0]);
+  Home = wxPathOnly(wxTheApp->argv[0]);
   FoundFileName << Home << wxFileName::GetPathSeparator() << FileName;
   if (wxFileExists(FoundFileName))
   {

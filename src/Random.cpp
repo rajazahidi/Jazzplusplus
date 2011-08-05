@@ -305,17 +305,17 @@ JZArrayEdit::JZArrayEdit(wxFrame *frame, JZRndArray &ar, int xx, int yy, int ww,
 }
 
 BEGIN_EVENT_TABLE(JZArrayEdit, wxScrolledWindow)
-  EVT_SIZE    (           JZArrayEdit::OnSize)
+  EVT_SIZE(JZArrayEdit::OnSize)
   EVT_MOUSE_EVENTS(JZArrayEdit::OnMouseEvent)
 END_EVENT_TABLE()
 
 
-void JZArrayEdit::OnSize(wxSizeEvent& event)
+void JZArrayEdit::OnSize(wxSizeEvent& Event)
 {
-  w = event.GetSize().GetWidth();
-  h = event.GetSize().GetHeight();
+  w = Event.GetSize().GetWidth();
+  h = Event.GetSize().GetHeight();
 
-  wxScrolledWindow::OnSize(event);
+  Event.Skip();
 
   int tw, th;
 

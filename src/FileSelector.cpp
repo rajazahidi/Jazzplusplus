@@ -77,16 +77,16 @@ wxString file_selector(
    path = wxPathOnly(DefaultFileName);
 
    int flags = save ? wxFD_SAVE : wxFD_OPEN;
-   wxString s = wxFileSelector(title, path, file, 0, Extension, flags);
+   wxString s = wxFileSelector(title, path, file, wxEmptyString, Extension, flags);
 
   // add extension if missing
-   if (!s.empty() && Extension)
+   if (!s.empty() && !Extension.empty())
   {
     s = add_default_ext(s, Extension);
   }
 
   // warn if overwriting existent file
-  if (s && save)
+  if (!s.empty() && save)
   {
     if (wxFileExists(s))
     {
@@ -101,7 +101,7 @@ wxString file_selector(
     }
   }
 
-  if (s && !save && changed)
+  if (!s.empty() && !save && changed)
   {
     wxString buf;
     buf << DefaultFileName;

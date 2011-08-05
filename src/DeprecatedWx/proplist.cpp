@@ -1268,7 +1268,7 @@ bool wxStringListValidator::OnDoubleClick( wxProperty *property,
     const wxString& s = *iString;
     if (wxStrcmp(s, currentString) == 0)
     {
-      const wxChar *nextString;
+      wxString nextString;
       ++iString;
       if (iString != m_strings->end())
       {

@@ -539,7 +539,7 @@ private:
 class WXDLLIMPEXP_DEPRECATED wxStringListValidator: public wxPropertyListValidator
 {
 public:
-   wxStringListValidator(wxArrayString *list = NULL, long flags = 0);
+   wxStringListValidator(wxArrayString* list = 0, long flags = 0);
 
     ~wxStringListValidator()
     {

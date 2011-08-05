@@ -253,7 +253,7 @@ public:
     wxPropertyListView* m_view;
 
 private:
-    DECLARE_CLASS(wxPropertyTextEdit)
+    DECLARE_DYNAMIC_CLASS(wxPropertyTextEdit)
 };
 
 #define wxPROP_ALLOW_TEXT_EDITING           1
@@ -351,7 +351,7 @@ private:
     wxPropertyListView*   m_view;
 
 private:
-    DECLARE_CLASS(wxPropertyListDialog)
+    DECLARE_DYNAMIC_CLASS(wxPropertyListDialog)
     DECLARE_EVENT_TABLE()
 };
 
@@ -395,7 +395,7 @@ private:
 
 private:
     DECLARE_EVENT_TABLE()
-    DECLARE_CLASS(wxPropertyListPanel)
+    DECLARE_DYNAMIC_CLASS(wxPropertyListPanel)
 };
 
 /*
@@ -437,7 +437,7 @@ private:
 
 private:
     DECLARE_EVENT_TABLE()
-    DECLARE_CLASS(wxPropertyListFrame)
+    DECLARE_DYNAMIC_CLASS(wxPropertyListFrame)
 };
 
 /*

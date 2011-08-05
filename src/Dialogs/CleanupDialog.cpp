@@ -129,15 +129,14 @@ bool JZCleanupDialog::TransferDataToWindow()
 //-----------------------------------------------------------------------------
 bool JZCleanupDialog::TransferDataFromWindow()
 {
-  wxString SelectedValue = mpShortestNoteChoice->GetStringSelection();
-  string SelectedString = SelectedValue.c_str();
+  string SelectedValue = mpShortestNoteChoice->GetStringSelection();
   for (
     map<int, string>::const_iterator iLimitSteps = gLimitSteps.begin();
     iLimitSteps != gLimitSteps.end();
     ++iLimitSteps)
   {
     const string& String = iLimitSteps->second;
-    if (SelectedString == String)
+    if (SelectedValue == String)
     {
       mShortestNote = iLimitSteps->first;
       break;

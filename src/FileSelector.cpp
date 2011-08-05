@@ -95,7 +95,6 @@ wxString file_selector(
       buf << "overwrite "<<s<<"?";
       if (wxMessageBox(buf, "Save ?", wxYES_NO) == wxNO)
       {
-
         s = wxEmptyString;
       }
     }
@@ -112,7 +111,7 @@ wxString file_selector(
     }
   }
 
-  if (s!=wxEmptyString && !save)
+  if (!s.empty() && !save)
   {
     if (!wxFileExists(s))
     {
@@ -124,7 +123,7 @@ wxString file_selector(
     }
   }
 
-  if (s != wxEmptyString)
+  if (!s.empty())
   {
     //DefaultFileName = s;
     //return DefaultFileName;

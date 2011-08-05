@@ -1449,7 +1449,7 @@ void JZHarmonyBrowserCanvas::FileLoad()
 
   if (!FileName.empty())
   {
-    ifstream Is(FileName.c_str());
+    ifstream Is(FileName.wx_str());
     Is >> *this;
   }
 }
@@ -1467,7 +1467,7 @@ void JZHarmonyBrowserCanvas::FileSaveAs()
 
   if (!FileName.empty())
   {
-    ofstream os(FileName.c_str());
+    ofstream os(FileName.wx_str());
     os << *this;
   }
 }

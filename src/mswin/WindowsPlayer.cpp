@@ -1023,7 +1023,7 @@ JZMtcTime* JZWindowsMtcPlayer::FreezeMtcRec()
 //-----------------------------------------------------------------------------
 void JZWindowsPlayer::SettingsDlg(int& InputDevice, int& OutputDevice)
 {
-  vector<pair<string, int> > MidiDevices;
+  vector<pair<wxString, int> > MidiDevices;
 
   //=========================
   // Select the input device.

@@ -196,7 +196,7 @@ void JZJazzPlusPlusApplication::ConfigureHelp()
   // Test for the existence of the help file.
   bool HelpFileFound = false;
   ifstream Is;
-  Is.open(HelpFileNameAndPath.c_str());
+  Is.open(HelpFileNameAndPath.wx_str());
   if (!Is)
   {
     // Ask the user to find the help file.
@@ -207,7 +207,7 @@ void JZJazzPlusPlusApplication::ConfigureHelp()
       // Try one more time.
       Is.close();
       Is.clear();
-      Is.open(HelpFileNameAndPath.c_str());
+      Is.open(HelpFileNameAndPath.wx_str());
       if (!Is)
       {
         wxString Message = "Failed to add the Jazz++ book " + mHelpFileName;

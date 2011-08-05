@@ -618,15 +618,15 @@ void JZSynthDlg::OnMenuCommand(int id)
   {
     case SYN_LOAD:
       {
-        wxString fname = file_selector(
+        wxString FileName = file_selector(
           mDefaultFileName,
           "Load Synth",
           0,
           0,
           "*.syn");
-        if (fname)
+        if (!FileName.empty())
         {
-          ifstream is(fname);
+          ifstream is(FileName.wx_str());
           is >> *this;
           SetupEdits();
           int cw, ch;
@@ -640,15 +640,15 @@ void JZSynthDlg::OnMenuCommand(int id)
 
     case SYN_SAVE:
       {
-        wxString fname = file_selector(
+        wxString FileName = file_selector(
           mDefaultFileName,
           "Save Synth",
           1,
           0,
           "*.syn");
-        if (fname)
+        if (!FileName.empty())
         {
-          ofstream os(fname);
+          ofstream os(FileName.wx_str());
           os << *this;
         }
       }

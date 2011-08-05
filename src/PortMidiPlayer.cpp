@@ -451,7 +451,7 @@ void JZPortMidiPlayer::DeviceSelectionDialog()
   bool NeedToTerminate = InitPM();
   int Count = Pm_CountDevices();
 
-  vector<pair<string, int> > MidiDevices;
+  vector<pair<wxString, int> > MidiDevices;
 
   // Create a container of input devices.
   for (int i = 0; i < Count; ++i)
@@ -465,7 +465,7 @@ void JZPortMidiPlayer::DeviceSelectionDialog()
         wxT(", ") +
         wxString(pPmDeviceInfo->name, wxConvISO8859_1);
 
-      MidiDevices.push_back(make_pair(Name.c_str(), i));
+      MidiDevices.push_back(make_pair(Name, i));
     }
   }
 
@@ -482,14 +482,14 @@ void JZPortMidiPlayer::DeviceSelectionDialog()
 
     // Set the input device based on the selected integer.
     for (
-      vector<pair<string, int> >::const_iterator iDevice =
+      vector<pair<wxString, int> >::const_iterator iDevice =
         MidiDevices.begin();
       iDevice != MidiDevices.end();
       ++iDevice)
     {
       if (iDevice->second == InputDevice)
       {
-        SetOutputDevice(iDevice->first.c_str());
+        SetOutputDevice(iDevice->first);
         break;
       }
     }
@@ -509,7 +509,7 @@ void JZPortMidiPlayer::DeviceSelectionDialog()
         wxT(", ") +
         wxString(pPmDeviceInfo->name, wxConvISO8859_1);
 
-      MidiDevices.push_back(make_pair(Name.c_str(), i));
+      MidiDevices.push_back(make_pair(Name, i));
     }
   }
 
@@ -526,14 +526,14 @@ void JZPortMidiPlayer::DeviceSelectionDialog()
 
     // Set the output device based on the selected integer.
     for (
-      vector<pair<string, int> >::const_iterator iDevice =
+      vector<pair<wxString, int> >::const_iterator iDevice =
         MidiDevices.begin();
       iDevice != MidiDevices.end();
       ++iDevice)
     {
       if (iDevice->second == OutputDevice)
       {
-        SetOutputDevice(iDevice->first.c_str());
+        SetOutputDevice(iDevice->first);
         break;
       }
     }

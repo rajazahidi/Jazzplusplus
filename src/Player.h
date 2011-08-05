@@ -23,14 +23,14 @@
 #ifndef JZ_PLAYER_H
 #define JZ_PLAYER_H
 
-#include <wx/timer.h>
-
 #include "config.h"
 #include "Events.h"
 #include "Track.h"
 #include "Song.h"
 //#include "midinet.h"
 #include "Audio.h"
+
+#include <wx/timer.h>
 
 #include <sys/types.h>
 #include <time.h>
@@ -62,13 +62,13 @@ class JZDeviceList
       return mDeviceNames.size();
     }
 
-    const std::string& GetName(unsigned i) const
+    const wxString& GetName(unsigned i) const
     {
       if (i < mDeviceNames.size())
       {
         return mDeviceNames[i];
       }
-      static std::string Unknown("Unknown");
+      static wxString Unknown("Unknown");
       return Unknown;
     }
 
@@ -85,11 +85,11 @@ class JZDeviceList
 
   protected:
 
-    std::vector<std::string> mDeviceNames;
+    std::vector<wxString> mDeviceNames;
 
   private:
 
-    // Prevent accidental copy or assignment.
+    // Hidden and unimplemented to prevent accidental copy or assignment.
     JZDeviceList(const JZDeviceList &);
     JZDeviceList& operator = (const JZDeviceList &);
 };

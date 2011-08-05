@@ -72,9 +72,9 @@ class JZDeviceList
       return Unknown;
     }
 
-    unsigned Add(const char* pName)
+    unsigned Add(const wxString& Name)
     {
-      mDeviceNames.push_back(pName);
+      mDeviceNames.push_back(Name);
       return mDeviceNames.size();
     }
 

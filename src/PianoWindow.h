@@ -43,18 +43,26 @@ class JZListen : public wxTimer
 {
   public:
 
-    JZListen();
+    static JZListen* Instance();
+
+    static void Destroy();
 
     void KeyOn(
-      JZTrack *t,
+      JZTrack* pTrack,
       int Pitch,
       int Channel,
       int Velocity = 64,
       int MilliSeconds = 100);
 
-    void Notify();
+    virtual void Notify();
 
   private:
+
+    JZListen();
+
+  private:
+
+    static JZListen* mpInstance;
 
     bool mActive;
     int mPitch, mChannel;
@@ -293,7 +301,7 @@ class JZPianoWindow : public JZEventWindow, public JZButtonLabelInterface
 
   private:
 
-    static JZListen mListen;
+//    static JZListen mListen;
 
     JZTrack* mpTrack;
 

@@ -52,8 +52,32 @@ using namespace std;
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+JZListen* JZListen::mpInstance = 0;
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZListen* JZListen::Instance()
+{
+  if (!mpInstance)
+  {
+    mpInstance = new JZListen;
+  }
+  return mpInstance;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZListen::Destroy()
+{
+  delete mpInstance;
+  mpInstance = 0;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZListen::JZListen()
-  : mActive(false),
+  : wxTimer(),
+    mActive(false),
     mPitch(-1),
     mChannel(-1),
     mpTrack(0)
@@ -635,7 +659,7 @@ END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZListen JZPianoWindow::mListen;
+//JZListen JZPianoWindow::mListen;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -3042,7 +3066,7 @@ void JZPianoWindow::Copy(JZTrack* pTrack, JZEvent* pEvent, int Kill)
       }
       else
       {
-        mListen.KeyOn(
+        JZListen::Instance()->KeyOn(
           pTrack,
           pKeyOn->GetKey(),
           pKeyOn->GetChannel(),
@@ -3137,7 +3161,7 @@ void JZPianoWindow::Paste(JZTrack* pTrack, int Clock, int Pitch)
         }
         else
         {
-          mListen.KeyOn(
+          JZListen::Instance()->KeyOn(
             pTrack,
             pKeyOn->GetKey(),
             pKeyOn->GetChannel(),

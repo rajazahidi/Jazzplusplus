@@ -106,8 +106,6 @@ class JZJazzPlusPlusApplication : public wxApp
     JZTrackFrame* mpTrackFrame;
 
     mutable wxHtmlHelpController mHelp;
-
-  DECLARE_EVENT_TABLE()
 };
 
 DECLARE_APP(JZJazzPlusPlusApplication)

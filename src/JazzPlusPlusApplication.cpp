@@ -78,11 +78,6 @@ IMPLEMENT_APP(JZJazzPlusPlusApplication)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-BEGIN_EVENT_TABLE(JZJazzPlusPlusApplication, wxApp)
-END_EVENT_TABLE()
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 JZJazzPlusPlusApplication::JZJazzPlusPlusApplication()
   : wxApp(),
     mpProject(0),

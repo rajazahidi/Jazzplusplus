@@ -320,7 +320,7 @@ JZProject::JZProject()
   {
     if ((wxTheApp->argc > opt) && isdigit(wxTheApp->argv[opt][0]))
     {
-      mpConfig->Put(i + C_TrackWinXpos, atoi(wxTheApp->argv[opt]));
+      mpConfig->Put(i + C_TrackWinXpos, atoi(wxTheApp->argv[opt].c_str()));
     }
     else
     {

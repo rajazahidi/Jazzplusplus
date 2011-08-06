@@ -114,8 +114,8 @@ JZWindowsPlayer::JZWindowsPlayer(JZSong* pSong)
     }
     if (rc)
     {
-      char ErrorMessage[MAXERRORLENGTH];
-      midiInGetErrorText(rc, (LPSTR)ErrorMessage, sizeof(ErrorMessage));
+      wchar_t ErrorMessage[MAXERRORLENGTH];
+      midiInGetErrorText(rc, ErrorMessage, sizeof(ErrorMessage));
       ::wxMessageBox(ErrorMessage, "Open MIDI Input", wxOK);
     }
   }
@@ -136,8 +136,8 @@ JZWindowsPlayer::JZWindowsPlayer(JZSong* pSong)
       CALLBACK_FUNCTION);
     if (rc)
     {
-      char ErrorMessage[MAXERRORLENGTH];
-      midiOutGetErrorText(rc, (LPSTR)ErrorMessage, sizeof(ErrorMessage));
+      wchar_t ErrorMessage[MAXERRORLENGTH];
+      midiOutGetErrorText(rc, ErrorMessage, sizeof(ErrorMessage));
       ::wxMessageBox(ErrorMessage, "Open MIDI Output", wxOK);
     }
   }

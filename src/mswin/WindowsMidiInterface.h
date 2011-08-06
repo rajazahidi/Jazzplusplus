@@ -107,7 +107,7 @@ class JZWinSysexBuffer
       hdr.dwUser = (DWORD)this;
       hdr.lpData = (char *)data;
       hdr.dwBufferLength = size;
-      OutputDebugString("prepare\n");
+      OutputDebugString(L"prepare\n");
       midiOutPrepareHeader(hmo, &hdr, sizeof(hdr));
       prepared = 1;
     }
@@ -116,7 +116,7 @@ class JZWinSysexBuffer
     {
       if (prepared)
       {
-        OutputDebugString("unprepare\n");
+        OutputDebugString(L"unprepare\n");
         midiOutUnprepareHeader(hmo, &hdr, sizeof(hdr));
         size = 0;
         prepared = 0;

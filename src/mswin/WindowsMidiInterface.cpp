@@ -624,11 +624,10 @@ void CALLBACK MidiOutProc(
     if (buf != 0)
     {  // ignore OutNow() buffers
       buf->Release();
-      OutputDebugString("release\n");
+      OutputDebugString(L"release\n");
     }
   }
 }
 
 
 } // extern "C"
-

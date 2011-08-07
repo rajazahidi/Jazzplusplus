@@ -586,6 +586,7 @@ void JZEventWindow::OnMouseEvent(wxMouseEvent& MouseEvent)
         Refresh();
       }
 
+      delete mpMouseAction;
       mpMouseAction = 0;
     }
   }

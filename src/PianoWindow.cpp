@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008-2010 Peter J. Stieber
+// Modifications Copyright (C) 2008-2011 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -216,7 +216,8 @@ int JZMousePlay::ProcessMouseEvent(
 
   if (!mPitch)
   {
-    return 1;        // done
+    // Done.
+    return 1;
   }
   return 0;
 }
@@ -865,9 +866,17 @@ void JZPianoWindow::Draw(wxDC& Dc)
   ///////////////////////////////////////////////////////////////
   // horizontal lines(ripped from drawpianoroll code)
 
-//     for (y = TrackIndex2y(mFromLine); y < mEventsY + mEventsHeight; y += mTrackHeight)
-//      if (y > mEventsY)        // cheaper than clipping
-//        LocalDc.DrawLine(mEventsX+1, y, mEventsX + mEventsWidth, y);
+//  for (
+//    y = TrackIndex2y(mFromLine);
+//    y < mEventsY + mEventsHeight;
+//    y += mTrackHeight)
+//  {
+//    // cheaper than clipping
+//    if (y > mEventsY)
+//    {
+//      LocalDc.DrawLine(mEventsX+1, y, mEventsX + mEventsWidth, y);
+//    }
+//  }
 
   LocalDc.SetPen(*wxGREY_PEN);
   wxBrush blackKeysBrush = wxBrush(wxColor(250, 240, 240), wxSOLID);
@@ -928,9 +937,16 @@ void JZPianoWindow::Draw(wxDC& Dc)
     Oss << BarInfo.GetBarIndex() + 1 - intro;
     if (x > mEventsX)
     {
-      LocalDc.DrawText(Oss.str().c_str(), x + mLittleBit, mEventsY - mFixedFontHeight - 2);
+      LocalDc.DrawText(
+        Oss.str().c_str(),
+        x + mLittleBit,
+        mEventsY - mFixedFontHeight - 2);
       LocalDc.SetPen(*wxGREY_PEN);
-      LocalDc.DrawLine(x, mEventsY - mFixedFontHeight, x, mEventsY + mEventsHeight);
+      LocalDc.DrawLine(
+        x,
+        mEventsY - mFixedFontHeight,
+        x,
+        mEventsY + mEventsHeight);
     }
 
     LocalDc.SetPen(*wxLIGHT_GREY_PEN);
@@ -967,7 +983,11 @@ void JZPianoWindow::Draw(wxDC& Dc)
       sbrush.SetColour(230,255,230);
 #endif
 
-//      LocalDc.SetClippingRegion(mEventsX, mEventsY, mEventsWidth, mEventsHeight);
+//      LocalDc.SetClippingRegion(
+//        mEventsX,
+//        mEventsY,
+//        mEventsWidth,
+//        mEventsHeight);
       LocalDc.SetLogicalFunction(wxXOR);
       LocalDc.SetPen(*wxTRANSPARENT_PEN);
 
@@ -1013,7 +1033,9 @@ void JZPianoWindow::Draw(wxDC& Dc)
               while (pitch < 127)
               {
                 int y = Pitch2y(pitch);
-                if (y >= mEventsY && y <= mEventsY + mEventsHeight - h) // y-clipping
+
+                // Perform y-clipping.
+                if (y >= mEventsY && y <= mEventsY + mEventsHeight - h)
                 {
                   LocalDc.DrawRectangle(x, y, w, h);
                 }
@@ -1330,17 +1352,28 @@ void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
       {
         Dc.DrawLine(0, y + mTrackHeight, mPianoWidth, y + mTrackHeight);
         Dc.SetPen(*wxWHITE_PEN);
-        Dc.DrawLine(0, y + mTrackHeight + 1, mPianoWidth, y + mTrackHeight + 1);
+        Dc.DrawLine(
+          0,
+          y + mTrackHeight + 1,
+          mPianoWidth,
+          y + mTrackHeight + 1);
         Dc.SetPen(*wxBLACK_PEN);
         ostringstream Oss;
         Oss << Pitch / 12;
-        Dc.DrawText(Oss.str().c_str(), wBlack + mLittleBit, y + mTrackHeight / 2);
+        Dc.DrawText(
+          Oss.str().c_str(),
+          wBlack + mLittleBit,
+          y + mTrackHeight / 2);
       }
       else if (!IsBlack(Pitch - 1))
       {
         Dc.DrawLine(0, y + mTrackHeight, mPianoWidth, y + mTrackHeight);
         Dc.SetPen(*wxWHITE_PEN);
-        Dc.DrawLine(0, y + mTrackHeight + 1, mPianoWidth, y + mTrackHeight + 1);
+        Dc.DrawLine(
+          0,
+          y + mTrackHeight + 1,
+          mPianoWidth,
+          y + mTrackHeight + 1);
         Dc.SetPen(*wxBLACK_PEN);
       }
 
@@ -1631,8 +1664,9 @@ void JZPianoWindow::DrawEvents(
 }
 
 //-----------------------------------------------------------------------------
-// Draws the a 3D button with text in it.  Used to draw the little area in the
-// top left of the window.
+// Description:
+//   Draws the a 3D button with text in it.  Used to draw the little area in
+// the top left of the window.
 //-----------------------------------------------------------------------------
 void JZPianoWindow::LineText(
   wxDC& Dc,
@@ -1917,7 +1951,8 @@ void JZPianoWindow::VerticalScroll(wxScrollWinEvent& Event)
 }
 
 //-----------------------------------------------------------------------------
-// Snapper
+// Description:
+//   Snapper
 //-----------------------------------------------------------------------------
 void JZPianoWindow::SnapSelectionStop(wxMouseEvent& MouseEvent)
 {
@@ -2314,12 +2349,12 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& MouseEvent)
           r.SetWidth(mPianoWidth - 2 * mLittleBit);
           r.SetHeight(mTopInfoHeight);
 
-          JZVelocityCounter *VelocCounter = new JZVelocityCounter(this, &r, pKeyOn);
-          VelocCounter->ProcessMouseEvent(MouseEvent, mScrolledX, mScrolledY);
-          mpMouseAction = VelocCounter;
+          JZVelocityCounter* pVelocCounter =
+            new JZVelocityCounter(this, &r, pKeyOn);
+          pVelocCounter->ProcessMouseEvent(MouseEvent, mScrolledX, mScrolledY);
+          mpMouseAction = pVelocCounter;
         }
         break;
-
     }
   }
 }
@@ -2342,7 +2377,8 @@ void JZPianoWindow::MousePiano(wxMouseEvent& MouseEvent)
 }
 
 //-----------------------------------------------------------------------------
-// This is an event handler for JZMouseCounter.
+// Description:
+//   This is an event handler for JZMouseCounter.
 //-----------------------------------------------------------------------------
 void JZPianoWindow::ButtonLabelDisplay(const wxString& Text, bool IsButtonDown)
 {
@@ -2397,9 +2433,9 @@ int JZPianoWindow::IsVisible(JZTrack* pTrack)
     (pTrack->Channel == gpConfig->GetValue(C_DrumChannel));
 }
 
-// ********************************************************************
+//=============================================================================
 // Utilities
-// ********************************************************************
+//=============================================================================
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -2471,7 +2507,8 @@ int JZPianoWindow::Pitch2y(int Pitch)
 }
 
 //-----------------------------------------------------------------------------
-// If Pitch == -1: search for any pitches.
+// Description:
+//   If Pitch == -1: search for any pitches.
 //-----------------------------------------------------------------------------
 JZEvent *JZPianoWindow::FindEvent(JZTrack* pTrack, int Clock, int Pitch)
 {
@@ -2603,13 +2640,15 @@ void JZPianoWindow::KillTrackEvent(JZEvent* pEvent)
 }
 
 //-----------------------------------------------------------------------------
-// positions for controller editor
+// Description:
+//   Positions for controller editor.
 //-----------------------------------------------------------------------------
 #define CtrlH(h)        ((h)/4)
 #define CtrlY(h)        (h - CtrlH(h))
 
 //-----------------------------------------------------------------------------
-// Activate velocity edit.
+// Description:
+//   Activate velocity edit.
 //-----------------------------------------------------------------------------
 void JZPianoWindow::CtrlVelocity()
 {
@@ -2841,7 +2880,8 @@ void JZPianoWindow::Redo()
 }
 
 //-----------------------------------------------------------------------------
-// Undo actions
+// Description:
+//   Undo actions
 //-----------------------------------------------------------------------------
 void JZPianoWindow::Undo()
 {
@@ -2854,20 +2894,28 @@ void JZPianoWindow::Undo()
 }
 
 //-----------------------------------------------------------------------------
-// Quantize selected events.
+// Description:
+//   Quantize selected events.
 //-----------------------------------------------------------------------------
 void JZPianoWindow::Quantize()
 {
   if (EventsSelected())
   {
-    JZCommandQuantize QuantizeCommand(mpFilter, SnapClocks(), true, false, 0, 0);
+    JZCommandQuantize QuantizeCommand(
+      mpFilter,
+      SnapClocks(),
+      true,
+      false,
+      0,
+      0);
     QuantizeCommand.Execute(1);
     Refresh();
   }
 }
 
 //-----------------------------------------------------------------------------
-// Flip events up and down.
+// Description:
+//   Flip events up and down.
 //-----------------------------------------------------------------------------
 void JZPianoWindow::ExchangeUpDown()
 {
@@ -2880,7 +2928,8 @@ void JZPianoWindow::ExchangeUpDown()
 }
 
 //-----------------------------------------------------------------------------
-// Flip events left to right.
+// Description:
+//   Flip events left to right.
 //-----------------------------------------------------------------------------
 void JZPianoWindow::ExchangeLeftRight()
 {
@@ -2893,7 +2942,8 @@ void JZPianoWindow::ExchangeLeftRight()
 }
 
 //-----------------------------------------------------------------------------
-// Shift events snapclock clocks to left.
+// Description:
+//   Shift events snapclock clocks to left.
 //-----------------------------------------------------------------------------
 void JZPianoWindow::ShiftLeft()
 {
@@ -2907,7 +2957,8 @@ void JZPianoWindow::ShiftLeft()
 }
 
 //-----------------------------------------------------------------------------
-// Shift events snapclock clocks to right.
+// Description:
+//   Shift events snapclock clocks to right.
 //-----------------------------------------------------------------------------
 void JZPianoWindow::ShiftRight()
 {
@@ -2921,7 +2972,8 @@ void JZPianoWindow::ShiftRight()
 }
 
 //-----------------------------------------------------------------------------
-// helper for cut and copy events
+// Description:
+//   This is a helper function for cut and copy events.
 //-----------------------------------------------------------------------------
 void JZPianoWindow::CutOrCopy(int Id)
 {
@@ -3228,77 +3280,72 @@ void JZPianoWindow::SetVisibleAllTracks(bool Value)
 //-----------------------------------------------------------------------------
 void JZPianoWindow::ActivateSettingsDialog()
 {
-/*
-  jppResourceDialog Dialog(this, "windowSettings");
-
-  Dialog.Attach("use_colours", &mUseColors);
-  Dialog.Attach("font_size", &mFontSize, mPianoFontSizes);
-
-  if (Dialog.ShowModal() == wxID_OK)
-  {
-    Setup();
-    SetScrollRanges();
-    Refresh();
-  }
-*/
+//  jppResourceDialog Dialog(this, "windowSettings");
+//
+//  Dialog.Attach("use_colours", &mUseColors);
+//  Dialog.Attach("font_size", &mFontSize, mPianoFontSizes);
+//
+//  if (Dialog.ShowModal() == wxID_OK)
+//  {
+//    Setup();
+//    SetScrollRanges();
+//    Refresh();
+//  }
 }
 
 //-----------------------------------------------------------------------------
-// This is a test to see how to implement a dialog with Patrick's system.
+// Description:
+//   This is a test to see how to implement a dialog with Patrick's system.
 // It replaces JZMidiDelayDlg, which isnt necesarily a good idea.
 //-----------------------------------------------------------------------------
 void JZPianoWindow::ActivateMidiDelayDialog()
 {
-/*
-  if (!EventsSelected())
-  {
-    return;
-  }
-
-  int scale = 50; //in percent
-  int clockDelay = 10;
-  int repeat = 6;
-
-  jppResourceDialog dialog(this, "midiDelay");
-
-  dialog.Attach("scale", &scale);
-  dialog.Attach("clockDelay", &clockDelay);
-  dialog.Attach("repeat", &repeat);
-
-  if (dialog.ShowModal() == wxID_OK)
-  {
-    //execute the command
-    JZCommandMidiDelay cmd(mpFilter, scale / 100.0, clockDelay, repeat);
-    cmd.Execute();
-    SetScrollRanges();
-    Refresh();
-  }
-*/
+//  if (!EventsSelected())
+//  {
+//    return;
+//  }
+//
+//  int scale = 50; //in percent
+//  int clockDelay = 10;
+//  int repeat = 6;
+//
+//  jppResourceDialog dialog(this, "midiDelay");
+//
+//  dialog.Attach("scale", &scale);
+//  dialog.Attach("clockDelay", &clockDelay);
+//  dialog.Attach("repeat", &repeat);
+//
+//  if (dialog.ShowModal() == wxID_OK)
+//  {
+//    //execute the command
+//    JZCommandMidiDelay cmd(mpFilter, scale / 100.0, clockDelay, repeat);
+//    cmd.Execute();
+//    SetScrollRanges();
+//    Refresh();
+//  }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZPianoWindow::ActivateSequenceLengthDialog()
 {
-/*
-  if (!EventsSelected())
-  {
-    return;
-  }
-
-  int scale = 100; //in percent
-
-  jppResourceDialog dialog(this, "sequenceLength");
-
-  dialog.Attach("scale", &scale);
-
-  if (dialog.ShowModal() == wxID_OK)
-  {
-    //execute the command
-    JZCommandSequenceLength cmd(mpFilter, scale / 100.0);
-    cmd.Execute();
-    SetScrollRanges();
-    Refresh();
-  }
-*/
+//  if (!EventsSelected())
+//  {
+//    return;
+//  }
+//
+//  int scale = 100; //in percent
+//
+//  jppResourceDialog dialog(this, "sequenceLength");
+//
+//  dialog.Attach("scale", &scale);
+//
+//  if (dialog.ShowModal() == wxID_OK)
+//  {
+//    //execute the command
+//    JZCommandSequenceLength cmd(mpFilter, scale / 100.0);
+//    cmd.Execute();
+//    SetScrollRanges();
+//    Refresh();
+//  }
 }

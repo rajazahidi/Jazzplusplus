@@ -659,10 +659,6 @@ END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-//JZListen JZPianoWindow::mListen;
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 JZPianoWindow::JZPianoWindow(
   JZPianoFrame* pPianoFrame,
   JZProject* pProject,
@@ -731,6 +727,7 @@ JZPianoWindow::~JZPianoWindow()
   delete mpFixedFont;
   delete mpDrumFont;
   delete mpFrameBuffer;
+  JZListen::Destroy();
 }
 
 //-----------------------------------------------------------------------------

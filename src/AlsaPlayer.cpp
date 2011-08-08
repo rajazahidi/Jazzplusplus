@@ -543,7 +543,7 @@ int JZAlsaPlayer::compose_echo(int clock, unsigned int arg)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZAlsaPlayer::OutBreak(long clock)
+void JZAlsaPlayer::OutBreak(int clock)
 {
   while (echo_clock + 48 < clock)
   {
@@ -559,7 +559,7 @@ void JZAlsaPlayer::OutBreak(long clock)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZAlsaPlayer::StartPlay(long clock, long loopClock, int cont)
+void JZAlsaPlayer::StartPlay(int clock, int loopClock, int cont)
 {
   recd_clock = clock;
   echo_clock = clock;
@@ -573,7 +573,7 @@ void JZAlsaPlayer::StartPlay(long clock, long loopClock, int cont)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZAlsaPlayer::ResetPlay(long clock)
+void JZAlsaPlayer::ResetPlay(int clock)
 {
   // Purge queues.
   snd_seq_drop_output_buffer(handle);
@@ -594,7 +594,7 @@ void JZAlsaPlayer::ResetPlay(long clock)
 void JZAlsaPlayer::Notify()
 {
   // called by timer
-  long Now = GetRealTimeClock();
+  int Now = GetRealTimeClock();
 
   cout << "JZAlsaPlayer::Notify " << Now << ' ' << play_clock << endl;
 
@@ -657,7 +657,7 @@ void JZAlsaPlayer::Notify()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZAlsaPlayer::set_event_header(snd_seq_event_t *ev, long clock, int type)
+void JZAlsaPlayer::set_event_header(snd_seq_event_t *ev, int clock, int type)
 {
   memset(ev, 0, sizeof(*ev));
   snd_seq_ev_set_source(ev, self.port);
@@ -671,7 +671,7 @@ void JZAlsaPlayer::set_event_header(snd_seq_event_t *ev, long clock, int type)
 //-----------------------------------------------------------------------------
 void JZAlsaPlayer::set_event_header(
   snd_seq_event_t *ev,
-  long clock,
+  int clock,
   int len,
   void *ptr)
 {
@@ -686,7 +686,7 @@ void JZAlsaPlayer::set_event_header(
 // Description:
 //   Initialize the alsa timer.
 //-----------------------------------------------------------------------------
-int JZAlsaPlayer::start_timer(long clock)
+int JZAlsaPlayer::start_timer(int clock)
 {
   int time_base = mpSong->GetTicksPerQuarter();
   int cur_speed = mpSong->GetTrack(0)->GetCurrentSpeed(clock);
@@ -716,7 +716,7 @@ void JZAlsaPlayer::init_queue_tempo(int time_base, int bpm)
 //   Immediately start the alsa queue timer.  Do this by sending an "start"
 // event to the queue.
 //-----------------------------------------------------------------------------
-void JZAlsaPlayer::start_queue_timer(long clock)
+void JZAlsaPlayer::start_queue_timer(int clock)
 {
   stop_queue_timer(); // to be sure
 
@@ -938,11 +938,11 @@ void JZAlsaPlayer::recd_event(snd_seq_event_t* ev)
 // looking at time stamps on events in the queue, and also updates the
 // display, so the name is not well chosen.
 //-----------------------------------------------------------------------------
-long JZAlsaPlayer::GetRealTimeClock()
+int JZAlsaPlayer::GetRealTimeClock()
 {
   // input recorded events (including my echo events)
   snd_seq_event_t *ie;
-  long old_recd_clock = recd_clock;
+  int old_recd_clock = recd_clock;
   while (snd_seq_event_input(handle, &ie) >= 0 && ie != 0)
   {
     recd_event(ie);

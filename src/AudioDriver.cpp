@@ -64,8 +64,8 @@ class JZAudioListener : public wxTimer
     JZAudioListener(
       JZAudioPlayer* pPlayer,
       JZSample& spl,
-      long fr_smpl,
-      long to_smpl)
+      int fr_smpl,
+      int to_smpl)
       : wxTimer(),
         mpPlayer(pPlayer),
         mCount(0),
@@ -97,7 +97,7 @@ class JZAudioListener : public wxTimer
       }
     }
 
-    long GetPlayPosition()
+    int GetPlayPosition()
     {
       count_info cinfo;
       if (ioctl(mpPlayer->dev, SNDCTL_DSP_GETOPTR, &cinfo) == -1)
@@ -200,7 +200,7 @@ void JZAudioPlayer::StartAudio()
     return;
   }
 
-  long ticks_per_minute = mpSong->GetTicksPerQuarter() * mpSong->Speed();
+  int ticks_per_minute = mpSong->GetTicksPerQuarter() * mpSong->Speed();
   mSamples.ResetBuffers(mpAudioBuffer, start_clock, ticks_per_minute);
   if (PlaybackMode())
   {
@@ -480,7 +480,7 @@ void JZAudioPlayer::MidiSync()
 
   // search for SNDCTL_DSP_GETOPTR in linux/drivers/sound/dmabuf
   // before trying to understand the next line
-  long new_bytes = cinfo.bytes - cinfo.ptr;  // info.ptr is garbage!!
+  int new_bytes = cinfo.bytes - cinfo.ptr;  // info.ptr is garbage!!
   if (new_bytes != audio_bytes)
   {
     // driver has processed some bytes or whole fragment
@@ -493,7 +493,7 @@ void JZAudioPlayer::MidiSync()
     audio_bytes = new_bytes;
 
     // OSS bug?: mpu401 does not like speed changes too often
-    long audio_clock = (long)mSamples.Samples2Ticks(audio_bytes / 2);
+    int audio_clock = (int)mSamples.Samples2Ticks(audio_bytes / 2);
     int delta_clock = audio_clock - midi_clock;
     int new_speed = midi_speed + delta_clock;
 
@@ -525,7 +525,7 @@ void JZAudioPlayer::MidiSync()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZAudioPlayer::StartPlay(long Clock, long LoopClock, int Continue)
+void JZAudioPlayer::StartPlay(int Clock, int LoopClock, int Continue)
 {
   delete mpListener;
   mSamples.StartPlay(Clock);
@@ -546,12 +546,12 @@ void JZAudioPlayer::StopPlay()
   CloseDsp(true);
   if (RecordMode())
   {
-    long frc = mpRecordingInfo->mFromClock;
+    int frc = mpRecordingInfo->mFromClock;
     if (frc < start_clock)
     {
       frc = start_clock;
     }
-    long toc = mpRecordingInfo->mToClock;
+    int toc = mpRecordingInfo->mToClock;
     if (toc > recd_clock)
     {
       toc = recd_clock;
@@ -595,7 +595,7 @@ void JZAudioPlayer::ListenAudio(int key, int start_stop_mode)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZAudioPlayer::ListenAudio(JZSample &spl, long fr_smpl, long to_smpl)
+void JZAudioPlayer::ListenAudio(JZSample &spl, int fr_smpl, int to_smpl)
 {
   if (!mAudioEnabled)
   {
@@ -617,7 +617,7 @@ void JZAudioPlayer::ListenAudio(JZSample &spl, long fr_smpl, long to_smpl)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long JZAudioPlayer::GetListenerPlayPosition()
+int JZAudioPlayer::GetListenerPlayPosition()
 {
   if (!mpListener)
   {

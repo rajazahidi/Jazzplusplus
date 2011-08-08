@@ -69,8 +69,8 @@ class JZAlsaAudioListener : public wxTimer
     JZAlsaAudioListener(
       JZAlsaAudioPlayer* pPlayer,
       JZSample& spl,
-      long fr_smpl,
-      long to_smpl)
+      int fr_smpl,
+      int to_smpl)
       : wxTimer(),
         mpPlayer(pPlayer),
         mHardExit(true)
@@ -107,7 +107,7 @@ class JZAlsaAudioListener : public wxTimer
       }
     }
 
-    long GetPlayPosition()
+    int GetPlayPosition()
     {
       return mpPlayer->GetCurrentPosition(JZAlsaAudioPlayer::PLAYBACK);
     }
@@ -175,7 +175,7 @@ int JZAlsaAudioPlayer::PlayBackMode() const
   return running_mode & (1 << PLAYBACK);
 }
 
-void JZAlsaAudioPlayer::StartPlay(long clock, long loopClock, int cont)
+void JZAlsaAudioPlayer::StartPlay(int clock, int loopClock, int cont)
 {
   delete mpListener;
   mSamples.StartPlay(clock);
@@ -186,7 +186,7 @@ void JZAlsaAudioPlayer::StartPlay(long clock, long loopClock, int cont)
     return;
   }
 
-  long ticks_per_minute = mpSong->GetTicksPerQuarter() * mpSong->Speed();
+  int ticks_per_minute = mpSong->GetTicksPerQuarter() * mpSong->Speed();
   mSamples.ResetBuffers(mpAudioBuffer, clock, ticks_per_minute);
   last_scount = 0;
   cur_pos = 0;
@@ -517,20 +517,20 @@ void JZAlsaAudioPlayer::ReadSamples()
 }
 
 
-void JZAlsaAudioPlayer::ResetPlay(long clock)
+void JZAlsaAudioPlayer::ResetPlay(int clock)
 {
   JZAlsaPlayer::ResetPlay(clock);
   if (pcm[PLAYBACK])
   {
     snd_pcm_drop(pcm[PLAYBACK]);
-//    long ticks_per_minute = mpSong->GetTicksPerQuarter() * mpSong->Speed();
+//    int ticks_per_minute = mpSong->GetTicksPerQuarter() * mpSong->Speed();
 //    mSamples.ResetBuffers(mpAudioBuffer, clock, ticks_per_minute);
   }
   audio_clock_offset = clock;
   cur_pos = 0;
 }
 
-long JZAlsaAudioPlayer::GetCurrentPosition(int mode)
+int JZAlsaAudioPlayer::GetCurrentPosition(int mode)
 {
   return cur_scount;
 }
@@ -556,7 +556,7 @@ void JZAlsaAudioPlayer::MidiSync()
     return; // disabled
   }
 
-  long scount = GetCurrentPosition(mode);
+  int scount = GetCurrentPosition(mode);
 
   // get realtime info for audio/midi sync
   if (scount != last_scount)
@@ -581,8 +581,8 @@ void JZAlsaAudioPlayer::MidiSync()
     }
     last_scount = scount;
     cur_pos += samplediff;
-    long audio_clock =
-      (long)mSamples.Samples2Ticks(cur_pos) + audio_clock_offset;
+    int audio_clock =
+      (int)mSamples.Samples2Ticks(cur_pos) + audio_clock_offset;
     int delta_clock = audio_clock - qtick;
     int new_speed = midi_speed + delta_clock;
 
@@ -625,12 +625,12 @@ void JZAlsaAudioPlayer::StopPlay()
   CloseDsp(true);
   if (RecordMode())
   {
-    long frc = mpRecordingInfo->mFromClock;
+    int frc = mpRecordingInfo->mFromClock;
     if (frc < audio_clock_offset)
     {
       frc = audio_clock_offset;
     }
-    long toc = mpRecordingInfo->mToClock;
+    int toc = mpRecordingInfo->mToClock;
     if (toc > recd_clock)
     {
       toc = recd_clock;
@@ -670,7 +670,7 @@ void JZAlsaAudioPlayer::ListenAudio(int key, int start_stop_mode)
   mpListener = new JZAlsaAudioListener(this, key);
 }
 
-void JZAlsaAudioPlayer::ListenAudio(JZSample& spl, long fr_smpl, long to_smpl)
+void JZAlsaAudioPlayer::ListenAudio(JZSample& spl, int fr_smpl, int to_smpl)
 {
   if (!mAudioEnabled)
   {
@@ -691,7 +691,7 @@ void JZAlsaAudioPlayer::ListenAudio(JZSample& spl, long fr_smpl, long to_smpl)
   mpListener = new JZAlsaAudioListener(this, spl, fr_smpl, to_smpl);
 }
 
-long JZAlsaAudioPlayer::GetListenerPlayPosition()
+int JZAlsaAudioPlayer::GetListenerPlayPosition()
 {
   if (!mpListener)
   {

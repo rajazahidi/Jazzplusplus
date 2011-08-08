@@ -62,10 +62,10 @@ class JZAlsaPlayer : public JZPlayer
     }
     void OutNow(JZParam *r);
     void OutBreak();
-    void OutBreak(long BreakOver);
-    void StartPlay(long Clock, long LoopClock = 0, int Continue = 0);
+    void OutBreak(int BreakOver);
+    void StartPlay(int Clock, int LoopClock = 0, int Continue = 0);
     void StopPlay();
-    long GetRealTimeClock();
+    int GetRealTimeClock();
     virtual void SetSoftThru(int on, int idev, int odev);
     virtual int SupportsMultipleDevices()
     {
@@ -114,17 +114,17 @@ class JZAlsaPlayer : public JZPlayer
       JZAlsaDeviceList& Devicelist,
       unsigned DeviceCapabilities);
     int select_list(JZAlsaDeviceList &list, const char *title, int def_device);
-    int  start_timer(long clock);
+    int  start_timer(int clock);
     int write(snd_seq_event_t *ev)
     {
       // 0 == ok
       return write(ev, 0);
     }
     int write(snd_seq_event_t *ev, int now); // 0 == ok
-    void set_event_header(snd_seq_event_t *ev, long clock, int type);
-    void set_event_header(snd_seq_event_t *ev, long clock, int len, void *ptr);
+    void set_event_header(snd_seq_event_t *ev, int clock, int type);
+    void set_event_header(snd_seq_event_t *ev, int clock, int len, void *ptr);
     void init_queue_tempo(int time_base, int bpm);
-    void start_queue_timer(long clock);
+    void start_queue_timer(int clock);
     void stop_queue_timer();
     void recd_event(snd_seq_event_t *ev);
     void flush_output();
@@ -134,15 +134,15 @@ class JZAlsaPlayer : public JZPlayer
     void set_pool_sizes();
     int compose_echo(int clock, unsigned int arg = 0);
     virtual void StartAudio();
-    virtual void ResetPlay(long clock);
+    virtual void ResetPlay(int clock);
     int sync_master();
     void sync_master_remove();
     int sync_slave();
     void sync_slave_remove();
 
-    long play_clock;   // current clock
-    long recd_clock;  // clock received so far from recorded events or echo events
-    long echo_clock;  // echo events have been sent up to this clock
+    int play_clock;   // current clock
+    int recd_clock;  // clock received so far from recorded events or echo events
+    int echo_clock;  // echo events have been sent up to this clock
 
     JZAlsaThru *thru;
     int ithru, othru;  // index in iaddr, oaddr of source/target device

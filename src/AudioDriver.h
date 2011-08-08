@@ -54,7 +54,7 @@ class JZAudioPlayer : public JZSeq2Player
 
     virtual void Notify();
 
-    virtual void StartPlay(long Clock, long LoopClock = 0, int Continue = 0);
+    virtual void StartPlay(int Clock, int LoopClock = 0, int Continue = 0);
 
     virtual void StopPlay();
 
@@ -77,14 +77,14 @@ class JZAudioPlayer : public JZSeq2Player
 
     virtual void ListenAudio(int key, int start_stop_mode = 1);
 
-    virtual void ListenAudio(JZSample &spl, long fr_smpl, long to_smpl);
+    virtual void ListenAudio(JZSample &spl, int fr_smpl, int to_smpl);
 
     virtual bool IsListening() const
     {
       return mpListener != 0;
     }
 
-    virtual long GetListenerPlayPosition();
+    virtual int GetListenerPlayPosition();
 
     // for recording
     int RecordMode() const;
@@ -109,8 +109,8 @@ class JZAudioPlayer : public JZSeq2Player
     int dev;
     bool mInstalled;
 
-    long midi_clock;
-    long audio_bytes;
+    int midi_clock;
+    int audio_bytes;
     int midi_speed;  // start speed in bpm
     int curr_speed;  // actual speed in bpm
 

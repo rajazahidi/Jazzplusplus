@@ -41,7 +41,7 @@ class JZAlsaAudioPlayer : public JZAlsaPlayer
     virtual ~JZAlsaAudioPlayer();
     int LoadSamples(const char *filename);
     virtual void Notify();
-    virtual void StartPlay(long Clock, long LoopClock = 0, int Continue = 0);
+    virtual void StartPlay(int Clock, int LoopClock = 0, int Continue = 0);
     virtual void StopPlay();
     virtual bool IsInstalled()
     {
@@ -56,14 +56,14 @@ class JZAlsaAudioPlayer : public JZAlsaPlayer
       mAudioEnabled = AudioEnabled;
     }
     virtual void ListenAudio(int key, int start_stop_mode = 1);
-    virtual void ListenAudio(JZSample &spl, long fr_smpl, long to_smpl);
+    virtual void ListenAudio(JZSample &spl, int fr_smpl, int to_smpl);
     virtual bool IsListening() const
     {
       return mpListener != 0;
     }
-    virtual long GetListenerPlayPosition();
+    virtual int GetListenerPlayPosition();
     virtual void StartAudio();
-    virtual void ResetPlay(long clock);
+    virtual void ResetPlay(int clock);
 
     enum
     {
@@ -84,7 +84,7 @@ class JZAlsaAudioPlayer : public JZAlsaPlayer
 
     void CloseDsp(bool Reset);
 
-    long GetCurrentPosition(int mode);
+    int GetCurrentPosition(int mode);
     int GetFreeSpace(int mode);
 
     // If true can do full duplex record/play.
@@ -93,10 +93,10 @@ class JZAlsaAudioPlayer : public JZAlsaPlayer
     snd_pcm_t *pcm[2];
     bool mInstalled;
 
-    long audio_clock_offset;
-    long cur_pos;
-    long last_scount;
-    long cur_scount;
+    int audio_clock_offset;
+    int cur_pos;
+    int last_scount;
+    int cur_scount;
     int running_mode;
     int  midi_speed;  // start speed in bpm
     int  curr_speed;  // actual speed in bpm
@@ -106,10 +106,10 @@ class JZAlsaAudioPlayer : public JZAlsaPlayer
 
     int card; // card number in config
     std::string mDeviceNames[2]; // device names
-    long frag_size[2];
-    long frag_byte_size[2];
+    int frag_size[2];
+    int frag_byte_size[2];
     int frame_shift[2];
-    long frame_boundary[2];
+    int frame_boundary[2];
 
     JZAlsaAudioListener* mpListener;
     JZAudioRecordBuffer recbuffers;

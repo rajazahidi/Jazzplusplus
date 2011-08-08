@@ -293,7 +293,7 @@ class JZPlayer : public wxTimer
 
     virtual int GetListenerPlayPosition()
     {
-      return -1L;
+      return -1;
     }
 
     void LoadDefaultSettings()

@@ -81,24 +81,24 @@ JZWindowsPlayer::JZWindowsPlayer(JZSong* pSong)
   // select input device
   if (ilong >= 0)
   {
-    UINT dev = (UINT)ilong;
+    UINT DeviceId = (UINT)ilong;
     UINT rc;
     switch (gpConfig->GetValue(C_ClockSource))
     {
       case CsMidi:
         rc = midiInOpen(
           &mpState->hinp,
-          dev,
-          (DWORD)midiMidiInputHandler,
-          (DWORD)mpState,
+          DeviceId,
+          (DWORD_PTR)midiMidiInputHandler,
+          (DWORD_PTR)mpState,
           CALLBACK_FUNCTION);
         break;
       case CsMtc:
         rc = midiInOpen(
           &mpState->hinp,
-          dev,
-          (DWORD)midiMtcInputHandler,
-          (DWORD)mpState,
+          DeviceId,
+          (DWORD_PTR)midiMtcInputHandler,
+          (DWORD_PTR)mpState,
           CALLBACK_FUNCTION);
         break;
       case CsInt:
@@ -106,9 +106,9 @@ JZWindowsPlayer::JZWindowsPlayer(JZSong* pSong)
       default:
         rc = midiInOpen(
           &mpState->hinp,
-          dev,
-          (DWORD)midiIntInputHandler,
-          (DWORD)mpState,
+          DeviceId,
+          (DWORD_PTR)midiIntInputHandler,
+          (DWORD_PTR)mpState,
           CALLBACK_FUNCTION);
         break;
     }
@@ -123,16 +123,18 @@ JZWindowsPlayer::JZWindowsPlayer(JZSong* pSong)
   // select output device
   if (olong >= 0)
   {
-    UINT dev = (UINT)olong;
-    if (dev == MAX_MIDI_DEVS)
-      dev = MIDI_MAPPER;
+    UINT DeviceId = (UINT)olong;
+    if (DeviceId == MAX_MIDI_DEVS)
+    {
+      DeviceId = MIDI_MAPPER;
+    }
 
-    //UINT rc = midiOutOpen(&mpState->hout, dev, 0L, 0L, 0L);
+    //UINT rc = midiOutOpen(&mpState->hout, DeviceId, 0L, 0L, 0L);
     UINT rc = midiOutOpen(
       &mpState->hout,
-      dev,
-      (DWORD)MidiOutProc,
-      (DWORD)mpState,
+      DeviceId,
+      (DWORD_PTR)MidiOutProc,
+      (DWORD_PTR)mpState,
       CALLBACK_FUNCTION);
     if (rc)
     {

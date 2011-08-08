@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008-2010 Peter J. Stieber
+// Modifications Copyright (C) 2008-2011 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,10 +30,9 @@
 
 #include <wx/msgdlg.h>
 
-// not sure if mutex may cause a dead lock when used to
-// synchronize the wxTimer::Notify() interrupt and the
-// low level midi interrupt, as these are not mswin threads.
-// As far as I can see, the mutex is not needed anyway.
+// I'm not sure if a mutex may cause a dead lock when used to synchronize the
+// wxTimer::Notify() interrupt and the low-level midi interrupt, as these are
+// not mswin threads.  As far as I can see, the mutex is not needed anyway.
 
 // IMPORTANT: enabling critical sections freezes NT!
 
@@ -43,12 +42,12 @@
 #define LeaveCriticalSection(a)
 #define DeleteCriticalSection(a)
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
+//*****************************************************************************
+// Description:
+//   Class to play a sample from the piano roll.
+//*****************************************************************************
 class JZAudioListener : public wxTimer
 {
-  // play a sample from piano roll
-
   public:
 
     JZAudioListener(JZWindowsAudioPlayer* pPlayer, int key)
@@ -173,7 +172,7 @@ JZWindowsAudioPlayer::JZWindowsAudioPlayer(JZSong* pSong)
 
   if (OpenDsp() == 0)
   {
-    // check output device capabilities
+    // Check output device capabilities.
     WAVEOUTCAPS ocaps;
     MMRESULT res = waveOutGetDevCaps((UINT)hout, &ocaps, sizeof(ocaps));
     if (res != MMSYSERR_NOERROR)
@@ -265,7 +264,8 @@ int JZWindowsAudioPlayer::OpenDsp()
   int i;
   MMRESULT res;
 
-  mErrorCode = NoError;  // everything ok for now.
+  // Everything is OK for now.
+  mErrorCode = NoError;
 
   if (!mAudioEnabled)
   {
@@ -285,7 +285,7 @@ int JZWindowsAudioPlayer::OpenDsp()
   fmt.wBitsPerSample  = 16;
   fmt.cbSize          = 0;
 
-  blocks_played   = 0;
+  blocks_played = 0;
   play_buffers_needed = 0;
   record_buffers_needed = 0;
 
@@ -297,8 +297,8 @@ int JZWindowsAudioPlayer::OpenDsp()
       &hout,
       WAVE_MAPPER,
       &fmt,
-      (DWORD)audioInterrupt,
-      (DWORD)this,
+      (DWORD_PTR)audioInterrupt,
+      (DWORD_PTR)this,
       CALLBACK_FUNCTION);
 
     if (res != MMSYSERR_NOERROR)
@@ -307,7 +307,7 @@ int JZWindowsAudioPlayer::OpenDsp()
       return 1;
     }
 
-    // prepare headers
+    // Prepare the headers.
     for (i = 0; i < BUFCOUNT; i++)
     {
       JZAudioBuffer* buf = mSamples.GetBuffer(i);
@@ -315,8 +315,10 @@ int JZWindowsAudioPlayer::OpenDsp()
       memset(hdr, 0, sizeof(WAVEHDR));
       buf->hdr = hdr;
 
-      hdr->lpData           = (char *)buf->Data();
-      hdr->dwBufferLength   = BUFBYTES;          // length, in bytes, of the buffer
+      hdr->lpData = (char *)buf->Data();
+
+      // Length, in bytes, of the buffer.
+      hdr->dwBufferLength = BUFBYTES;
 
       res = waveOutPrepareHeader(hout, hdr, sizeof(WAVEHDR));
       if (res != MMSYSERR_NOERROR)
@@ -333,29 +335,41 @@ int JZWindowsAudioPlayer::OpenDsp()
     hinp = 0;
     recbuffers.Clear();
 
-    res = waveInOpen(&hinp, WAVE_MAPPER, &fmt, (DWORD)audioInterrupt, (DWORD)this, CALLBACK_FUNCTION);
+    res = waveInOpen(
+      &hinp,
+      WAVE_MAPPER,
+      &fmt,
+      (DWORD_PTR)audioInterrupt,
+      (DWORD_PTR)this,
+      CALLBACK_FUNCTION);
     if (res != MMSYSERR_NOERROR)
     {
       mErrorCode = ErrInpOpen;
       return 1;
     }
 
-    // prepare headers and add them to recording device
+    // Prepare headers and add them to recording device.
     for (i = 0; i < BUFCOUNT; i++)
     {
       WAVEHDR *hdr = new WAVEHDR;
       memset(hdr, 0, sizeof(WAVEHDR));
 
       JZAudioBuffer* buf = recbuffers.RequestBuffer();
-      buf->hdr       = hdr;
+      buf->hdr = hdr;
 
-      hdr->lpData           = (LPSTR)buf->data;
-      hdr->dwBufferLength   = BUFBYTES;          // length, in bytes, of the buffer
-      hdr->dwFlags          = 0;                 // see below
+      hdr->lpData = (LPSTR)buf->data;
+
+      // length, in bytes, of the buffer
+      hdr->dwBufferLength = BUFBYTES;
+
+      // See below.
+      hdr->dwFlags = 0;
 
       res = waveInPrepareHeader(hinp, hdr, sizeof(WAVEHDR));
       if (res != MMSYSERR_NOERROR)
+      {
         return 1;
+      }
 
       res = waveInAddBuffer(hinp, hdr, sizeof(WAVEHDR));
       if (res != MMSYSERR_NOERROR)
@@ -365,7 +379,6 @@ int JZWindowsAudioPlayer::OpenDsp()
       }
     }
     hinp_open = 1;
-
   }
 
   return 0;
@@ -527,7 +540,9 @@ void JZWindowsAudioPlayer::Notify()
     if (hout_open)
     {
       mSamples.FillBuffers(mOutClock);
-      if (play_buffers_needed > 0)  // dont trigger start play by accident
+
+      // Don't trigger a start play by accident.
+      if (play_buffers_needed > 0)
       {
         WriteBuffers();
       }
@@ -549,18 +564,18 @@ void JZWindowsAudioPlayer::Notify()
           // low pass filter for time-correction (not really necessary)
           const long low = 50;
           mpState->time_correction =
-            (low * mpState->time_correction + (100 - low) * (audio_now - time_now) ) / 100L;
+            (low * mpState->time_correction +
+            (100 - low) * (audio_now - time_now) ) / 100L;
         }
       }
     }
-
 
     if (hinp_open)
     {
 
       while (record_buffers_needed > 0)
       {
-        // add a new record buffer
+        // Add a new record buffer.
         WAVEHDR *hdr = new WAVEHDR;
         memset(hdr, 0, sizeof(WAVEHDR));
 
@@ -568,7 +583,10 @@ void JZWindowsAudioPlayer::Notify()
         buf->hdr = hdr;
 
         hdr->lpData         = (LPSTR)buf->data;
-        hdr->dwBufferLength = BUFBYTES;          // length, in bytes, of the buffer
+
+        // Length, in bytes, of the buffer.
+        hdr->dwBufferLength = BUFBYTES;
+
         hdr->dwFlags        = 0;
 
         if (waveInPrepareHeader(hinp, hdr, sizeof(WAVEHDR)) == MMSYSERR_NOERROR)
@@ -598,7 +616,9 @@ void JZWindowsAudioPlayer::Notify()
 
           // Low pass filter for time-correction (not really necessary).
           const long low = 50;
-          mpState->time_correction = (low * mpState->time_correction + (100 - low) * (audio_now - time_now) ) / 100L;
+          mpState->time_correction =
+            (low * mpState->time_correction +
+            (100 - low) * (audio_now - time_now)) / 100L;
         }
       }
     }

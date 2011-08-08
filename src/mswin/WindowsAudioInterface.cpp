@@ -76,8 +76,8 @@ class JZAudioListener : public wxTimer
     JZAudioListener(
       JZWindowsAudioPlayer* pPlayer,
       JZSample& spl,
-      long fr_smpl,
-      long to_smpl)
+      int fr_smpl,
+      int to_smpl)
       : wxTimer(),
         mpPlayer(pPlayer),
         mCount(0),
@@ -123,7 +123,7 @@ class JZAudioListener : public wxTimer
       }
     }
 
-    long GetPlayPosition()
+    int GetPlayPosition()
     {
       MMTIME mmtime;
       mmtime.wType = TIME_SAMPLES;
@@ -135,11 +135,11 @@ class JZAudioListener : public wxTimer
 
     JZWindowsAudioPlayer* mpPlayer;
 
-    long mCount;
+    int mCount;
 
     bool mHardExit;
 
-    long mChannels;
+    int mChannels;
 };
 
 //-----------------------------------------------------------------------------
@@ -556,13 +556,13 @@ void JZWindowsAudioPlayer::Notify()
         res = waveOutGetPosition(hout, &mmtime, sizeof(mmtime));
         if (res == MMSYSERR_NOERROR && mmtime.wType == TIME_SAMPLES)
         {
-          long time_now = (long)timeGetTime();
-          long audio_now = (long)(
+          int time_now = (int)timeGetTime();
+          int audio_now = (int)(
             (double)start_time + 1000.0 * mmtime.u.sample /
             mSamples.GetSamplingRate());
 
           // low pass filter for time-correction (not really necessary)
-          const long low = 50;
+          const int low = 50;
           mpState->time_correction =
             (low * mpState->time_correction +
             (100 - low) * (audio_now - time_now) ) / 100L;
@@ -609,13 +609,13 @@ void JZWindowsAudioPlayer::Notify()
         res = waveInGetPosition(hinp, &mmtime, sizeof(mmtime));
         if (res == MMSYSERR_NOERROR && mmtime.wType == TIME_SAMPLES)
         {
-          long time_now  = (long)timeGetTime();
-          long audio_now = (long)(
+          int time_now  = (int)timeGetTime();
+          int audio_now = (int)(
             (double)mpState->start_time + 1000.0 * mmtime.u.sample /
             mSamples.GetSamplingRate());
 
           // Low pass filter for time-correction (not really necessary).
-          const long low = 50;
+          const int low = 50;
           mpState->time_correction =
             (low * mpState->time_correction +
             (100 - low) * (audio_now - time_now)) / 100L;
@@ -631,7 +631,7 @@ void JZWindowsAudioPlayer::Notify()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZWindowsAudioPlayer::StartPlay(long Clock, long LoopClock, int Continue)
+void JZWindowsAudioPlayer::StartPlay(int Clock, int LoopClock, int Continue)
 {
   mSamples.StartPlay(Clock);
   JZWindowsIntPlayer::StartPlay(Clock, LoopClock, Continue);
@@ -665,11 +665,11 @@ void JZWindowsAudioPlayer::StopPlay()
   mSamples.StopPlay();
   if (RecordMode())
   {
-    long frc = mpRecordingInfo->mFromClock;
+    int frc = mpRecordingInfo->mFromClock;
     if (frc < start_clock)
       frc = start_clock;
-    long toc = mpRecordingInfo->mToClock;
-    long play_clock = Time2Clock(mpState->play_time);
+    int toc = mpRecordingInfo->mToClock;
+    int play_clock = Time2Clock(mpState->play_time);
     if (toc > play_clock)
       toc = play_clock;
     mSamples.SaveRecordingDlg(frc, toc, recbuffers);
@@ -712,8 +712,8 @@ void JZWindowsAudioPlayer::ListenAudio(int key, int start_stop_mode)
 //-----------------------------------------------------------------------------
 void JZWindowsAudioPlayer::ListenAudio(
   JZSample &spl,
-  long fr_smpl,
-  long to_smpl)
+  int fr_smpl,
+  int to_smpl)
 {
   if (!mAudioEnabled)
   {
@@ -736,11 +736,11 @@ void JZWindowsAudioPlayer::ListenAudio(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long JZWindowsAudioPlayer::GetListenerPlayPosition()
+int JZWindowsAudioPlayer::GetListenerPlayPosition()
 {
   if (!mpListener)
   {
-    return -1L;
+    return -1;
   }
   return mpListener->GetPlayPosition();
 }

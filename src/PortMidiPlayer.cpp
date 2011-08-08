@@ -401,7 +401,7 @@ void JZPortMidiPlayer::StopPlay()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long JZPortMidiPlayer::GetRealTimeClock()
+int JZPortMidiPlayer::GetRealTimeClock()
 {
   long t = Pt_Time();
 

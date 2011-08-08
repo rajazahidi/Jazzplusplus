@@ -156,9 +156,9 @@ void CALLBACK midiIntInputHandler(
   DWORD dwParam2)
 {
     tWinPlayerState *state = (tWinPlayerState *)dwInstance;
-    long now;
+    int now;
 
-    now = (long)timeGetTime();
+    now = (int)timeGetTime();
 
     switch (wMsg)
     {
@@ -215,7 +215,7 @@ void CALLBACK midiIntTimerHandler(
     (void)state->thru_buffer.get();
   }
 
-  state->play_time = (long)timeGetTime() + state->time_correction;
+  state->play_time = (int)timeGetTime() + state->time_correction;
 
   midi_event* m = state->play_buffer.peek();
   while (m)
@@ -253,15 +253,15 @@ void CALLBACK midiIntTimerHandler(
   }
 
   // compute delta time for next interrupt
-  long delay = 100; // default in millisec
+  int delay = 100; // default in millisec
   if (m)
   {
-    delay = (long)m->ref - (long)state->play_time;
+    delay = (int)m->ref - (int)state->play_time;
   }
-  if (delay < (long)state->min_timer_period)
-    delay = (long)state->min_timer_period;
-  else if (delay > (long)state->max_timer_period)
-    delay = (long)state->max_timer_period;
+  if (delay < (int)state->min_timer_period)
+    delay = (int)state->min_timer_period;
+  else if (delay > (int)state->max_timer_period)
+    delay = (int)state->max_timer_period;
   timeSetEvent(
     (UINT) delay,
     state->min_timer_period,
@@ -279,9 +279,9 @@ void CALLBACK midiMidiInputHandler(
   DWORD dwParam2)
 {
     tWinPlayerState *state = (tWinPlayerState *)dwInstance;
-    long now;
+    int now;
 
-    now = (long)timeGetTime();
+    now = (int)timeGetTime();
 
     switch (wMsg)
     {
@@ -348,9 +348,9 @@ void CALLBACK midiMidiTimerHandler(
     (void)state->thru_buffer.get();
   }
 
-  state->play_time = (long)timeGetTime();
+  state->play_time = (int)timeGetTime();
   /* How many ticks since last signal? */
-  long delta_clock = ((state->play_time - state->signal_time) * 1000L) / state->time_per_tick;
+  int delta_clock = ((state->play_time - state->signal_time) * 1000L) / state->time_per_tick;
 
   if (delta_clock > (2 * state->ticks_per_signal)) /* Too many? */
   {
@@ -364,7 +364,7 @@ void CALLBACK midiMidiTimerHandler(
   midi_event *m = state->play_buffer.peek();
   while (m)
   {
-    if ((long)m->ref > state->play_clock)
+    if ((int)m->ref > state->play_clock)
       break;
 
     if (m->data)
@@ -391,16 +391,16 @@ void CALLBACK midiMidiTimerHandler(
   }
 
   // compute delta time for next interrupt
-  long delay = 100; // default in millisec
+  int delay = 100; // default in millisec
 
   if (m)
   {
-    delay = (((long)m->ref - state->play_clock) * state->time_per_tick) / 1000L;
+    delay = (((int)m->ref - state->play_clock) * state->time_per_tick) / 1000L;
   }
-  if (delay < (long)state->min_timer_period)
-    delay = (long)state->min_timer_period;
-  else if (delay > (long)state->max_timer_period)
-    delay = (long)state->max_timer_period;
+  if (delay < (int)state->min_timer_period)
+    delay = (int)state->min_timer_period;
+  else if (delay > (int)state->max_timer_period)
+    delay = (int)state->max_timer_period;
 
   timeSetEvent(
     (UINT) delay,
@@ -419,9 +419,9 @@ void CALLBACK midiMtcInputHandler(
   DWORD dwParam2)
 {
     tWinPlayerState *state = (tWinPlayerState *)dwInstance;
-    long now;
+    int now;
 
-    now = (long)timeGetTime();
+    now = (int)timeGetTime();
 
     switch (wMsg)
     {
@@ -476,7 +476,7 @@ void CALLBACK midiMtcInputHandler(
                   state->mtc_start.type = ((u.c[1] & 0x06) >> 1);
                   if (state->qfm_bits == 0xff)
                   {
-                    long mtc_time;
+                    int mtc_time;
                     state->signal_time = now;
                     Mtc2Frames( state );
                     GetMtcTime( state, mtc_time );
@@ -495,7 +495,7 @@ void CALLBACK midiMtcInputHandler(
           {
             if (state->mtc_valid)
             {
-              long mtc_time;
+              int mtc_time;
               GetMtcTime( state, mtc_time );
               state->recd_buffer.put(dwParam1, mtc_time + (now - state->signal_time) );
             }
@@ -549,7 +549,7 @@ void CALLBACK midiMtcTimerHandler(
     (void)state->thru_buffer.get();
   }
 
-  long now = (long)timeGetTime();
+  int now = (int)timeGetTime();
   if ( state->mtc_valid )
   {
     GetMtcTime( state, state->play_time );
@@ -592,15 +592,15 @@ void CALLBACK midiMtcTimerHandler(
   }
 
   // compute delta time for next interrupt
-  long delay = 100; // default in millisec
+  int delay = 100; // default in millisec
   if (m)
   {
-    delay = (long)m->ref - (long)state->play_time;
+    delay = (int)m->ref - (int)state->play_time;
   }
-  if (delay < (long)state->min_timer_period)
-    delay = (long)state->min_timer_period;
-  else if (delay > (long)state->max_timer_period)
-    delay = (long)state->max_timer_period;
+  if (delay < (int)state->min_timer_period)
+    delay = (int)state->min_timer_period;
+  else if (delay > (int)state->max_timer_period)
+    delay = (int)state->max_timer_period;
   timeSetEvent(
     (UINT) delay,
     state->min_timer_period,

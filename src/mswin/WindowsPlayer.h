@@ -47,10 +47,10 @@ class JZWindowsPlayer : public JZPlayer
     void OutNow(JZEvent *e);
     void OutNow(JZParam *r);
     void OutBreak();
-    virtual void OutBreak(long BreakOver);
-    void StartPlay(long Clock, long LoopClock = 0, int Continue = 0);
+    virtual void OutBreak(int BreakOver);
+    void StartPlay(int Clock, int LoopClock = 0, int Continue = 0);
     void StopPlay();
-    virtual long GetRealTimeClock() = 0;
+    virtual int GetRealTimeClock() = 0;
     virtual void FlushToDevice();
     void SetSoftThru(int on, int InputDevice, int OutputDevice);
 
@@ -75,21 +75,21 @@ class JZWindowsPlayer : public JZPlayer
     tWinPlayerState* mpState;
     DWORD Event2Dword(JZEvent *e);
     JZEvent* Dword2Event(DWORD dw);
-    long Clock2Time(long clock);
-    long Time2Clock(long time);
-    void SetTempo(long bpm, long clock);
+    int Clock2Time(int clock);
+    int Time2Clock(int time);
+    void SetTempo(int bpm, int clock);
     BOOL timer_installed;
-    long midiClockOut;
-    long lastValidMtcClock;
-    void FillMidiClocks(long to);
-    void FlushToDevice(long clock);
+    int midiClockOut;
+    int lastValidMtcClock;
+    void FillMidiClocks(int to);
+    void FlushToDevice(int clock);
 
     JZEventArray OutOfBandEvents;
-    long RealTimeClock2Time(long clock);
-    long Time2RealTimeClock(long time);
-    void SetRealTimeTempo(long bpm, long clock);
-    long real_start_time;
-    long real_ticks_per_minute;
+    int RealTimeClock2Time(int clock);
+    int Time2RealTimeClock(int time);
+    void SetRealTimeTempo(int bpm, int clock);
+    int real_start_time;
+    int real_ticks_per_minute;
 
     // buffer for sysexdata
     HANDLE hSysHdr;
@@ -110,7 +110,7 @@ class JZWindowsIntPlayer : public JZWindowsPlayer
     {
     }
 
-    virtual long GetRealTimeClock();
+    virtual int GetRealTimeClock();
 };
 
 //*****************************************************************************
@@ -124,9 +124,9 @@ class JZWindowsMidiPlayer : public JZWindowsPlayer
     {
     }
 
-    virtual long GetRealTimeClock();
+    virtual int GetRealTimeClock();
     virtual int OutEvent(JZEvent* pEvent);
-    virtual void OutBreak(long clock);
+    virtual void OutBreak(int clock);
 };
 
 //*****************************************************************************
@@ -139,7 +139,7 @@ class JZWindowsMtcPlayer : public JZWindowsPlayer
     {
     }
 
-    virtual long GetRealTimeClock();
+    virtual int GetRealTimeClock();
     virtual void InitMtcRec();
     virtual JZMtcTime* FreezeMtcRec();
 };

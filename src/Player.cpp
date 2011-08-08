@@ -107,7 +107,7 @@ void JZPlayLoop::Reset()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZPlayLoop::Set(long Start, long Stop)
+void JZPlayLoop::Set(int Start, int Stop)
 {
   mStartClock = Start;
   mStopClock = Stop;
@@ -115,7 +115,7 @@ void JZPlayLoop::Set(long Start, long Stop)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long JZPlayLoop::Ext2IntClock(long Clock)
+int JZPlayLoop::Ext2IntClock(int Clock)
 {
   if (mStopClock)
   {
@@ -126,7 +126,7 @@ long JZPlayLoop::Ext2IntClock(long Clock)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long JZPlayLoop::Int2ExtClock(long Clock)
+int JZPlayLoop::Int2ExtClock(int Clock)
 {
   return Clock;
 }
@@ -138,8 +138,8 @@ long JZPlayLoop::Int2ExtClock(long Clock)
 void JZPlayLoop::PrepareOutput(
   JZEventArray* pEventArray,
   JZSong* pSong,
-  long ExtFr,
-  long ExtTo,
+  int ExtFr,
+  int ExtTo,
   bool AudioMode)
 {
   if (pEventArray == 0)
@@ -147,9 +147,9 @@ void JZPlayLoop::PrepareOutput(
     return;
   }
 
-  long From = Ext2IntClock(ExtFr);
-  long Delta = ExtFr - From;
-  long Size = ExtTo - ExtFr;
+  int From = Ext2IntClock(ExtFr);
+  int Delta = ExtFr - From;
+  int Size = ExtTo - ExtFr;
   while (mStopClock && From + Size > mStopClock)
   {
     pSong->MergeTracks(
@@ -209,7 +209,7 @@ JZPlayer::~JZPlayer()
 void JZPlayer::Notify()
 {
   // called by timer
-  long Now = GetRealTimeClock();
+  int Now = GetRealTimeClock();
 
 #ifdef DEBUG_PLAYER_NOTIFY
   cout << "JZPlayer::Notify " << Now << endl;
@@ -301,7 +301,7 @@ void JZPlayer::OutNow(JZTrack *t, JZParam *r)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZPlayer::StartPlay(long Clock, long LoopClock, int Continue)
+void JZPlayer::StartPlay(int Clock, int LoopClock, int Continue)
 {
 #ifdef DEBUG_PLAYER_STARTPLAY
   cout << "JZPlayer::StartPlay" << endl;
@@ -608,7 +608,7 @@ void JZPlayer::StopPlay()
   Stop();
   mPlaying = false;
 
-  long Clock = GetRealTimeClock();
+  int Clock = GetRealTimeClock();
 
   // SN++ Patch: Notes off for not GM/GS devices
   int ii;
@@ -798,9 +798,9 @@ int dwrite(int dev, const char* buf, int size)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZMpuPlayer::StartPlay(long IntClock, long LoopClock, int Continue)
+void JZMpuPlayer::StartPlay(int IntClock, int LoopClock, int Continue)
 {
-  long ExtClock = mpPlayLoop->Int2ExtClock(IntClock);
+  int ExtClock = mpPlayLoop->Int2ExtClock(IntClock);
   char *play;
   int playsize;
 
@@ -1025,7 +1025,7 @@ int JZMpuPlayer::OutEvent(JZEvent* pEvent)
         ActiveTrack = 6;
       }
 
-      long Time = pEvent->GetClock() - TrackClock[ActiveTrack];
+      int Time = pEvent->GetClock() - TrackClock[ActiveTrack];
       assert(Time < 240);
 
       if (Stat != TrackRunningStatus[ActiveTrack])
@@ -1081,7 +1081,7 @@ void JZMpuPlayer::OutBreak()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZMpuPlayer::OutBreak(long BreakOver)
+void JZMpuPlayer::OutBreak(int BreakOver)
 {
   int OverFlow = 1;
 
@@ -1183,7 +1183,7 @@ void JZMpuPlayer::OutNow(JZEvent* pEvent)
 //-----------------------------------------------------------------------------
 // try to send all out of band events up to Clock to device
 //-----------------------------------------------------------------------------
-void JZMpuPlayer::FlushOutOfBand(long Clock)
+void JZMpuPlayer::FlushOutOfBand(int Clock)
 {
   JZEventIterator Iterator(&OutOfBandEvents);
   JZEvent* pEvent = Iterator.Range(0, Clock);
@@ -1229,10 +1229,10 @@ void JZMpuPlayer::FlushOutOfBand(long Clock)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long JZMpuPlayer::GetRealTimeClock()
+int JZMpuPlayer::GetRealTimeClock()
 {
   static int receiving_song_ptr = 0;
-  static long d0, d1;
+  static int d0, d1;
   int c;
   while ((c = RecBytes.Get(dev)) >= 0)
   {
@@ -1278,7 +1278,7 @@ long JZMpuPlayer::GetRealTimeClock()
       // Song pointer received
       receiving_song_ptr++;
 
-      long ExtClock;
+      int ExtClock;
 
       switch (receiving_song_ptr)
       {
@@ -1306,7 +1306,7 @@ long JZMpuPlayer::GetRealTimeClock()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long JZMpuPlayer::GetRecordedData()
+int JZMpuPlayer::GetRecordedData()
 {
   int c, i;
   unsigned char *recbuf = NULL;
@@ -1862,7 +1862,7 @@ int JZSeq2Player::OutEvent(JZEvent* pEvent, int now)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZSeq2Player::OutBreak(long clock)
+void JZSeq2Player::OutBreak(int clock)
 {
   if (play_clock < clock)
   {
@@ -1892,7 +1892,7 @@ void JZSeq2Player::OutBreak()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZSeq2Player::StartPlay(long Clock, long LoopClock, int Continue)
+void JZSeq2Player::StartPlay(int Clock, int LoopClock, int Continue)
 {
   char buf[512];
   cout<<"JZSeq2Player::StartPlay"<<endl;
@@ -2018,7 +2018,7 @@ void JZSeq2Player::FlushToDevice()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-long JZSeq2Player::GetRealTimeClock()
+int JZSeq2Player::GetRealTimeClock()
 {
   unsigned char buf[256];
   int  size;
@@ -2036,7 +2036,7 @@ long JZSeq2Player::GetRealTimeClock()
           {
             case TMR_WAIT_ABS:
             case TMR_ECHO:
-              recd_clock = *(unsigned long *)&buf[i+4] + start_clock;
+              recd_clock = *(unsigned int *)&buf[i+4] + start_clock;
               break;
 
             default:

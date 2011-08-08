@@ -320,16 +320,16 @@ struct tWinPlayerState
   HMIDIIN hinp;
   HMIDIOUT hout;
 
-  long start_time;
-  long play_time;
-  long start_clock;
-  long ticks_per_minute;
+  int start_time;
+  int play_time;
+  int start_clock;
+  int ticks_per_minute;
 
-  long play_clock;
-  long virtual_clock;
-  long ticks_per_signal;
-  long signal_time;
-  long time_per_tick;
+  int play_clock;
+  int virtual_clock;
+  int ticks_per_signal;
+  int signal_time;
+  int time_per_tick;
 
   tWinPlayerMtcTime mtc_start;
   DWORD mtc_frames;
@@ -349,7 +349,7 @@ struct tWinPlayerState
   JZMidiQueue thru_buffer;
 
   JZWindowsAudioPlayer* audio_player;
-  long time_correction;
+  int time_correction;
 
   JZWinSysexBufferArray* isx_buffers;
   JZWinSysexBufferArray* osx_buffers;

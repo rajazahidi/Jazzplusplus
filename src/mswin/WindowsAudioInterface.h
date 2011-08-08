@@ -60,7 +60,7 @@ class JZWindowsAudioPlayer : public JZWindowsIntPlayer
 
     virtual void Notify();
 
-    virtual void StartPlay(long Clock, long LoopClock = 0, int Continue = 0);
+    virtual void StartPlay(int Clock, int LoopClock = 0, int Continue = 0);
 
     virtual void StopPlay();
 
@@ -83,9 +83,9 @@ class JZWindowsAudioPlayer : public JZWindowsIntPlayer
 
     virtual void ListenAudio(int key, int start_stop_mode = 1);
 
-    virtual void ListenAudio(JZSample &spl, long fr_smpl, long to_smpl);
+    virtual void ListenAudio(JZSample &spl, int fr_smpl, int to_smpl);
 
-    virtual long GetListenerPlayPosition();
+    virtual int GetListenerPlayPosition();
 
     virtual bool IsListening() const
     {
@@ -141,11 +141,11 @@ class JZWindowsAudioPlayer : public JZWindowsIntPlayer
     // A value of false means MIDI only.
     bool mAudioEnabled;
 
-    long blocks_played;       // # of blocks written to device
+    int blocks_played;       // # of blocks written to device
     int play_buffers_needed;  // driver requests more output buffers
 
-    long start_clock;     // when did play start
-    long start_time;      // play start time (not altered by SetTempo)
+    int start_clock;     // when did play start
+    int start_time;      // play start time (not altered by SetTempo)
     JZAudioListener* mpListener;
 
     HWAVEOUT hout;

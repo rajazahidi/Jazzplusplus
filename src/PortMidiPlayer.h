@@ -36,7 +36,7 @@ class JZPortMidiPlayer : public JZPlayer
     void StartPlay(int Clock, int LoopClock = 0, int Continue = 0);
     void StopPlay();
 
-    long GetRealTimeClock();
+    int GetRealTimeClock();
     int Clock2Time(int clock);
     int Time2Clock(int time);
     void SetTempo(int bpm, int clock);

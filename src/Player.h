@@ -102,30 +102,30 @@ class JZPlayLoop
 
     JZPlayLoop();
 
-    void Set(long Start, long Stop);
+    void Set(int Start, int Stop);
 
     void Reset();
 
     // external clock -> internal clock where
     //   external clock == physical clock
     //   internal clock == song position
-    long Ext2IntClock(long Clock);
+    int Ext2IntClock(int Clock);
 
     // the other way round
-    long Int2ExtClock(long Clock);
+    int Int2ExtClock(int Clock);
 
     void PrepareOutput(
       JZEventArray* pEventArray,
       JZSong* pSong,
-      long ExtFr,
-      long ExtTo,
+      int ExtFr,
+      int ExtTo,
       bool AudioMode = false);
 
   private:
 
-    long mStartClock;
+    int mStartClock;
 
-    long mStopClock;
+    int mStopClock;
 };
 
 //*****************************************************************************
@@ -163,9 +163,9 @@ class JZPlayer : public wxTimer
     void OutNow(JZTrack* t, JZParam* r);
 
     // what's played right now?
-    virtual long GetRealTimeClock() = 0;
+    virtual int GetRealTimeClock() = 0;
 
-    virtual void StartPlay(long Clock, long LoopClock = 0, int Continue = 0);
+    virtual void StartPlay(int Clock, int LoopClock = 0, int Continue = 0);
     virtual void StopPlay();
     virtual void AllNotesOff(bool Reset = false);
 
@@ -255,7 +255,7 @@ class JZPlayer : public wxTimer
     virtual void ListenAudio(int key, int start_stop_mode = 1)
     {
     }
-    virtual void ListenAudio(JZSample &spl, long fr_smpl, long to_smpl)
+    virtual void ListenAudio(JZSample &spl, int fr_smpl, int to_smpl)
     {
     }
     virtual bool IsListening() const
@@ -270,7 +270,7 @@ class JZPlayer : public wxTimer
 
     virtual void AdjustAudioLength(JZTrack *t)
     {
-      long ticks_per_minute = mpSong->GetTicksPerQuarter() * mpSong->Speed();
+      int ticks_per_minute = mpSong->GetTicksPerQuarter() * mpSong->Speed();
       mSamples.AdjustAudioLength(t, ticks_per_minute);
     }
 
@@ -291,7 +291,7 @@ class JZPlayer : public wxTimer
       mSamples.Edit(key);
     }
 
-    virtual long GetListenerPlayPosition()
+    virtual int GetListenerPlayPosition()
     {
       return -1L;
     }
@@ -307,7 +307,7 @@ class JZPlayer : public wxTimer
 
   protected:
 
-    long mOutClock;
+    int mOutClock;
 
     JZPlayLoop* mpPlayLoop;
 
@@ -354,7 +354,7 @@ class JZBuffer : public JZWriteBase
 
   public:
 
-    long Clock;
+    int Clock;
     int  RunningStatus;
 
     void Clear()
@@ -398,9 +398,9 @@ class JZBuffer : public JZWriteBase
       return (int)sizeof(Buffer) - Written;
     }
 
-    void PutVar(long val)
+    void PutVar(int val)
     {
-      unsigned long buf;
+      unsigned int buf;
       buf = val & 0x7f;
       while ((val >>= 7) > 0)
       {
@@ -419,9 +419,9 @@ class JZBuffer : public JZWriteBase
       }
     }
 
-    long GetVar(int dev)
+    int GetVar(int dev)
     {
-      unsigned long val;
+      unsigned int val;
       int c;
       val = Get(dev);
       if (val & 0x80)
@@ -504,11 +504,11 @@ class JZMpuPlayer : public JZPlayer
     int  dev;
     JZBuffer PlyBytes;
     JZBuffer RecBytes;
-    long playclock;
+    int playclock;
     int clock_to_host_counter;
 
     int ActiveTrack;
-    long TrackClock[ACTIVE_TRACKS];
+    int TrackClock[ACTIVE_TRACKS];
     int TrackRunningStatus[ACTIVE_TRACKS];
 
     JZEventArray OutOfBandEvents;
@@ -520,15 +520,15 @@ class JZMpuPlayer : public JZPlayer
     int  OutEvent(JZEvent *e);
     void OutNow(JZEvent *e);
     void OutBreak();
-    void OutBreak(long BreakOver);
-    void StartPlay(long Clock, long LoopClock = 0, int Continue = 0);
+    void OutBreak(int BreakOver);
+    void StartPlay(int Clock, int LoopClock = 0, int Continue = 0);
     void StopPlay();
-    long GetRealTimeClock();
+    int GetRealTimeClock();
     virtual bool IsInstalled();
-    long GetRecordedData();
+    int GetRecordedData();
     void SetHardThru(int on, int idev, int odev);
 
-    void FlushOutOfBand( long Clock );
+    void FlushOutOfBand( int Clock );
 };
 
 #define TRK (0<<6)
@@ -576,7 +576,7 @@ class JZNullPlayer : public JZPlayer
     {
     }
 
-    void StartPlay(long Clock, long LoopClock = 0, int Continue = 0)
+    void StartPlay(int Clock, int LoopClock = 0, int Continue = 0)
     {
     }
 
@@ -584,7 +584,7 @@ class JZNullPlayer : public JZPlayer
     {
     }
 
-    long GetRealTimeClock()
+    int GetRealTimeClock()
     {
       return 0;
     }
@@ -636,20 +636,20 @@ class JZSeq2Player : public JZPlayer
       OutEvent(e, 1);
     }
     void OutBreak();
-    void OutBreak(long BreakOver);
-    void StartPlay(long Clock, long LoopClock = 0, int Continue = 0);
+    void OutBreak(int BreakOver);
+    void StartPlay(int Clock, int LoopClock = 0, int Continue = 0);
     void StopPlay();
-    long GetRealTimeClock();
+    int GetRealTimeClock();
     virtual void FlushToDevice();
     void SetSoftThru(int on, int idev, int odev);
     int     FindMidiDevice();
 
   protected:
 
-    long    play_clock;
-    long    recd_clock;
-    long    start_clock;
-    long    echo_clock;
+    int    play_clock;
+    int    recd_clock;
+    int    start_clock;
+    int    echo_clock;
 
     JZOssThru *through;
     int     card_id;

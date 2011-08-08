@@ -622,7 +622,7 @@ void JZSampleSet::AdjustAudioLength(JZTrack* pTrack, long TicksPerMinute)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZSampleSet::StartPlay(long clock)
+void JZSampleSet::StartPlay(int clock)
 {
   ReloadSamples();
 

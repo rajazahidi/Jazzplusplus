@@ -344,7 +344,7 @@ class JZSampleSet
 
     virtual const std::string& GetSampleLabel(int Index);
 
-    void StartPlay(long clock);
+    void StartPlay(int clock);
 
     void StopPlay();
 

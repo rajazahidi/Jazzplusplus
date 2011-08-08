@@ -869,7 +869,7 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
           break;
       }
     }
-    else if (pVector && isdigit(InputLine[0]))
+    else if (pVector && !InputLine.empty() && isdigit(InputLine[0]))
     {
       // Read named entries.
 
@@ -985,7 +985,11 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
         ::wxMessageBox(String, "Warning", wxOK);
       }
     }
-    else if (pVector == 0 && !mBankTable.empty()&& isdigit(InputLine[0]))
+    else if (
+      pVector == 0 &&
+      !mBankTable.empty() &&
+      !InputLine.empty() &&
+      isdigit(InputLine[0]))
     {
       // Read bank table entries.
       assert(0 <= BankIndex && BankIndex < mBankTable.size());

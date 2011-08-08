@@ -27,27 +27,31 @@
 
 using namespace std;
 
-FreqTab::FreqTab()
+//*****************************************************************************
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZFrequencyTable::JZFrequencyTable()
 {
-  double fac = pow(2.0, 1.0 / 12.0);
-  double frq = 440 * pow(fac, 3.0) / 32.0;
-  tab.reserve(128);
-  for (int i = 0; i < 128; i++)
+  double Factor = pow(2.0, 1.0 / 12.0);
+  double Frequency = 440 * pow(Factor, 3.0) / 32.0;
+  mFrequencyTable.reserve(128);
+  for (int i = 0; i < 128; ++i)
   {
-    tab.push_back(frq);
-    frq *= fac;
+    mFrequencyTable.push_back(Frequency);
+    Frequency *= Factor;
   }
 }
 
-inline double dabs(double a, double b)
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+size_t JZFrequencyTable::GetKey(double Frequency)
 {
-  return a > b ? a - b : b - a;
-}
+  // Do a binary search.
+  vector<double>::iterator Position =
+    lower_bound(mFrequencyTable.begin(), mFrequencyTable.end(), Frequency);
 
-int FreqTab::key(double f)
-{
-  // do a binary search
-  vector<double>::iterator pos = lower_bound(tab.begin(), tab.end(), f);
-  // todo: if f is only a very little bigger than *pos, f is nearer to pos-1
-  return pos - tab.begin();
+  // TODO: If Frequency is only a very little bigger than *Position, Frequency
+  // is nearer to Position - 1.
+  return Position - mFrequencyTable.begin();
 }

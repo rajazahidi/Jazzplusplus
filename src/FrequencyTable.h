@@ -25,22 +25,24 @@
 
 #include <vector>
 
-class FreqTab
+//*****************************************************************************
+//*****************************************************************************
+class JZFrequencyTable
 {
   public:
 
-    FreqTab();
+    JZFrequencyTable();
 
-    int key(double frq);
+    size_t GetKey(double Frequency);
 
-    double freq(int key) const
+    double GetFrequency(int Key) const
     {
-      return tab[key];
+      return mFrequencyTable[Key];
     }
 
   private:
 
-    std::vector<double> tab;
+    std::vector<double> mFrequencyTable;
 };
 
 #endif // !defined(JZ_FREQUENCYTABLE_H)

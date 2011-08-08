@@ -190,20 +190,20 @@ static void setup_wav_control(JZSigWaveCtrl &wav, JZRndArray &arr)
 }
 
 void sig_wavsynth(
-  JZSample &spl,                // destin
-  double duration,        // length in seconds
-  int midi_key,                // base frequency
+  JZSample &spl,        // destin
+  double duration,      // length in seconds
+  int midi_key,         // base frequency
   double fshift,        // frequeny modulation factor, 0 = off
-  int ntables,                // number of wavetables to be mixed
-  JZRndArray *arr[][4],        // (fft, vol, pitch, pan) * N
+  int ntables,          // number of wavetables to be mixed
+  JZRndArray *arr[][4], // (fft, vol, pitch, pan) * N
   int noisegen          // first array is noise filter
 )
 {
   long sr = spl.GetSamplingRate();
   long ch = spl.GetChannelCount();
   JZSigSynth synth(sr, ch);
-  FreqTab ft;
-  double freq = ft.freq(midi_key);
+  JZFrequencyTable FrequencyTable;
+  double freq = FrequencyTable.GetFrequency(midi_key);
 
   JZFloatSample obuf(ch, sr);
   tFloatIter *osig = new tFloatIter(synth, obuf);

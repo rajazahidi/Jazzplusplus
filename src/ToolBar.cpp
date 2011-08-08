@@ -69,14 +69,18 @@ JZToolBar::JZToolBar(wxFrame* pFrame, JZToolDef* pToolDef)
       {
         mpToolBar->AddCheckTool(
           pToolDef->mId,
-          "",
+          wxEmptyString,
           Bitmap,
           wxNullBitmap,
           pToolDef->mpToolTip);
       }
       else
       {
-        mpToolBar->AddTool(pToolDef->mId, Bitmap, pToolDef->mpToolTip);
+        mpToolBar->AddTool(
+          pToolDef->mId,
+          wxEmptyString,
+          Bitmap,
+          pToolDef->mpToolTip);
       }
     }
 

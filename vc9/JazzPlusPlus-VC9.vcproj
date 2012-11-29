@@ -19,7 +19,7 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug GUI VC9|Win32"
+			Name="Debug VC9|Win32"
 			OutputDirectory="BuildDir\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="BuildDir\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
@@ -118,7 +118,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug GUI VC9|x64"
+			Name="Debug VC9|x64"
 			OutputDirectory="BuildDir\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="BuildDir\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
@@ -217,7 +217,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release GUI VC9|Win32"
+			Name="Release VC9|Win32"
 			OutputDirectory="BuildDir\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="BuildDir\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
@@ -317,7 +317,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release GUI VC9|x64"
+			Name="Release VC9|x64"
 			OutputDirectory="BuildDir\$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="BuildDir\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
@@ -701,7 +701,7 @@
 				RelativePath="..\src\NamedChoice.cpp"
 				>
 				<FileConfiguration
-					Name="Debug GUI VC9|Win32"
+					Name="Debug VC9|Win32"
 					ExcludedFromBuild="true"
 					>
 					<Tool
@@ -713,7 +713,7 @@
 				RelativePath="..\src\NamedChoice.h"
 				>
 				<FileConfiguration
-					Name="Debug GUI VC9|Win32"
+					Name="Debug VC9|Win32"
 					ExcludedFromBuild="true"
 					>
 					<Tool
@@ -1034,7 +1034,7 @@
 				RelativePath="..\src\HelpFiles\jazz.tex"
 				>
 				<FileConfiguration
-					Name="Debug GUI VC9|Win32"
+					Name="Debug VC9|Win32"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -1044,7 +1044,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug GUI VC9|x64"
+					Name="Debug VC9|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -1054,7 +1054,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release GUI VC9|Win32"
+					Name="Release VC9|Win32"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
@@ -1063,7 +1063,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release GUI VC9|x64"
+					Name="Release VC9|x64"
 					>
 					<Tool
 						Name="VCCustomBuildTool"

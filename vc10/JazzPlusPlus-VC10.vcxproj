@@ -1,20 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug GUI VC10|Win32">
-      <Configuration>Debug GUI VC10</Configuration>
+    <ProjectConfiguration Include="Debug VC10|Win32">
+      <Configuration>Debug VC10</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug GUI VC10|x64">
-      <Configuration>Debug GUI VC10</Configuration>
+    <ProjectConfiguration Include="Debug VC10|x64">
+      <Configuration>Debug VC10</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release GUI VC10|Win32">
-      <Configuration>Release GUI VC10</Configuration>
+    <ProjectConfiguration Include="Release VC10|Win32">
+      <Configuration>Release VC10</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release GUI VC10|x64">
-      <Configuration>Release GUI VC10</Configuration>
+    <ProjectConfiguration Include="Release VC10|x64">
+      <Configuration>Release VC10</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -24,22 +24,22 @@
     <RootNamespace>A JazzPlusPlus Application</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release VC10|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug VC10|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release VC10|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug VC10|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
@@ -47,39 +47,39 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release VC10|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug VC10|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|x64'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release VC10|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|x64'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug VC10|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|Win32'">BuildDir\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|Win32'">BuildDir\$(Platform)\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|Win32'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|x64'">BuildDir\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|x64'">BuildDir\$(Platform)\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|x64'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|Win32'">BuildDir\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|Win32'">BuildDir\$(Platform)\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|Win32'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|x64'">BuildDir\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|x64'">BuildDir\$(Platform)\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|x64'">false</LinkIncremental>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|Win32'">JazzPlusPlus</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|Win32'">JazzPlusPlus</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|x64'">JazzPlusPlus</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|x64'">JazzPlusPlus</TargetName>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug VC10|Win32'">BuildDir\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug VC10|Win32'">BuildDir\$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug VC10|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug VC10|x64'">BuildDir\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug VC10|x64'">BuildDir\$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug VC10|x64'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release VC10|Win32'">BuildDir\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release VC10|Win32'">BuildDir\$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release VC10|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release VC10|x64'">BuildDir\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release VC10|x64'">BuildDir\$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release VC10|x64'">false</LinkIncremental>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release VC10|Win32'">JazzPlusPlus</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug VC10|Win32'">JazzPlusPlus</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug VC10|x64'">JazzPlusPlus</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release VC10|x64'">JazzPlusPlus</TargetName>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug VC10|Win32'">
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>true</MkTypLibCompatible>
@@ -91,7 +91,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.2-VC10\lib\vc_lib\mswud;$(EXT_PKGS)\wxMSW-2.9.2-VC10\include;..\src;..\src\mswin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.4-VC10\lib\vc_lib\mswud;$(EXT_PKGS)\wxMSW-2.9.4-VC10\include;..\src;..\src\mswin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;WINVER=0x0400;STRICT;NOMINMAX;__WXDEBUG__;WXDEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -112,13 +112,13 @@
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
-      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.2-VC10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.4-VC10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>wxmsw29ud_xrc.lib;wxbase29ud_xml.lib;wxexpatd.lib;wxmsw29ud_core.lib;wxmsw29ud_adv.lib;wxmsw29ud_html.lib;wxbase29ud.lib;wxpngd.lib;wxzlibd.lib;wxjpegd.lib;wxtiffd.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;winmm.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\$(OutDir)JazzPlusPlus.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(EXT_PKGS)\wxMSW-2.9.2-VC10\lib\vc_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(EXT_PKGS)\wxMSW-2.9.4-VC10\lib\vc_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\$(OutDir)JazzPlusPlus.pdb</ProgramDatabaseFile>
@@ -129,7 +129,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug VC10|x64'">
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>true</MkTypLibCompatible>
@@ -141,7 +141,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.2-VC10\lib\vc_amd64_lib\mswud;$(EXT_PKGS)\wxMSW-2.9.2-VC10\include;..\src;..\src\mswin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.4-VC10\lib\vc_amd64_lib\mswud;$(EXT_PKGS)\wxMSW-2.9.4-VC10\include;..\src;..\src\mswin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;WINVER=0x0501;STRICT;NOMINMAX;__WXDEBUG__;WXDEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -162,13 +162,13 @@
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
-      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.2-VC10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.4-VC10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>wxmsw29ud_xrc.lib;wxbase29ud_xml.lib;wxexpatd.lib;wxmsw29ud_core.lib;wxmsw29ud_adv.lib;wxmsw29ud_html.lib;wxbase29ud.lib;wxpngd.lib;wxzlibd.lib;wxjpegd.lib;wxtiffd.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;winmm.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\$(OutDir)JazzPlusPlus.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(EXT_PKGS)\wxMSW-2.9.2-VC10\lib\vc_amd64_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(EXT_PKGS)\wxMSW-2.9.4-VC10\lib\vc_amd64_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\$(OutDir)JazzPlusPlus.pdb</ProgramDatabaseFile>
@@ -179,7 +179,7 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release VC10|Win32'">
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>true</MkTypLibCompatible>
@@ -192,7 +192,7 @@
     <ClCompile>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.2-VC10\lib\vc_lib\mswu;$(EXT_PKGS)\wxMSW-2.9.2-VC10\include;..\src;..\src\mswin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.4-VC10\lib\vc_lib\mswu;$(EXT_PKGS)\wxMSW-2.9.4-VC10\include;..\src;..\src\mswin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;WINVER=0x0400;STRICT;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -214,13 +214,13 @@
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
-      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.2-VC10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.4-VC10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>wxmsw29u_xrc.lib;wxbase29u_xml.lib;wxexpat.lib;wxmsw29u_core.lib;wxmsw29u_adv.lib;wxmsw29u_html.lib;wxbase29u.lib;wxpng.lib;wxzlib.lib;wxjpeg.lib;wxtiff.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;winmm.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\$(OutDir)JazzPlusPlus.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(EXT_PKGS)\wxMSW-2.9.2-VC10\lib\vc_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(EXT_PKGS)\wxMSW-2.9.4-VC10\lib\vc_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ProgramDatabaseFile>.\$(OutDir)JazzPlusPlus.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -230,7 +230,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release VC10|x64'">
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>true</MkTypLibCompatible>
@@ -243,7 +243,7 @@
     <ClCompile>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.2-VC10\lib\vc_amd64_lib\mswu;$(EXT_PKGS)\wxMSW-2.9.2-VC10\include;..\src;..\src\mswin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.4-VC10\lib\vc_amd64_lib\mswu;$(EXT_PKGS)\wxMSW-2.9.4-VC10\include;..\src;..\src\mswin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;WINVER=0x0501;STRICT;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -266,13 +266,13 @@
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
-      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.2-VC10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.4-VC10\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>wxmsw29u_xrc.lib;wxbase29u_xml.lib;wxexpat.lib;wxmsw29u_core.lib;wxmsw29u_adv.lib;wxmsw29u_html.lib;wxbase29u.lib;wxpng.lib;wxzlib.lib;wxjpeg.lib;wxtiff.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;winmm.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\$(OutDir)JazzPlusPlus.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(EXT_PKGS)\wxMSW-2.9.2-VC10\lib\vc_amd64_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(EXT_PKGS)\wxMSW-2.9.4-VC10\lib\vc_amd64_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ProgramDatabaseFile>.\$(OutDir)JazzPlusPlus.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -287,10 +287,10 @@
     <ClCompile Include="..\src\AsciiMidiFile.cpp" />
     <ClCompile Include="..\src\Audio.cpp" />
     <ClCompile Include="..\src\ClockDialog.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug VC10|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug VC10|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release VC10|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release VC10|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\src\Command.cpp" />
     <ClCompile Include="..\src\Configuration.cpp" />
@@ -393,10 +393,10 @@
     <ClInclude Include="..\src\AsciiMidiFile.h" />
     <ClInclude Include="..\src\Audio.h" />
     <CustomBuildStep Include="..\src\ClockDialog.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug VC10|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug VC10|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release VC10|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release VC10|x64'">true</ExcludedFromBuild>
     </CustomBuildStep>
     <ClInclude Include="..\src\Command.h" />
     <ClInclude Include="..\src\Configuration.h" />
@@ -499,33 +499,34 @@
   <ItemGroup>
     <CustomBuild Include="..\src\HelpFiles\jazz.tex">
       <FileType>Document</FileType>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|Win32'">Performing Custom Help Build Step</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|Win32'">echo cd "%(RootDir)%(Directory)"
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug VC10|Win32'">Performing Custom Help Build Step</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug VC10|Win32'">echo cd "%(RootDir)%(Directory)"
 cd "%(RootDir)%(Directory)"
-echo $(EXT_PKGS)\wxMSW-2.9.2-VC10\bin\tex2rtf "%(Filename).tex" "%(Filename).html" -html -twice
-$(EXT_PKGS)\wxMSW-2.9.2-VC10\bin\tex2rtf "%(Filename).tex" "%(Filename).html" -html -twice
+echo $(EXT_PKGS)\wxMSW-2.9.4-VC10\bin\tex2rtf "%(Filename).tex" "%(Filename).html" -html -twice
+$(EXT_PKGS)\wxMSW-2.9.4-VC10\bin\tex2rtf "%(Filename).tex" "%(Filename).html" -html -twice
 </Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|Win32'">%(RootDir)%(Directory)%(Filename)_contents.html;%(RootDir)%(Directory)%(Filename).hhc;%(RootDir)%(Directory)%(Filename).hhp;%(RootDir)%(Directory)%(Filename).hhk;%(RootDir)%(Directory)%(Filename).ref;%(RootDir)%(Directory)%(Filename).con;%(RootDir)%(Directory)%(Filename).htx;%(Outputs)</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|x64'">Performing Custom Help Build Step</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|x64'">echo cd "%(RootDir)%(Directory)"
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug VC10|Win32'">%(RootDir)%(Directory)%(Filename)_contents.html;%(RootDir)%(Directory)%(Filename).hhc;%(RootDir)%(Directory)%(Filename).hhp;%(RootDir)%(Directory)%(Filename).hhk;%(RootDir)%(Directory)%(Filename).ref;%(RootDir)%(Directory)%(Filename).con;%(RootDir)%(Directory)%(Filename).htx;%(Outputs)</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug VC10|x64'">Performing Custom Help Build Step</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug VC10|x64'">echo cd "%(RootDir)%(Directory)"
 cd "%(RootDir)%(Directory)"
-echo $(EXT_PKGS)\wxMSW-2.9.2-VC10\bin\tex2rtf "%(Filename).tex" "%(Filename).html" -html -twice
-$(EXT_PKGS)\wxMSW-2.9.2-VC10\bin\tex2rtf "%(Filename).tex" "%(Filename).html" -html -twice
+echo $(EXT_PKGS)\wxMSW-2.9.4-VC10\bin\tex2rtf "%(Filename).tex" "%(Filename).html" -html -twice
+$(EXT_PKGS)\wxMSW-2.9.4-VC10\bin\tex2rtf "%(Filename).tex" "%(Filename).html" -html -twice
 </Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug GUI VC10|x64'">%(RootDir)%(Directory)%(Filename)_contents.html;%(RootDir)%(Directory)%(Filename).hhc;%(RootDir)%(Directory)%(Filename).hhp;%(RootDir)%(Directory)%(Filename).hhk;%(RootDir)%(Directory)%(Filename).ref;%(RootDir)%(Directory)%(Filename).con;%(RootDir)%(Directory)%(Filename).htx;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|Win32'">echo cd "%(RootDir)%(Directory)"
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug VC10|x64'">%(RootDir)%(Directory)%(Filename)_contents.html;%(RootDir)%(Directory)%(Filename).hhc;%(RootDir)%(Directory)%(Filename).hhp;%(RootDir)%(Directory)%(Filename).hhk;%(RootDir)%(Directory)%(Filename).ref;%(RootDir)%(Directory)%(Filename).con;%(RootDir)%(Directory)%(Filename).htx;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release VC10|Win32'">echo cd "%(RootDir)%(Directory)"
 cd "%(RootDir)%(Directory)"
-echo $(EXT_PKGS)\wxMSW-2.9.2-VC10\bin\tex2rtf "%(Filename).tex" "%(Filename).html" -html -twice
-$(EXT_PKGS)\wxMSW-2.9.2-VC10\bin\tex2rtf "%(Filename).tex" "%(Filename).html" -html -twice
+echo $(EXT_PKGS)\wxMSW-2.9.4-VC10\bin\tex2rtf "%(Filename).tex" "%(Filename).html" -html -twice
+$(EXT_PKGS)\wxMSW-2.9.4-VC10\bin\tex2rtf "%(Filename).tex" "%(Filename).html" -html -twice
 </Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|Win32'">%(RootDir)%(Directory)%(Filename)_contents.html;%(Outputs)</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|x64'">echo cd "%(RootDir)%(Directory)"
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release VC10|Win32'">%(RootDir)%(Directory)%(Filename)_contents.html;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release VC10|x64'">echo cd "%(RootDir)%(Directory)"
 cd "%(RootDir)%(Directory)"
-echo $(EXT_PKGS)\wxMSW-2.9.2-VC10\bin\tex2rtf "%(Filename).tex" "%(Filename).html" -html -twice
-$(EXT_PKGS)\wxMSW-2.9.2-VC10\bin\tex2rtf "%(Filename).tex" "%(Filename).html" -html -twice
+echo $(EXT_PKGS)\wxMSW-2.9.4-VC10\bin\tex2rtf "%(Filename).tex" "%(Filename).html" -html -twice
+$(EXT_PKGS)\wxMSW-2.9.4-VC10\bin\tex2rtf "%(Filename).tex" "%(Filename).html" -html -twice
 </Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release GUI VC10|x64'">%(RootDir)%(Directory)%(Filename)_contents.html;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release VC10|x64'">%(RootDir)%(Directory)%(Filename)_contents.html;%(Outputs)</Outputs>
     </CustomBuild>
+    <None Include="..\src\HelpFiles\tex2rtf.ini" />
     <None Include="..\src\Makefile.am" />
   </ItemGroup>
   <ItemGroup>

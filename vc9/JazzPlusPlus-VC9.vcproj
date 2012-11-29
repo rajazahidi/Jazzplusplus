@@ -426,14 +426,6 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat;h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath="..\src\AboutDialog.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\AboutDialog.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\AsciiMidiFile.cpp"
 				>
 			</File>
@@ -1076,6 +1068,14 @@
 		<Filter
 			Name="Dialog Source Files"
 			>
+			<File
+				RelativePath="..\src\AboutDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\AboutDialog.h"
+				>
+			</File>
 			<File
 				RelativePath="..\src\Dialogs\AudioSettingsDialog.cpp"
 				>

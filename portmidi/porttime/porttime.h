@@ -7,6 +7,8 @@
 
 /* Should there be a way to choose the source of time here? */
 
+#pragma once
+
 #ifdef __cplusplus
 extern "C" {
 #endif

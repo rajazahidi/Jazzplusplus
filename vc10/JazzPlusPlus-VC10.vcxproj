@@ -141,7 +141,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.4-VC10\lib\vc_amd64_lib\mswud;$(EXT_PKGS)\wxMSW-2.9.4-VC10\include;..\src;..\src\mswin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.4-VC10\lib\vc_x64_lib\mswud;$(EXT_PKGS)\wxMSW-2.9.4-VC10\include;..\src;..\src\mswin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;WINVER=0x0501;STRICT;NOMINMAX;__WXDEBUG__;WXDEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -168,7 +168,7 @@
       <AdditionalDependencies>wxmsw29ud_xrc.lib;wxbase29ud_xml.lib;wxexpatd.lib;wxmsw29ud_core.lib;wxmsw29ud_adv.lib;wxmsw29ud_html.lib;wxbase29ud.lib;wxpngd.lib;wxzlibd.lib;wxjpegd.lib;wxtiffd.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;winmm.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\$(OutDir)JazzPlusPlus.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(EXT_PKGS)\wxMSW-2.9.4-VC10\lib\vc_amd64_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(EXT_PKGS)\wxMSW-2.9.4-VC10\lib\vc_x64_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\$(OutDir)JazzPlusPlus.pdb</ProgramDatabaseFile>
@@ -243,7 +243,7 @@
     <ClCompile>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.4-VC10\lib\vc_amd64_lib\mswu;$(EXT_PKGS)\wxMSW-2.9.4-VC10\include;..\src;..\src\mswin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.4-VC10\lib\vc_x64_lib\mswu;$(EXT_PKGS)\wxMSW-2.9.4-VC10\include;..\src;..\src\mswin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;WINVER=0x0501;STRICT;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -272,7 +272,7 @@
       <AdditionalDependencies>wxmsw29u_xrc.lib;wxbase29u_xml.lib;wxexpat.lib;wxmsw29u_core.lib;wxmsw29u_adv.lib;wxmsw29u_html.lib;wxbase29u.lib;wxpng.lib;wxzlib.lib;wxjpeg.lib;wxtiff.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;winmm.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\$(OutDir)JazzPlusPlus.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(EXT_PKGS)\wxMSW-2.9.4-VC10\lib\vc_amd64_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(EXT_PKGS)\wxMSW-2.9.4-VC10\lib\vc_x64_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ProgramDatabaseFile>.\$(OutDir)JazzPlusPlus.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>

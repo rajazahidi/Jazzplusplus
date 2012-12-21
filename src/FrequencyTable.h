@@ -33,7 +33,7 @@ class JZFrequencyTable
 
     JZFrequencyTable();
 
-    size_t GetKey(double Frequency);
+    std::size_t GetKey(double Frequency);
 
     double GetFrequency(int Key) const
     {

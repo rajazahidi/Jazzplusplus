@@ -626,7 +626,7 @@ void JZSynthDlg::OnMenuCommand(int id)
           "*.syn");
         if (!FileName.empty())
         {
-          ifstream is(FileName.wx_str());
+          ifstream is(FileName.mb_str());
           is >> *this;
           SetupEdits();
           int cw, ch;
@@ -648,7 +648,7 @@ void JZSynthDlg::OnMenuCommand(int id)
           "*.syn");
         if (!FileName.empty())
         {
-          ofstream os(FileName.wx_str());
+          ofstream os(FileName.mb_str());
           os << *this;
         }
       }

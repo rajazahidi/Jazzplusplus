@@ -289,7 +289,7 @@ int JZSampleSet::Load(const wxString& FileName)
   // Get the path of the sample file.
   wxString SplFilePath = ::wxPathOnly(FileName);
 
-  ifstream Is(FileName.wx_str());
+  ifstream Is(FileName.mb_str());
   int Version;
   Is >> Version >> mSamplingRate >> mChannelCount >> mSoftwareSynchonization;
   while (Is && !Is.eof())
@@ -364,7 +364,7 @@ void JZSampleSet::ReloadSamples()
 //-----------------------------------------------------------------------------
 int JZSampleSet::Save(const wxString& FileName)
 {
-  ofstream Ofs(FileName.wx_str());
+  ofstream Ofs(FileName.mb_str());
   Ofs
     << 1
     << ' ' << mSamplingRate
@@ -1060,7 +1060,7 @@ void JZSampleSet::SaveWave(
   wh.data_length   = (end_index - start_index) * sizeof(short);
   wh.length        = wh.data_length + sizeof(WaveHeader);
 
-  ofstream os(FileName.wx_str(), ios::out | ios::binary | ios::trunc);
+  ofstream os(FileName.mb_str(), ios::out | ios::binary | ios::trunc);
 
   os.write((char*)&wh, sizeof(wh));
 

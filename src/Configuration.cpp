@@ -553,7 +553,7 @@ bool JZConfiguration::Get(int Entry, string& Value)
     return false;
   }
 
-  ifstream Ifs(FileName.wx_str());
+  ifstream Ifs(FileName.mb_str());
   if (!Ifs)
   {
     return false;
@@ -642,7 +642,7 @@ bool JZConfiguration::Put(int Index, const string& ValueString)
     return false;
   }
 
-  ifstream Ifs(FileName.wx_str());
+  ifstream Ifs(FileName.mb_str());
   if (!Ifs)
   {
     return false;
@@ -734,7 +734,7 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
     << "  \"" << mFileName << '"'
     << endl;
 
-  ifstream* pIs = new ifstream(mFileName.wx_str());
+  ifstream* pIs = new ifstream(mFileName.mb_str());
   InputFileStreams.push(pIs);
 
   if (!*InputFileStreams.top())
@@ -848,7 +848,7 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
             }
             else
             {
-              pIs = new ifstream(IncludeFileName.wx_str());
+              pIs = new ifstream(IncludeFileName.mb_str());
               InputFileStreams.push(pIs);
             }
 

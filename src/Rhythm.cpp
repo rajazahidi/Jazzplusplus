@@ -769,7 +769,7 @@ void JZRhythmWindow::OnMenuCommand(int id)
           "*.rhy");
         if (!FileName.empty())
         {
-          ifstream Is(FileName.wx_str());
+          ifstream Is(FileName.mb_str());
           Is >> *this;
           OnPaint();
         }
@@ -787,7 +787,7 @@ void JZRhythmWindow::OnMenuCommand(int id)
           "*.rhy");
         if (!FileName.empty())
         {
-          ofstream Os(FileName.wx_str());
+          ofstream Os(FileName.mb_str());
           Os << *this;
         }
       }

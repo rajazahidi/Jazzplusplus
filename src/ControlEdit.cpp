@@ -70,7 +70,7 @@ void JZCtrlEditBase::Create(
   clocks_per_pixel = 0;
   sticky = 1;
 
-  panel = new JZControlPanel(this, mpPianoWindow, x, y, dx, h, 0, "Controller Edit");
+  panel = new JZControlPanel(this, mpPianoWindow, wxPoint(x, y), wxSize(dx, h), 0, "Controller Edit");
   //(void) new wxMessage(panel, (char *)label);
   //panel->NewLine();
 

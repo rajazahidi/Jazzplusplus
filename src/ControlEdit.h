@@ -44,13 +44,11 @@ class JZControlPanel : public wxPanel
     JZControlPanel(
       JZCtrlEditBase* e,
       wxWindow* pParent,
-      int x=-1,
-      int y=-1,
-      int width=-1,
-      int height=-1,
+      const wxPoint& Position = wxDefaultPosition,
+      const wxSize& Size = wxDefaultSize,
       long style=0,
       const char* pName = "panel")
-      : wxPanel(pParent, x, y, width, height, style, pName)
+      : wxPanel(pParent, wxID_ANY, Position, Size, style, pName)
     {
       edit = e;
     }

@@ -45,7 +45,7 @@ JZSliderWindow::JZSliderWindow(
   in_constructor = true;
   n_sliders   = 0;
   sliders_per_row = 1;
-  panel = new wxPanel(this, 0, 0, 1000, 1000);
+  panel = new wxPanel(this, wxID_ANY, wxPoint(0, 0), wxSize(1000, 1000));
 
   if (tdefs != NULL)
     mpToolBar=new JZToolBar(this, tdefs);
@@ -93,7 +93,7 @@ END_EVENT_TABLE()
 void JZSliderWindow::OnSize(wxSizeEvent& Event)
 {
   cout <<"JZSliderWindow::OnSize "<<in_constructor<<endl;
-  wxSize sz = Event.GetSize();
+//  wxSize sz = Event.GetSize();
 
   if (in_constructor)
   {
@@ -147,7 +147,6 @@ bool JZSliderWindow::OnClose()
 {
   return true;
 }
-
 
 void JZSliderWindow::AddItems()
 {

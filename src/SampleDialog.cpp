@@ -710,11 +710,9 @@ void JZSynthDlg::AddItems()
   // und: klar, toolbar
 }
 
-
 void JZSynthDlg::AddEdits()
 {
-  int i, k;
-  for (i = 0, k = 0; i < MAXSYNTHS; i++)
+  for (int i = 0; i < MAXSYNTHS; i++)
   {
     synths[i] = new JZAddSynth(this);
     synths[i]->SetDuration(duration);

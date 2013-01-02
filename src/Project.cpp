@@ -432,9 +432,9 @@ bool JZProject::FindAndRegisterConfFilePath(wxString& ConfFilePath) const
   wxFileDialog OpenDialog(
     0,
     DialogTitle,
-    "",
+    wxString(""),
     mConfFileName,
-    "*.cfg",
+    wxString("*.cfg"),
     wxFD_OPEN);
 
   if (OpenDialog.ShowModal() == wxID_OK)

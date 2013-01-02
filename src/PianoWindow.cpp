@@ -1536,8 +1536,8 @@ void JZPianoWindow::DrawEvents(
 
   // Coordinate lines.
 
-  int x0 = Clock2x(0);
-  int y0 = TrackIndex2y(64);
+//  int x0 = Clock2x(0);
+//  int y0 = TrackIndex2y(64);
 
   while (pEvent)
   {
@@ -1649,8 +1649,8 @@ void JZPianoWindow::DrawEvents(
         }
       }
 
-      x0 = x1;
-      y0 = y1;
+//      x0 = x1;
+//      y0 = y1;
 
       if (Clock > mToClock)
       {

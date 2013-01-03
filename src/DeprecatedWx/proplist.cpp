@@ -38,6 +38,7 @@
     #include "wx/settings.h"
     #include "wx/msgdlg.h"
     #include "wx/filedlg.h"
+    #include "wx/wxcrtvararg.h"
 #endif
 
 #include "wx/sizer.h"

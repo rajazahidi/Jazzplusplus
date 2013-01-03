@@ -21,6 +21,7 @@
 #if wxUSE_PROPSHEET
 
 #ifndef WX_PRECOMP
+    #include "wx/wxcrtvararg.h"
     #include "wx/choice.h"
     #include "wx/checkbox.h"
     #include "wx/slider.h"

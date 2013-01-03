@@ -24,6 +24,7 @@
 #endif
 
 #include "wx/debug.h"
+#include "wx/wxcrtvararg.h"
 #include "prop.h"
 
 #include <ctype.h>

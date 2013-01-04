@@ -62,9 +62,9 @@ dnl Check to see if we are using _Ios_Openmode.  gcc 3.2 doesn't like using
 dnl ints and std::_Ios_Openmode interchangeably.  There's probably a simpler
 dnl autoconf technique for checking this feature.
 AC_MSG_CHECKING(for _Ios_Openmode)
-AC_COMPILE_IFELSE(
-[#include <iostream>
-std::_Ios_Openmode test;],
+AC_COMPILE_IFELSE([AC_LANG_SOURCE(
+[[#include <iostream>
+std::_Ios_Openmode test;]])],
 result=yes,
 result=no)
 if test $result = yes; then

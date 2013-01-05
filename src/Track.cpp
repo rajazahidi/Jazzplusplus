@@ -23,12 +23,14 @@
 #include "Track.h"
 
 #include "Configuration.h"
+#include "DrumUtilities.h"
 #include "Dialogs/TrackDialog.h"
 #include "Globals.h"
 #include "JazzPlusPlusApplication.h"
 #include "Player.h"
 #include "Song.h"
 #include "Synth.h"
+#include "SysexChannel.h"
 #include "TrackWindow.h"
 
 #include <cassert>
@@ -201,59 +203,6 @@ int JZMtcTime::ToMillisec()
   int msec = (((((hour * 60L) + min) * 60L) + sec) * 1000L) +
               ((fm * 1000L) / (int) gFramesPerSecond[type]);
   return msec;
-}
-
-int sysex_channel(int Channel)
-{
-  if (Channel < 10)
-  {
-    return(Channel);
-  }
-  else if (Channel == 10)
-  {
-    return 0;
-  }
-  return Channel - 1;
-}
-
-int drumParam2Index(int par)
-{
-  switch (par)
-  {
-    case drumPitch:
-      return(drumPitchIndex);
-    case drumTva:
-      return(drumTvaIndex);
-    case drumPan:
-      return(drumPanIndex);
-    case drumReverb:
-      return(drumReverbIndex);
-    case drumChorus:
-      return(drumChorusIndex);
-    default:
-      assert(0);
-  }
-  return 0;
-}
-
-int drumIndex2Param(int index)
-{
-  switch (index)
-  {
-    case drumPitchIndex:
-      return drumPitch;
-    case drumTvaIndex:
-      return drumTva;
-    case drumPanIndex:
-      return drumPan;
-    case drumReverbIndex:
-      return drumReverb;
-    case drumChorusIndex:
-      return drumChorus;
-    default:
-      assert(0);
-  }
-  return 0;
 }
 
 JZDrumInstrumentParameter::JZDrumInstrumentParameter(JZNrpn *par)

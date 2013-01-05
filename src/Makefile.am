@@ -47,6 +47,7 @@ Dialogs/TrackDialog.cpp \
 Dialogs/TransposeDialog.cpp \
 Dialogs/VelocityDialog.cpp \
 Dialogs.cpp \
+DrumUtilities.cpp \
 DynamicArray.cpp \
 ErrorMessage.cpp \
 Events.cpp \
@@ -100,6 +101,7 @@ StandardFile.cpp \
 StringReadWrite.cpp \
 StringUtilities.cpp \
 Synth.cpp \
+SysexChannel.cpp \
 ToolBar.cpp \
 Track.cpp \
 TrackFrame.cpp \
@@ -144,6 +146,8 @@ Dialogs/TrackDialog.cpp \
 Dialogs/TransposeDialog.cpp \
 Dialogs/VelocityDialog.cpp \
 Dialogs.cpp \
+DrumEnums.h \
+DrumUtilities.h \
 DynamicArray.cpp \
 ErrorMessage.cpp \
 Events.cpp \
@@ -198,6 +202,7 @@ StandardFile.cpp \
 StringReadWrite.cpp \
 StringUtilities.cpp \
 Synth.cpp \
+SysexChannel.cpp \
 ToolBar.cpp \
 Track.cpp \
 TrackFrame.cpp \
@@ -302,6 +307,7 @@ StandardFile.h \
 StringReadWrite.h \
 StringUtilities.h \
 Synth.h \
+SysexChannel.h \
 ToolBar.h \
 TrackFrame.h \
 Track.h \

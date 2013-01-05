@@ -23,8 +23,9 @@
 #ifndef JZ_TRACK_H
 #define JZ_TRACK_H
 
-#include "Events.h"
+#include "DrumEnums.h"
 #include "DynamicArray.h"
+#include "Events.h"
 #include "NamedValue.h"
 
 #include <string>
@@ -155,8 +156,6 @@ unsigned char *SysExDT1(
   int length,
   unsigned char* dd);
 
-int sysex_channel(int Channel);
-
 enum ModulationSysexParameter
 {
   mspModPitchControl = 0,
@@ -283,28 +282,6 @@ enum ModeSysexParameter
   mspRxPAf = 0x07,
   mspUseForRhythm = 0x15
 };
-
-enum DrumInstrumentParameter
-{
-  drumPitch = 0x18,
-  drumTva = 0x1a,
-  drumPan = 0x1c,
-  drumReverb = 0x1d,
-  drumChorus = 0x1e
-};
-
-enum DrumInstrumentParameterIndex
-{
-  drumPitchIndex = 0,
-  drumTvaIndex,
-  drumPanIndex,
-  drumReverbIndex,
-  drumChorusIndex,
-  numDrumParameters
-};
-
-int drumParam2Index(int par);
-int drumIndex2Param(int index);
 
 class JZDrumInstrumentParameterList;
 

@@ -298,6 +298,7 @@
     <ClCompile Include="..\src\Dialogs.cpp" />
     <ClCompile Include="..\src\Dialogs\AudioSettingsDialog.cpp" />
     <ClCompile Include="..\src\Dialogs\SamplesDialog.cpp" />
+    <ClCompile Include="..\src\DrumUtilities.cpp" />
     <ClCompile Include="..\src\DynamicArray.cpp" />
     <ClCompile Include="..\src\ErrorMessage.cpp" />
     <ClCompile Include="..\src\EventFrame.cpp" />
@@ -355,6 +356,7 @@
     <ClCompile Include="..\src\StringReadWrite.cpp" />
     <ClCompile Include="..\src\StringUtilities.cpp" />
     <ClCompile Include="..\src\Synth.cpp" />
+    <ClCompile Include="..\src\SysexChannel.cpp" />
     <ClCompile Include="..\src\ToolBar.cpp" />
     <ClCompile Include="..\src\Track.cpp" />
     <ClCompile Include="..\src\TrackFrame.cpp" />
@@ -404,6 +406,8 @@
     <ClInclude Include="..\src\Dialogs.h" />
     <ClInclude Include="..\src\Dialogs\AudioSettingsDialog.h" />
     <ClInclude Include="..\src\Dialogs\SamplesDialog.h" />
+    <ClInclude Include="..\src\DrumEnums.h" />
+    <ClInclude Include="..\src\DrumUtilities.h" />
     <ClInclude Include="..\src\DynamicArray.h" />
     <ClInclude Include="..\src\ErrorMessage.h" />
     <ClInclude Include="..\src\EventFrame.h" />
@@ -463,6 +467,7 @@
     <ClInclude Include="..\src\StringReadWrite.h" />
     <ClInclude Include="..\src\StringUtilities.h" />
     <ClInclude Include="..\src\Synth.h" />
+    <ClInclude Include="..\src\SysexChannel.h" />
     <ClInclude Include="..\src\ToolBar.h" />
     <ClInclude Include="..\src\Track.h" />
     <ClInclude Include="..\src\TrackFrame.h" />

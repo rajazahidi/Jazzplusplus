@@ -474,6 +474,18 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\DrumEnums.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\DrumUtilities.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\DrumUtilities.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\DynamicArray.cpp"
 				>
 			</File>
@@ -951,6 +963,14 @@
 			</File>
 			<File
 				RelativePath="..\src\Synth.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\SysexChannel.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\SysexChannel.h"
 				>
 			</File>
 			<File

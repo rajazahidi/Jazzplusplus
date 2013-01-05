@@ -154,6 +154,8 @@
     <ClCompile Include="..\src\Dialogs\QuantizeDialog.cpp">
       <Filter>Dialog Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\DrumUtilities.cpp" />
+    <ClCompile Include="..\src\SysexChannel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\AsciiMidiFile.h" />
@@ -310,6 +312,9 @@
     <ClInclude Include="..\src\Dialogs\QuantizeDialog.h">
       <Filter>Dialog Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\DrumEnums.h" />
+    <ClInclude Include="..\src\DrumUtilities.h" />
+    <ClInclude Include="..\src\SysexChannel.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\Makefile.am" />

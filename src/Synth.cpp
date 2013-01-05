@@ -22,17 +22,16 @@
 
 #include "Synth.h"
 
-#include "Track.h"
-#include "Player.h"
-#include "JazzPlusPlusApplication.h"
 //#include "eventwin.h"
-#include "TrackWindow.h"
 #include "Globals.h"
+#include "JazzPlusPlusApplication.h"
+#include "Player.h"
+#include "SysexChannel.h"
+#include "Track.h"
+#include "TrackWindow.h"
 
+#include <cassert>
 #include <cstdlib>
-
-#include <assert.h>
-
 #include <string>
 
 using namespace std;

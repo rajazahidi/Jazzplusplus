@@ -30,15 +30,6 @@
 #include <vector>
 #include <string>
 
-enum SynthTypeId
-{
-  SynthTypeGM = 0,
-  SynthTypeGS,
-  SynthTypeXG,
-  SynthTypeOther,
-  NumSynthTypes
-};
-
 enum SysexId
 {
   SX_NONE = 0,

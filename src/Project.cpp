@@ -30,6 +30,7 @@
 #include "Synth.h"
 #include "Song.h"
 #include "StandardFile.h"
+#include "SynthesizerTypeEnums.h"
 
 #ifdef __WXMSW__
 #include "WindowsPlayer.h"
@@ -45,11 +46,11 @@
 #include "AlsaDriver.h"
 #endif
 
-#include <wx/stdpaths.h>
 #include <wx/config.h>
 #include <wx/file.h>
 #include <wx/filedlg.h>
 #include <wx/filename.h>
+#include <wx/stdpaths.h>
 
 #include <fstream>
 #include <iostream>

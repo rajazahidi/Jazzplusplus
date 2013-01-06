@@ -225,6 +225,7 @@
     <ClInclude Include="..\src\StringReadWrite.h" />
     <ClInclude Include="..\src\StringUtilities.h" />
     <ClInclude Include="..\src\Synth.h" />
+    <ClInclude Include="..\src\SynthesizerTypeEnums.h" />
     <ClInclude Include="..\src\SysexChannel.h" />
     <ClInclude Include="..\src\ToolBar.h" />
     <ClInclude Include="..\src\Track.h" />

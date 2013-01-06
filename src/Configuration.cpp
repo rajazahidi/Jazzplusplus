@@ -26,6 +26,7 @@
 #include "Globals.h"
 #include "StringUtilities.h"
 #include "Synth.h"
+#include "SynthesizerTypeEnums.h"
 
 #include <wx/filename.h>
 #include <wx/msgdlg.h>

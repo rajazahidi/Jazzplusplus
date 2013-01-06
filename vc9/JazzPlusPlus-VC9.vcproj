@@ -966,6 +966,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\SynthesizerTypeEnums.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\SysexChannel.cpp"
 				>
 			</File>

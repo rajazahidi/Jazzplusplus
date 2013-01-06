@@ -26,6 +26,7 @@
 #include "Globals.h"
 #include "JazzPlusPlusApplication.h"
 #include "Player.h"
+#include "SynthesizerTypeEnums.h"
 #include "SysexChannel.h"
 #include "Track.h"
 #include "TrackWindow.h"

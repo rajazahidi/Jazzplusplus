@@ -307,6 +307,7 @@ StandardFile.h \
 StringReadWrite.h \
 StringUtilities.h \
 Synth.h \
+SynthesizerTypeEnums.h \
 SysexChannel.h \
 ToolBar.h \
 TrackFrame.h \

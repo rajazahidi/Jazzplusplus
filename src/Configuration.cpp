@@ -304,7 +304,7 @@ JZConfiguration::JZConfiguration()
     mDrumNames.push_back(make_pair("", i));
   }
 
-  const string NoneString = "None";
+  const string NoneString("None");
 
   mDrumSets.push_back(make_pair(NoneString, 0));
   for (int i = 1; i < 130; ++i)

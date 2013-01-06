@@ -106,7 +106,10 @@ JZJazzPlusPlusApplication::JZJazzPlusPlusApplication()
   // 2. Invalid arguments (for example sqrt of a negative number).
   // 3. Overflow.
   // on a Linux box.
-  feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+
+  // The scrollbar code in the Ubuntu 12.04 Unity liboveralay-scrollbar code
+  // is causing floating point exceptions so I'm commenting out this code.
+//  feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
 #endif // __LINUX__
 }
 
@@ -125,6 +128,12 @@ JZJazzPlusPlusApplication::~JZJazzPlusPlusApplication()
 //-----------------------------------------------------------------------------
 bool JZJazzPlusPlusApplication::OnInit()
 {
+  // Call base class function.  This is needed for command line parsing.
+  if (!wxApp::OnInit())
+  {
+    return false;
+  }
+
 #if defined(_MSC_VER) && defined(_DEBUG)
   RedirectIoToConsole();
 #endif // _MSC_VER
@@ -139,9 +148,6 @@ bool JZJazzPlusPlusApplication::OnInit()
   // Create the one and only top-level Jazz++ project.
   mpProject = new JZProject;
   gpProject = mpProject;
-
-  // Call base class function.  This is needed for command line parsing.
-  wxApp::OnInit();
 
   // Create the main application window.
   mpTrackFrame = JZProjectManager::Instance()->CreateTrackView();

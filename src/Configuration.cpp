@@ -46,66 +46,35 @@ using namespace std;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZConfigurationEntry::JZConfigurationEntry(
-  const char* pName,
+  const string& Name,
   int IntegerValue)
   : mType(eConfigEntryTypeInt),
-    mName(),
+    mName(Name),
     mValue(IntegerValue),
     mStringValue()
 {
-  if (pName)
-  {
-    mName = pName;
-  }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZConfigurationEntry::JZConfigurationEntry(
-  const char* pName,
-  const char* pStringValue)
-  : mType(eConfigEntryTypeStr),
-    mName(),
-    mValue(0),
-    mStringValue()
-{
-  if (pName)
-  {
-    mName = pName;
-  }
-
-  if (pStringValue)
-  {
-    mStringValue = pStringValue;
-  }
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-JZConfigurationEntry::JZConfigurationEntry(
-  const char* pName,
+  const string& Name,
   const string& StringValue)
+  : mType(eConfigEntryTypeStr),
+    mName(Name),
+    mValue(0),
+    mStringValue(StringValue)
 {
-  if (pName)
-  {
-    mName = pName;
-  }
-
-  mStringValue = StringValue;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZConfigurationEntry::JZConfigurationEntry(const char* pName)
+JZConfigurationEntry::JZConfigurationEntry(const string& Name)
   : mType(eConfigEntryTypeEmpty),
-    mName(),
+    mName(Name),
     mValue(0),
     mStringValue()
 {
-  if (pName)
-  {
-    mName = pName;
-  }
 }
 
 //-----------------------------------------------------------------------------
@@ -133,8 +102,6 @@ JZConfiguration::JZConfiguration()
   {
     mNames[i] = 0;
   }
-
-  const char* pNoneString = "None";
 
   // search for midi device
   mNames[C_Seq2Device] = new JZConfigurationEntry(".device", -1);
@@ -295,12 +262,12 @@ JZConfiguration::JZConfiguration()
   // Default synthesizer type.
   mNames[C_SynthType] = new JZConfigurationEntry(
     ".synth_type",
-    gSynthesizerTypes[SynthTypeGS].first.c_str());
+    gSynthesizerTypes[SynthTypeGS].first);
 
   // Default synthesizer configuration file.
   mNames[C_SynthConfig] = new JZConfigurationEntry(
     ".synth_config",
-    gSynthesierTypeFiles[SynthTypeGS].first.c_str());
+    gSynthesierTypeFiles[SynthTypeGS].first);
 
   // When to send synthesizer reset (0 = never, 1 = song start,
   // 2 = start play).
@@ -337,7 +304,9 @@ JZConfiguration::JZConfiguration()
     mDrumNames.push_back(make_pair("", i));
   }
 
-  mDrumSets.push_back(make_pair(pNoneString, 0));
+  const string NoneString = "None";
+
+  mDrumSets.push_back(make_pair(NoneString, 0));
   for (int i = 1; i < 130; ++i)
   {
     mDrumSets.push_back(make_pair("", i));
@@ -348,7 +317,7 @@ JZConfiguration::JZConfiguration()
     mControlNames.push_back(make_pair("", i));
   }
 
-  mVoiceNames.push_back(make_pair(pNoneString, 0));
+  mVoiceNames.push_back(make_pair(NoneString, 0));
   mVoiceNames.push_back(make_pair("", 0));
 }
 
@@ -525,7 +494,7 @@ int JZConfiguration::Load(const string& InputLine)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-const int& JZConfiguration::GetValue(const char* pName) const
+int JZConfiguration::GetValue(const char* pName) const
 {
   int i = Check(pName);
 
@@ -536,7 +505,7 @@ const int& JZConfiguration::GetValue(const char* pName) const
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-const int& JZConfiguration::GetValue(int Index) const
+int JZConfiguration::GetValue(int Index) const
 {
   assert((Index >= 0) && (Index < NumConfigNames));
   return mNames[Index]->GetValue();

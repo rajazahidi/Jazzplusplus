@@ -137,19 +137,19 @@ class JZConfigurationEntry
 {
   public:
 
-    JZConfigurationEntry(const char* pName, int IntegerValue);
+    JZConfigurationEntry(const std::string& Name, int IntegerValue);
 
-    JZConfigurationEntry(const char* pName, const char* pStringValue);
+    JZConfigurationEntry(
+      const std::string& Name,
+      const std::string& StringValue);
 
-    JZConfigurationEntry(const char* pName, const std::string& StringValue);
-
-    JZConfigurationEntry(const char* pName);
+    JZConfigurationEntry(const std::string& Name);
 
     TEConfigEntryType GetType() const;
 
     const std::string& GetName() const;
 
-    const int& GetValue() const;
+    int GetValue() const;
 
     void SetValue(const int& Value);
 
@@ -188,7 +188,7 @@ const std::string& JZConfigurationEntry::GetName() const
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 inline
-const int& JZConfigurationEntry::GetValue() const
+int JZConfigurationEntry::GetValue() const
 {
   return mValue;
 }
@@ -236,8 +236,8 @@ class JZConfiguration
 
     const std::string& GetStrValue(int Entry) const;
 
-    const int& GetValue(const char* pName) const;
-    const int& GetValue(int Index) const;
+    int GetValue(const char* pName) const;
+    int GetValue(int Index) const;
 
     bool Get(int Entry, std::string& Value);
     bool Get(int Entry, int& Value);

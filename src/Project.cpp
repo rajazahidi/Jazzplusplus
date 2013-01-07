@@ -365,10 +365,24 @@ JZProject::~JZProject()
 //-----------------------------------------------------------------------------
 void JZProject::ReadConfiguration()
 {
-  wxString ConfigDir = wxStandardPaths::Get().GetUserDataDir();
+  wxConfigBase* pConfig = wxConfigBase::Get();
 
+  wxString ConfigurationFilePathGuess =
+    wxStandardPaths::Get().GetUserDataDir();
+
+  // Attempt to obtain the path to the help file from configuration data.
+  wxString ConfigurationFilePath;
+  if (pConfig)
+  {
+    pConfig->Read(
+      "/Paths/Conf",
+      &ConfigurationFilePath,
+      ConfigurationFilePathGuess);
+  }
+
+  // Construct a full file name.
   wxString JazzCfgFile =
-    ConfigDir +
+    ConfigurationFilePath +
     wxFileName::GetPathSeparator() +
     mConfFileName;
 
@@ -377,10 +391,10 @@ void JZProject::ReadConfiguration()
   if (!::wxFileExists(JazzCfgFile))
   {
     // Return a valid path to the data.
-    wxString ConfFilePath;
-    if (FindAndRegisterConfFilePath(ConfFilePath))
+    ConfigurationFilePath.clear();
+    if (FindAndRegisterConfFilePath(ConfigurationFilePath))
     {
-      JazzCfgFile = ConfFilePath + mConfFileName;
+      JazzCfgFile = ConfigurationFilePath + mConfFileName;
 
       // Try one more time.
       if (!::wxFileExists(JazzCfgFile))
@@ -400,11 +414,6 @@ void JZProject::ReadConfiguration()
 
   if (ConfigurationFileFound)
   {
-    cout
-      << "JZProject::ReadConfiguration() JazzCfgFile:" << '\n'
-      << "  \"" << JazzCfgFile << '"'
-      << endl;
-
     mpConfig->LoadConfig(JazzCfgFile);
   }
 }

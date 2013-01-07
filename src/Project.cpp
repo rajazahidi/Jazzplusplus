@@ -394,7 +394,10 @@ void JZProject::ReadConfiguration()
     ConfigurationFilePath.clear();
     if (FindAndRegisterConfFilePath(ConfigurationFilePath))
     {
-      JazzCfgFile = ConfigurationFilePath + mConfFileName;
+      JazzCfgFile =
+        ConfigurationFilePath +
+        wxFileName::GetPathSeparator() +
+        mConfFileName;
 
       // Try one more time.
       if (!::wxFileExists(JazzCfgFile))
@@ -452,7 +455,6 @@ bool JZProject::FindAndRegisterConfFilePath(wxString& ConfFilePath) const
     // Generate a c-style string that contains a path to the help file.
     wxString TempConfFilePath;
     TempConfFilePath = ::wxPathOnly(OpenDialog.GetPath());
-    TempConfFilePath += ::wxFileName::GetPathSeparator();
 
     wxConfigBase* pConfig = wxConfigBase::Get();
     if (pConfig)

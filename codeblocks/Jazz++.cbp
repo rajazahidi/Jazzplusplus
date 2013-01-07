@@ -125,6 +125,9 @@
 		<Unit filename="../src/Dialogs/TransposeDialog.h" />
 		<Unit filename="../src/Dialogs/VelocityDialog.cpp" />
 		<Unit filename="../src/Dialogs/VelocityDialog.h" />
+		<Unit filename="../src/DrumEnums.h" />
+		<Unit filename="../src/DrumUtilities.cpp" />
+		<Unit filename="../src/DrumUtilities.h" />
 		<Unit filename="../src/DynamicArray.cpp" />
 		<Unit filename="../src/DynamicArray.h" />
 		<Unit filename="../src/ErrorMessage.cpp" />
@@ -232,6 +235,8 @@
 		<Unit filename="../src/StringUtilities.h" />
 		<Unit filename="../src/Synth.cpp" />
 		<Unit filename="../src/Synth.h" />
+		<Unit filename="../src/SysexChannel.cpp" />
+		<Unit filename="../src/SysexChannel.h" />
 		<Unit filename="../src/ToolBar.cpp" />
 		<Unit filename="../src/ToolBar.h" />
 		<Unit filename="../src/Track.cpp" />

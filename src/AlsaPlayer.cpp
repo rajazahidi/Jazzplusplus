@@ -596,7 +596,9 @@ void JZAlsaPlayer::Notify()
   // called by timer
   int Now = GetRealTimeClock();
 
+#ifdef DEBUG_ALSA
   cout << "JZAlsaPlayer::Notify " << Now << ' ' << play_clock << endl;
+#endif // DEBUG_ALSA
 
   if (Now < 0)
   {
@@ -607,7 +609,9 @@ void JZAlsaPlayer::Notify()
   {
     // rewind..
     // clear and rebuild
+#ifdef DEBUG_ALSA
     cout << "JZAlsaPlayer::Notify rewind" << endl;
+#endif // DEBUG_ALSA
     ResetPlay(Now);
     mPlayBuffer.Clear();
     mOutClock = Now + FIRST_DELTACLOCK;
@@ -831,10 +835,12 @@ void JZAlsaPlayer::recd_event(snd_seq_event_t* ev)
 {
   JZEvent* pEvent = 0;
 
+#ifdef DEBUG_ALSA
   cout
     << "JZAlsaPlayer::recd_event got " << (int)ev->type
     << " (echo is " << SND_SEQ_EVENT_ECHO << ')'
     << endl;
+#endif // DEBUG_ALSA
 
   switch (ev->type)
   {
@@ -917,7 +923,9 @@ void JZAlsaPlayer::recd_event(snd_seq_event_t* ev)
       else
       {
         recd_clock = ev->time.tick;
+#ifdef DEBUG_ALSA
         cout << "recd_clock now: " << recd_clock << endl;
+#endif // DEBUG_ALSA
       }
       break;
 

@@ -18,9 +18,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_CONTROLLERDIALOG_H
-#define JZ_CONTROLLERDIALOG_H
-
+#pragma once
 
 #include <wx/dialog.h>
 
@@ -47,5 +45,3 @@ class JZControllerDialog : public wxDialog
 
   DECLARE_EVENT_TABLE();
 };
-
-#endif // !defined(JZ_CONTROLLERDIALOG_H)

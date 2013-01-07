@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008-2010 Peter J. Stieber
+// Modifications Copyright (C) 2008-2013 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,8 +20,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_RESOURCES_H
-#define JZ_RESOURCES_H
+#pragma once
 
 // The wxWidgets documentation says it's safe to roll your own identifiers
 // below "wxID_LOWEST" or above "wxID_HIGHEST".  In recent versions, the
@@ -139,5 +138,3 @@
 
 // JZSamplesDialog resource IDs.
 #define IDC_BN_SD_FILE_SELECT_BROWSE         wxID_HIGHEST + 1240
-
-#endif // !defined(JZ_RESOURCES_H)

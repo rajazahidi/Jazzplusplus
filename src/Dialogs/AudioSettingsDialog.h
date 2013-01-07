@@ -18,8 +18,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_AUDIOSETTINGSDIALOG_H
-#define JZ_AUDIOSETTINGSDIALOG_H
+#pragma once
 
 #include <wx/dialog.h>
 
@@ -44,5 +43,3 @@ class JZAudioSettingsDialog : public wxDialog
     wxCheckBox* mpStereoCheckBox;
     wxCheckBox* mpSoftwareMidiAudioSyncCheckBox;
 };
-
-#endif // !defined(JZ_AUDIOSETTINGSDIALOG_H)

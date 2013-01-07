@@ -18,8 +18,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_PITCHWHEELDIALOG_H
-#define JZ_PITCHWHEELDIALOG_H
+#pragma once
 
 class JZPitchEvent;
 class JZTrack;
@@ -49,5 +48,3 @@ class JZPitchWheelDialog : public wxDialog
 
   DECLARE_EVENT_TABLE();
 };
-
-#endif // !defined(JZ_PITCHWHEELDIALOG_H)

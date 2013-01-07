@@ -1,5 +1,4 @@
-#ifndef JZ_PROJECTMANAGER_H
-#define JZ_PROJECTMANAGER_H
+#pragma once
 
 class JZTrackFrame;
 class JZPianoFrame;
@@ -47,5 +46,3 @@ class JZProjectManager
 
     JZGuitarFrame* mpGuitarFrame;
 };
-
-#endif // !defined(JZ_PROJECTMANAGER_H)

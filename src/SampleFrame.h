@@ -1,5 +1,4 @@
-#ifndef JZ_SAMPLEFRAME_H
-#define JZ_SAMPLEFRAME_H
+#pragma once
 
 #include "SampleCommand.h"
 
@@ -102,5 +101,3 @@ class JZSampleFrame : public wxFrame
     wxDialog* wah_settings;
     wxDialog* pitch_settings;
 };
-
-#endif // !defined(JZ_SAMPLEFRAME_H)

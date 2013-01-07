@@ -18,8 +18,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_ENDOFTRACKDIALOG_H
-#define JZ_ENDOFTRACKDIALOG_H
+#pragma once
 
 #include <wx/dialog.h>
 
@@ -54,5 +53,3 @@ class JZEndOfTrackDialog : public wxDialog
 
   DECLARE_EVENT_TABLE();
 };
-
-#endif // !defined(JZ_ENDOFTRACKDIALOG_H)

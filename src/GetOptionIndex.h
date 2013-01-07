@@ -1,6 +1,3 @@
-#ifndef JZ_GETOPTIONINDEX_H
-#define JZ_GETOPTIONINDEX_H
+#pragma once
 
 int GetOptionIndex(const wxString& Option);
-
-#endif // !defined(JZ_GETOPTIONINDEX_H)

@@ -18,8 +18,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_SETTEMPODIALOG_H
-#define JZ_SETTEMPODIALOG_H
+#pragma once
 
 #include <wx/dialog.h>
 
@@ -57,5 +56,3 @@ class JZSetTempoDialog : public wxDialog
 
   DECLARE_EVENT_TABLE();
 };
-
-#endif // !defined(JZ_SETTEMPODIALOG_H)

@@ -18,8 +18,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_PROGRAMCHANGEDIALOG_H
-#define JZ_PROGRAMCHANGEDIALOG_H
+#pragma once
 
 #include <wx/dialog.h>
 
@@ -46,5 +45,3 @@ class JZProgramChangeDialog : public wxDialog
 
   DECLARE_EVENT_TABLE();
 };
-
-#endif // !defined(JZ_PROGRAMCHANGEDIALOG_H)

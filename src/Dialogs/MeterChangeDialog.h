@@ -18,8 +18,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_METERCHANGEDIALOG_H
-#define JZ_METERCHANGEDIALOG_H
+#pragma once
 
 #include <wx/dialog.h>
 
@@ -45,5 +44,3 @@ class JZMeterChangeDialog : public wxDialog
 
   DECLARE_EVENT_TABLE();
 };
-
-#endif // !defined(JZ_METERCHANGEDIALOG_H)

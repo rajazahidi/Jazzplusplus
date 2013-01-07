@@ -1,7 +1,7 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// Copyright (C) 2008-2009 Peter J. Stieber
+// Copyright (C) 2008-2013 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,8 +18,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_KNOB_H
-#define JZ_KNOB_H
+#pragma once
 
 #include <wx/bitmap.h>
 #include <wx/control.h>
@@ -256,5 +255,3 @@ int JZKnob::GetValue() const
 {
   return mSetting;
 }
-
-#endif // !defined(JZ_KNOB_H)

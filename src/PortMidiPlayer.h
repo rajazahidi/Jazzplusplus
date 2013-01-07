@@ -1,5 +1,4 @@
-#ifndef JZ_PORTMIDIDRIVER_H
-#define JZ_PORTMIDIDRIVER_H
+#pragma once
 
 #include "Player.h"
 
@@ -65,5 +64,3 @@ class JZPortMidiPlayer : public JZPlayer
     int mInDev;
     int mOutDev;
 };
-
-#endif // !defined(JZ_PORTMIDIDRIVER_H)

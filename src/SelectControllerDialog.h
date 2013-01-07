@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008-2010 Peter J. Stieber
+// Modifications Copyright (C) 2008-2013 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,9 +20,6 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_SELECTCONTROLLERDIALOG_H
-#define JZ_SELECTCONTROLLERDIALOG_H
+#pragma once
 
 int SelectControllerDlg();
-
-#endif // !defined(JZ_SELECTCONTROLLERDIALOG_H)

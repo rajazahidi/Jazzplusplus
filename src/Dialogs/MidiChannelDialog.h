@@ -1,7 +1,7 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// Copyright (C) 2009-2010 Peter J. Stieber, all rights reserved.
+// Copyright (C) 2009-2013 Peter J. Stieber, all rights reserved.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,8 +18,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_MIDICHANNELDIALOG_H
-#define JZ_MIDICHANNELDIALOG_H
+#pragma once
 
 #include <wx/dialog.h>
 
@@ -54,5 +53,3 @@ class JZMidiChannelDialog : public wxDialog
 
   DECLARE_EVENT_TABLE();
 };
-
-#endif // !defined(JZ_MIDICHANNELDIALOG_H)

@@ -3,7 +3,7 @@
 //
 // Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
 // Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008-2010 Peter J. Stieber
+// Modifications Copyright (C) 2008-2013 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -32,8 +32,7 @@
 // In the future this class might be used to implement wxPropertyForms, who
 // can be better looking.
 
-#ifndef JZ_PROPERTYLISTDIALOG_H
-#define JZ_PROPERTYLISTDIALOG_H
+#pragma once
 
 #include "DeprecatedWx/proplist.h"
 #include "DeprecatedWx/propform.h"
@@ -59,5 +58,3 @@ class JZPropertyListDlg
     wxPropertyValidatorRegistry *myListValidatorRegistry;//cannot be a temporary! leads to a crash
     wxString title;
 };
-
-#endif // !defined(JZ_PROPERTYLISTDIALOG_H)

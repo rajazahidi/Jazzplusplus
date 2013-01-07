@@ -37,8 +37,9 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="`wx-config --cflags`" />
 			<Add option="-Wall" />
+			<Add option="`wx-config --cflags`" />
+			<Add option="-DDEV_ALSA" />
 		</Compiler>
 		<Linker>
 			<Add option="`wx-config --libs`" />

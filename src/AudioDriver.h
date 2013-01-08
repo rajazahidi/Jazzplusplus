@@ -20,8 +20,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_AUDIODRIVER_H
-#define JZ_AUDIODRIVER_H
+#pragma once
 
 #include <sys/soundcard.h>
 // in oss/free (from kernel 2.0.29) the following is not implemented
@@ -123,5 +122,3 @@ class JZAudioPlayer : public JZSeq2Player
     // Needed by buggy audio driver ...
     int force_read;
 };
-
-#endif // !define(JZ_AUDIODRIVER_H)

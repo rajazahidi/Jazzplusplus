@@ -20,8 +20,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_RESOURCEDIALOG_H
-#define JZ_RESOURCEDIALOG_H
+#pragma once
 
 #include <list>
 
@@ -245,5 +244,3 @@ class jppResourceDialog
   /// The name of the dialog resource.  Used in error reporting.
   wxString dialogName;
 };
-
-#endif // !defined(JZ_RESOURCEDIALOG_H)

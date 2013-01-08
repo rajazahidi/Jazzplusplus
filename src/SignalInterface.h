@@ -20,8 +20,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_SIGNALINTERFACE_H
-#define JZ_SIGNALINTERFACE_H
+#pragma once
 
 class JZRndArray;
 class JZSample;
@@ -87,5 +86,3 @@ class JZSplFilter
     JZOpFilter* filter;
     float sr;
 };
-
-#endif // !defined(JZ_SIGNALINTERFACE_H)

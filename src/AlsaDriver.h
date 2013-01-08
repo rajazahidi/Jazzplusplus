@@ -20,8 +20,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_ALSADRIVER_H
-#define JZ_ALSADRIVER_H
+#pragma once
 
 #include "Events.h"
 #include "Player.h"
@@ -114,5 +113,3 @@ class JZAlsaAudioPlayer : public JZAlsaPlayer
     JZAlsaAudioListener* mpListener;
     JZAudioRecordBuffer recbuffers;
 };
-
-#endif // !defined(JZ_ALSADRIVER_H)

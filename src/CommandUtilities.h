@@ -18,8 +18,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_COMMANDUTILITIES_H
-#define JZ_COMMANDUTILITIES_H
+#pragma once
 
 //*****************************************************************************
 //*****************************************************************************
@@ -29,6 +28,3 @@ enum JEValueAlterationMode
   eAddValues,
   eSubtractValues
 };
-
-
-#endif // !defined(JZ_COMMANDUTILITIES_H)

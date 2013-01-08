@@ -20,8 +20,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_ALSATHRU_H
-#define JZ_ALSATHRU_H
+#pragma once
 
 #include <stdlib.h>
 #include <errno.h>
@@ -95,5 +94,3 @@ class JZAlsaThru
     pid_t worker;
     int running;
 };
-
-#endif // !defined(JZ_ALSATHRU_H)

@@ -20,8 +20,7 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#ifndef JZ_ALSAPLAY_H
-#define JZ_ALSAPLAY_H
+#pragma once
 
 #include "Player.h"
 #include "AlsaThru.h"
@@ -147,6 +146,3 @@ class JZAlsaPlayer : public JZPlayer
     JZAlsaThru *thru;
     int ithru, othru;  // index in iaddr, oaddr of source/target device
 };
-
-
-#endif // !defined(JZ_ALSAPLAY_H)

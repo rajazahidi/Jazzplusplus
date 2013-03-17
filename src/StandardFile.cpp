@@ -25,11 +25,10 @@
 #include "ErrorMessage.h"
 
 #include <cassert>
-#include <cstdio>
 #include <cstdlib>
-#include <cstdarg>
+#include <cstring>
+#include <iostream>
 #include <sstream>
-#include <string.h>
 
 using namespace std;
 
@@ -85,9 +84,9 @@ class JZStandardChunk
 
     int IsEof();            // Only after Load, Save never has Eof.
 
-    void Load(FILE* fd);
+    void Load(std::istream& Is);
 
-    void Save(FILE* fd);    // Depends on EndOfTrack
+    void Save(std::ostream& Os);    // Depends on EndOfTrack
 
     void Put(JZEvent* pEvent, unsigned char* pData, int Length);
 
@@ -98,17 +97,17 @@ class JZStandardChunk
 
   private:
 
-    long Size;             // Size of base
-    long nRead;            // Number of bytes read from the file
+    int Size;              // Size of base
+    int nRead;             // Number of bytes read from the file
     unsigned char* mpBase; // Buffer for data.
     unsigned char* cp;     // Aktueller Schreib/Lese pointer
-    long Clock;            // Absolute Clock
+    int Clock;             // Absolute Clock
     int EofSeen;           // endoftrack meta-event read
     int RunningStatus;
 
     void Resize(int SizeNeeded);
-    void PutVar(unsigned long val);
-    unsigned long GetVar();
+    void PutVar(unsigned int val);
+    unsigned int GetVar();
 };
 
 //*****************************************************************************
@@ -147,8 +146,8 @@ void JZStandardChunk::Rewind()
 inline
 void JZStandardChunk::Resize(int Needed)
 {
-  long Used = cp - mpBase;
-  long i, n = Size;
+  int Used = cp - mpBase;
+  int i, n = Size;
   if (Size - Used < Needed)
   {
     do
@@ -177,9 +176,9 @@ int JZStandardChunk::IsEof()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZStandardChunk::PutVar(unsigned long val)
+void JZStandardChunk::PutVar(unsigned int val)
 {
-  unsigned long buf;
+  unsigned int buf;
   buf = val & 0x7f;
   while ((val >>= 7) > 0)
   {
@@ -200,9 +199,9 @@ void JZStandardChunk::PutVar(unsigned long val)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-unsigned long JZStandardChunk::GetVar()
+unsigned int JZStandardChunk::GetVar()
 {
-  unsigned long val;
+  unsigned int val;
   char c;
   if ((val = *cp++) & 0x80)
   {
@@ -219,7 +218,7 @@ unsigned long JZStandardChunk::GetVar()
 void JZStandardChunk::Put(JZEvent* pEvent, unsigned char* Data, int Length)
 {
   unsigned char Stat;
-  long  dif;
+  int dif;
 
   Resize(Length + 20);
   dif = pEvent->GetClock() - Clock;
@@ -302,9 +301,9 @@ void JZStandardChunk::Put(JZEvent* pEvent, unsigned char* Data, int Length)
       }
       break;
 
-    /*
-     * Meta-Events
-     */
+    //
+    // Meta-Events
+    //
 
     case StatText:
     case StatTrackName:
@@ -315,7 +314,7 @@ void JZStandardChunk::Put(JZEvent* pEvent, unsigned char* Data, int Length)
     case StatKeySignat:
     case StatMtcOffset:
 
-    default:        /* hopefully */
+    default:        // hopefully
 
 #if 0
 if (1)
@@ -446,7 +445,7 @@ if (1)
             RunningStatus = 0;
             return pEvent;
 
-          default:                // Text und andere ignorieren
+          default:                // Text and ignore others
             len = GetVar();
             pEvent = new JZMetaEvent(Clock, Stat, cp, len);
             cp += len;
@@ -456,7 +455,7 @@ if (1)
 
       default:
 
-        if (cp[0] & 0x80)        // neuer Running Status?
+        if (cp[0] & 0x80)        // new Running Status?
           RunningStatus = *cp++;
         Stat  = RunningStatus & 0xF0;
         Channel = RunningStatus & 0x0F;
@@ -516,22 +515,22 @@ if (1)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZStandardChunk::Load(FILE* pFd)
+void JZStandardChunk::Load(istream& Is)
 {
   char Type[4];
   int Size;
 
-  fread(Type, 4, 1, pFd);
-  fread(&Size, 4, 1, pFd);
+  Is.read(Type, 4);
+  Is.read((char*)&Size, sizeof(Size));
   SwapL(&Size);
   Resize(Size);
-  fread(mpBase, Size, 1, pFd);
+  Is.read((char*)mpBase, Size);
   nRead = Size;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZStandardChunk::Save(FILE* pFd)
+void JZStandardChunk::Save(ostream& Os)
 {
   int Size, hSize;
 
@@ -540,11 +539,11 @@ void JZStandardChunk::Save(FILE* pFd)
   *cp++ = 0xff;
   *cp++ = 0x2f;
   *cp++ = 0x00;
-  fwrite("MTrk", 4, 1, pFd);
+  Os.write("MTrk", 4);
   Size = hSize = cp - mpBase;
   SwapL(&hSize);
-  fwrite(&hSize, 4, 1, pFd);
-  fwrite(mpBase, Size, 1, pFd);
+  Os.write((char*)&hSize, sizeof(hSize));
+  Os.write((char*)mpBase, Size);
 }
 
 //*****************************************************************************
@@ -589,22 +588,22 @@ JZStandardRead::~JZStandardRead()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZStandardRead::Open(const char* pFileName)
+int JZStandardRead::Open(const string& FileName)
 {
   JZFileHeader FileHeader;
   int hSize;
   int i;
   char Type[4];
 
-  if (!JZReadBase::Open(pFileName))
+  if (!JZReadBase::Open(FileName))
   {
     ostringstream Oss;
-    Oss << "Can't open " << pFileName;
+    Oss << "Can't open " << FileName;
     Error(Oss.str());
     return 0;
   }
 
-  fread(Type, 4, 1, mpFd);
+  mIfs.read(Type, 4);
 
   if (strncmp("MThd", Type, 4) != 0)
   {
@@ -612,11 +611,11 @@ int JZStandardRead::Open(const char* pFileName)
     return 0;
   }
 
-  fread(&hSize, 4, 1, mpFd);
+  mIfs.read((char*)&hSize, 4);
   SwapL(&hSize);
   assert (hSize == sizeof(FileHeader));
 
-  fread(&FileHeader, 6, 1, mpFd);
+  mIfs.read((char*)&FileHeader, 6);
   FileHeader.Swap();
   mTrackCount = FileHeader.mTrackCount;
   mTicksPerQuarter = FileHeader.Unit;
@@ -624,7 +623,7 @@ int JZStandardRead::Open(const char* pFileName)
   mpTracks = new JZStandardChunk [mTrackCount];
   for (i = 0; i < mTrackCount; i++)
   {
-    mpTracks[i].Load(mpFd);
+    mpTracks[i].Load(mIfs);
   }
 
   mTrackIndex = -1;
@@ -678,11 +677,11 @@ JZStandardWrite::~JZStandardWrite()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 int JZStandardWrite::Open(
-  const char* pFileName,
+  const string& FileName,
   int TrackCount,
   int TicksPerQuarter)
 {
-  if (!JZWriteBase::Open(pFileName, TrackCount, TicksPerQuarter))
+  if (!JZWriteBase::Open(FileName, TrackCount, TicksPerQuarter))
   {
     return 0;
   }
@@ -698,23 +697,22 @@ int JZStandardWrite::Open(
 //-----------------------------------------------------------------------------
 void JZStandardWrite::Close()
 {
-  long Size;
-  JZFileHeader FileHeader;
-  int i;
+  mOfs.write("MThd", 4);
 
-  fwrite("MThd", 4, 1, mpFd);
-  Size = 6;
+  int Size = 6;
   SwapL(&Size);
-  fwrite(&Size, 4, 1, mpFd);
+  mOfs.write((char*)&Size, sizeof(Size));
+
+  JZFileHeader FileHeader;
   FileHeader.Unit = mTicksPerQuarter;
   FileHeader.Format = 1;
   FileHeader.mTrackCount = mTrackCount;
   FileHeader.Swap();
-  fwrite(&FileHeader, 6, 1, mpFd);
+  mOfs.write((char*) &FileHeader, sizeof(FileHeader));
 
-  for (i = 0; i < mTrackCount; i++)
+  for (int i = 0; i < mTrackCount; ++i)
   {
-    mpTracks[i].Save(mpFd);
+    mpTracks[i].Save(mOfs);
   }
 
   JZWriteBase::Close();

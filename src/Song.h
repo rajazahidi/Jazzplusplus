@@ -94,9 +94,9 @@ class JZSong
 
     void Clear();
 
-    void Read(JZReadBase& Io, const char* pFileName = 0);
+    void Read(JZReadBase& Io, const std::string& FileName);
 
-    void Write(JZWriteBase& Io, const char* pFileName = 0);
+    void Write(JZWriteBase& Io, const std::string& FileName);
 
     JZTrack* GetTrack(int TrackIndex);
 

@@ -170,7 +170,7 @@ int JZSong::Speed()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZSong::Read(JZReadBase& Io, const char* pFileName)
+void JZSong::Read(JZReadBase& Io, const string& FileName)
 {
   int i;
   wxBeginBusyCursor();
@@ -178,7 +178,7 @@ void JZSong::Read(JZReadBase& Io, const char* pFileName)
   {
     mTracks[i].Clear();
   }
-  int n = Io.Open(pFileName);
+  int n = Io.Open(FileName);
   for (i = 0; i < n && i < eMaxTrackCount; ++i)
   {
     mTracks[i].Read(Io);
@@ -207,7 +207,7 @@ void JZSong::Read(JZReadBase& Io, const char* pFileName)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZSong::Write(JZWriteBase& Io, const char* pFileName)
+void JZSong::Write(JZWriteBase& Io, const string& FileName)
 {
   // Make sure track 0 has a synth reset
   if (!mTracks[0].mpReset)
@@ -217,7 +217,7 @@ void JZSong::Write(JZWriteBase& Io, const char* pFileName)
   }
 
   int n = NumUsedTracks();
-  if (!Io.Open(pFileName, n, mTicksPerQuarter))
+  if (!Io.Open(FileName, n, mTicksPerQuarter))
   {
     return;
   }

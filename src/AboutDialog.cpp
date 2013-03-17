@@ -45,6 +45,8 @@ using namespace std;
 //-----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(JZAboutDialog, wxDialog)
 
+  EVT_BUTTON(IDC_BN_VISIT_WEB_SITE, JZAboutDialog::OnVisitWebSite)
+
   EVT_BUTTON(wxID_HELP, JZAboutDialog::OnHelp)
 
 END_EVENT_TABLE()
@@ -101,11 +103,6 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
 //    "<p>"
 //    + Paragraph2String +
 //    "</p>"
-
-    "<p><center>"
-    "<a href=\"http://jazzplusplus.sourceforge.net/\">"
-    "http://jazzplusplus.sourceforge.net/</a>"
-    "</center></p>"
 
     "<p><center>" + InformationString + "</center></p>"
 
@@ -167,6 +164,11 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
   wxBoxSizer* pButtonsSizer = new wxBoxSizer(wxHORIZONTAL);
 
   pButtonsSizer->Add(new wxButton(this, wxID_OK, "OK"), 0, wxALL, 10);
+  pButtonsSizer->Add(
+    new wxButton(this, IDC_BN_VISIT_WEB_SITE, "Visit Web Site..."),
+    0,
+    wxALL,
+    10);
   pButtonsSizer->Add(new wxButton(this, wxID_HELP, "Help"), 0, wxALL, 10);
 
   pTopSizer->Add(pButtonsSizer, 0, wxALIGN_CENTER);
@@ -186,6 +188,13 @@ JZAboutDialog::~JZAboutDialog()
 {
   delete mpLogo;
   delete mpBitmap;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZAboutDialog::OnVisitWebSite(wxCommandEvent&)
+{
+  wxLaunchDefaultBrowser("http://jazzplusplus.sourceforge.net/");
 }
 
 //-----------------------------------------------------------------------------

@@ -41,6 +41,8 @@ class JZAboutDialog : public wxDialog
 
   protected:
 
+    void OnVisitWebSite(wxCommandEvent& Event);
+
     void OnHelp(wxCommandEvent& Event);
 
   protected:

@@ -164,9 +164,11 @@ int JZJazzPlusPlusApplication::GetMinorVersion() const
 //                looking at old commit messages.
 //  11 1/21/2008  See minor version 3.
 //  12 9/1/2008   See minor version 4.
+//  13 3/17/2013  Fixed closing while recording and/or playing back.
+//  14 3/17/2013  Added "Visit Web Site..." button to the about dialog.
 //-----------------------------------------------------------------------------
 inline
 int JZJazzPlusPlusApplication::GetBuildNumber() const
 {
-  return 12;
+  return 14;
 }

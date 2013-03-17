@@ -21,6 +21,10 @@
 
 #include "AsciiMidiFile.h"
 
+#include <iomanip>
+
+using namespace std;
+
 //*****************************************************************************
 //*****************************************************************************
 //-----------------------------------------------------------------------------
@@ -28,12 +32,15 @@
 int JZAsciiRead::Open(const char* pFileName)
 {
   int TrackCount, TicksPerQuarter;
-  if (
-    fscanf(
-      mpFd,
-      "Tracks %d, TicksPerQuarter %d\n",
-      &TrackCount,
-      &TicksPerQuarter) != 2)
+  string Junk;
+  mIfs >> Junk >> TrackCount >> Junk >> TicksPerQuarter;
+  if (mIfs.fail())
+//  if (
+//    fscanf(
+//      mpFd,
+//      "Tracks %d, TicksPerQuarter %d\n",
+//      &TrackCount,
+//      &TicksPerQuarter) != 2)
   {
     return 0;
   }
@@ -48,14 +55,16 @@ JZEvent* JZAsciiRead::Read()
 
   long Clock;
   int StatusByte, Channel, Length;
-  if (
-    fscanf(
-      mpFd,
-      "%6lu %02x %2d %d ",
-      &Clock,
-      &StatusByte,
-      &Channel,
-      &Length) != 4)
+  mIfs >> Clock >> StatusByte >> Channel >> Length;
+  if (mIfs.fail())
+//  if (
+//    fscanf(
+//      mpFd,
+//      "%6lu %02x %2d %d ",
+//      &Clock,
+//      &StatusByte,
+//      &Channel,
+//      &Length) != 4)
   {
     return pEvent;
   }
@@ -64,7 +73,8 @@ JZEvent* JZAsciiRead::Read()
   for (int i = 0; i < Length; ++i)
   {
     int d;
-    fscanf(mpFd, "%02x ", &d);
+    mIfs >> d;
+//    fscanf(mpFd, "%02x ", &d);
     pBuffer[i] = (unsigned char)d;
   }
 
@@ -135,7 +145,10 @@ JZEvent* JZAsciiRead::Read()
 //-----------------------------------------------------------------------------
 int JZAsciiRead::NextTrack()
 {
-  return fscanf(mpFd, "NextTrack\n") == 0;
+  string String;
+  mIfs >> String;
+  return String == "NextTrack";
+//  return fscanf(mpFd, "NextTrack\n") == 0;
 }
 
 //*****************************************************************************
@@ -154,11 +167,14 @@ int JZAsciiWrite::Open(
     return 0;
   }
 
-  fprintf(
-    mpFd,
-    "Tracks %d, TicksPerQuarter %d\n",
-    TrackCount,
-    TicksPerQuarter);
+  mOfs
+    << "Tracks " << TrackCount << ", TicksPerQuarter " << TicksPerQuarter
+    << endl;
+//  fprintf(
+//    mpFd,
+//    "Tracks %d, TicksPerQuarter %d\n",
+//    TrackCount,
+//    TicksPerQuarter);
 
   return TrackCount;
 }
@@ -169,22 +185,31 @@ int JZAsciiWrite::Write(JZEvent* pEvent, unsigned char* pData, int Length)
 {
   JZChannelEvent* pChannelEvent;
 
-  fprintf(mpFd, "%6d %02x ",  pEvent->GetClock(), pEvent->GetStat());
+  mOfs
+    << setw(6) << pEvent->GetClock()
+    << ' ' << setw(2) << hex << pEvent->GetStat()
+    << ' ' << dec;
+//  fprintf(mpFd, "%6d %02x ",  pEvent->GetClock(), pEvent->GetStat());
   if ((pChannelEvent = pEvent->IsChannelEvent()) != 0)
   {
-    fprintf(mpFd, "%2d ",  pChannelEvent->GetChannel());
+    mOfs << setw(2) << pChannelEvent->GetChannel() << ' ';
+//    fprintf(mpFd, "%2d ",  pChannelEvent->GetChannel());
   }
   else
   {
-    fprintf(mpFd, "-1 ");
+    mOfs << "-1 ";
+//    fprintf(mpFd, "-1 ");
   }
 
-  fprintf(mpFd, "%d ", Length);
+  mOfs << Length << ' ';
+//  fprintf(mpFd, "%d ", Length);
   for (int i = 0; i < Length; ++i)
   {
-    fprintf(mpFd, "%02x ", pData[i]);
+    mOfs << setw(2) << hex << pData[i] << dec;
+//    fprintf(mpFd, "%02x ", pData[i]);
   }
-  fprintf(mpFd, "\n");
+  mOfs << '\n';
+//  fprintf(mpFd, "\n");
 
   return 0;
 }
@@ -193,5 +218,6 @@ int JZAsciiWrite::Write(JZEvent* pEvent, unsigned char* pData, int Length)
 //-----------------------------------------------------------------------------
 void JZAsciiWrite::NextTrack()
 {
-  fprintf(mpFd, "NextTrack\n");
+  mOfs << "NextTrack" << endl;
+//  fprintf(mpFd, "NextTrack\n");
 }

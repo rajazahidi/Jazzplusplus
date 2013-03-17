@@ -23,8 +23,8 @@
 #include "Track.h"
 
 #include "Configuration.h"
-#include "DrumUtilities.h"
 #include "Dialogs/TrackDialog.h"
+#include "DrumUtilities.h"
 #include "Globals.h"
 #include "JazzPlusPlusApplication.h"
 #include "Player.h"
@@ -44,7 +44,7 @@ int JZParam::Write(JZWriteBase& Io)
   return mMsb.Write(Io) + mLsb.Write(Io) + mDataMsb.Write(Io);
 }
 
-void JZParam::SetCha(unsigned char Channel)
+void JZParam::SetChannel(unsigned char Channel)
 {
   mMsb.SetChannel(Channel);
   mLsb.SetChannel(Channel);
@@ -68,7 +68,7 @@ unsigned char *SysExDT1(
   unsigned char *data)
 {
   int length = 9 + datalen;
-  unsigned char *mess = new unsigned char[length];
+  unsigned char* mess = new unsigned char[length];
   mess[0] = 0x41;
   mess[1] = 0x10;
   mess[2] = 0x42;
@@ -185,15 +185,15 @@ void JZMtcTime::ToString(string& String)
   String = Oss.str();
 }
 
-JZMtcOffsetEvent *JZMtcTime::ToOffset()
+JZMtcOffsetEvent* JZMtcTime::ToOffset()
 {
-  unsigned char *mess = new unsigned char[5];
+  unsigned char* mess = new unsigned char[5];
   mess[0] = (unsigned char) hour | ((unsigned char) type << 5);
   mess[1] = (unsigned char) min;
   mess[2] = (unsigned char) sec;
   mess[3] = (unsigned char) fm;
   mess[4] = 0x00;
-  JZMtcOffsetEvent *s = new JZMtcOffsetEvent(0, mess, 5);
+  JZMtcOffsetEvent* s = new JZMtcOffsetEvent(0, mess, 5);
   delete mess;
   return s;
 }
@@ -205,7 +205,7 @@ int JZMtcTime::ToMillisec()
   return msec;
 }
 
-JZDrumInstrumentParameter::JZDrumInstrumentParameter(JZNrpn *par)
+JZDrumInstrumentParameter::JZDrumInstrumentParameter(JZNrpn* par)
   : mPitch(par->mLsb.GetControlValue()),
     mpNext(0)
 {
@@ -216,18 +216,18 @@ JZDrumInstrumentParameter::JZDrumInstrumentParameter(JZNrpn *par)
   param[drumParam2Index(par->mMsb.GetControlValue())] = par;
 }
 
-JZNrpn *JZDrumInstrumentParameter::Get(int index)
+JZNrpn* JZDrumInstrumentParameter::Get(int index)
 {
   assert((index >= drumPitchIndex) && (index < numDrumParameters));
   return(param[index]);
 }
 
-void JZDrumInstrumentParameter::Put(JZNrpn *par)
+void JZDrumInstrumentParameter::Put(JZNrpn* par)
 {
   param[par->mLsb.GetControlValue()] = par;
 }
 
-JZDrumInstrumentParameter *JZDrumInstrumentParameter::Next()
+JZDrumInstrumentParameter* JZDrumInstrumentParameter::Next()
 {
   return mpNext;
 }
@@ -237,10 +237,10 @@ int JZDrumInstrumentParameter::Pitch()
   return mPitch;
 }
 
-JZDrumInstrumentParameter
-*JZDrumInstrumentParameterList::GetElem(int pit)
+JZDrumInstrumentParameter*
+JZDrumInstrumentParameterList::GetElem(int pit)
 {
-  JZDrumInstrumentParameter *ptr = list;
+  JZDrumInstrumentParameter* ptr = list;
   while (ptr)
   {
     if (ptr->mPitch == pit)
@@ -252,9 +252,9 @@ JZDrumInstrumentParameter
   return ptr;
 }
 
-JZNrpn *JZDrumInstrumentParameterList::GetParam(int pit, int index)
+JZNrpn* JZDrumInstrumentParameterList::GetParam(int pit, int index)
 {
-  JZDrumInstrumentParameter *ptr = GetElem(pit);
+  JZDrumInstrumentParameter* ptr = GetElem(pit);
   if (ptr)
   {
     return ptr->Get(index);
@@ -262,7 +262,7 @@ JZNrpn *JZDrumInstrumentParameterList::GetParam(int pit, int index)
   return 0;
 }
 
-void JZDrumInstrumentParameterList::PutParam(JZNrpn *par)
+void JZDrumInstrumentParameterList::PutParam(JZNrpn* par)
 {
   JZDrumInstrumentParameter* ptr = GetElem(par->mLsb.GetControlValue());
   if (!ptr)
@@ -281,7 +281,7 @@ void JZDrumInstrumentParameterList::DelParam(int pit, int index)
 {
   if (list)
   {
-    JZDrumInstrumentParameter *elem = GetElem(pit);
+    JZDrumInstrumentParameter* elem = GetElem(pit);
     if (elem)
     {
       if (elem->Get(index))
@@ -300,8 +300,8 @@ void JZDrumInstrumentParameterList::DelElem(int pit)
     DelParam(pit, i);
   }
 
-  JZDrumInstrumentParameter *ptr = list;
-  JZDrumInstrumentParameter *prev = 0;
+  JZDrumInstrumentParameter* ptr = list;
+  JZDrumInstrumentParameter* prev = 0;
   while (ptr)
   {
     if (ptr->mPitch == pit)
@@ -322,17 +322,17 @@ void JZDrumInstrumentParameterList::DelElem(int pit)
   }
 }
 
-JZDrumInstrumentParameter *JZDrumInstrumentParameterList::FirstElem()
+JZDrumInstrumentParameter* JZDrumInstrumentParameterList::FirstElem()
 {
   return list;
 }
 
-JZDrumInstrumentParameter *JZDrumInstrumentParameterList::NextElem(
-  JZDrumInstrumentParameter *cur)
+JZDrumInstrumentParameter* JZDrumInstrumentParameterList::NextElem(
+  JZDrumInstrumentParameter* cur)
 {
   if (cur)
   {
-    JZDrumInstrumentParameter *ptr = GetElem(cur->mPitch);
+    JZDrumInstrumentParameter* ptr = GetElem(cur->mPitch);
     if (ptr)
     {
       return ptr->mpNext;
@@ -350,7 +350,7 @@ JZDrumInstrumentParameter *JZDrumInstrumentParameterList::NextElem(
 
 void JZDrumInstrumentParameterList::Clear()
 {
-  JZDrumInstrumentParameter *ptr = list;
+  JZDrumInstrumentParameter* ptr = list;
   while (ptr)
   {
     list = ptr->mpNext;
@@ -655,17 +655,17 @@ JZEventArray::~JZEventArray()
 
 
 
-static int compare(const void *p1, const void *p2)
+static int compare(const void* p1, const void* p2)
 {
-  JZEvent *e1 = *(JZEvent **)p1;
-  JZEvent *e2 = *(JZEvent **)p2;
+  JZEvent* e1 = *(JZEvent **)p1;
+  JZEvent* e2 = *(JZEvent **)p2;
   return e1->Compare(*e2);
 }
 
 
 void JZSimpleEventArray::Sort()
 {
-  qsort(mppEvents, nEvents, sizeof(JZEvent *), compare);
+  qsort(mppEvents, nEvents, sizeof(JZEvent*), compare);
 }
 
 
@@ -1157,7 +1157,7 @@ void JZEventArray::Keyoff2Length()
   // kill all KeyOn's with non matching KeyOff's
   for (i = 0; i < nEvents; i++)
   {
-    JZKeyOnEvent *k = mppEvents[i]->IsKeyOn();
+    JZKeyOnEvent* k = mppEvents[i]->IsKeyOn();
     if (k && k->Length <= 0)
     {
       k->Kill();
@@ -1286,7 +1286,7 @@ void JZEventArray::Write(JZWriteBase& Io)
     BendPitchSens->Write(Io);
   }
 
-  JZDrumInstrumentParameter *dpar = DrumParams.FirstElem();
+  JZDrumInstrumentParameter* dpar = DrumParams.FirstElem();
   while (dpar)
   {
     int index;
@@ -1630,7 +1630,7 @@ int JZEventArray::GetFirstClock()
 class JZTrackDlg : public wxForm
 {
   JZTrackWindow* TrackWin;
-  JZTrack *trk;
+  JZTrack* trk;
   std::string& mTrackName;
   JZNamedChoice PatchChoice;
   JZNamedChoice DeviceChoice;
@@ -1641,15 +1641,15 @@ class JZTrackDlg : public wxForm
   int AudioMode;
 
  public:
-  JZTrackDlg::JZTrackDlg(JZTrackWindow *w, JZTrack *t);
-  void EditForm(wxPanel *panel);
+  JZTrackDlg::JZTrackDlg(JZTrackWindow* w, JZTrack* t);
+  void EditForm(wxPanel* panel);
   virtual void OnOk();
   virtual void OnCancel();
   virtual void OnHelp();
 };
 
 
-JZTrackDlg::JZTrackDlg(JZTrackWindow *w, JZTrack *t)
+JZTrackDlg::JZTrackDlg(JZTrackWindow* w, JZTrack* t)
   : wxForm(USED_WXFORM_BUTTONS),
     PatchChoice(
       "Patch",
@@ -1698,7 +1698,7 @@ void JZTrackDlg::OnOk()
   trk->SetDevice(Device);
   if (trk->ForceChannel)
   {
-    JZChannelEvent *c;
+    JZChannelEvent* c;
     JZSysExEvent* s;
     JZEventIterator Iterator(trk);
     trk->Sort();
@@ -1707,7 +1707,7 @@ void JZTrackDlg::OnOk()
     {
       if ((c = pEvent->IsChannelEvent()) != 0)
       {
-        c = (JZChannelEvent *)pEvent->Copy();
+        c = (JZChannelEvent*)pEvent->Copy();
         c->SetChannel(trk->Channel - 1);
         trk->Kill(pEvent);
         trk->Put(c);
@@ -1728,7 +1728,7 @@ void JZTrackDlg::OnOk()
             *pChannel |= sysex_channel(trk->Channel);
           }
 
-          s = (JZSysExEvent *) pEvent->Copy();
+          s = (JZSysExEvent*) pEvent->Copy();
           trk->Kill(pEvent);
           trk->Put(s);
         }
@@ -1738,39 +1738,39 @@ void JZTrackDlg::OnOk()
 
     if (trk->VibRate)
     {
-      trk->VibRate->SetCha(trk->Channel - 1);
+      trk->VibRate->SetChannel(trk->Channel - 1);
     }
     if (trk->VibDepth)
     {
-      trk->VibDepth->SetCha(trk->Channel - 1);
+      trk->VibDepth->SetChannel(trk->Channel - 1);
     }
     if (trk->VibDelay)
     {
-      trk->VibDelay->SetCha(trk->Channel - 1);
+      trk->VibDelay->SetChannel(trk->Channel - 1);
     }
     if (trk->Cutoff)
     {
-      trk->Cutoff->SetCha(trk->Channel - 1);
+      trk->Cutoff->SetChannel(trk->Channel - 1);
     }
     if (trk->Resonance)
     {
-      trk->Resonance->SetCha(trk->Channel - 1);
+      trk->Resonance->SetChannel(trk->Channel - 1);
     }
     if (trk->EnvAttack)
     {
-      trk->EnvAttack->SetCha(trk->Channel - 1);
+      trk->EnvAttack->SetChannel(trk->Channel - 1);
     }
     if (trk->EnvDecay)
     {
-      trk->EnvDecay->SetCha(trk->Channel - 1);
+      trk->EnvDecay->SetChannel(trk->Channel - 1);
     }
     if (trk->EnvRelease)
     {
-      trk->EnvRelease->SetCha(trk->Channel - 1);
+      trk->EnvRelease->SetChannel(trk->Channel - 1);
     }
     if (trk->BendPitchSens)
     {
-      trk->BendPitchSens->SetCha(trk->Channel - 1);
+      trk->BendPitchSens->SetChannel(trk->Channel - 1);
     }
     if (trk->mpBank)
     {
@@ -1782,14 +1782,14 @@ void JZTrackDlg::OnOk()
     }
     if (!trk->DrumParams.IsEmpty())
     {
-      JZDrumInstrumentParameter *dpar = trk->DrumParams.FirstElem();
+      JZDrumInstrumentParameter* dpar = trk->DrumParams.FirstElem();
       while (dpar)
       {
         for (int index = drumPitchIndex; index < numDrumParameters; ++index)
         {
           if (dpar->Get(index))
           {
-            dpar->Get(index)->SetCha(trk->Channel - 1);
+            dpar->Get(index)->SetChannel(trk->Channel - 1);
           }
         }
         dpar = trk->DrumParams.NextElem(dpar);
@@ -1801,7 +1801,7 @@ void JZTrackDlg::OnOk()
   wxForm::OnOk();
 }
 
-void JZTrackDlg::EditForm(wxPanel *panel)
+void JZTrackDlg::EditForm(wxPanel* panel)
 {
   PatchNr   = trk->GetPatch() + (trk->GetBank() << 8);
   Device    = trk->GetDevice();
@@ -1911,7 +1911,7 @@ bool JZTrack::IsDrumTrack()
   return Channel == gpConfig->GetValue(C_DrumChannel);
 }
 
-void JZTrack::Merge(JZEventArray *t)
+void JZTrack::Merge(JZEventArray* t)
 {
   for (int i = 0; i < t->nEvents; i++)
   {
@@ -1976,7 +1976,7 @@ void JZTrack::Undo()
 {
   if (mUndoCount > 0)
   {
-    JZUndoBuffer *undo = &mUndoBuffers[mUndoIndex];
+    JZUndoBuffer* undo = &mUndoBuffers[mUndoIndex];
     for (int i = undo->nEvents - 1; i >= 0; i--)
     {
       JZEvent* pEvent = undo->mppEvents[i];
@@ -2006,7 +2006,7 @@ void JZTrack::Redo()
   {
     mUndoIndex = (mUndoIndex + 1) % MaxUndo;
 
-    JZUndoBuffer *undo = &mUndoBuffers[mUndoIndex];
+    JZUndoBuffer* undo = &mUndoBuffers[mUndoIndex];
     for (int i = 0; i < undo->nEvents; i++)
     {
       JZEvent* pEvent = undo->mppEvents[i];
@@ -2060,14 +2060,14 @@ const char* JZTrack::GetCopyright()
 {
   if (mpCopyright)
   {
-    return (const char *)mpCopyright->GetData();
+    return (const char*)mpCopyright->GetData();
   }
   return "";
 }
 
 
 
-void JZTrack::SetCopyright(char *str)
+void JZTrack::SetCopyright(char* str)
 {
   if (mpCopyright)
   {
@@ -2080,7 +2080,7 @@ void JZTrack::SetCopyright(char *str)
     {
       len = strlen(str);
     }
-    Put(new JZCopyrightEvent(0, (unsigned char *)str, len));
+    Put(new JZCopyrightEvent(0, (unsigned char*)str, len));
   }
   Cleanup();
 }
@@ -2106,7 +2106,7 @@ void JZTrack::SetName(const char* pTrackName)
   {
     Put(new JZTrackNameEvent(
       0,
-      (unsigned char *)pTrackName,
+      (unsigned char*)pTrackName,
       strlen(pTrackName)));
   }
   Cleanup();
@@ -2608,7 +2608,7 @@ int JZTrack::GetDrumParam(int pitch, int index)
 {
   if (!DrumParams.IsEmpty())
   {
-    JZNrpn *par = DrumParams.GetParam(pitch, index);
+    JZNrpn* par = DrumParams.GetParam(pitch, index);
     if (par)
     {
       return(par->GetVal() + 1);
@@ -2761,7 +2761,7 @@ int JZTrack::GetPAfSysex(int psp)
 
   if (pValue)
   {
-    return *pValue + 1;
+    return* pValue + 1;
   }
 
   return 0;
@@ -2955,7 +2955,7 @@ void JZTrack::SetReverbType(int Value, int lsb)
 
 int JZTrack::GetChorusType(int lsb)
 {
-  const unsigned char *pValue = gpSynth->GetSysexValPtr(ChorusType);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(ChorusType);
 
   if (pValue)
   {
@@ -3112,7 +3112,7 @@ int JZTrack::GetPartRsrv(int chan)
   return 0;
 }
 
-void JZTrack::SetPartRsrv(unsigned char *rsrv)
+void JZTrack::SetPartRsrv(unsigned char* rsrv)
 {
   if (PartialReserve)
   {
@@ -3318,7 +3318,7 @@ void JZTrack::SetDefaultSpeed(int bpm)
   Cleanup();
 }
 
-JZSetTempoEvent *JZTrack::GetCurrentTempo(int clk)
+JZSetTempoEvent* JZTrack::GetCurrentTempo(int clk)
 {
   JZEventIterator Iterator(this);
   Sort();
@@ -3338,7 +3338,7 @@ JZSetTempoEvent *JZTrack::GetCurrentTempo(int clk)
 
 int JZTrack::GetCurrentSpeed(int clk)
 {
-  JZSetTempoEvent *t = GetCurrentTempo(clk);
+  JZSetTempoEvent* t = GetCurrentTempo(clk);
   if (t)
   {
     return t->GetBPM();

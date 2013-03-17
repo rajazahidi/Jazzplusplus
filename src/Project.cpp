@@ -22,6 +22,7 @@
 
 #include "Project.h"
 
+#include "AsciiMidiFile.h"
 #include "Filter.h"
 #include "GetOptionIndex.h"
 #include "Globals.h"
@@ -515,8 +516,24 @@ void JZProject::OpenSong(const wxString& SongFileName)
 {
   JZStandardRead Io;
   Clear();
-  Read(Io, SongFileName.c_str());
+  Read(Io, SongFileName);
   mpConfig->Put(C_StartUpSong, SongFileName);
+}
+
+//-----------------------------------------------------------------------------
+// Description:
+//   Open and read an ASCII MIDI file.
+//
+// Inputs:
+//   const wxString& SongFileName:
+//     Song path and file name.
+//-----------------------------------------------------------------------------
+void JZProject::OpenAndReadAsciiMidiFile(const wxString& AsciiMidiFileName)
+{
+  JZAsciiRead AsciiRead;
+  Clear();
+  Read(AsciiRead, AsciiMidiFileName);
+//  mpConfig->Put(C_StartUpSong, SongFileName);
 }
 
 //-----------------------------------------------------------------------------
@@ -531,8 +548,16 @@ void JZProject::OpenSong(const wxString& SongFileName)
 void JZProject::ExportMidiFile(const wxString& MidiFileName)
 {
   JZStandardWrite Io;
-  Write(Io, MidiFileName.c_str());
+  Write(Io, MidiFileName);
   mpConfig->Put(C_StartUpSong, MidiFileName);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZProject::ExportAsciiMidiFile(const wxString& AsciiMidiFileName)
+{
+  JZAsciiWrite AsciiWrite;
+  Write(AsciiWrite, AsciiMidiFileName);
 }
 
 //-----------------------------------------------------------------------------

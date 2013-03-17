@@ -112,6 +112,8 @@ class JZProject : public JZSong
     //     Song path and file name.
     void OpenSong(const wxString& SongFileName);
 
+    void OpenAndReadAsciiMidiFile(const wxString& AsciiMidiFileName);
+
     // Description:
     //   Save a MIDI file.  This function will overwrite the file if it
     // already exists!
@@ -120,6 +122,8 @@ class JZProject : public JZSong
     //   const wxString& MidiFileName:
     //     MIDI file path and file name.
     void ExportMidiFile(const wxString& MidiFileName);
+
+    void ExportAsciiMidiFile(const wxString& AsciiMidiFileName);
 
     // Here is the new play interface.  For now it just acts as a layer
     // between the Project and the GUI.

@@ -81,7 +81,11 @@ class JZTrackFrame : public JZEventFrame, public JZButtonLabelInterface
 
     void OnFileImportMidi(wxCommandEvent& Event);
 
+    void OnFileImportAscii(wxCommandEvent& Event);
+
     void OnFileExportMidi(wxCommandEvent& Event);
+
+    void OnFileExportAscii(wxCommandEvent& Event);
 
     void OnFileExportSelectionAsMidi(wxCommandEvent& Event);
 
@@ -100,6 +104,8 @@ class JZTrackFrame : public JZEventFrame, public JZButtonLabelInterface
     void OnPianoWindow(wxCommandEvent& Event);
 
     void OnToolsHarmonyBrowser(wxCommandEvent& Event);
+
+    void OnToolsRhythmGenerator(wxCommandEvent& Event);
 
     void OnSettingsMetronome(wxCommandEvent& Event);
 

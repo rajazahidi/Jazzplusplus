@@ -22,20 +22,21 @@
 
 #include "TrackFrame.h"
 
+#include "AboutDialog.h"
+#include "Configuration.h"
+#include "Dialogs/MetronomeSettingsDialog.h"
+#include "Dialogs/SynthesizerSettingsDialog.h"
+#include "Globals.h"
+#include "Harmony.h"
 #include "JazzPlusPlusApplication.h"
 #include "Player.h"
 #include "Project.h"
 #include "ProjectManager.h"
-#include "Resources.h"
 #include "RecordingInfo.h"
+#include "Resources.h"
+#include "Rhythm.h"
 #include "TrackWindow.h"
 #include "ToolBar.h"
-#include "Globals.h"
-#include "Configuration.h"
-#include "Harmony.h"
-#include "Dialogs/MetronomeSettingsDialog.h"
-#include "Dialogs/SynthesizerSettingsDialog.h"
-#include "AboutDialog.h"
 
 #ifdef __WXMSW__
 #include "mswin/WindowsPlayer.h"
@@ -89,7 +90,11 @@ BEGIN_EVENT_TABLE(JZTrackFrame, JZEventFrame)
 
   EVT_MENU(ID_IMPORT_MIDI, JZTrackFrame::OnFileImportMidi)
 
+  EVT_MENU(ID_IMPORT_ASCII_MIDI, JZTrackFrame::OnFileImportAscii)
+
   EVT_MENU(ID_EXPORT_MIDI, JZTrackFrame::OnFileExportMidi)
+
+  EVT_MENU(ID_EXPORT_ASCII_MIDI, JZTrackFrame::OnFileExportAscii)
 
   EVT_MENU(
     ID_EXPORT_SELECTION_AS_MIDI,
@@ -112,6 +117,8 @@ BEGIN_EVENT_TABLE(JZTrackFrame, JZEventFrame)
   EVT_MENU(wxID_ZOOM_OUT, JZTrackFrame::OnZoomOut)
 
   EVT_MENU(ID_TOOLS_HARMONY_BROWSER, JZTrackFrame::OnToolsHarmonyBrowser)
+
+  EVT_MENU(ID_TOOLS_RHYTHM_GENERATOR, JZTrackFrame::OnToolsRhythmGenerator)
 
   EVT_MENU(ID_SETTINGS_METRONOME, JZTrackFrame::OnSettingsMetronome)
 
@@ -238,8 +245,9 @@ void JZTrackFrame::CreateMenu()
   mpFileMenu->AppendSeparator();
 
   mpFileMenu->Append(ID_IMPORT_MIDI, "Import MIDI...");
-
+//DEBUG  mpFileMenu->Append(ID_IMPORT_ASCII_MIDI, "Import ASCII...");
   mpFileMenu->Append(ID_EXPORT_MIDI, "Export as MIDI...");
+//DEBUG  mpFileMenu->Append(ID_EXPORT_ASCII_MIDI, "Export as ASCII...");
   mpFileMenu->Append(
     ID_EXPORT_SELECTION_AS_MIDI,
     "Export Selection as MIDI...");
@@ -309,7 +317,8 @@ void JZTrackFrame::CreateMenu()
   pMiscMenu->Append(ID_MISC_SET_COPYRIGHT, "&Set Music Copyright...");
 
   mpToolsMenu = new wxMenu;
-  mpToolsMenu->Append(ID_TOOLS_HARMONY_BROWSER,  "&Harmony Browser...");
+  mpToolsMenu->Append(ID_TOOLS_HARMONY_BROWSER, "&Harmony Browser...");
+  mpToolsMenu->Append(ID_TOOLS_RHYTHM_GENERATOR, "&Rhythm Generator...");
 
 #if 0
   // Move to Project Menu
@@ -468,6 +477,7 @@ bool JZTrackFrame::OnClose()
 //  }
 
   delete gpHarmonyBrowser;
+  delete gpRhythmGeneratorFrame;
 
   return true;
 }
@@ -557,6 +567,27 @@ void JZTrackFrame::OnFileImportMidi(wxCommandEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void JZTrackFrame::OnFileImportAscii(wxCommandEvent&)
+{
+  wxFileDialog OpenDialog(
+    0,
+    "Load ASCII File",
+    "",
+    "",
+    "ASCII MIDI files (txt)|*.txt|All files (*.*)|*.*",
+    wxFD_OPEN | wxFD_CHANGE_DIR);
+  if (OpenDialog.ShowModal() == wxID_OK)
+  {
+    wxString AsciiMidiFileName = OpenDialog.GetPath();
+    gpProject->OpenAndReadAsciiMidiFile(AsciiMidiFileName);
+    SetTitle(AsciiMidiFileName);
+    mpTrackWindow->SetScrollRanges();
+    mpTrackWindow->Refresh(false);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZTrackFrame::OnFileExportMidi(wxCommandEvent& Event)
 {
   // wxFD_OVERWRITE_PROMPT - For save dialog only: prompt for a confirmation
@@ -572,6 +603,27 @@ void JZTrackFrame::OnFileExportMidi(wxCommandEvent& Event)
   {
     wxString FileName = SaveAsDialog.GetPath();
     gpProject->ExportMidiFile(FileName);
+    SetTitle(FileName);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnFileExportAscii(wxCommandEvent&)
+{
+  // wxFD_OVERWRITE_PROMPT - For save dialog only: prompt for a confirmation
+  // if a file will be overwritten.
+  wxFileDialog SaveAsDialog(
+    0,
+    "Save MIDI File as ASCII",
+    "",
+    "",
+    "ASCII MIDI files (txt)|*.txt|All files (*.*)|*.*",
+    wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+  if (SaveAsDialog.ShowModal() == wxID_OK)
+  {
+    wxString FileName = SaveAsDialog.GetPath();
+    gpProject->ExportAsciiMidiFile(FileName);
     SetTitle(FileName);
   }
 }
@@ -650,6 +702,13 @@ void JZTrackFrame::OnZoomOut(wxCommandEvent& Event)
 void JZTrackFrame::OnToolsHarmonyBrowser(wxCommandEvent& Event)
 {
   CreateHarmonyBrowser();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnToolsRhythmGenerator(wxCommandEvent& Event)
+{
+  CreateRhythmGenerator();
 }
 
 //-----------------------------------------------------------------------------

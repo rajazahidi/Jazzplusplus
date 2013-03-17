@@ -79,18 +79,18 @@ class JZParam
   public:
 
     JZParam(
-      int clk,
-      int cha,
+      int Clock,
+      int Channel,
       unsigned char id1,
       unsigned char msb,
       unsigned char id2,
       unsigned char lsb,
       unsigned char msbval)
-      : mMsb(clk, cha, id1, msb),
-        mLsb(clk, cha, id2, lsb),
-        mDataMsb(clk, cha, 0x06, msbval),
-        mResetMsb(clk, cha, id1, 0x7f),
-        mResetLsb(clk, cha, id2, 0x7f)
+      : mMsb(Clock, Channel, id1, msb),
+        mLsb(Clock, Channel, id2, lsb),
+        mDataMsb(Clock, Channel, 0x06, msbval),
+        mResetMsb(Clock, Channel, id1, 0x7f),
+        mResetLsb(Clock, Channel, id2, 0x7f)
     {
     }
 
@@ -100,7 +100,7 @@ class JZParam
 
     virtual int Write(JZWriteBase& Io);
 
-    virtual void SetCha(unsigned char cha);
+    virtual void SetChannel(unsigned char Channel);
 
     virtual int GetVal()
     {
@@ -121,12 +121,12 @@ class JZNrpn : public JZParam
   public:
 
     JZNrpn(
-      int clk,
-      int cha,
+      int Clock,
+      int Channel,
       unsigned char msb,
       unsigned char lsb,
       unsigned char msbval)
-      : JZParam(clk, cha, 0x63, msb, 0x62, lsb, msbval)
+      : JZParam(Clock, Channel, 0x63, msb, 0x62, lsb, msbval)
     {
     }
 };
@@ -138,12 +138,12 @@ class JZRpn : public JZParam
   public:
 
     JZRpn(
-      int clk,
-      int cha,
+      int Clock,
+      int Channel,
       unsigned char msb,
       unsigned char lsb,
       unsigned char msbval)
-      : JZParam(clk, cha, 0x65, msb, 0x64, lsb, msbval)
+      : JZParam(Clock, Channel, 0x65, msb, 0x64, lsb, msbval)
     {
     }
 };
@@ -386,7 +386,7 @@ class JZSimpleEventArray : public wxObject
 
     void GrabData(JZSimpleEventArray &src);
 
-    void Copy(JZSimpleEventArray& src, int frclk, int toclk);
+    void Copy(JZSimpleEventArray& src, int frClock, int toClock);
 
     JZSimpleEventArray();
 
@@ -692,9 +692,9 @@ class JZTrack : public JZEventArray
     int  GetDefaultSpeed();  // beats per minute
     void SetDefaultSpeed(int bpm);
 
-    int  GetCurrentSpeed( int clk );  // beats per minute
+    int  GetCurrentSpeed(int Clock);  // beats per minute
 
-    JZSetTempoEvent *GetCurrentTempo( int clk );
+    JZSetTempoEvent* GetCurrentTempo(int Clock);
 
     int  GetMasterVol();
     void SetMasterVol(int MasterVol);

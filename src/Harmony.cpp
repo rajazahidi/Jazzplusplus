@@ -882,8 +882,7 @@ JZHarmonyBrowserCanvas::JZHarmonyBrowserCanvas(
     mMargin = 1;
   }
 
-
-  mHasChanged      = false;
+  mHasChanged = false;
 
   SetScrollbars(0, (int)(mChordHeight + 0.5), 0, 12 + SEQMAX / 8 + 2, 0, 0);
 }
@@ -2390,6 +2389,8 @@ void JZHarmonyBrowserFrame::TransposeSelection()
   mpHbWindow->TransposeSelection();
 }
 
+//*****************************************************************************
+//*****************************************************************************
 void CreateHarmonyBrowser()
 {
   if (!gpHarmonyBrowser)

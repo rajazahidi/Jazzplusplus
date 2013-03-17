@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "Globals.h"
 #include "Random.h"
 
 #include "ToolBar.h"
@@ -30,10 +31,10 @@
 
 #include <iostream>
 
-class JZTrack;
+class JZBarInfo;
 class JZEventWindow;
 class JZSong;
-class JZBarInfo;
+class JZTrack;
 class wxButton;
 class wxCheckBox;
 class wxListBox;
@@ -75,6 +76,7 @@ struct JZRhythmGroups
 class JZRhythm
 {
     friend class JZRhythmWindow;
+    friend class JZRhythmGeneratorWindow;
 
   private:
 
@@ -176,20 +178,20 @@ class JZRhythmWindow : public wxFrame
     friend std::ostream& operator << (std::ostream& os, JZRhythmWindow const& a);
     friend std::istream& operator >> (std::istream& Is, JZRhythmWindow& a);
 
-    wxPanel    *inst_panel;
+    wxPanel*    inst_panel;
 #ifdef OBSOLETE
     wxText     *label;
 #endif
-    wxSlider   *steps_per_count;
-    wxSlider   *count_per_bar;
-    wxSlider   *n_bars;
-    wxListBox  *instrument_list;
-    wxCheckBox *rand_checkbox;
+    wxSlider*   steps_per_count;
+    wxSlider*   count_per_bar;
+    wxSlider*   n_bars;
+    wxListBox*  instrument_list;
+    wxCheckBox* rand_checkbox;
 
-    wxPanel    *group_panel;
-    wxListBox  *group_list;
-    wxSlider   *group_contrib;
-    wxSlider   *group_listen;
+    wxPanel*   group_panel;
+    wxListBox* group_list;
+    wxSlider*  group_contrib;
+    wxSlider*  group_listen;
     int        act_group;
 
     JZArrayEdit    *length_edit;
@@ -240,7 +242,41 @@ class JZRhythmWindow : public wxFrame
     void UpInstrument();
     void DownInstrument();
     void InitInstrumentList();
-
 };
 
-extern JZRhythmWindow *rhythm_win;
+//*****************************************************************************
+//*****************************************************************************
+class JZRhythmGeneratorWindow : public wxWindow
+{
+  public:
+
+    JZRhythmGeneratorWindow(
+      wxFrame* pParent,
+      const wxPoint& Position,
+      const wxSize& Size);
+
+  private:
+
+    JZRhythm mRhythm;
+
+    JZArrayEdit* mpLengthEdit;
+    JZArrayEdit* mpVelocityEdit;
+    JZRhyArrayEdit* mpRhythmEdit;
+};
+
+//*****************************************************************************
+//*****************************************************************************
+class JZRhythmGeneratorFrame : public wxFrame
+{
+  public:
+
+    JZRhythmGeneratorFrame();
+
+    ~JZRhythmGeneratorFrame();
+
+  private:
+
+    JZRhythmGeneratorWindow* mpRhythmGeneratorWindow;
+};
+
+extern void CreateRhythmGenerator();

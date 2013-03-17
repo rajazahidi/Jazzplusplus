@@ -35,6 +35,7 @@ class JZSynthesizer;
 class JZPlayer;
 class JZHelp;
 class JZProject;
+class JZRhythmGeneratorFrame;
 class JZTrackFrame;
 class JZTrackWindow;
 class JZHarmonyBrowserInterface;
@@ -62,6 +63,7 @@ extern JZProject* gpProject;
 extern JZTrackFrame* gpTrackFrame;
 extern JZTrackWindow* gpTrackWindow;
 extern JZHarmonyBrowserInterface* gpHarmonyBrowser;
+extern JZRhythmGeneratorFrame* gpRhythmGeneratorFrame;
 extern const double gDegreesToRadians;
 extern const double gRadiansToDegrees;
 

@@ -65,6 +65,8 @@ JZTrackWindow* gpTrackWindow = 0;
 
 JZHarmonyBrowserInterface* gpHarmonyBrowser = 0;
 
+JZRhythmGeneratorFrame* gpRhythmGeneratorFrame = 0;
+
 const double gDegreesToRadians = 0.01745329251994330212;
 const double gRadiansToDegrees = 57.2957795130823;
 
@@ -105,4 +107,3 @@ int Tokenize(
 
   return TokenIndex;
 }
-

@@ -41,6 +41,7 @@
 #include <wx/checkbox.h>
 #include <wx/choicdlg.h>
 #include <wx/listbox.h>
+#include <wx/menu.h>
 #include <wx/msgdlg.h>
 #include <wx/slider.h>
 #include <wx/toolbar.h>
@@ -49,8 +50,6 @@
 #include <sstream>
 
 using namespace std;
-
-JZRhythmWindow* rhythm_win = 0;
 
 void tRhyGroup::write(ostream& Os) const
 {
@@ -1236,7 +1235,6 @@ JZRhythmWindow::~JZRhythmWindow()
     delete instruments[i];
   }
   delete mpToolBar;
-  rhythm_win = 0;
 }
 
 bool JZRhythmWindow::OnClose()
@@ -1298,3 +1296,106 @@ istream & operator >> (istream& Is, JZRhythmWindow& a)
   return Is;
 }
 
+//*****************************************************************************
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZRhythmGeneratorWindow::JZRhythmGeneratorWindow(
+  wxFrame* pParent,
+  const wxPoint& Position,
+  const wxSize& Size)
+  : wxWindow(pParent, wxID_ANY, Position, Size),
+    mRhythm(0),
+    mpLengthEdit(0),
+    mpVelocityEdit(0),
+    mpRhythmEdit(0)
+{
+  int x = 0;
+  int y = 0;
+  int Width, Height;
+  GetClientSize(&Width, &Height);
+
+  mpLengthEdit = new JZArrayEdit(
+    pParent,
+    mRhythm.length,
+    x,
+    y + Height / 2,
+    Width / 2,
+    Height / 4 - 4);
+  mpLengthEdit->SetXMinMax(1, 8);
+  mpLengthEdit->SetLabel("length/interval");
+
+  mpVelocityEdit = new JZArrayEdit(
+    pParent,
+    mRhythm.veloc,
+    x + Width / 2,
+    y + Height / 2,
+    Width / 2,
+    Height / 4 - 4);
+  mpVelocityEdit->SetXMinMax(1, 127);
+  mpVelocityEdit->SetLabel("velocity");
+
+  mpRhythmEdit = new JZRhyArrayEdit(
+    pParent,
+    mRhythm.rhythm,
+    x,
+    y + 3 * Height / 4,
+    Width,
+    Height/ 4 - 4);
+  mpRhythmEdit->SetMeter(
+    mRhythm.steps_per_count,
+    mRhythm.count_per_bar,
+    mRhythm.n_bars);
+  mpRhythmEdit->SetLabel("rhythm");
+}
+
+//*****************************************************************************
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZRhythmGeneratorFrame::JZRhythmGeneratorFrame()
+  : wxFrame(
+      0,
+      wxID_ANY,
+      "Rhythm Generator",
+      wxPoint(
+        gpConfig->GetValue(C_RhythmXpos),
+        gpConfig->GetValue(C_RhythmYpos)),
+      wxSize(640, 580)),
+    mpRhythmGeneratorWindow(0)
+{
+  wxMenu* pFileMenu = new wxMenu;
+  pFileMenu->Append(wxID_OPEN, "&Load...");
+  pFileMenu->Append(wxID_SAVEAS, "Save &As...");
+  pFileMenu->Append(wxID_CLOSE, "&Close");
+
+  wxMenuBar* pMenuBar = new wxMenuBar;
+  pMenuBar->Append(pFileMenu, "&File");
+
+  SetMenuBar(pMenuBar);
+
+  int Width, Height;
+  GetClientSize(&Width, &Height);
+  mpRhythmGeneratorWindow =
+    new JZRhythmGeneratorWindow(this, wxPoint(0, 0), wxSize(Width, Height));
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZRhythmGeneratorFrame::~JZRhythmGeneratorFrame()
+{
+  delete mpRhythmGeneratorWindow;
+
+  gpRhythmGeneratorFrame = 0;
+}
+
+//*****************************************************************************
+//*****************************************************************************
+void CreateRhythmGenerator()
+{
+  if (!gpRhythmGeneratorFrame)
+  {
+    gpRhythmGeneratorFrame = new JZRhythmGeneratorFrame();
+  }
+  ((JZRhythmGeneratorFrame*)gpRhythmGeneratorFrame)->Show(true);
+}

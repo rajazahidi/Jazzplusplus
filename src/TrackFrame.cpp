@@ -77,6 +77,8 @@ using namespace std;
 //-----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(JZTrackFrame, JZEventFrame)
 
+  EVT_CLOSE(JZTrackFrame::OnClose)
+
   EVT_MENU(wxID_NEW, JZTrackFrame::OnFileNew)
 
   EVT_MENU(wxID_OPEN, JZTrackFrame::OnFileOpenProject)
@@ -468,6 +470,34 @@ bool JZTrackFrame::OnClose()
   delete gpHarmonyBrowser;
 
   return true;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnClose(wxCloseEvent& CloseEvent)
+{
+  if (CloseEvent.CanVeto() && mpProject && mpProject->IsPlaying())
+  {
+    if (
+      wxMessageBox(
+        "Currently playing the MIDI file... continue closing?",
+        "Please confirm",
+        wxICON_QUESTION | wxYES_NO) != wxYES )
+    {
+      CloseEvent.Veto();
+      return;
+    }
+  }
+
+  if (mpProject && mpProject->IsPlaying())
+  {
+    // Since we cannont veto the close event, stop a playing project.
+    mpProject->Stop();
+  }
+
+  // At this point, we can either call Destroy(), or CloseEvent.Skip()
+  // since the default event handler also calls Destroy().
+  CloseEvent.Skip();
 }
 
 //-----------------------------------------------------------------------------

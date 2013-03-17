@@ -69,6 +69,8 @@ class JZTrackFrame : public JZEventFrame, public JZButtonLabelInterface
 
     void CreateMenu();
 
+    void OnClose(wxCloseEvent& CloseEvent);
+
     void OnFileNew(wxCommandEvent& Event);
 
     void OnFileOpenProject(wxCommandEvent& Event);

@@ -32,8 +32,10 @@
 #define ID_FILE_REVERT_TO_SAVED              (wxID_HIGHEST + 1)
 
 #define ID_IMPORT_MIDI                       (wxID_HIGHEST + 2)
-#define ID_EXPORT_MIDI                       (wxID_HIGHEST + 3)
-#define ID_EXPORT_SELECTION_AS_MIDI          (wxID_HIGHEST + 4)
+#define ID_IMPORT_ASCII_MIDI                 (wxID_HIGHEST + 3)
+#define ID_EXPORT_MIDI                       (wxID_HIGHEST + 4)
+#define ID_EXPORT_ASCII_MIDI                 (wxID_HIGHEST + 5)
+#define ID_EXPORT_SELECTION_AS_MIDI          (wxID_HIGHEST + 6)
 
 #define ID_SETTINGS_METRONOME                (wxID_HIGHEST + 10)
 #define ID_SETTINGS_SYNTHESIZER              (wxID_HIGHEST + 11)
@@ -106,6 +108,7 @@
 #define ID_SHOW_ALL_EVENTS_FROM_ALL_TRACKS   (wxID_HIGHEST + 93)
 
 #define ID_TOOLS_HARMONY_BROWSER             (wxID_HIGHEST + 95)
+#define ID_TOOLS_RHYTHM_GENERATOR            (wxID_HIGHEST + 96)
 
 #define ID_HELP_PIANO_WINDOW                 (wxID_HIGHEST + 100)
 

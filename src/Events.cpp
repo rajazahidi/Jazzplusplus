@@ -27,10 +27,6 @@
 #include "JazzPlusPlusApplication.h"
 #include "Synth.h"
 
-#include <cassert>
-#include <cstdarg>
-#include <cstdio>
-#include <cstdlib>
 #include <sstream>
 
 using namespace std;
@@ -42,7 +38,7 @@ using namespace std;
 JZReadBase::JZReadBase()
   : mTicksPerQuarter(0),
     mTrackCount(0),
-    mpFd(NULL)
+    mIfs()
 {
 }
 
@@ -54,22 +50,15 @@ JZReadBase::~JZReadBase()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZReadBase::Open(const char* pFileName)
+int JZReadBase::Open(const string& FileName)
 {
-  if (pFileName == NULL)
+  mIfs.open(FileName.c_str(), ios::binary);
+  if (!mIfs)
   {
-    mpFd = stdin;
-  }
-  else
-  {
-    mpFd = fopen(pFileName, "rb");
-    if (mpFd == NULL)
-    {
-      ostringstream Oss;
-      Oss << "Error opening file " << pFileName;
-      Error(Oss.str());
-      return 0;
-    }
+    ostringstream Oss;
+    Oss << "Error opening file " << FileName;
+    Error(Oss.str());
+    return 0;
   }
   return 1;
 }
@@ -78,10 +67,7 @@ int JZReadBase::Open(const char* pFileName)
 //-----------------------------------------------------------------------------
 void JZReadBase::Close()
 {
-  if (mpFd != stdin)
-  {
-    fclose(mpFd);
-  }
+  mIfs.close();
 }
 
 //*****************************************************************************
@@ -89,7 +75,7 @@ void JZReadBase::Close()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZWriteBase::JZWriteBase()
-  : mpFd(NULL)
+  : mOfs()
 {
 }
 
@@ -102,39 +88,17 @@ JZWriteBase::~JZWriteBase()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 int JZWriteBase::Open(
-  const char* pFileName,
+  const string& FileName,
   int TrackCount,
   int TicksPerQuarter)
 {
-  if (pFileName == NULL)
+  mOfs.open(FileName.c_str(), ios::binary);
+  if (!mOfs)
   {
-    mpFd = stdout;
-  }
-  else
-  {
-#ifndef __WXMSW__
-    FILE *testfd = fopen(pFileName, "r");
-    if (testfd)
-    {
-      fclose(testfd);
-      char *syscmd;
-      syscmd = new char[strlen("cp") + 2 * strlen(pFileName) + strlen(".backup") + 3];
-      sprintf(syscmd, "cp %s %s.backup", pFileName, pFileName);
-      if (system(syscmd) != 0)
-      {
-        fprintf(stderr, "Could not make backup file %s.backup\n", pFileName);
-      }
-      delete syscmd;
-    }
-#endif
-    mpFd = fopen(pFileName, "wb");
-    if (mpFd == NULL)
-    {
-      ostringstream Oss;
-      Oss << "Error opening file " << pFileName;
-      Error(Oss.str());
-      return 0;
-    }
+    ostringstream Oss;
+    Oss << "Error opening file " << FileName;
+    Error(Oss.str());
+    return 0;
   }
   return TrackCount;
 }
@@ -143,10 +107,7 @@ int JZWriteBase::Open(
 //-----------------------------------------------------------------------------
 void JZWriteBase::Close()
 {
-  if (mpFd != stdout)
-  {
-    fclose(mpFd);
-  }
+  mOfs.close();
 }
 
 //*****************************************************************************

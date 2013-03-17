@@ -22,7 +22,8 @@
 
 #pragma once
 
-#include <cstdio>
+#include <fstream>
+#include <string>
 
 #include <wx/pen.h>
 
@@ -42,7 +43,7 @@ class JZReadBase
 
     virtual ~JZReadBase();
 
-    virtual int Open(const char* pFileName);
+    virtual int Open(const std::string& FileName);
 
     virtual void Close();
 
@@ -59,7 +60,7 @@ class JZReadBase
 
     int mTrackCount;
 
-    FILE* mpFd;
+    std::ifstream mIfs;
 };
 
 //*****************************************************************************
@@ -85,7 +86,7 @@ class JZWriteBase
     virtual ~JZWriteBase();
 
     virtual int Open(
-      const char* pFileName,
+      const std::string& FileName,
       int TrackCount,
       int TicksPerQuarter);
 
@@ -122,7 +123,7 @@ class JZWriteBase
 
   protected:
 
-    FILE* mpFd;
+    std::ofstream mOfs;
 };
 
 //*****************************************************************************
@@ -212,7 +213,7 @@ class JZGetMidiBytes : public JZWriteBase
 {
   public:
 
-    int Open(const char* pFileName, int nTracks, int TicksPerQuarter)
+    int Open(const std::string& FileName, int nTracks, int TicksPerQuarter)
     {
       return 1;
     }

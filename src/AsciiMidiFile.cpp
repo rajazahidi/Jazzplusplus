@@ -53,7 +53,7 @@ JZEvent* JZAsciiRead::Read()
 {
   JZEvent* pEvent = 0;
 
-  long Clock;
+  int Clock;
   int StatusByte, Channel, Length;
   mIfs >> Clock >> StatusByte >> Channel >> Length;
   if (mIfs.fail())

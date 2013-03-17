@@ -29,7 +29,7 @@ class JZAsciiRead : public JZReadBase
 {
   public:
 
-    virtual int Open(const char* pFileName);
+    virtual int Open(const std::string& FileName);
 
     virtual JZEvent* Read();
 
@@ -43,7 +43,7 @@ class JZAsciiWrite : public JZWriteBase
   public:
 
     virtual int Open(
-      const char* pFileName,
+      const std::string& FileName,
       int TrackCount,
       int TicksPerQuarter);
 

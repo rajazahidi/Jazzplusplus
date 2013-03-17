@@ -21,26 +21,34 @@
 
 #include "AsciiMidiFile.h"
 
+#include "ErrorMessage.h"
+
 #include <iomanip>
+#include <sstream>
 
 using namespace std;
 
 //*****************************************************************************
+// Description:
+//   This is the ASCII reader class.  This is used to debug MIDI events.
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZAsciiRead::Open(const char* pFileName)
+int JZAsciiRead::Open(const string& FileName)
 {
+  mIfs.open(FileName.c_str());
+  if (!mIfs)
+  {
+    ostringstream Oss;
+    Oss << "Error opening file " << FileName;
+    Error(Oss.str());
+    return 0;
+  }
+
   int TrackCount, TicksPerQuarter;
   string Junk;
-  mIfs >> Junk >> TrackCount >> Junk >> TicksPerQuarter;
+  mIfs >> Junk >> TrackCount >> Junk >> Junk >> TicksPerQuarter;
   if (mIfs.fail())
-//  if (
-//    fscanf(
-//      mpFd,
-//      "Tracks %d, TicksPerQuarter %d\n",
-//      &TrackCount,
-//      &TicksPerQuarter) != 2)
   {
     return 0;
   }
@@ -55,16 +63,8 @@ JZEvent* JZAsciiRead::Read()
 
   int Clock;
   int StatusByte, Channel, Length;
-  mIfs >> Clock >> StatusByte >> Channel >> Length;
+  mIfs >> Clock >> hex >> StatusByte >> dec >> Channel >> Length;
   if (mIfs.fail())
-//  if (
-//    fscanf(
-//      mpFd,
-//      "%6lu %02x %2d %d ",
-//      &Clock,
-//      &StatusByte,
-//      &Channel,
-//      &Length) != 4)
   {
     return pEvent;
   }
@@ -73,8 +73,12 @@ JZEvent* JZAsciiRead::Read()
   for (int i = 0; i < Length; ++i)
   {
     int d;
-    mIfs >> d;
-//    fscanf(mpFd, "%02x ", &d);
+    mIfs >> hex >> d >> dec;
+    if (mIfs.fail())
+    {
+      delete [] pBuffer;
+      return pEvent;
+    }
     pBuffer[i] = (unsigned char)d;
   }
 
@@ -91,20 +95,56 @@ JZEvent* JZAsciiRead::Read()
       pEvent = new JZKeyOnEvent(Clock, Channel, pBuffer[0], pBuffer[1]);
       break;
 
-    case StatControl:
-      pEvent = new JZControlEvent(Clock, Channel, pBuffer[0], pBuffer[1]);
+    case StatKeyPressure:
+      pEvent = new JZKeyPressureEvent(Clock, Channel, pBuffer[0], pBuffer[1]);
       break;
 
-    case StatPitch:
-      pEvent = new JZPitchEvent(Clock, Channel, pBuffer[0], pBuffer[1]);
+    case StatControl:
+      pEvent = new JZControlEvent(Clock, Channel, pBuffer[0], pBuffer[1]);
       break;
 
     case StatProgram:
       pEvent = new JZProgramEvent(Clock, Channel, pBuffer[0]);
       break;
 
+    case StatChnPressure:
+      pEvent = new JZChnPressureEvent(Clock, Channel, pBuffer[0]);
+      break;
+
+    case StatPitch:
+      pEvent = new JZPitchEvent(Clock, Channel, pBuffer[0], pBuffer[1]);
+      break;
+
+    case StatSysEx:
+      pEvent = new JZSysExEvent(Clock, pBuffer, Length);
+      break;
+
+    case StatSongPtr:
+      pEvent = new JZSongPtrEvent(Clock,  pBuffer, Length);
+      break;
+
+    case StatMidiClock:
+      pEvent = new JZMidiClockEvent(Clock,  pBuffer, Length);
+      break;
+
+    case StatStartPlay:
+      pEvent = new JZStartPlayEvent(Clock,  pBuffer, Length);
+      break;
+
+    case StatContPlay:
+      pEvent = new JZContPlayEvent(Clock,  pBuffer, Length);
+      break;
+
+    case StatStopPlay:
+      pEvent = new JZStopPlayEvent(Clock,  pBuffer, Length);
+      break;
+
     case StatText:
       pEvent = new JZTextEvent(Clock, pBuffer, Length);
+      break;
+
+    case StatCopyright:
+      pEvent = new JZCopyrightEvent(Clock, pBuffer, Length);
       break;
 
     case StatTrackName:
@@ -116,10 +156,15 @@ JZEvent* JZAsciiRead::Read()
       break;
 
     case StatEndOfTrack:
+      pEvent = new JZEndOfTrackEvent(Clock);
       break;
 
     case StatSetTempo:
       pEvent = new JZSetTempoEvent(Clock, pBuffer[0], pBuffer[1], pBuffer[2]);
+      break;
+
+    case StatMtcOffset:
+      pEvent = new JZMtcOffsetEvent(Clock, pBuffer, Length);
       break;
 
     case StatTimeSignat:
@@ -131,8 +176,27 @@ JZEvent* JZAsciiRead::Read()
         pBuffer[3]);
       break;
 
-    case StatSysEx:
-      pEvent = new JZSysExEvent(Clock, pBuffer, Length);
+    case StatKeySignat:
+      pEvent = new JZKeySignatEvent(Clock, pBuffer[0], pBuffer[1]);
+      break;
+
+    case StatJazzMeta:
+      if (memcmp(pBuffer, "JAZ2", 4) == 0)
+      {
+        pEvent = new JZJazzMetaEvent(Clock, pBuffer, Length);
+      }
+      else
+      {
+        pEvent = new JZMetaEvent(Clock, StatusByte, pBuffer, Length);
+      }
+      break;
+
+    case StatPlayTrack:
+      pEvent = new JZPlayTrackEvent(Clock, pBuffer, Length);
+      break;
+
+    case 33:
+      pEvent = new JZMetaEvent(Clock, StatusByte, pBuffer, Length);
       break;
   }
 
@@ -148,33 +212,31 @@ int JZAsciiRead::NextTrack()
   string String;
   mIfs >> String;
   return String == "NextTrack";
-//  return fscanf(mpFd, "NextTrack\n") == 0;
 }
 
 //*****************************************************************************
 // Description:
-//   Ascii-Output (debug)
+//   This is the ASCII writer class.  This is used to debug MIDI events.
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 int JZAsciiWrite::Open(
-  const char* pFileName,
+  const string& FileName,
   int TrackCount,
   int TicksPerQuarter)
 {
-  if (!JZWriteBase::Open(pFileName, TrackCount, TicksPerQuarter))
+  mOfs.open(FileName.c_str());
+  if (!mOfs)
   {
+    ostringstream Oss;
+    Oss << "Error opening file " << FileName;
+    Error(Oss.str());
     return 0;
   }
 
   mOfs
     << "Tracks " << TrackCount << ", TicksPerQuarter " << TicksPerQuarter
     << endl;
-//  fprintf(
-//    mpFd,
-//    "Tracks %d, TicksPerQuarter %d\n",
-//    TrackCount,
-//    TicksPerQuarter);
 
   return TrackCount;
 }
@@ -187,29 +249,24 @@ int JZAsciiWrite::Write(JZEvent* pEvent, unsigned char* pData, int Length)
 
   mOfs
     << setw(6) << pEvent->GetClock()
-    << ' ' << setw(2) << hex << pEvent->GetStat()
-    << ' ' << dec;
-//  fprintf(mpFd, "%6d %02x ",  pEvent->GetClock(), pEvent->GetStat());
+    << ' ' << setw(2) << hex << static_cast<unsigned>(pEvent->GetStat())
+    << dec;
   if ((pChannelEvent = pEvent->IsChannelEvent()) != 0)
   {
-    mOfs << setw(2) << pChannelEvent->GetChannel() << ' ';
-//    fprintf(mpFd, "%2d ",  pChannelEvent->GetChannel());
+    mOfs
+      << ' ' << setw(2) << static_cast<unsigned>(pChannelEvent->GetChannel());
   }
   else
   {
-    mOfs << "-1 ";
-//    fprintf(mpFd, "-1 ");
+    mOfs << " -1";
   }
 
-  mOfs << Length << ' ';
-//  fprintf(mpFd, "%d ", Length);
+  mOfs << ' ' << Length;
   for (int i = 0; i < Length; ++i)
   {
-    mOfs << setw(2) << hex << pData[i] << dec;
-//    fprintf(mpFd, "%02x ", pData[i]);
+    mOfs << ' ' << setw(2) << hex << static_cast<unsigned>(pData[i]) << dec;
   }
-  mOfs << '\n';
-//  fprintf(mpFd, "\n");
+  mOfs << endl;
 
   return 0;
 }
@@ -219,5 +276,4 @@ int JZAsciiWrite::Write(JZEvent* pEvent, unsigned char* pData, int Length)
 void JZAsciiWrite::NextTrack()
 {
   mOfs << "NextTrack" << endl;
-//  fprintf(mpFd, "NextTrack\n");
 }

@@ -11,6 +11,7 @@ AboutDialog.cpp \
 AlsaDriver.cpp \
 AlsaPlayer.cpp \
 AlsaThru.cpp \
+ArrayControl.cpp \
 AsciiMidiFile.cpp \
 Audio.cpp \
 AudioDriver.cpp \
@@ -111,6 +112,7 @@ else
 
 jazz_SOURCES = \
 AboutDialog.cpp \
+ArrayControl.cpp \
 AsciiMidiFile.cpp \
 Audio.cpp \
 Command.cpp \
@@ -215,6 +217,7 @@ AboutDialog.h \
 AlsaDriver.h \
 AlsaPlayer.h \
 AlsaThru.h \
+ArrayControl.h \
 AsciiMidiFile.h \
 Audio.h \
 AudioDriver.h \

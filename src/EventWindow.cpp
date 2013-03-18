@@ -118,7 +118,7 @@ JZEventWindow::~JZEventWindow()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool JZEventWindow::AreEventsSelected()
+bool JZEventWindow::AreEventsSelected() const
 {
   return mpSnapSel->IsSelected();
 }
@@ -585,8 +585,11 @@ void JZEventWindow::OnMouseEvent(wxMouseEvent& MouseEvent)
         // inefficient, invalidate rect first instead.
         Refresh();
       }
+      else
+      {
+        delete mpMouseAction;
+      }
 
-      delete mpMouseAction;
       mpMouseAction = 0;
     }
   }

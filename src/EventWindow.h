@@ -50,7 +50,7 @@ class JZEventWindow : public wxWindow
     // WARNING: non-constant access.
     JZProject* GetProject() const;
 
-    bool AreEventsSelected();
+    bool AreEventsSelected() const;
 
     bool EventsSelected(const wxString& Message) const;
 
@@ -117,9 +117,11 @@ class JZEventWindow : public wxWindow
 
     void OnMouseEvent(wxMouseEvent& MouseEvent);
 
-  public:
+  protected:
 
     JZSnapSelection* mpSnapSel;
+
+  public:
 
     JZFilter* mpFilter;
 

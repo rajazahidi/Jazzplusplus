@@ -257,9 +257,9 @@ class JZSnapSelection : public JZSelection
       int ScrolledY,
       bool Up);
 
-    void SetXSnap(int XCount, int* pXVector, int ScrolledX);
+    void SetXSnap(const std::vector<int>& XVector, int ScrolledX);
 
-    void SetYSnap(int YCount, int* pYVector, int ScrolledY);
+    void SetYSnap(const std::vector<int>& YVector, int ScrolledY);
 
     void SetXSnap(int XMin, int XMax, int XStep);
 
@@ -267,11 +267,9 @@ class JZSnapSelection : public JZSelection
 
   private:
 
-    static void SnapToVector(
-      int& Coordinate,
-      std::vector<int> Vector,
-      int Scrolled,
-      bool Up);
+    void SnapToXVector(int& Coordinate, int Scrolled, bool Up) const;
+
+    void SnapToYVector(int& Coordinate, int Scrolled, bool Up) const;
 
     static void SnapMod(
       int& Coordinate,

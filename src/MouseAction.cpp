@@ -397,7 +397,7 @@ void JZSnapSelection::Snap(
 {
   if (!mXCoordinates.empty())
   {
-    SnapToVector(x, mXCoordinates, ScrolledX, Up);
+    SnapToXVector(x, ScrolledX, Up);
   }
   else if (mXStep)
   {
@@ -406,7 +406,7 @@ void JZSnapSelection::Snap(
 
   if (!mYCoordinates.empty())
   {
-    SnapToVector(y, mYCoordinates, ScrolledY, Up);
+    SnapToYVector(y, ScrolledY, Up);
   }
   else if (mYStep)
   {
@@ -416,24 +416,32 @@ void JZSnapSelection::Snap(
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZSnapSelection::SetXSnap(int XCount, int* pXVector, int ScrolledX)
+void JZSnapSelection::SetXSnap(const vector<int>& XVector, int ScrolledX)
 {
   mXCoordinates.clear();
-  for (int i = 0; i < XCount; ++i)
+  for (
+    vector<int>::const_iterator iXValue = XVector.begin();
+    iXValue != XVector.end();
+    ++iXValue)
   {
-    mXCoordinates.push_back(pXVector[i] + ScrolledX);
+    const int& XValue = *iXValue;
+    mXCoordinates.push_back(XValue + ScrolledX);
   }
   mXStep = 0;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZSnapSelection::SetYSnap(int YCount, int* pYVector, int ScrolledY)
+void JZSnapSelection::SetYSnap(const vector<int>& YVector, int ScrolledY)
 {
   mYCoordinates.clear();
-  for (int i = 0; i < YCount; ++i)
+  for (
+    vector<int>::const_iterator iYValue = YVector.begin();
+    iYValue != YVector.end();
+    ++iYValue)
   {
-    mXCoordinates.push_back(pYVector[i] + ScrolledY);
+    const int& YValue = *iYValue;
+    mYCoordinates.push_back(YValue + ScrolledY);
   }
   mYStep = 0;
 }
@@ -460,31 +468,58 @@ void JZSnapSelection::SetYSnap(int YMin, int YMax, int YStep)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZSnapSelection::SnapToVector(
+void JZSnapSelection::SnapToXVector(
   int& Coordinate,
-  vector<int> Vector,
   int Scrolled,
-  bool Up)
+  bool Up) const
 {
 //DEBUG  cout << "In: " << Coordinate;
-  for (unsigned i = 0; i < Vector.size(); ++i)
+  for (unsigned i = 0; i < mXCoordinates.size(); ++i)
   {
-    if (Vector[i] > Coordinate)
+    if (mXCoordinates[i] > Coordinate)
     {
       if (Up || i == 0)
       {
-        Coordinate = Vector[i];
+        Coordinate = mXCoordinates[i];
       }
       else
       {
-        Coordinate = Vector[i - 1];
+        Coordinate = mXCoordinates[i - 1];
       }
 //DEBUG      cout << "     Out: " << Coordinate  << endl;
       return;
     }
   }
 //DEBUG  cout << "     Out: " << Coordinate  << endl;
-  Coordinate = Vector[Vector.size() - 1];
+  Coordinate = mXCoordinates[mXCoordinates.size() - 1];
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZSnapSelection::SnapToYVector(
+  int& Coordinate,
+  int Scrolled,
+  bool Up) const
+{
+//DEBUG  cout << "In: " << Coordinate;
+  for (unsigned i = 0; i < mYCoordinates.size(); ++i)
+  {
+    if (mYCoordinates[i] > Coordinate)
+    {
+      if (Up || i == 0)
+      {
+        Coordinate = mYCoordinates[i];
+      }
+      else
+      {
+        Coordinate = mYCoordinates[i - 1];
+      }
+//DEBUG      cout << "     Out: " << Coordinate  << endl;
+      return;
+    }
+  }
+//DEBUG  cout << "     Out: " << Coordinate  << endl;
+  Coordinate = mYCoordinates[mYCoordinates.size() - 1];
 }
 
 //-----------------------------------------------------------------------------

@@ -74,7 +74,7 @@ JZKnobEvent::JZKnobEvent(JZKnob* pKnobCtrl, int Value, wxEventType Type)
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-BEGIN_EVENT_TABLE(JZKnob,wxControl)
+BEGIN_EVENT_TABLE(JZKnob, wxControl)
   EVT_SIZE(JZKnob::OnSize)
   EVT_ERASE_BACKGROUND(JZKnob::OnEraseBackground)
   EVT_PAINT(JZKnob::OnPaint)

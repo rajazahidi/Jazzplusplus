@@ -140,7 +140,7 @@ class JZCtrlEditBase : public JZArrayEditDrawBars
 // SN++
     static void Edit(wxButton &but, wxCommandEvent& event);
     static void Bars(wxButton &but, wxCommandEvent& event);
-    void DrawBars(wxDC* dc);
+    void DrawBars(wxDC& Dc);
 };
 
 class JZPitchEdit : public JZCtrlEditBase

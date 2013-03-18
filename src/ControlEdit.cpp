@@ -248,12 +248,11 @@ void JZCtrlEditBase::OnRevert()
 }
 
 
-/*void JZCtrlEditBase::Revert(wxButton &but, wxCommandEvent& event)
-{
-  JZControlPanel *panel = (JZControlPanel *)but.GetParent();
-  panel->edit->OnRevert();
-}
-*/
+//void JZCtrlEditBase::Revert(wxButton &but, wxCommandEvent& event)
+//{
+//  JZControlPanel *panel = (JZControlPanel *)but.GetParent();
+//  panel->edit->OnRevert();
+//}
 
 
 void JZCtrlEditBase::OnApply()
@@ -381,7 +380,7 @@ void JZCtrlEditBase::OnEdit()
 
 // SN++ Has 3 Modes (bars_state)  0: no Bars, 1,2: draw Bars
 // av: called by JZArrayEdit::OnPaint
-void JZCtrlEditBase::DrawBars(wxDC* dc)
+void JZCtrlEditBase::DrawBars(wxDC& Dc)
 {
   JZBarInfo BarInfo(*mpPianoWindow->GetProject());
   BarInfo.SetClock(from_clock);
@@ -394,14 +393,14 @@ void JZCtrlEditBase::DrawBars(wxDC* dc)
     {
       gclk = BarInfo.GetClock();
       x = mpPianoWindow->Clock2x(gclk-from_clock);
-      edit->DrawBarLine(dc, x - x_off);
+      edit->DrawBarLine(Dc, x - x_off);
       if (bars_state == 2)
       {
         for (ii = 0; ii < BarInfo.GetCountsPerBar(); ++ii)
         {
           gclk += BarInfo.GetTicksPerBar() / BarInfo.GetCountsPerBar();
           x = mpPianoWindow->Clock2x(gclk-from_clock);
-          edit->DrawBarLine(dc, x - x_off);
+          edit->DrawBarLine(Dc, x - x_off);
         }
       }
       BarInfo.Next();
@@ -514,7 +513,7 @@ int JZVelocityEdit::IsCtrlEdit(JZEvent* pEvent)
 {
   // SN++ Falls im PianoWin Events selektiert sind, werden nur diese
   //      Events geaendert
-  if (!mpPianoWindow->mpSnapSel->IsSelected())
+  if (!mpPianoWindow->AreEventsSelected())
   {
     return (pEvent->IsKeyOn() != 0);
   }
@@ -545,7 +544,7 @@ void JZVelocityEdit::OnApply()
 
   JZEventIterator iter(track);
 
-  if (mpPianoWindow->mpSnapSel->IsSelected())
+  if (mpPianoWindow->AreEventsSelected())
   {
     from_clk = mpPianoWindow->GetFilter()->GetFromClock();
     to_clk   = mpPianoWindow->GetFilter()->GetToClock();
@@ -563,7 +562,7 @@ void JZVelocityEdit::OnApply()
     // SN++ Falls im PianoWin Events selektiert sind, werden nur diese
     //      Events geaendert
     if (
-      !mpPianoWindow->mpSnapSel->IsSelected() ||
+      !mpPianoWindow->AreEventsSelected() ||
       mpPianoWindow->GetFilter()->IsSelected(pEvent))
     {
 
@@ -615,7 +614,7 @@ int JZPolyAfterEdit::IsCtrlEdit(JZEvent* pEvent)
   // SN++ Falls im PianoWin Events selektiert sind, werden nur diese
   //      Events geaendert
 
-  if (!mpPianoWindow->mpSnapSel->IsSelected())
+  if (!mpPianoWindow->AreEventsSelected())
   {
     return pEvent->IsKeyPressure() != 0;
   }
@@ -649,7 +648,7 @@ void JZPolyAfterEdit::OnApply()
   JZEvent* pEvent;
 
   // SN++ Apply works only if some events are selected !!
-  if (!mpPianoWindow->mpSnapSel->IsSelected())
+  if (!mpPianoWindow->AreEventsSelected())
   {
     OnRevert();
     return;
@@ -660,7 +659,7 @@ void JZPolyAfterEdit::OnApply()
 
   JZEventIterator iter(track);
 
-  if (mpPianoWindow->mpSnapSel->IsSelected())
+  if (mpPianoWindow->AreEventsSelected())
   {
     from_clk = mpPianoWindow->GetFilter()->GetFromClock();
     to_clk   = mpPianoWindow->GetFilter()->GetToClock();
@@ -681,7 +680,7 @@ void JZPolyAfterEdit::OnApply()
     while (pEvent)
     {
       if (
-        !mpPianoWindow->mpSnapSel->IsSelected() ||
+        !mpPianoWindow->AreEventsSelected() ||
         mpPianoWindow->GetFilter()->IsSelected(pEvent))
       {
         JZKeyPressureEvent* pKeyPressure = pEvent->IsKeyPressure();
@@ -701,7 +700,7 @@ void JZPolyAfterEdit::OnApply()
     while (pEvent)
     {
       if (
-        !mpPianoWindow->mpSnapSel->IsSelected() ||
+        !mpPianoWindow->AreEventsSelected() ||
         mpPianoWindow->GetFilter()->IsSelected(pEvent))
       {
         pKeyOn = pEvent->IsKeyOn();
@@ -749,7 +748,7 @@ void JZPolyAfterEdit::OnApply()
     while (pEvent)
     {
       if (
-        !mpPianoWindow->mpSnapSel->IsSelected() ||
+        !mpPianoWindow->AreEventsSelected() ||
         mpPianoWindow->GetFilter()->IsSelected(pEvent))
       {
         if (pEvent->IsKeyPressure())

@@ -55,11 +55,6 @@ class JZTrackWindow : public JZEventWindow
 {
   public:
 
-    enum TELimits
-    {
-      eMaxBars = 200
-    };
-
     JZTrackWindow(
       wxFrame* pParent,
       JZProject* pProject,
@@ -169,8 +164,7 @@ class JZTrackWindow : public JZEventWindow
     int mStateX, mStateWidth;
     int mPatchX, mPatchWidth;
 
-    int mBarCount;
-    int mBarX[eMaxBars];
+    std::vector<int> mBarX;
 
     TECounterModes mCounterMode;
     TENumberModes mNumberMode;

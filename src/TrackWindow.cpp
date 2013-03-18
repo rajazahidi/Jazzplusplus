@@ -80,7 +80,7 @@ JZTrackWindow::JZTrackWindow(
     mStateWidth(),
     mPatchX(0),
     mPatchWidth(0),
-    mBarCount(0),
+    mBarX(),
     mCounterMode(eCmProgram),
     mNumberMode(eNmMidiChannel),
     mpFixedFont(0),
@@ -637,7 +637,7 @@ void JZTrackWindow::Draw(wxDC& Dc)
 
     BarInfo.SetClock(mFromClock);
 
-    mBarCount = 0;
+    mBarX.clear();
     int Intro = gpProject->GetIntroLength();
     LocalDc.SetPen(*wxGREY_PEN);
     while (1)
@@ -682,12 +682,9 @@ void JZTrackWindow::Draw(wxDC& Dc)
         }
 
         // x-coordinate for MouseAction->Snap()
-        if (mBarCount < eMaxBars)
-        {
-          mBarX[mBarCount++] = x;
-//DEBUG          LocalDc.SetPen(*wxRED_PEN);
-//DEBUG          LocalDc.DrawLine(x, 0, x, mCanvasHeight);
-        }
+        mBarX.push_back(x);
+//DEBUG        LocalDc.SetPen(*wxRED_PEN);
+//DEBUG        LocalDc.DrawLine(x, 0, x, mCanvasHeight);
       }
       BarInfo.Next();
     }
@@ -1176,7 +1173,7 @@ const char* JZTrackWindow::GetNumberString() const
 //-----------------------------------------------------------------------------
 //int JZTrackWindow::x2xBar(int x)
 //{
-//  for (int i = 1; i < mBarCount; ++i)
+//  for (int i = 1; i < mBarX.size(); ++i)
 //  {
 //    if (x < mBarX[i])
 //    {
@@ -1190,7 +1187,7 @@ const char* JZTrackWindow::GetNumberString() const
 //-----------------------------------------------------------------------------
 //int JZTrackWindow::x2wBar(int x)
 //{
-//  for (int i = 1; i < mBarCount; ++i)
+//  for (int i = 1; i < mBarX.size(); ++i)
 //  {
 //    if (x < mBarX[i])
 //    {
@@ -1436,7 +1433,7 @@ void JZTrackWindow::MousePlay(wxMouseEvent& MouseEvent, TEMousePlayMode Mode)
 //-----------------------------------------------------------------------------
 void JZTrackWindow::SnapSelectionStart(wxMouseEvent& MouseEvent)
 {
-  mpSnapSel->SetXSnap(mBarCount, mBarX, mScrolledX);
+  mpSnapSel->SetXSnap(mBarX, mScrolledX);
   mpSnapSel->SetYSnap(
     TrackIndex2y(mFromLine),
     mEventsY + mEventsHeight + mScrolledY,

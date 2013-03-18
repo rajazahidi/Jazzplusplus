@@ -143,7 +143,7 @@ class JZArrayEditDrawBars
     {
     }
 
-    virtual void DrawBars(wxDC* pDc) = 0;
+    virtual void DrawBars(wxDC& Dc) = 0;
 };
 
 
@@ -153,7 +153,7 @@ class JZArrayEdit : public wxScrolledWindow
 
     // paint position
     int x, y, w, h, ynul;
-    void DrawBar(wxDC *dc, int i, int black);
+    void DrawBar(wxDC& Dc, int i, int black);
 
     int dragging;                // Dragging-Event valid
     int index;                // ctrl down: drag this one
@@ -166,14 +166,14 @@ class JZArrayEdit : public wxScrolledWindow
     // array size is mapped to this range for x-tick marks
     int xmin, xmax;
 
-    virtual void DrawXTicks(wxDC* dc);
-    virtual void DrawYTicks(wxDC* dc);
-    virtual void DrawLabel(wxDC* dc);
-    virtual void DrawNull(wxDC* dc);
-    int  Index(wxMouseEvent& MouseEvent);
+    virtual void DrawXTicks(wxDC& Dc);
+    virtual void DrawYTicks(wxDC& Dc);
+    virtual void DrawLabel(wxDC& Dc);
+    virtual void DrawNull(wxDC& Dc);
+    int Index(wxMouseEvent& MouseEvent);
 
-    int  enabled;
-    int  style_bits;
+    int enabled;
+    int mStyleBits;
 
     virtual const char *GetXText(int xval);  // Text for x-tickmarks
     virtual const char *GetYText(int yval);  // Text for y-tickmarks
@@ -187,11 +187,11 @@ class JZArrayEdit : public wxScrolledWindow
       int yy,
       int ww,
       int hh,
-      int style_bits = (ARED_GAP | ARED_XTICKS));
+      int StyleBits = (ARED_GAP | ARED_XTICKS));
 
     virtual ~JZArrayEdit();
 
-    virtual void OnDraw(wxDC& indc);
+    virtual void OnDraw(wxDC& Dc);
     virtual void OnSize(wxSizeEvent& event);
     virtual void OnMouseEvent(wxMouseEvent& MouseEvent);
     virtual int Dragging(wxMouseEvent& MouseEvent);
@@ -200,15 +200,15 @@ class JZArrayEdit : public wxScrolledWindow
 
     virtual void SetLabel(char const *llabel);
     void Enable(int enable = 1);
-    void SetStyle(int style)
+    void SetStyle(int StyleBits)
     {
-      style_bits = style;
+      mStyleBits = StyleBits;
     }
     // min and max value in array (both values inclusive)
     void SetYMinMax(int min, int max);
     // for display x-axis only, does not resize the array (both values inclusive)
     void SetXMinMax(int xmin, int xmax);
-    void DrawBarLine (wxDC *dc, int xx);
+    void DrawBarLine (wxDC& Dc, int xx);
     void SetDrawBars(JZArrayEditDrawBars *x)
     {
       draw_bars = x;
@@ -233,13 +233,13 @@ class JZRhyArrayEdit : public JZArrayEdit
       int yy,
       int ww,
       int hh,
-      int style_bits = (ARED_GAP | ARED_XTICKS | ARED_RHYTHM));
+      int StyleBits = (ARED_GAP | ARED_XTICKS | ARED_RHYTHM));
 
     void SetMeter(int steps_per_count, int count_per_bar, int n_bars);
 
   protected:
 
-    virtual void DrawXTicks(wxDC* dc);
+    virtual void DrawXTicks(wxDC& Dc);
 
   private:
 

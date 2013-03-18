@@ -260,7 +260,14 @@ istream & operator >> (istream &is, JZRndArray &a)
 // length of tickmark line
 #define TICK_LINE 0
 
-JZArrayEdit::JZArrayEdit(wxFrame *frame, JZRndArray &ar, int xx, int yy, int ww, int hh, int sty)
+JZArrayEdit::JZArrayEdit(
+  wxFrame *frame,
+  JZRndArray &ar,
+  int xx,
+  int yy,
+  int ww,
+  int hh,
+  int StyleBits)
   : wxScrolledWindow(frame, wxID_ANY, wxPoint(xx, yy), wxSize(ww, hh)),
     mArray(ar),
     n(ar.n),
@@ -272,7 +279,7 @@ JZArrayEdit::JZArrayEdit(wxFrame *frame, JZRndArray &ar, int xx, int yy, int ww,
   enabled = 1;
   dragging = 0;
   index = -1;
-  style_bits = sty;
+  mStyleBits = StyleBits;
 
   xmin = 0;
   xmax = n;
@@ -284,17 +291,17 @@ JZArrayEdit::JZArrayEdit(wxFrame *frame, JZRndArray &ar, int xx, int yy, int ww,
 
   int tw, th;
 
-  wxDC *dc = new wxClientDC(this);
-  dc->SetFont(*wxSMALL_FONT);
-  dc->GetTextExtent("123", &tw, &th);
+  wxClientDC Dc(this);
+  Dc.SetFont(*wxSMALL_FONT);
+  Dc.GetTextExtent("123", &tw, &th);
 
-  if (style_bits & ARED_XTICKS)
+  if (mStyleBits & ARED_XTICKS)
   {
     // leave space for bottomline
     h -= (int)th;
   }
 
-  if (style_bits & (ARED_MINMAX | ARED_YTICKS))
+  if (mStyleBits & (ARED_MINMAX | ARED_YTICKS))
   {
     // leave space to display min / max
     x = (int)(tw + TICK_LINE);
@@ -319,13 +326,12 @@ void JZArrayEdit::OnSize(wxSizeEvent& Event)
 
   int tw, th;
 
-  wxClientDC* dc=new wxClientDC(this);
-  dc->GetTextExtent("123", &tw, &th);
-  delete dc;
+  wxClientDC Dc(this);
+  Dc.GetTextExtent("123", &tw, &th);
 
-  if (style_bits & ARED_XTICKS)
+  if (mStyleBits & ARED_XTICKS)
     h -= (int)th;
-  if (style_bits & (ARED_MINMAX | ARED_YTICKS))
+  if (mStyleBits & (ARED_MINMAX | ARED_YTICKS))
   {
     x = (int)(tw + TICK_LINE);
     w -= (int)(tw + TICK_LINE);
@@ -337,13 +343,13 @@ JZArrayEdit::~JZArrayEdit()
 {
 }
 
-void JZArrayEdit::DrawBar(wxDC *dc, int i, int black)
+void JZArrayEdit::DrawBar(wxDC& Dc, int i, int black)
 {
-  if (style_bits & ARED_LINES)
+  if (mStyleBits & ARED_LINES)
   {
     if (!black)
     {
-      dc->SetPen(*wxWHITE_PEN);
+      Dc.SetPen(*wxWHITE_PEN);
     }
 
     JZMapper XMap(0, n, 0, w);
@@ -356,23 +362,25 @@ void JZArrayEdit::DrawBar(wxDC *dc, int i, int black)
       // draw line to prev position
       int x0 = (int)XMap.XToY(i - 0.5);
       int y0 = (int)YMap.XToY(mArray[i-1]);
-      dc->DrawLine(x0, y0, x1, y1);
+      Dc.DrawLine(x0, y0, x1, y1);
     }
     if (i < n-1)
     {
       // draw line to next position
       int x2 = (int)XMap.XToY(i + 1.5);
       int y2 = (int)YMap.XToY(mArray[i+1]);
-      dc->DrawLine(x1, y1, x2, y2);
+      Dc.DrawLine(x1, y1, x2, y2);
     }
 
     if (!black)
-      dc->SetPen(*wxBLACK_PEN);
+    {
+      Dc.SetPen(*wxBLACK_PEN);
+    }
     return;
   }
 
   int gap = 0;
-  if (style_bits & ARED_GAP)
+  if (mStyleBits & ARED_GAP)
   {
     gap = w / n / 6;
     if (!gap && w / n > 3)
@@ -384,7 +392,7 @@ void JZArrayEdit::DrawBar(wxDC *dc, int i, int black)
   xbar = x + i * w / n + gap;
   hbar = h * (mArray[i] - nul) / (max - min);
 
-  if (style_bits & ARED_BLOCKS)
+  if (mStyleBits & ARED_BLOCKS)
   {
     /*
     ybar = ynul - hbar;
@@ -425,15 +433,17 @@ void JZArrayEdit::DrawBar(wxDC *dc, int i, int black)
 
   if (!black)
   {
-    dc->SetBrush(*wxWHITE_BRUSH);
-    dc->SetPen(*wxWHITE_PEN);
+    Dc.SetBrush(*wxWHITE_BRUSH);
+    Dc.SetPen(*wxWHITE_PEN);
   }
   if (wbar && hbar)
-    dc->DrawRectangle(xbar, ybar, wbar, hbar);
+  {
+    Dc.DrawRectangle(xbar, ybar, wbar, hbar);
+  }
   if (!black)
   {
-    dc->SetBrush(*wxBLACK_BRUSH);
-    dc->SetPen(*wxBLACK_PEN);
+    Dc.SetBrush(*wxBLACK_BRUSH);
+    Dc.SetPen(*wxBLACK_PEN);
   }
 }
 
@@ -451,18 +461,19 @@ const char *JZArrayEdit::GetYText(int yval)
   return buf;
 }
 
-void JZArrayEdit::DrawXTicks(wxDC* dc)
+void JZArrayEdit::DrawXTicks(wxDC& Dc)
 {
   int tw, th;
 
-  if (!(style_bits & ARED_XTICKS))
+  if (!(mStyleBits & ARED_XTICKS))
+  {
     return;
+  }
 
-
-  dc->SetFont(*wxSMALL_FONT);
+  Dc.SetFont(*wxSMALL_FONT);
 
   // compute tickmark x-distance
-  dc->GetTextExtent("-123", &tw, &th);
+  Dc.GetTextExtent("-123", &tw, &th);
   int max_labels = (int)(w / (tw + tw/2));
   if (max_labels > 0)
   {
@@ -473,30 +484,30 @@ void JZArrayEdit::DrawXTicks(wxDC* dc)
     {
       const char *buf = GetXText(val);
       //sprintf(buf, "%d", val);
-      dc->GetTextExtent((char *)buf, &tw, &th);
+      Dc.GetTextExtent((char *)buf, &tw, &th);
       float yy = y + h;
       float xx = x + w * (val - xmin) / (xmax - xmin + 1);
       xx -= tw/2;        // center text
       xx += 0.5 * w / n; // middle of bar
-      dc->DrawText(buf, (int)xx, (int)yy);
-      //dc->DrawLine(x - TICK_LINE, yy, x, yy);
+      Dc.DrawText(buf, (int)xx, (int)yy);
+      //Dc.DrawLine(x - TICK_LINE, yy, x, yy);
     }
   }
 
-  dc->SetFont(*wxNORMAL_FONT);
+  Dc.SetFont(*wxNORMAL_FONT);
 }
 
 
-void JZArrayEdit::DrawYTicks(wxDC* dc)
+void JZArrayEdit::DrawYTicks(wxDC& Dc)
 {
 
-  dc->SetFont(*wxSMALL_FONT);
+  Dc.SetFont(*wxSMALL_FONT);
 
-  if (style_bits & ARED_YTICKS)
+  if (mStyleBits & ARED_YTICKS)
   {
     // compute tickmark y-distance
     int tw, th;
-    dc->GetTextExtent("-123", &tw, &th);
+    Dc.GetTextExtent("-123", &tw, &th);
     int max_labels = (int)(h / (th + th/2));
     if (max_labels > 0)
     {
@@ -507,88 +518,98 @@ void JZArrayEdit::DrawYTicks(wxDC* dc)
       {
         const char *buf = GetYText(val);
         //sprintf(buf, "%d", val);
-        dc->GetTextExtent((char *)buf, &tw, &th);
+        Dc.GetTextExtent((char *)buf, &tw, &th);
         float yy = y + h - h * (val - min) / (max - min) - th/2;
-        dc->DrawText(buf, x - tw - TICK_LINE, (int)yy);
-        //dc->DrawLine(x - TICK_LINE, yy, x, yy);
+        Dc.DrawText(buf, x - tw - TICK_LINE, (int)yy);
+        //Dc.DrawLine(x - TICK_LINE, yy, x, yy);
       }
     }
   }
 
-  else if (style_bits & ARED_MINMAX)
+  else if (mStyleBits & ARED_MINMAX)
   {
     // min/max
     int tw, th;
     char buf[20];
     sprintf(buf, "%d", max);
-    dc->GetTextExtent(buf, &tw, &th);
-    dc->DrawText(buf, x - tw, y);
+    Dc.GetTextExtent(buf, &tw, &th);
+    Dc.DrawText(buf, x - tw, y);
     sprintf(buf, "%d", min);
-    dc->GetTextExtent(buf, &tw, &th);
-    dc->DrawText(buf, x - tw, y + h - th);
+    Dc.GetTextExtent(buf, &tw, &th);
+    Dc.DrawText(buf, x - tw, y + h - th);
 
   }
 
-  dc->SetFont(*wxNORMAL_FONT);
+  Dc.SetFont(*wxNORMAL_FONT);
 
 }
 
-void JZArrayEdit::DrawLabel(wxDC* dc)
+void JZArrayEdit::DrawLabel(wxDC& Dc)
 {
-  dc->SetFont(*wxSMALL_FONT);
+  Dc.SetFont(*wxSMALL_FONT);
   if (!mLabel.empty())
   {
-    dc->DrawText(mLabel.c_str(), x + 5, y + 2);
+    Dc.DrawText(mLabel.c_str(), x + 5, y + 2);
   }
-  dc->SetFont(*wxNORMAL_FONT);
+  Dc.SetFont(*wxNORMAL_FONT);
 }
 
 
 
-void JZArrayEdit::OnDraw(wxDC& indc)
+void JZArrayEdit::OnDraw(wxDC& Dc)
 {
   int i;
-  wxDC *dc = &indc; //just lazy...
 
   // surrounding rectangle
-  dc->Clear();
+  Dc.Clear();
   if (enabled)
-    dc->SetBrush(*wxWHITE_BRUSH);
+  {
+    Dc.SetBrush(*wxWHITE_BRUSH);
+  }
   else
-    dc->SetBrush(*wxGREY_BRUSH);
-  dc->SetPen(*wxBLACK_PEN);
+  {
+    Dc.SetBrush(*wxGREY_BRUSH);
+  }
+
+  Dc.SetPen(*wxBLACK_PEN);
   if (w && h)
-    dc->DrawRectangle(x, y, w, h);
+  {
+    Dc.DrawRectangle(x, y, w, h);
+  }
 
   // sliders
-  dc->SetBrush(*wxBLACK_BRUSH);
-  for (i = 0; i < n; i++)
-    DrawBar(dc, i, 1);
+  Dc.SetBrush(*wxBLACK_BRUSH);
+  for (i = 0; i < n; ++i)
+  {
+    DrawBar(Dc, i, 1);
+  }
 
-  DrawXTicks(dc);
-  DrawLabel(dc);
-  DrawYTicks(dc);
-  DrawNull(dc);
+  DrawXTicks(Dc);
+  DrawLabel(Dc);
+  DrawYTicks(Dc);
+  DrawNull(Dc);
   if (draw_bars)
-    draw_bars->DrawBars(dc);
+  {
+    draw_bars->DrawBars(Dc);
+  }
 }
 
 
 
-void JZArrayEdit::DrawNull(wxDC* dc)
+void JZArrayEdit::DrawNull(wxDC& Dc)
 {
 
-  dc->SetPen(*wxCYAN_PEN);
+  Dc.SetPen(*wxCYAN_PEN);
   // draw y-null line
   if (min < nul && nul < max)
-    dc->DrawLine(x, ynul, x+w, ynul);
+    Dc.DrawLine(x, ynul, x+w, ynul);
   // draw x-null line
   if (xmin < 0 && 0 < xmax)
   {
     int x0 = w * (0 - xmin) / (xmax - xmin);
-    dc->DrawLine(x0, y, x0, y + h);
+    Dc.DrawLine(x0, y, x0, y + h);
   }
-  dc->SetPen(*wxBLACK_PEN);
+  Dc.SetPen(*wxBLACK_PEN);
 }
 
 
@@ -621,44 +642,46 @@ int JZArrayEdit::Dragging(wxMouseEvent& MouseEvent)
     index = Index(MouseEvent);
   }
 
+  wxClientDC Dc(this); // PORTING this is evil and shoud go
+
   int val = nul;
   if (MouseEvent.LeftIsDown())
   {
     int ex, ey;
     MouseEvent.GetPosition(&ex, &ey);
+
+#if 0
+    {
+      // in msw ex,ey are 65536 for negative values!
+      char buf[500];
+      sprintf(buf, "x %4.0f, y %4.0f, sh %d", ex, ey, MouseEvent.ShiftDown());
+      Dc.DrawText(buf, 50, 50);
+    }
+#endif
+
     // $blk$ val = (int)( (y + h - (short)ey) * (max - min) / h + min);
     val = (int)( (double)(y + h - ey) * (max - min) / h + min + 0.5);
     val = val > max ? max : val;
     val = val < min ? min : val;
   }
 
-#if 0
-  {
-    // in msw ex,ey are 65536 for negative values!
-    wxDC *dc = new wxClientDC(this);//GetDC();
-    char buf[500];
-    sprintf(buf, "x %4.0f, y %4.0f, sh %d", ex, ey, MouseEvent.ShiftDown());
-    dc->DrawText(buf, 50, 50);
-  }
-#endif
-  wxDC *dc = new wxClientDC(this); // PORTING this is evil and shoud go
   if (MouseEvent.ShiftDown())
   {
     int k;
     for (k = 0; k < n; k++)
     {
 
-      DrawBar(dc, k, 0);
+      DrawBar(Dc, k, 0);
       mArray[k] = val;
-      DrawBar(dc, k, 1);
+      DrawBar(Dc, k, 1);
 
     }
   }
   else if (MouseEvent.ControlDown())
   {
-    DrawBar(dc, index, 0);
+    DrawBar(Dc, index, 0);
     mArray[index] = val;
-    DrawBar(dc, index, 1);
+    DrawBar(Dc, index, 1);
   }
   else
   {
@@ -667,20 +690,20 @@ int JZArrayEdit::Dragging(wxMouseEvent& MouseEvent)
     if (i < index)
       for (; i <= index; i++)
       {
-        DrawBar(dc, i, 0);
+        DrawBar(Dc, i, 0);
         mArray[i] = val;
-        DrawBar(dc, i, 1);
+        DrawBar(Dc, i, 1);
       }
     else
       for (; i >= index; i--)
       {
-        DrawBar(dc, i, 0);
+        DrawBar(Dc, i, 0);
         mArray[i] = val;
-        DrawBar(dc, i, 1);
+        DrawBar(Dc, i, 1);
       }
     index = k;
   }
-      delete dc;
+
   return 0;
 }
 
@@ -702,10 +725,9 @@ int JZArrayEdit::ButtonUp(wxMouseEvent& MouseEvent)
 #endif
   dragging = 0;
   index    = -1;
-//       wxDC *dc = new wxClientDC(this); // PORTING this is evil and shoud go
-//   DrawLabel(dc);
-//   DrawNull(dc);
-//   delete dc;
+//  wxClientDC Dc(this); // PORTING this is evil and shoud go
+//  DrawLabel(Dc);
+//  DrawNull(Dc);
   Refresh();
   return 0;
 }
@@ -747,16 +769,15 @@ void JZArrayEdit::SetYMinMax(int mi, int ma)
   ynul = y + h - h * (nul - min) / (max - min);
 }
 
-void JZArrayEdit::DrawBarLine (wxDC *dc, int xx)
+void JZArrayEdit::DrawBarLine(wxDC& Dc, int xx)
 {
-  //  wxDC *dc = new wxClientDC(this);//GetDC();
-  //  fprintf(stderr,"x: %ld, xx: %ld\n",x,xx);
+//  cerr << "x: " << x << " xx: " << xx << endl;
   if (xx > x && xx + 1 < x + w)
-    {
-      dc->SetPen (*wxLIGHT_GREY_PEN);
-      dc->DrawLine (xx, y + 1, xx, y + h - 2);
-      dc->SetPen (*wxBLACK_PEN);
-    }
+  {
+    Dc.SetPen(*wxLIGHT_GREY_PEN);
+    Dc.DrawLine(xx, y + 1, xx, y + h - 2);
+    Dc.SetPen(*wxBLACK_PEN);
+  }
 }
 
 
@@ -768,8 +789,8 @@ JZRhyArrayEdit::JZRhyArrayEdit(
   int yy,
   int ww,
   int hh,
-  int sty)
-  : JZArrayEdit(parent, Array, xx, yy, ww, hh, sty)
+  int StyleBits)
+  : JZArrayEdit(parent, Array, xx, yy, ww, hh, StyleBits)
 {
   steps_per_count = 4;
   count_per_bar   = 4;
@@ -786,19 +807,18 @@ void JZRhyArrayEdit::SetMeter(int s, int c, int b)
 }
 
 
-void JZRhyArrayEdit::DrawXTicks(wxDC* dc)
+void JZRhyArrayEdit::DrawXTicks(wxDC& Dc)
 {
-  if (!(style_bits & ARED_RHYTHM))
+  if (!(mStyleBits & ARED_RHYTHM))
   {
-    JZArrayEdit::DrawXTicks(dc);
+    JZArrayEdit::DrawXTicks(Dc);
     return;
   }
 
   char buf[20];
   int tw, th;
 
-
-  dc->SetFont(*wxSMALL_FONT);
+  Dc.SetFont(*wxSMALL_FONT);
 
   // tick marks
   assert(steps_per_count && count_per_bar && n_bars);
@@ -809,10 +829,9 @@ void JZRhyArrayEdit::DrawXTicks(wxDC* dc)
     sprintf(buf, "%d", mark);
     int yy = y + h;
     int xx = (int)(x + (i + 0.5) * w / n);
-    dc->GetTextExtent(buf, &tw, &th);
+    Dc.GetTextExtent(buf, &tw, &th);
     xx -= (int)(tw/2.0);
-    dc->DrawText(buf, xx, yy);
+    Dc.DrawText(buf, xx, yy);
   }
-  dc->SetFont(*wxNORMAL_FONT);
+  Dc.SetFont(*wxNORMAL_FONT);
 }
-

@@ -668,7 +668,6 @@ JZPianoWindow::JZPianoWindow(
   : JZEventWindow(pPianoFrame, pProject, Position, Size),
     mpPianoFrame(pPianoFrame),
     mPlayClock(-1),
-    mSnapCount(0),
     mPasteBuffer(),
     mpTrack(0),
     mTrackIndex(0),
@@ -2014,22 +2013,16 @@ int JZPianoWindow::SnapClock(int Clock, bool Up)
 //-----------------------------------------------------------------------------
 void JZPianoWindow::SnapSelectionStart(wxMouseEvent& MouseEvent)
 {
-  mSnapCount = 0;
   int clk = SnapClock(mFromClock, false);
   int qnt = SnapClocks();
-  while (clk <= mToClock && mSnapCount < eMaxSnaps)
+  vector<int> XSnaps;
+  while (clk <= mToClock)
   {
-    mSnapsX[mSnapCount++] = Clock2x(clk);
+    XSnaps.push_back(Clock2x(clk));
     clk += qnt;
   }
-  if (mSnapCount < eMaxSnaps)
-  {
-    mpSnapSel->SetXSnap(mSnapCount, mSnapsX, 0);
-  }
-  else
-  {
-    mpSnapSel->SetXSnap(0, 0, 0);
-  }
+  mpSnapSel->SetXSnap(XSnaps, 0);
+
   mpSnapSel->SetYSnap(
     mFromLine * mTrackHeight + mTopInfoHeight,
     mEventsY + mEventsHeight,

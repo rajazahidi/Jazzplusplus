@@ -206,14 +206,7 @@ class JZPianoWindow : public JZEventWindow, public JZButtonLabelInterface
 
     int mPlayClock;
 
-    enum TESizes
-    {
-      eMaxSnaps = 500
-    };
-
-    int mSnapCount;
-
-    int mSnapsX[eMaxSnaps];
+  public:
 
     JZEventArray mPasteBuffer;
 

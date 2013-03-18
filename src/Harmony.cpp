@@ -1426,11 +1426,13 @@ void JZHarmonyBrowserCanvas::TransposeSelection()
     wxMessageBox("define a chord sequence first", "error", wxOK);
     return;
   }
-  if (gpTrackWindow->EventsSelected("please select destination range in track window"))
+  if (
+    gpTrackWindow->EventsSelected(
+      "please select destination range in track window"))
   {
     wxBeginBusyCursor();
-    JZHarmonyBrowserAnalyzer analyzer(mSequence, mSequenceCount);
-    analyzer.Transpose(gpTrackWindow->mpFilter, transpose_res);
+    JZHarmonyBrowserAnalyzer HarmonyBrowserAnalyzer(mSequence, mSequenceCount);
+    HarmonyBrowserAnalyzer.Transpose(gpTrackWindow->mpFilter, transpose_res);
     wxEndBusyCursor();
   }
 }
@@ -1494,11 +1496,16 @@ void JZHarmonyBrowserCanvas::MenuCommand(int MenuId, wxToolBar* pToolBar)
       break;
 
     case MEN_ANALYZE:
-      if (gpTrackWindow->EventsSelected("please select source range in track window"))
+      if (
+        gpTrackWindow->EventsSelected(
+          "please select source range in track window"))
       {
         wxBeginBusyCursor();
-        JZHarmonyBrowserAnalyzer analyzer(mSequence, (int)SEQMAX);
-        mSequenceCount = analyzer.Analyze(gpTrackWindow->mpFilter, analyze_res);
+        JZHarmonyBrowserAnalyzer
+          HarmonyBrowserAnalyzer(mSequence, (int)SEQMAX);
+        mSequenceCount = HarmonyBrowserAnalyzer.Analyze(
+          gpTrackWindow->mpFilter,
+          analyze_res);
         Refresh();
         wxEndBusyCursor();
       }
@@ -1520,13 +1527,14 @@ void JZHarmonyBrowserCanvas::MenuCommand(int MenuId, wxToolBar* pToolBar)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZHarmonyBrowserAnalyzer * JZHarmonyBrowserCanvas::GetAnalyzer()
+JZHarmonyBrowserAnalyzer* JZHarmonyBrowserCanvas::GetAnalyzer()
 {
-  if (mSequenceCount > 0 && gpTrackWindow->mpSnapSel->IsSelected())
+  if (mSequenceCount > 0 && gpTrackWindow->AreEventsSelected())
   {
-    JZHarmonyBrowserAnalyzer *analyzer = new JZHarmonyBrowserAnalyzer(mSequence, mSequenceCount);
-    analyzer->Init(gpTrackWindow->mpFilter, transpose_res);
-    return analyzer;
+    JZHarmonyBrowserAnalyzer* pHarmonyBrowserAnalyzer =
+      new JZHarmonyBrowserAnalyzer(mSequence, mSequenceCount);
+    pHarmonyBrowserAnalyzer->Init(gpTrackWindow->mpFilter, transpose_res);
+    return pHarmonyBrowserAnalyzer;
   }
   return 0;
 }

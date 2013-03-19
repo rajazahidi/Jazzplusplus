@@ -409,8 +409,8 @@
     <ClInclude Include="..\src\Dialogs.h" />
     <ClInclude Include="..\src\Dialogs\AudioSettingsDialog.h" />
     <ClInclude Include="..\src\Dialogs\SamplesDialog.h" />
-    <ClCompile Include="..\src\DrumEnums.h" />
-    <ClCompile Include="..\src\DrumUtilities.h" />
+    <ClInclude Include="..\src\DrumEnums.h" />
+    <ClInclude Include="..\src\DrumUtilities.h" />
     <ClInclude Include="..\src\DynamicArray.h" />
     <ClInclude Include="..\src\ErrorMessage.h" />
     <ClInclude Include="..\src\EventFrame.h" />

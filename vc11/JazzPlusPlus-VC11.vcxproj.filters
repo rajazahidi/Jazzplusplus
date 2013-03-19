@@ -164,8 +164,6 @@
     <ClInclude Include="..\src\Configuration.h" />
     <ClInclude Include="..\src\ControlEdit.h" />
     <ClInclude Include="..\src\Dialogs.h" />
-    <ClCompile Include="..\src\DrumEnums.h" />
-    <ClCompile Include="..\src\DrumUtilities.h" />
     <ClInclude Include="..\src\DynamicArray.h" />
     <ClInclude Include="..\src\ErrorMessage.h" />
     <ClInclude Include="..\src\EventFrame.h" />
@@ -316,6 +314,8 @@
     <ClInclude Include="..\src\Dialogs\QuantizeDialog.h">
       <Filter>Dialog Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\DrumUtilities.h" />
+    <ClInclude Include="..\src\DrumEnums.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\Makefile.am" />

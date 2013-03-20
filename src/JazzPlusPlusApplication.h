@@ -23,7 +23,6 @@
 #pragma once
 
 #include <wx/app.h>
-#include <wx/html/helpctrl.h>
 
 class JZProject;
 class JZTrackFrame;
@@ -60,115 +59,17 @@ class JZJazzPlusPlusApplication : public wxApp
     //     A pointer to the application's main frame.
     JZTrackFrame* GetMainFrame() const;
 
-    void DisplayHelpContents() const;
-
-    void GetHelp(const wxString& TopicString) const;
-
-    // Description:
-    //   This function returns the application's major version number.
-    //
-    // Returns:
-    //   int:
-    //     The application's major version number.
-    int GetMajorVersion() const;
-
-    // Description:
-    //   This function returns the application's minor version number.
-    //
-    // Returns:
-    //   int:
-    //     The application's minor version number.
-    int GetMinorVersion() const;
-
-    // Description:
-    //   This function returns the application's build number.
-    //
-    // Returns:
-    //   int:
-    //     The application's build number.
-    int GetBuildNumber() const;
-
   private:
-
-    void ConfigureHelp();
 
     void InsureConfigurationFileExistence() const;
 
-    bool FindAndRegisterHelpFilePath(wxString& HelpFilePath) const;
-
   private:
-
-    static wxString mHelpFileName;
 
     JZProject* mpProject;
 
     JZTrackFrame* mpTrackFrame;
-
-    mutable wxHtmlHelpController mHelp;
 };
 
+//*****************************************************************************
+//*****************************************************************************
 DECLARE_APP(JZJazzPlusPlusApplication)
-
-//*****************************************************************************
-// Description:
-//   These are the Jazz++ application class inline member functions.
-//*****************************************************************************
-//-----------------------------------------------------------------------------
-// Description:
-//   This function returns the application's major version number.
-// Version 1 was the MFC version developed on the Phase II ONR SBIR.
-//
-// Ver Date       Description
-//  4  ?          Unknown for all prior versions.  Might be filled in by
-//                looking at old commit messages.
-//  5  1/21/2008  Start of the Jazz++ development revival.
-//
-// Returns:
-//   int:
-//     The application's major version number.
-//-----------------------------------------------------------------------------
-inline
-int JZJazzPlusPlusApplication::GetMajorVersion() const
-{
-  return 5;
-}
-
-//-----------------------------------------------------------------------------
-// Description:
-//   This function returns the application's minor version number.
-//
-// Ver Date       Description
-//  ?  ?          Unknown for all prior versions.  Might be filled in by
-//                looking at old commit messages.
-//  3  1/21/2008  Major refactoring here to get the code compiling with
-//                wxWidgets 2.8.7 and recent compilers including Visual Studio
-//                .NET 2005 and GCC 4.
-//  4  9/1/2008   Updated to wxWidgets version 2.8.8.
-//
-// Returns:
-//   int:
-//     The application's minor version number.
-//-----------------------------------------------------------------------------
-inline
-int JZJazzPlusPlusApplication::GetMinorVersion() const
-{
-  return 4;
-}
-
-//-----------------------------------------------------------------------------
-// Description:
-//   This function returns the application's build number.
-//
-// Ver Date       Description
-//  ?  ?          Unknown for all prior versions.  Might be filled in by
-//                looking at old commit messages.
-//  11 1/21/2008  See minor version 3.
-//  12 9/1/2008   See minor version 4.
-//  13 3/17/2013  Fixed closing while recording and/or playing back.
-//  14 3/17/2013  Added "Visit Web Site..." button to the about dialog.
-//-----------------------------------------------------------------------------
-inline
-int JZJazzPlusPlusApplication::GetBuildNumber() const
-{
-  return 14;
-}

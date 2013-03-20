@@ -23,6 +23,7 @@
 #include "JazzPlusPlusApplication.h"
 
 #include "Globals.h"
+#include "Help.h"
 #include "Project.h"
 #include "ProjectManager.h"
 #include "TrackFrame.h"
@@ -49,11 +50,9 @@
 
 #include <wx/stdpaths.h>
 #include <wx/fileconf.h>
-#include <wx/filedlg.h>
 #include <wx/image.h>
 #include <wx/msgdlg.h>
 
-#include <fstream>
 #include <vector>
 
 using namespace std;
@@ -62,10 +61,6 @@ using namespace std;
 // Description:
 //   This is the JazzPlusPlus application class definition.
 //*****************************************************************************
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-wxString JZJazzPlusPlusApplication::mHelpFileName = "jazz.hhp";
-
 //-----------------------------------------------------------------------------
 // Description:
 //   Create a new application object using the wxWidgets macro.  This macro
@@ -81,8 +76,7 @@ IMPLEMENT_APP(JZJazzPlusPlusApplication)
 JZJazzPlusPlusApplication::JZJazzPlusPlusApplication()
   : wxApp(),
     mpProject(0),
-    mpTrackFrame(0),
-    mHelp(wxHF_DEFAULT_STYLE | wxHF_OPEN_FILES)
+    mpTrackFrame(0)
 {
 #ifdef _MSC_VER
   // When using the Microsoft C++ compiler in debug mode, each heap allocation
@@ -157,92 +151,9 @@ bool JZJazzPlusPlusApplication::OnInit()
   // Show it and tell the application that it's our main window
   SetTopWindow(mpTrackFrame);
 
-  ConfigureHelp();
+  JZHelp::Instance().ConfigureHelp();
 
   return true;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZJazzPlusPlusApplication::ConfigureHelp()
-{
-  wxConfigBase* pConfig = wxConfigBase::Get();
-
-  // Let the help system store the Jazz++ help configuration info.
-  mHelp.UseConfig(pConfig);
-
-  // This code should be distributed with a HelpFiles subdirectory under
-  // the directory the executable is stored in on Windows and under the
-  // ${prefix}/shared/${appname} on Linux.
-  wxString HelpFileDirectoryGuess =
-    wxStandardPaths::Get().GetDataDir() +
-    wxFileName::GetPathSeparator() +
-    "HelpFiles" +
-    wxFileName::GetPathSeparator();
-
-  // Attempt to obtain the path to the help file from configuration data.
-  wxString HelpFilePath;
-  bool WasHelpPathRead = false;
-  if (pConfig)
-  {
-    WasHelpPathRead = pConfig->Read(
-      "/Paths/Help",
-      &HelpFilePath,
-      HelpFileDirectoryGuess);
-  }
-
-  // Construct a full file name.
-  wxString HelpFileNameAndPath = HelpFilePath + mHelpFileName;
-
-  // Test for the existence of the help file.
-  bool HelpFileFound = false;
-  ifstream Is;
-  Is.open(HelpFileNameAndPath.mb_str());
-  if (!Is)
-  {
-    // Ask the user to find the help file.
-    if (FindAndRegisterHelpFilePath(HelpFilePath))
-    {
-      HelpFileNameAndPath = HelpFilePath + mHelpFileName;
-
-      // Try one more time.
-      Is.close();
-      Is.clear();
-      Is.open(HelpFileNameAndPath.mb_str());
-      if (!Is)
-      {
-        wxString Message = "Failed to add the Jazz++ book " + mHelpFileName;
-        ::wxMessageBox(Message);
-      }
-      else
-      {
-        HelpFileFound = true;
-      }
-    }
-  }
-  else
-  {
-    HelpFileFound = true;
-  }
-
-  // GetUserDataDir returns the directory for the user-dependent application
-  // data files.  The value is $HOME/.appname on Linux,
-  // c:\Documents and Settings\username\Application Data\appname on
-  // Windows, and ~/Library/Application Support/appname on the Mac.
-  // The cached version of the help file will be placed in this location.
-  mHelp.SetTempDir(wxStandardPaths::Get().GetUserDataDir());
-
-  if (HelpFileFound)
-  {
-    // Add the Jazz++ help file the the help system.
-    mHelp.AddBook(HelpFileNameAndPath);
-
-    if (!WasHelpPathRead && pConfig)
-    {
-      // Register the help path.
-      pConfig->Write("/Paths/Help", HelpFilePath);
-    }
-  }
 }
 
 //-----------------------------------------------------------------------------
@@ -337,74 +248,12 @@ void JZJazzPlusPlusApplication::InsureConfigurationFileExistence() const
 }
 
 //-----------------------------------------------------------------------------
-// Description:
-//   This function walks the user through a top-level help file search.  If
-// the help file is found, create a configuration entry so the code can find
-// the help file path the next time the application starts.
-//
-// Outputs:
-//   wxString& HelpFilePath:
-//     A user-selected path to the help file.  The calling code should check
-//     to insure the help file is actually in this path.
-//-----------------------------------------------------------------------------
-bool JZJazzPlusPlusApplication::FindAndRegisterHelpFilePath(
-  wxString& HelpFilePath) const
-{
-  wxString Message;
-  Message =
-    "Unable to find " + mHelpFileName + "\n" +
-    "Would you like to locate this file?";
-  int Response = ::wxMessageBox(
-    Message,
-    "Cannnot Find Help File",
-    wxOK | wxCANCEL);
-
-  if (Response == wxOK)
-  {
-    // Use an open dialog to find the help file.
-    wxFileDialog OpenDialog(
-      0,
-      "Open the Help File",
-      HelpFilePath,
-      mHelpFileName,
-      "*.hhp",
-      wxFD_OPEN);
-
-    if (OpenDialog.ShowModal() == wxID_OK)
-    {
-      // Generate a string that contains a path to the help file.
-      wxString TempHelpFilePath;
-      TempHelpFilePath = ::wxPathOnly(OpenDialog.GetPath());
-      TempHelpFilePath += ::wxFileName::GetPathSeparator();
-
-      wxConfigBase* pConfig = wxConfigBase::Get();
-      if (pConfig)
-      {
-        pConfig->Write("/Paths/Help", TempHelpFilePath);
-      }
-
-      // Return the user selected help file path.
-      HelpFilePath = TempHelpFilePath;
-
-      return true;
-    }
-  }
-
-  return false;
-}
-
-//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 int JZJazzPlusPlusApplication::OnExit()
 {
   delete mpProject;
 
-  // GetFrame returns NULL if there is no help frame active.
-  if (mHelp.GetFrame())
-  {
-    // Close the help frame; this will cause the config data to get written.
-    mHelp.GetFrame()->Close(true);
-  }
+  JZHelp::Instance().CloseHelp();
 
   // Prevent reported leaks from the configuration class.
   delete wxConfigBase::Set(0);
@@ -419,22 +268,4 @@ int JZJazzPlusPlusApplication::OnExit()
 JZTrackFrame* JZJazzPlusPlusApplication::GetMainFrame() const
 {
   return mpTrackFrame;
-}
-
-//-----------------------------------------------------------------------------
-// Description:
-//   Display the table of contents for Jazz++ help.
-//-----------------------------------------------------------------------------
-void JZJazzPlusPlusApplication::DisplayHelpContents() const
-{
-  mHelp.DisplayContents();
-}
-
-//-----------------------------------------------------------------------------
-// Description:
-//   Provide context sensitive help for Jazz++.
-//-----------------------------------------------------------------------------
-void JZJazzPlusPlusApplication::GetHelp(const wxString& TopicString) const
-{
-  mHelp.DisplaySection(TopicString);
 }

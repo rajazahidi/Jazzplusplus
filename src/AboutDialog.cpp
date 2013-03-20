@@ -22,7 +22,8 @@
 
 #include "AboutDialog.h"
 
-#include "JazzPlusPlusApplication.h"
+#include "JazzPlusPlusVersion.h"
+#include "Help.h"
 #include "Resources.h"
 
 #include <wx/button.h>
@@ -67,12 +68,10 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
   wxString LocaleString = wxLocale::GetSystemEncodingName();
 
   wxString VersionString;
-  const JZJazzPlusPlusApplication& JazzApplication = ::wxGetApp();
-
   VersionString
-    << JazzApplication.GetMajorVersion()
-    << '.' << JazzApplication.GetMinorVersion()
-    << '.' << JazzApplication.GetBuildNumber();
+    << JZJazzPlusPlusVersion::Instance().GetMajorVersion()
+    << '.' << JZJazzPlusPlusVersion::Instance().GetMinorVersion()
+    << '.' << JZJazzPlusPlusVersion::Instance().GetBuildNumber();
 
   // Indicate the wxWidgets version used in the build.
   wxString InformationString = "Jazz++ uses ";
@@ -201,5 +200,5 @@ void JZAboutDialog::OnVisitWebSite(wxCommandEvent&)
 //-----------------------------------------------------------------------------
 void JZAboutDialog::OnHelp(wxCommandEvent& Event)
 {
-  ::wxGetApp().DisplayHelpContents();
+  JZHelp::Instance().DisplayHelpContents();
 }

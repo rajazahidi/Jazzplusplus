@@ -22,7 +22,6 @@
 
 #include "Globals.h"
 
-#include "Help.h"
 #include "NamedValue.h"
 #include "Player.h"
 #include "Project.h"
@@ -38,8 +37,6 @@ JZSong* gpSong = 0;
 JZSynthesizer* gpSynth = 0;
 
 JZPlayer* gpMidiPlayer = 0;
-
-JZHelp* gpHelpInstance = 0;
 
 map<int, string> gLimitSteps;
 

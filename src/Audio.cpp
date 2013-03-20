@@ -762,7 +762,7 @@ class JZAudioGloblForm : public wxForm
 
     void OnHelp()
     {
-      gpHelpInstance->ShowTopic("Global Settings");
+      JZHelp::Instance().ShowTopic("Global Settings");
     }
 
     void OnOk()
@@ -1341,7 +1341,7 @@ void JZSamplesDlg::OnClrButton()
 //-----------------------------------------------------------------------------
 void JZSamplesDlg::OnHelpButton()
 {
-  gpHelpInstance->ShowTopic("Sample Settings");
+  JZHelp::Instance().ShowTopic("Sample Settings");
 }
 
 //-----------------------------------------------------------------------------

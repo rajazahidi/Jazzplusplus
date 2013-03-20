@@ -131,5 +131,5 @@ bool JZSnapDialog::TransferDataFromWindow()
 //-----------------------------------------------------------------------------
 void JZSnapDialog::OnHelp(wxCommandEvent& Event)
 {
-  gpHelpInstance->ShowTopic("Snap");
+  JZHelp::Instance().ShowTopic("Snap");
 }

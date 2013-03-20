@@ -1171,7 +1171,7 @@ void JZPianoWindow::OnMenuCommand(int Id)
   switch (Id)
   {
     case ID_HELP_PIANO_WINDOW:
-      gpHelpInstance->ShowTopic("Piano Window");
+      JZHelp::Instance().ShowTopic("Piano Window");
       break;
   }
 }

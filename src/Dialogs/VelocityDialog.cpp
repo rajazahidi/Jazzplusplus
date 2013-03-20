@@ -225,5 +225,5 @@ void JZVelocityDialog::OnVelocityStopChange(JZKnobEvent& Event)
 //-----------------------------------------------------------------------------
 void JZVelocityDialog::OnHelp(wxCommandEvent& Event)
 {
-  gpHelpInstance->ShowTopic("Velocity");
+  JZHelp::Instance().ShowTopic("Velocity");
 }

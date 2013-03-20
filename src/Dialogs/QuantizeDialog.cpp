@@ -230,5 +230,5 @@ void JZQuantizeDialog::OnDelayChange(JZKnobEvent& Event)
 //-----------------------------------------------------------------------------
 void JZQuantizeDialog::OnHelp(wxCommandEvent& Event)
 {
-  gpHelpInstance->ShowTopic("Quantize");
+  JZHelp::Instance().ShowTopic("Quantize");
 }

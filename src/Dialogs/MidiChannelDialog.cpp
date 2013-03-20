@@ -135,5 +135,5 @@ void JZMidiChannelDialog::OnMidiChannelChange(JZKnobEvent& Event)
 //-----------------------------------------------------------------------------
 void JZMidiChannelDialog::OnHelp(wxCommandEvent& Event)
 {
-  gpHelpInstance->ShowTopic("Set MIDI Channel");
+  JZHelp::Instance().ShowTopic("Set MIDI Channel");
 }

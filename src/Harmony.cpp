@@ -387,7 +387,7 @@ class JZHarmonyBrowserPlayerForm : public wxForm
     }
     void OnHelp()
     {
-      gpHelpInstance->ShowTopic("Harmony browser");
+      JZHelp::Instance().ShowTopic("Harmony browser");
     }
 };
 #endif
@@ -1889,7 +1889,7 @@ void JZHarmonyBrowserContextDlg::OnPlayButton()
 
 void JZHarmonyBrowserContextDlg::OnHelp()
 {
-  gpHelpInstance->ShowTopic("Edit chord");
+  JZHelp::Instance().ShowTopic("Edit chord");
 }
 
 
@@ -2380,7 +2380,7 @@ void JZHarmonyBrowserFrame::OnMouseHelp(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZHarmonyBrowserFrame::OnHelp(wxCommandEvent& Event)
 {
-//  gpHelpInstance->ShowTopic("Harmony browser");
+  JZHelp::Instance().ShowTopic("Harmony browser");
 }
 
 //-----------------------------------------------------------------------------

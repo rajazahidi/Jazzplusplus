@@ -78,5 +78,5 @@ JZMeterChangeDialog::JZMeterChangeDialog(wxWindow* pParent)
 //-----------------------------------------------------------------------------
 void JZMeterChangeDialog::OnHelp(wxCommandEvent& Event)
 {
-  gpHelpInstance->ShowTopic("Meterchange");
+  JZHelp::Instance().ShowTopic("Meterchange");
 }

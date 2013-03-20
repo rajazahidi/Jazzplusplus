@@ -581,7 +581,7 @@ void JZVisibleDlg::OnOk()
 
 void JZVisibleDlg::OnHelp()
 {
-  gpHelpInstance->ShowTopic("Events");
+  JZHelp::Instance().ShowTopic("Events");
 }
 
 

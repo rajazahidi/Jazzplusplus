@@ -136,7 +136,7 @@ class JZSmplWinSettingsForm : public wxForm
     }
     void OnHelp()
     {
-      gpHelpInstance->ShowTopic("Settings");
+      JZHelp::Instance().ShowTopic("Settings");
     }
   private:
     JZSampleFrame& mpSampleFrame;
@@ -521,5 +521,3 @@ void JZSampleWindow::Play()
     playpos->StartListen(fr_smpl, to_smpl);
   }
 }
-
-

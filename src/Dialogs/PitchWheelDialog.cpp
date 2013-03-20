@@ -83,5 +83,5 @@ bool JZPitchWheelDialog::TransferDataFromWindow()
 //-----------------------------------------------------------------------------
 void JZPitchWheelDialog::OnHelp(wxCommandEvent& Event)
 {
-  gpHelpInstance->ShowTopic("Pitch Wheel Dialog");
+  JZHelp::Instance().ShowTopic("Pitch Wheel Dialog");
 }

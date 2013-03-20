@@ -129,5 +129,5 @@ JZSearchAndReplaceDialog::JZSearchAndReplaceDialog(
 //-----------------------------------------------------------------------------
 void JZSearchAndReplaceDialog::OnHelp(wxCommandEvent& Event)
 {
-  gpHelpInstance->ShowTopic("Search Replace");
+  JZHelp::Instance().ShowTopic("Search Replace");
 }

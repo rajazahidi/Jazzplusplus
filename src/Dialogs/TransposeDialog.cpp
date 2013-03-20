@@ -171,5 +171,5 @@ void JZTransposeDialog::OnAmountChange(JZKnobEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTransposeDialog::OnHelp(wxCommandEvent& Event)
 {
-  gpHelpInstance->ShowTopic("Transpose");
+  JZHelp::Instance().ShowTopic("Transpose");
 }

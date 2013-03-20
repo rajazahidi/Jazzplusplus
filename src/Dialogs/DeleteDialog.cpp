@@ -89,5 +89,5 @@ bool JZDeleteDialog::TransferDataFromWindow()
 //-----------------------------------------------------------------------------
 void JZDeleteDialog::OnHelp(wxCommandEvent& Event)
 {
-  gpHelpInstance->ShowTopic("Delete");
+  JZHelp::Instance().ShowTopic("Delete");
 }

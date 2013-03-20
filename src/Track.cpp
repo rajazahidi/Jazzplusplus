@@ -1670,7 +1670,7 @@ void JZTrackDlg::OnCancel()
 
 void JZTrackDlg::OnHelp()
 {
-  gpHelpInstance->ShowTopic("Trackname, midi channel etc");
+  JZHelp::Instance().ShowTopic("Trackname, midi channel etc");
 }
 
 void JZTrackDlg::OnOk()

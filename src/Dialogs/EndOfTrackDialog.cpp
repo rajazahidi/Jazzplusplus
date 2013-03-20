@@ -114,5 +114,5 @@ bool JZEndOfTrackDialog::TransferDataFromWindow()
 //-----------------------------------------------------------------------------
 void JZEndOfTrackDialog::OnHelp(wxCommandEvent& Event)
 {
-  gpHelpInstance->ShowTopic("Template");
+  JZHelp::Instance().ShowTopic("Template");
 }

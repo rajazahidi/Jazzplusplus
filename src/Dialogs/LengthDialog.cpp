@@ -246,5 +246,5 @@ void JZLengthDialog::OnLengthStopChange(JZKnobEvent& Event)
 //-----------------------------------------------------------------------------
 void JZLengthDialog::OnHelp(wxCommandEvent& Event)
 {
-  gpHelpInstance->ShowTopic("Length");
+  JZHelp::Instance().ShowTopic("Length");
 }

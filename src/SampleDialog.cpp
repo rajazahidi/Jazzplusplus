@@ -671,8 +671,8 @@ void JZSynthDlg::OnMenuCommand(int id)
       break;
 
     case SYN_HELP:
-      gpHelpInstance->ShowTopic("{Additive Synthesis");
-    break;
+      JZHelp::Instance().ShowTopic("{Additive Synthesis");
+      break;
   }
 }
 
@@ -921,7 +921,7 @@ JZReverbForm::JZReverbForm(JZSampleFrame& SampleFrame)
 
 void JZReverbForm::OnHelp()
 {
-  gpHelpInstance->ShowTopic("Reverb");
+  JZHelp::Instance().ShowTopic("Reverb");
 }
 
 
@@ -1038,7 +1038,7 @@ JZShifterForm::JZShifterForm(JZSampleFrame& SampleFrame)
 
 void JZShifterForm::OnHelp()
 {
-  gpHelpInstance->ShowTopic("Pitch shifter");
+  JZHelp::Instance().ShowTopic("Pitch shifter");
 }
 
 
@@ -1149,7 +1149,7 @@ JZSplFilterForm::JZSplFilterForm(JZSampleFrame& SampleFrame, bool p)
 
 void JZSplFilterForm::OnHelp()
 {
-  gpHelpInstance->ShowTopic("Filter");
+  JZHelp::Instance().ShowTopic("Filter");
 }
 
 
@@ -1259,7 +1259,7 @@ JZWahSettingsForm::JZWahSettingsForm(
 
 void JZWahSettingsForm::OnHelp()
 {
-  gpHelpInstance->ShowTopic("Settings");
+  JZHelp::Instance().ShowTopic("Settings");
 }
 
 void JZWahSettingsForm::OnOk()
@@ -1307,7 +1307,7 @@ void JZSplPitchForm::OnCancel()
 
 void JZSplPitchForm::OnHelp()
 {
-  gpHelpInstance->ShowTopic("Settings");
+  JZHelp::Instance().ShowTopic("Settings");
 }
 
 
@@ -1390,7 +1390,7 @@ void JZChorusForm::OnCancel()
 
 void JZChorusForm::OnHelp()
 {
-  gpHelpInstance->ShowTopic("Chorus");
+  JZHelp::Instance().ShowTopic("Chorus");
 }
 
 // -----------------------------------------------------------------------
@@ -1473,7 +1473,7 @@ JZStretcherForm::JZStretcherForm(JZSampleFrame& SampleFrame)
 
 void JZStretcherForm::OnHelp()
 {
-  gpHelpInstance->ShowTopic("Time Stretcher");
+  JZHelp::Instance().ShowTopic("Time Stretcher");
 }
 
 

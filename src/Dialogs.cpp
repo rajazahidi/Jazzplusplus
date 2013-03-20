@@ -87,7 +87,7 @@ using namespace std;
 //-----------------------------------------------------------------------------
 //void JZShiftDlg::OnHelp()
 //{
-//  gpHelpInstance->ShowTopic("Shift");
+//  JZHelp::Instance().ShowTopic("Shift");
 //}
 
 //-----------------------------------------------------------------------------
@@ -180,7 +180,7 @@ bool JZSeqLengthDlg::OnClose()
 
 void JZSeqLengthDlg::OnHelp()
 {
-  gpHelpInstance->ShowTopic("SeqLength");
+  JZHelp::Instance().ShowTopic("SeqLength");
 }
 
 
@@ -224,7 +224,7 @@ bool JZMidiDelayDlg::OnClose()
 
 void JZMidiDelayDlg::OnHelp()
 {
-  gpHelpInstance->ShowTopic("MidiDelay");
+  JZHelp::Instance().ShowTopic("MidiDelay");
 }
 
 
@@ -310,7 +310,7 @@ void JZMidiDelayDlg::AddProperties()
 
 //void JZEventDlg::OnHelp()
 //{
-//  gpHelpInstance->ShowTopic("Piano Window");
+//  JZHelp::Instance().ShowTopic("Piano Window");
 //}
 
 // -------------------------------- Play track ---------------------------

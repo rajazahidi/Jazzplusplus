@@ -782,9 +782,9 @@ void JZSampleFrame::OnMenuCommand(int id)
       }
       break;
 
-  case MEN_HELP:
-    gpHelpInstance->ShowTopic("Sample Editor");
-    break;
+    case MEN_HELP:
+      JZHelp::Instance().ShowTopic("Sample Editor");
+      break;
 
     default:
       break;

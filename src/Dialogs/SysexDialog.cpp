@@ -205,5 +205,5 @@ bool JZSysexDialog::TransferDataFromWindow()
 //-----------------------------------------------------------------------------
 void JZSysexDialog::OnHelp(wxCommandEvent& Event)
 {
-  gpHelpInstance->ShowTopic("Sysex Dialog");
+  JZHelp::Instance().ShowTopic("Sysex Dialog");
 }

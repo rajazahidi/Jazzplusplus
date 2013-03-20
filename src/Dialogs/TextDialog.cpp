@@ -130,5 +130,5 @@ bool JZTextDialog::TransferDataFromWindow()
 //-----------------------------------------------------------------------------
 void JZTextDialog::OnHelp(wxCommandEvent& Event)
 {
-  gpHelpInstance->ShowTopic("Text Dialog");
+  JZHelp::Instance().ShowTopic("Text Dialog");
 }

@@ -28,6 +28,7 @@
 #include "Dialogs/SynthesizerSettingsDialog.h"
 #include "Globals.h"
 #include "Harmony.h"
+#include "Help.h"
 #include "JazzPlusPlusApplication.h"
 #include "Player.h"
 #include "Project.h"
@@ -814,7 +815,7 @@ void JZTrackFrame::OnAudioNewSampleSet(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnHelpContents(wxCommandEvent& Event)
 {
-  ::wxGetApp().DisplayHelpContents();
+  JZHelp::Instance().DisplayHelpContents();
 }
 
 //-----------------------------------------------------------------------------

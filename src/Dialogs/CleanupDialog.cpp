@@ -152,5 +152,5 @@ bool JZCleanupDialog::TransferDataFromWindow()
 //-----------------------------------------------------------------------------
 void JZCleanupDialog::OnHelp(wxCommandEvent& Event)
 {
-  gpHelpInstance->ShowTopic("Cleanup");
+  JZHelp::Instance().ShowTopic("Cleanup");
 }

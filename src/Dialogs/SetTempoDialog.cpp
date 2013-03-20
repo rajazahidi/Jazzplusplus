@@ -139,5 +139,5 @@ bool JZSetTempoDialog::TransferDataFromWindow()
 //-----------------------------------------------------------------------------
 void JZSetTempoDialog::OnHelp(wxCommandEvent& Event)
 {
-  gpHelpInstance->ShowTopic("Set Tempo Dialog");
+  JZHelp::Instance().ShowTopic("Set Tempo Dialog");
 }

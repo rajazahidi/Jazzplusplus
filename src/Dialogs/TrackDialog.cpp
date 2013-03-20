@@ -22,6 +22,7 @@
 
 #include "../Configuration.h"
 #include "../Globals.h"
+#include "../Help.h"
 #include "../Knob.h"
 #include "../Resources.h"
 #include "../Track.h"
@@ -232,5 +233,5 @@ void JZTrackDialog::OnChannelChange(JZKnobEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackDialog::OnHelp(wxCommandEvent& Event)
 {
-//  gpHelpInstance->ShowTopic("Track Dialog");
+  JZHelp::Instance().ShowTopic("Track Dialog");
 }

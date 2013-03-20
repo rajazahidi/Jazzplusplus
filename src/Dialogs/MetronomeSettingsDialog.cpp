@@ -22,6 +22,7 @@
 
 #include "../Configuration.h"
 #include "../Globals.h"
+#include "../Help.h"
 #include "../Knob.h"
 #include "../Metronome.h"
 #include "../Resources.h"
@@ -264,5 +265,5 @@ void JZMetronomeSettingsDialog::OnVolumeChange(JZKnobEvent& Event)
 //-----------------------------------------------------------------------------
 void JZMetronomeSettingsDialog::OnHelp(wxCommandEvent& Event)
 {
-//  gpHelpInstance->ShowTopic("Metronome Settings");
+  JZHelp::Instance().ShowTopic("Metronome Settings");
 }

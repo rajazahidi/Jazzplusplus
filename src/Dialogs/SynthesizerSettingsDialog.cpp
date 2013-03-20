@@ -22,6 +22,7 @@
 
 #include "../Configuration.h"
 #include "../Globals.h"
+#include "../Help.h"
 
 #include <wx/button.h>
 #include <wx/listbox.h>
@@ -167,5 +168,5 @@ bool JZSynthesizerDialog::TransferDataFromWindow()
 //-----------------------------------------------------------------------------
 void JZSynthesizerDialog::OnHelp(wxCommandEvent& Event)
 {
-//  gpHelpInstance->ShowTopic("Synthesizer Type Settings");
+  JZHelp::Instance().ShowTopic("Synthesizer Type Settings");
 }

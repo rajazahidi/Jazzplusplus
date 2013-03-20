@@ -22,6 +22,7 @@
 
 #include "../Command.h"
 #include "../Filter.h"
+#include "../Help.h"
 #include "../ProjectManager.h"
 
 #include <wx/button.h>
@@ -124,5 +125,5 @@ bool JZShiftDialog::TransferDataFromWindow()
 //-----------------------------------------------------------------------------
 void JZShiftDialog::OnHelp(wxCommandEvent& Event)
 {
-//  gpHelpInstance->ShowTopic("Shift Dialog");
+  JZHelp::Instance().ShowTopic("Shift Dialog");
 }

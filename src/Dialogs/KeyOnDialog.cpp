@@ -22,6 +22,7 @@
 
 #include "../Events.h"
 #include "../Globals.h"
+#include "../Help.h"
 #include "../KeyStringConverters.h"
 #include "../Knob.h"
 #include "../Project.h"
@@ -277,5 +278,5 @@ void JZKeyOnDialog::OnChannelChange(JZKnobEvent& Event)
 //-----------------------------------------------------------------------------
 void JZKeyOnDialog::OnHelp(wxCommandEvent& Event)
 {
-//  gpHelpInstance->ShowTopic("Key On Dialog");
+  JZHelp::Instance().ShowTopic("Key On Dialog");
 }

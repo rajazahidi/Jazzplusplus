@@ -21,6 +21,7 @@
 #include "FilterDialog.h"
 
 #include "../Filter.h"
+#include "../Help.h"
 #include "IntegerEdit.h"
 
 #include <wx/button.h>
@@ -533,5 +534,5 @@ bool JZFilterDialog::TransferDataFromWindow()
 //-----------------------------------------------------------------------------
 void JZFilterDialog::OnHelp(wxCommandEvent& Event)
 {
-//  gpHelpInstance->ShowTopic("Filter Dialog");
+  JZHelp::Instance().ShowTopic("Filter Dialog");
 }

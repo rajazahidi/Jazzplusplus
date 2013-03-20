@@ -24,6 +24,7 @@
 
 #include "GuitarWindow.h"
 #include "GuitarSettingsDialog.h"
+#include "Help.h"
 #include "ProjectManager.h"
 #include "Resources.h"
 
@@ -128,7 +129,7 @@ void JZGuitarFrame::OnSettings(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZGuitarFrame::OnHelp(wxCommandEvent& event)
 {
-//  gpHelpInstance->ShowTopic("Guitar board");
+  JZHelp::Instance().ShowTopic("Guitar board");
 }
 
 //-----------------------------------------------------------------------------

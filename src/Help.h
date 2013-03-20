@@ -35,17 +35,36 @@ class JZHelp
 {
   public:
 
-    JZHelp(const char* pHelpFleName);
+    static JZHelp& Instance();
 
-    ~JZHelp();
+    void ConfigureHelp();
 
-    void ShowTopic(const char* pTopic);
+    void ShowTopic(const wxString& TopicString);
 
-    void DisplayContents();
+    void DisplayHelpContents();
+
+    void CloseHelp();
 
   private:
 
-    wxHtmlHelpController* mpHelp;
+    JZHelp();
 
-    wxString mHelpFile;
+    ~JZHelp();
+
+    bool FindAndRegisterHelpFilePath(wxString& HelpFilePath) const;
+
+  private:
+
+    static wxString mHelpFileName;
+
+    wxHtmlHelpController* mpHelp;
 };
+
+//*****************************************************************************
+//*****************************************************************************
+inline
+JZHelp& JZHelp::Instance()
+{
+  static JZHelp JazzHelp;
+  return JazzHelp;
+}

@@ -110,7 +110,13 @@
 #define ID_TOOLS_HARMONY_BROWSER             (wxID_HIGHEST + 95)
 #define ID_TOOLS_RHYTHM_GENERATOR            (wxID_HIGHEST + 96)
 
-#define ID_HELP_PIANO_WINDOW                 (wxID_HIGHEST + 100)
+#define ID_INSTRUMENT_ADD                    (wxID_HIGHEST + 100)
+#define ID_INSTRUMENT_DELETE                 (wxID_HIGHEST + 101)
+#define ID_INSTRUMENT_UP                     (wxID_HIGHEST + 102)
+#define ID_INSTRUMENT_DOWN                   (wxID_HIGHEST + 103)
+#define ID_INSTRUMENT_GENERATE               (wxID_HIGHEST + 104)
+
+#define ID_HELP_PIANO_WINDOW                 (wxID_HIGHEST + 108)
 
 #define MEN_CLEAR                            (wxID_HIGHEST + 110)
 #define ID_VIEW_SETTINGS                     (wxID_HIGHEST + 120)

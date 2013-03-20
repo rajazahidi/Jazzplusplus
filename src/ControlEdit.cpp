@@ -74,7 +74,8 @@ void JZCtrlEditBase::Create(
   //(void) new wxMessage(panel, (char *)label);
   //panel->NewLine();
 
-  // PORTING: changed the calls a bit so it would compile, need to remake the layout and do the event bindings
+  // PORTING: changed the calls a bit so it would compile,
+  // need to remake the layout and do the event bindings
 
   ctrlmode = 0;  // Edit seems stupid to me.
 
@@ -97,8 +98,7 @@ void JZCtrlEditBase::Create(
     //(void)new wxButton(panel, (wxFunction)Bars,   "Bars");
   }
   ctrlmode = 0;
-  // ab hier dient ctrlmode zur Unterscheidung zwischen
-  // Apply und Edit.
+  // ctrlmode is used to distinguish between Apply and Edit.
 
   edit = new JZArrayEdit((wxFrame *)mpPianoWindow, array, x+dx, y, w - dx, h, 0);
   edit->SetLabel(label);

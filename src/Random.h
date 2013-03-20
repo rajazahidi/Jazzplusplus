@@ -126,13 +126,13 @@ class JZRndArray
 };
 
 
-#define ARED_GAP        1
+#define ARED_GAP            1
 #define ARED_XTICKS         2
-#define ARED_YTICKS        4
-#define ARED_MINMAX        8
+#define ARED_YTICKS         4
+#define ARED_MINMAX         8
 #define ARED_RHYTHM        16
-#define ARED_BLOCKS     32
-#define ARED_LINES      64
+#define ARED_BLOCKS        32
+#define ARED_LINES         64
 
 
 class JZArrayEditDrawBars

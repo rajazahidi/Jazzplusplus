@@ -274,6 +274,7 @@ Harmony.h \
 HarmonyP.h \
 Help.h \
 JazzPlusPlusApplication.h \
+JazzPlusPlusVersion.h \
 KeyStringConverters.h \
 Mapper.h \
 MeasureChoice.h \

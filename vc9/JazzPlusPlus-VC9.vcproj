@@ -654,6 +654,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\JazzPlusPlusVersion.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\KeyStringConverters.cpp"
 				>
 			</File>

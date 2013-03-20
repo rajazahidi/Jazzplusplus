@@ -31,6 +31,7 @@
 #include "Help.h"
 #include "KeyStringConverters.h"
 #include "PianoWindow.h"
+#include "Resources.h"
 #include "SelectControllerDialog.h"
 #include "Song.h"
 #include "StringReadWrite.h"
@@ -495,11 +496,6 @@ void JZRhythm::Generate(
 
 
 #define MEN_HELP  4
-#define MEN_ADD   5
-#define MEN_DEL   6
-#define MEN_GEN   7
-#define MEN_UP    8
-#define MEN_DOWN  9
 
 
 //#include "Bitmaps/open.xpm"
@@ -536,13 +532,13 @@ JZRhythmWindow::JZRhythmWindow(JZEventWindow* pEventWindow, JZSong* pSong)
     { wxID_OPEN, FALSE, open_xpm,    "open rhythm file" },
     { wxID_SAVE, FALSE, save_xpm,    "save into rhythm file" },
     { JZToolBar::eToolBarSeparator },
-    { MEN_ADD,  FALSE, rrgadd_xpm,  "add instrument" },
-    { MEN_DEL,  FALSE, rrgdel_xpm,  "remove instrument" },
-    { MEN_UP,   FALSE, rrgup_xpm,   "move instrument up" },
-    { MEN_DOWN, FALSE, rrgdown_xpm, "move instrument down" },
-    { MEN_GEN,  FALSE, rrggen_xpm,  "generate events into trackwin selection" },
+    { ID_INSTRUMENT_ADD,      FALSE, rrgadd_xpm,  "add instrument" },
+    { ID_INSTRUMENT_DELETE,   FALSE, rrgdel_xpm,  "remove instrument" },
+    { ID_INSTRUMENT_UP,       FALSE, rrgup_xpm,   "move instrument up" },
+    { ID_INSTRUMENT_DOWN,     FALSE, rrgdown_xpm, "move instrument down" },
+    { ID_INSTRUMENT_GENERATE, FALSE, rrggen_xpm,  "generate events into trackwin selection" },
     { JZToolBar::eToolBarSeparator },
-    { MEN_HELP, FALSE, help_xpm,    "help" },
+    { wxID_HELP_CONTENTS,     FALSE, help_xpm,    "help" },
     { JZToolBar::eToolBarEnd }
   };
 
@@ -563,16 +559,16 @@ JZRhythmWindow::JZRhythmWindow(JZEventWindow* pEventWindow, JZSong* pSong)
   menu_bar->Append(menu,  "&File");
 
   menu = new wxMenu;
-  menu->Append(MEN_ADD,         "&Add");
-  menu->Append(MEN_DEL,         "&Delete");
-  menu->Append(MEN_UP,          "&Up");
-  menu->Append(MEN_DOWN,        "&Down");
-  menu->Append(MEN_GEN,         "&Generate");
-  menu_bar->Append(menu,        "&Instrument");
+  menu->Append(ID_INSTRUMENT_ADD,      "&Add");
+  menu->Append(ID_INSTRUMENT_DELETE,   "&Delete");
+  menu->Append(ID_INSTRUMENT_UP,       "&Up");
+  menu->Append(ID_INSTRUMENT_DOWN,     "&Down");
+  menu->Append(ID_INSTRUMENT_GENERATE, "&Generate");
+  menu_bar->Append(menu,        &Instrument");
 
   menu = new wxMenu;
-  menu->Append(MEN_HELP,        "&Help");
-  menu_bar->Append(menu,        "Help");
+  menu->Append(wxID_HELP, "&Help");
+  menu_bar->Append(menu,  "Help");
 
   SetMenuBar(menu_bar);
 
@@ -747,10 +743,6 @@ void JZRhythmWindow::OnMenuCommand(int id)
 {
   switch (id)
   {
-    case MEN_HELP:
-      Help();
-      break;
-
     case wxID_CLOSE:
         // motif crashes, when Show(FALSE) is called before destructor!
       // Show(FALSE);
@@ -792,25 +784,24 @@ void JZRhythmWindow::OnMenuCommand(int id)
       }
       break;
 
-    case MEN_ADD:
+    case ID_INSTRUMENT_ADD:
       AddInstrumentDlg();
       break;
-    case MEN_DEL:
+    case ID_INSTRUMENT_DELETE:
       DelInstrument();
       break;
-    case MEN_GEN:
+    case ID_INSTRUMENT_GENERATE:
       wxBeginBusyCursor();
       Win2Instrument();
       GenRhythm();
       wxEndBusyCursor();
       break;
-    case MEN_UP:
+    case ID_INSTRUMENT_UP:
       UpInstrument();
       break;
-    case MEN_DOWN:
+    case ID_INSTRUMENT_DOWN:
       DownInstrument();
       break;
-
   }
 }
 
@@ -1122,12 +1113,6 @@ void JZRhythmWindow::GenRhythm()
   mpEventWindow->Refresh();
 }
 
-
-void JZRhythmWindow::Help()
-{
-  gpHelpInstance->ShowTopic("Random rhythm generator");
-}
-
 #ifdef OBSOLETE
 
 void JZRhythmWindow::ItemCallback(wxItem& item, wxCommandEvent& event)
@@ -1353,6 +1338,16 @@ JZRhythmGeneratorWindow::JZRhythmGeneratorWindow(
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+BEGIN_EVENT_TABLE(JZRhythmGeneratorFrame, wxFrame)
+
+  EVT_MENU(wxID_HELP, JZRhythmGeneratorFrame::OnHelp)
+
+  EVT_MENU(wxID_HELP_CONTENTS, JZRhythmGeneratorFrame::OnHelpContents)
+
+END_EVENT_TABLE()
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZRhythmGeneratorFrame::JZRhythmGeneratorFrame()
   : wxFrame(
       0,
@@ -1369,8 +1364,21 @@ JZRhythmGeneratorFrame::JZRhythmGeneratorFrame()
   pFileMenu->Append(wxID_SAVEAS, "Save &As...");
   pFileMenu->Append(wxID_CLOSE, "&Close");
 
+  wxMenu* pInstrumentMenu = new wxMenu;
+  pInstrumentMenu->Append(ID_INSTRUMENT_ADD, "&Add");
+  pInstrumentMenu->Append(ID_INSTRUMENT_DELETE, "&Delete");
+  pInstrumentMenu->Append(ID_INSTRUMENT_UP, "&Up");
+  pInstrumentMenu->Append(ID_INSTRUMENT_DOWN, "&Down");
+  pInstrumentMenu->Append(ID_INSTRUMENT_GENERATE, "&Generate");
+
+  wxMenu* mpHelpMenu = new wxMenu;
+  mpHelpMenu->Append(wxID_HELP_CONTENTS, "&Contents");
+  mpHelpMenu->Append(wxID_HELP, "&Help");
+
   wxMenuBar* pMenuBar = new wxMenuBar;
   pMenuBar->Append(pFileMenu, "&File");
+  pMenuBar->Append(pInstrumentMenu, "&Instrument");
+  pMenuBar->Append(mpHelpMenu, "&Help");
 
   SetMenuBar(pMenuBar);
 
@@ -1387,6 +1395,20 @@ JZRhythmGeneratorFrame::~JZRhythmGeneratorFrame()
   delete mpRhythmGeneratorWindow;
 
   gpRhythmGeneratorFrame = 0;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZRhythmGeneratorFrame::OnHelp(wxCommandEvent&)
+{
+  JZHelp::Instance().ShowTopic("Random rhythm generator");
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZRhythmGeneratorFrame::OnHelpContents(wxCommandEvent&)
+{
+  JZHelp::Instance().DisplayHelpContents();
 }
 
 //*****************************************************************************

@@ -221,7 +221,6 @@ class JZRhythmWindow : public wxFrame
     static void Add(wxButton &but, wxCommandEvent& event);
     static void Del(wxButton &but, wxCommandEvent& event);
     static void Generate(wxButton &but, wxCommandEvent& event);
-    static void Help();
 
     void Instrument2Win(int i = -1);        // instrument[act_instrument] -> win
     void Win2Instrument(int i = -1);        // win -> instrument[act_instrument]
@@ -276,7 +275,15 @@ class JZRhythmGeneratorFrame : public wxFrame
 
   private:
 
+    void OnHelp(wxCommandEvent& Event);
+
+    void OnHelpContents(wxCommandEvent& Event);
+
+  private:
+
     JZRhythmGeneratorWindow* mpRhythmGeneratorWindow;
+
+  DECLARE_EVENT_TABLE()
 };
 
 extern void CreateRhythmGenerator();

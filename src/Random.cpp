@@ -263,12 +263,10 @@ istream & operator >> (istream &is, JZRndArray &a)
 JZArrayEdit::JZArrayEdit(
   wxFrame *frame,
   JZRndArray &ar,
-  int xx,
-  int yy,
-  int ww,
-  int hh,
+  const wxPoint& Position,
+  const wxSize& Size,
   int StyleBits)
-  : wxScrolledWindow(frame, wxID_ANY, wxPoint(xx, yy), wxSize(ww, hh)),
+  : wxScrolledWindow(frame, wxID_ANY, Position, Size),
     mArray(ar),
     n(ar.n),
     min(ar.min),
@@ -286,8 +284,8 @@ JZArrayEdit::JZArrayEdit(
 
   x = 0;        // draw to topleft corner of canvas
   y = 0;
-  w = ww;
-  h = hh;
+  w = Size.GetWidth();
+  h = Size.GetHeight();
 
   int tw, th;
 
@@ -785,12 +783,10 @@ void JZArrayEdit::DrawBarLine(wxDC& Dc, int xx)
 JZRhyArrayEdit::JZRhyArrayEdit(
   wxFrame *parent,
   JZRndArray& Array,
-  int xx,
-  int yy,
-  int ww,
-  int hh,
+  const wxPoint& Position,
+  const wxSize& Size,
   int StyleBits)
-  : JZArrayEdit(parent, Array, xx, yy, ww, hh, StyleBits)
+  : JZArrayEdit(parent, Array, Position, Size, StyleBits)
 {
   steps_per_count = 4;
   count_per_bar   = 4;

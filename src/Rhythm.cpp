@@ -1303,30 +1303,24 @@ JZRhythmGeneratorWindow::JZRhythmGeneratorWindow(
   mpLengthEdit = new JZArrayEdit(
     pParent,
     mRhythm.length,
-    x,
-    y + Height / 2,
-    Width / 2,
-    Height / 4 - 4);
+    wxPoint(x, y + Height / 2),
+    wxSize(Width / 2, Height / 4 - 4));
   mpLengthEdit->SetXMinMax(1, 8);
   mpLengthEdit->SetLabel("length/interval");
 
   mpVelocityEdit = new JZArrayEdit(
     pParent,
     mRhythm.veloc,
-    x + Width / 2,
-    y + Height / 2,
-    Width / 2,
-    Height / 4 - 4);
+    wxPoint(x + Width / 2, y + Height / 2),
+    wxSize(Width / 2, Height / 4 - 4));
   mpVelocityEdit->SetXMinMax(1, 127);
   mpVelocityEdit->SetLabel("velocity");
 
   mpRhythmEdit = new JZRhyArrayEdit(
     pParent,
     mRhythm.rhythm,
-    x,
-    y + 3 * Height / 4,
-    Width,
-    Height/ 4 - 4);
+    wxPoint(x, y + 3 * Height / 4),
+    wxSize(Width, Height/ 4 - 4));
   mpRhythmEdit->SetMeter(
     mRhythm.steps_per_count,
     mRhythm.count_per_bar,

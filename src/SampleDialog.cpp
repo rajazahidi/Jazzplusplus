@@ -78,7 +78,7 @@ class JZEquArrayEdit : public JZRhyArrayEdit
   public:
 
     JZEquArrayEdit(JZEqualizer *parent, JZRndArray &arr, int style)
-      : JZRhyArrayEdit(parent, arr, 10, 10, 10, 10, style),
+      : JZRhyArrayEdit(parent, arr, wxPoint(10, 10), wxSize(10, 10), style),
         equ(*parent)
     {
     }
@@ -245,7 +245,8 @@ void JZDistortion::AddItems()
 void JZDistortion::AddEdits()
 {
   n_sliders = 1;
-  sliders[0] = new JZRhyArrayEdit(this, arr, 10,10,10,10, ARED_LINES);
+  sliders[0] =
+    new JZRhyArrayEdit(this, arr, wxPoint(10, 10), wxSize(10, 10), ARED_LINES);
 }
 
 #ifdef OBSOLETE
@@ -374,9 +375,16 @@ class JZAddSynthArray
     {
       int i;
       arr.SetNull(ynul);
-      for (i = 0; i < n; i++)
+      for (i = 0; i < n; ++i)
+      {
         arr[i] = ynul;
-      edit = new JZRhyArrayEdit(parent, arr, 10,10,10,10, style);
+      }
+      edit = new JZRhyArrayEdit(
+        parent,
+        arr,
+        wxPoint(10, 10),
+        wxSize(10, 10),
+        style);
       edit->SetLabel(label);
     }
     void Show(bool x)

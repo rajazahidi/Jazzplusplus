@@ -160,8 +160,15 @@ void JZSliderWindow::AddEdits()
 {
   n_sliders = 2;
   sliders_per_row = 2;
-  for (int i = 0; i < n_sliders; i++)
-    sliders[i] = new JZRhyArrayEdit(this, *new JZRndArray(20, 0, 100), 10, 10, 10, 10, (ARED_GAP | ARED_XTICKS));
+  for (int i = 0; i < n_sliders; ++i)
+  {
+    sliders[i] = new JZRhyArrayEdit(
+      this,
+      *new JZRndArray(20, 0, 100),
+      wxPoint(10, 10),
+      wxSize(10, 10),
+      ARED_GAP | ARED_XTICKS);
+  }
 }
 
 #ifdef OBSOLETE

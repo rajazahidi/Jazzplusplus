@@ -183,10 +183,8 @@ class JZArrayEdit : public wxScrolledWindow
     JZArrayEdit(
       wxFrame* pParent,
       JZRndArray& Array,
-      int xx,
-      int yy,
-      int ww,
-      int hh,
+      const wxPoint& Position,
+      const wxSize& Size,
       int StyleBits = (ARED_GAP | ARED_XTICKS));
 
     virtual ~JZArrayEdit();
@@ -229,10 +227,8 @@ class JZRhyArrayEdit : public JZArrayEdit
     JZRhyArrayEdit(
       wxFrame *parent,
       JZRndArray& Array,
-      int xx,
-      int yy,
-      int ww,
-      int hh,
+      const wxPoint& Position,
+      const wxSize& Size,
       int StyleBits = (ARED_GAP | ARED_XTICKS | ARED_RHYTHM));
 
     void SetMeter(int steps_per_count, int count_per_bar, int n_bars);

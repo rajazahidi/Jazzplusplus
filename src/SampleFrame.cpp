@@ -333,7 +333,8 @@ bool JZSampleFrame::HaveSelection(
 //-----------------------------------------------------------------------------
 void JZSampleFrame::AddParam(JZRndArray *array, const char *label)
 {
-  params[num_params] = new JZArrayEdit(this, *array, 0, 0, 10, 10, 0);
+  params[num_params] =
+    new JZArrayEdit(this, *array, wxPoint(0, 0), wxSize(10, 10), 0);
   params[num_params]->SetLabel(label);
   num_params++;
   int cw, ch;

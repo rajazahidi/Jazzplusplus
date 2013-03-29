@@ -235,10 +235,10 @@ ostream & operator << (ostream &os, JZRndArray const &a)
 {
   int i;
 
-  os << a.n << " " << a.min << " " << a.max << endl;
+  os << a.n << ' ' << a.min << ' ' << a.max << endl;
   for (i = 0; i < a.n; i++)
   {
-    os << a.mArray[i] << " ";
+    os << a.mArray[i] << ' ';
   }
   os << endl;
   return os;

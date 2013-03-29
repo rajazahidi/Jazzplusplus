@@ -475,7 +475,7 @@ int JZSampleSet::FillBuffers(long last_clock)
   }
 
   // iterate the events and add sounding voices
-  while (event_index < events->nEvents)
+  while (event_index < events->mEventCount)
   {
     JZEvent* pEvent = events->mppEvents[event_index];
     if (pEvent->GetClock() >= last_clock)
@@ -1012,7 +1012,7 @@ void JZSampleSet::AddNote(const string& FileName, long frc, long toc)
   // add a noteon
   JZKeyOnEvent* pKeyOn = new JZKeyOnEvent(
     frc,
-    track->Channel - 1,
+    track->mChannel - 1,
     key,
     64,
     (unsigned short)(toc - frc));

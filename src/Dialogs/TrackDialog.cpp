@@ -177,10 +177,10 @@ bool JZTrackDialog::TransferDataToWindow()
 
   ostringstream Oss;
 
-  Oss << (int)mTrack.Channel;
+  Oss << (int)mTrack.mChannel;
   mpChannelValue->SetLabel(Oss.str().c_str());
 
-  mpChannelKnob->SetValue(mTrack.Channel);
+  mpChannelKnob->SetValue(mTrack.mChannel);
 
   mpAudioModeCheckBox->SetValue(mTrack.GetAudioMode());
 
@@ -201,7 +201,7 @@ bool JZTrackDialog::TransferDataFromWindow()
     int Bank = (Selection & 0x0000ff00) >> 8;
     mTrack.SetPatch(Patch);
     mTrack.SetBank(Bank);
-    mTrack.Channel = mpChannelKnob->GetValue();
+    mTrack.mChannel = mpChannelKnob->GetValue();
     mTrack.SetAudioMode(mpAudioModeCheckBox->GetValue());
   }
 
@@ -216,7 +216,7 @@ void JZTrackDialog::OnChannelChange(JZKnobEvent& Event)
   ostringstream Oss;
   Oss << Value;
   mpChannelValue->SetLabel(Oss.str().c_str());
-  mTrack.Channel = Value;
+  mTrack.mChannel = Value;
 
   // Test to determine if the track channel toggled in our out of drum mode.
   if (mLastTrackChannelWasDrums != mTrack.IsDrumTrack())

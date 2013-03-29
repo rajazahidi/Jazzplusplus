@@ -146,8 +146,8 @@ JZMousePlay::JZMousePlay(JZPianoWindow* pPianoWindow)
     mChannel(-1),
     mpPianoWindow(pPianoWindow)
 {
-  mChannel = mpPianoWindow->GetTrack()->Channel ?
-    mpPianoWindow->GetTrack()->Channel - 1 : 0;
+  mChannel = mpPianoWindow->GetTrack()->mChannel ?
+    mpPianoWindow->GetTrack()->mChannel - 1 : 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -2319,7 +2319,7 @@ void JZPianoWindow::MouseEvents(wxMouseEvent& MouseEvent)
 
 
       case MA_DIALOG:
-        EventDialog(pEvent, this, mpTrack, Clock, mpTrack->Channel - 1, Pitch);
+        EventDialog(pEvent, this, mpTrack, Clock, mpTrack->mChannel - 1, Pitch);
         Refresh();
         break;
 
@@ -2422,8 +2422,8 @@ int JZPianoWindow::IsVisible(JZTrack* pTrack)
   }
 
   return
-    (mpTrack->Channel == gpConfig->GetValue(C_DrumChannel)) ==
-    (pTrack->Channel == gpConfig->GetValue(C_DrumChannel));
+    (mpTrack->mChannel == gpConfig->GetValue(C_DrumChannel)) ==
+    (pTrack->mChannel == gpConfig->GetValue(C_DrumChannel));
 }
 
 //=============================================================================
@@ -3143,7 +3143,7 @@ void JZPianoWindow::Copy(JZTrack* pTrack, JZEvent* pEvent, int Kill)
 //-----------------------------------------------------------------------------
 void JZPianoWindow::Paste(JZTrack* pTrack, int Clock, int Pitch)
 {
-  if (mPasteBuffer.nEvents == 0)
+  if (mPasteBuffer.mEventCount == 0)
   {
     int len = SnapClocks() - 4;
     if (len < 2)
@@ -3190,9 +3190,9 @@ void JZPianoWindow::Paste(JZTrack* pTrack, int Clock, int Pitch)
       JZEvent *c = pEvent->Copy();
       c->SetPitch(c->GetPitch() + DeltaPitch);
       c->SetClock(c->GetClock() + DeltaClock);
-      if (pTrack->ForceChannel && c->IsChannelEvent())
+      if (pTrack->mForceChannel && c->IsChannelEvent())
       {
-        c->IsChannelEvent()->SetChannel(pTrack->Channel - 1);
+        c->IsChannelEvent()->SetChannel(pTrack->mChannel - 1);
       }
       JZKeyOnEvent* pKeyOn = c->IsKeyOn();
       if (pKeyOn)
@@ -3250,7 +3250,7 @@ int JZPianoWindow::GetKeyOnEventCount()
 //-----------------------------------------------------------------------------
 int JZPianoWindow::Channel()
 {
-  return mpTrack->Channel ? mpTrack->Channel - 1 : 0;
+  return mpTrack->mChannel ? mpTrack->mChannel - 1 : 0;
 }
 
 //-----------------------------------------------------------------------------

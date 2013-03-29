@@ -566,7 +566,7 @@ void JZSong::SetTicksPerQuarter(int TicksPerQuarter)
   for (int TrackIndex = 0; TrackIndex < mTrackCount; ++TrackIndex)
   {
     JZTrack* pTrack = &mTracks[TrackIndex];
-    for (int EventIndex = 0; EventIndex < pTrack->nEvents; ++EventIndex)
+    for (int EventIndex = 0; EventIndex < pTrack->mEventCount; ++EventIndex)
     {
       JZEvent* pEvent = pTrack->mppEvents[EventIndex];
       pEvent->SetClock((int)(f * pEvent->GetClock() + 0.5));

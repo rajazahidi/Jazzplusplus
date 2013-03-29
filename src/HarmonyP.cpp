@@ -447,11 +447,11 @@ void JZHarmonyBrowserContext::Initialize()
 
 ostream & operator << (ostream &os, JZHarmonyBrowserContext const &a)
 {
-  os << (int) a.scale_type << " ";
-  os << a.scale_nr << " ";
-  os << a.chord_nr << " ";
-  os << a.seq_nr << " ";
-  os << a.chord_key << " ";
+  os << (int) a.scale_type << ' ';
+  os << a.scale_nr << ' ';
+  os << a.chord_nr << ' ';
+  os << a.seq_nr << ' ';
+  os << a.chord_key << ' ';
   os << a.chord << a.scale;
   return os;
 }
@@ -556,7 +556,7 @@ void db(const JZHarmonyBrowserChord c)
 {
   for (int i = 0; i < 12; i++)
     if (c.Contains(i))
-      cout << i << " ";
+      cout << i << ' ';
   cout << endl;
 }
 

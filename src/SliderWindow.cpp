@@ -135,8 +135,8 @@ void JZSliderWindow::OnSize(wxSizeEvent& Event)
       sliders[k]->SetSize((int)x0, (int)y0, (int)(x1 - x0), (int)(y1 - y0));
 //      sliders[k]->SetSize((int)x0, 0, (int)(x1 - x0), (int)(y0-y1));
       cout
-        << "slider " << k << " size:" << (int)x0 << " " << (int)y0
-        << " " << (int)(x1 - x0) << " " << (int)(y1 - y0)
+        << "slider " << k << " size:" << (int)x0 << ' ' << (int)y0
+        << ' ' << (int)(x1 - x0) << ' ' << (int)(y1 - y0)
         << endl;
     }
   }

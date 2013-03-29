@@ -832,7 +832,7 @@ void JZTrackWindow::DrawNumbers(wxDC& Dc)
             Value = i + 1;
             break;
           case eNmMidiChannel:
-            Value = pTrack->Channel;
+            Value = pTrack->mChannel;
             break;
           default:
             Value = 0;

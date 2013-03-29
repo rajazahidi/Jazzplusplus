@@ -54,8 +54,8 @@ using namespace std;
 
 void tRhyGroup::write(ostream& Os) const
 {
-  Os << listen << " ";
-  Os << contrib << " ";
+  Os << listen << ' ';
+  Os << contrib << ' ';
 }
 
 void tRhyGroup::read(istream& Is, int version)
@@ -169,19 +169,19 @@ void JZRhythm::write(ostream& Os) const
   Os << length;
   Os << veloc;
 
-  Os << steps_per_count << " ";
-  Os << count_per_bar << " ";
-  Os << n_bars << " ";
-  Os << mode << " ";
-  Os << n_keys << " ";
+  Os << steps_per_count << ' ';
+  Os << count_per_bar << ' ';
+  Os << n_bars << ' ';
+  Os << mode << ' ';
+  Os << n_keys << ' ';
   for (int i = 0; i < n_keys; i++)
   {
-    Os << keys[i] << " ";
+    Os << keys[i] << ' ';
   }
   Os << parm << endl;
   WriteString(Os, mLabel.c_str()) << endl;
 
-  Os << randomize << " ";
+  Os << randomize << ' ';
   groups.write(Os);
 }
 
@@ -267,9 +267,9 @@ void JZRhythm::GenInit(long frc)
 }
 
 
-void JZRhythm::GenerateEvent(JZTrack *track, long clock, short vel, short len)
+void JZRhythm::GenerateEvent(JZTrack* pTrack, long clock, short vel, short len)
 {
-  int chan = track->Channel - 1;
+  int chan = pTrack->mChannel - 1;
 
   // generate key events
   if (mode == MODE_ALL_OF)
@@ -277,7 +277,7 @@ void JZRhythm::GenerateEvent(JZTrack *track, long clock, short vel, short len)
     for (int ii = 0; ii < n_keys; ii++)
     {
       JZKeyOnEvent *k = new JZKeyOnEvent(clock, chan, keys[ii], vel, len);
-      track->Put(k);
+      pTrack->Put(k);
     }
   }
   else if (mode == MODE_ONE_OF)
@@ -286,14 +286,14 @@ void JZRhythm::GenerateEvent(JZTrack *track, long clock, short vel, short len)
     if (ii < n_keys)
     {
       JZKeyOnEvent *k = new JZKeyOnEvent(clock, chan, keys[ii], vel, len);
-      track->Put(k);
+      pTrack->Put(k);
     }
   }
   else if (mode == MODE_CONTROL)
   {
     // generate controller
     JZControlEvent* c = new JZControlEvent(clock, chan, parm - 1, vel);
-    track->Put(c);
+    pTrack->Put(c);
   }
   else
   {
@@ -303,9 +303,9 @@ void JZRhythm::GenerateEvent(JZTrack *track, long clock, short vel, short len)
 
 
 #if 0
-void JZRhythm::Generate(JZTrack *track, long fr_clock, long to_clock, long ticks_per_bar)
+void JZRhythm::Generate(JZTrack* pTrack, long fr_clock, long to_clock, long ticks_per_bar)
 {
-  int chan   = track->Channel - 1;
+  int chan   = pTrack->Channel - 1;
   long clock = fr_clock;
 
   long clocks_per_step = ticks_per_bar / (steps_per_count * count_per_bar);
@@ -348,7 +348,7 @@ void JZRhythm::Generate(JZTrack *track, long fr_clock, long to_clock, long ticks
           for (int j = 0; j < n_keys; j++)
           {
             JZKeyOnEvent *k = new JZKeyOnEvent(clock, chan, keys[j], vel, len - clocks_per_step/2);
-            track->Put(k);
+            pTrack->Put(k);
           }
         }
       }
@@ -357,13 +357,13 @@ void JZRhythm::Generate(JZTrack *track, long fr_clock, long to_clock, long ticks
       else if (key == PASTE_KEY)
       {
         JZEventArray &src = gpTrackWindow->GetPianoWindow()->PasteBuffer;
-        for (int ii = 0; ii < src.nEvents; ii++)
+        for (int ii = 0; ii < src.mEventCount; ii++)
         {
           JZKeyOnEvent* pKeyOn = src.Events[ii]->IsKeyOn();
           if (pKeyOn)
           {
             JZKeyOnEvent *k = new JZKeyOnEvent(clock, chan, pKeyOn->Key, vel, len - clocks_per_step / 2);
-            track->Put(k);
+            pTrack->Put(k);
           }
         }
       }
@@ -372,13 +372,13 @@ void JZRhythm::Generate(JZTrack *track, long fr_clock, long to_clock, long ticks
       else if (key == CONTROL_KEY)
       {
         JZControlEvent* c = new JZControlEvent(clock, chan, parm - 1, vel);
-        track->Put(c);
+        pTrack->Put(c);
       }
       // generate note on events
       else
       {
         JZKeyOnEvent *k = new JZKeyOnEvent(clock, chan, key, vel, len - clocks_per_step/2);
-        track->Put(k);
+        pTrack->Put(k);
       }
 
       clock += len;
@@ -425,7 +425,7 @@ void JZRhythm::GenGroup(
 
 
 void JZRhythm::Generate(
-  JZTrack* track,
+  JZTrack* pTrack,
   const JZBarInfo& BarInfo,
   JZRhythm* rhy[],
   int n_rhy)
@@ -480,7 +480,7 @@ void JZRhythm::Generate(
         vel = rrg[i] * 126 / rrg.Max() + 1;
       }
       short len = (length.Random() + 1) * clocks_per_step;
-      GenerateEvent(track, clock, vel, len - clocks_per_step/2);
+      GenerateEvent(pTrack, clock, vel, len - clocks_per_step/2);
       clock += len;
     }
     else
@@ -930,7 +930,7 @@ void JZRhythmWindow::AddInstrumentDlg()
       JZCommandCopyToBuffer cmd(gpTrackFrame->GetPianoWindow()->GetFilter(), &events);
       cmd.Execute(0);   // no UNDO
 
-      for (int ii = 0; ii < events.nEvents; ii++)
+      for (int ii = 0; ii < events.mEventCount; ii++)
       {
         JZKeyOnEvent* pKeyOn = events.mppEvents[ii]->IsKeyOn();
         if (pKeyOn)
@@ -1072,7 +1072,7 @@ void JZRhythmWindow::GenRhythm()
 
   long fr_clock = pFilter->GetFromClock();
   long to_clock = pFilter->GetToClock();
-  JZTrack *track = mpSong->GetTrack(pFilter->GetFromTrack());
+  JZTrack* pTrack = mpSong->GetTrack(pFilter->GetFromTrack());
   mpSong->NewUndoBuffer();
 
   // remove selection
@@ -1096,19 +1096,19 @@ void JZRhythmWindow::GenRhythm()
 
 //  for (int i = 0; i < n_instruments; i++)
 //  {
-//    instruments[i]->Generate(track, fr_clock, to_clock, BarInfo.GetTicksPerBar());
+//    instruments[i]->Generate(pTrack, fr_clock, to_clock, BarInfo.GetTicksPerBar());
 //  }
 
   while (BarInfo.GetClock() < to_clock)
   {
     for (int i = 0; i < n_instruments; i++)
     {
-      instruments[i]->Generate(track, BarInfo, instruments, n_instruments);
+      instruments[i]->Generate(pTrack, BarInfo, instruments, n_instruments);
     }
     BarInfo.Next();
   }
 
-  track->Cleanup();
+  pTrack->Cleanup();
 
   mpEventWindow->Refresh();
 }

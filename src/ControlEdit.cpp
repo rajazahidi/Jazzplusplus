@@ -445,7 +445,7 @@ int JZPitchEdit::GetValue(JZEvent* pEvent)
 
 JZEvent * JZPitchEdit::NewEvent(long clock, int val)
 {
-  return new JZPitchEvent(clock, track->Channel - 1, val);
+  return new JZPitchEvent(clock, track->mChannel - 1, val);
 }
 
 // ------------------------------------------------------------------
@@ -490,7 +490,7 @@ int JZControlEdit::GetValue(JZEvent* pEvent)
 
 JZEvent * JZControlEdit::NewEvent(long clock, int val)
 {
-  return new JZControlEvent(clock, track->Channel - 1, ctrl_num, val);
+  return new JZControlEvent(clock, track->mChannel - 1, ctrl_num, val);
 }
 
 // ------------------------------------------------------------------
@@ -813,7 +813,7 @@ int JZChannelAftertouchEdit::GetValue(JZEvent* pEvent)
 
 JZEvent *JZChannelAftertouchEdit::NewEvent(long clock, int val)
 {
-  return new JZChnPressureEvent(clock, track->Channel - 1, val);
+  return new JZChnPressureEvent(clock, track->mChannel - 1, val);
 }
 
 void JZChannelAftertouchEdit::UpDate()

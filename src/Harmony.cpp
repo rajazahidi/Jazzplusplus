@@ -725,7 +725,7 @@ JZHarmonyBrowserMatchMarkers::JZHarmonyBrowserMatchMarkers(
   if (mpHbWindow->mMarkPiano && gpTrackFrame->GetPianoWindow())
   {
     JZEventArray &buf = gpTrackFrame->GetPianoWindow()->mPasteBuffer;
-    for (int i = 0; i < buf.nEvents; i++)
+    for (int i = 0; i < buf.mEventCount; i++)
     {
       JZKeyOnEvent* pKeyOn = buf.mppEvents[i]->IsKeyOn();
       if (pKeyOn)
@@ -1734,8 +1734,8 @@ JZHarmonyBrowserContextDlg::JZHarmonyBrowserContextDlg(JZHarmonyBrowserCanvas *c
   for (i = 0; i < 12; i++)
   {
     int x = w * i + 10;
-    chord_chk[i] = new wxCheckBox(this, wxID_ANY,  " ", wxPoint(x, y+1*h));//(wxFunction)ChordCheck,
-    scale_chk[i] = new wxCheckBox(this, wxID_ANY,  " ", wxPoint(x, y+2*h));//(wxFunction)ScaleCheck,
+    chord_chk[i] = new wxCheckBox(this, wxID_ANY, " ", wxPoint(x, y+1*h));//(wxFunction)ChordCheck,
+    scale_chk[i] = new wxCheckBox(this, wxID_ANY, " ", wxPoint(x, y+2*h));//(wxFunction)ScaleCheck,
     if (notename[i])
     {
       new wxStaticText(this, wxID_ANY, notename[i], wxPoint(x, y + 3 * h));

@@ -292,16 +292,16 @@ class JZDrumInstrumentParameter
 
   public:
 
-    JZDrumInstrumentParameter( JZNrpn *par );
-    JZNrpn *Get( int index );
-    void Put( JZNrpn *par );
-    JZDrumInstrumentParameter *Next();
+    JZDrumInstrumentParameter(JZNrpn* par);
+    JZNrpn* Get(int index);
+    void Put(  JZNrpn* par);
+    JZDrumInstrumentParameter* Next();
     int Pitch();
 
   private:
 
     int mPitch;
-    JZNrpn* param[numDrumParameters];
+    JZNrpn* mParam[numDrumParameters];
     JZDrumInstrumentParameter* mpNext;
 };
 
@@ -312,25 +312,25 @@ class JZDrumInstrumentParameterList
   public:
 
     JZDrumInstrumentParameterList()
-      : list(0)
+      : mpList(0)
     {
     }
-    JZDrumInstrumentParameter *GetElem( int pit );
-    JZNrpn *GetParam( int pit, int index );
-    void PutParam( JZNrpn *par );
-    void DelParam( int pit, int index );
+    JZDrumInstrumentParameter* GetElem(int pit);
+    JZNrpn* GetParam(int pit, int index);
+    void PutParam(JZNrpn* par);
+    void DelParam(int pit, int index);
     JZDrumInstrumentParameter *FirstElem();
-    JZDrumInstrumentParameter *NextElem( JZDrumInstrumentParameter *cur );
+    JZDrumInstrumentParameter *NextElem(JZDrumInstrumentParameter *cur );
     void DelElem( int pit );
     void Clear();
     bool IsEmpty() const
     {
-      return list == 0;
+      return mpList == 0;
     }
 
   private:
 
-    JZDrumInstrumentParameter* list;
+    JZDrumInstrumentParameter* mpList;
 };
 
 enum tMtcType
@@ -370,10 +370,10 @@ class JZSimpleEventArray : public wxObject
   public:
 
     // Actual number of events in **mppEvents.
-    int nEvents;
+    int mEventCount;
 
     // Memory allocated in **mppEvents
-    int MaxEvents;
+    int mMaxEvents;
 
     JZEvent** mppEvents;
 
@@ -410,7 +410,7 @@ class JZUndoBuffer : public JZSimpleEventArray
 
     void Put(JZEvent* pEvent, int killed)
     {
-      bits.set(nEvents, killed);
+      bits.set(mEventCount, killed);
       JZSimpleEventArray::Put(pEvent);
     }
 
@@ -483,9 +483,9 @@ class JZEventArray : public JZSimpleEventArray
 
     JZDrumInstrumentParameterList DrumParams;
 
-    int Channel;  // 1..16, set from first ChannelEvent, 0 = multichannel/nochannel
-    int Device;   // 0 for tSeq2/Mpu401
-    int ForceChannel;
+    int mChannel;  // 1..16, set from first ChannelEvent, 0 = multichannel/nochannel
+    int mDevice;   // 0 for tSeq2/Mpu401
+    int mForceChannel;
 
     virtual void Clear();
     void Cleanup(bool dont_delete_killed_events = 0);
@@ -585,19 +585,19 @@ class JZTrack : public JZEventArray
     void SetState(int NewState);
     void ToggleState(int Direction);   // +1 = next, -1 = prev
 
-    int  GetChannel()
+    int GetChannel()
     {
-      return Channel;
+      return mChannel;
     }
     void SetChannel(int NewChannel);
 
     int GetDevice() const
     {
-      return Device;
+      return mDevice;
     }
-    void SetDevice(int d)
+    void SetDevice(int Device)
     {
-      Device = d;
+      mDevice = Device;
     }
 
     int  GetPatch();
@@ -740,7 +740,7 @@ class JZEventIterator
     {
       mpTrack = pTrack;
       mStart  = 0;
-      mStop   = mpTrack->nEvents;
+      mStop   = mpTrack->mEventCount;
       mActual = mStart;
     }
 
@@ -782,7 +782,7 @@ class JZEventIterator
     JZEvent* Range(int FromClock, unsigned ToClock)
     {
       mStart = mActual = 0;
-      mStop  = mpTrack->nEvents;
+      mStop  = mpTrack->mEventCount;
 
       if (!GreaterEqual(FromClock))
       {

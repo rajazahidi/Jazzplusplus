@@ -430,9 +430,9 @@ void JZPlayer::StartPlay(int Clock, int LoopClock, int Continue)
 
       for (j = mspModPitchControl; j < mspModulationSysexParameters; j++)
       {
-        if (t->ModulationSettings[j])
+        if (t->mpModulationSettings[j])
         {
-          OutNow(t, t->ModulationSettings[j]);
+          OutNow(t, t->mpModulationSettings[j]);
         }
       }
 
@@ -476,9 +476,9 @@ void JZPlayer::StartPlay(int Clock, int LoopClock, int Continue)
         }
       }
 
-      if (t->CC1ControllerNr)
+      if (t->mpCC1ControllerNr)
       {
-        OutNow(t, t->CC1ControllerNr);
+        OutNow(t, t->mpCC1ControllerNr);
       }
 
       if (t->CC2ControllerNr)

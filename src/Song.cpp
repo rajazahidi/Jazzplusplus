@@ -357,7 +357,7 @@ void JZSong::MergeTracks(
   bool DoSoloTracksExist = false;
   for (i = 0; i < mTrackCount; i++)
   {
-    if (mTracks[i].State == tsSolo)
+    if (mTracks[i].mState == tsSolo)
     {
       DoSoloTracksExist = true;
       break;
@@ -368,8 +368,8 @@ void JZSong::MergeTracks(
   {
     JZTrack* pTrack = &mTracks[i];
     if (
-      pTrack->State == tsSolo ||
-      (!DoSoloTracksExist && pTrack->State == tsPlay))
+      pTrack->mState == tsSolo ||
+      (!DoSoloTracksExist && pTrack->mState == tsPlay))
     {
       if (pTrack->GetAudioMode() != AudioMode)
       {

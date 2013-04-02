@@ -148,7 +148,7 @@ class JZRpn : public JZParam
     }
 };
 
-unsigned char *SysExDT1(
+unsigned char* SysExDT1(
   unsigned char aa,
   unsigned char bb,
   unsigned char cc,
@@ -294,7 +294,7 @@ class JZDrumInstrumentParameter
 
     JZDrumInstrumentParameter(JZNrpn* par);
     JZNrpn* Get(int index);
-    void Put(  JZNrpn* par);
+    void Put(JZNrpn* par);
     JZDrumInstrumentParameter* Next();
     int Pitch();
 
@@ -355,7 +355,7 @@ class JZMtcTime
 
     JZMtcTime(JZMtcOffsetEvent* s); // an mtc offset or mtc full message
     JZMtcTime(int millisek, tMtcType t);
-    JZMtcTime(char *str, tMtcType t);
+    JZMtcTime(char* str, tMtcType t);
     JZMtcTime(unsigned h, unsigned m, unsigned s, unsigned f, unsigned t);
     void ToString(std::string& String);
     JZMtcOffsetEvent* ToOffset();
@@ -445,14 +445,14 @@ class JZEventArray : public JZSimpleEventArray
 
     JZSysExEvent* mpReset;
 
-    JZSysExEvent* ModulationSettings[mspModulationSysexParameters];
+    JZSysExEvent* mpModulationSettings[mspModulationSysexParameters];
     JZSysExEvent* BenderSettings[bspBenderSysexParameters];
     JZSysExEvent* CAfSettings[cspCAfSysexParameters];
     JZSysExEvent* PAfSettings[pspPAfSysexParameters];
     JZSysExEvent* CC1Settings[cspCC1SysexParameters];
     JZSysExEvent* CC2Settings[cspCC2SysexParameters];
 
-    JZSysExEvent* CC1ControllerNr;
+    JZSysExEvent* mpCC1ControllerNr;
     JZSysExEvent* CC2ControllerNr;
 
     JZSysExEvent* ReverbType;
@@ -488,7 +488,7 @@ class JZEventArray : public JZSimpleEventArray
     int mForceChannel;
 
     virtual void Clear();
-    void Cleanup(bool dont_delete_killed_events = 0);
+    void Cleanup(bool dont_delete_killed_events = false);
 
     void Keyoff2Length();
     void Length2Keyoff();
@@ -503,7 +503,7 @@ class JZEventArray : public JZSimpleEventArray
     bool IsEmpty() const;
     int GetFirstClock();
 
-    int State;    // tsXXX
+    int mState;    // tsXXX
 
   public:
 

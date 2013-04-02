@@ -520,7 +520,7 @@ JZEventArray::JZEventArray()
   mChannel = 0;
   mDevice = 0;
   mForceChannel = 0;
-  State = tsPlay;
+  mState = tsPlay;
 
   Clear();
 }
@@ -570,7 +570,7 @@ void JZEventArray::Clear()
 
   for (i = 0; i < mspModulationSysexParameters; i++)
   {
-    ModulationSettings[i] = 0;
+    mpModulationSettings[i] = 0;
   }
 
   for (i = 0; i < bspBenderSysexParameters; i++)
@@ -598,7 +598,7 @@ void JZEventArray::Clear()
     CC2Settings[i] = 0;
   }
 
-  CC1ControllerNr = 0;
+  mpCC1ControllerNr = 0;
   CC2ControllerNr = 0;
 
   ReverbType = 0;
@@ -641,7 +641,7 @@ void JZEventArray::Clear()
   mppEvents = 0;
   mMaxEvents = 0;
 
-  State = tsPlay;
+  mState = tsPlay;
   mAudioMode = false;
 }
 
@@ -697,7 +697,7 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
 
   for (i = 0; i < mspModulationSysexParameters; i++)
   {
-    ModulationSettings[i] = 0;
+    mpModulationSettings[i] = 0;
   }
 
   for (i = bspBendPitchControl; i < bspBenderSysexParameters; i++)
@@ -725,7 +725,7 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
     CC2Settings[i] = 0;
   }
 
-  CC1ControllerNr = 0;
+  mpCC1ControllerNr = 0;
   CC2ControllerNr = 0;
 
   ReverbType = 0;
@@ -869,7 +869,7 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
           case SX_GS_ModLfo2Pitch:
           case SX_GS_ModLfo2Tvf:
           case SX_GS_ModLfo2Tva:
-            ModulationSettings[SysExId - SX_GS_ModPitch] = s;
+            mpModulationSettings[SysExId - SX_GS_ModPitch] = s;
             break;
 
           case SX_GS_CafPitch:
@@ -956,7 +956,7 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
             break;
 
           case SX_GS_CC1CtrlNo:
-            CC1ControllerNr = s;
+            mpCC1ControllerNr = s;
             break;
 
           case SX_GS_CC2CtrlNo:
@@ -998,13 +998,13 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
           case SX_XG_ModPitch:
           case SX_XG_ModTvf:
           case SX_XG_ModAmpl:
-            ModulationSettings[SysExId - SX_XG_ModPitch] = s;
+            mpModulationSettings[SysExId - SX_XG_ModPitch] = s;
             break;
 
           case SX_XG_ModLfoPitch:
           case SX_XG_ModLfoTvf:
           case SX_XG_ModLfoTva:
-            ModulationSettings[SysExId + 1 - SX_XG_ModPitch] = s;
+            mpModulationSettings[SysExId + 1 - SX_XG_ModPitch] = s;
             break;
 
           case SX_XG_CafPitch:
@@ -1068,7 +1068,7 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
             break;
 
           case SX_XG_CC1CtrlNo:
-            CC1ControllerNr = s;
+            mpCC1ControllerNr = s;
             break;
 
           case SX_XG_CC2CtrlNo:
@@ -1318,7 +1318,7 @@ void JZEventArray::Write(JZWriteBase& Io)
 
   JZJazzMetaEvent JazzMeta;
   JazzMeta.SetAudioMode(mAudioMode);
-  JazzMeta.SetTrackState(State);
+  JazzMeta.SetTrackState(mState);
   JazzMeta.SetTrackDevice(mDevice);
   JazzMeta.SetIntroLength(gpSong->GetIntroLength());
   JazzMeta.Write(Io);
@@ -1392,7 +1392,7 @@ void JZEventArray::Read(JZReadBase& Io)
     {
       JZJazzMetaEvent* pJazzMetaEvent = pEvent->IsJazzMeta();
       mAudioMode = pJazzMetaEvent->GetAudioMode();
-      State      = (int)pJazzMetaEvent->GetTrackState();
+      mState     = (int)pJazzMetaEvent->GetTrackState();
       mDevice    = (int)pJazzMetaEvent->GetTrackDevice();
       gpSong->SetIntroLength((int)pJazzMetaEvent->GetIntroLength());
       delete pJazzMetaEvent;
@@ -2050,7 +2050,7 @@ void JZTrack::Clear()
   {
     mUndoBuffers[i].Clear();
   }
-  State  = tsPlay;
+  mState = tsPlay;
   JZEventArray::Clear();
 }
 
@@ -2661,7 +2661,7 @@ void JZTrack::SetBendPitchSens(int Value)
 int JZTrack::GetModulationSysex(int msp)
 {
   const unsigned char* pValue =
-    gpSynth->GetSysexValPtr(ModulationSettings[msp]);
+    gpSynth->GetSysexValPtr(mpModulationSettings[msp]);
 
   if (pValue)
   {
@@ -2673,9 +2673,9 @@ int JZTrack::GetModulationSysex(int msp)
 
 void JZTrack::SetModulationSysex(int msp, int Value)
 {
-  if (ModulationSettings[msp])
+  if (mpModulationSettings[msp])
   {
-    Kill(ModulationSettings[msp]);
+    Kill(mpModulationSettings[msp]);
   }
   if (Value > 0)
   {
@@ -2851,7 +2851,7 @@ void JZTrack::SetCC2Sysex(int csp, int Value)
 
 int JZTrack::GetCC1ControllerNr()
 {
-  const unsigned char* pValue = gpSynth->GetSysexValPtr(CC1ControllerNr);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(mpCC1ControllerNr);
 
   if (pValue)
   {
@@ -2863,9 +2863,9 @@ int JZTrack::GetCC1ControllerNr()
 
 void JZTrack::SetCC1ControllerNr(int Value)
 {
-  if (CC1ControllerNr)
+  if (mpCC1ControllerNr)
   {
-    Kill(CC1ControllerNr);
+    Kill(mpCC1ControllerNr);
   }
   if (Value > 0)
   {
@@ -3353,7 +3353,7 @@ int JZTrack::GetCurrentSpeed(int clk)
 
 const char* JZTrack::GetStateChar()
 {
-  switch (State)
+  switch (mState)
   {
     case tsPlay:
       return "P";
@@ -3367,12 +3367,12 @@ const char* JZTrack::GetStateChar()
 
 void JZTrack::SetState(int NewState)
 {
-  State = NewState % 3;
+  mState = NewState % 3;
 }
 
 void JZTrack::ToggleState(int Direction)
 {
-  State = (State + Direction + 3) % 3;
+  mState = (mState + Direction + 3) % 3;
 }
 
 // ------------------------- Channel ---------------------------

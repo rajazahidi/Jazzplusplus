@@ -551,26 +551,26 @@ JZRhythmWindow::JZRhythmWindow(JZEventWindow* pEventWindow, JZSong* pSong)
   n_bars          = 0;
   instrument_list = 0;
 
-  wxMenuBar *menu_bar = new wxMenuBar;
-  wxMenu    *menu = new wxMenu;
-  menu->Append(wxID_OPEN,  "&Load");
-  menu->Append(wxID_SAVE,  "&Save");
-  menu->Append(wxID_CLOSE, "&Close");
-  menu_bar->Append(menu,  "&File");
+  wxMenuBar* pMenuBar = new wxMenuBar;
+  wxMenu* pMenu = new wxMenu;
+  pMenu->Append(wxID_OPEN, "&Load");
+  pMenu->Append(wxID_SAVE, "&Save");
+  pMenu->Append(wxID_CLOSE, "&Close");
+  pMenuBar->Append(pMenu, "&File");
 
-  menu = new wxMenu;
-  menu->Append(ID_INSTRUMENT_ADD,      "&Add");
-  menu->Append(ID_INSTRUMENT_DELETE,   "&Delete");
-  menu->Append(ID_INSTRUMENT_UP,       "&Up");
-  menu->Append(ID_INSTRUMENT_DOWN,     "&Down");
-  menu->Append(ID_INSTRUMENT_GENERATE, "&Generate");
-  menu_bar->Append(menu,        &Instrument");
+  pMenu = new wxMenu;
+  pMenu->Append(ID_INSTRUMENT_ADD, "&Add");
+  pMenu->Append(ID_INSTRUMENT_DELETE, "&Delete");
+  pMenu->Append(ID_INSTRUMENT_UP, "&Up");
+  pMenu->Append(ID_INSTRUMENT_DOWN, "&Down");
+  pMenu->Append(ID_INSTRUMENT_GENERATE, "&Generate");
+  pMenuBar->Append(pMenu, "&Instrument");
 
-  menu = new wxMenu;
-  menu->Append(wxID_HELP, "&Help");
-  menu_bar->Append(menu,  "Help");
+  pMenu = new wxMenu;
+  pMenu->Append(wxID_HELP, "&Help");
+  pMenuBar->Append(pMenu,  "Help");
 
-  SetMenuBar(menu_bar);
+  SetMenuBar(pMenuBar);
 
   int x = 0;
   int y = (int)tb_height;

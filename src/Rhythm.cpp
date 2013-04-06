@@ -52,6 +52,15 @@
 
 using namespace std;
 
+#include "Bitmaps/open.xpm"
+#include "Bitmaps/save.xpm"
+#include "Bitmaps/rrgadd.xpm"
+#include "Bitmaps/rrgdel.xpm"
+#include "Bitmaps/rrgup.xpm"
+#include "Bitmaps/rrgdown.xpm"
+#include "Bitmaps/rrggen.xpm"
+#include "Bitmaps/help.xpm"
+
 void tRhyGroup::write(ostream& Os) const
 {
   Os << listen << ' ';
@@ -1351,8 +1360,11 @@ JZRhythmGeneratorFrame::JZRhythmGeneratorFrame()
         gpConfig->GetValue(C_RhythmXpos),
         gpConfig->GetValue(C_RhythmYpos)),
       wxSize(640, 580)),
+    mpToolBar(0),
     mpRhythmGeneratorWindow(0)
 {
+  CreateToolBar();
+
   wxMenu* pFileMenu = new wxMenu;
   pFileMenu->Append(wxID_OPEN, "&Load...");
   pFileMenu->Append(wxID_SAVEAS, "Save &As...");
@@ -1380,6 +1392,28 @@ JZRhythmGeneratorFrame::JZRhythmGeneratorFrame()
   GetClientSize(&Width, &Height);
   mpRhythmGeneratorWindow =
     new JZRhythmGeneratorWindow(this, wxPoint(0, 0), wxSize(Width, Height));
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZRhythmGeneratorFrame::CreateToolBar()
+{
+  JZToolDef ToolBarDefinitions[] =
+  {
+    { wxID_OPEN, false, open_xpm, "open rhythm file" },
+    { wxID_SAVE, false, save_xpm, "save into rhythm file" },
+    { JZToolBar::eToolBarSeparator },
+    { ID_INSTRUMENT_ADD, false, rrgadd_xpm, "add instrument" },
+    { ID_INSTRUMENT_DELETE, false, rrgdel_xpm, "remove instrument" },
+    { ID_INSTRUMENT_UP, false, rrgup_xpm, "move instrument up" },
+    { ID_INSTRUMENT_DOWN, false, rrgdown_xpm, "move instrument down" },
+    { ID_INSTRUMENT_GENERATE, false, rrggen_xpm, "generate events into trackwin selection" },
+    { JZToolBar::eToolBarSeparator },
+    { wxID_HELP_CONTENTS, false, help_xpm, "help" },
+    { JZToolBar::eToolBarEnd }
+  };
+
+  mpToolBar = new JZToolBar(this, ToolBarDefinitions);
 }
 
 //-----------------------------------------------------------------------------

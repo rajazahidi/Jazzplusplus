@@ -25,8 +25,6 @@
 #include "Globals.h"
 #include "Random.h"
 
-#include "ToolBar.h"
-
 #include <wx/frame.h>
 
 #include <iostream>
@@ -34,6 +32,7 @@
 class JZBarInfo;
 class JZEventWindow;
 class JZSong;
+class JZToolBar;
 class JZTrack;
 class wxButton;
 class wxCheckBox;
@@ -275,11 +274,15 @@ class JZRhythmGeneratorFrame : public wxFrame
 
   private:
 
+    void CreateToolBar();
+
     void OnHelp(wxCommandEvent& Event);
 
     void OnHelpContents(wxCommandEvent& Event);
 
   private:
+
+    JZToolBar* mpToolBar;
 
     JZRhythmGeneratorWindow* mpRhythmGeneratorWindow;
 

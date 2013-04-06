@@ -320,8 +320,8 @@ class JZDrumInstrumentParameterList
     void PutParam(JZNrpn* par);
     void DelParam(int pit, int index);
     JZDrumInstrumentParameter *FirstElem();
-    JZDrumInstrumentParameter *NextElem(JZDrumInstrumentParameter *cur );
-    void DelElem( int pit );
+    JZDrumInstrumentParameter *NextElem(JZDrumInstrumentParameter *cur);
+    void DelElem(int pit);
     void Clear();
     bool IsEmpty() const
     {
@@ -347,19 +347,25 @@ class JZMtcTime
 {
   public:
 
-    tMtcType type;
-    int hour;
-    int min;
-    int sec;
-    int fm;
-
     JZMtcTime(JZMtcOffsetEvent* s); // an mtc offset or mtc full message
     JZMtcTime(int millisek, tMtcType t);
     JZMtcTime(char* str, tMtcType t);
+    tMtcType GetType() const
+    {
+      return mType;
+    }
     JZMtcTime(unsigned h, unsigned m, unsigned s, unsigned f, unsigned t);
     void ToString(std::string& String);
     JZMtcOffsetEvent* ToOffset();
     int ToMillisec();
+
+  private:
+
+    tMtcType mType;
+    int mHours;
+    int mMinutes;
+    int mSeconds;
+    int fm;
 };
 
 
@@ -446,45 +452,45 @@ class JZEventArray : public JZSimpleEventArray
     JZSysExEvent* mpReset;
 
     JZSysExEvent* mpModulationSettings[mspModulationSysexParameters];
-    JZSysExEvent* BenderSettings[bspBenderSysexParameters];
-    JZSysExEvent* CAfSettings[cspCAfSysexParameters];
-    JZSysExEvent* PAfSettings[pspPAfSysexParameters];
-    JZSysExEvent* CC1Settings[cspCC1SysexParameters];
-    JZSysExEvent* CC2Settings[cspCC2SysexParameters];
+    JZSysExEvent* mpBenderSettings[bspBenderSysexParameters];
+    JZSysExEvent* mpCAfSettings[cspCAfSysexParameters];
+    JZSysExEvent* mpPAfSettings[pspPAfSysexParameters];
+    JZSysExEvent* mpCC1Settings[cspCC1SysexParameters];
+    JZSysExEvent* mpCC2Settings[cspCC2SysexParameters];
 
     JZSysExEvent* mpCC1ControllerNr;
-    JZSysExEvent* CC2ControllerNr;
+    JZSysExEvent* mpCC2ControllerNr;
 
-    JZSysExEvent* ReverbType;
-    JZSysExEvent* ChorusType;
-    JZSysExEvent* EqualizerType;
+    JZSysExEvent* mpReverbType;
+    JZSysExEvent* mpChorusType;
+    JZSysExEvent* mpEqualizerType;
 
-    JZSysExEvent* ReverbSettings[rspReverbSysexParameters];
-    JZSysExEvent* ChorusSettings[cspChorusSysexParameters];
+    JZSysExEvent* mpReverbSettings[rspReverbSysexParameters];
+    JZSysExEvent* mpChorusSettings[cspChorusSysexParameters];
 
-    JZSysExEvent* PartialReserve;
-    JZSysExEvent* MasterVol;
-    JZSysExEvent* MasterPan;
+    JZSysExEvent* mpPartialReserve;
+    JZSysExEvent* mpMasterVol;
+    JZSysExEvent* mpMasterPan;
 
-    JZSysExEvent* RxChannel;
-    JZSysExEvent* UseForRhythm;
+    JZSysExEvent* mpRxChannel;
+    JZSysExEvent* mpUseForRhythm ;
 
-    JZMtcOffsetEvent* MtcOffset;
+    JZMtcOffsetEvent* mpMtcOffset;
 
-    JZNrpn* VibRate;
-    JZNrpn* VibDepth;
-    JZNrpn* VibDelay;
-    JZNrpn* Cutoff;
-    JZNrpn* Resonance;
-    JZNrpn* EnvAttack;
-    JZNrpn* EnvDecay;
-    JZNrpn* EnvRelease;
-    JZRpn* BendPitchSens;
+    JZNrpn* mpVibRate;
+    JZNrpn* mpVibDepth;
+    JZNrpn* mpVibDelay;
+    JZNrpn* mpCutoff;
+    JZNrpn* mpResonance;
+    JZNrpn* mpEnvAttack;
+    JZNrpn* mpEnvDecay;
+    JZNrpn* mpEnvRelease;
+    JZRpn* mpBendPitchSens;
 
-    JZDrumInstrumentParameterList DrumParams;
+    JZDrumInstrumentParameterList mDrumParams;
 
     int mChannel;  // 1..16, set from first ChannelEvent, 0 = multichannel/nochannel
-    int mDevice;   // 0 for tSeq2/Mpu401
+    int mDevice;   // 0 for JZSeq2Player/JZMpuPlayer
     int mForceChannel;
 
     virtual void Clear();
@@ -576,7 +582,7 @@ class JZTrack : public JZEventArray
     void Cleanup();
 
     const char* GetName();
-    void SetName(const char *Name);
+    void SetName(const char* Name);
 
     const char* GetCopyright();
     void SetCopyright(char *Copyright);
@@ -647,23 +653,23 @@ class JZTrack : public JZEventArray
     int  GetBendPitchSens();
     void SetBendPitchSens(int BendPitchSens);
 
-    int  GetModulationSysex( int msp );
-    void SetModulationSysex( int msp, int value);
+    int  GetModulationSysex(int msp);
+    void SetModulationSysex(int msp, int value);
 
-    int  GetBenderSysex( int bsp );
-    void SetBenderSysex( int bsp, int value);
+    int  GetBenderSysex(int bsp);
+    void SetBenderSysex(int bsp, int value);
 
-    int  GetCAfSysex( int csp );
-    void SetCAfSysex( int csp, int value);
+    int  GetCAfSysex(int csp);
+    void SetCAfSysex(int csp, int value);
 
-    int  GetPAfSysex( int psp );
-    void SetPAfSysex( int psp, int value);
+    int  GetPAfSysex(int psp);
+    void SetPAfSysex(int psp, int value);
 
-    int  GetCC1Sysex( int csp );
-    void SetCC1Sysex( int csp, int value);
+    int  GetCC1Sysex(int csp);
+    void SetCC1Sysex(int csp, int value);
 
-    int  GetCC2Sysex( int csp );
-    void SetCC2Sysex( int csp, int value);
+    int  GetCC2Sysex(int csp);
+    void SetCC2Sysex(int csp, int value);
 
     int  GetCC1ControllerNr();
     void SetCC1ControllerNr(int ctrlno);
@@ -680,11 +686,11 @@ class JZTrack : public JZEventArray
     int  GetEqualizerType();
     void SetEqualizerType(int EqualizerType);
 
-    int  GetRevSysex( int rsp );
-    void SetRevSysex( int rsp, int value);
+    int  GetRevSysex(int rsp);
+    void SetRevSysex(int rsp, int value);
 
-    int  GetChoSysex( int csp );
-    void SetChoSysex( int csp, int value);
+    int  GetChoSysex(int csp);
+    void SetChoSysex(int csp, int value);
 
     int  GetBank();
     void SetBank(int Bank);
@@ -702,14 +708,14 @@ class JZTrack : public JZEventArray
     int  GetMasterPan();
     void SetMasterPan(int MasterPan);
 
-    int GetPartRsrv( int chan );
-    void SetPartRsrv( unsigned char *rsrv );
+    int GetPartRsrv(int chan);
+    void SetPartRsrv(unsigned char* rsrv);
 
-    int  GetModeSysex( int param );
-    void SetModeSysex( int param, int value);
+    int  GetModeSysex(int param);
+    void SetModeSysex(int param, int value);
 
     JZMtcTime* GetMtcOffset();
-    void SetMtcOffset( JZMtcTime* mtc );
+    void SetMtcOffset(JZMtcTime* mtc);
 
   private:
 

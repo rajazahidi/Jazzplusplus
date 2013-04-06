@@ -1348,18 +1348,6 @@ class JZTrackNameEvent : public JZMetaEvent
     JZTrackNameEvent(int Clock, unsigned char* pData, unsigned short Length)
       : JZMetaEvent(Clock, StatTrackName, pData, Length)
     {
-// SN++ Diese Restriktion ist viel zu hart. Es genuegt, den Namen im Mixerdialog
-//                zu begrenzen!!!
-/*
-#ifdef wx_motif
-      // clip to 16 chars
-      if (Length > 16)
-      {
-        mpData[16] = 0;
-        Length   = 16;
-      }
-#endif
-*/
     }
 
     virtual JZTrackNameEvent* IsTrackName()

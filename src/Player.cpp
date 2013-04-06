@@ -290,13 +290,13 @@ void JZPlayer::FlushToDevice()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZPlayer::OutNow(JZTrack *t, JZParam *r)
+void JZPlayer::OutNow(JZTrack* pTrack, JZParam *r)
 {
-  OutNow(t, &r->mMsb);
-  OutNow(t, &r->mLsb);
-  OutNow(t, &r->mDataMsb);
-  OutNow(t, &r->mResetMsb);
-  OutNow(t, &r->mResetLsb);
+  OutNow(pTrack, &r->mMsb);
+  OutNow(pTrack, &r->mLsb);
+  OutNow(pTrack, &r->mDataMsb);
+  OutNow(pTrack, &r->mResetMsb);
+  OutNow(pTrack, &r->mResetLsb);
 }
 
 //-----------------------------------------------------------------------------
@@ -326,230 +326,230 @@ void JZPlayer::StartPlay(int Clock, int LoopClock, int Continue)
     mpAudioBuffer->Clear();
   }
 
-  JZTrack *t;
+  JZTrack* pTrack;
 
-  if ( !Continue )
+  if (!Continue)
   {
     if (
       gpConfig->GetValue(C_SendSynthReset) == 2 ||
       ((Clock == 0) && (gpConfig->GetValue(C_SendSynthReset) == 1)))
     {
       // fixme: we should have different synths for each device
-      t = mpSong->GetTrack(0);
+      pTrack = mpSong->GetTrack(0);
       JZEvent* mpResetEvent = gpSynth->CreateResetEvent();
-      OutNow(t, mpResetEvent);
+      OutNow(pTrack, mpResetEvent);
       delete mpResetEvent;
     }
 
     // Send Volume, Pan, Chorus, etc
     for (i = 0; i < mpSong->GetTrackCount(); ++i)
     {
-      t = mpSong->GetTrack(i);
-      if (t->mpBank)
+      pTrack = mpSong->GetTrack(i);
+      if (pTrack->mpBank)
       {
-        OutNow(t, t->mpBank);
+        OutNow(pTrack, pTrack->mpBank);
       }
-      if (t->mpBank2)
+      if (pTrack->mpBank2)
       {
-        OutNow(t, t->mpBank2);
+        OutNow(pTrack, pTrack->mpBank2);
       }
-      if (t->mpPatch)
+      if (pTrack->mpPatch)
       {
-        OutNow(t, t->mpPatch);
+        OutNow(pTrack, pTrack->mpPatch);
       }
-      if (t->mpVolume)
+      if (pTrack->mpVolume)
       {
-        OutNow(t, t->mpVolume);
+        OutNow(pTrack, pTrack->mpVolume);
       }
-      if (t->mpPan)
+      if (pTrack->mpPan)
       {
-        OutNow(t, t->mpPan);
+        OutNow(pTrack, pTrack->mpPan);
       }
-      if (t->mpReverb)
+      if (pTrack->mpReverb)
       {
-        OutNow(t, t->mpReverb);
+        OutNow(pTrack, pTrack->mpReverb);
       }
-      if (t->mpChorus)
+      if (pTrack->mpChorus)
       {
-        OutNow(t, t->mpChorus);
+        OutNow(pTrack, pTrack->mpChorus);
       }
-      if (t->VibRate)
+      if (pTrack->mpVibRate)
       {
-        OutNow(t, t->VibRate);
+        OutNow(pTrack, pTrack->mpVibRate);
       }
-      if (t->VibDepth)
+      if (pTrack->mpVibDepth)
       {
-        OutNow(t, t->VibDepth);
+        OutNow(pTrack, pTrack->mpVibDepth);
       }
-      if (t->VibDelay)
+      if (pTrack->mpVibDelay)
       {
-        OutNow(t, t->VibDelay);
+        OutNow(pTrack, pTrack->mpVibDelay);
       }
-      if (t->Cutoff)
+      if (pTrack->mpCutoff)
       {
-        OutNow(t, t->Cutoff);
+        OutNow(pTrack, pTrack->mpCutoff);
       }
-      if (t->Resonance)
+      if (pTrack->mpResonance)
       {
-        OutNow(t, t->Resonance);
+        OutNow(pTrack, pTrack->mpResonance);
       }
-      if (t->EnvAttack)
+      if (pTrack->mpEnvAttack)
       {
-        OutNow(t, t->EnvAttack);
+        OutNow(pTrack, pTrack->mpEnvAttack);
       }
-      if (t->EnvDecay)
+      if (pTrack->mpEnvDecay)
       {
-        OutNow(t, t->EnvDecay);
+        OutNow(pTrack, pTrack->mpEnvDecay);
       }
-      if (t->EnvRelease)
+      if (pTrack->mpEnvRelease)
       {
-        OutNow(t, t->EnvRelease);
+        OutNow(pTrack, pTrack->mpEnvRelease);
       }
 
       int j;
-      if (!t->DrumParams.IsEmpty())
+      if (!pTrack->mDrumParams.IsEmpty())
       {
-        JZDrumInstrumentParameter *dpar = t->DrumParams.FirstElem();
+        JZDrumInstrumentParameter *dpar = pTrack->mDrumParams.FirstElem();
         while (dpar)
         {
-          for (j = drumPitchIndex; j < numDrumParameters; j++)
+          for (j = drumPitchIndex; j < numDrumParameters; ++j)
           {
             if (dpar->Get(j))
             {
-              OutNow(t, dpar->Get(j));
+              OutNow(pTrack, dpar->Get(j));
             }
           }
-          dpar = t->DrumParams.NextElem( dpar );
+          dpar = pTrack->mDrumParams.NextElem( dpar );
         }
       }
 
-      if (t->BendPitchSens)
+      if (pTrack->mpBendPitchSens)
       {
-        OutNow(t, t->BendPitchSens);
+        OutNow(pTrack, pTrack->mpBendPitchSens);
       }
 
-      for (j = mspModPitchControl; j < mspModulationSysexParameters; j++)
+      for (j = mspModPitchControl; j < mspModulationSysexParameters; ++j)
       {
-        if (t->mpModulationSettings[j])
+        if (pTrack->mpModulationSettings[j])
         {
-          OutNow(t, t->mpModulationSettings[j]);
+          OutNow(pTrack, pTrack->mpModulationSettings[j]);
         }
       }
 
-      for (j = bspBendPitchControl; j < bspBenderSysexParameters; j++)
+      for (j = bspBendPitchControl; j < bspBenderSysexParameters; ++j)
       {
-        if (t->BenderSettings[j])
+        if (pTrack->mpBenderSettings[j])
         {
-          OutNow(t, t->BenderSettings[j]);
+          OutNow(pTrack, pTrack->mpBenderSettings[j]);
         }
       }
 
-      for (j = cspCAfPitchControl; j < cspCAfSysexParameters; j++)
+      for (j = cspCAfPitchControl; j < cspCAfSysexParameters; ++j)
       {
-        if (t->CAfSettings[j])
+        if (pTrack->mpCAfSettings[j])
         {
-          OutNow(t, t->CAfSettings[j]);
+          OutNow(pTrack, pTrack->mpCAfSettings[j]);
         }
       }
 
-      for (j = pspPAfPitchControl; j < pspPAfSysexParameters; j++)
+      for (j = pspPAfPitchControl; j < pspPAfSysexParameters; ++j)
       {
-        if (t->PAfSettings[j])
+        if (pTrack->mpPAfSettings[j])
         {
-          OutNow(t, t->PAfSettings[j]);
+          OutNow(pTrack, pTrack->mpPAfSettings[j]);
         }
       }
 
-      for (j = cspCC1PitchControl; j < cspCC1SysexParameters; j++)
+      for (j = cspCC1PitchControl; j < cspCC1SysexParameters; ++j)
       {
-        if (t->CC1Settings[j])
+        if (pTrack->mpCC1Settings[j])
         {
-          OutNow(t, t->CC1Settings[j]);
+          OutNow(pTrack, pTrack->mpCC1Settings[j]);
         }
       }
 
-      for (j = cspCC2PitchControl; j < cspCC2SysexParameters; j++)
+      for (j = cspCC2PitchControl; j < cspCC2SysexParameters; ++j)
       {
-        if (t->CC2Settings[j])
+        if (pTrack->mpCC2Settings[j])
         {
-          OutNow(t, t->CC2Settings[j]);
+          OutNow(pTrack, pTrack->mpCC2Settings[j]);
         }
       }
 
-      if (t->mpCC1ControllerNr)
+      if (pTrack->mpCC1ControllerNr)
       {
-        OutNow(t, t->mpCC1ControllerNr);
+        OutNow(pTrack, pTrack->mpCC1ControllerNr);
       }
 
-      if (t->CC2ControllerNr)
+      if (pTrack->mpCC2ControllerNr)
       {
-        OutNow(t, t->CC2ControllerNr);
+        OutNow(pTrack, pTrack->mpCC2ControllerNr);
       }
 
       if (gpConfig->GetValue(C_UseReverbMacro))
       {
-        if (t->ReverbType)
+        if (pTrack->mpReverbType)
         {
-          OutNow(t, t->ReverbType);
+          OutNow(pTrack, pTrack->mpReverbType);
         }
       }
       else
       {
-        for (j = 0; j < rspReverbSysexParameters; j++)
+        for (j = 0; j < rspReverbSysexParameters; ++j)
         {
-          if (t->ReverbSettings[j])
+          if (pTrack->mpReverbSettings[j])
           {
-            OutNow(t, t->ReverbSettings[j]);
+            OutNow(pTrack, pTrack->mpReverbSettings[j]);
           }
         }
       }
       if (gpConfig->GetValue(C_UseChorusMacro))
       {
-        if (t->ChorusType)
+        if (pTrack->mpChorusType)
         {
-          OutNow(t, t->ChorusType);
+          OutNow(pTrack, pTrack->mpChorusType);
         }
       }
       else
       {
-        for (j = 0; j < cspChorusSysexParameters; j++)
+        for (j = 0; j < cspChorusSysexParameters; ++j)
         {
-          if (t->ChorusSettings[j])
+          if (pTrack->mpChorusSettings[j])
           {
-            OutNow(t, t->ChorusSettings[j]);
+            OutNow(pTrack, pTrack->mpChorusSettings[j]);
           }
         }
       }
 
-      if (t->EqualizerType)
+      if (pTrack->mpEqualizerType)
       {
-        OutNow(t, t->EqualizerType);
+        OutNow(pTrack, pTrack->mpEqualizerType);
       }
-      if (t->PartialReserve)
+      if (pTrack->mpPartialReserve)
       {
-        OutNow(t, t->PartialReserve);
+        OutNow(pTrack, pTrack->mpPartialReserve);
       }
-      if (t->MasterVol)
+      if (pTrack->mpMasterVol)
       {
-        OutNow(t, t->MasterVol);
+        OutNow(pTrack, pTrack->mpMasterVol);
       }
-      if (t->MasterPan)
+      if (pTrack->mpMasterPan)
       {
-        OutNow(t, t->MasterPan);
+        OutNow(pTrack, pTrack->mpMasterPan);
       }
-      if (t->RxChannel)
+      if (pTrack->mpRxChannel)
       {
-        OutNow(t, t->RxChannel);
+        OutNow(pTrack, pTrack->mpRxChannel);
       }
-      if (t->UseForRhythm && *gpSynth->GetSysexValPtr(t->UseForRhythm))
+      if (pTrack->mpUseForRhythm && *gpSynth->GetSysexValPtr(pTrack->mpUseForRhythm ))
       {
-        OutNow(t, t->UseForRhythm);
+        OutNow(pTrack, pTrack->mpUseForRhythm );
       }
     } // for
   } // if !Continue
 
-  t = mpSong->GetTrack(0);
-  JZEvent* pEvent = t->GetCurrentTempo(Clock);
+  pTrack = mpSong->GetTrack(0);
+  JZEvent* pEvent = pTrack->GetCurrentTempo(Clock);
   if (pEvent)
   {
     OutNow(pEvent);
@@ -614,7 +614,7 @@ void JZPlayer::StopPlay()
   int ii;
   JZKeyOffEvent pKeyOff(0, 0, 0);
 
-  for (ii = 0; ii < mpSong->GetTrackCount(); ii++)
+  for (ii = 0; ii < mpSong->GetTrackCount(); ++ii)
   {
     JZTrack *Track = mpSong->GetTrack(ii);
     if (Track)
@@ -650,9 +650,9 @@ void JZPlayer::AllNotesOff(bool Reset)
   JZControlEvent CtrlRes(0, 0, 0x79, 0);
 
   JZDeviceList &devs = gpMidiPlayer->GetOutputDevices();
-  for (unsigned dev = 0; dev < devs.GetCount(); dev++)
+  for (unsigned dev = 0; dev < devs.GetCount(); ++dev)
   {
-    for (int c = 0; c < 16; c++)
+    for (int c = 0; c < 16; ++c)
     {
       NoteOff.SetChannel(c);
       NoteOff.SetDevice(dev);
@@ -777,7 +777,7 @@ int dwrite(int dev, const char* buf, int size)
     return written;
   }
   printf("W: ");
-  for (i = 0; i < written; i++)
+  for (i = 0; i < written; ++i)
   {
     printf("%02x ", (unsigned char)buf[i]);
   }
@@ -785,7 +785,7 @@ int dwrite(int dev, const char* buf, int size)
   if (written != size)
   {
     printf("L: ");
-    for (i = written; i < size; i++)
+    for (i = written; i < size; ++i)
     {
       printf("%02x ", (unsigned char)buf[i]);
     }
@@ -808,7 +808,7 @@ void JZMpuPlayer::StartPlay(int IntClock, int LoopClock, int Continue)
   {
     CMD+1, 0x34,                    /* timing byte always */
     CMD+1, 0x8e,                /* conductor off */
-    CMD+1, 0x8c,                /* don't send measures while recording */
+    CMD+1, 0x8c,                /* don'pTrack send measures while recording */
     CMD+1, 0xe7, DAT+1, 60,        /* clock-to-host every 15'th tick (60/4) */
     CMD+1, 0x95,                 /* send clock to host instead */
     CMD+1, 0x87,                  /* pitch+controller enabled */
@@ -827,7 +827,7 @@ void JZMpuPlayer::StartPlay(int IntClock, int LoopClock, int Continue)
     CMD+1, 0x39,                  /* real time to host */
     CMD+1, 0x34,                    /* timing byte always */
     CMD+1, 0x8e,                /* conductor off */
-    CMD+1, 0x8c,                /* don't send measures while recording */
+    CMD+1, 0x8c,                /* don'pTrack send measures while recording */
     CMD+1, 0xe7, DAT+1, 60,        /* clock-to-host every 15'th tick (60/4) */
     CMD+1, 0x95,                 /* send clock to host instead */
     CMD+1, 0x87,                  /* pitch+controller enabled */
@@ -849,7 +849,7 @@ void JZMpuPlayer::StartPlay(int IntClock, int LoopClock, int Continue)
   clock_to_host_counter = 0;
 
   ActiveTrack = 0;
-  for (int i = 0; i < ACTIVE_TRACKS; i++)
+  for (int i = 0; i < ACTIVE_TRACKS; ++i)
   {
     TrackClock[i] = ExtClock;
     TrackRunningStatus[i] = 0;
@@ -1042,7 +1042,7 @@ int JZMpuPlayer::OutEvent(JZEvent* pEvent)
         PlyBytes.Put(ActiveTrack);
         PlyBytes.Put(Time);
       }
-      for (i = 1; i < midi.mByteCount; i++)
+      for (i = 1; i < midi.mByteCount; ++i)
         PlyBytes.Put(midi.mBuffer[i]);
 
       TrackClock[ActiveTrack] = pEvent->GetClock();
@@ -1088,7 +1088,7 @@ void JZMpuPlayer::OutBreak(int BreakOver)
   while (OverFlow)
   {
     OverFlow = 0;
-    for (int i = 0; i < ACTIVE_TRACKS; i++)
+    for (int i = 0; i < ACTIVE_TRACKS; ++i)
     {
       if ((BreakOver - TrackClock[i]) >= 240)
       {
@@ -1117,7 +1117,7 @@ void JZMpuPlayer::OutNow(JZEvent* pEvent)
     buf[n++] = CMD+1;
     buf[n++] = 0xd7;
     buf[n++] = DAT + midi.mByteCount;
-    for (i = 0; i < midi.mByteCount; i++)
+    for (i = 0; i < midi.mByteCount; ++i)
     {
       buf[n++] = midi.mBuffer[i];
     }
@@ -1149,7 +1149,7 @@ void JZMpuPlayer::OutNow(JZEvent* pEvent)
           sysex[n++] = 0xdf;
           sysex[n++] = DAT + s->Length + 1;
           sysex[n++] = StatSysEx;
-          for (i = 0; i < s->Length; i++)
+          for (i = 0; i < s->Length; ++i)
           {
             sysex[n++] = s->Data[i];
           }
@@ -1165,7 +1165,7 @@ void JZMpuPlayer::OutNow(JZEvent* pEvent)
           common[n++] = 0xdf;
           common[n++] = DAT + s->Length + 1;
           common[n++] = StatSongPtr;
-          for (i = 0; i < s->Length; i++)
+          for (i = 0; i < s->Length; ++i)
           {
             common[n++] = s->Data[i];
           }
@@ -1212,8 +1212,10 @@ void JZMpuPlayer::FlushOutOfBand(int Clock)
            sysex[n++] = 0xdf;
            sysex[n++] = DAT + s->Length + 1;
            sysex[n++] = StatSysEx;
-           for (int i = 0; i < s->Length; i++)
+           for (int i = 0; i < s->Length; ++i)
+           {
               sysex[n++] = s->Data[i];
+           }
            write_noack_mpu(sysex, n);
            delete[] sysex;
         }
@@ -1241,7 +1243,7 @@ int JZMpuPlayer::GetRealTimeClock()
     {
       // CLOCK_TO_HOST received
       playclock += CLOCK_TO_HOST_TICKS;
-      clock_to_host_counter++;
+      ++clock_to_host_counter;
 #ifdef SLOW_MACHINE
       // Update screen every 4 beats (120 ticks/beat).
       if ((clock_to_host_counter % 32) == 0)
@@ -1276,7 +1278,7 @@ int JZMpuPlayer::GetRealTimeClock()
     else if (c == 0xf2 || receiving_song_ptr)
     {
       // Song pointer received
-      receiving_song_ptr++;
+      ++receiving_song_ptr;
 
       int ExtClock;
 
@@ -1325,7 +1327,9 @@ int JZMpuPlayer::GetRecordedData()
   {
     c = recbuf[i++];
     if (c == 0xf8)
+    {
       RecBytes.Clock += 240;
+    }
     else if (c < 0xf0)
     {
       // timing byte
@@ -1614,7 +1618,7 @@ int JZSeq2Player::FindMidiDevice()
   wxString *devs = new wxString[nrsynths];
 
   ninp = 0;
-  for (i = 0; i < nrsynths; i++)
+  for (i = 0; i < nrsynths; ++i)
   {
     si.device = i;
     if (ioctl(seqfd, SNDCTL_SYNTH_INFO, &si) == -1)
@@ -1625,7 +1629,7 @@ int JZSeq2Player::FindMidiDevice()
  //    if (si.synth_type == SYNTH_TYPE_MIDI || si.synth_type == SYNTH_TYPE_SAMPLE)
     {
       devs[ninp] = si.name;
-      ninp++;
+      ++ninp;
     }
   }
 
@@ -1836,7 +1840,7 @@ int JZSeq2Player::OutEvent(JZEvent* pEvent, int now)
            char buf[N];
            buf[0] = (char)0xf0;
            i = 1;
-           for (j = 0; j < sx->GetDataLength(); j++)
+           for (j = 0; j < sx->GetDataLength(); ++j)
            {
              if (i == N)
              {

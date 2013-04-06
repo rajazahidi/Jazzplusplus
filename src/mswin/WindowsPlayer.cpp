@@ -627,11 +627,11 @@ void JZWindowsPlayer::StartPlay(int Clock, int LoopClock, int Continue)
     }
     if (!Continue)
     {
-      JZMtcTime *offs = mpSong->GetTrack(0)->GetMtcOffset();
-      mpState->start_time = offs->ToMillisec();
+      JZMtcTime* pMtcOffset = mpSong->GetTrack(0)->GetMtcOffset();
+      mpState->start_time = pMtcOffset->ToMillisec();
       real_start_time = mpState->start_time;
-      mpState->mtc_start.type = offs->type;
-      delete offs;
+      mpState->mtc_start.type = pMtcOffset->GetType();
+      delete pMtcOffset;
       mpState->start_clock = 0;
     }
   }

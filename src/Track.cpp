@@ -103,94 +103,94 @@ static double gFramesPerSecond[] =
 JZMtcTime::JZMtcTime(JZMtcOffsetEvent* pMtcOffset)
 {
   const unsigned char* pData = pMtcOffset->GetData();
-  type = (tMtcType) ((pData[0] & 0x60) >> 5);
-  if (type < Mtc24)
+  mType = (tMtcType) ((pData[0] & 0x60) >> 5);
+  if (mType < Mtc24)
   {
-    type = Mtc24;
+    mType = Mtc24;
   }
-  if (type > Mtc30Ndf)
+  if (mType > Mtc30Ndf)
   {
-    type = Mtc30Ndf;
+    mType = Mtc30Ndf;
   }
-  hour = pData[0] & 0x1f;
-  min = pData[1];
-  sec = pData[2];
+  mHours = pData[0] & 0x1f;
+  mMinutes = pData[1];
+  mSeconds = pData[2];
   fm = pData[3];
 }
 
-JZMtcTime::JZMtcTime(int millisec, tMtcType t)
+JZMtcTime::JZMtcTime(int millisec, tMtcType Type)
 {
-  type = t;
-  if (type < Mtc24)
+  mType = Type;
+  if (mType < Mtc24)
   {
-    type = Mtc24;
+    mType = Mtc24;
   }
-  if (type > Mtc30Ndf)
+  if (mType > Mtc30Ndf)
   {
-    type = Mtc30Ndf;
+    mType = Mtc30Ndf;
   }
-  sec = millisec / 1000;
+  mSeconds = millisec / 1000;
   int msec = millisec % 1000;
-  min = sec / 60;
-  sec = sec % 60;
-  hour = min / 60;
-  min = min % 60;
-  double frametime = 1000.0 / gFramesPerSecond[type];
+  mMinutes = mSeconds / 60;
+  mSeconds = mSeconds % 60;
+  mHours = mMinutes / 60;
+  mMinutes = mMinutes % 60;
+  double frametime = 1000.0 / gFramesPerSecond[mType];
   fm = (int) ((double) msec / frametime);
 }
 
-JZMtcTime::JZMtcTime(char* str, tMtcType t)
-  : hour(0),
-    min(0),
-    sec(0),
+JZMtcTime::JZMtcTime(char* str, tMtcType Type)
+  : mHours(0),
+    mMinutes(0),
+    mSeconds(0),
     fm(0)
 {
-  type = t;
-  if (type < Mtc24)
+  mType = Type;
+  if (mType < Mtc24)
   {
-    type = Mtc24;
+    mType = Mtc24;
   }
-  if (type > Mtc30Ndf)
+  if (mType > Mtc30Ndf)
   {
-    type = Mtc30Ndf;
+    mType = Mtc30Ndf;
   }
-  sscanf(str, "%d:%d:%d.%d", &hour, &min, &sec, &fm);
-  if (fm >= gFramesPerSecond[type])
+  sscanf(str, "%d:%d:%d.%d", &mHours, &mMinutes, &mSeconds, &fm);
+  if (fm >= gFramesPerSecond[mType])
   {
-    fm = (int) gFramesPerSecond[type] - 1;
+    fm = (int) gFramesPerSecond[mType] - 1;
   }
 }
 
-JZMtcTime::JZMtcTime(unsigned h, unsigned m, unsigned s, unsigned f, unsigned t)
+JZMtcTime::JZMtcTime(unsigned Hours, unsigned Minutes, unsigned Seconds, unsigned f, unsigned Type)
 {
-  hour = h;
-  min = m;
-  sec = s;
+  mHours = Hours;
+  mMinutes = Minutes;
+  mSeconds = Seconds;
   fm = f;
-  type = (tMtcType) t;
-  if (type < Mtc24)
+  mType = (tMtcType) Type;
+  if (mType < Mtc24)
   {
-    type = Mtc24;
+    mType = Mtc24;
   }
-  if (type > Mtc30Ndf)
+  if (mType > Mtc30Ndf)
   {
-    type = Mtc30Ndf;
+    mType = Mtc30Ndf;
   }
 }
 
 void JZMtcTime::ToString(string& String)
 {
   ostringstream Oss;
-  Oss << hour << ':' << min << ':' << sec << '.' << fm;
+  Oss << mHours << ':' << mMinutes << ':' << mSeconds << '.' << fm;
   String = Oss.str();
 }
 
 JZMtcOffsetEvent* JZMtcTime::ToOffset()
 {
   unsigned char* mess = new unsigned char[5];
-  mess[0] = (unsigned char) hour | ((unsigned char) type << 5);
-  mess[1] = (unsigned char) min;
-  mess[2] = (unsigned char) sec;
+  mess[0] = (unsigned char) mHours | ((unsigned char) mType << 5);
+  mess[1] = (unsigned char) mMinutes;
+  mess[2] = (unsigned char) mSeconds;
   mess[3] = (unsigned char) fm;
   mess[4] = 0x00;
   JZMtcOffsetEvent* s = new JZMtcOffsetEvent(0, mess, 5);
@@ -200,8 +200,8 @@ JZMtcOffsetEvent* JZMtcTime::ToOffset()
 
 int JZMtcTime::ToMillisec()
 {
-  int msec = (((((hour * 60L) + min) * 60L) + sec) * 1000L) +
-              ((fm * 1000L) / (int) gFramesPerSecond[type]);
+  int msec = (((((mHours * 60) + mMinutes) * 60) + mSeconds) * 1000) +
+              ((fm * 1000) / (int) gFramesPerSecond[mType]);
   return msec;
 }
 
@@ -575,64 +575,64 @@ void JZEventArray::Clear()
 
   for (i = 0; i < bspBenderSysexParameters; i++)
   {
-    BenderSettings[i] = 0;
+    mpBenderSettings[i] = 0;
   }
 
   for (i = 0; i < cspCAfSysexParameters; i++)
   {
-    CAfSettings[i] = 0;
+    mpCAfSettings[i] = 0;
   }
 
   for (i = 0; i < pspPAfSysexParameters; i++)
   {
-    PAfSettings[i] = 0;
+    mpPAfSettings[i] = 0;
   }
 
   for (i = 0; i < cspCC1SysexParameters; i++)
   {
-    CC1Settings[i] = 0;
+    mpCC1Settings[i] = 0;
   }
 
   for (i = 0; i < cspCC2SysexParameters; i++)
   {
-    CC2Settings[i] = 0;
+    mpCC2Settings[i] = 0;
   }
 
   mpCC1ControllerNr = 0;
-  CC2ControllerNr = 0;
+  mpCC2ControllerNr = 0;
 
-  ReverbType = 0;
-  ChorusType = 0;
-  EqualizerType = 0;
+  mpReverbType = 0;
+  mpChorusType = 0;
+  mpEqualizerType = 0;
 
   for (i = 0; i < rspReverbSysexParameters; i++)
   {
-    ReverbSettings[i] = 0;
+    mpReverbSettings[i] = 0;
   }
 
   for (i = 0; i < cspChorusSysexParameters; i++)
   {
-    ChorusSettings[i] = 0;
+    mpChorusSettings[i] = 0;
   }
 
-  PartialReserve = 0;
-  MasterVol = 0;
-  MasterPan = 0;
-  RxChannel = 0;
-  UseForRhythm = 0;
-  MtcOffset = 0;
+  mpPartialReserve = 0;
+  mpMasterVol = 0;
+  mpMasterPan = 0;
+  mpRxChannel = 0;
+  mpUseForRhythm  = 0;
+  mpMtcOffset = 0;
 
-  VibRate = 0;
-  VibDepth = 0;
-  VibDelay = 0;
-  Cutoff = 0;
-  Resonance = 0;
-  EnvAttack = 0;
-  EnvDecay = 0;
-  EnvRelease = 0;
-  BendPitchSens = 0;
+  mpVibRate = 0;
+  mpVibDepth = 0;
+  mpVibDelay = 0;
+  mpCutoff = 0;
+  mpResonance = 0;
+  mpEnvAttack = 0;
+  mpEnvDecay = 0;
+  mpEnvRelease = 0;
+  mpBendPitchSens = 0;
 
-  DrumParams.Clear();
+  mDrumParams.Clear();
 
   if (mppEvents)
   {
@@ -702,52 +702,52 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
 
   for (i = bspBendPitchControl; i < bspBenderSysexParameters; i++)
   {
-    BenderSettings[i] = 0;
+    mpBenderSettings[i] = 0;
   }
 
   for (i = 0; i < cspCAfSysexParameters; i++)
   {
-    CAfSettings[i] = 0;
+    mpCAfSettings[i] = 0;
   }
 
   for (i = 0; i < pspPAfSysexParameters; i++)
   {
-    PAfSettings[i] = 0;
+    mpPAfSettings[i] = 0;
   }
 
   for (i = 0; i < cspCC1SysexParameters; i++)
   {
-    CC1Settings[i] = 0;
+    mpCC1Settings[i] = 0;
   }
 
   for (i = 0; i < cspCC2SysexParameters; i++)
   {
-    CC2Settings[i] = 0;
+    mpCC2Settings[i] = 0;
   }
 
   mpCC1ControllerNr = 0;
-  CC2ControllerNr = 0;
+  mpCC2ControllerNr = 0;
 
-  ReverbType = 0;
-  ChorusType = 0;
-  EqualizerType = 0;
+  mpReverbType = 0;
+  mpChorusType = 0;
+  mpEqualizerType = 0;
 
   for (i = 0; i < rspReverbSysexParameters; i++)
   {
-    ReverbSettings[i] = 0;
+    mpReverbSettings[i] = 0;
   }
 
   for (i = 0; i < cspChorusSysexParameters; i++)
   {
-    ChorusSettings[i] = 0;
+    mpChorusSettings[i] = 0;
   }
 
-  PartialReserve = 0;
-  MasterVol = 0;
-  MasterPan = 0;
-  RxChannel = 0;
-  UseForRhythm = 0;
-  MtcOffset = 0;
+  mpPartialReserve = 0;
+  mpMasterVol = 0;
+  mpMasterPan = 0;
+  mpRxChannel = 0;
+  mpUseForRhythm  = 0;
+  mpMtcOffset = 0;
 
   for (i = 0; i < mEventCount; i++)
   {
@@ -783,9 +783,9 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
     {
       mpSpeed = pEvent->IsSetTempo();
     }
-    if (!MtcOffset)
+    if (!mpMtcOffset)
     {
-      MtcOffset = pEvent->IsMtcOffset();
+      mpMtcOffset = pEvent->IsMtcOffset();
     }
     if ((pControl = pEvent->IsControl()) != 0)
     {
@@ -827,7 +827,7 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
         {
           case SX_GM_MasterVol:
             // GS has its own; SC-55 doesn't recognize GM Mastervol
-            MasterVol = s;
+            mpMasterVol = s;
             break;
           default:
             break;
@@ -839,10 +839,10 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
         switch (SysExId)
         {
           case SX_GS_MasterVol:
-            MasterVol = s;
+            mpMasterVol = s;
             break;
           case SX_GS_MasterPan:
-            MasterPan = s;
+            mpMasterPan = s;
             break;
           case SX_GS_BendPitch:
           case SX_GS_BendTvf:
@@ -855,7 +855,7 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
           case SX_GS_BendLfo2Pitch:
           case SX_GS_BendLfo2Tvf:
           case SX_GS_BendLfo2Tva:
-            BenderSettings[SysExId - SX_GS_BendPitch] = s;
+            mpBenderSettings[SysExId - SX_GS_BendPitch] = s;
             break;
 
           case SX_GS_ModPitch:
@@ -883,7 +883,7 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
           case SX_GS_CafLfo2Pitch:
           case SX_GS_CafLfo2Tvf:
           case SX_GS_CafLfo2Tva:
-            CAfSettings[SysExId - SX_GS_CafPitch] = s;
+            mpCAfSettings[SysExId - SX_GS_CafPitch] = s;
             break;
 
           case SX_GS_PafPitch:
@@ -897,7 +897,7 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
           case SX_GS_PafLfo2Pitch:
           case SX_GS_PafLfo2Tvf:
           case SX_GS_PafLfo2Tva:
-            PAfSettings[SysExId - SX_GS_PafPitch] = s;
+            mpPAfSettings[SysExId - SX_GS_PafPitch] = s;
             break;
 
           case SX_GS_CC1Pitch:
@@ -911,7 +911,7 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
           case SX_GS_CC1Lfo2Pitch:
           case SX_GS_CC1Lfo2Tvf:
           case SX_GS_CC1Lfo2Tva:
-            CC1Settings[SysExId - SX_GS_CC1Pitch] = s;
+            mpCC1Settings[SysExId - SX_GS_CC1Pitch] = s;
             break;
 
           case SX_GS_CC2Pitch:
@@ -925,11 +925,11 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
           case SX_GS_CC2Lfo2Pitch:
           case SX_GS_CC2Lfo2Tvf:
           case SX_GS_CC2Lfo2Tva:
-            CC2Settings[SysExId - SX_GS_CC2Pitch] = s;
+            mpCC2Settings[SysExId - SX_GS_CC2Pitch] = s;
             break;
 
           case SX_GS_ReverbMacro:
-            ReverbType = s;
+            mpReverbType = s;
             break;
 
           case SX_GS_RevCharacter:
@@ -938,11 +938,11 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
           case SX_GS_RevTime:
           case SX_GS_RevDelayFeedback:
           case SX_GS_RevSendChorus:
-            ReverbSettings[SysExId - SX_GS_RevCharacter] = s;
+            mpReverbSettings[SysExId - SX_GS_RevCharacter] = s;
             break;
 
           case SX_GS_ChorusMacro:
-            ChorusType = s;
+            mpChorusType = s;
             break;
 
           case SX_GS_ChoPreLpf:
@@ -952,7 +952,7 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
           case SX_GS_ChoRate:
           case SX_GS_ChoDepth:
           case SX_GS_ChoSendReverb:
-            ChorusSettings[SysExId - SX_GS_ChoPreLpf] = s;
+            mpChorusSettings[SysExId - SX_GS_ChoPreLpf] = s;
             break;
 
           case SX_GS_CC1CtrlNo:
@@ -960,19 +960,19 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
             break;
 
           case SX_GS_CC2CtrlNo:
-            CC2ControllerNr = s;
+            mpCC2ControllerNr = s;
             break;
 
           case SX_GS_PartialReserve:
-            PartialReserve = s;
+            mpPartialReserve = s;
             break;
 
           case SX_GS_RxChannel:
-            RxChannel = s;
+            mpRxChannel = s;
             break;
 
           case SX_GS_UseForRhythm:
-            UseForRhythm = s;
+            mpUseForRhythm  = s;
             break;
 
           default:
@@ -986,13 +986,13 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
           case SX_XG_BendPitch:
           case SX_XG_BendTvf:
           case SX_XG_BendAmpl:
-            BenderSettings[SysExId - SX_XG_BendPitch] = s;
+            mpBenderSettings[SysExId - SX_XG_BendPitch] = s;
             break;
 
           case SX_XG_BendLfoPitch:
           case SX_XG_BendLfoTvf:
           case SX_XG_BendLfoTva:
-            BenderSettings[SysExId + 1 - SX_XG_BendPitch] = s;
+            mpBenderSettings[SysExId + 1 - SX_XG_BendPitch] = s;
             break;
 
           case SX_XG_ModPitch:
@@ -1010,61 +1010,61 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
           case SX_XG_CafPitch:
           case SX_XG_CafTvf:
           case SX_XG_CafAmpl:
-            CAfSettings[SysExId - SX_XG_CafPitch] = s;
+            mpCAfSettings[SysExId - SX_XG_CafPitch] = s;
             break;
 
           case SX_XG_CafLfoPitch:
           case SX_XG_CafLfoTvf:
           case SX_XG_CafLfoTva:
-            CAfSettings[SysExId + 1 - SX_XG_CafPitch] = s;
+            mpCAfSettings[SysExId + 1 - SX_XG_CafPitch] = s;
             break;
 
           case SX_XG_PafPitch:
           case SX_XG_PafTvf:
           case SX_XG_PafAmpl:
-            PAfSettings[SysExId - SX_XG_PafPitch] = s;
+            mpPAfSettings[SysExId - SX_XG_PafPitch] = s;
             break;
 
           case SX_XG_PafLfoPitch:
           case SX_XG_PafLfoTvf:
           case SX_XG_PafLfoTva:
-            PAfSettings[SysExId + 1 - SX_XG_PafPitch] = s;
+            mpPAfSettings[SysExId + 1 - SX_XG_PafPitch] = s;
             break;
 
           case SX_XG_CC1Pitch:
           case SX_XG_CC1Tvf:
           case SX_XG_CC1Ampl:
-            CC1Settings[SysExId - SX_XG_CC1Pitch] = s;
+            mpCC1Settings[SysExId - SX_XG_CC1Pitch] = s;
             break;
 
           case SX_XG_CC1LfoPitch:
           case SX_XG_CC1LfoTvf:
           case SX_XG_CC1LfoTva:
-            CC1Settings[SysExId + 1 - SX_XG_CC1Pitch] = s;
+            mpCC1Settings[SysExId + 1 - SX_XG_CC1Pitch] = s;
             break;
 
           case SX_XG_CC2Pitch:
           case SX_XG_CC2Tvf:
           case SX_XG_CC2Ampl:
-            CC2Settings[SysExId - SX_XG_CC2Pitch] = s;
+            mpCC2Settings[SysExId - SX_XG_CC2Pitch] = s;
             break;
 
           case SX_XG_CC2LfoPitch:
           case SX_XG_CC2LfoTvf:
           case SX_XG_CC2LfoTva:
-            CC2Settings[SysExId + 1 - SX_XG_CC2Pitch] = s;
+            mpCC2Settings[SysExId + 1 - SX_XG_CC2Pitch] = s;
             break;
 
           case SX_XG_ReverbMacro:
-            ReverbType = s;
+            mpReverbType = s;
             break;
 
           case SX_XG_ChorusMacro:
-            ChorusType = s;
+            mpChorusType = s;
             break;
 
           case SX_XG_EqualizerMacro:
-            EqualizerType = s;
+            mpEqualizerType = s;
             break;
 
           case SX_XG_CC1CtrlNo:
@@ -1072,15 +1072,15 @@ void JZEventArray::Cleanup(bool dont_delete_killed_events)
             break;
 
           case SX_XG_CC2CtrlNo:
-            CC2ControllerNr = s;
+            mpCC2ControllerNr = s;
             break;
 
           case SX_XG_RxChannel:
-            RxChannel = s;
+            mpRxChannel = s;
             break;
 
           case SX_XG_UseForRhythm:
-            UseForRhythm = s;
+            mpUseForRhythm  = s;
             break;
 
           default:
@@ -1236,9 +1236,9 @@ void JZEventArray::Write(JZWriteBase& Io)
   }
 
   // Write MTC offset before any transmittable events (spec)
-  if (MtcOffset)
+  if (mpMtcOffset)
   {
-    MtcOffset->Write(Io);
+    mpMtcOffset->Write(Io);
   }
 
   // Synth reset
@@ -1249,44 +1249,44 @@ void JZEventArray::Write(JZWriteBase& Io)
 
   // Rpn / Nrpn:
   // All these must be written in order (three JZControlEvent's in a row)
-  if (VibRate)
+  if (mpVibRate)
   {
-    VibRate->Write(Io);
+    mpVibRate->Write(Io);
   }
-  if (VibDepth)
+  if (mpVibDepth)
   {
-    VibDepth->Write(Io);
+    mpVibDepth->Write(Io);
   }
-  if (VibDelay)
+  if (mpVibDelay)
   {
-    VibDelay->Write(Io);
+    mpVibDelay->Write(Io);
   }
-  if (Cutoff)
+  if (mpCutoff)
   {
-    Cutoff->Write(Io);
+    mpCutoff->Write(Io);
   }
-  if (Resonance)
+  if (mpResonance)
   {
-    Resonance->Write(Io);
+    mpResonance->Write(Io);
   }
-  if (EnvAttack)
+  if (mpEnvAttack)
   {
-    EnvAttack->Write(Io);
+    mpEnvAttack->Write(Io);
   }
-  if (EnvDecay)
+  if (mpEnvDecay)
   {
-    EnvDecay->Write(Io);
+    mpEnvDecay->Write(Io);
   }
-  if (EnvRelease)
+  if (mpEnvRelease)
   {
-    EnvRelease->Write(Io);
+    mpEnvRelease->Write(Io);
   }
-  if (BendPitchSens)
+  if (mpBendPitchSens)
   {
-    BendPitchSens->Write(Io);
+    mpBendPitchSens->Write(Io);
   }
 
-  JZDrumInstrumentParameter* dpar = DrumParams.FirstElem();
+  JZDrumInstrumentParameter* dpar = mDrumParams.FirstElem();
   while (dpar)
   {
     int index;
@@ -1297,7 +1297,7 @@ void JZEventArray::Write(JZWriteBase& Io)
         dpar->Get(index)->Write(Io);
       }
     }
-    dpar = DrumParams.NextElem(dpar);
+    dpar = mDrumParams.NextElem(dpar);
   }
 
   // mpBank: Must be sure bank is written before program:
@@ -1424,51 +1424,51 @@ void JZEventArray::Read(JZReadBase& Io)
               switch (Lsb)
               {
                 case 0x08:
-                  if (!VibRate)
+                  if (!mpVibRate)
                   {
-                    VibRate = new JZNrpn(0, cha, Msb, Lsb, Data);
+                    mpVibRate = new JZNrpn(0, cha, Msb, Lsb, Data);
                   }
                   break;
                 case 0x09:
-                  if (!VibDepth)
+                  if (!mpVibDepth)
                   {
-                    VibDepth = new JZNrpn(0, cha, Msb, Lsb, Data);
+                    mpVibDepth = new JZNrpn(0, cha, Msb, Lsb, Data);
                   }
                   break;
                 case 0x0a:
-                  if (!VibDelay)
+                  if (!mpVibDelay)
                   {
-                    VibDelay = new JZNrpn(0, cha, Msb, Lsb, Data);
+                    mpVibDelay = new JZNrpn(0, cha, Msb, Lsb, Data);
                   }
                   break;
                 case 0x20:
-                  if (!Cutoff)
+                  if (!mpCutoff)
                   {
-                    Cutoff = new JZNrpn(0, cha, Msb, Lsb, Data);
+                    mpCutoff = new JZNrpn(0, cha, Msb, Lsb, Data);
                   }
                   break;
                 case 0x21:
-                  if (!Resonance)
+                  if (!mpResonance)
                   {
-                    Resonance = new JZNrpn(0, cha, Msb, Lsb, Data);
+                    mpResonance = new JZNrpn(0, cha, Msb, Lsb, Data);
                   }
                   break;
                 case 0x63:
-                  if (!EnvAttack)
+                  if (!mpEnvAttack)
                   {
-                    EnvAttack = new JZNrpn(0, cha, Msb, Lsb, Data);
+                    mpEnvAttack = new JZNrpn(0, cha, Msb, Lsb, Data);
                   }
                   break;
                 case 0x64:
-                  if (!EnvDecay)
+                  if (!mpEnvDecay)
                   {
-                    EnvDecay = new JZNrpn(0, cha, Msb, Lsb, Data);
+                    mpEnvDecay = new JZNrpn(0, cha, Msb, Lsb, Data);
                   }
                   break;
                 case 0x66:
-                  if (!EnvRelease)
+                  if (!mpEnvRelease)
                   {
-                    EnvRelease = new JZNrpn(0, cha, Msb, Lsb, Data);
+                    mpEnvRelease = new JZNrpn(0, cha, Msb, Lsb, Data);
                   }
                   break;
                 default:
@@ -1480,15 +1480,15 @@ void JZEventArray::Read(JZReadBase& Io)
             case drumPan:
             case drumReverb:
             case drumChorus:
-              DrumParams.PutParam(new JZNrpn(0, cha, Msb, Lsb, Data));
+              mDrumParams.PutParam(new JZNrpn(0, cha, Msb, Lsb, Data));
               break;
             case 0x00: // Rpn
               if (Lsb == 0x00)
               {
                 // Pitch Bend Sensivity
-                if (!BendPitchSens)
+                if (!mpBendPitchSens)
                 {
-                  BendPitchSens = new JZRpn(0, cha, Msb, Lsb, Data);
+                  mpBendPitchSens = new JZRpn(0, cha, Msb, Lsb, Data);
                 }
               }
               break;
@@ -1736,41 +1736,41 @@ void JZTrackDlg::OnOk()
       pEvent = Iterator.Next();
     } // while pEvent
 
-    if (trk->VibRate)
+    if (trk->mpVibRate)
     {
-      trk->VibRate->SetChannel(trk->mChannel - 1);
+      trk->mpVibRate->SetChannel(trk->mChannel - 1);
     }
-    if (trk->VibDepth)
+    if (trk->mpVibDepth)
     {
-      trk->VibDepth->SetChannel(trk->mChannel - 1);
+      trk->mpVibDepth->SetChannel(trk->mChannel - 1);
     }
-    if (trk->VibDelay)
+    if (trk->mpVibDelay)
     {
-      trk->VibDelay->SetChannel(trk->mChannel - 1);
+      trk->mpVibDelay->SetChannel(trk->mChannel - 1);
     }
-    if (trk->Cutoff)
+    if (trk->mpCutoff)
     {
-      trk->Cutoff->SetChannel(trk->mChannel - 1);
+      trk->mpCutoff->SetChannel(trk->mChannel - 1);
     }
-    if (trk->Resonance)
+    if (trk->mpResonance)
     {
-      trk->Resonance->SetChannel(trk->mChannel - 1);
+      trk->mpResonance->SetChannel(trk->mChannel - 1);
     }
-    if (trk->EnvAttack)
+    if (trk->mpEnvAttack)
     {
-      trk->EnvAttack->SetChannel(trk->mChannel - 1);
+      trk->mpEnvAttack->SetChannel(trk->mChannel - 1);
     }
-    if (trk->EnvDecay)
+    if (trk->mpEnvDecay)
     {
-      trk->EnvDecay->SetChannel(trk->mChannel - 1);
+      trk->mpEnvDecay->SetChannel(trk->mChannel - 1);
     }
-    if (trk->EnvRelease)
+    if (trk->mpEnvRelease)
     {
-      trk->EnvRelease->SetChannel(trk->mChannel - 1);
+      trk->mpEnvRelease->SetChannel(trk->mChannel - 1);
     }
-    if (trk->BendPitchSens)
+    if (trk->mpBendPitchSens)
     {
-      trk->BendPitchSens->SetChannel(trk->mChannel - 1);
+      trk->mpBendPitchSens->SetChannel(trk->mChannel - 1);
     }
     if (trk->mpBank)
     {
@@ -1780,9 +1780,9 @@ void JZTrackDlg::OnOk()
     {
       trk->mpPatch->mChannel = trk->mChannel - 1;
     }
-    if (!trk->DrumParams.IsEmpty())
+    if (!trk->mDrumParams.IsEmpty())
     {
-      JZDrumInstrumentParameter* dpar = trk->DrumParams.FirstElem();
+      JZDrumInstrumentParameter* dpar = trk->mDrumParams.FirstElem();
       while (dpar)
       {
         for (int index = drumPitchIndex; index < numDrumParameters; ++index)
@@ -1792,7 +1792,7 @@ void JZTrackDlg::OnOk()
             dpar->Get(index)->SetChannel(trk->mChannel - 1);
           }
         }
-        dpar = trk->DrumParams.NextElem(dpar);
+        dpar = trk->mDrumParams.NextElem(dpar);
       }
     }
     trk->Cleanup();
@@ -2391,25 +2391,25 @@ void JZTrack::SetPatch(int PatchNr)
 
 int JZTrack::GetVibRate()
 {
-  if (VibRate)
+  if (mpVibRate)
   {
-    return VibRate->GetVal() + 1;
+    return mpVibRate->GetVal() + 1;
   }
   return 0;
 }
 
 void JZTrack::SetVibRate(int Value)
 {
-  if (VibRate)
+  if (mpVibRate)
   {
-    delete VibRate;
-    VibRate = 0;
+    delete mpVibRate;
+    mpVibRate = 0;
   }
 
   if (Value > 0)
   {
-    VibRate = new JZNrpn(0, mChannel - 1, 0x01, 0x08, Value - 1);
-    gpMidiPlayer->OutNow(this, VibRate);
+    mpVibRate = new JZNrpn(0, mChannel - 1, 0x01, 0x08, Value - 1);
+    gpMidiPlayer->OutNow(this, mpVibRate);
     mChanged = true;
   }
 }
@@ -2418,24 +2418,24 @@ void JZTrack::SetVibRate(int Value)
 
 int JZTrack::GetVibDepth()
 {
-  if (VibDepth)
+  if (mpVibDepth)
   {
-    return VibDepth->GetVal() + 1;
+    return mpVibDepth->GetVal() + 1;
   }
   return 0;
 }
 
 void JZTrack::SetVibDepth(int Value)
 {
-  if (VibDepth)
+  if (mpVibDepth)
   {
-    delete VibDepth;
-    VibDepth = 0;
+    delete mpVibDepth;
+    mpVibDepth = 0;
   }
   if (Value > 0)
   {
-    VibDepth = new JZNrpn(0, mChannel - 1, 0x01, 0x09, Value - 1);
-    gpMidiPlayer->OutNow(this,  VibDepth);
+    mpVibDepth = new JZNrpn(0, mChannel - 1, 0x01, 0x09, Value - 1);
+    gpMidiPlayer->OutNow(this, mpVibDepth);
     mChanged = true;
   }
 }
@@ -2444,25 +2444,25 @@ void JZTrack::SetVibDepth(int Value)
 
 int JZTrack::GetVibDelay()
 {
-  if (VibDelay)
+  if (mpVibDelay)
   {
-    return VibDelay->GetVal() + 1;
+    return mpVibDelay->GetVal() + 1;
   }
   return 0;
 }
 
 void JZTrack::SetVibDelay(int Value)
 {
-  if (VibDelay)
+  if (mpVibDelay)
   {
-    delete VibDelay;
-    VibDelay = 0;
+    delete mpVibDelay;
+    mpVibDelay = 0;
   }
 
   if (Value > 0)
   {
-    VibDelay = new JZNrpn(0, mChannel - 1, 0x01, 0x0a, Value - 1);
-    gpMidiPlayer->OutNow(this,  VibDelay);
+    mpVibDelay = new JZNrpn(0, mChannel - 1, 0x01, 0x0a, Value - 1);
+    gpMidiPlayer->OutNow(this, mpVibDelay);
     mChanged = true;
   }
 }
@@ -2471,25 +2471,25 @@ void JZTrack::SetVibDelay(int Value)
 
 int JZTrack::GetCutoff()
 {
-  if (Cutoff)
+  if (mpCutoff)
   {
-    return Cutoff->GetVal() + 1;
+    return mpCutoff->GetVal() + 1;
   }
   return 0;
 }
 
 void JZTrack::SetCutoff(int Value)
 {
-  if (Cutoff)
+  if (mpCutoff)
   {
-    delete Cutoff;
-    Cutoff = 0;
+    delete mpCutoff;
+    mpCutoff = 0;
   }
 
   if (Value > 0)
   {
-    Cutoff = new JZNrpn(0, mChannel - 1, 0x01, 0x20, Value - 1);
-    gpMidiPlayer->OutNow(this,  Cutoff);
+    mpCutoff = new JZNrpn(0, mChannel - 1, 0x01, 0x20, Value - 1);
+    gpMidiPlayer->OutNow(this, mpCutoff);
     mChanged = true;
   }
 }
@@ -2498,25 +2498,25 @@ void JZTrack::SetCutoff(int Value)
 
 int JZTrack::GetResonance()
 {
-  if (Resonance)
+  if (mpResonance)
   {
-    return Resonance->GetVal() + 1;
+    return mpResonance->GetVal() + 1;
   }
   return 0;
 }
 
 void JZTrack::SetResonance(int Value)
 {
-  if (Resonance)
+  if (mpResonance)
   {
-    delete Resonance;
-    Resonance = 0;
+    delete mpResonance;
+    mpResonance = 0;
   }
 
   if (Value > 0)
   {
-    Resonance = new JZNrpn(0, mChannel - 1, 0x01, 0x21, Value - 1);
-    gpMidiPlayer->OutNow(this,  Resonance);
+    mpResonance = new JZNrpn(0, mChannel - 1, 0x01, 0x21, Value - 1);
+    gpMidiPlayer->OutNow(this, mpResonance);
     mChanged = true;
   }
 }
@@ -2525,25 +2525,25 @@ void JZTrack::SetResonance(int Value)
 
 int JZTrack::GetEnvAttack()
 {
-  if (EnvAttack)
+  if (mpEnvAttack)
   {
-    return EnvAttack->GetVal() + 1;
+    return mpEnvAttack->GetVal() + 1;
   }
   return 0;
 }
 
 void JZTrack::SetEnvAttack(int Value)
 {
-  if (EnvAttack)
+  if (mpEnvAttack)
   {
-    delete EnvAttack;
-    EnvAttack = 0;
+    delete mpEnvAttack;
+    mpEnvAttack = 0;
   }
 
   if (Value > 0)
   {
-    EnvAttack = new JZNrpn(0, mChannel - 1, 0x01, 0x63, Value - 1);
-    gpMidiPlayer->OutNow(this,  EnvAttack);
+    mpEnvAttack = new JZNrpn(0, mChannel - 1, 0x01, 0x63, Value - 1);
+    gpMidiPlayer->OutNow(this, mpEnvAttack);
     mChanged = true;
   }
 }
@@ -2552,25 +2552,25 @@ void JZTrack::SetEnvAttack(int Value)
 
 int JZTrack::GetEnvDecay()
 {
-  if (EnvDecay)
+  if (mpEnvDecay)
   {
-    return EnvDecay->GetVal() + 1;
+    return mpEnvDecay->GetVal() + 1;
   }
   return 0;
 }
 
 void JZTrack::SetEnvDecay(int Value)
 {
-  if (EnvDecay)
+  if (mpEnvDecay)
   {
-    delete EnvDecay;
-    EnvDecay = 0;
+    delete mpEnvDecay;
+    mpEnvDecay = 0;
   }
 
   if (Value > 0)
   {
-    EnvDecay = new JZNrpn(0, mChannel - 1, 0x01, 0x64, Value - 1);
-    gpMidiPlayer->OutNow(this,  EnvDecay);
+    mpEnvDecay = new JZNrpn(0, mChannel - 1, 0x01, 0x64, Value - 1);
+    gpMidiPlayer->OutNow(this, mpEnvDecay);
     mChanged = true;
   }
 }
@@ -2579,25 +2579,25 @@ void JZTrack::SetEnvDecay(int Value)
 
 int JZTrack::GetEnvRelease()
 {
-  if (EnvRelease)
+  if (mpEnvRelease)
   {
-    return EnvRelease->GetVal() + 1;
+    return mpEnvRelease->GetVal() + 1;
   }
   return 0;
 }
 
 void JZTrack::SetEnvRelease(int Value)
 {
-  if (EnvRelease)
+  if (mpEnvRelease)
   {
-    delete EnvRelease;
-    EnvRelease = 0;
+    delete mpEnvRelease;
+    mpEnvRelease = 0;
   }
 
   if (Value > 0)
   {
-    EnvRelease = new JZNrpn(0, mChannel - 1, 0x01, 0x66, Value - 1);
-    gpMidiPlayer->OutNow(this,  EnvRelease);
+    mpEnvRelease = new JZNrpn(0, mChannel - 1, 0x01, 0x66, Value - 1);
+    gpMidiPlayer->OutNow(this, mpEnvRelease);
     mChanged = true;
   }
 }
@@ -2606,9 +2606,9 @@ void JZTrack::SetEnvRelease(int Value)
 
 int JZTrack::GetDrumParam(int pitch, int index)
 {
-  if (!DrumParams.IsEmpty())
+  if (!mDrumParams.IsEmpty())
   {
-    JZNrpn* par = DrumParams.GetParam(pitch, index);
+    JZNrpn* par = mDrumParams.GetParam(pitch, index);
     if (par)
     {
       return(par->GetVal() + 1);
@@ -2619,12 +2619,12 @@ int JZTrack::GetDrumParam(int pitch, int index)
 
 void JZTrack::SetDrumParam(int pitch, int index, int Value)
 {
-  DrumParams.DelParam(pitch, index);
+  mDrumParams.DelParam(pitch, index);
   if (Value > 0)
   {
-    DrumParams.PutParam(
+    mDrumParams.PutParam(
       new JZNrpn(0, mChannel - 1, drumIndex2Param(index), pitch, Value - 1));
-    gpMidiPlayer->OutNow(this, DrumParams.GetParam(pitch, index));
+    gpMidiPlayer->OutNow(this, mDrumParams.GetParam(pitch, index));
     mChanged = true;
   }
 }
@@ -2633,25 +2633,25 @@ void JZTrack::SetDrumParam(int pitch, int index, int Value)
 
 int JZTrack::GetBendPitchSens()
 {
-  if (BendPitchSens)
+  if (mpBendPitchSens)
   {
-    return BendPitchSens->GetVal() + 1;
+    return mpBendPitchSens->GetVal() + 1;
   }
   return 0;
 }
 
 void JZTrack::SetBendPitchSens(int Value)
 {
-  if (BendPitchSens)
+  if (mpBendPitchSens)
   {
-    delete BendPitchSens;
-    BendPitchSens = 0;
+    delete mpBendPitchSens;
+    mpBendPitchSens = 0;
   }
 
   if (Value > 0)
   {
-    BendPitchSens = new JZRpn(0, mChannel - 1, 0x00, 0x00, Value - 1);
-    gpMidiPlayer->OutNow(this, BendPitchSens);
+    mpBendPitchSens = new JZRpn(0, mChannel - 1, 0x00, 0x00, Value - 1);
+    gpMidiPlayer->OutNow(this, mpBendPitchSens);
     mChanged = true;
   }
 }
@@ -2693,7 +2693,7 @@ void JZTrack::SetModulationSysex(int msp, int Value)
 
 int JZTrack::GetBenderSysex(int bsp)
 {
-  const unsigned char* pValue = gpSynth->GetSysexValPtr(BenderSettings[bsp]);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(mpBenderSettings[bsp]);
 
   if (pValue)
   {
@@ -2705,9 +2705,9 @@ int JZTrack::GetBenderSysex(int bsp)
 
 void JZTrack::SetBenderSysex(int bsp, int Value)
 {
-  if (BenderSettings[bsp])
+  if (mpBenderSettings[bsp])
   {
-    Kill(BenderSettings[bsp]);
+    Kill(mpBenderSettings[bsp]);
   }
   if (Value > 0)
   {
@@ -2725,7 +2725,7 @@ void JZTrack::SetBenderSysex(int bsp, int Value)
 
 int JZTrack::GetCAfSysex(int csp)
 {
-  const unsigned char* pValue = gpSynth->GetSysexValPtr(CAfSettings[csp]);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(mpCAfSettings[csp]);
 
   if (pValue)
   {
@@ -2737,9 +2737,9 @@ int JZTrack::GetCAfSysex(int csp)
 
 void JZTrack::SetCAfSysex(int csp, int Value)
 {
-  if (CAfSettings[csp])
+  if (mpCAfSettings[csp])
   {
-    Kill(CAfSettings[csp]);
+    Kill(mpCAfSettings[csp]);
   }
   if (Value > 0)
   {
@@ -2757,7 +2757,7 @@ void JZTrack::SetCAfSysex(int csp, int Value)
 
 int JZTrack::GetPAfSysex(int psp)
 {
-  const unsigned char* pValue = gpSynth->GetSysexValPtr(PAfSettings[psp]);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(mpPAfSettings[psp]);
 
   if (pValue)
   {
@@ -2769,9 +2769,9 @@ int JZTrack::GetPAfSysex(int psp)
 
 void JZTrack::SetPAfSysex(int psp, int Value)
 {
-  if (PAfSettings[psp])
+  if (mpPAfSettings[psp])
   {
-    Kill(PAfSettings[psp]);
+    Kill(mpPAfSettings[psp]);
   }
   if (Value > 0)
   {
@@ -2789,7 +2789,7 @@ void JZTrack::SetPAfSysex(int psp, int Value)
 
 int JZTrack::GetCC1Sysex(int csp)
 {
-  const unsigned char* pValue = gpSynth->GetSysexValPtr(CC1Settings[csp]);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(mpCC1Settings[csp]);
 
   if (pValue)
   {
@@ -2801,9 +2801,9 @@ int JZTrack::GetCC1Sysex(int csp)
 
 void JZTrack::SetCC1Sysex(int csp, int Value)
 {
-  if (CC1Settings[csp])
+  if (mpCC1Settings[csp])
   {
-    Kill(CC1Settings[csp]);
+    Kill(mpCC1Settings[csp]);
   }
   if (Value > 0)
   {
@@ -2821,7 +2821,7 @@ void JZTrack::SetCC1Sysex(int csp, int Value)
 
 int JZTrack::GetCC2Sysex(int csp)
 {
-  const unsigned char* pValue = gpSynth->GetSysexValPtr(CC2Settings[csp]);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(mpCC2Settings[csp]);
 
   if (pValue)
   {
@@ -2833,8 +2833,10 @@ int JZTrack::GetCC2Sysex(int csp)
 
 void JZTrack::SetCC2Sysex(int csp, int Value)
 {
-  if (CC2Settings[csp])
-    Kill(CC2Settings[csp]);
+  if (mpCC2Settings[csp])
+  {
+    Kill(mpCC2Settings[csp]);
+  }
   if (Value > 0)
   {
     JZEvent* pEvent = gpSynth->CC2SX(csp, 0, mChannel, Value - 1);
@@ -2883,7 +2885,7 @@ void JZTrack::SetCC1ControllerNr(int Value)
 
 int JZTrack::GetCC2ControllerNr()
 {
-  const unsigned char* pValue = gpSynth->GetSysexValPtr(CC2ControllerNr);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(mpCC2ControllerNr);
 
   if (pValue)
   {
@@ -2895,9 +2897,9 @@ int JZTrack::GetCC2ControllerNr()
 
 void JZTrack::SetCC2ControllerNr(int Value)
 {
-  if (CC2ControllerNr)
+  if (mpCC2ControllerNr)
   {
-    Kill(CC2ControllerNr);
+    Kill(mpCC2ControllerNr);
   }
   if (Value > 0)
   {
@@ -2915,7 +2917,7 @@ void JZTrack::SetCC2ControllerNr(int Value)
 
 int JZTrack::GetReverbType(int lsb)
 {
-  const unsigned char* pValue = gpSynth->GetSysexValPtr(ReverbType);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(mpReverbType);
 
   if (pValue)
   {
@@ -2931,9 +2933,9 @@ int JZTrack::GetReverbType(int lsb)
 
 void JZTrack::SetReverbType(int Value, int lsb)
 {
-  if (ReverbType)
+  if (mpReverbType)
   {
-    Kill(ReverbType);
+    Kill(mpReverbType);
   }
 
   if (Value > 0)
@@ -2955,7 +2957,7 @@ void JZTrack::SetReverbType(int Value, int lsb)
 
 int JZTrack::GetChorusType(int lsb)
 {
-  const unsigned char* pValue = gpSynth->GetSysexValPtr(ChorusType);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(mpChorusType);
 
   if (pValue)
   {
@@ -2972,9 +2974,9 @@ int JZTrack::GetChorusType(int lsb)
 
 void JZTrack::SetChorusType(int Value, int lsb)
 {
-  if (ChorusType)
+  if (mpChorusType)
   {
-    Kill(ChorusType);
+    Kill(mpChorusType);
   }
 
   if (Value > 0)
@@ -2996,7 +2998,7 @@ void JZTrack::SetChorusType(int Value, int lsb)
 
 int JZTrack::GetEqualizerType()
 {
-  const unsigned char* pValue = gpSynth->GetSysexValPtr(EqualizerType);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(mpEqualizerType);
 
   if (pValue)
   {
@@ -3008,9 +3010,9 @@ int JZTrack::GetEqualizerType()
 
 void JZTrack::SetEqualizerType(int Value)
 {
-  if (EqualizerType)
+  if (mpEqualizerType)
   {
-    Kill(EqualizerType);
+    Kill(mpEqualizerType);
   }
 
   if (Value > 0)
@@ -3029,7 +3031,7 @@ void JZTrack::SetEqualizerType(int Value)
 
 int JZTrack::GetRevSysex(int rsp)
 {
-  const unsigned char* pValue = gpSynth->GetSysexValPtr(ReverbSettings[rsp]);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(mpReverbSettings[rsp]);
 
   if (pValue)
   {
@@ -3041,9 +3043,9 @@ int JZTrack::GetRevSysex(int rsp)
 
 void JZTrack::SetRevSysex(int rsp, int Value)
 {
-  if (ReverbSettings[rsp])
+  if (mpReverbSettings[rsp])
   {
-    Kill(ReverbSettings[rsp]);
+    Kill(mpReverbSettings[rsp]);
   }
 
   if (Value > 0)
@@ -3065,7 +3067,7 @@ void JZTrack::SetRevSysex(int rsp, int Value)
 
 int JZTrack::GetChoSysex(int csp)
 {
-  const unsigned char* pValue = gpSynth->GetSysexValPtr(ChorusSettings[csp]);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(mpChorusSettings[csp]);
 
   if (pValue)
   {
@@ -3077,9 +3079,9 @@ int JZTrack::GetChoSysex(int csp)
 
 void JZTrack::SetChoSysex(int csp, int Value)
 {
-  if (ChorusSettings[csp])
+  if (mpChorusSettings[csp])
   {
-    Kill(ChorusSettings[csp]);
+    Kill(mpChorusSettings[csp]);
   }
 
   if (Value > 0)
@@ -3102,7 +3104,7 @@ void JZTrack::SetChoSysex(int csp, int Value)
 
 int JZTrack::GetPartRsrv(int chan)
 {
-  const unsigned char* pValue = gpSynth->GetSysexValPtr(PartialReserve);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(mpPartialReserve);
 
   if (pValue)
   {
@@ -3114,9 +3116,9 @@ int JZTrack::GetPartRsrv(int chan)
 
 void JZTrack::SetPartRsrv(unsigned char* rsrv)
 {
-  if (PartialReserve)
+  if (mpPartialReserve)
   {
-    Kill(PartialReserve);
+    Kill(mpPartialReserve);
   }
 
   if (rsrv)
@@ -3135,11 +3137,11 @@ void JZTrack::SetPartRsrv(unsigned char* rsrv)
 
 int JZTrack::GetMasterVol()
 {
-  const unsigned char* pValue = gpSynth->GetSysexValPtr(MasterVol);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(mpMasterVol);
 
   if (pValue)
   {
-    if (gpSynth->GetSysexId(MasterVol) == SX_GM_MasterVol)
+    if (gpSynth->GetSysexId(mpMasterVol) == SX_GM_MasterVol)
     {
       // first data byte is lsb; get msb instead!
       ++pValue;
@@ -3153,9 +3155,9 @@ int JZTrack::GetMasterVol()
 
 void JZTrack::SetMasterVol(int Value)
 {
-  if (MasterVol)
+  if (mpMasterVol)
   {
-    Kill(MasterVol);
+    Kill(mpMasterVol);
   }
   if (Value > 0)
   {
@@ -3174,7 +3176,7 @@ void JZTrack::SetMasterVol(int Value)
 
 int JZTrack::GetMasterPan()
 {
-  const unsigned char* pValue = gpSynth->GetSysexValPtr(MasterPan);
+  const unsigned char* pValue = gpSynth->GetSysexValPtr(mpMasterPan);
 
   if (pValue)
   {
@@ -3186,9 +3188,9 @@ int JZTrack::GetMasterPan()
 
 void JZTrack::SetMasterPan(int Value)
 {
-  if (MasterPan)
+  if (mpMasterPan)
   {
-    Kill(MasterPan);
+    Kill(mpMasterPan);
   }
   if (Value > 0)
   {
@@ -3211,11 +3213,11 @@ int JZTrack::GetModeSysex(int param)
    switch (param)
    {
      case mspRxChannel:
-       pValue = gpSynth->GetSysexValPtr(RxChannel);
+       pValue = gpSynth->GetSysexValPtr(mpRxChannel);
        break;
 
      case mspUseForRhythm:
-       pValue = gpSynth->GetSysexValPtr(UseForRhythm);
+       pValue = gpSynth->GetSysexValPtr(mpUseForRhythm );
        break;
    }
 
@@ -3232,16 +3234,16 @@ void JZTrack::SetModeSysex(int param, int Value)
   switch (param)
   {
     case mspRxChannel:
-      if (RxChannel)
+      if (mpRxChannel)
       {
-        Kill(RxChannel);
+        Kill(mpRxChannel);
       }
       break;
 
     case mspUseForRhythm:
-      if (UseForRhythm)
+      if (mpUseForRhythm )
       {
-        Kill(UseForRhythm);
+        Kill(mpUseForRhythm );
       }
       break;
   }
@@ -3273,18 +3275,18 @@ void JZTrack::SetModeSysex(int param, int Value)
 
 JZMtcTime* JZTrack::GetMtcOffset()
 {
-  if (MtcOffset)
+  if (mpMtcOffset)
   {
-    return new JZMtcTime(MtcOffset);
+    return new JZMtcTime(mpMtcOffset);
   }
   return(new JZMtcTime(0, Mtc30Ndf));
 }
 
 void JZTrack::SetMtcOffset(JZMtcTime* mtc)
 {
-  if (MtcOffset)
+  if (mpMtcOffset)
   {
-    Kill(MtcOffset);
+    Kill(mpMtcOffset);
   }
   if (mtc)
   {

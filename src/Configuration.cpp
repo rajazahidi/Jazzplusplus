@@ -863,10 +863,11 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
 
           mVoiceNames[VoiceIndex + 1].second = Value + 1;
 
-          string VoiceName =
-            TNStringUtilities::TrimLeadingAndTrailingBlanks(Iss.str());
+          string VoiceName;
+          getline(Iss, VoiceName);
 
-          mVoiceNames[VoiceIndex + 1].first = VoiceName;
+          mVoiceNames[VoiceIndex + 1].first =
+            TNStringUtilities::TrimLeadingAndTrailingBlanks(VoiceName);
 
           ++VoiceIndex;
         }
@@ -903,12 +904,10 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
           mDrumSets[DrumsetIndex + 1].second = Value + 1;
 
           string SetName;
-          Iss >> SetName;
+          getline(Iss, SetName);
 
-          string DrumSetName =
-            TNStringUtilities::TrimLeadingAndTrailingBlanks(Iss.str());
-
-          mDrumSets[DrumsetIndex + 1].first = DrumSetName;
+          mDrumSets[DrumsetIndex + 1].first =
+            TNStringUtilities::TrimLeadingAndTrailingBlanks(SetName);
 
           ++DrumsetIndex;
         }
@@ -941,10 +940,11 @@ void JZConfiguration::LoadConfig(const wxString& FileName)
         Iss >> i;
         assert(0 <= i && i <= 127);
 
-        string DrumName =
-          TNStringUtilities::TrimLeadingAndTrailingBlanks(Iss.str());
+        string DrumName;
+        getline(Iss, DrumName);
 
-        mDrumNames[i + 1].first = DrumName;
+        mDrumNames[i + 1].first =
+          TNStringUtilities::TrimLeadingAndTrailingBlanks(DrumName);
       }
       else
       {

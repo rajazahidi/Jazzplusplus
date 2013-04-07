@@ -59,10 +59,8 @@ JZArrayControl::JZArrayControl(
   const JZRndArray& RandomArray,
   const wxPoint& Position,
   const wxSize& Size,
-  long WindowStyle,
-  const wxValidator& Validator,
-  const wxString& Name)
-  : wxControl(),
+  long WindowStyle)
+  : wxControl(pParent, Id, Position, Size, wxNO_BORDER),
     mpRandomArray(0),
     mStyleBits(ARED_GAP | ARED_XTICKS),
     mEnabled(true),
@@ -77,15 +75,7 @@ JZArrayControl::JZArrayControl(
 {
   mpRandomArray = new JZRndArray(RandomArray);
 
-  Create(
-    pParent,
-    Id,
-    RandomArray,
-    Position,
-    Size,
-    WindowStyle,
-    Validator,
-    Name);
+  SetInitialSize(Size);
 }
 
 //-----------------------------------------------------------------------------
@@ -93,32 +83,6 @@ JZArrayControl::JZArrayControl(
 JZArrayControl::~JZArrayControl()
 {
   delete mpRandomArray;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZArrayControl::Create(
-  wxWindow* pParent,
-  wxWindowID Id,
-  const JZRndArray& RandomArray,
-  const wxPoint& Position,
-  const wxSize& Size,
-  long WindowStyle,
-  const wxValidator& Validator,
-  const wxString& Name)
-{
-  wxControl::Create(
-    pParent,
-    Id,
-    Position,
-    Size,
-    WindowStyle | wxNO_BORDER,
-    Validator,
-    Name);
-
-  SetInitialSize(Size);
-
-  *mpRandomArray = RandomArray;
 }
 
 //-----------------------------------------------------------------------------
@@ -138,26 +102,20 @@ void JZArrayControl::SetXMinMax(int XMin, int XMax)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZArrayControl::SetMeter(int StepsPerCount, int CountPerBar, int BarCount)
+void JZArrayControl::OnSize(wxSizeEvent& SizeEvent)
 {
-//  mStepsPerCount = StepsPerCount;
-//  mCountPerBar = CountPerBar;
-//  mpRandomArray->Resize(StepsPerCount * CountPerBar * BarCount);
-//  SetXMinMax(1, StepsPerCount * CountPerBar * BarCount);
+  Refresh();
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZArrayControl::OnSize(wxSizeEvent& SizeEvent)
+void JZArrayControl::OnPaint(wxPaintEvent& Event)
 {
-  mWidth = SizeEvent.GetSize().GetWidth();
-  mHeight = SizeEvent.GetSize().GetHeight();
+  wxSize Size = GetClientSize();
+  mWidth = Size.GetWidth();
+  mHeight = Size.GetHeight();
 
-  SizeEvent.Skip();
-
-  wxClientDC Dc(this);
-
-  Dc.SetFont(*wxSMALL_FONT);
+  wxPaintDC Dc(this);
 
   int TextWidth, TextHeight;
   Dc.GetTextExtent("123", &TextWidth, &TextHeight);
@@ -179,13 +137,6 @@ void JZArrayControl::OnSize(wxSizeEvent& SizeEvent)
     mY + mHeight -
     mHeight * (mpRandomArray->GetNull() - mpRandomArray->GetMin()) /
     (mpRandomArray->GetMax() - mpRandomArray->GetMin());
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZArrayControl::OnPaint(wxPaintEvent& Event)
-{
-  wxPaintDC Dc(this);
 
   int i;
 
@@ -201,6 +152,7 @@ void JZArrayControl::OnPaint(wxPaintEvent& Event)
   }
 
   Dc.SetPen(*wxBLACK_PEN);
+
   if (mWidth && mHeight)
   {
     Dc.DrawRectangle(0, 0, mWidth, mHeight);

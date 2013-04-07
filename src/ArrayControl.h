@@ -38,27 +38,13 @@ class JZArrayControl : public wxControl
       const JZRndArray& RandomArray,
       const wxPoint& Position = wxDefaultPosition,
       const wxSize& Size = wxSize(40, 40),
-      long WindowStyle = wxNO_BORDER,
-      const wxValidator& Validator = wxDefaultValidator,
-      const wxString& Name = wxT("arraycontrol"));
+      long WindowStyle = wxNO_BORDER);
 
     virtual ~JZArrayControl();
-
-    void Create(
-      wxWindow* pParent,
-      wxWindowID Id,
-      const JZRndArray& RandomArray,
-      const wxPoint& Position = wxDefaultPosition,
-      const wxSize& Size = wxSize(40, 40),
-      long WindowStyle = wxNO_BORDER,
-      const wxValidator& Validator = wxDefaultValidator,
-      const wxString& Name = wxT("arraycontrol"));
 
     void SetLabel(const std::string& Label);
 
     void SetXMinMax(int XMin, int XMax);
-
-    void SetMeter(int StepsPerCount, int CountPerBar, int BarCount);
 
   private:
 
@@ -70,13 +56,17 @@ class JZArrayControl : public wxControl
 
     void DrawLabel(wxDC& Dc);
 
-    void DrawXTicks(wxDC& Dc);
+  protected:
+
+    virtual void DrawXTicks(wxDC& Dc);
+
+  private:
 
     void DrawYTicks(wxDC& Dc);
 
     void DrawNull(wxDC& Dc);
 
-  private:
+  protected:
 
     JZRndArray* mpRandomArray;
 

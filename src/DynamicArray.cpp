@@ -21,37 +21,3 @@
 //*****************************************************************************
 
 #include "DynamicArray.h"
-
-DEFINE_ARRAY(JZIntArray, int)
-
-JZUniqIds::JZUniqIds()
-  : mArray(0)
-{
-  mArray[0] = 1;         // 0 is an invalid id
-}
-
-int JZUniqIds::Get()
-{
-  int i = 0;
-  while (mArray[i])
-  {
-    ++i;
-  }
-  mArray[i] = 1;
-  return i;
-}
-
-void JZUniqIds::Get(int id)
-{
-  ++mArray[id];
-}
-
-int JZUniqIds::Put(int id)
-{
-  int i = --mArray[id];
-  assert(i >= 0);
-  return i;
-}
-
-
-DEFINE_ARRAY(JZVoidPtrArray, void *)

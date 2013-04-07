@@ -25,10 +25,12 @@
 #include <wx/scrolwin.h>
 
 #include <iostream>
+#include <vector>
 
 #include "DynamicArray.h"
 
-
+//*****************************************************************************
+//*****************************************************************************
 class JZRandomGenerator
 {
   public:
@@ -38,37 +40,31 @@ class JZRandomGenerator
 
 extern JZRandomGenerator rnd;
 
-#undef min
-#undef max
-
-
-// array of probabilities
-
+//*****************************************************************************
+// Description:
+//   Array of probabilities.
+//*****************************************************************************
 class JZRndArray
 {
   friend class JZArrayEdit;
 
-  protected:
-
-    JZIntArray mArray;
-    int n;        // number of elements in array
-    int nul, min, max;
-
   public:
 
-    int Null()
-    {
-      return nul;
-    }
-    void SetNull(int n)
-    {
-      nul = n;
-    }
-    JZRndArray(int n, int min, int max);
+    JZRndArray(int Size, int Min, int Max);
     JZRndArray & operator = (const JZRndArray &);
     JZRndArray(JZRndArray const &);
 
     virtual ~JZRndArray();
+
+    int GetNull()
+    {
+      return mNull;
+    }
+    void SetNull(int Null)
+    {
+      mNull = Null;
+    }
+
     int &operator[] (int i)
     {
       return mArray[i];
@@ -77,44 +73,41 @@ class JZRndArray
     {
       return mArray[i];
     }
-    /* PAT - The following ifdef was removed due to changes in gcc 3.x.  If it
-       needs to be put back for compatibility purposes, it will need to return
-       in an alternate form. */
-    /*#ifdef FOR_MSW*/
     double operator[](double f);
     float operator[](float f)
     {
-      /*#else
-    double operator[](double f) const;
-    float operator[](float f) const
-    {
-    #endif*/
       return (float)operator[]((double)f);
     }
     int Size() const
     {
-      return n;
+      return mArray.size();
     }
     int Min() const
     {
-      return min;
+      return mMin;
     }
     int Max() const
     {
-      return max;
+      return mMax;
     }
-    void SetMinMax(int min, int max);
+    void SetMinMax(int Min, int Max);
     void Resize(int nn)
     {
-      n = nn;
+      mArray.resize(nn);
     }
 
     friend std::ostream & operator << (std::ostream &, JZRndArray const &);
     friend std::istream & operator >> (std::istream &, JZRndArray &);
 
-    int Random();        // returns index 0..n-1 (arrayvalues -> empiric distribution)
-    int Random(double rndval);        // returns index 0..n-1 (arrayvalues -> empiric distribution)
-    int Random(int i);  // return 0/1
+    // Returns index 0..n-1 (arrayvalues -> empiric distribution)
+    int Random();
+
+    // returns index 0..n-1 (arrayvalues -> empiric distribution)
+    int Random(double rndval);
+
+      // return 0/1
+    int Random(int i);
+
     int Interval(int seed);
 
     void SetUnion(JZRndArray &o, int fuzz);
@@ -123,9 +116,15 @@ class JZRndArray
     void SetInverse(int fuzz);
     int Fuzz(int fuzz, int v1, int v2) const;
     void Clear();
+
+  protected:
+
+    std::vector<int> mArray;
+    int mNull, mMin, mMax;
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 #define ARED_GAP            1
 #define ARED_XTICKS         2
 #define ARED_YTICKS         4
@@ -134,7 +133,8 @@ class JZRndArray
 #define ARED_BLOCKS        32
 #define ARED_LINES         64
 
-
+//*****************************************************************************
+//*****************************************************************************
 class JZArrayEditDrawBars
 {
   public:
@@ -146,38 +146,10 @@ class JZArrayEditDrawBars
     virtual void DrawBars(wxDC& Dc) = 0;
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 class JZArrayEdit : public wxScrolledWindow
 {
-  protected:
-
-    // paint position
-    int x, y, w, h, ynul;
-    void DrawBar(wxDC& Dc, int i, int black);
-
-    int dragging;                // Dragging-Event valid
-    int index;                // ctrl down: drag this one
-
-    JZRndArray& mArray;
-    int &n, &min, &max, &nul;        // shorthand for mArray.n, mArray.min, ...
-    wxString mLabel;
-    JZArrayEditDrawBars *draw_bars;
-
-    // array size is mapped to this range for x-tick marks
-    int xmin, xmax;
-
-    virtual void DrawXTicks(wxDC& Dc);
-    virtual void DrawYTicks(wxDC& Dc);
-    virtual void DrawLabel(wxDC& Dc);
-    virtual void DrawNull(wxDC& Dc);
-    int Index(wxMouseEvent& MouseEvent);
-
-    int enabled;
-    int mStyleBits;
-
-    virtual const char *GetXText(int xval);  // Text for x-tickmarks
-    virtual const char *GetYText(int yval);  // Text for y-tickmarks
-
   public:
 
     JZArrayEdit(
@@ -196,42 +168,88 @@ class JZArrayEdit : public wxScrolledWindow
     virtual int ButtonDown(wxMouseEvent& MouseEvent);
     virtual int ButtonUp(wxMouseEvent& MouseEvent);
 
-    virtual void SetLabel(char const *llabel);
-    void Enable(int enable = 1);
+    virtual void SetLabel(const std::string& Label);
+
+    void SetEnabled(bool Enabled = true);
+
     void SetStyle(int StyleBits)
     {
       mStyleBits = StyleBits;
     }
-    // min and max value in array (both values inclusive)
-    void SetYMinMax(int min, int max);
-    // for display x-axis only, does not resize the array (both values inclusive)
-    void SetXMinMax(int xmin, int xmax);
-    void DrawBarLine (wxDC& Dc, int xx);
-    void SetDrawBars(JZArrayEditDrawBars *x)
+
+    // Minimum and maximum value in array (both values inclusive)
+    void SetYMinMax(int Min, int Max);
+
+    // For display x-axis only, does not resize the array (both values inclusive)
+    void SetXMinMax(int XMin, int XMax);
+
+    void DrawBarLine(wxDC& Dc, int xx);
+    void SetDrawBars(JZArrayEditDrawBars* pDrawBars)
     {
-      draw_bars = x;
+      mpDrawBars = pDrawBars;
     }
+
     void Init()
     {
     }
 
+  protected:
+
+    void DrawBar(wxDC& Dc, int i, int black);
+
+    virtual void DrawXTicks(wxDC& Dc);
+    virtual void DrawYTicks(wxDC& Dc);
+    virtual void DrawLabel(wxDC& Dc);
+    virtual void DrawNull(wxDC& Dc);
+    int GetIndex(wxMouseEvent& MouseEvent);
+
+    virtual std::string GetXText(int XValue);  // Text for x-tickmarks
+    virtual std::string GetYText(int YValue);  // Text for y-tickmarks
+
+  protected:
+
+    JZRndArray& mArray;
+
+    // Shorthand for mArray.mMin, mArray.mMax, ...
+    int& mMin;
+    int& mMax;
+    int& mNull;
+
+    std::string mLabel;
+    JZArrayEditDrawBars* mpDrawBars;
+
+    // paint position
+    int mX, mY, mWidth, mHeight, mYNull;
+
+    // Dragging flag.
+    bool mDragging;
+
+    // If ctrl is pushed: drag this one.
+    int mIndex;
+
+    // Array size is mapped to this range for x-tick marks.
+    int mXMin, mXMax;
+
+    bool mEnabled;
+    int mStyleBits;
+
   DECLARE_EVENT_TABLE()
 };
 
-
-
+//*****************************************************************************
+//*****************************************************************************
 class JZRhyArrayEdit : public JZArrayEdit
 {
   public:
 
     JZRhyArrayEdit(
-      wxFrame *parent,
+      wxFrame* pParent,
       JZRndArray& Array,
       const wxPoint& Position,
       const wxSize& Size,
-      int StyleBits = (ARED_GAP | ARED_XTICKS | ARED_RHYTHM));
+      int StyleBits = ARED_GAP | ARED_XTICKS | ARED_RHYTHM);
 
-    void SetMeter(int steps_per_count, int count_per_bar, int n_bars);
+    void SetMeter(int StepsPerCount, int CountPerBar, int BarCount);
 
   protected:
 
@@ -239,7 +257,6 @@ class JZRhyArrayEdit : public JZArrayEdit
 
   private:
 
-    int steps_per_count;
-    int count_per_bar;
-    int n_bars;
+    int mStepsPerCount;
+    int mCountPerBar;
 };

@@ -361,8 +361,7 @@ void JZDrumInstrumentParameterList::Clear()
 
 
 JZSimpleEventArray::JZSimpleEventArray()
-  : wxObject(),
-    mEventCount(0),
+  : mEventCount(0),
     mMaxEvents(0),
     mppEvents(0)
 {
@@ -391,7 +390,7 @@ void JZUndoBuffer::Clear()
   int i;
   for (i = 0; i < mEventCount; i++)
   {
-    if (bits(i))
+    if (mBits(i))
     {
       delete mppEvents[i];
     }
@@ -1980,15 +1979,15 @@ void JZTrack::Undo()
     for (int i = undo->mEventCount - 1; i >= 0; i--)
     {
       JZEvent* pEvent = undo->mppEvents[i];
-      if (undo->bits(i))
+      if (undo->mBits(i))
       {
-        undo->bits.set(i, 0);
+        undo->mBits.set(i, 0);
         pEvent->UnKill();
         JZEventArray::Put(pEvent);
       }
       else
       {
-        undo->bits.set(i, 1);
+        undo->mBits.set(i, 1);
         pEvent->Kill();
       }
     }
@@ -2010,15 +2009,15 @@ void JZTrack::Redo()
     for (int i = 0; i < undo->mEventCount; i++)
     {
       JZEvent* pEvent = undo->mppEvents[i];
-      if (undo->bits(i))
+      if (undo->mBits(i))
       {
-        undo->bits.set(i, 0);
+        undo->mBits.set(i, 0);
         pEvent->UnKill();
         JZEventArray::Put(pEvent);
       }
       else
       {
-        undo->bits.set(i, 1);
+        undo->mBits.set(i, 1);
         pEvent->Kill();
       }
     }

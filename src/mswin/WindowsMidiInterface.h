@@ -22,12 +22,13 @@
 
 #pragma once
 
-#include "DynamicArray.h"
+#include <vector>
 
 struct tWinPlayerState;
 
 extern "C"
 {
+
 void CALLBACK midiIntInputHandler(HMIDIIN, WORD, DWORD, DWORD, DWORD);
 void CALLBACK midiMidiInputHandler(HMIDIIN, WORD, DWORD, DWORD, DWORD);
 void CALLBACK midiMtcInputHandler(HMIDIIN, WORD, DWORD, DWORD, DWORD);
@@ -44,254 +45,284 @@ void CALLBACK MidiOutProc(
   DWORD dwParam1,
   DWORD dwParam2
 );
-}
 
+} // extern "C"
+
+//*****************************************************************************
+//*****************************************************************************
 class JZWindowsAudioPlayer;
 
-// pseudo data word of struct midi_event, values must be less
+// pseudo data word of struct JZMidiEvent, values must be less
 // than 128 to be distinguished from a midi status
 #define START_AUDIO 1
 #define SYSEX_EVENT 2
 
+class JZWinSysexBufferArray;
 
-
+//*****************************************************************************
+//*****************************************************************************
 class JZWinSysexBuffer
 {
-    friend class JZWinSysexBufferArray;
-
   public:
 
-    JZWinSysexBuffer(JZWinSysexBufferArray *array)
-      : parent(array)
+    JZWinSysexBuffer(JZWinSysexBufferArray* pWinSysexBufferArray)
+      : mMidiHeader(),
+        mpData(0),
+        mSize(0),
+        mMaxSize(0),
+        mPrepared(false),
+        mpNextFree(0),
+        mpParent(pWinSysexBufferArray)
     {
-      maxsize = 0;
-      size = 0;
-      prepared = 0;
-      next_free = 0;
-      data = 0;
-      memset(&hdr, 0, sizeof(hdr));
+      memset(&mMidiHeader, 0, sizeof(mMidiHeader));
     }
 
-    MIDIHDR *MidiHdr()
+    MIDIHDR* MidiHdr()
     {
-      return &hdr;
+      return &mMidiHeader;
     }
 
-    int IsPrepared() const
+    bool IsPrepared() const
     {
-      return prepared;
+      return mPrepared;
+    }
+
+    JZWinSysexBuffer* GetNextFree() const
+    {
+      return mpNextFree;
+    }
+
+    void SetNextFree(JZWinSysexBuffer* pNextFree)
+    {
+      mpNextFree = pNextFree;
     }
 
     // sysex and length NOT including 0xf0 and 0xf7
-    void PrepareOut(HMIDIOUT hmo, const unsigned char *sysex, int length)
+    void PrepareOut(HMIDIOUT hmo, const unsigned char* pSysex, int Length)
     {
-      if (prepared)
+      if (mPrepared)
       {
         UnprepareOut(hmo);
       }
 
-      if (length + 2 >= maxsize)
+      if (Length + 2 >= mMaxSize)
       {
-        maxsize = length + 20;
-        delete [] data;
-        data = new unsigned char[maxsize];
+        mMaxSize = Length + 20;
+        delete [] mpData;
+        mpData = new unsigned char[mMaxSize];
       }
 
-      data[0] = (char)0xf0;
-      memcpy(data+1, sysex, length);
-      data[length+1] = (char)0xf7;
-      size = length + 2;
+      mpData[0] = (char)0xf0;
+      memcpy(mpData + 1, pSysex, Length);
+      mpData[Length + 1] = (char)0xf7;
+      mSize = Length + 2;
 
-      memset(&hdr, 0, sizeof(hdr));
-      hdr.dwUser = (DWORD)this;
-      hdr.lpData = (char *)data;
-      hdr.dwBufferLength = size;
+      memset(&mMidiHeader, 0, sizeof(mMidiHeader));
+      mMidiHeader.dwUser = (DWORD)this;
+      mMidiHeader.lpData = (char *)mpData;
+      mMidiHeader.dwBufferLength = mSize;
       OutputDebugString(L"prepare\n");
-      midiOutPrepareHeader(hmo, &hdr, sizeof(hdr));
-      prepared = 1;
+      midiOutPrepareHeader(hmo, &mMidiHeader, sizeof(mMidiHeader));
+      mPrepared = true;
     }
 
     void UnprepareOut(HMIDIOUT hmo)
     {
-      if (prepared)
+      if (mPrepared)
       {
         OutputDebugString(L"unprepare\n");
-        midiOutUnprepareHeader(hmo, &hdr, sizeof(hdr));
-        size = 0;
-        prepared = 0;
+        midiOutUnprepareHeader(hmo, &mMidiHeader, sizeof(mMidiHeader));
+        mSize = 0;
+        mPrepared = false;
       }
     }
 
     void Release();
 
-/**
-    void PrepareInp(HMIDIIN hmi)
-    {
-      memset(&hdr, 0, sizeof(hdr));
-      hdr.dwUser = (DWORD)this;
-      hdr.lpData = (char *)data;
-      hdr.dwBufferLength = maxsize;
-      midiInPrepareHeader(hmi, &hdr, sizeof(hdr));
-      prepared = 1;
-    }
-    void UnprepareInp(HMIDIIN hmi)
-    {
-      midiInUnprepareHeader(hmi, &hdr, sizeof(hdr));
-      prepared = 0;
-    }
-**/
+//    void PrepareInp(HMIDIIN hmi)
+//    {
+//      memset(&mMidiHeader, 0, sizeof(mMidiHeader));
+//      mMidiHeader.dwUser = (DWORD)this;
+//      mMidiHeader.lpData = (char *)mpData;
+//      mMidiHeader.dwBufferLength = mMaxSize;
+//      midiInPrepareHeader(hmi, &mMidiHeader, sizeof(mMidiHeader));
+//      mPrepared = true;
+//    }
+//    void UnprepareInp(HMIDIIN hmi)
+//    {
+//      midiInUnprepareHeader(hmi, &mMidiHeader, sizeof(mMidiHeader));
+//      mPrepared = false;
+//    }
 
-  protected:
-    MIDIHDR hdr;
-    unsigned char *data;
-    int size;
-    int maxsize;
-    int prepared;
-    JZWinSysexBuffer *next_free;
-    JZWinSysexBufferArray *parent;
+  private:
+
+    MIDIHDR mMidiHeader;
+    unsigned char* mpData;
+    int mSize;
+    int mMaxSize;
+    bool mPrepared;
+    JZWinSysexBuffer* mpNextFree;
+    JZWinSysexBufferArray* mpParent;
 };
 
-
-
+//*****************************************************************************
+//*****************************************************************************
 class JZWinSysexBufferArray
 {
   public:
 
     JZWinSysexBufferArray()
+      : mPointerArray(),
+        mpNextFree(0)
     {
-      size = 0;
-      next_free = 0;
     }
 
     ~JZWinSysexBufferArray()
     {
-      int n = Size();
-      for (int i = 0; i < n; i++)
+      for (size_t i = 0; i < mPointerArray.size(); ++i)
       {
-        delete (JZWinSysexBuffer *)array[i];
+        delete mPointerArray[i];
       }
     }
 
-    int Size() const
+    size_t Size() const
     {
-      return size;
+      return mPointerArray.size();
     }
 
-    JZWinSysexBuffer * At(int i) const
+    JZWinSysexBuffer* At(int i) const
     {
-      return (JZWinSysexBuffer *)array[i];
+      return mPointerArray.at(i);
     }
 
-    JZWinSysexBuffer * AllocBuffer()
+    JZWinSysexBuffer* AllocBuffer()
     {
-      if (next_free == 0)
+      if (mpNextFree == 0)
       {
-        JZWinSysexBuffer *buf = new JZWinSysexBuffer(this);
-        array[size++] = (void *)buf;
-        return buf;
+        JZWinSysexBuffer* pWinSysexBuffer = new JZWinSysexBuffer(this);
+        mPointerArray.push_back(pWinSysexBuffer);
+        return pWinSysexBuffer;
       }
-      JZWinSysexBuffer *buf = next_free;
-      next_free = buf->next_free;
-      return buf;
+      JZWinSysexBuffer* pWinSysexBuffer = mpNextFree;
+      mpNextFree = pWinSysexBuffer->GetNextFree();
+      return pWinSysexBuffer;
     }
 
-    void ReleaseBuffer(JZWinSysexBuffer *buf)
+    void ReleaseBuffer(JZWinSysexBuffer* pWinSysexBuffer)
     {
-      buf->next_free = next_free;
-      next_free = buf;
+      pWinSysexBuffer->SetNextFree(mpNextFree);
+      mpNextFree = pWinSysexBuffer;
     }
 
     void ReleaseAllBuffers()
     {
-      next_free = 0;
-      int n = Size();
-      for (int i = 0; i < n; i++)
+      mpNextFree = 0;
+      for (
+        std::vector<JZWinSysexBuffer*>::iterator iPointer =
+          mPointerArray.begin();
+        iPointer != mPointerArray.end();
+        ++iPointer)
       {
-        JZWinSysexBuffer *buf = At(i);
-        buf->next_free = next_free;
-        next_free = buf;
+        JZWinSysexBuffer* pWinSysexBuffer = *iPointer;
+        pWinSysexBuffer->SetNextFree(mpNextFree);
+        mpNextFree = pWinSysexBuffer;
       }
     }
 
   private:
 
-    JZVoidPtrArray array;
-    int size;
-    JZWinSysexBuffer *next_free;
+    std::vector<JZWinSysexBuffer*> mPointerArray;
+    JZWinSysexBuffer* mpNextFree;
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 inline
 void JZWinSysexBuffer::Release()
 {
-  parent->ReleaseBuffer(this);
+  mpParent->ReleaseBuffer(this);
 }
 
-// # events in record/play queue
-#define MIDI_BUFFER_SIZE 4096
-
-
-struct midi_event
+//*****************************************************************************
+//*****************************************************************************
+struct JZMidiEvent
 {
   DWORD ref;  // Means time or clock depending on sync mode.
-  DWORD data; // midi event or pseudo data.
+  DWORD data; // MIDI event or pseudo data.
 };
 
 
+//*****************************************************************************
+//*****************************************************************************
 class JZMidiQueue
 {
   public:
 
-    midi_event * get()
+    JZMidiEvent* get()
     {
-      if (wr == rd)
+      if (mWriteIndex == mReadIndex)
+      {
         return 0;
-      struct midi_event *e = &buffer[rd];
-      rd = (rd + 1) % MIDI_BUFFER_SIZE;
-      return e;
+      }
+      struct JZMidiEvent* pMidiEvent = &buffer[mReadIndex];
+      mReadIndex = (mReadIndex + 1) % eMidiBufferSize;
+      return pMidiEvent;
     }
 
-    midi_event * peek()
+    JZMidiEvent* peek()
     {
-      if (wr == rd)
+      if (mWriteIndex == mReadIndex)
+      {
         return 0;
-      return &buffer[rd];
+      }
+      return &buffer[mReadIndex];
     }
 
     void put(DWORD data, DWORD ref)
     {
       if (nfree() < 1)
+      {
         return;
-      midi_event *e = &buffer[wr];
-      e->data = data;
-      e->ref = ref;
-      wr = (wr + 1) % MIDI_BUFFER_SIZE;
+      }
+      JZMidiEvent* pMidiEvent = &buffer[mWriteIndex];
+      pMidiEvent->data = data;
+      pMidiEvent->ref = ref;
+      mWriteIndex = (mWriteIndex + 1) % eMidiBufferSize;
     }
 
     int empty() const
     {
-      return rd == wr;
+      return mReadIndex == mWriteIndex;
     }
 
     int nfree() const
     {
-      return (rd - wr - 1 + MIDI_BUFFER_SIZE) % MIDI_BUFFER_SIZE;
+      return
+        (mReadIndex - mWriteIndex - 1 + eMidiBufferSize) % eMidiBufferSize;
     }
 
-
-    void clear()
+    void Clear()
     {
-      rd = wr = 0;
+      mReadIndex = mWriteIndex = 0;
     }
 
     JZMidiQueue()
     {
-      clear();
+      Clear();
     }
 
   private:
-    int rd, wr;
-    midi_event buffer[MIDI_BUFFER_SIZE];
+
+    // Number of events in record/play queue.
+    enum JZSizes
+    {
+      eMidiBufferSize = 4096
+    };
+
+  private:
+
+    int mReadIndex, mWriteIndex;
+    JZMidiEvent buffer[eMidiBufferSize];
 };
 
 #define WIN_SYNC_INTERNAL 0
@@ -303,7 +334,8 @@ class JZMidiQueue
 #define WIN_MTC_TYPE_30DF  2
 #define WIN_MTC_TYPE_30NDF 3
 
-
+//*****************************************************************************
+//*****************************************************************************
 struct tWinPlayerMtcTime
 {
   DWORD hour;
@@ -313,6 +345,8 @@ struct tWinPlayerMtcTime
   DWORD type;
 };
 
+//*****************************************************************************
+//*****************************************************************************
 struct tWinPlayerState
 {
   HANDLE hmem;
@@ -350,7 +384,7 @@ struct tWinPlayerState
   JZWindowsAudioPlayer* audio_player;
   int time_correction;
 
-  JZWinSysexBufferArray* isx_buffers;
-  JZWinSysexBufferArray* osx_buffers;
-  int sysex_found;
+  JZWinSysexBufferArray* mpInputSysexBuffers;
+  JZWinSysexBufferArray* mpOutputSysexBuffers;
+  bool mSysexFound;
 };

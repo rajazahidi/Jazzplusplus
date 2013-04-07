@@ -41,10 +41,10 @@ class JZWindowsPlayer : public JZPlayer
 
     virtual bool IsInstalled();
     virtual ~JZWindowsPlayer();
-    virtual int OutEvent(JZEvent* e);
-    virtual int OutSysex(JZEvent* e, DWORD time);
-    void OutNow(JZEvent *e);
-    void OutNow(JZParam *r);
+    virtual int OutEvent(JZEvent* pEvent);
+    virtual bool OutSysex(JZEvent* pEvent, DWORD time);
+    void OutNow(JZEvent* pEvent);
+    void OutNow(JZParam* pParam);
     void OutBreak();
     virtual void OutBreak(int BreakOver);
     void StartPlay(int Clock, int LoopClock = 0, int Continue = 0);
@@ -72,7 +72,7 @@ class JZWindowsPlayer : public JZPlayer
   protected:
 
     tWinPlayerState* mpState;
-    DWORD Event2Dword(JZEvent *e);
+    DWORD Event2Dword(JZEvent* pEvent);
     JZEvent* Dword2Event(DWORD dw);
     int Clock2Time(int clock);
     int Time2Clock(int time);

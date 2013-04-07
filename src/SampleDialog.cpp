@@ -39,6 +39,7 @@
 #include <wx/statbox.h>
 
 #include <fstream>
+#include <sstream>
 #include <cmath>
 
 using namespace std;
@@ -83,24 +84,25 @@ class JZEquArrayEdit : public JZRhyArrayEdit
     {
     }
 
-    virtual const char *GetXText(int val);
+    virtual string GetXText(int XValue);
 
   private:
 
     JZEqualizer &equ;
 };
 
-const char* JZEquArrayEdit::GetXText(int val)
+string JZEquArrayEdit::GetXText(int XValue)
 {
-  if (val == 0)
+  if (XValue == 0)
   {
     return "KHz";
   }
 
-  static char buf[20];
-  double f = equ.Index2Hertz(val);
-  sprintf(buf, "%3.1f", f/1000.0);
-  return buf;
+  ostringstream Oss;
+  Oss.precision(1);
+  Oss.setf(ios::fixed | ios::showpoint);
+  Oss << equ.Index2Hertz(XValue) / 1000.0;
+  return Oss.str();
 }
 
 int JZEqualizer::geo[4] = { 50, 80, 350, 200 };

@@ -22,7 +22,8 @@
 
 #pragma once
 
-#include <assert.h>
+#include <cassert>
+#include <vector>
 
 #define DECLARE_ARRAY(CLASS, TYPE)                      \
                                                         \
@@ -162,27 +163,6 @@ int CLASS::GetSize() const                                     \
 }
 
 
-DECLARE_ARRAY(JZIntArray, int)
-
-
-
-class JZUniqIds
-{
-  public:
-
-    JZUniqIds();
-    int Get();
-    void Get(int id);
-
-    // Returns the no of pending references to id.
-    int Put(int id);
-
-  private:
-
-    JZIntArray mArray;
-};
-
-
 class JZBitset
 {
   public:
@@ -201,18 +181,10 @@ class JZBitset
         mArray[index(i)] &= ~mask(i);
       }
     }
-    void operator += (int i)
-    {
-      mArray[index(i)] |= mask(i);
-    }
-    void operator -= (int i)
-    {
-      mArray[index(i)] &= ~mask(i);
-    }
 
   private:
 
-    JZIntArray mArray;
+    std::vector<int> mArray;
 
     // this works for sizeof(int) >= 4
     int index(int i)
@@ -224,5 +196,3 @@ class JZBitset
       return 1 << (i & 31);
     }
 };
-
-DECLARE_ARRAY(JZVoidPtrArray, void *)

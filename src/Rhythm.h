@@ -27,7 +27,8 @@
 
 #include <wx/frame.h>
 
-#include <iostream>
+#include <iosfwd>
+#include <vector>
 
 class JZBarInfo;
 class JZEventWindow;
@@ -43,82 +44,54 @@ class wxSlider;
 #define MAX_GROUPS  5
 #define MAX_KEYS   20
 
-#define MOTIF_Y_OFFSET 16
-
-struct tRhyGroup
+//*****************************************************************************
+//*****************************************************************************
+class JZRhythmGroup
 {
-  int contrib;
-  int listen;
+  public:
 
-  tRhyGroup()
-  {
-    listen = 0;
-    contrib = 0;
-  }
-  void write(std::ostream& Os) const;
-  void read(std::istream& Is, int Version);
+    JZRhythmGroup();
+
+    void Write(std::ostream& Os) const;
+    void Read(std::istream& Is, int Version);
+
+  public:
+
+    int mListen;
+    int mContrib;
 };
 
-
-struct JZRhythmGroups
+//*****************************************************************************
+//*****************************************************************************
+class JZRhythmGroups
 {
-  tRhyGroup g[MAX_GROUPS];
-  tRhyGroup& operator [] (int i)
-  {
-    return g[i];
-  }
-  void write(std::ostream& Os) const;
-  void read(std::istream& Is, int Version);
+  public:
+
+    JZRhythmGroup& operator [] (int i)
+    {
+      return mRhythmGroups[i];
+    }
+
+    void Write(std::ostream& Os) const;
+    void Read(std::istream& Is, int Version);
+
+  public:
+
+    JZRhythmGroup mRhythmGroups[MAX_GROUPS];
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 class JZRhythm
 {
     friend class JZRhythmWindow;
     friend class JZRhythmGeneratorWindow;
 
-  private:
-
-    std::string mLabel;
-
-  protected:
-
-    JZRndArray rhythm;
-    JZRndArray length;
-    JZRndArray veloc;
-
-    int steps_per_count;
-    int count_per_bar;
-    int n_bars;
-    int keys[MAX_KEYS];
-    int n_keys;
-    int mode;
-    int parm;
-
-    bool randomize;
-    JZRhythmGroups groups;
-    JZRndArray history;
-
-    // set by GenInit()
-    long start_clock;
-    long next_clock;
-
-    void GenGroup(
-      JZRndArray& out,
-      int grp,
-      const JZBarInfo& BarInfo,
-      JZRhythm* rhy[],
-      int n_rhy);
-
-    int Clock2i(long clock, const JZBarInfo& BarInfo) const;
-
-    int ClocksPerStep(const JZBarInfo& BarInfo) const;
-
   public:
 
-    JZRhythm(int key);
+    JZRhythm(int Key);
     JZRhythm(const JZRhythm& Other);
-    JZRhythm & operator= (const JZRhythm &o);
+    JZRhythm& operator = (const JZRhythm& Other);
     virtual ~JZRhythm();
 
     const std::string& GetLabel() const
@@ -130,17 +103,17 @@ class JZRhythm
 
     void Generate(
       JZTrack* pTrack,
-      long fr_clock,
-      long to_clock,
-      long ticks_per_bar);
+      int FromClock,
+      int ToClock,
+      int TicksPerBar);
 
     void Generate(
       JZTrack* pTrack,
       const JZBarInfo& BarInfo,
       JZRhythm* rhy[],
-      int n_rhy);
+      int RhythmCount);
 
-    void GenInit(long start_clock);
+    void GenInit(int StartClock);
 
     void GenerateEvent(
       JZTrack* pTrack,
@@ -148,12 +121,50 @@ class JZRhythm
       short vel,
       short len);
 
-    void write(std::ostream& Os) const;
+    void Write(std::ostream& Os) const;
 
-    void read(std::istream& Is, int version);
+    void Read(std::istream& Is, int Version);
+
+  protected:
+
+    void GenGroup(
+      JZRndArray& out,
+      int grp,
+      const JZBarInfo& BarInfo,
+      JZRhythm* rhy[],
+      int RhythmCount);
+
+    int Clock2i(long clock, const JZBarInfo& BarInfo) const;
+
+    int ClocksPerStep(const JZBarInfo& BarInfo) const;
+
+  private:
+
+    std::string mLabel;
+
+    JZRndArray mRhythmArray;
+    JZRndArray mLengthArray;
+    JZRndArray mVelocityArray;
+
+    int mStepsPerCount;
+    int mCountPerBar;
+    int mBarCount;
+    int mKeyCount;
+    int mKeys[MAX_KEYS];
+    int mMode;
+    int mParameter;
+
+    bool mRandomizeFlag;
+    JZRhythmGroups mRhythmGroups;
+    JZRndArray mHistoryArray;
+
+    // Set by GenInit()
+    int mStartClock;
+    int mNextClock;
 };
 
-
+//*****************************************************************************
+//*****************************************************************************
 class JZRhythmWindow : public wxFrame
 {
   public:
@@ -174,42 +185,8 @@ class JZRhythmWindow : public wxFrame
 
   private:
 
-    friend std::ostream& operator << (std::ostream& os, JZRhythmWindow const& a);
+    friend std::ostream& operator << (std::ostream& Os, const JZRhythmWindow& a);
     friend std::istream& operator >> (std::istream& Is, JZRhythmWindow& a);
-
-    wxPanel*    inst_panel;
-#ifdef OBSOLETE
-    wxText     *label;
-#endif
-    wxSlider*   steps_per_count;
-    wxSlider*   count_per_bar;
-    wxSlider*   n_bars;
-    wxListBox*  instrument_list;
-    wxCheckBox* rand_checkbox;
-
-    wxPanel*   group_panel;
-    wxListBox* group_list;
-    wxSlider*  group_contrib;
-    wxSlider*  group_listen;
-    int        act_group;
-
-    JZArrayEdit    *length_edit;
-    JZArrayEdit    *veloc_edit;
-    JZRhyArrayEdit *rhythm_edit;
-
-    enum
-    {
-      MAX_INSTRUMENTS = 20
-    };
-    JZRhythm    *instruments[MAX_INSTRUMENTS];
-    int        n_instruments;
-    int        act_instrument;        // -1 if none
-
-    // this one is edited and copied from/to instruments[i]
-    JZRhythm    edit;
-
-    // ignore Updates while creating the window (motif)
-    bool in_create;
 
     // callbacks
 #ifdef OBSOLETE
@@ -221,25 +198,56 @@ class JZRhythmWindow : public wxFrame
     static void Del(wxButton &but, wxCommandEvent& event);
     static void Generate(wxButton &but, wxCommandEvent& event);
 
-    void Instrument2Win(int i = -1);        // instrument[act_instrument] -> win
-    void Win2Instrument(int i = -1);        // win -> instrument[act_instrument]
+    void Instrument2Win();
+    void Win2Instrument();
     void AddInstrumentDlg();
     void AddInstrument(JZRhythm *r);
     void DelInstrument();
 
-    JZEventWindow* mpEventWindow;
-    JZSong* mpSong;
-
     void RndEnable();
-
-    wxString mDefaultFileName;
-    bool has_changed;
-    wxToolBar* mpToolBar;
-    float tb_width, tb_height;
 
     void UpInstrument();
     void DownInstrument();
     void InitInstrumentList();
+
+  private:
+
+    wxPanel* mpInstrumentPanel;
+
+    wxSlider* mpStepsPerCountSlider;
+    wxSlider* mpCountsPerBarSlider;
+    wxSlider* mpBarCountSlider;
+    wxListBox* mpInstrumentListBox;
+    int mActiveInstrumentIndex;  // -1 if none
+
+    wxPanel* mpGroupPanel;
+    wxSlider* mpGroupContribSlider;
+    wxSlider* mpGroupListenSlider;
+    wxListBox* mpGroupListBox;
+    int mActiveGroup;
+    wxCheckBox* mpRandomCheckBox;
+
+    JZArrayEdit* mpLengthEdit;
+    JZArrayEdit* mpVelocityEdit;
+    JZRhyArrayEdit* mpRhythmEdit;
+
+    enum
+    {
+      MAX_INSTRUMENTS = 20
+    };
+
+    JZRhythm* mpInstruments[MAX_INSTRUMENTS];
+    int mInstrumentCount;
+
+    // This one is edited and copied from and to mpInstruments[i].
+    JZRhythm mRhythm;
+
+    JZEventWindow* mpEventWindow;
+    JZSong* mpSong;
+
+    wxString mDefaultFileName;
+    bool mHasChanged;
+    wxToolBar* mpToolBar;
 };
 
 //*****************************************************************************
@@ -253,13 +261,44 @@ class JZRhythmGeneratorWindow : public wxWindow
       const wxPoint& Position,
       const wxSize& Size);
 
+    virtual ~JZRhythmGeneratorWindow();
+
+    void AddInstrument();
+
+  private:
+
+    void AddInstrument(JZRhythm* pRhythm);
+
+    void Instrument2Win();
+
+    void Win2Instrument();
+
+    void RandomEnable();
+
   private:
 
     JZRhythm mRhythm;
 
+    std::vector<JZRhythm*> mInstruments;
+
+    wxPanel* mpInstrumentPanel;
+
+    wxSlider* mpStepsPerCountSlider;
+    wxSlider* mpCountsPerBarSlider;
+    wxSlider* mpBarCountSlider;
+    wxListBox* mpInstrumentListBox;
+    int mActiveInstrumentIndex;  // -1 if none
+    wxSlider* mpGroupContribSlider;
+    wxSlider* mpGroupListenSlider;
+    wxListBox* mpGroupListBox;
+    int mActiveGroup;
+    wxCheckBox* mpRandomCheckBox;
+
     JZArrayEdit* mpLengthEdit;
     JZArrayEdit* mpVelocityEdit;
     JZRhyArrayEdit* mpRhythmEdit;
+
+  DECLARE_EVENT_TABLE()
 };
 
 //*****************************************************************************
@@ -276,6 +315,8 @@ class JZRhythmGeneratorFrame : public wxFrame
 
     void CreateToolBar();
 
+    void OnAddInstrument(wxCommandEvent& Event);
+
     void OnHelp(wxCommandEvent& Event);
 
     void OnHelpContents(wxCommandEvent& Event);
@@ -289,4 +330,6 @@ class JZRhythmGeneratorFrame : public wxFrame
   DECLARE_EVENT_TABLE()
 };
 
+//*****************************************************************************
+//*****************************************************************************
 extern void CreateRhythmGenerator();

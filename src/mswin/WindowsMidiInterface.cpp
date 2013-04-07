@@ -31,123 +31,133 @@
 extern "C"
 {
 
-/*
- *  LibMain - Generic for a DLL.  Just initializes a little local memory.
- */
-
-int FAR PASCAL LibMain (
+//*****************************************************************************
+// LibMain - Generic for a DLL.  Just initializes a little local memory.
+//*****************************************************************************
+int FAR PASCAL LibMain(
   HANDLE hInstance,
-  WORD   wDataSeg, WORD wHeapSize,
-  LPSTR  lpCmdLine)
+  WORD wDataSeg,
+  WORD wHeapSize,
+  LPSTR lpCmdLine)
 
 {
-    // Nothing to do - SDK Libentry does the LocalInit
-
-    return TRUE;
+  // Nothing to do - SDK Libentry does the LocalInit
+  return TRUE;
 }
 
-/*
- *  WEP - Generic for a DLL.  Doesn't do a whole lot.
- */
+//*****************************************************************************
+// WEP - Generic for a DLL.  Doesn't do a whole lot.
+//*****************************************************************************
 void FAR PASCAL _WEP(WORD wParam)
 {
 }
 
-
-// allocate memory for the player vars that are accessed
-// in interrupt.
+//*****************************************************************************
+// Allocate memory for the player variables that are accessed in interrupt.
+//*****************************************************************************
 tWinPlayerState FAR * FAR PASCAL NewWinPlayerState()
 {
-  tWinPlayerState FAR *state = 0;
+  tWinPlayerState FAR * pState = 0;
   // Allocate Fixed Memory for interrupt handler
-  HANDLE hMem = GlobalAlloc(GMEM_SHARE | GMEM_FIXED | GMEM_ZEROINIT, (DWORD)sizeof(tWinPlayerState));
-  state = (tWinPlayerState FAR *)GlobalLock(hMem);
+  HANDLE hMem = GlobalAlloc(
+    GMEM_SHARE | GMEM_FIXED | GMEM_ZEROINIT,
+    (DWORD)sizeof(tWinPlayerState));
+  pState = (tWinPlayerState FAR *)GlobalLock(hMem);
 #ifdef WIN32
-  VirtualLock(state, sizeof(tWinPlayerState));
+  VirtualLock(pState, sizeof(tWinPlayerState));
 #else
-  GlobalPageLock((HGLOBAL)HIWORD(state));
+  GlobalPageLock((HGLOBAL)HIWORD(pState));
 #endif
-  memset(state, 0, sizeof(tWinPlayerState));
-  state->hmem = hMem;
+  memset(pState, 0, sizeof(tWinPlayerState));
+  pState->hmem = hMem;
 
-  state->isx_buffers = new JZWinSysexBufferArray();
-  state->osx_buffers = new JZWinSysexBufferArray();
+  pState->mpInputSysexBuffers = new JZWinSysexBufferArray();
+  pState->mpOutputSysexBuffers = new JZWinSysexBufferArray();
 
-  return state;
+  return pState;
 }
 
+//*****************************************************************************
 // free interrupt data
-void FAR PASCAL DeleteWinPlayerState(tWinPlayerState FAR * state)
+//*****************************************************************************
+void FAR PASCAL DeleteWinPlayerState(tWinPlayerState FAR * pState)
 {
-  delete state->isx_buffers;
-  state->isx_buffers = 0;
-  delete state->osx_buffers;
-  state->osx_buffers = 0;
+  delete pState->mpInputSysexBuffers;
+  pState->mpInputSysexBuffers = 0;
+  delete pState->mpOutputSysexBuffers;
+  pState->mpOutputSysexBuffers = 0;
 
 
-  HANDLE hMem = state->hmem;
+  HANDLE hMem = pState->hmem;
 #ifdef WIN32
-  VirtualUnlock(state, sizeof(tWinPlayerState));
+  VirtualUnlock(pState, sizeof(tWinPlayerState));
 #else
-  GlobalPageUnlock((HGLOBAL)HIWORD(state));
+  GlobalPageUnlock((HGLOBAL)HIWORD(pState));
 #endif
   GlobalUnlock(hMem);
   GlobalFree(hMem);
 }
 
-#define Mtc2Frames( state ) \
+//*****************************************************************************
+//*****************************************************************************
+#define Mtc2Frames(pState) \
 { \
-  switch (state->mtc_start.type) \
+  switch (pState->mtc_start.type) \
   { \
     case 0: \
-      state->mtc_frames = (((((state->mtc_start.hour * 60) + state->mtc_start.min) * 60) + state->mtc_start.sec) * 24) + state->mtc_start.fm; \
+      pState->mtc_frames = (((((pState->mtc_start.hour * 60) + pState->mtc_start.min) * 60) + pState->mtc_start.sec) * 24) + pState->mtc_start.fm; \
       break; \
     case 1: \
-      state->mtc_frames = (((((state->mtc_start.hour * 60) + state->mtc_start.min) * 60) + state->mtc_start.sec) * 25) + state->mtc_start.fm; \
+      pState->mtc_frames = (((((pState->mtc_start.hour * 60) + pState->mtc_start.min) * 60) + pState->mtc_start.sec) * 25) + pState->mtc_start.fm; \
       break; \
     case 2: \
     case 3: \
-      state->mtc_frames = (((((state->mtc_start.hour * 60) + state->mtc_start.min) * 60) + state->mtc_start.sec) * 30) + state->mtc_start.fm; \
+      pState->mtc_frames = (((((pState->mtc_start.hour * 60) + pState->mtc_start.min) * 60) + pState->mtc_start.sec) * 30) + pState->mtc_start.fm; \
       break; \
   } \
 }
 
-#define GetMtcTime( state, msec ) \
+//*****************************************************************************
+//*****************************************************************************
+#define GetMtcTime(pState, msec) \
 { \
-  switch (state->mtc_start.type) \
+  switch (pState->mtc_start.type) \
   { \
     case 0: \
-      msec = ((state->mtc_frames / 24) * 1000) + (((state->mtc_frames % 24) * state->time_per_frame) / 1000); \
+      msec = ((pState->mtc_frames / 24) * 1000) + \
+      (((pState->mtc_frames % 24) * pState->time_per_frame) / 1000); \
       break; \
     case 1: \
-      msec = ((state->mtc_frames / 25) * 1000) + (((state->mtc_frames % 25) * state->time_per_frame) / 1000); \
+      msec = ((pState->mtc_frames / 25) * 1000) + (((pState->mtc_frames % 25) * pState->time_per_frame) / 1000); \
       break; \
     case 2: \
     case 3: \
-      msec = ((state->mtc_frames / 30) * 1000) + (((state->mtc_frames % 30) * state->time_per_frame) / 1000); \
+      msec = ((pState->mtc_frames / 30) * 1000) + (((pState->mtc_frames % 30) * pState->time_per_frame) / 1000); \
       break; \
     default: \
       msec = 0; \
   } \
 }
 
-
-
-static inline void outsysex(tWinPlayerState *state)
+//*****************************************************************************
+//*****************************************************************************
+static inline void outsysex(tWinPlayerState* pState)
 {
-  // take away the SYSEX_EVENT meta event
-  (void) state->play_buffer.get();
-  // next entry is the actual data
-  midi_event *m = state->play_buffer.peek();
-  JZWinSysexBuffer *buf = (JZWinSysexBuffer *)m->data;
-  MIDIHDR *hdr = buf->MidiHdr();
-  midiOutLongMsg(state->hout, hdr, sizeof(MIDIHDR));
-  // dont care about returncodes because the SYSEX_EVENT was already
-  // taken from the queue
+  // Take away the SYSEX_EVENT meta event.
+  (void) pState->play_buffer.get();
+
+  // The next entry is the actual data.
+  JZMidiEvent* pMidiEvent = pState->play_buffer.peek();
+  JZWinSysexBuffer* pWinSysexBuffer = (JZWinSysexBuffer*)pMidiEvent->data;
+  MIDIHDR *hdr = pWinSysexBuffer->MidiHdr();
+  midiOutLongMsg(pState->hout, hdr, sizeof(MIDIHDR));
+  // Don't care about return codes because the SYSEX_EVENT was already taken
+  // from the queue.
 }
 
-
+//*****************************************************************************
 // handle incoming midi data (internal clock)
+//*****************************************************************************
 void CALLBACK midiIntInputHandler(
   HMIDIIN hMidiIn,
   WORD wMsg,
@@ -155,38 +165,42 @@ void CALLBACK midiIntInputHandler(
   DWORD dwParam1,
   DWORD dwParam2)
 {
-    tWinPlayerState *state = (tWinPlayerState *)dwInstance;
-    int now;
+  tWinPlayerState* pState = (tWinPlayerState*)dwInstance;
+  int now;
 
-    now = (int)timeGetTime();
+  now = (int)timeGetTime();
 
-    switch (wMsg)
-    {
-        case MIM_DATA:
-          // ignore active sensing and real time messages except midi stop
-          if ( (dwParam1 & 0x000000ff) < 0xf8)
+  switch (wMsg)
+  {
+    case MIM_DATA:
+      // Ignore active sensing and real time messages except midi stop.
+      if ((dwParam1 & 0x000000ff) < 0xf8)
+      {
+        pState->recd_buffer.put(dwParam1, now);
+
+        // Midi thru
+        if (pState->soft_thru)
+        {
+          if (
+            !pState->thru_buffer.empty() ||
+            midiOutShortMsg(pState->hout, dwParam1) == MIDIERR_NOTREADY)
           {
-              state->recd_buffer.put(dwParam1, now );
-
-            /* Midi thru */
-            if ( state->soft_thru )
-            {
-              if (!state->thru_buffer.empty() || midiOutShortMsg(state->hout, dwParam1) == MIDIERR_NOTREADY)
-              {
-                // device busy, output during normal play
-                state->thru_buffer.put(dwParam1, 0);
-              }
-            }
+            // device busy, output during normal play
+            pState->thru_buffer.put(dwParam1, 0);
           }
-          break;
-        case MIM_OPEN:
-        case MIM_ERROR:
-        default:
-            break;
-    }
+        }
+      }
+      break;
+    case MIM_OPEN:
+    case MIM_ERROR:
+    default:
+      break;
+  }
 }
 
+//*****************************************************************************
 // play output (internal clock)
+//*****************************************************************************
 void CALLBACK midiIntTimerHandler(
   UINT wTimerId,
   UINT wMsg,
@@ -194,83 +208,96 @@ void CALLBACK midiIntTimerHandler(
   DWORD dw1,
   DWORD dw2)
 {
-  tWinPlayerState *state = (tWinPlayerState *)dwUser;
-  if ( !state->playing )
+  tWinPlayerState* pState = (tWinPlayerState *)dwUser;
+  if (!pState->playing)
+  {
     return;
+  }
 
   // output what was left from midi thru
-  while (!state->thru_buffer.empty())
+  while (!pState->thru_buffer.empty())
   {
-    midi_event *m = state->thru_buffer.peek();
-    if (midiOutShortMsg(state->hout, m->data) == MIDIERR_NOTREADY)
+    JZMidiEvent* pMidiEvent = pState->thru_buffer.peek();
+    if (midiOutShortMsg(pState->hout, pMidiEvent->data) == MIDIERR_NOTREADY)
     {
       timeSetEvent(
-        state->min_timer_period,
-        state->min_timer_period * 5,
+        pState->min_timer_period,
+        pState->min_timer_period * 5,
         (LPTIMECALLBACK) midiIntTimerHandler,
-        (DWORD) state,
+        (DWORD) pState,
         TIME_ONESHOT);
       return;
     }
-    (void)state->thru_buffer.get();
+    (void)pState->thru_buffer.get();
   }
 
-  state->play_time = (int)timeGetTime() + state->time_correction;
+  pState->play_time = (int)timeGetTime() + pState->time_correction;
 
-  midi_event* m = state->play_buffer.peek();
-  while (m)
+  JZMidiEvent* pMidiEvent = pState->play_buffer.peek();
+  while (pMidiEvent)
   {
-    if (m->ref > state->play_time)
+    if (pMidiEvent->ref > pState->play_time)
     {
       break;
     }
 
-    if (m->data)
+    if (pMidiEvent->data)
     {
-
-      if (m->data == START_AUDIO)
-        state->audio_player->StartAudio();
-      else
-
-      if (m->data == SYSEX_EVENT)
-        outsysex(state);
-      else
-
-      if (midiOutShortMsg(state->hout, m->data) == MIDIERR_NOTREADY)
+      if (pMidiEvent->data == START_AUDIO)
       {
-        // try again later
-        timeSetEvent(
-          state->min_timer_period,
-          state->min_timer_period * 5,
-          (LPTIMECALLBACK) midiIntTimerHandler,
-          (DWORD) state,
-          TIME_ONESHOT);
-        return;
+        pState->audio_player->StartAudio();
+      }
+      else
+      {
+        if (pMidiEvent->data == SYSEX_EVENT)
+        {
+          outsysex(pState);
+        }
+        else
+        {
+          if (midiOutShortMsg(pState->hout, pMidiEvent->data) == MIDIERR_NOTREADY)
+          {
+            // try again later
+            timeSetEvent(
+              pState->min_timer_period,
+              pState->min_timer_period * 5,
+              (LPTIMECALLBACK) midiIntTimerHandler,
+              (DWORD) pState,
+              TIME_ONESHOT);
+            return;
+          }
+        }
       }
     }
-    (void) state->play_buffer.get();
-    m = state->play_buffer.peek();
+    (void) pState->play_buffer.get();
+    pMidiEvent = pState->play_buffer.peek();
   }
 
   // compute delta time for next interrupt
   int delay = 100; // default in millisec
-  if (m)
+  if (pMidiEvent)
   {
-    delay = (int)m->ref - (int)state->play_time;
+    delay = (int)pMidiEvent->ref - (int)pState->play_time;
   }
-  if (delay < (int)state->min_timer_period)
-    delay = (int)state->min_timer_period;
-  else if (delay > (int)state->max_timer_period)
-    delay = (int)state->max_timer_period;
+  if (delay < (int)pState->min_timer_period)
+  {
+    delay = (int)pState->min_timer_period;
+  }
+  else if (delay > (int)pState->max_timer_period)
+  {
+    delay = (int)pState->max_timer_period;
+  }
   timeSetEvent(
     (UINT) delay,
-    state->min_timer_period,
+    pState->min_timer_period,
     (LPTIMECALLBACK) midiIntTimerHandler,
-    (DWORD) state,
+    (DWORD) pState,
     TIME_ONESHOT);
 }
 
+//*****************************************************************************
 // handle incoming midi data (midi clock source) (songpointer)
+//*****************************************************************************
 void CALLBACK midiMidiInputHandler(
   HMIDIIN hMidiIn,
   WORD wMsg,
@@ -278,48 +305,56 @@ void CALLBACK midiMidiInputHandler(
   DWORD dwParam1,
   DWORD dwParam2)
 {
-    tWinPlayerState *state = (tWinPlayerState *)dwInstance;
-    int now;
+  tWinPlayerState* pState = (tWinPlayerState*)dwInstance;
+  int now;
 
-    now = (int)timeGetTime();
+  now = (int)timeGetTime();
 
-    switch (wMsg)
-    {
-        case MIM_DATA:
-          if ( dwParam1 == 0xf8 )
+  switch (wMsg)
+  {
+    case MIM_DATA:
+      if (dwParam1 == 0xf8)
+      {
+        pState->signal_time = now;
+        pState->virtual_clock += pState->ticks_per_signal;
+        return;
+      }
+
+      // ignore active sensing and real time messages except midi stop
+      if (
+        (dwParam1 != 0xf8) &&
+        (dwParam1 != 0xfa) &&
+        (dwParam1 != 0xfb) &&
+        (dwParam1 != 0xFE))
+      {
+        pState->recd_buffer.put(
+          dwParam1,
+          pState->virtual_clock +
+            (((now - pState->signal_time) * 1000L) / pState->time_per_tick));
+
+        // Midi thru, do not put stop-play thru
+        if (pState->soft_thru && (dwParam1 != 0xfc))
+        {
+          if (
+            !pState->thru_buffer.empty() ||
+            midiOutShortMsg(pState->hout, dwParam1) == MIDIERR_NOTREADY)
           {
-            state->signal_time = now;
-            state->virtual_clock += state->ticks_per_signal;
-            return;
+            // device busy, output during normal play
+            pState->thru_buffer.put(dwParam1, 0);
           }
-
-          // ignore active sensing and real time messages except midi stop
-          if ( (dwParam1 != 0xf8) &&
-               (dwParam1 != 0xfa) &&
-               (dwParam1 != 0xfb) &&
-               (dwParam1 != 0xFE) )
-          {
-            state->recd_buffer.put(dwParam1, state->virtual_clock + ( ((now - state->signal_time) * 1000L) / state->time_per_tick) );
-
-            /* Midi thru, do not put stop-play thru */
-            if ( state->soft_thru && (dwParam1 != 0xfc) )
-            {
-              if (!state->thru_buffer.empty() || midiOutShortMsg(state->hout, dwParam1) == MIDIERR_NOTREADY)
-              {
-                // device busy, output during normal play
-                state->thru_buffer.put(dwParam1, 0);
-              }
-            }
-          }
-          break;
-        case MIM_OPEN:
-        case MIM_ERROR:
-        default:
-            break;
-    }
+        }
+      }
+      break;
+    case MIM_OPEN:
+    case MIM_ERROR:
+    default:
+      break;
+  }
 }
 
+//*****************************************************************************
 // play output (midi clock source) (songpointer)
+//*****************************************************************************
 void CALLBACK midiMidiTimerHandler(
   UINT wTimerId,
   UINT wMsg,
@@ -327,90 +362,105 @@ void CALLBACK midiMidiTimerHandler(
   DWORD dw1,
   DWORD dw2)
 {
-  tWinPlayerState *state = (tWinPlayerState *)dwUser;
-  if ( !state->playing )
+  tWinPlayerState* pState = (tWinPlayerState*)dwUser;
+  if (!pState->playing)
+  {
     return;
+  }
 
   // output what was left from midi thru
-  while (!state->thru_buffer.empty())
+  while (!pState->thru_buffer.empty())
   {
-    midi_event *m = state->thru_buffer.peek();
-    if (midiOutShortMsg(state->hout, m->data) == MIDIERR_NOTREADY)
+    JZMidiEvent* pMidiEvent = pState->thru_buffer.peek();
+    if (midiOutShortMsg(pState->hout, pMidiEvent->data) == MIDIERR_NOTREADY)
     {
       timeSetEvent(
-        state->min_timer_period,
-        state->min_timer_period * 5,
+        pState->min_timer_period,
+        pState->min_timer_period * 5,
         (LPTIMECALLBACK) midiMidiTimerHandler,
-        (DWORD) state,
+        (DWORD) pState,
         TIME_ONESHOT);
       return;
     }
-    (void)state->thru_buffer.get();
+    (void)pState->thru_buffer.get();
   }
 
-  state->play_time = (int)timeGetTime();
-  /* How many ticks since last signal? */
-  int delta_clock = ((state->play_time - state->signal_time) * 1000L) / state->time_per_tick;
+  pState->play_time = (int)timeGetTime();
 
-  if (delta_clock > (2 * state->ticks_per_signal)) /* Too many? */
+  // How many ticks since last signal?
+  int delta_clock =
+    ((pState->play_time - pState->signal_time) * 1000L) /
+    pState->time_per_tick;
+
+  if (delta_clock > (2 * pState->ticks_per_signal)) // Too many?
   {
-    state->play_clock = state->virtual_clock; /* Yes, means tape stopped */
+    pState->play_clock = pState->virtual_clock; // Yes, means tape stopped.
   }
   else
   {
-    state->play_clock = state->virtual_clock + delta_clock;
+    pState->play_clock = pState->virtual_clock + delta_clock;
   }
 
-  midi_event *m = state->play_buffer.peek();
-  while (m)
+  JZMidiEvent* pMidiEvent = pState->play_buffer.peek();
+  while (pMidiEvent)
   {
-    if ((int)m->ref > state->play_clock)
-      break;
-
-    if (m->data)
+    if ((int)pMidiEvent->ref > pState->play_clock)
     {
+      break;
+    }
 
-      if (m->data == SYSEX_EVENT)
-        outsysex(state);
-      else
-
-      if (midiOutShortMsg(state->hout, m->data) == MIDIERR_NOTREADY)
+    if (pMidiEvent->data)
+    {
+      if (pMidiEvent->data == SYSEX_EVENT)
       {
-        // try again later
-        timeSetEvent(
-          state->min_timer_period,
-          state->min_timer_period * 5,
-          (LPTIMECALLBACK) midiMidiTimerHandler,
-          (DWORD) state,
-          TIME_ONESHOT);
-        return;
+        outsysex(pState);
+      }
+      else
+      {
+        if (midiOutShortMsg(pState->hout, pMidiEvent->data) == MIDIERR_NOTREADY)
+        {
+          // try again later
+          timeSetEvent(
+            pState->min_timer_period,
+            pState->min_timer_period * 5,
+            (LPTIMECALLBACK) midiMidiTimerHandler,
+            (DWORD) pState,
+            TIME_ONESHOT);
+          return;
+        }
       }
     }
-    (void) state->play_buffer.get();
-    m = state->play_buffer.peek();
+    (void) pState->play_buffer.get();
+    pMidiEvent = pState->play_buffer.peek();
   }
 
   // compute delta time for next interrupt
   int delay = 100; // default in millisec
 
-  if (m)
+  if (pMidiEvent)
   {
-    delay = (((int)m->ref - state->play_clock) * state->time_per_tick) / 1000L;
+    delay = (((int)pMidiEvent->ref - pState->play_clock) * pState->time_per_tick) / 1000L;
   }
-  if (delay < (int)state->min_timer_period)
-    delay = (int)state->min_timer_period;
-  else if (delay > (int)state->max_timer_period)
-    delay = (int)state->max_timer_period;
+  if (delay < (int)pState->min_timer_period)
+  {
+    delay = (int)pState->min_timer_period;
+  }
+  else if (delay > (int)pState->max_timer_period)
+  {
+    delay = (int)pState->max_timer_period;
+  }
 
   timeSetEvent(
     (UINT) delay,
-    state->min_timer_period,
+    pState->min_timer_period,
     (LPTIMECALLBACK) midiMidiTimerHandler,
-    (DWORD) state,
+    (DWORD) pState,
     TIME_ONESHOT);
 }
 
+//*****************************************************************************
 // handle incoming midi data (MTC clock source)
+//*****************************************************************************
 void CALLBACK midiMtcInputHandler(
   HMIDIIN hMidiIn,
   WORD wMsg,
@@ -418,107 +468,110 @@ void CALLBACK midiMtcInputHandler(
   DWORD dwParam1,
   DWORD dwParam2)
 {
-    tWinPlayerState *state = (tWinPlayerState *)dwInstance;
-    int now;
+  tWinPlayerState* pState = (tWinPlayerState*)dwInstance;
+  int now;
 
-    now = (int)timeGetTime();
+  now = (int)timeGetTime();
 
-    switch (wMsg)
-    {
-        case MIM_DATA:
-
-          if ( (dwParam1 & 0x000000ff) == 0xf1 )
+  switch (wMsg)
+  {
+    case MIM_DATA:
+      if ((dwParam1 & 0x000000ff) == 0xf1)
+      {
+        pState->last_qfm = (dwParam1 & 0x00007000) >> 12;
+        if (pState->mtc_valid)
+        {
+          if ((pState->last_qfm % 4) == 0)
           {
-            state->last_qfm = (dwParam1 & 0x00007000) >> 12;
-            if (state->mtc_valid)
-            {
-              if ( (state->last_qfm % 4) == 0 )
-              {
-                state->signal_time = now;
-                state->mtc_frames++;
-              }
-            }
-            else
-            {
-              union
-              {
-                DWORD w;
-                unsigned char c[4];
-              } u;
-              u.w = dwParam1;
-              state->qfm_bits |= (0x0001 << state->last_qfm);
-              switch (state->last_qfm)
-              {
-                case 0:
-                  state->signal_time = now;
-                  state->mtc_start.fm = u.c[1] & 0x0f;
-                  break;
-                case 1:
-                  state->mtc_start.fm |= ((u.c[1] & 0x0f) << 4);
-                  break;
-                case 2:
-                  state->mtc_start.sec = u.c[1] & 0x0f;
-                  break;
-                case 3:
-                  state->mtc_start.sec |= ((u.c[1] & 0x0f) << 4);
-                  break;
-                case 4:
-                  state->mtc_start.min = u.c[1] & 0x0f;
-                  break;
-                case 5:
-                  state->mtc_start.min |= ((u.c[1] & 0x0f) << 4);
-                  break;
-                case 6:
-                  state->mtc_start.hour = u.c[1] & 0x0f;
-                  break;
-                case 7:
-                  state->mtc_start.hour |= ((u.c[1] & 0x01) << 4);
-                  state->mtc_start.type = ((u.c[1] & 0x06) >> 1);
-                  if (state->qfm_bits == 0xff)
-                  {
-                    int mtc_time;
-                    state->signal_time = now;
-                    Mtc2Frames( state );
-                    GetMtcTime( state, mtc_time );
-                    state->recd_buffer.put( 0xf1, mtc_time );
-                    state->mtc_valid = TRUE;
-                  }
-                  state->qfm_bits = 0;
-                  break;
-              } /* switch last_qfm */
-            } /* mtc_valid */
-            return;
-          } /* 0xf1 */
-
-          // ignore active sensing and real time messages except midi stop
-          if ( (dwParam1 & 0x000000ff) < 0xf8)
-          {
-            if (state->mtc_valid)
-            {
-              int mtc_time;
-              GetMtcTime( state, mtc_time );
-              state->recd_buffer.put(dwParam1, mtc_time + (now - state->signal_time) );
-            }
-
-            /* Midi thru */
-            if ( state->soft_thru )
-            {
-              if (!state->thru_buffer.empty() || midiOutShortMsg(state->hout, dwParam1) == MIDIERR_NOTREADY)
-              {
-                // device busy, output during normal play
-                state->thru_buffer.put(dwParam1, 0);
-              }
-            }
+            pState->signal_time = now;
+            pState->mtc_frames++;
           }
-          break;
-        case MIM_OPEN:
-        case MIM_ERROR:
-        default:
-            break;
-    }
+        }
+        else
+        {
+          union
+          {
+            DWORD w;
+            unsigned char c[4];
+          } u;
+          u.w = dwParam1;
+          pState->qfm_bits |= (0x0001 << pState->last_qfm);
+          switch (pState->last_qfm)
+          {
+            case 0:
+              pState->signal_time = now;
+              pState->mtc_start.fm = u.c[1] & 0x0f;
+              break;
+            case 1:
+              pState->mtc_start.fm |= ((u.c[1] & 0x0f) << 4);
+              break;
+            case 2:
+              pState->mtc_start.sec = u.c[1] & 0x0f;
+              break;
+            case 3:
+              pState->mtc_start.sec |= ((u.c[1] & 0x0f) << 4);
+              break;
+            case 4:
+              pState->mtc_start.min = u.c[1] & 0x0f;
+              break;
+            case 5:
+              pState->mtc_start.min |= ((u.c[1] & 0x0f) << 4);
+              break;
+            case 6:
+              pState->mtc_start.hour = u.c[1] & 0x0f;
+              break;
+            case 7:
+              pState->mtc_start.hour |= ((u.c[1] & 0x01) << 4);
+              pState->mtc_start.type = ((u.c[1] & 0x06) >> 1);
+              if (pState->qfm_bits == 0xff)
+              {
+                int mtc_time;
+                pState->signal_time = now;
+                Mtc2Frames(pState);
+                GetMtcTime(pState, mtc_time);
+                pState->recd_buffer.put(0xf1, mtc_time);
+                pState->mtc_valid = TRUE;
+              }
+              pState->qfm_bits = 0;
+              break;
+          } // switch last_qfm
+        } // mtc_valid
+        return;
+      } // 0xf1
+
+      // ignore active sensing and real time messages except midi stop
+      if ((dwParam1 & 0x000000ff) < 0xf8)
+      {
+        if (pState->mtc_valid)
+        {
+          int mtc_time;
+          GetMtcTime(pState, mtc_time);
+          pState->recd_buffer.put(
+            dwParam1,
+            mtc_time + (now - pState->signal_time));
+        }
+
+        // Midi thru
+        if (pState->soft_thru)
+        {
+          if (!pState->thru_buffer.empty() || midiOutShortMsg(pState->hout, dwParam1) == MIDIERR_NOTREADY)
+          {
+            // device busy, output during normal play
+            pState->thru_buffer.put(dwParam1, 0);
+          }
+        }
+      }
+      break;
+    case MIM_OPEN:
+    case MIM_ERROR:
+    default:
+      break;
+  }
 }
 
+//*****************************************************************************
 // play output (MTC clock source)
+//*****************************************************************************
 void CALLBACK midiMtcTimerHandler(
   UINT wTimerId,
   UINT wMsg,
@@ -526,89 +579,102 @@ void CALLBACK midiMtcTimerHandler(
   DWORD dw1,
   DWORD dw2)
 {
-  tWinPlayerState *state = (tWinPlayerState *)dwUser;
-  if ( !state->playing )
+  tWinPlayerState* pState = (tWinPlayerState*)dwUser;
+  if (!pState->playing)
+  {
     return;
-  if ( state->doing_mtc_rec )
+  }
+  if (pState->doing_mtc_rec)
+  {
     return;
+  }
 
   // output what was left from midi thru
-  while (!state->thru_buffer.empty())
+  while (!pState->thru_buffer.empty())
   {
-    midi_event *m = state->thru_buffer.peek();
-    if (midiOutShortMsg(state->hout, m->data) == MIDIERR_NOTREADY)
+    JZMidiEvent* pMidiEvent = pState->thru_buffer.peek();
+    if (midiOutShortMsg(pState->hout, pMidiEvent->data) == MIDIERR_NOTREADY)
     {
       timeSetEvent(
-        state->min_timer_period,
-        state->min_timer_period * 5,
+        pState->min_timer_period,
+        pState->min_timer_period * 5,
         (LPTIMECALLBACK) midiMtcTimerHandler,
-        (DWORD) state,
+        (DWORD) pState,
         TIME_ONESHOT);
       return;
     }
-    (void)state->thru_buffer.get();
+    (void)pState->thru_buffer.get();
   }
 
   int now = (int)timeGetTime();
-  if ( state->mtc_valid )
+  if (pState->mtc_valid)
   {
-    GetMtcTime( state, state->play_time );
-    state->play_time += now - state->signal_time;
+    GetMtcTime(pState, pState->play_time);
+    pState->play_time += now - pState->signal_time;
   }
   else
   {
-    /* Tape not running */
+    // Tape not running
     return;
   }
 
-  midi_event *m = state->play_buffer.peek();
-  while (m)
+  JZMidiEvent* pMidiEvent = pState->play_buffer.peek();
+  while (pMidiEvent)
   {
-    if (m->ref > state->play_time)
+    if (pMidiEvent->ref > pState->play_time)
     {
       break;
     }
 
-    if (m->data)
+    if (pMidiEvent->data)
     {
-      if (m->data == SYSEX_EVENT)
-        outsysex(state);
-      else
-
-      if (midiOutShortMsg(state->hout, m->data) == MIDIERR_NOTREADY)
+      if (pMidiEvent->data == SYSEX_EVENT)
       {
-        // try again later
-        timeSetEvent(
-          state->min_timer_period,
-          state->min_timer_period * 5,
-          (LPTIMECALLBACK) midiMtcTimerHandler,
-          (DWORD) state,
-          TIME_ONESHOT);
-        return;
+        outsysex(pState);
+      }
+      else
+      {
+        if (midiOutShortMsg(pState->hout, pMidiEvent->data) == MIDIERR_NOTREADY)
+        {
+          // try again later
+          timeSetEvent(
+            pState->min_timer_period,
+            pState->min_timer_period * 5,
+            (LPTIMECALLBACK) midiMtcTimerHandler,
+            (DWORD) pState,
+            TIME_ONESHOT);
+          return;
+        }
       }
     }
-    (void) state->play_buffer.get();
-    m = state->play_buffer.peek();
+    (void) pState->play_buffer.get();
+    pMidiEvent = pState->play_buffer.peek();
   }
 
   // compute delta time for next interrupt
   int delay = 100; // default in millisec
-  if (m)
+  if (pMidiEvent)
   {
-    delay = (int)m->ref - (int)state->play_time;
+    delay = (int)pMidiEvent->ref - (int)pState->play_time;
   }
-  if (delay < (int)state->min_timer_period)
-    delay = (int)state->min_timer_period;
-  else if (delay > (int)state->max_timer_period)
-    delay = (int)state->max_timer_period;
+  if (delay < (int)pState->min_timer_period)
+  {
+    delay = (int)pState->min_timer_period;
+  }
+  else if (delay > (int)pState->max_timer_period)
+  {
+    delay = (int)pState->max_timer_period;
+  }
   timeSetEvent(
     (UINT) delay,
-    state->min_timer_period,
+    pState->min_timer_period,
     (LPTIMECALLBACK) midiMtcTimerHandler,
-    (DWORD) state,
+    (DWORD) pState,
     TIME_ONESHOT);
 }
 
+//*****************************************************************************
+//*****************************************************************************
 void CALLBACK MidiOutProc(
   HMIDIOUT hmo,
   UINT wMsg,
@@ -620,14 +686,14 @@ void CALLBACK MidiOutProc(
   if (wMsg == MOM_DONE)
   {
     MIDIHDR *hdr = (MIDIHDR *)dwParam1;
-    JZWinSysexBuffer *buf = (JZWinSysexBuffer *)hdr->dwUser;
-    if (buf != 0)
-    {  // ignore OutNow() buffers
-      buf->Release();
+    JZWinSysexBuffer* pWinSysexBuffer = (JZWinSysexBuffer *)hdr->dwUser;
+    if (pWinSysexBuffer != 0)
+    {
+      // ignore OutNow() buffers
+      pWinSysexBuffer->Release();
       OutputDebugString(L"release\n");
     }
   }
 }
-
 
 } // extern "C"

@@ -342,12 +342,14 @@ enum tMtcType
 };
 
 //*****************************************************************************
+// Description:
+//   MTC stands for MIDI time code or MIDI time division.
 //*****************************************************************************
 class JZMtcTime
 {
   public:
 
-    JZMtcTime(JZMtcOffsetEvent* s); // an mtc offset or mtc full message
+    JZMtcTime(JZMtcOffsetEvent* pMtcOffsetEvent);
     JZMtcTime(int millisek, tMtcType t);
     JZMtcTime(char* str, tMtcType t);
     tMtcType GetType() const
@@ -371,17 +373,9 @@ class JZMtcTime
 
 //*****************************************************************************
 //*****************************************************************************
-class JZSimpleEventArray : public wxObject
+class JZSimpleEventArray
 {
   public:
-
-    // Actual number of events in **mppEvents.
-    int mEventCount;
-
-    // Memory allocated in **mppEvents
-    int mMaxEvents;
-
-    JZEvent** mppEvents;
 
     // Resize **mppEvents
     void Resize();
@@ -401,6 +395,16 @@ class JZSimpleEventArray : public wxObject
     void Sort();
 
     void RemoveEOT();
+
+  public:
+
+    // Actual number of events in **mppEvents.
+    int mEventCount;
+
+    // Memory allocated in **mppEvents
+    int mMaxEvents;
+
+    JZEvent** mppEvents;
 };
 
 
@@ -416,13 +420,14 @@ class JZUndoBuffer : public JZSimpleEventArray
 
     void Put(JZEvent* pEvent, int killed)
     {
-      bits.set(mEventCount, killed);
+      mBits.set(mEventCount, killed);
       JZSimpleEventArray::Put(pEvent);
     }
 
   private:
 
-    JZBitset bits;  // set for killed events
+    // Set for killed events.
+    JZBitset mBits;
 };
 
 

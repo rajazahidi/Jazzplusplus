@@ -149,3 +149,12 @@
 
 // JZSamplesDialog resource IDs.
 #define IDC_BN_SD_FILE_SELECT_BROWSE         (wxID_HIGHEST + 1240)
+
+// Rhythm window resource IDs.
+#define IDC_SL_RHYTHM_STEPS_PER_COUNT        (wxID_HIGHEST + 1250)
+#define IDC_SL_RHYTHM_COUNTS_PER_BAR         (wxID_HIGHEST + 1251)
+#define IDC_SL_RHYTHM_BAR_COUNT              (wxID_HIGHEST + 1252)
+#define IDC_LB_RHYTHM_INSTRUMENTS            (wxID_HIGHEST + 1253)
+#define IDC_SL_RHYTHM_GROUP_CONTRIB          (wxID_HIGHEST + 1254)
+#define IDC_SL_RHYTHM_GROUP_LISTEN           (wxID_HIGHEST + 1255)
+#define IDC_CB_RHYTHM_RANDOMIZE              (wxID_HIGHEST + 1258)

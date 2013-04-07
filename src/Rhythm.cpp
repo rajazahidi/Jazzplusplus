@@ -1894,6 +1894,11 @@ void JZRhythmGeneratorFrame::CreateToolBar()
 //-----------------------------------------------------------------------------
 JZRhythmGeneratorFrame::~JZRhythmGeneratorFrame()
 {
+  int XPixel, YPixel;
+  GetPosition(&XPixel, &YPixel);
+  gpConfig->Put(C_RhythmXpos, XPixel);
+  gpConfig->Put(C_RhythmYpos, YPixel);
+
   delete mpRhythmGeneratorWindow;
 
   gpRhythmGeneratorFrame = 0;

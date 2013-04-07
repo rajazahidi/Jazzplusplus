@@ -287,6 +287,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\AboutDialog.cpp" />
+    <ClCompile Include="..\src\ArrayControl.cpp" />
     <ClCompile Include="..\src\AsciiMidiFile.cpp" />
     <ClCompile Include="..\src\Audio.cpp" />
     <ClCompile Include="..\src\ClockDialog.cpp">
@@ -346,6 +347,7 @@
     <ClCompile Include="..\src\RecordingInfo.cpp" />
     <ClCompile Include="..\src\Rectangle.cpp" />
     <ClCompile Include="..\src\Rhythm.cpp" />
+    <ClCompile Include="..\src\RhythmArrayControl.cpp" />
     <ClCompile Include="..\src\Sample.cpp" />
     <ClCompile Include="..\src\SampleCommand.cpp" />
     <ClCompile Include="..\src\SampleDialog.cpp" />
@@ -395,6 +397,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\AboutDialog.h" />
+    <ClInclude Include="..\src\ArrayControl.h" />
     <ClInclude Include="..\src\AsciiMidiFile.h" />
     <ClInclude Include="..\src\Audio.h" />
     <CustomBuildStep Include="..\src\ClockDialog.h">
@@ -456,6 +459,7 @@
     <ClInclude Include="..\src\Rectangle.h" />
     <ClInclude Include="..\src\Resources.h" />
     <ClInclude Include="..\src\Rhythm.h" />
+    <ClInclude Include="..\src\RhythmArrayControl.h" />
     <ClInclude Include="..\src\Sample.h" />
     <ClInclude Include="..\src\SampleCommand.h" />
     <ClInclude Include="..\src\SampleDialog.h" />

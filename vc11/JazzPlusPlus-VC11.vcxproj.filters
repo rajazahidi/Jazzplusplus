@@ -156,6 +156,8 @@
     <ClCompile Include="..\src\Dialogs\QuantizeDialog.cpp">
       <Filter>Dialog Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\ArrayControl.cpp" />
+    <ClCompile Include="..\src\RhythmArrayControl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\AsciiMidiFile.h" />
@@ -316,6 +318,8 @@
     </ClInclude>
     <ClInclude Include="..\src\DrumUtilities.h" />
     <ClInclude Include="..\src\DrumEnums.h" />
+    <ClInclude Include="..\src\ArrayControl.h" />
+    <ClInclude Include="..\src\RhythmArrayControl.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\Makefile.am" />

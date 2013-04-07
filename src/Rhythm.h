@@ -267,6 +267,8 @@ class JZRhythmGeneratorWindow : public wxPanel
 
     void Read(std::istream& Is);
 
+    void Write(std::ostream& Os);
+
     void AddInstrument();
 
     void DeleteInstrument();
@@ -327,6 +329,8 @@ class JZRhythmGeneratorFrame : public wxFrame
     void CreateToolBar();
 
     void OnOpen(wxCommandEvent& Event);
+
+    void OnSave(wxCommandEvent& Event);
 
     void OnAddInstrument(wxCommandEvent& Event);
 

@@ -1693,6 +1693,24 @@ void JZRhythmGeneratorWindow::Read(istream& Is)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void JZRhythmGeneratorWindow::Write(ostream& Os)
+{
+  Win2Instrument();
+
+  Os << 2 << endl;
+  Os << mInstruments.size() << endl;
+  for (
+    vector<JZRhythm*>::const_iterator iInstrument = mInstruments.begin();
+    iInstrument != mInstruments.end();
+    ++iInstrument)
+  {
+    const JZRhythm& Instrument = **iInstrument;
+    Instrument.Write(Os);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZRhythmGeneratorWindow::ClearInstruments()
 {
   for (
@@ -1847,6 +1865,8 @@ BEGIN_EVENT_TABLE(JZRhythmGeneratorFrame, wxFrame)
 
   EVT_MENU(wxID_OPEN, JZRhythmGeneratorFrame::OnOpen)
 
+  EVT_MENU(wxID_SAVE, JZRhythmGeneratorFrame::OnSave)
+
   EVT_MENU(ID_INSTRUMENT_ADD, JZRhythmGeneratorFrame::OnAddInstrument)
 
   EVT_MENU(ID_INSTRUMENT_DELETE, JZRhythmGeneratorFrame::OnDeleteInstrument)
@@ -1959,6 +1979,27 @@ void JZRhythmGeneratorFrame::OnOpen(wxCommandEvent&)
     if (Is)
     {
       mpRhythmGeneratorWindow->Read(Is);
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZRhythmGeneratorFrame::OnSave(wxCommandEvent&)
+{
+  bool HasChanged = false;
+  wxString FileName = file_selector(
+    mDefaultFileName,
+    "Save Rhythm",
+    true,
+    HasChanged,
+    "*.rhy");
+  if (!FileName.empty())
+  {
+    ofstream Os(FileName.mb_str());
+    if (Os)
+    {
+      mpRhythmGeneratorWindow->Write(Os);
     }
   }
 }

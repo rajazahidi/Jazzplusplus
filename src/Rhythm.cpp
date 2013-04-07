@@ -353,8 +353,9 @@ void JZRhythm::GenerateEvent(JZTrack* pTrack, long clock, short vel, short len)
   }
 }
 
-
 #if 0
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZRhythm::Generate(JZTrack* pTrack, int FromClock, int ToClock, int TicksPerBar)
 {
   int chan   = pTrack->Channel - 1;
@@ -545,7 +546,6 @@ void JZRhythm::Generate(
 }
 
 //*****************************************************************************
-// JZRhythmWindow
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -789,7 +789,6 @@ JZRhythmWindow::JZRhythmWindow(JZEventWindow* pEventWindow, JZSong* pSong)
 //-----------------------------------------------------------------------------
 void JZRhythmWindow::OnSize(int w, int h)
 {
- // wxFrame::OnSize(w, h);
   if (mpToolBar)
   {
     int cw, ch;
@@ -1530,13 +1529,7 @@ JZRhythmGeneratorWindow::JZRhythmGeneratorWindow(
 //-----------------------------------------------------------------------------
 JZRhythmGeneratorWindow::~JZRhythmGeneratorWindow()
 {
-  for (
-    vector<JZRhythm*>::iterator iInstrument = mInstruments.begin();
-    iInstrument != mInstruments.end();
-    ++iInstrument)
-  {
-    delete *iInstrument;
-  }
+  ClearInstruments();
 }
 
 //-----------------------------------------------------------------------------
@@ -1671,6 +1664,45 @@ void JZRhythmGeneratorWindow::AddInstrument()
       AddInstrument(pRhythm);
     }
   }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZRhythmGeneratorWindow::Read(istream& Is)
+{
+  int Version;
+  Is >> Version;
+  if (Version > 2)
+  {
+    wxMessageBox("Wrong file format!", "Error", wxOK);
+  }
+
+  ClearInstruments();
+
+  size_t InstrumentCount;
+  Is >> InstrumentCount;
+  for (size_t i = 0; i < InstrumentCount; ++i)
+  {
+    JZRhythm* pRhythm = new JZRhythm(0);
+    pRhythm->Read(Is, Version);
+    AddInstrument(pRhythm);
+  }
+
+  Refresh();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZRhythmGeneratorWindow::ClearInstruments()
+{
+  for (
+    vector<JZRhythm*>::iterator iInstrument = mInstruments.begin();
+    iInstrument != mInstruments.end();
+    ++iInstrument)
+  {
+    delete *iInstrument;
+  }
+  mInstruments.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -1813,6 +1845,8 @@ void JZRhythmGeneratorWindow::OnListBox(wxCommandEvent&)
 //-----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(JZRhythmGeneratorFrame, wxFrame)
 
+  EVT_MENU(wxID_OPEN, JZRhythmGeneratorFrame::OnOpen)
+
   EVT_MENU(ID_INSTRUMENT_ADD, JZRhythmGeneratorFrame::OnAddInstrument)
 
   EVT_MENU(ID_INSTRUMENT_DELETE, JZRhythmGeneratorFrame::OnDeleteInstrument)
@@ -1822,6 +1856,10 @@ BEGIN_EVENT_TABLE(JZRhythmGeneratorFrame, wxFrame)
   EVT_MENU(wxID_HELP_CONTENTS, JZRhythmGeneratorFrame::OnHelpContents)
 
 END_EVENT_TABLE()
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+const wxString JZRhythmGeneratorFrame::mDefaultFileName = "noname.rhy";
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -1902,6 +1940,27 @@ JZRhythmGeneratorFrame::~JZRhythmGeneratorFrame()
   delete mpRhythmGeneratorWindow;
 
   gpRhythmGeneratorFrame = 0;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZRhythmGeneratorFrame::OnOpen(wxCommandEvent&)
+{
+  bool HasChanged = false;
+  wxString FileName = file_selector(
+    mDefaultFileName,
+    "Load Rhythm",
+    false,
+    HasChanged,
+    "*.rhy");
+  if (!FileName.empty())
+  {
+    ifstream Is(FileName.mb_str());
+    if (Is)
+    {
+      mpRhythmGeneratorWindow->Read(Is);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------

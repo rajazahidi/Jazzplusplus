@@ -265,11 +265,15 @@ class JZRhythmGeneratorWindow : public wxPanel
 
     virtual ~JZRhythmGeneratorWindow();
 
+    void Read(std::istream& Is);
+
     void AddInstrument();
 
     void DeleteInstrument();
 
   private:
+
+    void ClearInstruments();
 
     void AddInstrument(JZRhythm* pRhythm);
 
@@ -322,6 +326,8 @@ class JZRhythmGeneratorFrame : public wxFrame
 
     void CreateToolBar();
 
+    void OnOpen(wxCommandEvent& Event);
+
     void OnAddInstrument(wxCommandEvent& Event);
 
     void OnDeleteInstrument(wxCommandEvent& Event);
@@ -331,6 +337,8 @@ class JZRhythmGeneratorFrame : public wxFrame
     void OnHelpContents(wxCommandEvent& Event);
 
   private:
+
+    static const wxString mDefaultFileName;
 
     JZToolBar* mpToolBar;
 

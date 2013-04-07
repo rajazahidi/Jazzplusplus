@@ -168,7 +168,7 @@ static void setup_wav_control(JZSigWaveCtrl &wav, JZRndArray &arr)
   const int N = wav.Size();
 
   JZLineMap<float>xmap(0, N, 0, arr.Size() - 1);
-  JZLineMap<float>ymap(arr.Min(), arr.Max(), -1, 1);
+  JZLineMap<float>ymap(arr.GetMin(), arr.GetMax(), -1, 1);
   for (i = 0; i < N; i++)
     /* PAT - Original line:  wav[i] = ymap(arr[xmap(i)]); */
     wav[i] = ymap(arr[xmap(i)]);

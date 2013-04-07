@@ -22,6 +22,8 @@
 
 #include <wx/control.h>
 
+#include <string>
+
 class JZRndArray;
 
 //*****************************************************************************
@@ -52,15 +54,43 @@ class JZArrayControl : public wxControl
       const wxValidator& Validator = wxDefaultValidator,
       const wxString& Name = wxT("arraycontrol"));
 
+    void SetLabel(const std::string& Label);
+
+    void SetXMinMax(int XMin, int XMax);
+
+    void SetMeter(int StepsPerCount, int CountPerBar, int BarCount);
+
   private:
 
     void OnSize(wxSizeEvent& Event);
 
     void OnPaint(wxPaintEvent& Event);
 
+    void DrawBar(wxDC& Dc, int i, bool black);
+
+    void DrawLabel(wxDC& Dc);
+
+    void DrawXTicks(wxDC& Dc);
+
+    void DrawYTicks(wxDC& Dc);
+
+    void DrawNull(wxDC& Dc);
+
   private:
 
     JZRndArray* mpRandomArray;
+
+    long mStyleBits;
+
+    bool mEnabled;
+
+    std::string mLabel;
+
+    int mX, mY, mYNull;
+    int mWidth, mHeight;
+
+    // Array size is mapped to this range for x-tick marks.
+    int mXMin, mXMax;
 
   DECLARE_EVENT_TABLE()
 };

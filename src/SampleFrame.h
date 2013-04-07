@@ -14,6 +14,7 @@ class JZSample;
 class JZSampleWindow;
 class JZSynthDlg;
 class wxDialog;
+class wxPanel;
 class wxScrollBar;
 
 //*****************************************************************************

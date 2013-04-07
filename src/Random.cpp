@@ -227,7 +227,7 @@ void JZRndArray::SetIntersection(JZRndArray& Other, int fuzz)
 void JZRndArray::SetDifference(JZRndArray& Other, int fuzz)
 {
   JZRndArray tmp(Other);
-  tmp.SetInverse(tmp.Max());
+  tmp.SetInverse(tmp.GetMax());
   SetIntersection(tmp, fuzz);
 }
 
@@ -299,7 +299,7 @@ istream & operator >> (istream& Is, JZRndArray& RndArray)
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-BEGIN_EVENT_TABLE(JZArrayEdit, wxScrolledWindow)
+BEGIN_EVENT_TABLE(JZArrayEdit, wxWindow)
   EVT_SIZE(JZArrayEdit::OnSize)
   EVT_MOUSE_EVENTS(JZArrayEdit::OnMouseEvent)
 END_EVENT_TABLE()
@@ -307,12 +307,12 @@ END_EVENT_TABLE()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZArrayEdit::JZArrayEdit(
-  wxFrame* pFrame,
+  wxWindow* pParent,
   JZRndArray& Array,
   const wxPoint& Position,
   const wxSize& Size,
   int StyleBits)
-  : wxScrolledWindow(pFrame, wxID_ANY, Position, Size),
+  : wxWindow(pParent, wxID_ANY, Position, Size),
     mArray(Array),
     mMin(Array.mMin),
     mMax(Array.mMax),
@@ -861,7 +861,7 @@ void JZArrayEdit::DrawBarLine(wxDC& Dc, int XPosition)
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZRhyArrayEdit::JZRhyArrayEdit(
-  wxFrame* pParent,
+  wxWindow* pParent,
   JZRndArray& Array,
   const wxPoint& Position,
   const wxSize& Size,

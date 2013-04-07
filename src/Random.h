@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <wx/scrolwin.h>
+#include <wx/window.h>
 
 #include <iostream>
 #include <vector>
@@ -82,11 +82,11 @@ class JZRndArray
     {
       return mArray.size();
     }
-    int Min() const
+    int GetMin() const
     {
       return mMin;
     }
-    int Max() const
+    int GetMax() const
     {
       return mMax;
     }
@@ -148,12 +148,12 @@ class JZArrayEditDrawBars
 
 //*****************************************************************************
 //*****************************************************************************
-class JZArrayEdit : public wxScrolledWindow
+class JZArrayEdit : public wxWindow
 {
   public:
 
     JZArrayEdit(
-      wxFrame* pParent,
+      wxWindow* pParent,
       JZRndArray& Array,
       const wxPoint& Position,
       const wxSize& Size,
@@ -243,7 +243,7 @@ class JZRhyArrayEdit : public JZArrayEdit
   public:
 
     JZRhyArrayEdit(
-      wxFrame* pParent,
+      wxWindow* pParent,
       JZRndArray& Array,
       const wxPoint& Position,
       const wxSize& Size,

@@ -498,7 +498,7 @@ float JZSplEqualizer::operator()(float x)
 {
   // add all the outputs
   double y = x;
-  JZMapper ymap(array.Min(), array.Max(), -1, 1);
+  JZMapper ymap(array.GetMin(), array.GetMax(), -1, 1);
   for (int i = 0; i < nfilters; i++)
   {
     double amp = fabs(ymap.XToY(array[i]));

@@ -101,7 +101,7 @@ void JZCtrlEditBase::Create(
   // ctrlmode is used to distinguish between Apply and Edit.
 
   edit = new JZArrayEdit(
-    (wxFrame *)mpPianoWindow,
+    mpPianoWindow,
     array,
     wxPoint(x + dx, y),
     wxSize(w - dx, h),

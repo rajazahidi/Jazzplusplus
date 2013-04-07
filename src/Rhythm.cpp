@@ -22,6 +22,7 @@
 
 #include "Rhythm.h"
 
+#include "ArrayControl.h"
 #include "Command.h"
 #include "EventWindow.h"
 #include "FileSelector.h"
@@ -44,6 +45,7 @@
 #include <wx/listbox.h>
 #include <wx/menu.h>
 #include <wx/msgdlg.h>
+#include <wx/sizer.h>
 #include <wx/slider.h>
 #include <wx/stattext.h>
 #include <wx/toolbar.h>
@@ -302,14 +304,14 @@ void JZRhythm::GenInit(int StartClock)
   // Initialize history with random values.
   for (i = 0; i < Size; ++i)
   {
-    mHistoryArray[i] = mHistoryArray.Min();
+    mHistoryArray[i] = mHistoryArray.GetMin();
   }
 
   for (i = 0; i < Size; i++)
   {
     if (mRhythmArray.Random(i))
     {
-      mHistoryArray[i] = mHistoryArray.Max();
+      mHistoryArray[i] = mHistoryArray.GetMax();
       i += mLengthArray.Random();
     }
   }
@@ -519,7 +521,7 @@ void JZRhythm::Generate(
     if ((!mRandomizeFlag && rrg[i] > 0) || rrg.Random(i))
     {
       // put event here
-      mHistoryArray[i] = mRhythmArray.Max();
+      mHistoryArray[i] = mRhythmArray.GetMax();
 
       short vel = 0;
       if (mRandomizeFlag)
@@ -528,7 +530,7 @@ void JZRhythm::Generate(
       }
       else
       {
-        vel = rrg[i] * 126 / rrg.Max() + 1;
+        vel = rrg[i] * 126 / rrg.GetMax() + 1;
       }
       short len = (mLengthArray.Random() + 1) * clocks_per_step;
       GenerateEvent(pTrack, clock, vel, len - clocks_per_step/2);
@@ -556,7 +558,6 @@ JZRhythmWindow::JZRhythmWindow(JZEventWindow* pEventWindow, JZSong* pSong)
         gpConfig->GetValue(C_RhythmXpos),
         gpConfig->GetValue(C_RhythmYpos)),
       wxSize(640, 580)),
-    mpInstrumentPanel(0),
     mpStepsPerCountSlider(0),
     mpCountsPerBarSlider(0),
     mpBarCountSlider(0),
@@ -628,10 +629,10 @@ JZRhythmWindow::JZRhythmWindow(JZEventWindow* pEventWindow, JZSong* pSong)
   int y = 0;
   int w, h;
   GetClientSize(&w, &h);
-  mpInstrumentPanel = new wxPanel(this, x, y, w/2, h/2, 0, "InstPanel");
+  wxPanel* pInstrumentPanel = new wxPanel(this, x, y, w/2, h/2, 0, "InstPanel");
 
   mpStepsPerCountSlider = new wxSlider(
-    mpInstrumentPanel,
+    pInstrumentPanel,
     (wxFunction)ItemCallback,
     "",
     4,
@@ -641,11 +642,11 @@ JZRhythmWindow::JZRhythmWindow(JZEventWindow* pEventWindow, JZSong* pSong)
     10,
     1,
     wxFIXED_LENGTH);
-  (void) new wxMessage(mpInstrumentPanel, "steps/count");
-  mpInstrumentPanel->NewLine();
+  (void) new wxMessage(pInstrumentPanel, "steps/count");
+  pInstrumentPanel->NewLine();
 
   mpCountsPerBarSlider = new wxSlider(
-    mpInstrumentPanel,
+    pInstrumentPanel,
     (wxFunction)ItemCallback,
     "",
     4,
@@ -655,11 +656,11 @@ JZRhythmWindow::JZRhythmWindow(JZEventWindow* pEventWindow, JZSong* pSong)
     10,
     h / 12,
     wxFIXED_LENGTH);
-  (void) new wxMessage(mpInstrumentPanel, "count/bar");
-  mpInstrumentPanel->NewLine();
+  (void) new wxMessage(pInstrumentPanel, "count/bar");
+  pInstrumentPanel->NewLine();
 
   mpBarCountSlider = new wxSlider(
-    mpInstrumentPanel,
+    pInstrumentPanel,
     (wxFunction)ItemCallback,
     "",
     4,
@@ -669,12 +670,12 @@ JZRhythmWindow::JZRhythmWindow(JZEventWindow* pEventWindow, JZSong* pSong)
     10,
     2 * h / 12,
     wxFIXED_LENGTH);
-  (void) new wxMessage(mpInstrumentPanel, "# bars");
-  mpInstrumentPanel->NewLine();
+  (void) new wxMessage(pInstrumentPanel, "# bars");
+  pInstrumentPanel->NewLine();
 
-  mpInstrumentPanel->SetLabelPosition(wxVERTICAL);
+  pInstrumentPanel->SetLabelPosition(wxVERTICAL);
   mpInstrumentListBox = new wxListBox(
-    mpInstrumentPanel,
+    pInstrumentPanel,
     (wxFunction)SelectInstr,
     "Instrument",
     wxLB_SINGLE /* | wxLB_ALWAYS_SB */,
@@ -683,7 +684,7 @@ JZRhythmWindow::JZRhythmWindow(JZEventWindow* pEventWindow, JZSong* pSong)
     220,
     80);
 
-  mpInstrumentPanel->NewLine();
+  pInstrumentPanel->NewLine();
 
   // Random array edits.
 
@@ -1377,7 +1378,7 @@ istream & operator >> (istream& Is, JZRhythmWindow& RhythmWindow)
 //*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-BEGIN_EVENT_TABLE(JZRhythmGeneratorWindow, wxWindow)
+BEGIN_EVENT_TABLE(JZRhythmGeneratorWindow, wxPanel)
 
 END_EVENT_TABLE()
 
@@ -1387,10 +1388,9 @@ JZRhythmGeneratorWindow::JZRhythmGeneratorWindow(
   wxFrame* pParent,
   const wxPoint& Position,
   const wxSize& Size)
-  : wxWindow(pParent, wxID_ANY, Position, Size),
+  : wxPanel(pParent, wxID_ANY, Position, Size),
     mRhythm(0),
     mInstruments(),
-    mpInstrumentPanel(0),
     mpStepsPerCountSlider(0),
     mpCountsPerBarSlider(0),
     mpBarCountSlider(0),
@@ -1410,11 +1410,11 @@ JZRhythmGeneratorWindow::JZRhythmGeneratorWindow(
   int Width, Height;
   GetClientSize(&Width, &Height);
 
-  mpInstrumentPanel =
+  wxPanel* pInstrumentPanel =
     new wxPanel(this, wxID_ANY, wxPoint(x, y), wxSize(Width, Height / 2));
 
   mpStepsPerCountSlider = new wxSlider(
-    mpInstrumentPanel,
+    pInstrumentPanel,
     IDC_SL_RHYTHM_STEPS_PER_COUNT,
     4,
     1,
@@ -1424,7 +1424,7 @@ JZRhythmGeneratorWindow::JZRhythmGeneratorWindow(
     wxSL_LABELS);
 
   mpCountsPerBarSlider = new wxSlider(
-    mpInstrumentPanel,
+    pInstrumentPanel,
     IDC_SL_RHYTHM_COUNTS_PER_BAR,
     4,
     1,
@@ -1434,7 +1434,7 @@ JZRhythmGeneratorWindow::JZRhythmGeneratorWindow(
     wxSL_LABELS);
 
   mpBarCountSlider = new wxSlider(
-    mpInstrumentPanel,
+    pInstrumentPanel,
     IDC_SL_RHYTHM_BAR_COUNT,
     1,
     1,
@@ -1444,13 +1444,13 @@ JZRhythmGeneratorWindow::JZRhythmGeneratorWindow(
     wxSL_LABELS);
 
   wxStaticText* pStaticText = new wxStaticText(
-    mpInstrumentPanel,
+    pInstrumentPanel,
     wxID_ANY,
     "Instrument",
     wxPoint(10, 3 * Height / 12));
 
   mpInstrumentListBox = new wxListBox(
-    mpInstrumentPanel,
+    pInstrumentPanel,
     IDC_LB_RHYTHM_INSTRUMENTS,
     wxPoint(10, 4 * Height / 12),
     wxSize(220, 80),
@@ -1458,7 +1458,7 @@ JZRhythmGeneratorWindow::JZRhythmGeneratorWindow(
     wxLB_SINGLE);
 
   mpGroupContribSlider = new wxSlider(
-    mpInstrumentPanel,
+    pInstrumentPanel,
     IDC_SL_RHYTHM_GROUP_CONTRIB,
     0,
     0,
@@ -1468,7 +1468,7 @@ JZRhythmGeneratorWindow::JZRhythmGeneratorWindow(
     wxSL_LABELS);
 
   mpGroupListenSlider = new wxSlider(
-    mpInstrumentPanel,
+    pInstrumentPanel,
     IDC_SL_RHYTHM_GROUP_LISTEN,
     0,
     -100,
@@ -1478,37 +1478,50 @@ JZRhythmGeneratorWindow::JZRhythmGeneratorWindow(
     wxSL_LABELS);
 
   mpRandomCheckBox  = new wxCheckBox(
-    mpInstrumentPanel,
+    pInstrumentPanel,
     IDC_CB_RHYTHM_RANDOMIZE,
     "Randomize",
     wxPoint(Width / 2, 4 * Height / 12));
 
-  mpLengthEdit = new JZArrayEdit(
-    pParent,
+  wxPanel* pPanel = new wxPanel(this);
+
+  mpLengthEdit = new JZArrayControl(
+    pPanel,
+    wxID_ANY,
     mRhythm.mLengthArray,
-    wxPoint(x, y + Height / 2),
-    wxSize(Width / 2, Height / 4 - 4));
+    wxPoint(x, y),
+    wxSize(Width / 2, Height / 2 - 4));
   mpLengthEdit->SetXMinMax(1, 8);
   mpLengthEdit->SetLabel("length/interval");
 
-  mpVelocityEdit = new JZArrayEdit(
-    pParent,
+  mpVelocityEdit = new JZArrayControl(
+    pPanel,
+    wxID_ANY,
     mRhythm.mVelocityArray,
-    wxPoint(x + Width / 2, y + Height / 2),
-    wxSize(Width / 2, Height / 4 - 4));
+    wxPoint(x + Width / 2, y),
+    wxSize(Width / 2, Height / 2 - 4));
   mpVelocityEdit->SetXMinMax(1, 127);
   mpVelocityEdit->SetLabel("velocity");
 
-  mpRhythmEdit = new JZRhyArrayEdit(
-    pParent,
+  mpRhythmEdit = new JZArrayControl(
+    pPanel,
+    wxID_ANY,
     mRhythm.mRhythmArray,
-    wxPoint(x, y + 3 * Height / 4),
-    wxSize(Width, Height/ 4 - 4));
-  mpRhythmEdit->SetMeter(
-    mRhythm.mStepsPerCount,
-    mRhythm.mCountPerBar,
-    mRhythm.mBarCount);
+    wxPoint(x, y + Height / 2),
+    wxSize(Width, Height / 2 - 4));
+  mpRhythmEdit->SetXMinMax(1, 4);
+//  mpRhythmEdit->SetMeter(
+//    mRhythm.mStepsPerCount,
+//    mRhythm.mCountPerBar,
+//    mRhythm.mBarCount);
   mpRhythmEdit->SetLabel("rhythm");
+
+  wxBoxSizer* pSizer = new wxBoxSizer(wxVERTICAL);
+
+  pSizer->Add(pInstrumentPanel, wxSizerFlags().Border().Expand());
+  pSizer->Add(pPanel, wxSizerFlags(1).Border().Expand());
+
+  SetSizer(pSizer);
 }
 
 //-----------------------------------------------------------------------------
@@ -1671,7 +1684,7 @@ void JZRhythmGeneratorWindow::AddInstrument(JZRhythm* pRhythm)
 
   Instrument2Win();
 
-  Refresh(); //OnPaint();
+  Refresh();
 }
 
 //-----------------------------------------------------------------------------

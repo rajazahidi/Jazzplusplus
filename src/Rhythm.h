@@ -26,10 +26,12 @@
 #include "Random.h"
 
 #include <wx/frame.h>
+#include <wx/panel.h>
 
 #include <iosfwd>
 #include <vector>
 
+class JZArrayControl;
 class JZBarInfo;
 class JZEventWindow;
 class JZSong;
@@ -252,7 +254,7 @@ class JZRhythmWindow : public wxFrame
 
 //*****************************************************************************
 //*****************************************************************************
-class JZRhythmGeneratorWindow : public wxWindow
+class JZRhythmGeneratorWindow : public wxPanel
 {
   public:
 
@@ -281,8 +283,6 @@ class JZRhythmGeneratorWindow : public wxWindow
 
     std::vector<JZRhythm*> mInstruments;
 
-    wxPanel* mpInstrumentPanel;
-
     wxSlider* mpStepsPerCountSlider;
     wxSlider* mpCountsPerBarSlider;
     wxSlider* mpBarCountSlider;
@@ -294,9 +294,12 @@ class JZRhythmGeneratorWindow : public wxWindow
     int mActiveGroup;
     wxCheckBox* mpRandomCheckBox;
 
-    JZArrayEdit* mpLengthEdit;
-    JZArrayEdit* mpVelocityEdit;
-    JZRhyArrayEdit* mpRhythmEdit;
+//    JZArrayEdit* mpLengthEdit;
+    JZArrayControl* mpLengthEdit;
+//    JZArrayEdit* mpVelocityEdit;
+    JZArrayControl* mpVelocityEdit;
+//    JZRhyArrayEdit* mpRhythmEdit;
+    JZArrayControl* mpRhythmEdit;
 
   DECLARE_EVENT_TABLE()
 };

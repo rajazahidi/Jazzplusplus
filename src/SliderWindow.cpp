@@ -25,8 +25,11 @@
 #include "Random.h"
 #include "ToolBar.h"
 
+#include <wx/panel.h>
+
 // These two lines are here to allow cout usage.
 #include <iostream>
+
 using namespace std;
 
 JZSliderWindow::JZSliderWindow(

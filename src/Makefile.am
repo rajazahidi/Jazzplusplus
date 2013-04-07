@@ -89,6 +89,7 @@ Random.cpp \
 RecordingInfo.cpp \
 Rectangle.cpp \
 Rhythm.cpp \
+RhythmArrayControl.cpp \
 Sample.cpp \
 SampleCommand.cpp \
 SampleDialog.cpp \
@@ -191,6 +192,7 @@ Random.cpp \
 RecordingInfo.cpp \
 Rectangle.cpp \
 Rhythm.cpp \
+RhythmArrayControl.cpp \
 Sample.cpp \
 SampleCommand.cpp \
 SampleDialog.cpp \
@@ -297,6 +299,7 @@ RecordingInfo.h \
 Rectangle.h \
 Resources.h \
 Rhythm.h \
+RhythmArrayControl.h \
 Sample.h \
 SampleCommand.h \
 SampleDialog.h \

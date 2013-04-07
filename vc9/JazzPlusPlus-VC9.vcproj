@@ -870,6 +870,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\RhythmArrayControl.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\RhythmArrayControl.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Sample.cpp"
 				>
 			</File>

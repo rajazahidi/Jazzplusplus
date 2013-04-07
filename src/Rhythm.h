@@ -267,6 +267,8 @@ class JZRhythmGeneratorWindow : public wxPanel
 
     void AddInstrument();
 
+    void DeleteInstrument();
+
   private:
 
     void AddInstrument(JZRhythm* pRhythm);
@@ -276,6 +278,8 @@ class JZRhythmGeneratorWindow : public wxPanel
     void Win2Instrument();
 
     void RandomEnable();
+
+    void OnListBox(wxCommandEvent&);
 
   private:
 
@@ -319,6 +323,8 @@ class JZRhythmGeneratorFrame : public wxFrame
     void CreateToolBar();
 
     void OnAddInstrument(wxCommandEvent& Event);
+
+    void OnDeleteInstrument(wxCommandEvent& Event);
 
     void OnHelp(wxCommandEvent& Event);
 

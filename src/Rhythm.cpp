@@ -1380,6 +1380,8 @@ istream & operator >> (istream& Is, JZRhythmWindow& RhythmWindow)
 //-----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(JZRhythmGeneratorWindow, wxPanel)
 
+  EVT_LISTBOX(IDC_LB_RHYTHM_INSTRUMENTS, JZRhythmGeneratorWindow::OnListBox)
+
 END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
@@ -1689,6 +1691,36 @@ void JZRhythmGeneratorWindow::AddInstrument(JZRhythm* pRhythm)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void JZRhythmGeneratorWindow::DeleteInstrument()
+{
+  if (mActiveInstrumentIndex >= 0)
+  {
+    vector<JZRhythm*> InstrumentsCopy(mInstruments);
+
+    int i = mActiveInstrumentIndex;
+    delete InstrumentsCopy[i];
+
+    size_t k;
+    for (k = i; k < InstrumentsCopy.size() - 1; ++k)
+    {
+      InstrumentsCopy[k] = InstrumentsCopy[k + 1];
+    }
+
+    mInstruments.clear();
+    for (k = 0; k < InstrumentsCopy.size() - 1; ++k)
+    {
+      mInstruments.push_back(InstrumentsCopy[k]);
+    }
+
+    mpInstrumentListBox->Delete(i);
+    mActiveInstrumentIndex = mpInstrumentListBox->GetSelection();
+    Instrument2Win();
+    Refresh();
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZRhythmGeneratorWindow::Instrument2Win()
 {
   if (
@@ -1765,6 +1797,16 @@ void JZRhythmGeneratorWindow::RandomEnable()
   mpGroupListenSlider->Enable(mRhythm.mRandomizeFlag);
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZRhythmGeneratorWindow::OnListBox(wxCommandEvent&)
+{
+  Win2Instrument();
+  mActiveInstrumentIndex = mpInstrumentListBox->GetSelection();
+  Instrument2Win();
+  Refresh();
+}
+
 //*****************************************************************************
 //*****************************************************************************
 //-----------------------------------------------------------------------------
@@ -1772,6 +1814,8 @@ void JZRhythmGeneratorWindow::RandomEnable()
 BEGIN_EVENT_TABLE(JZRhythmGeneratorFrame, wxFrame)
 
   EVT_MENU(ID_INSTRUMENT_ADD, JZRhythmGeneratorFrame::OnAddInstrument)
+
+  EVT_MENU(ID_INSTRUMENT_DELETE, JZRhythmGeneratorFrame::OnDeleteInstrument)
 
   EVT_MENU(wxID_HELP, JZRhythmGeneratorFrame::OnHelp)
 
@@ -1860,6 +1904,13 @@ JZRhythmGeneratorFrame::~JZRhythmGeneratorFrame()
 void JZRhythmGeneratorFrame::OnAddInstrument(wxCommandEvent&)
 {
   mpRhythmGeneratorWindow->AddInstrument();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZRhythmGeneratorFrame::OnDeleteInstrument(wxCommandEvent&)
+{
+  mpRhythmGeneratorWindow->DeleteInstrument();
 }
 
 //-----------------------------------------------------------------------------

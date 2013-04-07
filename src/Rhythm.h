@@ -34,6 +34,7 @@
 class JZArrayControl;
 class JZBarInfo;
 class JZEventWindow;
+class JZRhythmArrayControl;
 class JZSong;
 class JZToolBar;
 class JZTrack;
@@ -119,7 +120,7 @@ class JZRhythm
 
     void GenerateEvent(
       JZTrack* pTrack,
-      long clock,
+      int Clock,
       short vel,
       short len);
 
@@ -136,9 +137,9 @@ class JZRhythm
       JZRhythm* rhy[],
       int RhythmCount);
 
-    int Clock2i(long clock, const JZBarInfo& BarInfo) const;
+    int Clock2i(int Clock, const JZBarInfo& BarInfo) const;
 
-    int ClocksPerStep(const JZBarInfo& BarInfo) const;
+    int GetClocksPerStep(const JZBarInfo& BarInfo) const;
 
   private:
 
@@ -285,7 +286,9 @@ class JZRhythmGeneratorWindow : public wxPanel
 
     void RandomEnable();
 
-    void OnListBox(wxCommandEvent&);
+    void OnSliderUpdate(wxCommandEvent& Event);
+
+    void OnListBox(wxCommandEvent& Event);
 
   private:
 
@@ -304,12 +307,9 @@ class JZRhythmGeneratorWindow : public wxPanel
     int mActiveGroup;
     wxCheckBox* mpRandomCheckBox;
 
-//    JZArrayEdit* mpLengthEdit;
     JZArrayControl* mpLengthEdit;
-//    JZArrayEdit* mpVelocityEdit;
     JZArrayControl* mpVelocityEdit;
-//    JZRhyArrayEdit* mpRhythmEdit;
-    JZArrayControl* mpRhythmEdit;
+    JZRhythmArrayControl* mpRhythmEdit;
 
   DECLARE_EVENT_TABLE()
 };

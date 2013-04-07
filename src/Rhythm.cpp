@@ -33,6 +33,7 @@
 #include "KeyStringConverters.h"
 #include "PianoWindow.h"
 #include "Resources.h"
+#include "RhythmArrayControl.h"
 #include "SelectControllerDialog.h"
 #include "Song.h"
 #include "StringReadWrite.h"
@@ -114,11 +115,11 @@ void JZRhythmGroups::Read(istream& Is, int Version)
   }
 }
 
-// pseudo key nr's for harmony browser and sound effects
-static const int MODE_ALL_OF    = -1;
-static const int MODE_ONE_OF    = -2;
-static const int MODE_PIANO     = -3;
-static const int MODE_CONTROL   = -4;
+// Pseudo key numbers for the harmony browser and sound effects.
+static const int MODE_ALL_OF  = -1;
+static const int MODE_ONE_OF  = -2;
+static const int MODE_PIANO   = -3;
+static const int MODE_CONTROL = -4;
 
 //*****************************************************************************
 //*****************************************************************************
@@ -218,12 +219,12 @@ void JZRhythm::Write(ostream& Os) const
   Os << mBarCount << ' ';
   Os << mMode << ' ';
   Os << mKeyCount << ' ';
-  for (int i = 0; i < mKeyCount; i++)
+  for (int i = 0; i < mKeyCount; ++i)
   {
     Os << mKeys[i] << ' ';
   }
   Os << mParameter << endl;
-  WriteString(Os, mLabel.c_str()) << endl;
+  WriteString(Os, mLabel) << endl;
 
   Os << mRandomizeFlag << ' ';
   mRhythmGroups.Write(Os);
@@ -259,7 +260,7 @@ void JZRhythm::Read(istream& Is, int Version)
 
   string Label;
   ReadString(Is, Label);
-  SetLabel(Label.c_str());
+  SetLabel(Label);
 
   if (Version > 1)
   {
@@ -277,15 +278,16 @@ void JZRhythm::SetLabel(const string& Label)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZRhythm::Clock2i(long clock, const JZBarInfo& BarInfo) const
+int JZRhythm::Clock2i(int Clock, const JZBarInfo& BarInfo) const
 {
-  int clocks_per_step = BarInfo.GetTicksPerBar() / (mStepsPerCount * mCountPerBar);
-  return (int)(((clock - mStartClock) / clocks_per_step) % mRhythmArray.Size());
+  return
+    (int)(((Clock - mStartClock) /
+    GetClocksPerStep(BarInfo)) % mRhythmArray.Size());
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int JZRhythm::ClocksPerStep(const JZBarInfo& BarInfo) const
+int JZRhythm::GetClocksPerStep(const JZBarInfo& BarInfo) const
 {
   return BarInfo.GetTicksPerBar() / (mStepsPerCount * mCountPerBar);
 }
@@ -319,7 +321,7 @@ void JZRhythm::GenInit(int StartClock)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZRhythm::GenerateEvent(JZTrack* pTrack, long clock, short vel, short len)
+void JZRhythm::GenerateEvent(JZTrack* pTrack, int Clock, short vel, short len)
 {
   int chan = pTrack->mChannel - 1;
 
@@ -328,7 +330,7 @@ void JZRhythm::GenerateEvent(JZTrack* pTrack, long clock, short vel, short len)
   {
     for (int ii = 0; ii < mKeyCount; ii++)
     {
-      JZKeyOnEvent *k = new JZKeyOnEvent(clock, chan, mKeys[ii], vel, len);
+      JZKeyOnEvent *k = new JZKeyOnEvent(Clock, chan, mKeys[ii], vel, len);
       pTrack->Put(k);
     }
   }
@@ -337,14 +339,14 @@ void JZRhythm::GenerateEvent(JZTrack* pTrack, long clock, short vel, short len)
     int ii = (int)(rnd.asDouble() * mKeyCount);
     if (ii < mKeyCount)
     {
-      JZKeyOnEvent *k = new JZKeyOnEvent(clock, chan, mKeys[ii], vel, len);
+      JZKeyOnEvent *k = new JZKeyOnEvent(Clock, chan, mKeys[ii], vel, len);
       pTrack->Put(k);
     }
   }
   else if (mMode == MODE_CONTROL)
   {
     // generate controller
-    JZControlEvent* c = new JZControlEvent(clock, chan, mParameter - 1, vel);
+    JZControlEvent* c = new JZControlEvent(Clock, chan, mParameter - 1, vel);
     pTrack->Put(c);
   }
   else
@@ -356,17 +358,21 @@ void JZRhythm::GenerateEvent(JZTrack* pTrack, long clock, short vel, short len)
 #if 0
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZRhythm::Generate(JZTrack* pTrack, int FromClock, int ToClock, int TicksPerBar)
+void JZRhythm::Generate(
+  JZTrack* pTrack,
+  int FromClock,
+  int ToClock,
+  int TicksPerBar)
 {
   int chan   = pTrack->Channel - 1;
-  long clock = FromClock;
+  int Clock = FromClock;
 
-  long clocks_per_step = TicksPerBar / (mStepsPerCount * mCountPerBar);
-  long total_steps = (ToClock - FromClock) / clocks_per_step;
+  int ClocksPerStep = TicksPerBar / (mStepsPerCount * mCountPerBar);
+  int TotalSteps = (ToClock - FromClock) / ClocksPerStep;
 
-  while (clock < ToClock)
+  while (Clock < ToClock)
   {
-    int i = ((clock - FromClock) / clocks_per_step) % mRhythmArray.Size();
+    int i = ((Clock - FromClock) / ClocksPerStep) % mRhythmArray.Size();
     if (mRhythmArray.Random(i))
     {
       // put event here
@@ -381,26 +387,31 @@ void JZRhythm::Generate(JZTrack* pTrack, int FromClock, int ToClock, int TicksPe
         rndval = mVelocityArray.Random();
       }
       short vel = rndval * 127 / mVelocityArray.Size() + 1;
-      short len = (mLengthArray.Random() + 1) * clocks_per_step;
+      short len = (mLengthArray.Random() + 1) * ClocksPerStep;
 
       // generate keys from harmony browser
       if (key == CHORD_KEY || key == BASS_KEY)
       {
         if (gpHarmonyBrowser)
         {
-          long step = (clock - FromClock) * total_steps / (ToClock - FromClock);
+          int Step = (Clock - FromClock) * TotalSteps / (ToClock - FromClock);
           int Keys[12], KeyCount;
           if (key == CHORD_KEY)
           {
-            KeyCount = gpHarmonyBrowser->GetChordKeys(Keys, (int)step, (int)total_steps);
+            KeyCount = gpHarmonyBrowser->GetChordKeys(Keys, Step, TotalSteps);
           }
           else
           {
-            mKeyCount = gpHarmonyBrowser->GetBassKeys(Keys, (int)step, (int)total_steps);
+            mKeyCount = gpHarmonyBrowser->GetBassKeys(Keys, Step, TotalSteps);
           }
           for (int j = 0; j < mKeyCount; j++)
           {
-            JZKeyOnEvent *k = new JZKeyOnEvent(clock, chan, Keys[j], vel, len - clocks_per_step/2);
+            JZKeyOnEvent* k = new JZKeyOnEvent(
+              Clock,
+              chan,
+              Keys[j],
+              vel,
+              len - ClocksPerStep / 2);
             pTrack->Put(k);
           }
         }
@@ -415,7 +426,12 @@ void JZRhythm::Generate(JZTrack* pTrack, int FromClock, int ToClock, int TicksPe
           JZKeyOnEvent* pKeyOn = src.Events[ii]->IsKeyOn();
           if (pKeyOn)
           {
-            JZKeyOnEvent *k = new JZKeyOnEvent(clock, chan, pKeyOn->Key, vel, len - clocks_per_step / 2);
+            JZKeyOnEvent *k = new JZKeyOnEvent(
+              Clock,
+              chan,
+              pKeyOn->Key,
+              vel,
+              len - ClocksPerStep / 2);
             pTrack->Put(k);
           }
         }
@@ -424,20 +440,24 @@ void JZRhythm::Generate(JZTrack* pTrack, int FromClock, int ToClock, int TicksPe
       // generate controller
       else if (key == CONTROL_KEY)
       {
-        JZControlEvent* c = new JZControlEvent(clock, chan, mParameter - 1, vel);
+        JZControlEvent* c =
+          new JZControlEvent(Clock, chan, mParameter - 1, vel);
         pTrack->Put(c);
       }
       // generate note on events
       else
       {
-        JZKeyOnEvent *k = new JZKeyOnEvent(clock, chan, key, vel, len - clocks_per_step/2);
+        JZKeyOnEvent* k =
+          new JZKeyOnEvent(Clock, chan, key, vel, len - ClocksPerStep / 2);
         pTrack->Put(k);
       }
 
-      clock += len;
+      Clock += len;
     }
     else
-      clock += clocks_per_step;
+    {
+      Clock += ClocksPerStep;
+    }
   }
 }
 #endif
@@ -453,7 +473,7 @@ void JZRhythm::GenGroup(
 {
   out.Clear();
 
-  int clocks_per_step = ClocksPerStep(BarInfo);
+  int ClocksPerStep = GetClocksPerStep(BarInfo);
 
   for (int RhythmIndex = 0; RhythmIndex < RhythmCount; ++RhythmIndex)
   {
@@ -463,13 +483,13 @@ void JZRhythm::GenGroup(
     {
       JZRndArray tmp(mRhythmArray);
       tmp.Clear();
-      long clock = BarInfo.GetClock();
-      while (clock < BarInfo.GetClock() + BarInfo.GetTicksPerBar())
+      int Clock = BarInfo.GetClock();
+      while (Clock < BarInfo.GetClock() + BarInfo.GetTicksPerBar())
       {
-        int i = Clock2i(clock, BarInfo);
-        int j = pRhythm->Clock2i(clock, BarInfo);
+        int i = Clock2i(Clock, BarInfo);
+        int j = pRhythm->Clock2i(Clock, BarInfo);
         tmp[i] = pRhythm->mHistoryArray[j];
-        clock += clocks_per_step;
+        Clock += ClocksPerStep;
       }
       out.SetUnion(tmp, fuzz);
     }
@@ -505,20 +525,20 @@ void JZRhythm::Generate(
   }
 
   // Clear part of the history.
-  long clock = BarInfo.GetClock();
-  int clocks_per_step = ClocksPerStep(BarInfo);
-  while (clock < BarInfo.GetClock() + BarInfo.GetTicksPerBar())
+  int Clock = BarInfo.GetClock();
+  int ClocksPerStep = GetClocksPerStep(BarInfo);
+  while (Clock < BarInfo.GetClock() + BarInfo.GetTicksPerBar())
   {
-    int i = Clock2i(clock, BarInfo);
+    int i = Clock2i(Clock, BarInfo);
     mHistoryArray[i] = 0;
-    clock += clocks_per_step;
+    Clock += ClocksPerStep;
   }
 
   //  generate the events
-  clock = mNextClock;
-  while (clock < BarInfo.GetClock() + BarInfo.GetTicksPerBar())
+  Clock = mNextClock;
+  while (Clock < BarInfo.GetClock() + BarInfo.GetTicksPerBar())
   {
-    int i = Clock2i(clock, BarInfo);
+    int i = Clock2i(Clock, BarInfo);
     if ((!mRandomizeFlag && rrg[i] > 0) || rrg.Random(i))
     {
       // put event here
@@ -533,16 +553,16 @@ void JZRhythm::Generate(
       {
         vel = rrg[i] * 126 / rrg.GetMax() + 1;
       }
-      short len = (mLengthArray.Random() + 1) * clocks_per_step;
-      GenerateEvent(pTrack, clock, vel, len - clocks_per_step/2);
-      clock += len;
+      short len = (mLengthArray.Random() + 1) * ClocksPerStep;
+      GenerateEvent(pTrack, Clock, vel, len - ClocksPerStep / 2);
+      Clock += len;
     }
     else
     {
-      clock += clocks_per_step;
+      Clock += ClocksPerStep;
     }
   }
-  mNextClock = clock;
+  mNextClock = Clock;
 }
 
 //*****************************************************************************
@@ -779,7 +799,7 @@ JZRhythmWindow::JZRhythmWindow(JZEventWindow* pEventWindow, JZSong* pSong)
   }
   mActiveGroup = mpGroupListBox->GetSelection();
 
-  mpRandomCheckBox = new wxCheckBox(mpGroupPanel, (wxFunction)ItemCallback, "Randomize") ;
+  mpRandomCheckBox = new wxCheckBox(mpGroupPanel, (wxFunction)ItemCallback, "Randomize");
 
   Show(TRUE);
 #endif
@@ -976,7 +996,7 @@ void JZRhythmWindow::AddInstrumentDlg()
       {
         return;
       }
-      pRhythm->SetLabel(gpConfig->GetCtrlName(pRhythm->mParameter).first.c_str());
+      pRhythm->SetLabel(gpConfig->GetCtrlName(pRhythm->mParameter).first);
       pRhythm->mMode = MODE_CONTROL;
       pRhythm->mKeyCount = 0;
     }
@@ -1040,7 +1060,7 @@ void JZRhythmWindow::AddInstrument(JZRhythm* pRhythm)
 {
   mActiveInstrumentIndex = mInstrumentCount++;
   mpInstruments[mActiveInstrumentIndex] = pRhythm;
-  mpInstrumentListBox->Append(pRhythm->GetLabel().c_str());
+  mpInstrumentListBox->Append(pRhythm->GetLabel());
 
   mpInstrumentListBox->SetSelection(mActiveInstrumentIndex);
   Instrument2Win();
@@ -1085,7 +1105,7 @@ void JZRhythmWindow::InitInstrumentList()
   mpInstrumentListBox->Clear();
   for (int i = 0; i < mInstrumentCount; ++i)
   {
-    mpInstrumentListBox->Append(mpInstruments[i]->GetLabel().c_str());
+    mpInstrumentListBox->Append(mpInstruments[i]->GetLabel());
   }
   if (mActiveInstrumentIndex >= 0)
   {
@@ -1379,7 +1399,27 @@ istream & operator >> (istream& Is, JZRhythmWindow& RhythmWindow)
 //-----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(JZRhythmGeneratorWindow, wxPanel)
 
+  EVT_SLIDER(
+    IDC_SL_RHYTHM_STEPS_PER_COUNT,
+    JZRhythmGeneratorWindow::OnSliderUpdate)
+
+  EVT_SLIDER(
+    IDC_SL_RHYTHM_COUNTS_PER_BAR,
+    JZRhythmGeneratorWindow::OnSliderUpdate)
+
+  EVT_SLIDER(
+    IDC_SL_RHYTHM_BAR_COUNT,
+    JZRhythmGeneratorWindow::OnSliderUpdate)
+
   EVT_LISTBOX(IDC_LB_RHYTHM_INSTRUMENTS, JZRhythmGeneratorWindow::OnListBox)
+
+  EVT_SLIDER(
+    IDC_SL_RHYTHM_GROUP_CONTRIB,
+    JZRhythmGeneratorWindow::OnSliderUpdate)
+
+  EVT_SLIDER(
+    IDC_SL_RHYTHM_GROUP_LISTEN,
+    JZRhythmGeneratorWindow::OnSliderUpdate)
 
 END_EVENT_TABLE()
 
@@ -1504,17 +1544,16 @@ JZRhythmGeneratorWindow::JZRhythmGeneratorWindow(
   mpVelocityEdit->SetXMinMax(1, 127);
   mpVelocityEdit->SetLabel("velocity");
 
-  mpRhythmEdit = new JZArrayControl(
+  mpRhythmEdit = new JZRhythmArrayControl(
     pPanel,
     wxID_ANY,
     mRhythm.mRhythmArray,
     wxPoint(x, y + Height / 2),
     wxSize(Width, Height / 2 - 4));
-  mpRhythmEdit->SetXMinMax(1, 4);
-//  mpRhythmEdit->SetMeter(
-//    mRhythm.mStepsPerCount,
-//    mRhythm.mCountPerBar,
-//    mRhythm.mBarCount);
+  mpRhythmEdit->SetMeter(
+    mRhythm.mStepsPerCount,
+    mRhythm.mCountPerBar,
+    mRhythm.mBarCount);
   mpRhythmEdit->SetLabel("rhythm");
 
   wxBoxSizer* pSizer = new wxBoxSizer(wxVERTICAL);
@@ -1591,7 +1630,7 @@ void JZRhythmGeneratorWindow::AddInstrument()
       pRhythm = new JZRhythm(Keys[i]);
     }
 
-    // drum key?
+    // Is this a drum key?
     if (Keys[i] >= 0)
     {
       pRhythm->mKeyCount  = 1;
@@ -1600,7 +1639,7 @@ void JZRhythmGeneratorWindow::AddInstrument()
       pRhythm->SetLabel(InstrumentNames[i]);
     }
 
-    // choose controller?
+    // Was a controller chosen?
     else if (Keys[i] == MODE_CONTROL)
     {
       pRhythm->mParameter = SelectControllerDlg();
@@ -1608,7 +1647,7 @@ void JZRhythmGeneratorWindow::AddInstrument()
       {
         return;
       }
-      pRhythm->SetLabel(gpConfig->GetCtrlName(pRhythm->mParameter).first.c_str());
+      pRhythm->SetLabel(gpConfig->GetCtrlName(pRhythm->mParameter).first);
       pRhythm->mMode = MODE_CONTROL;
       pRhythm->mKeyCount = 0;
     }
@@ -1626,26 +1665,29 @@ void JZRhythmGeneratorWindow::AddInstrument()
       }
       pRhythm->mKeyCount = 0;
       pRhythm->mMode = Keys[i];
-      JZEventArray events;
-      JZCommandCopyToBuffer cmd(gpTrackFrame->GetPianoWindow()->GetFilter(), &events);
-      cmd.Execute(0);   // no UNDO
-
-      for (int ii = 0; ii < events.mEventCount; ii++)
+      if (gpTrackFrame->GetPianoWindow())
       {
-        JZKeyOnEvent* pKeyOn = events.mppEvents[ii]->IsKeyOn();
-        if (pKeyOn)
+        JZEventArray Events;
+        JZCommandCopyToBuffer cmd(gpTrackFrame->GetPianoWindow()->GetFilter(), &Events);
+        cmd.Execute(0);   // no UNDO
+
+        for (int ii = 0; ii < Events.mEventCount; ii++)
         {
-          pRhythm->mKeys[pRhythm->mKeyCount++] = pKeyOn->GetKey();
-          if (pRhythm->mKeyCount > 1)
+          JZKeyOnEvent* pKeyOn = Events.mppEvents[ii]->IsKeyOn();
+          if (pKeyOn)
           {
-            Oss << ", ";
-          }
-          string KeyString;
-          KeyToString(pKeyOn->GetKey(), KeyString);
-          Oss << KeyString;
-          if (pRhythm->mKeyCount >= MAX_KEYS)
-          {
-            break;
+            pRhythm->mKeys[pRhythm->mKeyCount++] = pKeyOn->GetKey();
+            if (pRhythm->mKeyCount > 1)
+            {
+              Oss << ", ";
+            }
+            string KeyString;
+            KeyToString(pKeyOn->GetKey(), KeyString);
+            Oss << KeyString;
+            if (pRhythm->mKeyCount >= MAX_KEYS)
+            {
+              break;
+            }
           }
         }
       }
@@ -1825,6 +1867,10 @@ void JZRhythmGeneratorWindow::Win2Instrument()
   mRhythm.mStepsPerCount = mpStepsPerCountSlider->GetValue();
   mRhythm.mCountPerBar   = mpCountsPerBarSlider->GetValue();
   mRhythm.mBarCount      = mpBarCountSlider->GetValue();
+  mpRhythmEdit->SetMeter(
+    mRhythm.mStepsPerCount,
+    mRhythm.mCountPerBar,
+    mRhythm.mBarCount);
   mRhythm.mRandomizeFlag = mpRandomCheckBox->GetValue();
 
   if (mActiveGroup >= 0)
@@ -1845,6 +1891,15 @@ void JZRhythmGeneratorWindow::RandomEnable()
   mpLengthEdit->Enable(mRhythm.mRandomizeFlag);
   mpVelocityEdit->Enable(mRhythm.mRandomizeFlag);
   mpGroupListenSlider->Enable(mRhythm.mRandomizeFlag);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZRhythmGeneratorWindow::OnSliderUpdate(wxCommandEvent&)
+{
+  Win2Instrument();
+  RandomEnable();
+  Refresh();
 }
 
 //-----------------------------------------------------------------------------

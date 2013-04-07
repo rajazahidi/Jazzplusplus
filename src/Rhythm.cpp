@@ -1411,7 +1411,7 @@ JZRhythmGeneratorWindow::JZRhythmGeneratorWindow(
   GetClientSize(&Width, &Height);
 
   mpInstrumentPanel =
-    new wxPanel(this, wxID_ANY, wxPoint(x, y), wxSize(Width / 2, Height / 2));
+    new wxPanel(this, wxID_ANY, wxPoint(x, y), wxSize(Width, Height / 2));
 
   mpStepsPerCountSlider = new wxSlider(
     mpInstrumentPanel,

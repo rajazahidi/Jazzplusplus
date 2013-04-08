@@ -100,7 +100,7 @@ template <typename TAType>
 TTDynamicArray<TAType>::TTDynamicArray(const TTDynamicArray<TAType>& Other)
   : mArrayCount(0),
     mBlockSize(16),
-    mInitialValue(Other.mInitialValue)
+    mInitialValue(Other.mInitialValue),
     mppArray(0)
 {
   for (int i = 0; i < Other.mArrayCount * mBlockSize; ++i)

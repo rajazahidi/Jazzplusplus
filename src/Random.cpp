@@ -25,8 +25,6 @@
 #include "Mapper.h"
 
 #include <wx/dcclient.h>
-#include <wx/frame.h>
-#include <wx/scrolwin.h>
 
 #include <cassert>
 #include <cstdlib>
@@ -111,7 +109,7 @@ double JZRndArray::operator[](double f)
   {
     i = mArray.size() - 2;
   }
-  JZMapper Map(i, i + 1, mArray[i], mArray[i+1]);
+  JZMapper Map(i, i + 1, mArray[i], mArray[i + 1]);
   return Map.XToY(f);
 }
 

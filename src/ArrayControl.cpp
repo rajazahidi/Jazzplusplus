@@ -58,12 +58,12 @@ END_EVENT_TABLE()
 JZArrayControl::JZArrayControl(
   wxWindow* pParent,
   wxWindowID Id,
-  const JZRndArray& RandomArray,
+  JZRndArray& RandomArray,
   const wxPoint& Position,
   const wxSize& Size,
   long WindowStyle)
   : wxControl(pParent, Id, Position, Size, wxNO_BORDER),
-    mpRandomArray(0),
+    mRandomArray(RandomArray),
     mStyleBits(ARED_GAP | ARED_XTICKS),
     mEnabled(true),
     mLabel(),
@@ -77,8 +77,6 @@ JZArrayControl::JZArrayControl(
     mXMin(0),
     mXMax(RandomArray.Size())
 {
-  mpRandomArray = new JZRndArray(RandomArray);
-
   SetInitialSize(Size);
 }
 
@@ -86,7 +84,6 @@ JZArrayControl::JZArrayControl(
 //-----------------------------------------------------------------------------
 JZArrayControl::~JZArrayControl()
 {
-  delete mpRandomArray;
 }
 
 //-----------------------------------------------------------------------------
@@ -139,8 +136,8 @@ void JZArrayControl::OnPaint(wxPaintEvent& Event)
 
   mYNull =
     mY + mHeight -
-    mHeight * (mpRandomArray->GetNull() - mpRandomArray->GetMin()) /
-    (mpRandomArray->GetMax() - mpRandomArray->GetMin());
+    mHeight * (mRandomArray.GetNull() - mRandomArray.GetMin()) /
+    (mRandomArray.GetMax() - mRandomArray.GetMin());
 
   int i;
 
@@ -164,7 +161,7 @@ void JZArrayControl::OnPaint(wxPaintEvent& Event)
 
   // sliders
   Dc.SetBrush(*wxBLACK_BRUSH);
-  for (i = 0; i < mpRandomArray->Size(); ++i)
+  for (i = 0; i < mRandomArray.Size(); ++i)
   {
     DrawBar(Dc, i, true);
   }
@@ -237,39 +234,39 @@ void JZArrayControl::Dragging(wxMouseEvent& MouseEvent)
 
   wxClientDC Dc(this); // PORTING this is evil and shoud go
 
-  int Value = mpRandomArray->GetNull();
+  int Value = mRandomArray.GetNull();
   if (MouseEvent.LeftIsDown())
   {
     int EventX, EventY;
     MouseEvent.GetPosition(&EventX, &EventY);
 
     Value = (int)((double)(mY + mHeight - EventY) *
-      (mpRandomArray->GetMax() - mpRandomArray->GetMin()) / mHeight +
-      mpRandomArray->GetMin() + 0.5);
+      (mRandomArray.GetMax() - mRandomArray.GetMin()) / mHeight +
+      mRandomArray.GetMin() + 0.5);
 
-    if (Value < mpRandomArray->GetMin())
+    if (Value < mRandomArray.GetMin())
     {
-      Value = mpRandomArray->GetMin();
+      Value = mRandomArray.GetMin();
     }
-    if (Value > mpRandomArray->GetMax())
+    if (Value > mRandomArray.GetMax())
     {
-      Value = mpRandomArray->GetMax();
+      Value = mRandomArray.GetMax();
     }
   }
 
   if (MouseEvent.ShiftDown())
   {
-    for (int k = 0; k < mpRandomArray->Size(); ++k)
+    for (int k = 0; k < mRandomArray.Size(); ++k)
     {
       DrawBar(Dc, k, 0);
-      (*mpRandomArray)[k] = Value;
+      mRandomArray[k] = Value;
       DrawBar(Dc, k, 1);
     }
   }
   else if (MouseEvent.ControlDown())
   {
     DrawBar(Dc, mIndex, 0);
-    (*mpRandomArray)[mIndex] = Value;
+    mRandomArray[mIndex] = Value;
     DrawBar(Dc, mIndex, 1);
   }
   else
@@ -281,7 +278,7 @@ void JZArrayControl::Dragging(wxMouseEvent& MouseEvent)
       for (; i <= mIndex; ++i)
       {
         DrawBar(Dc, i, 0);
-        (*mpRandomArray)[i] = Value;
+        mRandomArray[i] = Value;
         DrawBar(Dc, i, 1);
       }
     }
@@ -290,7 +287,7 @@ void JZArrayControl::Dragging(wxMouseEvent& MouseEvent)
       for (; i >= mIndex; --i)
       {
         DrawBar(Dc, i, 0);
-        (*mpRandomArray)[i] = Value;
+        mRandomArray[i] = Value;
         DrawBar(Dc, i, 1);
       }
     }
@@ -317,14 +314,14 @@ int JZArrayControl::GetIndex(wxMouseEvent& MouseEvent)
 {
   int EventX, EventY;
   MouseEvent.GetPosition(&EventX, &EventY);
-  int Index = (int)((EventX - mX) * mpRandomArray->Size() / mWidth);
+  int Index = (int)((EventX - mX) * mRandomArray.Size() / mWidth);
   if (Index < 0)
   {
     Index = 0;
   }
-  if (Index >= mpRandomArray->Size())
+  if (Index >= mRandomArray.Size())
   {
-    Index = mpRandomArray->Size() - 1;
+    Index = mRandomArray.Size() - 1;
   }
   return Index;
 }
@@ -340,24 +337,23 @@ void JZArrayControl::DrawBar(wxDC& Dc, int i, bool black)
       Dc.SetPen(*wxWHITE_PEN);
     }
 
-    JZMapper XMap(0, mpRandomArray->Size(), 0, mWidth);
-    JZMapper
-      YMap(mpRandomArray->GetMin(), mpRandomArray->GetMax(), mHeight, 0);
+    JZMapper XMap(0, mRandomArray.Size(), 0, mWidth);
+    JZMapper YMap(mRandomArray.GetMin(), mRandomArray.GetMax(), mHeight, 0);
 
     int x1 = (int)XMap.XToY(i + 0.5);
-    int y1 = (int)YMap.XToY((*mpRandomArray)[i]);
+    int y1 = (int)YMap.XToY(mRandomArray[i]);
     if (i > 0)
     {
       // draw line to prev position
       int x0 = (int)XMap.XToY(i - 0.5);
-      int y0 = (int)YMap.XToY((*mpRandomArray)[i - 1]);
+      int y0 = (int)YMap.XToY(mRandomArray[i - 1]);
       Dc.DrawLine(x0, y0, x1, y1);
     }
-    if (i < mpRandomArray->Size() - 1)
+    if (i < mRandomArray.Size() - 1)
     {
       // draw line to next position
       int x2 = (int)XMap.XToY(i + 1.5);
-      int y2 = (int)YMap.XToY((*mpRandomArray)[i + 1]);
+      int y2 = (int)YMap.XToY(mRandomArray[i + 1]);
       Dc.DrawLine(x1, y1, x2, y2);
     }
 
@@ -371,17 +367,17 @@ void JZArrayControl::DrawBar(wxDC& Dc, int i, bool black)
   int Gap = 0;
   if (mStyleBits & ARED_GAP)
   {
-    Gap = mWidth / mpRandomArray->Size() / 6;
-    if (!Gap && mWidth / mpRandomArray->Size() > 3)
+    Gap = mWidth / mRandomArray.Size() / 6;
+    if (!Gap && mWidth / mRandomArray.Size() > 3)
     {
       Gap = 1;
     }
   }
 
-  int wbar = mWidth / mpRandomArray->Size() - 2 * Gap;
-  int xbar = mX + i * mWidth / mpRandomArray->Size() + Gap;
-  int hbar = mHeight * ((*mpRandomArray)[i] - mpRandomArray->GetNull()) /
-    (mpRandomArray->GetMax() - mpRandomArray->GetMin());
+  int wbar = mWidth / mRandomArray.Size() - 2 * Gap;
+  int xbar = mX + i * mWidth / mRandomArray.Size() + Gap;
+  int hbar = mHeight * (mRandomArray[i] - mRandomArray.GetNull()) /
+    (mRandomArray.GetMax() - mRandomArray.GetMin());
   int ybar;
 
   if (mStyleBits & ARED_BLOCKS)
@@ -486,7 +482,7 @@ void JZArrayControl::DrawXTicks(wxDC& Dc)
       XPosition -= TextWidth / 2.0f;
 
       // Middle of bar.
-      XPosition += 0.5f * mWidth / mpRandomArray->Size();
+      XPosition += 0.5f * mWidth / mRandomArray.Size();
 
       Dc.DrawText(String, (int)XPosition, YPosition);
     }
@@ -509,23 +505,22 @@ void JZArrayControl::DrawYTicks(wxDC& Dc)
     int MaxLabels = (int)(mHeight / (TextHeight + TextHeight / 2));
     if (MaxLabels > 0)
     {
-      int Step =
-        (mpRandomArray->GetMax() - mpRandomArray->GetMin()) / MaxLabels;
+      int Step = (mRandomArray.GetMax() - mRandomArray.GetMin()) / MaxLabels;
       if (Step <= 0)
       {
         Step = 1;
       }
       for (
-        int Value = mpRandomArray->GetMin();
-        Value < mpRandomArray->GetMax();
+        int Value = mRandomArray.GetMin();
+        Value < mRandomArray.GetMax();
         Value += Step)
       {
         string String = GetText(Value);
         Dc.GetTextExtent(String, &TextWidth, &TextHeight);
         int YPosition =
           mY + mHeight -
-          mHeight * (Value - mpRandomArray->GetMin()) /
-          (mpRandomArray->GetMax() - mpRandomArray->GetMin()) -
+          mHeight * (Value - mRandomArray.GetMin()) /
+          (mRandomArray.GetMax() - mRandomArray.GetMin()) -
           TextHeight / 2;
         Dc.DrawText(String, mX - TextWidth - TICK_LINE, YPosition);
       }
@@ -537,13 +532,13 @@ void JZArrayControl::DrawYTicks(wxDC& Dc)
     int TextWidth, TextHeight;
     ostringstream Oss;
 
-    Oss << mpRandomArray->GetMax();
+    Oss << mRandomArray.GetMax();
     Dc.GetTextExtent(Oss.str(), &TextWidth, &TextHeight);
     Dc.DrawText(Oss.str(), mX - TextWidth, mY);
 
     Oss.str("");
 
-    Oss << mpRandomArray->GetMin();
+    Oss << mRandomArray.GetMin();
     Dc.GetTextExtent(Oss.str(), &TextWidth, &TextHeight);
     Dc.DrawText(Oss.str(), mX - TextWidth, mY + mHeight - TextHeight);
   }
@@ -559,14 +554,14 @@ void JZArrayControl::DrawNull(wxDC& Dc)
 
   // Draw y-null line.
   if (
-    mpRandomArray->GetMin() < mpRandomArray->GetNull() &&
-    mpRandomArray->GetNull() < mpRandomArray->GetMax())
+    mRandomArray.GetMin() < mRandomArray.GetNull() &&
+    mRandomArray.GetNull() < mRandomArray.GetMax())
   {
     Dc.DrawLine(
       mX,
-      mpRandomArray->GetNull(),
+      mRandomArray.GetNull(),
       mX + mWidth,
-      mpRandomArray->GetNull());
+      mRandomArray.GetNull());
   }
 
   // Draw x-null line.

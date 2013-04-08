@@ -35,7 +35,7 @@ class JZArrayControl : public wxControl
     JZArrayControl(
       wxWindow* pParent,
       wxWindowID Id,
-      const JZRndArray& RandomArray,
+      JZRndArray& RandomArray,
       const wxPoint& Position = wxDefaultPosition,
       const wxSize& Size = wxSize(40, 40),
       long WindowStyle = wxNO_BORDER);
@@ -80,7 +80,7 @@ class JZArrayControl : public wxControl
 
   protected:
 
-    JZRndArray* mpRandomArray;
+    JZRndArray& mRandomArray;
 
     long mStyleBits;
 

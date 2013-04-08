@@ -709,7 +709,7 @@ void JZTrackFrame::OnToolsHarmonyBrowser(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnToolsRhythmGenerator(wxCommandEvent& Event)
 {
-  CreateRhythmGenerator();
+  CreateRhythmGenerator(mpTrackWindow, mpProject);
 }
 
 //-----------------------------------------------------------------------------

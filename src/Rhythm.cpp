@@ -468,6 +468,42 @@ void JZRhythm::GenGroup(
   JZRndArray& out,
   int grp,
   const JZBarInfo& BarInfo,
+  const vector<JZRhythm*>& Rhythms)
+{
+  out.Clear();
+
+  int ClocksPerStep = GetClocksPerStep(BarInfo);
+
+  for (
+    vector<JZRhythm*>::const_iterator iRhythm = Rhythms.begin();
+    iRhythm != Rhythms.end();
+    ++iRhythm)
+  {
+    const JZRhythm* pRhythm = *iRhythm;
+    int fuzz = pRhythm->GetRhythmGroup(grp).GetContrib();
+    if (fuzz && pRhythm != this)
+    {
+      JZRndArray tmp(mRhythmArray);
+      tmp.Clear();
+      int Clock = BarInfo.GetClock();
+      while (Clock < BarInfo.GetClock() + BarInfo.GetTicksPerBar())
+      {
+        int i = Clock2i(Clock, BarInfo);
+        int j = pRhythm->Clock2i(Clock, BarInfo);
+        tmp[i] = pRhythm->mHistoryArray[j];
+        Clock += ClocksPerStep;
+      }
+      out.SetUnion(tmp, fuzz);
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZRhythm::GenGroup(
+  JZRndArray& out,
+  int grp,
+  const JZBarInfo& BarInfo,
   JZRhythm* rhy[],
   int RhythmCount)
 {
@@ -513,6 +549,74 @@ void JZRhythm::Generate(
     if (mRhythmGroups[gi].mListen)
     {
       GenGroup(tmp, gi, BarInfo, rhy, RhythmCount);
+      if (mRhythmGroups[gi].mListen > 0)
+      {
+        rrg.SetIntersection(tmp, mRhythmGroups[gi].mListen);
+      }
+      else
+      {
+        rrg.SetDifference(tmp, -mRhythmGroups[gi].mListen);
+      }
+    }
+  }
+
+  // Clear part of the history.
+  int Clock = BarInfo.GetClock();
+  int ClocksPerStep = GetClocksPerStep(BarInfo);
+  while (Clock < BarInfo.GetClock() + BarInfo.GetTicksPerBar())
+  {
+    int i = Clock2i(Clock, BarInfo);
+    mHistoryArray[i] = 0;
+    Clock += ClocksPerStep;
+  }
+
+  //  generate the events
+  Clock = mNextClock;
+  while (Clock < BarInfo.GetClock() + BarInfo.GetTicksPerBar())
+  {
+    int i = Clock2i(Clock, BarInfo);
+    if ((!mRandomizeFlag && rrg[i] > 0) || rrg.Random(i))
+    {
+      // put event here
+      mHistoryArray[i] = mRhythmArray.GetMax();
+
+      short vel = 0;
+      if (mRandomizeFlag)
+      {
+        vel = mVelocityArray.Random() * 127 / mVelocityArray.Size() + 1;
+      }
+      else
+      {
+        vel = rrg[i] * 126 / rrg.GetMax() + 1;
+      }
+      short len = (mLengthArray.Random() + 1) * ClocksPerStep;
+      GenerateEvent(pTrack, Clock, vel, len - ClocksPerStep / 2);
+      Clock += len;
+    }
+    else
+    {
+      Clock += ClocksPerStep;
+    }
+  }
+  mNextClock = Clock;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZRhythm::Generate(
+  JZTrack* pTrack,
+  const JZBarInfo& BarInfo,
+  const std::vector<JZRhythm*>& Instruments)
+{
+  JZRndArray rrg(mRhythmArray);
+
+  // Add groups to the rhythm array.
+  JZRndArray tmp(mRhythmArray);
+  for (int gi = 0; gi < MAX_GROUPS; ++gi)
+  {
+    if (mRhythmGroups[gi].mListen)
+    {
+      GenGroup(tmp, gi, BarInfo, Instruments);
       if (mRhythmGroups[gi].mListen > 0)
       {
         rrg.SetIntersection(tmp, mRhythmGroups[gi].mListen);
@@ -1426,11 +1530,15 @@ END_EVENT_TABLE()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZRhythmGeneratorWindow::JZRhythmGeneratorWindow(
+  JZEventWindow* pEventWindow,
+  JZSong* pSong,
   wxFrame* pParent,
   const wxPoint& Position,
   const wxSize& Size)
   : wxPanel(pParent, wxID_ANY, Position, Size),
     mRhythm(0),
+    mpEventWindow(pEventWindow),
+    mpSong(pSong),
     mInstruments(),
     mpStepsPerCountSlider(0),
     mpCountsPerBarSlider(0),
@@ -1440,7 +1548,7 @@ JZRhythmGeneratorWindow::JZRhythmGeneratorWindow(
     mpGroupContribSlider(0),
     mpGroupListenSlider(0),
     mpGroupListBox(0),
-    mActiveGroup(-1),
+    mActiveGroup(0),
     mpRandomCheckBox(0),
     mpLengthEdit(0),
     mpVelocityEdit(0),
@@ -1813,6 +1921,16 @@ void JZRhythmGeneratorWindow::DeleteInstrument()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void JZRhythmGeneratorWindow::Generate()
+{
+  wxBeginBusyCursor();
+  Win2Instrument();
+  GenerateRhythm();
+  wxEndBusyCursor();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZRhythmGeneratorWindow::Instrument2Win()
 {
   if (
@@ -1895,6 +2013,80 @@ void JZRhythmGeneratorWindow::RandomEnable()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void JZRhythmGeneratorWindow::GenerateRhythm()
+{
+  if (
+    !mpEventWindow->EventsSelected(
+      "Please mark the destination track in the track window"))
+  {
+    return;
+  }
+
+  JZFilter* pFilter = mpEventWindow->mpFilter;
+
+  if (pFilter->GetFromTrack() != pFilter->GetToTrack())
+  {
+    wxMessageBox("you must select exacty 1 track", "Error", wxOK);
+    return;
+  }
+
+  int FromClock = pFilter->GetFromClock();
+  int ToClock = pFilter->GetToClock();
+  JZTrack* pTrack = mpSong->GetTrack(pFilter->GetFromTrack());
+  mpSong->NewUndoBuffer();
+
+  // remove selection
+//  if (
+//    wxMessageBox(
+//      "Erase destination before generating?",
+//      "Replace",
+//      wxYES_NO) == wxYES)
+  {
+    JZCommandErase erase(pFilter, 1);
+    erase.Execute(0);
+  }
+
+  for (
+    vector<JZRhythm*>::iterator iInstrument = mInstruments.begin();
+    iInstrument != mInstruments.end();
+    ++iInstrument)
+  {
+    JZRhythm& Instrument = **iInstrument;
+    Instrument.GenInit(FromClock);
+  }
+
+  JZBarInfo BarInfo(*mpSong);
+  BarInfo.SetClock(FromClock);
+
+//  for (int i = 0; i < mInstrumentCount; ++i)
+//  {
+//    mpInstruments[i]->Generate(
+//      pTrack,
+//      FromClock,
+//      ToClock,
+//      BarInfo.GetTicksPerBar());
+//  }
+
+  while (BarInfo.GetClock() < ToClock)
+  {
+    for (
+      vector<JZRhythm*>::iterator iInstrument = mInstruments.begin();
+      iInstrument != mInstruments.end();
+      ++iInstrument)
+    {
+      JZRhythm& Instrument = **iInstrument;
+      Instrument.Generate(pTrack, BarInfo, mInstruments);
+    }
+    BarInfo.Next();
+  }
+
+  pTrack->Cleanup();
+
+  mpEventWindow->Refresh();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZRhythmGeneratorWindow::OnSliderUpdate(wxCommandEvent&)
 {
   Win2Instrument();
@@ -1926,6 +2118,8 @@ BEGIN_EVENT_TABLE(JZRhythmGeneratorFrame, wxFrame)
 
   EVT_MENU(ID_INSTRUMENT_DELETE, JZRhythmGeneratorFrame::OnDeleteInstrument)
 
+  EVT_MENU(ID_INSTRUMENT_GENERATE, JZRhythmGeneratorFrame::OnGenerate)
+
   EVT_MENU(wxID_HELP, JZRhythmGeneratorFrame::OnHelp)
 
   EVT_MENU(wxID_HELP_CONTENTS, JZRhythmGeneratorFrame::OnHelpContents)
@@ -1938,7 +2132,9 @@ const wxString JZRhythmGeneratorFrame::mDefaultFileName = "noname.rhy";
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-JZRhythmGeneratorFrame::JZRhythmGeneratorFrame()
+JZRhythmGeneratorFrame::JZRhythmGeneratorFrame(
+  JZEventWindow* pEventWindow,
+  JZSong* pSong)
   : wxFrame(
       0,
       wxID_ANY,
@@ -1977,8 +2173,12 @@ JZRhythmGeneratorFrame::JZRhythmGeneratorFrame()
 
   int Width, Height;
   GetClientSize(&Width, &Height);
-  mpRhythmGeneratorWindow =
-    new JZRhythmGeneratorWindow(this, wxPoint(0, 0), wxSize(Width, Height));
+  mpRhythmGeneratorWindow = new JZRhythmGeneratorWindow(
+    pEventWindow,
+    pSong,
+    this,
+    wxPoint(0, 0),
+    wxSize(Width, Height));
 }
 
 //-----------------------------------------------------------------------------
@@ -2075,6 +2275,13 @@ void JZRhythmGeneratorFrame::OnDeleteInstrument(wxCommandEvent&)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void JZRhythmGeneratorFrame::OnGenerate(wxCommandEvent&)
+{
+  mpRhythmGeneratorWindow->Generate();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZRhythmGeneratorFrame::OnHelp(wxCommandEvent&)
 {
   JZHelp::Instance().ShowTopic("Random rhythm generator");
@@ -2089,11 +2296,11 @@ void JZRhythmGeneratorFrame::OnHelpContents(wxCommandEvent&)
 
 //*****************************************************************************
 //*****************************************************************************
-void CreateRhythmGenerator()
+void CreateRhythmGenerator(JZEventWindow* pEventWindow, JZSong* pSong)
 {
   if (!gpRhythmGeneratorFrame)
   {
-    gpRhythmGeneratorFrame = new JZRhythmGeneratorFrame();
+    gpRhythmGeneratorFrame = new JZRhythmGeneratorFrame(pEventWindow, pSong);
   }
   gpRhythmGeneratorFrame->Show(true);
 }

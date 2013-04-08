@@ -35,7 +35,7 @@ using namespace std;
 JZRhythmArrayControl::JZRhythmArrayControl(
   wxWindow* pParent,
   wxWindowID Id,
-  const JZRndArray& RandomArray,
+  JZRndArray& RandomArray,
   const wxPoint& Position,
   const wxSize& Size,
   long WindowStyle)
@@ -57,7 +57,7 @@ void JZRhythmArrayControl::SetMeter(
 {
   mStepsPerCount = StepsPerCount;
   mCountPerBar = CountPerBar;
-  mpRandomArray->Resize(StepsPerCount * CountPerBar * BarCount);
+  mRandomArray.Resize(StepsPerCount * CountPerBar * BarCount);
   SetXMinMax(1, StepsPerCount * CountPerBar * BarCount);
 }
 
@@ -76,13 +76,13 @@ void JZRhythmArrayControl::DrawXTicks(wxDC& Dc)
   Dc.SetFont(*wxSMALL_FONT);
 
   int TextWidth, TextHeight;
-  for (int i = 0; i < mpRandomArray->Size(); i += mStepsPerCount)
+  for (int i = 0; i < mRandomArray.Size(); i += mStepsPerCount)
   {
     int Mark = (i / mStepsPerCount) % mCountPerBar + 1;
     ostringstream Oss;
     Oss << Mark;
     int YPosition = mY + mHeight;
-    int XPosition = (int)(mX + (i + 0.5) * mWidth / mpRandomArray->Size());
+    int XPosition = (int)(mX + (i + 0.5) * mWidth / mRandomArray.Size());
     Dc.GetTextExtent(Oss.str(), &TextWidth, &TextHeight);
     XPosition -= (int)(TextWidth / 2.0);
     Dc.DrawText(Oss.str(), XPosition, YPosition);

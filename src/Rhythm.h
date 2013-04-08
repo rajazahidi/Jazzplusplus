@@ -58,6 +58,16 @@ class JZRhythmGroup
     void Write(std::ostream& Os) const;
     void Read(std::istream& Is, int Version);
 
+    int GetContrib() const
+    {
+      return mContrib;
+    }
+
+    int GetListen() const
+    {
+      return mListen;
+    }
+
   public:
 
     int mListen;
@@ -69,6 +79,11 @@ class JZRhythmGroup
 class JZRhythmGroups
 {
   public:
+
+    const JZRhythmGroup& operator [] (int i) const
+    {
+      return mRhythmGroups[i];
+    }
 
     JZRhythmGroup& operator [] (int i)
     {
@@ -116,6 +131,11 @@ class JZRhythm
       JZRhythm* rhy[],
       int RhythmCount);
 
+    void Generate(
+      JZTrack* pTrack,
+      const JZBarInfo& BarInfo,
+      const std::vector<JZRhythm*>& Instruments);
+
     void GenInit(int StartClock);
 
     void GenerateEvent(
@@ -128,6 +148,11 @@ class JZRhythm
 
     void Read(std::istream& Is, int Version);
 
+    const JZRhythmGroup& GetRhythmGroup(int Index) const
+    {
+      return mRhythmGroups[Index];
+    }
+
   protected:
 
     void GenGroup(
@@ -136,6 +161,12 @@ class JZRhythm
       const JZBarInfo& BarInfo,
       JZRhythm* rhy[],
       int RhythmCount);
+
+    void JZRhythm::GenGroup(
+      JZRndArray& out,
+      int grp,
+      const JZBarInfo& BarInfo,
+      const std::vector<JZRhythm*>& Rhythms);
 
     int Clock2i(int Clock, const JZBarInfo& BarInfo) const;
 
@@ -260,6 +291,8 @@ class JZRhythmGeneratorWindow : public wxPanel
   public:
 
     JZRhythmGeneratorWindow(
+      JZEventWindow* pEventWindow,
+      JZSong* pSong,
       wxFrame* pParent,
       const wxPoint& Position,
       const wxSize& Size);
@@ -274,6 +307,8 @@ class JZRhythmGeneratorWindow : public wxPanel
 
     void DeleteInstrument();
 
+    void Generate();
+
   private:
 
     void ClearInstruments();
@@ -286,6 +321,8 @@ class JZRhythmGeneratorWindow : public wxPanel
 
     void RandomEnable();
 
+    void GenerateRhythm();
+
     void OnSliderUpdate(wxCommandEvent& Event);
 
     void OnListBox(wxCommandEvent& Event);
@@ -293,6 +330,9 @@ class JZRhythmGeneratorWindow : public wxPanel
   private:
 
     JZRhythm mRhythm;
+
+    JZEventWindow* mpEventWindow;
+    JZSong* mpSong;
 
     std::vector<JZRhythm*> mInstruments;
 
@@ -320,7 +360,7 @@ class JZRhythmGeneratorFrame : public wxFrame
 {
   public:
 
-    JZRhythmGeneratorFrame();
+    JZRhythmGeneratorFrame(JZEventWindow* pEventWindow, JZSong* pSong);
 
     ~JZRhythmGeneratorFrame();
 
@@ -335,6 +375,8 @@ class JZRhythmGeneratorFrame : public wxFrame
     void OnAddInstrument(wxCommandEvent& Event);
 
     void OnDeleteInstrument(wxCommandEvent& Event);
+
+    void OnGenerate(wxCommandEvent& Event);
 
     void OnHelp(wxCommandEvent& Event);
 
@@ -353,4 +395,4 @@ class JZRhythmGeneratorFrame : public wxFrame
 
 //*****************************************************************************
 //*****************************************************************************
-extern void CreateRhythmGenerator();
+extern void CreateRhythmGenerator(JZEventWindow* pEventWindow, JZSong* pSong);

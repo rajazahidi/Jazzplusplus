@@ -204,7 +204,7 @@ JZSampleSet::JZSampleSet(long TicksPerMinute)
   int i;
   for (i = 0; i < BUFCOUNT; ++i)
   {
-    buffers[i] = new JZAudioBuffer(0);
+    mpBuffers[i] = new JZAudioBuffer(0);
   }
 
   adjust_audio_length = 1;
@@ -241,7 +241,7 @@ JZSampleSet::~JZSampleSet()
   }
   for (i = 0; i < BUFCOUNT; i++)
   {
-    delete buffers[i];
+    delete mpBuffers[i];
   }
 }
 
@@ -415,7 +415,7 @@ int JZSampleSet::ResetBuffers(
   mDriverBuffers.Clear();
   for (i = 0; i < BUFCOUNT; i++)
   {
-    mFreeBuffers.Put(buffers[i]);
+    mFreeBuffers.Put(mpBuffers[i]);
   }
   buffers_written   = 0;
 
@@ -1072,15 +1072,15 @@ void JZSampleSet::SaveWave(
 
   // Save part of first buffer.
   os.write(
-    (char*)&buf.buffers[start_buffer]->data[start_offs],
+    (char*)&buf.mBuffers[start_buffer]->data[start_offs],
     2 * start_length);
 
   // write some complete buffers
   for (int i = start_buffer + 1; i < end_buffer; i++)
-    os.write((char*)buf.buffers[i]->data, bufsize * 2);
+    os.write((char*)buf.mBuffers[i]->data, bufsize * 2);
   // save part of last buffer
   if (end_length > 0)
-    os.write((char*)buf.buffers[end_buffer]->data, 2 * end_length);
+    os.write((char*)buf.mBuffers[end_buffer]->data, 2 * end_length);
 #if 0
   // very slow, but works!
   ofstream slow("t2.wav", ios::out | ios::bin | ios::trunc);
@@ -1089,7 +1089,7 @@ void JZSampleSet::SaveWave(
   {
     int bi = i / bufsize;
     int di = i % bufsize;
-    slow.write((char*)&buf.buffers[bi]->mpData[di], sizeof(short));
+    slow.write((char*)&buf.mBuffers[bi]->mpData[di], sizeof(short));
   }
 #endif
 }
@@ -1098,17 +1098,15 @@ void JZSampleSet::SaveWave(
 // ------------------------------- record  ------------------------
 // -----------------------------------------------------------------
 
-DEFINE_ARRAY(JZAudioBufferArray, JZAudioBuffer*)
-
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZAudioRecordBuffer::Clear()
 {
-  int n = buffers.GetSize();
+  int n = mBuffers.GetSize();
   for (int i = 0; i < n; i++)
   {
-    delete buffers[i];
-    buffers[i] = 0;
+    delete mBuffers[i];
+    mBuffers[i] = 0;
   }
   num_buffers = 0;
 }
@@ -1117,14 +1115,14 @@ void JZAudioRecordBuffer::Clear()
 //-----------------------------------------------------------------------------
 JZAudioBuffer* JZAudioRecordBuffer::RequestBuffer()
 {
-  if (buffers[num_buffers] == 0)
-    buffers[num_buffers] = new JZAudioBuffer(0);
-  if (buffers[num_buffers] == 0)
+  if (mBuffers[num_buffers] == 0)
+    mBuffers[num_buffers] = new JZAudioBuffer(0);
+  if (mBuffers[num_buffers] == 0)
   {
     Clear();
     fprintf(stderr, "memory exhausted!\n");
   }
-  return buffers[num_buffers++];
+  return mBuffers[num_buffers++];
 }
 
 // -----------------------------------------------------------------

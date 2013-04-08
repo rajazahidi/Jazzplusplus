@@ -49,7 +49,6 @@ Dialogs/TransposeDialog.cpp \
 Dialogs/VelocityDialog.cpp \
 Dialogs.cpp \
 DrumUtilities.cpp \
-DynamicArray.cpp \
 ErrorMessage.cpp \
 Events.cpp \
 EventFrame.cpp \
@@ -151,7 +150,6 @@ Dialogs/VelocityDialog.cpp \
 Dialogs.cpp \
 DrumEnums.h \
 DrumUtilities.h \
-DynamicArray.cpp \
 ErrorMessage.cpp \
 Events.cpp \
 EventFrame.cpp \
@@ -223,6 +221,7 @@ ArrayControl.h \
 AsciiMidiFile.h \
 Audio.h \
 AudioDriver.h \
+BitSet.h \
 Command.h \
 Configuration.h \
 ControlEdit.h \

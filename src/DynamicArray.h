@@ -1,9 +1,7 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
-// Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008-2013 Peter J. Stieber
+// Copyright (C) 2013 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,176 +21,195 @@
 #pragma once
 
 #include <cassert>
-#include <vector>
 
-#define DECLARE_ARRAY(CLASS, TYPE)                      \
-                                                        \
-class CLASS                                             \
-{                                                       \
-  public:                                               \
-    CLASS(TYPE initVal, int initSize = 0);              \
-    CLASS();                                            \
-    virtual ~CLASS();                                   \
-    CLASS(const CLASS &);                               \
-    CLASS & operator=(const CLASS &);                   \
-                                                        \
-    TYPE & operator[](int i);                           \
-    const TYPE operator[](int i) const;                 \
-    int GetSize() const;                                \
-  protected:                                            \
-    void Resize(int newSize);                           \
-    int  nArrays;     /* Anzahl Arrays */               \
-    int  block_size;  /* Anzahl Elemente je Array */    \
-    void Clear();     /* Loescht alle Arrays */         \
-    TYPE initVal;                                       \
-    TYPE** ppArray;                                     \
-};
-
-
-#define DEFINE_ARRAY(CLASS, TYPE)                              \
-                                                               \
-CLASS::CLASS(TYPE val, int s) : initVal(val)                   \
-{                                                              \
-  nArrays = 0;                                                 \
-  ppArray = 0;                                                 \
-  block_size = 16;                                             \
-  if (s) Resize(s);                                            \
-}                                                              \
-                                                               \
-CLASS::CLASS() : initVal(0)                                    \
-{                                                              \
-  nArrays = 0;                                                 \
-  ppArray = 0;                                                 \
-  block_size = 16;                                             \
-}                                                              \
-                                                               \
-CLASS::CLASS(const CLASS &X) : initVal(X.initVal)              \
-{                                                              \
-  int i;                                                       \
-  nArrays = 0;                                                 \
-  ppArray = 0;                                                 \
-  block_size = 16;                                             \
-  for (i = 0; i < X.nArrays * block_size; i++)                 \
-    (*this)[i] = (TYPE)X[i];                                   \
-}                                                              \
-                                                               \
-void CLASS::Clear()                                            \
-{                                                              \
-  int i;                                                       \
-  for (i = 0; i < nArrays; i++)                                \
-  {                                                            \
-    delete [] ppArray[i];                                      \
-  }                                                            \
-  delete [] ppArray;                                           \
-  nArrays = 0;                                                 \
-  ppArray = 0;                                                 \
-}                                                              \
-                                                               \
-CLASS::~CLASS()                                                \
-{                                                              \
-  Clear();                                                     \
-}                                                              \
-                                                               \
-CLASS& CLASS::operator=(const CLASS &X)                        \
-{                                                              \
-  int i;                                                       \
-  if (&X == this)                                              \
-    return *this;                                              \
-  Clear();                                                     \
-  initVal = X.initVal;                                         \
-  block_size = X.block_size;                                   \
-  for (i = 0; i < X.nArrays * X.block_size; i++)               \
-  {                                                            \
-    (*this)[i] = (TYPE)X[i];                                   \
-  }                                                            \
-  return *this;                                                \
-}                                                              \
-                                                               \
-TYPE& CLASS::operator[](int i)                                 \
-{                                                              \
-  assert(i >= 0);                                              \
-  Resize(i);                                                   \
-  return ppArray[i / block_size][i % block_size];              \
-}                                                              \
-                                                               \
-const TYPE CLASS::operator[](int i) const                      \
-{                                                              \
-  assert(i >= 0);                                              \
-  int k = i / block_size;                                      \
-  if (k >= nArrays || ppArray[k] == 0)                         \
-  {                                                            \
-    return initVal;                                            \
-  }                                                            \
-  return ppArray[k][i % block_size];                           \
-}                                                              \
-                                                               \
-void CLASS::Resize(int newSize)                                \
-{                                                              \
-  int k = newSize / block_size;                                \
-  if (k >= nArrays)                                            \
-  {                                                            \
-    int i, n = k + 1;                                          \
-    TYPE **tmp = new TYPE * [n];                               \
-    for (i = 0; i < nArrays; i++)                              \
-    {                                                          \
-      tmp[i] = ppArray[i];                                     \
-    }                                                          \
-    for (; i < n; i++)                                         \
-    {                                                          \
-      tmp[i] = 0;                                              \
-    }                                                          \
-    delete [] ppArray;                                         \
-    ppArray = tmp;                                             \
-    nArrays = n;                                               \
-  }                                                            \
-                                                               \
-  if (ppArray[k] == 0)                                         \
-  {                                                            \
-    int i;                                                     \
-    ppArray[k] = new TYPE [block_size];                        \
-    for (i = 0; i < block_size; i++)                           \
-    {                                                          \
-      ppArray[k][i] = initVal;                                 \
-    }                                                          \
-  }                                                            \
-}                                                              \
-                                                               \
-int CLASS::GetSize() const                                     \
-{                                                              \
-  return nArrays * block_size;                                 \
-}
-
-
-class JZBitset
+//*****************************************************************************
+// Description:
+//   Template version of the macro code macro code listed above.
+//*****************************************************************************
+template <typename TAType>
+class TTDynamicArray
 {
   public:
-    int operator()(int i)
-    {
-      return (mArray[index(i)] & mask(i)) != 0;
-    }
-    void set(int i, int b)
-    {
-      if (b)
-      {
-        mArray[index(i)] |= mask(i);
-      }
-      else
-      {
-        mArray[index(i)] &= ~mask(i);
-      }
-    }
 
-  private:
+    TTDynamicArray();
 
-    std::vector<int> mArray;
+    TTDynamicArray(TAType InitialValue, int InitialSize = 0);
 
-    // this works for sizeof(int) >= 4
-    int index(int i)
-    {
-      return i >> 5;
-    }
-    int mask(int i)
-    {
-      return 1 << (i & 31);
-    }
+    TTDynamicArray(const TTDynamicArray& Other);
+
+    virtual ~TTDynamicArray();
+
+    TTDynamicArray& operator = (const TTDynamicArray& Rhs);
+
+    TAType& operator[](int i);
+
+    const TAType operator[](int i) const;
+
+    int GetSize() const;
+
+  protected:
+
+    void Resize(int NewSize);
+
+    // Delete all arrays.
+    void Clear();
+
+  protected:
+
+    // Number of arrays.
+    int mArrayCount;
+
+    // Number of elements per array.
+    int mBlockSize;
+
+    TAType mInitialValue;
+    TAType** mppArray;
 };
+
+//*****************************************************************************
+//*****************************************************************************
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+template <typename TAType>
+TTDynamicArray<TAType>::TTDynamicArray()
+  : mArrayCount(0),
+    mBlockSize(16),
+    mInitialValue(0),
+    mppArray(0)
+{
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+template <typename TAType>
+TTDynamicArray<TAType>::TTDynamicArray(TAType InitialValue, int InitialSize)
+  : mArrayCount(0),
+    mBlockSize(16),
+    mInitialValue(InitialValue),
+    mppArray(0)
+{
+  if (InitialSize)
+  {
+    Resize(InitialSize);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+template <typename TAType>
+TTDynamicArray<TAType>::TTDynamicArray(const TTDynamicArray<TAType>& Other)
+  : mArrayCount(0),
+    mBlockSize(16),
+    mInitialValue(Other.mInitialValue)
+    mppArray(0)
+{
+  for (int i = 0; i < Other.mArrayCount * mBlockSize; ++i)
+  {
+    (*this)[i] = Other[i];
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+template <typename TAType>
+void TTDynamicArray<TAType>::Clear()
+{
+  for (int i = 0; i < mArrayCount; ++i)
+  {
+    delete [] mppArray[i];
+  }
+  delete [] mppArray;
+  mArrayCount = 0;
+  mppArray = 0;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+template <typename TAType>
+TTDynamicArray<TAType>::~TTDynamicArray()
+{
+  Clear();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+template <typename TAType>
+TTDynamicArray<TAType>& TTDynamicArray<TAType>::operator = (
+  const TTDynamicArray<TAType>& Rhs)
+{
+  if (&Rhs != this)
+  {
+    Clear();
+    mInitialValue = Rhs.mInitialValue;
+    mBlockSize = Rhs.mBlockSize;
+    for (int i = 0; i < Rhs.mArrayCount * Rhs.mBlockSize; ++i)
+    {
+      (*this)[i] = Rhs[i];
+    }
+  }
+  return *this;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+template <typename TAType>
+TAType& TTDynamicArray<TAType>::operator[](int i)
+{
+  assert(i >= 0);
+  Resize(i);
+  return mppArray[i / mBlockSize][i % mBlockSize];
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+template <typename TAType>
+const TAType TTDynamicArray<TAType>::operator[](int i) const
+{
+  assert(i >= 0);
+  int k = i / mBlockSize;
+  if (k >= mArrayCount || mppArray[k] == 0)
+  {
+    return mInitialValue;
+  }
+  return mppArray[k][i % mBlockSize];
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+template <typename TAType>
+void TTDynamicArray<TAType>::Resize(int NewSize)
+{
+  int k = NewSize / mBlockSize;
+  if (k >= mArrayCount)
+  {
+    int i, n = k + 1;
+    TAType** ppTemp = new TAType * [n];
+    for (i = 0; i < mArrayCount; i++)
+    {
+      ppTemp[i] = mppArray[i];
+    }
+    for (; i < n; ++i)
+    {
+      ppTemp[i] = 0;
+    }
+    delete [] mppArray;
+    mppArray = ppTemp;
+  }
+
+  if (mppArray[k] == 0)
+  {
+    mppArray[k] = new TAType [mBlockSize];
+    for (int i = 0; i < mBlockSize; ++i)
+    {
+      mppArray[k][i] = mInitialValue;
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+template <typename TAType>
+int TTDynamicArray<TAType>::GetSize() const
+{
+  return mArrayCount * mBlockSize;
+}

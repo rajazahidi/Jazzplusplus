@@ -22,8 +22,8 @@
 
 #pragma once
 
+#include "BitSet.h"
 #include "DrumEnums.h"
-#include "DynamicArray.h"
 #include "Events.h"
 #include "NamedValue.h"
 

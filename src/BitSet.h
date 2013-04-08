@@ -1,9 +1,7 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// Copyright (C) 1994-2000 Andreas Voss and Per Sigmond, all rights reserved.
-// Modifications Copyright (C) 2004 Patrick Earl
-// Modifications Copyright (C) 2008-2013 Peter J. Stieber
+// Copyright (C) 2013 Peter J. Stieber
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,4 +18,42 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
+#pragma once
+
 #include "DynamicArray.h"
+
+//*****************************************************************************
+//*****************************************************************************
+class JZBitset
+{
+  public:
+    int operator()(int i)
+    {
+      return (mArray[index(i)] & mask(i)) != 0;
+    }
+    void set(int i, int b)
+    {
+      if (b)
+      {
+        mArray[index(i)] |= mask(i);
+      }
+      else
+      {
+        mArray[index(i)] &= ~mask(i);
+      }
+    }
+
+  private:
+
+    TTDynamicArray<int> mArray;
+
+    // this works for sizeof(int) >= 4
+    int index(int i)
+    {
+      return i >> 5;
+    }
+    int mask(int i)
+    {
+      return 1 << (i & 31);
+    }
+};

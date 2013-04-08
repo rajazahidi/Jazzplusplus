@@ -24,10 +24,8 @@
 
 #include <wx/window.h>
 
-#include <iostream>
+#include <iosfwd>
 #include <vector>
-
-#include "DynamicArray.h"
 
 //*****************************************************************************
 //*****************************************************************************
@@ -96,8 +94,8 @@ class JZRndArray
       mArray.resize(nn);
     }
 
-    friend std::ostream & operator << (std::ostream &, JZRndArray const &);
-    friend std::istream & operator >> (std::istream &, JZRndArray &);
+    friend std::ostream& operator << (std::ostream &, JZRndArray const &);
+    friend std::istream& operator >> (std::istream &, JZRndArray &);
 
     // Returns index 0..n-1 (arrayvalues -> empiric distribution)
     int Random();

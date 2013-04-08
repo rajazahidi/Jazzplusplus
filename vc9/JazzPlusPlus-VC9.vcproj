@@ -450,6 +450,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\BitSet.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Command.cpp"
 				>
 			</File>
@@ -491,10 +495,6 @@
 			</File>
 			<File
 				RelativePath="..\src\DrumUtilities.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\DynamicArray.cpp"
 				>
 			</File>
 			<File

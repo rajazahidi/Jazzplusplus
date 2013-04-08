@@ -112,9 +112,6 @@ struct JZAudioBuffer
   }
 };
 
-
-DECLARE_ARRAY(JZAudioBufferArray, JZAudioBuffer*)
-
 //*****************************************************************************
 //*****************************************************************************
 class JZAudioBufferQueue
@@ -207,11 +204,10 @@ class JZAudioRecordBuffer
 
   private:
 
-    JZAudioBufferArray buffers;
+    TTDynamicArray<JZAudioBuffer*> mBuffers;
     int num_buffers;
     int bufbytes;
 };
-
 
 //*****************************************************************************
 // Description:
@@ -299,7 +295,7 @@ class JZSampleSet
     JZAudioBuffer* GetBuffer(int i) const
     {
       // 0 < i < BUFCOUNT
-      return buffers[i];
+      return mpBuffers[i];
     }
 
     void AdjustAudioLength(JZTrack *t, long TicksPerMinute);
@@ -426,7 +422,7 @@ class JZSampleSet
 
     unsigned int bufbytes;           // buffer size in byte
     unsigned int bufshorts;          // buffer size in short
-    JZAudioBuffer *buffers[BUFCOUNT]; // all the audio buffers
+    JZAudioBuffer* mpBuffers[BUFCOUNT]; // all the audio buffers
     JZAudioBufferQueue mFreeBuffers;  // to be filled with data
     JZAudioBufferQueue mFullBuffers;  // to be played by driver
     JZAudioBufferQueue mDriverBuffers;  // actually played by driver
@@ -458,6 +454,8 @@ class JZSampleSet
     JZSample* listen_sample;
 };
 
+//*****************************************************************************
+//*****************************************************************************
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 inline

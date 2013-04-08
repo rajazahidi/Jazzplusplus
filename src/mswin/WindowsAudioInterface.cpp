@@ -425,10 +425,10 @@ int JZWindowsAudioPlayer::CloseDsp()
     hinp_open = 0;
     waveInReset(hinp);
 
-    int n = recbuffers.buffers.GetSize();
+    int n = recbuffers.mBuffers.GetSize();
     for (i = 0; i < n; i++)
     {
-      JZAudioBuffer* buf = recbuffers.buffers[i];
+      JZAudioBuffer* buf = recbuffers.mBuffers[i];
       if (buf == 0)
         break;
       res = waveInUnprepareHeader(hinp, (WAVEHDR *)buf->hdr, sizeof(WAVEHDR));

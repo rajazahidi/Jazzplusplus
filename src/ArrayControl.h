@@ -52,6 +52,18 @@ class JZArrayControl : public wxControl
 
     void OnPaint(wxPaintEvent& Event);
 
+    void OnMouseEvent(wxMouseEvent& MouseEvent);
+
+    void OnMouseCaptureLost(wxMouseCaptureLostEvent& Event);
+
+    void ButtonDown(wxMouseEvent& MouseEvent);
+
+    void Dragging(wxMouseEvent& MouseEvent);
+
+    void ButtonUp(wxMouseEvent& MouseEvent);
+
+    int GetIndex(wxMouseEvent& MouseEvent);
+
     void DrawBar(wxDC& Dc, int i, bool black);
 
     void DrawLabel(wxDC& Dc);
@@ -78,6 +90,12 @@ class JZArrayControl : public wxControl
 
     int mX, mY, mYNull;
     int mWidth, mHeight;
+
+    // Dragging flag.
+    bool mDragging;
+
+    // If ctrl is pushed: drag this one.
+    int mIndex;
 
     // Array size is mapped to this range for x-tick marks.
     int mXMin, mXMax;

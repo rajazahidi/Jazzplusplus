@@ -49,6 +49,8 @@ static string GetText(int YValue)
 BEGIN_EVENT_TABLE(JZArrayControl, wxControl)
   EVT_SIZE(JZArrayControl::OnSize)
   EVT_PAINT(JZArrayControl::OnPaint)
+  EVT_MOUSE_EVENTS(JZArrayControl::OnMouseEvent)
+  EVT_MOUSE_CAPTURE_LOST(JZArrayControl::OnMouseCaptureLost)
 END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
@@ -70,6 +72,8 @@ JZArrayControl::JZArrayControl(
     mYNull(0),
     mWidth(0),
     mHeight(0),
+    mDragging(false),
+    mIndex(-1),
     mXMin(0),
     mXMax(RandomArray.Size())
 {
@@ -174,6 +178,155 @@ void JZArrayControl::OnPaint(wxPaintEvent& Event)
   {
 //    mpDrawBars->DrawBars(Dc);
   }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZArrayControl::OnMouseEvent(wxMouseEvent& MouseEvent)
+{
+  if (!mEnabled)
+  {
+    return;
+  }
+  if (MouseEvent.ButtonDown())
+  {
+    ButtonDown(MouseEvent);
+  }
+  else if (MouseEvent.Dragging())
+  {
+    Dragging(MouseEvent);
+  }
+  else if (MouseEvent.ButtonUp())
+  {
+    ButtonUp(MouseEvent);
+  }
+}
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZArrayControl::OnMouseCaptureLost(wxMouseCaptureLostEvent&)
+{
+  if (HasCapture())
+  {
+    ReleaseMouse();
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZArrayControl::ButtonDown(wxMouseEvent& MouseEvent)
+{
+  CaptureMouse();
+  mDragging = true;
+  mIndex = GetIndex(MouseEvent);
+  Dragging(MouseEvent);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZArrayControl::Dragging(wxMouseEvent& MouseEvent)
+{
+  if (!mDragging)
+  {
+    return;
+  }
+
+  if (mIndex < 0)
+  {
+    mIndex = GetIndex(MouseEvent);
+  }
+
+  wxClientDC Dc(this); // PORTING this is evil and shoud go
+
+  int Value = mpRandomArray->GetNull();
+  if (MouseEvent.LeftIsDown())
+  {
+    int EventX, EventY;
+    MouseEvent.GetPosition(&EventX, &EventY);
+
+    Value = (int)((double)(mY + mHeight - EventY) *
+      (mpRandomArray->GetMax() - mpRandomArray->GetMin()) / mHeight +
+      mpRandomArray->GetMin() + 0.5);
+
+    if (Value < mpRandomArray->GetMin())
+    {
+      Value = mpRandomArray->GetMin();
+    }
+    if (Value > mpRandomArray->GetMax())
+    {
+      Value = mpRandomArray->GetMax();
+    }
+  }
+
+  if (MouseEvent.ShiftDown())
+  {
+    for (int k = 0; k < mpRandomArray->Size(); ++k)
+    {
+      DrawBar(Dc, k, 0);
+      (*mpRandomArray)[k] = Value;
+      DrawBar(Dc, k, 1);
+    }
+  }
+  else if (MouseEvent.ControlDown())
+  {
+    DrawBar(Dc, mIndex, 0);
+    (*mpRandomArray)[mIndex] = Value;
+    DrawBar(Dc, mIndex, 1);
+  }
+  else
+  {
+    int i = GetIndex(MouseEvent);
+    int k = i;
+    if (i < mIndex)
+    {
+      for (; i <= mIndex; ++i)
+      {
+        DrawBar(Dc, i, 0);
+        (*mpRandomArray)[i] = Value;
+        DrawBar(Dc, i, 1);
+      }
+    }
+    else
+    {
+      for (; i >= mIndex; --i)
+      {
+        DrawBar(Dc, i, 0);
+        (*mpRandomArray)[i] = Value;
+        DrawBar(Dc, i, 1);
+      }
+    }
+    mIndex = k;
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZArrayControl::ButtonUp(wxMouseEvent& MouseEvent)
+{
+  if (HasCapture())
+  {
+    ReleaseMouse();
+  }
+  mDragging = false;
+  mIndex    = -1;
+  Refresh();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+int JZArrayControl::GetIndex(wxMouseEvent& MouseEvent)
+{
+  int EventX, EventY;
+  MouseEvent.GetPosition(&EventX, &EventY);
+  int Index = (int)((EventX - mX) * mpRandomArray->Size() / mWidth);
+  if (Index < 0)
+  {
+    Index = 0;
+  }
+  if (Index >= mpRandomArray->Size())
+  {
+    Index = mpRandomArray->Size() - 1;
+  }
+  return Index;
 }
 
 //-----------------------------------------------------------------------------

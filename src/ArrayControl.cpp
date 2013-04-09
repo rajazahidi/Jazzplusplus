@@ -48,6 +48,7 @@ static string GetText(int YValue)
 //-----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(JZArrayControl, wxControl)
   EVT_SIZE(JZArrayControl::OnSize)
+  EVT_ERASE_BACKGROUND(JZArrayControl::OnEraseBackground)
   EVT_PAINT(JZArrayControl::OnPaint)
   EVT_MOUSE_EVENTS(JZArrayControl::OnMouseEvent)
   EVT_MOUSE_CAPTURE_LOST(JZArrayControl::OnMouseCaptureLost)
@@ -106,6 +107,15 @@ void JZArrayControl::SetXMinMax(int XMin, int XMax)
 void JZArrayControl::OnSize(wxSizeEvent& SizeEvent)
 {
   Refresh();
+}
+
+//-----------------------------------------------------------------------------
+// Description:
+//   This code always erases when painting so we override this function to
+// avoid flicker.
+//-----------------------------------------------------------------------------
+void JZArrayControl::OnEraseBackground(wxEraseEvent& Event)
+{
 }
 
 //-----------------------------------------------------------------------------

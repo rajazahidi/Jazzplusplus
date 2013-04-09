@@ -50,6 +50,8 @@ class JZArrayControl : public wxControl
 
     void OnSize(wxSizeEvent& Event);
 
+    void OnEraseBackground(wxEraseEvent& Event);
+
     void OnPaint(wxPaintEvent& Event);
 
     void OnMouseEvent(wxMouseEvent& MouseEvent);

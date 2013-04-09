@@ -1554,13 +1554,11 @@ JZRhythmGeneratorWindow::JZRhythmGeneratorWindow(
     mpVelocityEdit(0),
     mpRhythmEdit(0)
 {
-  int x = 0;
-  int y = 0;
   int Width, Height;
   GetClientSize(&Width, &Height);
 
   wxPanel* pInstrumentPanel =
-    new wxPanel(this, wxID_ANY, wxPoint(x, y), wxSize(Width, Height / 2));
+    new wxPanel(this, wxID_ANY, wxPoint(0, 0), wxSize(Width, Height / 2));
 
   mpStepsPerCountSlider = new wxSlider(
     pInstrumentPanel,
@@ -1632,32 +1630,36 @@ JZRhythmGeneratorWindow::JZRhythmGeneratorWindow(
     "Randomize",
     wxPoint(Width / 2, 4 * Height / 12));
 
-  wxPanel* pPanel = new wxPanel(this);
+  wxPanel* pArrayControlPanel = new wxPanel(
+    this,
+    wxID_ANY,
+    wxPoint(0, Height / 2),
+    wxSize(Width, Height / 2));
 
   mpLengthEdit = new JZArrayControl(
-    pPanel,
+    pArrayControlPanel,
     wxID_ANY,
     mRhythm.mLengthArray,
-    wxPoint(x, y),
-    wxSize(Width / 2, Height / 2 - 4));
+    wxPoint(0, 0),
+    wxSize(Width / 2, Height / 4 - 4));
   mpLengthEdit->SetXMinMax(1, 8);
   mpLengthEdit->SetLabel("length/interval");
 
   mpVelocityEdit = new JZArrayControl(
-    pPanel,
+    pArrayControlPanel,
     wxID_ANY,
     mRhythm.mVelocityArray,
-    wxPoint(x + Width / 2, y),
-    wxSize(Width / 2, Height / 2 - 4));
+    wxPoint(Width / 2, 0),
+    wxSize(Width / 2, Height / 4 - 4));
   mpVelocityEdit->SetXMinMax(1, 127);
   mpVelocityEdit->SetLabel("velocity");
 
   mpRhythmEdit = new JZRhythmArrayControl(
-    pPanel,
+    pArrayControlPanel,
     wxID_ANY,
     mRhythm.mRhythmArray,
-    wxPoint(x, y + Height / 2),
-    wxSize(Width, Height / 2 - 4));
+    wxPoint(0, Height / 4),
+    wxSize(Width, Height / 4 - 4));
   mpRhythmEdit->SetMeter(
     mRhythm.mStepsPerCount,
     mRhythm.mCountPerBar,
@@ -1667,7 +1669,7 @@ JZRhythmGeneratorWindow::JZRhythmGeneratorWindow(
   wxBoxSizer* pSizer = new wxBoxSizer(wxVERTICAL);
 
   pSizer->Add(pInstrumentPanel, wxSizerFlags().Border().Expand());
-  pSizer->Add(pPanel, wxSizerFlags(1).Border().Expand());
+  pSizer->Add(pArrayControlPanel, wxSizerFlags(1).Border().Expand());
 
   SetSizer(pSizer);
 }
@@ -2035,15 +2037,15 @@ void JZRhythmGeneratorWindow::GenerateRhythm()
   JZTrack* pTrack = mpSong->GetTrack(pFilter->GetFromTrack());
   mpSong->NewUndoBuffer();
 
-  // remove selection
+  // Remove selection.
 //  if (
 //    wxMessageBox(
 //      "Erase destination before generating?",
 //      "Replace",
 //      wxYES_NO) == wxYES)
   {
-    JZCommandErase erase(pFilter, 1);
-    erase.Execute(0);
+    JZCommandErase Erase(pFilter, 1);
+    Erase.Execute(0);
   }
 
   for (

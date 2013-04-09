@@ -706,48 +706,10 @@ JZRhythmWindow::JZRhythmWindow(JZEventWindow* pEventWindow, JZSong* pSong)
 {
 #ifdef OBSOLETE
 
-  JZToolDef tdefs[] =
-  {
-    { wxID_OPEN, FALSE, open_xpm,    "open rhythm file" },
-    { wxID_SAVE, FALSE, save_xpm,    "save into rhythm file" },
-    { JZToolBar::eToolBarSeparator },
-    { ID_INSTRUMENT_ADD,      FALSE, rrgadd_xpm,  "add instrument" },
-    { ID_INSTRUMENT_DELETE,   FALSE, rrgdel_xpm,  "remove instrument" },
-    { ID_INSTRUMENT_UP,       FALSE, rrgup_xpm,   "move instrument up" },
-    { ID_INSTRUMENT_DOWN,     FALSE, rrgdown_xpm, "move instrument down" },
-    { ID_INSTRUMENT_GENERATE, FALSE, rrggen_xpm,  "generate events into trackwin selection" },
-    { JZToolBar::eToolBarSeparator },
-    { wxID_HELP_CONTENTS,     FALSE, help_xpm,    "help" },
-    { JZToolBar::eToolBarEnd }
-  };
-
-  mpToolBar = new JZToolBar(this, tdefs);
-
   mStepsPerCount = 0;
   mpCountsPerBarSlider = 0;
   mpBarCountSlider = 0;
   mpInstrumentListBox = 0;
-
-  wxMenuBar* pMenuBar = new wxMenuBar;
-  wxMenu* pMenu = new wxMenu;
-  pMenu->Append(wxID_OPEN, "&Load");
-  pMenu->Append(wxID_SAVE, "&Save");
-  pMenu->Append(wxID_CLOSE, "&Close");
-  pMenuBar->Append(pMenu, "&File");
-
-  pMenu = new wxMenu;
-  pMenu->Append(ID_INSTRUMENT_ADD, "&Add");
-  pMenu->Append(ID_INSTRUMENT_DELETE, "&Delete");
-  pMenu->Append(ID_INSTRUMENT_UP, "&Up");
-  pMenu->Append(ID_INSTRUMENT_DOWN, "&Down");
-  pMenu->Append(ID_INSTRUMENT_GENERATE, "&Generate");
-  pMenuBar->Append(pMenu, "&Instrument");
-
-  pMenu = new wxMenu;
-  pMenu->Append(wxID_HELP, "&Help");
-  pMenuBar->Append(pMenu,  "Help");
-
-  SetMenuBar(pMenuBar);
 
   int x = 0;
   int y = 0;
@@ -932,40 +894,6 @@ void JZRhythmWindow::OnMenuCommand(int id)
 //        DELETE_THIS();
         Destroy();
         break;
-
-    case wxID_OPEN:
-      {
-        wxString FileName = file_selector(
-          mDefaultFileName,
-          "Load Rhythm",
-          false,
-          mHasChanged,
-          "*.rhy");
-        if (!FileName.empty())
-        {
-          ifstream Is(FileName.mb_str());
-          Is >> *this;
-          OnPaint();
-        }
-      }
-      break;
-
-    case wxID_SAVE:
-      {
-        Win2Instrument();
-        wxString FileName = file_selector(
-          mDefaultFileName,
-          "Save Rhythm",
-          true,
-          mHasChanged,
-          "*.rhy");
-        if (!FileName.empty())
-        {
-          ofstream Os(FileName.mb_str());
-          Os << *this;
-        }
-      }
-      break;
 
     case ID_INSTRUMENT_ADD:
       AddInstrumentDlg();
@@ -1452,49 +1380,6 @@ void JZRhythmWindow::OnPaint()
   mpLengthEdit->Refresh();
   mpVelocityEdit->Refresh();
   mpRhythmEdit->Refresh();
-}
-
-//*****************************************************************************
-//*****************************************************************************
-ostream & operator << (ostream& Os, const JZRhythmWindow& RhythmWindow)
-{
-  int i;
-  Os << 2 << endl;
-  Os << RhythmWindow.mInstrumentCount << endl;
-  for (i = 0; i < RhythmWindow.mInstrumentCount; ++i)
-  {
-    RhythmWindow.mpInstruments[i]->Write(Os);
-  }
-  return Os;
-}
-
-//*****************************************************************************
-//*****************************************************************************
-istream & operator >> (istream& Is, JZRhythmWindow& RhythmWindow)
-{
-  int Version;
-  Is >> Version;
-  if (Version > 2)
-  {
-    wxMessageBox("Wrong file format!", "Error", wxOK);
-    return Is;
-  }
-
-  int InstrumentCount = RhythmWindow.mInstrumentCount;
-  for (int i = 0; i < InstrumentCount; i++)
-  {
-    RhythmWindow.mActiveInstrumentIndex = 0;
-    RhythmWindow.DelInstrument();
-  }
-
-  Is >> InstrumentCount;
-  for (int i = 0; i < InstrumentCount; i++)
-  {
-    JZRhythm* pRhythm = new JZRhythm(0);
-    pRhythm->Read(Is, Version);
-    RhythmWindow.AddInstrument(pRhythm);
-  }
-  return Is;
 }
 
 //*****************************************************************************

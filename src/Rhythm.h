@@ -219,9 +219,6 @@ class JZRhythmWindow : public wxFrame
 
   private:
 
-    friend std::ostream& operator << (std::ostream& Os, const JZRhythmWindow& a);
-    friend std::istream& operator >> (std::istream& Is, JZRhythmWindow& a);
-
     // callbacks
 #ifdef OBSOLETE
     static void ItemCallback(wxItem& item, wxCommandEvent& event);

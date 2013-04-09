@@ -253,7 +253,7 @@ void JZKnob::OnSize(wxSizeEvent& Event)
 
 //-----------------------------------------------------------------------------
 // Description:
-//   This code always erasew when painting so we override this function to
+//   This code always erases when painting so we override this function to
 // avoid flicker.
 //-----------------------------------------------------------------------------
 void JZKnob::OnEraseBackground(wxEraseEvent& Event)

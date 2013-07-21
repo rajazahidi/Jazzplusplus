@@ -162,7 +162,7 @@ class JZRhythm
       JZRhythm* rhy[],
       int RhythmCount);
 
-    void JZRhythm::GenGroup(
+    void GenGroup(
       JZRndArray& out,
       int grp,
       const JZBarInfo& BarInfo,

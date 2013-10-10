@@ -292,14 +292,17 @@ JZProject::JZProject()
   //------------------
   // Macintosh Drivers
   //------------------
-  mpMidiPlayer = new JZPortMidiPlayer(this);
-  mpMidiPlayer.DeviceSelectionDialog();
+  JZPortMidiPlayer* pPortMidiPlayer = new JZPortMidiPlayer(this);
+  pPortMidiPlayer->DeviceSelectionDialog();
 
-  if (!mpMidiPlayer->IsInstalled())
+  if (!pPortMidiPlayer->IsInstalled())
   {
-    delete mpMidiPlayer;
-    mpMidiPlayer = 0;
+    delete pPortMidiPlayer;
     cout << "Jazz++ will start with no play/record ability." << endl;
+  }
+  else
+  {
+    mpMidiPlayer = pPortMidiPlayer;
   }
 #endif // __WXMAC__
 

@@ -190,8 +190,8 @@ fi
 JAZZ_PATH=\${top_srcdir}
 AC_SUBST(JAZZ_PATH)
 
-PORTMIDI_PATH=$JAZZ_PATH/portmidi
-AC_SUBST(PORTMIDI_PATH)
+dnl PORTMIDI_PATH=$JAZZ_PATH/portmidi
+dnl AC_SUBST(PORTMIDI_PATH)
 
 TLDEBUG=
 if test x$ac_arg_debug = xyes ; then

@@ -8,7 +8,7 @@ SUBDIRS = src conf
 # Things to fix:
 #   The docs are missing because they are so large.
 #   Subversion directories are included.
-EXTRA_DIST = bootstrap wxwin2_port.txt song scripts midinetd mswin contrib bitmaps rebuild
+EXTRA_DIST = bootstrap song scripts midinetd mswin contrib bitmaps rebuild
 
 really-clean: maintainer-clean
 	cd bitmaps; make clean

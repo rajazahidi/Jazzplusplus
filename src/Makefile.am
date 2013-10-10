@@ -148,8 +148,7 @@ Dialogs/TrackDialog.cpp \
 Dialogs/TransposeDialog.cpp \
 Dialogs/VelocityDialog.cpp \
 Dialogs.cpp \
-DrumEnums.h \
-DrumUtilities.h \
+DrumUtilities.cpp \
 ErrorMessage.cpp \
 Events.cpp \
 EventFrame.cpp \
@@ -255,6 +254,8 @@ Dialogs/TrackDialog.h \
 Dialogs/TransposeDialog.h \
 Dialogs/VelocityDialog.h \
 Dialogs.h \
+DrumEnums.h \
+DrumUtilities.h \
 DynamicArray.h \
 ErrorMessage.h \
 Events.h \
@@ -322,7 +323,8 @@ TrackWindow.h
 
 if !USE_ALSA
 jazz_LDFLAGS = -framework CoreMIDI -framework CoreAudio
-jazz_LDADD = -L@PORTMIDI_PATH@/porttime -lporttime -L@PORTMIDI_PATH@/pm_mac -lportmidi
+#jazz_LDADD = -L@PORTMIDI_PATH@/porttime -lporttime -L@PORTMIDI_PATH@/pm_mac -lportmidi
+jazz_LDADD = -lportmidi
 endif
 
 # This directive defines the Jazz++ data directory.  This may be a hack, but

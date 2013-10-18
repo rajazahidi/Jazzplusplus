@@ -244,6 +244,7 @@ Makefile src/Makefile \
 src/HelpFiles/Makefile \
 src/HelpFiles/images/Makefile \
 conf/Makefile \
+Info.plist
 ])
 
 AC_OUTPUT

@@ -1,5 +1,3 @@
-## Process this file with automake to produce Makefile.in
-
 ACLOCAL_AMFLAGS=-I m4
 
 SUBDIRS = src conf
@@ -16,3 +14,17 @@ really-clean: maintainer-clean
 
 htmldocs:
 	doxygen jazz.doxy
+
+# New stuff
+Jazz++.app: Info.plist src/jazz
+	-mkdir Jazz++.app
+	-mkdir Jazz++.app/Contents
+	-mkdir Jazz++.app/Contents/MacOS
+	-mkdir Jazz++.app/Contents/Resources
+	-mkdir Jazz++.app/Contents/Resources/English.lproj
+	cp Info.plist Jazz++.app/Contents/
+	echo -n "Jazz++" > Jazz++.app/Contents/PkgInfo
+	cp src/jazz Jazz++.app/Contents/MacOS/Jazz++
+
+libs:
+	dylibbundler -od -b -x ./Jazz++.app/Contents/MacOS/Jazz++ -d ./Jazz++.app/Contents/libs/

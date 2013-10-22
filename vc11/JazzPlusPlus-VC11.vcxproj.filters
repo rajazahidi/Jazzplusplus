@@ -9,7 +9,6 @@
     <ClCompile Include="..\src\ControlEdit.cpp" />
     <ClCompile Include="..\src\Dialogs.cpp" />
     <ClCompile Include="..\src\DrumUtilities.cpp" />
-    <ClCompile Include="..\src\DynamicArray.cpp" />
     <ClCompile Include="..\src\ErrorMessage.cpp" />
     <ClCompile Include="..\src\EventFrame.cpp" />
     <ClCompile Include="..\src\Events.cpp" />

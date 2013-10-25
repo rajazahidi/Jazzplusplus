@@ -31,6 +31,8 @@
 #include <wx/button.h>
 #include <wx/sizer.h>
 
+#include <algorithm>
+
 static const long wbar = 2;
 static int bars_state = 2;  // from ArrayEdit
 

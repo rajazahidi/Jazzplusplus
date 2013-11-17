@@ -334,4 +334,9 @@
       <UniqueIdentifier>{7e14185d-521d-47ac-b425-dda76e9a5000}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\src\HelpFiles\jazz.tex">
+      <Filter>Help Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
 </Project>

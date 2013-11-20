@@ -533,13 +533,13 @@ echo $(EXT_PKGS)\wxWidgets-3.0.0-VC12\bin\tex2rtf jazz.tex jazz.html -html -twic
 $(EXT_PKGS)\wxWidgets-3.0.0-VC12\bin\tex2rtf jazz.tex jazz.html -html -twice
 </Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug VC12|Win32'">Building Jazz++ help</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug VC12|Win32'">$(InputDir)$(InputName).hhc;$(InputDir)$(InputName).hhp;$(InputDir)$(InputName).hhk;$(InputDir)$(InputName).ref;$(InputDir)$(InputName).con;$(InputDir)$(InputName).htx;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug VC12|Win32'">$(ProjectDir)..\src\HelpFiles\jazz.hhc;$(ProjectDir)..\src\HelpFiles\jazz.hhp;$(ProjectDir)..\src\HelpFiles\jazz.hhk;$(ProjectDir)..\src\HelpFiles\jazz.ref;$(ProjectDir)..\src\HelpFiles\jazz.con;$(ProjectDir)..\src\HelpFiles\jazz.htx;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release VC12|Win32'">Building Jazz++ help</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release VC12|Win32'">$(InputDir)$(InputName).hhc;$(InputDir)$(InputName).hhp;$(InputDir)$(InputName).hhk;$(InputDir)$(InputName).ref;$(InputDir)$(InputName).con;$(InputDir)$(InputName).htx;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release VC12|Win32'">$(ProjectDir)..\src\HelpFiles\jazz.hhc;$(ProjectDir)..\src\HelpFiles\jazz.hhp;$(ProjectDir)..\src\HelpFiles\jazz.hhk;$(ProjectDir)..\src\HelpFiles\jazz.ref;$(ProjectDir)..\src\HelpFiles\jazz.con;$(ProjectDir)..\src\HelpFiles\jazz.htx;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug VC12|x64'">Building Jazz++ help</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug VC12|x64'">$(InputDir)$(InputName).hhc;$(InputDir)$(InputName).hhp;$(InputDir)$(InputName).hhk;$(InputDir)$(InputName).ref;$(InputDir)$(InputName).con;$(InputDir)$(InputName).htx;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug VC12|x64'">$(ProjectDir)..\src\HelpFiles\jazz.hhc;$(ProjectDir)..\src\HelpFiles\jazz.hhp;$(ProjectDir)..\src\HelpFiles\jazz.hhk;$(ProjectDir)..\src\HelpFiles\jazz.ref;$(ProjectDir)..\src\HelpFiles\jazz.con;$(ProjectDir)..\src\HelpFiles\jazz.htx;%(Outputs)</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release VC12|x64'">Building Jazz++ help</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release VC12|x64'">$(InputDir)$(InputName).hhc;$(InputDir)$(InputName).hhp;$(InputDir)$(InputName).hhk;$(InputDir)$(InputName).ref;$(InputDir)$(InputName).con;$(InputDir)$(InputName).htx;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release VC12|x64'">$(ProjectDir)..\src\HelpFiles\jazz.hhc;$(ProjectDir)..\src\HelpFiles\jazz.hhp;$(ProjectDir)..\src\HelpFiles\jazz.hhk;$(ProjectDir)..\src\HelpFiles\jazz.ref;$(ProjectDir)..\src\HelpFiles\jazz.con;$(ProjectDir)..\src\HelpFiles\jazz.htx;%(Outputs)</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug VC12|Win32'">false</LinkObjects>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release VC12|Win32'">false</LinkObjects>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug VC12|x64'">false</LinkObjects>

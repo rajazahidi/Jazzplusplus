@@ -94,7 +94,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxWidgets-3.0.0-VC12\lib\vc_lib\mswud;$(EXT_PKGS)\wxWidgets-3.0.0-VC12\include;..\src;..\src\mswin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxWidgets-3.1.0-VC12\lib\vc_lib\mswud;$(EXT_PKGS)\wxWidgets-3.1.0-VC12\include;..\src;..\src\mswin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;WINVER=0x0400;STRICT;NOMINMAX;__WXDEBUG__;WXDEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -118,10 +118,10 @@
       <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.5-VC12\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>wxmsw30ud_xrc.lib;wxbase30ud_xml.lib;wxexpatd.lib;wxmsw30ud_core.lib;wxmsw30ud_adv.lib;wxmsw30ud_html.lib;wxbase30ud.lib;wxpngd.lib;wxzlibd.lib;wxjpegd.lib;wxtiffd.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;winmm.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxmsw31ud_xrc.lib;wxbase31ud_xml.lib;wxexpatd.lib;wxmsw31ud_core.lib;wxmsw31ud_adv.lib;wxmsw31ud_html.lib;wxbase31ud.lib;wxpngd.lib;wxzlibd.lib;wxjpegd.lib;wxtiffd.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;winmm.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\$(OutDir)JazzPlusPlus.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(EXT_PKGS)\wxWidgets-3.0.0-VC12\lib\vc_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(EXT_PKGS)\wxWidgets-3.1.0-VC12\lib\vc_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\$(OutDir)JazzPlusPlus.pdb</ProgramDatabaseFile>
@@ -144,7 +144,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxWidgets-3.0.0-VC12\lib\vc_x64_lib\mswud;$(EXT_PKGS)\wxWidgets-3.0.0-VC12\include;..\src;..\src\mswin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxWidgets-3.1.0-VC12\lib\vc_x64_lib\mswud;$(EXT_PKGS)\wxWidgets-3.1.0-VC12\include;..\src;..\src\mswin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;WINVER=0x0501;STRICT;NOMINMAX;__WXDEBUG__;WXDEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -168,10 +168,10 @@
       <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.5-VC12\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>wxmsw30ud_xrc.lib;wxbase30ud_xml.lib;wxexpatd.lib;wxmsw30ud_core.lib;wxmsw30ud_adv.lib;wxmsw30ud_html.lib;wxbase30ud.lib;wxpngd.lib;wxzlibd.lib;wxjpegd.lib;wxtiffd.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;winmm.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxmsw31ud_xrc.lib;wxbase31ud_xml.lib;wxexpatd.lib;wxmsw31ud_core.lib;wxmsw31ud_adv.lib;wxmsw31ud_html.lib;wxbase31ud.lib;wxpngd.lib;wxzlibd.lib;wxjpegd.lib;wxtiffd.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;winmm.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\$(OutDir)JazzPlusPlus.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(EXT_PKGS)\wxWidgets-3.0.0-VC12\lib\vc_x64_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(EXT_PKGS)\wxWidgets-3.1.0-VC12\lib\vc_x64_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\$(OutDir)JazzPlusPlus.pdb</ProgramDatabaseFile>
@@ -195,7 +195,7 @@
     <ClCompile>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxWidgets-3.0.0-VC12\lib\vc_lib\mswu;$(EXT_PKGS)\wxWidgets-3.0.0-VC12\include;..\src;..\src\mswin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxWidgets-3.1.0-VC12\lib\vc_lib\mswu;$(EXT_PKGS)\wxWidgets-3.1.0-VC12\include;..\src;..\src\mswin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;WINVER=0x0400;STRICT;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -220,10 +220,10 @@
       <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.5-VC12\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>wxmsw30u_xrc.lib;wxbase30u_xml.lib;wxexpat.lib;wxmsw30u_core.lib;wxmsw30u_adv.lib;wxmsw30u_html.lib;wxbase30u.lib;wxpng.lib;wxzlib.lib;wxjpeg.lib;wxtiff.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;winmm.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxmsw31u_xrc.lib;wxbase31u_xml.lib;wxexpat.lib;wxmsw31u_core.lib;wxmsw31u_adv.lib;wxmsw31u_html.lib;wxbase31u.lib;wxpng.lib;wxzlib.lib;wxjpeg.lib;wxtiff.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;winmm.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\$(OutDir)JazzPlusPlus.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(EXT_PKGS)\wxWidgets-3.0.0-VC12\lib\vc_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(EXT_PKGS)\wxWidgets-3.1.0-VC12\lib\vc_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ProgramDatabaseFile>.\$(OutDir)JazzPlusPlus.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -246,7 +246,7 @@
     <ClCompile>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxWidgets-3.0.0-VC12\lib\vc_x64_lib\mswu;$(EXT_PKGS)\wxWidgets-3.0.0-VC12\include;..\src;..\src\mswin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(EXT_PKGS)\wxWidgets-3.1.0-VC12\lib\vc_x64_lib\mswu;$(EXT_PKGS)\wxWidgets-3.1.0-VC12\include;..\src;..\src\mswin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;WINVER=0x0501;STRICT;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -272,10 +272,10 @@
       <AdditionalIncludeDirectories>$(EXT_PKGS)\wxMSW-2.9.5-VC12\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>wxmsw30u_xrc.lib;wxbase30u_xml.lib;wxexpat.lib;wxmsw30u_core.lib;wxmsw30u_adv.lib;wxmsw30u_html.lib;wxbase30u.lib;wxpng.lib;wxzlib.lib;wxjpeg.lib;wxtiff.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;winmm.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxmsw31u_xrc.lib;wxbase31u_xml.lib;wxexpat.lib;wxmsw31u_core.lib;wxmsw31u_adv.lib;wxmsw31u_html.lib;wxbase31u.lib;wxpng.lib;wxzlib.lib;wxjpeg.lib;wxtiff.lib;odbc32.lib;odbccp32.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;winmm.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\$(OutDir)JazzPlusPlus.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(EXT_PKGS)\wxWidgets-3.0.0-VC12\lib\vc_x64_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(EXT_PKGS)\wxWidgets-3.1.0-VC12\lib\vc_x64_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ProgramDatabaseFile>.\$(OutDir)JazzPlusPlus.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -514,23 +514,23 @@
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug VC12|Win32'">echo cd "$(ProjectDir)..\src\HelpFiles"
 cd "$(ProjectDir)..\src\HelpFiles"
-echo $(EXT_PKGS)\wxWidgets-3.0.0-VC12\bin\tex2rtf jazz.tex jazz.html -html -twice
-$(EXT_PKGS)\wxWidgets-3.0.0-VC12\bin\tex2rtf jazz.tex jazz.html -html -twice
+echo $(EXT_PKGS)\wxWidgets-3.1.0-VC12\bin\tex2rtf jazz.tex jazz.html -html -twice
+$(EXT_PKGS)\wxWidgets-3.1.0-VC12\bin\tex2rtf jazz.tex jazz.html -html -twice
 </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release VC12|Win32'">echo cd "$(ProjectDir)..\src\HelpFiles"
 cd "$(ProjectDir)..\src\HelpFiles"
-echo $(EXT_PKGS)\wxWidgets-3.0.0-VC12\bin\tex2rtf jazz.tex jazz.html -html -twice
-$(EXT_PKGS)\wxWidgets-3.0.0-VC12\bin\tex2rtf jazz.tex jazz.html -html -twice
+echo $(EXT_PKGS)\wxWidgets-3.1.0-VC12\bin\tex2rtf jazz.tex jazz.html -html -twice
+$(EXT_PKGS)\wxWidgets-3.1.0-VC12\bin\tex2rtf jazz.tex jazz.html -html -twice
 </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug VC12|x64'">echo cd "$(ProjectDir)..\src\HelpFiles"
 cd "$(ProjectDir)..\src\HelpFiles"
-echo $(EXT_PKGS)\wxWidgets-3.0.0-VC12\bin\tex2rtf jazz.tex jazz.html -html -twice
-$(EXT_PKGS)\wxWidgets-3.0.0-VC12\bin\tex2rtf jazz.tex jazz.html -html -twice
+echo $(EXT_PKGS)\wxWidgets-3.1.0-VC12\bin\tex2rtf jazz.tex jazz.html -html -twice
+$(EXT_PKGS)\wxWidgets-3.1.0-VC12\bin\tex2rtf jazz.tex jazz.html -html -twice
 </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release VC12|x64'">echo cd "$(ProjectDir)..\src\HelpFiles"
 cd "$(ProjectDir)..\src\HelpFiles"
-echo $(EXT_PKGS)\wxWidgets-3.0.0-VC12\bin\tex2rtf jazz.tex jazz.html -html -twice
-$(EXT_PKGS)\wxWidgets-3.0.0-VC12\bin\tex2rtf jazz.tex jazz.html -html -twice
+echo $(EXT_PKGS)\wxWidgets-3.1.0-VC12\bin\tex2rtf jazz.tex jazz.html -html -twice
+$(EXT_PKGS)\wxWidgets-3.1.0-VC12\bin\tex2rtf jazz.tex jazz.html -html -twice
 </Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug VC12|Win32'">Building Jazz++ help</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug VC12|Win32'">$(ProjectDir)..\src\HelpFiles\jazz.hhc;$(ProjectDir)..\src\HelpFiles\jazz.hhp;$(ProjectDir)..\src\HelpFiles\jazz.hhk;$(ProjectDir)..\src\HelpFiles\jazz.ref;$(ProjectDir)..\src\HelpFiles\jazz.con;$(ProjectDir)..\src\HelpFiles\jazz.htx;%(Outputs)</Outputs>

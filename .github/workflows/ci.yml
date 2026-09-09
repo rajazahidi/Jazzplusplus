@@ -157,13 +157,14 @@ jobs:
       - name: Package Windows Release
         shell: pwsh
         run: |
-          try {
+          & {
             $ErrorActionPreference = 'Stop'
 
-            Write-Host "=== 1. Creating dist folder ==="
+            Write-Host "=== Step 1: Create dist folder ==="
+            if (Test-Path "dist") { Remove-Item -Recurse -Force "dist" }
             New-Item -ItemType Directory -Force -Path "dist" | Out-Null
 
-            Write-Host "=== 2. Copying jazz.exe ==="
+            Write-Host "=== Step 2: Copy jazz.exe ==="
             if (Test-Path "build/Release/jazz.exe") {
                 Copy-Item -Path "build/Release/jazz.exe" -Destination "dist/jazz.exe" -Force
                 Write-Host "Copied build/Release/jazz.exe"
@@ -174,39 +175,40 @@ jobs:
                 throw "jazz.exe was not found in build directory!"
             }
 
-            Write-Host "=== 3. Copying conf and song resources ==="
-            Copy-Item -Path "conf" -Destination "dist" -Recurse -Force
-            Copy-Item -Path "song" -Destination "dist" -Recurse -Force
+            Write-Host "=== Step 3: Copy conf and song ==="
+            Copy-Item -Path "conf" -Destination "dist/conf" -Recurse -Force
+            Copy-Item -Path "song" -Destination "dist/song" -Recurse -Force
 
-            Write-Host "=== 4. Copying wxWidgets Release DLLs ==="
-            $dlls = Get-ChildItem -Path "C:\wxWidgets\lib\vc14x_x64_dll\*.dll" |
-              Where-Object { $_.Name -notlike "*ud_*" -and $_.Name -notlike "*ud.*" }
-            Write-Host "Found $($dlls.Count) runtime DLLs to copy."
-            $dlls | Copy-Item -Destination "dist" -Force
+            Write-Host "=== Step 4: Copy wxWidgets DLLs ==="
+            $dllCount = 0
+            Get-ChildItem -Path "C:\wxWidgets\lib\vc14x_x64_dll\*.dll" | ForEach-Object {
+                if ($_.Name -notlike "*ud_*" -and $_.Name -notlike "*ud.*") {
+                    Copy-Item -Path $_.FullName -Destination "dist/$($_.Name)" -Force
+                    $dllCount++
+                }
+            }
+            Write-Host "Copied $dllCount wxWidgets runtime DLLs."
 
-            Write-Host "=== 5. Copying documentation ==="
-            Copy-Item -Path "LICENSE" -Destination "dist" -Force
-            Copy-Item -Path "README.md" -Destination "dist" -Force
+            Write-Host "=== Step 5: Copy docs ==="
+            Copy-Item -Path "LICENSE" -Destination "dist/LICENSE" -Force
+            Copy-Item -Path "README.md" -Destination "dist/README.md" -Force
 
-            Write-Host "=== 6. Inspecting dist directory ==="
+            Write-Host "=== Step 6: Verify dist contents ==="
             Get-ChildItem -Path "dist" | Format-Table Name, Length
 
-            Write-Host "=== 7. Creating zip archive with 7z ==="
-            Push-Location "dist"
-            7z a -tzip "..\jazz-windows-x64.zip" *
-            Pop-Location
-
+            Write-Host "=== Step 7: Create zip archive ==="
+            if (Test-Path "jazz-windows-x64.zip") { Remove-Item -Force "jazz-windows-x64.zip" }
+            Compress-Archive -Path "dist\*" -DestinationPath "jazz-windows-x64.zip" -Force
+            
             if (-not (Test-Path "jazz-windows-x64.zip")) {
-                throw "Archive jazz-windows-x64.zip was not generated!"
+                Write-Host "Compress-Archive did not produce zip, trying 7z..."
+                7z a -tzip "jazz-windows-x64.zip" ".\dist\*"
             }
-            $zipSize = (Get-Item "jazz-windows-x64.zip").Length
-            Write-Host "Package complete! Archive size: $zipSize bytes."
-          } catch {
-            $err = "Packaging error: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
-            Write-Error $err
-            Set-Content -Path "pkg_error.txt" -Value $err
-            throw
-          }
+
+            $zipItem = Get-Item "jazz-windows-x64.zip"
+            Write-Host "SUCCESS: jazz-windows-x64.zip created ($($zipItem.Length) bytes)"
+          } 2>&1 | Tee-Object -FilePath "$env:GITHUB_WORKSPACE/pkg_output.txt"
+          if (-not (Test-Path "jazz-windows-x64.zip")) { exit 1 }
 
       - name: Post Failure Details to Commit
         if: failure()
@@ -215,14 +217,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $diag = "### Windows Build / Packaging Failure`n`n"
-          if (Test-Path pkg_error.txt) {
-              $diag += "#### Packaging Error`n````n"
-              $diag += (Get-Content pkg_error.txt | Out-String)
-              $diag += "````n"
-          }
-          if (Test-Path cmake_output.txt) {
-              $diag += "#### CMake Console Output (Tail 30)`n````n"
-              $diag += (Get-Content cmake_output.txt -Tail 30 | Out-String)
+          if (Test-Path "$env:GITHUB_WORKSPACE/pkg_output.txt") {
+              $diag += "#### Packaging Output`n````n"
+              $diag += (Get-Content "$env:GITHUB_WORKSPACE/pkg_output.txt" -Tail 60 | Out-String)
               $diag += "````n"
           }
           if (Test-Path build_output.txt) {

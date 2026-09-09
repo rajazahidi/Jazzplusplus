@@ -160,6 +160,16 @@ target_link_libraries(jazz PRIVATE
 
 include(GNUInstallDirs)
 install(TARGETS jazz RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(PROGRAMS scripts/jazz-launcher.sh RENAME jazz-launcher DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(FILES jazz.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+install(FILES resources/icons/jazz.svg DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
+install(FILES resources/icons/jazz.png DESTINATION ${CMAKE_INSTALL_DATADIR}/pixmaps)
+
+foreach(size 16 32 48 64 128 256)
+    install(FILES resources/icons/jazz-${size}.png
+            DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/${size}x${size}/apps
+            RENAME jazz.png)
+endforeach()
+
 install(DIRECTORY conf/ DESTINATION ${CMAKE_INSTALL_DATADIR}/jazz/conf)
 install(DIRECTORY song/ DESTINATION ${CMAKE_INSTALL_DATADIR}/jazz/song)

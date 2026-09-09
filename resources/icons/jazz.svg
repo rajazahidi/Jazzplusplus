@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E1B4B" />
+      <stop offset="50%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="50%" stop-color="#818CF8" />
+      <stop offset="100%" stop-color="#C084FC" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.5" />
+    </filter>
+  </defs>
+
+  <!-- Squircle Base -->
+  <rect x="16" y="16" width="224" height="224" rx="48" ry="48" fill="url(#bgGrad)" stroke="#334155" stroke-width="2" filter="url(#shadow)" />
+
+  <!-- Piano Keyboard Arc / Base at Bottom -->
+  <g transform="translate(36, 172)">
+    <!-- White Keys -->
+    <rect x="0" y="0" width="23" height="48" rx="4" fill="#F8FAFC" />
+    <rect x="26" y="0" width="23" height="48" rx="4" fill="#F8FAFC" />
+    <rect x="52" y="0" width="23" height="48" rx="4" fill="#F8FAFC" />
+    <rect x="78" y="0" width="23" height="48" rx="4" fill="#F8FAFC" />
+    <rect x="104" y="0" width="23" height="48" rx="4" fill="#F8FAFC" />
+    <rect x="130" y="0" width="23" height="48" rx="4" fill="#F8FAFC" />
+    <rect x="156" y="0" width="23" height="48" rx="4" fill="#F8FAFC" />
+    <!-- Black Keys -->
+    <rect x="16" y="0" width="14" height="30" rx="2" fill="#0F172A" />
+    <rect x="42" y="0" width="14" height="30" rx="2" fill="#0F172A" />
+    <rect x="94" y="0" width="14" height="30" rx="2" fill="#0F172A" />
+    <rect x="120" y="0" width="14" height="30" rx="2" fill="#0F172A" />
+    <rect x="146" y="0" width="14" height="30" rx="2" fill="#0F172A" />
+  </g>
+
+  <!-- Sequencer Grid Lines (Subtle) -->
+  <line x1="36" y1="70" x2="220" y2="70" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.6" />
+  <line x1="36" y1="100" x2="220" y2="100" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.6" />
+  <line x1="36" y1="130" x2="220" y2="130" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.6" />
+
+  <!-- Stylized Beamed Musical Notes (Jazz Motif) -->
+  <g transform="translate(56, 42)">
+    <!-- Note Stem 1 -->
+    <rect x="22" y="16" width="7" height="82" rx="3.5" fill="url(#glowGrad)" />
+    <!-- Note Stem 2 -->
+    <rect x="86" y="6" width="7" height="92" rx="3.5" fill="url(#glowGrad)" />
+    <!-- Cross Beam -->
+    <polygon points="22,16 93,6 93,24 22,34" fill="url(#glowGrad)" />
+    <!-- Secondary Beam -->
+    <polygon points="22,40 93,30 93,42 22,52" fill="url(#glowGrad)" opacity="0.9" />
+
+    <!-- Notehead 1 (Tilted Oval) -->
+    <ellipse cx="14" cy="98" rx="16" ry="12" transform="rotate(-25 14 98)" fill="url(#glowGrad)" />
+    <!-- Notehead 2 (Tilted Oval) -->
+    <ellipse cx="78" cy="88" rx="16" ry="12" transform="rotate(-25 78 88)" fill="url(#glowGrad)" />
+  </g>
+
+  <!-- "++" Accent Emblem (Golden) -->
+  <g transform="translate(170, 52)">
+    <!-- First + -->
+    <rect x="6" y="0" width="4" height="18" rx="2" fill="url(#goldGrad)" />
+    <rect x="-1" y="7" width="18" height="4" rx="2" fill="url(#goldGrad)" />
+    <!-- Second + -->
+    <rect x="24" y="8" width="4" height="18" rx="2" fill="url(#goldGrad)" />
+    <rect x="17" y="15" width="18" height="4" rx="2" fill="url(#goldGrad)" />
+  </g>
+</svg>

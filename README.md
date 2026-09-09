@@ -22,6 +22,30 @@ Originally created by Andreas Voss and Per Sigmond, with subsequent major develo
 
 ---
 
+## Quick Start: Download AppImage
+
+The easiest way to run Jazz++ on any modern Linux distribution (Ubuntu, Debian, Fedora, Arch, Zorin OS, Linux Mint, etc.) without installing compilers or development packages:
+
+1. Download **`Jazz++-x86_64.AppImage`** from the [GitHub Releases](https://github.com/rajazahidi/Jazzplusplus/releases) page or [GitHub Actions Artifacts](https://github.com/rajazahidi/Jazzplusplus/actions).
+2. Make it executable and run:
+   ```bash
+   chmod +x Jazz++-x86_64.AppImage
+   ./Jazz++-x86_64.AppImage
+   ```
+
+---
+
+## Smart Launcher & SoundFont Playback
+
+Jazz++ includes a smart launcher (`scripts/jazz-launcher.sh`) that automatically detects if an ALSA software synthesizer (such as FluidSynth or TiMidity) is already active. If none is running, it finds installed SoundFonts (e.g., `default-GM.sf2` or `FluidR3_GM.sf2`) and manages a lightweight background synthesizer so you can immediately hear MIDI playback without manual setup!
+
+To check your MIDI audio environment:
+```bash
+./scripts/jazz-launcher.sh --check
+```
+
+---
+
 ## System Requirements & Prerequisites
 
 On Debian, Ubuntu, Linux Mint, or Zorin OS:

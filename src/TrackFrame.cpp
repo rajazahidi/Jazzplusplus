@@ -62,6 +62,7 @@
 #include "Bitmaps/metro.xpm"
 #include "Bitmaps/playloop.xpm"
 #include "Bitmaps/record.xpm"
+#include "Bitmaps/jazz_icon.xpm"
 
 #include <wx/filedlg.h>
 #include <wx/menu.h>
@@ -178,6 +179,8 @@ JZTrackFrame::JZTrackFrame(
   mpTrackWindow->Create();
 
   SetEventWindow(mpTrackWindow);
+
+  SetIcon(wxIcon(jazz_icon_xpm));
 }
 
 //-----------------------------------------------------------------------------

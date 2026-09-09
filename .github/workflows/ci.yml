@@ -1,8 +1,9 @@
-name: CI Build
+name: CI & Packaging
 
 on:
   push:
     branches: [ "main" ]
+    tags: [ "v*" ]
   pull_request:
     branches: [ "main" ]
 
@@ -12,7 +13,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build (${{ matrix.os }})
+    name: Build Test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -45,9 +46,66 @@ jobs:
           ls -lh build/jazz
           ldd build/jazz
 
-      - name: Upload Compiled Binary
+      - name: Upload Binary Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: jazz-${{ matrix.os }}
+          name: jazz-bin-${{ matrix.os }}
           path: build/jazz
           if-no-files-found: error
+
+  appimage:
+    name: Package AppImage (Ubuntu 22.04)
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential libasound2-dev file wget
+          sudo apt-get install -y libwxgtk3.2-dev || sudo apt-get install -y libwxgtk3.0-gtk3-dev
+
+      - name: Build Project
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel $(nproc)
+
+      - name: Download AppImage Tool
+        run: |
+          wget -q https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
+          chmod +x appimagetool
+
+      - name: Build AppDir and AppImage
+        run: |
+          ./scripts/build-appimage.sh build
+          ./appimagetool --appimage-extract-and-run AppDir Jazz++-x86_64.AppImage
+
+      - name: Upload AppImage Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Jazz++-x86_64.AppImage
+          path: Jazz++-x86_64.AppImage
+          if-no-files-found: error
+
+  release:
+    name: GitHub Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build, appimage]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download AppImage
+        uses: actions/download-artifact@v4
+        with:
+          name: Jazz++-x86_64.AppImage
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Jazz++-x86_64.AppImage
+          generate_release_notes: true

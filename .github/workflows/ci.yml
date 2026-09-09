@@ -1,0 +1,53 @@
+name: CI Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-22.04]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential libasound2-dev
+          sudo apt-get install -y libwxgtk3.2-dev || sudo apt-get install -y libwxgtk3.0-gtk3-dev
+
+      - name: Configure CMake
+        run: |
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_VERBOSE_MAKEFILE=ON
+
+      - name: Build Jazz++
+        run: |
+          cmake --build build --parallel $(nproc)
+
+      - name: Verify Binary
+        run: |
+          file build/jazz
+          ls -lh build/jazz
+          ldd build/jazz
+
+      - name: Upload Compiled Binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: jazz-${{ matrix.os }}
+          path: build/jazz
+          if-no-files-found: error

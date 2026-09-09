@@ -1,5 +1,8 @@
 # Jazz++ MIDI & Audio Sequencer
 
+[![CI Build](https://github.com/rajazahidi/Jazzplusplus/actions/workflows/ci.yml/badge.svg)](https://github.com/rajazahidi/Jazzplusplus/actions/workflows/ci.yml)
+[![License: GPL-2.0](https://img.shields.io/badge/License-GPL_v2-blue.svg)](COPYING)
+
 **Jazz++** is a full-featured open-source MIDI sequencer and digital audio recording tool for Linux and Windows. Built using **wxWidgets**, it provides a rich visual environment for composing, editing, arranging, and recording multi-track MIDI music and digital audio.
 
 Originally created by Andreas Voss and Per Sigmond, with subsequent major development by Patrick Earl and Peter J. Stieber.

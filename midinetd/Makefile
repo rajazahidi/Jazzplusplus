@@ -5,7 +5,7 @@ OPT=-O2
 DEFINES=-DRPCGEN_NEW
 #
 # Non-linux users may want to alter this:
-CFLAGS=-m486 -Wall -DLINUX
+CFLAGS=-Wall -DLINUX
 #
 all : midinetd
 

@@ -155,7 +155,7 @@ void JZCMixCmd::tableset(float dur, int size, float *tab)
 
 float JZCMixCmd::tablei(long nsample, float *array, float *tab)
 {
-        register int loc1,loc2;
+        int loc1,loc2;
         float frac = ((float)(nsample)/(*tab)) * *(tab+1);
         if (frac < 0)
         {

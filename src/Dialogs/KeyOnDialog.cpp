@@ -223,14 +223,14 @@ bool JZKeyOnDialog::TransferDataToWindow()
 bool JZKeyOnDialog::TransferDataFromWindow()
 {
   wxString KeyString = mpPitchEdit->GetValue();
-  mpEvent->SetKey(StringToKey(KeyString));
+  mpEvent->SetKey(StringToKey(KeyString.ToStdString()));
 
   mpEvent->SetVelocity(mpVelocityKnob->GetValue());
 
   mpEvent->SetOffVelocity(mpOffVelocityKnob->GetValue());
 
   wxString LengthString = mpLengthEdit->GetValue();
-  istringstream Iss(LengthString);
+  istringstream Iss(LengthString.ToStdString());
   unsigned short Length;
   Iss >> Length;
   mpEvent->SetLength(Length);
@@ -238,7 +238,7 @@ bool JZKeyOnDialog::TransferDataFromWindow()
   mpEvent->SetChannel(mpChannelKnob->GetValue() - 1);
 
   wxString ClockString = mpClockEdit->GetValue();
-  int Clock = gpProject->StringToClock(ClockString);
+  int Clock = gpProject->StringToClock(ClockString.ToStdString());
   mpEvent->SetClock(Clock);
 
   return true;

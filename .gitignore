@@ -1,0 +1,60 @@
+# Build directories
+build/
+build-*/
+bin/
+obj/
+.objs/
+.svn/
+*.dirstamp
+
+# Executables
+jazz
+src/jazz
+
+# Object & Library files
+*.o
+*.a
+*.la
+*.lo
+*.lai
+*.so
+.libs/
+*/.libs/
+.deps/
+*/.deps/
+
+# Autotools generated files
+Makefile
+Makefile.in
+src/Makefile
+src/Makefile.in
+src/HelpFiles/Makefile
+src/HelpFiles/Makefile.in
+src/HelpFiles/images/Makefile
+src/HelpFiles/images/Makefile.in
+conf/Makefile
+conf/Makefile.in
+config.log
+config.status
+config.cache
+configure
+aclocal.m4
+autom4te.cache/
+config/
+libtool
+src/config.h
+src/config.h.in
+src/stamp-h*
+stamp-h*
+Info.plist
+m4/libtool.m4
+m4/lt*.m4
+
+# IDE & Editor files
+*.user
+*.suo
+*.ipch
+.vscode/
+.idea/
+*~
+*.swp

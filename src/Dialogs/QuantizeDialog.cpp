@@ -184,7 +184,7 @@ bool JZQuantizeDialog::TransferDataToWindow()
 //-----------------------------------------------------------------------------
 bool JZQuantizeDialog::TransferDataFromWindow()
 {
-  string SelectedValue = mpStepSizeComboBox->GetValue();
+  string SelectedValue = mpStepSizeComboBox->GetValue().ToStdString();
   for (
     map<int, string>::const_iterator iPair = gQuantizationSteps.begin();
     iPair != gQuantizationSteps.end();

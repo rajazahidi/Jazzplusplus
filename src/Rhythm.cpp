@@ -1017,7 +1017,7 @@ void JZRhythmWindow::AddInstrumentDlg()
       pRhythm->mKeyCount  = 1;
       pRhythm->mKeys[0] = Keys[i];
       pRhythm->mMode = MODE_ALL_OF;
-      pRhythm->SetLabel(InstrumentNames[i]);
+      pRhythm->SetLabel(InstrumentNames[i].ToStdString());
     }
 
     // choose controller?
@@ -1475,7 +1475,7 @@ JZRhythmGeneratorWindow::JZRhythmGeneratorWindow(
     wxSize(Width / 3, -1),
     wxSL_LABELS);
 
-  wxStaticText* pStaticText = new wxStaticText(
+  new wxStaticText(
     pInstrumentPanel,
     wxID_ANY,
     "Instrument",
@@ -1631,7 +1631,7 @@ void JZRhythmGeneratorWindow::AddInstrument()
       pRhythm->mKeyCount  = 1;
       pRhythm->mKeys[0] = Keys[i];
       pRhythm->mMode = MODE_ALL_OF;
-      pRhythm->SetLabel(InstrumentNames[i]);
+      pRhythm->SetLabel(InstrumentNames[i].ToStdString());
     }
 
     // Was a controller chosen?
@@ -1822,7 +1822,7 @@ void JZRhythmGeneratorWindow::Instrument2Win()
 {
   if (
     mActiveInstrumentIndex < 0 ||
-    mActiveInstrumentIndex >= mInstruments.size())
+    (size_t)mActiveInstrumentIndex >= mInstruments.size())
   {
     return;
   }
@@ -1864,7 +1864,7 @@ void JZRhythmGeneratorWindow::Win2Instrument()
 {
   if (
     mActiveInstrumentIndex < 0 ||
-    mActiveInstrumentIndex >= mInstruments.size())
+    (size_t)mActiveInstrumentIndex >= mInstruments.size())
   {
     return;
   }

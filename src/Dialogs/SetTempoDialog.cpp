@@ -127,7 +127,7 @@ bool JZSetTempoDialog::TransferDataFromWindow()
     mpSetTempoEvent->SetBPM(BeatsPerMinute);
 
     wxString ClockString = mpClockEdit->GetValue();
-    int Clock = gpProject->StringToClock(ClockString);
+    int Clock = gpProject->StringToClock(ClockString.ToStdString());
     mpSetTempoEvent->SetClock(Clock);
 
     return true;

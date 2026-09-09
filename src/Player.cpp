@@ -1156,6 +1156,7 @@ void JZMpuPlayer::OutNow(JZEvent* pEvent)
           write_noack_mpu(sysex, n);
           delete[] sysex;
         }
+        break;
       case StatSongPtr:
         {
           n = 0;
@@ -1219,6 +1220,7 @@ void JZMpuPlayer::FlushOutOfBand(int Clock)
            write_noack_mpu(sysex, n);
            delete[] sysex;
         }
+        break;
       default:
         break;
     }

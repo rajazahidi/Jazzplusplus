@@ -290,9 +290,10 @@ class JZSample
     void GotoRAM()
     {
       // Try to swap this sample into memory.
-      volatile short dummy;
+      volatile short dummy = 0;
       for (int i = 0; i < length; i++)
         dummy = mpData[i];
+      (void)dummy;
     }
 
     short *GetData()

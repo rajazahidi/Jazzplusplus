@@ -207,7 +207,7 @@ void JZSamplesDialog::OnSelectSampleFile(wxCommandEvent& Event)
     if (FileOpenDialog.ShowModal() == wxID_OK)
     {
       wxFileName FileName = FileOpenDialog.GetPath();
-      mSampleSet[Selection].SetFileName(FileName.GetFullPath());
+      mSampleSet[Selection].SetFileName(FileName.GetFullPath().ToStdString());
       mSampleSet[Selection].LoadWav();
       mpFileNameEdit->ChangeValue(FileName.GetFullPath());
       mpLabelEdit->ChangeValue(FileName.GetName());

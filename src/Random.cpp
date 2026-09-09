@@ -105,9 +105,9 @@ double JZRndArray::operator[](double f)
   {
     i = 0;
   }
-  else if (i >= mArray.size() - 2)
+  else if (i >= (int)mArray.size() - 2)
   {
-    i = mArray.size() - 2;
+    i = (int)mArray.size() - 2;
   }
   JZMapper Map(i, i + 1, mArray[i], mArray[i + 1]);
   return Map.XToY(f);
@@ -161,7 +161,7 @@ int JZRndArray::Random(double RandonValue)
   }
   i--;
 
-  assert(i >= 0 && i < mArray.size());
+  assert(i >= 0 && (size_t)i < mArray.size());
   return i;
 }
 

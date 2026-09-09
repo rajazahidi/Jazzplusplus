@@ -2866,7 +2866,7 @@ void JZPianoWindow::Redo()
 {
   mpProject->Redo();
   Refresh();
-  if (mpCtrlEdit && mpTrack >= 0)
+  if (mpCtrlEdit && mpTrack != 0)
   {
     mpCtrlEdit->ReInit(mpTrack, mFromClock, mClockTicsPerPixel);
   }
@@ -2880,7 +2880,7 @@ void JZPianoWindow::Undo()
 {
   mpProject->Undo();
   Refresh();
-  if (mpCtrlEdit && mpTrack >= 0)
+  if (mpCtrlEdit && mpTrack != 0)
   {
     mpCtrlEdit->ReInit(mpTrack, mFromClock, mClockTicsPerPixel);
   }

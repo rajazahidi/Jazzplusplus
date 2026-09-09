@@ -104,7 +104,7 @@ bool JZEndOfTrackDialog::TransferDataToWindow()
 bool JZEndOfTrackDialog::TransferDataFromWindow()
 {
   wxString ClockString = mpClockEdit->GetValue();
-  int Clock = gpProject->StringToClock(ClockString);
+  int Clock = gpProject->StringToClock(ClockString.ToStdString());
   mpEndOfTrackEvent->SetClock(Clock);
 
   return true;

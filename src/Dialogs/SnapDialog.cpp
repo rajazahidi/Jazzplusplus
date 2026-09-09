@@ -110,7 +110,7 @@ bool JZSnapDialog::TransferDataToWindow()
 //-----------------------------------------------------------------------------
 bool JZSnapDialog::TransferDataFromWindow()
 {
-  string SelectedValue = mpSnapValueChoice->GetStringSelection();
+  string SelectedValue = mpSnapValueChoice->GetStringSelection().ToStdString();
   for (
     map<int, string>::const_iterator iLimitSteps = gLimitSteps.begin();
     iLimitSteps != gLimitSteps.end();

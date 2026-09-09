@@ -195,7 +195,7 @@ bool JZSysexDialog::TransferDataFromWindow()
 //  mpSysExEvent->SetData(???);
 
   wxString ClockString = mpClockEdit->GetValue();
-  int Clock = gpProject->StringToClock(ClockString);
+  int Clock = gpProject->StringToClock(ClockString.ToStdString());
   mpSysExEvent->SetClock(Clock);
 
   return true;

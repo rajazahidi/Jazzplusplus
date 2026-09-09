@@ -81,8 +81,11 @@ class JZAlsaAudioListener : public wxTimer
 
       mpPlayer->OpenDsp(JZAlsaAudioPlayer::PLAYBACK, 0);
 
-      mpPlayer->mSamples.ResetBufferSize(
-        mpPlayer->frag_byte_size[JZAlsaAudioPlayer::PLAYBACK]);
+      if (mpPlayer->pcm[JZAlsaAudioPlayer::PLAYBACK])
+      {
+        mpPlayer->mSamples.ResetBufferSize(
+          mpPlayer->frag_byte_size[JZAlsaAudioPlayer::PLAYBACK]);
+      }
 
       mCount = 8 + mpPlayer->mSamples.PrepareListen(&spl, fr_smpl, to_smpl);
 
@@ -198,7 +201,10 @@ void JZAlsaAudioPlayer::StartPlay(int clock, int loopClock, int cont)
   if (mpRecordingInfo && mpRecordingInfo->mpTrack->GetAudioMode())
   {
     OpenDsp(CAPTURE, 1);
-    recbuffers.ResetBufferSize(frag_byte_size[CAPTURE]);
+    if (pcm[CAPTURE])
+    {
+      recbuffers.ResetBufferSize(frag_byte_size[CAPTURE]);
+    }
   }
 
   if (
@@ -207,8 +213,11 @@ void JZAlsaAudioPlayer::StartPlay(int clock, int loopClock, int cont)
     running_mode == 0)
   {
     OpenDsp(PLAYBACK, 1);
-    mSamples.ResetBufferSize(frag_byte_size[PLAYBACK]);
-    mSamples.FillBuffers(mOutClock);
+    if (pcm[PLAYBACK])
+    {
+      mSamples.ResetBufferSize(frag_byte_size[PLAYBACK]);
+      mSamples.FillBuffers(mOutClock);
+    }
   }
 
   if (running_mode == 0)
@@ -246,7 +255,7 @@ void JZAlsaAudioPlayer::OpenDsp(int mode, int sync_mode)
     return;
   }
 
-  unsigned int channels;
+  unsigned int channels, rate;
   snd_pcm_format_t format;
   snd_pcm_uframes_t buffer_size, period_size;
 
@@ -293,14 +302,16 @@ void JZAlsaAudioPlayer::OpenDsp(int mode, int sync_mode)
     perror("cannot set audio format");
     goto __error;
   }
-  if (snd_pcm_hw_params_set_channels(pcm[mode], hw, channels) < 0)
+  if (snd_pcm_hw_params_set_channels_near(pcm[mode], hw, &channels) < 0)
   {
     perror("cannot set audio channels");
     goto __error;
   }
-  if (
-    snd_pcm_hw_params_set_rate(pcm[mode], hw, mSamples.GetSamplingRate(), 0) <
-    0)
+  mSamples.SetChannelCount(channels);
+  frame_shift[mode] = (mSamples.GetBitsPerSample() > 8 ? 1 : 0) + (channels > 1 ? 1 : 0);
+
+  rate = mSamples.GetSamplingRate();
+  if (snd_pcm_hw_params_set_rate_near(pcm[mode], hw, &rate, 0) < 0)
   {
     cerr  << "cannot set audio rate: " << mSamples.GetSamplingRate() << endl;
     goto __error;
@@ -363,45 +374,42 @@ __error:
 
 void JZAlsaAudioPlayer::CloseDsp(bool Reset)
 {
-  if (pcm)
+  if (Reset)
   {
-    if (Reset)
-    {
-      if (pcm[PLAYBACK])
-      {
-        if (snd_pcm_drop(pcm[PLAYBACK]) < 0)
-        {
-          perror("playback drop");
-        }
-      }
-    }
-    else
-    {
-      if (pcm[PLAYBACK])
-      {
-        if (snd_pcm_drain(pcm[PLAYBACK]) < 0)
-        {
-          perror("playback drain");
-        }
-      }
-      if (pcm[CAPTURE])
-      {
-        if (snd_pcm_drain(pcm[CAPTURE]) < 0)
-        {
-          perror("capture drain");
-        }
-      }
-    }
     if (pcm[PLAYBACK])
     {
-      snd_pcm_close(pcm[PLAYBACK]);
-      pcm[PLAYBACK] = NULL;
+      if (snd_pcm_drop(pcm[PLAYBACK]) < 0)
+      {
+        perror("playback drop");
+      }
+    }
+  }
+  else
+  {
+    if (pcm[PLAYBACK])
+    {
+      if (snd_pcm_drain(pcm[PLAYBACK]) < 0)
+      {
+        perror("playback drain");
+      }
     }
     if (pcm[CAPTURE])
     {
-      snd_pcm_close(pcm[CAPTURE]);
-      pcm[CAPTURE] = NULL;
+      if (snd_pcm_drain(pcm[CAPTURE]) < 0)
+      {
+        perror("capture drain");
+      }
     }
+  }
+  if (pcm[PLAYBACK])
+  {
+    snd_pcm_close(pcm[PLAYBACK]);
+    pcm[PLAYBACK] = NULL;
+  }
+  if (pcm[CAPTURE])
+  {
+    snd_pcm_close(pcm[CAPTURE]);
+    pcm[CAPTURE] = NULL;
   }
 }
 

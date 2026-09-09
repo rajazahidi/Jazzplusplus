@@ -3,7 +3,7 @@ SUBDIRS = images
 SUFFIXES= .o .tex
 
 .tex.o:
-	export TEXINPUTS=.; tex2rtf $< $*.html -html -twice
+	-if which tex2rtf > /dev/null 2>&1; then export TEXINPUTS=.; tex2rtf $< $*.html -html -twice; fi
 	touch $@
 
 noinst_LIBRARIES = libphony.a

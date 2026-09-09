@@ -519,8 +519,8 @@ void JZProject::OpenSong(const wxString& SongFileName)
 {
   JZStandardRead Io;
   Clear();
-  Read(Io, SongFileName);
-  mpConfig->Put(C_StartUpSong, SongFileName);
+  Read(Io, SongFileName.ToStdString());
+  mpConfig->Put(C_StartUpSong, SongFileName.ToStdString());
 }
 
 //-----------------------------------------------------------------------------
@@ -535,7 +535,7 @@ void JZProject::OpenAndReadAsciiMidiFile(const wxString& AsciiMidiFileName)
 {
   JZAsciiRead AsciiRead;
   Clear();
-  Read(AsciiRead, AsciiMidiFileName);
+  Read(AsciiRead, AsciiMidiFileName.ToStdString());
 //  mpConfig->Put(C_StartUpSong, SongFileName);
 }
 
@@ -551,8 +551,8 @@ void JZProject::OpenAndReadAsciiMidiFile(const wxString& AsciiMidiFileName)
 void JZProject::ExportMidiFile(const wxString& MidiFileName)
 {
   JZStandardWrite Io;
-  Write(Io, MidiFileName);
-  mpConfig->Put(C_StartUpSong, MidiFileName);
+  Write(Io, MidiFileName.ToStdString());
+  mpConfig->Put(C_StartUpSong, MidiFileName.ToStdString());
 }
 
 //-----------------------------------------------------------------------------
@@ -560,7 +560,7 @@ void JZProject::ExportMidiFile(const wxString& MidiFileName)
 void JZProject::ExportAsciiMidiFile(const wxString& AsciiMidiFileName)
 {
   JZAsciiWrite AsciiWrite;
-  Write(AsciiWrite, AsciiMidiFileName);
+  Write(AsciiWrite, AsciiMidiFileName.ToStdString());
 }
 
 //-----------------------------------------------------------------------------

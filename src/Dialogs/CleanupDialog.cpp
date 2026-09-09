@@ -129,7 +129,7 @@ bool JZCleanupDialog::TransferDataToWindow()
 //-----------------------------------------------------------------------------
 bool JZCleanupDialog::TransferDataFromWindow()
 {
-  string SelectedValue = mpShortestNoteChoice->GetStringSelection();
+  string SelectedValue = mpShortestNoteChoice->GetStringSelection().ToStdString();
   for (
     map<int, string>::const_iterator iLimitSteps = gLimitSteps.begin();
     iLimitSteps != gLimitSteps.end();

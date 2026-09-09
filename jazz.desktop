@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Jazz++
+GenericName=MIDI & Audio Sequencer
+Comment=Full-featured MIDI sequencer and digital audio recording tool
+Exec=jazz %f
+Icon=audio-midi
+Terminal=false
+Categories=AudioVideo;Audio;Midi;Sequencer;AudioVideoEditing;
+MimeType=audio/midi;audio/x-midi;
+Keywords=midi;audio;sequencer;music;synthesizer;alsa;

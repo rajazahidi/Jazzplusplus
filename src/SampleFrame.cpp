@@ -731,7 +731,7 @@ void JZSampleFrame::OnMenuCommand(int id)
         {
           wxBeginBusyCursor();
           cnvs->ClearSelection();
-          spl.SetFileName(FileName);
+          spl.SetFileName(FileName.ToStdString());
           if (spl.Load(true))
           {
             LoadError(spl);
@@ -754,7 +754,7 @@ void JZSampleFrame::OnMenuCommand(int id)
           "*.wav");
         if (!FileName.empty())
         {
-          spl.SetFileName(FileName);
+          spl.SetFileName(FileName.ToStdString());
           OnMenuCommand(wxID_SAVE);
           spl->RefreshDialogs();
           SetTitle(FileName);

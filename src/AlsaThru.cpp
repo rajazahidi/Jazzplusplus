@@ -73,8 +73,11 @@ void JZAlsaThru::connect(snd_seq_addr_t &src, snd_seq_addr_t &dest)
   snd_seq_port_subscribe_alloca(&subs);
   snd_seq_port_subscribe_set_sender(subs, &src);
   snd_seq_port_subscribe_set_dest(subs, &dest);
-  if (snd_seq_subscribe_port(handle, subs) < 0)
-    perror("subscribe");
+  int err = snd_seq_subscribe_port(handle, subs);
+  if (err < 0 && err != -EBUSY)
+  {
+    fprintf(stderr, "MidiThru subscribe: %s\n", snd_strerror(err));
+  }
 }
 
 void JZAlsaThru::disconnect(snd_seq_addr_t &src, snd_seq_addr_t &dest)
@@ -83,9 +86,10 @@ void JZAlsaThru::disconnect(snd_seq_addr_t &src, snd_seq_addr_t &dest)
   snd_seq_port_subscribe_alloca(&subs);
   snd_seq_port_subscribe_set_sender(subs, &src);
   snd_seq_port_subscribe_set_dest(subs, &dest);
-  if (snd_seq_unsubscribe_port(handle, subs) < 0)
+  int err = snd_seq_unsubscribe_port(handle, subs);
+  if (err < 0 && err != -ENOENT)
   {
-    perror("unsubscribe");
+    fprintf(stderr, "MidiThru unsubscribe: %s\n", snd_strerror(err));
   }
 }
 

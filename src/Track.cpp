@@ -194,7 +194,7 @@ JZMtcOffsetEvent* JZMtcTime::ToOffset()
   mess[3] = (unsigned char) fm;
   mess[4] = 0x00;
   JZMtcOffsetEvent* s = new JZMtcOffsetEvent(0, mess, 5);
-  delete mess;
+  delete [] mess;
   return s;
 }
 

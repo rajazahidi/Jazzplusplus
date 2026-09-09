@@ -325,7 +325,7 @@ int JZSampleSet::Load(const wxString& FileName)
       continue;
     }
     assert(0 <= key && key < eSampleCount);
-    mSamples[key]->SetFileName(SampleFileName.GetFullPath());
+    mSamples[key]->SetFileName(SampleFileName.GetFullPath().ToStdString());
     mSamples[key]->SetLabel(Label.c_str());
     mSamples[key]->SetVolume(vol);
     mSamples[key]->SetPan(pan);
@@ -947,7 +947,7 @@ void JZSampleSet::SaveRecordingDlg(
     {
       wxBeginBusyCursor();
       SaveWave(FileName, frc, toc, buf);
-      AddNote(FileName, frc, toc);
+      AddNote(FileName.ToStdString(), frc, toc);
       wxEndBusyCursor();
     }
   }
@@ -990,7 +990,7 @@ void JZSampleSet::AddNote(const string& FileName, long frc, long toc)
   int key = i;
   spl->Clear();   // reset everything to defaults
   spl->SetFileName(FileName);
-  spl->SetLabel(wxFileNameFromPath(FileName));
+  spl->SetLabel(wxFileNameFromPath(FileName).ToStdString());
   spl->Load();   // reload data
 
   // delete selection

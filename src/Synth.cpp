@@ -524,9 +524,9 @@ int JZSynthesizerSysex::GetId(const JZSysExEvent* pSysEx) const
       // GS DT1?
       if (pData[2] == 0x42 && pData[3] == 0x12)
       {
-        register unsigned char a1 = pData[4];
-        register unsigned char a2 = pData[5];
-        register unsigned char a3 = pData[6];
+        unsigned char a1 = pData[4];
+        unsigned char a2 = pData[5];
+        unsigned char a3 = pData[6];
 
         if (a1 == 0x40)
         {
@@ -640,9 +640,9 @@ int JZSynthesizerSysex::GetId(const JZSysExEvent* pSysEx) const
       // XG Native?
       if (((pData[1] & 0xf0) == 0x10) && pData[2] == 0x4c)
       {
-        register unsigned char a1 = pData[3];
-        register unsigned char a2 = pData[4];
-        register unsigned char a3 = pData[5];
+        unsigned char a1 = pData[3];
+        unsigned char a2 = pData[4];
+        unsigned char a3 = pData[5];
 
         // Multipart?
         if (a1 == 0x08)
@@ -921,7 +921,7 @@ JZSysExEvent* JZSynthesizerSysex::operator()(
       pSysEx = new JZSysExEvent(clk, sx, len);
    }
 
-   delete sx;
+   delete [] sx;
    return pSysEx;
 }
 

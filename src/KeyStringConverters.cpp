@@ -30,6 +30,12 @@ using namespace std;
 //*****************************************************************************
 void KeyToString(int Key, string& String)
 {
+  if (Key < 0 || Key > 127)
+  {
+    String.clear();
+    return;
+  }
+
   static string Names[] =
   {
     "C",

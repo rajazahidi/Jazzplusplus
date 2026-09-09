@@ -32,6 +32,7 @@
 #include "HarmonyBrowserAnalyzer.h"
 #include "HarmonyP.h"
 #include "Help.h"
+#include "KeyStringConverters.h"
 #include "PianoFrame.h"
 #include "Player.h"
 #include "ProjectManager.h"
@@ -717,6 +718,7 @@ JZPianoWindow::JZPianoWindow(
     mVisibleSysex(true),
     mVisiblePlayTrack(true),
     mVisibleDrumNames(true),
+    mVisibleNoteNames(true),
     mVisibleAllTracks(true),
     mVisibleHBChord(true),
     mVisibleMono(true),
@@ -1324,6 +1326,17 @@ void JZPianoWindow::SetPressedPitch(int Pitch)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void JZPianoWindow::SetVisibleNoteNames(bool visible)
+{
+  if (mVisibleNoteNames != visible)
+  {
+    mVisibleNoteNames = visible;
+    Refresh(false);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int JZPianoWindow::TrackIndex2y(int TrackIndex)
 {
   return TrackIndex * mTrackHeight + mTopInfoHeight - mScrolledY;
@@ -1393,6 +1406,15 @@ void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
           y + mTrackHeight / 2 + 1);
         Dc.DrawLine(0, y, wBlack, y);
         Dc.SetPen(*wxBLACK_PEN);
+
+        if (mVisibleNoteNames)
+        {
+          Dc.SetFont(*mpFont);
+          Dc.SetBackgroundMode(wxTRANSPARENT);
+          Dc.SetTextForeground(Pitch == mPressedPitch ? *wxBLACK : *wxWHITE);
+          string NoteName = KeyToString(Pitch);
+          Dc.DrawText(NoteName.c_str(), 6, y + mLittleBit);
+        }
       }
       else
       {
@@ -1412,12 +1434,16 @@ void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
             mPianoWidth,
             y + mTrackHeight + 1);
           Dc.SetPen(*wxBLACK_PEN);
-          ostringstream Oss;
-          Oss << Pitch / 12;
-          Dc.DrawText(
-            Oss.str().c_str(),
-            wBlack + mLittleBit,
-            y + mTrackHeight / 2);
+          if (!mVisibleNoteNames)
+          {
+            Dc.SetFont(*mpFixedFont);
+            ostringstream Oss;
+            Oss << Pitch / 12;
+            Dc.DrawText(
+              Oss.str().c_str(),
+              wBlack + mLittleBit,
+              y + mTrackHeight / 2);
+          }
         }
         else if (!IsBlack(Pitch - 1))
         {
@@ -1429,6 +1455,15 @@ void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
             mPianoWidth,
             y + mTrackHeight + 1);
           Dc.SetPen(*wxBLACK_PEN);
+        }
+
+        if (mVisibleNoteNames)
+        {
+          Dc.SetFont(*mpFont);
+          Dc.SetBackgroundMode(wxTRANSPARENT);
+          Dc.SetTextForeground(*wxBLACK);
+          string NoteName = KeyToString(Pitch);
+          Dc.DrawText(NoteName.c_str(), 6, y + mLittleBit);
         }
       }
 
@@ -1510,8 +1545,8 @@ void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
     }
   }
 
-  //Dc.DestroyClippingRegion();
-  //Dc.SetTextBackground(*wxWHITE);
+  Dc.SetTextForeground(*wxBLACK);
+  Dc.SetBackgroundMode(wxTRANSPARENT);
   Dc.SetFont(*mpFont);
 }
 
@@ -1564,6 +1599,21 @@ void JZPianoWindow::DrawEvent(
   // end velocity colors
 
   Dc.DrawRectangle(x, y + mLittleBit, length, mTrackHeight - 2 * mLittleBit);
+
+  if (!xoor && mVisibleNoteNames && pEvent->IsKeyOn() && mpTrack && !mpTrack->IsDrumTrack())
+  {
+    string noteName = KeyToString(pEvent->GetPitch());
+    int textW = 0, textH = 0;
+    Dc.SetFont(*mpFont);
+    Dc.GetTextExtent(noteName.c_str(), &textW, &textH);
+    if (length >= textW + 4)
+    {
+      Dc.SetBackgroundMode(wxTRANSPARENT);
+      Dc.SetTextForeground(*wxWHITE);
+      Dc.DrawText(noteName.c_str(), x + 2, y + mLittleBit);
+      Dc.SetTextForeground(*wxBLACK);
+    }
+  }
 
   if (xoor)
   {
@@ -1652,6 +1702,28 @@ void JZPianoWindow::DrawEvents(
           DrawLength,
           mTrackHeight - 2 * mLittleBit);
         //shouldnt it be in drawevent? odd.
+
+        if (mVisibleNoteNames && pEvent->IsKeyOn() && !pTrack->IsDrumTrack())
+        {
+          string noteName = KeyToString(Pitch);
+          int textW = 0, textH = 0;
+          Dc.SetFont(*mpFont);
+          Dc.GetTextExtent(noteName.c_str(), &textW, &textH);
+          if (DrawLength >= textW + 4)
+          {
+            Dc.SetBackgroundMode(wxTRANSPARENT);
+            if (pTrack != mpTrack)
+            {
+              Dc.SetTextForeground(*wxBLACK);
+            }
+            else
+            {
+              Dc.SetTextForeground(*wxWHITE);
+            }
+            Dc.DrawText(noteName.c_str(), x1 + 2, y1 + mLittleBit);
+            Dc.SetTextForeground(*wxBLACK);
+          }
+        }
 
         if (pEvent->IsPlayTrack())
         {

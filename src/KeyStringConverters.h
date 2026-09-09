@@ -28,6 +28,13 @@
 //*****************************************************************************
 void KeyToString(int Key, std::string& String);
 
+inline std::string KeyToString(int Key)
+{
+  std::string String;
+  KeyToString(Key, String);
+  return String;
+}
+
 //*****************************************************************************
 //*****************************************************************************
 int StringToKey(const std::string& String);

@@ -82,6 +82,7 @@ class JZPianoFrame : public wxFrame
     void CutOrCopy(int id);
 
     void OnFilter(wxCommandEvent& Event);
+    void OnToggleNoteNames(wxCommandEvent& Event);
 
     // Actions (Called from menu items, toolbar buttons, and wx events)
     void ActCloseEvent(wxCloseEvent& Event);

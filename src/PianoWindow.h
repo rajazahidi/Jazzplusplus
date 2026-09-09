@@ -345,6 +345,7 @@ class JZPianoWindow : public JZEventWindow, public JZButtonLabelInterface
     bool mVisibleSysex;
     bool mVisiblePlayTrack;
     bool mVisibleDrumNames;
+    bool mVisibleNoteNames;
     bool mVisibleAllTracks;
     bool mVisibleHBChord;
     bool mVisibleMono;
@@ -352,6 +353,15 @@ class JZPianoWindow : public JZEventWindow, public JZButtonLabelInterface
     bool mDrawing;
 
     wxBitmap* mpFrameBuffer;
+
+  public:
+
+    bool GetVisibleNoteNames() const
+    {
+      return mVisibleNoteNames;
+    }
+
+    void SetVisibleNoteNames(bool visible);
 
   DECLARE_EVENT_TABLE()
 };

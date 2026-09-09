@@ -196,6 +196,7 @@ BEGIN_EVENT_TABLE(JZPianoFrame, wxFrame)
   EVT_MENU(MEN_VISIBLE, JZPianoFrame::OnFilter)
   EVT_MENU(ID_SNAP, JZPianoFrame::OnSnapDlg)
   EVT_MENU(ID_MISC_METER_CHANGE, JZPianoFrame::OnMeterChange)
+  EVT_MENU(ID_NOTE_NAMES, JZPianoFrame::OnToggleNoteNames)
   EVT_MENU(ID_HELP_PIANO_WINDOW, JZPianoFrame::OnHelpPiano)
   EVT_MENU(wxID_HELP_CONTENTS, JZPianoFrame::OnHelpPiano)
 
@@ -353,6 +354,8 @@ void JZPianoFrame::CreateMenu()
   setting_menu->Append(MEN_VISIBLE, "&Events...");
   setting_menu->Append(ID_SNAP, "&Snap...");
   setting_menu->Append(ID_MISC_METER_CHANGE, "&Meter Change...");
+  setting_menu->AppendCheckItem(ID_NOTE_NAMES, "&Note Names\tCtrl+N", "Toggle note names on piano roll");
+  setting_menu->Check(ID_NOTE_NAMES, true);
 
   wxMenu *misc_menu = new wxMenu("",wxMENU_TEAROFF);
   misc_menu->Append(wxID_UNDO, "&Undo");
@@ -386,6 +389,15 @@ void JZPianoFrame::CreateMenu()
 void JZPianoFrame::OnFilter(wxCommandEvent& Event)
 {
   mpPianoWindow->EditFilter();
+}
+
+
+void JZPianoFrame::OnToggleNoteNames(wxCommandEvent& Event)
+{
+  if (mpPianoWindow)
+  {
+    mpPianoWindow->SetVisibleNoteNames(Event.IsChecked());
+  }
 }
 
 

@@ -20,7 +20,8 @@
 // Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //*****************************************************************************
 
-#include <windows.h>
+#include <wx/wx.h>
+#include <mmsystem.h>
 #include <memory.h>
 
 #include "WindowsAudioInterface.h"

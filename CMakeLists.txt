@@ -52,7 +52,7 @@ if(WIN32)
 #define VERSION \"5.0.0\"
 ")
 
-    add_definitions(-DHAVE_CONFIG_H -DNOMINMAX)
+    add_definitions(-DHAVE_CONFIG_H -DNOMINMAX -DWIN32_LEAN_AND_MEAN)
     set(GUI_TYPE WIN32)
 else()
     # Linux / ALSA configuration

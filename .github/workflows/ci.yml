@@ -146,30 +146,6 @@ jobs:
           $out
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: Post Diagnostics to Commit
-        if: always()
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          $diag = "### Windows Build Diagnostics`n`n"
-          if (Test-Path cmake_output.txt) {
-              $diag += "#### CMake Console Output`n````n"
-              $diag += (Get-Content cmake_output.txt -Tail 50 | Out-String)
-              $diag += "````n"
-          }
-          if (Test-Path C:\wxWidgets\lib\vc14x_x64_dll) {
-              $diag += "#### C:\wxWidgets\lib\vc14x_x64_dll (first 25)`n````n"
-              $diag += (Get-ChildItem C:\wxWidgets\lib\vc14x_x64_dll | Select-Object -First 25 | Out-String)
-              $diag += "````n"
-          }
-          $json = @{ body = $diag } | ConvertTo-Json
-          Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/commits/${{ github.sha }}/comments" `
-            -Method Post `
-            -Headers @{ Authorization = "token $env:GH_TOKEN"; "User-Agent" = "GHA" } `
-            -Body $json `
-            -ContentType "application/json"
-
       - name: Build Jazz++
         shell: pwsh
         run: |
@@ -178,19 +154,57 @@ jobs:
           $build_out
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: Post Build Errors to Commit
+      - name: Package Windows Release
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          New-Item -ItemType Directory -Force -Path dist\conf | Out-Null
+          New-Item -ItemType Directory -Force -Path dist\song | Out-Null
+
+          if (Test-Path "build\Release\jazz.exe") {
+              Copy-Item "build\Release\jazz.exe" -Destination "dist\" -Force
+              Write-Host "Copied build\Release\jazz.exe"
+          } elseif (Test-Path "build\jazz.exe") {
+              Copy-Item "build\jazz.exe" -Destination "dist\" -Force
+              Write-Host "Copied build\jazz.exe"
+          } else {
+              throw "jazz.exe was not found in the build directory!"
+          }
+
+          Copy-Item -Path "conf\*" -Destination "dist\conf\" -Recurse -Force
+          Copy-Item -Path "song\*" -Destination "dist\song\" -Recurse -Force
+
+          Get-ChildItem "C:\wxWidgets\lib\vc14x_x64_dll\*.dll" |
+            Where-Object { $_.Name -notlike "*ud_*" -and $_.Name -notlike "*ud.*" } |
+            Copy-Item -Destination "dist\" -Force
+
+          Copy-Item "LICENSE" -Destination "dist\" -Force
+          Copy-Item "README.md" -Destination "dist\" -Force
+
+          Write-Host "=== Files in dist ==="
+          Get-ChildItem dist
+
+          Write-Host "=== Creating jazz-windows-x64.zip ==="
+          7z a -tzip jazz-windows-x64.zip .\dist\*
+
+      - name: Post Failure Details to Commit
         if: failure()
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $diag = "### Windows Compilation Error`n`n"
+          $diag = "### Windows Build / Packaging Failure`n`n"
+          if (Test-Path cmake_output.txt) {
+              $diag += "#### CMake Console Output (Tail 30)`n````n"
+              $diag += (Get-Content cmake_output.txt -Tail 30 | Out-String)
+              $diag += "````n"
+          }
           if (Test-Path build_output.txt) {
-              $diag += "#### All Errors in Build Output`n````n"
+              $diag += "#### Build Errors`n````n"
               $diag += (Select-String -Path build_output.txt -Pattern "(error|fatal|LNK)" -Context 1,1 | Select-Object -First 30 | Out-String)
               $diag += "````n"
-              $diag += "#### Build Output (Tail 100)`n````n"
-              $diag += (Get-Content build_output.txt -Tail 100 | Out-String)
+              $diag += "#### Build Output (Tail 50)`n````n"
+              $diag += (Get-Content build_output.txt -Tail 50 | Out-String)
               $diag += "````n"
           }
           $json = @{ body = $diag } | ConvertTo-Json
@@ -199,15 +213,6 @@ jobs:
             -Headers @{ Authorization = "token $env:GH_TOKEN"; "User-Agent" = "GHA" } `
             -Body $json `
             -ContentType "application/json"
-
-      - name: Package Windows Release
-        shell: pwsh
-        run: |
-          cmake --install build --prefix dist --config Release
-          Copy-Item "C:\wxWidgets\lib\vc14x_x64_dll\*.dll" -Destination dist\
-          Copy-Item "LICENSE" -Destination dist\
-          Copy-Item "README.md" -Destination dist\
-          Compress-Archive -Path dist\* -DestinationPath jazz-windows-x64.zip
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4

@@ -214,8 +214,8 @@ target_link_libraries(jazz PRIVATE
 
 if(WIN32)
     install(TARGETS jazz RUNTIME DESTINATION .)
-    install(DIRECTORY conf/ DESTINATION conf)
-    install(DIRECTORY song/ DESTINATION song)
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/conf/ DESTINATION conf)
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/song/ DESTINATION song)
 else()
     include(GNUInstallDirs)
     install(TARGETS jazz RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

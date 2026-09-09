@@ -157,35 +157,56 @@ jobs:
       - name: Package Windows Release
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path dist | Out-Null
-          New-Item -ItemType Directory -Force -Path dist/conf | Out-Null
-          New-Item -ItemType Directory -Force -Path dist/song | Out-Null
+          try {
+            $ErrorActionPreference = 'Stop'
 
-          if (Test-Path "build/Release/jazz.exe") {
-              Copy-Item "build/Release/jazz.exe" -Destination "dist" -Force
-              Write-Host "Copied build/Release/jazz.exe"
-          } elseif (Test-Path "build/jazz.exe") {
-              Copy-Item "build/jazz.exe" -Destination "dist" -Force
-              Write-Host "Copied build/jazz.exe"
-          } else {
-              throw "jazz.exe was not found in the build directory!"
+            Write-Host "=== 1. Creating dist folder ==="
+            New-Item -ItemType Directory -Force -Path "dist" | Out-Null
+
+            Write-Host "=== 2. Copying jazz.exe ==="
+            if (Test-Path "build/Release/jazz.exe") {
+                Copy-Item -Path "build/Release/jazz.exe" -Destination "dist/jazz.exe" -Force
+                Write-Host "Copied build/Release/jazz.exe"
+            } elseif (Test-Path "build/jazz.exe") {
+                Copy-Item -Path "build/jazz.exe" -Destination "dist/jazz.exe" -Force
+                Write-Host "Copied build/jazz.exe"
+            } else {
+                throw "jazz.exe was not found in build directory!"
+            }
+
+            Write-Host "=== 3. Copying conf and song resources ==="
+            Copy-Item -Path "conf" -Destination "dist" -Recurse -Force
+            Copy-Item -Path "song" -Destination "dist" -Recurse -Force
+
+            Write-Host "=== 4. Copying wxWidgets Release DLLs ==="
+            $dlls = Get-ChildItem -Path "C:\wxWidgets\lib\vc14x_x64_dll\*.dll" |
+              Where-Object { $_.Name -notlike "*ud_*" -and $_.Name -notlike "*ud.*" }
+            Write-Host "Found $($dlls.Count) runtime DLLs to copy."
+            $dlls | Copy-Item -Destination "dist" -Force
+
+            Write-Host "=== 5. Copying documentation ==="
+            Copy-Item -Path "LICENSE" -Destination "dist" -Force
+            Copy-Item -Path "README.md" -Destination "dist" -Force
+
+            Write-Host "=== 6. Inspecting dist directory ==="
+            Get-ChildItem -Path "dist" | Format-Table Name, Length
+
+            Write-Host "=== 7. Creating zip archive with 7z ==="
+            Push-Location "dist"
+            7z a -tzip "..\jazz-windows-x64.zip" *
+            Pop-Location
+
+            if (-not (Test-Path "jazz-windows-x64.zip")) {
+                throw "Archive jazz-windows-x64.zip was not generated!"
+            }
+            $zipSize = (Get-Item "jazz-windows-x64.zip").Length
+            Write-Host "Package complete! Archive size: $zipSize bytes."
+          } catch {
+            $err = "Packaging error: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
+            Write-Error $err
+            Set-Content -Path "pkg_error.txt" -Value $err
+            throw
           }
-
-          Copy-Item -Path "conf/*" -Destination "dist/conf" -Recurse -Force
-          Copy-Item -Path "song/*" -Destination "dist/song" -Recurse -Force
-
-          Get-ChildItem "C:/wxWidgets/lib/vc14x_x64_dll/*.dll" |
-            Where-Object { $_.Name -notlike "*ud_*" -and $_.Name -notlike "*ud.*" } |
-            Copy-Item -Destination "dist" -Force
-
-          Copy-Item "LICENSE" -Destination "dist" -Force
-          Copy-Item "README.md" -Destination "dist" -Force
-
-          Write-Host "=== Files in dist ==="
-          Get-ChildItem dist
-
-          Write-Host "=== Creating jazz-windows-x64.zip ==="
-          7z a -tzip jazz-windows-x64.zip ./dist/*
 
       - name: Post Failure Details to Commit
         if: failure()
@@ -194,9 +215,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $diag = "### Windows Build / Packaging Failure`n`n"
-          if ($Error.Count -gt 0) {
-              $diag += "#### PowerShell Errors`n````n"
-              $diag += ($Error | Select-Object -First 5 | Out-String)
+          if (Test-Path pkg_error.txt) {
+              $diag += "#### Packaging Error`n````n"
+              $diag += (Get-Content pkg_error.txt | Out-String)
               $diag += "````n"
           }
           if (Test-Path cmake_output.txt) {

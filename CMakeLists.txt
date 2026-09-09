@@ -13,6 +13,7 @@ elseif(MSVC)
 endif()
 
 if(WIN32)
+    enable_language(RC)
     set(wxWidgets_EXCLUDE_COMMON_LIBRARIES TRUE)
     set(BUILD_SHARED_LIBS ON)
     if(DEFINED wxWidgets_ROOT_DIR)

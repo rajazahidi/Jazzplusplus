@@ -186,8 +186,11 @@ jobs:
         run: |
           $diag = "### Windows Compilation Error`n`n"
           if (Test-Path build_output.txt) {
-              $diag += "#### Build Output (Tail 80)`n````n"
-              $diag += (Get-Content build_output.txt -Tail 80 | Out-String)
+              $diag += "#### All Errors in Build Output`n````n"
+              $diag += (Select-String -Path build_output.txt -Pattern "(error|fatal|LNK)" -Context 1,1 | Select-Object -First 30 | Out-String)
+              $diag += "````n"
+              $diag += "#### Build Output (Tail 100)`n````n"
+              $diag += (Get-Content build_output.txt -Tail 100 | Out-String)
               $diag += "````n"
           }
           $json = @{ body = $diag } | ConvertTo-Json

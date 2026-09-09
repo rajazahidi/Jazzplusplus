@@ -173,7 +173,29 @@ jobs:
       - name: Build Jazz++
         shell: pwsh
         run: |
-          cmake --build build --config Release --parallel
+          $build_out = cmake --build build --config Release --parallel 2>&1
+          $build_out | Out-File build_output.txt
+          $build_out
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Post Build Errors to Commit
+        if: failure()
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $diag = "### Windows Compilation Error`n`n"
+          if (Test-Path build_output.txt) {
+              $diag += "#### Build Output (Tail 80)`n````n"
+              $diag += (Get-Content build_output.txt -Tail 80 | Out-String)
+              $diag += "````n"
+          }
+          $json = @{ body = $diag } | ConvertTo-Json
+          Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/commits/${{ github.sha }}/comments" `
+            -Method Post `
+            -Headers @{ Authorization = "token $env:GH_TOKEN"; "User-Agent" = "GHA" } `
+            -Body $json `
+            -ContentType "application/json"
 
       - name: Package Windows Release
         shell: pwsh

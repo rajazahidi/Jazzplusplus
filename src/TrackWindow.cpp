@@ -64,6 +64,8 @@ BEGIN_EVENT_TABLE(JZTrackWindow, JZEventWindow)
 
   EVT_SCROLLWIN(JZTrackWindow::OnScroll)
 
+  EVT_MOUSEWHEEL(JZTrackWindow::OnMouseWheel)
+
 END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
@@ -1516,6 +1518,57 @@ void JZTrackWindow::OnScroll(wxScrollWinEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::OnMouseWheel(wxMouseEvent& Event)
+{
+  if (Event.GetWheelRotation() != 0)
+  {
+    int rot = Event.GetWheelRotation();
+    int delta = Event.GetWheelDelta();
+    if (delta <= 0) delta = 120;
+    int lines = Event.GetLinesPerAction();
+    if (lines <= 0) lines = 3;
+    int steps = (rot / delta) * lines;
+    if (steps == 0)
+    {
+      steps = (rot > 0) ? 1 : -1;
+    }
+
+    int EventWidth, EventHeight;
+    GetVirtualEventSize(EventWidth, EventHeight);
+
+    if (Event.ShiftDown())
+    {
+      // Horizontal scroll
+      int newX = mScrolledX - steps * 20;
+      if (newX < 0) newX = 0;
+      if (newX > EventWidth - 1) newX = EventWidth - 1;
+      if (newX != mScrolledX)
+      {
+        mScrolledX = newX;
+        SetScrollPos(wxHORIZONTAL, mScrolledX, true);
+        Refresh(false);
+      }
+    }
+    else
+    {
+      // Vertical scroll (by tracks)
+      int newY = mScrolledY - steps * mTrackHeight;
+      if (newY < 0) newY = 0;
+      if (newY > EventHeight - 1) newY = EventHeight - 1;
+      if (newY != mScrolledY)
+      {
+        mScrolledY = newY;
+        SetScrollPos(wxVERTICAL, mScrolledY, true);
+        Refresh(false);
+      }
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZTrackWindow::HorizontalScroll(wxScrollWinEvent& Event)
 {
   int EventWidth, EventHeight;
@@ -1525,19 +1578,19 @@ void JZTrackWindow::HorizontalScroll(wxScrollWinEvent& Event)
 
   if (Event.GetEventType() == wxEVT_SCROLLWIN_LINEUP)
   {
-    --NewScrolledX;
+    NewScrolledX -= 20;
   }
   else if (Event.GetEventType() == wxEVT_SCROLLWIN_LINEDOWN)
   {
-    ++NewScrolledX;
+    NewScrolledX += 20;
   }
   else if (Event.GetEventType() == wxEVT_SCROLLWIN_PAGEUP)
   {
-    NewScrolledX -= 10;
+    NewScrolledX -= 100;
   }
   else if (Event.GetEventType() == wxEVT_SCROLLWIN_PAGEDOWN)
   {
-    NewScrolledX += 10;
+    NewScrolledX += 100;
   }
   else if (Event.GetEventType() == wxEVT_SCROLLWIN_TOP)
   {
@@ -1582,19 +1635,19 @@ void JZTrackWindow::VerticalScroll(wxScrollWinEvent& Event)
 
   if (Event.GetEventType() == wxEVT_SCROLLWIN_LINEUP)
   {
-    --NewScrolledY;
+    NewScrolledY -= mTrackHeight;
   }
   else if (Event.GetEventType() == wxEVT_SCROLLWIN_LINEDOWN)
   {
-    ++NewScrolledY;
+    NewScrolledY += mTrackHeight;
   }
   else if (Event.GetEventType() == wxEVT_SCROLLWIN_PAGEUP)
   {
-    NewScrolledY -= 10;
+    NewScrolledY -= 4 * mTrackHeight;
   }
   else if (Event.GetEventType() == wxEVT_SCROLLWIN_PAGEDOWN)
   {
-    NewScrolledY += 10;
+    NewScrolledY += 4 * mTrackHeight;
   }
   else if (Event.GetEventType() == wxEVT_SCROLLWIN_TOP)
   {

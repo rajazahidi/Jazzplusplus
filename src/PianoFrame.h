@@ -109,8 +109,19 @@ class JZPianoFrame : public wxFrame
     void OnShift(wxCommandEvent& Event);
     void OnCut(wxCommandEvent& Event);
     void OnCopy(wxCommandEvent& Event);
+    void OnPaste(wxCommandEvent& Event);
+    void OnSelectAll(wxCommandEvent& Event);
     void OnErase(wxCommandEvent& Event);
     void OnReset(wxCommandEvent& Event);
+    void OnTranspose(wxCommandEvent& Event);
+    void OnSetChannel(wxCommandEvent& Event);
+    void OnVelocity(wxCommandEvent& Event);
+    void OnLength(wxCommandEvent& Event);
+    void OnCleanup(wxCommandEvent& Event);
+    void OnSearchReplace(wxCommandEvent& Event);
+    void OnConvertToModulation(wxCommandEvent& Event);
+    void OnMeterChange(wxCommandEvent& Event);
+    void OnHelpPiano(wxCommandEvent& Event);
 
     //==============================================
     // These are facades for piano window functions.

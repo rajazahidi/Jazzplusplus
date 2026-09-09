@@ -164,6 +164,8 @@ class JZPianoWindow : public JZEventWindow, public JZButtonLabelInterface
 
     void Erase();
 
+    void SelectAll();
+
     void ToggleVisibleAllTracks();
 
     void MSelect();
@@ -229,15 +231,18 @@ class JZPianoWindow : public JZEventWindow, public JZButtonLabelInterface
     int Pitch2y(int Pitch);
     JZEvent *FindEvent(JZTrack *t, int Clock, int Pitch);
     void Copy(JZTrack* pTrack, JZEvent* pEvent, int Kill);
-    void Paste(JZTrack* pTrack, int Clock, int Pitch);
 
+  public:
+    void Paste(JZTrack* pTrack, int Clock, int Pitch);
+    int EventsSelected(const char *msg = 0);
+
+  private:
     // SN++ Key_Aftertouch Utils
     void paste_keys_aftertouch(JZTrack *t, JZEvent *e);
     void kill_keys_aftertouch(JZTrack *t, JZEvent *e);
     int GetKeyOnEventCount();
 
     int y2TrackIndex(int y);
-    int EventsSelected(const char *msg = 0);
     int OnEventWinMouseEvent(wxMouseEvent& MouseEvent);
 
     void DrawEvents(

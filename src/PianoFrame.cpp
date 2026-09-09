@@ -25,6 +25,7 @@
 #include "Command.h"
 #include "ControlEdit.h"
 #include "Dialogs.h"
+#include "Filter.h"
 #include "Globals.h"
 #include "Harmony.h"
 #include "PianoWindow.h"
@@ -156,10 +157,14 @@ BEGIN_EVENT_TABLE(JZPianoFrame, wxFrame)
   EVT_MENU(MEN_GUITAR, JZPianoFrame::OnGuitar)
 
   EVT_MENU(ID_MISC_RESET_MIDI, JZPianoFrame::OnReset)
+  EVT_MENU(wxID_RESET, JZPianoFrame::OnReset)
   EVT_MENU(MEN_VIS_ALL_TRK, JZPianoFrame::OnVisibleAllTracks)
+  EVT_MENU(ID_SHOW_ALL_EVENTS_FROM_ALL_TRACKS, JZPianoFrame::OnVisibleAllTracks)
   EVT_MENU(wxID_DELETE, JZPianoFrame::OnErase)
   EVT_MENU(wxID_CUT, JZPianoFrame::OnCut)
   EVT_MENU(wxID_COPY, JZPianoFrame::OnCopy)
+  EVT_MENU(wxID_PASTE, JZPianoFrame::OnPaste)
+  EVT_MENU(wxID_SELECTALL, JZPianoFrame::OnSelectAll)
   EVT_MENU(ID_SHIFT, JZPianoFrame::OnShift)
   EVT_MENU(ID_SHIFT_LEFT, JZPianoFrame::OnShiftLeft)
   EVT_MENU(ID_SHIFT_RIGHT, JZPianoFrame::OnShiftRight)
@@ -176,20 +181,23 @@ BEGIN_EVENT_TABLE(JZPianoFrame, wxFrame)
   EVT_MENU(MEN_CTRL_NONE, JZPianoFrame::OnCtrlNone)
   EVT_MENU(MEN_CTRL_POLY_AFTER, JZPianoFrame::OnCtrlPolyAftertouchEdit)
   EVT_MENU(MEN_CTRL_CHANNEL_AFTER, JZPianoFrame::CtrlChannelAftertouchEdit)
-// FIXME PAT - We need to bring these back once Dave has figured out what
-//             he's doing with them in relation to the track window.
-//  EVT_MENU(ID_CLEANUP, JZPianoFrame::OnCleanup)
-//  EVT_MENU(ID_SEARCH_AND_REPLACE, JZPianoFrame::OnSearchReplace)
-//  EVT_MENU(ID_TRANSPOSE, JZPianoFrame::OnTranspose)
-//  EVT_MENU(ID_SET_CHANNEL, JZPianoFrame::OnSetChannel)
-//  EVT_MENU(ID_LENGTH, JZPianoFrame::OnLength)
+  EVT_MENU(ID_CLEANUP, JZPianoFrame::OnCleanup)
+  EVT_MENU(ID_SEARCH_AND_REPLACE, JZPianoFrame::OnSearchReplace)
+  EVT_MENU(ID_TRANSPOSE, JZPianoFrame::OnTranspose)
+  EVT_MENU(ID_SET_CHANNEL, JZPianoFrame::OnSetChannel)
+  EVT_MENU(ID_LENGTH, JZPianoFrame::OnLength)
+  EVT_MENU(ID_VELOCITY, JZPianoFrame::OnVelocity)
   EVT_MENU(MEN_MIDIDELAY, JZPianoFrame::OnActivateMidiDelayDialog)
   EVT_MENU(MEN_SEQLENGTH, JZPianoFrame::OnActivateSequenceLengthDialog)
 
-//  EVT_MENU(MEN_CONVERT_TO_MODULATION, JZPianoFrame::OnnConvertToModulation)
+  EVT_MENU(MEN_CONVERT_TO_MODULATION, JZPianoFrame::OnConvertToModulation)
   EVT_MENU(ACT_SETTINGS, JZPianoFrame::OnActivateSettingsDialog)
   EVT_MENU(MEN_FILTER, JZPianoFrame::OnFilter)
+  EVT_MENU(MEN_VISIBLE, JZPianoFrame::OnFilter)
   EVT_MENU(ID_SNAP, JZPianoFrame::OnSnapDlg)
+  EVT_MENU(ID_MISC_METER_CHANGE, JZPianoFrame::OnMeterChange)
+  EVT_MENU(ID_HELP_PIANO_WINDOW, JZPianoFrame::OnHelpPiano)
+  EVT_MENU(wxID_HELP_CONTENTS, JZPianoFrame::OnHelpPiano)
 
   // These are all "Patrick Approved"
   EVT_CLOSE(JZPianoFrame::ActCloseEvent)
@@ -317,20 +325,23 @@ void JZPianoFrame::CreateMenu()
   win_menu->Append(ACT_CLOSE, "&Close");
 
   wxMenu *edit_menu = new wxMenu("",wxMENU_TEAROFF);
-  edit_menu->Append(wxID_DELETE, "&Delete");
-  edit_menu->Append(wxID_COPY, "&Copy");
-  edit_menu->Append(wxID_CUT, "&Cut");
+  edit_menu->Append(wxID_DELETE, "&Delete\tDel");
+  edit_menu->Append(wxID_COPY, "&Copy\tCtrl+C");
+  edit_menu->Append(wxID_CUT, "&Cut\tCtrl+X");
+  edit_menu->Append(wxID_PASTE, "&Paste\tCtrl+V");
+  edit_menu->Append(wxID_SELECTALL, "Select &All\tCtrl+A");
+  edit_menu->AppendSeparator();
   edit_menu->Append(ID_SHIFT, "&Shift...");
   edit_menu->Append(ID_QUANTIZE, "&Quantize...");
   edit_menu->Append(ID_SET_CHANNEL, "&Set MIDI Channel...");
   edit_menu->Append(ID_TRANSPOSE, "&Transpose...");
   edit_menu->Append(ID_VELOCITY, "&Velocity...");
   edit_menu->Append(ID_LENGTH, "&Length...");
-
+  edit_menu->AppendSeparator();
   edit_menu->Append(MEN_SEQLENGTH, "&Sequence Length...");
   edit_menu->Append(MEN_MIDIDELAY, "&Midi Delay...");
-  edit_menu->Append(MEN_CONVERT_TO_MODULATION, "&Convert to Modulation(experimental)");
-
+  edit_menu->Append(MEN_CONVERT_TO_MODULATION, "&Convert to Modulation (experimental)");
+  edit_menu->AppendSeparator();
   edit_menu->Append(MEN_LERI, "&Left <-> Right");
   edit_menu->Append(MEN_UPDN, "&Up <-> Down");
   edit_menu->Append(ID_CLEANUP, "&Cleanup...");
@@ -464,9 +475,10 @@ void JZPianoFrame::OnShiftRight(wxCommandEvent& Event)
 
 void JZPianoFrame::OnShift(wxCommandEvent& Event)
 {
-  // FIXME PAT - Bring this back once Dave has figured out what's he's doing
-  // with the trackwin stuff.
-  //MenShift(SnapClocks());
+  if (mpPianoWindow && mpPianoWindow->EventsSelected())
+  {
+    mpPianoWindow->Shift(mpPianoWindow->SnapClocks());
+  }
 }
 
 void JZPianoFrame::OnCut(wxCommandEvent& Event)
@@ -477,6 +489,28 @@ void JZPianoFrame::OnCut(wxCommandEvent& Event)
 void JZPianoFrame::OnCopy(wxCommandEvent& Event)
 {
   mpPianoWindow->CutOrCopy(wxID_COPY);
+}
+
+void JZPianoFrame::OnPaste(wxCommandEvent& Event)
+{
+  if (mpPianoWindow)
+  {
+    int clock = 0;
+    if (mpPianoWindow->GetFilter() && mpPianoWindow->GetFilter()->GetFromClock() > 0)
+    {
+      clock = mpPianoWindow->GetFilter()->GetFromClock();
+    }
+    mpPianoWindow->Paste(mpPianoWindow->GetTrack(), clock, -1);
+    mpPianoWindow->Refresh(false);
+  }
+}
+
+void JZPianoFrame::OnSelectAll(wxCommandEvent& Event)
+{
+  if (mpPianoWindow)
+  {
+    mpPianoWindow->SelectAll();
+  }
 }
 
 void JZPianoFrame::OnErase(wxCommandEvent& Event)
@@ -494,6 +528,75 @@ void JZPianoFrame::OnVisibleAllTracks(wxCommandEvent& Event)
 void JZPianoFrame::OnReset(wxCommandEvent& Event)
 {
   gpMidiPlayer->AllNotesOff(true);
+}
+
+void JZPianoFrame::OnTranspose(wxCommandEvent& Event)
+{
+  if (mpPianoWindow && mpPianoWindow->EventsSelected())
+  {
+    mpPianoWindow->Transpose();
+  }
+}
+
+void JZPianoFrame::OnSetChannel(wxCommandEvent& Event)
+{
+  if (mpPianoWindow && mpPianoWindow->EventsSelected())
+  {
+    mpPianoWindow->SetChannel();
+  }
+}
+
+void JZPianoFrame::OnVelocity(wxCommandEvent& Event)
+{
+  if (mpPianoWindow && mpPianoWindow->EventsSelected())
+  {
+    mpPianoWindow->Velocity();
+  }
+}
+
+void JZPianoFrame::OnLength(wxCommandEvent& Event)
+{
+  if (mpPianoWindow && mpPianoWindow->EventsSelected())
+  {
+    mpPianoWindow->Length();
+  }
+}
+
+void JZPianoFrame::OnCleanup(wxCommandEvent& Event)
+{
+  if (mpPianoWindow && mpPianoWindow->EventsSelected())
+  {
+    mpPianoWindow->Cleanup();
+  }
+}
+
+void JZPianoFrame::OnSearchReplace(wxCommandEvent& Event)
+{
+  if (mpPianoWindow && mpPianoWindow->EventsSelected())
+  {
+    mpPianoWindow->SearchReplace();
+  }
+}
+
+void JZPianoFrame::OnConvertToModulation(wxCommandEvent& Event)
+{
+  if (mpPianoWindow && mpPianoWindow->EventsSelected())
+  {
+    mpPianoWindow->ConvertToModulation();
+  }
+}
+
+void JZPianoFrame::OnMeterChange(wxCommandEvent& Event)
+{
+  if (mpPianoWindow)
+  {
+    mpPianoWindow->EditMeter();
+  }
+}
+
+void JZPianoFrame::OnHelpPiano(wxCommandEvent& Event)
+{
+  JZHelp::Instance().ShowTopic("Piano Window");
 }
 
 void JZPianoFrame::OnMSelect(wxCommandEvent& Event)

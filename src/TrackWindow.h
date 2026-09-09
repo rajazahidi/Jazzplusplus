@@ -105,6 +105,8 @@ class JZTrackWindow : public JZEventWindow
 
     void OnScroll(wxScrollWinEvent& Event);
 
+    void OnMouseWheel(wxMouseEvent& Event);
+
     void HorizontalScroll(wxScrollWinEvent& Event);
 
     void VerticalScroll(wxScrollWinEvent& Event);

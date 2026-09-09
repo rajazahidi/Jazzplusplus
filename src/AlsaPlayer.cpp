@@ -115,41 +115,61 @@ JZAlsaPlayer::JZAlsaPlayer(JZSong* pSong)
   }
 
   mInputDeviceIndex = gpConfig->GetValue(C_AlsaInputDevice);
-  if (mInputDeviceIndex < 0)
+  if (mInputDeviceIndex < 0 || static_cast<unsigned>(mInputDeviceIndex) >= iaddr.GetCount())
   {
-    cout << "INFO: input device is -1, so selecting one." << endl;
-    mInputDeviceIndex = select_list(
-      iaddr,
-      "Input Device",
-      mInputDeviceIndex);
-    cout << "INFO: Input device is: " << mInputDeviceIndex << endl;
-    gpConfig->Put(C_AlsaInputDevice, mInputDeviceIndex);
-  }
-  else if (static_cast<unsigned>(mInputDeviceIndex) > iaddr.GetCount())
-  {
-    cout << "INFO: Input device is out of range, so selecting one." << endl;
-    mInputDeviceIndex = select_list(
-      iaddr,
-      "Output Device",
-      mInputDeviceIndex);
+    mInputDeviceIndex = (iaddr.GetCount() > 0) ? 0 : -1;
+    if (mInputDeviceIndex >= 0)
+    {
+      gpConfig->Put(C_AlsaInputDevice, mInputDeviceIndex);
+    }
   }
 
   mOutputDeviceIndex = gpConfig->GetValue(C_AlsaOutputDevice);
-  if (mOutputDeviceIndex < 0)
+
+  auto findSynthDevice = [&]() -> int {
+    // 1. Search for synth/soundfont engines in output devices
+    for (unsigned i = 0; i < oaddr.GetCount(); i++)
+    {
+      wxString name = oaddr.GetName(i).Lower();
+      if (name.Contains("fluid") || name.Contains("synth") || name.Contains("timidity"))
+      {
+        return static_cast<int>(i);
+      }
+    }
+    // 2. Fall back to any non-"through" device
+    for (unsigned i = 0; i < oaddr.GetCount(); i++)
+    {
+      wxString name = oaddr.GetName(i).Lower();
+      if (!name.Contains("through"))
+      {
+        return static_cast<int>(i);
+      }
+    }
+    // 3. Fall back to first device if available
+    return (oaddr.GetCount() > 0) ? 0 : -1;
+  };
+
+  if (mOutputDeviceIndex < 0 || static_cast<unsigned>(mOutputDeviceIndex) >= oaddr.GetCount())
   {
-    cout << "INFO: Output device is -1, so selecting one." << endl;
-    mOutputDeviceIndex = select_list(
-      oaddr,
-      "Output Device",
-      mOutputDeviceIndex);
+    mOutputDeviceIndex = findSynthDevice();
+    if (mOutputDeviceIndex >= 0)
+    {
+      gpConfig->Put(C_AlsaOutputDevice, mOutputDeviceIndex);
+    }
   }
-  else if (static_cast<unsigned>(mOutputDeviceIndex) > oaddr.GetCount())
+  else
   {
-    cout << "INFO: Output device is out of range, so selecting one." << endl;
-    mOutputDeviceIndex = select_list(
-      oaddr,
-      "Output Device",
-      mOutputDeviceIndex);
+    // If output device is pointing to dummy Through port but a real synth exists, prefer the synth
+    wxString curName = oaddr.GetName(mOutputDeviceIndex).Lower();
+    if (curName.Contains("through"))
+    {
+      int synthIdx = findSynthDevice();
+      if (synthIdx >= 0 && synthIdx != mOutputDeviceIndex)
+      {
+        mOutputDeviceIndex = synthIdx;
+        gpConfig->Put(C_AlsaOutputDevice, mOutputDeviceIndex);
+      }
+    }
   }
 
   if (mInputDeviceIndex >= 0)
@@ -172,6 +192,8 @@ JZAlsaPlayer::JZAlsaPlayer(JZSong* pSong)
   {
     if (static_cast<unsigned>(mOutputDeviceIndex) < oaddr.GetCount())
     {
+      cout << "INFO: Subscribing to ALSA output device [" << mOutputDeviceIndex
+           << "]: " << oaddr.GetName(mOutputDeviceIndex) << endl;
       subscribe_out(mOutputDeviceIndex);
     }
     else

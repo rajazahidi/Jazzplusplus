@@ -1742,6 +1742,51 @@ void JZPianoWindow::OnPaint(wxPaintEvent& Event)
 //-----------------------------------------------------------------------------
 void JZPianoWindow::OnMouseEvent(wxMouseEvent& MouseEvent)
 {
+  if (MouseEvent.GetWheelRotation() != 0)
+  {
+    int rot = MouseEvent.GetWheelRotation();
+    int delta = MouseEvent.GetWheelDelta();
+    if (delta <= 0) delta = 120;
+    int lines = MouseEvent.GetLinesPerAction();
+    if (lines <= 0) lines = 3;
+    int steps = (rot / delta) * lines;
+    if (steps == 0)
+    {
+      steps = (rot > 0) ? 1 : -1;
+    }
+
+    int EventWidth, EventHeight;
+    GetVirtualEventSize(EventWidth, EventHeight);
+
+    if (MouseEvent.ShiftDown())
+    {
+      // Scroll horizontally
+      int newX = mScrolledX - steps * 20;
+      if (newX < 0) newX = 0;
+      if (newX > EventWidth - 1) newX = EventWidth - 1;
+      if (newX != mScrolledX)
+      {
+        mScrolledX = newX;
+        SetScrollPos(wxHORIZONTAL, mScrolledX, true);
+        Refresh(false);
+      }
+    }
+    else
+    {
+      // Scroll vertically (pitch by semitones)
+      int newY = mScrolledY - steps * mTrackHeight;
+      if (newY < 0) newY = 0;
+      if (newY > EventHeight - 1) newY = EventHeight - 1;
+      if (newY != mScrolledY)
+      {
+        mScrolledY = newY;
+        SetScrollPos(wxVERTICAL, mScrolledY, true);
+        Refresh(false);
+      }
+    }
+    return;
+  }
+
   if (MouseEvent.Moving() && !MouseEvent.Dragging() && !mpMouseAction)
   {
     int fx, fy;
@@ -1816,8 +1861,23 @@ void JZPianoWindow::OnMouseEvent(wxMouseEvent& MouseEvent)
   }
   else
   {
-    MouseEvent.Skip();
-//NEW    OnEventWinMouseEvent(MouseEvent);
+    // A mouse action is active (piano key play, selection, note length dragging, velocity, etc.)
+    JZMouseAction* pAction = mpMouseAction;
+    int status = pAction->ProcessMouseEvent(MouseEvent, mScrolledX, mScrolledY);
+    if (status == 1)
+    {
+      if (mpMouseAction == mpSnapSel)
+      {
+        SnapSelectionStop(MouseEvent);
+        Refresh();
+        mpMouseAction = 0;
+      }
+      else if (mpMouseAction != 0)
+      {
+        delete mpMouseAction;
+        mpMouseAction = 0;
+      }
+    }
   }
 }
 
@@ -1846,19 +1906,19 @@ void JZPianoWindow::HorizontalScroll(wxScrollWinEvent& Event)
 
   if (Event.GetEventType() == wxEVT_SCROLLWIN_LINEUP)
   {
-    --NewScrolledX;
+    NewScrolledX -= 20;
   }
   else if (Event.GetEventType() == wxEVT_SCROLLWIN_LINEDOWN)
   {
-    ++NewScrolledX;
+    NewScrolledX += 20;
   }
   else if (Event.GetEventType() == wxEVT_SCROLLWIN_PAGEUP)
   {
-    NewScrolledX -= 10;
+    NewScrolledX -= (mCanvasWidth > 0) ? (mCanvasWidth / 2) : 100;
   }
   else if (Event.GetEventType() == wxEVT_SCROLLWIN_PAGEDOWN)
   {
-    NewScrolledX += 10;
+    NewScrolledX += (mCanvasWidth > 0) ? (mCanvasWidth / 2) : 100;
   }
   else if (Event.GetEventType() == wxEVT_SCROLLWIN_TOP)
   {
@@ -1903,19 +1963,19 @@ void JZPianoWindow::VerticalScroll(wxScrollWinEvent& Event)
 
   if (Event.GetEventType() == wxEVT_SCROLLWIN_LINEUP)
   {
-    --NewScrolledY;
+    NewScrolledY -= mTrackHeight;
   }
   else if (Event.GetEventType() == wxEVT_SCROLLWIN_LINEDOWN)
   {
-    ++NewScrolledY;
+    NewScrolledY += mTrackHeight;
   }
   else if (Event.GetEventType() == wxEVT_SCROLLWIN_PAGEUP)
   {
-    NewScrolledY -= 10;
+    NewScrolledY -= 12 * mTrackHeight;
   }
   else if (Event.GetEventType() == wxEVT_SCROLLWIN_PAGEDOWN)
   {
-    NewScrolledY += 10;
+    NewScrolledY += 12 * mTrackHeight;
   }
   else if (Event.GetEventType() == wxEVT_SCROLLWIN_TOP)
   {
@@ -3003,6 +3063,41 @@ void JZPianoWindow::Erase()
     cmd.Execute(1);        // with UNDO
     Refresh();
   }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPianoWindow::SelectAll()
+{
+  int endClock = mpProject->GetLastClock();
+  if (endClock <= 0)
+  {
+    endClock = mpProject->GetMaxQuarters() * mpProject->GetTicksPerQuarter();
+  }
+  int totalWidth = Clock2x(endClock) + 100;
+  int totalHeight = 128 * mTrackHeight;
+  JZRectangle Rectangle(mLeftInfoWidth, mTopInfoHeight, totalWidth, totalHeight);
+  mpSnapSel->Select(Rectangle);
+
+  mpFilter->SetFilterEvent(eFilterKeyOn, mVisibleKeyOn, 0, 127);
+  mpFilter->SetFilterEvent(eFilterPitch, mVisiblePitch, -8192, 8191);
+  mpFilter->SetFilterEvent(eFilterControl, mVisibleController, 0, 127);
+  mpFilter->SetFilterEvent(eFilterProgram, mVisibleProgram, 0, 127);
+  mpFilter->SetFilterEvent(eFilterKeyPressure, mVisibleKeyOn, 0, 127);
+  mpFilter->SetFilterMeter(mVisibleTempo);
+  mpFilter->SetFilterChannelAftertouch(mVisibleMono);
+  mpFilter->SetFilterSysEx(mVisibleSysex);
+
+  mpFilter->SetFromTrack(mTrackIndex);
+  mpFilter->SetToTrack(mTrackIndex);
+  mpFilter->SetFromClock(0);
+  mpFilter->SetToClock(endClock);
+
+  if (mpCtrlEdit)
+  {
+    mpCtrlEdit->UpDate();
+  }
+  Refresh(false);
 }
 
 //-----------------------------------------------------------------------------

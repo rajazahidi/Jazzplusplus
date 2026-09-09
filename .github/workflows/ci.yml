@@ -90,7 +90,7 @@ jobs:
 
   build-windows:
     name: Build & Package Windows (x64)
-    runs-on: windows-latest
+    runs-on: windows-2022
     permissions:
       contents: write
     steps:

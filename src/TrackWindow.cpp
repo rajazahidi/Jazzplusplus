@@ -1259,15 +1259,15 @@ void JZTrackWindow::SetScrollRanges()
   int EventWidth, EventHeight;
   GetVirtualEventSize(EventWidth, EventHeight);
 
-  // Must add the thumb size to the passed range to reach the maximum
-  // desired value.
-  int ThumbSize;
+  int ThumbSizeX = std::max(1, EventWidth / 10);
+  int RangeX = std::max(ThumbSizeX + 1, EventWidth + ThumbSizeX);
+  int PosX = std::max(0, std::min(mScrolledX, RangeX - ThumbSizeX));
+  SetScrollbar(wxHORIZONTAL, PosX, ThumbSizeX, RangeX);
 
-  ThumbSize = EventWidth / 10;
-  SetScrollbar(wxHORIZONTAL, mScrolledX, ThumbSize, EventWidth + ThumbSize);
-
-  ThumbSize = EventHeight / 10;
-  SetScrollbar(wxVERTICAL, mScrolledY, ThumbSize, EventHeight + ThumbSize);
+  int ThumbSizeY = std::max(1, EventHeight / 10);
+  int RangeY = std::max(ThumbSizeY + 1, EventHeight + ThumbSizeY);
+  int PosY = std::max(0, std::min(mScrolledY, RangeY - ThumbSizeY));
+  SetScrollbar(wxVERTICAL, PosY, ThumbSizeY, RangeY);
 }
 
 //-----------------------------------------------------------------------------
@@ -1547,6 +1547,8 @@ void JZTrackWindow::OnMouseWheel(wxMouseEvent& Event)
       if (newX != mScrolledX)
       {
         mScrolledX = newX;
+        mFromClock = mScrolledX * mClockTicsPerPixel;
+        mToClock = x2Clock(mCanvasWidth);
         SetScrollPos(wxHORIZONTAL, mScrolledX, true);
         Refresh(false);
       }
@@ -1560,6 +1562,8 @@ void JZTrackWindow::OnMouseWheel(wxMouseEvent& Event)
       if (newY != mScrolledY)
       {
         mScrolledY = newY;
+        mFromLine = mScrolledY / mTrackHeight;
+        mToLine = 1 + (mScrolledY + mCanvasHeight - mTopInfoHeight) / mTrackHeight;
         SetScrollPos(wxVERTICAL, mScrolledY, true);
         Refresh(false);
       }
@@ -1619,6 +1623,8 @@ void JZTrackWindow::HorizontalScroll(wxScrollWinEvent& Event)
   if (NewScrolledX != mScrolledX)
   {
     mScrolledX = NewScrolledX;
+    mFromClock = mScrolledX * mClockTicsPerPixel;
+    mToClock = x2Clock(mCanvasWidth);
     SetScrollPos(wxHORIZONTAL, mScrolledX, true);
     Refresh(false);
   }
@@ -1676,6 +1682,8 @@ void JZTrackWindow::VerticalScroll(wxScrollWinEvent& Event)
   if (NewScrolledY != mScrolledY)
   {
     mScrolledY = NewScrolledY;
+    mFromLine = mScrolledY / mTrackHeight;
+    mToLine = 1 + (mScrolledY + mCanvasHeight - mTopInfoHeight) / mTrackHeight;
     SetScrollPos(wxVERTICAL, mScrolledY, true);
     Refresh(false);
   }

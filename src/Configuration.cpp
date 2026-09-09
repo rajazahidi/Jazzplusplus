@@ -131,10 +131,10 @@ JZConfiguration::JZConfiguration()
   // ALSA audio devices.
   mNames[C_AlsaAudioInputDevice] = new JZConfigurationEntry(
     ".alsa_audio_input_device",
-    "hw:0,0");
+    "default");
   mNames[C_AlsaAudioOutputDevice] = new JZConfigurationEntry(
     ".alsa_audio_output_device",
-    "hw:0,0");
+    "default");
 
   // Emulate MIDI thru.
   mNames[C_SoftThru] = new JZConfigurationEntry(".softthru", 1);

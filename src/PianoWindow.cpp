@@ -126,6 +126,7 @@ class JZMousePlay : public JZMouseAction
   public:
 
     JZMousePlay(JZPianoWindow* pPianoWindow);
+    virtual ~JZMousePlay();
 
     virtual int ProcessMouseEvent(
       wxMouseEvent& MouseEvent,
@@ -148,6 +149,24 @@ JZMousePlay::JZMousePlay(JZPianoWindow* pPianoWindow)
 {
   mChannel = mpPianoWindow->GetTrack()->mChannel ?
     mpPianoWindow->GetTrack()->mChannel - 1 : 0;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+JZMousePlay::~JZMousePlay()
+{
+  if (mPitch > 0)
+  {
+    JZKeyOffEvent KeyOff(0, mChannel, mPitch);
+    if (gpMidiPlayer && mpPianoWindow && mpPianoWindow->GetTrack())
+    {
+      gpMidiPlayer->OutNow(mpPianoWindow->GetTrack(), &KeyOff);
+    }
+  }
+  if (mpPianoWindow)
+  {
+    mpPianoWindow->SetPressedPitch(-1);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -188,6 +207,11 @@ int JZMousePlay::ProcessMouseEvent(
   else
   {
     return 0;
+  }
+
+  if (mpPianoWindow)
+  {
+    mpPianoWindow->SetPressedPitch(mPitch > 0 ? mPitch : -1);
   }
 
   if (mpPianoWindow->GetTrack()->GetAudioMode())
@@ -654,6 +678,8 @@ BEGIN_EVENT_TABLE(JZPianoWindow, JZEventWindow)
 
   EVT_MOUSE_EVENTS(JZPianoWindow::OnMouseEvent)
 
+  EVT_MOUSEWHEEL(JZPianoWindow::OnMouseWheel)
+
   EVT_SCROLLWIN(JZPianoWindow::OnScroll)
 
 END_EVENT_TABLE()
@@ -682,6 +708,7 @@ JZPianoWindow::JZPianoWindow(
     mFixedFontHeight(0),
     mpDrumFont(0),
     mSnapDenomiator(16),
+    mPressedPitch(-1),
     mVisibleKeyOn(true),
     mVisiblePitch(true),
     mVisibleController(true),
@@ -1273,15 +1300,26 @@ void JZPianoWindow::SetScrollRanges()
   int EventWidth, EventHeight;
   GetVirtualEventSize(EventWidth, EventHeight);
 
-  // Must add the thumb size to the passed range to reach the maximum
-  // desired value.
-  int ThumbSize;
+  int ThumbSizeX = std::max(1, EventWidth / 10);
+  int RangeX = std::max(ThumbSizeX + 1, EventWidth + ThumbSizeX);
+  int PosX = std::max(0, std::min(mScrolledX, RangeX - ThumbSizeX));
+  SetScrollbar(wxHORIZONTAL, PosX, ThumbSizeX, RangeX);
 
-  ThumbSize = EventWidth / 10;
-  SetScrollbar(wxHORIZONTAL, mScrolledX, ThumbSize, EventWidth + ThumbSize);
+  int ThumbSizeY = std::max(1, EventHeight / 10);
+  int RangeY = std::max(ThumbSizeY + 1, EventHeight + ThumbSizeY);
+  int PosY = std::max(0, std::min(mScrolledY, RangeY - ThumbSizeY));
+  SetScrollbar(wxVERTICAL, PosY, ThumbSizeY, RangeY);
+}
 
-  ThumbSize = EventHeight / 10;
-  SetScrollbar(wxVERTICAL, mScrolledY, ThumbSize, EventHeight + ThumbSize);
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZPianoWindow::SetPressedPitch(int Pitch)
+{
+  if (mPressedPitch != Pitch)
+  {
+    mPressedPitch = Pitch;
+    Refresh(false);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -1332,7 +1370,16 @@ void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
     {
       if (IsBlack(Pitch))
       {
+        if (Pitch == mPressedPitch)
+        {
+          Dc.SetBrush(*wxCYAN_BRUSH);
+        }
+        else
+        {
+          Dc.SetBrush(*wxBLACK_BRUSH);
+        }
         Dc.DrawRectangle(0, y, wBlack, mTrackHeight);
+        Dc.SetBrush(*wxBLACK_BRUSH);
         Dc.DrawLine(
           wBlack,
           y + mTrackHeight / 2,
@@ -1347,33 +1394,42 @@ void JZPianoWindow::DrawPianoRoll(wxDC& Dc)
         Dc.DrawLine(0, y, wBlack, y);
         Dc.SetPen(*wxBLACK_PEN);
       }
-      else if ((Pitch % 12) == 0)
+      else
       {
-        Dc.DrawLine(0, y + mTrackHeight, mPianoWidth, y + mTrackHeight);
-        Dc.SetPen(*wxWHITE_PEN);
-        Dc.DrawLine(
-          0,
-          y + mTrackHeight + 1,
-          mPianoWidth,
-          y + mTrackHeight + 1);
-        Dc.SetPen(*wxBLACK_PEN);
-        ostringstream Oss;
-        Oss << Pitch / 12;
-        Dc.DrawText(
-          Oss.str().c_str(),
-          wBlack + mLittleBit,
-          y + mTrackHeight / 2);
-      }
-      else if (!IsBlack(Pitch - 1))
-      {
-        Dc.DrawLine(0, y + mTrackHeight, mPianoWidth, y + mTrackHeight);
-        Dc.SetPen(*wxWHITE_PEN);
-        Dc.DrawLine(
-          0,
-          y + mTrackHeight + 1,
-          mPianoWidth,
-          y + mTrackHeight + 1);
-        Dc.SetPen(*wxBLACK_PEN);
+        if (Pitch == mPressedPitch)
+        {
+          Dc.SetBrush(*wxCYAN_BRUSH);
+          Dc.DrawRectangle(0, y, mPianoWidth, mTrackHeight);
+          Dc.SetBrush(*wxLIGHT_GREY_BRUSH);
+        }
+        if ((Pitch % 12) == 0)
+        {
+          Dc.DrawLine(0, y + mTrackHeight, mPianoWidth, y + mTrackHeight);
+          Dc.SetPen(*wxWHITE_PEN);
+          Dc.DrawLine(
+            0,
+            y + mTrackHeight + 1,
+            mPianoWidth,
+            y + mTrackHeight + 1);
+          Dc.SetPen(*wxBLACK_PEN);
+          ostringstream Oss;
+          Oss << Pitch / 12;
+          Dc.DrawText(
+            Oss.str().c_str(),
+            wBlack + mLittleBit,
+            y + mTrackHeight / 2);
+        }
+        else if (!IsBlack(Pitch - 1))
+        {
+          Dc.DrawLine(0, y + mTrackHeight, mPianoWidth, y + mTrackHeight);
+          Dc.SetPen(*wxWHITE_PEN);
+          Dc.DrawLine(
+            0,
+            y + mTrackHeight + 1,
+            mPianoWidth,
+            y + mTrackHeight + 1);
+          Dc.SetPen(*wxBLACK_PEN);
+        }
       }
 
       y += mTrackHeight;
@@ -1767,7 +1823,13 @@ void JZPianoWindow::OnMouseEvent(wxMouseEvent& MouseEvent)
       if (newX != mScrolledX)
       {
         mScrolledX = newX;
+        mFromClock = mScrolledX * mClockTicsPerPixel;
+        mToClock = x2Clock(mCanvasWidth);
         SetScrollPos(wxHORIZONTAL, mScrolledX, true);
+        if (mpCtrlEdit)
+        {
+          mpCtrlEdit->ReInit(mpTrack, mFromClock, mClockTicsPerPixel);
+        }
         Refresh(false);
       }
     }
@@ -1780,6 +1842,8 @@ void JZPianoWindow::OnMouseEvent(wxMouseEvent& MouseEvent)
       if (newY != mScrolledY)
       {
         mScrolledY = newY;
+        mFromLine = mScrolledY / mTrackHeight;
+        mToLine = 1 + (mScrolledY + mCanvasHeight - mTopInfoHeight) / mTrackHeight;
         SetScrollPos(wxVERTICAL, mScrolledY, true);
         Refresh(false);
       }
@@ -1883,6 +1947,13 @@ void JZPianoWindow::OnMouseEvent(wxMouseEvent& MouseEvent)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void JZPianoWindow::OnMouseWheel(wxMouseEvent& Event)
+{
+  OnMouseEvent(Event);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::OnScroll(wxScrollWinEvent& Event)
 {
   if (Event.GetOrientation() == wxHORIZONTAL)
@@ -1947,7 +2018,13 @@ void JZPianoWindow::HorizontalScroll(wxScrollWinEvent& Event)
   if (NewScrolledX != mScrolledX)
   {
     mScrolledX = NewScrolledX;
+    mFromClock = mScrolledX * mClockTicsPerPixel;
+    mToClock = x2Clock(mCanvasWidth);
     SetScrollPos(wxHORIZONTAL, mScrolledX, true);
+    if (mpCtrlEdit)
+    {
+      mpCtrlEdit->ReInit(mpTrack, mFromClock, mClockTicsPerPixel);
+    }
     Refresh(false);
   }
 }
@@ -2004,6 +2081,8 @@ void JZPianoWindow::VerticalScroll(wxScrollWinEvent& Event)
   if (NewScrolledY != mScrolledY)
   {
     mScrolledY = NewScrolledY;
+    mFromLine = mScrolledY / mTrackHeight;
+    mToLine = 1 + (mScrolledY + mCanvasHeight - mTopInfoHeight) / mTrackHeight;
     SetScrollPos(wxVERTICAL, mScrolledY, true);
     Refresh(false);
   }

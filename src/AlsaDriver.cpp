@@ -256,6 +256,7 @@ void JZAlsaAudioPlayer::OpenDsp(int mode, int sync_mode)
   }
 
   unsigned int channels, rate;
+  int dir;
   snd_pcm_format_t format;
   snd_pcm_uframes_t buffer_size, period_size;
 
@@ -277,16 +278,41 @@ void JZAlsaAudioPlayer::OpenDsp(int mode, int sync_mode)
 
   snd_pcm_stream_t stream = (mode == PLAYBACK) ?
     SND_PCM_STREAM_PLAYBACK : SND_PCM_STREAM_CAPTURE;
+
+  std::string devName = mDeviceNames[mode];
+  if (devName.empty() || devName == "hw:0,0")
+  {
+    devName = "default";
+  }
+
   if (
     snd_pcm_open(
       &pcm[mode],
-      mDeviceNames[mode].c_str(),
+      devName.c_str(),
       stream,
       SND_PCM_NONBLOCK) < 0)
   {
-    perror("snd_pcm_open");
-    mAudioEnabled = false;
-    return;
+    if (devName != "default")
+    {
+      devName = "default";
+      if (
+        snd_pcm_open(
+          &pcm[mode],
+          devName.c_str(),
+          stream,
+          SND_PCM_NONBLOCK) < 0)
+      {
+        perror("snd_pcm_open");
+        mAudioEnabled = false;
+        return;
+      }
+    }
+    else
+    {
+      perror("snd_pcm_open");
+      mAudioEnabled = false;
+      return;
+    }
   }
 
   snd_pcm_hw_params_t *hw;
@@ -316,17 +342,17 @@ void JZAlsaAudioPlayer::OpenDsp(int mode, int sync_mode)
     cerr  << "cannot set audio rate: " << mSamples.GetSamplingRate() << endl;
     goto __error;
   }
+  mSamples.SetSamplingRate(rate);
 
   period_size = FRAGBYTES >> frame_shift[mode];
-  if (
-    (period_size = snd_pcm_hw_params_set_period_size_near(pcm[mode], hw, &period_size, 0)) < 0)
+  dir = 0;
+  if (snd_pcm_hw_params_set_period_size_near(pcm[mode], hw, &period_size, &dir) < 0)
   {
     perror("cannot set audio period");
     goto __error;
   }
   buffer_size = period_size * MAX_FRAGS;
-  if (
-    (buffer_size = snd_pcm_hw_params_set_buffer_size_near(pcm[mode], hw, &buffer_size)) < 0)
+  if (snd_pcm_hw_params_set_buffer_size_near(pcm[mode], hw, &buffer_size) < 0)
   {
     perror("cannot set audio buffer");
     goto __error;

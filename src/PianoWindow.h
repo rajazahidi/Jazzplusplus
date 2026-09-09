@@ -235,6 +235,7 @@ class JZPianoWindow : public JZEventWindow, public JZButtonLabelInterface
   public:
     void Paste(JZTrack* pTrack, int Clock, int Pitch);
     int EventsSelected(const char *msg = 0);
+    void SetPressedPitch(int Pitch);
 
   private:
     // SN++ Key_Aftertouch Utils
@@ -272,6 +273,8 @@ class JZPianoWindow : public JZEventWindow, public JZButtonLabelInterface
     void OnPaint(wxPaintEvent& Event);
 
     void OnMouseEvent(wxMouseEvent& MouseEvent);
+
+    void OnMouseWheel(wxMouseEvent& Event);
 
     void OnScroll(wxScrollWinEvent& Event);
 
@@ -331,6 +334,8 @@ class JZPianoWindow : public JZEventWindow, public JZButtonLabelInterface
     wxFont* mpDrumFont;
 
     int mSnapDenomiator;        // 16 for 16-tel
+
+    int mPressedPitch;
 
     bool mVisibleKeyOn;
     bool mVisiblePitch;

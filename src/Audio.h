@@ -51,6 +51,9 @@ struct JZAudioBuffer;
 
 #ifdef __WXMSW__
 
+#include <wx/msw/wrapwin.h>
+#include <mmsystem.h>
+
 // Microsoft Windows has big buffers.
 
 #define FRAGBITS   14

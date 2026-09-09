@@ -60,3 +60,6 @@ m4/lt*.m4
 .idea/
 *~
 *.swp
+
+# SoundFonts
+soundfonts/

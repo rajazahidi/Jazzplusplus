@@ -12,6 +12,10 @@ elseif(MSVC)
     add_compile_options(/W3 /wd4996)
 endif()
 
+if(WIN32)
+    set(wxWidgets_EXCLUDE_COMMON_LIBRARIES TRUE)
+endif()
+
 # Find wxWidgets
 find_package(wxWidgets REQUIRED core base adv net html)
 include(${wxWidgets_USE_FILE})
@@ -44,7 +48,7 @@ if(WIN32)
 #define VERSION \"5.0.0\"
 ")
 
-    add_definitions(-DHAVE_CONFIG_H)
+    add_definitions(-DHAVE_CONFIG_H -DNOMINMAX)
     set(GUI_TYPE WIN32)
 else()
     # Linux / ALSA configuration

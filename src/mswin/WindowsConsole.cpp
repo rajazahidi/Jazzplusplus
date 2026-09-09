@@ -39,13 +39,14 @@ static const WORD MAX_CONSOLE_LINES = 500;
 //*****************************************************************************
 void RedirectIoToConsole()
 {
-  int                        hConHandle;
-  HANDLE                     lStdHandle;
   CONSOLE_SCREEN_BUFFER_INFO coninfo;
-  FILE                       *fp;
+  FILE *fp = NULL;
 
   // allocate a console for this app
-  AllocConsole();
+  if (!AllocConsole())
+  {
+    return;
+  }
 
   // set the screen buffer to be big enough to let us scroll text
   GetConsoleScreenBufferInfo(
@@ -56,26 +57,10 @@ void RedirectIoToConsole()
     GetStdHandle(STD_OUTPUT_HANDLE),
     coninfo.dwSize);
 
-  // redirect unbuffered STDOUT to the console
-  lStdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-  hConHandle = _open_osfhandle((intptr_t)lStdHandle, _O_TEXT);
-  fp = _fdopen(hConHandle, "w");
-  *stdout = *fp;
-  setvbuf(stdout, NULL, _IONBF, 0);
-
-  // redirect unbuffered STDIN to the console
-  lStdHandle = GetStdHandle(STD_INPUT_HANDLE);
-  hConHandle = _open_osfhandle((intptr_t)lStdHandle, _O_TEXT);
-  fp = _fdopen(hConHandle, "r");
-  *stdin = *fp;
-  setvbuf(stdin, NULL, _IONBF, 0);
-
-  // redirect unbuffered STDERR to the console
-  lStdHandle = GetStdHandle(STD_ERROR_HANDLE);
-  hConHandle = _open_osfhandle((intptr_t)lStdHandle, _O_TEXT);
-  fp = _fdopen(hConHandle, "w");
-  *stderr = *fp;
-  setvbuf(stderr, NULL, _IONBF, 0);
+  // redirect unbuffered STDOUT, STDIN, and STDERR to the console
+  freopen_s(&fp, "CONOUT$", "w", stdout);
+  freopen_s(&fp, "CONIN$", "r", stdin);
+  freopen_s(&fp, "CONOUT$", "w", stderr);
 
   // make cout, wcout, cin, wcin, wcerr, cerr, wclog and clog
   // point to console as well

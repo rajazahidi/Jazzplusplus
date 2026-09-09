@@ -22,6 +22,7 @@
 
 #include <wx/app.h>
 #include <wx/filename.h>
+#include <wx/stdpaths.h>
 
 #include <iostream>
 
@@ -81,10 +82,21 @@ wxString FindFile(const wxString& FileName)
   // Look where the executable was started.
   FoundFileName = "";
   Home = wxPathOnly(wxTheApp->argv[0]);
-  FoundFileName << Home << wxFileName::GetPathSeparator() << FileName;
+  if (!Home.empty())
+  {
+    FoundFileName << Home << wxFileName::GetPathSeparator() << FileName;
+    if (wxFileExists(FoundFileName))
+    {
+      cout << "FindFile: Startup directory: \"" << FoundFileName << '"' << endl;
+      return FoundFileName;
+    }
+  }
+
+  // Look in application data directory.
+  FoundFileName = wxStandardPaths::Get().GetDataDir() + wxFileName::GetPathSeparator() + FileName;
   if (wxFileExists(FoundFileName))
   {
-    cout << "FindFile: Startup directory: \"" << FoundFileName << '"' << endl;
+    cout << "FindFile: Data dir: \"" << FoundFileName << '"' << endl;
     return FoundFileName;
   }
 

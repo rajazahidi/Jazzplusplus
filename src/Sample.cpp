@@ -34,6 +34,9 @@
 #include <fstream>
 
 #include <sys/stat.h>
+#ifdef __WXMSW__
+#include <io.h>
+#endif
 
 using namespace std;
 
@@ -722,7 +725,7 @@ int JZSample::SaveWave()
   wh.length = wh.data_length + sizeof(WaveHeader);
 
 #ifdef __WXMSW__
-  unlink(mFileName.c_str()); // buggy, sigh!
+  _unlink(mFileName.c_str());
 #endif
   ofstream os(mFileName.c_str(), ios::out | ios::binary | ios::trunc);
 

@@ -468,7 +468,7 @@ bool JZWindowsPlayer::OutSysex(JZEvent* pEvent, DWORD time)
     pSysExEvent->GetData(),
     pSysExEvent->GetLength() - 1);
   mpState->play_buffer.put(SYSEX_EVENT, time);
-  mpState->play_buffer.put((DWORD)pWinSysexBuffer, time);
+  mpState->play_buffer.put((DWORD_PTR)pWinSysexBuffer, time);
 
   return false;
 }
@@ -709,7 +709,7 @@ void JZWindowsPlayer::StartPlay(int Clock, int LoopClock, int Continue)
         mpState->min_timer_period,
         mpState->min_timer_period,
         (LPTIMECALLBACK) midiMidiTimerHandler,
-        (DWORD) mpState,
+        (DWORD_PTR) mpState,
         TIME_ONESHOT);
       break;
     case CsMtc:
@@ -740,7 +740,7 @@ void JZWindowsPlayer::StartPlay(int Clock, int LoopClock, int Continue)
         mpState->min_timer_period,
         mpState->min_timer_period,
         (LPTIMECALLBACK) midiMtcTimerHandler,
-        (DWORD) mpState,
+        (DWORD_PTR) mpState,
         TIME_ONESHOT);
       break;
     case CsInt:
@@ -751,7 +751,7 @@ void JZWindowsPlayer::StartPlay(int Clock, int LoopClock, int Continue)
         mpState->min_timer_period,
         mpState->min_timer_period,
         (LPTIMECALLBACK) midiIntTimerHandler,
-        (DWORD) mpState,
+        (DWORD_PTR) mpState,
         TIME_ONESHOT);
       break;
   }

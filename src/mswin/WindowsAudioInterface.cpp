@@ -452,9 +452,9 @@ int JZWindowsAudioPlayer::CloseDsp()
 void FAR PASCAL audioInterrupt(
   HWAVEOUT hout,
   UINT wMsg,
-  DWORD dwUser,
-  DWORD dw1,
-  DWORD dw2)
+  DWORD_PTR dwUser,
+  DWORD_PTR dw1,
+  DWORD_PTR dw2)
 {
   if (wMsg == MM_WOM_DONE || wMsg == MM_WIM_DATA)
   {

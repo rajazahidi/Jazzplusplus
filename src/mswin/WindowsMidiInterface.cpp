@@ -161,9 +161,9 @@ static inline void outsysex(tWinPlayerState* pState)
 void CALLBACK midiIntInputHandler(
   HMIDIIN hMidiIn,
   WORD wMsg,
-  DWORD dwInstance,
-  DWORD dwParam1,
-  DWORD dwParam2)
+  DWORD_PTR dwInstance,
+  DWORD_PTR dwParam1,
+  DWORD_PTR dwParam2)
 {
   tWinPlayerState* pState = (tWinPlayerState*)dwInstance;
   int now;
@@ -204,9 +204,9 @@ void CALLBACK midiIntInputHandler(
 void CALLBACK midiIntTimerHandler(
   UINT wTimerId,
   UINT wMsg,
-  DWORD dwUser,
-  DWORD dw1,
-  DWORD dw2)
+  DWORD_PTR dwUser,
+  DWORD_PTR dw1,
+  DWORD_PTR dw2)
 {
   tWinPlayerState* pState = (tWinPlayerState *)dwUser;
   if (!pState->playing)
@@ -224,7 +224,7 @@ void CALLBACK midiIntTimerHandler(
         pState->min_timer_period,
         pState->min_timer_period * 5,
         (LPTIMECALLBACK) midiIntTimerHandler,
-        (DWORD) pState,
+        (DWORD_PTR) pState,
         TIME_ONESHOT);
       return;
     }
@@ -262,7 +262,7 @@ void CALLBACK midiIntTimerHandler(
               pState->min_timer_period,
               pState->min_timer_period * 5,
               (LPTIMECALLBACK) midiIntTimerHandler,
-              (DWORD) pState,
+              (DWORD_PTR) pState,
               TIME_ONESHOT);
             return;
           }
@@ -291,7 +291,7 @@ void CALLBACK midiIntTimerHandler(
     (UINT) delay,
     pState->min_timer_period,
     (LPTIMECALLBACK) midiIntTimerHandler,
-    (DWORD) pState,
+    (DWORD_PTR) pState,
     TIME_ONESHOT);
 }
 
@@ -301,9 +301,9 @@ void CALLBACK midiIntTimerHandler(
 void CALLBACK midiMidiInputHandler(
   HMIDIIN hMidiIn,
   WORD wMsg,
-  DWORD dwInstance,
-  DWORD dwParam1,
-  DWORD dwParam2)
+  DWORD_PTR dwInstance,
+  DWORD_PTR dwParam1,
+  DWORD_PTR dwParam2)
 {
   tWinPlayerState* pState = (tWinPlayerState*)dwInstance;
   int now;
@@ -358,9 +358,9 @@ void CALLBACK midiMidiInputHandler(
 void CALLBACK midiMidiTimerHandler(
   UINT wTimerId,
   UINT wMsg,
-  DWORD dwUser,
-  DWORD dw1,
-  DWORD dw2)
+  DWORD_PTR dwUser,
+  DWORD_PTR dw1,
+  DWORD_PTR dw2)
 {
   tWinPlayerState* pState = (tWinPlayerState*)dwUser;
   if (!pState->playing)
@@ -378,7 +378,7 @@ void CALLBACK midiMidiTimerHandler(
         pState->min_timer_period,
         pState->min_timer_period * 5,
         (LPTIMECALLBACK) midiMidiTimerHandler,
-        (DWORD) pState,
+        (DWORD_PTR) pState,
         TIME_ONESHOT);
       return;
     }
@@ -424,7 +424,7 @@ void CALLBACK midiMidiTimerHandler(
             pState->min_timer_period,
             pState->min_timer_period * 5,
             (LPTIMECALLBACK) midiMidiTimerHandler,
-            (DWORD) pState,
+            (DWORD_PTR) pState,
             TIME_ONESHOT);
           return;
         }
@@ -454,7 +454,7 @@ void CALLBACK midiMidiTimerHandler(
     (UINT) delay,
     pState->min_timer_period,
     (LPTIMECALLBACK) midiMidiTimerHandler,
-    (DWORD) pState,
+    (DWORD_PTR) pState,
     TIME_ONESHOT);
 }
 
@@ -464,9 +464,9 @@ void CALLBACK midiMidiTimerHandler(
 void CALLBACK midiMtcInputHandler(
   HMIDIIN hMidiIn,
   WORD wMsg,
-  DWORD dwInstance,
-  DWORD dwParam1,
-  DWORD dwParam2)
+  DWORD_PTR dwInstance,
+  DWORD_PTR dwParam1,
+  DWORD_PTR dwParam2)
 {
   tWinPlayerState* pState = (tWinPlayerState*)dwInstance;
   int now;
@@ -575,9 +575,9 @@ void CALLBACK midiMtcInputHandler(
 void CALLBACK midiMtcTimerHandler(
   UINT wTimerId,
   UINT wMsg,
-  DWORD dwUser,
-  DWORD dw1,
-  DWORD dw2)
+  DWORD_PTR dwUser,
+  DWORD_PTR dw1,
+  DWORD_PTR dw2)
 {
   tWinPlayerState* pState = (tWinPlayerState*)dwUser;
   if (!pState->playing)
@@ -599,7 +599,7 @@ void CALLBACK midiMtcTimerHandler(
         pState->min_timer_period,
         pState->min_timer_period * 5,
         (LPTIMECALLBACK) midiMtcTimerHandler,
-        (DWORD) pState,
+        (DWORD_PTR) pState,
         TIME_ONESHOT);
       return;
     }
@@ -641,7 +641,7 @@ void CALLBACK midiMtcTimerHandler(
             pState->min_timer_period,
             pState->min_timer_period * 5,
             (LPTIMECALLBACK) midiMtcTimerHandler,
-            (DWORD) pState,
+            (DWORD_PTR) pState,
             TIME_ONESHOT);
           return;
         }
@@ -669,7 +669,7 @@ void CALLBACK midiMtcTimerHandler(
     (UINT) delay,
     pState->min_timer_period,
     (LPTIMECALLBACK) midiMtcTimerHandler,
-    (DWORD) pState,
+    (DWORD_PTR) pState,
     TIME_ONESHOT);
 }
 
@@ -678,9 +678,9 @@ void CALLBACK midiMtcTimerHandler(
 void CALLBACK MidiOutProc(
   HMIDIOUT hmo,
   UINT wMsg,
-  DWORD dwInstance,
-  DWORD dwParam1,
-  DWORD dwParam2
+  DWORD_PTR dwInstance,
+  DWORD_PTR dwParam1,
+  DWORD_PTR dwParam2
 )
 {
   if (wMsg == MOM_DONE)

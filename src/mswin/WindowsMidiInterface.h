@@ -29,21 +29,21 @@ struct tWinPlayerState;
 extern "C"
 {
 
-void CALLBACK midiIntInputHandler(HMIDIIN, WORD, DWORD, DWORD, DWORD);
-void CALLBACK midiMidiInputHandler(HMIDIIN, WORD, DWORD, DWORD, DWORD);
-void CALLBACK midiMtcInputHandler(HMIDIIN, WORD, DWORD, DWORD, DWORD);
-void CALLBACK midiIntTimerHandler(UINT, UINT, DWORD, DWORD, DWORD);
-void CALLBACK midiMidiTimerHandler(UINT, UINT, DWORD, DWORD, DWORD);
-void CALLBACK midiMtcTimerHandler(UINT, UINT, DWORD, DWORD, DWORD);
+void CALLBACK midiIntInputHandler(HMIDIIN, WORD, DWORD_PTR, DWORD_PTR, DWORD_PTR);
+void CALLBACK midiMidiInputHandler(HMIDIIN, WORD, DWORD_PTR, DWORD_PTR, DWORD_PTR);
+void CALLBACK midiMtcInputHandler(HMIDIIN, WORD, DWORD_PTR, DWORD_PTR, DWORD_PTR);
+void CALLBACK midiIntTimerHandler(UINT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR);
+void CALLBACK midiMidiTimerHandler(UINT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR);
+void CALLBACK midiMtcTimerHandler(UINT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR);
 tWinPlayerState FAR * FAR PASCAL NewWinPlayerState();
 void FAR PASCAL DeleteWinPlayerState(tWinPlayerState FAR * state);
 
 void CALLBACK MidiOutProc(
   HMIDIOUT hmo,
   UINT wMsg,
-  DWORD dwInstance,
-  DWORD dwParam1,
-  DWORD dwParam2
+  DWORD_PTR dwInstance,
+  DWORD_PTR dwParam1,
+  DWORD_PTR dwParam2
 );
 
 } // extern "C"
@@ -118,7 +118,7 @@ class JZWinSysexBuffer
       mSize = Length + 2;
 
       memset(&mMidiHeader, 0, sizeof(mMidiHeader));
-      mMidiHeader.dwUser = (DWORD)this;
+      mMidiHeader.dwUser = (DWORD_PTR)this;
       mMidiHeader.lpData = (char *)mpData;
       mMidiHeader.dwBufferLength = mSize;
       OutputDebugString(L"prepare\n");
@@ -247,8 +247,8 @@ void JZWinSysexBuffer::Release()
 //*****************************************************************************
 struct JZMidiEvent
 {
-  DWORD ref;  // Means time or clock depending on sync mode.
-  DWORD data; // MIDI event or pseudo data.
+  DWORD ref;      // Means time or clock depending on sync mode.
+  DWORD_PTR data; // MIDI event or pseudo data or pointer.
 };
 
 
@@ -278,7 +278,7 @@ class JZMidiQueue
       return &buffer[mReadIndex];
     }
 
-    void put(DWORD data, DWORD ref)
+    void put(DWORD_PTR data, DWORD ref)
     {
       if (nfree() < 1)
       {

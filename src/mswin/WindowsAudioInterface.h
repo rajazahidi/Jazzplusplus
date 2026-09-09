@@ -112,9 +112,9 @@ class JZWindowsAudioPlayer : public JZWindowsIntPlayer
     friend void FAR PASCAL audioInterrupt(
       HWAVEOUT,
       UINT,
-      DWORD,
-      DWORD,
-      DWORD);
+      DWORD_PTR,
+      DWORD_PTR,
+      DWORD_PTR);
 
     // Description:
     //   Send the sample set to driver.

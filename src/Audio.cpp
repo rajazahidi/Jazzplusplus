@@ -897,6 +897,15 @@ void JZSampleSet::SaveSampleSet(wxWindow* pParent)
 
 //-----------------------------------------------------------------------------
 // case ID_AUDIO_NEW_SAMPLE_SET:
+void JZSampleSet::Clear()
+{
+  for (int i = 0; i < eSampleCount; ++i)
+  {
+    mSamples[i]->Clear();
+  }
+}
+
+//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZSampleSet::ClearSampleSet(wxWindow* pParent)
 {
@@ -906,10 +915,7 @@ void JZSampleSet::ClearSampleSet(wxWindow* pParent)
     {
       return;
     }
-    for (int i = 0; i < eSampleCount; ++i)
-    {
-      mSamples[i]->Clear();
-    }
+    Clear();
   }
 }
 

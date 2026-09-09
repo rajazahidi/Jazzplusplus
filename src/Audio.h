@@ -243,6 +243,8 @@ class JZSampleSet
 
     int Save(const wxString& FileName);
 
+    void Clear();
+
     void ReloadSamples();
 
     void Edit(int key);

@@ -350,6 +350,12 @@ JZProject::JZProject()
   {
     JZStandardRead Io;
     Read(Io, StartUpSong.c_str());
+    wxFileName SplFile(StartUpSong.c_str());
+    SplFile.SetExt("spl");
+    if (SplFile.FileExists() && mpMidiPlayer)
+    {
+      mpMidiPlayer->GetSampleSet()->Load(SplFile.GetFullPath());
+    }
   }
 }
 
@@ -521,6 +527,19 @@ void JZProject::OpenSong(const wxString& SongFileName)
   Clear();
   Read(Io, SongFileName.ToStdString());
   mpConfig->Put(C_StartUpSong, SongFileName.ToStdString());
+  wxFileName SplFile(SongFileName);
+  SplFile.SetExt("spl");
+  if (mpMidiPlayer)
+  {
+    if (SplFile.FileExists())
+    {
+      mpMidiPlayer->GetSampleSet()->Load(SplFile.GetFullPath());
+    }
+    else
+    {
+      mpMidiPlayer->GetSampleSet()->Clear();
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------

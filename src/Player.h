@@ -300,6 +300,11 @@ class JZPlayer : public wxTimer
       mSamples.LoadDefaultSettings();
     }
 
+    JZSampleSet* GetSampleSet()
+    {
+      return &mSamples;
+    }
+
   protected:
 
     virtual void OutNow(JZEvent* pEvent) = 0;

@@ -1085,20 +1085,23 @@ void JZTrackFrame::OnSettingsMidiDevice(wxCommandEvent& Event)
     "Info",
     wxOK);
 #else
-  if (gpConfig->GetValue(C_MidiDriver) == eMidiDriverOss)
+  if (gpMidiPlayer)
   {
     int Device = gpMidiPlayer->FindMidiDevice();
-    if (Device >= 0)
+    if (gpConfig->GetValue(C_MidiDriver) == eMidiDriverOss)
     {
-      gpConfig->Put(C_Seq2Device, Device);
-      ::wxMessageBox(
-        "Restart Jazz++ to activate changes in device settings",
-        "Info",
-        wxOK);
-    }
-    else
-    {
-      ::wxMessageBox("No midi device found", "Info", wxOK);
+      if (Device >= 0)
+      {
+        gpConfig->Put(C_Seq2Device, Device);
+        ::wxMessageBox(
+          "Restart Jazz++ to activate changes in device settings",
+          "Info",
+          wxOK);
+      }
+      else
+      {
+        ::wxMessageBox("No midi device found", "Info", wxOK);
+      }
     }
   }
 #endif

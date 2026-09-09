@@ -590,7 +590,7 @@ void JZAlsaPlayer::StartPlay(int clock, int loopClock, int cont)
   start_timer(clock);
   JZPlayer::StartPlay(clock, loopClock, cont);
   Notify();
-//  flush_output();
+  flush_output();
 }
 
 //-----------------------------------------------------------------------------
@@ -681,6 +681,7 @@ void JZAlsaPlayer::Notify()
   {
     OutBreak();        // does nothing unless mOutClock has changed
   }
+  flush_output();
 }
 
 //-----------------------------------------------------------------------------
@@ -803,6 +804,11 @@ int JZAlsaPlayer::write(snd_seq_event_t *ev, int now)
     return snd_seq_event_output_direct(handle, ev);
   }
   int rc = snd_seq_event_output(handle, ev);
+  if (rc == -EAGAIN)
+  {
+    snd_seq_drain_output(handle);
+    rc = snd_seq_event_output(handle, ev);
+  }
   if (rc < 0 && rc != -EAGAIN)
   {
     snd_seq_extract_output(handle, NULL); // remove the error event

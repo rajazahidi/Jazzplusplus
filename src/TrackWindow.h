@@ -77,6 +77,8 @@ class JZTrackWindow : public JZEventWindow
 
     void SetScrollRanges();
 
+    void SelectAll();
+
   protected:
 
     virtual void SnapSelectionStart(wxMouseEvent& MouseEvent);
@@ -92,6 +94,8 @@ class JZTrackWindow : public JZEventWindow
     void OnPaint(wxPaintEvent& Event);
 
     void OnLeftButtonDown(wxMouseEvent& MouseEvent);
+
+    void OnLeftDoubleClick(wxMouseEvent& MouseEvent);
 
     void OnMouseMove(wxMouseEvent& MouseEvent);
 

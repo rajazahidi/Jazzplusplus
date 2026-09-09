@@ -36,31 +36,22 @@ using namespace std;
 //-----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(JZEventFrame, wxFrame)
 
-  EVT_UPDATE_UI(ID_SHIFT, JZEventFrame::OnUpdateEventsSelected)
   EVT_MENU(ID_SHIFT, JZEventFrame::OnShift)
 
-  EVT_UPDATE_UI(ID_CLEANUP, JZEventFrame::OnUpdateEventsSelected)
   EVT_MENU(ID_CLEANUP, JZEventFrame::OnCleanup)
 
-  EVT_UPDATE_UI(ID_SEARCH_AND_REPLACE, JZEventFrame::OnUpdateEventsSelected)
   EVT_MENU(ID_SEARCH_AND_REPLACE, JZEventFrame::OnSearchReplace)
 
-  EVT_UPDATE_UI(ID_QUANTIZE, JZEventFrame::OnUpdateEventsSelected)
   EVT_MENU(ID_QUANTIZE, JZEventFrame::OnQuantize)
 
-  EVT_UPDATE_UI(ID_SET_CHANNEL, JZEventFrame::OnUpdateEventsSelected)
   EVT_MENU(ID_SET_CHANNEL, JZEventFrame::OnSetChannel)
 
-  EVT_UPDATE_UI(ID_TRANSPOSE, JZEventFrame::OnUpdateEventsSelected)
   EVT_MENU(ID_TRANSPOSE, JZEventFrame::OnTranspose)
 
-  EVT_UPDATE_UI(wxID_DELETE, JZEventFrame::OnUpdateEventsSelected)
   EVT_MENU(wxID_DELETE, JZEventFrame::OnDelete)
 
-  EVT_UPDATE_UI(ID_VELOCITY, JZEventFrame::OnUpdateEventsSelected)
   EVT_MENU(ID_VELOCITY, JZEventFrame::OnVelocity)
 
-  EVT_UPDATE_UI(ID_LENGTH, JZEventFrame::OnUpdateEventsSelected)
   EVT_MENU(ID_LENGTH, JZEventFrame::OnLength)
 
   EVT_MENU(ID_MISC_METER_CHANGE, JZEventFrame::OnMeterChange)
@@ -123,7 +114,7 @@ void JZEventFrame::OnUpdateEventsSelected(wxUpdateUIEvent& Event)
 //-----------------------------------------------------------------------------
 void JZEventFrame::OnShift(wxCommandEvent& Event)
 {
-  if (mpEventWindow && mpEventWindow->AreEventsSelected())
+  if (mpEventWindow && mpEventWindow->EventsSelected("Please select a range of events or track first."))
   {
     mpEventWindow->Shift(16);
   }
@@ -133,7 +124,7 @@ void JZEventFrame::OnShift(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZEventFrame::OnQuantize(wxCommandEvent& Event)
 {
-  if (mpEventWindow && mpEventWindow->AreEventsSelected())
+  if (mpEventWindow && mpEventWindow->EventsSelected("Please select a range of events or track first."))
   {
     mpEventWindow->Quantize();
   }
@@ -143,7 +134,7 @@ void JZEventFrame::OnQuantize(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZEventFrame::OnSetChannel(wxCommandEvent& Event)
 {
-  if (mpEventWindow && mpEventWindow->AreEventsSelected())
+  if (mpEventWindow && mpEventWindow->EventsSelected("Please select a range of events or track first."))
   {
     mpEventWindow->SetChannel();
   }
@@ -153,7 +144,7 @@ void JZEventFrame::OnSetChannel(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZEventFrame::OnTranspose(wxCommandEvent& Event)
 {
-  if (mpEventWindow && mpEventWindow->AreEventsSelected())
+  if (mpEventWindow && mpEventWindow->EventsSelected("Please select a range of events or track first."))
   {
     mpEventWindow->Transpose();
   }
@@ -163,7 +154,7 @@ void JZEventFrame::OnTranspose(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZEventFrame::OnDelete(wxCommandEvent& Event)
 {
-  if (mpEventWindow && mpEventWindow->AreEventsSelected())
+  if (mpEventWindow && mpEventWindow->EventsSelected("Please select a range of events or track first."))
   {
     mpEventWindow->Delete();
   }
@@ -173,7 +164,7 @@ void JZEventFrame::OnDelete(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZEventFrame::OnVelocity(wxCommandEvent& Event)
 {
-  if (mpEventWindow && mpEventWindow->AreEventsSelected())
+  if (mpEventWindow && mpEventWindow->EventsSelected("Please select a range of events or track first."))
   {
     mpEventWindow->Velocity();
   }
@@ -183,7 +174,7 @@ void JZEventFrame::OnVelocity(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZEventFrame::OnLength(wxCommandEvent& Event)
 {
-  if (mpEventWindow && mpEventWindow->AreEventsSelected())
+  if (mpEventWindow && mpEventWindow->EventsSelected("Please select a range of events or track first."))
   {
     mpEventWindow->Length();
   }
@@ -193,7 +184,7 @@ void JZEventFrame::OnLength(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZEventFrame::OnConvertToModulation(wxCommandEvent& Event)
 {
-  if (mpEventWindow && mpEventWindow->AreEventsSelected())
+  if (mpEventWindow && mpEventWindow->EventsSelected("Please select a range of events or track first."))
   {
     mpEventWindow->ConvertToModulation();
   }
@@ -203,7 +194,7 @@ void JZEventFrame::OnConvertToModulation(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZEventFrame::OnCleanup(wxCommandEvent& Event)
 {
-  if (mpEventWindow && mpEventWindow->AreEventsSelected())
+  if (mpEventWindow && mpEventWindow->EventsSelected("Please select a range of events or track first."))
   {
     mpEventWindow->Cleanup();
   }
@@ -213,7 +204,7 @@ void JZEventFrame::OnCleanup(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZEventFrame::OnSearchReplace(wxCommandEvent& Event)
 {
-  if (mpEventWindow && mpEventWindow->AreEventsSelected())
+  if (mpEventWindow && mpEventWindow->EventsSelected("Please select a range of events or track first."))
   {
     mpEventWindow->SearchReplace();
   }

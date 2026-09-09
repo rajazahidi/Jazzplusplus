@@ -16,7 +16,12 @@ class JZProjectManager
 
     JZTrackFrame* CreateTrackView();
 
-    void CreatePianoView();
+    void CreatePianoView(int TrackIndex = -1);
+
+    JZPianoFrame* GetPianoFrame() const
+    {
+      return mpPianoFrame;
+    }
 
     void Detach(JZPianoFrame* pPianoFrame);
 

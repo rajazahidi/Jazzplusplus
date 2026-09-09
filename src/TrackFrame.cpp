@@ -23,13 +23,17 @@
 #include "TrackFrame.h"
 
 #include "AboutDialog.h"
+#include "Command.h"
 #include "Configuration.h"
 #include "Dialogs/MetronomeSettingsDialog.h"
 #include "Dialogs/SynthesizerSettingsDialog.h"
+#include "Filter.h"
 #include "Globals.h"
 #include "Harmony.h"
 #include "Help.h"
 #include "JazzPlusPlusApplication.h"
+#include "PianoFrame.h"
+#include "PianoWindow.h"
 #include "Player.h"
 #include "Project.h"
 #include "ProjectManager.h"
@@ -67,8 +71,10 @@
 #include <wx/filedlg.h>
 #include <wx/menu.h>
 #include <wx/msgdlg.h>
+#include <wx/textdlg.h>
 
 //DEBUG#include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -86,6 +92,8 @@ BEGIN_EVENT_TABLE(JZTrackFrame, JZEventFrame)
 
   EVT_MENU(wxID_OPEN, JZTrackFrame::OnFileOpenProject)
 
+  EVT_MENU(wxID_CLOSE, JZTrackFrame::OnFileClose)
+
   EVT_MENU(wxID_SAVE, JZTrackFrame::OnFileProjectSave)
 
   EVT_MENU(wxID_SAVEAS, JZTrackFrame::OnFileProjectSaveAs)
@@ -102,7 +110,23 @@ BEGIN_EVENT_TABLE(JZTrackFrame, JZEventFrame)
     ID_EXPORT_SELECTION_AS_MIDI,
     JZTrackFrame::OnFileExportSelectionAsMidi)
 
+  EVT_MENU(wxID_PREFERENCES, JZTrackFrame::OnSettingsSynthesizerType)
+
   EVT_MENU(wxID_EXIT, JZTrackFrame::OnFileExit)
+
+  EVT_MENU(wxID_UNDO, JZTrackFrame::OnUndo)
+
+  EVT_MENU(wxID_REDO, JZTrackFrame::OnRedo)
+
+  EVT_MENU(wxID_CUT, JZTrackFrame::OnCut)
+
+  EVT_MENU(wxID_COPY, JZTrackFrame::OnCopy)
+
+  EVT_MENU(wxID_PASTE, JZTrackFrame::OnPaste)
+
+  EVT_MENU(ID_TRIM, JZTrackFrame::OnTrim)
+
+  EVT_MENU(wxID_SELECTALL, JZTrackFrame::OnSelectAll)
 
   EVT_MENU(ID_PLAY, JZTrackFrame::OnPlay)
 
@@ -111,6 +135,18 @@ BEGIN_EVENT_TABLE(JZTrackFrame, JZEventFrame)
   EVT_MENU(ID_RECORD, JZTrackFrame::OnRecord)
 
   EVT_MENU(ID_PIANOWIN, JZTrackFrame::OnPianoWindow)
+
+  EVT_MENU(ID_MIXER, JZTrackFrame::OnMixer)
+
+  EVT_MENU(wxID_RESET, JZTrackFrame::OnReset)
+
+  EVT_MENU(ID_MISC_RESET_MIDI, JZTrackFrame::OnReset)
+
+  EVT_MENU(ID_MISC_SET_COPYRIGHT, JZTrackFrame::OnSetCopyright)
+
+  EVT_MENU(ID_MISC_TRACK_MERGE, JZTrackFrame::OnMiscMergeTracks)
+
+  EVT_MENU(ID_MISC_SPLIT_TRACKS, JZTrackFrame::OnMiscSplitTracks)
 
   EVT_MENU(ID_METRONOME_TOGGLE, JZTrackFrame::OnMetroOn)
 
@@ -202,6 +238,17 @@ JZTrackFrame::~JZTrackFrame()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+JZPianoWindow* JZTrackFrame::GetPianoWindow()
+{
+  if (JZProjectManager::Instance() && JZProjectManager::Instance()->GetPianoFrame())
+  {
+    return JZProjectManager::Instance()->GetPianoFrame()->mpPianoWindow;
+  }
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZTrackFrame::CreateToolBar()
 {
   JZToolDef ToolBarDefinitions[] =
@@ -266,15 +313,19 @@ void JZTrackFrame::CreateMenu()
 
   mpEditMenu = new wxMenu;
 
-  mpEditMenu->Append(wxID_UNDO, "&Undo...");
-  mpEditMenu->Append(wxID_REDO, "&Redo...");
+  mpEditMenu->Append(wxID_UNDO, "&Undo\tCtrl+Z");
+  mpEditMenu->Append(wxID_REDO, "&Redo\tCtrl+Y");
 
   mpEditMenu->AppendSeparator();
 
-  mpEditMenu->Append(wxID_CUT, "&Cut");
-  mpEditMenu->Append(wxID_COPY, "C&opy");
-  mpEditMenu->Append(wxID_PASTE, "&Paste");
+  mpEditMenu->Append(wxID_CUT, "&Cut\tCtrl+X");
+  mpEditMenu->Append(wxID_COPY, "C&opy\tCtrl+C");
+  mpEditMenu->Append(wxID_PASTE, "&Paste\tCtrl+V");
   mpEditMenu->Append(ID_TRIM, "&Trim");
+
+  mpEditMenu->AppendSeparator();
+
+  mpEditMenu->Append(wxID_SELECTALL, "Select &All\tCtrl+A");
 
   mpEditMenu->AppendSeparator();
 
@@ -289,7 +340,7 @@ void JZTrackFrame::CreateMenu()
 
   mpEditMenu->AppendSeparator();
 
-  mpEditMenu->Append(wxID_DELETE, "&Delete");
+  mpEditMenu->Append(wxID_DELETE, "&Delete\tDel");
   mpEditMenu->Append(wxID_DELETE, "&Silence");
 
 #if 0
@@ -321,6 +372,8 @@ void JZTrackFrame::CreateMenu()
   pMiscMenu->Append(ID_MISC_SET_COPYRIGHT, "&Set Music Copyright...");
 
   mpToolsMenu = new wxMenu;
+  mpToolsMenu->Append(ID_PIANOWIN, "&Piano Roll...\tCtrl+P");
+  mpToolsMenu->Append(ID_MIXER, "&Track Settings / Mixer...\tCtrl+M");
   mpToolsMenu->Append(ID_TOOLS_HARMONY_BROWSER, "&Harmony Browser...");
   mpToolsMenu->Append(ID_TOOLS_RHYTHM_GENERATOR, "&Rhythm Generator...");
 
@@ -534,6 +587,13 @@ void JZTrackFrame::OnFileOpenProject(wxCommandEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void JZTrackFrame::OnFileClose(wxCommandEvent& Event)
+{
+  Close(false);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZTrackFrame::OnFileProjectSave(wxCommandEvent& Event)
 {
 }
@@ -675,9 +735,281 @@ void JZTrackFrame::OnRecord(wxCommandEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void JZTrackFrame::OnUndo(wxCommandEvent& Event)
+{
+  if (gpProject)
+  {
+    gpProject->Undo();
+    JZProjectManager::Instance()->UpdateAllViews();
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnRedo(wxCommandEvent& Event)
+{
+  if (gpProject)
+  {
+    gpProject->Redo();
+    JZProjectManager::Instance()->UpdateAllViews();
+  }
+}
+
+static JZEventArray gTrackClipboard;
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnCopy(wxCommandEvent& Event)
+{
+  if (!mpTrackWindow || !mpTrackWindow->AreEventsSelected())
+  {
+    wxMessageBox("Please select a range of events or track first.", "Copy", wxOK | wxICON_INFORMATION, this);
+    return;
+  }
+  gTrackClipboard.Clear();
+  JZCommandCopyToBuffer cmd(mpTrackWindow->mpFilter, &gTrackClipboard);
+  cmd.Execute(0);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnCut(wxCommandEvent& Event)
+{
+  if (!mpTrackWindow || !mpTrackWindow->AreEventsSelected())
+  {
+    wxMessageBox("Please select a range of events or track first.", "Cut", wxOK | wxICON_INFORMATION, this);
+    return;
+  }
+  gTrackClipboard.Clear();
+  JZCommandCopyToBuffer copyCmd(mpTrackWindow->mpFilter, &gTrackClipboard);
+  copyCmd.Execute(0);
+  gpProject->NewUndoBuffer();
+  JZCommandErase eraseCmd(mpTrackWindow->mpFilter, false);
+  eraseCmd.Execute(1);
+  JZProjectManager::Instance()->UpdateAllViews();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnPaste(wxCommandEvent& Event)
+{
+  if (gTrackClipboard.mEventCount == 0)
+  {
+    wxMessageBox("Clipboard is empty.", "Paste", wxOK | wxICON_INFORMATION, this);
+    return;
+  }
+  int destTrack = 1;
+  int destClock = 0;
+  if (mpTrackWindow && mpTrackWindow->AreEventsSelected())
+  {
+    destTrack = mpTrackWindow->mpFilter->GetFromTrack();
+    destClock = mpTrackWindow->mpFilter->GetFromClock();
+  }
+  else
+  {
+    destClock = mpProject ? mpProject->mStartTime : 0;
+  }
+  if (destTrack < 0 || destTrack >= mpProject->GetTrackCount())
+  {
+    destTrack = 0;
+  }
+  JZTrack* pTrack = mpProject->GetTrack(destTrack);
+  if (!pTrack)
+  {
+    return;
+  }
+
+  gpProject->NewUndoBuffer();
+  JZEventIterator Iterator(&gTrackClipboard);
+  JZEvent* pFirst = Iterator.First();
+  int baseClock = pFirst ? pFirst->GetClock() : 0;
+  JZEvent* pEv = pFirst;
+  while (pEv)
+  {
+    JZEvent* pCopy = pEv->Copy();
+    pCopy->SetClock(destClock + (pEv->GetClock() - baseClock));
+    if (pTrack->mForceChannel && pCopy->IsChannelEvent())
+    {
+      pCopy->IsChannelEvent()->SetChannel(pTrack->mChannel - 1);
+    }
+    pTrack->Put(pCopy);
+    pEv = Iterator.Next();
+  }
+  JZProjectManager::Instance()->UpdateAllViews();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnTrim(wxCommandEvent& Event)
+{
+  if (!mpTrackWindow || !mpTrackWindow->AreEventsSelected())
+  {
+    wxMessageBox("Please select a range of events first.", "Trim", wxOK | wxICON_INFORMATION, this);
+    return;
+  }
+  gpProject->NewUndoBuffer();
+  int fromClock = mpTrackWindow->mpFilter->GetFromClock();
+  int toClock = mpTrackWindow->mpFilter->GetToClock();
+  int fromTrack = mpTrackWindow->mpFilter->GetFromTrack();
+  int toTrack = mpTrackWindow->mpFilter->GetToTrack();
+
+  for (int t = fromTrack; t <= toTrack && t < gpProject->GetTrackCount(); ++t)
+  {
+    JZTrack* pTrack = gpProject->GetTrack(t);
+    if (!pTrack)
+    {
+      continue;
+    }
+    JZEventIterator iter(pTrack);
+    JZEvent* pEvent = iter.First();
+    while (pEvent)
+    {
+      JZEvent* next = iter.Next();
+      if (pEvent->GetClock() < fromClock || pEvent->GetClock() > toClock)
+      {
+        pTrack->Kill(pEvent);
+      }
+      pEvent = next;
+    }
+  }
+  JZProjectManager::Instance()->UpdateAllViews();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnSelectAll(wxCommandEvent& Event)
+{
+  if (mpTrackWindow)
+  {
+    mpTrackWindow->SelectAll();
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnReset(wxCommandEvent& Event)
+{
+  if (gpMidiPlayer)
+  {
+    gpMidiPlayer->AllNotesOff(true);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnSetCopyright(wxCommandEvent& Event)
+{
+  JZTrack* pTrack = gpProject->GetTrack(0);
+  if (!pTrack)
+  {
+    return;
+  }
+  const char* cur = pTrack->GetCopyright();
+  wxString currentVal = (cur && strlen(cur) > 0) ? wxString(cur) : wxString("Copyright (C) 2026 Jazz++");
+  wxString result = wxGetTextFromUser("Enter Music Copyright Notice:", "Music Copyright", currentVal, this);
+  if (!result.empty())
+  {
+    pTrack->SetCopyright(const_cast<char*>(static_cast<const char*>(result.mb_str())));
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnMiscMergeTracks(wxCommandEvent& Event)
+{
+  if (wxMessageBox("Merge all tracks into Track 0?", "Merge Tracks", wxYES_NO | wxICON_QUESTION, this) != wxYES)
+  {
+    return;
+  }
+  gpProject->NewUndoBuffer();
+  JZTrack* pTrack0 = gpProject->GetTrack(0);
+  if (!pTrack0)
+  {
+    return;
+  }
+  for (int i = 1; i < gpProject->GetTrackCount(); ++i)
+  {
+    JZTrack* pTrack = gpProject->GetTrack(i);
+    JZEventIterator iter(pTrack);
+    JZEvent* pEvent = iter.First();
+    while (pEvent)
+    {
+      JZEvent* next = iter.Next();
+      pTrack->Kill(pEvent);
+      pTrack0->Put(pEvent);
+      pEvent = next;
+    }
+  }
+  JZProjectManager::Instance()->UpdateAllViews();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnMiscSplitTracks(wxCommandEvent& Event)
+{
+  JZTrack* pTrack0 = gpProject->GetTrack(0);
+  if (!pTrack0)
+  {
+    return;
+  }
+  gpProject->NewUndoBuffer();
+  JZEventIterator iter(pTrack0);
+  JZEvent* pEvent = iter.First();
+  std::vector<JZEvent*> toMove;
+  while (pEvent)
+  {
+    if (pEvent->IsChannelEvent())
+    {
+      toMove.push_back(pEvent);
+    }
+    pEvent = iter.Next();
+  }
+  for (size_t i = 0; i < toMove.size(); ++i)
+  {
+    JZEvent* ev = toMove[i];
+    int ch = ev->IsChannelEvent()->GetChannel();
+    int destTrackIdx = ch + 1;
+    if (destTrackIdx < gpProject->GetTrackCount())
+    {
+      JZTrack* destTrack = gpProject->GetTrack(destTrackIdx);
+      pTrack0->Kill(ev);
+      destTrack->Put(ev);
+    }
+  }
+  JZProjectManager::Instance()->UpdateAllViews();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZTrackFrame::OnPianoWindow(wxCommandEvent& Event)
 {
-  JZProjectManager::Instance()->CreatePianoView();
+  int trackIndex = -1;
+  if (mpTrackWindow && mpTrackWindow->AreEventsSelected())
+  {
+    trackIndex = mpTrackWindow->mpFilter->GetFromTrack();
+  }
+  JZProjectManager::Instance()->CreatePianoView(trackIndex);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnMixer(wxCommandEvent& Event)
+{
+  int trackIndex = 1;
+  if (mpTrackWindow && mpTrackWindow->AreEventsSelected())
+  {
+    trackIndex = mpTrackWindow->mpFilter->GetFromTrack();
+  }
+  if (trackIndex < 0 || trackIndex >= gpProject->GetTrackCount())
+  {
+    trackIndex = 0;
+  }
+  JZTrack* pTrack = gpProject->GetTrack(trackIndex);
+  if (pTrack)
+  {
+    pTrack->Edit(mpTrackWindow);
+    mpTrackWindow->Refresh(false);
+  }
 }
 
 //-----------------------------------------------------------------------------

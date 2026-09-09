@@ -25,6 +25,7 @@
 #include "TrackFrame.h"
 #include "Filter.h"
 #include "Project.h"
+#include "ProjectManager.h"
 #include "Player.h"
 #include "RecordingInfo.h"
 #include "Globals.h"
@@ -52,6 +53,8 @@ BEGIN_EVENT_TABLE(JZTrackWindow, JZEventWindow)
   EVT_PAINT(JZTrackWindow::OnPaint)
 
   EVT_LEFT_DOWN(JZTrackWindow::OnLeftButtonDown)
+
+  EVT_LEFT_DCLICK(JZTrackWindow::OnLeftDoubleClick)
 
   EVT_MOTION(JZTrackWindow::OnMouseMove)
 
@@ -287,6 +290,21 @@ void JZTrackWindow::OnLeftButtonDown(wxMouseEvent& MouseEvent)
     SnapSelectionStart(MouseEvent);
 
     mpSnapSel->ButtonDown(MouseEvent, mScrolledX, mScrolledY);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::OnLeftDoubleClick(wxMouseEvent& MouseEvent)
+{
+  wxPoint Point = MouseEvent.GetPosition();
+  if (Point.y >= mTopInfoHeight)
+  {
+    int trackIndex = y2TrackIndex(Point.y);
+    if (trackIndex >= 0 && trackIndex < mpProject->GetTrackCount())
+    {
+      JZProjectManager::Instance()->CreatePianoView(trackIndex);
+    }
   }
 }
 
@@ -1248,6 +1266,31 @@ void JZTrackWindow::SetScrollRanges()
 
   ThumbSize = EventHeight / 10;
   SetScrollbar(wxVERTICAL, mScrolledY, ThumbSize, EventHeight + ThumbSize);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackWindow::SelectAll()
+{
+  int totalTracks = mpProject->GetTrackCount();
+  if (totalTracks <= 0)
+  {
+    return;
+  }
+  int totalHeight = totalTracks * mTrackHeight;
+  int endClock = mpProject->GetLastClock();
+  if (endClock <= 0)
+  {
+    endClock = mpProject->GetMaxQuarters() * mpProject->GetTicksPerQuarter();
+  }
+  int totalWidth = Clock2x(endClock) + 100;
+  JZRectangle Rectangle(0, mTopInfoHeight, totalWidth, totalHeight);
+  mpSnapSel->Select(Rectangle);
+  mpFilter->SetFromTrack(0);
+  mpFilter->SetToTrack(totalTracks - 1);
+  mpFilter->SetFromClock(0);
+  mpFilter->SetToClock(endClock);
+  Refresh(false);
 }
 
 //-----------------------------------------------------------------------------

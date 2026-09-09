@@ -47,10 +47,7 @@ class JZTrackFrame : public JZEventFrame, public JZButtonLabelInterface
 
     virtual ~JZTrackFrame();
 
-    JZPianoWindow* GetPianoWindow()
-    {
-      return 0;
-    }
+    JZPianoWindow* GetPianoWindow();
 
     void NewPlayPosition(int Clock);
 
@@ -75,6 +72,8 @@ class JZTrackFrame : public JZEventFrame, public JZButtonLabelInterface
 
     void OnFileOpenProject(wxCommandEvent& Event);
 
+    void OnFileClose(wxCommandEvent& Event);
+
     void OnFileProjectSave(wxCommandEvent& Event);
 
     void OnFileProjectSaveAs(wxCommandEvent& Event);
@@ -91,6 +90,28 @@ class JZTrackFrame : public JZEventFrame, public JZButtonLabelInterface
 
     void OnFileExit(wxCommandEvent& Event);
 
+    void OnUndo(wxCommandEvent& Event);
+
+    void OnRedo(wxCommandEvent& Event);
+
+    void OnCut(wxCommandEvent& Event);
+
+    void OnCopy(wxCommandEvent& Event);
+
+    void OnPaste(wxCommandEvent& Event);
+
+    void OnTrim(wxCommandEvent& Event);
+
+    void OnSelectAll(wxCommandEvent& Event);
+
+    void OnReset(wxCommandEvent& Event);
+
+    void OnSetCopyright(wxCommandEvent& Event);
+
+    void OnMiscMergeTracks(wxCommandEvent& Event);
+
+    void OnMiscSplitTracks(wxCommandEvent& Event);
+
     void OnZoomIn(wxCommandEvent& Event);
 
     void OnZoomOut(wxCommandEvent& Event);
@@ -102,6 +123,8 @@ class JZTrackFrame : public JZEventFrame, public JZButtonLabelInterface
     void OnRecord(wxCommandEvent& Event);
 
     void OnPianoWindow(wxCommandEvent& Event);
+
+    void OnMixer(wxCommandEvent& Event);
 
     void OnToolsHarmonyBrowser(wxCommandEvent& Event);
 

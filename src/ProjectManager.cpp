@@ -1,8 +1,10 @@
 #include "ProjectManager.h"
 
 #include "PianoFrame.h"
+#include "PianoWindow.h"
 #include "TrackFrame.h"
 #include "GuitarFrame.h"
+#include "Project.h"
 #include "Globals.h"
 
 //*****************************************************************************
@@ -78,8 +80,20 @@ JZTrackFrame* JZProjectManager::CreateTrackView()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZProjectManager::CreatePianoView()
+void JZProjectManager::CreatePianoView(int TrackIndex)
 {
+  if (TrackIndex < 0)
+  {
+    if (gpProject && gpProject->GetTrackCount() > 1)
+    {
+      TrackIndex = 1;
+    }
+    else
+    {
+      TrackIndex = 0;
+    }
+  }
+
   if (!mpPianoFrame)
   {
     int XPosition(10), YPosition(10), Width(640), Height(480);
@@ -101,7 +115,13 @@ void JZProjectManager::CreatePianoView()
       Size);
   }
 
+  if (mpPianoFrame->mpPianoWindow)
+  {
+    mpPianoFrame->mpPianoWindow->NewPosition(TrackIndex, -1);
+  }
+
   mpPianoFrame->Show(true);
+  mpPianoFrame->Raise();
 }
 
 //-----------------------------------------------------------------------------

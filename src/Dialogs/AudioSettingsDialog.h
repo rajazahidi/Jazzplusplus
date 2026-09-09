@@ -34,6 +34,11 @@ class JZAudioSettingsDialog : public wxDialog
 
     JZAudioSettingsDialog(wxWindow* pParent, JZSampleSet& SampleSet);
 
+    virtual bool TransferDataToWindow();
+    virtual bool TransferDataFromWindow();
+
+    void OnHelp(wxCommandEvent& Event);
+
   private:
 
     JZSampleSet& mSampleSet;
@@ -42,4 +47,6 @@ class JZAudioSettingsDialog : public wxDialog
     wxComboBox* mpSamplingRateComboBox;
     wxCheckBox* mpStereoCheckBox;
     wxCheckBox* mpSoftwareMidiAudioSyncCheckBox;
+
+  DECLARE_EVENT_TABLE()
 };

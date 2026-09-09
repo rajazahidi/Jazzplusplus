@@ -1,6 +1,10 @@
 #include "AudioSettingsDialog.h"
 
 #include "../Audio.h"
+#include "../Configuration.h"
+#include "../Globals.h"
+#include "../Help.h"
+#include "../Player.h"
 
 #include <wx/button.h>
 #include <wx/checkbox.h>
@@ -8,8 +12,14 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 
+#include <sstream>
+
 //*****************************************************************************
 //*****************************************************************************
+BEGIN_EVENT_TABLE(JZAudioSettingsDialog, wxDialog)
+  EVT_BUTTON(wxID_HELP, JZAudioSettingsDialog::OnHelp)
+END_EVENT_TABLE()
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZAudioSettingsDialog::JZAudioSettingsDialog(
@@ -29,6 +39,7 @@ JZAudioSettingsDialog::JZAudioSettingsDialog(
   SampleRates.push_back("11025");
   SampleRates.push_back("22050");
   SampleRates.push_back("44100");
+  SampleRates.push_back("48000");
 
   mpSamplingRateComboBox = new wxComboBox(
     this,
@@ -86,4 +97,57 @@ JZAudioSettingsDialog::JZAudioSettingsDialog(
 
   pTopSizer->SetSizeHints(this);
   pTopSizer->Fit(this);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZAudioSettingsDialog::TransferDataToWindow()
+{
+  bool enable = (gpConfig->GetValue(C_EnableAudio) != 0);
+  mpEnableAudioCheckBox->SetValue(enable);
+
+  std::ostringstream Oss;
+  Oss << mSampleSet.GetSamplingRate();
+  mpSamplingRateComboBox->SetValue(Oss.str());
+
+  mpStereoCheckBox->SetValue(mSampleSet.GetChannelCount() == 2);
+  mpSoftwareMidiAudioSyncCheckBox->SetValue(mSampleSet.GetSoftSync());
+
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZAudioSettingsDialog::TransferDataFromWindow()
+{
+  bool enable = mpEnableAudioCheckBox->GetValue();
+  gpConfig->Put(C_EnableAudio, enable ? 1 : 0);
+  if (gpMidiPlayer)
+  {
+    gpMidiPlayer->SetAudioEnabled(enable);
+  }
+
+  long speed = 22050;
+  wxString rateStr = mpSamplingRateComboBox->GetValue();
+  if (rateStr.ToLong(&speed))
+  {
+    mSampleSet.SetSamplingRate(speed);
+  }
+
+  mSampleSet.SetChannelCount(mpStereoCheckBox->GetValue() ? 2 : 1);
+  mSampleSet.SetSoftSync(mpSoftwareMidiAudioSyncCheckBox->GetValue());
+
+  if (enable)
+  {
+    mSampleSet.ReloadSamples();
+  }
+
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZAudioSettingsDialog::OnHelp(wxCommandEvent& Event)
+{
+  JZHelp::Instance().ShowTopic("Global Settings");
 }

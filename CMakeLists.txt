@@ -14,6 +14,10 @@ endif()
 
 if(WIN32)
     set(wxWidgets_EXCLUDE_COMMON_LIBRARIES TRUE)
+    set(BUILD_SHARED_LIBS ON)
+    if(DEFINED wxWidgets_ROOT_DIR)
+        set(WX_ROOT_DIR ${wxWidgets_ROOT_DIR} CACHE INTERNAL "wxWidgets_ROOT_DIR")
+    endif()
 endif()
 
 # Find wxWidgets

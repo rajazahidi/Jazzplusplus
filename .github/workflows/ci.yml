@@ -114,22 +114,41 @@ jobs:
           7z x wxDev.7z -oC:\wxWidgets -y
           7z x wxDLL.7z -oC:\wxWidgets -y
 
+          # Normalize if headers or dev had a top-level wrapper directory
+          $wrapper = Get-ChildItem "C:\wxWidgets" -Directory | Where-Object { $_.Name -like "wxWidgets*" }
+          if ($wrapper) {
+              Copy-Item "$($wrapper.FullName)\*" -Destination "C:\wxWidgets\" -Recurse -Force
+          }
+
       - name: Inspect wxWidgets Directory
         shell: pwsh
         run: |
+          Write-Host "=== C:\wxWidgets ==="
           Get-ChildItem C:\wxWidgets
+          Write-Host "=== C:\wxWidgets\lib ==="
           if (Test-Path C:\wxWidgets\lib) { Get-ChildItem C:\wxWidgets\lib }
-          if (Test-Path C:\wxWidgets\lib\vc14x_x64_dll) { Get-ChildItem C:\wxWidgets\lib\vc14x_x64_dll }
+          Write-Host "=== C:\wxWidgets\lib\vc14x_x64_dll ==="
+          if (Test-Path C:\wxWidgets\lib\vc14x_x64_dll) { Get-ChildItem C:\wxWidgets\lib\vc14x_x64_dll | Select-Object -First 20 }
 
       - name: Configure CMake
         shell: pwsh
         run: |
           cmake -B build -G "Visual Studio 17 2022" -A x64 `
             -DCMAKE_BUILD_TYPE=Release `
+            -DBUILD_SHARED_LIBS=ON `
             -DwxWidgets_EXCLUDE_COMMON_LIBRARIES=ON `
             -DwxWidgets_ROOT_DIR="C:/wxWidgets" `
             -DwxWidgets_LIB_DIR="C:/wxWidgets/lib/vc14x_x64_dll" `
             -DwxWidgets_CONFIGURATION=mswu
+
+      - name: Upload Diagnostics on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-cmake-logs
+          path: |
+            build/CMakeFiles/*.log
+            build/CMakeFiles/*.yaml
 
       - name: Build Jazz++
         shell: pwsh

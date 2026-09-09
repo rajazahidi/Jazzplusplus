@@ -56,16 +56,9 @@
 #define wxUSE_TOOLBAR_SIMPLE 1
 
 
-#ifdef WXMAKINGDLL_DEPRECATED
-    #define WXDLLIMPEXP_DEPRECATED WXEXPORT
-    #define WXDLLIMPEXP_DATA_DEPRECATED(type) WXEXPORT type
-#elif defined(WXUSINGDLL)
-    #define WXDLLIMPEXP_DEPRECATED WXIMPORT
-    #define WXDLLIMPEXP_DATA_DEPRECATED(type) WXIMPORT type
-#else // not making nor using DLL
-    #define WXDLLIMPEXP_DEPRECATED
-    #define WXDLLIMPEXP_DATA_DEPRECATED(type) type
-#endif
+// DeprecatedWx classes are compiled directly into jazz executable
+#define WXDLLIMPEXP_DEPRECATED
+#define WXDLLIMPEXP_DATA_DEPRECATED(type) type
 
 #endif
     // _WX_DEPRECATED_SETUP_H_

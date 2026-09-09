@@ -227,3 +227,6 @@ endforeach()
 
 install(DIRECTORY conf/ DESTINATION ${CMAKE_INSTALL_DATADIR}/jazz/conf)
 install(DIRECTORY song/ DESTINATION ${CMAKE_INSTALL_DATADIR}/jazz/song)
+install(DIRECTORY src/HelpFiles/ DESTINATION ${CMAKE_INSTALL_DATADIR}/jazz/HelpFiles)
+
+file(COPY src/HelpFiles DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

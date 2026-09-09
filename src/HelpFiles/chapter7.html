@@ -1,0 +1,219 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Examples - Jazz++ Help</title>
+</head>
+<body bgcolor="#ffffff">
+<table width="100%" border="0" cellpadding="2">
+<tr>
+<td align="left"><a href="chapter6.html">[ Previous ]</a> <a href="index.html">[ Contents ]</a> <a href="chapter8.html">[ Next ]</a></td>
+<td align="right"><b>Jazz++ Manual</b></td>
+</tr>
+</table>
+<hr>
+<h1>Chapter 7: Examples</h1>
+<a name="examples"></a>
+<h2><a name="howtobuildanewmidisong">How to build a new midi song</a></h2><a name="exmidisong"></a>
+<p>Supposing you start with a blank song in the trackwin, these are the steps
+you need to do in order to record some midi tracks and make your own midi song.</p>
+<ol>
+<li>{\em Turn on the metronome}. Push the \helpref{metronome button}{twtoolbar}.
+This will help you keep in time when playing.
+Later, when you have recorded some tracks, you may want to turn the metronome
+off again because the other recorded tracks will support you with the necessary
+beat information.
+<li>{\em Select counts per bar etc.}. By default, a blank song will have
+4 counts per bar with each count corresponding to a quarter note. To change
+this you need to invoke the \helpref{Misc-$>$Meterchange}{meterchange}
+menu entry.
+<li>{\em Select song speed}. You probably have a feeling about how fast
+your song should be. You can try this right away by just pressing the
+\helpref{play button}{twtoolbar}. You will then hear the beats of the
+metronome. Change the speed to your preference by clicking into the
+\helpref{speed field}{speed}.
+<li>{\em Define track defaults}<a name="rectrackdef"></a>. Before you can enter music
+(events) into
+a track, you need to define {\em track name}, {\em instrument to be played}
+and {\em midi channel number} for that track. Do this by clicking on the
+\helpref{track name field}{trackdlg}, starting on the {\em second} track (will
+invoke the Track Settings dialog). {\em Never use the first track for
+recording}, as this is defined to be the {\em master track} (holding events
+controlling the whole song like speed, meter change etc.).
+<ul>
+<li>{\em Track name}. Enter a track-name that describes what you play on the
+track, not just the instrument
+name (you may want to play some other voice using the same instrument into
+another track at a later stage).
+<li>{\em Instrument}. Select an instrument from the instrument list. The instruments with
+one number in front of the name (e.g. &rsquo;5 Rhodes Piano&rsquo;) are the &rsquo;General MIDI&rsquo; (GM)
+instruments, the others are extensions to the GM standard and may not be
+supported by your synth/sound-card.
+<p>If this track is to play the same
+channel and the same instrument as a previously defined track, set the
+instrument to &rsquo;None&rsquo; (default).</p>
+<p>If your track is a drum track, the instrument names are a bit misleading.
+To get started we recommend that you select instrument number 1
+(labeled &rsquo;1 Piano 1&rsquo;). This will give you the &rsquo;standard drum kit&rsquo; on a
+GM compatible synth/sound-card. You must study the instrument list in your
+synth documentation to see what other drumkits are available.</p>
+<li>{\em MIDI channel}. If the track is to play a new instrument, choose a
+midi channel that
+has not been used by another track. Start at channel 1 and increment by one
+for each new instrument (track). If your track is to play {\em drums}, select
+channel 10 (predefined by GM to be the drum channel).
+</ul>
+<li>{\em Set output midi channel on your keyboard}<a name="recsetkbchan"></a>.
+If your keyboard is
+capable of sending on different midi channels, you should now set the
+keyboard output channel according to the midi channel of the track you are
+about to record. If your keyboard can only send on one midi channel
+(e.g. channel 1), you must use a slightly different algorithm
+(described \helpref{below}{onechannel}).
+<p>Note that you can also &rsquo;record&rsquo; without a keyboard by manually entering
+events into the \helpref{pianowin}{pianowin} using the mouse.</p>
+<li>{\em Select some bars}. \helpref{Select}{select} the area of your track
+where you want to record. You can also select the whole track by
+clicking in the leftmost field of the track in trackwin (the
+\helpref{track/channel display column}{trackdefs}).
+<li>{\em Start recording}. Start recording by clicking at the
+\helpref{record button}{twtoolbar}. JAZZ++ will then start to play one bar
+ahead of the selected area to give you a count-in. You can also start
+recording by clicking directly at a bar in the top-line of the event area
+(see section \helpref{Record and play}{recplay}). While recording you will
+hear the metronome (if enabled), any previously recorded tracks plus your own
+keyboard playing.
+<li>{\em Stop recording}. Stop recording by clicking the
+\helpref{record button}{twtoolbar} again (or use one of the other &rsquo;stop-play&rsquo;
+methods). If you played any notes, you will be asked if you want
+to keep the recorded events. If you decide to keep them, press &rsquo;Ok&rsquo;. You can
+then listen to the recording. If you are not satisfied you can press the
+\helpref{Undo button}{twtoolbar} to take it away and then do a new recording
+(go back to previous item).
+You can also do a new recording by pressing right-button on the top-line.
+The old recording will then be silent, and any new recording will replace the
+old one.
+<li>{\em Post process the recording}. You may want to fix something in your
+recording afterwards. You may want to \helpref{quantize}{quantize} or
+\helpref{transpose}{transpose} the recording (menu entry {\em Edit-$>$Transpose}),
+or you may want to fix notes that are wrong using the mouse in the
+\helpref{pianowin}{pianowin}.
+</ol>
+<p>You can record a new track by going back to the item
+{\em &rsquo;Define track defaults&rsquo;}. You can also record more
+music into an existing track by going back to item
+{\em &rsquo;Set output midi channel on your keyboard&rsquo;}.</p>
+<p>At some point you will probably also want to edit other track defaults like
+volume, pan, reverb and chorus. You can do this by invoking the
+\helpref{Mixer}{mixer} dialog (press the \helpref{mixer button}{twtoolbar}).</p>
+<p>If your synth is {\em GS} or {\em XG} compatible, you may also want to do other kinds of
+part editing like adjusting {\em sound-color}, {\em vibrato} or {\em envelope},
+or change the behavior of controllers like {\em pitch bender} and
+{\em modulation wheel}. These things and a lot more are accessible through the
+\helpref{Parts menu}{partsmenu}.</p>
+<h3><a name="recordingwithaonechannelkeyboard">Recording with a one-channel keyboard</a></h3><a name="onechannel"></a>
+<p>If your keyboard can only send on one midi channel (e.g. channel 1) you must
+change the above procedure according to the following:</p>
+<ul>
+<li>Always record in a track having the default channel set to 1.
+<li>When finished recording on that track, change the default track number
+to something else (a free channel number) by clicking the track-name-field
+and adjusting the slider in the "Track Settings" dialog. When you click
+&rsquo;Ok&rsquo;, the default channel and all events on the track will be converted to
+the new channel number (this is true if the entry
+{\em &rsquo;Force channel number onto all events on track&rsquo;} is checked).
+<li>If you want to do more recording on a previously recorded track, change
+that track back to channel 1 first using the same method.
+</ul>
+<p>Pressing the \helpref{Panic}{twtoolbar} button between operations will
+prevent the synth/sound-card from being confused (sends a &rsquo;reset&rsquo; command
+to the synth/sound-card).</p>
+<h2><a name="randomrhythmandharmonizerexample">Random rhythm and harmonizer example</a></h2>
+<p>This section documents the demo example.</p>
+<ol>
+<li>I prepared the tracks for the song and assigned names and channels for
+drums, bass, piano and melody. Then I generated the drums with the
+random rhythm generator.
+<li>open the random rhythm generator and load the file demo.rhy. Lets take a
+look at the adjustments for the instruments:
+<p>The first kick drum defines high probabilities at beat 1/4 and 3/4 -
+this makes the basic groove. The probabilities at 3/16 and 9/16 are a
+little lower, so the kick drum will not play these beats always. The
+velocity ranges from about 70 to 100, so the loudness of the beats varies.</p>
+<p>The snare drum plays at 2/4 and 4/4 but probabilities are less than 100%, so
+it will play most of the time but not always. The velocity is about 80 .. 100, so
+the snare is loud always, there is not much dynamic.</p>
+<p>The third entry, closed hi-hat, plays at 2/8, 4/8, 6/8 and 8/8 - the probabilities
+are 100% and velocity is high - these beats are played always and all of them are
+loud.</p>
+<p>The ride cymbal plays most of 1/4, 2/4, 3/4 and 4/4 and sometimes on 16/16. Also
+it plays at 9/16 - just to make things more interesting.</p>
+<p>The next entry, snare drum again, plays with low probability on all 1/16 timings -
+so not all of them are played - the probabilities would lead to about every 2nd
+1/16 would be played. For every beat that is played, the generator selects a
+length from the length field. Valid length values are 1/16, 2/16 and 3/16 where
+1/16 is chosen most often because it has the highest probability. When a length
+greater 1 is selected, then the generator will not produce a beat on the following
+1/16 step, because the previous note has not finished. Anyway, the velocity is
+very low compared to the other snare drum entry. Together both snare drum entries
+produce a loud and steady beat from the first entry and a lot of low-velocity
+fillings from the second entry.</p>
+<p>The last entry, closed hi-hat again, is similar. It does not play on the timing positions
+where the first closed hi-hat plays its loud and steady beats. It plays at the other
+timing position in between with a very wide range of velocity - so some of these
+in between beats will be dominant while others will sound like background.</p>
+<li>To produce the rhythm I selected bar 5 to 20 on the drum track and then
+clicked on the &rsquo;gen&rsquo; button. This gives demo1.mid
+<li>next I recorded 2 bars of a bass line and some chords. I quantized
+this and set the velocity to 90. Last I choose repeat copy to duplicate
+the material to the full length of 16 bars. This is demo2.mid.
+<li>next I recorded a melody and did some corrections in the pianowin editor.
+This is demo3.mid.
+<li>last I wanted some more interesting harmonies. To reproduce this step
+you may open the harmony browser and load the file demo.har.
+<p>The first 4 chords
+are from the original recording Am7 and D7. These are step II and V from G major.
+So I chose Gj7 as the next 2 chords to establish that scale.</p>
+<p>The next 6 chords are a minor II-V-I move, which leads to Bbm7 in the
+scale of Ab major - notice, that the V was taken from the harmonic scale.
+The last chords are a V-I move in Ab major.</p>
+<li>to perform the transposition, transpose every track on its own. Mark the
+bass track in the trackwin and select transpose in the harmony browser (the button
+where the arrow points from the rectangle to the note). Then do the same for
+piano and melody. This should result in demo4.mid.
+<p>demo4.mid is not perfectly transposed, but it could serve as a starting point and
+you could correct some notes in the pianowin editor. The pianowin editor can
+show the chords and scales in colors, look at \helpref{Pianowin Menu Events}{pwevents}
+for details.</p>
+</ol>
+<h2><a name="audioexample">Audio example</a></h2><a name="exaudio"></a>
+<p>This is how you run the supplied audio demo:</p>
+<ol>
+<li>Load the midi file named &rsquo;audiodem.mid&rsquo;. You will see there are 3 tracks
+defined; drums, bass and an audio track named &rsquo;guitar&rsquo;.
+<li>Invoke menu entry {\em Audio$->$Load Set} and load file &rsquo;audiodem.spl&rsquo;.
+This is the &rsquo;sample set definition file&rsquo; that binds audio sample files to
+the different key pitches (see \helpref{Audio Overview}{audiointro}).
+<li>Check that audio is enabled (invoke menu entry
+{\em Audio$->$Global Settings}, see \helpref{Global Settings}{globalsettings}).
+<li>Now you can play the song (with audio) (see
+\helpref{Record and Play}{recplay}).
+</ol>
+<p>You may also want to look at how the samples are bound to the key pitches by
+invoking
+\helpref{Sample Settings dialog}{samplesettings} and scroll the listbox down to
+position 50. There are two samples defined (funkguit1.wav and funkguit2.wav).
+Play the samples by selecting in the listbox and press the {\em Play} button.
+Look at how you can edit the samples in the
+\helpref{Sample Editor}{samplewin} by pressing the {\em Edit} button.</p>
+<p>At last you should look at the &rsquo;guitar&rsquo; audio track in the
+\helpref{Piano Window}{pianowin}. Scroll
+up and down until you find the defined samples.</p>
+<hr>
+<table width="100%" border="0" cellpadding="2">
+<tr>
+<td align="left"><a href="chapter6.html">[ Previous ]</a> <a href="index.html">[ Contents ]</a> <a href="chapter8.html">[ Next ]</a></td>
+</tr>
+</table>
+</body>
+</html>

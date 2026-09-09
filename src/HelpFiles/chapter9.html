@@ -1,0 +1,161 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>RoadMap - Jazz++ Help</title>
+</head>
+<body bgcolor="#ffffff">
+<table width="100%" border="0" cellpadding="2">
+<tr>
+<td align="left"><a href="chapter8.html">[ Previous ]</a> <a href="index.html">[ Contents ]</a> <a href="index.html">[ Next ]</a></td>
+<td align="right"><b>Jazz++ Manual</b></td>
+</tr>
+</table>
+<hr>
+<h1>Chapter 9: RoadMap</h1>
+<h2><a name="frequentlyaskedquestions">Frequently Asked Questions</a></h2>\title{FAQ}
+<h2><a name="jazzspecific">Jazz++ Specific</a></h2>
+<h2><a name="howpowerfuldoesmycomputerneedtobetorunjazzproperly">How powerful does my computer need to be to run JAZZ++ properly?</a></h2>
+<p>It is best to understand here, that it&rsquo;s not so much a matter of how much raw
+processing power your computer has -- it&rsquo;s more to do with JAZZ++ and other
+MIDI softwares being able to do what they want to do, -exactly when- they want
+to do it. If another software process happens to be using the CPU and OS at the
+exact same moment JAZZ++ or another MIDI program wants to send a MIDI event or
+else send PCM data to the soundcard (and both these things have to happen
+almost simultaneously), one or another process is going to have to wait. That
+can&rsquo;t technically happen in the MIDI domain, because the real time nature of
+compositional recording and playing doesn&rsquo;t allow for such.</p>
+<p>In practise, there&rsquo;s a tiny &rsquo;window&rsquo; in time for MIDI to complete any note
+event cycle. The practical size of this &rsquo;window&rsquo; is roughly bounded by the
+average human ear perception of what is actually &rsquo;in sync&rsquo; and what is &rsquo;out of
+sync&rsquo;. This percepton &rsquo;window&rsquo; tends to vary from individual to individual,
+but for example only here, most people don&rsquo;t perceive things being &rsquo;out of
+sync&rsquo; during MIDI performances, provided the note event &rsquo;window&rsquo; isn&rsquo;t longer
+than 20 milliseconds or so. However, in the case of music, it&rsquo;s perhaps better
+not to play the note at all, if it&rsquo;s too far out of time with the composition,
+and that &rsquo;window&rsquo; definitely closes when it comes time for the next MIDI event
+on the same channel or track. If your MIDI note event or softsynth is put on
+wait trying to access the CPU and hardware, this &rsquo;window&rsquo; becomes even smaller.</p>
+<p>If you use JAZZ++ with MIDI software synths and drum-machines etc, all these
+processes compete against each other for a slice of CPU time. Critically, they
+will all want to do this at exactly the same time in empathy with the real time
+nature of the MIDI compositional playing or recording processes. At a hardware
+level, this is sometimes impossible to do. This is especially so when you&rsquo;ve
+got MIDI softsynths running. Consider the analogy of a MIDI softsynth program
+as being akin to the old original analog synthesizers that used many discrete
+electronic components and circuits to create the actual sound one hears. Unlike
+these real world hardwares however, where one merely applies power and the
+hardware does the rest with sound emerging at end, MIDI softsynths require CPU
+cycles to render the waveform data and pass that onto the soundcard itself, to
+recreate the sound that you will eventually hear.</p>
+<p>This being the case, imagine you&rsquo;re replaying a MIDI composition using JAZZ++
+and a softsynth, to recreate the sound of a traditional string quartet. During
+replay, three of the instrument voices are engaged in a harmonic drone, while
+the lead violin plays solo....</p>
+<p>[ed: TBC.. ]</p>
+<h2><a name="windowsspecific">Windows Specific</a></h2>
+<p>[ed: TBC.. ]</p>
+<h2><a name="linuxspecific">Linux Specific</a></h2>
+<p>Here you will find topical reference for using JAZZ++ with Linux</p>
+<p>Note: At this time the following is only tested and known to be true when using
+JAZZ++ with Linux on Intel based ix86 architectures in both 32 and 64 bit
+flavors. If you are using Linux on another hardware platform, the following
+should be treated as a guide only.</p>
+<p>Q. Does Jazz++ work on all Linux distributions?</p>
+<p>A. Jazz++ should work on most all current Linux distributions. If there are
+no binary packages available to suit your particular installation, Jazz++
+should build, install, and run currectly from the source code contained in
+either the release tarball or the Jazz++ svn repository. Note: The source 
+code obtained from the Jazz++ svn repository should be considered as being
+the &rsquo;unstable&rsquo; development branch of the Jazz++ tree. Some Linux users may
+find that they have to update their system kernel (see below), however if
+you don&rsquo;t wish to (or don&rsquo;t feel up to) changing the Linux kernel on your
+installation, you might consider the following ;</p>
+<p>"It seems some Linux distibutors are now moving towards multimedia and
+  audio-visual &rsquo;studio&rsquo; type sub-distributions, specifically aimed for
+  people wanting to use Linux in this area. These distribution releases
+  have the low-latency, so called &rsquo;real time&rsquo; (RT) Linux kernel build as
+  standard, and this can &rsquo;ease the pain&rsquo; for a lot of Linux users..."</p>
+<p>Q. Do I need a low-latency or &rsquo;RT&rsquo; Linux kernel to run Jazz++ ?</p>
+<p>A. The answer to this question largely depends on what sort of Jazz++
+user you might be...ie; &rsquo;casual&rsquo; or &rsquo;serious&rsquo;....and exactly what kind
+of (MIDI) hardware you are using to render the actual sound with...ie;
+hardware MIDI/synth or softsynth. Generally speaking, if you experience
+latency problems with either the MIDI transports and/or sound rendering
+using softsynths, it is very likely you will need a &rsquo;RT&rsquo; Linux kernel.
+Such latency problems can manifest themselves in a number of ways. (see below)</p>
+<p>Q. What are &rsquo;latency problems&rsquo; when using Jazz++ with Linux?</p>
+<p>A. There are a couple places Linux kernel latency issues will obviate
+themselves. Each is a little different from the other, and one or more of these
+things might happen at any same given time -- they share a common cause.</p>
+<p>1. When using Jazz++ on Linux with externally connected MIDI equipment
+    and/or hardware MIDI/synth soundcard, your computer is only dealing with
+    the MIDI data being orchestrated by Jazz++. It can happen, especially
+    during complex MIDI passages, that certain notes are being seemingly
+    &rsquo;dropped&rsquo; on one or more channels.</p>
+<p>2. When using Jazz++ on Linux with software MIDI synthesizers, your
+    computer has to deal with transporting the MIDI data *and* render the
+    actual sound your hear as well. In this case, not only might there be
+    &rsquo;dropped&rsquo; notes, but also the actual sound of the softsynth might be
+    distorted, or have other unwanted sound artifacts such as &rsquo;clicks&rsquo; or a
+    harsh scratching noise - it varies on the type of softsynth used and
+    just how bad the actual problem itself is.</p>
+<p>Remember, Jazz++ itself is only dealing with MIDI data (when not being
+used cojointly with the audio mode features), and it attempts to both
+generate and receive that MIDI data in as close to real time as possible.
+However, getting this MIDI data to/from Jazz++ itself and real MIDI hardware
+devices, necessitates real time access to the actual -computer- hardware
+itself, and the -only- way that can happen is via the running Linux kernel.</p>
+<p>Likewise, softsynths have to actually render the sound data, and have real time
+access to the soundcard (PCM) ports, and this too has to travel through the
+Linux kernel layer. The only solution is to change your Linux kernel if you
+come across problems like these using Jazz++ on Linux, and in fact you might
+have to do this anyway if you intend to use a MIDI softsynth.</p>
+<p>Q. I think I have the above problems, where can I get a &rsquo;RT&rsquo; Linux kernel?</p>
+<p>A. With some 250+ Linux distributions out there, this will never be an
+exhaustive list -- however, here are some pointers to help people out ;</p>
+<p>1. Definitive: The latest Linux kernel release is always available from
+    www.kernel.org and mirrors. At the time of this writing, the &rsquo;current&rsquo;
+    stable Linux kernel is the 2.6.25.4 release. If you&rsquo;re up to configuring
+    and installing the Linux kernel from source, currently the &rsquo;RT&rsquo; patches
+    are available at www.kernel.org/pub/linux/kernel/projects/rt/</p>
+<p>2. I found this on a webpage: - "Many distributions have at least one 
+    specialised low-latency kernel package available via some sort of 
+    additional multimedia distribution or repository; consider using one of 
+    these. For example, Ubuntu -> Ubuntu Studio; Debian  -> 64 Studio or Musix;
+    Fedora  -> PlanetCCRMA; OpenSUSE -> JAD."</p>
+<p>3. Ubuntu: (quote) "Lowlatency kernel is in standard ubuntu repositories,
+    just run:</p>
+<p>sudo apt-get install linux-lowlatency</p>
+<p>Then reboot and select that kernel from the GRUB list. It should have no 
+    detrimental effects at all on normal usage."</p>
+<p>4. Debian: Have a look here ;</p>
+<p>http://apt.64studio.com/64studio/testing/pool/main/l/linux-2.6/</p>
+<p>Although these are intended for the 64studio release, these packages
+    may work with the current Debian 4.0 branch. There are also 32bit
+    packages here as well.</p>
+<p>5. Mandriva: Have a look here ;</p>
+<p>http://wiki.mandriva.com/en/Docs/Howto/Mandriva_Kernels#kernel-rt</p>
+<p>6. Fedora: Have a look here ;</p>
+<p>http://ccrma.stanford.edu/planetccrma/software/installplaneteight.html</p>
+<p>7. Other linux distributions: Yours not listed? Perhaps you know how
+    to address this issue with the Linux distribution you are using, and
+    would like to tell us? See the Jazz++ MailingList and let us know?</p>
+<p>Q. When I start jackd/QJACKCTL I get the following error, what&rsquo;s wrong?</p>
+<h3><a name="othermidisoftwareknowntoworkwithjazzandlinux">Other MIDI software known to work with JAZZ++ and Linux</a></h3>
+<p>The following may never be a complete list of MIDI software synthesizers and
+other MIDI based programs that work with JAZZ++ and Linux today, however we take
+the time here to mention some of the more popular and actively supported
+softwares of this type, that members of the JAZZ++ team have tried and tested.</p>
+<p>[ed: TBC.. ]</p>
+<h2><a name="macspecific">Mac Specific</a></h2>
+<p>[ed: TBC.. ]</p>
+<p>\end{document}</p>
+<hr>
+<table width="100%" border="0" cellpadding="2">
+<tr>
+<td align="left"><a href="chapter8.html">[ Previous ]</a> <a href="index.html">[ Contents ]</a> <a href="index.html">[ Next ]</a></td>
+</tr>
+</table>
+</body>
+</html>

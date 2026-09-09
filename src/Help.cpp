@@ -59,6 +59,25 @@ JZHelp::~JZHelp()
 //-----------------------------------------------------------------------------
 void JZHelp::ShowTopic(const wxString& TopicString)
 {
+  ifstream test(mHelpFileName.mb_str());
+  if (!test.is_open())
+  {
+    ConfigureHelp();
+    ifstream test2(mHelpFileName.mb_str());
+    if (!test2.is_open())
+    {
+      wxString HelpFilePath;
+      if (FindAndRegisterHelpFilePath(HelpFilePath))
+      {
+        mHelpFileName = HelpFilePath + "jazz.hhp";
+        mpHelp->AddBook(mHelpFileName);
+      }
+      else
+      {
+        return;
+      }
+    }
+  }
   mpHelp->LoadFile(mHelpFileName);
   mpHelp->KeywordSearch(TopicString);
 }
@@ -67,6 +86,25 @@ void JZHelp::ShowTopic(const wxString& TopicString)
 //-----------------------------------------------------------------------------
 void JZHelp::DisplayHelpContents()
 {
+  ifstream test(mHelpFileName.mb_str());
+  if (!test.is_open())
+  {
+    ConfigureHelp();
+    ifstream test2(mHelpFileName.mb_str());
+    if (!test2.is_open())
+    {
+      wxString HelpFilePath;
+      if (FindAndRegisterHelpFilePath(HelpFilePath))
+      {
+        mHelpFileName = HelpFilePath + "jazz.hhp";
+        mpHelp->AddBook(mHelpFileName);
+      }
+      else
+      {
+        return;
+      }
+    }
+  }
   mpHelp->LoadFile(mHelpFileName);
   mpHelp->DisplayContents();
 }
@@ -91,76 +129,68 @@ void JZHelp::ConfigureHelp()
 
   // Let the help system store the Jazz++ help configuration info.
   mpHelp->UseConfig(pConfig);
+  mpHelp->SetTempDir(wxStandardPaths::Get().GetUserDataDir());
 
-  // This code should be distributed with a HelpFiles subdirectory under
-  // the directory the executable is stored in on Windows and under the
-  // ${prefix}/shared/${appname} on Linux.
-  wxString HelpFileDirectoryGuess =
+  wxString HelpFilePath;
+  if (pConfig)
+  {
+    pConfig->Read("/Paths/Help", &HelpFilePath);
+  }
+
+  std::vector<wxString> candidatePaths;
+  if (!HelpFilePath.empty())
+  {
+    if (HelpFilePath.Last() != wxFileName::GetPathSeparator())
+    {
+      HelpFilePath += wxFileName::GetPathSeparator();
+    }
+    candidatePaths.push_back(HelpFilePath);
+  }
+
+  // 1. Data dir
+  candidatePaths.push_back(
     wxStandardPaths::Get().GetDataDir() +
     wxFileName::GetPathSeparator() +
     "HelpFiles" +
-    wxFileName::GetPathSeparator();
+    wxFileName::GetPathSeparator());
 
-  // Attempt to obtain the path to the help file from configuration data.
-  wxString HelpFilePath;
-  bool WasHelpPathRead = false;
-  if (pConfig)
-  {
-    WasHelpPathRead = pConfig->Read(
-      "/Paths/Help",
-      &HelpFilePath,
-      HelpFileDirectoryGuess);
-  }
+  // 2. Relative to executable
+  wxString exeDir = ::wxPathOnly(wxStandardPaths::Get().GetExecutablePath());
+  candidatePaths.push_back(exeDir + wxFileName::GetPathSeparator() + "HelpFiles" + wxFileName::GetPathSeparator());
+  candidatePaths.push_back(exeDir + wxFileName::GetPathSeparator() + ".." + wxFileName::GetPathSeparator() + "src" + wxFileName::GetPathSeparator() + "HelpFiles" + wxFileName::GetPathSeparator());
+  candidatePaths.push_back(exeDir + wxFileName::GetPathSeparator() + ".." + wxFileName::GetPathSeparator() + "HelpFiles" + wxFileName::GetPathSeparator());
 
-  // Construct a full file name.
-  wxString HelpFileNameAndPath = HelpFilePath + mHelpFileName;
+  // 3. Current working directory
+  candidatePaths.push_back(wxGetCwd() + wxFileName::GetPathSeparator() + "src" + wxFileName::GetPathSeparator() + "HelpFiles" + wxFileName::GetPathSeparator());
+  candidatePaths.push_back(wxGetCwd() + wxFileName::GetPathSeparator() + "HelpFiles" + wxFileName::GetPathSeparator());
 
-  // Test for the existence of the help file.
+  // 4. Source root / standard install paths
+  candidatePaths.push_back("/home/kingzahidi/jazz/src/HelpFiles/");
+  candidatePaths.push_back("/usr/share/jazz/HelpFiles/");
+  candidatePaths.push_back("/usr/local/share/jazz/HelpFiles/");
+
   bool HelpFileFound = false;
-  ifstream Is;
-  Is.open(HelpFileNameAndPath.mb_str());
-  if (!Is)
+  wxString foundPath;
+  for (size_t i = 0; i < candidatePaths.size(); ++i)
   {
-    // Ask the user to find the help file.
-    if (FindAndRegisterHelpFilePath(HelpFilePath))
+    wxString testPath = candidatePaths[i] + "jazz.hhp";
+    ifstream testFile(testPath.mb_str());
+    if (testFile.is_open())
     {
-      HelpFileNameAndPath = HelpFilePath + mHelpFileName;
-
-      // Try one more time.
-      Is.close();
-      Is.clear();
-      Is.open(HelpFileNameAndPath.mb_str());
-      if (!Is)
-      {
-        wxString Message = "Failed to add the Jazz++ book " + mHelpFileName;
-        ::wxMessageBox(Message);
-      }
-      else
-      {
-        HelpFileFound = true;
-      }
+      HelpFileFound = true;
+      foundPath = candidatePaths[i];
+      break;
     }
   }
-  else
-  {
-    HelpFileFound = true;
-  }
-
-  // GetUserDataDir returns the directory for the user-dependent application
-  // data files.  The value is $HOME/.appname on Linux,
-  // c:\Documents and Settings\username\Application Data\appname on
-  // Windows, and ~/Library/Application Support/appname on the Mac.
-  // The cached version of the help file will be placed in this location.
-  mpHelp->SetTempDir(wxStandardPaths::Get().GetUserDataDir());
 
   if (HelpFileFound)
   {
-    // Add the Jazz++ help file the the help system.
-    mpHelp->AddBook(HelpFileNameAndPath);
+    HelpFilePath = foundPath;
+    mHelpFileName = HelpFilePath + "jazz.hhp";
+    mpHelp->AddBook(mHelpFileName);
 
-    if (!WasHelpPathRead && pConfig)
+    if (pConfig)
     {
-      // Register the help path.
       pConfig->Write("/Paths/Help", HelpFilePath);
     }
   }

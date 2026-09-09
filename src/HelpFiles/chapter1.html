@@ -1,0 +1,240 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Introduction - Jazz++ Help</title>
+</head>
+<body bgcolor="#ffffff">
+<table width="100%" border="0" cellpadding="2">
+<tr>
+<td align="left"><a href="index.html">[ Previous ]</a> <a href="index.html">[ Contents ]</a> <a href="chapter2.html">[ Next ]</a></td>
+<td align="right"><b>Jazz++ Manual</b></td>
+</tr>
+</table>
+<hr>
+<h1>Chapter 1: Introduction</h1>
+<a name="introduction"></a>
+<p>JAZZ++ is a fully featured software MIDI sequencer with audio support. In
+addition to basic sequencer functions like record and play, JAZZ++ provides
+many specialized editing features like quantize, copy, transpose, graphical
+pitch editing, multiple undo/redo etc. As an extension to traditional normal
+MIDI sequencing, JAZZ++ provides audio play (*.wav files), audio recording and
+audio/midi integration. A multi function {\em audio editor} is also included.</p>
+<p>JAZZ++ has support for {\em GM} (General MIDI) equipment with both {\em GS}
+and {\em XG} extensions, and also offers special functions like GS/XG sound
+editing, setting of effect types, a {\em random rhythm generator} and a {\em
+harmony browser}. Windows versions of JAZZ++ can be synchronized to other sound
+equipment (e.g. a tape recorder) using MIDI Time Code (MTC) or SongPointer
+synchronization techniques. [ed: is this still only so for the Win version??]</p>
+<p>JAZZ++ is a platform/OS independant software program, and has been designed to
+work on Windows and Linux operating systems using 32bit or 64bit Intel ix86
+based computers (the &rsquo;PC&rsquo;), and also for MacOSX using Mac computer systems. [ed:
+ppc? intelmac? m680x0? ;-] Being a MIDI based program, JAZZ++ can interact with
+both externally connected MIDI equipment (MIDI capable keyboards, synthesizer
+modules, drum-machines etc), internally connected MIDI equipment (soundcards
+with hardware based MIDI/synth capabilities), or with one or more MIDI capable
+software synthesizer programs (&rsquo;softsynths&rsquo;) running on the same computer as
+JAZZ++. [ed: I&rsquo;d like to add something here...is it possible ...or going to
+be...to use combinations of all of these?]</p>
+<p>[ed:..actually, this belongs in it&rsquo;s own chapter above trackwindow, with a
+title like &rsquo;Overview of working with jazz++&rsquo;...then this bit below would
+fit.....]</p>
+<p>JAZZ++ has two main windows; one
+operating on the song as a whole, and one operating on single tracks and
+single events. Among the other windows and dialogs are mixer windows for easy
+adjusting of default track parameters, and all settings are saved into the
+MIDI file for later use.</p>
+<p>[ed:...and carry on with some bits removed from track/piano/audio chapters
+ below which are more to do with basic -program- operations and nothing
+to do with -tracks- (or the editing thereof) at all for instance.]</p>
+<h2><a name="systemrequirements">System requirements</a></h2><a name="requirements"></a>
+<p>JAZZ++ is a software MIDI sequencer that makes it possible for the JAZZ++
+user to employ everyday personal computing hardwares, and other connected MIDI
+based equipment, to potentially create a very powerful and highly featured
+Digital Audio Workstation (DAW). The performance of JAZZ++ itself when used
+is this manner, is primarily dependent on just how capable/powerful the user&rsquo;s
+computer system actually is  This section briefly describes the various minimum
+hardware and software requirements needed for satisfactory operation using the
+JAZZ++ software MIDI sequencer.</p>
+<p>The original Jazz++ documentation recorded here;</p>
+<p>"To play MIDI music your PC must be attached to a MIDI synthesizer device. The
+synthesizer can either be an integrated part of a sound-card, or an external
+device attached to the PC with a cable. To record MIDI music you will need a
+midi-capable piano-keyboard attached to the PC (as an alternative you can enter
+notes using the mouse). For audio you need an audio capable sound card."</p>
+<p>It is now 2008, and a lot has changed in the computing hardware and software
+arenas since the original JAZZ++ documentation was drafted some time around
+1995. While the above paragraph is more or less still correct, it was written in
+a time before modern computers had &rsquo;onboard&rsquo; sound hardware like most people
+have now-a-days. Likewise, back in those days software based MIDI synthesizers
+were not as functional (nor as plentiful) as they are today, so you really
+<u>don&rsquo;t</u> need any &rsquo;real&rsquo; MIDI hardware to play MIDI music on your PC
+anymore -- you can use a software synthesizer (softsynth) instead.</p>
+<h3><a name="operatingsystemssupportedbyjazz">Operating Systems supported by JAZZ++</a></h3>
+<p>The current version of JAZZ++ is known to work with the Windows, Linux, and
+MacOSX operating systems. You will need to be running one of these operating
+systems on your computer hardware to use JAZZ++.</p>
+<h3><a name="computerarchitecturessupportedbyjazz">Computer Architectures supported by JAZZ++</a></h3>
+<p>The current version of JAZZ++ is known to work with most all computer
+architectures supported by the above Operating Systems. This includes the
+Intel based &rsquo;PC&rsquo; hardware platforms (x86_32bit and x86_64bit), and also Mac
+computer system hardwares.[ed: bit more clarity with the Mac stuff here]</p>
+<h3><a name="softwareprerequisitesofjazz">Software pre-requisites of JAZZ++</a></h3>
+<p>The current version of JAZZ++ uses the wxWidgets GUI library to create
+the JAZZ++ user interface. The wxWidgets GUI library, like JAZZ++ itself,
+is platform/OS independant, and versions of wxWidgets are available for
+all platforms/OS&rsquo; currently supported by JAZZ++. If you do not have the
+wxWidgets GUI library installed, please visit the following link to download
+and install wxWidgets for your platform/OS ;</p>
+<p>\begin{indented}{2cm}
+\htmlonly{\urlref{http://www.wxwidgets.org/}{http://www.wxwidgets.org/}}
+\latexonly{http://www.wxwidgets.org/}
+\end{indented}</p>
+<p>The wxWidgets GUI library <u>must be installed</u> before installing
+JAZZ++ itself.</p>
+<h3><a name="recommendedcomputerspecificationsforusingjazz">Recommended Computer Specifications for using JAZZ++</a></h3>
+<p>How powerful your computer system needs to be, is determined primarily by
+how you use it with JAZZ++ ....ie; if you are going to be using JAZZ++ on
+a computer system that is also running a MIDI &rsquo;softsynth&rsquo; for the actual sound 
+rendering and reproduction, you will need more computing power compared to 
+using JAZZ++ with the same computing hardware and having MIDI/synth soundcards
+and/or external MIDI devices connected to it instead.</p>
+<p>Generally speaking though, any &rsquo;modern&rsquo; computer system (post-2000) with a
+1GHz or greater CPU speed and 512Mb or system ram, should easily run JAZZ++
+in normal use. Even computer systems older than this date might be perfectly
+capable or running JAZZ++ depending on what you are doing and how much system
+ram that older computer has. More details of the actual requirements needed here
+are discussed in the &rsquo;Installation and Setup&rsquo; chapter of this manual, and
+various platform/OS specific informations can be found in this manual&rsquo;s
+Appendix section.</p>
+<h3><a name="mididevicessupportedbyjazz">MIDI devices supported by JAZZ++</a></h3>
+<p>JAZZ++ supports all standard MIDI protocols and commands, and as such should
+work with any standard MIDI capable equipment and/or musical instruments. JAZZ++
+also supports most &rsquo;virtual&rsquo; MIDI devices, such as software synthesizers, other
+software MIDI sequencers and trackers, and software virtual MIDI keyboards - if
+it&rsquo;s MIDI, it should work with JAZZ++ &rsquo;out of the box&rsquo;.</p>
+<h2><a name="wheretogetit">Where to get it</a></h2><a name="wheretoget"></a>
+<p>For the latest JAZZ++ updates from {\em sourceforge}, please look at the JAZZ++
+homepage at ;</p>
+<p>\begin{indented}{2cm}
+\htmlonly{\urlref{http://jazzplusplus.sourceforge.net}{http://jazzplusplus.sourceforge.net}}
+\latexonly{http://jazzplusplus.sourceforge.net}
+\end{indented}</p>
+<p>[ed: make the above link point to downloads page? ]</p>
+<p>If you are interested in developing JAZZ++ or want to check out the latest
+&rsquo;bleeding edge&rsquo; version of the JAZZ++ source code, you can always checkout the
+JAZZ++ Subversion repository at ;</p>
+<p>\begin{indented}{2cm}
+\htmlonly{\urlref{http://jazzplusplus.sourceforge.net/subversion}{http://jazzplusplus.sourceforge.net/subversion}}
+\latexonly{http://jazzplusplus.sourceforge.net/subversion}
+\end{indented}</p>
+<h2><a name="gettinghelpwithjazz">Getting Help with JAZZ++</a></h2>
+<p>You are welcome to join the JAZZ++ mailing lists if you require any additional
+or specific help with JAZZ+ usage and setup not covered by this manual. The
+JAZZ++ mailing lists give JAZZ++ users the facility to discuss problems they
+might be having with JAZZ++, with both other users of the software -and- the
+developers of JAZZ++ itself.</p>
+<p>The JAZZ++ developers are a faily easy going bunch of people, and they really do
+look forward from hearing from you, however, to protect both themselves and
+other subscribers to the JAZZ++ mailing lists from &rsquo;SPAM&rsquo;, they ask that people
+who join and post emails to the JAZZ++ mailing lists adhere to the following
+two points of list etiquette ;</p>
+<p>&rsquo;PCYMTNQREAIYR&rsquo;</p>
+<u>Please Configure Your Mailer To Not Quote Raw E-mail Addresses In
+Your Replies.</u>
+Some email programs (&rsquo;Mailers&rsquo;) by default include the raw e-mail address in the
+"Joe <joe@example.com> wrote:" line. The web archives for the mailing lists are
+publicly available. Let&rsquo;s not feed the spam harvesters! Mailing lists are
+routine targets for spam software to come looking for valid email addresses, and
+if you include raw email addresses in your email replies you may well be
+inadvertantly and innocently unaware that you&rsquo;re actually helping such spam
+operations in doing so. People who use their web-browser and one or another of
+the free public email servers available... like hotmail, yahoo and so on...have
+to be particularly careful with this, and you may find that you have to manually
+delete raw email addresses from you replies to comply with this etiquette.
+<p>&rsquo;PCYMTWLL&rsquo;</p>
+<u>Please Configure Your Mailer To Wrap Long Lines.</u> Some email programs
+don&rsquo;t, and
+this is especially so when a web-browser interface is being used, and then most
+of the message ends up looking like one lo-ong line in the web archives. It&rsquo;s
+very annoying to have to scroll left and right as well as up and down. Please be
+considerate of this situation! All you have to do is remember to hit the return
+[enter] key at about 80 characters along each line, and start a new line. Your
+email text in an web-browser window, should appear as a column in the left of
+your web-browser window, not as a document that fills the entire window page. It
+makes it easier for everyone if you please comply with this etiquette when
+submitting emails to the lists.
+<p>\begin{indented}{2cm}
+\htmlonly{\urlref{http://jazzplusplus.sourceforge.net/mailinglist}{http://jazzplusplus.sourceforge.net/mailinglist}}
+\latexonly{http://jazzplusplus.sourceforge.net/mailinglist}
+\end{indented}</p>
+<p>There are three mailing lists.  The first is a devoted to JAZZ++ users.  To
+subscribe, please visit ;</p>
+<p>[ed: double check these links below]</p>
+<p>\begin{indented}{2cm}
+\htmlonly{\urlref{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-user}{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-user}}
+\latexonly{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-user}
+\end{indented}</p>
+<p>The second is devoted to developers.  To subscribe visit</p>
+<p>\begin{indented}{2cm}
+\htmlonly{\urlref{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-devel}{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-devel}}
+\latexonly{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-devel}
+\end{indented}</p>
+<p>The third list contains messages generated by developers when they commit
+documentation, web content, or code to the JAZZ++ subversion repository.
+To subscribe visit</p>
+<p>\begin{indented}{2cm}
+\htmlonly{\urlref{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-updates}{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-updates}}
+\latexonly{https://lists.sourceforge.net/lists/listinfo/jazzplusplus-updates}
+\end{indented}</p>
+<p>We&rsquo;d also be happy to receive your bug reports (well, somehow). We want to find
+and fix any problems with JAZZ++, so bug reports are welcomed. Before you do
+send any email regarding a possible JAZZ++ bug, please be sure to read the
+JAZZ++ Reporting Bugs page on the JAZZ++ website, for instructions on how
+to gather the necessary informations JAZZ++ developers might need to fix the
+problem, and how to submit that bug report in a meaningful and consistant way ;</p>
+<p>\begin{indented}{2cm}
+\htmlonly{\urlref{http://jazzplusplus.sourceforge.net/bugreports}{http://jazzplusplus.sourceforge.net/bugreports}}
+\latexonly{http://jazzplusplus.sourceforge.net/bugreports}
+\end{indented}</p>
+<p>//...this subpara below should be melded into the above somewhere...//
+[ed: probably to get it to hit -user instead of -devel..fix l8r]</p>
+<p>or success stories. And - of course - you are welcome to contribute to the
+JAZZ++ project by sending code, suggestions, ..., or corrections for this
+manual.</p>
+<h2><a name="acknowledgments">Acknowledgments</a></h2>
+<p>JAZZ++ is based on the work of countless other people who have have made
+their software freely available. Beside all the people who made Linux,
+GNU and X11 possible, we&rsquo;d like to mention</p>
+<ul>
+<li>{\em Hannu Savolainen} for writing all these excellent midi drivers, so
+JAZZ++ can talk to nearly every midi card on Linux.
+<li>{\em Julian Smart} who wrote the free, portable GUI library
+wxwin, so JAZZ++ runs with XView, Motif and MS-Windows.
+</ul>
+<p>We would also like to thank Henrik Seidel and Stefan Nitschke for code
+contributions.</p>
+<p>[ed: is the above complete for this section?]</p>
+<h2><a name="copyright">Copyright</a></h2><a name="copyright"></a>
+<p>The JAZZ++ MIDI Sequencer is copyright (C) 1994-2000 Andreas Voss and
+Per Sigmond, all rights reserved.</p>
+<p>[ed: Pete&rsquo;s name should be here somewhere too ]</p>
+<p>JAZZ++ program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.</p>
+<hr>
+<table width="100%" border="0" cellpadding="2">
+<tr>
+<td align="left"><a href="index.html">[ Previous ]</a> <a href="index.html">[ Contents ]</a> <a href="chapter2.html">[ Next ]</a></td>
+</tr>
+</table>
+</body>
+</html>

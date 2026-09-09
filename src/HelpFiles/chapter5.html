@@ -1,0 +1,207 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Piano window - Jazz++ Help</title>
+</head>
+<body bgcolor="#ffffff">
+<table width="100%" border="0" cellpadding="2">
+<tr>
+<td align="left"><a href="chapter4.html">[ Previous ]</a> <a href="index.html">[ Contents ]</a> <a href="chapter6.html">[ Next ]</a></td>
+<td align="right"><b>Jazz++ Manual</b></td>
+</tr>
+</table>
+<hr>
+<h1>Chapter 5: Piano window</h1>
+<a name="pianowin"></a>
+<p>The pianowindow shows Note-On events of a single Track.
+Displayed track and bar is selected by clicking with the right
+mouse button into the trackwindow.</p>
+<p>\begin{figure}
+\latexonly{<p align="center"><img src="pianowin.png"></p>}
+\htmlonly{\image{0cm;0cm}{pianowin.png}}
+\caption{Piano Window}
+\end{figure}</p>
+<h2><a name="toolbar">Toolbar</a></h2><a name="pwtoolbar"></a>
+<p>\begin{figure}
+\latexonly{<p align="center"><img src="pwtoolb.png"></p>}
+\htmlonly{\image{0cm;0cm}{pwtoolb.png}}
+\caption{Pianowin toolbar}
+\end{figure}</p>
+<p>Buttons to set the mode of the left mouse-button:
+<ul>
+<li>{\em select area} (by dragging a rectangle)
+<li>{\em change length} (by dragging the &rsquo;tail&rsquo; of an event)
+<li>{\em show dialog} (\helpref{edit existing event or create a new one}{pweventedit})
+<li>{\em cut/paste} (great for fast note-by-note editing)
+</ul></p>
+<p>Note that these actions can also be done by using other mouse buttons or
+by combining shift- and ctrl-keys with mouse buttons
+(see \helpref{Mouse actions}{mouseact}).</p>
+<p>Buttons to set the most common \helpref{snap}{snap} values (pasted events
+will be placed at nearest &rsquo;snap&rsquo; value, similar to a &rsquo;grid&rsquo; in a graphics
+paint system):
+<ul>
+<li>set snap to 1/8 note
+<li>set snap to 1/12 note
+<li>set snap to 1/16 note
+<li>set snap to 1/24 note
+</ul></p>
+<p>Buttons to manipulate events:
+<ul>
+<li>\helpref{Cut}{pwcutpaste}
+<li>\helpref{Delete}{pwcutpaste}
+<li>\helpref{Quantize}{quantize}
+<li>\helpref{Shift left}{pwshift}
+<li>\helpref{Shift right}{pwshift}
+<li>Enable {\em multi track mode} as described \helpref{here}{pwevents}
+</ul></p>
+<p>Buttons for other operations:
+<ul>
+<li>\helpref{Undo}{undo}
+<li>\helpref{Redo}{undo}
+<li>\helpref{Panic (MIDI reset)}{panic}
+<li>\helpref{Help}{help}
+</ul></p>
+<h2><a name="mouseactions">Mouse actions</a></h2><a name="mouseact"></a>
+<p>For a fast reference to mouse-actions, please invoke the {\em Help-$>$Mouse}
+menu entry.</p>
+<p>{\bf Mouse actions in the event area}</p>
+<ul>
+<li>{\em Select events}. When in &rsquo;select area&rsquo; mode
+(see \helpref{toolbar}{pwtoolbar}), events can
+be selected by dragging a rectangle with the left mouse button.
+A selection is continued by dragging while holding the shiftkey down. (To
+continue a selection outside the current view, you need to scroll using the
+window scrollbars before doing shiftkey + left-button again.)
+<li>{\em Adjust note length by dragging}. Click on the event and drag
+the &rsquo;tail&rsquo; while holding mouse button down. This can be done with the
+left mouse button when in &rsquo;change length&rsquo; mode
+(see \helpref{toolbar}{pwtoolbar}), or by using the right mouse button.
+<li>{\em Show event dialog}. Opens a dialog box to
+modify the values of the event
+or to create a new event. This can be done with the left mouse button when in
+&rsquo;show dialog&rsquo; mode
+(see \helpref{toolbar}{pwtoolbar}), or by using ctrl+middle (if
+available).
+<li>{\em Cut / paste events}. Clicking on an event cuts the event to the
+internal cut/paste buffer, clicking on an empty position pastes the
+buffer contents into the pianowin. This can be done with the left mouse
+button when in &rsquo;cut/paste&rsquo; mode
+(see \helpref{toolbar}{pwtoolbar}), with the middle mouse button (if
+available) or with shift+ctrl+left.
+<li>{\em Copy events}. Copy an event into the internal cut/paste buffer. Do
+this by pressing shift+ctrl+right or shift+middle (if available).
+<li>{\em Change velocity of event}. Holding the controlkey while pressing the
+left or right button on an event increments/decrements the velocity. The
+velocity value is displayed in the left end of the top line (just
+above the piano keyboard).
+<li>{\em Change track in &rsquo;single track mode&rsquo;}. You may change the track by pressing
+shift + cursor keys.
+<li>{\em Change track in &rsquo;multiple track mode&rsquo;}. In this mode you can change track
+by pressing the right mouse button on an event from another track
+(painted with grey color).
+<li>{\em Listen to pitch}. Do this by pressing shift+right.
+</ul>
+<p>{\bf Mouse actions in the top line}</p>
+<ul>
+<li>{\em Start/stop play}. Click the left mouse button on the top line to
+start/stop playing (record is not available in the pianowin).
+<li>{\em Start cycle play}. Select some events (some bars) and press
+shift+left-button. If there is no selection active, 4 bars are cycled.
+</ul>
+<h2><a name="editcreatesingleevents">Edit/create single events</a></h2><a name="pweventedit"></a>
+<p>\begin{figure}
+\latexonly{<p align="center"><img src="eventdlg.png"></p>}
+\htmlonly{\image{0cm;0cm}{eventdlg.png}}
+\caption{Example of event editing dialog}
+\end{figure}</p>
+<p>There are a number of dialogs that allow for detailed editing of single events.
+The dialogs are invoked by clicking left mouse button in the pianowin when
+in {\em show dialog} mode (see \helpref{toolbar}{pwtoolbar}). Events that
+can be created or edited are {\em Note On}, {\em Controller},
+{\em Program Change}, {\em Set Tempo} and {\em System Exclusive}.</p>
+<h2><a name="editmenu">Edit menu</a></h2>
+<p>Some entries work the same way as discussed in the \helpref{edit menu}{twedit}
+of the trackwindow. Only the entries that is special for the pianowindow is
+described here.</p>
+<h3><a name="cutcopypaste">Cut, Copy, Paste</a></h3><a name="pwcutpaste"></a>
+Copies selected events into an internal buffer. Events can be pasted to an
+empty space.
+<p>Cut is like Copy + delete.</p>
+<h3><a name="shift">Shift</a></h3><a name="pwshift"></a>
+<p>Moves selected events to the left or right. The amount is snaps, which can be
+adjusted in the settings-menu.</p>
+<h3><a name="quantize">Quantize</a></h3>
+Quantizes selected events to the current snap-setting.
+<h3><a name="leftrightupdown">Left - Right, Up - Down</a></h3>
+<p>Exchanges the position of selected events. Try it.</p>
+<h2><a name="settingsmenu">Settings menu</a></h2>
+<p>Some entries work the same way as discussed in the
+\helpref{settings menu}{twsettings} of the trackwindow.</p>
+<h3><a name="events">Events</a></h3><a name="pwevents"></a>
+<p>\begin{figure}
+\latexonly{<p align="center"><img src="pwevents.png"></p>}
+\htmlonly{\image{0cm;0cm}{pwevents.png}}
+\caption{Pianowin show-events dialog}
+\end{figure}</p>
+<p>You can specify what events are to be shown in the pianowin.</p>
+<ul>
+<li>{\em NoteOn, Controller, Program, Tempo, SysEx}. These events can be
+shown and
+edited in the pianowin. If you select exactly one, the piano at the left
+hand side will be replaced by a list of controller- or program names.
+<li>{\em Show drumnames}. Switch it off if you prefer to see the piano
+keyboard instead of drumnames.
+<li>{\em Show events from all tracks}. Displays all events
+(&rsquo;multi track mode&rsquo;). Events from active track are shown
+red, the others grey. Clicking with the right mouse button on a grey event
+changes the actual track.
+<li>{\em Show harmonies from harmonybrowser}. Displays the chords and
+scales from the harmony browser. To see the chords, you must first open the
+harmonybrowser and define a chord sequence. Then you have to mark some bars
+in the trackwin to show, where the chords should go. Now the pianowin shows
+notes from chords in light blue and notes from the scale in light green.
+</ul>
+<h3><a name="snap">Snap</a></h3><a name="snap"></a>
+<p>The start time of pasted events will be quantized to this value. This value is also
+used in the quantize- and shift dialogs in pianowin and trackwin.</p>
+<h2><a name="miscmenu">Misc menu</a></h2>
+<h3><a name="editpitchandothers">Edit Pitch and others</a></h3>
+<p>\begin{figure}
+\latexonly{<p align="center"><img src="pitched.png"></p>}
+\htmlonly{\image{0cm;0cm}{pitched.png}}
+\caption{Graphical editing in Pianowin}
+\end{figure}</p>
+<p>Opens a painting area where you can paint values of the specified type (pitch, controller, ...).
+Painting with mouse is done analogous to the \helpref{random rhythm generator}{randrhy}, make sure
+you use the right button to set values to zero because you can&rsquo;t paint an exact zero because
+of limited screen resolution. Use the Apply button to make your changes take effect.</p>
+<p>Also &rsquo;tempo&rsquo; change events can be painted. Please note that tempo changes
+in the middle of the song may not work if audio/midi synchronization is
+enabled (see \helpref{Global Audio dialog}{globalsettings}).</p>
+<h3><a name="guitarboard">Guitar board</a></h3>
+<p>Opens a window displaying the frets of a guitar. Moving the mouse over the guitar board shows
+the names of the notes and moves the black bar in the pianowin. Same works the other way around,
+moving the mouse in the pianowin shows the notes on the guitar board.</p>
+<p>Also, the actual contents of the pianowin cut / paste buffer is shown (this may be set from the
+harmony browser too, so you can see how chords could be played).</p>
+<p>Clicking with the left button adds events to the pianowin buffer so you can paste them into
+your song. In chord mode (settings dialog), if you add several events to the buffer, they all
+start at the same time, otherwise they are generated one after the other (length is the
+current snap setting).</p>
+<h2><a name="helpmenu">Help menu</a></h2>
+<ul>
+<li>{\em Pianowin} - loads the pianowin chapter of the help file.
+<li>{\em Mouse} - displays a dialog that describes mouse actions (what the buttons
+do etc.).
+</ul>
+<p>For more info about help see \helpref{&rsquo;Help System&rsquo;}{help} in the {\em Track Window} chapter.</p>
+<hr>
+<table width="100%" border="0" cellpadding="2">
+<tr>
+<td align="left"><a href="chapter4.html">[ Previous ]</a> <a href="index.html">[ Contents ]</a> <a href="chapter6.html">[ Next ]</a></td>
+</tr>
+</table>
+</body>
+</html>

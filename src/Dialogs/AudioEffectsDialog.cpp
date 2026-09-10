@@ -36,6 +36,7 @@ namespace
 #include <wx/msgdlg.h>
 #include <wx/notebook.h>
 #include <wx/panel.h>
+#include <wx/scrolwin.h>
 #include <wx/sizer.h>
 #include <wx/slider.h>
 #include <wx/statbox.h>
@@ -68,7 +69,7 @@ JZAudioEffectsDialog::JZAudioEffectsDialog(
       wxID_ANY,
       wxString("Audio Effects & DSP Suite"),
       wxDefaultPosition,
-      wxSize(560, 530),
+      wxSize(720, 620),
       wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER),
     mpProject(pProject),
     mSelectedSampleIndex(DefaultSampleIndex),
@@ -98,6 +99,7 @@ JZAudioEffectsDialog::JZAudioEffectsDialog(
     mpApplyButton(0),
     mpCloseButton(0)
 {
+  SetMinSize(wxSize(680, 560));
   CreateControls();
   CentreOnParent();
 }
@@ -155,7 +157,8 @@ void JZAudioEffectsDialog::CreateControls()
   // --------------------------------------------------------------------------
   // Tab 1: 3-Band Parametric Equalizer
   // --------------------------------------------------------------------------
-  wxPanel* pEqPanel = new wxPanel(mpNotebook);
+  wxScrolledWindow* pEqPanel = new wxScrolledWindow(mpNotebook, wxID_ANY);
+  pEqPanel->SetScrollRate(5, 10);
   wxBoxSizer* pEqSizer = new wxBoxSizer(wxVERTICAL);
 
   wxFlexGridSizer* pEqGrid = new wxFlexGridSizer(3, 2, 10, 12);
@@ -175,12 +178,14 @@ void JZAudioEffectsDialog::CreateControls()
 
   pEqSizer->Add(pEqGrid, 0, wxEXPAND | wxALL, 15);
   pEqPanel->SetSizer(pEqSizer);
+  pEqSizer->FitInside(pEqPanel);
   mpNotebook->AddPage(pEqPanel, "3-Band EQ");
 
   // --------------------------------------------------------------------------
   // Tab 2: Freeverb Algorithmic Reverb
   // --------------------------------------------------------------------------
-  wxPanel* pRevPanel = new wxPanel(mpNotebook);
+  wxScrolledWindow* pRevPanel = new wxScrolledWindow(mpNotebook, wxID_ANY);
+  pRevPanel->SetScrollRate(5, 10);
   wxBoxSizer* pRevSizer = new wxBoxSizer(wxVERTICAL);
 
   wxFlexGridSizer* pRevGrid = new wxFlexGridSizer(5, 2, 8, 12);
@@ -208,12 +213,14 @@ void JZAudioEffectsDialog::CreateControls()
 
   pRevSizer->Add(pRevGrid, 0, wxEXPAND | wxALL, 12);
   pRevPanel->SetSizer(pRevSizer);
+  pRevSizer->FitInside(pRevPanel);
   mpNotebook->AddPage(pRevPanel, "Reverb (Freeverb)");
 
   // --------------------------------------------------------------------------
   // Tab 3: Stereo Delay & Echo
   // --------------------------------------------------------------------------
-  wxPanel* pDelayPanel = new wxPanel(mpNotebook);
+  wxScrolledWindow* pDelayPanel = new wxScrolledWindow(mpNotebook, wxID_ANY);
+  pDelayPanel->SetScrollRate(5, 10);
   wxBoxSizer* pDelaySizer = new wxBoxSizer(wxVERTICAL);
 
   wxFlexGridSizer* pDelayGrid = new wxFlexGridSizer(5, 2, 8, 12);
@@ -241,12 +248,14 @@ void JZAudioEffectsDialog::CreateControls()
 
   pDelaySizer->Add(pDelayGrid, 0, wxEXPAND | wxALL, 12);
   pDelayPanel->SetSizer(pDelaySizer);
+  pDelaySizer->FitInside(pDelayPanel);
   mpNotebook->AddPage(pDelayPanel, "Stereo Delay");
 
   // --------------------------------------------------------------------------
   // Tab 4: Stereo Chorus / Flanger
   // --------------------------------------------------------------------------
-  wxPanel* pChoPanel = new wxPanel(mpNotebook);
+  wxScrolledWindow* pChoPanel = new wxScrolledWindow(mpNotebook, wxID_ANY);
+  pChoPanel->SetScrollRate(5, 10);
   wxBoxSizer* pChoSizer = new wxBoxSizer(wxVERTICAL);
 
   wxFlexGridSizer* pChoGrid = new wxFlexGridSizer(4, 2, 10, 12);
@@ -270,12 +279,14 @@ void JZAudioEffectsDialog::CreateControls()
 
   pChoSizer->Add(pChoGrid, 0, wxEXPAND | wxALL, 15);
   pChoPanel->SetSizer(pChoSizer);
+  pChoSizer->FitInside(pChoPanel);
   mpNotebook->AddPage(pChoPanel, "Stereo Chorus");
 
   // --------------------------------------------------------------------------
   // Tab 5: Master Limiter & Distortion
   // --------------------------------------------------------------------------
-  wxPanel* pLimPanel = new wxPanel(mpNotebook);
+  wxScrolledWindow* pLimPanel = new wxScrolledWindow(mpNotebook, wxID_ANY);
+  pLimPanel->SetScrollRate(5, 10);
   wxBoxSizer* pLimSizer = new wxBoxSizer(wxVERTICAL);
 
   wxFlexGridSizer* pLimGrid = new wxFlexGridSizer(3, 2, 10, 12);
@@ -296,6 +307,7 @@ void JZAudioEffectsDialog::CreateControls()
 
   pLimSizer->Add(pLimGrid, 0, wxEXPAND | wxALL, 15);
   pLimPanel->SetSizer(pLimSizer);
+  pLimSizer->FitInside(pLimPanel);
   mpNotebook->AddPage(pLimPanel, "Limiter & Overdrive");
 
   pTopSizer->Add(mpNotebook, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 10);
@@ -317,6 +329,7 @@ void JZAudioEffectsDialog::CreateControls()
   pTopSizer->Add(pBtnSizer, 0, wxEXPAND | wxALL, 10);
 
   SetSizer(pTopSizer);
+  pTopSizer->SetSizeHints(this);
 }
 
 void JZAudioEffectsDialog::OnSampleSelect(wxCommandEvent& Event)

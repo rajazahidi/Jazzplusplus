@@ -22,6 +22,7 @@
 #include <wx/msgdlg.h>
 #include <wx/notebook.h>
 #include <wx/panel.h>
+#include <wx/scrolwin.h>
 #include <wx/sizer.h>
 #include <wx/slider.h>
 #include <wx/statbox.h>
@@ -63,7 +64,7 @@ JZSoundGeneratorDialog::JZSoundGeneratorDialog(
       wxID_ANY,
       wxString("Procedural Sound FX & Drum Synthesizer"),
       wxDefaultPosition,
-      wxSize(560, 530),
+      wxSize(720, 640),
       wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER),
     mpProject(pProject),
     mTargetTrackIndex(DefaultTrack),
@@ -92,6 +93,7 @@ JZSoundGeneratorDialog::JZSoundGeneratorDialog(
     mpDrumInsertBtn(0),
     mpCloseButton(0)
 {
+  SetMinSize(wxSize(680, 580));
   CreateControls();
   CentreOnParent();
 }
@@ -109,7 +111,8 @@ void JZSoundGeneratorDialog::CreateControls()
   // ==========================================================================
   // Tab 1: Retro Game SFX Synthesizer
   // ==========================================================================
-  wxPanel* pSFXPanel = new wxPanel(mpNotebook);
+  wxScrolledWindow* pSFXPanel = new wxScrolledWindow(mpNotebook, wxID_ANY);
+  pSFXPanel->SetScrollRate(5, 10);
   wxBoxSizer* pSFXSizer = new wxBoxSizer(wxVERTICAL);
 
   wxFlexGridSizer* pSFXGrid = new wxFlexGridSizer(7, 2, 8, 12);
@@ -175,12 +178,14 @@ void JZSoundGeneratorDialog::CreateControls()
 
   pSFXSizer->Add(pSFXBtnRow, 0, wxALIGN_CENTER | wxALL, 10);
   pSFXPanel->SetSizer(pSFXSizer);
+  pSFXSizer->FitInside(pSFXPanel);
   mpNotebook->AddPage(pSFXPanel, "Retro Game SFX");
 
   // ==========================================================================
   // Tab 2: Vintage Analog Drum Synthesizer (808)
   // ==========================================================================
-  wxPanel* pDrumPanel = new wxPanel(mpNotebook);
+  wxScrolledWindow* pDrumPanel = new wxScrolledWindow(mpNotebook, wxID_ANY);
+  pDrumPanel->SetScrollRate(5, 10);
   wxBoxSizer* pDrumSizer = new wxBoxSizer(wxVERTICAL);
 
   wxFlexGridSizer* pDrumGrid = new wxFlexGridSizer(7, 2, 8, 12);
@@ -253,6 +258,7 @@ void JZSoundGeneratorDialog::CreateControls()
 
   pDrumSizer->Add(pDrumBtnRow, 0, wxALIGN_CENTER | wxALL, 10);
   pDrumPanel->SetSizer(pDrumSizer);
+  pDrumSizer->FitInside(pDrumPanel);
   mpNotebook->AddPage(pDrumPanel, "Analog Synth Drums");
 
   pTopSizer->Add(mpNotebook, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 10);
@@ -265,6 +271,7 @@ void JZSoundGeneratorDialog::CreateControls()
   pTopSizer->Add(pBottomSizer, 0, wxEXPAND | wxALL, 10);
 
   SetSizer(pTopSizer);
+  pTopSizer->SetSizeHints(this);
 }
 
 void JZSoundGeneratorDialog::OnSFXPresetChange(wxCommandEvent& Event)

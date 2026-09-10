@@ -20,6 +20,7 @@
 #include <wx/notebook.h>
 #include <wx/panel.h>
 #include <wx/radiobox.h>
+#include <wx/scrolwin.h>
 #include <wx/sizer.h>
 #include <wx/slider.h>
 #include <wx/spinctrl.h>
@@ -54,7 +55,7 @@ JZMidiEffectsDialog::JZMidiEffectsDialog(
       wxID_ANY,
       wxString("MIDI Effects Suite"),
       wxDefaultPosition,
-      wxSize(540, 520),
+      wxSize(720, 600),
       wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER),
     mpProject(pProject),
     mTargetTrackIndex(DefaultTrack),
@@ -84,6 +85,7 @@ JZMidiEffectsDialog::JZMidiEffectsDialog(
     mpApplyButton(0),
     mpCloseButton(0)
 {
+  SetMinSize(wxSize(680, 560));
   CreateControls();
   CentreOnParent();
 }
@@ -192,10 +194,11 @@ void JZMidiEffectsDialog::CreateControls()
   // --------------------------------------------------------------------------
   // Tab 1: Arpeggiator
   // --------------------------------------------------------------------------
-  wxPanel* pArpPanel = new wxPanel(mpNotebook);
+  wxScrolledWindow* pArpPanel = new wxScrolledWindow(mpNotebook, wxID_ANY);
+  pArpPanel->SetScrollRate(5, 10);
   wxBoxSizer* pArpSizer = new wxBoxSizer(wxVERTICAL);
 
-  wxFlexGridSizer* pArpGrid = new wxFlexGridSizer(5, 2, 8, 12);
+  wxFlexGridSizer* pArpGrid = new wxFlexGridSizer(4, 2, 8, 12);
   pArpGrid->AddGrowableCol(1);
 
   pArpGrid->Add(new wxStaticText(pArpPanel, wxID_ANY, "Pattern:"), 0, wxALIGN_CENTER_VERTICAL);
@@ -235,7 +238,7 @@ void JZMidiEffectsDialog::CreateControls()
   wxStaticBoxSizer* pScaleLockBox = new wxStaticBoxSizer(wxVERTICAL, pArpPanel, "Scale-Aware Quantization");
   mpArpScaleLockCheck = new wxCheckBox(pArpPanel, wxID_ANY, "Lock Generated Notes to Active Scale");
   mpArpScaleLockCheck->SetValue(false);
-  pScaleLockBox->Add(mpArpScaleLockCheck, 0, wxBOTTOM, 6);
+  pScaleLockBox->Add(mpArpScaleLockCheck, 0, wxALL, 6);
 
   wxBoxSizer* pScaleRow = new wxBoxSizer(wxHORIZONTAL);
   pScaleRow->Add(new wxStaticText(pArpPanel, wxID_ANY, "Key:"), 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 4);
@@ -247,16 +250,18 @@ void JZMidiEffectsDialog::CreateControls()
   mpArpScaleChoice = new wxChoice(pArpPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, scaleNames);
   mpArpScaleChoice->SetSelection(0);
   pScaleRow->Add(mpArpScaleChoice, 1, wxEXPAND);
-  pScaleLockBox->Add(pScaleRow, 0, wxEXPAND);
+  pScaleLockBox->Add(pScaleRow, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 6);
 
   pArpSizer->Add(pScaleLockBox, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 10);
   pArpPanel->SetSizer(pArpSizer);
+  pArpSizer->FitInside(pArpPanel);
   mpNotebook->AddPage(pArpPanel, "Smart Arpeggiator");
 
   // --------------------------------------------------------------------------
   // Tab 2: Humanizer
   // --------------------------------------------------------------------------
-  wxPanel* pHumPanel = new wxPanel(mpNotebook);
+  wxScrolledWindow* pHumPanel = new wxScrolledWindow(mpNotebook, wxID_ANY);
+  pHumPanel->SetScrollRate(5, 10);
   wxBoxSizer* pHumSizer = new wxBoxSizer(wxVERTICAL);
 
   wxFlexGridSizer* pHumGrid = new wxFlexGridSizer(3, 2, 10, 12);
@@ -284,12 +289,14 @@ void JZMidiEffectsDialog::CreateControls()
   pHumSizer->Add(pHumHint, 0, wxALL, 15);
 
   pHumPanel->SetSizer(pHumSizer);
+  pHumSizer->FitInside(pHumPanel);
   mpNotebook->AddPage(pHumPanel, "Humanizer & Swing");
 
   // --------------------------------------------------------------------------
   // Tab 3: Harmonizer
   // --------------------------------------------------------------------------
-  wxPanel* pHarmPanel = new wxPanel(mpNotebook);
+  wxScrolledWindow* pHarmPanel = new wxScrolledWindow(mpNotebook, wxID_ANY);
+  pHarmPanel->SetScrollRate(5, 10);
   wxBoxSizer* pHarmSizer = new wxBoxSizer(wxVERTICAL);
 
   wxFlexGridSizer* pHarmGrid = new wxFlexGridSizer(4, 2, 10, 12);
@@ -325,12 +332,14 @@ void JZMidiEffectsDialog::CreateControls()
 
   pHarmSizer->Add(pHarmGrid, 0, wxEXPAND | wxALL, 15);
   pHarmPanel->SetSizer(pHarmSizer);
+  pHarmSizer->FitInside(pHarmPanel);
   mpNotebook->AddPage(pHarmPanel, "Intelligent Harmonizer");
 
   // --------------------------------------------------------------------------
   // Tab 4: Echo / Delay
   // --------------------------------------------------------------------------
-  wxPanel* pEchoPanel = new wxPanel(mpNotebook);
+  wxScrolledWindow* pEchoPanel = new wxScrolledWindow(mpNotebook, wxID_ANY);
+  pEchoPanel->SetScrollRate(5, 10);
   wxBoxSizer* pEchoSizer = new wxBoxSizer(wxVERTICAL);
 
   wxFlexGridSizer* pEchoGrid = new wxFlexGridSizer(4, 2, 10, 12);
@@ -361,6 +370,7 @@ void JZMidiEffectsDialog::CreateControls()
 
   pEchoSizer->Add(pEchoGrid, 0, wxEXPAND | wxALL, 15);
   pEchoPanel->SetSizer(pEchoSizer);
+  pEchoSizer->FitInside(pEchoPanel);
   mpNotebook->AddPage(pEchoPanel, "Tempo-Synced Echo");
 
   pTopSizer->Add(mpNotebook, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 10);
@@ -379,6 +389,7 @@ void JZMidiEffectsDialog::CreateControls()
   pTopSizer->Add(pButtonSizer, 0, wxEXPAND | wxALL, 10);
 
   SetSizer(pTopSizer);
+  pTopSizer->SetSizeHints(this);
 }
 
 void JZMidiEffectsDialog::OnApplyButton(wxCommandEvent& Event)

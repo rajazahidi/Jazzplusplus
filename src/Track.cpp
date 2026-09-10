@@ -2130,9 +2130,13 @@ void JZTrack::SetVolume(int Value)
   }
   if (Value > 0)
   {
-    JZEvent* pEvent = new JZControlEvent(0, mChannel - 1, 0x07, Value - 1);
+    int ch = mChannel > 0 ? (mChannel - 1) : 0;
+    JZEvent* pEvent = new JZControlEvent(0, ch, 0x07, Value - 1);
     Put(pEvent);
-    gpMidiPlayer->OutNow(this, pEvent);
+    if (gpMidiPlayer)
+    {
+      gpMidiPlayer->OutNow(this, pEvent);
+    }
   }
   Cleanup();
 }
@@ -2145,13 +2149,17 @@ bool JZTrack::DecreaseVolume()
 
     mpVolume->SetControlValue(mpVolume->GetControlValue() - 1);
 
+    int ch = mChannel > 0 ? (mChannel - 1) : 0;
     JZEvent* pEvent = new JZControlEvent(
       0,
-      mChannel - 1,
+      ch,
       0x07,
       mpVolume->GetControlValue());
     Put(pEvent);
-    gpMidiPlayer->OutNow(this, pEvent);
+    if (gpMidiPlayer)
+    {
+      gpMidiPlayer->OutNow(this, pEvent);
+    }
 
     Cleanup();
 
@@ -2168,14 +2176,18 @@ bool JZTrack::IncreaseVolume()
 
     mpVolume->SetControlValue(mpVolume->GetControlValue() + 1);
 
+    int ch = mChannel > 0 ? (mChannel - 1) : 0;
     JZEvent* pEvent = new JZControlEvent(
       0,
-      mChannel - 1,
+      ch,
       0x07,
       mpVolume->GetControlValue());
 
     Put(pEvent);
-    gpMidiPlayer->OutNow(this, pEvent);
+    if (gpMidiPlayer)
+    {
+      gpMidiPlayer->OutNow(this, pEvent);
+    }
 
     Cleanup();
 
@@ -2203,9 +2215,13 @@ void JZTrack::SetPan(int Value)
   }
   if (Value > 0)
   {
-    JZEvent* pEvent = new JZControlEvent(0, mChannel - 1, 0x0a, Value - 1);
+    int ch = mChannel > 0 ? (mChannel - 1) : 0;
+    JZEvent* pEvent = new JZControlEvent(0, ch, 0x0a, Value - 1);
     Put(pEvent);
-    gpMidiPlayer->OutNow(this, pEvent);
+    if (gpMidiPlayer)
+    {
+      gpMidiPlayer->OutNow(this, pEvent);
+    }
   }
   Cleanup();
 }
@@ -2229,9 +2245,13 @@ void JZTrack::SetReverb(int Value)
   }
   if (Value > 0)
   {
-    JZEvent* pEvent = new JZControlEvent(0, mChannel - 1, 0x5B, Value - 1);
+    int ch = mChannel > 0 ? (mChannel - 1) : 0;
+    JZEvent* pEvent = new JZControlEvent(0, ch, 0x5B, Value - 1);
     Put(pEvent);
-    gpMidiPlayer->OutNow(this, pEvent);
+    if (gpMidiPlayer)
+    {
+      gpMidiPlayer->OutNow(this, pEvent);
+    }
   }
   Cleanup();
 }
@@ -2255,9 +2275,13 @@ void JZTrack::SetChorus(int Value)
   }
   if (Value > 0)
   {
-    JZEvent* pEvent = new JZControlEvent(0, mChannel - 1, 0x5D, Value - 1);
+    int ch = mChannel > 0 ? (mChannel - 1) : 0;
+    JZEvent* pEvent = new JZControlEvent(0, ch, 0x5D, Value - 1);
     Put(pEvent);
-    gpMidiPlayer->OutNow(this, pEvent);
+    if (gpMidiPlayer)
+    {
+      gpMidiPlayer->OutNow(this, pEvent);
+    }
   }
   Cleanup();
 }
@@ -2312,51 +2336,63 @@ void JZTrack::SetBank(int Value)
 
   if (Value >= 0)
   {
+    int ch = mChannel > 0 ? (mChannel - 1) : 0;
     if (!gpConfig->GetValue(C_UseTwoCommandBankSelect))
     {
       DEBUG(fprintf (stderr, "Single command bank select (Bank %d).\n",
             Value);)
       mpBank = new JZControlEvent(
         0,
-        mChannel - 1,
+        ch,
         gpConfig->GetValue(C_BankControlNumber),
         Value);
-      gpMidiPlayer->OutNow(this, mpBank);
+      if (gpMidiPlayer)
+      {
+        gpMidiPlayer->OutNow(this, mpBank);
+      }
       return;
     }
     while (gpConfig->BankEntry(Value).Command[0]<0 && Value>0)
     {
       Value--;
     }
-    assert(gpConfig->BankEntry(Value).Command[0] >= 0);
-    DEBUG(fprintf(stderr, "Double command bank select (Bank %d).\n",Value);)
-    mpBank  = new JZControlEvent(
-      0,
-      mChannel - 1,
-      gpConfig->GetValue(C_BankControlNumber),
-      gpConfig->BankEntry(Value).Command[0]);
-    gpMidiPlayer->OutNow(this, mpBank);
-    DEBUG(
-      fprintf(
+    if (gpConfig->BankEntry(Value).Command[0] >= 0)
+    {
+      DEBUG(fprintf(stderr, "Double command bank select (Bank %d).\n",Value);)
+      mpBank  = new JZControlEvent(
+        0,
+        ch,
+        gpConfig->GetValue(C_BankControlNumber),
+        gpConfig->BankEntry(Value).Command[0]);
+      if (gpMidiPlayer)
+      {
+        gpMidiPlayer->OutNow(this, mpBank);
+      }
+      DEBUG(
+        fprintf(
+          stderr,
+          "First bank select command: %d %d\n",
+          mpBank->Control,
+          mpBank->Value);)
+      mpBank2 = new JZControlEvent(
+        0,
+        ch,
+        gpConfig->GetValue(C_BankControlNumber2),
+        gpConfig->BankEntry(Value).Command[1]);
+
+      if (gpMidiPlayer)
+      {
+        gpMidiPlayer->OutNow(this, mpBank2);
+      }
+
+      DEBUG(fprintf(
         stderr,
-        "First bank select command: %d %d\n",
-        mpBank->Control,
-        mpBank->Value);)
-    mpBank2 = new JZControlEvent(
-      0,
-      mChannel - 1,
-      gpConfig->GetValue(C_BankControlNumber2),
-      gpConfig->BankEntry(Value).Command[1]);
-
-    gpMidiPlayer->OutNow(this, mpBank2);
-
-    DEBUG(fprintf(
-      stderr,
-      "Second bank select command: %d %d\n\n",
-      mpBank2->Control,
-      mpBank2->Value);
-    )
-    mChanged = true;
+        "Second bank select command: %d %d\n\n",
+        mpBank2->Control,
+        mpBank2->Value);
+      )
+      mChanged = true;
+    }
   }
 }
 
@@ -2380,8 +2416,12 @@ void JZTrack::SetPatch(int PatchNr)
   }
   if (PatchNr > 0)
   {
-    mpPatch = new JZProgramEvent(0, mChannel - 1, PatchNr - 1);
-    gpMidiPlayer->OutNow(this, mpPatch);
+    int ch = mChannel > 0 ? (mChannel - 1) : 0;
+    mpPatch = new JZProgramEvent(0, ch, PatchNr - 1);
+    if (gpMidiPlayer)
+    {
+      gpMidiPlayer->OutNow(this, mpPatch);
+    }
     mChanged = true;
   }
 }
@@ -3381,4 +3421,33 @@ void JZTrack::ToggleState(int Direction)
 void JZTrack::SetChannel(int Channel)
 {
   mChannel = Channel;
+  int ch = mChannel > 0 ? (mChannel - 1) : 0;
+  if (mpPatch)
+  {
+    mpPatch->SetChannel(ch);
+  }
+  if (mpBank)
+  {
+    mpBank->SetChannel(ch);
+  }
+  if (mpBank2)
+  {
+    mpBank2->SetChannel(ch);
+  }
+  if (mpVolume)
+  {
+    mpVolume->SetChannel(ch);
+  }
+  if (mpPan)
+  {
+    mpPan->SetChannel(ch);
+  }
+  if (mpReverb)
+  {
+    mpReverb->SetChannel(ch);
+  }
+  if (mpChorus)
+  {
+    mpChorus->SetChannel(ch);
+  }
 }

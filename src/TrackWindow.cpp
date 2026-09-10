@@ -306,7 +306,19 @@ void JZTrackWindow::OnLeftDoubleClick(wxMouseEvent& MouseEvent)
     int trackIndex = y2TrackIndex(Point.y);
     if (trackIndex >= 0 && trackIndex < mpProject->GetTrackCount())
     {
-      JZProjectManager::Instance()->CreatePianoView(trackIndex);
+      if (Point.x < mLeftInfoWidth)
+      {
+        JZTrack* pTrack = mpProject->GetTrack(trackIndex);
+        if (pTrack)
+        {
+          pTrack->Edit(this);
+          Refresh(false);
+        }
+      }
+      else
+      {
+        JZProjectManager::Instance()->CreatePianoView(trackIndex);
+      }
     }
   }
 }
@@ -404,6 +416,13 @@ void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& MouseEvent)
       if (Point.x < mNumberWidth)
       {
         // The point is inside the number field.
+        if (mNumberMode == eNmMidiChannel)
+        {
+          int ch = pTrack->mChannel;
+          ch = (ch % 16) + 1;
+          pTrack->SetChannel(ch);
+          Refresh(false);
+        }
       }
       else if (
         Point.x >= mTrackNameX &&
@@ -422,7 +441,7 @@ void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& MouseEvent)
       }
       else if (Point.x >= mPatchX && Point.x < mPatchX + mPatchWidth)
       {
-        IncreaseTrackNumberField(pTrack);
+        IncreaseTrackNumberField(pTrack, MouseEvent.ShiftDown() ? 10 : 1);
       }
       else if (
         Point.x >= mEventsX && Point.x < mEventsX + mEventsWidth &&
@@ -473,14 +492,23 @@ void JZTrackWindow::OnRightButtonUp(wxMouseEvent& MouseEvent)
       if (Point.x < mNumberWidth)
       {
         // The point is inside the number field.
+        if (mNumberMode == eNmMidiChannel)
+        {
+          int ch = pTrack->mChannel;
+          ch = (ch > 1) ? (ch - 1) : 16;
+          pTrack->SetChannel(ch);
+          Refresh(false);
+        }
       }
       else if (Point.x >= mStateX && Point.x < mStateX + mStateWidth)
       {
-        // The point is inside the track name field.
+        // The point is inside the track state field.
+        pTrack->ToggleState(-1);
+        Refresh(false);
       }
       else if (Point.x >= mPatchX && Point.x < mPatchX + mPatchWidth)
       {
-        DecreaseTrackNumberField(pTrack);
+        DecreaseTrackNumberField(pTrack, MouseEvent.ShiftDown() ? 10 : 1);
       }
     }
   }
@@ -488,24 +516,78 @@ void JZTrackWindow::OnRightButtonUp(wxMouseEvent& MouseEvent)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZTrackWindow::IncreaseTrackNumberField(JZTrack* pTrack)
+void JZTrackWindow::IncreaseTrackNumberField(JZTrack* pTrack, int Step)
 {
   bool UpdateFlag = false;
 
   switch (mCounterMode)
   {
     case eCmProgram:
+      {
+        int patch = pTrack->GetPatch();
+        int newPatch = std::min(128, patch + Step);
+        if (newPatch != patch)
+        {
+          pTrack->SetPatch(newPatch);
+          UpdateFlag = true;
+        }
+      }
       break;
     case eCmBank:
+      {
+        int bank = pTrack->GetBank();
+        int newBank = std::min(16383, bank + Step);
+        if (newBank != bank)
+        {
+          pTrack->SetBank(newBank);
+          UpdateFlag = true;
+        }
+      }
       break;
     case eCmVolume:
-      UpdateFlag = pTrack->IncreaseVolume();
+      {
+        int vol = pTrack->GetVolume();
+        int newVol = std::min(128, vol + Step);
+        if (newVol != vol)
+        {
+          pTrack->SetVolume(newVol);
+          UpdateFlag = true;
+        }
+      }
       break;
     case eCmPan:
+      {
+        int pan = pTrack->GetPan();
+        int newPan = std::min(128, pan + Step);
+        if (newPan != pan)
+        {
+          pTrack->SetPan(newPan);
+          UpdateFlag = true;
+        }
+      }
       break;
     case eCmReverb:
+      {
+        int rev = pTrack->GetReverb();
+        int newRev = std::min(128, rev + Step);
+        if (newRev != rev)
+        {
+          pTrack->SetReverb(newRev);
+          UpdateFlag = true;
+        }
+      }
       break;
     case eCmChorus:
+      {
+        int cho = pTrack->GetChorus();
+        int newCho = std::min(128, cho + Step);
+        if (newCho != cho)
+        {
+          pTrack->SetChorus(newCho);
+          UpdateFlag = true;
+        }
+      }
+      break;
     default:
       break;
   }
@@ -517,24 +599,78 @@ void JZTrackWindow::IncreaseTrackNumberField(JZTrack* pTrack)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZTrackWindow::DecreaseTrackNumberField(JZTrack* pTrack)
+void JZTrackWindow::DecreaseTrackNumberField(JZTrack* pTrack, int Step)
 {
   bool UpdateFlag = false;
 
   switch (mCounterMode)
   {
     case eCmProgram:
+      {
+        int patch = pTrack->GetPatch();
+        int newPatch = std::max(0, patch - Step);
+        if (newPatch != patch)
+        {
+          pTrack->SetPatch(newPatch);
+          UpdateFlag = true;
+        }
+      }
       break;
     case eCmBank:
+      {
+        int bank = pTrack->GetBank();
+        int newBank = std::max(0, bank - Step);
+        if (newBank != bank)
+        {
+          pTrack->SetBank(newBank);
+          UpdateFlag = true;
+        }
+      }
       break;
     case eCmVolume:
-      UpdateFlag = pTrack->DecreaseVolume();
+      {
+        int vol = pTrack->GetVolume();
+        int newVol = std::max(0, vol - Step);
+        if (newVol != vol)
+        {
+          pTrack->SetVolume(newVol);
+          UpdateFlag = true;
+        }
+      }
       break;
     case eCmPan:
+      {
+        int pan = pTrack->GetPan();
+        int newPan = std::max(0, pan - Step);
+        if (newPan != pan)
+        {
+          pTrack->SetPan(newPan);
+          UpdateFlag = true;
+        }
+      }
       break;
     case eCmReverb:
+      {
+        int rev = pTrack->GetReverb();
+        int newRev = std::max(0, rev - Step);
+        if (newRev != rev)
+        {
+          pTrack->SetReverb(newRev);
+          UpdateFlag = true;
+        }
+      }
       break;
     case eCmChorus:
+      {
+        int cho = pTrack->GetChorus();
+        int newCho = std::max(0, cho - Step);
+        if (newCho != cho)
+        {
+          pTrack->SetChorus(newCho);
+          UpdateFlag = true;
+        }
+      }
+      break;
     default:
       break;
   }

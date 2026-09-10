@@ -22,6 +22,8 @@
 
 #include <wx/dialog.h>
 
+#include <vector>
+
 class JZKnob;
 class JZKnobEvent;
 class JZTrack;
@@ -65,6 +67,8 @@ class JZTrackDialog : public wxDialog
     JZKnob* mpChannelKnob;
 
     wxCheckBox* mpAudioModeCheckBox;
+
+    std::vector<int> mPatchValues;
 
   DECLARE_EVENT_TABLE();
 };

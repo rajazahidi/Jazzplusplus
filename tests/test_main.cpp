@@ -347,6 +347,95 @@ void TestMidiFilesIntegrity()
 }
 
 //-----------------------------------------------------------------------------
+// Test 8: Channel & Program/Bank Logic
+//-----------------------------------------------------------------------------
+void TestChannelAndProgramLogic()
+{
+  cout << "[TEST] Running TestChannelAndProgramLogic..." << endl;
+
+  // 1. Channel cycling (1..16)
+  int ch = 1;
+  ch = (ch % 16) + 1;
+  TEST_ASSERT(ch == 2, "Channel 1 increment should be 2");
+
+  ch = 16;
+  ch = (ch % 16) + 1;
+  TEST_ASSERT(ch == 1, "Channel 16 increment should wrap to 1");
+
+  ch = 1;
+  ch = (ch > 1) ? (ch - 1) : 16;
+  TEST_ASSERT(ch == 16, "Channel 1 decrement should wrap to 16");
+
+  ch = 5;
+  ch = (ch > 1) ? (ch - 1) : 16;
+  TEST_ASSERT(ch == 4, "Channel 5 decrement should be 4");
+
+  // 2. Program & Bank bit packing and unpacking
+  // Standard Piano 1 (Program 1, Bank 0)
+  int patchVal = 1;
+  int bank = (patchVal & 0x0000ff00) >> 8;
+  int patch = patchVal & 0x000000ff;
+  TEST_ASSERT(bank == 0 && patch == 1, "Piano 1 should decode to Bank 0, Patch 1");
+
+  // GS Detuned EP 1: Value 2052 -> Bank 8, Program 4
+  int gsDetunedEP1Val = 2052;
+  bank = (gsDetunedEP1Val & 0x0000ff00) >> 8;
+  patch = gsDetunedEP1Val & 0x000000ff;
+  TEST_ASSERT(bank == 8 && patch == 4, "Detuned EP 1 should decode to Bank 8, Patch 4");
+
+  // GS Mandolin: Value 4121 -> Bank 16, Program 25
+  int gsMandolinVal = 4121;
+  bank = (gsMandolinVal & 0x0000ff00) >> 8;
+  patch = gsMandolinVal & 0x000000ff;
+  TEST_ASSERT(bank == 16 && patch == 25, "Mandolin should decode to Bank 16, Patch 25");
+
+  // Drum set: CM-64/32L Set (Patch 128, Bank 0)
+  int drumVal = 128;
+  bank = (drumVal & 0x0000ff00) >> 8;
+  patch = drumVal & 0x000000ff;
+  TEST_ASSERT(bank == 0 && patch == 128, "CM-64/32L drum should decode to Bank 0, Patch 128");
+
+  // 3. Selection bounds safety verification
+  vector<int> drumValues;
+  drumValues.push_back(1);
+  drumValues.push_back(9);
+  drumValues.push_back(17);
+  drumValues.push_back(25);
+  drumValues.push_back(26);
+  drumValues.push_back(33);
+  drumValues.push_back(41);
+  drumValues.push_back(49);
+  drumValues.push_back(128);
+
+  // List count is 9. A patch index of 128 should NEVER be used directly as listbox index!
+  int rawPatchNr = 128;
+  int safeSelectionIndex = -1;
+  for (size_t i = 0; i < drumValues.size(); ++i)
+  {
+    if (drumValues[i] == rawPatchNr)
+    {
+      safeSelectionIndex = (int)i;
+      break;
+    }
+  }
+  TEST_ASSERT(safeSelectionIndex == 8, "Safe lookup finds CM-64/32L at index 8");
+  TEST_ASSERT(safeSelectionIndex < (int)drumValues.size(), "Safe selection index is within listbox bounds");
+
+  // Ensure an out-of-range lookup doesn't crash and falls back
+  int unknownPatch = 999;
+  int unknownIndex = -1;
+  for (size_t i = 0; i < drumValues.size(); ++i)
+  {
+    if (drumValues[i] == unknownPatch)
+    {
+      unknownIndex = (int)i;
+      break;
+    }
+  }
+  TEST_ASSERT(unknownIndex == -1, "Unknown patch returns -1 safely");
+}
+
+//-----------------------------------------------------------------------------
 // Main Runner
 //-----------------------------------------------------------------------------
 int main()
@@ -362,6 +451,7 @@ int main()
   TestScales();
   TestPitchAndNoteConversions();
   TestMidiFilesIntegrity();
+  TestChannelAndProgramLogic();
 
   cout << "==========================================" << endl;
   cout << "Tests Run:    " << gTestsRun << endl;

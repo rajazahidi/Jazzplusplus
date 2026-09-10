@@ -264,6 +264,17 @@ void JZKnob::OnEraseBackground(wxEraseEvent& Event)
 //-----------------------------------------------------------------------------
 void JZKnob::OnPaint(wxPaintEvent& Event)
 {
+  wxSize clientSize = GetClientSize();
+  if (clientSize.x <= 0 || clientSize.y <= 0)
+  {
+    return;
+  }
+
+  if (!mBuffer.IsOk() || mBuffer.GetWidth() != clientSize.x || mBuffer.GetHeight() != clientSize.y)
+  {
+    mBuffer.Create(clientSize.x, clientSize.y);
+  }
+
   wxSize Size = GetSize();
 
   double Theta = gDegreesToRadians *

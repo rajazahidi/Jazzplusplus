@@ -116,9 +116,9 @@ class JZTrackWindow : public JZEventWindow
 
     void VerticalScroll(wxScrollWinEvent& Event);
 
-    void IncreaseTrackNumberField(JZTrack* pTrack);
+    void IncreaseTrackNumberField(JZTrack* pTrack, int Step = 1);
 
-    void DecreaseTrackNumberField(JZTrack* pTrack);
+    void DecreaseTrackNumberField(JZTrack* pTrack, int Step = 1);
 
     virtual void OnDraw(wxDC& Dc);
 

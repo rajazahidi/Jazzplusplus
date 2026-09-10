@@ -21,6 +21,7 @@
 #include "ProgramChangeDialog.h"
 
 #include "../Configuration.h"
+#include "../Events.h"
 #include "../Globals.h"
 
 #include <wx/button.h>
@@ -57,6 +58,15 @@ JZProgramChangeDialog::JZProgramChangeDialog(
     mpProgramListBox->Append(iName->first.c_str());
   }
 
+  if (mpProgram && mpProgramListBox->GetCount() > 0)
+  {
+    int currentPrg = mpProgram->GetProgram();
+    if (currentPrg >= 0 && currentPrg < (int)mpProgramListBox->GetCount())
+    {
+      mpProgramListBox->SetSelection(currentPrg);
+    }
+  }
+
   wxButton* pOkButton = new wxButton(this, wxID_OK, "&OK");
   wxButton* pCancelButton = new wxButton(this, wxID_CANCEL, "Cancel");
   wxButton* pHelpButton = new wxButton(this, wxID_HELP, "Help");
@@ -79,5 +89,20 @@ JZProgramChangeDialog::JZProgramChangeDialog(
 
   pTopSizer->SetSizeHints(this);
   pTopSizer->Fit(this);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZProgramChangeDialog::TransferDataFromWindow()
+{
+  if (mpProgram && mpProgramListBox)
+  {
+    int sel = mpProgramListBox->GetSelection();
+    if (sel != wxNOT_FOUND)
+    {
+      mpProgram->SetProgram(sel);
+    }
+  }
+  return true;
 }
 

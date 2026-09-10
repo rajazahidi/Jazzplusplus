@@ -39,6 +39,8 @@ class JZProgramChangeDialog : public wxDialog
 
   private:
 
+    virtual bool TransferDataFromWindow();
+
     JZProgramEvent* mpProgram;
 
     wxListBox* mpProgramListBox;

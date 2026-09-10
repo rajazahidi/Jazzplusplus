@@ -129,6 +129,10 @@ JZTrackDialog::JZTrackDialog(JZTrack& Track, wxWindow* pParent)
 void JZTrackDialog::SetPatchListEntries()
 {
   mpPatchListBox->Clear();
+  mPatchValues.clear();
+
+  int CurrentPatchValue = mTrack.GetPatch() + (mTrack.GetBank() << 8);
+  int SelectionIndex = wxNOT_FOUND;
 
   if (mTrack.IsDrumTrack())
   {
@@ -143,7 +147,13 @@ void JZTrackDialog::SetPatchListEntries()
 
       if (!DrumSet.empty())
       {
-        mpPatchListBox->Append(DrumSet.c_str());
+        int val = iDrumSet->second;
+        int idx = mpPatchListBox->Append(DrumSet.c_str());
+        mPatchValues.push_back(val);
+        if (val == CurrentPatchValue)
+        {
+          SelectionIndex = idx;
+        }
       }
     }
   }
@@ -160,9 +170,24 @@ void JZTrackDialog::SetPatchListEntries()
 
       if (!VoiceName.empty())
       {
-        mpPatchListBox->Append(VoiceName.c_str());
+        int val = iVoiceName->second;
+        int idx = mpPatchListBox->Append(VoiceName.c_str());
+        mPatchValues.push_back(val);
+        if (val == CurrentPatchValue)
+        {
+          SelectionIndex = idx;
+        }
       }
     }
+  }
+
+  if (SelectionIndex != wxNOT_FOUND && SelectionIndex >= 0 && SelectionIndex < (int)mpPatchListBox->GetCount())
+  {
+    mpPatchListBox->SetSelection(SelectionIndex);
+  }
+  else if (mpPatchListBox->GetCount() > 0)
+  {
+    mpPatchListBox->SetSelection(0);
   }
 }
 
@@ -172,15 +197,23 @@ bool JZTrackDialog::TransferDataToWindow()
 {
   mpTrackNameEdit->ChangeValue(mTrack.GetName());
 
-  int PatchIndex = mTrack.GetPatch() + (mTrack.GetBank() << 8);
-  mpPatchListBox->SetSelection(PatchIndex);
+  SetPatchListEntries();
+
+  int channel = mTrack.mChannel;
+  if (channel < 1)
+  {
+    channel = 1;
+  }
+  else if (channel > 16)
+  {
+    channel = 16;
+  }
 
   ostringstream Oss;
-
-  Oss << (int)mTrack.mChannel;
+  Oss << channel;
   mpChannelValue->SetLabel(Oss.str().c_str());
 
-  mpChannelKnob->SetValue(mTrack.mChannel);
+  mpChannelKnob->SetValue(channel);
 
   mpAudioModeCheckBox->SetValue(mTrack.GetAudioMode());
 
@@ -194,15 +227,17 @@ bool JZTrackDialog::TransferDataFromWindow()
   wxString Trackname = mpTrackNameEdit->GetValue();
   mTrack.SetName(Trackname.c_str());
 
+  mTrack.SetChannel(mpChannelKnob->GetValue());
+  mTrack.SetAudioMode(mpAudioModeCheckBox->GetValue());
+
   int Selection = mpPatchListBox->GetSelection();
-  if (Selection != wxNOT_FOUND)
+  if (Selection != wxNOT_FOUND && Selection >= 0 && Selection < (int)mPatchValues.size())
   {
-    int Patch = Selection & 0x000000ff;
-    int Bank = (Selection & 0x0000ff00) >> 8;
-    mTrack.SetPatch(Patch);
+    int PatchVal = mPatchValues[Selection];
+    int Bank = (PatchVal & 0x0000ff00) >> 8;
+    int Patch = PatchVal & 0x000000ff;
     mTrack.SetBank(Bank);
-    mTrack.mChannel = mpChannelKnob->GetValue();
-    mTrack.SetAudioMode(mpAudioModeCheckBox->GetValue());
+    mTrack.SetPatch(Patch);
   }
 
   return true;
@@ -218,10 +253,10 @@ void JZTrackDialog::OnChannelChange(JZKnobEvent& Event)
   mpChannelValue->SetLabel(Oss.str().c_str());
   mTrack.mChannel = Value;
 
-  // Test to determine if the track channel toggled in our out of drum mode.
+  // Test to determine if the track channel toggled in or out of drum mode.
   if (mLastTrackChannelWasDrums != mTrack.IsDrumTrack())
   {
-    // If it did switch, update the patch list entries.
+    // If it did switch, update the patch list entries safely.
     SetPatchListEntries();
   }
 

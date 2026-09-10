@@ -526,6 +526,7 @@ void JZProject::OpenSong(const wxString& SongFileName)
   JZStandardRead Io;
   Clear();
   Read(Io, SongFileName.ToStdString());
+  mSongFileName = SongFileName;
   mpConfig->Put(C_StartUpSong, SongFileName.ToStdString());
   wxFileName SplFile(SongFileName);
   SplFile.SetExt("spl");
@@ -555,6 +556,7 @@ void JZProject::OpenAndReadAsciiMidiFile(const wxString& AsciiMidiFileName)
   JZAsciiRead AsciiRead;
   Clear();
   Read(AsciiRead, AsciiMidiFileName.ToStdString());
+  mSongFileName = AsciiMidiFileName;
 //  mpConfig->Put(C_StartUpSong, SongFileName);
 }
 
@@ -571,6 +573,7 @@ void JZProject::ExportMidiFile(const wxString& MidiFileName)
 {
   JZStandardWrite Io;
   Write(Io, MidiFileName.ToStdString());
+  mSongFileName = MidiFileName;
   mpConfig->Put(C_StartUpSong, MidiFileName.ToStdString());
 }
 
@@ -580,6 +583,7 @@ void JZProject::ExportAsciiMidiFile(const wxString& AsciiMidiFileName)
 {
   JZAsciiWrite AsciiWrite;
   Write(AsciiWrite, AsciiMidiFileName.ToStdString());
+  mSongFileName = AsciiMidiFileName;
 }
 
 //-----------------------------------------------------------------------------
@@ -683,42 +687,60 @@ JZRecordingInfo* JZProject::GetRecInfo()
 //-----------------------------------------------------------------------------
 void JZProject::EditAudioGlobalSettings(wxWindow* pParent)
 {
-  mpMidiPlayer->EditAudioGlobalSettings(pParent);
+  if (mpMidiPlayer)
+  {
+    mpMidiPlayer->EditAudioGlobalSettings(pParent);
+  }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZProject::EditAudioSamples(wxWindow* pParent)
 {
-  mpMidiPlayer->EditAudioSamples(pParent);
+  if (mpMidiPlayer)
+  {
+    mpMidiPlayer->EditAudioSamples(pParent);
+  }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZProject::LoadSampleSet(wxWindow* pParent)
 {
-  mpMidiPlayer->LoadSampleSet(pParent);
+  if (mpMidiPlayer)
+  {
+    mpMidiPlayer->LoadSampleSet(pParent);
+  }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZProject::SaveSampleSetAs(wxWindow* pParent)
 {
-  mpMidiPlayer->SaveSampleSetAs(pParent);
+  if (mpMidiPlayer)
+  {
+    mpMidiPlayer->SaveSampleSetAs(pParent);
+  }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZProject::SaveSampleSet(wxWindow* pParent)
 {
-  mpMidiPlayer->SaveSampleSet(pParent);
+  if (mpMidiPlayer)
+  {
+    mpMidiPlayer->SaveSampleSet(pParent);
+  }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZProject::ClearSampleSet(wxWindow* pParent)
 {
-  mpMidiPlayer->ClearSampleSet(pParent);
+  if (mpMidiPlayer)
+  {
+    mpMidiPlayer->ClearSampleSet(pParent);
+  }
 }
 
 //-----------------------------------------------------------------------------

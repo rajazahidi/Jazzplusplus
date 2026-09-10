@@ -40,6 +40,7 @@
 #include "RecordingInfo.h"
 #include "Resources.h"
 #include "Rhythm.h"
+#include "StandardFile.h"
 #include "TrackWindow.h"
 #include "ToolBar.h"
 
@@ -341,7 +342,6 @@ void JZTrackFrame::CreateMenu()
   mpEditMenu->AppendSeparator();
 
   mpEditMenu->Append(wxID_DELETE, "&Delete\tDel");
-  mpEditMenu->Append(wxID_DELETE, "&Silence");
 
 #if 0
   mpEditMenu->AppendSeparator();
@@ -574,6 +574,8 @@ void JZTrackFrame::OnFileNew(wxCommandEvent& Event)
   if (wxMessageBox("Clear Song?", "Sure?", wxOK | wxCANCEL) == wxOK)
   {
     gpProject->Clear();
+    gpProject->mSongFileName.clear();
+    SetTitle("Jazz++");
     mpTrackWindow->Refresh(false);
 //    NextWin->NewPosition(1, 0);
   }
@@ -583,6 +585,7 @@ void JZTrackFrame::OnFileNew(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnFileOpenProject(wxCommandEvent& Event)
 {
+  OnFileImportMidi(Event);
 }
 
 //-----------------------------------------------------------------------------
@@ -596,12 +599,27 @@ void JZTrackFrame::OnFileClose(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnFileProjectSave(wxCommandEvent& Event)
 {
+  if (!gpProject)
+  {
+    return;
+  }
+  if (gpProject->mSongFileName.empty())
+  {
+    OnFileProjectSaveAs(Event);
+  }
+  else
+  {
+    gpProject->ExportMidiFile(gpProject->mSongFileName);
+    SetTitle(gpProject->mSongFileName);
+    wxMessageBox("Project saved successfully.", "Save Project", wxOK | wxICON_INFORMATION, this);
+  }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnFileProjectSaveAs(wxCommandEvent& Event)
 {
+  OnFileExportMidi(Event);
 }
 
 //-----------------------------------------------------------------------------
@@ -696,6 +714,107 @@ void JZTrackFrame::OnFileExportAscii(wxCommandEvent&)
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnFileExportSelectionAsMidi(wxCommandEvent& Event)
 {
+  if (!mpTrackWindow || !mpTrackWindow->AreEventsSelected())
+  {
+    wxMessageBox("Please select a range of events or track first.", "Export Selection", wxOK | wxICON_INFORMATION, this);
+    return;
+  }
+
+  wxFileDialog SaveAsDialog(
+    0,
+    "Export Selection as MIDI",
+    "",
+    "",
+    "MIDI files (MID, MIDI)|*.mid;*.midi|All files (*.*)|*.*",
+    wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+  if (SaveAsDialog.ShowModal() != wxID_OK)
+  {
+    return;
+  }
+
+  wxString FileName = SaveAsDialog.GetPath();
+
+  JZSong SelectionSong;
+  SelectionSong.SetTicksPerQuarter(gpProject->GetTicksPerQuarter());
+
+  int fromClock = mpTrackWindow->mpFilter->GetFromClock();
+  int toClock = mpTrackWindow->mpFilter->GetToClock();
+  int fromTrack = mpTrackWindow->mpFilter->GetFromTrack();
+  int toTrack = mpTrackWindow->mpFilter->GetToTrack();
+
+  // Copy tempo and meter events from track 0 if available to preserve tempo map
+  JZTrack* pOrigTrack0 = gpProject->GetTrack(0);
+  JZTrack* pDestTrack0 = SelectionSong.GetTrack(0);
+  if (pOrigTrack0 && pDestTrack0)
+  {
+    JZEventIterator iter(pOrigTrack0);
+    JZEvent* pEv = iter.First();
+    while (pEv)
+    {
+      if (pEv->IsSetTempo() || pEv->IsTimeSignat())
+      {
+        if (pEv->GetClock() <= toClock)
+        {
+          JZEvent* pCopy = pEv->Copy();
+          int newClock = pEv->GetClock() - fromClock;
+          if (newClock < 0)
+          {
+            newClock = 0;
+          }
+          pCopy->SetClock(newClock);
+          pDestTrack0->Put(pCopy);
+        }
+      }
+      pEv = iter.Next();
+    }
+    pDestTrack0->Cleanup();
+  }
+
+  for (int t = fromTrack; t <= toTrack && t < gpProject->GetTrackCount(); ++t)
+  {
+    JZTrack* pSrcTrack = gpProject->GetTrack(t);
+    JZTrack* pDstTrack = SelectionSong.GetTrack(t);
+    if (!pSrcTrack || !pDstTrack)
+    {
+      continue;
+    }
+    if (t != 0)
+    {
+      pDstTrack->SetName(pSrcTrack->GetName());
+      pDstTrack->mChannel = pSrcTrack->mChannel;
+      pDstTrack->mForceChannel = pSrcTrack->mForceChannel;
+    }
+
+    JZEventIterator iter(pSrcTrack);
+    JZEvent* pEv = iter.Range(fromClock, toClock);
+    while (pEv)
+    {
+      if (mpTrackWindow->mpFilter->IsSelected(pEv))
+      {
+        if (t == 0 && (pEv->IsSetTempo() || pEv->IsTimeSignat()))
+        {
+          // Already copied in track 0 handling
+        }
+        else
+        {
+          JZEvent* pCopy = pEv->Copy();
+          int newClock = pEv->GetClock() - fromClock;
+          if (newClock < 0)
+          {
+            newClock = 0;
+          }
+          pCopy->SetClock(newClock);
+          pDstTrack->Put(pCopy);
+        }
+      }
+      pEv = iter.Next();
+    }
+    pDstTrack->Cleanup();
+  }
+
+  JZStandardWrite Io;
+  SelectionSong.Write(Io, FileName.ToStdString());
+  wxMessageBox("Selection exported successfully to:\n" + FileName, "Export Selection", wxOK | wxICON_INFORMATION, this);
 }
 
 //-----------------------------------------------------------------------------
@@ -1102,6 +1221,14 @@ void JZTrackFrame::OnSettingsMidiDevice(wxCommandEvent& Event)
       {
         ::wxMessageBox("No midi device found", "Info", wxOK);
       }
+    }
+    else if (gpConfig->GetValue(C_MidiDriver) == eMidiDriverAlsa)
+    {
+      ::wxMessageBox(
+        "ALSA MIDI device settings updated successfully.",
+        "MIDI Device",
+        wxOK | wxICON_INFORMATION,
+        this);
     }
   }
 #endif

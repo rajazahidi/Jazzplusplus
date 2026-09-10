@@ -140,12 +140,14 @@ void JZProjectManager::CreateGuitarView()
 {
   if (!mpGuitarFrame)
   {
-    if (mpPianoFrame)
-    {
-      mpGuitarFrame = new JZGuitarFrame(mpPianoFrame);
-    }
+    wxWindow* pParent = mpPianoFrame ? static_cast<wxWindow*>(mpPianoFrame) : static_cast<wxWindow*>(mpTrackFrame);
+    mpGuitarFrame = new JZGuitarFrame(pParent);
   }
-  mpGuitarFrame->Show(true);
+  if (mpGuitarFrame)
+  {
+    mpGuitarFrame->Show(true);
+    mpGuitarFrame->Raise();
+  }
 }
 
 //-----------------------------------------------------------------------------

@@ -23,6 +23,7 @@
 #include <wx/statbox.h>
 #include <wx/stattext.h>
 
+#include <algorithm>
 #include <cstdint>
 #include <sstream>
 
@@ -108,14 +109,15 @@ void JZInsertChordScaleDialog::CreateControls()
   wxBoxSizer* pMainSizer = new wxBoxSizer(wxVERTICAL);
 
   // Top Mode selection (Chord vs Scale)
-  wxString modes[] = { "Chords (Harmonic / Power Chords)", "Scales (Melodic Runs)" };
+  wxArrayString modes;
+  modes.Add("Chords (Harmonic / Power Chords)");
+  modes.Add("Scales (Melodic Runs)");
   mpModeRadio = new wxRadioBox(
     this,
     ID_MODE_RADIO,
     "Type",
     wxDefaultPosition,
     wxDefaultSize,
-    2,
     modes,
     2,
     wxRA_SPECIFY_COLS);
@@ -129,7 +131,7 @@ void JZInsertChordScaleDialog::CreateControls()
   pMainSizer->Add(pCatSizer, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 6);
 
   // List of Chords / Scales
-  mpItemListBox = new wxListBox(this, ID_ITEM_LIST, wxDefaultPosition, wxSize(-1, 140), 0, NULL, wxLB_SINGLE | wxLB_NEEDED_SB);
+  mpItemListBox = new wxListBox(this, ID_ITEM_LIST, wxDefaultPosition, wxSize(-1, 140), wxArrayString(), wxLB_SINGLE | wxLB_NEEDED_SB);
   pMainSizer->Add(mpItemListBox, 1, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 6);
 
   // Parameters Grid
@@ -216,7 +218,9 @@ void JZInsertChordScaleDialog::CreateControls()
 
   // Formula & Notes details label
   mpInfoText = new wxStaticText(this, wxID_ANY, "Selected: None");
-  mpInfoText->SetFont(mpInfoText->GetFont().Bold());
+  wxFont infoFont = mpInfoText->GetFont();
+  infoFont.SetWeight(wxFONTWEIGHT_BOLD);
+  mpInfoText->SetFont(infoFont);
   pParamBox->Add(mpInfoText, 0, wxEXPAND | wxTOP | wxLEFT | wxRIGHT, 4);
 
   pMainSizer->Add(pParamBox, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 6);
@@ -253,7 +257,7 @@ void JZInsertChordScaleDialog::PopulateCategories()
     vector<string> cats = JZChordScaleLibrary::GetChordCategories();
     for (size_t i = 0; i < cats.size(); ++i)
     {
-      mpCategoryChoice->Append(cats[i]);
+      mpCategoryChoice->Append(cats[i].c_str());
     }
 
     mpStyleChoice->Clear();
@@ -268,7 +272,7 @@ void JZInsertChordScaleDialog::PopulateCategories()
     vector<string> cats = JZChordScaleLibrary::GetScaleCategories();
     for (size_t i = 0; i < cats.size(); ++i)
     {
-      mpCategoryChoice->Append(cats[i]);
+      mpCategoryChoice->Append(cats[i].c_str());
     }
 
     mpStyleChoice->Clear();
@@ -299,7 +303,7 @@ void JZInsertChordScaleDialog::PopulateItems()
       {
         ostringstream oss;
         oss << chords[i].mName << "  [" << chords[i].GetFormulaString() << "]";
-        mpItemListBox->Append(oss.str(), reinterpret_cast<void*>(static_cast<uintptr_t>(i)));
+        mpItemListBox->Append(oss.str().c_str(), reinterpret_cast<void*>(static_cast<uintptr_t>(i)));
       }
     }
   }
@@ -312,7 +316,7 @@ void JZInsertChordScaleDialog::PopulateItems()
       {
         ostringstream oss;
         oss << scales[i].mName << "  [" << scales[i].GetFormulaString() << "]";
-        mpItemListBox->Append(oss.str(), reinterpret_cast<void*>(static_cast<uintptr_t>(i)));
+        mpItemListBox->Append(oss.str().c_str(), reinterpret_cast<void*>(static_cast<uintptr_t>(i)));
       }
     }
   }
@@ -545,7 +549,8 @@ void JZInsertChordScaleDialog::ExecuteInsert()
       pTrack->Cleanup();
       mStartClock += noteClocks;
       JZProjectManager::Instance()->UpdateAllViews();
-      wxMessageBox(wxString("Chord inserted successfully into ") + wxString(pTrack->GetName()) + ".", "Insert Chord", wxOK | wxICON_INFORMATION, this);
+      wxString msg = wxString::Format("Chord inserted successfully into %s.", pTrack->GetName());
+      wxMessageBox(msg, "Insert Chord", wxOK | wxICON_INFORMATION, this);
       return;
     }
     else if (styleSel == 1) // Arpeggio Up
@@ -630,7 +635,8 @@ void JZInsertChordScaleDialog::ExecuteInsert()
   mStartClock = currentClock;
 
   JZProjectManager::Instance()->UpdateAllViews();
-  wxMessageBox(wxString("Notes inserted successfully into ") + wxString(pTrack->GetName()) + ".", "Insert", wxOK | wxICON_INFORMATION, this);
+  wxString msg = wxString::Format("Notes inserted successfully into %s.", pTrack->GetName());
+  wxMessageBox(msg, "Insert", wxOK | wxICON_INFORMATION, this);
 }
 
 //-----------------------------------------------------------------------------

@@ -45,6 +45,7 @@
 #include <wx/dcmemory.h>
 #include <wx/msgdlg.h>
 
+#include <algorithm>
 #include <sstream>
 
 using namespace std;

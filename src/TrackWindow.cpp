@@ -34,6 +34,7 @@
 #include <wx/dcmemory.h>
 #include <wx/msgdlg.h>
 
+#include <algorithm>
 #include <iomanip>
 //DEBUG#include <iostream>
 #include <sstream>

@@ -23,11 +23,14 @@
 #include "Help.h"
 
 #include <wx/filedlg.h>
+#include <wx/filefn.h>
+#include <wx/filename.h>
 #include <wx/html/helpctrl.h>
 #include <wx/msgdlg.h>
 #include <wx/stdpaths.h>
 
 #include <fstream>
+#include <vector>
 
 using namespace std;
 
@@ -165,7 +168,6 @@ void JZHelp::ConfigureHelp()
   candidatePaths.push_back(wxGetCwd() + wxFileName::GetPathSeparator() + "HelpFiles" + wxFileName::GetPathSeparator());
 
   // 4. Source root / standard install paths
-  candidatePaths.push_back("/home/kingzahidi/jazz/src/HelpFiles/");
   candidatePaths.push_back("/usr/share/jazz/HelpFiles/");
   candidatePaths.push_back("/usr/local/share/jazz/HelpFiles/");
 

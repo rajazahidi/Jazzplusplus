@@ -35,11 +35,11 @@ JZAudioSettingsDialog::JZAudioSettingsDialog(
   mpEnableAudioCheckBox = new wxCheckBox(this, wxID_ANY, "Enable Audio");
 
   wxArrayString SampleRates;
-  SampleRates.push_back("8000");
-  SampleRates.push_back("11025");
-  SampleRates.push_back("22050");
-  SampleRates.push_back("44100");
-  SampleRates.push_back("48000");
+  SampleRates.Add("8000");
+  SampleRates.Add("11025");
+  SampleRates.Add("22050");
+  SampleRates.Add("44100");
+  SampleRates.Add("48000");
 
   mpSamplingRateComboBox = new wxComboBox(
     this,

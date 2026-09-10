@@ -41,6 +41,10 @@ jobs:
         run: |
           cmake --build build --parallel $(nproc)
 
+      - name: Run Unit Tests
+        run: |
+          ctest --test-dir build --output-on-failure
+
       - name: Verify Binary
         run: |
           file build/jazz
@@ -71,6 +75,7 @@ jobs:
         run: |
           cmake -B build -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel $(nproc)
+          ctest --test-dir build --output-on-failure
 
       - name: Download AppImage Tool
         run: |

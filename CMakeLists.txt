@@ -232,3 +232,16 @@ install(DIRECTORY song/ DESTINATION ${CMAKE_INSTALL_DATADIR}/jazz/song)
 install(DIRECTORY src/HelpFiles/ DESTINATION ${CMAKE_INSTALL_DATADIR}/jazz/HelpFiles)
 
 file(COPY src/HelpFiles DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+# -----------------------------------------------------------------------------
+# Tests
+# -----------------------------------------------------------------------------
+enable_testing()
+add_executable(jazz_tests
+    tests/test_main.cpp
+    src/ChordScaleData.cpp
+)
+target_include_directories(jazz_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+add_test(NAME JazzCoreUnitTests COMMAND jazz_tests)
+set_tests_properties(JazzCoreUnitTests PROPERTIES WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+

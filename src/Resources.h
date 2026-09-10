@@ -96,6 +96,9 @@
 #define ID_SEARCH_AND_REPLACE                (wxID_HIGHEST + 73)
 #define ID_NOTE_NAMES                        (wxID_HIGHEST + 74)
 #define ID_INSERT_CHORD_SCALE                (wxID_HIGHEST + 75)
+#define ID_EFFECTS_MIDI                      (wxID_HIGHEST + 76)
+#define ID_EFFECTS_SOUND_GEN                 (wxID_HIGHEST + 77)
+#define ID_EFFECTS_AUDIO_DSP                 (wxID_HIGHEST + 78)
 
 #define ID_PLAY                              (wxID_HIGHEST + 80)
 #define ID_PLAY_LOOP                         (wxID_HIGHEST + 81)

@@ -84,6 +84,9 @@ class JZPianoFrame : public wxFrame
     void OnFilter(wxCommandEvent& Event);
     void OnToggleNoteNames(wxCommandEvent& Event);
     void OnInsertChordScale(wxCommandEvent& Event);
+    void OnEffectsMidi(wxCommandEvent& Event);
+    void OnEffectsSoundGen(wxCommandEvent& Event);
+    void OnEffectsAudioDsp(wxCommandEvent& Event);
 
     // Actions (Called from menu items, toolbar buttons, and wx events)
     void ActCloseEvent(wxCloseEvent& Event);

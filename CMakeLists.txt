@@ -111,6 +111,7 @@ set(JAZZ_SOURCES
     src/ArrayControl.cpp
     src/AsciiMidiFile.cpp
     src/Audio.cpp
+    src/AudioEffects.cpp
     src/ChordScaleData.cpp
     src/Command.cpp
     src/Configuration.cpp
@@ -118,6 +119,7 @@ set(JAZZ_SOURCES
     src/DeprecatedWx/prop.cpp
     src/DeprecatedWx/propform.cpp
     src/DeprecatedWx/proplist.cpp
+    src/Dialogs/AudioEffectsDialog.cpp
     src/Dialogs/AudioSettingsDialog.cpp
     src/Dialogs/CleanupDialog.cpp
     src/Dialogs/ControllerDialog.cpp
@@ -131,6 +133,7 @@ set(JAZZ_SOURCES
     src/Dialogs/MeterChangeDialog.cpp
     src/Dialogs/MetronomeSettingsDialog.cpp
     src/Dialogs/MidiChannelDialog.cpp
+    src/Dialogs/MidiEffectsDialog.cpp
     src/Dialogs/PitchWheelDialog.cpp
     src/Dialogs/ProgramChangeDialog.cpp
     src/Dialogs/QuantizeDialog.cpp
@@ -139,6 +142,7 @@ set(JAZZ_SOURCES
     src/Dialogs/SetTempoDialog.cpp
     src/Dialogs/ShiftDialog.cpp
     src/Dialogs/SnapDialog.cpp
+    src/Dialogs/SoundGeneratorDialog.cpp
     src/Dialogs/SynthesizerSettingsDialog.cpp
     src/Dialogs/SysexDialog.cpp
     src/Dialogs/TextDialog.cpp
@@ -171,6 +175,7 @@ set(JAZZ_SOURCES
     src/Mapper.cpp
     src/MeasureChoice.cpp
     src/MidiDeviceDialog.cpp
+    src/MidiEffects.cpp
     src/Metronome.cpp
     src/MouseAction.cpp
     src/NamedChoice.cpp
@@ -196,6 +201,7 @@ set(JAZZ_SOURCES
     src/Signal2.cpp
     src/SliderWindow.cpp
     src/Song.cpp
+    src/SoundGenerator.cpp
     src/StandardFile.cpp
     src/StringReadWrite.cpp
     src/StringUtilities.cpp
@@ -240,7 +246,11 @@ enable_testing()
 add_executable(jazz_tests
     tests/test_main.cpp
     src/ChordScaleData.cpp
+    src/AudioEffects.cpp
+    src/SoundGenerator.cpp
+    src/MidiEffects.cpp
 )
+target_compile_definitions(jazz_tests PRIVATE JAZZ_UNIT_TEST)
 target_include_directories(jazz_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 add_test(NAME JazzCoreUnitTests COMMAND jazz_tests)
 set_tests_properties(JazzCoreUnitTests PROPERTIES WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")

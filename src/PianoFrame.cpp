@@ -26,6 +26,9 @@
 #include "ControlEdit.h"
 #include "Dialogs.h"
 #include "Dialogs/InsertChordScaleDialog.h"
+#include "Dialogs/MidiEffectsDialog.h"
+#include "Dialogs/SoundGeneratorDialog.h"
+#include "Dialogs/AudioEffectsDialog.h"
 #include "Filter.h"
 #include "Globals.h"
 #include "Harmony.h"
@@ -167,6 +170,9 @@ BEGIN_EVENT_TABLE(JZPianoFrame, wxFrame)
   EVT_MENU(wxID_PASTE, JZPianoFrame::OnPaste)
   EVT_MENU(wxID_SELECTALL, JZPianoFrame::OnSelectAll)
   EVT_MENU(ID_INSERT_CHORD_SCALE, JZPianoFrame::OnInsertChordScale)
+  EVT_MENU(ID_EFFECTS_MIDI, JZPianoFrame::OnEffectsMidi)
+  EVT_MENU(ID_EFFECTS_SOUND_GEN, JZPianoFrame::OnEffectsSoundGen)
+  EVT_MENU(ID_EFFECTS_AUDIO_DSP, JZPianoFrame::OnEffectsAudioDsp)
   EVT_MENU(ID_SHIFT, JZPianoFrame::OnShift)
   EVT_MENU(ID_SHIFT_LEFT, JZPianoFrame::OnShiftLeft)
   EVT_MENU(ID_SHIFT_RIGHT, JZPianoFrame::OnShiftRight)
@@ -335,6 +341,8 @@ void JZPianoFrame::CreateMenu()
   edit_menu->Append(wxID_SELECTALL, "Select &All\tCtrl+A");
   edit_menu->AppendSeparator();
   edit_menu->Append(ID_INSERT_CHORD_SCALE, "&Insert Chord / Scale...\tCtrl+I");
+  edit_menu->Append(ID_EFFECTS_MIDI, "&MIDI Effects Suite (Arp, Humanize, Echo)...");
+  edit_menu->Append(ID_EFFECTS_SOUND_GEN, "&Procedural SFX & Synth Drums...");
   edit_menu->AppendSeparator();
   edit_menu->Append(ID_SHIFT, "&Shift...");
   edit_menu->Append(ID_QUANTIZE, "&Quantize...");
@@ -351,6 +359,11 @@ void JZPianoFrame::CreateMenu()
   edit_menu->Append(MEN_UPDN, "&Up <-> Down");
   edit_menu->Append(ID_CLEANUP, "&Cleanup...");
   edit_menu->Append(ID_SEARCH_AND_REPLACE, "&Search Replace...");
+
+  wxMenu *effects_menu = new wxMenu("", wxMENU_TEAROFF);
+  effects_menu->Append(ID_EFFECTS_MIDI, "&MIDI Effects Suite (Arp, Humanize, Echo)...");
+  effects_menu->Append(ID_EFFECTS_SOUND_GEN, "&Procedural SFX & Synth Drums...");
+  effects_menu->Append(ID_EFFECTS_AUDIO_DSP, "&Audio Effects DSP (EQ, Reverb, Delay)...");
 
   wxMenu *setting_menu = new wxMenu("", wxMENU_TEAROFF);
   setting_menu->Append(MEN_FILTER, "&Filter...");
@@ -381,8 +394,9 @@ void JZPianoFrame::CreateMenu()
   help_menu->Append(ACT_HELP_MOUSE, "&Mouse");
 
   wxMenuBar *menu_bar = new wxMenuBar;
-  menu_bar->Append(win_menu,    "&Window");
+  menu_bar->Append(win_menu,     "&Window");
   menu_bar->Append(edit_menu,    "&Edit");
+  menu_bar->Append(effects_menu, "E&ffects");
   menu_bar->Append(setting_menu, "&Settings");
   menu_bar->Append(misc_menu,    "&Misc");
   menu_bar->Append(help_menu,    "&Help");
@@ -932,3 +946,51 @@ void JZPianoFrame::OnInsertChordScale(wxCommandEvent& Event)
   JZInsertChordScaleDialog dlg(this, mpProject, trackIdx, clock);
   dlg.ShowModal();
 }
+
+void JZPianoFrame::OnEffectsMidi(wxCommandEvent& Event)
+{
+  int trackIdx = 0;
+  long fromClock = 0;
+  long toClock = 0;
+  if (mpPianoWindow)
+  {
+    trackIdx = mpPianoWindow->GetTrackIndex();
+    if (mpPianoWindow->GetFilter() && mpPianoWindow->GetFilter()->GetFromClock() < mpPianoWindow->GetFilter()->GetToClock())
+    {
+      fromClock = mpPianoWindow->GetFilter()->GetFromClock();
+      toClock = mpPianoWindow->GetFilter()->GetToClock();
+    }
+  }
+  JZMidiEffectsDialog dlg(this, mpProject, trackIdx, fromClock, toClock);
+  if (dlg.ShowModal() == wxID_OK && mpPianoWindow)
+  {
+    mpPianoWindow->Refresh();
+  }
+}
+
+void JZPianoFrame::OnEffectsSoundGen(wxCommandEvent& Event)
+{
+  int trackIdx = 0;
+  long clock = 0;
+  if (mpPianoWindow)
+  {
+    trackIdx = mpPianoWindow->GetTrackIndex();
+    if (mpPianoWindow->GetFilter() && mpPianoWindow->GetFilter()->GetFromClock() > 0)
+    {
+      clock = mpPianoWindow->GetFilter()->GetFromClock();
+    }
+  }
+  JZSoundGeneratorDialog dlg(this, mpProject, trackIdx, clock);
+  dlg.ShowModal();
+  if (mpPianoWindow)
+  {
+    mpPianoWindow->Refresh();
+  }
+}
+
+void JZPianoFrame::OnEffectsAudioDsp(wxCommandEvent& Event)
+{
+  JZAudioEffectsDialog dlg(this, mpProject);
+  dlg.ShowModal();
+}
+

@@ -28,6 +28,9 @@
 #include "Dialogs/MetronomeSettingsDialog.h"
 #include "Dialogs/SynthesizerSettingsDialog.h"
 #include "Dialogs/InsertChordScaleDialog.h"
+#include "Dialogs/MidiEffectsDialog.h"
+#include "Dialogs/SoundGeneratorDialog.h"
+#include "Dialogs/AudioEffectsDialog.h"
 #include "Filter.h"
 #include "Globals.h"
 #include "Harmony.h"
@@ -131,6 +134,10 @@ BEGIN_EVENT_TABLE(JZTrackFrame, JZEventFrame)
   EVT_MENU(wxID_SELECTALL, JZTrackFrame::OnSelectAll)
 
   EVT_MENU(ID_INSERT_CHORD_SCALE, JZTrackFrame::OnInsertChordScale)
+
+  EVT_MENU(ID_EFFECTS_MIDI, JZTrackFrame::OnEffectsMidi)
+  EVT_MENU(ID_EFFECTS_SOUND_GEN, JZTrackFrame::OnEffectsSoundGen)
+  EVT_MENU(ID_EFFECTS_AUDIO_DSP, JZTrackFrame::OnEffectsAudioDsp)
 
   EVT_MENU(ID_PLAY, JZTrackFrame::OnPlay)
 
@@ -384,6 +391,10 @@ void JZTrackFrame::CreateMenu()
   mpToolsMenu->Append(ID_INSERT_CHORD_SCALE, "&Insert Chord / Scale...\tCtrl+I");
   mpToolsMenu->Append(ID_TOOLS_HARMONY_BROWSER, "&Harmony Browser...");
   mpToolsMenu->Append(ID_TOOLS_RHYTHM_GENERATOR, "&Rhythm Generator...");
+  mpToolsMenu->AppendSeparator();
+  mpToolsMenu->Append(ID_EFFECTS_MIDI, "&MIDI Effects Suite (Arp, Humanize, Echo)...");
+  mpToolsMenu->Append(ID_EFFECTS_SOUND_GEN, "&Procedural SFX & Synth Drums...");
+  mpToolsMenu->Append(ID_EFFECTS_AUDIO_DSP, "&Audio Effects DSP (EQ, Reverb, Delay)...");
 
 #if 0
   // Move to Project Menu
@@ -493,6 +504,11 @@ void JZTrackFrame::CreateMenu()
 //  mpHelpMenu->Append(MEN_HELP_MOUSE, "&Mouse");
   mpHelpMenu->Append(wxID_ABOUT, "&About");
 
+  wxMenu* pEffectsMenu = new wxMenu;
+  pEffectsMenu->Append(ID_EFFECTS_MIDI, "&MIDI Effects Suite (Arp, Humanize, Echo)...");
+  pEffectsMenu->Append(ID_EFFECTS_SOUND_GEN, "&Procedural SFX & Synth Drums...");
+  pEffectsMenu->Append(ID_EFFECTS_AUDIO_DSP, "&Audio Effects DSP (EQ, Reverb, Delay)...");
+
   // Create a menu bar and add entries.
   wxMenuBar* pMenuBar = new wxMenuBar();
   pMenuBar->Append(mpFileMenu, "&File");
@@ -501,6 +517,7 @@ void JZTrackFrame::CreateMenu()
   pMenuBar->Append(parts_menu, "&Parts");
 #endif
   pMenuBar->Append(mpToolsMenu, "&Tools");
+  pMenuBar->Append(pEffectsMenu, "E&ffects");
   pMenuBar->Append(pSettingMenu, "&Settings");
   pMenuBar->Append(pMiscMenu, "&Misc");
   pMenuBar->Append(pAudioMenu, "&Audio");
@@ -1035,6 +1052,76 @@ void JZTrackFrame::OnInsertChordScale(wxCommandEvent& Event)
     }
   }
   JZInsertChordScaleDialog dlg(this, mpProject ? mpProject : gpProject, trackIdx, clock);
+  dlg.ShowModal();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnEffectsMidi(wxCommandEvent& Event)
+{
+  int trackIdx = 0;
+  long fromClock = 0;
+  long toClock = 0;
+  if (mpTrackWindow)
+  {
+    if (mpTrackWindow->AreEventsSelected() && mpTrackWindow->mpFilter)
+    {
+      trackIdx = mpTrackWindow->mpFilter->GetFromTrack();
+      fromClock = mpTrackWindow->mpFilter->GetFromClock();
+      toClock = mpTrackWindow->mpFilter->GetToClock();
+    }
+    else
+    {
+      fromClock = mpTrackWindow->GetPlayClock();
+      if (fromClock < 0)
+      {
+        fromClock = 0;
+      }
+      toClock = 0;
+    }
+  }
+  JZMidiEffectsDialog dlg(this, mpProject ? mpProject : gpProject, trackIdx, fromClock, toClock);
+  if (dlg.ShowModal() == wxID_OK && mpTrackWindow)
+  {
+    mpTrackWindow->Refresh();
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnEffectsSoundGen(wxCommandEvent& Event)
+{
+  int trackIdx = 0;
+  long clock = 0;
+  if (mpTrackWindow)
+  {
+    if (mpTrackWindow->AreEventsSelected() && mpTrackWindow->mpFilter)
+    {
+      trackIdx = mpTrackWindow->mpFilter->GetFromTrack();
+      clock = mpTrackWindow->mpFilter->GetFromClock();
+    }
+    else
+    {
+      clock = mpTrackWindow->GetPlayClock();
+      if (clock < 0)
+      {
+        clock = 0;
+      }
+    }
+  }
+  JZSoundGeneratorDialog dlg(this, mpProject ? mpProject : gpProject, trackIdx, clock);
+  dlg.ShowModal();
+  if (mpTrackWindow)
+  {
+    mpTrackWindow->Refresh();
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnEffectsAudioDsp(wxCommandEvent& Event)
+{
+  JZAudioEffectsDialog dlg(this, mpProject ? mpProject : gpProject);
   dlg.ShowModal();
 }
 

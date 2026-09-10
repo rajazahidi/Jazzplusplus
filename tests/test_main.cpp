@@ -5,8 +5,13 @@
 //*****************************************************************************
 
 #include "ChordScaleData.h"
+#include "AudioEffects.h"
+#include "SoundGenerator.h"
+#include "MidiEffects.h"
 
 #include <cassert>
+#include <cmath>
+#include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -436,6 +441,270 @@ void TestChannelAndProgramLogic()
 }
 
 //-----------------------------------------------------------------------------
+// Test 9: MIDI Effects Suite (Arpeggiator, Harmonizer, Rates)
+//-----------------------------------------------------------------------------
+void TestMidiEffects()
+{
+  cout << "[TEST] Running TestMidiEffects..." << endl;
+
+  // 1. Arpeggiator Rate Ticks
+  TEST_ASSERT(JZMidiArpeggiator::GetRateTicks(eArpRate_Quarter, 480) == 480, "Quarter rate should be 480 ticks");
+  TEST_ASSERT(JZMidiArpeggiator::GetRateTicks(eArpRate_Eighth, 480) == 240, "Eighth rate should be 240 ticks");
+  TEST_ASSERT(JZMidiArpeggiator::GetRateTicks(eArpRate_Sixteenth, 480) == 120, "Sixteenth rate should be 120 ticks");
+  TEST_ASSERT(JZMidiArpeggiator::GetRateTicks(eArpRate_ThirtySecond, 480) == 60, "Thirty-second rate should be 60 ticks");
+  TEST_ASSERT(JZMidiArpeggiator::GetRateTicks(eArpRate_EighthTriplet, 480) == 320, "Eighth triplet should be 320 ticks");
+  TEST_ASSERT(JZMidiArpeggiator::GetRateTicks(eArpRate_SixteenthTriplet, 480) == 160, "Sixteenth triplet should be 160 ticks");
+
+  // 2. Pitch Sequences
+  vector<int> chord = {60, 64, 67}; // C Major triad (C4, E4, G4)
+
+  // Up pattern 1 octave
+  vector<int> seqUp1 = JZMidiArpeggiator::GeneratePitchSequence(chord, eArpUp, 1);
+  vector<int> expectedUp1 = {60, 64, 67};
+  TEST_ASSERT(seqUp1 == expectedUp1, "Up pattern 1 octave matches {60, 64, 67}");
+
+  // Up pattern 2 octaves
+  vector<int> seqUp2 = JZMidiArpeggiator::GeneratePitchSequence(chord, eArpUp, 2);
+  vector<int> expectedUp2 = {60, 64, 67, 72, 76, 79};
+  TEST_ASSERT(seqUp2 == expectedUp2, "Up pattern 2 octaves matches {60, 64, 67, 72, 76, 79}");
+
+  // Down pattern 1 octave
+  vector<int> seqDown1 = JZMidiArpeggiator::GeneratePitchSequence(chord, eArpDown, 1);
+  vector<int> expectedDown1 = {67, 64, 60};
+  TEST_ASSERT(seqDown1 == expectedDown1, "Down pattern matches {67, 64, 60}");
+
+  // UpDown pattern 1 octave
+  vector<int> seqUpDown = JZMidiArpeggiator::GeneratePitchSequence(chord, eArpUpDown, 1);
+  vector<int> expectedUpDown = {60, 64, 67, 64};
+  TEST_ASSERT(seqUpDown == expectedUpDown, "UpDown pattern matches {60, 64, 67, 64}");
+
+  // 3. Harmonizer Diatonic & Octave intervals
+  vector<int> harmOctUp = JZMidiHarmonizer::GetHarmonizedPitches(60, eHarmOctaveAbove, 0, "Major");
+  TEST_ASSERT(harmOctUp.size() == 1 && harmOctUp[0] == 72, "Octave above 60 is 72");
+
+  vector<int> harmOctDown = JZMidiHarmonizer::GetHarmonizedPitches(60, eHarmOctaveBelow, 0, "Major");
+  TEST_ASSERT(harmOctDown.size() == 1 && harmOctDown[0] == 48, "Octave below 60 is 48");
+
+  vector<int> harmThird = JZMidiHarmonizer::GetHarmonizedPitches(60, eHarmThirdAbove, 0, "Major");
+  TEST_ASSERT(harmThird.size() == 1 && harmThird[0] == 64, "Diatonic 3rd above C4 in C Major is E4 (64)");
+
+  vector<int> harmFifth = JZMidiHarmonizer::GetHarmonizedPitches(60, eHarmFifthAbove, 0, "Major");
+  TEST_ASSERT(harmFifth.size() == 1 && harmFifth[0] == 67, "Diatonic 5th above C4 in C Major is G4 (67)");
+
+  vector<int> harmTriad = JZMidiHarmonizer::GetHarmonizedPitches(60, eHarmDiatonicTriad, 0, "Major");
+  vector<int> expectedTriad = {64, 67};
+  TEST_ASSERT(harmTriad == expectedTriad, "Diatonic triad above C4 in C Major is {64, 67}");
+}
+
+//-----------------------------------------------------------------------------
+// Test 10: Audio DSP Suite (Biquad, EQ, Freeverb, Delay, Chorus, Limiter)
+//-----------------------------------------------------------------------------
+void TestAudioEffects()
+{
+  cout << "[TEST] Running TestAudioEffects..." << endl;
+
+  // 1. RBJ Biquad Filter
+  JZBiquadFilter lpFilter;
+  lpFilter.Configure(eBiquadLowPass, 44100.0f, 1000.0f, 0.707f);
+  float outVal = 0.0f;
+  bool isStable = true;
+  for (int i = 0; i < 100; ++i)
+  {
+    float inSample = (i == 0) ? 1.0f : 0.0f; // Unit impulse
+    outVal = lpFilter.Process(inSample);
+    if (std::isnan(outVal) || std::isinf(outVal))
+    {
+      isStable = false;
+      break;
+    }
+  }
+  TEST_ASSERT(isStable, "Biquad LowPass filter impulse response is stable and finite");
+
+  // 2. 3-Band Parametric Equalizer
+  JZ3BandEqualizer eq(44100.0f);
+  JZEqualizerSettings eqSettings;
+  eqSettings.bassGainDB = 6.0f; // +6 dB bass boost
+  eqSettings.midGainDB = -3.0f;
+  eqSettings.trebleGainDB = 4.0f;
+  eq.SetSettings(eqSettings);
+
+  const int numSamples = 512;
+  vector<float> eqL(numSamples, 0.0f);
+  vector<float> eqR(numSamples, 0.0f);
+  // Feed 100 Hz test tone
+  for (int i = 0; i < numSamples; ++i)
+  {
+    eqL[i] = sin(2.0f * 3.14159f * 100.0f * i / 44100.0f) * 0.5f;
+    eqR[i] = eqL[i];
+  }
+  eq.Process(eqL.data(), eqR.data(), numSamples);
+  bool eqValid = true;
+  for (int i = 0; i < numSamples; ++i)
+  {
+    if (std::isnan(eqL[i]) || std::isinf(eqL[i]) || std::isnan(eqR[i]) || std::isinf(eqR[i]))
+    {
+      eqValid = false;
+      break;
+    }
+  }
+  TEST_ASSERT(eqValid, "3-Band Equalizer processes audio buffer without NaN or Inf");
+
+  // 3. Freeverb Reverb
+  JZFreeverb reverb(44100.0f);
+  JZReverbSettings verbSettings;
+  verbSettings.roomSize = 0.7f;
+  verbSettings.wet = 0.5f;
+  verbSettings.dry = 0.5f;
+  reverb.SetSettings(verbSettings);
+
+  vector<float> verbInL(numSamples, 0.0f);
+  vector<float> verbInR(numSamples, 0.0f);
+  vector<float> verbOutL(numSamples, 0.0f);
+  vector<float> verbOutR(numSamples, 0.0f);
+  verbInL[0] = 1.0f; // Impulse in left
+  verbInR[0] = 1.0f;
+
+  reverb.Process(verbInL.data(), verbInR.data(), verbOutL.data(), verbOutR.data(), numSamples);
+  float totalEnergy = 0.0f;
+  for (int i = 0; i < numSamples; ++i)
+  {
+    totalEnergy += fabs(verbOutL[i]) + fabs(verbOutR[i]);
+  }
+  TEST_ASSERT(totalEnergy > 0.01f, "Freeverb produces reverberant tail energy from impulse");
+
+  // 4. Stereo Delay
+  JZStereoDelay delay(44100.0f);
+  JZDelaySettings delaySettings;
+  delaySettings.delayTimeMsL = 10.0f; // ~441 samples delay
+  delaySettings.delayTimeMsR = 10.0f;
+  delaySettings.feedback = 0.0f;
+  delaySettings.wet = 1.0f;
+  delaySettings.dry = 0.0f;
+  delay.SetSettings(delaySettings);
+
+  const int delayTestSamples = 1000;
+  vector<float> dInL(delayTestSamples, 0.0f);
+  vector<float> dInR(delayTestSamples, 0.0f);
+  vector<float> dOutL(delayTestSamples, 0.0f);
+  vector<float> dOutR(delayTestSamples, 0.0f);
+  dInL[0] = 1.0f;
+
+  delay.Process(dInL.data(), dInR.data(), dOutL.data(), dOutR.data(), delayTestSamples);
+  // Delayed impulse should arrive near sample index 441
+  int peakIdx = 0;
+  float peakVal = 0.0f;
+  for (int i = 1; i < delayTestSamples; ++i)
+  {
+    if (fabs(dOutL[i]) > peakVal)
+    {
+      peakVal = fabs(dOutL[i]);
+      peakIdx = i;
+    }
+  }
+  TEST_ASSERT(peakIdx >= 435 && peakIdx <= 445, "Stereo Delay reproduces impulse at expected delay sample offset");
+
+  // 5. Modulation (Stereo Chorus)
+  JZStereoChorus chorus(44100.0f);
+  vector<float> chorL(numSamples, 0.5f);
+  vector<float> chorR(numSamples, 0.5f);
+  chorus.Process(chorL.data(), chorR.data(), numSamples);
+  TEST_ASSERT(!std::isnan(chorL[10]) && !std::isnan(chorR[10]), "Stereo Chorus produces valid modulated output");
+
+  // 6. Limiter & Overdrive Soft-Clipping
+  JZAudioLimiterDistortion limiter;
+  JZLimiterSettings limSettings;
+  limSettings.enableOverdrive = true;
+  limSettings.drive = 4.0f;      // 4x overdrive
+  limSettings.ceilingDB = -0.3f; // ~0.966 max ceiling
+  limiter.SetSettings(limSettings);
+
+  vector<float> hotL = {0.5f, 2.0f, 10.0f, -5.0f};
+  vector<float> hotR = {0.5f, 2.0f, 10.0f, -5.0f};
+  limiter.Process(hotL.data(), hotR.data(), 4);
+
+  // Ceiling check: no sample should exceed ceiling magnitude (~0.966f)
+  float maxCeiling = pow(10.0f, -0.3f / 20.0f) + 0.001f;
+  bool ceilingRespected = true;
+  for (int i = 0; i < 4; ++i)
+  {
+    if (fabs(hotL[i]) > maxCeiling || fabs(hotR[i]) > maxCeiling)
+    {
+      ceilingRespected = false;
+      break;
+    }
+  }
+  TEST_ASSERT(ceilingRespected, "Master Limiter clamps large overdrive signals within ceiling threshold");
+}
+
+//-----------------------------------------------------------------------------
+// Test 11: Procedural Sound Generator Suite (Retro SFX, 808 Drums, WAV IO)
+//-----------------------------------------------------------------------------
+void TestSoundGenerator()
+{
+  cout << "[TEST] Running TestSoundGenerator..." << endl;
+
+  // 1. Retro SFX Presets and Generation
+  JZRetroSFXParams laserParams = JZRetroSFXGenerator::GetPreset(eSFXLaser);
+  vector<short> laserWave = JZRetroSFXGenerator::Generate(laserParams, 44100);
+  TEST_ASSERT(!laserWave.empty(), "Laser SFX generated non-empty PCM buffer");
+  TEST_ASSERT(laserWave.size() == static_cast<size_t>(laserParams.duration * 44100), "Laser PCM length matches duration");
+
+  JZRetroSFXParams expParams = JZRetroSFXGenerator::GetPreset(eSFXExplosion);
+  vector<short> expWave = JZRetroSFXGenerator::Generate(expParams, 44100);
+  TEST_ASSERT(!expWave.empty(), "Explosion SFX generated non-empty PCM buffer");
+
+  JZRetroSFXParams coinParams = JZRetroSFXGenerator::GetPreset(eSFXCoin);
+  vector<short> coinWave = JZRetroSFXGenerator::Generate(coinParams, 44100);
+  TEST_ASSERT(!coinWave.empty(), "Coin SFX generated non-empty PCM buffer");
+
+  JZRetroSFXParams powerParams = JZRetroSFXGenerator::GetPreset(eSFXPowerUp);
+  vector<short> powerWave = JZRetroSFXGenerator::Generate(powerParams, 44100);
+  TEST_ASSERT(!powerWave.empty(), "PowerUp SFX generated non-empty PCM buffer");
+
+  // 2. Analog Synth Drums Generation
+  JZSynthDrumParams kickParams = JZSynthDrumGenerator::GetPreset(eDrum808Kick);
+  vector<short> kickWave = JZSynthDrumGenerator::Generate(kickParams, 44100);
+  TEST_ASSERT(!kickWave.empty(), "808 Kick generated non-empty PCM buffer");
+  TEST_ASSERT(kickWave.size() == static_cast<size_t>(kickParams.duration * 44100), "Kick PCM length matches duration");
+
+  JZSynthDrumParams snareParams = JZSynthDrumGenerator::GetPreset(eDrum808Snare);
+  vector<short> snareWave = JZSynthDrumGenerator::Generate(snareParams, 44100);
+  TEST_ASSERT(!snareWave.empty(), "808 Snare generated non-empty PCM buffer");
+
+  JZSynthDrumParams hatParams = JZSynthDrumGenerator::GetPreset(eDrumHiHatClosed);
+  vector<short> hatWave = JZSynthDrumGenerator::Generate(hatParams, 44100);
+  TEST_ASSERT(!hatWave.empty(), "Closed Hi-Hat generated non-empty PCM buffer");
+
+  JZSynthDrumParams clapParams = JZSynthDrumGenerator::GetPreset(eDrum808Clap);
+  vector<short> clapWave = JZSynthDrumGenerator::Generate(clapParams, 44100);
+  TEST_ASSERT(!clapWave.empty(), "808 Clap generated non-empty PCM buffer");
+
+  // 3. RIFF/WAVE Export Validation
+  string tempWavPath = "test_sfx_export.wav";
+  bool saveSuccess = JZSoundIO::SaveWav(tempWavPath, coinWave, 44100, 1);
+  TEST_ASSERT(saveSuccess, "SaveWav successfully written to disk");
+
+  // Read back and verify WAV header
+  ifstream wavFile(tempWavPath.c_str(), ios::binary);
+  TEST_ASSERT(wavFile.is_open(), "Written WAV file is openable for reading");
+
+  char riffHeader[4];
+  wavFile.read(riffHeader, 4);
+  bool isRiff = (riffHeader[0] == 'R' && riffHeader[1] == 'I' && riffHeader[2] == 'F' && riffHeader[3] == 'F');
+  TEST_ASSERT(isRiff, "WAV file contains valid 'RIFF' header chunk");
+
+  wavFile.seekg(8, ios::beg);
+  char waveHeader[4];
+  wavFile.read(waveHeader, 4);
+  bool isWave = (waveHeader[0] == 'W' && waveHeader[1] == 'A' && waveHeader[2] == 'V' && waveHeader[3] == 'E');
+  TEST_ASSERT(isWave, "WAV file contains valid 'WAVE' format identifier");
+  wavFile.close();
+
+  // Clean up
+  remove(tempWavPath.c_str());
+}
+
+//-----------------------------------------------------------------------------
 // Main Runner
 //-----------------------------------------------------------------------------
 int main()
@@ -452,6 +721,9 @@ int main()
   TestPitchAndNoteConversions();
   TestMidiFilesIntegrity();
   TestChannelAndProgramLogic();
+  TestMidiEffects();
+  TestAudioEffects();
+  TestSoundGenerator();
 
   cout << "==========================================" << endl;
   cout << "Tests Run:    " << gTestsRun << endl;

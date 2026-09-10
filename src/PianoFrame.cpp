@@ -25,6 +25,7 @@
 #include "Command.h"
 #include "ControlEdit.h"
 #include "Dialogs.h"
+#include "Dialogs/InsertChordScaleDialog.h"
 #include "Filter.h"
 #include "Globals.h"
 #include "Harmony.h"
@@ -165,6 +166,7 @@ BEGIN_EVENT_TABLE(JZPianoFrame, wxFrame)
   EVT_MENU(wxID_COPY, JZPianoFrame::OnCopy)
   EVT_MENU(wxID_PASTE, JZPianoFrame::OnPaste)
   EVT_MENU(wxID_SELECTALL, JZPianoFrame::OnSelectAll)
+  EVT_MENU(ID_INSERT_CHORD_SCALE, JZPianoFrame::OnInsertChordScale)
   EVT_MENU(ID_SHIFT, JZPianoFrame::OnShift)
   EVT_MENU(ID_SHIFT_LEFT, JZPianoFrame::OnShiftLeft)
   EVT_MENU(ID_SHIFT_RIGHT, JZPianoFrame::OnShiftRight)
@@ -331,6 +333,8 @@ void JZPianoFrame::CreateMenu()
   edit_menu->Append(wxID_CUT, "&Cut\tCtrl+X");
   edit_menu->Append(wxID_PASTE, "&Paste\tCtrl+V");
   edit_menu->Append(wxID_SELECTALL, "Select &All\tCtrl+A");
+  edit_menu->AppendSeparator();
+  edit_menu->Append(ID_INSERT_CHORD_SCALE, "&Insert Chord / Scale...\tCtrl+I");
   edit_menu->AppendSeparator();
   edit_menu->Append(ID_SHIFT, "&Shift...");
   edit_menu->Append(ID_QUANTIZE, "&Quantize...");
@@ -911,4 +915,20 @@ void JZPianoFrame::ActHelpMouse(wxCommandEvent& Event)
       "        +Ctrl:  Decrease velocity\n"
       "        +Ctrl+Shift:  Copy event",
     "Mouse Help");
+}
+
+void JZPianoFrame::OnInsertChordScale(wxCommandEvent& Event)
+{
+  int trackIdx = 1;
+  int clock = 0;
+  if (mpPianoWindow)
+  {
+    trackIdx = mpPianoWindow->GetTrackIndex();
+    if (mpPianoWindow->GetFilter() && mpPianoWindow->GetFilter()->GetFromClock() > 0)
+    {
+      clock = mpPianoWindow->GetFilter()->GetFromClock();
+    }
+  }
+  JZInsertChordScaleDialog dlg(this, mpProject, trackIdx, clock);
+  dlg.ShowModal();
 }

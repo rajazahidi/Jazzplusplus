@@ -79,6 +79,11 @@ class JZTrackWindow : public JZEventWindow
 
     void SelectAll();
 
+    int GetPlayClock() const
+    {
+      return mPlayClock;
+    }
+
   protected:
 
     virtual void SnapSelectionStart(wxMouseEvent& MouseEvent);

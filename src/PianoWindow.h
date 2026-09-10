@@ -87,6 +87,11 @@ class JZPianoWindow : public JZEventWindow, public JZButtonLabelInterface
 
     JZTrack* GetTrack();
 
+    int GetTrackIndex() const
+    {
+      return mTrackIndex;
+    }
+
     void ShowPitch(int Pitch);
 
     // Channel of actual track 0..15

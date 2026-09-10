@@ -104,6 +104,8 @@ class JZTrackFrame : public JZEventFrame, public JZButtonLabelInterface
 
     void OnSelectAll(wxCommandEvent& Event);
 
+    void OnInsertChordScale(wxCommandEvent& Event);
+
     void OnReset(wxCommandEvent& Event);
 
     void OnSetCopyright(wxCommandEvent& Event);

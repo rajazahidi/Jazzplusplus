@@ -111,6 +111,7 @@ set(JAZZ_SOURCES
     src/ArrayControl.cpp
     src/AsciiMidiFile.cpp
     src/Audio.cpp
+    src/ChordScaleData.cpp
     src/Command.cpp
     src/Configuration.cpp
     src/ControlEdit.cpp
@@ -123,6 +124,7 @@ set(JAZZ_SOURCES
     src/Dialogs/DeleteDialog.cpp
     src/Dialogs/EndOfTrackDialog.cpp
     src/Dialogs/FilterDialog.cpp
+    src/Dialogs/InsertChordScaleDialog.cpp
     src/Dialogs/IntegerEdit.cpp
     src/Dialogs/LengthDialog.cpp
     src/Dialogs/KeyOnDialog.cpp

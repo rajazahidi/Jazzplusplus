@@ -95,6 +95,7 @@
 #define ID_CLEANUP                           (wxID_HIGHEST + 72)
 #define ID_SEARCH_AND_REPLACE                (wxID_HIGHEST + 73)
 #define ID_NOTE_NAMES                        (wxID_HIGHEST + 74)
+#define ID_INSERT_CHORD_SCALE                (wxID_HIGHEST + 75)
 
 #define ID_PLAY                              (wxID_HIGHEST + 80)
 #define ID_PLAY_LOOP                         (wxID_HIGHEST + 81)

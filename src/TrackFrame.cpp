@@ -27,6 +27,7 @@
 #include "Configuration.h"
 #include "Dialogs/MetronomeSettingsDialog.h"
 #include "Dialogs/SynthesizerSettingsDialog.h"
+#include "Dialogs/InsertChordScaleDialog.h"
 #include "Filter.h"
 #include "Globals.h"
 #include "Harmony.h"
@@ -128,6 +129,8 @@ BEGIN_EVENT_TABLE(JZTrackFrame, JZEventFrame)
   EVT_MENU(ID_TRIM, JZTrackFrame::OnTrim)
 
   EVT_MENU(wxID_SELECTALL, JZTrackFrame::OnSelectAll)
+
+  EVT_MENU(ID_INSERT_CHORD_SCALE, JZTrackFrame::OnInsertChordScale)
 
   EVT_MENU(ID_PLAY, JZTrackFrame::OnPlay)
 
@@ -330,6 +333,10 @@ void JZTrackFrame::CreateMenu()
 
   mpEditMenu->AppendSeparator();
 
+  mpEditMenu->Append(ID_INSERT_CHORD_SCALE, "&Insert Chord / Scale...\tCtrl+I");
+
+  mpEditMenu->AppendSeparator();
+
   mpEditMenu->Append(ID_QUANTIZE, "&Quantize...");
   mpEditMenu->Append(ID_SET_CHANNEL, "&Set MIDI Channel...");
   mpEditMenu->Append(ID_TRANSPOSE, "&Transpose...");
@@ -374,6 +381,7 @@ void JZTrackFrame::CreateMenu()
   mpToolsMenu = new wxMenu;
   mpToolsMenu->Append(ID_PIANOWIN, "&Piano Roll...\tCtrl+P");
   mpToolsMenu->Append(ID_MIXER, "&Track Settings / Mixer...\tCtrl+M");
+  mpToolsMenu->Append(ID_INSERT_CHORD_SCALE, "&Insert Chord / Scale...\tCtrl+I");
   mpToolsMenu->Append(ID_TOOLS_HARMONY_BROWSER, "&Harmony Browser...");
   mpToolsMenu->Append(ID_TOOLS_RHYTHM_GENERATOR, "&Rhythm Generator...");
 
@@ -1002,6 +1010,32 @@ void JZTrackFrame::OnSelectAll(wxCommandEvent& Event)
   {
     mpTrackWindow->SelectAll();
   }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnInsertChordScale(wxCommandEvent& Event)
+{
+  int trackIdx = 1;
+  int clock = 0;
+  if (mpTrackWindow)
+  {
+    if (mpTrackWindow->AreEventsSelected() && mpTrackWindow->mpFilter)
+    {
+      trackIdx = mpTrackWindow->mpFilter->GetFromTrack();
+      clock = mpTrackWindow->mpFilter->GetFromClock();
+    }
+    else
+    {
+      clock = mpTrackWindow->GetPlayClock();
+      if (clock < 0)
+      {
+        clock = 0;
+      }
+    }
+  }
+  JZInsertChordScaleDialog dlg(this, mpProject ? mpProject : gpProject, trackIdx, clock);
+  dlg.ShowModal();
 }
 
 //-----------------------------------------------------------------------------

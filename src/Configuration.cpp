@@ -108,8 +108,12 @@ JZConfiguration::JZConfiguration()
   // search for midi device
   mNames[C_Seq2Device] = new JZConfigurationEntry(".device", -1);
 
-  // use /dev/music
+  // Default to ALSA on Linux, OSS fallback
+#ifdef __WXGTK__
+  mNames[C_MidiDriver] = new JZConfigurationEntry(".driver", eMidiDriverAlsa);
+#else
   mNames[C_MidiDriver] = new JZConfigurationEntry(".driver", 1);
+#endif
 
   // Enable audio at startup.
   mNames[C_EnableAudio] = new JZConfigurationEntry(".enable_audio", 1);

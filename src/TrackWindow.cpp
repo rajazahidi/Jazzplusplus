@@ -416,55 +416,68 @@ void JZTrackWindow::OnLeftButtonUp(wxMouseEvent& MouseEvent)
     }
     else if (Point.x >= mEventsX)
     {
-      // Clicked on the measure track bar (timeline ruler).
-      // Easily toggle playback: Play from the clicked measure or Stop if currently playing.
-      if (gpProject && gpProject->IsPlaying())
+      if (!gpProject)
       {
+        return;
+      }
+
+      int clock = x2BarClock(Point.x);
+      if (clock < 0)
+      {
+        clock = 0;
+      }
+
+      if (gpProject->IsPlaying())
+      {
+        // If clicking near current play position (same bar), stop playback
+        JZBarInfo currentBar(*gpProject);
+        currentBar.SetClock(mPlayClock);
+        int curBarClock = currentBar.GetClock();
+
+        if (clock == curBarClock)
+        {
+          gpProject->Stop();
+          Refresh(false);
+          return;
+        }
+        // Otherwise stop current position and immediately jump to clicked bar
         gpProject->Stop();
+      }
+
+      // Start playback from clicked measure
+      if (MouseEvent.ShiftDown() && mpSnapSel->IsSelected())
+      {
+        clock = mpFilter->GetFromClock();
+        int loopClock = mpFilter->GetToClock();
+        gpProject->SetPlayPosition(clock);
+        mPlayClock = clock;
+        mPreviousClock = clock;
+        gpProject->mStartTime = clock;
+        gpProject->mStopTime = loopClock;
+        gpProject->SetLoop(true);
+        gpProject->SetRecord(false);
+        if (gpMidiPlayer)
+        {
+          gpMidiPlayer->SetRecordInfo(0);
+        }
+        gpProject->Play();
         Refresh(false);
       }
-      else if (gpProject)
+      else
       {
-        int clock;
-        if (MouseEvent.ShiftDown() && mpSnapSel->IsSelected())
+        gpProject->SetPlayPosition(clock);
+        mPlayClock = clock;
+        mPreviousClock = clock;
+        gpProject->mStartTime = clock;
+        gpProject->mStopTime = 0;
+        gpProject->SetLoop(false);
+        gpProject->SetRecord(false);
+        if (gpMidiPlayer)
         {
-          clock = mpFilter->GetFromClock();
-          int loopClock = mpFilter->GetToClock();
-          gpProject->SetPlayPosition(clock);
-          mPlayClock = clock;
-          mPreviousClock = clock;
-          gpProject->mStartTime = clock;
-          gpProject->mStopTime = loopClock;
-          gpProject->SetLoop(true);
-          gpProject->SetRecord(false);
-          if (gpMidiPlayer)
-          {
-            gpMidiPlayer->SetRecordInfo(0);
-          }
-          gpProject->Play();
-          Refresh(false);
+          gpMidiPlayer->SetRecordInfo(0);
         }
-        else
-        {
-          clock = x2BarClock(Point.x);
-          if (clock < 0)
-          {
-            clock = 0;
-          }
-          gpProject->SetPlayPosition(clock);
-          mPlayClock = clock;
-          mPreviousClock = clock;
-          gpProject->mStartTime = clock;
-          gpProject->mStopTime = 0;
-          gpProject->SetLoop(false);
-          gpProject->SetRecord(false);
-          if (gpMidiPlayer)
-          {
-            gpMidiPlayer->SetRecordInfo(0);
-          }
-          gpProject->Play();
-          Refresh(false);
-        }
+        gpProject->Play();
+        Refresh(false);
       }
     }
   }

@@ -169,89 +169,73 @@ JZProject::JZProject()
   // Linux drivers
   //--------------
 #ifdef __WXGTK__
-  if (gpConfig->GetValue(C_MidiDriver) == eMidiDriverOss)
+  int configuredDriver = gpConfig->GetValue(C_MidiDriver);
+
+  // 1. If OSS was configured, attempt OSS first
+  if (configuredDriver == eMidiDriverOss)
   {
 #ifdef DEV_SEQUENCER2
     mpMidiPlayer = new JZAudioPlayer(this);
     if (!mpMidiPlayer->IsInstalled())
     {
-      cerr << "JZAudioPlayer didn't install." << endl;
-
       delete mpMidiPlayer;
       mpMidiPlayer = new JZSeq2Player(this);
     }
     if (!mpMidiPlayer->IsInstalled())
     {
-      cerr << "JZSeq2Player didn't install." << endl;
-
-      perror("/dev/music");
-
-      cerr << "Jazz will start with no play/record ability." << endl;
       delete mpMidiPlayer;
-      mpMidiPlayer = new JZNullPlayer(this);
+      mpMidiPlayer = 0;
+      cerr << "OSS driver unavailable (/dev/music not found). Falling back to ALSA..." << endl;
     }
 #else
-    cerr << "This programm lacks OSS driver support." << endl;
-    cerr << "Jazz will start with no play/record ability." << endl;
-    mpMidiPlayer = new JZNullPlayer(this);
+    mpMidiPlayer = 0;
 #endif // DEV_SEQUENCER2
   }
-  else if (gpConfig->GetValue(C_MidiDriver) == eMidiDriverAlsa)
-  {
-#ifdef DEV_ALSA
-    mpMidiPlayer = new JZAlsaAudioPlayer(this);
-    if (!mpMidiPlayer->IsInstalled())
-    {
-      cerr << "JZAlsaAudioPlayer didn't install." << endl;
-
-      delete mpMidiPlayer;
-      mpMidiPlayer = new JZAlsaPlayer(this);
-    }
-    if (!mpMidiPlayer->IsInstalled())
-    {
-      cerr << "JZAlsaPlayer didn't install." << endl;
-
-      cerr
-        << "Could not install alsa driver." << '\n'
-        << "Jazz will start with no play/record ability."
-        << endl;
-      delete mpMidiPlayer;
-      mpMidiPlayer = new JZNullPlayer(this);
-    }
-#else
-    cerr << "This programm lacks ALSA driver support" << endl;
-    cerr << "Jazz will start with no play/record ability." << endl;
-    mpMidiPlayer = new JZNullPlayer(this);
-#endif
-  }
-  else if (gpConfig->GetValue(C_MidiDriver) == eMidiDriverJazz)
+  // 2. If Jazz/MPU was configured, attempt it
+  else if (configuredDriver == eMidiDriverJazz)
   {
 #ifdef DEV_MPU401
     mpMidiPlayer = new JZMpuPlayer(this);
     if (!mpMidiPlayer->IsInstalled())
     {
-      cerr << "JZMpuPlayer didn't install." << endl;
-
-      cerr
-        << "Could not connect to midinet server at host \""
-        << %midinethost << "\"\n"
-        << "Jazz will start with no play/record ability."
-        << endl;
       delete mpMidiPlayer;
-      mpMidiPlayer = new JZNullPlayer(this);
+      mpMidiPlayer = 0;
+      cerr << "JZMpuPlayer unavailable. Falling back to ALSA..." << endl;
     }
 #else
-    cerr << "This programm lacks JAZZ/MPU401 driver support" << endl;
-    cerr << "Jazz will start with no play/record ability." << endl;
-    mpMidiPlayer = new JZNullPlayer(this);
+    mpMidiPlayer = 0;
 #endif
   }
-  else
+
+  // 3. Fall back to / use modern ALSA driver
+  if (!mpMidiPlayer)
   {
-    cerr
-      << "No valid driver configured in config file." << '\n'
-      << "Jazz will start with no play/record ability"
-      << endl;
+#ifdef DEV_ALSA
+    mpMidiPlayer = new JZAlsaAudioPlayer(this);
+    if (!mpMidiPlayer->IsInstalled())
+    {
+      delete mpMidiPlayer;
+      mpMidiPlayer = new JZAlsaPlayer(this);
+    }
+    if (mpMidiPlayer->IsInstalled())
+    {
+      cout << "INFO: ALSA driver initialized successfully." << endl;
+      gpConfig->Put(C_MidiDriver, eMidiDriverAlsa);
+    }
+    else
+    {
+      cerr << "Could not install ALSA driver." << endl;
+      delete mpMidiPlayer;
+      mpMidiPlayer = 0;
+    }
+#endif
+  }
+
+  // 4. Final fallback to null player if no hardware drivers succeeded
+  if (!mpMidiPlayer)
+  {
+    cerr << "Jazz will start with no play/record ability." << endl;
+    mpMidiPlayer = new JZNullPlayer(this);
   }
 #endif // defined(__WXGTK__)
 

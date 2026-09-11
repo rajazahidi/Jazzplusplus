@@ -113,6 +113,11 @@ class JZPlayLoop
     // the other way round
     int Int2ExtClock(int Clock);
 
+    bool IsLooping() const
+    {
+      return mStopClock > 0;
+    }
+
     void PrepareOutput(
       JZEventArray* pEventArray,
       JZSong* pSong,

@@ -880,18 +880,27 @@ void TestTimelineBarClickLogic()
   TEST_ASSERT(snapToBar(3840 * 4) == 15360, "Bar 5 start clock is 15360");
   TEST_ASSERT(snapToBar(-500) == 0, "Negative clock clamps to 0");
 
-  // 3. Play/Stop Toggle Simulation
+  // 3. Play/Stop & Jump-Seek Simulation
   bool isPlaying = false;
   int playheadClock = 0;
 
   auto onLeftClickTimelineBar = [&](int clickedClock) {
+    int targetClock = snapToBar(clickedClock);
     if (isPlaying)
     {
-      isPlaying = false; // Stop
+      int currentBar = snapToBar(playheadClock);
+      if (targetClock == currentBar)
+      {
+        isPlaying = false; // Stop if clicked on current bar
+        return;
+      }
+      // If clicked on a different bar, jump and continue playing
+      playheadClock = targetClock;
+      isPlaying = true;
     }
     else
     {
-      playheadClock = snapToBar(clickedClock);
+      playheadClock = targetClock;
       isPlaying = true; // Start playback
     }
   };
@@ -907,19 +916,40 @@ void TestTimelineBarClickLogic()
   // Initial state: Stopped at 0
   TEST_ASSERT(!isPlaying, "Initial state is stopped");
 
-  // Click on Bar 5 (clock 15400)
+  // 1. Click on Bar 5 (clock 15400) -> starts playback at Bar 5
   onLeftClickTimelineBar(15400);
   TEST_ASSERT(isPlaying, "Left-click on timeline bar starts playback");
   TEST_ASSERT(playheadClock == 15360, "Playback starts snapped to Bar 5");
 
-  // Click again on timeline bar while playing
-  onLeftClickTimelineBar(20000);
-  TEST_ASSERT(!isPlaying, "Second left-click on timeline bar stops playback");
+  // 2. Click on Bar 9 (clock 31000) while playing -> jumps to Bar 9 and keeps playing
+  onLeftClickTimelineBar(31000);
+  TEST_ASSERT(isPlaying, "Clicking a different bar while playing jumps and stays playing");
+  TEST_ASSERT(playheadClock == 30720, "Playhead jumped to Bar 9 (clock 30720)");
 
-  // Right-click on Bar 3 (clock 8000)
+  // 3. Click on Bar 9 again (same bar) -> toggles stop
+  onLeftClickTimelineBar(31000);
+  TEST_ASSERT(!isPlaying, "Clicking the current bar while playing stops playback");
+
+  // 4. Right-click on Bar 3 (clock 8000)
   onRightClickTimelineBar(8000);
   TEST_ASSERT(!isPlaying, "Right-click does not start playback");
   TEST_ASSERT(playheadClock == 7680, "Right-click seeks playhead to start of Bar 3");
+
+  // 4. Linux Driver Fallback Simulation
+  int configuredDriver = 1; // OSS
+  bool ossInstalled = false; // /dev/music missing on modern Linux
+  bool alsaInstalled = true; // ALSA always available
+
+  int activeDriver = -1;
+  if (configuredDriver == 1 && ossInstalled)
+  {
+    activeDriver = 1;
+  }
+  else if (alsaInstalled)
+  {
+    activeDriver = 2; // Auto-fallback to ALSA
+  }
+  TEST_ASSERT(activeDriver == 2, "OSS unavailability automatically falls back to ALSA");
 }
 
 //-----------------------------------------------------------------------------

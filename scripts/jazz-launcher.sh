@@ -108,13 +108,32 @@ if ! is_synth_active; then
     SF="$(find_soundfont || true)"
     if [ -n "$SF" ] && command -v fluidsynth >/dev/null 2>&1; then
         echo "Auto-starting background FluidSynth with $SF..."
-        # Try pipewire first, then pulseaudio, then alsa
-        fluidsynth -a pulseaudio -m alsa_seq -s -i -j "$SF" >/dev/null 2>&1 &
+        # Try pipewire first, then pulseaudio, then alsa default
+        fluidsynth -a pipewire -m alsa_seq -s -i -j "$SF" >/dev/null 2>&1 &
         FS_PID=$!
-        STARTED_SYNTH=1
-        sleep 0.5
+        sleep 0.3
+        if ! kill -0 "$FS_PID" 2>/dev/null; then
+            fluidsynth -a pulseaudio -m alsa_seq -s -i -j "$SF" >/dev/null 2>&1 &
+            FS_PID=$!
+            sleep 0.3
+            if ! kill -0 "$FS_PID" 2>/dev/null; then
+                fluidsynth -a alsa -o audio.alsa.device=default -m alsa_seq -s -i -j "$SF" >/dev/null 2>&1 &
+                FS_PID=$!
+            fi
+        fi
+        if kill -0 "$FS_PID" 2>/dev/null; then
+            STARTED_SYNTH=1
+            echo "[OK] Background FluidSynth started (PID $FS_PID)"
+        fi
     fi
 fi
 
 # Run Jazz++
-exec "$JAZZ_BIN" "$@"
+if [ "$STARTED_SYNTH" -eq 1 ]; then
+    "$JAZZ_BIN" "$@"
+    EXIT_CODE=$?
+    cleanup
+    exit $EXIT_CODE
+else
+    exec "$JAZZ_BIN" "$@"
+fi

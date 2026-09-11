@@ -59,7 +59,8 @@ JZAlsaPlayer::JZAlsaPlayer(JZSong* pSong)
   recd_clock = 0;
   echo_clock = 0;
 
-  if (snd_seq_open(&handle, "hw", SND_SEQ_OPEN_DUPLEX, 0) < 0)
+  if (snd_seq_open(&handle, "default", SND_SEQ_OPEN_DUPLEX, 0) < 0 &&
+      snd_seq_open(&handle, "hw", SND_SEQ_OPEN_DUPLEX, 0) < 0)
   {
     perror("open sequencer");
     mInstalled = false;
@@ -583,6 +584,27 @@ void JZAlsaPlayer::OutBreak(int clock)
 //-----------------------------------------------------------------------------
 void JZAlsaPlayer::StartPlay(int clock, int loopClock, int cont)
 {
+  // If output device is not set or points to dummy Through, check if a real synth has appeared
+  if (mOutputDeviceIndex < 0 || (oaddr.GetCount() > 0 && oaddr.GetName(mOutputDeviceIndex).Lower().Contains("through")))
+  {
+    scan_clients(oaddr, SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE);
+    for (unsigned i = 0; i < oaddr.GetCount(); i++)
+    {
+      wxString name = oaddr.GetName(i).Lower();
+      if (name.Contains("fluid") || name.Contains("synth") || name.Contains("timidity"))
+      {
+        if (mOutputDeviceIndex >= 0)
+        {
+          unsubscribe_out(mOutputDeviceIndex);
+        }
+        mOutputDeviceIndex = static_cast<int>(i);
+        gpConfig->Put(C_AlsaOutputDevice, mOutputDeviceIndex);
+        subscribe_out(mOutputDeviceIndex);
+        break;
+      }
+    }
+  }
+
   recd_clock = clock;
   echo_clock = clock;
   play_clock = clock;
@@ -671,6 +693,11 @@ void JZAlsaPlayer::Notify()
   }
 
   play_clock = Now;
+  if (!mpPlayLoop->IsLooping() && mpSong->GetLastClock() > 0 && Now > mpSong->GetLastClock() + 960)
+  {
+    StopPlay();
+    return;
+  }
   if (
     mPlayBuffer.mEventCount &&
     mPlayBuffer.mppEvents[0]->GetClock() < mOutClock)
@@ -986,6 +1013,19 @@ int JZAlsaPlayer::GetRealTimeClock()
     recd_event(ie);
     snd_seq_free_event(ie);
   }
+
+  // Also query queue tick directly from ALSA kernel queue status to ensure smooth playback
+  snd_seq_queue_status_t *status;
+  snd_seq_queue_status_alloca(&status);
+  if (snd_seq_get_queue_status(handle, queue, status) >= 0)
+  {
+    int q_tick = snd_seq_queue_status_get_tick_time(status);
+    if (q_tick > recd_clock)
+    {
+      recd_clock = q_tick;
+    }
+  }
+
   if (recd_clock != old_recd_clock)
   {
     JZProjectManager::Instance()->NewPlayPosition(

@@ -361,6 +361,11 @@ void JZPlayer::StartPlay(int Clock, int LoopClock, int Continue)
       {
         OutNow(pTrack, pTrack->mpVolume);
       }
+      else if (pTrack->GetChannel() > 0)
+      {
+        JZControlEvent defaultVolume(0, pTrack->GetChannel() - 1, 7, 100);
+        OutNow(pTrack, &defaultVolume);
+      }
       if (pTrack->mpPan)
       {
         OutNow(pTrack, pTrack->mpPan);

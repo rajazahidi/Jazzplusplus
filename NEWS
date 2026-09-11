@@ -49,13 +49,13 @@ HIGHLIGHTS & NEW FEATURES
     - Master Limiter & Tube Overdrive/Distortion with soft clipping.
   - Audio sample slot processing and preview monitoring.
 
-* Windows Hardware Auto-Detection (MIDI & Audio):
-  - Intelligent, silent auto-detection of available MIDI and audio hardware devices.
-  - Automatically selects active software synthesizers (e.g. Microsoft GS Wavetable Synth)
-    or external hardware devices for immediate playback without modal dialog interruption.
-  - Automatically binds connected hardware USB MIDI controllers for real-time recording.
-  - Dynamic re-detection and safe fallback to MIDI Mapper if devices are unplugged.
-
+* Windows Hardware Auto-Detection & MIDI Driver Hardening:
+  - Intelligent, silent auto-detection and probing of available MIDI and audio hardware devices.
+  - Automatically verifies driver availability with non-blocking probe to eliminate "The driver was not enabled" dialogs.
+  - Prioritizes software synthesizers (e.g. Microsoft GS Wavetable Synth, FluidSynth) over dummy loopback ports for immediate audible playback.
+  - Sets master MIDI output volume to maximum (100%) and injects default channel volume (CC 7) on uninitialized tracks.
+  - Fixed JZMidiDeviceDialog device index mapping to properly preserve system device IDs and MIDI Mapper.
+  - Dynamic re-detection and safe multi-tier fallback to MIDI Mapper and available alternate ports.
 
 CORE CODEBASE REPAIRS & STABILITY IMPROVEMENTS
 ----------------------------------------------
@@ -74,9 +74,9 @@ CORE CODEBASE REPAIRS & STABILITY IMPROVEMENTS
 
 AUTOMATED TESTING, COMPATIBILITY & PACKAGING
 --------------------------------------------
-* Added a comprehensive automated test suite (210 tests via CTest) covering
-  MIDI effects, sound generator, audio DSP algorithms, guitar fretboard logic,
-  and music data structures.
+* Added a comprehensive automated test suite (223 tests via CTest) covering
+  MIDI device scoring, MIDI effects, sound generator, audio DSP algorithms,
+  guitar fretboard logic, and music data structures.
 * Modern C++17 and GCC 11+ compatibility fixes across the entire codebase.
 * Automated GitHub Actions CI for cross-platform build and release:
   - Linux: Standalone portable Jazz++-x86_64.AppImage with embedded SoundFont

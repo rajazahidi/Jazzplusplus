@@ -172,11 +172,39 @@ JZWindowsPlayer::JZWindowsPlayer(JZSong* pSong)
       }
     }
 
+    // If MIDI_MAPPER also failed, try probing any other available output device
     if (rc != MMSYSERR_NOERROR)
     {
+      UINT numOut = midiOutGetNumDevs();
+      for (UINT i = 0; i < numOut; ++i)
+      {
+        if (i == DeviceId) continue;
+        rc = midiOutOpen(
+          &mpState->hout,
+          i,
+          (DWORD_PTR)MidiOutProc,
+          (DWORD_PTR)mpState,
+          CALLBACK_FUNCTION);
+        if (rc == MMSYSERR_NOERROR)
+        {
+          olong = (int)i;
+          gpConfig->Put(C_WinOutputDevice, olong);
+          break;
+        }
+      }
+    }
+
+    if (rc != MMSYSERR_NOERROR)
+    {
+      mpState->hout = 0;
       wchar_t ErrorMessage[MAXERRORLENGTH];
       midiOutGetErrorText(rc, ErrorMessage, sizeof(ErrorMessage));
       ::wxMessageBox(ErrorMessage, "Open MIDI Output", wxOK);
+    }
+    else if (mpState->hout)
+    {
+      // Ensure master MIDI volume is at maximum for left and right channels
+      midiOutSetVolume(mpState->hout, 0xFFFFFFFF);
     }
   }
 
@@ -1094,85 +1122,76 @@ void JZWindowsPlayer::SettingsDlg(int& InputDevice, int& OutputDevice)
   //=========================
   // Select the input device.
   //=========================
-
-  // Get a list of the available input devices.
-  UINT i;
+  MidiDevices.push_back(make_pair("[None / Disabled]", -1));
   UINT InputMidiDeviceCount = midiInGetNumDevs();
-  for (i = 0; i < InputMidiDeviceCount; ++i)
+  for (UINT i = 0; i < InputMidiDeviceCount; ++i)
   {
     MIDIINCAPS caps;
-    midiInGetDevCaps(i, &caps, sizeof(caps));
-    MidiDevices.push_back(make_pair(caps.szPname, i));
+    if (midiInGetDevCaps(i, &caps, sizeof(caps)) == MMSYSERR_NOERROR)
+    {
+      MidiDevices.push_back(make_pair(caps.szPname, (int)i));
+    }
   }
 
-  if (InputMidiDeviceCount > 0)
+  JZMidiDeviceDialog MidiInputDeviceDialog(
+    MidiDevices,
+    InputDevice,
+    ::wxGetApp().GetMainFrame(),
+    "Input MIDI device");
+  if (MidiInputDeviceDialog.ShowModal() == wxID_OK)
   {
-    JZMidiDeviceDialog MidiInputDeviceDialog(
-      MidiDevices,
-      InputDevice,
-      ::wxGetApp().GetMainFrame(),
-      "Input MIDI device");
-    MidiInputDeviceDialog.ShowModal();
+    gpConfig->Put(C_WinInputDevice, InputDevice);
   }
 
   MidiDevices.clear();
 
-  // select output device
+  //=========================
+  // Select the output device.
+  //=========================
   UINT OutputMidiDeviceCount = midiOutGetNumDevs();
-  for (i = 0; i < OutputMidiDeviceCount; ++i)
+  for (UINT i = 0; i < OutputMidiDeviceCount; ++i)
   {
     MIDIOUTCAPS caps;
-    midiOutGetDevCaps(i, &caps, sizeof(caps));
-    MidiDevices.push_back(make_pair(caps.szPname, i));
+    if (midiOutGetDevCaps(i, &caps, sizeof(caps)) == MMSYSERR_NOERROR)
+    {
+      MidiDevices.push_back(make_pair(caps.szPname, (int)i));
+    }
   }
-  MidiDevices.push_back(make_pair("Midi Mapper", MAX_MIDI_DEVS));
+  MidiDevices.push_back(make_pair("MIDI Mapper", MAX_MIDI_DEVS));
 
   JZMidiDeviceDialog MidiOutputDeviceDialog(
     MidiDevices,
     OutputDevice,
     gpTrackWindow,
     "Output MIDI device");
-  MidiOutputDeviceDialog.ShowModal();
-
-  if (InputDevice >= 0)
-  {
-    gpConfig->Put(C_WinInputDevice, InputDevice);
-  }
-  else
-  {
-    gpConfig->Get(C_WinInputDevice, InputDevice);
-  }
-
-  if (OutputDevice >= 0)
+  if (MidiOutputDeviceDialog.ShowModal() == wxID_OK)
   {
     gpConfig->Put(C_WinOutputDevice, OutputDevice);
-  }
-  else
-  {
-    gpConfig->Get(C_WinOutputDevice, OutputDevice);
   }
 }
 
 //-----------------------------------------------------------------------------
 // Auto-detect available MIDI hardware input and output devices.
 // Prioritizes software/wavetable synths for immediate audible output,
-// hardware USB MIDI keyboards for input, and gracefully falls back to MIDI Mapper.
+// probes input devices to ensure drivers are enabled,
+// and gracefully falls back to MIDI Mapper.
 //-----------------------------------------------------------------------------
 void JZWindowsPlayer::AutoDetectDevices(int& InputDevice, int& OutputDevice)
 {
-  // 1. Auto-detect MIDI Input Device
+  // 1. Auto-detect MIDI Input Device: probe for a driver that is actively enabled
   UINT InputMidiDeviceCount = midiInGetNumDevs();
-  if (InputMidiDeviceCount > 0)
+  int foundInput = -1;
+  for (UINT i = 0; i < InputMidiDeviceCount; ++i)
   {
-    if (InputDevice < 0 || (UINT)InputDevice >= InputMidiDeviceCount)
+    HMIDIIN testHinp = NULL;
+    if (midiInOpen(&testHinp, i, 0, 0, CALLBACK_NULL) == MMSYSERR_NOERROR)
     {
-      InputDevice = 0; // Primary connected hardware MIDI keyboard or port
+      midiInClose(testHinp);
+      foundInput = (int)i;
+      break;
     }
   }
-  else
-  {
-    InputDevice = -1; // No MIDI input hardware connected
-  }
+  InputDevice = foundInput;
 
   // 2. Auto-detect MIDI Output Device
   UINT OutputMidiDeviceCount = midiOutGetNumDevs();
@@ -1181,7 +1200,12 @@ void JZWindowsPlayer::AutoDetectDevices(int& InputDevice, int& OutputDevice)
     bool valid = false;
     if (OutputDevice >= 0 && (UINT)OutputDevice < OutputMidiDeviceCount)
     {
-      valid = true;
+      HMIDIOUT testHout = NULL;
+      if (midiOutOpen(&testHout, (UINT)OutputDevice, 0, 0, CALLBACK_NULL) == MMSYSERR_NOERROR)
+      {
+        midiOutClose(testHout);
+        valid = true;
+      }
     }
     else if (OutputDevice == MAX_MIDI_DEVS)
     {
@@ -1191,10 +1215,17 @@ void JZWindowsPlayer::AutoDetectDevices(int& InputDevice, int& OutputDevice)
     if (!valid)
     {
       int bestDevice = -1;
-      int bestPriority = -1;
+      int bestPriority = -100;
 
       for (UINT i = 0; i < OutputMidiDeviceCount; ++i)
       {
+        HMIDIOUT testHout = NULL;
+        if (midiOutOpen(&testHout, i, 0, 0, CALLBACK_NULL) != MMSYSERR_NOERROR)
+        {
+          continue;
+        }
+        midiOutClose(testHout);
+
         MIDIOUTCAPS caps;
         if (midiOutGetDevCaps(i, &caps, sizeof(caps)) == MMSYSERR_NOERROR)
         {
@@ -1203,22 +1234,34 @@ void JZWindowsPlayer::AutoDetectDevices(int& InputDevice, int& OutputDevice)
           // Software synthesizers (e.g. Microsoft GS Wavetable Synth) guarantee audible sound
           if (caps.wTechnology == MOD_SWSYNTH || caps.wTechnology == MOD_SYNTH)
           {
-            priority = 10;
+            priority = 30;
           }
           else if (caps.wTechnology == MOD_WAVETABLE)
           {
-            priority = 9;
+            priority = 25;
+          }
+          else if (caps.wTechnology == MOD_FMSYNTH)
+          {
+            priority = 20;
           }
           else if (caps.wTechnology == MOD_MIDIPORT)
           {
-            priority = 8;
+            priority = 10;
           }
 
           wxString name(caps.szPname);
           name.MakeLower();
-          if (name.Contains("microsoft") || name.Contains("synth") || name.Contains("wavetable"))
+          if (name.Contains("microsoft") || name.Contains("synth") ||
+              name.Contains("wavetable") || name.Contains("fluid") ||
+              name.Contains("timidity"))
           {
-            priority += 5;
+            priority += 15;
+          }
+
+          // Linux ALSA / Wine "Midi Through" port is a dummy loopback with no sound attached
+          if (name.Contains("through"))
+          {
+            priority -= 20;
           }
 
           if (priority > bestPriority)
@@ -1235,7 +1278,7 @@ void JZWindowsPlayer::AutoDetectDevices(int& InputDevice, int& OutputDevice)
       }
       else
       {
-        OutputDevice = 0;
+        OutputDevice = MAX_MIDI_DEVS; // Fall back to MIDI Mapper
       }
     }
   }

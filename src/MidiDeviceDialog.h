@@ -50,6 +50,8 @@ class JZMidiDeviceDialog : public wxDialog
 
     int& mDeviceIndex;
 
+    std::vector<std::pair<wxString, int> > mMidiDevices;
+
     wxListBox* mpMidiDeviceListBox;
 
   DECLARE_EVENT_TABLE()

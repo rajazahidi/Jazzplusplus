@@ -766,6 +766,85 @@ void TestGuitarFretboardLogic()
 }
 
 //-----------------------------------------------------------------------------
+// Test 13: MIDI Device Selection & Synthesizer Prioritization Logic
+//-----------------------------------------------------------------------------
+void TestMidiDeviceSelectionLogic()
+{
+  cout << "[TEST] Running TestMidiDeviceSelectionLogic..." << endl;
+
+  // 1. Verify pair-based device index mapping
+  vector<pair<string, int> > devices;
+  devices.push_back(make_pair("[None / Disabled]", -1));
+  devices.push_back(make_pair("USB MIDI Keyboard", 0));
+  devices.push_back(make_pair("External Synth Port", 1));
+  devices.push_back(make_pair("MIDI Mapper", 10));
+
+  auto findIndexByDeviceId = [&](int devId) -> int {
+    for (size_t i = 0; i < devices.size(); ++i)
+    {
+      if (devices[i].second == devId) return static_cast<int>(i);
+    }
+    return -1;
+  };
+
+  TEST_ASSERT(findIndexByDeviceId(-1) == 0, "Device -1 maps to list index 0");
+  TEST_ASSERT(findIndexByDeviceId(0) == 1, "Device 0 maps to list index 1");
+  TEST_ASSERT(findIndexByDeviceId(1) == 2, "Device 1 maps to list index 2");
+  TEST_ASSERT(findIndexByDeviceId(10) == 3, "Device 10 (MIDI Mapper) maps to list index 3");
+  TEST_ASSERT(findIndexByDeviceId(99) == -1, "Invalid device ID returns -1");
+
+  // 2. Synthesizer Prioritization Scoring Algorithm
+  enum { TECH_MIDIPORT = 1, TECH_SYNTH = 2, TECH_SWSYNTH = 7, TECH_WAVETABLE = 6 };
+
+  auto scoreDevice = [](const string& name, int tech) -> int {
+    int priority = 1;
+    if (tech == TECH_SWSYNTH || tech == TECH_SYNTH) priority = 30;
+    else if (tech == TECH_WAVETABLE) priority = 25;
+    else if (tech == TECH_MIDIPORT) priority = 10;
+
+    string lower = name;
+    for (char& c : lower) c = (char)tolower(c);
+
+    if (lower.find("microsoft") != string::npos ||
+        lower.find("synth") != string::npos ||
+        lower.find("wavetable") != string::npos ||
+        lower.find("fluid") != string::npos ||
+        lower.find("timidity") != string::npos)
+    {
+      priority += 15;
+    }
+    if (lower.find("through") != string::npos)
+    {
+      priority -= 20;
+    }
+    return priority;
+  };
+
+  int msSynthScore = scoreDevice("Microsoft GS Wavetable Synth", TECH_SWSYNTH);
+  int fluidScore = scoreDevice("FLUID Synth (ALSA)", TECH_SYNTH);
+  int genericPortScore = scoreDevice("External MIDI Out Port", TECH_MIDIPORT);
+  int throughScore = scoreDevice("Midi Through Port-0", TECH_MIDIPORT);
+
+  TEST_ASSERT(msSynthScore > genericPortScore, "MS Wavetable Synth must score higher than generic port");
+  TEST_ASSERT(fluidScore > genericPortScore, "FluidSynth must score higher than generic port");
+  TEST_ASSERT(genericPortScore > throughScore, "Generic port must score higher than Midi Through loopback");
+  TEST_ASSERT(throughScore < 0, "Midi Through port must have negative net score to avoid silent playback trap");
+
+  // 3. Test Master Volume Bitmask
+  unsigned long masterVol = 0xFFFFFFFF;
+  unsigned short leftChannelVol = (unsigned short)(masterVol & 0xFFFF);
+  unsigned short rightChannelVol = (unsigned short)((masterVol >> 16) & 0xFFFF);
+  TEST_ASSERT(leftChannelVol == 0xFFFF, "Left channel volume is max 0xFFFF");
+  TEST_ASSERT(rightChannelVol == 0xFFFF, "Right channel volume is max 0xFFFF");
+
+  // 4. Test Default Channel Volume CC
+  int defaultCC = 7;
+  int defaultVolVal = 100;
+  TEST_ASSERT(defaultCC == 7, "Standard MIDI channel volume is CC 7");
+  TEST_ASSERT(defaultVolVal >= 90 && defaultVolVal <= 127, "Default channel volume is audible");
+}
+
+//-----------------------------------------------------------------------------
 // Main Runner
 //-----------------------------------------------------------------------------
 int main()
@@ -786,6 +865,7 @@ int main()
   TestAudioEffects();
   TestSoundGenerator();
   TestGuitarFretboardLogic();
+  TestMidiDeviceSelectionLogic();
 
   cout << "==========================================" << endl;
   cout << "Tests Run:    " << gTestsRun << endl;

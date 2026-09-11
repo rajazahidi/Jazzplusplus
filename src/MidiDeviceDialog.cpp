@@ -47,27 +47,25 @@ JZMidiDeviceDialog::JZMidiDeviceDialog(
   const wxString& Title)
   : wxDialog(pParent, wxID_ANY, Title),
     mDeviceIndex(DeviceIndex),
+    mMidiDevices(MidiDevices),
     mpMidiDeviceListBox(0)
 {
   mpMidiDeviceListBox = new wxListBox(this, wxID_ANY);
 
-  for (
-    vector<pair<wxString, int> >::const_iterator iMidiDevice =
-      MidiDevices.begin();
-    iMidiDevice != MidiDevices.end();
-    ++iMidiDevice)
+  int initialSelection = 0;
+  for (size_t i = 0; i < mMidiDevices.size(); ++i)
   {
-    const wxString& MidiDeviceName = iMidiDevice->first;
+    const wxString& MidiDeviceName = mMidiDevices[i].first;
     mpMidiDeviceListBox->Append(MidiDeviceName);
+    if (mMidiDevices[i].second == mDeviceIndex)
+    {
+      initialSelection = static_cast<int>(i);
+    }
   }
 
-  if (mDeviceIndex < static_cast<int>(mpMidiDeviceListBox->GetCount()))
+  if (mpMidiDeviceListBox->GetCount() > 0)
   {
-    mpMidiDeviceListBox->SetSelection(mDeviceIndex);
-  }
-  else
-  {
-    mpMidiDeviceListBox->SetSelection(0);
+    mpMidiDeviceListBox->SetSelection(initialSelection);
   }
 
   wxButton* pOkButton = new wxButton(this, wxID_OK, "&OK");
@@ -98,13 +96,9 @@ JZMidiDeviceDialog::JZMidiDeviceDialog(
 void JZMidiDeviceDialog::OnOK(wxCommandEvent& Event)
 {
   int Selection = mpMidiDeviceListBox->GetSelection();
-  if (Selection == wxNOT_FOUND)
+  if (Selection >= 0 && Selection < static_cast<int>(mMidiDevices.size()))
   {
-    mDeviceIndex = 0;
-  }
-  else
-  {
-    mDeviceIndex = Selection;
+    mDeviceIndex = mMidiDevices[Selection].second;
   }
 
   // Let wxWidgets do the rest.

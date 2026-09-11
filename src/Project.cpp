@@ -211,12 +211,7 @@ JZProject::JZProject()
   if (!mpMidiPlayer)
   {
 #ifdef DEV_ALSA
-    mpMidiPlayer = new JZAlsaAudioPlayer(this);
-    if (!mpMidiPlayer->IsInstalled())
-    {
-      delete mpMidiPlayer;
-      mpMidiPlayer = new JZAlsaPlayer(this);
-    }
+    mpMidiPlayer = new JZAlsaPlayer(this);
     if (mpMidiPlayer->IsInstalled())
     {
       cout << "INFO: ALSA driver initialized successfully." << endl;

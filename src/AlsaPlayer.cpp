@@ -59,8 +59,8 @@ JZAlsaPlayer::JZAlsaPlayer(JZSong* pSong)
   recd_clock = 0;
   echo_clock = 0;
 
-  if (snd_seq_open(&handle, "default", SND_SEQ_OPEN_DUPLEX, 0) < 0 &&
-      snd_seq_open(&handle, "hw", SND_SEQ_OPEN_DUPLEX, 0) < 0)
+  if (snd_seq_open(&handle, "default", SND_SEQ_OPEN_DUPLEX, SND_SEQ_NONBLOCK) < 0 &&
+      snd_seq_open(&handle, "hw", SND_SEQ_OPEN_DUPLEX, SND_SEQ_NONBLOCK) < 0)
   {
     perror("open sequencer");
     mInstalled = false;
@@ -568,6 +568,14 @@ int JZAlsaPlayer::compose_echo(int clock, unsigned int arg)
 //-----------------------------------------------------------------------------
 void JZAlsaPlayer::OutBreak(int clock)
 {
+  if (clock < 0)
+  {
+    clock = mOutClock;
+  }
+  if (echo_clock < clock - 96)
+  {
+    echo_clock = clock - 96;
+  }
   while (echo_clock + 48 < clock)
   {
     echo_clock += 48;
@@ -584,25 +592,47 @@ void JZAlsaPlayer::OutBreak(int clock)
 //-----------------------------------------------------------------------------
 void JZAlsaPlayer::StartPlay(int clock, int loopClock, int cont)
 {
-  // If output device is not set or points to dummy Through, check if a real synth has appeared
-  if (mOutputDeviceIndex < 0 || (oaddr.GetCount() > 0 && oaddr.GetName(mOutputDeviceIndex).Lower().Contains("through")))
+  scan_clients(oaddr, SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE);
+
+  auto isSynth = [](const wxString& name) {
+    wxString s = name.Lower();
+    return s.Contains("fluid") || s.Contains("synth") || s.Contains("timidity");
+  };
+
+  int synthIdx = -1;
+  for (unsigned i = 0; i < oaddr.GetCount(); i++)
   {
-    scan_clients(oaddr, SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE);
-    for (unsigned i = 0; i < oaddr.GetCount(); i++)
+    if (isSynth(oaddr.GetName(i)))
     {
-      wxString name = oaddr.GetName(i).Lower();
-      if (name.Contains("fluid") || name.Contains("synth") || name.Contains("timidity"))
-      {
-        if (mOutputDeviceIndex >= 0)
-        {
-          unsubscribe_out(mOutputDeviceIndex);
-        }
-        mOutputDeviceIndex = static_cast<int>(i);
-        gpConfig->Put(C_AlsaOutputDevice, mOutputDeviceIndex);
-        subscribe_out(mOutputDeviceIndex);
-        break;
-      }
+      synthIdx = static_cast<int>(i);
+      break;
     }
+  }
+
+  if (synthIdx >= 0)
+  {
+    if (mOutputDeviceIndex != synthIdx)
+    {
+      if (mOutputDeviceIndex >= 0 && static_cast<unsigned>(mOutputDeviceIndex) < oaddr.GetCount())
+      {
+        unsubscribe_out(mOutputDeviceIndex);
+      }
+      mOutputDeviceIndex = synthIdx;
+      gpConfig->Put(C_AlsaOutputDevice, mOutputDeviceIndex);
+    }
+  }
+  else if (mOutputDeviceIndex < 0 || static_cast<unsigned>(mOutputDeviceIndex) >= oaddr.GetCount())
+  {
+    mOutputDeviceIndex = (oaddr.GetCount() > 0) ? 0 : -1;
+    if (mOutputDeviceIndex >= 0)
+    {
+      gpConfig->Put(C_AlsaOutputDevice, mOutputDeviceIndex);
+    }
+  }
+
+  if (mOutputDeviceIndex >= 0 && static_cast<unsigned>(mOutputDeviceIndex) < oaddr.GetCount())
+  {
+    subscribe_out(mOutputDeviceIndex);
   }
 
   recd_clock = clock;
@@ -781,24 +811,17 @@ void JZAlsaPlayer::start_queue_timer(int clock)
   snd_seq_ev_set_source(&ev, self.port);
   snd_seq_ev_set_direct(&ev);
   snd_seq_ev_set_queue_pos_tick(&ev, queue, clock);
-  int rv = 0;
-  rv = write(&ev, 1);
-  if (rv < 0)
-  {
-    cout << "JZAlsaPlayer::start_queue_timer write failed" << endl;
-  }
-  snd_seq_ev_set_queue_continue(&ev, queue);
-  rv = write(&ev, 1);
-  if (rv < 0)
-  {
-    cout << "JZAlsaPlayer::start_queue_timer write failed" << endl;
-  }
+  write(&ev, 1);
 
-  cout
-    << "JZAlsaPlayer::start_queue_timer added trial-and-error start_queue"
-    << endl;
-
-  snd_seq_start_queue(handle, queue, NULL);
+  if (clock == 0)
+  {
+    snd_seq_start_queue(handle, queue, NULL);
+  }
+  else
+  {
+    snd_seq_continue_queue(handle, queue, NULL);
+  }
+  snd_seq_drain_output(handle);
 }
 
 //-----------------------------------------------------------------------------
@@ -807,12 +830,8 @@ void JZAlsaPlayer::start_queue_timer(int clock)
 //-----------------------------------------------------------------------------
 void JZAlsaPlayer::stop_queue_timer()
 {
-  snd_seq_event_t ev;
-  memset(&ev, 0, sizeof(ev));
-  snd_seq_ev_set_source(&ev, self.port);
-  snd_seq_ev_set_direct(&ev);
-  snd_seq_ev_set_queue_stop(&ev, queue);
-  write(&ev, 1);
+  snd_seq_stop_queue(handle, queue, NULL);
+  snd_seq_drain_output(handle);
 }
 
 //-----------------------------------------------------------------------------
@@ -1008,8 +1027,13 @@ int JZAlsaPlayer::GetRealTimeClock()
   // input recorded events (including my echo events)
   snd_seq_event_t *ie;
   int old_recd_clock = recd_clock;
-  while (snd_seq_event_input(handle, &ie) >= 0 && ie != 0)
+  int event_limit = 50;
+  while (snd_seq_event_input_pending(handle, 0) > 0 && --event_limit >= 0)
   {
+    if (snd_seq_event_input(handle, &ie) < 0 || ie == 0)
+    {
+      break;
+    }
     recd_event(ie);
     snd_seq_free_event(ie);
   }

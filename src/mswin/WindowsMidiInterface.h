@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <windows.h>
+#include <mmsystem.h>
 #include <vector>
 
 struct tWinPlayerState;

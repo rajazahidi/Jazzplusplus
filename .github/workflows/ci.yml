@@ -94,10 +94,86 @@ jobs:
           path: Jazz++-x86_64.AppImage
           if-no-files-found: error
 
+  build-windows:
+    name: Build Windows (MSVC x64)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache wxWidgets
+        id: cache-wx
+        uses: actions/cache@v4
+        with:
+          path: D:/wxWidgets
+          key: wxwidgets-3.2.6-msvc-x64
+
+      - name: Download & Extract wxWidgets 3.2.6
+        if: steps.cache-wx.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "D:\wxWidgets"
+          Invoke-WebRequest -Uri "https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.6/wxMSW-3.2.6_vc14x_x64_Dev.7z" -OutFile "wx_dev.7z"
+          Invoke-WebRequest -Uri "https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.6/wxMSW-3.2.6_vc14x_x64_ReleaseDLL.7z" -OutFile "wx_dll.7z"
+          7z x wx_dev.7z -o"D:\wxWidgets" -y
+          7z x wx_dll.7z -o"D:\wxWidgets" -y
+          Remove-Item wx_dev.7z, wx_dll.7z
+
+      - name: Configure CMake
+        shell: pwsh
+        run: |
+          cmake -B build `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DwxWidgets_ROOT_DIR="D:/wxWidgets" `
+            -DwxWidgets_LIB_DIR="D:/wxWidgets/lib/vc14x_x64_dll" `
+            -DwxWidgets_CONFIGURATION=mswu
+
+      - name: Build Jazz++ & Tests
+        shell: pwsh
+        run: |
+          cmake --build build --config Release --parallel
+
+      - name: Run Unit Tests
+        shell: pwsh
+        run: |
+          ctest --test-dir build -C Release --output-on-failure
+
+      - name: Package Windows Release (ZIP)
+        shell: pwsh
+        run: |
+          $pkgDir = "Jazz++-Windows-x64"
+          New-Item -ItemType Directory -Force -Path $pkgDir
+
+          # Copy executable
+          if (Test-Path "build\Release\jazz.exe") {
+            Copy-Item "build\Release\jazz.exe" "$pkgDir\"
+          } elseif (Test-Path "build\jazz.exe") {
+            Copy-Item "build\jazz.exe" "$pkgDir\"
+          }
+
+          # Copy wxWidgets runtime DLLs
+          Copy-Item "D:\wxWidgets\lib\vc14x_x64_dll\*.dll" "$pkgDir\" -Force
+
+          # Copy assets and documentation
+          Copy-Item -Recurse "conf" "$pkgDir\conf"
+          Copy-Item -Recurse "song" "$pkgDir\song"
+          Copy-Item -Recurse "src\HelpFiles" "$pkgDir\HelpFiles"
+          Copy-Item "README.md", "COPYING", "ChangeLog" "$pkgDir\"
+
+          # Compress to zip
+          Compress-Archive -Path $pkgDir -DestinationPath "Jazz++-Windows-x64.zip" -Force
+
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Jazz++-Windows-x64
+          path: Jazz++-Windows-x64.zip
+          if-no-files-found: error
+
   release:
     name: GitHub Release
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [build-linux, appimage]
+    needs: [build-linux, appimage, build-windows]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -110,8 +186,15 @@ jobs:
         with:
           name: Jazz++-x86_64.AppImage
 
+      - name: Download Windows Package
+        uses: actions/download-artifact@v4
+        with:
+          name: Jazz++-Windows-x64
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: Jazz++-x86_64.AppImage
+          files: |
+            Jazz++-x86_64.AppImage
+            Jazz++-Windows-x64.zip
           generate_release_notes: true

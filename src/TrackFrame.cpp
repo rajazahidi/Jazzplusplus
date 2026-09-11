@@ -391,10 +391,6 @@ void JZTrackFrame::CreateMenu()
   mpToolsMenu->Append(ID_INSERT_CHORD_SCALE, "&Insert Chord / Scale...\tCtrl+I");
   mpToolsMenu->Append(ID_TOOLS_HARMONY_BROWSER, "&Harmony Browser...");
   mpToolsMenu->Append(ID_TOOLS_RHYTHM_GENERATOR, "&Rhythm Generator...");
-  mpToolsMenu->AppendSeparator();
-  mpToolsMenu->Append(ID_EFFECTS_MIDI, "&MIDI Effects Suite (Arp, Humanize, Echo)...");
-  mpToolsMenu->Append(ID_EFFECTS_SOUND_GEN, "&Procedural SFX & Synth Drums...");
-  mpToolsMenu->Append(ID_EFFECTS_AUDIO_DSP, "&Audio Effects DSP (EQ, Reverb, Delay)...");
 
 #if 0
   // Move to Project Menu

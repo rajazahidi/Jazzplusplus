@@ -535,6 +535,10 @@ bool JZProject::FindAndRegisterConfFilePath(wxString& ConfFilePath) const
 //-----------------------------------------------------------------------------
 bool JZProject::IsPlaying()
 {
+  if (mpMidiPlayer && !mpMidiPlayer->IsPlaying())
+  {
+    mIsPlaying = false;
+  }
   return mIsPlaying;
 }
 

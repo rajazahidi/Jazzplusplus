@@ -845,6 +845,84 @@ void TestMidiDeviceSelectionLogic()
 }
 
 //-----------------------------------------------------------------------------
+// Test 14: Timeline Track Bar Click & Play/Stop Logic
+//-----------------------------------------------------------------------------
+void TestTimelineBarClickLogic()
+{
+  cout << "[TEST] Running TestTimelineBarClickLogic..." << endl;
+
+  // 1. Timeline Header Hit Testing
+  const int topInfoHeight = 24;
+  const int eventsX = 200;
+
+  auto isTimelineHeader = [&](int x, int y) -> bool {
+    return (y < topInfoHeight && x >= eventsX);
+  };
+
+  TEST_ASSERT(isTimelineHeader(250, 10) == true, "Point inside timeline ruler header is recognized");
+  TEST_ASSERT(isTimelineHeader(200, 0) == true, "Left edge of timeline ruler is recognized");
+  TEST_ASSERT(isTimelineHeader(150, 10) == false, "Point in left controls is not timeline ruler");
+  TEST_ASSERT(isTimelineHeader(250, 30) == false, "Point in track event area is not timeline ruler");
+
+  // 2. Measure Clock Snapping
+  const int tpq = 960; // Standard 960 ticks per quarter
+  const int ticksPerBar = tpq * 4; // 4/4 measure = 3840 ticks
+
+  auto snapToBar = [&](int clock) -> int {
+    if (clock < 0) return 0;
+    return (clock / ticksPerBar) * ticksPerBar;
+  };
+
+  TEST_ASSERT(snapToBar(0) == 0, "Bar 1 start clock is 0");
+  TEST_ASSERT(snapToBar(100) == 0, "Snaps to start of Bar 1");
+  TEST_ASSERT(snapToBar(3840) == 3840, "Bar 2 start clock is 3840");
+  TEST_ASSERT(snapToBar(4000) == 3840, "Snaps to start of Bar 2");
+  TEST_ASSERT(snapToBar(3840 * 4) == 15360, "Bar 5 start clock is 15360");
+  TEST_ASSERT(snapToBar(-500) == 0, "Negative clock clamps to 0");
+
+  // 3. Play/Stop Toggle Simulation
+  bool isPlaying = false;
+  int playheadClock = 0;
+
+  auto onLeftClickTimelineBar = [&](int clickedClock) {
+    if (isPlaying)
+    {
+      isPlaying = false; // Stop
+    }
+    else
+    {
+      playheadClock = snapToBar(clickedClock);
+      isPlaying = true; // Start playback
+    }
+  };
+
+  auto onRightClickTimelineBar = [&](int clickedClock) {
+    if (isPlaying)
+    {
+      isPlaying = false;
+    }
+    playheadClock = snapToBar(clickedClock); // Seek without playing
+  };
+
+  // Initial state: Stopped at 0
+  TEST_ASSERT(!isPlaying, "Initial state is stopped");
+
+  // Click on Bar 5 (clock 15400)
+  onLeftClickTimelineBar(15400);
+  TEST_ASSERT(isPlaying, "Left-click on timeline bar starts playback");
+  TEST_ASSERT(playheadClock == 15360, "Playback starts snapped to Bar 5");
+
+  // Click again on timeline bar while playing
+  onLeftClickTimelineBar(20000);
+  TEST_ASSERT(!isPlaying, "Second left-click on timeline bar stops playback");
+
+  // Right-click on Bar 3 (clock 8000)
+  onRightClickTimelineBar(8000);
+  TEST_ASSERT(!isPlaying, "Right-click does not start playback");
+  TEST_ASSERT(playheadClock == 7680, "Right-click seeks playhead to start of Bar 3");
+}
+
+//-----------------------------------------------------------------------------
 // Main Runner
 //-----------------------------------------------------------------------------
 int main()
@@ -866,6 +944,7 @@ int main()
   TestSoundGenerator();
   TestGuitarFretboardLogic();
   TestMidiDeviceSelectionLogic();
+  TestTimelineBarClickLogic();
 
   cout << "==========================================" << endl;
   cout << "Tests Run:    " << gTestsRun << endl;

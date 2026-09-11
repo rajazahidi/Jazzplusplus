@@ -28,12 +28,14 @@ cmake --install "$BUILD_DIR" --prefix "$APPDIR/usr"
 
 # Bundle wxWidgets and required shared libraries into AppDir/usr/lib for standalone portability
 mkdir -p "$APPDIR/usr/lib"
-for search_dir in /usr/lib/x86_64-linux-gnu /usr/lib /usr/local/lib; do
-    if [ -d "$search_dir" ]; then
-        find "$search_dir" -maxdepth 1 -name "libwx_*.so*" -exec cp -a {} "$APPDIR/usr/lib/" \; 2>/dev/null || true
-        find "$search_dir" -maxdepth 1 -name "libpcre2-32.so*" -exec cp -a {} "$APPDIR/usr/lib/" \; 2>/dev/null || true
-    fi
+for pattern in "libwx_*" "libpcre2-32*" "libtiff*" "libjbig*" "libdeflate*" "libjpeg*" "libpng16*" "libnotify*" "libasound*"; do
+    for search_dir in /usr/lib/x86_64-linux-gnu /usr/lib /lib/x86_64-linux-gnu /lib; do
+        if [ -d "$search_dir" ]; then
+            find "$search_dir" -maxdepth 1 -name "$pattern" -exec cp -a {} "$APPDIR/usr/lib/" \; 2>/dev/null || true
+        fi
+    done
 done
+rm -f "$APPDIR/usr/lib/"*.a 2>/dev/null || true
 
 # Install smart launcher
 if [ -f "$ROOT_DIR/scripts/jazz-launcher.sh" ]; then

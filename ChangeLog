@@ -1,5 +1,42 @@
 ChangeLog for Development Version
 
+09-11-2026 Raja Zahidi
+- Fix: Removed duplicate MIDI Effects, Procedural SFX & Audio DSP items from
+  Tools menu. Effects items now appear exclusively under the Effects menu.
+- Credit: Added "Developer" label to Raja Zahidi entry in About dialog.
+- Credit: Added Raja Zahidi name, copyright headers across all new source files,
+  and updated build number to 15 in JazzPlusPlusVersion.h.
+
+09-10-2026 Raja Zahidi
+- Fix: Dialog windows (MIDI Effects Suite, Procedural SFX & Drum Synthesizer,
+  Audio Effects DSP) were collapsing to a very small size on open. Root cause
+  was use of wxScrolledWindow for tab pages combined with SetSizeHints() which
+  computed near-zero minimum sizes. Fixed by reverting tab pages to wxPanel and
+  replacing SetSizeHints() with Fit() + explicit minimum size clamping.
+
+09-09-2026 Raja Zahidi
+- Fix: Dialog layout and sizing for MIDI Effects and Sound Generator dialogs.
+  Increased default sizes, added minimum size constraints and scroll support.
+- Fix: Crash when clicking on track/channel selector in PianoFrame. Fixed null
+  pointer dereference and channel adjustment logic.
+- Add: MIDI Effects Suite (Arpeggiator, Humanizer, Harmonizer, MIDI Echo)
+  - src/MidiEffects.h, src/MidiEffects.cpp
+  - src/Dialogs/MidiEffectsDialog.h, src/Dialogs/MidiEffectsDialog.cpp
+  - Menu entries added to TrackFrame and PianoFrame under Tools & Effects menus
+- Add: Procedural Sound FX & 808 Analog Drum Synthesizer
+  - src/SoundGenerator.h, src/SoundGenerator.cpp
+  - src/Dialogs/SoundGeneratorDialog.h, src/Dialogs/SoundGeneratorDialog.cpp
+  - Retro Game SFX (8 presets), Analog Synth Drums (6 voices)
+  - WAV export and track insertion support
+- Add: Audio DSP Engine
+  - src/AudioEffects.h, src/AudioEffects.cpp
+  - src/Dialogs/AudioEffectsDialog.h, src/Dialogs/AudioEffectsDialog.cpp
+  - 3-Band Parametric EQ, Freeverb Algorithmic Reverb, Stereo Delay & Echo,
+    Stereo Chorus/Flanger, Master Limiter & Overdrive/Distortion
+  - Play preview and apply-to-sample-slot support
+- Add: Comprehensive automated unit test suite (185 tests) covering all new
+  MIDI effects, sound generator, and audio DSP classes via CTest.
+
 03-23-04
 -Added the XRC library and make a Makefile.am for it.
 -Removed the configure and Makefile.in entries from the CVS.  They keep

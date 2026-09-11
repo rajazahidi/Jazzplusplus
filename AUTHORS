@@ -1,2 +1,22 @@
-A bunch of people including...
-Pete J. Stieber <pstieber@verizon.net>
+Jazz++ MIDI Sequencer — Authors & Contributors
+
+Original Authors:
+  Andreas Voss
+  Per Sigmond
+
+Developers:
+  Pete J. Stieber <pstieber@verizon.net>  (Lead Developer)
+  Patrick Earl                             (Developer)
+  Kevin Cosgrove                           (Developer, RPM packages)
+  Dave Fancella                            (Developer, JazzPlusPlus website)
+  Joakim Verona                            (Developer, wxWidgets 2.4 port)
+
+Other Contributors:
+  Mark Constable
+  Matt Kelly
+
+2026 Extension — Raja Zahidi:
+  MIDI Effects Suite (Arpeggiator, Humanizer, Harmonizer, MIDI Echo)
+  Procedural Sound FX & 808 Analog Drum Synthesizer
+  Audio DSP Engine (3-Band EQ, Reverb, Delay, Chorus, Limiter/Overdrive)
+  Automated unit test suite (185 tests)

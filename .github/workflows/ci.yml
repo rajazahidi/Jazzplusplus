@@ -12,6 +12,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+  actions: write
+
 jobs:
   build-linux:
     name: Build Linux (${{ matrix.os }})
@@ -57,6 +61,7 @@ jobs:
           name: jazz-bin-${{ matrix.os }}
           path: build/jazz
           if-no-files-found: error
+          overwrite: true
 
   appimage:
     name: Package AppImage (Ubuntu 22.04)
@@ -85,7 +90,8 @@ jobs:
       - name: Build AppDir and AppImage
         run: |
           ./scripts/build-appimage.sh build
-          ./appimagetool --appimage-extract-and-run AppDir Jazz++-x86_64.AppImage
+          ARCH=x86_64 ./appimagetool --appimage-extract-and-run AppDir Jazz++-x86_64.AppImage
+          ls -lh Jazz++-x86_64.AppImage
 
       - name: Upload AppImage Artifact
         uses: actions/upload-artifact@v4
@@ -93,6 +99,7 @@ jobs:
           name: Jazz++-x86_64.AppImage
           path: Jazz++-x86_64.AppImage
           if-no-files-found: error
+          overwrite: true
 
   build-windows:
     name: Build Windows (MSVC x64)
@@ -174,6 +181,7 @@ jobs:
           name: Jazz++-Windows-x64
           path: Jazz++-Windows-x64.zip
           if-no-files-found: error
+          overwrite: true
 
   release:
     name: GitHub Release

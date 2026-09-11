@@ -1,3 +1,81 @@
+==============================================================================
+Jazz++ Version 5.4.15 (September 2026) - Release Announcement
+==============================================================================
+
+Main Developer & Maintainer for 2026 Release:
+  Raja Zahidi <https://github.com/rajazahidi>
+
+This milestone release revitalizes Jazz++ for modern Linux and Windows
+environments with major new features, modern audio DSP & MIDI effects suites,
+an overhauled Guitar Board & Tablature editor, comprehensive bug fixes,
+rock-solid stability improvements, and cross-platform automated CI packaging.
+
+HIGHLIGHTS & NEW FEATURES
+-------------------------
+* Guitar Board & Tablature Overhaul:
+  - Dramatically enlarged fretboard window (1040x280 default, min 740x200)
+    with dynamic responsive wxBoxSizer layout.
+  - Authentic TAB headstock header with string tuning indicators ('e B G D A E'
+    for 6-string guitar, 'G D A E' for 4-string bass).
+  - Fret numbers (0 to 24) along fretboard bottom and pearl position inlay dots
+    at standard frets (3, 5, 7, 9, 12 double-dot, 15, 17, 19, 21).
+  - Fixed open string (fret 0) rendering and coordinate calculation bugs.
+  - Realistic string thickness gauges and modern note badge markers.
+  - Real-time sound synthesis preview on click and drag across the fretboard.
+  - Fully fixed Guitar Settings dialog with instant preference updates.
+  - Dedicated "Guitar Board & Tab..." entry in TrackFrame Tools menu (Ctrl+G).
+
+* MIDI Effects Suite:
+  - Real-time & offline MIDI processing tools accessible via Effects menu:
+    - Arpeggiator: Up, Down, Up/Down, Random, Chord, with Octave range & gate.
+    - Humanizer: Natural velocity, timing jitter, and swing simulation.
+    - Harmonizer: Dynamic intelligent diatonic and modal harmony generator.
+    - MIDI Echo: Tempo-synced repeats with velocity and pitch decay.
+  - Seamless track selection and multi-track application.
+
+* Procedural Sound FX & 808 Analog Drum Synthesizer:
+  - Built-in procedural 16-bit 44.1kHz audio synthesis engine.
+  - 8 Retro 8-bit / Chiptune SFX presets (Laser, Explosion, Jump, Powerup, etc.).
+  - 6 Classic 808 Analog Drum voices (Kick, Snare, Hi-Hat, Tom, Clap, Cymbal).
+  - Direct preview playback, WAV audio file export, and direct project track
+    insertion.
+
+* Audio DSP Engine:
+  - Real-time high-fidelity digital audio signal processing:
+    - 3-Band Parametric Equalizer (Low Shelf, Mid Peaking, High Shelf).
+    - Freeverb Algorithmic Reverb with room size, damping, and wet/dry mix.
+    - Stereo Delay & Ping-Pong Echo with feedback and tempo sync.
+    - Stereo Chorus & Flanger with LFO modulation and stereo width.
+    - Master Limiter & Tube Overdrive/Distortion with soft clipping.
+  - Audio sample slot processing and preview monitoring.
+
+CORE CODEBASE REPAIRS & STABILITY IMPROVEMENTS
+----------------------------------------------
+* Fixed crash when clicking PRG / track channel selector in PianoFrame and
+  TrackDialog (null pointer dereference and channel index bounds check).
+* Fixed audio null pointer crash in EditAudioGlobalSettings with modern
+  JZAudioSettingsDialog implementation.
+* Modernized Linux ALSA audio backend: immediate PCM buffer flushing, dynamic
+  MIDI device discovery, and automatic SoundFont synth integration.
+* Resolved dialog window collapse issue across multi-page wxNotebook dialogs
+  using robust wxPanel sizing and minimum constraint clamping.
+* Fixed startup wxHTML help viewer warning and missing help resource assets.
+* Cleaned up and organized Tools and Effects menus across TrackFrame and PianoFrame.
+
+AUTOMATED TESTING, COMPATIBILITY & PACKAGING
+--------------------------------------------
+* Added a comprehensive automated test suite (185 tests via CTest) covering
+  MIDI effects, sound generator, audio DSP algorithms, and data structures.
+* Modern C++17 and GCC 11+ compatibility fixes across the entire codebase.
+* Automated GitHub Actions CI for cross-platform build and release:
+  - Linux: Standalone portable Jazz++-x86_64.AppImage with embedded SoundFont
+    auto-playback launcher.
+  - Windows: Automated MSVC x64 build packaging standalone Jazz++-Windows-x64.zip
+    with wxWidgets 3.2.6 runtime DLLs.
+
+==============================================================================
+Previous Releases
+==============================================================================
 * Added a mailing list for subversion updates in March, 2008.
 
 * New Jazz++ development revival started in January, 2008.

@@ -14,7 +14,10 @@ Originally created by Andreas Voss and Per Sigmond, with subsequent major develo
 - **Multi-Track Sequencer**: Track timeline editor with mute, solo, track volume, pan, and instrument assignment.
 - **Piano Roll Editor**: Note grid editor with velocity bars, pitch bend, and real-time step editing.
 - **Event List Editor**: Raw MIDI event viewer and editor supporting SysEx, control changes, and tempo maps.
-- **Guitar Fretboard & Tab**: Visual fretboard display for guitar and tablature-oriented composition.
+- **Guitar Fretboard & Tab**: Overhauled responsive fretboard display (1040x280) with tuning labels ('e B G D A E' / 'G D A E'), fret numbers (0-24), pearl inlays, and real-time sound preview on click & drag.
+- **MIDI Effects Suite**: Integrated Arpeggiator, Humanizer, Harmonizer, and MIDI Echo accessible via the Effects menu.
+- **Procedural Sound FX & 808 Drums**: Built-in 8-bit retro sound generator (8 presets) and classic 808 analog drum synthesizer (6 voices) with WAV export and project insertion.
+- **Audio DSP Engine**: High-fidelity real-time 3-Band Parametric EQ, Freeverb Reverb, Stereo Delay, Chorus, and Master Limiter/Overdrive.
 - **Harmony & Rhythm Generator**: Harmony analyzer, chord progressions, groove quantization, and shuffle algorithms.
 - **Digital Audio Mixing**: Audio track support with WAV sample playback and recording.
 - **ALSA & PortMidi Integration**: Native Linux ALSA sequencer (`snd_seq`) and PCM audio (`snd_pcm`) backend.
@@ -22,16 +25,21 @@ Originally created by Andreas Voss and Per Sigmond, with subsequent major develo
 
 ---
 
-## Quick Start: Download AppImage
+## Quick Start: Pre-built Binaries
 
-The easiest way to run Jazz++ on any modern Linux distribution (Ubuntu, Debian, Fedora, Arch, Zorin OS, Linux Mint, etc.) without installing compilers or development packages:
+Pre-compiled standalone packages for Linux and Windows are available from the [GitHub Releases](https://github.com/rajazahidi/Jazzplusplus/releases) page or [GitHub Actions Artifacts](https://github.com/rajazahidi/Jazzplusplus/actions).
 
-1. Download **`Jazz++-x86_64.AppImage`** from the [GitHub Releases](https://github.com/rajazahidi/Jazzplusplus/releases) page or [GitHub Actions Artifacts](https://github.com/rajazahidi/Jazzplusplus/actions).
+### Linux (AppImage)
+1. Download **`Jazz++-x86_64.AppImage`**.
 2. Make it executable and run:
    ```bash
    chmod +x Jazz++-x86_64.AppImage
    ./Jazz++-x86_64.AppImage
    ```
+
+### Windows (64-bit ZIP)
+1. Download **`Jazz++-Windows-x64.zip`**.
+2. Extract the archive and launch **`jazz.exe`**. All required wxWidgets 3.2.6 runtime DLLs are included.
 
 ---
 

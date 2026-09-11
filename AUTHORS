@@ -27,4 +27,8 @@ Other Contributors:
     * MIDI Effects Suite (Arpeggiator, Humanizer, Harmonizer, MIDI Echo)
     * Procedural Sound FX & 808 Analog Drum Synthesizer
     * Audio DSP Engine (3-Band EQ, Reverb, Delay, Chorus, Limiter/Overdrive)
-    * Automated unit test suite via CTest (185 tests)
+    * Overhauled and enlarged Guitar Board & Tablature editor (1040x280) with
+      tuning indicators, fret markers, pearl inlays, and real-time audio preview
+    * Automated cross-platform CI for Linux (AppImage) and Windows x64 (ZIP)
+    * Comprehensive automated unit test suite via CTest (185 tests)
+

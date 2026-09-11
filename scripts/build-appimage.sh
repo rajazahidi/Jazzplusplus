@@ -26,6 +26,21 @@ rm -rf "$APPDIR"
 mkdir -p "$APPDIR"
 cmake --install "$BUILD_DIR" --prefix "$APPDIR/usr"
 
+# Bundle wxWidgets and required shared libraries into AppDir/usr/lib for standalone portability
+mkdir -p "$APPDIR/usr/lib"
+for search_dir in /usr/lib/x86_64-linux-gnu /usr/lib /usr/local/lib; do
+    if [ -d "$search_dir" ]; then
+        find "$search_dir" -maxdepth 1 -name "libwx_*.so*" -exec cp -a {} "$APPDIR/usr/lib/" \; 2>/dev/null || true
+        find "$search_dir" -maxdepth 1 -name "libpcre2-32.so*" -exec cp -a {} "$APPDIR/usr/lib/" \; 2>/dev/null || true
+    fi
+done
+
+# Install smart launcher
+if [ -f "$ROOT_DIR/scripts/jazz-launcher.sh" ]; then
+    cp "$ROOT_DIR/scripts/jazz-launcher.sh" "$APPDIR/usr/bin/jazz-launcher"
+    chmod +x "$APPDIR/usr/bin/jazz-launcher"
+fi
+
 # 3. Copy top-level AppImage metadata
 cp "$ROOT_DIR/jazz.desktop" "$APPDIR/jazz.desktop"
 cp "$ROOT_DIR/resources/icons/jazz-256.png" "$APPDIR/jazz.png"

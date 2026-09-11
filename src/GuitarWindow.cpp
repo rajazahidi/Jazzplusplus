@@ -23,10 +23,16 @@
 #include "GuitarWindow.h"
 
 #include "GuitarFrame.h"
+#include "Events.h"
+#include "Globals.h"
+#include "Player.h"
+#include "Project.h"
+#include "Track.h"
 
 #include <wx/dcclient.h>
 
 #include <string>
+#include <algorithm>
 
 using namespace std;
 
@@ -48,30 +54,60 @@ bool JZGuitarWindow::mBassGuitar = false;
 bool JZGuitarWindow::mShowOctaves = true;
 
 //-----------------------------------------------------------------------------
+// 21 frets standard full-board view
 //-----------------------------------------------------------------------------
-int JZGuitarWindow::mFretCount = 17;
+int JZGuitarWindow::mFretCount = 21;
 
 //-----------------------------------------------------------------------------
+// 4-string Bass Guitar Pitches (G2, D2, A1, E1)
 //-----------------------------------------------------------------------------
 const int JZGuitarWindow::mBassPitches[4] =
 {
-  28 + 15,
-  28 + 10,
-  28 +  5,
-  28
+  28 + 15, // 43 = G2
+  28 + 10, // 38 = D2
+  28 +  5, // 33 = A1
+  28       // 28 = E1
 };
 
 //-----------------------------------------------------------------------------
+// 6-string Guitar Standard Tuning Pitches (E4, B3, G3, D3, A2, E2)
 //-----------------------------------------------------------------------------
 const int JZGuitarWindow::mGuitarPitches[6] =
 {
-  40 + 24,
-  40 + 19,
-  40 + 15,
-  40 + 10,
-  40 +  5,
-  40
+  40 + 24, // 64 = E4
+  40 + 19, // 59 = B3
+  40 + 15, // 55 = G3
+  40 + 10, // 50 = D3
+  40 +  5, // 45 = A2
+  40       // 40 = E2
 };
+
+void JZGuitarWindow::SetBassGuitar(bool b)
+{
+  mBassGuitar = b;
+}
+
+void JZGuitarWindow::SetFretCount(int count)
+{
+  if (count < 12) count = 12;
+  if (count > 24) count = 24;
+  mFretCount = count;
+}
+
+void JZGuitarWindow::UpdateSettings()
+{
+  if (mBassGuitar)
+  {
+    mpPitches = mBassPitches;
+    mStringCount = 4;
+  }
+  else
+  {
+    mpPitches = mGuitarPitches;
+    mStringCount = 6;
+  }
+  Refresh();
+}
 
 //-----------------------------------------------------------------------------
 // Description:
@@ -82,10 +118,11 @@ const int JZGuitarWindow::mGuitarPitches[6] =
 BEGIN_EVENT_TABLE(JZGuitarWindow, wxScrolledWindow)
 
   EVT_SIZE(JZGuitarWindow::OnSize)
-
   EVT_PAINT(JZGuitarWindow::OnPaint)
-
   EVT_MOTION(JZGuitarWindow::OnMouseMove)
+  EVT_LEFT_DOWN(JZGuitarWindow::OnMouseDown)
+  EVT_LEFT_UP(JZGuitarWindow::OnMouseUp)
+  EVT_LEAVE_WINDOW(JZGuitarWindow::OnMouseLeave)
 
 END_EVENT_TABLE()
 
@@ -101,16 +138,17 @@ JZGuitarWindow::JZGuitarWindow(
       Position,
       Size,
       wxHSCROLL | wxVSCROLL | wxNO_FULL_REPAINT_ON_RESIZE),
-//    mpGuitarFrame(pParent),
-//    mpPianoWindow(pPianoWindow)
+    mNutX(75),
     mMargin(2),
     mActivePitch(0),
     mPlayPitch(0),
-    mpFont(0)
+    put_clock(0),
+    mpFont(0),
+    mpBoldFont(0),
+    mpSmallFont(0)
 {
   mWidth = Size.GetWidth();
   mHeight = Size.GetHeight();
-  put_clock = 0;
 
   if (mBassGuitar)
   {
@@ -122,10 +160,12 @@ JZGuitarWindow::JZGuitarWindow(
     mpPitches = mGuitarPitches;
     mStringCount = 6;
   }
-  mStringHeight = mHeight / (mStringCount + 1);
-  mFretWidth = mWidth / mFretCount;
+  mStringHeight = 26;
+  mFretWidth = 40;
 
-  mpFont = new wxFont(12, wxSWISS, wxNORMAL, wxNORMAL);
+  mpFont = new wxFont(10, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+  mpBoldFont = new wxFont(11, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD);
+  mpSmallFont = new wxFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 }
 
 //-----------------------------------------------------------------------------
@@ -133,14 +173,16 @@ JZGuitarWindow::JZGuitarWindow(
 JZGuitarWindow::~JZGuitarWindow()
 {
   delete mpFont;
+  delete mpBoldFont;
+  delete mpSmallFont;
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZGuitarWindow::ClearBuffer()
 {
-//  piano->PasteBuffer.Clear();
-//  put_clock = 0;
+  mActivePitch = 0;
+  StopNote();
   Refresh();
 }
 
@@ -148,30 +190,30 @@ void JZGuitarWindow::ClearBuffer()
 //-----------------------------------------------------------------------------
 void JZGuitarWindow::OnSize(wxSizeEvent& Event)
 {
-  int Width, Height;
-  GetClientSize(&Width, &Height);
-  SetWindowSize(Width, Height);
+  GetClientSize(&mWidth, &mHeight);
+  Refresh();
+  Event.Skip();
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZGuitarWindow::ShowPitch(int Pitch)
 {
-  wxClientDC Dc(this);
-  PrepareDC(Dc);
+  mActivePitch = Pitch;
+  Refresh();
+}
 
-  Dc.SetFont(*mpFont);
-  Dc.SetTextBackground(GetForegroundColour());
-  ShowPitch(Dc, Pitch);
+void JZGuitarWindow::ShowPitch(wxDC&, int Pitch)
+{
+  mActivePitch = Pitch;
+  Refresh();
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZGuitarWindow::OnPaint(wxPaintEvent& Event)
+void JZGuitarWindow::OnPaint(wxPaintEvent&)
 {
   wxPaintDC Dc(this);
-  PrepareDC(Dc);
-
   OnDraw(Dc);
 }
 
@@ -179,61 +221,150 @@ void JZGuitarWindow::OnPaint(wxPaintEvent& Event)
 //-----------------------------------------------------------------------------
 void JZGuitarWindow::OnDraw(wxDC& Dc)
 {
-  Dc.SetFont(*mpFont);
-
-  GetSize(&mWidth, &mHeight);
+  GetClientSize(&mWidth, &mHeight);
+  if (mWidth <= 0 || mHeight <= 0)
+  {
+    return;
+  }
 
   DrawBoard(Dc);
-  DrawPitch(Dc, mActivePitch, true);
+  if (mActivePitch > 0)
+  {
+    DrawPitch(Dc, mActivePitch, true);
+  }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZGuitarWindow::DrawBoard(wxDC& Dc)
 {
-  int i;
+  mNutX = 75; // Width of Tab String Labels / Headstock area
+  int topY = 28;
+  int bottomY = mHeight - 28;
+  int playableHeight = bottomY - topY;
 
-  mStringHeight = mHeight / (mStringCount + 1);
-  mFretWidth = mWidth / mFretCount;
+  mStringHeight = (mStringCount > 1) ? playableHeight / (mStringCount - 1) : playableHeight;
+  int fretboardWidth = mWidth - mNutX - 10;
+  if (fretboardWidth < 10) fretboardWidth = 10;
+  mFretWidth = fretboardWidth / mFretCount;
 
-  // Paint the guitar strings.
-  for (i = 0; i < mStringCount; ++i)
+  // 1. Fretboard Wood Background (Warm Rosewood tone)
+  Dc.SetPen(*wxTRANSPARENT_PEN);
+  wxBrush woodBrush(wxColour(46, 38, 33));
+  Dc.SetBrush(woodBrush);
+  Dc.DrawRectangle(mNutX, topY - 12, fretboardWidth, playableHeight + 24);
+
+  // 2. Headstock / TAB Header Area (Dark charcoal/slate)
+  wxBrush headstockBrush(wxColour(30, 28, 26));
+  Dc.SetBrush(headstockBrush);
+  Dc.DrawRectangle(0, topY - 12, mNutX, playableHeight + 24);
+
+  // Draw "TAB" header label on the headstock
+  Dc.SetFont(*mpBoldFont);
+  Dc.SetTextForeground(wxColour(220, 190, 140));
+  Dc.DrawText("TAB", 8, 6);
+
+  // 3. Fret Position Inlays (Pearl Dots)
+  wxBrush dotBrush(wxColour(225, 225, 230));
+  Dc.SetBrush(dotBrush);
+  Dc.SetPen(wxPen(wxColour(110, 105, 100), 1));
+  int centerY = topY + playableHeight / 2;
+  int dotRadius = 5;
+
+  for (int f = 1; f <= mFretCount; ++f)
   {
-    int y = mHeight * (i + 1) / (mStringCount + 1);
-    Dc.DrawLine(0, y, mWidth, y);
+    int fretCenter = mNutX + (f - 1) * mFretWidth + mFretWidth / 2;
+
+    // Single dots at standard frets: 3, 5, 7, 9, 15, 17, 19, 21
+    if (f == 3 || f == 5 || f == 7 || f == 9 || f == 15 || f == 17 || f == 19 || f == 21)
+    {
+      Dc.DrawCircle(fretCenter, centerY, dotRadius);
+    }
+    // Double dots at octave: fret 12 (and 24)
+    else if (f == 12 || f == 24)
+    {
+      int offset = mStringHeight;
+      if (mStringCount >= 6) offset = static_cast<int>(mStringHeight * 1.3);
+      Dc.DrawCircle(fretCenter, centerY - offset / 2, dotRadius);
+      Dc.DrawCircle(fretCenter, centerY + offset / 2, dotRadius);
+    }
   }
 
-  // Paint the guitar frets.
-  int y1 = mHeight / (mStringCount + 1);
-  int y2 = mHeight * (mStringCount) / (mStringCount + 1);
-  int d1 = mHeight / 5;
-  for (i = 0; i < mFretCount; i++)
+  // 4. Fret Wires (Metallic silver nickel)
+  wxPen wirePen(wxColour(205, 210, 220), 2);
+  Dc.SetPen(wirePen);
+  for (int f = 1; f <= mFretCount; ++f)
   {
-    int x = mWidth * i / mFretCount;
-    Dc.DrawLine(x, y1, x, y2);
-    switch (i)
+    int fx = mNutX + f * mFretWidth;
+    Dc.DrawLine(fx, topY - 12, fx, bottomY + 12);
+  }
+
+  // 5. Nut (Bone/Ivory nut bar separating Tab open string header from fret 1)
+  wxBrush nutBrush(wxColour(245, 240, 225));
+  Dc.SetBrush(nutBrush);
+  Dc.SetPen(wxPen(wxColour(170, 160, 140), 1));
+  Dc.DrawRectangle(mNutX - 4, topY - 14, 6, playableHeight + 28);
+
+  // 6. Strings with Realistic Gauges & Tab String Names
+  static const char* guitarTuningNames[6] = { "e (1)", "B (2)", "G (3)", "D (4)", "A (5)", "E (6)" };
+  static const char* bassTuningNames[4] = { "G (1)", "D (2)", "A (3)", "E (4)" };
+
+  for (int s = 0; s < mStringCount; ++s)
+  {
+    int sy = topY + s * mStringHeight;
+
+    int thickness = 1;
+    if (mBassGuitar)
     {
-      case 0:
-      case 11:
-      case 23:
-        Dc.DrawLine(x + 2, y1, x + 2, y2);
-        break;
-
-      case 4:
-      case 6:
-      case 16:
-      case 18:
-        Dc.DrawLine(x + 2, y1 + d1, x + 2, y2 - d1);
-        break;
-
-      default:
-      case 2:
-      case 8:
-      case 14:
-      case 20:
-        break;
-
+      thickness = 2 + s;
     }
+    else
+    {
+      if (s >= 4) thickness = 3;
+      else if (s >= 2) thickness = 2;
+      else thickness = 1;
+    }
+
+    // Draw string
+    wxPen stringPen(wxColour(215, 220, 230), thickness);
+    Dc.SetPen(stringPen);
+    Dc.DrawLine(0, sy, mWidth, sy);
+
+    // Draw Tab String Name in headstock area
+    Dc.SetFont(*mpFont);
+    Dc.SetTextForeground(wxColour(230, 230, 230));
+    const char* label = mBassGuitar ? bassTuningNames[s] : guitarTuningNames[s];
+    Dc.DrawText(label, 6, sy - 8);
+  }
+
+  // 7. Fret Numbers along the bottom
+  Dc.SetFont(*mpSmallFont);
+  for (int f = 0; f <= mFretCount; ++f)
+  {
+    int fx = 0;
+    if (f == 0)
+    {
+      fx = mNutX / 2 + 10;
+    }
+    else
+    {
+      fx = mNutX + (f - 1) * mFretWidth + mFretWidth / 2;
+    }
+
+    bool isKeyFret = (f == 0 || f == 3 || f == 5 || f == 7 || f == 9 || f == 12 || f == 15 || f == 17 || f == 19 || f == 21);
+    if (isKeyFret)
+    {
+      Dc.SetTextForeground(wxColour(255, 205, 80)); // Gold for key frets
+    }
+    else
+    {
+      Dc.SetTextForeground(wxColour(145, 145, 155));
+    }
+
+    wxString numStr = wxString::Format("%d", f);
+    int tw, th;
+    Dc.GetTextExtent(numStr, &tw, &th);
+    Dc.DrawText(numStr, fx - tw / 2, bottomY + 12);
   }
 }
 
@@ -243,71 +374,49 @@ void JZGuitarWindow::DrawPitch(wxDC& Dc, int Pitch, int String, bool Show)
 {
   static const string KeyNames[12] =
   {
-    "C",
-    "C#",
-    "D",
-    "D#",
-    "E",
-    "F",
-    "F#",
-    "G",
-    "G#",
-    "A",
-    "A#",
-    "B"
+    "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
   };
 
-  int x =
-    (Pitch - mpPitches[String] - 1) * mWidth / mFretCount + mFretWidth / 3;
-  if (x < 0 || x > mWidth)
+  if (String < 0 || String >= mStringCount || Pitch < mpPitches[String])
   {
     return;
   }
 
-  int TextWidth, TextHeight;
-  Dc.GetTextExtent(KeyNames[Pitch % 12].c_str(), &TextWidth, &TextHeight);
-
-  int y = mHeight * (String + 1) / (mStringCount + 1) - int(TextHeight / 2);
-
-  wxPen OldPen = Dc.GetPen();
-  Dc.SetPen(*wxTRANSPARENT_PEN);
-  wxBrush OldBrush = Dc.GetBrush();
-  wxBrush Brush(GetBackgroundColour());
-  Dc.SetBrush(Brush);
-  Dc.DrawRectangle(
-    x - mMargin,
-    y - mMargin,
-    TextWidth + 2 * mMargin,
-    TextHeight + 2 * mMargin);
-  Dc.SetPen(*wxBLACK_PEN);
-  Dc.SetBrush(OldBrush);
-
-  if (Show)
+  int fret = Pitch - mpPitches[String];
+  if (fret < 0 || fret > mFretCount)
   {
-    // Draw the note name.
-    Dc.DrawText(KeyNames[Pitch % 12].c_str(), x, y);
+    return;
+  }
+
+  int topY = 28;
+  int sy = topY + String * mStringHeight;
+  int cx = 0;
+
+  if (fret == 0)
+  {
+    cx = mNutX / 2 + 14; // Open string / nut position
   }
   else
   {
-    // Draw the guitar string.
-    int YPosition = y + TextHeight / 2;
-    Dc.DrawLine(
-      x - mMargin,
-      YPosition,
-      x + TextWidth + 2 * mMargin,
-      YPosition);
+    cx = mNutX + (fret - 1) * mFretWidth + mFretWidth / 2;
   }
-}
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void JZGuitarWindow::ShowPitch(wxDC& Dc, int Pitch)
-{
-  if (Pitch != mActivePitch)
+  if (Show)
   {
-    DrawPitch(Dc, mActivePitch, false);
-    mActivePitch = Pitch;
-    DrawPitch(Dc, mActivePitch, true);
+    int radius = 12;
+    if (mFretWidth < 28) radius = std::max(8, mFretWidth / 2 - 2);
+
+    wxColour badgeColor = (Pitch == mPlayPitch) ? wxColour(255, 175, 20) : wxColour(35, 145, 255);
+    Dc.SetBrush(wxBrush(badgeColor));
+    Dc.SetPen(wxPen(*wxWHITE, 1));
+    Dc.DrawCircle(cx, sy, radius);
+
+    Dc.SetFont(*mpBoldFont);
+    Dc.SetTextForeground(*wxWHITE);
+    string name = KeyNames[Pitch % 12];
+    int tw, th;
+    Dc.GetTextExtent(name.c_str(), &tw, &th);
+    Dc.DrawText(name.c_str(), cx - tw / 2, sy - th / 2);
   }
 }
 
@@ -340,36 +449,137 @@ void JZGuitarWindow::DrawPitch(wxDC& Dc, int Pitch, bool Show)
 }
 
 //-----------------------------------------------------------------------------
+// Coordinate mapping: y -> string index
 //-----------------------------------------------------------------------------
-void JZGuitarWindow::OnMouseMove(wxMouseEvent& MouseEvent)
+int JZGuitarWindow::y2String(int y)
 {
-  wxClientDC Dc(this);
-  PrepareDC(Dc);
-
-  wxPoint Position = MouseEvent.GetPosition();
-  int x = Dc.DeviceToLogicalX(Position.x);
-  int y = Dc.DeviceToLogicalY(Position.y);
-
-  int Pitch = Xy2Pitch(x, y);
-
-  Dc.SetFont(*mpFont);
-  Dc.SetTextBackground(GetForegroundColour());
-  ShowPitch(Dc, Pitch);
+  int topY = 28;
+  if (mStringHeight <= 0) return 0;
+  int s = (y - topY + mStringHeight / 2) / mStringHeight;
+  if (s < 0) s = 0;
+  if (s >= mStringCount) s = mStringCount - 1;
+  return s;
 }
 
 //-----------------------------------------------------------------------------
+// Coordinate mapping: x -> fret index (0 = open string, 1..mFretCount)
+//-----------------------------------------------------------------------------
+int JZGuitarWindow::x2Grid(int x)
+{
+  if (x < mNutX) return 0;
+  if (mFretWidth <= 0) return 1;
+  int f = (x - mNutX) / mFretWidth + 1;
+  if (f > mFretCount) f = mFretCount;
+  return f;
+}
+
+//-----------------------------------------------------------------------------
+// Coordinate mapping: (x, y) -> MIDI pitch
 //-----------------------------------------------------------------------------
 int JZGuitarWindow::Xy2Pitch(int x, int y)
 {
-  int string = y2String(y);
-  if (string >= 0 && string < mStringCount)
+  int s = y2String(y);
+  if (s < 0 || s >= mStringCount) return 0;
+
+  if (x < mNutX)
   {
-    int Fret = x2Grid(x);
-    if (Fret >= 0 && Fret < mFretCount)
-    {
-      return mpPitches[string] + Fret + 1;
-    }
+    return mpPitches[s]; // Fret 0: open string
+  }
+  int f = (x - mNutX) / mFretWidth + 1;
+  if (f >= 1 && f <= mFretCount)
+  {
+    return mpPitches[s] + f;
   }
   return 0;
 }
 
+//-----------------------------------------------------------------------------
+// Sound synthesis: play note immediately via MIDI player
+//-----------------------------------------------------------------------------
+void JZGuitarWindow::PlayNote(int pitch)
+{
+  if (pitch <= 0 || pitch == mPlayPitch) return;
+
+  StopNote();
+
+  mPlayPitch = pitch;
+  if (gpMidiPlayer)
+  {
+    JZTrack* pTrack = gpProject ? gpProject->GetTrack(0) : 0;
+    int channel = pTrack ? pTrack->GetChannel() : 0;
+    JZKeyOnEvent KeyOn(0, channel, pitch, 100);
+    gpMidiPlayer->OutNow(pTrack, &KeyOn);
+  }
+}
+
+void JZGuitarWindow::StopNote()
+{
+  if (mPlayPitch > 0 && gpMidiPlayer)
+  {
+    JZTrack* pTrack = gpProject ? gpProject->GetTrack(0) : 0;
+    int channel = pTrack ? pTrack->GetChannel() : 0;
+    JZKeyOnEvent KeyOff(0, channel, mPlayPitch, 0);
+    gpMidiPlayer->OutNow(pTrack, &KeyOff);
+    mPlayPitch = 0;
+  }
+}
+
+//-----------------------------------------------------------------------------
+// Interactive mouse events: click & drag to play notes on fretboard
+//-----------------------------------------------------------------------------
+void JZGuitarWindow::OnMouseDown(wxMouseEvent& MouseEvent)
+{
+  CaptureMouse();
+  wxPoint pos = MouseEvent.GetPosition();
+  int pitch = Xy2Pitch(pos.x, pos.y);
+  if (pitch > 0)
+  {
+    PlayNote(pitch);
+    mActivePitch = pitch;
+    Refresh();
+  }
+}
+
+void JZGuitarWindow::OnMouseMove(wxMouseEvent& MouseEvent)
+{
+  wxPoint pos = MouseEvent.GetPosition();
+  int pitch = Xy2Pitch(pos.x, pos.y);
+
+  if (MouseEvent.LeftIsDown())
+  {
+    if (pitch > 0 && pitch != mPlayPitch)
+    {
+      PlayNote(pitch);
+      mActivePitch = pitch;
+      Refresh();
+    }
+  }
+  else
+  {
+    if (pitch != mActivePitch)
+    {
+      mActivePitch = pitch;
+      Refresh();
+    }
+  }
+}
+
+void JZGuitarWindow::OnMouseUp(wxMouseEvent&)
+{
+  if (HasCapture())
+  {
+    ReleaseMouse();
+  }
+  StopNote();
+  Refresh();
+}
+
+void JZGuitarWindow::OnMouseLeave(wxMouseEvent& MouseEvent)
+{
+  if (!MouseEvent.LeftIsDown())
+  {
+    StopNote();
+    mActivePitch = 0;
+    Refresh();
+  }
+}

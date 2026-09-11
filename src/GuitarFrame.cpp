@@ -29,6 +29,7 @@
 #include "Resources.h"
 
 #include <wx/menu.h>
+#include <wx/sizer.h>
 
 //*****************************************************************************
 // Description:
@@ -61,14 +62,11 @@ JZGuitarFrame::JZGuitarFrame(wxWindow* pParent)
   : wxFrame(
       pParent,
       wxID_ANY,
-      "Guitar board",
+      "Guitar Board & Tablature",
       wxPoint(20, 20),
-      wxSize(600, 150),
+      wxSize(1040, 280),
       wxDEFAULT_FRAME_STYLE | wxNO_FULL_REPAINT_ON_RESIZE)
 {
-  // set the frame icon
-//  SetIcon(wxICON(mondrian));
-
   wxMenu* pMenu = 0;
   wxMenuBar* pMenuBar = new wxMenuBar;
 
@@ -78,7 +76,7 @@ JZGuitarFrame::JZGuitarFrame(wxWindow* pParent)
 
   pMenu = new wxMenu;
   pMenu->Append(MEN_CLEAR, "C&lear");
-  pMenu->Append(ID_VIEW_SETTINGS, "&Settings");
+  pMenu->Append(ID_VIEW_SETTINGS, "&Settings...");
   pMenuBar->Append(pMenu, "&View");
 
   pMenu = new wxMenu;
@@ -87,8 +85,13 @@ JZGuitarFrame::JZGuitarFrame(wxWindow* pParent)
 
   SetMenuBar(pMenuBar);
 
-  mpFretBoardWindow = new JZGuitarWindow(this, wxPoint(0, 0), wxSize(600, 120));
-//  mpFretBoardWindow->SetScrollbars(10, 10, 100, 240);
+  mpFretBoardWindow = new JZGuitarWindow(this, wxPoint(0, 0), wxSize(1040, 230));
+
+  wxBoxSizer* pTopSizer = new wxBoxSizer(wxVERTICAL);
+  pTopSizer->Add(mpFretBoardWindow, 1, wxEXPAND);
+  SetSizer(pTopSizer);
+
+  SetMinSize(wxSize(740, 200));
 }
 
 //-----------------------------------------------------------------------------
@@ -122,6 +125,7 @@ void JZGuitarFrame::OnSettings(wxCommandEvent& Event)
 
   if (GuitarSettingsDialog.ShowModal() == wxID_OK)
   {
+    mpFretBoardWindow->UpdateSettings();
   }
 }
 

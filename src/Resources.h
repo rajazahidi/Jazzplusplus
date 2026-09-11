@@ -114,6 +114,7 @@
 
 #define ID_TOOLS_HARMONY_BROWSER             (wxID_HIGHEST + 95)
 #define ID_TOOLS_RHYTHM_GENERATOR            (wxID_HIGHEST + 96)
+#define ID_TOOLS_GUITAR                      (wxID_HIGHEST + 97)
 
 #define ID_INSTRUMENT_ADD                    (wxID_HIGHEST + 100)
 #define ID_INSTRUMENT_DELETE                 (wxID_HIGHEST + 101)

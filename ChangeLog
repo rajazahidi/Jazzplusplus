@@ -1,6 +1,20 @@
 ChangeLog for Development Version
 
 09-11-2026 Raja Zahidi
+- UI & Feature: Overhauled, enlarged, and fixed Guitar Board & Tab:
+  * Dramatically enlarged window from 600x150 to 1040x280 (min 740x200) with
+    responsive wxBoxSizer and dynamic fret/string resizing.
+  * Added authentic TAB headstock header with string tuning names (e B G D A E
+    for 6-string guitar, G D A E for 4-string bass).
+  * Added fret numbers (0 to 24) along bottom and pearl position inlay dots
+    at standard frets (3, 5, 7, 9, 12 double-dot, 15, 17, 19, 21).
+  * Fixed open string (fret 0) rendering and coordinate calculation bugs which
+    previously filtered out open string notes.
+  * Added realistic string thickness gauges and modern note badge markers.
+  * Added real-time sound synthesis on click & drag across fretboard.
+  * Fixed Guitar Settings dialog to properly load, configure (fret count 17-24,
+    bass/guitar, octaves, chord mode), and apply settings immediately.
+  * Added "Guitar Board & Tab..." entry to TrackFrame Tools menu (Ctrl+G).
 - Fix: Removed duplicate MIDI Effects, Procedural SFX & Audio DSP items from
   Tools menu. Effects items now appear exclusively under the Effects menu.
 - Credit: Added "Developer" label to Raja Zahidi entry in About dialog.

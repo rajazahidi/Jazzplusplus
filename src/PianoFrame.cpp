@@ -387,7 +387,7 @@ void JZPianoFrame::CreateMenu()
   misc_menu->Append(MEN_CTRL_CONTR,        "Edit &Controller...");
   misc_menu->Append(MEN_CTRL_TEMPO,        "Edit &Tempo");
   misc_menu->Append(MEN_CTRL_NONE,        "Edit &None");
-  misc_menu->Append(MEN_GUITAR,                "&Guitar board");
+  misc_menu->Append(MEN_GUITAR,           "&Guitar Board & Tab...\tCtrl+G");
 
   wxMenu *help_menu = new wxMenu("",wxMENU_TEAROFF);
   help_menu->Append(ID_HELP_PIANO_WINDOW, "&Pianowin");

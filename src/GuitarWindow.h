@@ -49,11 +49,20 @@ class JZGuitarWindow : public wxScrolledWindow
     {
       mWidth = Width;
       mHeight = Height;
-      wxScrolledWindow::SetSize(0, 0, Width, Height);
       Refresh();
     }
 
     void ShowPitch(int Pitch);
+    void UpdateSettings();
+
+    static bool GetChordMode() { return mChordMode; }
+    static void SetChordMode(bool c) { mChordMode = c; }
+    static bool GetBassGuitar() { return mBassGuitar; }
+    static void SetBassGuitar(bool b);
+    static bool GetShowOctaves() { return mShowOctaves; }
+    static void SetShowOctaves(bool s) { mShowOctaves = s; }
+    static int  GetFretCount() { return mFretCount; }
+    static void SetFretCount(int count);
 
   private:
 
@@ -77,10 +86,17 @@ class JZGuitarWindow : public wxScrolledWindow
 
     void OnMouseMove(wxMouseEvent& MouseEvent);
 
-  private:
+    void OnMouseDown(wxMouseEvent& MouseEvent);
 
-//    JZGuitarFrame* mpGuitarFrame;
-//    JZPianoFrame* mpPianoWindow;
+    void OnMouseUp(wxMouseEvent& MouseEvent);
+
+    void OnMouseLeave(wxMouseEvent& MouseEvent);
+
+    void PlayNote(int pitch);
+
+    void StopNote();
+
+  private:
 
     static bool mChordMode;
     static bool mBassGuitar;
@@ -93,31 +109,16 @@ class JZGuitarWindow : public wxScrolledWindow
     static const int mBassPitches[4];
 
     int mWidth, mHeight;
-    int mStringHeight, mFretWidth;        // rounded values
+    int mStringHeight, mFretWidth;
+    int mNutX;
     int mMargin;
-    int mActivePitch;     // mouse move
-    int mPlayPitch;       // sound
+    int mActivePitch;     // mouse hover
+    int mPlayPitch;       // active sound playing
     int put_clock;        // left up
 
     wxFont* mpFont;
+    wxFont* mpBoldFont;
+    wxFont* mpSmallFont;
 
     DECLARE_EVENT_TABLE()
 };
-
-//*****************************************************************************
-//*****************************************************************************
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-inline
-int JZGuitarWindow::y2String(int y)
-{
-  return (y + mStringHeight / 2) * (mStringCount + 1) / mHeight - 1;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-inline
-int JZGuitarWindow::x2Grid(int x)
-{
-  return x * mFretCount / mWidth;
-}

@@ -25,6 +25,7 @@
 #include <wx/dialog.h>
 
 class wxCheckBox;
+class wxChoice;
 
 class JZGuitarSettingsDialog : public wxDialog
 {
@@ -34,13 +35,15 @@ class JZGuitarSettingsDialog : public wxDialog
 
   private:
 
+    void OnOk(wxCommandEvent& Event);
+
     wxCheckBox* mpChordModeCheckBox;
 
     wxCheckBox* mpBassGuitarCheckBox;
 
     wxCheckBox* mpShowOctavesCheckBox;
 
-//    wxTextCtrl* mpFretCountEdit;
+    wxChoice* mpFretCountChoice;
 
   DECLARE_EVENT_TABLE()
 };

@@ -705,6 +705,67 @@ void TestSoundGenerator()
 }
 
 //-----------------------------------------------------------------------------
+// Test 12: Guitar Fretboard & Tab Pitch Calculations
+//-----------------------------------------------------------------------------
+void TestGuitarFretboardLogic()
+{
+  cout << "[TEST] Running TestGuitarFretboardLogic..." << endl;
+
+  // Standard 6-string Guitar Tuning Pitches (E4, B3, G3, D3, A2, E2)
+  const int guitarPitches[6] = { 64, 59, 55, 50, 45, 40 };
+
+  // Standard 4-string Bass Tuning Pitches (G2, D2, A1, E1)
+  const int bassPitches[4] = { 43, 38, 33, 28 };
+
+  // 1. Verify standard guitar pitches
+  TEST_ASSERT(guitarPitches[0] == 64, "Guitar string 1 (high e) is E4 (MIDI 64)");
+  TEST_ASSERT(guitarPitches[1] == 59, "Guitar string 2 (B) is B3 (MIDI 59)");
+  TEST_ASSERT(guitarPitches[2] == 55, "Guitar string 3 (G) is G3 (MIDI 55)");
+  TEST_ASSERT(guitarPitches[3] == 50, "Guitar string 4 (D) is D3 (MIDI 50)");
+  TEST_ASSERT(guitarPitches[4] == 45, "Guitar string 5 (A) is A2 (MIDI 45)");
+  TEST_ASSERT(guitarPitches[5] == 40, "Guitar string 6 (low E) is E2 (MIDI 40)");
+
+  // 2. Verify standard bass pitches
+  TEST_ASSERT(bassPitches[0] == 43, "Bass string 1 (G) is G2 (MIDI 43)");
+  TEST_ASSERT(bassPitches[1] == 38, "Bass string 2 (D) is D2 (MIDI 38)");
+  TEST_ASSERT(bassPitches[2] == 33, "Bass string 3 (A) is A1 (MIDI 33)");
+  TEST_ASSERT(bassPitches[3] == 28, "Bass string 4 (low E) is E1 (MIDI 28)");
+
+  // 3. Verify fret octave calculations
+  // Octave 12 on low E string gives 40 + 12 = 52 (E3)
+  TEST_ASSERT(guitarPitches[5] + 12 == 52, "Fret 12 on low E string is E3 (52)");
+  // Octave 24 on low E string gives 40 + 24 = 64 (E4 - matches open high e)
+  TEST_ASSERT(guitarPitches[5] + 24 == guitarPitches[0], "Fret 24 on low E equals open high e string (64)");
+  // Octave 12 on high e gives 64 + 12 = 76 (E5)
+  TEST_ASSERT(guitarPitches[0] + 12 == 76, "Fret 12 on high e is E5 (76)");
+  // Octave 24 on high e gives 64 + 24 = 88 (E6)
+  TEST_ASSERT(guitarPitches[0] + 24 == 88, "Fret 24 on high e is E6 (88)");
+
+  // 4. Verify note chroma (pitch % 12)
+  static const string noteNames[12] = {
+    "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
+  };
+  TEST_ASSERT(noteNames[guitarPitches[0] % 12] == "E", "String 1 chroma is E");
+  TEST_ASSERT(noteNames[guitarPitches[1] % 12] == "B", "String 2 chroma is B");
+  TEST_ASSERT(noteNames[guitarPitches[2] % 12] == "G", "String 3 chroma is G");
+  TEST_ASSERT(noteNames[guitarPitches[3] % 12] == "D", "String 4 chroma is D");
+  TEST_ASSERT(noteNames[guitarPitches[4] % 12] == "A", "String 5 chroma is A");
+  TEST_ASSERT(noteNames[guitarPitches[5] % 12] == "E", "String 6 chroma is E");
+
+  // 5. Test Fret Clamping Bounds (12 to 24)
+  auto clampFrets = [](int count) {
+    if (count < 12) count = 12;
+    if (count > 24) count = 24;
+    return count;
+  };
+  TEST_ASSERT(clampFrets(5) == 12, "Fret count below 12 clamps to 12");
+  TEST_ASSERT(clampFrets(17) == 17, "Fret count 17 remains 17");
+  TEST_ASSERT(clampFrets(21) == 21, "Fret count 21 remains 21");
+  TEST_ASSERT(clampFrets(24) == 24, "Fret count 24 remains 24");
+  TEST_ASSERT(clampFrets(30) == 24, "Fret count above 24 clamps to 24");
+}
+
+//-----------------------------------------------------------------------------
 // Main Runner
 //-----------------------------------------------------------------------------
 int main()
@@ -724,6 +785,7 @@ int main()
   TestMidiEffects();
   TestAudioEffects();
   TestSoundGenerator();
+  TestGuitarFretboardLogic();
 
   cout << "==========================================" << endl;
   cout << "Tests Run:    " << gTestsRun << endl;

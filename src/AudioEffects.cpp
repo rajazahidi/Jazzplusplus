@@ -142,7 +142,7 @@ void JZBiquadFilter::Configure(
   }
 
   // Normalize by a0
-  if (abs(a0) > 1e-9f)
+  if (std::fabs(a0) > 1e-9f)
   {
     b0 /= a0;
     b1 /= a0;

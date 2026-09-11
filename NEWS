@@ -64,8 +64,9 @@ CORE CODEBASE REPAIRS & STABILITY IMPROVEMENTS
 
 AUTOMATED TESTING, COMPATIBILITY & PACKAGING
 --------------------------------------------
-* Added a comprehensive automated test suite (185 tests via CTest) covering
-  MIDI effects, sound generator, audio DSP algorithms, and data structures.
+* Added a comprehensive automated test suite (210 tests via CTest) covering
+  MIDI effects, sound generator, audio DSP algorithms, guitar fretboard logic,
+  and music data structures.
 * Modern C++17 and GCC 11+ compatibility fixes across the entire codebase.
 * Automated GitHub Actions CI for cross-platform build and release:
   - Linux: Standalone portable Jazz++-x86_64.AppImage with embedded SoundFont

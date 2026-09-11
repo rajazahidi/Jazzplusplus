@@ -30,5 +30,5 @@ Other Contributors:
     * Overhauled and enlarged Guitar Board & Tablature editor (1040x280) with
       tuning indicators, fret markers, pearl inlays, and real-time audio preview
     * Automated cross-platform CI for Linux (AppImage) and Windows x64 (ZIP)
-    * Comprehensive automated unit test suite via CTest (185 tests)
+    * Comprehensive automated unit test suite via CTest (210 tests)
 

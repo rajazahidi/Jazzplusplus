@@ -92,6 +92,8 @@ class JZGuitarWindow : public wxScrolledWindow
 
     void OnMouseLeave(wxMouseEvent& MouseEvent);
 
+    void OnMouseCaptureLost(wxMouseCaptureLostEvent& Event);
+
     void PlayNote(int pitch);
 
     void StopNote();
@@ -114,7 +116,6 @@ class JZGuitarWindow : public wxScrolledWindow
     int mMargin;
     int mActivePitch;     // mouse hover
     int mPlayPitch;       // active sound playing
-    int put_clock;        // left up
 
     wxFont* mpFont;
     wxFont* mpBoldFont;

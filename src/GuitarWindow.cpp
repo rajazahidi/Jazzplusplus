@@ -123,6 +123,7 @@ BEGIN_EVENT_TABLE(JZGuitarWindow, wxScrolledWindow)
   EVT_LEFT_DOWN(JZGuitarWindow::OnMouseDown)
   EVT_LEFT_UP(JZGuitarWindow::OnMouseUp)
   EVT_LEAVE_WINDOW(JZGuitarWindow::OnMouseLeave)
+  EVT_MOUSE_CAPTURE_LOST(JZGuitarWindow::OnMouseCaptureLost)
 
 END_EVENT_TABLE()
 
@@ -142,7 +143,6 @@ JZGuitarWindow::JZGuitarWindow(
     mMargin(2),
     mActivePitch(0),
     mPlayPitch(0),
-    put_clock(0),
     mpFont(0),
     mpBoldFont(0),
     mpSmallFont(0)
@@ -172,6 +172,11 @@ JZGuitarWindow::JZGuitarWindow(
 //-----------------------------------------------------------------------------
 JZGuitarWindow::~JZGuitarWindow()
 {
+  if (HasCapture())
+  {
+    ReleaseMouse();
+  }
+  StopNote();
   delete mpFont;
   delete mpBoldFont;
   delete mpSmallFont;
@@ -244,9 +249,11 @@ void JZGuitarWindow::DrawBoard(wxDC& Dc)
   int playableHeight = bottomY - topY;
 
   mStringHeight = (mStringCount > 1) ? playableHeight / (mStringCount - 1) : playableHeight;
+  if (mStringHeight < 1) mStringHeight = 1;
   int fretboardWidth = mWidth - mNutX - 10;
   if (fretboardWidth < 10) fretboardWidth = 10;
   mFretWidth = fretboardWidth / mFretCount;
+  if (mFretWidth < 1) mFretWidth = 1;
 
   // 1. Fretboard Wood Background (Warm Rosewood tone)
   Dc.SetPen(*wxTRANSPARENT_PEN);
@@ -351,7 +358,7 @@ void JZGuitarWindow::DrawBoard(wxDC& Dc)
       fx = mNutX + (f - 1) * mFretWidth + mFretWidth / 2;
     }
 
-    bool isKeyFret = (f == 0 || f == 3 || f == 5 || f == 7 || f == 9 || f == 12 || f == 15 || f == 17 || f == 19 || f == 21);
+    bool isKeyFret = (f == 0 || f == 3 || f == 5 || f == 7 || f == 9 || f == 12 || f == 15 || f == 17 || f == 19 || f == 21 || f == 24);
     if (isKeyFret)
     {
       Dc.SetTextForeground(wxColour(255, 205, 80)); // Gold for key frets
@@ -478,6 +485,7 @@ int JZGuitarWindow::x2Grid(int x)
 //-----------------------------------------------------------------------------
 int JZGuitarWindow::Xy2Pitch(int x, int y)
 {
+  if (mStringHeight <= 0 || mFretWidth <= 0) return 0;
   int s = y2String(y);
   if (s < 0 || s >= mStringCount) return 0;
 
@@ -514,12 +522,15 @@ void JZGuitarWindow::PlayNote(int pitch)
 
 void JZGuitarWindow::StopNote()
 {
-  if (mPlayPitch > 0 && gpMidiPlayer)
+  if (mPlayPitch > 0)
   {
-    JZTrack* pTrack = gpProject ? gpProject->GetTrack(0) : 0;
-    int channel = pTrack ? pTrack->GetChannel() : 0;
-    JZKeyOnEvent KeyOff(0, channel, mPlayPitch, 0);
-    gpMidiPlayer->OutNow(pTrack, &KeyOff);
+    if (gpMidiPlayer)
+    {
+      JZTrack* pTrack = gpProject ? gpProject->GetTrack(0) : 0;
+      int channel = pTrack ? pTrack->GetChannel() : 0;
+      JZKeyOnEvent KeyOff(0, channel, mPlayPitch, 0);
+      gpMidiPlayer->OutNow(pTrack, &KeyOff);
+    }
     mPlayPitch = 0;
   }
 }
@@ -529,7 +540,10 @@ void JZGuitarWindow::StopNote()
 //-----------------------------------------------------------------------------
 void JZGuitarWindow::OnMouseDown(wxMouseEvent& MouseEvent)
 {
-  CaptureMouse();
+  if (!HasCapture())
+  {
+    CaptureMouse();
+  }
   wxPoint pos = MouseEvent.GetPosition();
   int pitch = Xy2Pitch(pos.x, pos.y);
   if (pitch > 0)
@@ -582,4 +596,11 @@ void JZGuitarWindow::OnMouseLeave(wxMouseEvent& MouseEvent)
     mActivePitch = 0;
     Refresh();
   }
+}
+
+void JZGuitarWindow::OnMouseCaptureLost(wxMouseCaptureLostEvent&)
+{
+  StopNote();
+  mActivePitch = 0;
+  Refresh();
 }

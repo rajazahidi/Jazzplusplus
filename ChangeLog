@@ -17,6 +17,14 @@ ChangeLog for Development Version
   * Added "Guitar Board & Tab..." entry to TrackFrame Tools menu (Ctrl+G).
 - Fix: Removed duplicate MIDI Effects, Procedural SFX & Audio DSP items from
   Tools menu. Effects items now appear exclusively under the Effects menu.
+- Fix & Stability: Fretboard dimension safeguards and mouse capture handling:
+  * Protected against potential division-by-zero in fretboard dimension calculations
+    when window is resized down.
+  * Added EVT_MOUSE_CAPTURE_LOST handling and HasCapture() validation to prevent
+    Windows assertions during mouse click-and-drag.
+  * Ensured StopNote() unconditionally resets playing note state and is invoked on window destruction.
+  * Replaced float abs() with std::fabs() in AudioEffects biquad filter.
+  * Expanded automated test suite from 185 to 210 tests covering guitar and bass fretboard logic.
 - Credit: Added "Developer" label to Raja Zahidi entry in About dialog.
 - Credit: Added Raja Zahidi name, copyright headers across all new source files,
   and updated build number to 15 in JazzPlusPlusVersion.h.

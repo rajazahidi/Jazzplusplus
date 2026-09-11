@@ -136,8 +136,9 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
     "<tr>"
       "<td><b>Raja Zahidi</b></td>"
       "<td>" +
-        "Developer. MIDI Effects Suite, Procedural Sound FX &amp; Drum Synthesizer,"
-        " Audio DSP Engine (2026)." +
+        "Developer. Core codebase fixes, stability & crash repairs, modern ALSA audio subsystem, "
+        "MIDI Effects Suite, Procedural Sound FX &amp; Drums, Audio DSP Engine, "
+        "automated test suite (2026)." +
       "</td>"
     "</tr>"
     "</table>"

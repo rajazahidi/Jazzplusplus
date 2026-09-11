@@ -37,6 +37,20 @@ ChangeLog for Development Version
 - Add: Comprehensive automated unit test suite (185 tests) covering all new
   MIDI effects, sound generator, and audio DSP classes via CTest.
 
+09-08-2026 Raja Zahidi
+- Fix: Core stability and crash when clicking on PRG / track channel selector.
+  Patched null pointer checks in TrackDialog and PianoFrame event handling.
+- Fix: Modern audio subsystem — immediate ALSA PCM flushing, auto-loading of
+  samples, and dynamic MIDI device selection.
+- Fix: Audio null pointer crash in EditAudioGlobalSettings, implemented modern
+  JZAudioSettingsDialog for configuring audio devices and sample rates.
+- Add: SoundFont switching utility and integrated high-quality SoundFont support.
+- UI: Display note names on Piano Roll keyboard keys and note rectangles.
+- UI: Fixed piano roll opening via double-click and menus, synchronized scrolling.
+- Build & Docs: Generated missing HTML help files to fix 'Cannot Find Help File
+  jazz.hhp' startup popup. Fixed CI build on Ubuntu 22.04 with GCC 11 and
+  wxWidgets 3.0 compatibility.
+
 03-23-04
 -Added the XRC library and make a Makefile.am for it.
 -Removed the configure and Makefile.in entries from the CVS.  They keep

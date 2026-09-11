@@ -682,8 +682,11 @@ wxPropertyListDialog::wxPropertyListDialog(wxPropertyListView *v, wxWindow *pare
      wxDialog(parent, wxID_ANY, title, pos, size, style, name)
 {
   m_view = v;
-  m_view->AssociatePanel( ((wxPanel*)this) );
-  m_view->SetManagedWindow(this);
+  if (m_view)
+  {
+    m_view->AssociatePanel( ((wxPanel*)this) );
+    m_view->SetManagedWindow(this);
+  }
   SetAutoLayout(true);
 }
 

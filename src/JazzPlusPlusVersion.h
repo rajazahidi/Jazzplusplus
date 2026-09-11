@@ -125,9 +125,12 @@ int JZJazzPlusPlusVersion::GetMinorVersion()
 //                modern UI updates, automated test suite (185 tests),
 //                plus MIDI Effects Suite, Procedural Sound FX & 808 Drum
 //                Synthesizer, and Audio DSP Engine.
+//  16 9/2026     Raja Zahidi: Complete Linux playback freeze & mute resolution
+//                via pure ALSA sequencer player, non-blocking event polling,
+//                real-time queue clock sync, and automatic synthesizer binding.
 //-----------------------------------------------------------------------------
 inline
 int JZJazzPlusPlusVersion::GetBuildNumber()
 {
-  return 15;
+  return 16;
 }

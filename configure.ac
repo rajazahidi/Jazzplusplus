@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT([jazzplusplus], [5.0.0], pstieber@verizon.net, [Jazz++])
+AC_INIT([jazzplusplus], [5.4.16], pstieber@verizon.net, [Jazz++])
 
 AC_CONFIG_MACRO_DIR([m4])
 

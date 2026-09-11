@@ -134,9 +134,9 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
       "</td>"
     "</tr>"
     "<tr>"
-      "<td><b>Raja Zahidi</b></td>"
+      "<td><b>Raja Zahidi</b><br>&lt;rajazahidi@aol.com&gt;</td>"
       "<td>" +
-        "Developer. Core codebase fixes, stability & crash repairs, modern ALSA audio subsystem, "
+        "Developer &amp; Maintainer. Core codebase fixes, stability &amp; crash repairs, modern ALSA audio subsystem, "
         "MIDI Effects Suite, Procedural Sound FX &amp; Drums, Audio DSP Engine, "
         "automated test suite (2026)." +
       "</td>"
@@ -201,7 +201,7 @@ JZAboutDialog::~JZAboutDialog()
 //-----------------------------------------------------------------------------
 void JZAboutDialog::OnVisitWebSite(wxCommandEvent&)
 {
-  wxLaunchDefaultBrowser("http://jazzplusplus.sourceforge.net/");
+  wxLaunchDefaultBrowser("https://rajazahidi.github.io/Jazzplusplus/");
 }
 
 //-----------------------------------------------------------------------------

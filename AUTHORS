@@ -15,7 +15,7 @@ Other Contributors:
   Mark Constable
   Matt Kelly
 
-2026 Core Modernization, Bug Fixes & Extensions — Raja Zahidi:
+2026 Core Modernization, Bug Fixes & Extensions — Raja Zahidi <rajazahidi@aol.com>:
   - Core Codebase Repairs:
     * Fixed null pointer crashes in TrackDialog and channel/patch switching
     * Fixed audio setting dialog null dereference and PCM device feedback

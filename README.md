@@ -9,7 +9,7 @@
 
 Visit the official website: **[https://rajazahidi.github.io/Jazzplusplus/](https://rajazahidi.github.io/Jazzplusplus/)**
 
-Originally created by Andreas Voss and Per Sigmond, with subsequent major development by Patrick Earl and Peter J. Stieber.
+Originally created by Andreas Voss and Per Sigmond, with subsequent development by Patrick Earl and Peter J. Stieber. Maintained, modernized, and expanded by **Raja Zahidi** ([rajazahidi@aol.com](mailto:rajazahidi@aol.com)).
 
 ---
 

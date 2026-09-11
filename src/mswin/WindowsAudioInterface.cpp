@@ -168,9 +168,22 @@ JZWindowsAudioPlayer::JZWindowsAudioPlayer(JZSong* pSong)
   hout_open     = 0;
   hinp_open     = 0;
 
-  // check for device
+  // Auto-detect audio hardware availability
   mInstalled = false;
-  mCanDuplex = (gpConfig->GetValue(C_DuplexAudio) != 0);
+  UINT numWaveOut = waveOutGetNumDevs();
+  UINT numWaveIn  = waveInGetNumDevs();
+
+  if (numWaveOut == 0)
+  {
+    // No wave audio output hardware available on system
+    mAudioEnabled = false;
+    mInstalled = false;
+    recbuffers.Clear();
+    return;
+  }
+
+  // Duplex recording is supported if input hardware is present
+  mCanDuplex = (numWaveIn > 0) && (gpConfig->GetValue(C_DuplexAudio) != 0);
 
   if (OpenDsp() == 0)
   {
@@ -183,11 +196,8 @@ JZWindowsAudioPlayer::JZWindowsAudioPlayer(JZSong* pSong)
     }
     else if (!(ocaps.dwSupport & WAVECAPS_SAMPLEACCURATE))
     {
-      // This is not an error; just a warning.
-      wxMessageBox(
-        "Your soundcard does not support audio/midi sync",
-        "Warning",
-        wxOK);
+      // Sample accurate sync flag is often not set by modern WDM/WASAPI drivers;
+      // normal audio playback still works fine without showing a modal warning.
       mCanSynchronize = false;
     }
 

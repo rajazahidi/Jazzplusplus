@@ -63,6 +63,7 @@ class JZWindowsPlayer : public JZPlayer
     }
 
     static void SettingsDlg(int& InputDevice, int& OutputDevice);
+    static void AutoDetectDevices(int& InputDevice, int& OutputDevice);
 
     enum
     {

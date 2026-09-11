@@ -64,20 +64,42 @@ JZWindowsPlayer::JZWindowsPlayer(JZSong* pSong)
   mpState->audio_player = 0;
 
   int ilong = -1, olong = -1;
-  if (
-    !gpConfig->Get(C_WinInputDevice, ilong) ||
-    !gpConfig->Get(C_WinOutputDevice, olong))
+  bool hasInputConfig = gpConfig->Get(C_WinInputDevice, ilong);
+  bool hasOutputConfig = gpConfig->Get(C_WinOutputDevice, olong);
+
+  // Automatically detect available hardware input and output devices
+  if (!hasInputConfig || !hasOutputConfig || olong < 0)
   {
-    SettingsDlg(ilong, olong);
+    AutoDetectDevices(ilong, olong);
+    if (ilong >= 0)
+    {
+      gpConfig->Put(C_WinInputDevice, ilong);
+    }
+    if (olong >= 0)
+    {
+      gpConfig->Put(C_WinOutputDevice, olong);
+    }
   }
-  // only output device MUST be there
-  else if (olong < 0)
+  else
   {
-    SettingsDlg(ilong, olong);
+    // Verify that configured hardware devices are still attached to the system
+    UINT numIn = midiInGetNumDevs();
+    if (ilong >= 0 && (UINT)ilong >= numIn)
+    {
+      ilong = (numIn > 0) ? 0 : -1;
+      gpConfig->Put(C_WinInputDevice, ilong);
+    }
+
+    UINT numOut = midiOutGetNumDevs();
+    if (olong >= 0 && olong != MAX_MIDI_DEVS && (UINT)olong >= numOut)
+    {
+      AutoDetectDevices(ilong, olong);
+      gpConfig->Put(C_WinOutputDevice, olong);
+    }
   }
 
   // select input device
-  if (ilong >= 0)
+  if (ilong >= 0 && (UINT)ilong < midiInGetNumDevs())
   {
     UINT DeviceId = (UINT)ilong;
     UINT rc;
@@ -110,11 +132,11 @@ JZWindowsPlayer::JZWindowsPlayer(JZSong* pSong)
           CALLBACK_FUNCTION);
         break;
     }
-    if (rc)
+    if (rc != MMSYSERR_NOERROR)
     {
-      wchar_t ErrorMessage[MAXERRORLENGTH];
-      midiInGetErrorText(rc, ErrorMessage, sizeof(ErrorMessage));
-      ::wxMessageBox(ErrorMessage, "Open MIDI Input", wxOK);
+      mpState->hinp = 0;
+      ilong = -1;
+      gpConfig->Put(C_WinInputDevice, ilong);
     }
   }
 
@@ -133,7 +155,24 @@ JZWindowsPlayer::JZWindowsPlayer(JZSong* pSong)
       (DWORD_PTR)MidiOutProc,
       (DWORD_PTR)mpState,
       CALLBACK_FUNCTION);
-    if (rc)
+
+    // Fallback to MIDI_MAPPER if the selected hardware device failed to open
+    if (rc != MMSYSERR_NOERROR && DeviceId != MIDI_MAPPER)
+    {
+      rc = midiOutOpen(
+        &mpState->hout,
+        MIDI_MAPPER,
+        (DWORD_PTR)MidiOutProc,
+        (DWORD_PTR)mpState,
+        CALLBACK_FUNCTION);
+      if (rc == MMSYSERR_NOERROR)
+      {
+        olong = MAX_MIDI_DEVS;
+        gpConfig->Put(C_WinOutputDevice, olong);
+      }
+    }
+
+    if (rc != MMSYSERR_NOERROR)
     {
       wchar_t ErrorMessage[MAXERRORLENGTH];
       midiOutGetErrorText(rc, ErrorMessage, sizeof(ErrorMessage));
@@ -1113,3 +1152,97 @@ void JZWindowsPlayer::SettingsDlg(int& InputDevice, int& OutputDevice)
     gpConfig->Get(C_WinOutputDevice, OutputDevice);
   }
 }
+
+//-----------------------------------------------------------------------------
+// Auto-detect available MIDI hardware input and output devices.
+// Prioritizes software/wavetable synths for immediate audible output,
+// hardware USB MIDI keyboards for input, and gracefully falls back to MIDI Mapper.
+//-----------------------------------------------------------------------------
+void JZWindowsPlayer::AutoDetectDevices(int& InputDevice, int& OutputDevice)
+{
+  // 1. Auto-detect MIDI Input Device
+  UINT InputMidiDeviceCount = midiInGetNumDevs();
+  if (InputMidiDeviceCount > 0)
+  {
+    if (InputDevice < 0 || (UINT)InputDevice >= InputMidiDeviceCount)
+    {
+      InputDevice = 0; // Primary connected hardware MIDI keyboard or port
+    }
+  }
+  else
+  {
+    InputDevice = -1; // No MIDI input hardware connected
+  }
+
+  // 2. Auto-detect MIDI Output Device
+  UINT OutputMidiDeviceCount = midiOutGetNumDevs();
+  if (OutputMidiDeviceCount > 0)
+  {
+    bool valid = false;
+    if (OutputDevice >= 0 && (UINT)OutputDevice < OutputMidiDeviceCount)
+    {
+      valid = true;
+    }
+    else if (OutputDevice == MAX_MIDI_DEVS)
+    {
+      valid = true;
+    }
+
+    if (!valid)
+    {
+      int bestDevice = -1;
+      int bestPriority = -1;
+
+      for (UINT i = 0; i < OutputMidiDeviceCount; ++i)
+      {
+        MIDIOUTCAPS caps;
+        if (midiOutGetDevCaps(i, &caps, sizeof(caps)) == MMSYSERR_NOERROR)
+        {
+          int priority = 1;
+
+          // Software synthesizers (e.g. Microsoft GS Wavetable Synth) guarantee audible sound
+          if (caps.wTechnology == MOD_SWSYNTH || caps.wTechnology == MOD_SYNTH)
+          {
+            priority = 10;
+          }
+          else if (caps.wTechnology == MOD_WAVETABLE)
+          {
+            priority = 9;
+          }
+          else if (caps.wTechnology == MOD_MIDIPORT)
+          {
+            priority = 8;
+          }
+
+          wxString name(caps.szPname);
+          name.MakeLower();
+          if (name.Contains("microsoft") || name.Contains("synth") || name.Contains("wavetable"))
+          {
+            priority += 5;
+          }
+
+          if (priority > bestPriority)
+          {
+            bestPriority = priority;
+            bestDevice = (int)i;
+          }
+        }
+      }
+
+      if (bestDevice >= 0)
+      {
+        OutputDevice = bestDevice;
+      }
+      else
+      {
+        OutputDevice = 0;
+      }
+    }
+  }
+  else
+  {
+    // Fallback to MIDI Mapper
+    OutputDevice = MAX_MIDI_DEVS;
+  }
+}
+

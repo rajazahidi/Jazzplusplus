@@ -49,6 +49,14 @@ HIGHLIGHTS & NEW FEATURES
     - Master Limiter & Tube Overdrive/Distortion with soft clipping.
   - Audio sample slot processing and preview monitoring.
 
+* Windows Hardware Auto-Detection (MIDI & Audio):
+  - Intelligent, silent auto-detection of available MIDI and audio hardware devices.
+  - Automatically selects active software synthesizers (e.g. Microsoft GS Wavetable Synth)
+    or external hardware devices for immediate playback without modal dialog interruption.
+  - Automatically binds connected hardware USB MIDI controllers for real-time recording.
+  - Dynamic re-detection and safe fallback to MIDI Mapper if devices are unplugged.
+
+
 CORE CODEBASE REPAIRS & STABILITY IMPROVEMENTS
 ----------------------------------------------
 * Fixed crash when clicking PRG / track channel selector in PianoFrame and

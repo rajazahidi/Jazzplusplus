@@ -32,6 +32,15 @@ ChangeLog for Development Version
     and .jzi synthesizer files from candidate paths to UserConfigDir.
   * Enhanced FindFile() to seamlessly locate included .jzi files in conf/ subdirectories.
   * Packaged jazz.cfg into both package root and conf/ in Windows release ZIP.
+- Feature & Hardware: Auto-detection of MIDI and Audio hardware on Windows:
+  * Implemented JZWindowsPlayer::AutoDetectDevices() to automatically scan and select
+    active MIDI input and output hardware without modal prompt interruption at startup.
+  * Prioritizes software wavetable synthesizers (e.g. Microsoft GS Wavetable Synth)
+    for immediate playback and connected USB MIDI keyboards for input.
+  * Added validation and dynamic re-detection if connected hardware is changed or unplugged.
+  * Added fallback to MIDI_MAPPER if opening a specific hardware output port fails.
+  * Added hardware presence check for wave audio (waveOutGetNumDevs / waveInGetNumDevs)
+    and eliminated disruptive sync warning dialogs on modern Windows WDM/WASAPI systems.
 - Credit: Added "Developer" label to Raja Zahidi entry in About dialog.
 - Credit: Added Raja Zahidi name, copyright headers across all new source files,
   and updated build number to 15 in JazzPlusPlusVersion.h.

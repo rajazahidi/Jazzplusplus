@@ -377,57 +377,101 @@ void JZProject::ReadConfiguration()
 {
   wxConfigBase* pConfig = wxConfigBase::Get();
 
-  wxString ConfigurationFilePathGuess =
-    wxStandardPaths::Get().GetUserDataDir();
-
-  // Attempt to obtain the path to the help file from configuration data.
   wxString ConfigurationFilePath;
   if (pConfig)
   {
-    pConfig->Read(
-      "/Paths/Conf",
-      &ConfigurationFilePath,
-      ConfigurationFilePathGuess);
+    pConfig->Read("/Paths/Conf", &ConfigurationFilePath);
   }
 
-  // Construct a full file name.
-  wxString JazzCfgFile =
-    ConfigurationFilePath +
-    wxFileName::GetPathSeparator() +
-    mConfFileName;
-
-  // Test for the existence of the Jazz++ configuration file.
-  bool ConfigurationFileFound = false;
-  if (!::wxFileExists(JazzCfgFile))
+  std::vector<wxString> candidateDirs;
+  if (!ConfigurationFilePath.empty())
   {
-    // Return a valid path to the data.
-    ConfigurationFilePath.clear();
-    if (FindAndRegisterConfFilePath(ConfigurationFilePath))
-    {
-      JazzCfgFile =
-        ConfigurationFilePath +
-        wxFileName::GetPathSeparator() +
-        mConfFileName;
+    candidateDirs.push_back(ConfigurationFilePath);
+  }
 
-      // Try one more time.
-      if (!::wxFileExists(JazzCfgFile))
-      {
-        JazzCfgFile.clear();
-      }
-      else
-      {
-        ConfigurationFileFound = true;
-      }
+  // 1. User config directory
+  candidateDirs.push_back(wxStandardPaths::Get().GetUserDataDir());
+
+  // 2. Next to executable in conf/ and exeDir
+  wxString exeDir = ::wxPathOnly(wxStandardPaths::Get().GetExecutablePath());
+  if (!exeDir.empty())
+  {
+    candidateDirs.push_back(exeDir + wxFileName::GetPathSeparator() + "conf");
+    candidateDirs.push_back(exeDir);
+  }
+
+  // 3. Application data dir in conf/ and dataDir
+  wxString dataDir = wxStandardPaths::Get().GetDataDir();
+  if (!dataDir.empty())
+  {
+    candidateDirs.push_back(dataDir + wxFileName::GetPathSeparator() + "conf");
+    candidateDirs.push_back(dataDir);
+  }
+
+  // 4. Resources dir
+  wxString resDir = wxStandardPaths::Get().GetResourcesDir();
+  if (!resDir.empty())
+  {
+    candidateDirs.push_back(resDir + wxFileName::GetPathSeparator() + "conf");
+    candidateDirs.push_back(resDir);
+  }
+
+  // 5. Current working directory in conf/ and cwd
+  candidateDirs.push_back(wxGetCwd() + wxFileName::GetPathSeparator() + "conf");
+  candidateDirs.push_back(wxGetCwd());
+
+  // 6. Environment variables
+  if (getenv("JAZZ") != 0)
+  {
+    wxString jazzEnv = getenv("JAZZ");
+    candidateDirs.push_back(jazzEnv + wxFileName::GetPathSeparator() + "conf");
+    candidateDirs.push_back(jazzEnv);
+  }
+
+  // 7. System directories
+  candidateDirs.push_back("/usr/local/share/jazz/conf");
+  candidateDirs.push_back("/usr/share/jazz/conf");
+
+  wxString foundConfFile;
+  wxString foundConfDir;
+
+  for (size_t i = 0; i < candidateDirs.size(); ++i)
+  {
+    wxString testFile =
+      candidateDirs[i] +
+      wxFileName::GetPathSeparator() +
+      mConfFileName;
+
+    if (::wxFileExists(testFile))
+    {
+      foundConfFile = testFile;
+      foundConfDir = candidateDirs[i];
+      break;
     }
   }
-  else
+
+  if (!foundConfFile.empty())
   {
-    ConfigurationFileFound = true;
+    if (pConfig)
+    {
+      pConfig->Write("/Paths/Conf", foundConfDir);
+    }
+    mpConfig->LoadConfig(foundConfFile);
+    return;
   }
 
-  if (ConfigurationFileFound)
+  // Fallback: prompt the user only if jazz.cfg cannot be found anywhere
+  if (FindAndRegisterConfFilePath(ConfigurationFilePath))
   {
-    mpConfig->LoadConfig(JazzCfgFile);
+    wxString JazzCfgFile =
+      ConfigurationFilePath +
+      wxFileName::GetPathSeparator() +
+      mConfFileName;
+
+    if (::wxFileExists(JazzCfgFile))
+    {
+      mpConfig->LoadConfig(JazzCfgFile);
+    }
   }
 }
 
@@ -451,11 +495,17 @@ bool JZProject::FindAndRegisterConfFilePath(wxString& ConfFilePath) const
   wxString DialogTitle;
   DialogTitle = "Please Indicate the Location of " + mConfFileName;
 
+  wxString defaultDir = ::wxPathOnly(wxStandardPaths::Get().GetExecutablePath());
+  if (::wxDirExists(defaultDir + wxFileName::GetPathSeparator() + "conf"))
+  {
+    defaultDir = defaultDir + wxFileName::GetPathSeparator() + "conf";
+  }
+
   // Use an open dialog to find the Jazz++ configuration file.
   wxFileDialog OpenDialog(
     0,
     DialogTitle,
-    wxString(""),
+    defaultDir,
     mConfFileName,
     wxString("*.cfg"),
     wxFD_OPEN);

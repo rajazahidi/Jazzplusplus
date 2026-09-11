@@ -59,7 +59,9 @@ CORE CODEBASE REPAIRS & STABILITY IMPROVEMENTS
   MIDI device discovery, and automatic SoundFont synth integration.
 * Resolved dialog window collapse issue across multi-page wxNotebook dialogs
   using robust wxPanel sizing and minimum constraint clamping.
-* Fixed startup wxHTML help viewer warning and missing help resource assets.
+* Resolved initial "Please Indicate the Location of jazz.cfg" dialog on
+  fresh portable installs by implementing multi-candidate directory searching
+  (conf/ subfolder, executable path, data directory, and current working directory).
 * Cleaned up and organized Tools and Effects menus across TrackFrame and PianoFrame.
 
 AUTOMATED TESTING, COMPATIBILITY & PACKAGING

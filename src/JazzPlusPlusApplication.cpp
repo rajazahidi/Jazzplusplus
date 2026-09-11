@@ -217,6 +217,49 @@ void JZJazzPlusPlusApplication::InsureConfigurationFileExistence() const
   ConfigurationFileNames.push_back("xgdrmset.jzi");
   ConfigurationFileNames.push_back("xgvoices.jzi");
 
+  // Candidate source directories where default conf files live
+  std::vector<wxString> SourceDirs;
+
+  // 1. Exe directory + conf and Exe directory
+  wxString exeDir = ::wxPathOnly(wxStandardPaths::Get().GetExecutablePath());
+  if (!exeDir.empty())
+  {
+    SourceDirs.push_back(exeDir + wxFileName::GetPathSeparator() + "conf");
+    SourceDirs.push_back(exeDir);
+  }
+
+  // 2. Data directory + conf and Data directory
+  wxString dataDir = wxStandardPaths::Get().GetDataDir();
+  if (!dataDir.empty())
+  {
+    SourceDirs.push_back(dataDir + wxFileName::GetPathSeparator() + "conf");
+    SourceDirs.push_back(dataDir);
+  }
+
+  // 3. Resources directory + conf and Resources directory
+  wxString resDir = wxStandardPaths::Get().GetResourcesDir();
+  if (!resDir.empty())
+  {
+    SourceDirs.push_back(resDir + wxFileName::GetPathSeparator() + "conf");
+    SourceDirs.push_back(resDir);
+  }
+
+  // 4. Current working directory
+  SourceDirs.push_back(wxGetCwd() + wxFileName::GetPathSeparator() + "conf");
+  SourceDirs.push_back(wxGetCwd());
+
+  // 5. JAZZ environment variable
+  if (getenv("JAZZ") != 0)
+  {
+    wxString jazzEnv = getenv("JAZZ");
+    SourceDirs.push_back(jazzEnv + wxFileName::GetPathSeparator() + "conf");
+    SourceDirs.push_back(jazzEnv);
+  }
+
+  // 6. System install paths
+  SourceDirs.push_back("/usr/local/share/jazz/conf");
+  SourceDirs.push_back("/usr/share/jazz/conf");
+
   for (
     vector<wxString>::const_iterator iConfigurationFileName =
       ConfigurationFileNames.begin();
@@ -232,16 +275,19 @@ void JZJazzPlusPlusApplication::InsureConfigurationFileExistence() const
 
     if (!::wxFileExists(JazzCfgFile))
     {
-      // Attempt to copy the default Jazz++ configuration file to this
-      // directory.
-      wxString DefaultJazzCfgFile =
-        wxStandardPaths::Get().GetDataDir() +
-        wxFileName::GetPathSeparator() +
-        *iConfigurationFileName;
-
-      if (::wxFileExists(DefaultJazzCfgFile))
+      // Attempt to copy the default Jazz++ configuration file from available source paths
+      for (size_t i = 0; i < SourceDirs.size(); ++i)
       {
-        ::wxCopyFile(DefaultJazzCfgFile, JazzCfgFile);
+        wxString DefaultJazzCfgFile =
+          SourceDirs[i] +
+          wxFileName::GetPathSeparator() +
+          *iConfigurationFileName;
+
+        if (::wxFileExists(DefaultJazzCfgFile))
+        {
+          ::wxCopyFile(DefaultJazzCfgFile, JazzCfgFile);
+          break;
+        }
       }
     }
   }

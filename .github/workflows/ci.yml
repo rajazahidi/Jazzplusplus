@@ -160,6 +160,7 @@ jobs:
 
           # Copy assets and documentation
           Copy-Item -Recurse "conf" "$pkgDir\conf"
+          Copy-Item "conf\jazz.cfg" "$pkgDir\" -Force
           Copy-Item -Recurse "song" "$pkgDir\song"
           Copy-Item -Recurse "src\HelpFiles" "$pkgDir\HelpFiles"
           Copy-Item "README.md", "COPYING", "ChangeLog" "$pkgDir\"

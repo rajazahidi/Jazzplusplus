@@ -21,24 +21,29 @@
 //*****************************************************************************
 
 #include <wx/app.h>
+#include <wx/config.h>
 #include <wx/filename.h>
 #include <wx/stdpaths.h>
 
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
 //*****************************************************************************
 // Description:
 //   This function attempts to find a file.  It checks for the existence of
-// the file by
+// the file across various standard and relative candidate directories:
 //
-// 1. using the passed file name
-// 2. appending the passed file name to the path specified by the HOME
-//    environment variable, if it exists
-// 3. appending the passed file name to the path specified by the JAZZ
-//    environment variable, if it exists
-// 4. appending the passed file name to the location of the Jazz++ executable
+// 1. the passed file name directly
+// 2. user configuration directory (where user copies reside)
+// 3. /Paths/Conf registered in wxConfig
+// 4. conf/ subfolder and base folder next to the executable
+// 5. conf/ subfolder and base folder in application data directory
+// 6. conf/ subfolder and base folder in resources directory
+// 7. current working directory (with and without conf/ subfolder)
+// 8. paths specified by JAZZ or HOME environment variables
+// 9. standard Linux system installation paths
 //
 // Returns:
 //   wxString:
@@ -53,54 +58,90 @@ wxString FindFile(const wxString& FileName)
     return FileName;
   }
 
-  wxString FoundFileName;
+  vector<wxString> searchDirs;
 
-  wxString Home;
-  if (getenv("HOME") != 0)
+  // 1. User config directory
+  wxString userDir = wxStandardPaths::Get().GetUserDataDir();
+  if (!userDir.empty())
   {
-    Home = getenv("HOME");
-    FoundFileName << Home << wxFileName::GetPathSeparator() << FileName;
-    if (wxFileExists(FoundFileName))
+    searchDirs.push_back(userDir);
+  }
+
+  // 2. Configured /Paths/Conf if registered
+  wxConfigBase* pConfig = wxConfigBase::Get();
+  if (pConfig)
+  {
+    wxString confPath;
+    if (pConfig->Read("/Paths/Conf", &confPath) && !confPath.empty())
     {
-      cout << "FindFile: HOME: \"" << FoundFileName << '"' << endl;
-      return FoundFileName;
+      searchDirs.push_back(confPath);
     }
   }
 
+  // 3. Executable directory (conf/ subfolder and base)
+  wxString exeDir = ::wxPathOnly(wxStandardPaths::Get().GetExecutablePath());
+  if (exeDir.empty() && wxTheApp && wxTheApp->argv)
+  {
+    exeDir = ::wxPathOnly(wxTheApp->argv[0]);
+  }
+  if (!exeDir.empty())
+  {
+    searchDirs.push_back(exeDir + wxFileName::GetPathSeparator() + "conf");
+    searchDirs.push_back(exeDir);
+  }
+
+  // 4. Application data directory (conf/ subfolder and base)
+  wxString dataDir = wxStandardPaths::Get().GetDataDir();
+  if (!dataDir.empty())
+  {
+    searchDirs.push_back(dataDir + wxFileName::GetPathSeparator() + "conf");
+    searchDirs.push_back(dataDir);
+  }
+
+  // 5. Resources directory
+  wxString resDir = wxStandardPaths::Get().GetResourcesDir();
+  if (!resDir.empty())
+  {
+    searchDirs.push_back(resDir + wxFileName::GetPathSeparator() + "conf");
+    searchDirs.push_back(resDir);
+  }
+
+  // 6. Current working directory
+  searchDirs.push_back(wxGetCwd() + wxFileName::GetPathSeparator() + "conf");
+  searchDirs.push_back(wxGetCwd());
+
+  // 7. JAZZ environment variable
   if (getenv("JAZZ") != 0)
   {
-    FoundFileName = "";
-    Home = getenv("JAZZ");
-    FoundFileName << Home << wxFileName::GetPathSeparator() << FileName;
-    if (wxFileExists(FoundFileName))
-    {
-      cout << "FindFile: JAZZ: \"" << FoundFileName << '"' << endl;
-      return FoundFileName;
-    }
+    wxString jazzEnv = getenv("JAZZ");
+    searchDirs.push_back(jazzEnv + wxFileName::GetPathSeparator() + "conf");
+    searchDirs.push_back(jazzEnv);
   }
 
-  // Look where the executable was started.
-  FoundFileName = "";
-  Home = wxPathOnly(wxTheApp->argv[0]);
-  if (!Home.empty())
+  // 8. HOME environment variable
+  if (getenv("HOME") != 0)
   {
-    FoundFileName << Home << wxFileName::GetPathSeparator() << FileName;
-    if (wxFileExists(FoundFileName))
-    {
-      cout << "FindFile: Startup directory: \"" << FoundFileName << '"' << endl;
-      return FoundFileName;
-    }
+    wxString home = getenv("HOME");
+    searchDirs.push_back(home + wxFileName::GetPathSeparator() + ".jazz");
+    searchDirs.push_back(home);
   }
 
-  // Look in application data directory.
-  FoundFileName = wxStandardPaths::Get().GetDataDir() + wxFileName::GetPathSeparator() + FileName;
-  if (wxFileExists(FoundFileName))
+  // 9. Standard system paths
+  searchDirs.push_back("/usr/local/share/jazz/conf");
+  searchDirs.push_back("/usr/share/jazz/conf");
+  searchDirs.push_back("/usr/local/share/jazz");
+  searchDirs.push_back("/usr/share/jazz");
+
+  for (size_t i = 0; i < searchDirs.size(); ++i)
   {
-    cout << "FindFile: Data dir: \"" << FoundFileName << '"' << endl;
-    return FoundFileName;
+    wxString candidate = searchDirs[i] + wxFileName::GetPathSeparator() + FileName;
+    if (::wxFileExists(candidate))
+    {
+      cout << "FindFile: Found \"" << FileName << "\" at \"" << candidate << '"' << endl;
+      return candidate;
+    }
   }
 
   cout << "FindFile: File not found: \"" << FileName << '"' << endl;
-
   return wxEmptyString;
 }

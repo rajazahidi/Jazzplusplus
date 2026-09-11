@@ -24,7 +24,14 @@ ChangeLog for Development Version
     Windows assertions during mouse click-and-drag.
   * Ensured StopNote() unconditionally resets playing note state and is invoked on window destruction.
   * Replaced float abs() with std::fabs() in AudioEffects biquad filter.
-  * Expanded automated test suite from 185 to 210 tests covering guitar and bass fretboard logic.
+- Fix & Portability: Automatic discovery and setup of jazz.cfg and definition files:
+  * Resolved "Please Indicate the Location of jazz.cfg" dialog on fresh installs
+    and portable runs by implementing multi-candidate directory searching across
+    exeDir/conf, dataDir/conf, userConfigDir, and working directory.
+  * Enhanced InsureConfigurationFileExistence() to automatically copy default conf
+    and .jzi synthesizer files from candidate paths to UserConfigDir.
+  * Enhanced FindFile() to seamlessly locate included .jzi files in conf/ subdirectories.
+  * Packaged jazz.cfg into both package root and conf/ in Windows release ZIP.
 - Credit: Added "Developer" label to Raja Zahidi entry in About dialog.
 - Credit: Added Raja Zahidi name, copyright headers across all new source files,
   and updated build number to 15 in JazzPlusPlusVersion.h.

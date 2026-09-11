@@ -28,6 +28,8 @@
 #include "Synth.h"
 #include "SynthesizerTypeEnums.h"
 
+#include <wx/config.h>
+#include <wx/confbase.h>
 #include <wx/filename.h>
 #include <wx/msgdlg.h>
 #include <wx/stdpaths.h>
@@ -412,7 +414,7 @@ int JZConfiguration::Check(const string& InputLine) const
 //-----------------------------------------------------------------------------
 wxString JZConfiguration::GetFileName()
 {
-  if (!mFileName.empty())
+  if (!mFileName.empty() && ::wxFileExists(mFileName))
   {
     return mFileName;
   }
@@ -427,6 +429,41 @@ wxString JZConfiguration::GetFileName()
   if (::wxFileExists(JazzCfgFile))
   {
     mFileName = JazzCfgFile;
+    return mFileName;
+  }
+
+  // Check /Paths/Conf
+  wxConfigBase* pConfig = wxConfigBase::Get();
+  if (pConfig)
+  {
+    wxString confPath;
+    if (pConfig->Read("/Paths/Conf", &confPath) && !confPath.empty())
+    {
+      wxString testFile = confPath + wxFileName::GetPathSeparator() + "jazz.cfg";
+      if (::wxFileExists(testFile))
+      {
+        mFileName = testFile;
+        return mFileName;
+      }
+    }
+  }
+
+  // Check next to executable in conf/ and base
+  wxString exeDir = ::wxPathOnly(wxStandardPaths::Get().GetExecutablePath());
+  if (!exeDir.empty())
+  {
+    wxString testFile = exeDir + wxFileName::GetPathSeparator() + "conf" + wxFileName::GetPathSeparator() + "jazz.cfg";
+    if (::wxFileExists(testFile))
+    {
+      mFileName = testFile;
+      return mFileName;
+    }
+    testFile = exeDir + wxFileName::GetPathSeparator() + "jazz.cfg";
+    if (::wxFileExists(testFile))
+    {
+      mFileName = testFile;
+      return mFileName;
+    }
   }
 
   return mFileName;

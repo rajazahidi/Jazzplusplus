@@ -120,9 +120,13 @@ int JZJazzPlusPlusVersion::GetMinorVersion()
 //  12 9/1/2008   See minor version 4.
 //  13 3/17/2013  Fixed closing while recording and/or playing back.
 //  14 3/17/2013  Added "Visit Web Site..." button to the about dialog.
+//  15 9/2026     Raja Zahidi: Added MIDI Effects Suite (Arpeggiator,
+//                Humanizer, Harmonizer, MIDI Echo), Procedural Sound FX
+//                & 808 Drum Synthesizer, Audio DSP Engine (3-Band EQ,
+//                Freeverb Reverb, Stereo Delay, Chorus, Limiter/Overdrive).
 //-----------------------------------------------------------------------------
 inline
 int JZJazzPlusPlusVersion::GetBuildNumber()
 {
-  return 14;
+  return 15;
 }

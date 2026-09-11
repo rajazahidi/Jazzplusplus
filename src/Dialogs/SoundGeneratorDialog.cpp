@@ -2,6 +2,7 @@
 // The JAZZ++ Midi Sequencer
 //
 // Sound Generator Dialog Implementation
+// Copyright (C) 2026 Raja Zahidi
 //*****************************************************************************
 
 #include "SoundGeneratorDialog.h"

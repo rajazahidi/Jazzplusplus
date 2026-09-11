@@ -133,6 +133,13 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
         "Developer. Wrote most of the original wxWidgets 2.4 port of Jazz++." +
       "</td>"
     "</tr>"
+    "<tr>"
+      "<td><b>Raja Zahidi</b></td>"
+      "<td>" +
+        "<b>MIDI Effects Suite, Procedural Sound FX &amp; Drum Synthesizer,"
+        " Audio DSP Engine (2026)</b>" +
+      "</td>"
+    "</tr>"
     "</table>"
 
     "<center>"

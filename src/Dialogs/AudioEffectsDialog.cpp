@@ -2,6 +2,7 @@
 // The JAZZ++ Midi Sequencer
 //
 // Audio Effects DSP Dialog Implementation
+// Copyright (C) 2026 Raja Zahidi
 //*****************************************************************************
 
 #include "AudioEffectsDialog.h"

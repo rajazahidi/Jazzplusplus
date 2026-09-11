@@ -2,6 +2,7 @@
 // The JAZZ++ Midi Sequencer
 //
 // MIDI Effects Dialog Implementation
+// Copyright (C) 2026 Raja Zahidi
 //*****************************************************************************
 
 #include "MidiEffectsDialog.h"

@@ -1,7 +1,8 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// Copyright (C) 2026 Jazz++ Developers
+// Copyright (C) 2026 Raja Zahidi
+// Audio DSP Engine — 3-Band EQ, Reverb, Delay, Chorus, Limiter/Overdrive
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by

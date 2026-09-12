@@ -657,6 +657,54 @@
       color: var(--text-dim);
     }
 
+    .visitor-counter-bar {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      padding: 0.45rem 1rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      flex-wrap: wrap;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .visitor-counter-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      background-color: var(--accent-emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--accent-emerald);
+      animation: pulse-glow 2s infinite;
+    }
+
+    @keyframes pulse-glow {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      }
+      70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+      }
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+      }
+    }
+
     @media (max-width: 768px) {
       .mobile-toggle {
         display: flex;
@@ -1193,6 +1241,15 @@
     </div>
 
     <div class="footer-bottom">
+      <div class="visitor-counter-bar">
+        <span class="visitor-counter-title">
+          <span class="pulse-dot"></span>
+          Live Visitors &amp; Traffic:
+        </span>
+        <a href="https://hits.sh/rajazahidi.github.io/Jazzplusplus/" target="_blank" rel="noopener noreferrer" title="View Live Traffic Analytics on hits.sh">
+          <img alt="Jazz++ Visitors: Today / Total" src="https://hits.sh/rajazahidi.github.io/Jazzplusplus.svg?view=today-total&style=flat-square&label=Visitors%20(Today%20%2F%20Total)&color=00d2ff&labelColor=161e2e" style="height: 20px; vertical-align: middle; border-radius: 4px; border: 1px solid rgba(0, 210, 255, 0.25);">
+        </a>
+      </div>
       <p>&copy; 1994–2026 Andreas Voss, Per Sigmond, Peter J. Stieber &amp; Raja Zahidi. All rights reserved.</p>
     </div>
   </footer>

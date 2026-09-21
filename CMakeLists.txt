@@ -12,22 +12,32 @@ elseif(MSVC)
     add_compile_options(/W3 /wd4996)
 endif()
 
-if(WIN32)
-    enable_language(RC)
-    set(wxWidgets_EXCLUDE_COMMON_LIBRARIES TRUE)
-    set(BUILD_SHARED_LIBS ON)
-    if(DEFINED wxWidgets_ROOT_DIR)
-        set(ENV{WXWIN} "${wxWidgets_ROOT_DIR}")
-        set(WX_ROOT_DIR ${wxWidgets_ROOT_DIR} CACHE INTERNAL "wxWidgets_ROOT_DIR")
-    endif()
-    if(DEFINED wxWidgets_LIB_DIR)
-        set(ENV{WXMSW_LIB} "${wxWidgets_LIB_DIR}")
-    endif()
+# Options
+if(APPLE)
+    option(BUILD_JAZZ_WX "Build classic wxWidgets-based Jazz++ application" OFF)
+else()
+    option(BUILD_JAZZ_WX "Build classic wxWidgets-based Jazz++ application" ON)
 endif()
 
-# Find wxWidgets
-find_package(wxWidgets REQUIRED core base adv net html)
+if(BUILD_JAZZ_WX)
+    if(WIN32)
+        enable_language(RC)
+        set(wxWidgets_EXCLUDE_COMMON_LIBRARIES TRUE)
+        set(BUILD_SHARED_LIBS ON)
+        if(DEFINED wxWidgets_ROOT_DIR)
+            set(ENV{WXWIN} "${wxWidgets_ROOT_DIR}")
+            set(WX_ROOT_DIR ${wxWidgets_ROOT_DIR} CACHE INTERNAL "wxWidgets_ROOT_DIR")
+        endif()
+        if(DEFINED wxWidgets_LIB_DIR)
+            set(ENV{WXMSW_LIB} "${wxWidgets_LIB_DIR}")
+        endif()
+    endif()
 
+    # Find wxWidgets
+    find_package(wxWidgets REQUIRED core base adv net html)
+endif()
+
+if(BUILD_JAZZ_WX)
 if(WIN32)
     # Windows configuration
     set(PLATFORM_SOURCES
@@ -250,6 +260,7 @@ install(DIRECTORY song/ DESTINATION ${CMAKE_INSTALL_DATADIR}/jazz/song)
 install(DIRECTORY src/HelpFiles/ DESTINATION ${CMAKE_INSTALL_DATADIR}/jazz/HelpFiles)
 
 file(COPY src/HelpFiles DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+endif() # BUILD_JAZZ_WX
 
 # -----------------------------------------------------------------------------
 # Tests
@@ -342,13 +353,18 @@ if(BUILD_JAZZ_JUCE)
         juce::juce_gui_extra
     )
 
-    add_custom_command(TARGET jazz-juce POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E create_symlink
-            "$<TARGET_FILE:jazz-juce>"
-            "${CMAKE_BINARY_DIR}/jazz-juce"
-        COMMENT "Creating convenience symlink build/jazz-juce"
-    )
+    if(UNIX AND NOT APPLE)
+        add_custom_command(TARGET jazz-juce POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E create_symlink
+                "$<TARGET_FILE:jazz-juce>"
+                "${CMAKE_BINARY_DIR}/jazz-juce"
+            COMMENT "Creating convenience symlink build/jazz-juce"
+        )
+    endif()
 
-    install(TARGETS jazz-juce RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    install(TARGETS jazz-juce
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        BUNDLE DESTINATION Applications
+    )
 endif()
 

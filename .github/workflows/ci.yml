@@ -32,16 +32,17 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake build-essential libasound2-dev
+          sudo apt-get install -y cmake build-essential libasound2-dev libgl1-mesa-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev
           sudo apt-get install -y libwxgtk3.2-dev || sudo apt-get install -y libwxgtk3.0-gtk3-dev
 
       - name: Configure CMake
         run: |
           cmake -B build \
             -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_JAZZ_JUCE=ON \
             -DCMAKE_VERBOSE_MAKEFILE=ON
 
-      - name: Build Jazz++
+      - name: Build Jazz++ & JUCE 8
         run: |
           cmake --build build --parallel $(nproc)
 
@@ -49,17 +50,22 @@ jobs:
         run: |
           ctest --test-dir build --output-on-failure
 
-      - name: Verify Binary
+      - name: Verify Binaries
         run: |
           file build/jazz
           ls -lh build/jazz
-          ldd build/jazz
+          if [ -f "build/jazz-juce" ]; then
+            file build/jazz-juce
+            ls -lh build/jazz-juce
+          fi
 
-      - name: Upload Binary Artifact
+      - name: Upload Linux Binaries
         uses: actions/upload-artifact@v4
         with:
-          name: jazz-bin-${{ matrix.os }}
-          path: build/jazz
+          name: jazz-linux-${{ matrix.os }}
+          path: |
+            build/jazz
+            build/jazz-juce
           if-no-files-found: error
           overwrite: true
 
@@ -73,12 +79,12 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake build-essential libasound2-dev file wget
+          sudo apt-get install -y cmake build-essential libasound2-dev file wget libgl1-mesa-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev
           sudo apt-get install -y libwxgtk3.2-dev || sudo apt-get install -y libwxgtk3.0-gtk3-dev
 
       - name: Build Project
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_JAZZ_JUCE=ON
           cmake --build build --parallel $(nproc)
           ctest --test-dir build --output-on-failure
 
@@ -135,6 +141,7 @@ jobs:
         run: |
           cmake -B build `
             -DCMAKE_BUILD_TYPE=Release `
+            -DBUILD_JAZZ_JUCE=ON `
             -DwxWidgets_ROOT_DIR="D:/wxWidgets" `
             -DwxWidgets_LIB_DIR="D:/wxWidgets/lib/vc14x_x64_dll" `
             -DwxWidgets_CONFIGURATION=mswu
@@ -155,11 +162,18 @@ jobs:
           $pkgDir = "Jazz++-Windows-x64"
           New-Item -ItemType Directory -Force -Path $pkgDir
 
-          # Copy executable
+          # Copy classic executable
           if (Test-Path "build\Release\jazz.exe") {
             Copy-Item "build\Release\jazz.exe" "$pkgDir\"
           } elseif (Test-Path "build\jazz.exe") {
             Copy-Item "build\jazz.exe" "$pkgDir\"
+          }
+
+          # Copy modern JUCE 8 executable
+          if (Test-Path "build\jazz-juce_artefacts\Release\Jazz++ JUCE.exe") {
+            Copy-Item "build\jazz-juce_artefacts\Release\Jazz++ JUCE.exe" "$pkgDir\jazz-juce.exe"
+          } elseif (Test-Path "build\Release\jazz-juce.exe") {
+            Copy-Item "build\Release\jazz-juce.exe" "$pkgDir\"
           }
 
           # Copy wxWidgets runtime DLLs
@@ -183,10 +197,56 @@ jobs:
           if-no-files-found: error
           overwrite: true
 
+  build-macos:
+    name: Build macOS (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, macos-13]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure CMake
+        run: |
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_JAZZ_JUCE=ON \
+            -DBUILD_JAZZ_WX=OFF
+
+      - name: Build Jazz++ JUCE & Tests
+        run: |
+          cmake --build build --parallel
+
+      - name: Run Unit Tests
+        run: |
+          ctest --test-dir build --output-on-failure
+
+      - name: Package macOS Release (ZIP)
+        run: |
+          mkdir -p "Jazz++-macOS"
+          if [ -d "build/jazz-juce_artefacts/Release/Jazz++ JUCE.app" ]; then
+            cp -R "build/jazz-juce_artefacts/Release/Jazz++ JUCE.app" "Jazz++-macOS/"
+          elif [ -d "build/Jazz++ JUCE.app" ]; then
+            cp -R "build/Jazz++ JUCE.app" "Jazz++-macOS/"
+          fi
+          cp -R conf song src/HelpFiles README.md COPYING "Jazz++-macOS/"
+          zip -r "Jazz++-macOS-${{ matrix.os }}.zip" "Jazz++-macOS"
+
+      - name: Upload macOS Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Jazz++-macOS-${{ matrix.os }}
+          path: Jazz++-macOS-${{ matrix.os }}.zip
+          if-no-files-found: error
+          overwrite: true
+
   release:
     name: GitHub Release
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [build-linux, appimage, build-windows]
+    needs: [build-linux, appimage, build-windows, build-macos]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -204,10 +264,22 @@ jobs:
         with:
           name: Jazz++-Windows-x64
 
+      - name: Download macOS Package (macOS 14 ARM64)
+        uses: actions/download-artifact@v4
+        with:
+          name: Jazz++-macOS-macos-14
+
+      - name: Download macOS Package (macOS 13 x86_64)
+        uses: actions/download-artifact@v4
+        with:
+          name: Jazz++-macOS-macos-13
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             Jazz++-x86_64.AppImage
             Jazz++-Windows-x64.zip
+            Jazz++-macOS-macos-14.zip
+            Jazz++-macOS-macos-13.zip
           generate_release_notes: true

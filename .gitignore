@@ -63,3 +63,6 @@ m4/lt*.m4
 
 # SoundFonts
 soundfonts/
+
+# External libraries
+libs/

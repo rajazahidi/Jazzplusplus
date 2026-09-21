@@ -364,6 +364,40 @@
       gap: 0.5rem;
     }
 
+    /* JUCE Modern Showcase */
+    .juce-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .juce-tab-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.55rem 1.1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .juce-tab-btn:hover {
+      background: rgba(0, 210, 255, 0.1);
+      border-color: var(--accent-cyan);
+      color: var(--text-main);
+    }
+
+    .juce-tab-btn.active {
+      background: rgba(0, 210, 255, 0.2);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+      box-shadow: 0 0 15px rgba(0, 210, 255, 0.25);
+    }
+
     /* Section Styles */
     section {
       position: relative;
@@ -795,6 +829,17 @@
         font-size: 0.92rem;
       }
 
+      .juce-tabs {
+        gap: 0.35rem;
+      }
+
+      .juce-tab-btn {
+        padding: 0.45rem 0.75rem;
+        font-size: 0.78rem;
+        flex: 1 1 calc(50% - 0.35rem);
+        text-align: center;
+      }
+
       .features-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
@@ -918,6 +963,7 @@
       </button>
 
       <nav id="mainNav" class="nav-links">
+        <a href="#juce-edition" class="nav-link">JUCE 8 &amp; Plugins</a>
         <a href="#features" class="nav-link">Features</a>
         <a href="#downloads" class="nav-link">Downloads</a>
         <a href="#installation" class="nav-link">Getting Started</a>
@@ -935,7 +981,7 @@
   <!-- Hero Section -->
   <main class="hero">
     <a href="#changelog" class="pill-announcement">
-      <span>✨ What's new in v5.4.16: Linux Playback Freeze Fix & Synth Auto-Connect</span> →
+      <span>✨ What's new in v5.4.16 &amp; JUCE 8: VST3 &amp; CLAP Plugin Hosting</span> →
     </a>
 
     <h1>
@@ -944,7 +990,7 @@
     </h1>
 
     <p class="lead">
-      Jazz++ is a comprehensive cross-platform MIDI sequencing workstation. Version 5.4.16 brings seamless non-blocking playback, intelligent hardware and software synthesizer discovery, a procedural sound and 808 drum engine, and real-time DSP effects.
+      Jazz++ is a comprehensive cross-platform MIDI sequencing workstation. Experience seamless non-blocking playback, intelligent hardware and software synthesizer discovery, a procedural sound and 808 drum engine, and the next-generation JUCE 8 edition with native VST3 &amp; CLAP plugin hosting.
     </p>
 
     <!-- Download Call to Action -->
@@ -974,6 +1020,35 @@
       </div>
     </div>
   </main>
+
+  <!-- Next-Gen JUCE 8 Edition & Plugin Hosting -->
+  <section id="juce-edition">
+    <div class="section-header">
+      <span class="section-tag" style="background: rgba(0, 210, 255, 0.15); border-color: rgba(0, 210, 255, 0.3); color: var(--accent-cyan);">Next-Gen JUCE 8 Architecture</span>
+      <h2 class="section-title">Modernized with VST3 &amp; CLAP Plugin Hosting</h2>
+      <p class="section-desc">
+        Experience the cutting edge of Jazz++: low-latency C++20 audio/MIDI processing, professional vector UI, and native hosting for both VST3 and CLAP audio plugins.
+      </p>
+    </div>
+
+    <!-- Interactive View Tabs -->
+    <div class="juce-tabs" role="tablist">
+      <button class="juce-tab-btn active" onclick="switchJuceView('plugins', this)" role="tab" aria-selected="true">🔌 Plugins (VST3 / CLAP)</button>
+      <button class="juce-tab-btn" onclick="switchJuceView('arranger', this)" role="tab" aria-selected="false">🎼 Arranger Timeline</button>
+      <button class="juce-tab-btn" onclick="switchJuceView('piano', this)" role="tab" aria-selected="false">🎹 High-DPI Piano Roll</button>
+      <button class="juce-tab-btn" onclick="switchJuceView('drum', this)" role="tab" aria-selected="false">🥁 808 Drum Machine</button>
+      <button class="juce-tab-btn" onclick="switchJuceView('fretboard', this)" role="tab" aria-selected="false">🎸 Fretboard &amp; Scales</button>
+      <button class="juce-tab-btn" onclick="switchJuceView('fxrack', this)" role="tab" aria-selected="false">🎛️ Audio FX Rack</button>
+    </div>
+
+    <!-- Interactive Showcase Display -->
+    <div class="showcase-wrapper" style="border-color: rgba(0, 210, 255, 0.35); box-shadow: var(--shadow-subtle), 0 0 35px rgba(0, 210, 255, 0.2);">
+      <img id="juceShowcaseImg" src="assets/jazz_juce_plugins.png" alt="Jazz++ JUCE 8 Plugin Hosting" loading="lazy">
+      <div class="showcase-caption" id="juceShowcaseCaption">
+        <span>🔌 <strong>VST3 &amp; CLAP Audio Plugin Host:</strong> Discover, load, and automate instruments and master insert effects with bypass and native GUI windows.</span>
+      </div>
+    </div>
+  </section>
 
   <!-- Major Highlights & Features -->
   <section id="features">
@@ -1102,9 +1177,13 @@
           <code><span class="cmd">git clone</span> https://github.com/rajazahidi/Jazzplusplus.git</code>
           <code><span class="cmd">cd</span> Jazzplusplus</code>
           <br>
-          <code><span class="comment"># Configure and build</span></code>
+          <code><span class="comment"># Build legacy wxWidgets application</span></code>
           <code><span class="cmd">cmake</span> -B build -DCMAKE_BUILD_TYPE=Release</code>
-          <code><span class="cmd">cmake</span> --build build -j$(nproc)</code>
+          <code><span class="cmd">cmake</span> --build build --target jazz -j$(nproc)</code>
+          <br>
+          <code><span class="comment"># Build modern JUCE 8 Edition with VST3 &amp; CLAP hosting</span></code>
+          <code><span class="cmd">cmake</span> -B build -DBUILD_JAZZ_JUCE=ON</code>
+          <code><span class="cmd">cmake</span> --build build --target jazz-juce -j$(nproc)</code>
           <br>
           <code><span class="comment"># Run core unit tests</span></code>
           <code>./build/jazz_tests</code>
@@ -1119,6 +1198,22 @@
       <span class="section-tag">Release History</span>
       <h2 class="section-title">Changelog & Updates</h2>
       <p class="section-desc">Tracking the evolution and stability upgrades of the Jazz++ codebase.</p>
+    </div>
+
+    <!-- v6.0.0-preview -->
+    <div class="changelog-card" style="border-color: rgba(0, 210, 255, 0.3); background: rgba(14, 25, 45, 0.85);">
+      <h3>
+        <span style="color: var(--accent-cyan);">v6.0.0-preview</span> — Modern JUCE 8 Architecture, VST3 &amp; CLAP Plugin Hosting
+        <span class="version-badge" style="margin-left: auto; background: rgba(0, 210, 255, 0.2); border-color: var(--accent-cyan); color: var(--accent-cyan);">JUCE 8 Preview</span>
+      </h3>
+      <ul class="changelog-list">
+        <li><strong>Dual Architecture Coexistence:</strong> Modern standalone <code style="color:var(--accent-cyan);">jazz-juce</code> target powered by JUCE 8 and C++20, maintaining complete coexistence with the classic wxWidgets <code style="color:var(--accent-cyan);">jazz</code> application.</li>
+        <li><strong>Native VST3 Plugin Hosting:</strong> Integrated JUCE 8 format manager (<code style="color:var(--accent-cyan);">JUCE_PLUGINHOST_VST3=1</code>) supporting 64-bit VST3 instruments and effects.</li>
+        <li><strong>Native CLAP Plugin Hosting:</strong> Custom CLAP format and instance wrapper (<code style="color:var(--accent-cyan);">ClapPluginFormat</code> &amp; <code style="color:var(--accent-cyan);">ClapPluginInstance</code>) integrating official CLAP C API headers for binary discovery, parameter automation, state save/load, and UI windowing.</li>
+        <li><strong>Plugin Scanner &amp; Browser:</strong> Automatic scanning of standard Linux plugin paths (<code style="color:var(--accent-cyan);">/usr/lib/vst3</code>, <code style="color:var(--accent-cyan);">/usr/lib/clap</code>, <code style="color:var(--accent-cyan);">~/.vst3</code>, <code style="color:var(--accent-cyan);">~/.clap</code>), live search, and file picker.</li>
+        <li><strong>Active Instrument &amp; Master Effect Racks:</strong> Real-time MIDI note forwarding to loaded instrument, master insert processing, bypass toggles, and floating UI window launcher.</li>
+        <li><strong>Modern Studio Suite:</strong> Arranger timeline with clip navigation, High-DPI piano roll with scale highlighting, 808 vintage drum machine with 16-step sequencer &amp; MPC pads, 24-fret interactive guitar/bass fretboard, and 5-module studio DSP effects rack.</li>
+      </ul>
     </div>
 
     <!-- v5.4.16 -->
@@ -1245,6 +1340,62 @@
           mobileToggle.setAttribute('aria-expanded', 'false');
         }
       });
+    }
+
+    // JUCE 8 View Switcher
+    const juceViews = {
+      plugins: {
+        img: 'assets/jazz_juce_plugins.png',
+        alt: 'Jazz++ JUCE 8 Plugin Hosting',
+        caption: '🔌 <strong>VST3 &amp; CLAP Audio Plugin Host:</strong> Discover, load, and automate instruments and master insert effects with bypass and native GUI windows.'
+      },
+      arranger: {
+        img: 'assets/jazz_juce_arranger.png',
+        alt: 'Jazz++ JUCE 8 Multi-Track Arranger',
+        caption: '🎼 <strong>Multi-Track Arranger Timeline:</strong> Interactive measure ruler, clip previews, track lanes with mute/solo/arm, and smooth playhead synchronization.'
+      },
+      piano: {
+        img: 'assets/jazz_juce_pianoroll.png',
+        alt: 'Jazz++ JUCE 8 High-DPI Piano Roll',
+        caption: '🎹 <strong>High-DPI Piano Roll:</strong> Musical scale degree highlighting, note editing with grid snapping, and velocity lane.'
+      },
+      drum: {
+        img: 'assets/jazz_juce_drummachine.png',
+        alt: 'Jazz++ JUCE 8 808 Drum Machine',
+        caption: '🥁 <strong>808 Vintage Drum Machine:</strong> 16-step sequencer matrix with 8 analog drum voices, pattern presets, and live MPC trigger pads.'
+      },
+      fretboard: {
+        img: 'assets/jazz_juce_fretboard.png',
+        alt: 'Jazz++ JUCE 8 Interactive Fretboard',
+        caption: '🎸 <strong>Interactive Guitar &amp; Bass Fretboard:</strong> 24 frets, standard/drop tunings, pearl inlay markers, and scale visualization.'
+      },
+      fxrack: {
+        img: 'assets/jazz_juce_fxrack.png',
+        alt: 'Jazz++ JUCE 8 Audio FX Rack',
+        caption: '🎛️ <strong>Studio DSP Effects Rack:</strong> 5 hardware-style rack units including 3-Band EQ, Freeverb Reverb, Ping-Pong Delay, Chorus, and Limiter/Overdrive.'
+      }
+    };
+
+    function switchJuceView(viewKey, btn) {
+      const view = juceViews[viewKey];
+      if (!view) return;
+      const img = document.getElementById('juceShowcaseImg');
+      const caption = document.getElementById('juceShowcaseCaption');
+      if (img) {
+        img.src = view.img;
+        img.alt = view.alt;
+      }
+      if (caption) {
+        caption.innerHTML = '<span>' + view.caption + '</span>';
+      }
+      document.querySelectorAll('.juce-tab-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      if (btn) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+      }
     }
   </script>
 </body>

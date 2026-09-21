@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(jazzplusplus VERSION 5.4.16 LANGUAGES C CXX)
+project(jazzplusplus VERSION 6.0.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -69,7 +69,7 @@ if(WIN32)
 
 #define HAVE_CONFIG_H 1
 #define PACKAGE \"jazzplusplus\"
-#define VERSION \"5.4.16\"
+#define VERSION \"6.0.0\"
 ")
 
     set(GUI_TYPE WIN32)
@@ -109,7 +109,7 @@ else()
 #define DEV_ALSA 1
 #define DEV_SEQUENCER2 1
 #define PACKAGE \"jazzplusplus\"
-#define VERSION \"5.4.16\"
+#define VERSION \"6.0.0\"
 ")
 
     set(GUI_TYPE "")

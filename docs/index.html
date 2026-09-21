@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jazz++ MIDI & Audio Sequencer | v5.4.16 Release</title>
-  <meta name="description" content="Jazz++ v5.4.16 is a powerful, full-featured open source MIDI and digital audio sequencer for Linux and Windows. Featuring a real-time ALSA sequencer engine, synth auto-detection, MIDI FX suite, and 808 procedural drum synthesizer.">
+  <title>Jazz++ MIDI & Audio Sequencer | v6.0.0 Release</title>
+  <meta name="description" content="Jazz++ v6.0.0 is a powerful, full-featured open source MIDI and digital audio sequencer for Linux, Windows, and macOS. Featuring next-gen JUCE 8 architecture, native VST3 & CLAP plugin hosting, real-time ALSA sequencer engine, synth auto-detection, and studio DSP suite.">
   <link rel="icon" type="image/svg+xml" href="assets/jazz-icon.svg">
   <link rel="icon" type="image/png" href="assets/jazz-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -314,6 +314,19 @@
     .btn-download.windows:hover {
       transform: translateY(-3px);
       box-shadow: 0 16px 30px -5px rgba(37, 99, 235, 0.6);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .btn-download.macos {
+      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.4);
+    }
+
+    .btn-download.macos:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 30px -5px rgba(124, 58, 237, 0.6);
       border-color: rgba(255, 255, 255, 0.4);
     }
 
@@ -952,7 +965,7 @@
       <a href="#" class="logo-group">
         <img src="assets/jazz-icon.svg" alt="Jazz++ Logo" class="logo-img">
         <span class="logo-text">Jazz++</span>
-        <span class="version-badge">v5.4.16 Live</span>
+        <span class="version-badge">v6.0.0 Live</span>
       </a>
 
       <!-- Mobile Menu Toggle Button -->
@@ -981,7 +994,7 @@
   <!-- Hero Section -->
   <main class="hero">
     <a href="#changelog" class="pill-announcement">
-      <span>✨ What's new in v5.4.16 &amp; JUCE 8: VST3 &amp; CLAP Plugin Hosting</span> →
+      <span>✨ What's new in v6.0.0: JUCE 8 Architecture, VST3 &amp; CLAP Plugin Hosting, macOS Support</span> →
     </a>
 
     <h1>
@@ -990,12 +1003,12 @@
     </h1>
 
     <p class="lead">
-      Jazz++ is a comprehensive cross-platform MIDI sequencing workstation. Experience seamless non-blocking playback, intelligent hardware and software synthesizer discovery, a procedural sound and 808 drum engine, and the next-generation JUCE 8 edition with native VST3 &amp; CLAP plugin hosting.
+      Jazz++ is a comprehensive cross-platform MIDI sequencing workstation. Experience seamless non-blocking playback, intelligent hardware and software synthesizer discovery, a procedural sound and 808 drum engine, and the next-generation JUCE 8 edition with native VST3 &amp; CLAP plugin hosting across Linux, Windows, and macOS.
     </p>
 
     <!-- Download Call to Action -->
     <div class="download-grid" id="downloads">
-      <a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v5.4.16/Jazz%2B%2B-x86_64.AppImage" class="btn-download linux">
+      <a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v6.0.0/Jazz%2B%2B-x86_64.AppImage" class="btn-download linux">
         <div class="btn-icon">🐧</div>
         <div>
           <span class="btn-text-main">Download AppImage</span>
@@ -1003,20 +1016,28 @@
         </div>
       </a>
 
-      <a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v5.4.16/Jazz%2B%2B-Windows-x64.zip" class="btn-download windows">
+      <a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v6.0.0/Jazz%2B%2B-Windows-x64.zip" class="btn-download windows">
         <div class="btn-icon">🪟</div>
         <div>
           <span class="btn-text-main">Download Windows ZIP</span>
-          <span class="btn-text-sub">Windows 10/11 x64 • 18.2 MB • Portable</span>
+          <span class="btn-text-sub">Windows 10/11 x64 • Portable</span>
+        </div>
+      </a>
+
+      <a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v6.0.0/Jazz%2B%2B-macOS-macos-14.zip" class="btn-download macos">
+        <div class="btn-icon">🍎</div>
+        <div>
+          <span class="btn-text-main">Download macOS App</span>
+          <span class="btn-text-sub">macOS 13/14 • Universal (M-series &amp; Intel)</span>
         </div>
       </a>
     </div>
 
     <!-- Application Screenshot -->
     <div class="showcase-wrapper">
-      <img src="assets/screenshot-main.png" alt="Jazz++ v5.4.16 Modern Track Interface" loading="eager">
+      <img src="assets/screenshot-main.png" alt="Jazz++ v6.0.0 Modern Track Interface" loading="eager">
       <div class="showcase-caption">
-        <span>📸 Jazz++ v5.4.16 playing active MIDI project with real-time ruler cursor and FluidSynth on Linux</span>
+        <span>📸 Jazz++ v6.0.0 playing active MIDI project with real-time ruler cursor and FluidSynth on Linux</span>
       </div>
     </div>
   </main>
@@ -1063,7 +1084,7 @@
     <div class="features-grid">
       <!-- Feature 1: Pure ALSA Sequencer Engine -->
       <div class="feature-card">
-        <div class="feature-badge">v5.4.16 Highlight</div>
+        <div class="feature-badge">Core Engine</div>
         <div class="feature-icon-box">⚡</div>
         <h3>High-Precision ALSA Sequencer</h3>
         <p>
@@ -1200,19 +1221,20 @@
       <p class="section-desc">Tracking the evolution and stability upgrades of the Jazz++ codebase.</p>
     </div>
 
-    <!-- v6.0.0-preview -->
-    <div class="changelog-card" style="border-color: rgba(0, 210, 255, 0.3); background: rgba(14, 25, 45, 0.85);">
+    <!-- v6.0.0 -->
+    <div class="changelog-card" style="border-color: rgba(0, 210, 255, 0.4); background: rgba(14, 25, 45, 0.85);">
       <h3>
-        <span style="color: var(--accent-cyan);">v6.0.0-preview</span> — Modern JUCE 8 Architecture, VST3 &amp; CLAP Plugin Hosting
-        <span class="version-badge" style="margin-left: auto; background: rgba(0, 210, 255, 0.2); border-color: var(--accent-cyan); color: var(--accent-cyan);">JUCE 8 Preview</span>
+        <span style="color: var(--accent-cyan);">v6.0.0</span> — Next-Gen JUCE 8 Workstation, VST3 &amp; CLAP Hosting, Multi-Platform Support
+        <span class="version-badge" style="margin-left: auto;">Latest Release</span>
       </h3>
       <ul class="changelog-list">
         <li><strong>Dual Architecture Coexistence:</strong> Modern standalone <code style="color:var(--accent-cyan);">jazz-juce</code> target powered by JUCE 8 and C++20, maintaining complete coexistence with the classic wxWidgets <code style="color:var(--accent-cyan);">jazz</code> application.</li>
         <li><strong>Native VST3 Plugin Hosting:</strong> Integrated JUCE 8 format manager (<code style="color:var(--accent-cyan);">JUCE_PLUGINHOST_VST3=1</code>) supporting 64-bit VST3 instruments and effects.</li>
         <li><strong>Native CLAP Plugin Hosting:</strong> Custom CLAP format and instance wrapper (<code style="color:var(--accent-cyan);">ClapPluginFormat</code> &amp; <code style="color:var(--accent-cyan);">ClapPluginInstance</code>) integrating official CLAP C API headers for binary discovery, parameter automation, state save/load, and UI windowing.</li>
-        <li><strong>Plugin Scanner &amp; Browser:</strong> Automatic scanning of standard Linux plugin paths (<code style="color:var(--accent-cyan);">/usr/lib/vst3</code>, <code style="color:var(--accent-cyan);">/usr/lib/clap</code>, <code style="color:var(--accent-cyan);">~/.vst3</code>, <code style="color:var(--accent-cyan);">~/.clap</code>), live search, and file picker.</li>
+        <li><strong>Plugin Scanner &amp; Browser:</strong> Automatic scanning of standard plugin paths (<code style="color:var(--accent-cyan);">/usr/lib/vst3</code>, <code style="color:var(--accent-cyan);">/usr/lib/clap</code>, <code style="color:var(--accent-cyan);">~/.vst3</code>, <code style="color:var(--accent-cyan);">~/.clap</code>), live search, and file picker.</li>
         <li><strong>Active Instrument &amp; Master Effect Racks:</strong> Real-time MIDI note forwarding to loaded instrument, master insert processing, bypass toggles, and floating UI window launcher.</li>
         <li><strong>Modern Studio Suite:</strong> Arranger timeline with clip navigation, High-DPI piano roll with scale highlighting, 808 vintage drum machine with 16-step sequencer &amp; MPC pads, 24-fret interactive guitar/bass fretboard, and 5-module studio DSP effects rack.</li>
+        <li><strong>Multi-Platform Builds:</strong> First-class CMake and GitHub Actions CI/CD workflows for Linux (AppImage &amp; ELF), Windows (MSVC x64), and macOS (Apple Silicon macOS-14 &amp; Intel macOS-13).</li>
       </ul>
     </div>
 
@@ -1220,7 +1242,7 @@
     <div class="changelog-card">
       <h3>
         <span style="color: var(--accent-cyan);">v5.4.16</span> — Linux Playback Freeze Resolution & Synthesizer Auto-Binding
-        <span class="version-badge" style="margin-left: auto;">Latest Release</span>
+        <span class="version-badge" style="margin-left: auto; opacity: 0.7;">v5.4.16</span>
       </h3>
       <ul class="changelog-list">
         <li><strong>Fixed GUI Freeze on Playback:</strong> Replaced legacy PCM audio device streaming (<code style="color:var(--accent-cyan);">JZAlsaAudioPlayer</code>) with pure ALSA MIDI Sequencer player (<code style="color:var(--accent-cyan);">JZAlsaPlayer</code>), eliminating thread lockups and buffer underruns on PipeWire and modern Linux sound servers.</li>
@@ -1260,11 +1282,13 @@
       </div>
 
       <div class="footer-links">
-        <h4>Downloads</h4>
+        <h4>Downloads (v6.0.0)</h4>
         <ul>
-          <li><a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v5.4.16/Jazz%2B%2B-x86_64.AppImage">Linux AppImage (x86_64)</a></li>
-          <li><a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v5.4.16/Jazz%2B%2B-Windows-x64.zip">Windows x64 Package (ZIP)</a></li>
-          <li><a href="https://github.com/rajazahidi/Jazzplusplus/releases/tag/v5.4.16">GitHub Release v5.4.16</a></li>
+          <li><a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v6.0.0/Jazz%2B%2B-x86_64.AppImage">Linux AppImage (x86_64)</a></li>
+          <li><a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v6.0.0/Jazz%2B%2B-Windows-x64.zip">Windows x64 Package (ZIP)</a></li>
+          <li><a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v6.0.0/Jazz%2B%2B-macOS-macos-14.zip">macOS Apple Silicon (ZIP)</a></li>
+          <li><a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v6.0.0/Jazz%2B%2B-macOS-macos-13.zip">macOS Intel x64 (ZIP)</a></li>
+          <li><a href="https://github.com/rajazahidi/Jazzplusplus/releases/tag/v6.0.0">GitHub Release v6.0.0</a></li>
         </ul>
       </div>
 

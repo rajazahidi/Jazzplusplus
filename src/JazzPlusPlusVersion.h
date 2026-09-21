@@ -76,6 +76,9 @@ const JZJazzPlusPlusVersion& JZJazzPlusPlusVersion::Instance()
 //  4  ?          Unknown for all prior versions.  Might be filled in by
 //                looking at old commit messages.
 //  5  1/21/2008  Start of the Jazz++ development revival.
+//  6  9/2026     Raja Zahidi: Version 6.0.0 milestone release. Modern JUCE 8
+//                architecture, native VST3 & CLAP plugin hosting, multi-platform
+//                builds (Linux, Windows, macOS).
 //
 // Returns:
 //   int:
@@ -84,7 +87,7 @@ const JZJazzPlusPlusVersion& JZJazzPlusPlusVersion::Instance()
 inline
 int JZJazzPlusPlusVersion::GetMajorVersion()
 {
-  return 5;
+  return 6;
 }
 
 //-----------------------------------------------------------------------------
@@ -98,6 +101,7 @@ int JZJazzPlusPlusVersion::GetMajorVersion()
 //                wxWidgets 2.8.7 and recent compilers including Visual Studio
 //                .NET 2005 and GCC 4.
 //  4  9/1/2008   Updated to wxWidgets version 2.8.8.
+//  0  9/2026     Reset for version 6.0.0.
 //
 // Returns:
 //   int:
@@ -106,7 +110,7 @@ int JZJazzPlusPlusVersion::GetMajorVersion()
 inline
 int JZJazzPlusPlusVersion::GetMinorVersion()
 {
-  return 4;
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -128,9 +132,12 @@ int JZJazzPlusPlusVersion::GetMinorVersion()
 //  16 9/2026     Raja Zahidi: Complete Linux playback freeze & mute resolution
 //                via pure ALSA sequencer player, non-blocking event polling,
 //                real-time queue clock sync, and automatic synthesizer binding.
+//  0  9/2026     Raja Zahidi: Version 6.0.0 official release with JUCE 8
+//                architecture, VST3 & CLAP hosting, multi-platform Linux,
+//                Windows, and macOS support.
 //-----------------------------------------------------------------------------
 inline
 int JZJazzPlusPlusVersion::GetBuildNumber()
 {
-  return 16;
+  return 0;
 }

@@ -1,11 +1,11 @@
 # Jazz++ MIDI & Audio Sequencer
 
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Site-00d2ff?logo=github)](https://rajazahidi.github.io/Jazzplusplus/)
-[![Latest Release](https://img.shields.io/github/v/release/rajazahidi/Jazzplusplus?color=10b981)](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v5.4.16)
+[![Latest Release](https://img.shields.io/github/v/release/rajazahidi/Jazzplusplus?color=10b981)](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v6.0.0)
 [![CI Build](https://github.com/rajazahidi/Jazzplusplus/actions/workflows/ci.yml/badge.svg)](https://github.com/rajazahidi/Jazzplusplus/actions/workflows/ci.yml)
 [![License: GPL-2.0](https://img.shields.io/badge/License-GPL_v2-blue.svg)](COPYING)
 
-**Jazz++** is a full-featured open-source MIDI sequencer and digital audio recording workstation for Linux and Windows. It offers two application editions designed to coexist seamlessly in the same repository:
+**Jazz++** is a full-featured open-source MIDI sequencer and digital audio recording workstation for Linux, Windows, and macOS. It offers two application editions designed to coexist seamlessly in the same repository:
 
 1. **Modern JUCE 8 Edition (`jazz-juce`)**: Next-generation workstation powered by **JUCE 8** and modern **C++20**, featuring native **VST3 & CLAP plugin hosting**, high-DPI vector graphics, non-blocking multi-threaded audio/MIDI engine, and modern studio tools.
 2. **Classic wxWidgets Edition (`jazz`)**: The battle-tested, lightweight desktop sequencer powered by **wxWidgets 3.2** and native ALSA (`snd_seq`) / WinMM drivers.
@@ -41,7 +41,7 @@ Originally created by Andreas Voss and Per Sigmond, with subsequent development 
 
 ## Quick Start: Pre-built Binaries
 
-Pre-compiled standalone packages for Linux and Windows are available from the [GitHub Releases](https://github.com/rajazahidi/Jazzplusplus/releases) page or [GitHub Actions Artifacts](https://github.com/rajazahidi/Jazzplusplus/actions).
+Pre-compiled standalone packages for Linux, Windows, and macOS are available from the [GitHub Releases](https://github.com/rajazahidi/Jazzplusplus/releases) page or [GitHub Actions Artifacts](https://github.com/rajazahidi/Jazzplusplus/actions).
 
 ### Linux (AppImage)
 1. Download **`Jazz++-x86_64.AppImage`**.
@@ -53,7 +53,11 @@ Pre-compiled standalone packages for Linux and Windows are available from the [G
 
 ### Windows (64-bit ZIP)
 1. Download **`Jazz++-Windows-x64.zip`**.
-2. Extract the archive and launch **`jazz.exe`**. All required wxWidgets 3.2.6 runtime DLLs are included.
+2. Extract the archive and launch **`jazz.exe`** or **`jazz-juce.exe`**. All required wxWidgets 3.2.6 runtime DLLs are included.
+
+### macOS (Apple Silicon & Intel)
+1. Download **`Jazz++-macOS-macos-14.zip`** (Apple Silicon M-series) or **`Jazz++-macOS-macos-13.zip`** (Intel x86_64).
+2. Extract the archive and run **`Jazz++ JUCE.app`**.
 
 ---
 

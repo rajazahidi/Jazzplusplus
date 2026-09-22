@@ -166,10 +166,11 @@ jobs:
   build-macos:
     name: Build macOS (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14, macos-13]
+        os: [macos-14, macos-15]
 
     steps:
       - name: Checkout repository
@@ -232,15 +233,15 @@ jobs:
         with:
           name: Jazz++-Windows-x64
 
-      - name: Download macOS Package (macOS 14 ARM64)
+      - name: Download macOS Package (macOS 14)
         uses: actions/download-artifact@v4
         with:
           name: Jazz++-macOS-macos-14
 
-      - name: Download macOS Package (macOS 13 x86_64)
+      - name: Download macOS Package (macOS 15)
         uses: actions/download-artifact@v4
         with:
-          name: Jazz++-macOS-macos-13
+          name: Jazz++-macOS-macos-15
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
@@ -249,5 +250,5 @@ jobs:
             Jazz++-x86_64.AppImage
             Jazz++-Windows-x64.zip
             Jazz++-macOS-macos-14.zip
-            Jazz++-macOS-macos-13.zip
+            Jazz++-macOS-macos-15.zip
           generate_release_notes: true

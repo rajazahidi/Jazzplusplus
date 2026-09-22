@@ -46,8 +46,8 @@ Pre-compiled standalone packages for Linux, Windows, and macOS are available fro
 1. Download **`Jazz++-Windows-x64.zip`**.
 2. Extract the archive and launch **`jazz.exe`**.
 
-### macOS (Apple Silicon & Intel)
-1. Download **`Jazz++-macOS-macos-14.zip`** (Apple Silicon M-series) or **`Jazz++-macOS-macos-13.zip`** (Intel x86_64).
+### macOS
+1. Download **`Jazz++-macOS-macos-14.zip`** (macOS 14 Sonoma) or **`Jazz++-macOS-macos-15.zip`** (macOS 15 Sequoia).
 2. Extract the archive and run **`Jazz++.app`**.
 
 ---

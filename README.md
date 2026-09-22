@@ -57,7 +57,7 @@ Pre-compiled standalone packages for Linux, Windows, and macOS are available fro
 ### Linux (Debian, Ubuntu, Linux Mint, Zorin OS)
 ```bash
 sudo apt update
-sudo apt install -y build-essential cmake libasound2-dev libgl1-mesa-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev
+sudo apt install -y build-essential cmake libasound2-dev libgl1-mesa-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libfreetype-dev libfontconfig1-dev
 ```
 
 ### Windows

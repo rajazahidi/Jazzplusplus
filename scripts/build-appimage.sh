@@ -28,7 +28,7 @@ cmake --install "$BUILD_DIR" --prefix "$APPDIR/usr"
 
 # Bundle required shared libraries into AppDir/usr/lib for standalone portability
 mkdir -p "$APPDIR/usr/lib"
-for pattern in "libpcre2*" "libpng16*" "libasound*"; do
+for pattern in "libpcre2*" "libpng16*" "libasound*" "libfreetype*" "libfontconfig*"; do
     for search_dir in /usr/lib/x86_64-linux-gnu /usr/lib /lib/x86_64-linux-gnu /lib; do
         if [ -d "$search_dir" ]; then
             find "$search_dir" -maxdepth 1 -name "$pattern" -exec cp -a {} "$APPDIR/usr/lib/" \; 2>/dev/null || true

@@ -64,5 +64,5 @@ m4/lt*.m4
 # SoundFonts
 soundfonts/
 
-# External libraries
-libs/
+# External libraries (JUCE is fetched via CMake or stored locally)
+libs/JUCE/

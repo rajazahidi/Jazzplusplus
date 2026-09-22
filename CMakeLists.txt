@@ -88,10 +88,26 @@ target_compile_definitions(jazz PRIVATE
     JUCE_PLUGINHOST_VST3=1
 )
 
+# -----------------------------------------------------------------------------
+# CLAP Plugin API Headers
+# -----------------------------------------------------------------------------
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/libs/clap/include/clap/clap.h")
+    set(CLAP_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/clap/include")
+else()
+    include(FetchContent)
+    FetchContent_Declare(clap
+        GIT_REPOSITORY https://github.com/free-audio/clap.git
+        GIT_TAG 1.2.5
+        GIT_SHALLOW TRUE
+    )
+    FetchContent_MakeAvailable(clap)
+    set(CLAP_INCLUDE_DIR "${clap_SOURCE_DIR}/include")
+endif()
+
 target_include_directories(jazz PRIVATE
     src
     src/juce
-    libs/clap/include
+    ${CLAP_INCLUDE_DIR}
 )
 
 target_compile_features(jazz PRIVATE cxx_std_20)

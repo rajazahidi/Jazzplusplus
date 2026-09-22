@@ -15,10 +15,6 @@
 #include <vector>
 #include <string>
 
-class JZSample;
-class JZTrack;
-class JZSong;
-
 // ============================================================================
 // 1. Procedural Retro Game Sound Effects (8-bit / 16-bit Chiptune SFX)
 // ============================================================================
@@ -119,21 +115,6 @@ class JZSoundIO
       int sampleRate = 44100,
       int channels = 1);
 
-    // Play WAV file asynchronously using wxSound
+    // Play WAV file asynchronously
     static bool PlayWav(const std::string& filePath);
-
-    // Insert or load samples into a JZSample in Jazz++
-    static bool AssignToSample(
-      JZSample& destSample,
-      const std::vector<short>& samples,
-      const std::string& label,
-      int sampleRate = 44100);
-
-    // Insert NoteOn event into a track at clock tick
-    static bool InsertNoteTrigger(
-      JZTrack* pTrack,
-      long clock,
-      int midiKey,
-      int velocity = 100,
-      int durationTicks = 120);
 };

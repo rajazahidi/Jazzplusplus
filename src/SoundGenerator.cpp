@@ -11,16 +11,6 @@
 //*****************************************************************************
 
 #include "SoundGenerator.h"
-#ifndef JAZZ_UNIT_TEST
-#include "Sample.h"
-#include "Track.h"
-#include "Song.h"
-#include "Events.h"
-
-#include <wx/sound.h>
-#include <wx/filename.h>
-#include <wx/stdpaths.h>
-#endif
 
 #include <cmath>
 #include <cstdlib>
@@ -584,81 +574,6 @@ bool JZSoundIO::SaveWav(
 
 bool JZSoundIO::PlayWav(const std::string& filePath)
 {
-#ifndef JAZZ_UNIT_TEST
-#if wxUSE_SOUND
-  wxSound sound(wxString::FromUTF8(filePath.c_str()));
-  if (sound.IsOk())
-  {
-    return sound.Play(wxSOUND_ASYNC);
-  }
-#endif
-#endif
   (void)filePath;
   return false;
 }
-
-#ifndef JAZZ_UNIT_TEST
-bool JZSoundIO::AssignToSample(
-  JZSample& destSample,
-  const std::vector<short>& samples,
-  const std::string& label,
-  int sampleRate)
-{
-  wxString tempDir = wxStandardPaths::Get().GetTempDir();
-  wxFileName tempWav(tempDir, wxString::FromUTF8(label.c_str()), "wav");
-  std::string tempPath = std::string(tempWav.GetFullPath().mb_str());
-
-  if (!SaveWav(tempPath, samples, sampleRate, 1))
-  {
-    return false;
-  }
-
-  destSample.SetFileName(tempPath);
-  destSample.SetLabel(label);
-  destSample.LoadWav();
-  return true;
-}
-
-bool JZSoundIO::InsertNoteTrigger(
-  JZTrack* pTrack,
-  long clock,
-  int midiKey,
-  int velocity,
-  int durationTicks)
-{
-  if (!pTrack)
-  {
-    return false;
-  }
-
-  // Create KeyOn event
-  JZKeyOnEvent* pKeyOn = new JZKeyOnEvent(
-    clock,
-    0, // Channel
-    midiKey,
-    velocity,
-    durationTicks);
-
-  pTrack->Put(pKeyOn);
-  return true;
-}
-#else
-bool JZSoundIO::AssignToSample(
-  JZSample&,
-  const std::vector<short>&,
-  const std::string&,
-  int)
-{
-  return true;
-}
-
-bool JZSoundIO::InsertNoteTrigger(
-  JZTrack*,
-  long,
-  int,
-  int,
-  int)
-{
-  return true;
-}
-#endif

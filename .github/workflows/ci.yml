@@ -33,16 +33,14 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake build-essential libasound2-dev libgl1-mesa-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev
-          sudo apt-get install -y libwxgtk3.2-dev || sudo apt-get install -y libwxgtk3.0-gtk3-dev
 
       - name: Configure CMake
         run: |
           cmake -B build \
             -DCMAKE_BUILD_TYPE=Release \
-            -DBUILD_JAZZ_JUCE=ON \
             -DCMAKE_VERBOSE_MAKEFILE=ON
 
-      - name: Build Jazz++ & JUCE 8
+      - name: Build Jazz++ & Tests
         run: |
           cmake --build build --parallel $(nproc)
 
@@ -80,11 +78,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake build-essential libasound2-dev file wget libgl1-mesa-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev
-          sudo apt-get install -y libwxgtk3.2-dev || sudo apt-get install -y libwxgtk3.0-gtk3-dev
 
       - name: Build Project
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_JAZZ_JUCE=ON
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel $(nproc)
           ctest --test-dir build --output-on-failure
 
@@ -114,37 +111,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Cache wxWidgets
-        id: cache-wx
-        uses: actions/cache@v4
-        with:
-          path: D:/wxWidgets
-          key: wxwidgets-3.2.6-msvc-x64-v3
-
-      - name: Download & Extract wxWidgets 3.2.6
-        if: steps.cache-wx.outputs.cache-hit != 'true'
-        shell: pwsh
-        run: |
-          New-Item -ItemType Directory -Force -Path "D:\wxWidgets"
-          Invoke-WebRequest -Uri "https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.6/wxWidgets-3.2.6-headers.7z" -OutFile "wx_headers.7z"
-          Invoke-WebRequest -Uri "https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.6/wxMSW-3.2.6_vc14x_x64_Dev.7z" -OutFile "wx_dev.7z"
-          Invoke-WebRequest -Uri "https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.6/wxMSW-3.2.6_vc14x_x64_ReleaseDLL.7z" -OutFile "wx_dll.7z"
-          7z x wx_headers.7z -o"D:\wxWidgets" -y
-          7z x wx_dev.7z -o"D:\wxWidgets" -y
-          7z x wx_dll.7z -o"D:\wxWidgets" -y
-          Remove-Item wx_headers.7z, wx_dev.7z, wx_dll.7z
-
       - name: Configure CMake
         shell: pwsh
-        env:
-          WXWIN: "D:/wxWidgets"
         run: |
-          cmake -B build `
-            -DCMAKE_BUILD_TYPE=Release `
-            -DBUILD_JAZZ_JUCE=ON `
-            -DwxWidgets_ROOT_DIR="D:/wxWidgets" `
-            -DwxWidgets_LIB_DIR="D:/wxWidgets/lib/vc14x_x64_dll" `
-            -DwxWidgets_CONFIGURATION=mswu
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
 
       - name: Build Jazz++ & Tests
         shell: pwsh
@@ -162,22 +132,17 @@ jobs:
           $pkgDir = "Jazz++-Windows-x64"
           New-Item -ItemType Directory -Force -Path $pkgDir
 
-          # Copy classic executable
-          if (Test-Path "build\Release\jazz.exe") {
-            Copy-Item "build\Release\jazz.exe" "$pkgDir\"
+          # Copy JUCE executable
+          if (Test-Path "build\jazz_artefacts\Release\Jazz++.exe") {
+            Copy-Item "build\jazz_artefacts\Release\Jazz++.exe" "$pkgDir\jazz.exe"
+            Copy-Item "build\jazz_artefacts\Release\Jazz++.exe" "$pkgDir\jazz-juce.exe"
+          } elseif (Test-Path "build\Release\jazz.exe") {
+            Copy-Item "build\Release\jazz.exe" "$pkgDir\jazz.exe"
+            Copy-Item "build\Release\jazz.exe" "$pkgDir\jazz-juce.exe"
           } elseif (Test-Path "build\jazz.exe") {
-            Copy-Item "build\jazz.exe" "$pkgDir\"
+            Copy-Item "build\jazz.exe" "$pkgDir\jazz.exe"
+            Copy-Item "build\jazz.exe" "$pkgDir\jazz-juce.exe"
           }
-
-          # Copy modern JUCE 8 executable
-          if (Test-Path "build\jazz-juce_artefacts\Release\Jazz++ JUCE.exe") {
-            Copy-Item "build\jazz-juce_artefacts\Release\Jazz++ JUCE.exe" "$pkgDir\jazz-juce.exe"
-          } elseif (Test-Path "build\Release\jazz-juce.exe") {
-            Copy-Item "build\Release\jazz-juce.exe" "$pkgDir\"
-          }
-
-          # Copy wxWidgets runtime DLLs
-          Copy-Item "D:\wxWidgets\lib\vc14x_x64_dll\*.dll" "$pkgDir\" -Force
 
           # Copy assets and documentation
           Copy-Item -Recurse "conf" "$pkgDir\conf"
@@ -211,12 +176,9 @@ jobs:
 
       - name: Configure CMake
         run: |
-          cmake -B build \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DBUILD_JAZZ_JUCE=ON \
-            -DBUILD_JAZZ_WX=OFF
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
 
-      - name: Build Jazz++ JUCE & Tests
+      - name: Build Jazz++ & Tests
         run: |
           cmake --build build --parallel
 
@@ -227,10 +189,12 @@ jobs:
       - name: Package macOS Release (ZIP)
         run: |
           mkdir -p "Jazz++-macOS"
-          if [ -d "build/jazz-juce_artefacts/Release/Jazz++ JUCE.app" ]; then
+          if [ -d "build/jazz_artefacts/Release/Jazz++.app" ]; then
+            cp -R "build/jazz_artefacts/Release/Jazz++.app" "Jazz++-macOS/"
+          elif [ -d "build/Jazz++.app" ]; then
+            cp -R "build/Jazz++.app" "Jazz++-macOS/"
+          elif [ -d "build/jazz-juce_artefacts/Release/Jazz++ JUCE.app" ]; then
             cp -R "build/jazz-juce_artefacts/Release/Jazz++ JUCE.app" "Jazz++-macOS/"
-          elif [ -d "build/Jazz++ JUCE.app" ]; then
-            cp -R "build/Jazz++ JUCE.app" "Jazz++-macOS/"
           fi
           cp -R conf song src/HelpFiles README.md COPYING "Jazz++-macOS/"
           zip -r "Jazz++-macOS-${{ matrix.os }}.zip" "Jazz++-macOS"

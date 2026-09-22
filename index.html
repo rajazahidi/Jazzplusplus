@@ -1162,7 +1162,7 @@
       <!-- Linux Tab -->
       <div id="tab-linux">
         <p style="margin-bottom: 1rem; color: var(--text-muted);">
-          The Linux AppImage bundles all required libraries (wxWidgets 3.2, libtiff, libasound, etc.) and is ready to run on any modern Linux distribution:
+          The Linux AppImage bundles all required libraries and is ready to run on any modern Linux distribution:
         </p>
         <div class="code-block">
           <code><span class="comment"># 1. Make the AppImage executable</span></code>
@@ -1191,23 +1191,22 @@
       <!-- Source Tab -->
       <div id="tab-source" style="display: none;">
         <p style="margin-bottom: 1rem; color: var(--text-muted);">
-          Building Jazz++ from source is clean and straightforward with CMake and GCC/Clang or MSVC:
+          Building Jazz++ from source is clean and straightforward with CMake and modern C++20:
         </p>
         <div class="code-block">
           <code><span class="comment"># Clone the repository</span></code>
           <code><span class="cmd">git clone</span> https://github.com/rajazahidi/Jazzplusplus.git</code>
           <code><span class="cmd">cd</span> Jazzplusplus</code>
           <br>
-          <code><span class="comment"># Build legacy wxWidgets application</span></code>
+          <code><span class="comment"># Configure and build</span></code>
           <code><span class="cmd">cmake</span> -B build -DCMAKE_BUILD_TYPE=Release</code>
-          <code><span class="cmd">cmake</span> --build build --target jazz -j$(nproc)</code>
-          <br>
-          <code><span class="comment"># Build modern JUCE 8 Edition with VST3 &amp; CLAP hosting</span></code>
-          <code><span class="cmd">cmake</span> -B build -DBUILD_JAZZ_JUCE=ON</code>
-          <code><span class="cmd">cmake</span> --build build --target jazz-juce -j$(nproc)</code>
+          <code><span class="cmd">cmake</span> --build build --parallel $(nproc)</code>
           <br>
           <code><span class="comment"># Run core unit tests</span></code>
-          <code>./build/jazz_tests</code>
+          <code>ctest --test-dir build --output-on-failure</code>
+          <br>
+          <code><span class="comment"># Launch workstation</span></code>
+          <code>./build/jazz</code>
         </div>
       </div>
     </div>
@@ -1228,7 +1227,7 @@
         <span class="version-badge" style="margin-left: auto;">Latest Release</span>
       </h3>
       <ul class="changelog-list">
-        <li><strong>Dual Architecture Coexistence:</strong> Modern standalone <code style="color:var(--accent-cyan);">jazz-juce</code> target powered by JUCE 8 and C++20, maintaining complete coexistence with the classic wxWidgets <code style="color:var(--accent-cyan);">jazz</code> application.</li>
+        <li><strong>Pure JUCE 8 Architecture:</strong> High-performance digital audio workstation powered purely by JUCE 8 and modern C++20, completely replacing and retiring the legacy wxWidgets codebase.</li>
         <li><strong>Native VST3 Plugin Hosting:</strong> Integrated JUCE 8 format manager (<code style="color:var(--accent-cyan);">JUCE_PLUGINHOST_VST3=1</code>) supporting 64-bit VST3 instruments and effects.</li>
         <li><strong>Native CLAP Plugin Hosting:</strong> Custom CLAP format and instance wrapper (<code style="color:var(--accent-cyan);">ClapPluginFormat</code> &amp; <code style="color:var(--accent-cyan);">ClapPluginInstance</code>) integrating official CLAP C API headers for binary discovery, parameter automation, state save/load, and UI windowing.</li>
         <li><strong>Plugin Scanner &amp; Browser:</strong> Automatic scanning of standard plugin paths (<code style="color:var(--accent-cyan);">/usr/lib/vst3</code>, <code style="color:var(--accent-cyan);">/usr/lib/clap</code>, <code style="color:var(--accent-cyan);">~/.vst3</code>, <code style="color:var(--accent-cyan);">~/.clap</code>), live search, and file picker.</li>

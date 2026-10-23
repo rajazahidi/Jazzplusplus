@@ -68,6 +68,7 @@ class JZAutoAccompanimentDialog : public wxDialog
 
     // Header Controls
     wxChoice* mpSourceTrackChoice;
+    wxStaticText* mpKeyCenterLabel;
     wxRadioButton* mpRangeAllRadio;
     wxRadioButton* mpRangeCustomRadio;
     wxSpinCtrl* mpFromBarSpin;
@@ -78,6 +79,8 @@ class JZAutoAccompanimentDialog : public wxDialog
 
     // Tab 1: Band Accompaniment
     wxChoice* mpBandStyleChoice;
+    wxChoice* mpSectionChoice;
+    wxChoice* mpBassFeelChoice;
     wxCheckBox* mpBassCheckBox;
     wxCheckBox* mpDrumsCheckBox;
     wxCheckBox* mpPadCheckBox;
@@ -101,11 +104,14 @@ class JZAutoAccompanimentDialog : public wxDialog
     wxChoice* mpSoloPatchChoice;
     wxSpinCtrl* mpSoloOctaveSpin;
 
-    // Musicality Options
+    // Musicality & Harmony Options
     wxSlider* mpSwingSlider;
     wxCheckBox* mpDrumFillsCheckBox;
     wxCheckBox* mpSoloBendsCheckBox;
     wxCheckBox* mpHumanizeVelCheckBox;
+    wxCheckBox* mpSmoothVoiceLeadingCheckBox;
+    wxCheckBox* mpGhostNotesCheckBox;
+    wxCheckBox* mpMixerPresetsCheckBox;
 
     // Bottom Controls
     wxCheckBox* mpOverwriteCheckBox;

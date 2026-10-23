@@ -4,7 +4,8 @@
 // Smart Auto-Accompaniment & Music Intelligence Engine (Pro Edition)
 //
 // Full-Band Accompaniment, Strumming, Plucking, Riffs, and Expressive Solo
-// with Half-Measure Chord Tracking, Inversions, Drum Fills, Pitch Bends & Vibrato.
+// with Smooth Voice Leading, Song Form Dynamics, Key Center Detection,
+// Smart Auto-Mixer Presets, Advanced Bass Articulations, and Live Jamming.
 //*****************************************************************************
 
 #pragma once
@@ -24,6 +25,43 @@ enum JZGenerationMode
   MODE_RIFF_MAKER,        // Harmonic Riffs & Melodic Hooks
   MODE_AUTO_SOLO,         // Intelligent Lead Improviser / Solo Generator
   MODE_ALL_SIMULTANEOUS   // Generate all selected layers together
+};
+
+// Song Form Dynamic Sections
+enum JZSongSection
+{
+  SECTION_AUTO = 0,       // Procedurally determined by bar position in the arrangement
+  SECTION_INTRO,          // Soft ambient entry, pedal tones, light cymbal/hi-hat
+  SECTION_VERSE,          // 2-feel bass with ghost notes, rimshot / closed hi-hat, lyrical phrasing
+  SECTION_CHORUS,         // 4-feel walking bass, ride cymbal, energetic full dynamics, virtuoso solo
+  SECTION_BRIDGE,         // Breakdown / syncopated hits, alternate harmonic texture
+  SECTION_OUTRO,          // Decrescendo fade, pedal point, definitive final cadence
+  SECTION_COUNT
+};
+
+// Advanced Bass Articulation Feels
+enum JZBassFeel
+{
+  BASS_FEEL_AUTO = 0,     // 2-feel in Intro/Verse, 4-feel in Chorus/Bridge
+  BASS_FEEL_2,            // Half-notes with subtle ghost notes (2-feel)
+  BASS_FEEL_4             // Quarter-notes continuous walking bass (4-feel)
+};
+
+// Global Key Center / Tonal Anchor (Krumhansl-Schmuckler Key Finding)
+struct JZKeyCenter
+{
+  int tonicPc;            // 0..11 (0=C, 1=C#, 2=D, 3=D#, 4=E, 5=F, 6=F#, 7=G, 8=G#, 9=A, 10=Bb, 11=B)
+  bool isMinor;           // false = Major, true = Minor
+  float confidence;       // 0.0 to 1.0 correlation score
+  std::string name;       // e.g. "C Major", "A Minor"
+
+  JZKeyCenter()
+    : tonicPc(0),
+      isMinor(false),
+      confidence(0.0f),
+      name("C Major")
+  {
+  }
 };
 
 // 1. Full Band Accompaniment Styles
@@ -208,11 +246,23 @@ struct JZAccompanimentConfig
   JZRiffConfig riff;
   JZSoloConfig solo;
 
+  // Song Form & Arrangement Dynamics
+  JZSongSection songSection;      // SECTION_AUTO, SECTION_INTRO, SECTION_VERSE, SECTION_CHORUS, SECTION_BRIDGE, SECTION_OUTRO
+  JZBassFeel bassFeel;            // BASS_FEEL_AUTO, BASS_FEEL_2, BASS_FEEL_4
+
+  // Studio Audio & Harmonization
+  bool applyMixerPresets;         // Balanced stereo panning & volume levels for professional mix
+  bool enableSmoothVoiceLeading;  // Intelligent inversions to minimize pad register leaps
+  bool enableGhostNotes;          // Subtle ghost notes & octave drops on bass
+
   // Musicality Enhancements
   int swingPercent;               // 50 (straight) to 70 (heavy swing)
   bool enableHumanizeVelocity;    // Subtle velocity drift
   bool enableDrumFills;           // Fills on measure 4, 8, 12, 16
   bool enableSoloBendsAndVibrato; // Pitch bend & CC 1 vibrato on solo
+
+  // Global Key Center
+  JZKeyCenter keyCenter;
 
   // Range and Options
   int fromBar;          // 0-based bar index (0 = Bar 1)
@@ -229,6 +279,11 @@ struct JZAccompanimentConfig
       drumsTrackIndex(9),
       generatePad(true),
       padTrackIndex(2),
+      songSection(SECTION_AUTO),
+      bassFeel(BASS_FEEL_AUTO),
+      applyMixerPresets(true),
+      enableSmoothVoiceLeading(true),
+      enableGhostNotes(true),
       swingPercent(62),
       enableHumanizeVelocity(true),
       enableDrumFills(true),
@@ -245,17 +300,20 @@ struct JZAccompanimentResult
 {
   bool success;
   int barsProcessed;
+  int sectionsProcessed;
   int bassNotesGenerated;
   int drumNotesGenerated;
   int padNotesGenerated;
   int strumNotesGenerated;
   int riffNotesGenerated;
   int soloNotesGenerated;
+  JZKeyCenter detectedKey;
   std::string message;
 
   JZAccompanimentResult()
     : success(false),
       barsProcessed(0),
+      sectionsProcessed(0),
       bassNotesGenerated(0),
       drumNotesGenerated(0),
       padNotesGenerated(0),
@@ -275,6 +333,20 @@ class JZAutoAccompaniment
     static const char* GetStrumPluckStyleName(JZStrumPluckStyle style);
     static const char* GetRiffStyleName(JZRiffStyle style);
     static const char* GetSoloStyleName(JZSoloStyle style);
+    static const char* GetSectionName(JZSongSection section);
+    static const char* GetBassFeelName(JZBassFeel feel);
+
+    // Procedural song structure mapping
+    static JZSongSection DetermineSection(int barIndex, int totalBars, JZSongSection overrideSection = SECTION_AUTO);
+
+    // Global Key Center Detection via Krumhansl-Schmuckler Key-Finding Algorithm
+    static JZKeyCenter DetectSongKeyCenter(JZTrack* pSourceTrack);
+
+    // Smooth Voice Leading: finds voicing that minimizes semitone distance from prevVoicing
+    static std::vector<int> FindSmoothVoiceLeading(
+      int rootPc,
+      JZChordQuality quality,
+      const std::vector<int>& prevVoicing);
 
     // Run the generator on the given song according to config
     static JZAccompanimentResult Generate(JZSong* pSong, const JZAccompanimentConfig& config);
@@ -288,7 +360,7 @@ class JZAutoAccompaniment
 
   public:
 
-    // Generator helpers for each instrument
+    // Generator helpers for each instrument (now with Song Form & Voice Leading awareness)
     static int GenerateBassMeasure(
       JZTrack* pTrack,
       int barIndex,
@@ -298,7 +370,8 @@ class JZAutoAccompaniment
       int countsPerBar,
       const JZDetectedChord& chord,
       const JZDetectedChord& nextChord,
-      const JZAccompanimentConfig& config);
+      const JZAccompanimentConfig& config,
+      JZSongSection currentSection);
 
     static int GenerateDrumsMeasure(
       JZTrack* pTrack,
@@ -307,7 +380,8 @@ class JZAutoAccompaniment
       int ticksPerBar,
       int ticksPerQuarter,
       int countsPerBar,
-      const JZAccompanimentConfig& config);
+      const JZAccompanimentConfig& config,
+      JZSongSection currentSection);
 
     static int GeneratePadMeasure(
       JZTrack* pTrack,
@@ -317,7 +391,9 @@ class JZAutoAccompaniment
       int ticksPerQuarter,
       int countsPerBar,
       const JZDetectedChord& chord,
-      const JZAccompanimentConfig& config);
+      const JZAccompanimentConfig& config,
+      JZSongSection currentSection,
+      std::vector<int>& prevVoicing);
 
     static int GenerateStrumPluckMeasure(
       JZTrack* pTrack,
@@ -327,7 +403,8 @@ class JZAutoAccompaniment
       int ticksPerQuarter,
       int countsPerBar,
       const JZDetectedChord& chord,
-      const JZAccompanimentConfig& config);
+      const JZAccompanimentConfig& config,
+      JZSongSection currentSection);
 
     static int GenerateRiffMeasure(
       JZTrack* pTrack,
@@ -337,7 +414,8 @@ class JZAutoAccompaniment
       int ticksPerQuarter,
       int countsPerBar,
       const JZDetectedChord& chord,
-      const JZAccompanimentConfig& config);
+      const JZAccompanimentConfig& config,
+      JZSongSection currentSection);
 
     static int GenerateSoloMeasure(
       JZTrack* pTrack,
@@ -347,9 +425,45 @@ class JZAutoAccompaniment
       int ticksPerQuarter,
       int countsPerBar,
       const JZDetectedChord& chord,
-      const JZAccompanimentConfig& config);
+      const JZAccompanimentConfig& config,
+      JZSongSection currentSection);
 
     // Clear key-on notes in clock range [fromClock, toClock)
+    static void ClearRange(JZTrack* pTrack, int fromClock, int toClock);
+
+  private:
+
+    // Helper for analyzing notes within an arbitrary clock window
+    static bool AnalyzeWindow(
+      JZTrack* pTrack,
+      int startClock,
+      int endClock,
+      int& rootPc,
+      int& bassPc,
+      int& inversion,
+      JZChordQuality& quality,
+      int& minP);
+};
+
+// Real-Time Interactive Chord & Jamming Tracker
+class JZLiveJamEngine
+{
+  public:
+
+    JZLiveJamEngine();
+    void Reset();
+    void NoteOn(int pitch, int velocity);
+    void NoteOff(int pitch);
+    bool HasActiveChord() const;
+    const JZDetectedChord& GetCurrentChord() const;
+    std::string GetCurrentChordName() const;
+
+  private:
+
+    void Reevaluate();
+    std::vector<int> mActivePitches;
+    JZDetectedChord mCurrentChord;
+};
     static void ClearRange(JZTrack* pTrack, int fromClock, int toClock);
 
   private:

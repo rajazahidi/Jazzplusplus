@@ -1,3 +1,34 @@
+24-10-2026 Raja Zahidi
+- Feature & Music Intelligence: Smart Studio Arranger Edition (Smooth Voice Leading, Song Form Dynamics, Key Center Detection, Smart Auto-Mixer & Live Jamming):
+  * Pimpinan Suara Licin (Smooth Voice Leading Engine - src/AutoAccompaniment.h & .cpp):
+    - Melaksanakan algoritma pemilihan pembalikan kord (*inversion selection*) yang meminimumkan jumlah jarak pergerakan semiton antara kord berturutan.
+    - Not sepunya (*common tones*) dikekalkan pada pic yang sama tanpa lompatan kasar bagi lapisan Pad dan Strings (cth: peralihan C Maj -> F Maj menggunakan pembalikan kedua F/C dengan jumlah jarak lompatan hanya 3 semiton berbanding 15 semiton dalam kedudukan asas).
+  * Struktur Lagu & Dinamik Bahagian (Song Form & Dynamic Arrangement):
+    - Pengenalan sistem bahagian lagu: Intro, Verse, Chorus, Bridge, dan Outro secara automatik mengikut kepanjangan lagu atau pilihan pengguna.
+    - Dinamik Dram Mengikut Bahagian: Intro (hi-hat tertutup/ride bell lembut, kick beat 1 sahaja), Verse (rimshot 37 & closed hi-hat dalam poket kemas), Chorus (ride cymbal 51 / open hi-hat bertenaga dengan snare padu 38 dan double kick accents), Bridge (breakdown toms), dan Outro (decrescendo ride wash dengan crash penamat).
+    - Dinamik Solo Mengikut Bahagian: Kepadatan dan halaju solo dilaraskan secara dinamik—lebih berjiwa dan renggang dalam Verse/Intro dan melonjak kepada frasa virtuoso bertenaga tinggi dengan lengkungan pic dalam Chorus.
+  * Pengecaman Kunci Lagu Global (Global Key Center Detection):
+    - Pelaksanaan algoritma Krumhansl-Schmuckler Key-Finding yang menganalisis taburan frekuensi pic (*pitch class duration profile*) ke atas keseluruhan trek sumber.
+    - Mengira korelasi Pearson terhadap templat Krumhansl-Kessler bagi kesemua 24 kunci Major dan Minor untuk menentukan tonik lagu berserta tahap keyakinan (*tonal confidence score*).
+  * Pratetap Adunan Pintar Automatik (Smart Auto-Mixer Studio Presets):
+    - Konfigurasi automatik bagi pemisahan stereo (*stereo panning*) dan imbangan aras volum:
+      - Bass: Pan 64 (Center), Volum 100, Reverb 15 (punchy & kering di tengah).
+      - Drums: Pan 64 (Center), Volum 106, Reverb 25 (padu & bertenaga di tengah).
+      - Pad / Strings: Pan 85 (Kanan 35%), Volum 72, Reverb 65, Chorus 45 (lebar, hangat dan berdimensi).
+      - Strum / Pluck Guitar: Pan 40 (Kiri 38%), Volum 84, Reverb 40, Chorus 20 (lebar di sebelah kiri).
+      - Riffs / Hooks: Pan 48 (Kiri Tengah), Volum 92, Reverb 35, Chorus 15.
+      - Solo Lead: Pan 64 (Center-Front), Volum 110, Reverb 50, Chorus 20 (menyerlah di barisan hadapan).
+  * Artikulasi Bes Lanjutan (Advanced Bass Articulations):
+    - Peralihan automatik atau manual antara 2-feel (not separuh pada beat 1 & 3 dalam Verse) dan 4-feel (walking bass berterusan dalam Chorus).
+    - Penjanaan not hantu (*ghost notes*) berhalaju rendah (35-45) pada offbeat (beat 2-and dan 4-and) untuk groove akustik semula jadi.
+    - Penurunan oktaf automatik (*octave drop*) bagi pic melebihi 44 untuk memastikan frekuensi sub-bass kekal tebal dan mantap.
+  * Enjin Jamming Masa Nyata Interaktif (Live Real-Time Jam Engine):
+    - Penjejak kord interaktif (JZLiveJamEngine) yang memantau not MIDI In secara langsung, mengira pic aktif, dan mengenal pasti kord serta pembalikannya secara masa nyata untuk sokongan jamming langsung.
+  * Antara Muka Pengguna Dipertingkat (src/Dialogs/AutoAccompanimentDialog.h & .cpp):
+    - Paparan Kunci Global lagu secara masa nyata dalam pengepala dialog.
+    - Kawalan Song Section (Auto / Intro / Verse / Chorus / Bridge / Outro) dan Bass Articulation Feel.
+    - Kotak semak pilihan Smooth Voice Leading, Bass Ghost Notes, dan Smart Auto-Mixer Presets.
+
 23-10-2026 Raja Zahidi
 - Feature & Music Intelligence: Smart Music Intelligence & Session Band Hub (Pro Edition):
   * Ketepatan Harmoni Lanjutan (src/AutoAccompaniment.h & src/AutoAccompaniment.cpp):

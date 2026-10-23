@@ -68,12 +68,15 @@ JZAutoAccompanimentDialog::JZAutoAccompanimentDialog(
     mDefaultSourceTrack(defaultSourceTrack),
     mIsAuditioning(false),
     mpSourceTrackChoice(0),
+    mpKeyCenterLabel(0),
     mpRangeAllRadio(0),
     mpRangeCustomRadio(0),
     mpFromBarSpin(0),
     mpToBarSpin(0),
     mpNotebook(0),
     mpBandStyleChoice(0),
+    mpSectionChoice(0),
+    mpBassFeelChoice(0),
     mpBassCheckBox(0),
     mpDrumsCheckBox(0),
     mpPadCheckBox(0),
@@ -94,6 +97,9 @@ JZAutoAccompanimentDialog::JZAutoAccompanimentDialog(
     mpDrumFillsCheckBox(0),
     mpSoloBendsCheckBox(0),
     mpHumanizeVelCheckBox(0),
+    mpSmoothVoiceLeadingCheckBox(0),
+    mpGhostNotesCheckBox(0),
+    mpMixerPresetsCheckBox(0),
     mpOverwriteCheckBox(0),
     mpSimultaneousCheckBox(0),
     mpAuditionButton(0),
@@ -167,6 +173,17 @@ void JZAutoAccompanimentDialog::CreateControls()
   }
   mpSourceTrackChoice->SetSelection((mDefaultSourceTrack >= 0 && mDefaultSourceTrack < maxTracks) ? mDefaultSourceTrack : 0);
   pSourceBox->Add(mpSourceTrackChoice, 0, wxALL | wxEXPAND, FromDIP(4));
+
+  JZKeyCenter detectedKey;
+  if (mpProject)
+  {
+    JZTrack* src = mpProject->GetTrack(mDefaultSourceTrack);
+    if (src) detectedKey = JZAutoAccompaniment::DetectSongKeyCenter(src);
+  }
+  wxString keyText = wxString::Format("Key Center: %s (%d%% match)", detectedKey.name.c_str(), (int)(detectedKey.confidence * 100));
+  mpKeyCenterLabel = new wxStaticText(this, wxID_ANY, keyText);
+  pSourceBox->Add(mpKeyCenterLabel, 0, wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(4));
+
   pTopRow->Add(pSourceBox, 1, wxALL | wxEXPAND, FromDIP(5));
 
   // Measure Range Box
@@ -236,6 +253,22 @@ void JZAutoAccompanimentDialog::CreateControls()
   mpSoloBendsCheckBox->SetValue(true);
   pExprRow->Add(mpSoloBendsCheckBox, 1, 0, 0);
   pGrooveBox->Add(pExprRow, 0, wxALL | wxEXPAND, FromDIP(4));
+
+  wxBoxSizer* pAdvRow = new wxBoxSizer(wxHORIZONTAL);
+  mpSmoothVoiceLeadingCheckBox = new wxCheckBox(this, wxID_ANY, "Smooth Voice Leading (Minimal Leaps)");
+  mpSmoothVoiceLeadingCheckBox->SetValue(true);
+  pAdvRow->Add(mpSmoothVoiceLeadingCheckBox, 1, wxRIGHT, FromDIP(8));
+
+  mpGhostNotesCheckBox = new wxCheckBox(this, wxID_ANY, "Bass Ghost Notes & Articulations");
+  mpGhostNotesCheckBox->SetValue(true);
+  pAdvRow->Add(mpGhostNotesCheckBox, 1, 0, 0);
+  pGrooveBox->Add(pAdvRow, 0, wxALL | wxEXPAND, FromDIP(4));
+
+  wxBoxSizer* pMixRow = new wxBoxSizer(wxHORIZONTAL);
+  mpMixerPresetsCheckBox = new wxCheckBox(this, wxID_ANY, "Apply Smart Auto-Mixer Studio Presets (Stereo Pan, Levels & FX)");
+  mpMixerPresetsCheckBox->SetValue(true);
+  pMixRow->Add(mpMixerPresetsCheckBox, 1, 0, 0);
+  pGrooveBox->Add(pMixRow, 0, wxALL | wxEXPAND, FromDIP(4));
 
   pMainSizer->Add(pGrooveBox, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(6));
 
@@ -310,6 +343,31 @@ wxPanel* JZAutoAccompanimentDialog::CreateBandTab(wxWindow* pParent)
   pInstBox->Add(mpPadCheckBox, 0, wxALL, FromDIP(4));
 
   pSizer->Add(pInstBox, 0, wxALL | wxEXPAND, FromDIP(6));
+
+  wxStaticBoxSizer* pFormBox = new wxStaticBoxSizer(wxVERTICAL, pPanel, "Song Form & Dynamic Arrangement");
+  wxFlexGridSizer* pFormGrid = new wxFlexGridSizer(2, 2, FromDIP(6), FromDIP(10));
+  pFormGrid->AddGrowableCol(1);
+
+  pFormGrid->Add(new wxStaticText(pPanel, wxID_ANY, "Song Section:"), 0, wxALIGN_CENTER_VERTICAL);
+  mpSectionChoice = new wxChoice(pPanel, wxID_ANY);
+  for (int s = 0; s < SECTION_COUNT; ++s)
+  {
+    mpSectionChoice->Append(JZAutoAccompaniment::GetSectionName((JZSongSection)s));
+  }
+  mpSectionChoice->SetSelection(SECTION_AUTO);
+  pFormGrid->Add(mpSectionChoice, 1, wxEXPAND);
+
+  pFormGrid->Add(new wxStaticText(pPanel, wxID_ANY, "Bass Articulation:"), 0, wxALIGN_CENTER_VERTICAL);
+  mpBassFeelChoice = new wxChoice(pPanel, wxID_ANY);
+  for (int f = 0; f < 3; ++f)
+  {
+    mpBassFeelChoice->Append(JZAutoAccompaniment::GetBassFeelName((JZBassFeel)f));
+  }
+  mpBassFeelChoice->SetSelection(BASS_FEEL_AUTO);
+  pFormGrid->Add(mpBassFeelChoice, 1, wxEXPAND);
+
+  pFormBox->Add(pFormGrid, 0, wxALL | wxEXPAND, FromDIP(5));
+  pSizer->Add(pFormBox, 0, wxALL | wxEXPAND, FromDIP(6));
   pPanel->SetSizer(pSizer);
   return pPanel;
 }
@@ -672,6 +730,11 @@ void JZAutoAccompanimentDialog::OnGenerateButton(wxCommandEvent& Event)
   mConfig.enableDrumFills = mpDrumFillsCheckBox->GetValue();
   mConfig.enableSoloBendsAndVibrato = mpSoloBendsCheckBox->GetValue();
   mConfig.enableHumanizeVelocity = true;
+  if (mpSmoothVoiceLeadingCheckBox) mConfig.enableSmoothVoiceLeading = mpSmoothVoiceLeadingCheckBox->GetValue();
+  if (mpGhostNotesCheckBox) mConfig.enableGhostNotes = mpGhostNotesCheckBox->GetValue();
+  if (mpMixerPresetsCheckBox) mConfig.applyMixerPresets = mpMixerPresetsCheckBox->GetValue();
+  if (mpSectionChoice) mConfig.songSection = (JZSongSection)mpSectionChoice->GetSelection();
+  if (mpBassFeelChoice) mConfig.bassFeel = (JZBassFeel)mpBassFeelChoice->GetSelection();
 
   // Determine mode
   if (mpSimultaneousCheckBox->GetValue())

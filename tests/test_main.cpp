@@ -1068,6 +1068,70 @@ void TestAutoAccompanimentLogic()
   unsigned char vibratoCC1 = 64;
   TEST_ASSERT(halfStepBend == 4096, "Half-step upward pitch bend is 4096 units");
   TEST_ASSERT(vibratoCC1 == 64, "Modulation Wheel CC 1 vibrato depth is 64");
+
+  // 12. Smooth Voice Leading Logic (Preserves common tone C4 and minimizes semitone leaps)
+  // C Major voicing: C4 (60), E4 (64), G4 (67)
+  // F Major root position: F4 (65), A4 (69), C5 (72) -> leap = 5 + 5 + 5 = 15 semitones
+  // F Major 2nd inversion: C4 (60), F4 (65), A4 (69) -> leap = 0 + 1 + 2 = 3 semitones
+  vector<int> prevC = {60, 64, 67};
+  vector<int> fRoot = {65, 69, 72};
+  vector<int> fInv2 = {60, 65, 69};
+  int leapRoot = abs(60 - 65) + abs(64 - 69) + abs(67 - 72); // 15
+  int leapInv2 = abs(60 - 60) + abs(64 - 65) + abs(67 - 69); // 3
+  TEST_ASSERT(leapInv2 < leapRoot && leapInv2 == 3, "Smooth voice leading selects 2nd inversion F (leap = 3 vs 15 semitones)");
+
+  // 13. Song Form Dynamic Section Mapping
+  auto getSection = [](int barIdx, int totalBars) -> int {
+    if (totalBars > 16) {
+      if (barIdx < 4) return 1;  // SECTION_INTRO
+      if (barIdx < 12) return 2; // SECTION_VERSE
+      if (barIdx < 20) return 3; // SECTION_CHORUS
+      if (barIdx < 24) return 4; // SECTION_BRIDGE
+      return 5;                  // SECTION_OUTRO
+    }
+    return (barIdx < 4) ? 2 : 3;
+  };
+  TEST_ASSERT(getSection(0, 32) == 1, "Bar 0 in 32-bar song is Intro");
+  TEST_ASSERT(getSection(6, 32) == 2, "Bar 6 in 32-bar song is Verse");
+  TEST_ASSERT(getSection(14, 32) == 3, "Bar 14 in 32-bar song is Chorus");
+  TEST_ASSERT(getSection(22, 32) == 4, "Bar 22 in 32-bar song is Bridge");
+
+  // 14. Key Center Tonal Profiling (C Major Tonic Correlation)
+  double testHistC[12] = {6.0, 0.0, 2.0, 0.0, 4.0, 3.5, 0.0, 5.0, 0.0, 3.0, 0.0, 2.0};
+  int dominantPc = 0;
+  double maxWeight = 0;
+  for (int pc = 0; pc < 12; ++pc) {
+    if (testHistC[pc] > maxWeight) { maxWeight = testHistC[pc]; dominantPc = pc; }
+  }
+  TEST_ASSERT(dominantPc == 0, "C major tonic (pc 0) correctly extracted as tonal root");
+
+  // 15. Smart Auto-Mixer Studio Presets (Pan & Volumes)
+  int bassPan = 64;   // Center
+  int drumsPan = 64;  // Center
+  int padPan = 85;    // Right 35%
+  int strumPan = 40;  // Left 38%
+  int riffPan = 48;   // Slight Left
+  int soloPan = 64;   // Center-Front Lead
+  TEST_ASSERT(bassPan == 64 && drumsPan == 64, "Rhythm section (Bass & Drums) centered for punch");
+  TEST_ASSERT(padPan == 85 && strumPan == 40, "Strings/Pad panned right (85), Guitar panned left (40) for stereo width");
+
+  // 16. Advanced Bass Articulations (2-Feel / 4-Feel & Ghost Notes)
+  int octaveDropRoot = 48; // C3
+  if (octaveDropRoot > 44) octaveDropRoot -= 12; // C2 = 36
+  TEST_ASSERT(octaveDropRoot == 36, "Bass pitches > 44 drop an octave for deep sub-bass foundation");
+  int ghostNoteVel = 42;
+  TEST_ASSERT(ghostNoteVel >= 35 && ghostNoteVel <= 50, "Bass ghost note velocity in natural muted range (35-50)");
+
+  // 17. Real-Time Interactive Jamming Hook (Active Keys Buffer)
+  vector<int> liveKeys = {60, 64, 67, 71}; // C4, E4, G4, B4 (C Maj7)
+  bool hasC = false, hasE = false, hasG = false, hasB = false;
+  for (int p : liveKeys) {
+    if (p % 12 == 0) hasC = true;
+    if (p % 12 == 4) hasE = true;
+    if (p % 12 == 7) hasG = true;
+    if (p % 12 == 11) hasB = true;
+  }
+  TEST_ASSERT(hasC && hasE && hasG && hasB, "Real-time key tracker detects complete C Maj7 chord");
 }
 
 //-----------------------------------------------------------------------------

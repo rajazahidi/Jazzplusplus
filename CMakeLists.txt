@@ -116,6 +116,7 @@ set(JAZZ_SOURCES
     src/AsciiMidiFile.cpp
     src/Audio.cpp
     src/AudioEffects.cpp
+    src/AutoAccompaniment.cpp
     src/ChordScaleData.cpp
     src/Command.cpp
     src/Configuration.cpp
@@ -125,6 +126,7 @@ set(JAZZ_SOURCES
     src/DeprecatedWx/proplist.cpp
     src/Dialogs/AudioEffectsDialog.cpp
     src/Dialogs/AudioSettingsDialog.cpp
+    src/Dialogs/AutoAccompanimentDialog.cpp
     src/Dialogs/CleanupDialog.cpp
     src/Dialogs/ControllerDialog.cpp
     src/Dialogs/DeleteDialog.cpp

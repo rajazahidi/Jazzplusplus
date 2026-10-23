@@ -142,6 +142,8 @@ class JZTrackFrame : public JZEventFrame, public JZButtonLabelInterface
 
     void OnGuitar(wxCommandEvent& Event);
 
+    void OnAutoAccompaniment(wxCommandEvent& Event);
+
     void OnSettingsMetronome(wxCommandEvent& Event);
 
     void OnSettingsSynthesizerType(wxCommandEvent& Event);

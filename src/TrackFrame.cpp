@@ -31,6 +31,7 @@
 #include "Dialogs/MidiEffectsDialog.h"
 #include "Dialogs/SoundGeneratorDialog.h"
 #include "Dialogs/AudioEffectsDialog.h"
+#include "Dialogs/AutoAccompanimentDialog.h"
 #include "Filter.h"
 #include "Globals.h"
 #include "Harmony.h"
@@ -172,6 +173,8 @@ BEGIN_EVENT_TABLE(JZTrackFrame, JZEventFrame)
   EVT_MENU(ID_TOOLS_RHYTHM_GENERATOR, JZTrackFrame::OnToolsRhythmGenerator)
 
   EVT_MENU(ID_TOOLS_GUITAR, JZTrackFrame::OnGuitar)
+
+  EVT_MENU(ID_TOOLS_AUTO_ACCOMPANIMENT, JZTrackFrame::OnAutoAccompaniment)
 
   EVT_MENU(ID_SETTINGS_METRONOME, JZTrackFrame::OnSettingsMetronome)
 
@@ -395,6 +398,7 @@ void JZTrackFrame::CreateMenu()
   mpToolsMenu->Append(ID_TOOLS_HARMONY_BROWSER, "&Harmony Browser...");
   mpToolsMenu->Append(ID_TOOLS_RHYTHM_GENERATOR, "&Rhythm Generator...");
   mpToolsMenu->Append(ID_TOOLS_GUITAR, "&Guitar Board & Tab...\tCtrl+G");
+  mpToolsMenu->Append(ID_TOOLS_AUTO_ACCOMPANIMENT, "&Auto-Accompaniment (Smart Band)...\tCtrl+B");
 
 #if 0
   // Move to Project Menu
@@ -1324,6 +1328,14 @@ void JZTrackFrame::OnToolsRhythmGenerator(wxCommandEvent& Event)
 void JZTrackFrame::OnGuitar(wxCommandEvent& Event)
 {
   JZProjectManager::Instance()->CreateGuitarView();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnAutoAccompaniment(wxCommandEvent& Event)
+{
+  JZAutoAccompanimentDialog Dlg(this, mpProject, 0);
+  Dlg.ShowModal();
 }
 
 //-----------------------------------------------------------------------------

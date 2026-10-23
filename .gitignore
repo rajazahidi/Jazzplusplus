@@ -4,6 +4,7 @@ build-*/
 AppDir/
 *.AppImage
 bin/
+bin-*/
 obj/
 .objs/
 .svn/

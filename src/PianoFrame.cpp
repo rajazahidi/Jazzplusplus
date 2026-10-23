@@ -29,6 +29,7 @@
 #include "Dialogs/MidiEffectsDialog.h"
 #include "Dialogs/SoundGeneratorDialog.h"
 #include "Dialogs/AudioEffectsDialog.h"
+#include "Dialogs/AutoAccompanimentDialog.h"
 #include "Filter.h"
 #include "Globals.h"
 #include "Harmony.h"
@@ -171,6 +172,7 @@ BEGIN_EVENT_TABLE(JZPianoFrame, wxFrame)
   EVT_MENU(wxID_DUPLICATE, JZPianoFrame::OnDuplicate)
   EVT_MENU(wxID_SELECTALL, JZPianoFrame::OnSelectAll)
   EVT_MENU(ID_INSERT_CHORD_SCALE, JZPianoFrame::OnInsertChordScale)
+  EVT_MENU(ID_TOOLS_AUTO_ACCOMPANIMENT, JZPianoFrame::OnAutoAccompaniment)
   EVT_MENU(ID_EFFECTS_MIDI, JZPianoFrame::OnEffectsMidi)
   EVT_MENU(ID_EFFECTS_SOUND_GEN, JZPianoFrame::OnEffectsSoundGen)
   EVT_MENU(ID_EFFECTS_AUDIO_DSP, JZPianoFrame::OnEffectsAudioDsp)
@@ -345,6 +347,7 @@ void JZPianoFrame::CreateMenu()
   edit_menu->Append(wxID_SELECTALL, "Select &All\tCtrl+A");
   edit_menu->AppendSeparator();
   edit_menu->Append(ID_INSERT_CHORD_SCALE, "&Insert Chord / Scale...\tCtrl+I");
+  edit_menu->Append(ID_TOOLS_AUTO_ACCOMPANIMENT, "&Auto-Accompaniment (Smart Band)...\tCtrl+B");
   edit_menu->AppendSeparator();
   edit_menu->Append(ID_SHIFT, "&Shift...");
   edit_menu->Append(ID_QUANTIZE, "&Quantize...");
@@ -981,6 +984,20 @@ void JZPianoFrame::OnInsertChordScale(wxCommandEvent& Event)
   }
   JZInsertChordScaleDialog dlg(this, mpProject, trackIdx, clock);
   dlg.ShowModal();
+}
+
+void JZPianoFrame::OnAutoAccompaniment(wxCommandEvent& Event)
+{
+  int trackIdx = 0;
+  if (mpPianoWindow)
+  {
+    trackIdx = mpPianoWindow->GetTrackIndex();
+  }
+  JZAutoAccompanimentDialog dlg(this, mpProject, trackIdx);
+  if (dlg.ShowModal() == wxID_OK)
+  {
+    Redraw();
+  }
 }
 
 void JZPianoFrame::OnEffectsMidi(wxCommandEvent& Event)

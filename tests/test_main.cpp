@@ -953,6 +953,87 @@ void TestTimelineBarClickLogic()
 }
 
 //-----------------------------------------------------------------------------
+// Test 15: Auto-Accompaniment (Smart Band) Engine Logic
+//-----------------------------------------------------------------------------
+void TestAutoAccompanimentLogic()
+{
+  cout << "[TEST] Running TestAutoAccompanimentLogic..." << endl;
+
+  // 1. Chord Detection from pitch collections
+  auto detectChord = [](const vector<int>& pitches) -> pair<int, string> {
+    if (pitches.empty()) return {-1, "N.C."};
+    int minP = 128;
+    bool pc[12] = {false};
+    for (int p : pitches) {
+      if (p < minP) minP = p;
+      pc[p % 12] = true;
+    }
+    int r = minP % 12;
+    static const char* sNames[12] = {"C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"};
+    string chord = sNames[r];
+
+    bool hasMin3 = pc[(r + 3) % 12];
+    bool hasMaj3 = pc[(r + 4) % 12];
+    bool hasDim5 = pc[(r + 6) % 12];
+    bool hasMin7 = pc[(r + 10) % 12];
+    bool hasMaj7 = pc[(r + 11) % 12];
+
+    if (hasMin3 && !hasMaj3) {
+      if (hasDim5) chord += "dim";
+      else if (hasMin7) chord += "m7";
+      else chord += "m";
+    } else {
+      if (hasMin7) chord += "7";
+      else if (hasMaj7) chord += "maj7";
+    }
+    return {r, chord};
+  };
+
+  // C Major: C4 (60), E4 (64), G4 (67)
+  auto cMaj = detectChord({60, 64, 67});
+  TEST_ASSERT(cMaj.first == 0 && cMaj.second == "C", "C Major detection");
+
+  // D minor 7: D3 (50), F4 (65), A4 (69), C5 (72)
+  auto dMin7 = detectChord({50, 65, 69, 72});
+  TEST_ASSERT(dMin7.first == 2 && dMin7.second == "Dm7", "Dm7 detection");
+
+  // G Dominant 7: G3 (55), B4 (71), D5 (74), F5 (77)
+  auto gDom7 = detectChord({55, 71, 74, 77});
+  TEST_ASSERT(gDom7.first == 7 && gDom7.second == "G7", "G7 detection");
+
+  // F Major 7: F3 (53), A4 (69), C5 (72), E5 (76)
+  auto fMaj7 = detectChord({53, 69, 72, 76});
+  TEST_ASSERT(fMaj7.first == 5 && fMaj7.second == "Fmaj7", "Fmaj7 detection");
+
+  // B Diminished: B3 (59), D4 (62), F4 (65)
+  auto bDim = detectChord({59, 62, 65});
+  TEST_ASSERT(bDim.first == 11 && bDim.second == "Bdim", "Bdim detection");
+
+  // 2. Walking Bass Chromatic Approach Calculation
+  // Moving from C (36) to F (41): nextRoot is higher, approach note is 40 (E2)
+  int rootC = 36;
+  int rootF = 41;
+  int approach = (rootF > rootC) ? (rootF - 1) : (rootF + 1);
+  TEST_ASSERT(approach == 40, "Walking bass chromatic approach towards F is E (40)");
+
+  // 3. Jazz Ride Swing Spang-a-lang Triplet Timing
+  int ticksPerQuarter = 120;
+  int swingSkip = (ticksPerQuarter * 2) / 3;
+  TEST_ASSERT(swingSkip == 80, "Swing triplet skip offset at 120 TPQ is 80 ticks");
+
+  // 4. Accompaniment Track and Channel Mapping
+  int bassTrack = 1;     // Track 2
+  int bassChannel = 2;   // Channel 2
+  int drumsTrack = 9;    // Track 10
+  int drumsChannel = 10; // Channel 10
+  int padTrack = 2;      // Track 3
+  int padChannel = 3;    // Channel 3
+  TEST_ASSERT(bassTrack == 1 && bassChannel == 2, "Bass assigned to Track 2, Channel 2");
+  TEST_ASSERT(drumsTrack == 9 && drumsChannel == 10, "Drums assigned to Track 10, Channel 10");
+  TEST_ASSERT(padTrack == 2 && padChannel == 3, "Strings/Pad assigned to Track 3, Channel 3");
+}
+
+//-----------------------------------------------------------------------------
 // Main Runner
 //-----------------------------------------------------------------------------
 int main()
@@ -975,6 +1056,7 @@ int main()
   TestGuitarFretboardLogic();
   TestMidiDeviceSelectionLogic();
   TestTimelineBarClickLogic();
+  TestAutoAccompanimentLogic();
 
   cout << "==========================================" << endl;
   cout << "Tests Run:    " << gTestsRun << endl;

@@ -100,6 +100,8 @@ class JZTrackFrame : public JZEventFrame, public JZButtonLabelInterface
 
     void OnPaste(wxCommandEvent& Event);
 
+    void OnDuplicate(wxCommandEvent& Event);
+
     void OnTrim(wxCommandEvent& Event);
 
     void OnSelectAll(wxCommandEvent& Event);

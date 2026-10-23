@@ -115,6 +115,7 @@ class JZPianoFrame : public wxFrame
     void OnCut(wxCommandEvent& Event);
     void OnCopy(wxCommandEvent& Event);
     void OnPaste(wxCommandEvent& Event);
+    void OnDuplicate(wxCommandEvent& Event);
     void OnSelectAll(wxCommandEvent& Event);
     void OnErase(wxCommandEvent& Event);
     void OnReset(wxCommandEvent& Event);

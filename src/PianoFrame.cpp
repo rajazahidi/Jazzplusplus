@@ -168,6 +168,7 @@ BEGIN_EVENT_TABLE(JZPianoFrame, wxFrame)
   EVT_MENU(wxID_CUT, JZPianoFrame::OnCut)
   EVT_MENU(wxID_COPY, JZPianoFrame::OnCopy)
   EVT_MENU(wxID_PASTE, JZPianoFrame::OnPaste)
+  EVT_MENU(wxID_DUPLICATE, JZPianoFrame::OnDuplicate)
   EVT_MENU(wxID_SELECTALL, JZPianoFrame::OnSelectAll)
   EVT_MENU(ID_INSERT_CHORD_SCALE, JZPianoFrame::OnInsertChordScale)
   EVT_MENU(ID_EFFECTS_MIDI, JZPianoFrame::OnEffectsMidi)
@@ -338,11 +339,10 @@ void JZPianoFrame::CreateMenu()
   edit_menu->Append(wxID_COPY, "&Copy\tCtrl+C");
   edit_menu->Append(wxID_CUT, "&Cut\tCtrl+X");
   edit_menu->Append(wxID_PASTE, "&Paste\tCtrl+V");
+  edit_menu->Append(wxID_DUPLICATE, "&Duplicate\tCtrl+D");
   edit_menu->Append(wxID_SELECTALL, "Select &All\tCtrl+A");
   edit_menu->AppendSeparator();
   edit_menu->Append(ID_INSERT_CHORD_SCALE, "&Insert Chord / Scale...\tCtrl+I");
-  edit_menu->Append(ID_EFFECTS_MIDI, "&MIDI Effects Suite (Arp, Humanize, Echo)...");
-  edit_menu->Append(ID_EFFECTS_SOUND_GEN, "&Procedural SFX & Synth Drums...");
   edit_menu->AppendSeparator();
   edit_menu->Append(ID_SHIFT, "&Shift...");
   edit_menu->Append(ID_QUANTIZE, "&Quantize...");
@@ -533,6 +533,40 @@ void JZPianoFrame::OnPaste(wxCommandEvent& Event)
     mpPianoWindow->Paste(mpPianoWindow->GetTrack(), clock, -1);
     mpPianoWindow->Refresh(false);
   }
+}
+
+void JZPianoFrame::OnDuplicate(wxCommandEvent& Event)
+{
+  if (!mpPianoWindow || !mpPianoWindow->EventsSelected("Please select a range of events or notes first."))
+  {
+    return;
+  }
+  JZFilter* pFilter = mpPianoWindow->GetFilter();
+  if (!pFilter)
+  {
+    return;
+  }
+  int fromClock = pFilter->GetFromClock();
+  int toClock = pFilter->GetToClock();
+  int delta = toClock - fromClock;
+  if (delta <= 0)
+  {
+    delta = mpProject ? mpProject->GetTicksPerBar() : 1920;
+  }
+
+  int destTrack = pFilter->GetFromTrack();
+  JZCommandCopy copyCmd(pFilter, destTrack, fromClock + delta);
+  copyCmd.EraseDestin = 0;
+  copyCmd.EraseSource = 0;
+  copyCmd.InsertSpace = 0;
+  copyCmd.RepeatClock = -1;
+
+  gpProject->NewUndoBuffer();
+  copyCmd.Execute(1);
+
+  pFilter->SetFromClock(fromClock + delta);
+  pFilter->SetToClock(toClock + delta);
+  JZProjectManager::Instance()->UpdateAllViews();
 }
 
 void JZPianoFrame::OnSelectAll(wxCommandEvent& Event)

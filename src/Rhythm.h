@@ -304,6 +304,10 @@ class JZRhythmGeneratorWindow : public wxPanel
 
     void DeleteInstrument();
 
+    void UpInstrument();
+
+    void DownInstrument();
+
     void Generate();
 
   private:
@@ -369,9 +373,15 @@ class JZRhythmGeneratorFrame : public wxFrame
 
     void OnSave(wxCommandEvent& Event);
 
+    void OnClose(wxCommandEvent& Event);
+
     void OnAddInstrument(wxCommandEvent& Event);
 
     void OnDeleteInstrument(wxCommandEvent& Event);
+
+    void OnUpInstrument(wxCommandEvent& Event);
+
+    void OnDownInstrument(wxCommandEvent& Event);
 
     void OnGenerate(wxCommandEvent& Event);
 

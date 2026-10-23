@@ -1,4 +1,19 @@
 23-10-2026 Raja Zahidi
+- Audit, Simulasi & Pembaikan Antara Muka (Toolbar Buttons & Menu Bar):
+  * Pembaikan Tombol Mati (Dead Buttons):
+    - JZTrackFrame: Menghidupkan tombol toolbar 'duplicate selection' (wxID_DUPLICATE / repl_xpm) dengan menyambungkan event handler OnDuplicate serta menambah pilihan menu 'Duplicate' (Ctrl+D) di bawah Edit menu. Logik penggandaan menyokong pemilihan pelbagai birama merentasi berbilang trek secara bersiri dengan sokongan penuh fungsi Undo.
+    - JZPianoFrame: Menambah sokongan penggandaan nota/frasa (wxID_DUPLICATE / Ctrl+D) di dalam Piano Roll.
+    - JZRhythmGeneratorFrame: Menghidupkan tombol toolbar dan menu 'move instrument up' (ID_INSTRUMENT_UP), 'move instrument down' (ID_INSTRUMENT_DOWN), 'Save As...' (wxID_SAVEAS), dan 'Close' (wxID_CLOSE).
+    - JZHarmonyBrowserFrame: Menghidupkan tombol dan item menu 'Analyze trackwin selection' (MEN_ANALYZE), 'Transpose trackwin selection' (MEN_TRANSPOSE), dan 'Global Settings' (ID_VIEW_SETTINGS) yang sebelum ini terpadam dalam jadual event.
+    - JZSampleFrame: Menyambungkan pemetaan acara (Event Table) bagi seluruh bar alatan dan menu Penyunting Sampel Audio (Waveform Editor) agar semua perintah pemprosesan audio berfungsi.
+    - JZSliderWindow: Menyambungkan penghalaan menu bagi tdefs dialog Additive Synthesis.
+  * Pembetulan Ralat Logik & Typos:
+    - JZHarmonyBrowserFrame: Membaiki ralat taip ID event table MEN_EQ1 -> MEN_EQ0 pada OnUpdateZeroEqualNotes dan MEN_MAJSCALE -> MEN_HAUNSCH pada OnUpdateHaunschildLayout.
+  * Penyingkiran Redundansi (Duplicate Menu Items):
+    - JZTrackFrame: Memadam penduaan 'Insert Chord / Scale...' dari Edit Menu; kekal teratur di dalam Tools Menu bersama alatan gubahan muzik lain.
+    - JZPianoFrame: Memadam penduaan 'MIDI Effects Suite' dan 'Procedural SFX & Synth Drums' dari Edit Menu; kekal kemas di bawah menu teras Effects.
+
+23-10-2026 Raja Zahidi
 - Upgrade: Naik taraf pustaka teras GUI kepada wxWidgets v3.3.4 (Latest Feature Release):
   * Kemas kini CI GitHub Actions (.github/workflows/ci.yml) bagi binaan Windows MSVC x64 menggunakan wxWidgets 3.3.4.
   * Tambah sokongan Windows 11 Dark Mode asli melalui MSWEnableDarkMode(DarkMode_Auto) dalam JZJazzPlusPlusApplication::OnInit().

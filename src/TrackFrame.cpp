@@ -129,6 +129,8 @@ BEGIN_EVENT_TABLE(JZTrackFrame, JZEventFrame)
 
   EVT_MENU(wxID_PASTE, JZTrackFrame::OnPaste)
 
+  EVT_MENU(wxID_DUPLICATE, JZTrackFrame::OnDuplicate)
+
   EVT_MENU(ID_TRIM, JZTrackFrame::OnTrim)
 
   EVT_MENU(wxID_SELECTALL, JZTrackFrame::OnSelectAll)
@@ -334,15 +336,12 @@ void JZTrackFrame::CreateMenu()
   mpEditMenu->Append(wxID_CUT, "&Cut\tCtrl+X");
   mpEditMenu->Append(wxID_COPY, "C&opy\tCtrl+C");
   mpEditMenu->Append(wxID_PASTE, "&Paste\tCtrl+V");
+  mpEditMenu->Append(wxID_DUPLICATE, "&Duplicate\tCtrl+D");
   mpEditMenu->Append(ID_TRIM, "&Trim");
 
   mpEditMenu->AppendSeparator();
 
   mpEditMenu->Append(wxID_SELECTALL, "Select &All\tCtrl+A");
-
-  mpEditMenu->AppendSeparator();
-
-  mpEditMenu->Append(ID_INSERT_CHORD_SCALE, "&Insert Chord / Scale...\tCtrl+I");
 
   mpEditMenu->AppendSeparator();
 
@@ -978,6 +977,38 @@ void JZTrackFrame::OnPaste(wxCommandEvent& Event)
     pTrack->Put(pCopy);
     pEv = Iterator.Next();
   }
+  JZProjectManager::Instance()->UpdateAllViews();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnDuplicate(wxCommandEvent& Event)
+{
+  if (!mpTrackWindow || !mpTrackWindow->AreEventsSelected())
+  {
+    wxMessageBox("Please select a range of events or track first.", "Duplicate", wxOK | wxICON_INFORMATION, this);
+    return;
+  }
+  int fromClock = mpTrackWindow->mpFilter->GetFromClock();
+  int toClock = mpTrackWindow->mpFilter->GetToClock();
+  int delta = toClock - fromClock;
+  if (delta <= 0)
+  {
+    delta = mpProject ? mpProject->GetTicksPerBar() : 1920;
+  }
+
+  int destTrack = mpTrackWindow->mpFilter->GetFromTrack();
+  JZCommandCopy copyCmd(mpTrackWindow->mpFilter, destTrack, fromClock + delta);
+  copyCmd.EraseDestin = 0;
+  copyCmd.EraseSource = 0;
+  copyCmd.InsertSpace = 0;
+  copyCmd.RepeatClock = -1;
+
+  gpProject->NewUndoBuffer();
+  copyCmd.Execute(1);
+
+  mpTrackWindow->mpFilter->SetFromClock(fromClock + delta);
+  mpTrackWindow->mpFilter->SetToClock(toClock + delta);
   JZProjectManager::Instance()->UpdateAllViews();
 }
 

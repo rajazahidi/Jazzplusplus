@@ -1808,6 +1808,44 @@ void JZRhythmGeneratorWindow::DeleteInstrument()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void JZRhythmGeneratorWindow::UpInstrument()
+{
+  if (mActiveInstrumentIndex > 0 && (size_t)mActiveInstrumentIndex < mInstruments.size())
+  {
+    Win2Instrument();
+    int i = mActiveInstrumentIndex;
+    std::swap(mInstruments[i], mInstruments[i - 1]);
+    wxString label = mpInstrumentListBox->GetString(i);
+    mpInstrumentListBox->Delete(i);
+    mpInstrumentListBox->Insert(label, i - 1);
+    mActiveInstrumentIndex = i - 1;
+    mpInstrumentListBox->SetSelection(mActiveInstrumentIndex);
+    Instrument2Win();
+    Refresh();
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZRhythmGeneratorWindow::DownInstrument()
+{
+  if (mActiveInstrumentIndex >= 0 && (size_t)mActiveInstrumentIndex + 1 < mInstruments.size())
+  {
+    Win2Instrument();
+    int i = mActiveInstrumentIndex;
+    std::swap(mInstruments[i], mInstruments[i + 1]);
+    wxString label = mpInstrumentListBox->GetString(i);
+    mpInstrumentListBox->Delete(i);
+    mpInstrumentListBox->Insert(label, i + 1);
+    mActiveInstrumentIndex = i + 1;
+    mpInstrumentListBox->SetSelection(mActiveInstrumentIndex);
+    Instrument2Win();
+    Refresh();
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZRhythmGeneratorWindow::Generate()
 {
   wxBeginBusyCursor();
@@ -2001,9 +2039,17 @@ BEGIN_EVENT_TABLE(JZRhythmGeneratorFrame, wxFrame)
 
   EVT_MENU(wxID_SAVE, JZRhythmGeneratorFrame::OnSave)
 
+  EVT_MENU(wxID_SAVEAS, JZRhythmGeneratorFrame::OnSave)
+
+  EVT_MENU(wxID_CLOSE, JZRhythmGeneratorFrame::OnClose)
+
   EVT_MENU(ID_INSTRUMENT_ADD, JZRhythmGeneratorFrame::OnAddInstrument)
 
   EVT_MENU(ID_INSTRUMENT_DELETE, JZRhythmGeneratorFrame::OnDeleteInstrument)
+
+  EVT_MENU(ID_INSTRUMENT_UP, JZRhythmGeneratorFrame::OnUpInstrument)
+
+  EVT_MENU(ID_INSTRUMENT_DOWN, JZRhythmGeneratorFrame::OnDownInstrument)
 
   EVT_MENU(ID_INSTRUMENT_GENERATE, JZRhythmGeneratorFrame::OnGenerate)
 
@@ -2158,6 +2204,27 @@ void JZRhythmGeneratorFrame::OnAddInstrument(wxCommandEvent&)
 void JZRhythmGeneratorFrame::OnDeleteInstrument(wxCommandEvent&)
 {
   mpRhythmGeneratorWindow->DeleteInstrument();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZRhythmGeneratorFrame::OnUpInstrument(wxCommandEvent&)
+{
+  mpRhythmGeneratorWindow->UpInstrument();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZRhythmGeneratorFrame::OnDownInstrument(wxCommandEvent&)
+{
+  mpRhythmGeneratorWindow->DownInstrument();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZRhythmGeneratorFrame::OnClose(wxCommandEvent&)
+{
+  Close(true);
 }
 
 //-----------------------------------------------------------------------------

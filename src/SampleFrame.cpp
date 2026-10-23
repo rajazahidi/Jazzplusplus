@@ -59,6 +59,24 @@ int JZSampleFrame::geo[4] =
 
 JZSample *JZSampleFrame::copy_buffer;
 
+BEGIN_EVENT_TABLE(JZSampleFrame, wxFrame)
+  EVT_MENU(wxID_ANY, JZSampleFrame::OnMenu)
+  EVT_CLOSE(JZSampleFrame::OnCloseWindow)
+END_EVENT_TABLE()
+
+void JZSampleFrame::OnMenu(wxCommandEvent& Event)
+{
+  OnMenuCommand(Event.GetId());
+}
+
+void JZSampleFrame::OnCloseWindow(wxCloseEvent& Event)
+{
+  if (OnClose())
+  {
+    Destroy();
+  }
+}
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 JZSampleFrame::JZSampleFrame(

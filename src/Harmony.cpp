@@ -1996,7 +1996,7 @@ BEGIN_EVENT_TABLE(JZHarmonyBrowserFrame, wxFrame)
   EVT_UPDATE_UI(MEN_EQ1, JZHarmonyBrowserFrame::OnUpdateOneEqualNotes)
   EVT_MENU(MEN_EQ1, JZHarmonyBrowserFrame::OnToolBarSelect)
 
-  EVT_UPDATE_UI(MEN_EQ1, JZHarmonyBrowserFrame::OnUpdateZeroEqualNotes)
+  EVT_UPDATE_UI(MEN_EQ0, JZHarmonyBrowserFrame::OnUpdateZeroEqualNotes)
   EVT_MENU(MEN_EQ0, JZHarmonyBrowserFrame::OnToolBarSelect)
 
   EVT_MENU(MEN_EQH, JZHarmonyBrowserFrame::OnToolBarSelect)
@@ -2013,7 +2013,7 @@ BEGIN_EVENT_TABLE(JZHarmonyBrowserFrame, wxFrame)
 
   EVT_MENU(MEN_MIDI, JZHarmonyBrowserFrame::OnSettingsMidi)
 
-  EVT_UPDATE_UI(MEN_MAJSCALE, JZHarmonyBrowserFrame::OnUpdateHaunschildLayout)
+  EVT_UPDATE_UI(MEN_HAUNSCH, JZHarmonyBrowserFrame::OnUpdateHaunschildLayout)
   EVT_MENU(MEN_HAUNSCH, JZHarmonyBrowserFrame::OnSettingsHaunschild)
 
   EVT_MENU(MEN_CLEARSEQ, JZHarmonyBrowserFrame::OnActionClearSequence)
@@ -2022,9 +2022,9 @@ BEGIN_EVENT_TABLE(JZHarmonyBrowserFrame, wxFrame)
 
   EVT_MENU(MEN_HELP, JZHarmonyBrowserFrame::OnHelp)
 
-//  EVT_MENU(MEN_ANALYZE,
-//  EVT_MENU(MEN_TRANSPOSE,
-//  EVT_MENU(ID_VIEW_SETTINGS,
+  EVT_MENU(MEN_ANALYZE, JZHarmonyBrowserFrame::OnToolBarSelect)
+  EVT_MENU(MEN_TRANSPOSE, JZHarmonyBrowserFrame::OnToolBarSelect)
+  EVT_MENU(ID_VIEW_SETTINGS, JZHarmonyBrowserFrame::OnToolBarSelect)
 
 END_EVENT_TABLE()
 

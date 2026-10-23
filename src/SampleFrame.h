@@ -101,4 +101,11 @@ class JZSampleFrame : public wxFrame
     wxDialog* settings;
     wxDialog* wah_settings;
     wxDialog* pitch_settings;
+
+  private:
+
+    void OnMenu(wxCommandEvent& Event);
+    void OnCloseWindow(wxCloseEvent& Event);
+
+  DECLARE_EVENT_TABLE()
 };

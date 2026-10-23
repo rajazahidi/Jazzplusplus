@@ -85,7 +85,17 @@ JZSliderWindow::~JZSliderWindow()
 
 BEGIN_EVENT_TABLE(JZSliderWindow, wxFrame)
   EVT_SIZE(JZSliderWindow::OnSize)
+  EVT_MENU(wxID_ANY, JZSliderWindow::OnMenu)
 END_EVENT_TABLE()
+
+void JZSliderWindow::OnMenu(wxCommandEvent& Event)
+{
+  OnMenuCommand(Event.GetId());
+}
+
+void JZSliderWindow::OnMenuCommand(int id)
+{
+}
 
   /**called from the event table whenever the window is resized
 

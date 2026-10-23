@@ -61,7 +61,11 @@ class JZSliderWindow : public wxFrame
 
     virtual void ForceRepaint();
 
+    virtual void OnMenuCommand(int id);
+
   protected:
+
+    void OnMenu(wxCommandEvent& Event);
 
 #ifdef OBSOLETE
     static void ItemCallback(wxItem& item, wxCommandEvent& event);

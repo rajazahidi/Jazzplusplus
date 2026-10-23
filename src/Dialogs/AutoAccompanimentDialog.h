@@ -1,7 +1,9 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// Auto-Accompaniment (Smart Band) Dialog
+// Auto-Accompaniment & Smart Music Intelligence Dialog
+//
+// Integrated Tabbed Hub for Session Band, Strumming, Plucking, Riffs & Solo
 //*****************************************************************************
 
 #pragma once
@@ -13,6 +15,9 @@ class wxChoice;
 class wxCheckBox;
 class wxRadioButton;
 class wxSpinCtrl;
+class wxSlider;
+class wxNotebook;
+class wxButton;
 class JZProject;
 
 //*****************************************************************************
@@ -36,9 +41,18 @@ class JZAutoAccompanimentDialog : public wxDialog
   private:
 
     void CreateControls();
+    wxPanel* CreateBandTab(wxWindow* pParent);
+    wxPanel* CreateStrumPluckTab(wxWindow* pParent);
+    wxPanel* CreateRiffTab(wxWindow* pParent);
+    wxPanel* CreateSoloTab(wxWindow* pParent);
+
+    void OnNotebookPageChanged(wxBookCtrlEvent& Event);
     void OnRangeRadio(wxCommandEvent& Event);
+    void OnSimultaneousCheck(wxCommandEvent& Event);
     void OnGenerateButton(wxCommandEvent& Event);
     void OnCancelButton(wxCommandEvent& Event);
+
+    void UpdateGenerateButtonLabel();
 
   private:
 
@@ -46,19 +60,46 @@ class JZAutoAccompanimentDialog : public wxDialog
     JZAccompanimentConfig mConfig;
     int mDefaultSourceTrack;
 
+    // Header Controls
     wxChoice* mpSourceTrackChoice;
-    wxChoice* mpStyleChoice;
-
-    wxCheckBox* mpBassCheckBox;
-    wxCheckBox* mpDrumsCheckBox;
-    wxCheckBox* mpPadCheckBox;
-
     wxRadioButton* mpRangeAllRadio;
     wxRadioButton* mpRangeCustomRadio;
     wxSpinCtrl* mpFromBarSpin;
     wxSpinCtrl* mpToBarSpin;
 
+    // Notebook Hub
+    wxNotebook* mpNotebook;
+
+    // Tab 1: Band Accompaniment
+    wxChoice* mpBandStyleChoice;
+    wxCheckBox* mpBassCheckBox;
+    wxCheckBox* mpDrumsCheckBox;
+    wxCheckBox* mpPadCheckBox;
+
+    // Tab 2: Strum & Pluck
+    wxChoice* mpStrumStyleChoice;
+    wxChoice* mpStrumTrackChoice;
+    wxChoice* mpStrumPatchChoice;
+    wxSlider* mpStrumSpeedSlider;
+
+    // Tab 3: Riffs & Hooks
+    wxChoice* mpRiffStyleChoice;
+    wxChoice* mpRiffTrackChoice;
+    wxChoice* mpRiffPatchChoice;
+    wxSpinCtrl* mpRiffOctaveSpin;
+
+    // Tab 4: Auto-Solo Lead
+    wxChoice* mpSoloStyleChoice;
+    wxChoice* mpSoloDensityChoice;
+    wxChoice* mpSoloTrackChoice;
+    wxChoice* mpSoloPatchChoice;
+    wxSpinCtrl* mpSoloOctaveSpin;
+
+    // Bottom Controls
     wxCheckBox* mpOverwriteCheckBox;
+    wxCheckBox* mpSimultaneousCheckBox;
+    wxButton* mpGenerateButton;
+    wxButton* mpCancelButton;
 
   DECLARE_EVENT_TABLE();
 };

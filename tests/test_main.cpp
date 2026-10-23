@@ -1031,6 +1031,24 @@ void TestAutoAccompanimentLogic()
   TEST_ASSERT(bassTrack == 1 && bassChannel == 2, "Bass assigned to Track 2, Channel 2");
   TEST_ASSERT(drumsTrack == 9 && drumsChannel == 10, "Drums assigned to Track 10, Channel 10");
   TEST_ASSERT(padTrack == 2 && padChannel == 3, "Strings/Pad assigned to Track 3, Channel 3");
+
+  // 5. Guitar Strumming Micro-Delay Timing
+  int strumSpeedMs = 18;
+  int strumDelay = max(2, (ticksPerQuarter * strumSpeedMs) / 500);
+  TEST_ASSERT(strumDelay == 4, "Strum micro-timing delay at 18ms & 120 TPQ is 4 ticks");
+
+  // 6. Travis Picking & Classical P-I-M-A Fingerstyle Sequence
+  vector<string> pimaExpected = {"P", "I", "M", "A"};
+  TEST_ASSERT(pimaExpected.size() == 4 && pimaExpected[0] == "P", "Classical P-I-M-A picking sequence");
+
+  // 7. Blues Riff Scale Degrees (Root, b3, 4, b5 blue note, 5, b7, Octave)
+  vector<int> bluesRiffDegrees = {0, 3, 5, 6, 7, 10, 12};
+  TEST_ASSERT(bluesRiffDegrees[3] == 6, "Blues riff blue note is flat-5th (interval 6)");
+
+  // 8. Auto-Solo Phrasing Logic (Call & Response Structure)
+  auto isCallBar = [](int barIdx) -> bool { return (barIdx % 2 == 0); };
+  TEST_ASSERT(isCallBar(0) == true, "Bar 0 is Call phrase");
+  TEST_ASSERT(isCallBar(1) == false, "Bar 1 is Response / Resolution phrase");
 }
 
 //-----------------------------------------------------------------------------

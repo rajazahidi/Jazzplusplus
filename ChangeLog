@@ -1,19 +1,14 @@
 23-10-2026 Raja Zahidi
-- Feature & Music Intelligence: Penjanaan Iringan Muzik Automatik (Smart Auto-Accompaniment / Session Band Engine):
+- Feature & Music Intelligence: Smart Music Intelligence & Session Band Hub (Accompaniment, Strumming, Plucking, Riffs & Auto-Solo):
+  * Hab Bersepadu Berbilang Tab wxNotebook (src/Dialogs/AutoAccompanimentDialog.h & .cpp):
+    - Tab 1 [Session Band]: Penjanaan iringan penuh (Bass, Drums, Pad) dalam 5 genre (Jazz Swing, Bossa Nova, Blues Shuffle, Pop/Rock, Funk Groove).
+    - Tab 2 [Strum & Pluck]: Kocokan berirama gitar & papan kekunci dengan micro-delay pemasaan manusia (10-35ms), sapuan Downstroke (↓) & Upstroke (↑), perkusif chucks (x), petikan Travis Picking, Ballad Arpeggio, P-I-M-A Classical, dan Neo-Soul spread voicings.
+    - Tab 3 [Riffs & Hooks]: Penjana riff harmoni automatik berasaskan skala kord (Blues Rock boogie, Funk brass section hits, Hard Rock palm-muted power riffs, Synthwave 16th rolling bass, dan Jazz Bebop chromatic enclosures).
+    - Tab 4 [Auto-Solo Lead]: Penjana solo & melodi pintar dengan padanan skala kord (Dorian, Mixolydian, Lydian, Blues Scale), struktur frasa Call-and-Response 2-birama, peluncuran not blues, dan pelarasan kepadatan frasa (Sparse, Balanced, Virtuoso).
+    - Sokongan penjanaan serentak semua lapisan (Simultaneous Multi-layer Generation) atau secara berasingan bagi setiap tab.
   * Enjin Harmoni & Analisis Kord Prosedural (src/AutoAccompaniment.h & src/AutoAccompaniment.cpp):
-    - Menganalisis nota MIDI pada trek piano/melodi secara birama demi birama untuk mengekstrak not akar (root pitch class) dan kualiti kord (Major, Minor, Dominant 7th, Major 7th, Minor 7th, Diminished, Sus4).
-    - Menangani birama senyap dengan mewarisi kord terdahulu secara bijak tanpa gangguan harmoni.
-  * Penjanaan Iringan Pelbagai Gaya Muzik (Multi-Genre Stylistic Generation):
-    - Jazz Swing: Walking bassline 4 sukuan rentak dengan not pendekatan kromatik (chromatic approach tone) pada beat ke-4 menuju ke root birama seterusnya; corak dram ride cymbal 'spang-a-lang' berasaskan swing triplet, hentakan pedal hi-hat chick pada beat 2 & 4, feathered kick lembut, dan simbal crash pada intro.
-    - Bossa Nova: Bassline sinkopasi gaya Brazil (dotted quarter + 8th offbeat); corak dram closed hi-hat straight 8ths, rimshot Bossa clave, dan denyutan kick sinkopasi.
-    - Blues Shuffle: 12-bar walking boogie shuffle bass (1-3-5-6); corak dram shuffle ride dengan snare backbeat.
-    - Pop / Rock: Driving 8th note bassline berterusan; corak dram solid 2 & 4 snare backbeat dengan pemanduan kick dan hi-hat.
-    - Funk Groove: Bassline sinkopasi 16th dengan lompatan oktaf slap/pop; corak dram tight 16th hi-hat dengan aksen buka/tutup dan ghost snare.
-  * Pad / Strings Voice Leading:
-    - Menjana kord latar pad/strings bersuara penuh (Root, 5th, 3rd, 7th) dalam oktaf tengah yang tenang dengan artikulasi legato sepanjang birama.
-  * Antara Muka & Integrasi GUI wxWidgets (src/Dialogs/AutoAccompanimentDialog.h & .cpp):
-    - Dialog High-DPI scaled dengan pemilihan gaya muzik, trek sumber, instrumen yang ingin dijana (Bass Track 2 Ch 2, Drums Track 10 Ch 10, Strings/Pad Track 3 Ch 3), dan julat birama.
-    - Sokongan penuh sistem Undo song-wide (gpProject->NewUndoBuffer()) untuk pembatalan satu klik.
+    - Pengesanan not akar dan kualiti kord (Maj, Min, 7th, Maj7, m7, Dim, Sus4) birama demi birama.
+    - Sokongan penuh sistem Undo song-wide (gpProject->NewUndoBuffer()) untuk pembalikan satu klik.
     - Pintasan menu 'Auto-Accompaniment (Smart Band)...' (Ctrl+B) dalam Tools menu (TrackFrame) dan Edit menu (PianoFrame).
 
 23-10-2026 Raja Zahidi

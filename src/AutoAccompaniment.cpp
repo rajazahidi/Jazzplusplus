@@ -21,15 +21,20 @@ static const char* sPitchNames[12] = {
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-string JZDetectedChord::GetChordName() const
+string JZDetectedChord::GetChordName(bool second) const
 {
   if (!hasNotes)
   {
     return "N.C.";
   }
 
-  string name = sPitchNames[rootPitchClass % 12];
-  switch (quality)
+  int r = second ? rootPitchClass2 : rootPitchClass;
+  int b = second ? bassPitchClass2 : bassPitchClass;
+  int inv = second ? inversion2 : inversion;
+  JZChordQuality q = second ? quality2 : quality;
+
+  string name = sPitchNames[r % 12];
+  switch (q)
   {
     case CHORD_MAJOR:
       break;
@@ -52,6 +57,14 @@ string JZDetectedChord::GetChordName() const
       name += "sus4";
       break;
   }
+
+  // Slash chord notation for inversions (e.g. C/E, G/B, C/G)
+  if (inv > 0 && (b % 12) != (r % 12))
+  {
+    name += "/";
+    name += sPitchNames[b % 12];
+  }
+
   return name;
 }
 
@@ -144,26 +157,30 @@ const char* JZAutoAccompaniment::GetSoloStyleName(JZSoloStyle style)
 }
 
 //-----------------------------------------------------------------------------
+// Helper to analyze notes in a clock window (with Inversion Disambiguation)
 //-----------------------------------------------------------------------------
-JZDetectedChord JZAutoAccompaniment::AnalyzeMeasure(
-  JZTrack* pSourceTrack,
-  int barStartClock,
-  int barEndClock,
-  const JZDetectedChord& fallbackChord)
+bool JZAutoAccompaniment::AnalyzeWindow(
+  JZTrack* pTrack,
+  int startClock,
+  int endClock,
+  int& rootPc,
+  int& bassPc,
+  int& inversion,
+  JZChordQuality& quality,
+  int& minP)
 {
-  JZDetectedChord result;
-  if (!pSourceTrack)
+  if (!pTrack)
   {
-    return fallbackChord;
+    return false;
   }
 
   bool pcPresent[12] = {false};
   int noteCount = 0;
   int minPitch = 128;
 
-  for (int i = 0; i < pSourceTrack->mEventCount; ++i)
+  for (int i = 0; i < pTrack->mEventCount; ++i)
   {
-    JZEvent* pEvent = pSourceTrack->mppEvents[i];
+    JZEvent* pEvent = pTrack->mppEvents[i];
     if (!pEvent || pEvent->IsKilled())
     {
       continue;
@@ -175,8 +192,8 @@ JZDetectedChord JZAutoAccompaniment::AnalyzeMeasure(
       continue;
     }
 
-    int clock = pKeyOn->GetClock();
-    if (clock >= barStartClock && clock < barEndClock)
+    int clk = pKeyOn->GetClock();
+    if (clk >= startClock && clk < endClock)
     {
       int pitch = pKeyOn->GetPitch();
       if (pitch >= 0 && pitch <= 127)
@@ -193,59 +210,183 @@ JZDetectedChord JZAutoAccompaniment::AnalyzeMeasure(
 
   if (noteCount == 0)
   {
-    return fallbackChord;
+    return false;
   }
 
-  result.hasNotes = true;
-  result.minPitch = minPitch;
-  result.rootPitchClass = minPitch % 12;
+  minP = minPitch;
+  bassPc = minPitch % 12;
 
-  int r = result.rootPitchClass;
-  bool hasMin3 = pcPresent[(r + 3) % 12];
-  bool hasMaj3 = pcPresent[(r + 4) % 12];
-  bool hasDim5 = pcPresent[(r + 6) % 12];
-  bool hasP5   = pcPresent[(r + 7) % 12];
-  bool hasMin7 = pcPresent[(r + 10) % 12];
-  bool hasMaj7 = pcPresent[(r + 11) % 12];
-  bool hasSus4 = pcPresent[(r + 5) % 12];
+  // Find candidate root among present pitch classes
+  // A true root has standard intervals: 3rd (3 or 4) and 5th (6 or 7)
+  int bestRoot = bassPc;
+  JZChordQuality bestQuality = CHORD_MAJOR;
+  int bestScore = -1;
 
-  if (hasMin3 && !hasMaj3)
+  for (int candidate = 0; candidate < 12; ++candidate)
   {
-    if (hasDim5)
+    if (!pcPresent[candidate])
     {
-      result.quality = CHORD_DIMINISHED;
+      continue;
     }
-    else if (hasMin7)
+
+    bool hasMin3 = pcPresent[(candidate + 3) % 12];
+    bool hasMaj3 = pcPresent[(candidate + 4) % 12];
+    bool hasDim5 = pcPresent[(candidate + 6) % 12];
+    bool hasP5   = pcPresent[(candidate + 7) % 12];
+    bool hasMin7 = pcPresent[(candidate + 10) % 12];
+    bool hasMaj7 = pcPresent[(candidate + 11) % 12];
+    bool hasSus4 = pcPresent[(candidate + 5) % 12];
+
+    int score = 0;
+    JZChordQuality q = CHORD_MAJOR;
+
+    if (hasMin3 && !hasMaj3)
     {
-      result.quality = CHORD_MINOR7;
+      score += 3;
+      if (hasDim5) { q = CHORD_DIMINISHED; score += 2; }
+      else if (hasMin7) { q = CHORD_MINOR7; score += 3; }
+      else { q = CHORD_MINOR; score += 2; }
+      if (hasP5) score += 2;
     }
-    else
+    else if (hasMaj3)
     {
-      result.quality = CHORD_MINOR;
+      score += 3;
+      if (hasMin7) { q = CHORD_DOMINANT7; score += 3; }
+      else if (hasMaj7) { q = CHORD_MAJOR7; score += 3; }
+      else { q = CHORD_MAJOR; score += 2; }
+      if (hasP5) score += 2;
+    }
+    else if (hasSus4 && !hasMin3)
+    {
+      q = CHORD_SUS4;
+      score += 2;
+      if (hasP5) score += 2;
+    }
+    else if (hasP5)
+    {
+      // Power chord (Root + 5th)
+      score += 2;
+      q = CHORD_MAJOR;
+    }
+
+    // Bias slightly towards the actual bass note if tied
+    if (candidate == bassPc)
+    {
+      score += 1;
+    }
+
+    if (score > bestScore)
+    {
+      bestScore = score;
+      bestRoot = candidate;
+      bestQuality = q;
     }
   }
-  else if (hasMaj3 || (!hasMin3 && !hasSus4))
+
+  rootPc = bestRoot;
+  quality = bestQuality;
+
+  // Determine Inversion
+  if (bassPc == rootPc)
   {
-    if (hasMin7)
-    {
-      result.quality = CHORD_DOMINANT7;
-    }
-    else if (hasMaj7)
-    {
-      result.quality = CHORD_MAJOR7;
-    }
-    else
-    {
-      result.quality = CHORD_MAJOR;
-    }
-  }
-  else if (hasSus4 && !hasMaj3)
-  {
-    result.quality = CHORD_SUS4;
+    inversion = 0; // Root position
   }
   else
   {
-    result.quality = CHORD_MAJOR;
+    int intervalFromRoot = (bassPc - rootPc + 12) % 12;
+    if (intervalFromRoot == 3 || intervalFromRoot == 4)
+    {
+      inversion = 1; // 1st Inversion (3rd in bass, e.g. C/E)
+    }
+    else if (intervalFromRoot == 6 || intervalFromRoot == 7)
+    {
+      inversion = 2; // 2nd Inversion (5th in bass, e.g. C/G)
+    }
+    else if (intervalFromRoot == 10 || intervalFromRoot == 11)
+    {
+      inversion = 3; // 3rd Inversion (7th in bass, e.g. G7/F)
+    }
+    else
+    {
+      inversion = 1; // Generic slash chord
+    }
+  }
+
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+// Measure Analysis (With Half-Bar Split Detection)
+//-----------------------------------------------------------------------------
+JZDetectedChord JZAutoAccompaniment::AnalyzeMeasure(
+  JZTrack* pSourceTrack,
+  int barStartClock,
+  int barEndClock,
+  const JZDetectedChord& fallbackChord)
+{
+  JZDetectedChord result;
+  if (!pSourceTrack)
+  {
+    return fallbackChord;
+  }
+
+  int barLen = barEndClock - barStartClock;
+  int midClock = barStartClock + (barLen / 2);
+
+  int r1 = 0, b1 = 0, inv1 = 0, minP1 = 60;
+  JZChordQuality q1 = CHORD_MAJOR;
+  bool hasHalf1 = AnalyzeWindow(pSourceTrack, barStartClock, midClock, r1, b1, inv1, q1, minP1);
+
+  int r2 = 0, b2 = 0, inv2 = 0, minP2 = 60;
+  JZChordQuality q2 = CHORD_MAJOR;
+  bool hasHalf2 = AnalyzeWindow(pSourceTrack, midClock, barEndClock, r2, b2, inv2, q2, minP2);
+
+  if (!hasHalf1 && !hasHalf2)
+  {
+    // Check if entire bar has sparse notes spanning across boundary
+    int rAll = 0, bAll = 0, invAll = 0, minPAll = 60;
+    JZChordQuality qAll = CHORD_MAJOR;
+    if (AnalyzeWindow(pSourceTrack, barStartClock, barEndClock, rAll, bAll, invAll, qAll, minPAll))
+    {
+      result.hasNotes = true;
+      result.rootPitchClass = rAll;
+      result.bassPitchClass = bAll;
+      result.inversion = invAll;
+      result.quality = qAll;
+      result.minPitch = minPAll;
+      return result;
+    }
+    return fallbackChord;
+  }
+
+  if (hasHalf1)
+  {
+    result.hasNotes = true;
+    result.rootPitchClass = r1;
+    result.bassPitchClass = b1;
+    result.inversion = inv1;
+    result.quality = q1;
+    result.minPitch = minP1;
+
+    // Check if second half has a different chord (split-measure ii-V etc.)
+    if (hasHalf2 && (r2 != r1 || q2 != q1 || b2 != b1))
+    {
+      result.hasSecondChord = true;
+      result.rootPitchClass2 = r2;
+      result.bassPitchClass2 = b2;
+      result.inversion2 = inv2;
+      result.quality2 = q2;
+    }
+  }
+  else if (hasHalf2)
+  {
+    // Only second half had notes
+    result.hasNotes = true;
+    result.rootPitchClass = r2;
+    result.bassPitchClass = b2;
+    result.inversion = inv2;
+    result.quality = q2;
+    result.minPitch = minP2;
   }
 
   return result;
@@ -278,7 +419,7 @@ void JZAutoAccompaniment::ClearRange(JZTrack* pTrack, int fromClock, int toClock
 }
 
 //-----------------------------------------------------------------------------
-// Bass Generation
+// Bass Generation (Supports Slash Inversions & Split Half-Bar Chords)
 //-----------------------------------------------------------------------------
 int JZAutoAccompaniment::GenerateBassMeasure(
   JZTrack* pTrack,
@@ -289,7 +430,7 @@ int JZAutoAccompaniment::GenerateBassMeasure(
   int countsPerBar,
   const JZDetectedChord& chord,
   const JZDetectedChord& nextChord,
-  JZAccompanimentStyle style)
+  const JZAccompanimentConfig& config)
 {
   if (!pTrack || !chord.hasNotes)
   {
@@ -298,57 +439,67 @@ int JZAutoAccompaniment::GenerateBassMeasure(
 
   int ch = pTrack->GetChannel() > 0 ? (pTrack->GetChannel() - 1) : 1;
   int notesAdded = 0;
-
-  int rootBass = 36 + (chord.rootPitchClass % 12);
-  int thirdBass = rootBass + 4;
-  if (chord.quality == CHORD_MINOR || chord.quality == CHORD_MINOR7 || chord.quality == CHORD_DIMINISHED)
-  {
-    thirdBass = rootBass + 3;
-  }
-  else if (chord.quality == CHORD_SUS4)
-  {
-    thirdBass = rootBass + 5;
-  }
-
-  int fifthBass = (chord.quality == CHORD_DIMINISHED) ? (rootBass + 6) : (rootBass + 7);
-  int nextRootBass = 36 + (nextChord.rootPitchClass % 12);
-
-  int approachBass = (nextRootBass > rootBass) ? (nextRootBass - 1) : (nextRootBass + 1);
-  if (approachBass == nextRootBass)
-  {
-    approachBass = fifthBass;
-  }
-
   int beatTicks = ticksPerQuarter;
 
-  switch (style)
+  // Helper for humanized velocity drift
+  auto hVel = [&](int base, int step) -> unsigned char {
+    if (!config.enableHumanizeVelocity) return (unsigned char)base;
+    int drift = ((barIndex * 5 + step * 3) % 9) - 4;
+    return (unsigned char)max(20, min(127, base + drift));
+  };
+
+  // Chord 1 Root & Bass
+  int rootBass1 = 36 + (chord.rootPitchClass % 12);
+  int bassNote1 = 36 + (chord.bassPitchClass % 12);
+  int thirdBass1 = rootBass1 + ((chord.quality == CHORD_MINOR || chord.quality == CHORD_MINOR7 || chord.quality == CHORD_DIMINISHED) ? 3 : 4);
+  int fifthBass1 = rootBass1 + ((chord.quality == CHORD_DIMINISHED) ? 6 : 7);
+
+  // If slash chord inversion (e.g. C/E), use bassNote on beat 1
+  int downbeatPitch1 = (chord.inversion > 0) ? bassNote1 : rootBass1;
+
+  // Chord 2 (for split-measure) or Next Bar Root
+  int nextRoot = chord.hasSecondChord ? (36 + chord.rootPitchClass2 % 12) : (36 + nextChord.rootPitchClass % 12);
+  int approachBass = (nextRoot > rootBass1) ? (nextRoot - 1) : (nextRoot + 1);
+
+  if (chord.hasSecondChord)
+  {
+    // Split Bar: 2 beats for Chord 1, 2 beats for Chord 2
+    int rootBass2 = 36 + (chord.rootPitchClass2 % 12);
+    int bassNote2 = 36 + (chord.bassPitchClass2 % 12);
+    int downbeatPitch2 = (chord.inversion2 > 0) ? bassNote2 : rootBass2;
+    int nextBarRoot = 36 + (nextChord.rootPitchClass % 12);
+    int approach2 = (nextBarRoot > rootBass2) ? (nextBarRoot - 1) : (nextBarRoot + 1);
+
+    int len = (int)(beatTicks * 0.9);
+    pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)downbeatPitch1, hVel(95, 0), (unsigned short)len));
+    pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks, ch, (unsigned char)fifthBass1, hVel(86, 1), (unsigned short)len));
+
+    pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2, ch, (unsigned char)downbeatPitch2, hVel(94, 2), (unsigned short)len));
+    pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3, ch, (unsigned char)approach2, hVel(85, 3), (unsigned short)len));
+    return 4;
+  }
+
+  switch (config.style)
   {
     case STYLE_JAZZ_SWING:
     {
       if (countsPerBar == 4)
       {
         int len = (int)(beatTicks * 0.9);
-        pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)rootBass, 96, (unsigned short)len));
-        notesAdded++;
-
-        int b2Pitch = (barIndex % 2 == 0) ? thirdBass : fifthBass;
-        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks, ch, (unsigned char)b2Pitch, 84, (unsigned short)len));
-        notesAdded++;
-
-        int b3Pitch = (barIndex % 2 == 0) ? fifthBass : (rootBass + 12);
-        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2, ch, (unsigned char)b3Pitch, 90, (unsigned short)len));
-        notesAdded++;
-
-        int b4Len = (int)(beatTicks * 0.85);
-        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3, ch, (unsigned char)approachBass, 86, (unsigned short)b4Len));
-        notesAdded++;
+        pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)downbeatPitch1, hVel(96, 0), (unsigned short)len));
+        int b2Pitch = (barIndex % 2 == 0) ? thirdBass1 : fifthBass1;
+        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks, ch, (unsigned char)b2Pitch, hVel(84, 1), (unsigned short)len));
+        int b3Pitch = (barIndex % 2 == 0) ? fifthBass1 : (rootBass1 + 12);
+        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2, ch, (unsigned char)b3Pitch, hVel(90, 2), (unsigned short)len));
+        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3, ch, (unsigned char)approachBass, hVel(86, 3), (unsigned short)(beatTicks * 0.85)));
+        notesAdded += 4;
       }
       else
       {
         int len = (int)(beatTicks * 0.9);
-        pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)rootBass, 95, (unsigned short)len));
-        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks, ch, (unsigned char)thirdBass, 84, (unsigned short)len));
-        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2, ch, (unsigned char)fifthBass, 88, (unsigned short)len));
+        pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)downbeatPitch1, hVel(95, 0), (unsigned short)len));
+        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks, ch, (unsigned char)thirdBass1, hVel(84, 1), (unsigned short)len));
+        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2, ch, (unsigned char)fifthBass1, hVel(88, 2), (unsigned short)len));
         notesAdded += 3;
       }
       break;
@@ -357,35 +508,24 @@ int JZAutoAccompaniment::GenerateBassMeasure(
     case STYLE_BOSSA_NOVA:
     {
       int len1 = (int)(beatTicks * 1.35);
-      pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)rootBass, 92, (unsigned short)len1));
-      notesAdded++;
-
       int len2 = (int)(beatTicks * 0.45);
-      pTrack->Put(new JZKeyOnEvent(barStartClock + (int)(beatTicks * 1.5), ch, (unsigned char)fifthBass, 82, (unsigned short)len2));
-      notesAdded++;
-
-      if (countsPerBar == 4)
-      {
-        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2, ch, (unsigned char)rootBass, 88, (unsigned short)len1));
-        notesAdded++;
-        pTrack->Put(new JZKeyOnEvent(barStartClock + (int)(beatTicks * 3.5), ch, (unsigned char)fifthBass, 80, (unsigned short)len2));
-        notesAdded++;
-      }
+      pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)downbeatPitch1, hVel(92, 0), (unsigned short)len1));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + (int)(beatTicks * 1.5), ch, (unsigned char)fifthBass1, hVel(82, 1), (unsigned short)len2));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2, ch, (unsigned char)downbeatPitch1, hVel(88, 2), (unsigned short)len1));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + (int)(beatTicks * 3.5), ch, (unsigned char)fifthBass1, hVel(80, 3), (unsigned short)len2));
+      notesAdded += 4;
       break;
     }
 
     case STYLE_BLUES_SHUFFLE:
     {
-      int sixthBass = rootBass + 9;
+      int sixthBass = rootBass1 + 9;
       int len = (int)(beatTicks * 0.85);
-      if (countsPerBar == 4)
-      {
-        pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)rootBass, 95, (unsigned short)len));
-        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks, ch, (unsigned char)thirdBass, 85, (unsigned short)len));
-        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2, ch, (unsigned char)fifthBass, 90, (unsigned short)len));
-        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3, ch, (unsigned char)sixthBass, 85, (unsigned short)len));
-        notesAdded += 4;
-      }
+      pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)downbeatPitch1, hVel(95, 0), (unsigned short)len));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks, ch, (unsigned char)thirdBass1, hVel(85, 1), (unsigned short)len));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2, ch, (unsigned char)fifthBass1, hVel(90, 2), (unsigned short)len));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3, ch, (unsigned char)sixthBass, hVel(85, 3), (unsigned short)len));
+      notesAdded += 4;
       break;
     }
 
@@ -395,11 +535,10 @@ int JZAutoAccompaniment::GenerateBassMeasure(
       int len = (int)(eighthTicks * 0.85);
       for (int b = 0; b < countsPerBar; ++b)
       {
-        int pDown = (b == 2 && barIndex % 2 == 1) ? fifthBass : rootBass;
+        int pDown = (b == 0) ? downbeatPitch1 : ((b == 2 && barIndex % 2 == 1) ? fifthBass1 : rootBass1);
         int pUp = (b == 3 && barIndex % 4 == 3) ? approachBass : pDown;
-
-        pTrack->Put(new JZKeyOnEvent(barStartClock + b * beatTicks, ch, (unsigned char)pDown, 95, (unsigned short)len));
-        pTrack->Put(new JZKeyOnEvent(barStartClock + b * beatTicks + eighthTicks, ch, (unsigned char)pUp, 80, (unsigned short)len));
+        pTrack->Put(new JZKeyOnEvent(barStartClock + b * beatTicks, ch, (unsigned char)pDown, hVel(95, b), (unsigned short)len));
+        pTrack->Put(new JZKeyOnEvent(barStartClock + b * beatTicks + eighthTicks, ch, (unsigned char)pUp, hVel(80, b + 4), (unsigned short)len));
         notesAdded += 2;
       }
       break;
@@ -408,15 +547,12 @@ int JZAutoAccompaniment::GenerateBassMeasure(
     case STYLE_FUNK_GROOVE:
     {
       int sixteenth = beatTicks / 4;
-      int lenShort = (int)(sixteenth * 0.9);
-      int lenMed = (int)(beatTicks * 0.7);
-
-      pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)rootBass, 105, (unsigned short)lenShort));
-      pTrack->Put(new JZKeyOnEvent(barStartClock + sixteenth * 3, ch, (unsigned char)(rootBass + 12), 92, (unsigned short)lenShort));
-      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks + sixteenth * 2, ch, (unsigned char)thirdBass, 88, (unsigned short)lenShort));
-      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2 + sixteenth, ch, (unsigned char)fifthBass, 96, (unsigned short)lenMed));
-      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3, ch, (unsigned char)rootBass, 98, (unsigned short)lenShort));
-      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3 + sixteenth * 3, ch, (unsigned char)approachBass, 85, (unsigned short)lenShort));
+      pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)downbeatPitch1, hVel(105, 0), (unsigned short)(sixteenth * 0.9)));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + sixteenth * 3, ch, (unsigned char)(rootBass1 + 12), hVel(92, 1), (unsigned short)(sixteenth * 0.9)));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks + sixteenth * 2, ch, (unsigned char)thirdBass1, hVel(88, 2), (unsigned short)(sixteenth * 0.9)));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2 + sixteenth, ch, (unsigned char)fifthBass1, hVel(96, 3), (unsigned short)(beatTicks * 0.7)));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3, ch, (unsigned char)rootBass1, hVel(98, 4), (unsigned short)(sixteenth * 0.9)));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3 + sixteenth * 3, ch, (unsigned char)approachBass, hVel(85, 5), (unsigned short)(sixteenth * 0.9)));
       notesAdded += 6;
       break;
     }
@@ -429,7 +565,7 @@ int JZAutoAccompaniment::GenerateBassMeasure(
 }
 
 //-----------------------------------------------------------------------------
-// Drums Generation
+// Drums Generation (Smart Drum Fills on Measure 4/8/12/16 & Swing Control)
 //-----------------------------------------------------------------------------
 int JZAutoAccompaniment::GenerateDrumsMeasure(
   JZTrack* pTrack,
@@ -438,7 +574,7 @@ int JZAutoAccompaniment::GenerateDrumsMeasure(
   int ticksPerBar,
   int ticksPerQuarter,
   int countsPerBar,
-  JZAccompanimentStyle style)
+  const JZAccompanimentConfig& config)
 {
   if (!pTrack)
   {
@@ -450,7 +586,9 @@ int JZAutoAccompaniment::GenerateDrumsMeasure(
   int beatTicks = ticksPerQuarter;
   int eighthTicks = beatTicks / 2;
   int sixteenthTicks = beatTicks / 4;
-  int swingSkip = (beatTicks * 2) / 3;
+
+  // Swing ratio calculation
+  int swingSkip = (beatTicks * config.swingPercent) / 100;
   int hitLen = 40;
 
   const unsigned char KICK = 36;
@@ -461,17 +599,51 @@ int JZAutoAccompaniment::GenerateDrumsMeasure(
   const unsigned char OPEN_HH = 46;
   const unsigned char CRASH = 49;
   const unsigned char RIDE = 51;
+  const unsigned char HIGH_TOM = 50;
+  const unsigned char MID_TOM = 47;
+  const unsigned char LOW_TOM = 45;
+  const unsigned char FLOOR_TOM = 41;
 
-  switch (style)
+  bool isFillBar = config.enableDrumFills && (countsPerBar == 4) && (barIndex % 4 == 3);
+
+  // Crash on start of song and on section starts (every 4 bars)
+  if (barIndex % 4 == 0)
+  {
+    pTrack->Put(new JZKeyOnEvent(barStartClock, ch, CRASH, 100, (unsigned short)hitLen));
+    pTrack->Put(new JZKeyOnEvent(barStartClock, ch, KICK, 105, (unsigned short)hitLen));
+    notesAdded += 2;
+  }
+
+  if (isFillBar)
+  {
+    // Dynamic Procedural Drum Fill on beats 3 & 4!
+    // Beats 1 & 2: Keep beat solid
+    pTrack->Put(new JZKeyOnEvent(barStartClock, ch, KICK, 95, (unsigned short)hitLen));
+    pTrack->Put(new JZKeyOnEvent(barStartClock, ch, CLOSED_HH, 85, (unsigned short)hitLen));
+    pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks, ch, SNARE, 100, (unsigned short)hitLen));
+    pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks, ch, CLOSED_HH, 85, (unsigned short)hitLen));
+    notesAdded += 4;
+
+    // Beat 3: Snare 16ths into High Tom
+    pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2, ch, SNARE, 90, (unsigned short)hitLen));
+    pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2 + sixteenthTicks, ch, SNARE, 96, (unsigned short)hitLen));
+    pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2 + sixteenthTicks * 2, ch, HIGH_TOM, 100, (unsigned short)hitLen));
+    pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2 + sixteenthTicks * 3, ch, HIGH_TOM, 105, (unsigned short)hitLen));
+
+    // Beat 4: Cascading Toms down to floor tom + kick flam
+    pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3, ch, MID_TOM, 102, (unsigned short)hitLen));
+    pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3 + sixteenthTicks, ch, LOW_TOM, 106, (unsigned short)hitLen));
+    pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3 + sixteenthTicks * 2, ch, FLOOR_TOM, 110, (unsigned short)hitLen));
+    pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3 + sixteenthTicks * 3, ch, SNARE, 115, (unsigned short)hitLen));
+    pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3 + sixteenthTicks * 3, ch, KICK, 110, (unsigned short)hitLen));
+    notesAdded += 9;
+    return notesAdded;
+  }
+
+  switch (config.style)
   {
     case STYLE_JAZZ_SWING:
     {
-      if (barIndex == 0)
-      {
-        pTrack->Put(new JZKeyOnEvent(barStartClock, ch, CRASH, 95, (unsigned short)hitLen));
-        notesAdded++;
-      }
-
       if (countsPerBar == 4)
       {
         pTrack->Put(new JZKeyOnEvent(barStartClock, ch, RIDE, 88, (unsigned short)hitLen));
@@ -499,23 +671,15 @@ int JZAutoAccompaniment::GenerateDrumsMeasure(
         pTrack->Put(new JZKeyOnEvent(barStartClock + i * eighthTicks, ch, CLOSED_HH, (unsigned char)vel, (unsigned short)hitLen));
         notesAdded++;
       }
-
       pTrack->Put(new JZKeyOnEvent(barStartClock, ch, KICK, 82, (unsigned short)hitLen));
       pTrack->Put(new JZKeyOnEvent(barStartClock + (int)(beatTicks * 1.5), ch, KICK, 75, (unsigned short)hitLen));
-      notesAdded += 2;
-
-      if (countsPerBar == 4)
-      {
-        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2, ch, KICK, 80, (unsigned short)hitLen));
-        pTrack->Put(new JZKeyOnEvent(barStartClock + (int)(beatTicks * 3.5), ch, KICK, 75, (unsigned short)hitLen));
-        notesAdded += 2;
-
-        pTrack->Put(new JZKeyOnEvent(barStartClock, ch, RIMSHOT, 85, (unsigned short)hitLen));
-        pTrack->Put(new JZKeyOnEvent(barStartClock + (int)(beatTicks * 1.5), ch, RIMSHOT, 88, (unsigned short)hitLen));
-        pTrack->Put(new JZKeyOnEvent(barStartClock + (int)(beatTicks * 2.5), ch, RIMSHOT, 86, (unsigned short)hitLen));
-        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3, ch, RIMSHOT, 84, (unsigned short)hitLen));
-        notesAdded += 4;
-      }
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2, ch, KICK, 80, (unsigned short)hitLen));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + (int)(beatTicks * 3.5), ch, KICK, 75, (unsigned short)hitLen));
+      pTrack->Put(new JZKeyOnEvent(barStartClock, ch, RIMSHOT, 85, (unsigned short)hitLen));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + (int)(beatTicks * 1.5), ch, RIMSHOT, 88, (unsigned short)hitLen));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + (int)(beatTicks * 2.5), ch, RIMSHOT, 86, (unsigned short)hitLen));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3, ch, RIMSHOT, 84, (unsigned short)hitLen));
+      notesAdded += 8;
       break;
     }
 
@@ -528,36 +692,25 @@ int JZAutoAccompaniment::GenerateDrumsMeasure(
         pTrack->Put(new JZKeyOnEvent(barStartClock + b * beatTicks, ch, KICK, 85, (unsigned short)hitLen));
         notesAdded += 3;
       }
-      if (countsPerBar == 4)
-      {
-        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks, ch, SNARE, 100, (unsigned short)hitLen));
-        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3, ch, SNARE, 100, (unsigned short)hitLen));
-        notesAdded += 2;
-      }
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks, ch, SNARE, 100, (unsigned short)hitLen));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3, ch, SNARE, 100, (unsigned short)hitLen));
+      notesAdded += 2;
       break;
     }
 
     case STYLE_POP_ROCK:
     {
-      if (barIndex == 0)
-      {
-        pTrack->Put(new JZKeyOnEvent(barStartClock, ch, CRASH, 100, (unsigned short)hitLen));
-        notesAdded++;
-      }
       for (int i = 0; i < countsPerBar * 2; ++i)
       {
         int vel = (i % 2 == 0) ? 85 : 68;
         pTrack->Put(new JZKeyOnEvent(barStartClock + i * eighthTicks, ch, CLOSED_HH, (unsigned char)vel, (unsigned short)hitLen));
         notesAdded++;
       }
-      if (countsPerBar == 4)
-      {
-        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks, ch, SNARE, 102, (unsigned short)hitLen));
-        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3, ch, SNARE, 105, (unsigned short)hitLen));
-        pTrack->Put(new JZKeyOnEvent(barStartClock, ch, KICK, 100, (unsigned short)hitLen));
-        pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2, ch, KICK, 95, (unsigned short)hitLen));
-        notesAdded += 4;
-      }
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks, ch, SNARE, 102, (unsigned short)hitLen));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3, ch, SNARE, 105, (unsigned short)hitLen));
+      pTrack->Put(new JZKeyOnEvent(barStartClock, ch, KICK, 100, (unsigned short)hitLen));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2, ch, KICK, 95, (unsigned short)hitLen));
+      notesAdded += 4;
       break;
     }
 
@@ -590,7 +743,7 @@ int JZAutoAccompaniment::GenerateDrumsMeasure(
 }
 
 //-----------------------------------------------------------------------------
-// Pad / Strings Generation
+// Pad / Strings Generation (Supports Split Half-Bar Chords)
 //-----------------------------------------------------------------------------
 int JZAutoAccompaniment::GeneratePadMeasure(
   JZTrack* pTrack,
@@ -600,7 +753,7 @@ int JZAutoAccompaniment::GeneratePadMeasure(
   int ticksPerQuarter,
   int countsPerBar,
   const JZDetectedChord& chord,
-  JZAccompanimentStyle style)
+  const JZAccompanimentConfig& config)
 {
   if (!pTrack || !chord.hasNotes)
   {
@@ -610,44 +763,42 @@ int JZAutoAccompaniment::GeneratePadMeasure(
   int ch = pTrack->GetChannel() > 0 ? (pTrack->GetChannel() - 1) : 2;
   int notesAdded = 0;
 
-  int rootPad = 60 + (chord.rootPitchClass % 12);
-  if (rootPad > 67)
+  auto emitPadVoicing = [&](int clk, int r, JZChordQuality q, int dur, unsigned char vel) {
+    int rootPad = 60 + (r % 12);
+    if (rootPad > 67) rootPad -= 12;
+    int thirdPad = rootPad + ((q == CHORD_MINOR || q == CHORD_MINOR7 || q == CHORD_DIMINISHED) ? 3 : (q == CHORD_SUS4 ? 5 : 4));
+    int fifthPad = rootPad + ((q == CHORD_DIMINISHED) ? 6 : 7);
+    int seventhPad = rootPad + ((q == CHORD_MAJOR7) ? 11 : 10);
+
+    pTrack->Put(new JZKeyOnEvent(clk, ch, (unsigned char)rootPad, vel, (unsigned short)dur));
+    pTrack->Put(new JZKeyOnEvent(clk, ch, (unsigned char)fifthPad, (unsigned char)(vel - 5), (unsigned short)dur));
+    pTrack->Put(new JZKeyOnEvent(clk, ch, (unsigned char)(thirdPad + 12), (unsigned char)(vel - 3), (unsigned short)dur));
+    notesAdded += 3;
+
+    if (q == CHORD_DOMINANT7 || q == CHORD_MAJOR7 || q == CHORD_MINOR7)
+    {
+      pTrack->Put(new JZKeyOnEvent(clk, ch, (unsigned char)seventhPad, (unsigned char)(vel - 8), (unsigned short)dur));
+      notesAdded++;
+    }
+  };
+
+  if (chord.hasSecondChord)
   {
-    rootPad -= 12;
+    int halfLen = (ticksPerBar / 2) - (ticksPerQuarter / 8);
+    emitPadVoicing(barStartClock, chord.rootPitchClass, chord.quality, halfLen, 70);
+    emitPadVoicing(barStartClock + (ticksPerBar / 2), chord.rootPitchClass2, chord.quality2, halfLen, 68);
   }
-
-  int thirdPad = rootPad + 4;
-  if (chord.quality == CHORD_MINOR || chord.quality == CHORD_MINOR7 || chord.quality == CHORD_DIMINISHED)
+  else
   {
-    thirdPad = rootPad + 3;
-  }
-  else if (chord.quality == CHORD_SUS4)
-  {
-    thirdPad = rootPad + 5;
-  }
-
-  int fifthPad = (chord.quality == CHORD_DIMINISHED) ? (rootPad + 6) : (rootPad + 7);
-  int seventhPad = (chord.quality == CHORD_MAJOR7) ? (rootPad + 11) : (rootPad + 10);
-
-  int noteLen = ticksPerBar - (ticksPerQuarter / 8);
-  unsigned char vel = 70;
-
-  pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)rootPad, vel, (unsigned short)noteLen));
-  pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)fifthPad, (unsigned char)(vel - 5), (unsigned short)noteLen));
-  pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)(thirdPad + 12), (unsigned char)(vel - 3), (unsigned short)noteLen));
-  notesAdded += 3;
-
-  if (chord.quality == CHORD_DOMINANT7 || chord.quality == CHORD_MAJOR7 || chord.quality == CHORD_MINOR7)
-  {
-    pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)seventhPad, (unsigned char)(vel - 8), (unsigned short)noteLen));
-    notesAdded++;
+    int noteLen = ticksPerBar - (ticksPerQuarter / 8);
+    emitPadVoicing(barStartClock, chord.rootPitchClass, chord.quality, noteLen, 70);
   }
 
   return notesAdded;
 }
 
 //-----------------------------------------------------------------------------
-// Strumming & Plucking Generation
+// Strumming & Plucking Generation (Supports Split Chords & Human Micro-Delay)
 //-----------------------------------------------------------------------------
 int JZAutoAccompaniment::GenerateStrumPluckMeasure(
   JZTrack* pTrack,
@@ -657,78 +808,55 @@ int JZAutoAccompaniment::GenerateStrumPluckMeasure(
   int ticksPerQuarter,
   int countsPerBar,
   const JZDetectedChord& chord,
-  const JZStrumPluckConfig& cfg)
+  const JZAccompanimentConfig& config)
 {
   if (!pTrack || !chord.hasNotes)
   {
     return 0;
   }
 
+  const JZStrumPluckConfig& cfg = config.strumPluck;
   int ch = pTrack->GetChannel() > 0 ? (pTrack->GetChannel() - 1) : (cfg.midiChannel - 1);
   int notesAdded = 0;
   int beatTicks = ticksPerQuarter;
   int eighthTicks = beatTicks / 2;
-
-  // Build authentic guitar chord voicing (5 to 6 strings from low to high)
-  int r = chord.rootPitchClass % 12;
-  int rootGtr = 40 + r; // E2 (40) to D#3 (51)
-  if (rootGtr < 40) rootGtr += 12;
-  if (rootGtr > 50) rootGtr -= 12;
-
-  int thirdGtr = rootGtr + 4;
-  if (chord.quality == CHORD_MINOR || chord.quality == CHORD_MINOR7 || chord.quality == CHORD_DIMINISHED)
-  {
-    thirdGtr = rootGtr + 3;
-  }
-  int fifthGtr = (chord.quality == CHORD_DIMINISHED) ? (rootGtr + 6) : (rootGtr + 7);
-  int seventhGtr = (chord.quality == CHORD_MAJOR7) ? (rootGtr + 11) : (rootGtr + 10);
-
-  // 5-string voicing: Root, 5th, Octave, 3rd, 5th (or 7th)
-  vector<int> chordPitches;
-  chordPitches.push_back(rootGtr);
-  chordPitches.push_back(fifthGtr);
-  chordPitches.push_back(rootGtr + 12);
-  chordPitches.push_back(thirdGtr + 12);
-  if (chord.quality == CHORD_DOMINANT7 || chord.quality == CHORD_MAJOR7 || chord.quality == CHORD_MINOR7)
-  {
-    chordPitches.push_back(seventhGtr + 12);
-  }
-  else
-  {
-    chordPitches.push_back(fifthGtr + 12);
-  }
-
   int strumDelay = max(2, (ticksPerQuarter * cfg.strumSpeedMs) / 500);
 
-  // Helper lambda to emit downstroke (↓)
-  auto emitDownstroke = [&](int startClk, int vel, int dur) {
-    for (size_t k = 0; k < chordPitches.size(); ++k)
+  auto buildGuitarVoicing = [](int r, JZChordQuality q) -> vector<int> {
+    int rootGtr = 40 + (r % 12);
+    if (rootGtr < 40) rootGtr += 12;
+    if (rootGtr > 50) rootGtr -= 12;
+    int thirdGtr = rootGtr + ((q == CHORD_MINOR || q == CHORD_MINOR7 || q == CHORD_DIMINISHED) ? 3 : 4);
+    int fifthGtr = (q == CHORD_DIMINISHED) ? (rootGtr + 6) : (rootGtr + 7);
+    int seventhGtr = (q == CHORD_MAJOR7) ? (rootGtr + 11) : (rootGtr + 10);
+
+    vector<int> p;
+    p.push_back(rootGtr);
+    p.push_back(fifthGtr);
+    p.push_back(rootGtr + 12);
+    p.push_back(thirdGtr + 12);
+    if (q == CHORD_DOMINANT7 || q == CHORD_MAJOR7 || q == CHORD_MINOR7) p.push_back(seventhGtr + 12);
+    else p.push_back(fifthGtr + 12);
+    return p;
+  };
+
+  vector<int> chordPitches1 = buildGuitarVoicing(chord.rootPitchClass, chord.quality);
+  vector<int> chordPitches2 = chord.hasSecondChord ? buildGuitarVoicing(chord.rootPitchClass2, chord.quality2) : chordPitches1;
+
+  auto emitDown = [&](int clk, const vector<int>& pitches, int vel, int dur) {
+    for (size_t k = 0; k < pitches.size(); ++k)
     {
-      int clk = startClk + (int)k * strumDelay;
-      int noteVel = max(30, vel - (int)k * 2);
-      pTrack->Put(new JZKeyOnEvent(clk, ch, (unsigned char)chordPitches[k], (unsigned char)noteVel, (unsigned short)dur));
+      pTrack->Put(new JZKeyOnEvent(clk + (int)k * strumDelay, ch, (unsigned char)pitches[k], (unsigned char)max(30, vel - (int)k * 2), (unsigned short)dur));
       notesAdded++;
     }
   };
 
-  // Helper lambda to emit upstroke (↑)
-  auto emitUpstroke = [&](int startClk, int vel, int dur) {
-    size_t count = min((size_t)4, chordPitches.size()); // Upstrokes hit upper strings
+  auto emitUp = [&](int clk, const vector<int>& pitches, int vel, int dur) {
+    size_t count = min((size_t)4, pitches.size());
     for (size_t k = 0; k < count; ++k)
     {
-      size_t idx = chordPitches.size() - 1 - k;
-      int clk = startClk + (int)k * strumDelay;
-      int noteVel = max(30, vel - (int)k * 2);
-      pTrack->Put(new JZKeyOnEvent(clk, ch, (unsigned char)chordPitches[idx], (unsigned char)noteVel, (unsigned short)dur));
-      notesAdded++;
-    }
-  };
-
-  // Helper lambda for muted percussive chuck (x)
-  auto emitChuck = [&](int startClk) {
-    for (size_t k = 0; k < chordPitches.size(); ++k)
-    {
-      pTrack->Put(new JZKeyOnEvent(startClk, ch, (unsigned char)chordPitches[k], 75, 35));
+      size_t idx = pitches.size() - 1 - k;
+      pTrack->Put(new JZKeyOnEvent(clk + (int)k * strumDelay, ch, (unsigned char)pitches[idx], (unsigned char)max(30, vel - (int)k * 2), (unsigned short)dur));
       notesAdded++;
     }
   };
@@ -739,23 +867,22 @@ int JZAutoAccompaniment::GenerateStrumPluckMeasure(
   {
     case STRUM_ACOUSTIC_FOLK:
     {
-      // D - D U - U D - pattern
-      emitDownstroke(barStartClock, 95, ringLen);
-      emitDownstroke(barStartClock + beatTicks, 88, eighthTicks);
-      emitUpstroke(barStartClock + beatTicks + eighthTicks, 78, eighthTicks);
-      emitUpstroke(barStartClock + beatTicks * 2 + eighthTicks, 82, eighthTicks);
-      emitDownstroke(barStartClock + beatTicks * 3, 90, eighthTicks);
-      emitUpstroke(barStartClock + beatTicks * 3 + eighthTicks, 76, eighthTicks);
+      emitDown(barStartClock, chordPitches1, 95, ringLen);
+      emitDown(barStartClock + beatTicks, chordPitches1, 88, eighthTicks);
+      emitUp(barStartClock + beatTicks + eighthTicks, chordPitches1, 78, eighthTicks);
+      emitUp(barStartClock + beatTicks * 2 + eighthTicks, chordPitches2, 82, eighthTicks);
+      emitDown(barStartClock + beatTicks * 3, chordPitches2, 90, eighthTicks);
+      emitUp(barStartClock + beatTicks * 3 + eighthTicks, chordPitches2, 76, eighthTicks);
       break;
     }
 
     case STRUM_POP_ROCK_8TH:
     {
-      // Driving 8th notes
       for (int b = 0; b < countsPerBar; ++b)
       {
-        emitDownstroke(barStartClock + b * beatTicks, 96, eighthTicks);
-        emitUpstroke(barStartClock + b * beatTicks + eighthTicks, 80, eighthTicks);
+        const vector<int>& p = (b >= 2 && chord.hasSecondChord) ? chordPitches2 : chordPitches1;
+        emitDown(barStartClock + b * beatTicks, p, 96, eighthTicks);
+        emitUp(barStartClock + b * beatTicks + eighthTicks, p, 80, eighthTicks);
       }
       break;
     }
@@ -763,59 +890,50 @@ int JZAutoAccompaniment::GenerateStrumPluckMeasure(
     case STRUM_FUNK_16TH_CHOP:
     {
       int sixteenth = beatTicks / 4;
-      emitDownstroke(barStartClock, 102, sixteenth * 2);
-      emitChuck(barStartClock + sixteenth);
-      emitChuck(barStartClock + sixteenth * 2);
-      emitUpstroke(barStartClock + sixteenth * 3, 85, sixteenth * 2);
-
-      emitDownstroke(barStartClock + beatTicks, 105, sixteenth * 2);
-      emitChuck(barStartClock + beatTicks + sixteenth * 2);
-
-      emitDownstroke(barStartClock + beatTicks * 2 + sixteenth * 2, 98, sixteenth * 2);
-      emitDownstroke(barStartClock + beatTicks * 3, 104, sixteenth * 2);
+      emitDown(barStartClock, chordPitches1, 102, sixteenth * 2);
+      emitUp(barStartClock + sixteenth * 3, chordPitches1, 85, sixteenth * 2);
+      emitDown(barStartClock + beatTicks, chordPitches1, 105, sixteenth * 2);
+      emitDown(barStartClock + beatTicks * 2 + sixteenth * 2, chordPitches2, 98, sixteenth * 2);
+      emitDown(barStartClock + beatTicks * 3, chordPitches2, 104, sixteenth * 2);
       break;
     }
 
     case STRUM_REGGAE_SKANK:
     {
-      // Sharp offbeat chops
       for (int b = 0; b < countsPerBar; ++b)
       {
-        emitDownstroke(barStartClock + b * beatTicks + eighthTicks, 98, eighthTicks / 2);
+        const vector<int>& p = (b >= 2 && chord.hasSecondChord) ? chordPitches2 : chordPitches1;
+        emitDown(barStartClock + b * beatTicks + eighthTicks, p, 98, eighthTicks / 2);
       }
       break;
     }
 
     case PLUCK_TRAVIS_PICKING:
     {
-      // Thumb alternating bass + finger syncopation
-      int pBass1 = chordPitches[0];
-      int pBass2 = chordPitches[1];
-      int pHigh1 = chordPitches[3];
-      int pHigh2 = chordPitches[4];
+      int pB1 = chordPitches1[0], pB2 = chordPitches1[1], pH1 = chordPitches1[3], pH2 = chordPitches1[4];
+      pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)pB1, 95, (unsigned short)ringLen));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + eighthTicks, ch, (unsigned char)pH1, 80, (unsigned short)eighthTicks));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks, ch, (unsigned char)pB2, 88, (unsigned short)ringLen));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks + eighthTicks, ch, (unsigned char)pH2, 85, (unsigned short)eighthTicks));
 
-      pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)pBass1, 95, (unsigned short)ringLen));
-      pTrack->Put(new JZKeyOnEvent(barStartClock + eighthTicks, ch, (unsigned char)pHigh1, 80, (unsigned short)eighthTicks));
-      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks, ch, (unsigned char)pBass2, 88, (unsigned short)ringLen));
-      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks + eighthTicks, ch, (unsigned char)pHigh2, 85, (unsigned short)eighthTicks));
-
-      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2, ch, (unsigned char)pBass1, 92, (unsigned short)ringLen));
-      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2 + eighthTicks, ch, (unsigned char)pHigh1, 80, (unsigned short)eighthTicks));
-      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3, ch, (unsigned char)pBass2, 88, (unsigned short)ringLen));
-      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3 + eighthTicks, ch, (unsigned char)pHigh2, 82, (unsigned short)eighthTicks));
+      const vector<int>& p2 = chordPitches2;
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2, ch, (unsigned char)p2[0], 92, (unsigned short)ringLen));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2 + eighthTicks, ch, (unsigned char)p2[3], 80, (unsigned short)eighthTicks));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3, ch, (unsigned char)p2[1], 88, (unsigned short)ringLen));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3 + eighthTicks, ch, (unsigned char)p2[4], 82, (unsigned short)eighthTicks));
       notesAdded += 8;
       break;
     }
 
     case PLUCK_BALLAD_ARPEGGIO:
     {
-      // Flowing 8th notes broken chord
       int steps[8] = {0, 1, 2, 3, 4, 3, 2, 1};
       for (int i = 0; i < 8; ++i)
       {
-        int p = chordPitches[steps[i] % chordPitches.size()];
+        const vector<int>& p = (i >= 4 && chord.hasSecondChord) ? chordPitches2 : chordPitches1;
+        int note = p[steps[i] % p.size()];
         int vel = (i == 0 || i == 4) ? 92 : 78;
-        pTrack->Put(new JZKeyOnEvent(barStartClock + i * eighthTicks, ch, (unsigned char)p, (unsigned char)vel, (unsigned short)ringLen));
+        pTrack->Put(new JZKeyOnEvent(barStartClock + i * eighthTicks, ch, (unsigned char)note, (unsigned char)vel, (unsigned short)ringLen));
         notesAdded++;
       }
       break;
@@ -823,19 +941,14 @@ int JZAutoAccompaniment::GenerateStrumPluckMeasure(
 
     case PLUCK_PIMA_CLASSICAL:
     {
-      // P (Root), I (3rd), M (5th), A (High)
-      int pP = chordPitches[0];
-      int pI = chordPitches[2];
-      int pM = chordPitches[3];
-      int pA = chordPitches[4];
-
       for (int cycle = 0; cycle < 2; ++cycle)
       {
+        const vector<int>& p = (cycle == 1 && chord.hasSecondChord) ? chordPitches2 : chordPitches1;
         int offset = cycle * beatTicks * 2;
-        pTrack->Put(new JZKeyOnEvent(barStartClock + offset, ch, (unsigned char)pP, 94, (unsigned short)ringLen));
-        pTrack->Put(new JZKeyOnEvent(barStartClock + offset + eighthTicks, ch, (unsigned char)pI, 80, (unsigned short)ringLen));
-        pTrack->Put(new JZKeyOnEvent(barStartClock + offset + beatTicks, ch, (unsigned char)pM, 84, (unsigned short)ringLen));
-        pTrack->Put(new JZKeyOnEvent(barStartClock + offset + beatTicks + eighthTicks, ch, (unsigned char)pA, 88, (unsigned short)ringLen));
+        pTrack->Put(new JZKeyOnEvent(barStartClock + offset, ch, (unsigned char)p[0], 94, (unsigned short)ringLen));
+        pTrack->Put(new JZKeyOnEvent(barStartClock + offset + eighthTicks, ch, (unsigned char)p[2], 80, (unsigned short)ringLen));
+        pTrack->Put(new JZKeyOnEvent(barStartClock + offset + beatTicks, ch, (unsigned char)p[3], 84, (unsigned short)ringLen));
+        pTrack->Put(new JZKeyOnEvent(barStartClock + offset + beatTicks + eighthTicks, ch, (unsigned char)p[4], 88, (unsigned short)ringLen));
         notesAdded += 4;
       }
       break;
@@ -843,10 +956,10 @@ int JZAutoAccompaniment::GenerateStrumPluckMeasure(
 
     case PLUCK_NEO_SOUL:
     {
-      // Spread voicings with gentle delay and release
-      emitDownstroke(barStartClock, 92, beatTicks * 2);
-      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2 + eighthTicks, ch, (unsigned char)chordPitches[4], 84, (unsigned short)eighthTicks));
-      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3, ch, (unsigned char)chordPitches[3], 80, (unsigned short)eighthTicks));
+      emitDown(barStartClock, chordPitches1, 92, beatTicks * 2);
+      const vector<int>& p2 = chordPitches2;
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2 + eighthTicks, ch, (unsigned char)p2[4], 84, (unsigned short)eighthTicks));
+      pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3, ch, (unsigned char)p2[3], 80, (unsigned short)eighthTicks));
       notesAdded += 2;
       break;
     }
@@ -869,13 +982,14 @@ int JZAutoAccompaniment::GenerateRiffMeasure(
   int ticksPerQuarter,
   int countsPerBar,
   const JZDetectedChord& chord,
-  const JZRiffConfig& cfg)
+  const JZAccompanimentConfig& config)
 {
   if (!pTrack || !chord.hasNotes)
   {
     return 0;
   }
 
+  const JZRiffConfig& cfg = config.riff;
   int ch = pTrack->GetChannel() > 0 ? (pTrack->GetChannel() - 1) : (cfg.midiChannel - 1);
   int notesAdded = 0;
   int beatTicks = ticksPerQuarter;
@@ -886,7 +1000,6 @@ int JZAutoAccompaniment::GenerateRiffMeasure(
   int root = (baseOct * 12) + (chord.rootPitchClass % 12);
 
   int min3 = root + 3;
-  int maj3 = root + 4;
   int fourth = root + 5;
   int dim5 = root + 6;
   int fifth = root + 7;
@@ -897,7 +1010,6 @@ int JZAutoAccompaniment::GenerateRiffMeasure(
   {
     case RIFF_BLUES_ROCK:
     {
-      // Driving Pentatonic Boogie Hook
       pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)root, 102, (unsigned short)(eighthTicks * 0.9)));
       pTrack->Put(new JZKeyOnEvent(barStartClock + eighthTicks, ch, (unsigned char)root, 90, (unsigned short)(eighthTicks * 0.9)));
       pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks, ch, (unsigned char)min3, 98, (unsigned short)(eighthTicks * 0.8)));
@@ -912,48 +1024,48 @@ int JZAutoAccompaniment::GenerateRiffMeasure(
 
     case RIFF_FUNK_BRASS:
     {
-      // Sharp Brass Section Stabs (triad chords on offbeats)
-      auto emitBrassStab = [&](int clk, int vel) {
+      auto emitBrassStab = [&](int clk, int r, int vel) {
         int len = sixteenthTicks * 2;
-        pTrack->Put(new JZKeyOnEvent(clk, ch, (unsigned char)root, (unsigned char)vel, (unsigned short)len));
-        pTrack->Put(new JZKeyOnEvent(clk, ch, (unsigned char)fifth, (unsigned char)(vel - 4), (unsigned short)len));
-        pTrack->Put(new JZKeyOnEvent(clk, ch, (unsigned char)octave, (unsigned char)(vel - 2), (unsigned short)len));
+        pTrack->Put(new JZKeyOnEvent(clk, ch, (unsigned char)r, (unsigned char)vel, (unsigned short)len));
+        pTrack->Put(new JZKeyOnEvent(clk, ch, (unsigned char)(r + 7), (unsigned char)(vel - 4), (unsigned short)len));
+        pTrack->Put(new JZKeyOnEvent(clk, ch, (unsigned char)(r + 12), (unsigned char)(vel - 2), (unsigned short)len));
         notesAdded += 3;
       };
 
-      emitBrassStab(barStartClock + eighthTicks, 105);
-      emitBrassStab(barStartClock + beatTicks + eighthTicks, 108);
-      emitBrassStab(barStartClock + beatTicks * 3, 112);
+      emitBrassStab(barStartClock + eighthTicks, root, 105);
+      emitBrassStab(barStartClock + beatTicks + eighthTicks, root, 108);
+      int r2 = chord.hasSecondChord ? (baseOct * 12 + chord.rootPitchClass2 % 12) : root;
+      emitBrassStab(barStartClock + beatTicks * 3, r2, 112);
       break;
     }
 
     case RIFF_HARD_ROCK_POWER:
     {
-      // Palm-muted root pedal with power chord hits
-      auto emitPowerChord = [&](int clk, int vel, int len) {
-        pTrack->Put(new JZKeyOnEvent(clk, ch, (unsigned char)root, (unsigned char)vel, (unsigned short)len));
-        pTrack->Put(new JZKeyOnEvent(clk, ch, (unsigned char)fifth, (unsigned char)(vel - 2), (unsigned short)len));
-        pTrack->Put(new JZKeyOnEvent(clk, ch, (unsigned char)octave, (unsigned char)(vel - 3), (unsigned short)len));
+      auto emitPowerChord = [&](int clk, int r, int vel, int len) {
+        pTrack->Put(new JZKeyOnEvent(clk, ch, (unsigned char)r, (unsigned char)vel, (unsigned short)len));
+        pTrack->Put(new JZKeyOnEvent(clk, ch, (unsigned char)(r + 7), (unsigned char)(vel - 2), (unsigned short)len));
+        pTrack->Put(new JZKeyOnEvent(clk, ch, (unsigned char)(r + 12), (unsigned char)(vel - 3), (unsigned short)len));
         notesAdded += 3;
       };
 
-      emitPowerChord(barStartClock, 110, beatTicks);
+      emitPowerChord(barStartClock, root, 110, beatTicks);
       pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks, ch, (unsigned char)root, 88, (unsigned short)eighthTicks));
       pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks + eighthTicks, ch, (unsigned char)root, 88, (unsigned short)eighthTicks));
       notesAdded += 2;
 
-      emitPowerChord(barStartClock + beatTicks * 2 + eighthTicks, 108, eighthTicks);
-      emitPowerChord(barStartClock + beatTicks * 3, 112, beatTicks);
+      int r2 = chord.hasSecondChord ? (baseOct * 12 + chord.rootPitchClass2 % 12) : root;
+      emitPowerChord(barStartClock + beatTicks * 2 + eighthTicks, r2, 108, eighthTicks);
+      emitPowerChord(barStartClock + beatTicks * 3, r2, 112, beatTicks);
       break;
     }
 
     case RIFF_SYNTHWAVE_BASS:
     {
-      // 16th rolling synth bass hook
       int pat[16] = {0, 12, 7, 12, 10, 12, 7, 12, 0, 12, 7, 12, 10, 12, 12, 7};
       for (int i = 0; i < 16; ++i)
       {
-        int p = root + pat[i];
+        int currRoot = (i >= 8 && chord.hasSecondChord) ? (baseOct * 12 + chord.rootPitchClass2 % 12) : root;
+        int p = currRoot + pat[i];
         int vel = (i % 4 == 0) ? 104 : 85;
         pTrack->Put(new JZKeyOnEvent(barStartClock + i * sixteenthTicks, ch, (unsigned char)p, (unsigned char)vel, (unsigned short)(sixteenthTicks * 0.9)));
         notesAdded++;
@@ -963,11 +1075,9 @@ int JZAutoAccompaniment::GenerateRiffMeasure(
 
     case RIFF_JAZZ_BEBOP_MOTIF:
     {
-      // Chromatic enclosure motif leading to chord root
       int encUpper = root + 14;
       int encLower = root + 11;
       int encPassing = root + 13;
-
       pTrack->Put(new JZKeyOnEvent(barStartClock + eighthTicks, ch, (unsigned char)encUpper, 95, (unsigned short)eighthTicks));
       pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks, ch, (unsigned char)encPassing, 90, (unsigned short)eighthTicks));
       pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks + eighthTicks, ch, (unsigned char)encLower, 92, (unsigned short)eighthTicks));
@@ -984,7 +1094,7 @@ int JZAutoAccompaniment::GenerateRiffMeasure(
 }
 
 //-----------------------------------------------------------------------------
-// Auto-Solo / Lead Improviser Generation
+// Auto-Solo Lead Generation (With Pitch Bends & Vibrato Modulation CC 1)
 //-----------------------------------------------------------------------------
 int JZAutoAccompaniment::GenerateSoloMeasure(
   JZTrack* pTrack,
@@ -994,18 +1104,18 @@ int JZAutoAccompaniment::GenerateSoloMeasure(
   int ticksPerQuarter,
   int countsPerBar,
   const JZDetectedChord& chord,
-  const JZSoloConfig& cfg)
+  const JZAccompanimentConfig& config)
 {
   if (!pTrack || !chord.hasNotes)
   {
     return 0;
   }
 
+  const JZSoloConfig& cfg = config.solo;
   int ch = pTrack->GetChannel() > 0 ? (pTrack->GetChannel() - 1) : (cfg.midiChannel - 1);
   int notesAdded = 0;
   int beatTicks = ticksPerQuarter;
   int eighthTicks = beatTicks / 2;
-  int swingSkip = (beatTicks * 2) / 3;
 
   int baseOct = max(4, min(6, cfg.octave));
   int root = (baseOct * 12) + (chord.rootPitchClass % 12);
@@ -1014,13 +1124,11 @@ int JZAutoAccompaniment::GenerateSoloMeasure(
   vector<int> scale;
   if (chord.quality == CHORD_MINOR || chord.quality == CHORD_MINOR7)
   {
-    // Dorian / Minor Pentatonic
     int degs[] = {0, 2, 3, 5, 7, 9, 10, 12, 14, 15};
     for (int d : degs) scale.push_back(root + d);
   }
   else if (chord.quality == CHORD_DOMINANT7)
   {
-    // Mixolydian with Blue Note
     int degs[] = {0, 2, 4, 5, 6, 7, 10, 12, 14, 16};
     for (int d : degs) scale.push_back(root + d);
   }
@@ -1031,17 +1139,14 @@ int JZAutoAccompaniment::GenerateSoloMeasure(
   }
   else
   {
-    // Major Pentatonic / Ionian
     int degs[] = {0, 2, 4, 7, 9, 12, 14, 16};
     for (int d : degs) scale.push_back(root + d);
   }
 
-  // Phrasing: 2-measure Call-and-Response structure
   bool isCallMeasure = (barIndex % 2 == 0);
 
   if (isCallMeasure)
   {
-    // Call: Ascending melodic line, starts on offbeat
     int nNotes = (cfg.density == SOLO_DENSITY_SPARSE) ? 3 : (cfg.density == SOLO_DENSITY_VIRTUOSO ? 6 : 4);
     for (int i = 0; i < nNotes; ++i)
     {
@@ -1056,27 +1161,38 @@ int JZAutoAccompaniment::GenerateSoloMeasure(
   }
   else
   {
-    // Response: Resolves into strong chord tone (Root or 5th or 3rd), leaves resting space
     int resolvePitch = scale[0] + 12; // Octave Root
-    if (cfg.style == SOLO_BLUESY_SOULFUL)
+    int noteDur = beatTicks * 2;
+
+    if (cfg.style == SOLO_BLUESY_SOULFUL && config.enableSoloBendsAndVibrato)
     {
-      // Blue note slide into 5th
-      pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)(root + 6), 92, (unsigned short)(eighthTicks / 2)));
-      pTrack->Put(new JZKeyOnEvent(barStartClock + (eighthTicks / 2), ch, (unsigned char)(root + 7), 108, (unsigned short)(beatTicks * 1.5)));
-      notesAdded += 2;
+      // Expressive Pitch Bend: Blues flat-5 bending into natural 5th
+      int bendNote = root + 6;
+      pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)bendNote, 105, (unsigned short)noteDur));
+      notesAdded++;
+
+      // Half-step pitch bend upwards at midpoint (+4096)
+      pTrack->Put(new JZPitchEvent(barStartClock + eighthTicks, ch, 4096));
+      // Reset pitch bend at end of note
+      pTrack->Put(new JZPitchEvent(barStartClock + noteDur, ch, 0));
     }
     else
     {
-      pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)resolvePitch, 112, (unsigned short)(beatTicks * 2)));
+      pTrack->Put(new JZKeyOnEvent(barStartClock, ch, (unsigned char)resolvePitch, 112, (unsigned short)noteDur));
       notesAdded++;
+    }
+
+    // Expressive Vibrato (CC 1 Modulation Wheel) on sustained note
+    if (config.enableSoloBendsAndVibrato)
+    {
+      pTrack->Put(new JZControlEvent(barStartClock + beatTicks, ch, 1, 40));
+      pTrack->Put(new JZControlEvent(barStartClock + (int)(beatTicks * 1.5), ch, 1, 64));
+      pTrack->Put(new JZControlEvent(barStartClock + noteDur, ch, 1, 0));
     }
 
     if (cfg.density == SOLO_DENSITY_VIRTUOSO)
     {
-      // Additional turnaround lick on beat 3 & 4
-      int p3 = scale[3];
-      int p2 = scale[2];
-      int pRoot = scale[0];
+      int p3 = scale[3], p2 = scale[2], pRoot = scale[0];
       pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 2 + eighthTicks, ch, (unsigned char)p3, 95, (unsigned short)eighthTicks));
       pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3, ch, (unsigned char)p2, 90, (unsigned short)eighthTicks));
       pTrack->Put(new JZKeyOnEvent(barStartClock + beatTicks * 3 + eighthTicks, ch, (unsigned char)pRoot, 98, (unsigned short)eighthTicks));
@@ -1121,7 +1237,6 @@ JZAccompanimentResult JZAutoAccompaniment::Generate(JZSong* pSong, const JZAccom
   int endBar = (config.toBar >= 0) ? min(config.toBar, songTotalBars) : songTotalBars;
   if (endBar <= startBar) endBar = startBar + 1;
 
-  // Determine what targets are active based on mode
   bool doBass = (config.mode == MODE_FULL_BAND || config.mode == MODE_ALL_SIMULTANEOUS) && config.generateBass;
   bool doDrums = (config.mode == MODE_FULL_BAND || config.mode == MODE_ALL_SIMULTANEOUS) && config.generateDrums;
   bool doPad = (config.mode == MODE_FULL_BAND || config.mode == MODE_ALL_SIMULTANEOUS) && config.generatePad;
@@ -1136,7 +1251,6 @@ JZAccompanimentResult JZAutoAccompaniment::Generate(JZSong* pSong, const JZAccom
   JZTrack* pRiffTrack = doRiff ? pSong->GetTrack(config.riff.targetTrackIndex) : 0;
   JZTrack* pSoloTrack = doSolo ? pSong->GetTrack(config.solo.targetTrackIndex) : 0;
 
-  // Initialize track properties
   if (pBassTrack)
   {
     if (pBassTrack->IsEmpty() || string(pBassTrack->GetName()).empty()) pBassTrack->SetName("Auto Bass");
@@ -1173,7 +1287,6 @@ JZAccompanimentResult JZAutoAccompaniment::Generate(JZSong* pSong, const JZAccom
     pSoloTrack->SetPatch(config.solo.patchNumber);
   }
 
-  // Pre-analyze chords for all bars in range
   vector<JZDetectedChord> chords;
   chords.reserve(endBar - startBar + 1);
 
@@ -1209,7 +1322,6 @@ JZAccompanimentResult JZAutoAccompaniment::Generate(JZSong* pSong, const JZAccom
     return res;
   }
 
-  // Calculate clock boundaries for clear range
   JZBarInfo startInfo(*pSong);
   startInfo.SetBar(startBar);
   int fromClock = startInfo.GetClock();
@@ -1228,7 +1340,6 @@ JZAccompanimentResult JZAutoAccompaniment::Generate(JZSong* pSong, const JZAccom
     if (pSoloTrack) ClearRange(pSoloTrack, fromClock, toClock);
   }
 
-  // Generation loop
   JZBarInfo genIter(*pSong);
   genIter.SetBar(startBar);
 
@@ -1248,27 +1359,27 @@ JZAccompanimentResult JZAutoAccompaniment::Generate(JZSong* pSong, const JZAccom
 
     if (pBassTrack)
     {
-      totalBass += GenerateBassMeasure(pBassTrack, b, bStart, bTicks, tpq, bCounts, ch, nextCh, config.style);
+      totalBass += GenerateBassMeasure(pBassTrack, b, bStart, bTicks, tpq, bCounts, ch, nextCh, config);
     }
     if (pDrumsTrack)
     {
-      totalDrums += GenerateDrumsMeasure(pDrumsTrack, b, bStart, bTicks, tpq, bCounts, config.style);
+      totalDrums += GenerateDrumsMeasure(pDrumsTrack, b, bStart, bTicks, tpq, bCounts, config);
     }
     if (pPadTrack)
     {
-      totalPad += GeneratePadMeasure(pPadTrack, b, bStart, bTicks, tpq, bCounts, ch, config.style);
+      totalPad += GeneratePadMeasure(pPadTrack, b, bStart, bTicks, tpq, bCounts, ch, config);
     }
     if (pStrumTrack)
     {
-      totalStrum += GenerateStrumPluckMeasure(pStrumTrack, b, bStart, bTicks, tpq, bCounts, ch, config.strumPluck);
+      totalStrum += GenerateStrumPluckMeasure(pStrumTrack, b, bStart, bTicks, tpq, bCounts, ch, config);
     }
     if (pRiffTrack)
     {
-      totalRiff += GenerateRiffMeasure(pRiffTrack, b, bStart, bTicks, tpq, bCounts, ch, config.riff);
+      totalRiff += GenerateRiffMeasure(pRiffTrack, b, bStart, bTicks, tpq, bCounts, ch, config);
     }
     if (pSoloTrack)
     {
-      totalSolo += GenerateSoloMeasure(pSoloTrack, b, bStart, bTicks, tpq, bCounts, ch, config.solo);
+      totalSolo += GenerateSoloMeasure(pSoloTrack, b, bStart, bTicks, tpq, bCounts, ch, config);
     }
 
     genIter.Next();

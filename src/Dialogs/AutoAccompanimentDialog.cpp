@@ -9,6 +9,7 @@
 #include "../Song.h"
 #include "../Track.h"
 #include "../Globals.h"
+#include "../Player.h"
 #include "../TrackWindow.h"
 
 #include <wx/button.h>
@@ -31,6 +32,8 @@ using namespace std;
 enum
 {
   ID_BTN_GENERATE = wxID_HIGHEST + 301,
+  ID_BTN_AUDITION,
+  ID_BTN_STOP_AUDITION,
   ID_RANGE_ALL_RADIO,
   ID_RANGE_CUSTOM_RADIO,
   ID_NOTEBOOK_HUB,
@@ -39,6 +42,8 @@ enum
 
 BEGIN_EVENT_TABLE(JZAutoAccompanimentDialog, wxDialog)
   EVT_BUTTON(ID_BTN_GENERATE, JZAutoAccompanimentDialog::OnGenerateButton)
+  EVT_BUTTON(ID_BTN_AUDITION, JZAutoAccompanimentDialog::OnAuditionPreview)
+  EVT_BUTTON(ID_BTN_STOP_AUDITION, JZAutoAccompanimentDialog::OnStopPreview)
   EVT_BUTTON(wxID_CANCEL, JZAutoAccompanimentDialog::OnCancelButton)
   EVT_RADIOBUTTON(ID_RANGE_ALL_RADIO, JZAutoAccompanimentDialog::OnRangeRadio)
   EVT_RADIOBUTTON(ID_RANGE_CUSTOM_RADIO, JZAutoAccompanimentDialog::OnRangeRadio)
@@ -61,6 +66,7 @@ JZAutoAccompanimentDialog::JZAutoAccompanimentDialog(
       wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER),
     mpProject(pProject),
     mDefaultSourceTrack(defaultSourceTrack),
+    mIsAuditioning(false),
     mpSourceTrackChoice(0),
     mpRangeAllRadio(0),
     mpRangeCustomRadio(0),
@@ -84,13 +90,19 @@ JZAutoAccompanimentDialog::JZAutoAccompanimentDialog(
     mpSoloTrackChoice(0),
     mpSoloPatchChoice(0),
     mpSoloOctaveSpin(0),
+    mpSwingSlider(0),
+    mpDrumFillsCheckBox(0),
+    mpSoloBendsCheckBox(0),
+    mpHumanizeVelCheckBox(0),
     mpOverwriteCheckBox(0),
     mpSimultaneousCheckBox(0),
+    mpAuditionButton(0),
+    mpStopAuditionButton(0),
     mpGenerateButton(0),
     mpCancelButton(0)
 {
   CreateControls();
-  SetMinSize(FromDIP(wxSize(540, 620)));
+  SetMinSize(FromDIP(wxSize(560, 680)));
   Fit();
   CentreOnParent();
 }
@@ -99,6 +111,26 @@ JZAutoAccompanimentDialog::JZAutoAccompanimentDialog(
 //-----------------------------------------------------------------------------
 JZAutoAccompanimentDialog::~JZAutoAccompanimentDialog()
 {
+  StopAudition();
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZAutoAccompanimentDialog::StopAudition()
+{
+  if (gpMidiPlayer)
+  {
+    gpMidiPlayer->AllNotesOff(true);
+  }
+  mIsAuditioning = false;
+  if (mpStopAuditionButton)
+  {
+    mpStopAuditionButton->Enable(false);
+  }
+  if (mpAuditionButton)
+  {
+    mpAuditionButton->Enable(true);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -183,21 +215,56 @@ void JZAutoAccompanimentDialog::CreateControls()
   mpNotebook->AddPage(CreateRiffTab(mpNotebook), "⚡ Riffs & Hooks", false);
   mpNotebook->AddPage(CreateSoloTab(mpNotebook), "🎷 Auto-Solo", false);
 
-  pMainSizer->Add(mpNotebook, 1, wxEXPAND | wxALL, FromDIP(8));
+  pMainSizer->Add(mpNotebook, 1, wxEXPAND | wxALL, FromDIP(6));
 
-  // Bottom Options
-  wxBoxSizer* pOptSizer = new wxBoxSizer(wxVERTICAL);
-  mpOverwriteCheckBox = new wxCheckBox(this, wxID_ANY, "Overwrite existing notes in target tracks for selected range");
+  // Musical Expression & Groove Box
+  wxStaticBoxSizer* pGrooveBox = new wxStaticBoxSizer(wxVERTICAL, this, "Groove & Musical Expression");
+
+  wxBoxSizer* pSwingRow = new wxBoxSizer(wxHORIZONTAL);
+  pSwingRow->Add(new wxStaticText(this, wxID_ANY, "Swing Ratio: Straight (50%)"), 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, FromDIP(6));
+  mpSwingSlider = new wxSlider(this, wxID_ANY, 62, 50, 70, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_AUTOTICKS);
+  pSwingRow->Add(mpSwingSlider, 1, wxEXPAND | wxRIGHT, FromDIP(6));
+  pSwingRow->Add(new wxStaticText(this, wxID_ANY, "Hard (70%)"), 0, wxALIGN_CENTER_VERTICAL);
+  pGrooveBox->Add(pSwingRow, 0, wxALL | wxEXPAND, FromDIP(4));
+
+  wxBoxSizer* pExprRow = new wxBoxSizer(wxHORIZONTAL);
+  mpDrumFillsCheckBox = new wxCheckBox(this, wxID_ANY, "Smart Drum Fills (Bar 4/8/12/16)");
+  mpDrumFillsCheckBox->SetValue(true);
+  pExprRow->Add(mpDrumFillsCheckBox, 1, wxRIGHT, FromDIP(8));
+
+  mpSoloBendsCheckBox = new wxCheckBox(this, wxID_ANY, "Expressive Solo Bends & CC1 Vibrato");
+  mpSoloBendsCheckBox->SetValue(true);
+  pExprRow->Add(mpSoloBendsCheckBox, 1, 0, 0);
+  pGrooveBox->Add(pExprRow, 0, wxALL | wxEXPAND, FromDIP(4));
+
+  pMainSizer->Add(pGrooveBox, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(6));
+
+  // Bottom Options & Preview
+  wxBoxSizer* pOptSizer = new wxBoxSizer(wxHORIZONTAL);
+
+  wxBoxSizer* pCheckSizer = new wxBoxSizer(wxVERTICAL);
+  mpOverwriteCheckBox = new wxCheckBox(this, wxID_ANY, "Overwrite existing notes in target tracks");
   mpOverwriteCheckBox->SetValue(true);
-  pOptSizer->Add(mpOverwriteCheckBox, 0, wxBOTTOM, FromDIP(4));
+  pCheckSizer->Add(mpOverwriteCheckBox, 0, wxBOTTOM, FromDIP(3));
 
   mpSimultaneousCheckBox = new wxCheckBox(this, ID_SIMULTANEOUS_CHECK, "Generate all tab layers simultaneously (Full Band + Guitar + Riff + Solo)");
   mpSimultaneousCheckBox->SetValue(false);
-  pOptSizer->Add(mpSimultaneousCheckBox, 0, 0, 0);
+  pCheckSizer->Add(mpSimultaneousCheckBox, 0, 0, 0);
+  pOptSizer->Add(pCheckSizer, 1, wxEXPAND, 0);
 
-  pMainSizer->Add(pOptSizer, 0, wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(10));
+  // Audition Preview Buttons
+  wxBoxSizer* pAuditionSizer = new wxBoxSizer(wxHORIZONTAL);
+  mpAuditionButton = new wxButton(this, ID_BTN_AUDITION, "▶ Preview");
+  pAuditionSizer->Add(mpAuditionButton, 0, wxRIGHT, FromDIP(4));
 
-  // Button Row
+  mpStopAuditionButton = new wxButton(this, ID_BTN_STOP_AUDITION, "■ Stop");
+  mpStopAuditionButton->Enable(false);
+  pAuditionSizer->Add(mpStopAuditionButton, 0, 0, 0);
+  pOptSizer->Add(pAuditionSizer, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, FromDIP(10));
+
+  pMainSizer->Add(pOptSizer, 0, wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(8));
+
+  // Final Action Buttons
   wxBoxSizer* pBtnSizer = new wxBoxSizer(wxHORIZONTAL);
   mpGenerateButton = new wxButton(this, ID_BTN_GENERATE, "Generate Session Band");
   mpGenerateButton->SetDefault();
@@ -380,7 +447,7 @@ wxPanel* JZAutoAccompanimentDialog::CreateSoloTab(wxWindow* pParent)
   mpSoloDensityChoice->Append("Sparse / Soulful (Singing quarter notes, spacious rests)");
   mpSoloDensityChoice->Append("Balanced Phrasing (2-Measure Call-and-Response)");
   mpSoloDensityChoice->Append("Virtuoso (Dense 8th/16th runs, turnarounds, enclosure)");
-  mpSoloDensityChoice->SetSelection(1); // Balanced
+  mpSoloDensityChoice->SetSelection(1);
   pDensityBox->Add(mpSoloDensityChoice, 0, wxALL | wxEXPAND, FromDIP(5));
   pSizer->Add(pDensityBox, 0, wxALL | wxEXPAND, FromDIP(6));
 
@@ -438,21 +505,11 @@ void JZAutoAccompanimentDialog::UpdateGenerateButtonLabel()
   int page = mpNotebook->GetSelection();
   switch (page)
   {
-    case 0:
-      mpGenerateButton->SetLabel("Generate Session Band");
-      break;
-    case 1:
-      mpGenerateButton->SetLabel("Generate Strum / Pluck");
-      break;
-    case 2:
-      mpGenerateButton->SetLabel("Generate Riff / Hook");
-      break;
-    case 3:
-      mpGenerateButton->SetLabel("Generate Auto-Solo");
-      break;
-    default:
-      mpGenerateButton->SetLabel("Generate Selected");
-      break;
+    case 0: mpGenerateButton->SetLabel("Generate Session Band"); break;
+    case 1: mpGenerateButton->SetLabel("Generate Strum / Pluck"); break;
+    case 2: mpGenerateButton->SetLabel("Generate Riff / Hook"); break;
+    case 3: mpGenerateButton->SetLabel("Generate Auto-Solo"); break;
+    default: mpGenerateButton->SetLabel("Generate Selected"); break;
   }
 }
 
@@ -460,6 +517,7 @@ void JZAutoAccompanimentDialog::UpdateGenerateButtonLabel()
 //-----------------------------------------------------------------------------
 void JZAutoAccompanimentDialog::OnNotebookPageChanged(wxBookCtrlEvent& Event)
 {
+  StopAudition();
   UpdateGenerateButtonLabel();
 }
 
@@ -480,9 +538,98 @@ void JZAutoAccompanimentDialog::OnSimultaneousCheck(wxCommandEvent& Event)
 }
 
 //-----------------------------------------------------------------------------
+// Audition / Live Preview
+//-----------------------------------------------------------------------------
+void JZAutoAccompanimentDialog::OnAuditionPreview(wxCommandEvent& Event)
+{
+  if (!gpMidiPlayer)
+  {
+    wxMessageBox("MIDI Output device is not available for preview.", "Preview", wxOK | wxICON_INFORMATION, this);
+    return;
+  }
+
+  StopAudition();
+  mIsAuditioning = true;
+  mpAuditionButton->Enable(false);
+  mpStopAuditionButton->Enable(true);
+
+  // Play a representative 2-bar preview chord / groove on track
+  int page = mpNotebook->GetSelection();
+  JZTrack dummyTrack;
+
+  if (page == 0) // Band Preview: C Major / G7 preview
+  {
+    // Bass note
+    JZKeyOnEvent bass1(0, 1, 36 /* C2 */, 95, 400);
+    gpMidiPlayer->OutNow(&dummyTrack, &bass1);
+
+    // Pad chord
+    JZKeyOnEvent pad1(0, 2, 60 /* C4 */, 70, 700);
+    JZKeyOnEvent pad2(0, 2, 64 /* E4 */, 66, 700);
+    JZKeyOnEvent pad3(0, 2, 67 /* G4 */, 68, 700);
+    gpMidiPlayer->OutNow(&dummyTrack, &pad1);
+    gpMidiPlayer->OutNow(&dummyTrack, &pad2);
+    gpMidiPlayer->OutNow(&dummyTrack, &pad3);
+
+    // Drum ride
+    JZKeyOnEvent ride(0, 9, 51 /* Ride */, 88, 100);
+    gpMidiPlayer->OutNow(&dummyTrack, &ride);
+  }
+  else if (page == 1) // Strum Preview
+  {
+    // Guitar steel string chord strum
+    int strumSpeed = mpStrumSpeedSlider->GetValue();
+    int delay = max(2, (120 * strumSpeed) / 500);
+    int pitches[] = {48, 55, 60, 64, 67}; // C Major guitar chord
+    for (int k = 0; k < 5; ++k)
+    {
+      JZKeyOnEvent str(k * delay, 3, (unsigned char)pitches[k], (unsigned char)(90 - k * 2), 600);
+      gpMidiPlayer->OutNow(&dummyTrack, &str);
+    }
+  }
+  else if (page == 2) // Riff Preview
+  {
+    int oct = mpRiffOctaveSpin->GetValue();
+    int root = oct * 12; // C
+    JZKeyOnEvent r1(0, 4, (unsigned char)root, 105, 120);
+    JZKeyOnEvent r2(120, 4, (unsigned char)(root + 3), 98, 120);
+    JZKeyOnEvent r3(240, 4, (unsigned char)(root + 5), 102, 120);
+    JZKeyOnEvent r4(360, 4, (unsigned char)(root + 6), 108, 250); // Blue note
+    gpMidiPlayer->OutNow(&dummyTrack, &r1);
+    gpMidiPlayer->OutNow(&dummyTrack, &r2);
+    gpMidiPlayer->OutNow(&dummyTrack, &r3);
+    gpMidiPlayer->OutNow(&dummyTrack, &r4);
+  }
+  else if (page == 3) // Solo Preview
+  {
+    int oct = mpSoloOctaveSpin->GetValue();
+    int root = oct * 12; // C
+    // Melodic phrase with vibrato
+    JZKeyOnEvent s1(0, 5, (unsigned char)(root + 4), 95, 180);
+    JZKeyOnEvent s2(180, 5, (unsigned char)(root + 7), 100, 180);
+    JZKeyOnEvent s3(360, 5, (unsigned char)(root + 12), 110, 500);
+    gpMidiPlayer->OutNow(&dummyTrack, &s1);
+    gpMidiPlayer->OutNow(&dummyTrack, &s2);
+    gpMidiPlayer->OutNow(&dummyTrack, &s3);
+
+    // CC 1 Vibrato
+    JZControlEvent vib(480, 5, 1, 55);
+    gpMidiPlayer->OutNow(&dummyTrack, &vib);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZAutoAccompanimentDialog::OnStopPreview(wxCommandEvent& Event)
+{
+  StopAudition();
+}
+
+//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZAutoAccompanimentDialog::OnCancelButton(wxCommandEvent& Event)
 {
+  StopAudition();
   EndModal(wxID_CANCEL);
 }
 
@@ -490,6 +637,8 @@ void JZAutoAccompanimentDialog::OnCancelButton(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZAutoAccompanimentDialog::OnGenerateButton(wxCommandEvent& Event)
 {
+  StopAudition();
+
   if (!mpProject)
   {
     wxMessageBox("No active project found.", "Error", wxOK | wxICON_ERROR, this);
@@ -517,6 +666,12 @@ void JZAutoAccompanimentDialog::OnGenerateButton(wxCommandEvent& Event)
     mConfig.fromBar = 0;
     mConfig.toBar = -1;
   }
+
+  // Musicality Enhancements
+  mConfig.swingPercent = mpSwingSlider->GetValue();
+  mConfig.enableDrumFills = mpDrumFillsCheckBox->GetValue();
+  mConfig.enableSoloBendsAndVibrato = mpSoloBendsCheckBox->GetValue();
+  mConfig.enableHumanizeVelocity = true;
 
   // Determine mode
   if (mpSimultaneousCheckBox->GetValue())

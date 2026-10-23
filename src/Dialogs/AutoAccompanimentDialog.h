@@ -1,14 +1,16 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// Auto-Accompaniment & Smart Music Intelligence Dialog
+// Auto-Accompaniment & Smart Music Intelligence Dialog (Pro Edition)
 //
 // Integrated Tabbed Hub for Session Band, Strumming, Plucking, Riffs & Solo
+// with Live Audition, Groove Swing, Smart Drum Fills & Expressive Soloing.
 //*****************************************************************************
 
 #pragma once
 
 #include <wx/dialog.h>
+#include <wx/timer.h>
 #include "../AutoAccompaniment.h"
 
 class wxChoice;
@@ -49,16 +51,20 @@ class JZAutoAccompanimentDialog : public wxDialog
     void OnNotebookPageChanged(wxBookCtrlEvent& Event);
     void OnRangeRadio(wxCommandEvent& Event);
     void OnSimultaneousCheck(wxCommandEvent& Event);
+    void OnAuditionPreview(wxCommandEvent& Event);
+    void OnStopPreview(wxCommandEvent& Event);
     void OnGenerateButton(wxCommandEvent& Event);
     void OnCancelButton(wxCommandEvent& Event);
 
     void UpdateGenerateButtonLabel();
+    void StopAudition();
 
   private:
 
     JZProject* mpProject;
     JZAccompanimentConfig mConfig;
     int mDefaultSourceTrack;
+    bool mIsAuditioning;
 
     // Header Controls
     wxChoice* mpSourceTrackChoice;
@@ -95,9 +101,17 @@ class JZAutoAccompanimentDialog : public wxDialog
     wxChoice* mpSoloPatchChoice;
     wxSpinCtrl* mpSoloOctaveSpin;
 
+    // Musicality Options
+    wxSlider* mpSwingSlider;
+    wxCheckBox* mpDrumFillsCheckBox;
+    wxCheckBox* mpSoloBendsCheckBox;
+    wxCheckBox* mpHumanizeVelCheckBox;
+
     // Bottom Controls
     wxCheckBox* mpOverwriteCheckBox;
     wxCheckBox* mpSimultaneousCheckBox;
+    wxButton* mpAuditionButton;
+    wxButton* mpStopAuditionButton;
     wxButton* mpGenerateButton;
     wxButton* mpCancelButton;
 

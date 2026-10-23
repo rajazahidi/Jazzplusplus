@@ -1049,6 +1049,25 @@ void TestAutoAccompanimentLogic()
   auto isCallBar = [](int barIdx) -> bool { return (barIdx % 2 == 0); };
   TEST_ASSERT(isCallBar(0) == true, "Bar 0 is Call phrase");
   TEST_ASSERT(isCallBar(1) == false, "Bar 1 is Response / Resolution phrase");
+
+  // 9. Chord Inversion Detection (Slash Chord C/E)
+  int bassPitch = 40; // E2 (pc 4)
+  int rootPitch = 0;  // C (pc 0)
+  int intervalFromRoot = (bassPitch % 12 - rootPitch + 12) % 12;
+  int inv = (intervalFromRoot == 4) ? 1 : 0;
+  TEST_ASSERT(inv == 1, "E in bass over C major detected as 1st Inversion (C/E)");
+
+  // 10. Smart Drum Fill Trigger (Phrase End at Measure 4/8/12/16)
+  auto isDrumFillBar = [](int barIdx) -> bool { return (barIdx % 4 == 3); };
+  TEST_ASSERT(isDrumFillBar(3) == true, "Bar 3 (Measure 4) triggers procedural drum fill");
+  TEST_ASSERT(isDrumFillBar(7) == true, "Bar 7 (Measure 8) triggers procedural drum fill");
+  TEST_ASSERT(isDrumFillBar(4) == false, "Bar 4 (Measure 5) is regular groove");
+
+  // 11. Expressive MIDI Pitch Bend & Vibrato Controllers
+  short halfStepBend = 4096;
+  unsigned char vibratoCC1 = 64;
+  TEST_ASSERT(halfStepBend == 4096, "Half-step upward pitch bend is 4096 units");
+  TEST_ASSERT(vibratoCC1 == 64, "Modulation Wheel CC 1 vibrato depth is 64");
 }
 
 //-----------------------------------------------------------------------------

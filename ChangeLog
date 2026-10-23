@@ -1,13 +1,24 @@
 23-10-2026 Raja Zahidi
-- Feature & Music Intelligence: Smart Music Intelligence & Session Band Hub (Accompaniment, Strumming, Plucking, Riffs & Auto-Solo):
+- Feature & Music Intelligence: Smart Music Intelligence & Session Band Hub (Pro Edition):
+  * Ketepatan Harmoni Lanjutan (src/AutoAccompaniment.h & src/AutoAccompaniment.cpp):
+    - Pengesanan 2 kord sebirama (Half-Bar Split Detection): mengesan pertukaran kord pertengahan birama (cth: ii-V) agar bass, kocokan, riff dan solo mengikut perubahan harmoni dengan tepat.
+    - Pengecaman Kord Pembalikan & Not Slash (Chord Inversion Disambiguation): mengenal pasti pembalikan kord pertama, kedua, dan ketiga (cth: C/E, G/B, C/G, G7/F) tanpa tersilap menganggap not bes sebagai not akar triad.
+  * Smart Drum Fills & Peralihan Frasa:
+    - Penjanaan dram fill dinamik secara automatik pada sempadan frasa (birama ke-4, ke-8, ke-12, ke-16) menggunakan snare roll 16th dan cascading toms (High Tom 50, Mid Tom 47, Low Tom 45, Floor Tom 41) menuju ke hentakan simbal crash pada permulaan frasa baru.
+  * Ekspresi Solo Lanjutan (MIDI Pitch Bend & Vibrato Modulation CC 1):
+    - Penjanaan lengkungan pic automatik (JZPitchEvent) pada not-not blues (flat-5th ke 5th) untuk meniru bend gitar dan saksofon sebenar.
+    - Penjanaan modulasi vibrato automatik (JZControlEvent CC 1) pada not-not solo berpanjangan (> 1 beat).
+  * Kawalan Groove & Humanisasi Pemasaan:
+    - Slider Groove Swing Ratio (50% straight hingga 70% heavy swing).
+    - Variasi rawak halaju semulajadi (velocity drift +/- 4) agar persembahan tidak kedengaran kaku/robotik.
+  * Pratonton Audio Langsung Dalam Dialog (Live Audition Preview):
+    - Butang [▶ Preview] dan [■ Stop] untuk mendengar corak muzik, kocokan gitar, riff atau solo secara masa nyata sebelum menjana ke dalam trek projek.
   * Hab Bersepadu Berbilang Tab wxNotebook (src/Dialogs/AutoAccompanimentDialog.h & .cpp):
     - Tab 1 [Session Band]: Penjanaan iringan penuh (Bass, Drums, Pad) dalam 5 genre (Jazz Swing, Bossa Nova, Blues Shuffle, Pop/Rock, Funk Groove).
     - Tab 2 [Strum & Pluck]: Kocokan berirama gitar & papan kekunci dengan micro-delay pemasaan manusia (10-35ms), sapuan Downstroke (↓) & Upstroke (↑), perkusif chucks (x), petikan Travis Picking, Ballad Arpeggio, P-I-M-A Classical, dan Neo-Soul spread voicings.
     - Tab 3 [Riffs & Hooks]: Penjana riff harmoni automatik berasaskan skala kord (Blues Rock boogie, Funk brass section hits, Hard Rock palm-muted power riffs, Synthwave 16th rolling bass, dan Jazz Bebop chromatic enclosures).
     - Tab 4 [Auto-Solo Lead]: Penjana solo & melodi pintar dengan padanan skala kord (Dorian, Mixolydian, Lydian, Blues Scale), struktur frasa Call-and-Response 2-birama, peluncuran not blues, dan pelarasan kepadatan frasa (Sparse, Balanced, Virtuoso).
     - Sokongan penjanaan serentak semua lapisan (Simultaneous Multi-layer Generation) atau secara berasingan bagi setiap tab.
-  * Enjin Harmoni & Analisis Kord Prosedural (src/AutoAccompaniment.h & src/AutoAccompaniment.cpp):
-    - Pengesanan not akar dan kualiti kord (Maj, Min, 7th, Maj7, m7, Dim, Sus4) birama demi birama.
     - Sokongan penuh sistem Undo song-wide (gpProject->NewUndoBuffer()) untuk pembalikan satu klik.
     - Pintasan menu 'Auto-Accompaniment (Smart Band)...' (Ctrl+B) dalam Tools menu (TrackFrame) dan Edit menu (PianoFrame).
 

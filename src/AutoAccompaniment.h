@@ -1,10 +1,10 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// Smart Auto-Accompaniment & Music Intelligence Engine
+// Smart Auto-Accompaniment & Music Intelligence Engine (Pro Edition)
 //
-// Accompaniment, Strumming, Plucking, Riffs, and Auto-Solo Improviser
-// based on procedural harmony analysis of a piano/melody track.
+// Full-Band Accompaniment, Strumming, Plucking, Riffs, and Expressive Solo
+// with Half-Measure Chord Tracking, Inversions, Drum Fills, Pitch Bends & Vibrato.
 //*****************************************************************************
 
 #pragma once
@@ -91,23 +91,40 @@ enum JZChordQuality
   CHORD_SUS4
 };
 
-// Chord information for a single measure
+// Chord information for a measure (supports split-bar 2 chords & inversions)
 struct JZDetectedChord
 {
+  // First Half (or full measure)
   int rootPitchClass; // 0..11 (0=C, 1=C#, 2=D, 3=D#/Eb, 4=E, 5=F, 6=F#, 7=G, 8=G#, 9=A, 10=A#/Bb, 11=B)
+  int bassPitchClass; // Lowest bass note played (for slash chords e.g. C/E)
+  int inversion;      // 0 = Root position, 1 = 1st inversion, 2 = 2nd inversion, 3 = 3rd inversion
   JZChordQuality quality;
   bool hasNotes;
-  int minPitch;       // Lowest pitch detected in measure
+  int minPitch;
+
+  // Second Half of Measure (for split-measure progressions e.g. ii - V)
+  bool hasSecondChord;
+  int rootPitchClass2;
+  int bassPitchClass2;
+  int inversion2;
+  JZChordQuality quality2;
 
   JZDetectedChord()
     : rootPitchClass(0),
+      bassPitchClass(0),
+      inversion(0),
       quality(CHORD_MAJOR),
       hasNotes(false),
-      minPitch(60)
+      minPitch(60),
+      hasSecondChord(false),
+      rootPitchClass2(0),
+      bassPitchClass2(0),
+      inversion2(0),
+      quality2(CHORD_MAJOR)
   {
   }
 
-  std::string GetChordName() const;
+  std::string GetChordName(bool second = false) const;
 };
 
 // Configuration for Strum & Pluck
@@ -191,6 +208,12 @@ struct JZAccompanimentConfig
   JZRiffConfig riff;
   JZSoloConfig solo;
 
+  // Musicality Enhancements
+  int swingPercent;               // 50 (straight) to 70 (heavy swing)
+  bool enableHumanizeVelocity;    // Subtle velocity drift
+  bool enableDrumFills;           // Fills on measure 4, 8, 12, 16
+  bool enableSoloBendsAndVibrato; // Pitch bend & CC 1 vibrato on solo
+
   // Range and Options
   int fromBar;          // 0-based bar index (0 = Bar 1)
   int toBar;            // 0-based bar index (-1 = up to end of song)
@@ -206,6 +229,10 @@ struct JZAccompanimentConfig
       drumsTrackIndex(9),
       generatePad(true),
       padTrackIndex(2),
+      swingPercent(62),
+      enableHumanizeVelocity(true),
+      enableDrumFills(true),
+      enableSoloBendsAndVibrato(true),
       fromBar(0),
       toBar(-1),
       overwriteExisting(true)
@@ -252,7 +279,7 @@ class JZAutoAccompaniment
     // Run the generator on the given song according to config
     static JZAccompanimentResult Generate(JZSong* pSong, const JZAccompanimentConfig& config);
 
-    // Analyze a measure of a track to extract root and chord quality
+    // Analyze a measure of a track to extract root, quality, inversions, and half-bar splits
     static JZDetectedChord AnalyzeMeasure(
       JZTrack* pSourceTrack,
       int barStartClock,
@@ -271,7 +298,7 @@ class JZAutoAccompaniment
       int countsPerBar,
       const JZDetectedChord& chord,
       const JZDetectedChord& nextChord,
-      JZAccompanimentStyle style);
+      const JZAccompanimentConfig& config);
 
     static int GenerateDrumsMeasure(
       JZTrack* pTrack,
@@ -280,7 +307,7 @@ class JZAutoAccompaniment
       int ticksPerBar,
       int ticksPerQuarter,
       int countsPerBar,
-      JZAccompanimentStyle style);
+      const JZAccompanimentConfig& config);
 
     static int GeneratePadMeasure(
       JZTrack* pTrack,
@@ -290,7 +317,7 @@ class JZAutoAccompaniment
       int ticksPerQuarter,
       int countsPerBar,
       const JZDetectedChord& chord,
-      JZAccompanimentStyle style);
+      const JZAccompanimentConfig& config);
 
     static int GenerateStrumPluckMeasure(
       JZTrack* pTrack,
@@ -300,7 +327,7 @@ class JZAutoAccompaniment
       int ticksPerQuarter,
       int countsPerBar,
       const JZDetectedChord& chord,
-      const JZStrumPluckConfig& cfg);
+      const JZAccompanimentConfig& config);
 
     static int GenerateRiffMeasure(
       JZTrack* pTrack,
@@ -310,7 +337,7 @@ class JZAutoAccompaniment
       int ticksPerQuarter,
       int countsPerBar,
       const JZDetectedChord& chord,
-      const JZRiffConfig& cfg);
+      const JZAccompanimentConfig& config);
 
     static int GenerateSoloMeasure(
       JZTrack* pTrack,
@@ -320,8 +347,21 @@ class JZAutoAccompaniment
       int ticksPerQuarter,
       int countsPerBar,
       const JZDetectedChord& chord,
-      const JZSoloConfig& cfg);
+      const JZAccompanimentConfig& config);
 
     // Clear key-on notes in clock range [fromClock, toClock)
     static void ClearRange(JZTrack* pTrack, int fromClock, int toClock);
+
+  private:
+
+    // Helper for analyzing notes within an arbitrary clock window
+    static bool AnalyzeWindow(
+      JZTrack* pTrack,
+      int startClock,
+      int endClock,
+      int& rootPc,
+      int& bassPc,
+      int& inversion,
+      JZChordQuality& quality,
+      int& minP);
 };

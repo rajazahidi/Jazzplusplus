@@ -231,6 +231,8 @@ JZTrackFrame::JZTrackFrame(
 
   SetEventWindow(mpTrackWindow);
 
+  SetMinSize(wxSize(800, 480));
+
   SetIcon(wxIcon(jazz_icon_xpm));
 }
 

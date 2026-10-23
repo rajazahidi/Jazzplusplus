@@ -122,36 +122,37 @@ void JZTrackWindow::Create()
 
   Dc.SetFont(wxNullFont);
 
+  int fontSize = std::max(10, FromDIP(10));
   delete mpFixedFont;
-  mpFixedFont = new wxFont(12, wxSWISS, wxNORMAL, wxNORMAL);
+  mpFixedFont = new wxFont(fontSize, wxSWISS, wxNORMAL, wxBOLD);
   Dc.SetFont(*mpFixedFont);
 
   int Width, Height;
   Dc.GetTextExtent("M", &Width, &mFixedFontHeight);
 
   delete mpFont;
-  mpFont = new wxFont(mFontSize, wxSWISS, wxNORMAL, wxNORMAL);
+  mpFont = new wxFont(fontSize, wxSWISS, wxNORMAL, wxNORMAL);
   Dc.SetFont(*mpFont);
 
   Dc.GetTextExtent("M", &Width, &Height);
-  mLittleBit = Width / 2;
+  mLittleBit = std::max(FromDIP(3), Width / 2);
 
-  mTopInfoHeight = mFixedFontHeight + 2 * mLittleBit;
+  mTopInfoHeight = std::max(FromDIP(24), mFixedFontHeight + 2 * mLittleBit);
 
   Dc.GetTextExtent("HXWjgi", &Width, &Height);
-  mTrackHeight = Height + 2 * mLittleBit;
+  mTrackHeight = std::max(FromDIP(28), Height + 2 * mLittleBit + FromDIP(4));
 
   Dc.GetTextExtent("999", &Width, &Height);
-  mNumberWidth = Width + 2 * mLittleBit;
+  mNumberWidth = std::max(FromDIP(38), Width + 2 * mLittleBit);
 
   Dc.GetTextExtent("Normal Track Name", &Width, &Height);
-  mTrackNameWidth = Width + 2 * mLittleBit;
+  mTrackNameWidth = std::max(FromDIP(150), Width + 2 * mLittleBit + FromDIP(8));
 
   Dc.GetTextExtent("m", &Width, &Height);
-  mStateWidth = Width + 2 * mLittleBit;
+  mStateWidth = std::max(FromDIP(32), Width + 2 * mLittleBit);
 
   Dc.GetTextExtent("999", &Width, &Height);
-  mPatchWidth = Width + 2 * mLittleBit;
+  mPatchWidth = std::max(FromDIP(48), Width + 2 * mLittleBit);
 
   mLeftInfoWidth =
     mNumberWidth + mTrackNameWidth + mStateWidth + mPatchWidth + 1;
@@ -1215,7 +1216,8 @@ void JZTrackWindow::LineText(
     {
       Margin = mLittleBit;
     }
-    Dc.DrawText(pString, x + Margin, y + mLittleBit);
+    int vMargin = std::max(1, (Height - TextHeight) / 2);
+    Dc.DrawText(pString, x + Margin, y + vMargin);
     Dc.SetTextBackground(TextBackgroundColor);
   }
 }

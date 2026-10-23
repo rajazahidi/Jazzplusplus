@@ -24,6 +24,7 @@
 
 #include <wx/frame.h>
 #include <wx/toolbar.h>
+#include <wx/image.h>
 
 //*****************************************************************************
 // Description:
@@ -37,23 +38,11 @@ JZToolBar::JZToolBar(wxFrame* pFrame, JZToolDef* pToolDef)
   mpToolBar = pFrame->CreateToolBar(
     wxTB_FLAT | wxTB_HORIZONTAL | wxTB_DOCKABLE);
 
-  mpToolBar->SetMargins(5, 5);
+  int targetW = pFrame->FromDIP(24);
+  int targetH = pFrame->FromDIP(24);
 
-//  int BitmapWidth = ToolBarBitmaps[0].GetWidth();
-//  int BitmapHeight = ToolBarBitmaps[0].GetHeight();
-//  if (mUseLargeToolBarIcons)
-//  {
-//    BitmapWidth  = 2 * ToolBarBitmaps[0].GetWidth();
-//    BitmapHeight = 2 * ToolBarBitmaps[0].GetHeight();
-//    for (size_t n = 0; n < WXSIZEOF(ToolBarBitmaps); ++n)
-//    {
-//      ToolBarBitmaps[n] = wxBitmap(
-//        ToolBarBitmaps[n].ConvertToImage().Scale(BitmapWidth, BitmapHeight));
-//    }
-//  }
-//
-//  mpToolBar->SetToolBitmapSize(wxSize(BitmapWidth, BitmapHeight));
-  mpToolBar->SetToolBitmapSize(wxSize(20, 19));
+  mpToolBar->SetToolBitmapSize(wxSize(targetW, targetH));
+  mpToolBar->SetMargins(pFrame->FromDIP(4), pFrame->FromDIP(4));
 
   while (pToolDef->mId != eToolBarEnd)
   {
@@ -64,6 +53,18 @@ JZToolBar::JZToolBar(wxFrame* pFrame, JZToolDef* pToolDef)
     else
     {
       wxBitmap Bitmap = wxBitmap((char **)pToolDef->mpResourceId);
+      if (Bitmap.IsOk())
+      {
+        wxImage img = Bitmap.ConvertToImage();
+        if (img.IsOk())
+        {
+          if (img.GetWidth() != targetW || img.GetHeight() != targetH)
+          {
+            img.Rescale(targetW, targetH, wxIMAGE_QUALITY_HIGH);
+          }
+          Bitmap = wxBitmap(img);
+        }
+      }
 
       if (pToolDef->mSticky)
       {

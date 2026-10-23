@@ -1,4 +1,11 @@
 23-10-2026 Raja Zahidi
+- UI & High-DPI Modernization: Penskalaan dan pembesaran antaramuka bagi paparan monitor desktop moden (1080p, 1440p, 4K):
+  * Toolbar Icons: Menaik taraf saiz ikon toolbar daripada 20x19px kepada FromDIP(24x24px) dengan penskalaan lancar berkualiti tinggi (wxIMAGE_QUALITY_HIGH) dan margin yang lebih lapang.
+  * Arranger / Track Window: Ketinggian baris trek (mTrackHeight) dinaikkan daripada ~18px kepada minimum FromDIP(28px) dengan fon yang jelas dan pemusatan teks menegak yang kemas pada lajur nama trek, nombor trek, status bisu/solo, dan nombor patch.
+  * Piano Roll: Ketinggian semitone dinaikkan kepada minimum FromDIP(20px) dan kelebaran papan kekunci piano (mPianoWidth) dinaikkan kepada minimum FromDIP(140px).
+  * Dimensi Tetingkap Lalai: Saiz tetingkap mulaan (fallback) Track Window dan Piano Roll dinaikkan daripada 600x400 / 640x480 kepada 1280x720 (min 800x480).
+
+23-10-2026 Raja Zahidi
 - Audit, Simulasi & Pembaikan Antara Muka (Toolbar Buttons & Menu Bar):
   * Pembaikan Tombol Mati (Dead Buttons):
     - JZTrackFrame: Menghidupkan tombol toolbar 'duplicate selection' (wxID_DUPLICATE / repl_xpm) dengan menyambungkan event handler OnDuplicate serta menambah pilihan menu 'Duplicate' (Ctrl+D) di bawah Edit menu. Logik penggandaan menyokong pemilihan pelbagai birama merentasi berbilang trek secara bersiri dengan sokongan penuh fungsi Undo.

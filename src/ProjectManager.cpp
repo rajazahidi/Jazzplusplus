@@ -53,12 +53,21 @@ JZTrackFrame* JZProjectManager::CreateTrackView()
 {
   if (!mpTrackFrame)
   {
-    int XPosition(10), YPosition(10), Width(600), Height(400);
+    int XPosition(10), YPosition(10), Width(1280), Height(720);
 
     gpConfig->Get(C_TrackWinXpos, XPosition);
     gpConfig->Get(C_TrackWinYpos, YPosition);
     gpConfig->Get(C_TrackWinWidth, Width);
     gpConfig->Get(C_TrackWinHeight, Height);
+
+    if (Width < 900)
+    {
+      Width = 1280;
+    }
+    if (Height < 500)
+    {
+      Height = 720;
+    }
 
     wxPoint Position(XPosition, YPosition);
 
@@ -96,12 +105,21 @@ void JZProjectManager::CreatePianoView(int TrackIndex)
 
   if (!mpPianoFrame)
   {
-    int XPosition(10), YPosition(10), Width(640), Height(480);
+    int XPosition(10), YPosition(10), Width(1280), Height(720);
 
     gpConfig->Get(C_PianoWinXpos, XPosition);
     gpConfig->Get(C_PianoWinYpos, YPosition);
     gpConfig->Get(C_PianoWinWidth, Width);
     gpConfig->Get(C_PianoWinHeight, Height);
+
+    if (Width < 800)
+    {
+      Width = 1280;
+    }
+    if (Height < 450)
+    {
+      Height = 720;
+    }
 
     wxPoint Position(XPosition, YPosition);
 

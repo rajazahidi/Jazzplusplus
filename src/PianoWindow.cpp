@@ -784,32 +784,33 @@ void JZPianoWindow::Setup()
 
   Dc.SetFont(wxNullFont);
 
+  int fontSize = std::max(10, FromDIP(10));
   delete mpFixedFont;
-  mpFixedFont = new wxFont(12, wxSWISS, wxNORMAL, wxNORMAL);
+  mpFixedFont = new wxFont(fontSize, wxSWISS, wxNORMAL, wxBOLD);
   Dc.SetFont(*mpFixedFont);
 
   int Width, Height;
   Dc.GetTextExtent("M", &Width, &mFixedFontHeight);
 
   delete mpFont;
-  mpFont = new wxFont(mFontSize, wxSWISS, wxNORMAL, wxNORMAL);
+  mpFont = new wxFont(fontSize, wxSWISS, wxNORMAL, wxNORMAL);
   Dc.SetFont(*mpFont);
 
   Dc.GetTextExtent("M", &Width, &Height);
-  mLittleBit = Width / 2;
+  mLittleBit = std::max(FromDIP(2), Width / 2);
 
-  mTopInfoHeight = mFixedFontHeight + 2 * mLittleBit;
+  mTopInfoHeight = std::max(FromDIP(24), mFixedFontHeight + 2 * mLittleBit);
 
   Dc.GetTextExtent("HXWjgi", &Width, &Height);
-  mTrackHeight = Height + 2 * mLittleBit;
+  mTrackHeight = std::max(FromDIP(20), Height + 2 * mLittleBit);
 
   delete mpDrumFont;
-  mpDrumFont = new wxFont(mFontSize + 3, wxSWISS, wxNORMAL, wxNORMAL);
+  mpDrumFont = new wxFont(fontSize + 2, wxSWISS, wxNORMAL, wxNORMAL);
 
   Dc.SetFont(*mpDrumFont);
 
   Dc.GetTextExtent("Low Conga mid 2 or so", &Width, &Height);
-  mPianoWidth = Width + mLittleBit;
+  mPianoWidth = std::max(FromDIP(140), Width + mLittleBit);
 
   mLeftInfoWidth = mPianoWidth;
 
@@ -1841,7 +1842,10 @@ void JZPianoWindow::LineText(
   Dc.DrawLine(x, y+h, x+w, y+h);
 
   // Print the message in the button.
-  Dc.DrawText(str, x + mLittleBit, y + mLittleBit);
+  int TextWidth, TextHeight;
+  Dc.GetTextExtent(str, &TextWidth, &TextHeight);
+  int vMargin = std::max(1, (h - TextHeight) / 2);
+  Dc.DrawText(str, x + mLittleBit, y + vMargin);
 }
 
 //-----------------------------------------------------------------------------

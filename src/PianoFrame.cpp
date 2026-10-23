@@ -259,6 +259,8 @@ JZPianoFrame::JZPianoFrame(
   mpToolBar->ToggleTool(ID_SNAP_16, TRUE);
 
   mpPianoWindow = new JZPianoWindow(this, pProject);
+
+  SetMinSize(wxSize(800, 480));
 }
 
 //-----------------------------------------------------------------------------

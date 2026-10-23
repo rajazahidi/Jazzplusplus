@@ -1,74 +1,97 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
   <defs>
+    <!-- Background Gradient -->
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1E1B4B" />
-      <stop offset="50%" stop-color="#0F172A" />
+      <stop offset="0%" stop-color="#0F172A" />
+      <stop offset="50%" stop-color="#0B0F19" />
       <stop offset="100%" stop-color="#020617" />
     </linearGradient>
-    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#38BDF8" />
-      <stop offset="50%" stop-color="#818CF8" />
-      <stop offset="100%" stop-color="#C084FC" />
-    </linearGradient>
-    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FDE047" />
-      <stop offset="100%" stop-color="#F59E0B" />
-    </linearGradient>
-    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.5" />
+
+    <!-- Metallic Gold Brass Gradient -->
+    <radialGradient id="brassGleam" cx="30%" cy="25%" r="75%">
+      <stop offset="0%" stop-color="#FFFBEB" />
+      <stop offset="20%" stop-color="#FDE047" />
+      <stop offset="45%" stop-color="#F59E0B" />
+      <stop offset="75%" stop-color="#B45309" />
+      <stop offset="100%" stop-color="#451A03" />
+    </radialGradient>
+
+    <!-- Bell Hole Depth -->
+    <radialGradient id="bellHole" cx="45%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#020617" />
+      <stop offset="75%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#78350F" />
+    </radialGradient>
+
+    <!-- Neon Glow Filter -->
+    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
     </filter>
+
+    <!-- Subtle Drop Shadow -->
+    <filter id="baseShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.6" />
+    </filter>
+
+    <!-- Soundwave Cyan Gradient -->
+    <linearGradient id="cyanWave" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#818CF8" />
+    </linearGradient>
   </defs>
 
-  <!-- Squircle Base -->
-  <rect x="16" y="16" width="224" height="224" rx="48" ry="48" fill="url(#bgGrad)" stroke="#334155" stroke-width="2" filter="url(#shadow)" />
+  <!-- Base App Icon Container (Squircle) -->
+  <rect x="12" y="12" width="232" height="232" rx="52" ry="52" fill="url(#bgGrad)" stroke="#1E293B" stroke-width="2" filter="url(#baseShadow)" />
 
-  <!-- Piano Keyboard Arc / Base at Bottom -->
-  <g transform="translate(36, 172)">
-    <!-- White Keys -->
-    <rect x="0" y="0" width="23" height="48" rx="4" fill="#F8FAFC" />
-    <rect x="26" y="0" width="23" height="48" rx="4" fill="#F8FAFC" />
-    <rect x="52" y="0" width="23" height="48" rx="4" fill="#F8FAFC" />
-    <rect x="78" y="0" width="23" height="48" rx="4" fill="#F8FAFC" />
-    <rect x="104" y="0" width="23" height="48" rx="4" fill="#F8FAFC" />
-    <rect x="130" y="0" width="23" height="48" rx="4" fill="#F8FAFC" />
-    <rect x="156" y="0" width="23" height="48" rx="4" fill="#F8FAFC" />
-    <!-- Black Keys -->
-    <rect x="16" y="0" width="14" height="30" rx="2" fill="#0F172A" />
-    <rect x="42" y="0" width="14" height="30" rx="2" fill="#0F172A" />
-    <rect x="94" y="0" width="14" height="30" rx="2" fill="#0F172A" />
-    <rect x="120" y="0" width="14" height="30" rx="2" fill="#0F172A" />
-    <rect x="146" y="0" width="14" height="30" rx="2" fill="#0F172A" />
+  <!-- Background Sequencer Timeline Grid (Subtle) -->
+  <g opacity="0.4">
+    <line x1="32" y1="72" x2="224" y2="72" stroke="#334155" stroke-width="1.2" stroke-dasharray="4,4" />
+    <line x1="32" y1="128" x2="224" y2="128" stroke="#334155" stroke-width="1.2" stroke-dasharray="4,4" />
+    <line x1="32" y1="184" x2="224" y2="184" stroke="#334155" stroke-width="1.2" stroke-dasharray="4,4" />
   </g>
 
-  <!-- Sequencer Grid Lines (Subtle) -->
-  <line x1="36" y1="70" x2="220" y2="70" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.6" />
-  <line x1="36" y1="100" x2="220" y2="100" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.6" />
-  <line x1="36" y1="130" x2="220" y2="130" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.6" />
+  <!-- Ambient Light Reflection Behind Sax Bell -->
+  <circle cx="160" cy="110" r="70" fill="#F59E0B" opacity="0.12" filter="url(#neonGlow)" />
 
-  <!-- Stylized Beamed Musical Notes (Jazz Motif) -->
-  <g transform="translate(56, 42)">
-    <!-- Note Stem 1 -->
-    <rect x="22" y="16" width="7" height="82" rx="3.5" fill="url(#glowGrad)" />
-    <!-- Note Stem 2 -->
-    <rect x="86" y="6" width="7" height="92" rx="3.5" fill="url(#glowGrad)" />
-    <!-- Cross Beam -->
-    <polygon points="22,16 93,6 93,24 22,34" fill="url(#glowGrad)" />
-    <!-- Secondary Beam -->
-    <polygon points="22,40 93,30 93,42 22,52" fill="url(#glowGrad)" opacity="0.9" />
+  <!-- Saxophone Body Tube & Curved Bow -->
+  <path d="M 72 216 C 46 216 34 176 42 136 C 50 88 88 64 120 56" fill="none" stroke="url(#brassGleam)" stroke-width="28" stroke-linecap="round" />
+  <!-- Gloss Specular Highlight Line -->
+  <path d="M 72 216 C 46 216 34 176 42 136 C 50 88 88 64 120 56" fill="none" stroke="#FEF08A" stroke-width="3" opacity="0.75" />
 
-    <!-- Notehead 1 (Tilted Oval) -->
-    <ellipse cx="14" cy="98" rx="16" ry="12" transform="rotate(-25 14 98)" fill="url(#glowGrad)" />
-    <!-- Notehead 2 (Tilted Oval) -->
-    <ellipse cx="78" cy="88" rx="16" ry="12" transform="rotate(-25 78 88)" fill="url(#glowGrad)" />
+  <!-- Saxophone Tone Hole Key Touches -->
+  <circle cx="48" cy="144" r="7.5" fill="#FDE047" stroke="#78350F" stroke-width="1.5" />
+  <circle cx="58" cy="112" r="8.5" fill="#FDE047" stroke="#78350F" stroke-width="1.5" />
+  <circle cx="78" cy="86" r="9" fill="#FDE047" stroke="#78350F" stroke-width="1.5" />
+
+  <!-- Saxophone Bell Outer Rim (Angled 3D Ellipse) -->
+  <ellipse cx="156" cy="108" rx="58" ry="68" transform="rotate(-20 156 108)" fill="url(#brassGleam)" stroke="#FEF08A" stroke-width="5" />
+
+  <!-- Inner Dark Sound Chamber -->
+  <ellipse cx="156" cy="108" rx="44" ry="53" transform="rotate(-20 156 108)" fill="url(#bellHole)" stroke="#B45309" stroke-width="2.5" />
+
+  <!-- Dynamic Glowing Soundwaves Bursting from Bell -->
+  <g filter="url(#neonGlow)">
+    <path d="M 156 108 Q 184 88 212 76 Q 228 68 236 56" fill="none" stroke="url(#cyanWave)" stroke-width="3.6" stroke-linecap="round" />
+    <path d="M 156 108 Q 192 116 220 112 Q 236 108 244 100" fill="none" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" />
+    <path d="M 156 108 Q 188 136 216 148 Q 232 156 240 164" fill="none" stroke="url(#cyanWave)" stroke-width="3.2" stroke-linecap="round" />
   </g>
 
-  <!-- "++" Accent Emblem (Golden) -->
-  <g transform="translate(170, 52)">
-    <!-- First + -->
-    <rect x="6" y="0" width="4" height="18" rx="2" fill="url(#goldGrad)" />
-    <rect x="-1" y="7" width="18" height="4" rx="2" fill="url(#goldGrad)" />
-    <!-- Second + -->
-    <rect x="24" y="8" width="4" height="18" rx="2" fill="url(#goldGrad)" />
-    <rect x="17" y="15" width="18" height="4" rx="2" fill="url(#goldGrad)" />
+  <!-- Glowing Sound Particles & Musical Notelets -->
+  <circle cx="218" cy="74" r="3" fill="#38BDF8" filter="url(#neonGlow)" />
+  <circle cx="238" cy="98" r="2.5" fill="#FDE047" filter="url(#neonGlow)" />
+  <circle cx="226" cy="152" r="3" fill="#38BDF8" filter="url(#neonGlow)" />
+
+  <!-- "++" Futuristic Emblem Badge -->
+  <g transform="translate(155, 68)" filter="url(#neonGlow)">
+    <!-- First '+' -->
+    <rect x="28" y="14" width="13" height="4" rx="1.5" fill="#38BDF8" />
+    <rect x="32.5" y="9.5" width="4" height="13" rx="1.5" fill="#38BDF8" />
+    <!-- Second '+' -->
+    <rect x="46" y="14" width="13" height="4" rx="1.5" fill="#38BDF8" />
+    <rect x="50.5" y="9.5" width="4" height="13" rx="1.5" fill="#38BDF8" />
   </g>
 </svg>

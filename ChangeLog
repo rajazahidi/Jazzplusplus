@@ -1,4 +1,11 @@
 23-10-2026 Raja Zahidi
+- Brand Identity & Visual Design: Pelaksanaan rasmi logo baharu Konsep 1 'The Golden Horn & Digital Flow':
+  * Vektor Master SVG (resources/icons/jazz.svg): Reka bentuk berprofil tinggi menampilkan corong saksofon loyang emas berkilau (metallic gold brass) dengan gelombang audio neon sian/emas dan lencana berkembar '++'.
+  * Ikon Pelbagai Resolusi: Penjanaan semula kesemua saiz ikon PNG (16x16, 32x32, 48x48, 64x64, 128x128, 256x256) menggunakan penapisan Lanczos berkualiti tinggi.
+  * Ikon Windows (.ico): Penjanaan pakej multi-layer ICO rasmi (resources/icons/jazz.ico & src/mswin/jazz.ico) untuk paparan Windows Explorer dan Taskbar.
+  * Ikon Tetingkap Aplikasi (src/Bitmaps/jazz_icon.xpm): Pengemaskinian kod XPM 32x32 bagi ikon tetingkap wxWidgets.
+
+23-10-2026 Raja Zahidi
 - UI & High-DPI Modernization: Penskalaan dan pembesaran antaramuka bagi paparan monitor desktop moden (1080p, 1440p, 4K):
   * Toolbar Icons: Menaik taraf saiz ikon toolbar daripada 20x19px kepada FromDIP(24x24px) dengan penskalaan lancar berkualiti tinggi (wxIMAGE_QUALITY_HIGH) dan margin yang lebih lapang.
   * Arranger / Track Window: Ketinggian baris trek (mTrackHeight) dinaikkan daripada ~18px kepada minimum FromDIP(28px) dengan fon yang jelas dan pemusatan teks menegak yang kemas pada lajur nama trek, nombor trek, status bisu/solo, dan nombor patch.

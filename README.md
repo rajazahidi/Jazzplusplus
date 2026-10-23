@@ -43,7 +43,7 @@ Pre-compiled standalone packages for Linux and Windows are available from the [G
 
 ### Windows (64-bit ZIP)
 1. Download **`Jazz++-Windows-x64.zip`**.
-2. Extract the archive and launch **`jazz.exe`**. All required wxWidgets 3.2.6 runtime DLLs are included.
+2. Extract the archive and launch **`jazz.exe`**. All required wxWidgets 3.3.4 runtime DLLs are included.
 
 ---
 

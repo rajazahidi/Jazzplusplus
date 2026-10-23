@@ -128,6 +128,10 @@ bool JZJazzPlusPlusApplication::OnInit()
     return false;
   }
 
+#if wxCHECK_VERSION(3, 3, 0) && defined(__WXMSW__)
+  MSWEnableDarkMode(DarkMode_Auto);
+#endif
+
 #if defined(_MSC_VER) && defined(_DEBUG)
   RedirectIoToConsole();
 #endif // _MSC_VER

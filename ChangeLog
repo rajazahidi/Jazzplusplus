@@ -1,3 +1,9 @@
+23-10-2026 Raja Zahidi
+- Upgrade: Naik taraf pustaka teras GUI kepada wxWidgets v3.3.4 (Latest Feature Release):
+  * Kemas kini CI GitHub Actions (.github/workflows/ci.yml) bagi binaan Windows MSVC x64 menggunakan wxWidgets 3.3.4.
+  * Tambah sokongan Windows 11 Dark Mode asli melalui MSWEnableDarkMode(DarkMode_Auto) dalam JZJazzPlusPlusApplication::OnInit().
+  * Pengoptimuman kelajuan muat turun aset CI dengan curl.exe.
+  * Kemas kini dokumentasi README.md.
 ChangeLog for Development Version
 
 09-11-2026 Raja Zahidi

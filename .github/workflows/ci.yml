@@ -113,16 +113,16 @@ jobs:
         uses: actions/cache@v4
         with:
           path: D:/wxWidgets
-          key: wxwidgets-3.2.6-msvc-x64-v3
+          key: wxwidgets-3.3.4-msvc-x64-v1
 
-      - name: Download & Extract wxWidgets 3.2.6
+      - name: Download & Extract wxWidgets 3.3.4
         if: steps.cache-wx.outputs.cache-hit != 'true'
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path "D:\wxWidgets"
-          Invoke-WebRequest -Uri "https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.6/wxWidgets-3.2.6-headers.7z" -OutFile "wx_headers.7z"
-          Invoke-WebRequest -Uri "https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.6/wxMSW-3.2.6_vc14x_x64_Dev.7z" -OutFile "wx_dev.7z"
-          Invoke-WebRequest -Uri "https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.6/wxMSW-3.2.6_vc14x_x64_ReleaseDLL.7z" -OutFile "wx_dll.7z"
+          curl.exe -L -o "wx_headers.7z" "https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.4/wxWidgets-3.3.4-headers.7z"
+          curl.exe -L -o "wx_dev.7z" "https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.4/wxMSW-3.3.4_vc14x_x64_Dev.7z"
+          curl.exe -L -o "wx_dll.7z" "https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.4/wxMSW-3.3.4_vc14x_x64_ReleaseDLL.7z"
           7z x wx_headers.7z -o"D:\wxWidgets" -y
           7z x wx_dev.7z -o"D:\wxWidgets" -y
           7z x wx_dll.7z -o"D:\wxWidgets" -y

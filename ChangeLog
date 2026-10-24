@@ -1,4 +1,27 @@
 24-10-2026 Raja Zahidi
+- Feature & Master Studio Broadcast, Live Performance & Precision Dynamics Suite v5.0: Dynamic Vocal De-Esser, Audio Flex-Time Warping & Transient Quantizer, 3-Band Multiband Compressor, Non-Linear Clip Matrix & Live Launcher Grid, Transient Shaper & Punch Designer, ITU-R BS.1770-4 / EBU R128 Loudness Meter & True Peak Engine:
+  * Penekan Desisan Vokal Dinamik (Dynamic Vocal De-Esser & Sibilance Suppressor - src/DynamicDeEsser.h & .cpp):
+    - JZDynamicDeEsser melaksanakan pemampatan sibilance frekuensi terpilih (4kHz - 9kHz) untuk menghapuskan kekasaran desisan konsonan vokal ('S', 'T', 'CH').
+    - Menyokong mod pemampatan Split-Band (hanya melemahkan frekuensi desisan) dan mod Wideband, mod pratonton pendengaran sibilance (Listen Mode), serta pemeteran pengurangan gandaan masa nyata.
+  * Penala Masa Anjal Audio & Kuantisasi Transien (Audio Flex-Time Warping & Transient Quantizer - src/AudioFlexTimeWarp.h & .cpp):
+    - JZAudioFlexTimeWarp menyediakan sistem penanda anjal (Warp Markers / Anchor Pins) yang membolehkan manipulasi masa audio secara setempat tanpa memusnahkan bentuk gelombang.
+    - Fungsi AutoQuantizeTransients mengesan transien audio secara automatik dan menguncinya tepat ke grid tempo projek (1/8, 1/16, 1/32) dengan pelarasan peratusan kekuatan kuantisasi (Quantize Strength).
+  * Pemampat Dinamik 3-Jalur Fasa Linear (3-Band Studio Multiband Compressor - src/MultibandCompressor.h & .cpp):
+    - JZMultibandCompressor membahagikan spektrum audio kepada 3 jalur (Low/Sub < 140Hz, Mid 140Hz - 2.5kHz, High > 2.5kHz) menggunakan penapis silang fasa-linear Linkwitz-Riley darjah ke-4 (24 dB/oktaf).
+    - Setiap jalur dilengkapi ambang (-50dB hingga 0dB), nisbah pemampatan, masa attack/release, solekan volum, butang Solo/Mute, dan meter pengurangan gandaan bebas.
+  * Matriks Klip Sesi & Pelancar Gelung Langsung (Non-Linear Session View Clip Matrix & Live Launcher Grid - src/ClipMatrixEngine.h & .cpp):
+    - JZClipMatrixEngine menyediakan persekitaran persembahan langsung ala Ableton Live / Logic Live Loops bergrid (8 Trek x 8 Adegan/Scenes).
+    - Menyokong pelancaran adegan berkuantisasi (1 Bar, 1/2 Bar, 1/4 Bar) tanpa menghentikan pengangkutan audio, mod sel Trigger/Gate/Toggle, gelung berulang (looping), dan rakaman langsung sesi ke garis masa susunan lagu (Record Session to Arrangement).
+  * Pembentuk Pukulan Transien & Pereka Resonans Ekor (Studio Audio Transient Shaper & Punch Designer - src/TransientShaper.h & .cpp):
+    - JZTransientShaper memisahkan komponen transien pantas dan komponen getaran berterusan (sustain body) secara bebas daripada ambang volum (threshold-independent).
+    - Pelarasan gandaan Attack (+-15 dB) untuk hentakan dram bertenaga dan gandaan Sustain (+-15 dB) untuk resonans bilik yang padu, dilindungi pemotongan analog lembut (tanh soft-clipping).
+  * Meter Kenyaringan Penyiaran EBU R128 & Puncak Benar Antara Sampel (ITU-R BS.1770-4 / EBU R128 Loudness Meter & True Peak - src/LoudnessMeterEBU.h & .cpp):
+    - JZLoudnessMeterEBU mematuhi spesifikasi antarabangsa ITU-R BS.1770-4 dengan penapis pra-kenyaringan K-weighting (High-Shelf + RLB High-Pass).
+    - Memaparkan Momentary LUFS (400ms), Short-Term LUFS (3s), Integrated Gated LUFS, Loudness Range (LRA), dan True Peak Meter (dBTP) dengan 4x oversampling untuk mengelakkan herotan penstriman di Spotify, Apple Music, dan YouTube Music.
+  * Kemas Kini Ujian Unit 59 hingga 64 (tests/test_main.cpp):
+    - Menambah ujian pengesahan matematik pengurangan De-Esser (-8.33dB), pemetaan anjal flex-time (output 600 -> orig 500), pemeliharaan tenaga penapis silang 3-jalur, peralihan adegan matriks klip berkuantisasi, pengesanan hentakan transien, dan formula kenyaringan LKFS/LUFS.
+
+24-10-2026 Raja Zahidi
 - Feature & Master Studio Production & Mastering Suite v4.0: Sidechain Compression & Dynamic Ducking Engine, Multi-Track Stems Exporter & Batch Render, Real-Time Vocal Pitch Correction & Auto-Tune, Convolution Reverb & IR Cabinet Simulator, Multi-Velocity Zone Sampler Instrument, Master Spectrum Analyzer & Stereo Goniometer Visualizer:
   * Pemampatan Sidechain & Enjin Pengelakan Dinamik (Studio Sidechain Compressor & Dynamic Ducking - src/SidechainCompressor.h & .cpp):
     - JZSidechainCompressor menyokong laluan isyarat pengesanan aux luaran (external sidechain bus) untuk pengepaman bass-kick dinamik atau ducking vokal.

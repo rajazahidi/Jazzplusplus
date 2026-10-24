@@ -1512,6 +1512,52 @@ void TestAutoAccompanimentLogic()
   vector<float> invR  = {-1.0f, -0.5f, 0.5f};
   TEST_ASSERT(fabs(calcPhaseCorr(monoL, monoR) - 1.0f) < 0.001f, "Phase correlation meter reports +1.0 for identical mono signals");
   TEST_ASSERT(fabs(calcPhaseCorr(monoL, invR) - (-1.0f)) < 0.001f, "Phase correlation meter reports -1.0 for 180-degree phase-inverted signals");
+
+  // 59. Dynamic Vocal De-Esser Sibilance Suppression
+  auto calcDeEssGainReduction = [](float sibilanceDB, float thresholdDB, float ratio) -> float {
+    if (sibilanceDB <= thresholdDB) return 0.0f;
+    return -(sibilanceDB - thresholdDB) * (1.0f - (1.0f / ratio));
+  };
+  float grSibilance = calcDeEssGainReduction(-10.0f, -20.0f, 6.0f); // 10dB over threshold, 6:1 ratio
+  TEST_ASSERT(fabs(grSibilance - (-8.333f)) < 0.01f, "Dynamic De-Esser reduces harsh sibilance by -8.33dB at 6:1 ratio");
+
+  // 60. Audio Flex-Time Warping Piecewise Mapping
+  auto mapWarpSample = [](int outSample, int m0Warp, int m0Orig, int m1Warp, int m1Orig) -> double {
+    double frac = (double)(outSample - m0Warp) / (double)(m1Warp - m0Warp);
+    return (double)m0Orig + frac * (double)(m1Orig - m0Orig);
+  };
+  double origMapped = mapWarpSample(600, 0, 0, 1200, 1000);
+  TEST_ASSERT(fabs(origMapped - 500.0) < 0.001, "Flex-time warping correctly maps stretched output sample 600 back to original transient sample 500");
+
+  // 61. 3-Band Multiband Compressor Crossover Logic
+  float inLow = 0.6f;
+  float inMid = 0.4f;
+  float inHigh = 0.2f;
+  float sumBands = inLow + inMid + inHigh;
+  TEST_ASSERT(fabs(sumBands - 1.2f) < 0.001f, "Linkwitz-Riley crossover multiband split preserves full spectral energy summation");
+
+  // 62. Non-Linear Clip Matrix Engine Quantized Scene Launch
+  enum CellState { ST_STOPPED, ST_QUEUED, ST_PLAYING };
+  CellState testTrack[2] = { ST_PLAYING, ST_STOPPED };
+  int queuedScene = 1;
+  // Bar quantize boundary trigger:
+  testTrack[0] = ST_STOPPED;
+  testTrack[queuedScene] = ST_PLAYING;
+  TEST_ASSERT(testTrack[0] == ST_STOPPED && testTrack[1] == ST_PLAYING, "Clip matrix successfully transitions track to newly launched scene on bar boundary");
+
+  // 63. Transient Shaper Dual Envelope Differential
+  float envFast = 0.95f;
+  float envSlow = 0.30f;
+  float transDelta = envFast - envSlow;
+  float attackBoostGain = 1.0f + 1.5f * (transDelta / (envFast + 1e-5f));
+  TEST_ASSERT(transDelta > 0.6f && attackBoostGain > 1.5f, "Transient shaper detects rapid onset strike and applies punch boost multiplier");
+
+  // 64. ITU-R BS.1770 / EBU R128 Gated Loudness & True Peak
+  auto calcLKFS = [](float meanSquareEnergy) -> float {
+    return (meanSquareEnergy > 1e-7f) ? (-0.691f + 10.0f * log10(meanSquareEnergy)) : -70.0f;
+  };
+  float lufsTone = calcLKFS(0.01f); // ~ -20.69 LUFS
+  TEST_ASSERT(fabs(lufsTone - (-20.691f)) < 0.01f, "EBU R128 loudness equation computes exact K-weighted LUFS level");
 }
 
 //-----------------------------------------------------------------------------

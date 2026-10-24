@@ -117,6 +117,7 @@ set(JAZZ_SOURCES
     src/Audio.cpp
     src/AudioEffects.cpp
     src/AudioFlexTimeWarp.cpp
+    src/AudioRestorationEngine.cpp
     src/AudioTimeStretch.cpp
     src/AudioToMidiTranscriber.cpp
     src/AudioWaveform.cpp
@@ -185,12 +186,15 @@ set(JAZZ_SOURCES
     src/GuitarAmpCabinetSim.cpp
     src/GuitarSettings.cpp
     src/GuitarSettingsDialog.cpp
+    src/GuitarStrumEngine.cpp
     src/GuitarWindow.cpp
     src/HarmonyBrowserAnalyzer.cpp
     src/Harmony.cpp
     src/HarmonyP.cpp
     src/Help.cpp
+    src/ImmersiveAudioPanner.cpp
     src/JazzPlusPlusApplication.cpp
+    src/KeyChordDetector.cpp
     src/KeyStringConverters.cpp
     src/Knob.cpp
     src/LoudnessMeterEBU.cpp
@@ -244,6 +248,7 @@ set(JAZZ_SOURCES
     src/SoundGenerator.cpp
     src/SpatialAudioPanner.cpp
     src/SpectralDenoise.cpp
+    src/SpectralResonanceTamer.cpp
     src/StandardFile.cpp
     src/StemSeparatorEngine.cpp
     src/StemsExporter.cpp
@@ -253,6 +258,7 @@ set(JAZZ_SOURCES
     src/SysexChannel.cpp
     src/TakesComping.cpp
     src/TapeConsoleWarmer.cpp
+    src/VintageLofiProcessor.cpp
     src/ToolBar.cpp
     src/Track.cpp
     src/TrackFrame.cpp

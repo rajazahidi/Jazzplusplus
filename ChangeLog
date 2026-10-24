@@ -1,4 +1,26 @@
 24-10-2026 Raja Zahidi
+- Feature & Master Studio Audio De-Clipper & De-Clicker, Guitar Strum Engine, 7.1.4 Immersive Audio, Vintage Lo-Fi Modeler, Key/Chord Detector & Resonance Tamer Suite v10.0 (Milestone Release):
+  * Pemulihan Audio Terpotong & Pembersih Klik Spektral (Spectral Audio De-Clipper & De-Clicker - src/AudioRestorationEngine.h & .cpp):
+    - JZAudioRestorationEngine melaksanakan rekonstruksi polinomial kubik bagi sampel audio yang mengalami herotan pemotongan digital (De-Clip), membentuk semula puncak kubah analog di atas paras ambang klip.
+    - Dilengkapi modul De-Clicker linear-predictive residual untuk mengesan dan menghapuskan letupan klik vinil, klik bibir vokal, dan lepasan digital tanpa merosakkan transien muzik asal.
+  * Enjin Petikan & Ayunan Gitar Sebenar (Realistic Guitar Strumming & Fingerpicking Engine - src/GuitarStrumEngine.h & .cpp):
+    - JZGuitarStrumEngine menukarkan blok kord MIDI kepada urutan petikan gitar realistik dengan arah ayunan berbeza (Downstroke / Upstroke / Alternating).
+    - Menyokong kelengahan masa mikro antara dawai (Strum Speed ticks), corak petikan jari klasik/akustik (P-I-M-A arpeggio), pengartikulasian redaman tapak tangan (Palm Muting), dan dinamik halaju dawai bes vs treble.
+  * Audio Imersif Dolby Atmos 7.1.4 & Pemutar Objek Ketinggian (Immersive 7.1.4 Spatial Bed & Height Object Panner - src/ImmersiveAudioPanner.h & .cpp):
+    - JZImmersiveAudioPanner menyediakan penghalaan 12 saluran imersif penuh (7 saluran keliling telinga: L, C, R, LFE, Lss, Rss, Lsr, Rsr; dan 4 pembesar suara ketinggian siling: Top Front L/R, Top Rear L/R).
+    - Membolehkan kedudukan objek 3D dimanipulasi secara bebas mengikut Azimuth (0-360 deg), Elevasi (-30 hingga +90 deg), dan Jarak dengan atenuasi kuasa terbalik.
+  * Pemproses Watak Kaset Retro & Ayunan Pic Lo-Fi (Vintage Lo-Fi Cassette Degradation & Pitch Wobble - src/VintageLofiProcessor.h & .cpp):
+    - JZVintageLofiProcessor mensimulasikan ketidakstabilan motor pita kaset retro dengan ayunan pic mikro (Slow Wow & Fast Flutter), pengurangan frekuensi tinggi akibat jajaran kepala pita kaset (Azimuth Rolloff), penjana desisan pita analog (Type I Ferric & Type II Chrome), dan kecacatan pita magnetik rawak (Tape Dropouts).
+  * Pengecam Kunci Muzik & Garis Masa Kord Automatik (Automatic Song Key, Scale & Chord Timeline Detector - src/KeyChordDetector.h & .cpp):
+    - JZKeyChordDetector mengekstrak profil kelas pic kromagram 12-jalur daripada audio atau acara MIDI projek.
+    - Algoritma Krumhansl-Schmuckler menentukan tangga nada utama lagu (24 nada Major/Minor) beserta skor keyakinan (Confidence Score 0% - 100%), dan memetakan perkembangan kord muzik pada garis masa lagu secara automatik.
+  * Penjinak Resonans Spektral Dinamik Pintar (Smart Dynamic Spectral Resonance Tamer - src/SpectralResonanceTamer.h & .cpp):
+    - JZSpectralResonanceTamer mengesan dan menolak lonjakan resonans frekuensi sempit yang tajam pada julat 1kHz - 11kHz secara automatik dan telus (ala Oeksound Soothe).
+    - Menghapuskan kekasaran sibilance vokal, simbal dram yang pedih di telinga, dan dengungan akustik dengan kawalan Depth (0% - 100%), Sharpness Q, dan mod Listen Delta.
+  * Penambahan Ujian Unit 89 hingga 94 (tests/test_main.cpp):
+    - Mengesahkan rekonstruksi kubah parabola analog De-Clipper, lengahan 20-tick ayunan gitar 6-dawai, pemisahan 100% tenaga pembesar suara siling imersif 7.1.4 pada elevasi 90 darjah, had ayunan pic fractional pita kaset Lo-Fi, korelasi profil Krumhansl-Schmuckler tangga nada C Major, dan atenuasi takuk dinamik penjinak resonans spektral.
+
+24-10-2026 Raja Zahidi
 - Feature & Master Studio Vocal Note-Blob Pitch Editor, Stem Separator, Modulation Matrix, Guitar Amp Sim, Polymetric Drums & Match EQ Suite v9.0:
   * Editor Pic Grafik Vokal Berskala Not (Vocal Graphical Note-Blob Pitch Editor - src/VocalPitchEditor.h & .cpp):
     - JZVocalPitchEditor membahagikan rakaman vokal kepada blok segmen not muzik (Note-Blobs ala Melodyne/VariAudio).

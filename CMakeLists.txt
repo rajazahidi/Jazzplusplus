@@ -124,6 +124,7 @@ set(JAZZ_SOURCES
     src/Command.cpp
     src/Configuration.cpp
     src/ControlEdit.cpp
+    src/ConvolutionEngine.cpp
     src/DeprecatedWx/prop.cpp
     src/DeprecatedWx/propform.cpp
     src/DeprecatedWx/proplist.cpp
@@ -184,11 +185,13 @@ set(JAZZ_SOURCES
     src/KeyStringConverters.cpp
     src/Knob.cpp
     src/Mapper.cpp
+    src/MasterVisualizer.cpp
     src/MeasureChoice.cpp
     src/MidiDeviceDialog.cpp
     src/MidiEffects.cpp
     src/MixerConsole.cpp
     src/MpeEngine.cpp
+    src/MultiVelocitySampler.cpp
     src/Metronome.cpp
     src/MouseAction.cpp
     src/NamedChoice.cpp
@@ -197,6 +200,7 @@ set(JAZZ_SOURCES
     src/PianoFrame.cpp
     src/PianoScaleChordHelper.cpp
     src/PianoWindow.cpp
+    src/PitchCorrectionEngine.cpp
     src/Player.cpp
     src/Project.cpp
     src/ProjectBundle.cpp
@@ -213,11 +217,13 @@ set(JAZZ_SOURCES
     src/SampleFrame.cpp
     src/SampleWindow.cpp
     src/SelectControllerDialog.cpp
+    src/SidechainCompressor.cpp
     src/Signal2.cpp
     src/SliderWindow.cpp
     src/Song.cpp
     src/SoundGenerator.cpp
     src/StandardFile.cpp
+    src/StemsExporter.cpp
     src/StringReadWrite.cpp
     src/StringUtilities.cpp
     src/Synth.cpp

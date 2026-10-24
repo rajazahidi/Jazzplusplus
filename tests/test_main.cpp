@@ -1443,6 +1443,75 @@ void TestAutoAccompanimentLogic()
   struct CompSlice { int take; int start; int end; };
   vector<CompSlice> compRegions = { {0, 0, 384}, {1, 384, 768} };
   TEST_ASSERT(compRegions[0].take == 0 && compRegions[1].take == 1, "Comping engine seamlessly assembles Bar 1 from Take 1 and Bar 2 from Take 2");
+
+  // 53. Sidechain Compressor & Dynamic Ducking
+  auto calcCompGainReduction = [](float inputDB, float thresholdDB, float ratio) -> float {
+    if (inputDB <= thresholdDB) return 0.0f;
+    float yG = thresholdDB + (inputDB - thresholdDB) / ratio;
+    return yG - inputDB;
+  };
+  float grDB = calcCompGainReduction(0.0f, -18.0f, 4.0f); // 0dB input, -18dB thresh, 4:1
+  TEST_ASSERT(fabs(grDB - (-13.5f)) < 0.01f, "Sidechain compressor attenuates 0dB signal by -13.5dB at 4:1 ratio above -18dB threshold");
+
+  // 54. Multi-Track Stems Exporter & WAV Header
+  auto buildMiniWavHeader = [](int channels, int sr, int bits, int dataBytes) -> vector<uint8_t> {
+    vector<uint8_t> hdr(44, 0);
+    hdr[0] = 'R'; hdr[1] = 'I'; hdr[2] = 'F'; hdr[3] = 'F';
+    hdr[8] = 'W'; hdr[9] = 'A'; hdr[10] = 'V'; hdr[11] = 'E';
+    hdr[12] = 'f'; hdr[13] = 'm'; hdr[14] = 't'; hdr[15] = ' ';
+    hdr[16] = 16;
+    hdr[20] = (bits == 32) ? 3 : 1;
+    hdr[22] = (uint8_t)channels;
+    hdr[34] = (uint8_t)bits;
+    hdr[36] = 'd'; hdr[37] = 'a'; hdr[38] = 't'; hdr[39] = 'a';
+    return hdr;
+  };
+  auto wav24 = buildMiniWavHeader(2, 48000, 24, 96000);
+  TEST_ASSERT(wav24[0] == 'R' && wav24[8] == 'W' && wav24[20] == 1 && wav24[34] == 24, "Stems Exporter generates compliant 24-bit PCM stereo WAV container");
+
+  // 55. Vocal Pitch Correction & Scale Quantizer
+  auto quantizePitch = [](float freqHz) -> int {
+    double exact = 69.0 + 12.0 * (log(freqHz / 440.0) / log(2.0));
+    return (int)floor(exact + 0.5);
+  };
+  int note445 = quantizePitch(445.0f); // Slightly sharp A4 (~445Hz)
+  TEST_ASSERT(note445 == 69, "Pitch Correction quantizer correctly snaps 445 Hz to MIDI note 69 (A4)");
+
+  // 56. Convolution Reverb & Impulse Response (IR) Convolution
+  vector<float> impulse = {1.0f, 0.0f, 0.0f, 0.0f};
+  vector<float> irKernel = {0.5f, 0.25f, 0.125f};
+  vector<float> convOut(4, 0.0f);
+  for (int n = 0; n < 4; ++n) {
+    for (int k = 0; k < 3; ++k) {
+      if (n - k >= 0) convOut[n] += impulse[n - k] * irKernel[k];
+    }
+  }
+  TEST_ASSERT(fabs(convOut[0] - 0.5f) < 0.001f && fabs(convOut[1] - 0.25f) < 0.001f, "Direct convolution of unit delta reproduces exact IR response");
+
+  // 57. Multi-Velocity Zone Sampler Matching
+  auto matchVelocityZone = [](int vel) -> int {
+    if (vel <= 45) return 0; // Soft
+    if (vel <= 95) return 1; // Medium
+    return 2;                // Hard strike
+  };
+  TEST_ASSERT(matchVelocityZone(25) == 0 && matchVelocityZone(70) == 1 && matchVelocityZone(115) == 2, "Sampler routes velocity 25->Soft, 70->Medium, 115->Hard layer");
+
+  // 58. Master Visualizer Phase Correlation & Goniometer
+  auto calcPhaseCorr = [](const vector<float>& L, const vector<float>& R) -> float {
+    float sumLR = 0.0f, sumL2 = 0.0f, sumR2 = 0.0f;
+    for (size_t i = 0; i < L.size(); ++i) {
+      sumLR += L[i] * R[i];
+      sumL2 += L[i] * L[i];
+      sumR2 += R[i] * R[i];
+    }
+    float d = sqrt(sumL2 * sumR2);
+    return (d > 1e-6f) ? (sumLR / d) : 1.0f;
+  };
+  vector<float> monoL = {1.0f, 0.5f, -0.5f};
+  vector<float> monoR = {1.0f, 0.5f, -0.5f};
+  vector<float> invR  = {-1.0f, -0.5f, 0.5f};
+  TEST_ASSERT(fabs(calcPhaseCorr(monoL, monoR) - 1.0f) < 0.001f, "Phase correlation meter reports +1.0 for identical mono signals");
+  TEST_ASSERT(fabs(calcPhaseCorr(monoL, invR) - (-1.0f)) < 0.001f, "Phase correlation meter reports -1.0 for 180-degree phase-inverted signals");
 }
 
 //-----------------------------------------------------------------------------

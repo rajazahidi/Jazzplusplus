@@ -1,4 +1,29 @@
 24-10-2026 Raja Zahidi
+- Feature & Studio Production Suite: Master Music Arranger & Producer Edition (Chord Progression Builder, Multi-Track Stems, Lead Sheet Generator, Outro Ritardando, Velocity Curves & Microtonal Tuning):
+  * Pembina Progresi Kord Automatik 1-Klik (Smart Chord Progression Builder & Song Starters - src/AutoAccompaniment.h & .cpp):
+    - Fungsi GenerateChordProgression menyuntik progresi kord lengkap dengan susunan pimpinan suara licin (smooth voice leading) ke dalam trek sasaran (piano/lead).
+    - Menyokong templat standard industri: Jazz Classic Cadence (ii-V-I-vi), Pop/Rock 4-Chords (I-V-vi-IV), Neo-Soul & R&B (ii9-V13-Imaj9), 12-Bar Blues Traditional, Nusantara Folk / Zapin-Joget (Am-Dm-E7-Am), Andalusian Cadence (Am-G-F-E), Pachelbel Canon, dan Lo-Fi Chillhop Vamp.
+    - Kord didaftarkan secara automatik ke dalam JZChordTrack agar pembaris garis masa memaparkannya serta-merta.
+  * Eksport Audio Stems Berasingan Multi-Trek (Multi-Track Stem Audio Export - src/AutoAccompaniment.h & .cpp):
+    - Fungsi JZMidiAudioRenderer::ExportStems merender setiap trek aktif secara berasingan ke fail audio WAV PCM 16-bit 44.1kHz (01_Drums_Stem.wav, 02_Bass_Stem.wav, dll.) di dalam folder pilihan pengguna.
+    - Membolehkan pengadunan profesional (mixing & mastering) dalam perisian DAW luar seperti FL Studio, Ableton Live, Logic Pro, Cubase, dan Reaper.
+  * Penjana Carta Kord & Lembaran Muzik Pentas (Printable Musician's Lead Sheet / Real Book Generator - src/AutoAccompaniment.h & .cpp):
+    - Fungsi GenerateLeadSheetHtml & ExportLeadSheetHtml menjana carta kord format HTML grid 4-birama standard The Real Book.
+    - Dilengkapi penanda seksyen (Intro, Verse, Chorus, Bridge, Outro), simbol kord berani, nombor birama, maklumat tempo & kunci, serta butang cetak mesra PDF.
+  * Otomasi Tempo & Liku Perlambatan Penamat (Outro Ritardando Tempo Automation - src/AutoAccompaniment.h & .cpp):
+    - Penurunan tempo lancar pada 2 birama terakhir bahagian Outro (diselaraskan sebanyak 15% hingga 25% lebih perlahan) melalui acara JZSetTempoEvent untuk menghasilkan penamat konsert akustik semula jadi.
+  * Keluk Respons Halaju Dinamik (Velocity Dynamic Touch Curves - src/AutoAccompaniment.h & .cpp):
+    - Fungsi ApplyVelocityCurve memetakan sentuhan pemuzik mengikut profil terpilih: Standard Balanced Linear, Soft & Lyrical Touch (logaritma), Punchy & Aggressive Attack (eksponen), dan Vintage Analog Tape Drift.
+  * Penalaan Mikro Tradisional Nusantara & Timur (Microtonal Quarter-Tone Tuning - src/AutoAccompaniment.h & .cpp):
+    - Modul talaan mikro menjana acara MIDI Pitch Bend (-2048 unit = -50 sen) pada not ke-3 neutral bagi skala Bayati / Rast Zapin dan Gamelan Slendro / Pelog (+35 sen).
+  * Antara Muka Pengguna Dipertingkat (src/Dialogs/AutoAccompanimentDialog.h & .cpp):
+    - Kotak Song Starter dengan menu pilihan progresi kord dan butang [ 🎹 Inject Chords to Track 1 ].
+    - Pilihan Velocity Response Curve, Outro Ritardando, dan Microtonal Tuning.
+    - Butang tindakan pantas [ 📄 Lead Sheet... ], [ 📦 Stems (WAV)... ], dan [ 🎧 Mix (WAV)... ].
+  * Pengesahan Ujian Unit Komprehensif (tests/test_main.cpp):
+    - Ditambah ujian unit 24 hingga 29 (progresi kord, pembersihan nama fail stems, susun atur grid 4-lajur lead sheet, formula ritardando, liku halaju sentuhan, dan penalaan mikro suku-ton -50 sen).
+
+24-10-2026 Raja Zahidi
 - Feature & DAW Audio Intelligence: Professional DAW-Grade Upgrades (Global Chord Track, 3/4 & 6/8 Meters, Nusantara Grooves, Micro-Timing Pocket, Smart Scale Lock & Direct WAV Audio Mixdown):
   * Trek Kord Visual Global & Pembaris Garis Masa (Global Visual Chord Track & Timeline Ruler - src/AutoAccompaniment.h, .cpp, src/TrackWindow.cpp):
     - Kelas pengurusan kord global JZChordTrack menyimpan simbol kord bagi setiap birama lagu secara berpusat.

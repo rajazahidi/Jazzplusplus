@@ -55,6 +55,9 @@ class JZAutoAccompanimentDialog : public wxDialog
     void OnStopPreview(wxCommandEvent& Event);
     void OnGenerateButton(wxCommandEvent& Event);
     void OnExportWav(wxCommandEvent& Event);
+    void OnExportStems(wxCommandEvent& Event);
+    void OnExportLeadSheet(wxCommandEvent& Event);
+    void OnInjectProgression(wxCommandEvent& Event);
     void OnCancelButton(wxCommandEvent& Event);
 
     void UpdateGenerateButtonLabel();
@@ -74,6 +77,10 @@ class JZAutoAccompanimentDialog : public wxDialog
     wxRadioButton* mpRangeCustomRadio;
     wxSpinCtrl* mpFromBarSpin;
     wxSpinCtrl* mpToBarSpin;
+
+    // Song Starter Chord Progression
+    wxChoice* mpProgressionChoice;
+    wxButton* mpInjectProgressionButton;
 
     // Notebook Hub
     wxNotebook* mpNotebook;
@@ -114,6 +121,10 @@ class JZAutoAccompanimentDialog : public wxDialog
     wxCheckBox* mpGhostNotesCheckBox;
     wxCheckBox* mpMicroPocketCheckBox;
     wxCheckBox* mpScaleLockCheckBox;
+    wxChoice* mpVelocityCurveChoice;
+    wxCheckBox* mpOutroRitardandoCheckBox;
+    wxCheckBox* mpMicrotonalCheckBox;
+    wxChoice* mpMicrotonalChoice;
     wxCheckBox* mpMixerPresetsCheckBox;
 
     // Bottom Controls
@@ -121,6 +132,8 @@ class JZAutoAccompanimentDialog : public wxDialog
     wxCheckBox* mpSimultaneousCheckBox;
     wxButton* mpAuditionButton;
     wxButton* mpStopAuditionButton;
+    wxButton* mpExportLeadSheetButton;
+    wxButton* mpExportStemsButton;
     wxButton* mpExportWavButton;
     wxButton* mpGenerateButton;
     wxButton* mpCancelButton;

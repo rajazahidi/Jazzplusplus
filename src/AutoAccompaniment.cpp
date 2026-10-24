@@ -216,6 +216,362 @@ const char* JZAutoAccompaniment::GetBassFeelName(JZBassFeel feel)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+const char* JZAutoAccompaniment::GetProgressionName(JZChordProgressionPreset preset)
+{
+  switch (preset)
+  {
+    case PROGRESSION_JAZZ_2_5_1_6:
+      return "Jazz Classic Turnaround (ii7 - V7 - Imaj7 - VI7)";
+    case PROGRESSION_POP_4_CHORDS:
+      return "Pop / Rock 4-Chords (I - V - vi - IV)";
+    case PROGRESSION_NEO_SOUL_2_5_1:
+      return "Neo-Soul & R&B (ii9 - V13 - Imaj9 - VI7alt)";
+    case PROGRESSION_12_BAR_BLUES:
+      return "12-Bar Blues Traditional Form (I7 - IV7 - V7)";
+    case PROGRESSION_NUSANTARA_FOLK:
+      return "Nusantara Folk / Zapin-Joget Cadence (i - iv - V7 - i)";
+    case PROGRESSION_ANDALUSIAN:
+      return "Andalusian Flamenco Cadence (i - VII - VI - V)";
+    case PROGRESSION_PACHELBEL:
+      return "Pachelbel Canon Progression (I - V - vi - iii - IV - I - IV - V)";
+    case PROGRESSION_LOFI_VAMP:
+      return "Lo-Fi Chillhop Vamp (IVmaj7 - iiim7 - iim7 - Imaj7)";
+    default:
+      return "Jazz Classic Turnaround";
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+const char* JZAutoAccompaniment::GetVelocityCurveName(JZVelocityCurve curve)
+{
+  switch (curve)
+  {
+    case VELOCITY_CURVE_LINEAR:
+      return "Standard Balanced Linear Response";
+    case VELOCITY_CURVE_SOFT_LYRICAL:
+      return "Soft & Lyrical Touch (Ballads / Smooth Jazz)";
+    case VELOCITY_CURVE_PUNCHY_HARD:
+      return "Punchy & Aggressive Attack (Funk / Rock / Joget)";
+    case VELOCITY_CURVE_VINTAGE_ANALOG:
+      return "Vintage Analog Tape Warmth & Drift";
+    default:
+      return "Standard Balanced";
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+const char* JZAutoAccompaniment::GetMicrotonalTuningName(JZMicrotonalTuning tuning)
+{
+  switch (tuning)
+  {
+    case MICROTONAL_NONE:
+      return "Standard 12-TET Equal Temperament";
+    case MICROTONAL_BAYATI_RAST:
+      return "Bayati / Rast Quarter-Tone Neutral 3rd (-50 Cents)";
+    case MICROTONAL_SLENDRO_PELOG:
+      return "Gamelan Slendro / Pelog Equidistant Scale";
+    default:
+      return "Standard 12-TET";
+  }
+}
+
+//-----------------------------------------------------------------------------
+// Dynamic Velocity Response Curve Transformer
+//-----------------------------------------------------------------------------
+unsigned char JZAutoAccompaniment::ApplyVelocityCurve(int baseVelocity, JZVelocityCurve curve, int step)
+{
+  double norm = max(0.01, min(1.0, (double)baseVelocity / 127.0));
+  double result = norm;
+
+  switch (curve)
+  {
+    case VELOCITY_CURVE_SOFT_LYRICAL:
+      result = pow(norm, 1.35);
+      break;
+    case VELOCITY_CURVE_PUNCHY_HARD:
+      result = pow(norm, 0.75);
+      break;
+    case VELOCITY_CURVE_VINTAGE_ANALOG:
+    {
+      int jitter = ((step * 7 + 13) % 9) - 4;
+      int v = baseVelocity + jitter;
+      return (unsigned char)max(20, min(127, v));
+    }
+    case VELOCITY_CURVE_LINEAR:
+    default:
+      result = norm;
+      break;
+  }
+
+  int outVel = (int)(result * 127.0 + 0.5);
+  return (unsigned char)max(15, min(127, outVel));
+}
+
+//-----------------------------------------------------------------------------
+// 1-Click Chord Progression Generator & Instant Song Starter
+//-----------------------------------------------------------------------------
+int JZAutoAccompaniment::GenerateChordProgression(
+  JZSong* pSong,
+  int targetTrackIndex,
+  JZChordProgressionPreset preset,
+  int tonicPitchClass,
+  int startBar,
+  int repeatCount,
+  bool isMinor)
+{
+  if (!pSong) return 0;
+  JZTrack* pTrack = pSong->GetTrack(targetTrackIndex);
+  if (!pTrack) return 0;
+
+  int tpq = pSong->GetTicksPerQuarter();
+  if (tpq <= 0) tpq = 96;
+  int ticksPerBar = 4 * tpq;
+
+  struct ChordSpec
+  {
+    int rootInterval;
+    JZChordQuality quality;
+  };
+
+  vector<ChordSpec> pattern;
+
+  switch (preset)
+  {
+    case PROGRESSION_JAZZ_2_5_1_6:
+      pattern.push_back({2, CHORD_MINOR7});
+      pattern.push_back({7, CHORD_DOMINANT7});
+      pattern.push_back({0, CHORD_MAJOR7});
+      pattern.push_back({9, CHORD_DOMINANT7});
+      break;
+
+    case PROGRESSION_POP_4_CHORDS:
+      pattern.push_back({0, CHORD_MAJOR});
+      pattern.push_back({7, CHORD_MAJOR});
+      pattern.push_back({9, CHORD_MINOR});
+      pattern.push_back({5, CHORD_MAJOR});
+      break;
+
+    case PROGRESSION_NEO_SOUL_2_5_1:
+      pattern.push_back({2, CHORD_MINOR7});
+      pattern.push_back({7, CHORD_DOMINANT7});
+      pattern.push_back({0, CHORD_MAJOR7});
+      pattern.push_back({9, CHORD_DOMINANT7});
+      break;
+
+    case PROGRESSION_12_BAR_BLUES:
+      pattern.push_back({0, CHORD_DOMINANT7});
+      pattern.push_back({5, CHORD_DOMINANT7});
+      pattern.push_back({0, CHORD_DOMINANT7});
+      pattern.push_back({0, CHORD_DOMINANT7});
+      pattern.push_back({5, CHORD_DOMINANT7});
+      pattern.push_back({5, CHORD_DOMINANT7});
+      pattern.push_back({0, CHORD_DOMINANT7});
+      pattern.push_back({0, CHORD_DOMINANT7});
+      pattern.push_back({7, CHORD_DOMINANT7});
+      pattern.push_back({5, CHORD_DOMINANT7});
+      pattern.push_back({0, CHORD_DOMINANT7});
+      pattern.push_back({7, CHORD_DOMINANT7});
+      break;
+
+    case PROGRESSION_NUSANTARA_FOLK:
+      pattern.push_back({0, CHORD_MINOR});
+      pattern.push_back({5, CHORD_MINOR});
+      pattern.push_back({7, CHORD_DOMINANT7});
+      pattern.push_back({0, CHORD_MINOR});
+      break;
+
+    case PROGRESSION_ANDALUSIAN:
+      pattern.push_back({0, CHORD_MINOR});
+      pattern.push_back({10, CHORD_MAJOR});
+      pattern.push_back({8, CHORD_MAJOR});
+      pattern.push_back({7, CHORD_MAJOR});
+      break;
+
+    case PROGRESSION_PACHELBEL:
+      pattern.push_back({0, CHORD_MAJOR});
+      pattern.push_back({7, CHORD_MAJOR});
+      pattern.push_back({9, CHORD_MINOR});
+      pattern.push_back({4, CHORD_MINOR});
+      pattern.push_back({5, CHORD_MAJOR});
+      pattern.push_back({0, CHORD_MAJOR});
+      pattern.push_back({5, CHORD_MAJOR});
+      pattern.push_back({7, CHORD_MAJOR});
+      break;
+
+    case PROGRESSION_LOFI_VAMP:
+      pattern.push_back({5, CHORD_MAJOR7});
+      pattern.push_back({4, CHORD_MINOR7});
+      pattern.push_back({2, CHORD_MINOR7});
+      pattern.push_back({0, CHORD_MAJOR7});
+      break;
+
+    default:
+      pattern.push_back({0, CHORD_MAJOR});
+      pattern.push_back({5, CHORD_MAJOR});
+      pattern.push_back({7, CHORD_DOMINANT7});
+      pattern.push_back({0, CHORD_MAJOR});
+      break;
+  }
+
+  int totalBars = (int)pattern.size() * max(1, repeatCount);
+  int notesAdded = 0;
+  int ch = pTrack->GetChannel() > 0 ? (pTrack->GetChannel() - 1) : 0;
+
+  vector<int> prevVoicing;
+
+  for (int b = 0; b < totalBars; ++b)
+  {
+    int patIdx = b % (int)pattern.size();
+    const ChordSpec& spec = pattern[patIdx];
+    int root = (tonicPitchClass + spec.rootInterval) % 12;
+
+    int currentBar = startBar + b;
+    int bStart = currentBar * ticksPerBar;
+    int bLen = (int)(ticksPerBar * 0.95);
+
+    JZDetectedChord det;
+    det.rootPitchClass = root;
+    det.bassPitchClass = root;
+    det.inversion = 0;
+    det.quality = spec.quality;
+    det.hasNotes = true;
+    det.minPitch = 48 + root;
+    JZChordTrack::Instance().SetChord(currentBar, det);
+
+    vector<int> voicing = FindSmoothVoiceLeading(root, spec.quality, prevVoicing);
+    prevVoicing = voicing;
+
+    int bassRoot = 36 + root;
+    if (bassRoot > 44) bassRoot -= 12;
+    pTrack->Put(new JZKeyOnEvent(bStart, ch, (unsigned char)bassRoot, 85, (unsigned short)bLen));
+    notesAdded++;
+
+    for (size_t k = 0; k < voicing.size(); ++k)
+    {
+      pTrack->Put(new JZKeyOnEvent(bStart, ch, (unsigned char)voicing[k], 78, (unsigned short)bLen));
+      notesAdded++;
+    }
+  }
+
+  pTrack->Cleanup();
+  return notesAdded;
+}
+
+//-----------------------------------------------------------------------------
+// Musician's Lead Sheet & Real Book Generator (HTML / Text)
+//-----------------------------------------------------------------------------
+string JZAutoAccompaniment::GenerateLeadSheetHtml(
+  JZSong* pSong,
+  const string& songTitle,
+  const string& composer)
+{
+  int tpq = pSong ? pSong->GetTicksPerQuarter() : 96;
+  if (tpq <= 0) tpq = 96;
+  int ticksPerBar = 4 * tpq;
+
+  int maxClock = pSong ? pSong->GetLastClock() : (16 * ticksPerBar);
+  int totalBars = (ticksPerBar > 0) ? ((maxClock + ticksPerBar - 1) / ticksPerBar) : 16;
+  if (totalBars < 4) totalBars = 4;
+
+  JZKeyCenter kc = (pSong && pSong->GetTrack(0)) ? DetectSongKeyCenter(pSong->GetTrack(0)) : JZKeyCenter();
+
+  ostringstream h;
+  h << "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n";
+  h << "<title>" << songTitle << " - Musician's Lead Sheet</title>\n";
+  h << "<style>\n";
+  h << "  body { font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background: #fdfdfd; color: #222; margin: 20px; }\n";
+  h << "  .sheet-container { max-width: 900px; margin: 0 auto; background: #fff; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 8px; }\n";
+  h << "  .sheet-header { border-bottom: 3px double #333; padding-bottom: 12px; margin-bottom: 24px; }\n";
+  h << "  .sheet-title { font-size: 32px; font-weight: 800; margin: 0 0 6px 0; color: #111; text-transform: uppercase; letter-spacing: 1px; }\n";
+  h << "  .sheet-meta { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; color: #555; }\n";
+  h << "  .lead-grid { width: 100%; border-collapse: collapse; margin-bottom: 25px; }\n";
+  h << "  .lead-grid td { width: 25%; height: 75px; border-top: 1px solid #ddd; border-bottom: 2px solid #222; border-left: 2px solid #222; border-right: 2px solid #222; vertical-align: middle; text-align: center; position: relative; background: #fafafa; }\n";
+  h << "  .bar-num { position: absolute; top: 4px; left: 6px; font-size: 11px; font-weight: 700; color: #888; }\n";
+  h << "  .section-tag { position: absolute; top: 4px; right: 6px; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 3px; background: #e3f2fd; color: #1565c0; }\n";
+  h << "  .chord-symbol { font-size: 26px; font-weight: 900; color: #0d47a1; letter-spacing: 0.5px; }\n";
+  h << "  .no-chord { color: #bbb; font-size: 18px; }\n";
+  h << "  .print-btn { display: inline-block; padding: 10px 20px; background: #1976d2; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold; cursor: pointer; border: none; margin-bottom: 20px; }\n";
+  h << "  @media print { .print-btn { display: none; } body { margin: 0; } .sheet-container { box-shadow: none; padding: 0; } }\n";
+  h << "</style>\n</head>\n<body>\n";
+  h << "<div class=\"sheet-container\">\n";
+  h << "  <button class=\"print-btn\" onclick=\"window.print()\">🖨️ Cetak / Print Lead Sheet (PDF)</button>\n";
+  h << "  <div class=\"sheet-header\">\n";
+  h << "    <h1 class=\"sheet-title\">" << songTitle << "</h1>\n";
+  h << "    <div class=\"sheet-meta\">\n";
+  h << "      <span>Komposer / Susunan: " << composer << "</span>\n";
+  h << "      <span>Kunci: " << (kc.confidence > 0.0f ? kc.name : "C Major") << "</span>\n";
+  h << "      <span>Tempo: 120 BPM | Tanda Masa: 4/4</span>\n";
+  h << "    </div>\n";
+  h << "  </div>\n";
+
+  h << "  <table class=\"lead-grid\">\n";
+  for (int b = 0; b < totalBars; ++b)
+  {
+    if (b % 4 == 0) h << "    <tr>\n";
+
+    string chord = JZChordTrack::Instance().GetChordName(b);
+    if (chord.empty())
+    {
+      chord = GetMeasureChordName(pSong, b);
+    }
+
+    JZSongSection sec = DetermineSection(b, totalBars, SECTION_AUTO);
+    string secTag = "";
+    if (b % 4 == 0)
+    {
+      string secName = GetSectionName(sec);
+      if (secName.find("Intro") != string::npos) secTag = "INTRO";
+      else if (secName.find("Verse") != string::npos) secTag = "VERSE";
+      else if (secName.find("Chorus") != string::npos) secTag = "CHORUS";
+      else if (secName.find("Bridge") != string::npos) secTag = "BRIDGE";
+      else if (secName.find("Outro") != string::npos) secTag = "OUTRO";
+    }
+
+    h << "      <td>\n";
+    h << "        <span class=\"bar-num\">Bar " << (b + 1) << "</span>\n";
+    if (!secTag.empty())
+    {
+      h << "        <span class=\"section-tag\">" << secTag << "</span>\n";
+    }
+    if (!chord.empty())
+    {
+      h << "        <span class=\"chord-symbol\">" << chord << "</span>\n";
+    }
+    else
+    {
+      h << "        <span class=\"no-chord\">%</span>\n";
+    }
+    h << "      </td>\n";
+
+    if (b % 4 == 3 || b == totalBars - 1) h << "    </tr>\n";
+  }
+  h << "  </table>\n";
+  h << "  <div style=\"font-size: 11px; color: #777; text-align: center; margin-top: 20px;\">\n";
+  h << "    Dijana secara automatik oleh Jazz++ Smart Music Intelligence Engine\n";
+  h << "  </div>\n";
+  h << "</div>\n</body>\n</html>\n";
+
+  return h.str();
+}
+
+bool JZAutoAccompaniment::ExportLeadSheetHtml(
+  JZSong* pSong,
+  const string& filePath,
+  const string& songTitle,
+  const string& composer)
+{
+  string html = GenerateLeadSheetHtml(pSong, songTitle, composer);
+  ofstream out(filePath.c_str());
+  if (!out.is_open()) return false;
+  out << html;
+  out.close();
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 JZSongSection JZAutoAccompaniment::DetermineSection(int barIndex, int totalBars, JZSongSection overrideSection)
 {
   if (overrideSection != SECTION_AUTO)
@@ -1024,6 +1380,241 @@ bool JZMidiAudioRenderer::ExportWav(
 }
 
 //-----------------------------------------------------------------------------
+// Multi-Track Stem Audio Export Implementation
+//-----------------------------------------------------------------------------
+bool JZMidiAudioRenderer::ExportStems(
+  JZSong* pSong,
+  const string& outputDirectory,
+  vector<string>& outGeneratedFiles,
+  int sampleRate,
+  int fromClock,
+  int toClock)
+{
+  if (!pSong || sampleRate <= 0) return false;
+  outGeneratedFiles.clear();
+
+  int trackCount = pSong->GetTrackCount();
+  if (trackCount <= 0) return false;
+
+  int tpq = pSong->GetTicksPerQuarter();
+  if (tpq <= 0) tpq = 96;
+
+  double bpm = 120.0;
+  double secondsPerTick = (60.0 / bpm) / (double)tpq;
+
+  int maxSongClock = pSong->GetLastClock();
+  if (maxSongClock <= 0) maxSongClock = 16 * tpq;
+
+  int effectiveEndClock = (toClock > 0) ? min(toClock, maxSongClock + 4 * tpq) : maxSongClock;
+  int effectiveStartClock = max(0, fromClock);
+
+  double durationSeconds = ((effectiveEndClock - effectiveStartClock) * secondsPerTick) + 1.2;
+  int totalSamples = (int)(durationSeconds * (double)sampleRate);
+  if (totalSamples <= 0) totalSamples = sampleRate * 2;
+  if (totalSamples > sampleRate * 600) totalSamples = sampleRate * 600;
+
+  for (int t = 0; t < trackCount; ++t)
+  {
+    JZTrack* pTrack = pSong->GetTrack(t);
+    if (!pTrack || pTrack->IsKilled() || pTrack->IsMute() || pTrack->IsEmpty()) continue;
+
+    string trackName = pTrack->GetName();
+    if (trackName.empty())
+    {
+      ostringstream ss;
+      ss << "Track_" << (t + 1);
+      trackName = ss.str();
+    }
+    string safeName = "";
+    for (size_t c = 0; c < trackName.size(); ++c)
+    {
+      char ch = trackName[c];
+      if (isalnum((unsigned char)ch) || ch == '_' || ch == '-') safeName += ch;
+      else if (ch == ' ') safeName += '_';
+    }
+    if (safeName.empty())
+    {
+      ostringstream ss;
+      ss << "Track_" << (t + 1);
+      safeName = ss.str();
+    }
+
+    ostringstream fn;
+    fn << outputDirectory << "/";
+    if (t + 1 < 10) fn << "0";
+    fn << (t + 1) << "_" << safeName << "_Stem.wav";
+    string stemPath = fn.str();
+
+    vector<float> leftBuf(totalSamples, 0.0f);
+    vector<float> rightBuf(totalSamples, 0.0f);
+
+    double trackVol = (double)pTrack->GetVolume() / 127.0;
+    if (trackVol <= 0.01) trackVol = 0.8;
+    int pan = pTrack->GetPan();
+    if (pan < 0 || pan > 127) pan = 64;
+    double panAngle = ((double)pan / 127.0) * 1.57079632679;
+    double panL = cos(panAngle);
+    double panR = sin(panAngle);
+
+    int midiCh = pTrack->GetChannel() > 0 ? (pTrack->GetChannel() - 1) : 0;
+    bool isDrums = (midiCh == 9);
+
+    for (int i = 0; i < pTrack->mEventCount; ++i)
+    {
+      JZEvent* pEv = pTrack->mppEvents[i];
+      if (!pEv || pEv->IsKilled()) continue;
+
+      JZKeyOnEvent* pKey = pEv->IsKeyOn();
+      if (!pKey) continue;
+
+      int noteClk = pKey->GetClock();
+      int noteLen = pKey->GetLength();
+      if (noteLen <= 0) noteLen = tpq / 2;
+      int pitch = pKey->GetPitch();
+      int vel = pKey->GetVelocity();
+
+      if (noteClk + noteLen < effectiveStartClock || noteClk > effectiveEndClock) continue;
+
+      int startSample = (int)((noteClk - effectiveStartClock) * secondsPerTick * (double)sampleRate);
+      int lengthSamples = (int)(noteLen * secondsPerTick * (double)sampleRate);
+      if (startSample < 0 || startSample >= totalSamples) continue;
+
+      double velScale = (double)vel / 127.0;
+
+      if (isDrums)
+      {
+        if (pitch == 35 || pitch == 36)
+        {
+          int hitSamples = min(lengthSamples + (sampleRate / 4), totalSamples - startSample);
+          double decayTime = 0.22;
+          for (int s = 0; s < hitSamples; ++s)
+          {
+            double tSec = (double)s / (double)sampleRate;
+            double freq = 45.0 + 95.0 * exp(-tSec * 28.0);
+            double env = exp(-tSec / decayTime);
+            float val = (float)(sin(2.0 * 3.14159265359 * freq * tSec) * env * velScale * trackVol * 0.9);
+            leftBuf[startSample + s] += val * 0.7f;
+            rightBuf[startSample + s] += val * 0.7f;
+          }
+        }
+        else if (pitch == 38 || pitch == 40 || pitch == 37)
+        {
+          int hitSamples = min(lengthSamples + (sampleRate / 5), totalSamples - startSample);
+          double decayTime = 0.16;
+          for (int s = 0; s < hitSamples; ++s)
+          {
+            double tSec = (double)s / (double)sampleRate;
+            double tone = sin(2.0 * 3.14159265359 * 185.0 * tSec) * exp(-tSec / 0.08);
+            double noise = (((double)(s * 1103515245 + 12345) / 2147483648.0) - 1.0) * exp(-tSec / decayTime);
+            float val = (float)((tone * 0.4 + noise * 0.6) * velScale * trackVol * 0.85);
+            leftBuf[startSample + s] += val * 0.65f;
+            rightBuf[startSample + s] += val * 0.65f;
+          }
+        }
+        else
+        {
+          bool isOpen = (pitch == 46 || pitch == 49 || pitch == 51);
+          int hitSamples = min(isOpen ? (sampleRate / 2) : (sampleRate / 15), totalSamples - startSample);
+          double decayTime = isOpen ? 0.35 : 0.045;
+          for (int s = 0; s < hitSamples; ++s)
+          {
+            double tSec = (double)s / (double)sampleRate;
+            double noise = (((double)(s * 1664525 + 1013904223) / 2147483648.0) - 1.0) * exp(-tSec / decayTime);
+            float val = (float)(noise * velScale * trackVol * 0.5);
+            leftBuf[startSample + s] += (float)(val * panL);
+            rightBuf[startSample + s] += (float)(val * panR);
+          }
+        }
+      }
+      else
+      {
+        double freq = 440.0 * pow(2.0, (pitch - 69.0) / 12.0);
+        int totalNoteSamples = min(lengthSamples + (int)(sampleRate * 0.08), totalSamples - startSample);
+        int attackSamples = max(8, (int)(sampleRate * 0.006));
+        int releaseSamples = max(16, (int)(sampleRate * 0.05));
+        bool isBass = (pitch < 52 || midiCh == 1);
+
+        for (int s = 0; s < totalNoteSamples; ++s)
+        {
+          double tSec = (double)s / (double)sampleRate;
+          double env = 1.0;
+          if (s < attackSamples) env = (double)s / (double)attackSamples;
+          else if (s > lengthSamples) env = max(0.0, 1.0 - (double)(s - lengthSamples) / (double)releaseSamples);
+
+          double osc = 0.0;
+          if (isBass)
+          {
+            osc = sin(2.0 * 3.14159265359 * freq * tSec) * 0.8 +
+                  sin(4.0 * 3.14159265359 * freq * tSec) * 0.25;
+          }
+          else
+          {
+            double phase = fmod(freq * tSec, 1.0);
+            double tri = (phase < 0.5) ? (4.0 * phase - 1.0) : (3.0 - 4.0 * phase);
+            double sine = sin(2.0 * 3.14159265359 * freq * tSec);
+            osc = tri * 0.6 + sine * 0.4;
+          }
+
+          float val = (float)(osc * env * velScale * trackVol * 0.6);
+          leftBuf[startSample + s] += (float)(val * panL);
+          rightBuf[startSample + s] += (float)(val * panR);
+        }
+      }
+    }
+
+    float peak = 0.0f;
+    for (int s = 0; s < totalSamples; ++s)
+    {
+      if (fabs(leftBuf[s]) > peak) peak = fabs(leftBuf[s]);
+      if (fabs(rightBuf[s]) > peak) peak = fabs(rightBuf[s]);
+    }
+    float gain = (peak > 0.92f) ? (0.92f / peak) : 1.0f;
+
+    ofstream out(stemPath.c_str(), ios::binary);
+    if (!out.is_open()) continue;
+
+    uint32_t subchunk2Size = (uint32_t)totalSamples * 2 * 2;
+    uint32_t chunkSize = 36 + subchunk2Size;
+    uint16_t numChannels = 2;
+    uint32_t sRate = (uint32_t)sampleRate;
+    uint32_t byteRate = sRate * numChannels * 2;
+    uint16_t blockAlign = numChannels * 2;
+    uint16_t bitsPerSample = 16;
+    uint32_t subchunk1Size = 16;
+    uint16_t audioFormat = 1;
+
+    out.write("RIFF", 4);
+    out.write(reinterpret_cast<const char*>(&chunkSize), 4);
+    out.write("WAVE", 4);
+    out.write("fmt ", 4);
+    out.write(reinterpret_cast<const char*>(&subchunk1Size), 4);
+    out.write(reinterpret_cast<const char*>(&audioFormat), 2);
+    out.write(reinterpret_cast<const char*>(&numChannels), 2);
+    out.write(reinterpret_cast<const char*>(&sRate), 4);
+    out.write(reinterpret_cast<const char*>(&byteRate), 4);
+    out.write(reinterpret_cast<const char*>(&blockAlign), 2);
+    out.write(reinterpret_cast<const char*>(&bitsPerSample), 2);
+    out.write("data", 4);
+    out.write(reinterpret_cast<const char*>(&subchunk2Size), 4);
+
+    for (int s = 0; s < totalSamples; ++s)
+    {
+      float l = tanh(leftBuf[s] * gain);
+      float r = tanh(rightBuf[s] * gain);
+      int16_t sampleL = (int16_t)max(-32767.0f, min(32767.0f, l * 32760.0f));
+      int16_t sampleR = (int16_t)max(-32767.0f, min(32767.0f, r * 32760.0f));
+      out.write(reinterpret_cast<const char*>(&sampleL), 2);
+      out.write(reinterpret_cast<const char*>(&sampleR), 2);
+    }
+    out.close();
+
+    outGeneratedFiles.push_back(stemPath);
+  }
+
+  return !outGeneratedFiles.empty();
+}
+
+//-----------------------------------------------------------------------------
 // Helper to analyze notes in a clock window (with Inversion Disambiguation)
 //-----------------------------------------------------------------------------
 bool JZAutoAccompaniment::AnalyzeWindow(
@@ -1313,11 +1904,15 @@ int JZAutoAccompaniment::GenerateBassMeasure(
   int driveOffset = config.enableMicroPocket ? config.bassDriveTicks : 0;
   int barStartWithDrive = max(0, barStartClock + driveOffset);
 
-  // Helper for humanized velocity drift
+  // Helper for humanized velocity drift and touch response curve
   auto hVel = [&](int base, int step) -> unsigned char {
-    if (!config.enableHumanizeVelocity) return (unsigned char)base;
-    int drift = ((barIndex * 5 + step * 3) % 9) - 4;
-    return (unsigned char)max(20, min(127, base + drift));
+    int v = base;
+    if (config.enableHumanizeVelocity)
+    {
+      int drift = ((barIndex * 5 + step * 3) % 9) - 4;
+      v = max(20, min(127, base + drift));
+    }
+    return ApplyVelocityCurve(v, config.velocityCurve, step);
   };
 
   // Chord 1 Root & Bass
@@ -2370,9 +2965,26 @@ int JZAutoAccompaniment::GenerateSoloMeasure(
         p = SnapToKeyScale(p, config.keyCenter);
       }
       int vel = (currentSection == SECTION_CHORUS) ? (98 + i * 3) : (88 + i * 4);
+      vel = ApplyVelocityCurve(vel, config.velocityCurve, i);
       int len = (int)(eighthTicks * 0.9);
       pTrack->Put(new JZKeyOnEvent(clk, ch, (unsigned char)p, (unsigned char)vel, (unsigned short)len));
       notesAdded++;
+
+      // Microtonal Tuning pitch bend articulation
+      if (config.enableMicrotonalTuning && config.microtonalTuning != MICROTONAL_NONE)
+      {
+        int deg = (p - root + 120) % 12;
+        if (config.microtonalTuning == MICROTONAL_BAYATI_RAST && (deg == 3 || deg == 4))
+        {
+          pTrack->Put(new JZPitchEvent(clk, ch, -2048));
+          pTrack->Put(new JZPitchEvent(clk + len, ch, 0));
+        }
+        else if (config.microtonalTuning == MICROTONAL_SLENDRO_PELOG && (deg == 2 || deg == 7))
+        {
+          pTrack->Put(new JZPitchEvent(clk, ch, 1433));
+          pTrack->Put(new JZPitchEvent(clk + len, ch, 0));
+        }
+      }
     }
   }
   else
@@ -2614,6 +3226,19 @@ JZAccompanimentResult JZAutoAccompaniment::Generate(JZSong* pSong, const JZAccom
     // 3. Dynamic Song Form Section Determination
     JZSongSection section = DetermineSection(b, endBar, config.songSection);
 
+    // 4. Outro Ritardando Tempo Automation on Final 2 Measures
+    if (config.enableOutroRitardando && endBar > 4 && b >= endBar - 2)
+    {
+      JZTrack* pConductor = pSong->GetTrack(0);
+      if (pConductor)
+      {
+        int baseBpm = 120;
+        int slowBpm = (b == endBar - 2) ? (baseBpm * (100 - config.outroSlowdownPercent / 2) / 100)
+                                        : (baseBpm * (100 - config.outroSlowdownPercent) / 100);
+        pConductor->Put(new JZSetTempoEvent(bStart, max(40, slowBpm)));
+      }
+    }
+
     if (pBassTrack)
     {
       totalBass += GenerateBassMeasure(pBassTrack, b, bStart, bTicks, tpq, bCounts, ch, nextCh, config, section);
@@ -2666,6 +3291,9 @@ JZAccompanimentResult JZAutoAccompaniment::Generate(JZSong* pSong, const JZAccom
   if (config.enableSmoothVoiceLeading) oss << " • Smooth Voice Leading: Active (Common tones preserved, minimal jumps)\n";
   if (config.enableMicroPocket) oss << " • Micro-Timing Pocket: Active (Laid-back snare +" << config.snarePocketTicks << " ticks, push bass " << config.bassDriveTicks << " ticks)\n";
   if (config.enableScaleLock) oss << " • Smart Scale Lock: Active (Notes snapped to " << detectedKey.name << " scale)\n";
+  if (config.enableOutroRitardando) oss << " • Outro Ritardando: Active (Final cadence slowed by " << config.outroSlowdownPercent << "%)\n";
+  if (config.enableMicrotonalTuning) oss << " • Microtonal Tuning: Active (" << GetMicrotonalTuningName(config.microtonalTuning) << ")\n";
+  oss << " • Velocity Response Curve: " << GetVelocityCurveName(config.velocityCurve) << "\n";
   if (config.applyMixerPresets) oss << " • Smart Auto-Mixer: Stereo Panning & Studio Gains configured\n";
   if (totalBass > 0) oss << " • Bass: " << totalBass << " notes (Track " << (config.bassTrackIndex + 1) << ")\n";
   if (totalDrums > 0) oss << " • Drums: " << totalDrums << " notes (Track " << (config.drumsTrackIndex + 1) << ")\n";

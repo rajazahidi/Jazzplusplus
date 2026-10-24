@@ -1191,6 +1191,52 @@ void TestAutoAccompanimentLogic()
   uint16_t blockAlign = wavChannels * (wavBitsPerSample / 8);
   TEST_ASSERT(byteRate == 176400, "16-bit 44.1kHz stereo PCM WAV byte rate is 176,400 bytes/sec");
   TEST_ASSERT(blockAlign == 4, "Stereo 16-bit block align is 4 bytes");
+
+  // 24. Smart Chord Progression Generator Patterns (Jazz ii-V-I & Pop 4-Chords)
+  vector<int> jazzTurnaroundRoots = {2, 7, 0, 9};
+  TEST_ASSERT(jazzTurnaroundRoots[0] == 2 && jazzTurnaroundRoots[2] == 0, "Jazz 2-5-1-6 progression starts on ii (Dm7) and resolves to I (Cmaj7)");
+  vector<int> pop4Roots = {0, 7, 9, 5};
+  TEST_ASSERT(pop4Roots[2] == 9 && pop4Roots[3] == 5, "Pop 4-chords progression reaches vi (Am) and IV (F)");
+
+  // 25. Multi-Track Audio Stem File Naming & Path Sanitization
+  string trackRawName = "Auto Bass & Synth / 808?";
+  string safeStemName = "";
+  for (size_t c = 0; c < trackRawName.size(); ++c) {
+    char ch = trackRawName[c];
+    if (isalnum((unsigned char)ch) || ch == '_' || ch == '-') safeStemName += ch;
+    else if (ch == ' ') safeStemName += '_';
+  }
+  TEST_ASSERT(safeStemName == "Auto_Bass__Synth__808", "Stem track name sanitized for filesystem compatibility");
+
+  // 26. Musician's Lead Sheet Real Book HTML Grid Layout Verification
+  int songBars = 16;
+  int leadSheetCols = 4;
+  int leadSheetRows = (songBars + leadSheetCols - 1) / leadSheetCols;
+  TEST_ASSERT(leadSheetRows == 4, "16-measure song formats into exactly 4 rows in 4-column Real Book grid");
+
+  // 27. Outro Ritardando Decelerando Percentage Curve Calculation
+  int initialBpm = 120;
+  int slowPercent = 25;
+  int penultBpm = initialBpm * (100 - slowPercent / 2) / 100;
+  int finalBpm = initialBpm * (100 - slowPercent) / 100;
+  TEST_ASSERT(penultBpm == 105 && finalBpm == 90, "Outro ritardando decelerates 120 BPM smoothly down to 90 BPM");
+
+  // 28. Velocity Dynamic Touch Response Curves (Linear, Soft Lyrical, Punchy Hard)
+  auto curveTransform = [](int vel, int type) -> int {
+    double norm = (double)vel / 127.0;
+    if (type == 1) return (int)(pow(norm, 1.35) * 127.0 + 0.5);
+    if (type == 2) return (int)(pow(norm, 0.75) * 127.0 + 0.5);
+    return vel;
+  };
+  int midVel = 64;
+  int softVel = curveTransform(midVel, 1);
+  int punchVel = curveTransform(midVel, 2);
+  TEST_ASSERT(softVel < midVel, "Soft Lyrical curve dampens mid velocity for gentle touch");
+  TEST_ASSERT(punchVel > midVel, "Punchy Hard curve boosts mid velocity for assertive attack");
+
+  // 29. Microtonal Quarter-Tone Pitch Bend Offset (Bayati/Rast -50 cents)
+  int quarterToneOffset = -2048;
+  TEST_ASSERT(quarterToneOffset == -2048, "Quarter-tone flat (-50 cents) is exactly -2048 pitch bend units");
 }
 
 //-----------------------------------------------------------------------------

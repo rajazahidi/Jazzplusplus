@@ -126,6 +126,39 @@ enum JZSoloDensity
   SOLO_DENSITY_VIRTUOSO       // Dense 8th/16th lines
 };
 
+// 5. Smart Chord Progression Presets (1-Click Song Starter)
+enum JZChordProgressionPreset
+{
+  PROGRESSION_JAZZ_2_5_1_6 = 0,    // ii-V-I-vi (Dm7 -> G7 -> Cmaj7 -> A7)
+  PROGRESSION_POP_4_CHORDS,        // I-V-vi-IV (C -> G -> Am -> F)
+  PROGRESSION_NEO_SOUL_2_5_1,      // ii9 -> V13 -> Imaj9 -> VI7b13
+  PROGRESSION_12_BAR_BLUES,        // 12-Bar Blues standard in Key (I7-IV7-V7)
+  PROGRESSION_NUSANTARA_FOLK,      // Tradisi Melayu / Zapin-Joget (Am -> Dm -> E7 -> Am)
+  PROGRESSION_ANDALUSIAN,          // Andalusian Flamenco Cadence (Am -> G -> F -> E)
+  PROGRESSION_PACHELBEL,           // Pachelbel Canon (C -> G -> Am -> Em -> F -> C -> F -> G)
+  PROGRESSION_LOFI_VAMP,           // Lo-Fi Chillhop Vamp (Fmaj7 -> Em7 -> Dm7 -> Cmaj7)
+  PROGRESSION_COUNT
+};
+
+// 6. Velocity Dynamics & Human Touch Curves
+enum JZVelocityCurve
+{
+  VELOCITY_CURVE_LINEAR = 0,       // Standard balanced response
+  VELOCITY_CURVE_SOFT_LYRICAL,     // Logarithmic soft touch (ballads, smooth jazz)
+  VELOCITY_CURVE_PUNCHY_HARD,      // Exponential high-energy attack (funk, rock)
+  VELOCITY_CURVE_VINTAGE_ANALOG,   // Analog tape warmth and micro-tuning drift
+  VELOCITY_CURVE_COUNT
+};
+
+// 7. Microtonal Tuning & Traditional Scales
+enum JZMicrotonalTuning
+{
+  MICROTONAL_NONE = 0,
+  MICROTONAL_BAYATI_RAST,          // Neutral 3rd (-50 cents) / Arabic-Malay Rast quarter-tone
+  MICROTONAL_SLENDRO_PELOG,        // Gamelan equidistant scale approximation
+  MICROTONAL_COUNT
+};
+
 // Chord Qualities detected from piano track
 enum JZChordQuality
 {
@@ -282,6 +315,17 @@ struct JZAccompanimentConfig
   // Global Key Center
   JZKeyCenter keyCenter;
 
+  // Velocity Dynamics & Touch Response
+  JZVelocityCurve velocityCurve;
+
+  // Tempo Automation & Outro Ritardando
+  bool enableOutroRitardando;      // Decrescendo / ritardando on final measures
+  int outroSlowdownPercent;        // Default: 25% slowdown on cadence
+
+  // Microtonal Pitch Offset
+  bool enableMicrotonalTuning;
+  JZMicrotonalTuning microtonalTuning;
+
   // Range and Options
   int fromBar;          // 0-based bar index (0 = Bar 1)
   int toBar;            // 0-based bar index (-1 = up to end of song)
@@ -311,6 +355,11 @@ struct JZAccompanimentConfig
       bassDriveTicks(-3),
       enableScaleLock(false),
       enableInputQuantize(true),
+      velocityCurve(VELOCITY_CURVE_LINEAR),
+      enableOutroRitardando(true),
+      outroSlowdownPercent(25),
+      enableMicrotonalTuning(false),
+      microtonalTuning(MICROTONAL_NONE),
       fromBar(0),
       toBar(-1),
       overwriteExisting(true)
@@ -368,6 +417,35 @@ class JZAutoAccompaniment
     // Smart Scale Lock (Snap-to-Key) and Quantize Helpers
     static int SnapToKeyScale(int pitch, const JZKeyCenter& keyCenter);
     static int QuantizeClock(int clock, int ticksPerQuarter, int division = 16, int swingPercent = 50);
+
+    // Dynamic Velocity Response Curve Transformer
+    static unsigned char ApplyVelocityCurve(int baseVelocity, JZVelocityCurve curve, int step = 0);
+
+    // 1-Click Chord Progression Generator (Instant Song Starter)
+    static const char* GetProgressionName(JZChordProgressionPreset preset);
+    static const char* GetVelocityCurveName(JZVelocityCurve curve);
+    static const char* GetMicrotonalTuningName(JZMicrotonalTuning tuning);
+
+    static int GenerateChordProgression(
+      JZSong* pSong,
+      int targetTrackIndex,
+      JZChordProgressionPreset preset,
+      int tonicPitchClass = 0,
+      int startBar = 0,
+      int repeatCount = 2,
+      bool isMinor = false);
+
+    // Musician's Lead Sheet & Real Book Generator (HTML / Text)
+    static std::string GenerateLeadSheetHtml(
+      JZSong* pSong,
+      const std::string& songTitle = "Untitled Jazz Project",
+      const std::string& composer = "Jazz++ Arranger");
+
+    static bool ExportLeadSheetHtml(
+      JZSong* pSong,
+      const std::string& filePath,
+      const std::string& songTitle = "Untitled Jazz Project",
+      const std::string& composer = "Jazz++ Arranger");
 
     // Global Chord Track access for Timeline Ruler and Viewers
     static std::string GetMeasureChordName(JZSong* pSong, int barIndex);
@@ -504,6 +582,15 @@ class JZMidiAudioRenderer
     static bool ExportWav(
       JZSong* pSong,
       const std::string& wavFilePath,
+      int sampleRate = 44100,
+      int fromClock = 0,
+      int toClock = -1);
+
+    // Multi-Track Stem Audio Export (renders each active track to separate stem WAV files)
+    static bool ExportStems(
+      JZSong* pSong,
+      const std::string& outputDirectory,
+      std::vector<std::string>& outGeneratedFiles,
       int sampleRate = 44100,
       int fromClock = 0,
       int toClock = -1);

@@ -15,6 +15,7 @@
 #include <wx/button.h>
 #include <wx/checkbox.h>
 #include <wx/choice.h>
+#include <wx/dirdlg.h>
 #include <wx/filedlg.h>
 #include <wx/msgdlg.h>
 #include <wx/notebook.h>
@@ -36,6 +37,9 @@ enum
   ID_BTN_AUDITION,
   ID_BTN_STOP_AUDITION,
   ID_BTN_EXPORT_WAV,
+  ID_BTN_EXPORT_STEMS,
+  ID_BTN_EXPORT_LEADSHEET,
+  ID_BTN_INJECT_PROGRESSION,
   ID_RANGE_ALL_RADIO,
   ID_RANGE_CUSTOM_RADIO,
   ID_NOTEBOOK_HUB,
@@ -47,6 +51,9 @@ BEGIN_EVENT_TABLE(JZAutoAccompanimentDialog, wxDialog)
   EVT_BUTTON(ID_BTN_AUDITION, JZAutoAccompanimentDialog::OnAuditionPreview)
   EVT_BUTTON(ID_BTN_STOP_AUDITION, JZAutoAccompanimentDialog::OnStopPreview)
   EVT_BUTTON(ID_BTN_EXPORT_WAV, JZAutoAccompanimentDialog::OnExportWav)
+  EVT_BUTTON(ID_BTN_EXPORT_STEMS, JZAutoAccompanimentDialog::OnExportStems)
+  EVT_BUTTON(ID_BTN_EXPORT_LEADSHEET, JZAutoAccompanimentDialog::OnExportLeadSheet)
+  EVT_BUTTON(ID_BTN_INJECT_PROGRESSION, JZAutoAccompanimentDialog::OnInjectProgression)
   EVT_BUTTON(wxID_CANCEL, JZAutoAccompanimentDialog::OnCancelButton)
   EVT_RADIOBUTTON(ID_RANGE_ALL_RADIO, JZAutoAccompanimentDialog::OnRangeRadio)
   EVT_RADIOBUTTON(ID_RANGE_CUSTOM_RADIO, JZAutoAccompanimentDialog::OnRangeRadio)
@@ -76,6 +83,8 @@ JZAutoAccompanimentDialog::JZAutoAccompanimentDialog(
     mpRangeCustomRadio(0),
     mpFromBarSpin(0),
     mpToBarSpin(0),
+    mpProgressionChoice(0),
+    mpInjectProgressionButton(0),
     mpNotebook(0),
     mpBandStyleChoice(0),
     mpSectionChoice(0),
@@ -104,11 +113,17 @@ JZAutoAccompanimentDialog::JZAutoAccompanimentDialog(
     mpGhostNotesCheckBox(0),
     mpMicroPocketCheckBox(0),
     mpScaleLockCheckBox(0),
+    mpVelocityCurveChoice(0),
+    mpOutroRitardandoCheckBox(0),
+    mpMicrotonalCheckBox(0),
+    mpMicrotonalChoice(0),
     mpMixerPresetsCheckBox(0),
     mpOverwriteCheckBox(0),
     mpSimultaneousCheckBox(0),
     mpAuditionButton(0),
     mpStopAuditionButton(0),
+    mpExportLeadSheetButton(0),
+    mpExportStemsButton(0),
     mpExportWavButton(0),
     mpGenerateButton(0),
     mpCancelButton(0)
@@ -231,6 +246,20 @@ void JZAutoAccompanimentDialog::CreateControls()
 
   pMainSizer->Add(pTopRow, 0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(5));
 
+  // Song Starter: 1-Click Chord Progression Generator Box
+  wxStaticBoxSizer* pProgBox = new wxStaticBoxSizer(wxHORIZONTAL, this, "Song Starter: 1-Click Chord Progression Builder");
+  mpProgressionChoice = new wxChoice(this, wxID_ANY);
+  for (int p = 0; p < PROGRESSION_COUNT; ++p)
+  {
+    mpProgressionChoice->Append(JZAutoAccompaniment::GetProgressionName((JZChordProgressionPreset)p));
+  }
+  mpProgressionChoice->SetSelection(0);
+  pProgBox->Add(mpProgressionChoice, 1, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
+
+  mpInjectProgressionButton = new wxButton(this, ID_BTN_INJECT_PROGRESSION, "🎹 Inject Chords to Track 1");
+  pProgBox->Add(mpInjectProgressionButton, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
+  pMainSizer->Add(pProgBox, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(6));
+
   // Notebook Tabs
   mpNotebook = new wxNotebook(this, ID_NOTEBOOK_HUB);
   mpNotebook->AddPage(CreateBandTab(mpNotebook), "🥁 Session Band", true);
@@ -286,6 +315,27 @@ void JZAutoAccompanimentDialog::CreateControls()
   pMixRow->Add(mpMixerPresetsCheckBox, 1, 0, 0);
   pGrooveBox->Add(pMixRow, 0, wxALL | wxEXPAND, FromDIP(4));
 
+  wxBoxSizer* pVelCurveRow = new wxBoxSizer(wxHORIZONTAL);
+  pVelCurveRow->Add(new wxStaticText(this, wxID_ANY, "Velocity Dynamic Response:"), 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, FromDIP(8));
+  mpVelocityCurveChoice = new wxChoice(this, wxID_ANY);
+  for (int vc = 0; vc < VELOCITY_CURVE_COUNT; ++vc)
+  {
+    mpVelocityCurveChoice->Append(JZAutoAccompaniment::GetVelocityCurveName((JZVelocityCurve)vc));
+  }
+  mpVelocityCurveChoice->SetSelection(0);
+  pVelCurveRow->Add(mpVelocityCurveChoice, 1, wxEXPAND);
+  pGrooveBox->Add(pVelCurveRow, 0, wxALL | wxEXPAND, FromDIP(4));
+
+  wxBoxSizer* pRitMicroRow = new wxBoxSizer(wxHORIZONTAL);
+  mpOutroRitardandoCheckBox = new wxCheckBox(this, wxID_ANY, "Outro Ritardando (Slow Cadence)");
+  mpOutroRitardandoCheckBox->SetValue(true);
+  pRitMicroRow->Add(mpOutroRitardandoCheckBox, 1, wxRIGHT, FromDIP(8));
+
+  mpMicrotonalCheckBox = new wxCheckBox(this, wxID_ANY, "Microtonal Eastern / Tradisi Tuning");
+  mpMicrotonalCheckBox->SetValue(false);
+  pRitMicroRow->Add(mpMicrotonalCheckBox, 1, 0, 0);
+  pGrooveBox->Add(pRitMicroRow, 0, wxALL | wxEXPAND, FromDIP(4));
+
   pMainSizer->Add(pGrooveBox, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(6));
 
   // Bottom Options & Preview
@@ -315,8 +365,14 @@ void JZAutoAccompanimentDialog::CreateControls()
 
   // Final Action Buttons
   wxBoxSizer* pBtnSizer = new wxBoxSizer(wxHORIZONTAL);
-  mpExportWavButton = new wxButton(this, ID_BTN_EXPORT_WAV, "🎧 Export Audio WAV...");
-  pBtnSizer->Add(mpExportWavButton, 0, wxRIGHT, FromDIP(12));
+  mpExportLeadSheetButton = new wxButton(this, ID_BTN_EXPORT_LEADSHEET, "📄 Lead Sheet...");
+  pBtnSizer->Add(mpExportLeadSheetButton, 0, wxRIGHT, FromDIP(6));
+
+  mpExportStemsButton = new wxButton(this, ID_BTN_EXPORT_STEMS, "📦 Stems (WAV)...");
+  pBtnSizer->Add(mpExportStemsButton, 0, wxRIGHT, FromDIP(6));
+
+  mpExportWavButton = new wxButton(this, ID_BTN_EXPORT_WAV, "🎧 Mix (WAV)...");
+  pBtnSizer->Add(mpExportWavButton, 0, wxRIGHT, FromDIP(10));
 
   mpGenerateButton = new wxButton(this, ID_BTN_GENERATE, "Generate Session Band");
   mpGenerateButton->SetDefault();
@@ -754,6 +810,147 @@ void JZAutoAccompanimentDialog::OnExportWav(wxCommandEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void JZAutoAccompanimentDialog::OnExportStems(wxCommandEvent& Event)
+{
+  StopAudition();
+  if (!mpProject || !mpProject->GetSong())
+  {
+    wxMessageBox("No active song project to export.", "Export Error", wxOK | wxICON_ERROR, this);
+    return;
+  }
+
+  wxDirDialog dirDlg(
+    this,
+    "Choose Destination Folder for Multi-Track Audio Stems",
+    "",
+    wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
+
+  if (dirDlg.ShowModal() != wxID_OK)
+  {
+    return;
+  }
+
+  string folder = dirDlg.GetPath().ToStdString();
+  vector<string> files;
+  bool ok = JZMidiAudioRenderer::ExportStems(mpProject->GetSong(), folder, files);
+
+  if (ok && !files.empty())
+  {
+    ostringstream oss;
+    oss << "Successfully exported " << files.size() << " multi-track stems to folder:\n" << folder << "\n\nFiles generated:\n";
+    for (size_t i = 0; i < files.size(); ++i)
+    {
+      size_t slash = files[i].find_last_of("/\\");
+      string fn = (slash != string::npos) ? files[i].substr(slash + 1) : files[i];
+      oss << " • " << fn << "\n";
+    }
+    wxMessageBox(wxString(oss.str().c_str(), wxConvUTF8), "Multi-Track Stems Exported", wxOK | wxICON_INFORMATION, this);
+  }
+  else
+  {
+    wxMessageBox("No active tracks found to export as stems.", "Export Warning", wxOK | wxICON_WARNING, this);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZAutoAccompanimentDialog::OnExportLeadSheet(wxCommandEvent& Event)
+{
+  if (!mpProject || !mpProject->GetSong())
+  {
+    wxMessageBox("No active song project to export.", "Export Error", wxOK | wxICON_ERROR, this);
+    return;
+  }
+
+  wxFileDialog saveDlg(
+    this,
+    "Export Printable Musician's Lead Sheet (HTML)",
+    "",
+    "JazzLeadSheet.html",
+    "HTML Files (*.html;*.htm)|*.html;*.htm",
+    wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+  if (saveDlg.ShowModal() != wxID_OK)
+  {
+    return;
+  }
+
+  string path = saveDlg.GetPath().ToStdString();
+  string title = "Jazz Project Lead Sheet";
+  if (mpProject->GetTrack(0) && mpProject->GetTrack(0)->GetName())
+  {
+    string tn = mpProject->GetTrack(0)->GetName();
+    if (!tn.empty()) title = tn;
+  }
+
+  bool ok = JZAutoAccompaniment::ExportLeadSheetHtml(mpProject->GetSong(), path, title, "Jazz++ Arranger");
+  if (ok)
+  {
+    wxMessageBox(
+      wxString::Format("Musician's Lead Sheet successfully generated at:\n%s\n\nYou can open this in any web browser to view, format, or print (PDF).", saveDlg.GetPath().c_str()),
+      "Lead Sheet Export Complete",
+      wxOK | wxICON_INFORMATION,
+      this);
+  }
+  else
+  {
+    wxMessageBox("Failed to write HTML lead sheet file.", "Export Error", wxOK | wxICON_ERROR, this);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZAutoAccompanimentDialog::OnInjectProgression(wxCommandEvent& Event)
+{
+  if (!mpProject || !mpProject->GetSong())
+  {
+    wxMessageBox("No active song project.", "Error", wxOK | wxICON_ERROR, this);
+    return;
+  }
+
+  int sel = mpProgressionChoice->GetSelection();
+  if (sel < 0) sel = 0;
+  JZChordProgressionPreset preset = (JZChordProgressionPreset)sel;
+
+  mpProject->NewUndoBuffer();
+
+  int targetTrack = mpSourceTrackChoice->GetSelection();
+  if (targetTrack < 0) targetTrack = 0;
+
+  int tonic = 0;
+  JZTrack* pSrc = mpProject->GetTrack(targetTrack);
+  if (pSrc && !pSrc->IsEmpty())
+  {
+    JZKeyCenter kc = JZAutoAccompaniment::DetectSongKeyCenter(pSrc);
+    if (kc.confidence > 0.3f) tonic = kc.tonicPc;
+  }
+
+  int notes = JZAutoAccompaniment::GenerateChordProgression(
+    mpProject->GetSong(),
+    targetTrack,
+    preset,
+    tonic,
+    0,
+    2,
+    false);
+
+  if (gpTrackWindow) gpTrackWindow->Refresh();
+
+  JZKeyCenter updatedKey = JZAutoAccompaniment::DetectSongKeyCenter(mpProject->GetTrack(targetTrack));
+  mpKeyCenterLabel->SetLabel(wxString::Format("Key Center: %s (%d%% match)", updatedKey.name.c_str(), (int)(updatedKey.confidence * 100)));
+
+  wxMessageBox(
+    wxString::Format("Successfully injected %d chord notes for:\n'%s'\ninto Track %d!\n\nYou can now click 'Generate Session Band' to build accompaniment.",
+      notes,
+      JZAutoAccompaniment::GetProgressionName(preset),
+      targetTrack + 1),
+    "Song Starter Injected",
+    wxOK | wxICON_INFORMATION,
+    this);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZAutoAccompanimentDialog::OnGenerateButton(wxCommandEvent& Event)
 {
   StopAudition();
@@ -795,6 +992,15 @@ void JZAutoAccompanimentDialog::OnGenerateButton(wxCommandEvent& Event)
   if (mpGhostNotesCheckBox) mConfig.enableGhostNotes = mpGhostNotesCheckBox->GetValue();
   if (mpMicroPocketCheckBox) mConfig.enableMicroPocket = mpMicroPocketCheckBox->GetValue();
   if (mpScaleLockCheckBox) mConfig.enableScaleLock = mpScaleLockCheckBox->GetValue();
+  if (mpVelocityCurveChoice) mConfig.velocityCurve = (JZVelocityCurve)mpVelocityCurveChoice->GetSelection();
+  if (mpOutroRitardandoCheckBox) mConfig.enableOutroRitardando = mpOutroRitardandoCheckBox->GetValue();
+  if (mpMicrotonalCheckBox)
+  {
+    mConfig.enableMicrotonalTuning = mpMicrotonalCheckBox->GetValue();
+    mConfig.microtonalTuning = (mConfig.style == STYLE_NUSANTARA_ZAPIN || mConfig.style == STYLE_NUSANTARA_INANG)
+                                ? MICROTONAL_BAYATI_RAST
+                                : (mConfig.style == STYLE_NUSANTARA_JOGET ? MICROTONAL_SLENDRO_PELOG : MICROTONAL_BAYATI_RAST);
+  }
   if (mpMixerPresetsCheckBox) mConfig.applyMixerPresets = mpMixerPresetsCheckBox->GetValue();
   if (mpSectionChoice) mConfig.songSection = (JZSongSection)mpSectionChoice->GetSelection();
   if (mpBassFeelChoice) mConfig.bassFeel = (JZBassFeel)mpBassFeelChoice->GetSelection();

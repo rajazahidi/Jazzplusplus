@@ -14,6 +14,12 @@
 #include "Ara2HostBridge.h"
 #include "SpatialHeadTracker.h"
 #include "NeuralAudioEngine.h"
+#include "NetworkSessionEngine.h"
+#include "GameAudioBridge.h"
+#include "TapeMachineCalibrationEngine.h"
+#include "AdmBwfSpatialMetadataEngine.h"
+#include "IntelligentMasteringAssistant.h"
+#include "ControlSurfaceManager.h"
 
 #include <cassert>
 #include <cmath>
@@ -2098,6 +2104,124 @@ void TestAutoAccompanimentLogic()
   TEST_ASSERT(fabs(geluZero) < 0.0001f && fabs(geluOne - 0.8412f) < 0.001f && sepSuccess &&
               fabs(totalL - 1.0f) < 0.0001f && fabs(totalR - 0.8f) < 0.0001f,
               "Neural Audio Engine validates GELU activation 0.8412 and 4-stem deep learning softmask exact 1.0 energy conservation");
+
+  // 131. Real-Time Audio-over-IP & Timeline Delta-CRDT Distributed Synchronization
+  Jazz::JZNetworkSessionEngine netSession(1, "StudioA");
+  bool peerRegistered = netSession.registerPeer(2, "StudioB", "192.168.1.50", 5004);
+  size_t connectedPeers = netSession.getConnectedPeerCount();
+
+  float inL[64], inR[64];
+  for (int i = 0; i < 64; ++i) { inL[i] = 0.5f; inR[i] = -0.5f; }
+  Jazz::AoipAudioPacket pkt = netSession.packetizeAudio(inL, inR, 64, 48000);
+
+  float recL[64] = {0}, recR[64] = {0};
+  bool ingestOk = netSession.ingestRemotePacket(2, pkt, recL, recR, 64);
+
+  Jazz::TimelineDeltaCrdt delta = netSession.createTimelineDelta("trk:1:note:60", "insert", "{\"vel\":100}");
+  bool deltaApplied = netSession.applyRemoteDelta(delta);
+
+  TEST_ASSERT(peerRegistered && connectedPeers == 1 && pkt.sampleCount == 64 &&
+              ingestOk && recL[0] == 0.5f && recR[0] == -0.5f && deltaApplied &&
+              netSession.getLamportClock() >= 1,
+              "Network Session Engine validates AES67 AoIP audio packetization, remote ingestion, and Lamport CRDT timeline synchronization");
+
+  // 132. Interactive Game Audio Middleware RTPC & Acoustic Obstruction Modeling
+  Jazz::JZGameAudioBridge gameAudio(Jazz::GameEngineTarget::WWISE_MIDDLEWARE);
+  gameAudio.registerRtpc("Player_Health", 100.0f, 0.0f, 100.0f);
+  gameAudio.setRtpcValue("Player_Health", 75.0f);
+  float healthVal = gameAudio.getRtpcValue("Player_Health");
+
+  gameAudio.setGameState("Combat_State", "High_Tension");
+  std::string combatState = gameAudio.getGameState("Combat_State");
+
+  gameAudio.registerSoundEvent("Play_Footstep", "audio/footstep_gravel.wav", -3.0f, false);
+  const Jazz::GameSoundEvent* ev = gameAudio.getSoundEvent("Play_Footstep");
+
+  float directLpf = 0.0f, directGain = 0.0f, reverbSend = 0.0f;
+  gameAudio.calculateAcousticObstruction(0.5f, 0.2f, directLpf, directGain, reverbSend);
+
+  std::string sbXml = gameAudio.exportSoundBankDefinition("HeroSoundBank");
+
+  TEST_ASSERT(healthVal == 75.0f && combatState == "High_Tension" && ev != nullptr &&
+              fabs(directLpf - 4000.0f) < 5.0f && directGain > 0.5f && reverbSend == 0.85f &&
+              sbXml.find("HeroSoundBank") != std::string::npos,
+              "Game Audio Bridge validates RTPC controls, acoustic obstruction 4000Hz LPF cutoff, and SoundBank XML export");
+
+  // 133. Studio Tape Machine Calibration, Operating Fluxivity & Alignment Tone
+  Jazz::JZTapeMachineCalibrationEngine tapeCal(44100.0f);
+  tapeCal.setOperatingFluxivity(320.0f);
+  tapeCal.setEqualizationStandard(Jazz::TapeStandardEq::CCIR_IEC1);
+  tapeCal.setTapeSpeedIps(15.0f);
+
+  tapeCal.setCalibrationTone(Jazz::CalibrationTone::TONE_1KHZ_REF_LEVEL);
+  float toneL = 0.0f, toneR = 0.0f;
+  tapeCal.process(0.0f, 0.0f, toneL, toneR);
+
+  tapeCal.setCalibrationTone(Jazz::CalibrationTone::TONE_OFF);
+  tapeCal.setInputDriveDb(0.0f);
+  float outL = 0.0f, outR = 0.0f;
+  tapeCal.process(0.2f, 0.2f, outL, outR);
+
+  TEST_ASSERT(tapeCal.getOperatingFluxivity() == 320.0f &&
+              fabs(toneL - toneR) < 0.0001f &&
+              fabs(outL - outR) < 0.0001f && outL > 0.1f && outL < 0.3f,
+              "Tape Machine Calibration validates CCIR/NAB standard, 320 nWb/m fluxivity, 1kHz 0 VU alignment tone, and magnetic core saturation");
+
+  // 134. Dolby Atmos ADM BWF ITU-R BS.2076-1 Metadata Packaging
+  Jazz::JZAdmBwfSpatialMetadataEngine admEngine("Master_Dolby_Atmos");
+  uint32_t bedLeft = admEngine.addBedChannel("Left", 1);
+  uint32_t bedRight = admEngine.addBedChannel("Right", 2);
+  uint32_t objSynth = admEngine.addDynamicObject("SynthLead", 3, 45.0f, 20.0f, 0.25f, Jazz::BinauralRenderMode::ROOM_MID);
+
+  const Jazz::AdmAudioObject* pObj = admEngine.getObject(objSynth);
+  std::string xmlAxml = admEngine.generateAxmlMetadataXml();
+  std::vector<uint8_t> chnaBin = admEngine.generateChnaChunkBinary();
+
+  std::string atmosErr;
+  bool isCompliant = admEngine.validateAtmosCompliance(atmosErr);
+
+  TEST_ASSERT(bedLeft == 1 && bedRight == 2 && pObj != nullptr && pObj->azimuthDeg == 45.0f &&
+              pObj->elevationDeg == 20.0f && xmlAxml.find("ITU-R_BS.2076-1") != std::string::npos &&
+              xmlAxml.find("SynthLead") != std::string::npos && chnaBin.size() >= 4 && isCompliant,
+              "ADM BWF Metadata Engine validates ITU-R BS.2076-1 XML schema, 3D object azimuth/elevation, and binary <chna> chunk compliance");
+
+  // 135. AI Assistive Mastering Psychoacoustic Profiling & Target Ceiling Enforcement
+  Jazz::JZIntelligentMasteringAssistant masterAssist(Jazz::MasteringTargetProfile::STREAMING_SPOTIFY);
+  float targetSpotifyLufs = Jazz::JZIntelligentMasteringAssistant::getTargetLufs(Jazz::MasteringTargetProfile::STREAMING_SPOTIFY);
+  float targetSpotifyCeil = Jazz::JZIntelligentMasteringAssistant::getTargetCeilingDb(Jazz::MasteringTargetProfile::STREAMING_SPOTIFY);
+
+  const int N = 1000;
+  std::vector<float> mixL(N, 0.1f);
+  std::vector<float> mixR(N, 0.1f);
+  Jazz::MasteringAnalysisResult analysis = masterAssist.analyzeMix(mixL.data(), mixR.data(), N, 44100.0f);
+  Jazz::MasteringRecommendation rec = masterAssist.generateRecommendations(analysis);
+
+  masterAssist.setTargetProfile(Jazz::MasteringTargetProfile::VINYL_RECORD);
+  Jazz::MasteringRecommendation vinylRec = masterAssist.generateRecommendations(analysis);
+
+  TEST_ASSERT(targetSpotifyLufs == -14.0f && targetSpotifyCeil == -1.0f &&
+              analysis.crestFactorDb > 0.0f && rec.limiterCeilingDb == -1.0f &&
+              !rec.requireMonoBassGuard && vinylRec.requireMonoBassGuard && vinylRec.limiterCeilingDb == -1.5f,
+              "Intelligent Mastering Assistant validates Spotify vs Vinyl profile targets, crest factor profiling, and mono bass guard enforcement");
+
+  // 136. Studio Hardware Control Surface MCU Motorized Fader & Scribble Strip Protocol
+  Jazz::JZControlSurfaceManager surfaceManager(Jazz::ControlSurfaceProtocol::MACKIE_CONTROL_UNIVERSAL);
+  surfaceManager.setTrackInfo(0, "KickSub", 0.75f, 0.5f);
+  const Jazz::ChannelStripHardwareState* ch0 = surfaceManager.getChannelState(0);
+
+  std::vector<uint8_t> faderMsg = surfaceManager.generateFaderMotorMessage(0, 768);
+  int parsedFaderIdx = -1;
+  uint16_t parsedFaderVal = 0;
+  bool parsedMove = surfaceManager.parseFaderMoveMessage(faderMsg[0], faderMsg[1], faderMsg[2], parsedFaderIdx, parsedFaderVal);
+
+  std::vector<uint8_t> sysexScr = surfaceManager.generateScribbleStripSysEx(0);
+  int ticks = surfaceManager.processJogWheelDelta(2);
+
+  TEST_ASSERT(ch0 != nullptr && ch0->trackName.find("KickSub") != std::string::npos &&
+              faderMsg.size() == 3 && faderMsg[0] == 0xE0 && parsedMove &&
+              parsedFaderIdx == 0 && parsedFaderVal == 768 &&
+              sysexScr.size() == 64 && sysexScr[0] == 0xF0 && sysexScr[63] == 0xF7 && ticks == 48,
+              "Control Surface Manager validates MCU 10-bit pitch-bend fader messages, 64-byte scribble strip SysEx, and jog wheel scrub delta");
 }
 
 //-----------------------------------------------------------------------------

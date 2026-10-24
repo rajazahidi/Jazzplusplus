@@ -112,6 +112,7 @@ include_directories(
 
 set(JAZZ_SOURCES
     src/AboutDialog.cpp
+    src/AdmBwfSpatialMetadataEngine.cpp
     src/AiMelodyCounterpointGenerator.cpp
     src/AnalogTapeFlutterModeler.cpp
     src/Ara2HostBridge.cpp
@@ -137,6 +138,7 @@ set(JAZZ_SOURCES
     src/ClipMatrixEngine.cpp
     src/Command.cpp
     src/Configuration.cpp
+    src/ControlSurfaceManager.cpp
     src/ControlEdit.cpp
     src/ConvolutionEngine.cpp
     src/DeprecatedWx/prop.cpp
@@ -191,6 +193,7 @@ set(JAZZ_SOURCES
     src/FmSynthesizer.cpp
     src/FractalGenerativeArp.cpp
     src/FrequencyTable.cpp
+    src/GameAudioBridge.cpp
     src/GenerativeDrumMorpher.cpp
     src/GetOptionIndex.cpp
     src/Globals.cpp
@@ -208,6 +211,7 @@ set(JAZZ_SOURCES
     src/Harmony.cpp
     src/HarmonyP.cpp
     src/Help.cpp
+    src/IntelligentMasteringAssistant.cpp
     src/Immersive3DReverbConvolver.cpp
     src/ImmersiveAudioPanner.cpp
     src/JazzPlusPlusApplication.cpp
@@ -241,6 +245,7 @@ set(JAZZ_SOURCES
     src/NamedChoice.cpp
     src/NamedValue.cpp
     src/NamedValueChoice.cpp
+    src/NetworkSessionEngine.cpp
     src/NeuralAudioEngine.cpp
     src/PhaseAlignerEngine.cpp
     src/PhysicalResonator.cpp
@@ -289,6 +294,7 @@ set(JAZZ_SOURCES
     src/Synth.cpp
     src/SysexChannel.cpp
     src/TakesComping.cpp
+    src/TapeMachineCalibrationEngine.cpp
     src/TapeConsoleWarmer.cpp
     src/ThroughZeroFlanger.cpp
     src/VintageLofiProcessor.cpp

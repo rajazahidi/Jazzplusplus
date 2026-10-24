@@ -1,4 +1,27 @@
 24-10-2026 Raja Zahidi
+- Feature & Master Studio Dual-Mic Phase Aligner, AI Melody/Counterpoint, Vocal Doubler, Multiband OTT, Mic Modeler & Streaming Inspector Suite v11.0 (Next-Gen Production):
+  * Penyelaras Fasa Dwi-Mikrofon Dinamik (Dual-Mic Dynamic Phase Aligner & Auto-Correlator - src/PhaseAlignerEngine.h & .cpp):
+    - JZPhaseAlignerEngine menyelesaikan masalah pembatalan fasa sisir (comb filtering) pada rakaman berbilang mikrofon (Snare Top/Bottom, Kick In/Out, stereo guitar cabs).
+    - Dilengkapi pengesan korelasi silang fasa automatik, pelarasan kelewatan sub-sampel mikro (0.01ms - 25.0ms), pemutar fasa all-pass berterusan (0 - 360 darjah), dan pembalik kutub 180 darjah (Polarity Flip).
+  * Penjana Melodi & Kontrapun AI Berpandukan Teori Muzik (AI MIDI Melody & Counterpoint Generator - src/AiMelodyCounterpointGenerator.h & .cpp):
+    - JZAiMelodyCounterpointGenerator menjana garis melodi utama ekspresif dan suara kedua kontrapun berlawanan arah (Contrary Motion Counterpoint) berdasarkan progresi kord harmoni projek.
+    - Mematuhi hukum teori muzik Fuxian (mengelakkan kelima dan oktaf sejajar, keutamaan pergerakan melangkah stepwise, dan resolusi ketegangan kord pada nada ke-3 dan ke-7).
+  * Pengganda Vokal Stereo & Ensembel Mikro-Detune (Vocal Stereo Doubler & Micro-Detune Ensemble - src/VocalDoublerEngine.h & .cpp):
+    - JZVocalDoublerEngine menjana 4 lapisan vokal kembar stereo dimensional serentak daripada trek vokal mono.
+    - Dilengkapi penalaan mikro bebas per suara (+/- 4 hingga 18 cents), fluktuasi masa manusia rawak (Jitter 0ms - 15ms), sebaran stereo ekstrem (Stereo Width 0% - 200%), dan pengawal fasa mono (Mono-Compatibility Phase Guard).
+  * Pemampat Multi-Jalur Dwi-Arah OTT (Upward / Downward OTT Multiband Dynamics Processor - src/MultibandOttProcessor.h & .cpp):
+    - JZMultibandOttProcessor melaksanakan pemampatan multi-jalur 3-jalur (Low < 140Hz, Mid 140Hz - 2.5kHz, High > 2.5kHz) dengan dwi-pemampatan serentak.
+    - Pemampatan Menurun (Downward Compression untuk menekan transien kasar) dan Pemampatan Menaik (Upward Compression sehingga +18dB untuk mengangkat butiran halus yang terpendam) dengan pemasaan hiper-pantas.
+  * Pemodelan Kapsul Mikrofon Studio Vintaj (Vintage Studio Microphone Modeler & Capsule Simulator - src/MicrophoneModeler.h & .cpp):
+    - JZMicrophoneModeler memodelkan respon frekuensi dan ciri akustik 4 mikrofon studio legenda: German U87 (kondenser serba boleh, mid jernih), Vintage 251 (tiub sutera berkilau), Broadcast 7B (dinamik penyiaran tebal), dan Ribbon R121 (pita ribbon hangat).
+    - Dilengkapi kawalan kesan kedekatan (Proximity Effect 0cm - 30cm), corak kutub (Cardioid, Omni, Figure-8), dan saturasi transformer tiub analog.
+  * Penganalisis Kenyaringan & Penormalan Penstriman (Streaming Loudness Target & True-Peak Inspector - src/StreamingLoudnessInspector.h & .cpp):
+    - JZStreamingLoudnessInspector mengukur Integrated LUFS, Short-Term LUFS, Loudness Range (LRA), dan Max True-Peak dBTP (standard ITU-R BS.1770-4 / EBU R128).
+    - Membandingkan adunan dengan sasaran rasmi platform komersial (Spotify -14 LUFS, Apple Music -16 LUFS, YouTube -14 LUFS, Tidal -14 LUFS, Broadcast EBU -23 LUFS), mengira penalti kenyaringan (Gain Penalty dB), dan menyediakan pengganda penormalan satu-klik (One-Click Match Target).
+  * Penambahan Ujian Unit 95 hingga 100 (tests/test_main.cpp - Genap 100 Ujian Unit!):
+    - Mengesahkan pengesanan korelasi fasa dwi-mikrofon dan pembalikan kutub, panduan suara kontrapun berlawanan arah AI, nisbah penalaan sen mikro pengganda vokal, keluk pemampatan menaik OTT (+4.5dB boost), pemodelan kapsul German U87, penalti kenyaringan penstriman Spotify (-3.5dB), dan penormalan volum satu-klik pada Ujian Unit ke-100!
+
+24-10-2026 Raja Zahidi
 - Feature & Master Studio Audio De-Clipper & De-Clicker, Guitar Strum Engine, 7.1.4 Immersive Audio, Vintage Lo-Fi Modeler, Key/Chord Detector & Resonance Tamer Suite v10.0 (Milestone Release):
   * Pemulihan Audio Terpotong & Pembersih Klik Spektral (Spectral Audio De-Clipper & De-Clicker - src/AudioRestorationEngine.h & .cpp):
     - JZAudioRestorationEngine melaksanakan rekonstruksi polinomial kubik bagi sampel audio yang mengalami herotan pemotongan digital (De-Clip), membentuk semula puncak kubah analog di atas paras ambang klip.

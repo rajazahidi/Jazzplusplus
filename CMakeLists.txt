@@ -112,6 +112,7 @@ include_directories(
 
 set(JAZZ_SOURCES
     src/AboutDialog.cpp
+    src/AiMelodyCounterpointGenerator.cpp
     src/ArrayControl.cpp
     src/AsciiMidiFile.cpp
     src/Audio.cpp
@@ -203,6 +204,7 @@ set(JAZZ_SOURCES
     src/MasterVisualizer.cpp
     src/MatchEqProfiler.cpp
     src/MeasureChoice.cpp
+    src/MicrophoneModeler.cpp
     src/MidiDeviceDialog.cpp
     src/MidiEffects.cpp
     src/MidiHumanizerProbability.cpp
@@ -213,12 +215,14 @@ set(JAZZ_SOURCES
     src/ModulationMatrix.cpp
     src/MpeEngine.cpp
     src/MultibandCompressor.cpp
+    src/MultibandOttProcessor.cpp
     src/MultiVelocitySampler.cpp
     src/Metronome.cpp
     src/MouseAction.cpp
     src/NamedChoice.cpp
     src/NamedValue.cpp
     src/NamedValueChoice.cpp
+    src/PhaseAlignerEngine.cpp
     src/PhysicalResonator.cpp
     src/PianoFrame.cpp
     src/PianoScaleChordHelper.cpp
@@ -252,6 +256,7 @@ set(JAZZ_SOURCES
     src/StandardFile.cpp
     src/StemSeparatorEngine.cpp
     src/StemsExporter.cpp
+    src/StreamingLoudnessInspector.cpp
     src/StringReadWrite.cpp
     src/StringUtilities.cpp
     src/Synth.cpp
@@ -266,6 +271,7 @@ set(JAZZ_SOURCES
     src/TransientShaper.cpp
     src/TransientSlicer.cpp
     src/VocalAligner.cpp
+    src/VocalDoublerEngine.cpp
     src/VocalHarmonizer.cpp
     src/VocalPitchEditor.cpp
     src/VocoderEngine.cpp

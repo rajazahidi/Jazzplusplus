@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Globals.h"
+#include <map>
 #include <string>
 #include <vector>
 
@@ -72,6 +73,12 @@ enum JZAccompanimentStyle
   STYLE_BLUES_SHUFFLE,
   STYLE_POP_ROCK,
   STYLE_FUNK_GROOVE,
+  STYLE_JAZZ_WALTZ_3_4,       // 3/4 Time Signature Jazz Waltz Trio
+  STYLE_BALLAD_6_8,           // 6/8 Time Signature Slow Soul / Blues Ballad
+  STYLE_NUSANTARA_ZAPIN,      // Nusantara Zapin (Gambus & Marwas syncopation)
+  STYLE_NUSANTARA_JOGET,      // Nusantara Joget (Lively 2/4 folk dance)
+  STYLE_NUSANTARA_INANG,      // Nusantara Inang / Asli (Graceful 8-beat lenggang)
+  STYLE_LOFI_CHILLHOP,        // Lo-Fi Chillhop (Laid-back boom-bap & warm Rhodes)
   STYLE_COUNT
 };
 
@@ -86,6 +93,8 @@ enum JZStrumPluckStyle
   PLUCK_BALLAD_ARPEGGIO,      // Flowing 8th/16th broken chord
   PLUCK_PIMA_CLASSICAL,       // Pulgar-Indice-Medio-Anular classical
   PLUCK_NEO_SOUL,             // Spread voicing with open release
+  STRUM_WALTZ_3_4,            // 3/4 Time Waltz acoustic strum
+  PLUCK_BALLAD_6_8,           // 6/8 Time Slow 6-step arpeggio flow
   STRUM_PLUCK_COUNT
 };
 
@@ -261,6 +270,15 @@ struct JZAccompanimentConfig
   bool enableDrumFills;           // Fills on measure 4, 8, 12, 16
   bool enableSoloBendsAndVibrato; // Pitch bend & CC 1 vibrato on solo
 
+  // Micro-Timing Pocket & Humanization (Laid-Back Snare & Push Bass)
+  bool enableMicroPocket;         // Micro-delay on backbeat snare & push bass
+  int snarePocketTicks;           // Default: +8 ticks behind beat (~12ms)
+  int bassDriveTicks;             // Default: -3 ticks ahead of beat (~5ms)
+
+  // Smart Scale Lock & Input Quantize
+  bool enableScaleLock;           // Constrain notes to detected global key scale
+  bool enableInputQuantize;       // Snap live notes to nearest grid division
+
   // Global Key Center
   JZKeyCenter keyCenter;
 
@@ -288,6 +306,11 @@ struct JZAccompanimentConfig
       enableHumanizeVelocity(true),
       enableDrumFills(true),
       enableSoloBendsAndVibrato(true),
+      enableMicroPocket(true),
+      snarePocketTicks(8),
+      bassDriveTicks(-3),
+      enableScaleLock(false),
+      enableInputQuantize(true),
       fromBar(0),
       toBar(-1),
       overwriteExisting(true)
@@ -342,6 +365,13 @@ class JZAutoAccompaniment
     // Global Key Center Detection via Krumhansl-Schmuckler Key-Finding Algorithm
     static JZKeyCenter DetectSongKeyCenter(JZTrack* pSourceTrack);
 
+    // Smart Scale Lock (Snap-to-Key) and Quantize Helpers
+    static int SnapToKeyScale(int pitch, const JZKeyCenter& keyCenter);
+    static int QuantizeClock(int clock, int ticksPerQuarter, int division = 16, int swingPercent = 50);
+
+    // Global Chord Track access for Timeline Ruler and Viewers
+    static std::string GetMeasureChordName(JZSong* pSong, int barIndex);
+
     // Smooth Voice Leading: finds voicing that minimizes semitone distance from prevVoicing
     static std::vector<int> FindSmoothVoiceLeading(
       int rootPc,
@@ -360,7 +390,7 @@ class JZAutoAccompaniment
 
   public:
 
-    // Generator helpers for each instrument (now with Song Form & Voice Leading awareness)
+    // Generator helpers for each instrument (now with Song Form, Time Signature & Voice Leading awareness)
     static int GenerateBassMeasure(
       JZTrack* pTrack,
       int barIndex,
@@ -445,6 +475,40 @@ class JZAutoAccompaniment
       int& minP);
 };
 
+// Global Chord Track & Timeline Marker Registry
+class JZChordTrack
+{
+  public:
+
+    static JZChordTrack& Instance();
+
+    void Clear();
+    void SetChord(int barIndex, const JZDetectedChord& chord);
+    bool HasChord(int barIndex) const;
+    JZDetectedChord GetChord(int barIndex) const;
+    std::string GetChordName(int barIndex) const;
+    void PopulateFromSong(JZSong* pSong, int sourceTrackIndex = 0);
+
+  private:
+
+    JZChordTrack() {}
+    std::map<int, JZDetectedChord> mChords;
+};
+
+// Direct MIDI-to-Audio WAV Mixdown Renderer
+class JZMidiAudioRenderer
+{
+  public:
+
+    // Renders all active tracks in pSong to a 16-bit 44.1kHz stereo PCM WAV file.
+    static bool ExportWav(
+      JZSong* pSong,
+      const std::string& wavFilePath,
+      int sampleRate = 44100,
+      int fromClock = 0,
+      int toClock = -1);
+};
+
 // Real-Time Interactive Chord & Jamming Tracker
 class JZLiveJamEngine
 {
@@ -463,19 +527,4 @@ class JZLiveJamEngine
     void Reevaluate();
     std::vector<int> mActivePitches;
     JZDetectedChord mCurrentChord;
-};
-    static void ClearRange(JZTrack* pTrack, int fromClock, int toClock);
-
-  private:
-
-    // Helper for analyzing notes within an arbitrary clock window
-    static bool AnalyzeWindow(
-      JZTrack* pTrack,
-      int startClock,
-      int endClock,
-      int& rootPc,
-      int& bassPc,
-      int& inversion,
-      JZChordQuality& quality,
-      int& minP);
 };

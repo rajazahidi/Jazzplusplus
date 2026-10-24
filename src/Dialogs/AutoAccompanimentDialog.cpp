@@ -15,6 +15,7 @@
 #include <wx/button.h>
 #include <wx/checkbox.h>
 #include <wx/choice.h>
+#include <wx/filedlg.h>
 #include <wx/msgdlg.h>
 #include <wx/notebook.h>
 #include <wx/panel.h>
@@ -34,6 +35,7 @@ enum
   ID_BTN_GENERATE = wxID_HIGHEST + 301,
   ID_BTN_AUDITION,
   ID_BTN_STOP_AUDITION,
+  ID_BTN_EXPORT_WAV,
   ID_RANGE_ALL_RADIO,
   ID_RANGE_CUSTOM_RADIO,
   ID_NOTEBOOK_HUB,
@@ -44,6 +46,7 @@ BEGIN_EVENT_TABLE(JZAutoAccompanimentDialog, wxDialog)
   EVT_BUTTON(ID_BTN_GENERATE, JZAutoAccompanimentDialog::OnGenerateButton)
   EVT_BUTTON(ID_BTN_AUDITION, JZAutoAccompanimentDialog::OnAuditionPreview)
   EVT_BUTTON(ID_BTN_STOP_AUDITION, JZAutoAccompanimentDialog::OnStopPreview)
+  EVT_BUTTON(ID_BTN_EXPORT_WAV, JZAutoAccompanimentDialog::OnExportWav)
   EVT_BUTTON(wxID_CANCEL, JZAutoAccompanimentDialog::OnCancelButton)
   EVT_RADIOBUTTON(ID_RANGE_ALL_RADIO, JZAutoAccompanimentDialog::OnRangeRadio)
   EVT_RADIOBUTTON(ID_RANGE_CUSTOM_RADIO, JZAutoAccompanimentDialog::OnRangeRadio)
@@ -99,11 +102,14 @@ JZAutoAccompanimentDialog::JZAutoAccompanimentDialog(
     mpHumanizeVelCheckBox(0),
     mpSmoothVoiceLeadingCheckBox(0),
     mpGhostNotesCheckBox(0),
+    mpMicroPocketCheckBox(0),
+    mpScaleLockCheckBox(0),
     mpMixerPresetsCheckBox(0),
     mpOverwriteCheckBox(0),
     mpSimultaneousCheckBox(0),
     mpAuditionButton(0),
     mpStopAuditionButton(0),
+    mpExportWavButton(0),
     mpGenerateButton(0),
     mpCancelButton(0)
 {
@@ -264,6 +270,16 @@ void JZAutoAccompanimentDialog::CreateControls()
   pAdvRow->Add(mpGhostNotesCheckBox, 1, 0, 0);
   pGrooveBox->Add(pAdvRow, 0, wxALL | wxEXPAND, FromDIP(4));
 
+  wxBoxSizer* pPocketRow = new wxBoxSizer(wxHORIZONTAL);
+  mpMicroPocketCheckBox = new wxCheckBox(this, wxID_ANY, "Micro-Timing Pocket (Laid-Back Snare & Push Bass)");
+  mpMicroPocketCheckBox->SetValue(true);
+  pPocketRow->Add(mpMicroPocketCheckBox, 1, wxRIGHT, FromDIP(8));
+
+  mpScaleLockCheckBox = new wxCheckBox(this, wxID_ANY, "Smart Scale Lock (Snap-to-Key)");
+  mpScaleLockCheckBox->SetValue(false);
+  pPocketRow->Add(mpScaleLockCheckBox, 1, 0, 0);
+  pGrooveBox->Add(pPocketRow, 0, wxALL | wxEXPAND, FromDIP(4));
+
   wxBoxSizer* pMixRow = new wxBoxSizer(wxHORIZONTAL);
   mpMixerPresetsCheckBox = new wxCheckBox(this, wxID_ANY, "Apply Smart Auto-Mixer Studio Presets (Stereo Pan, Levels & FX)");
   mpMixerPresetsCheckBox->SetValue(true);
@@ -299,6 +315,9 @@ void JZAutoAccompanimentDialog::CreateControls()
 
   // Final Action Buttons
   wxBoxSizer* pBtnSizer = new wxBoxSizer(wxHORIZONTAL);
+  mpExportWavButton = new wxButton(this, ID_BTN_EXPORT_WAV, "🎧 Export Audio WAV...");
+  pBtnSizer->Add(mpExportWavButton, 0, wxRIGHT, FromDIP(12));
+
   mpGenerateButton = new wxButton(this, ID_BTN_GENERATE, "Generate Session Band");
   mpGenerateButton->SetDefault();
   pBtnSizer->Add(mpGenerateButton, 0, wxRIGHT, FromDIP(10));
@@ -693,6 +712,48 @@ void JZAutoAccompanimentDialog::OnCancelButton(wxCommandEvent& Event)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void JZAutoAccompanimentDialog::OnExportWav(wxCommandEvent& Event)
+{
+  StopAudition();
+
+  if (!mpProject || !mpProject->GetSong())
+  {
+    wxMessageBox("No active song project to export.", "Export Error", wxOK | wxICON_ERROR, this);
+    return;
+  }
+
+  wxFileDialog saveDlg(
+    this,
+    "Export Direct Audio WAV Mixdown",
+    "",
+    "JazzAccompanimentMix.wav",
+    "WAV Audio Files (*.wav)|*.wav",
+    wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+  if (saveDlg.ShowModal() != wxID_OK)
+  {
+    return;
+  }
+
+  string path = saveDlg.GetPath().ToStdString();
+  bool success = JZMidiAudioRenderer::ExportWav(mpProject->GetSong(), path);
+
+  if (success)
+  {
+    wxMessageBox(
+      wxString::Format("WAV audio mixdown successfully exported to:\n%s", saveDlg.GetPath().c_str()),
+      "Audio Export Complete",
+      wxOK | wxICON_INFORMATION,
+      this);
+  }
+  else
+  {
+    wxMessageBox("Failed to export audio mixdown. Please check directory permissions.", "Export Failed", wxOK | wxICON_ERROR, this);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZAutoAccompanimentDialog::OnGenerateButton(wxCommandEvent& Event)
 {
   StopAudition();
@@ -732,6 +793,8 @@ void JZAutoAccompanimentDialog::OnGenerateButton(wxCommandEvent& Event)
   mConfig.enableHumanizeVelocity = true;
   if (mpSmoothVoiceLeadingCheckBox) mConfig.enableSmoothVoiceLeading = mpSmoothVoiceLeadingCheckBox->GetValue();
   if (mpGhostNotesCheckBox) mConfig.enableGhostNotes = mpGhostNotesCheckBox->GetValue();
+  if (mpMicroPocketCheckBox) mConfig.enableMicroPocket = mpMicroPocketCheckBox->GetValue();
+  if (mpScaleLockCheckBox) mConfig.enableScaleLock = mpScaleLockCheckBox->GetValue();
   if (mpMixerPresetsCheckBox) mConfig.applyMixerPresets = mpMixerPresetsCheckBox->GetValue();
   if (mpSectionChoice) mConfig.songSection = (JZSongSection)mpSectionChoice->GetSelection();
   if (mpBassFeelChoice) mConfig.bassFeel = (JZBassFeel)mpBassFeelChoice->GetSelection();

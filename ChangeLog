@@ -1,4 +1,33 @@
 24-10-2026 Raja Zahidi
+- Feature & DAW Audio Intelligence: Professional DAW-Grade Upgrades (Global Chord Track, 3/4 & 6/8 Meters, Nusantara Grooves, Micro-Timing Pocket, Smart Scale Lock & Direct WAV Audio Mixdown):
+  * Trek Kord Visual Global & Pembaris Garis Masa (Global Visual Chord Track & Timeline Ruler - src/AutoAccompaniment.h, .cpp, src/TrackWindow.cpp):
+    - Kelas pengurusan kord global JZChordTrack menyimpan simbol kord bagi setiap birama lagu secara berpusat.
+    - Pembaris garis masa (JZTrackWindow::OnPaint) memaparkan simbol kord secara visual di atas bar birama (contoh: 1 [C], 5 [Am7], 9 [Dm7], 13 [G7]).
+  * Eksport Terus Adunan Audio WAV Bebas Dependensi (Direct MIDI-to-WAV Audio Mixdown - src/AutoAccompaniment.h & .cpp):
+    - Enjin sintesis PCM stereo 16-bit 44.1kHz JZMidiAudioRenderer::ExportWav menjana fail WAV master lengkap tanpa memerlukan soundfont atau DLL luaran.
+    - Sintesis berbilang lapisan: sweep frekuensi punchy untuk Kick drum, tone + noise burst untuk Snare/Rimshot, metallic noise decay untuk Hi-Hats/Cymbals, sine + harmonic blend untuk Bass, dan hybrid wave dengan ADSR envelope untuk instrumen melodik.
+    - Dilengkapi pemprosesan soft-limiting tanh & peak normalization automatik untuk mencegah herotan clipping.
+  * Sokongan Penuh Tanda Masa 3/4 & 6/8 (Full Time Signature Awareness - src/AutoAccompaniment.h & .cpp):
+    - Gaya Jazz Waltz 3/4 (STYLE_JAZZ_WALTZ_3_4 & STRUM_WALTZ_3_4): 3 rentak setiap birama dengan bass berayun, corak ride waltz spang-a-lang, hi-hat pedal pada rentak 2, dan kocokan akustik Down/Down-Up.
+    - Gaya Slow Soul / Blues Ballad 6/8 (STYLE_BALLAD_6_8 & PLUCK_BALLAD_6_8): 6 not perlapan dengan rentak kencang snare pada langkah ke-4 (dotted quarter) dan arpeggio 6-langkah yang mengalir.
+  * Poket Pemasaan Mikro & Sentuhan Manusia (Micro-Timing Pocket & Humanization - src/AutoAccompaniment.h & .cpp):
+    - Snare Pocket Delay: Not snare pada backbeat dianjak ke belakang (+8 ticks / ~12ms) untuk menghasilkan 'laid-back pocket feel' gaya J Dilla / Neo-Soul / Chillhop.
+    - Bass Forward Drive: Not bass pada downbeat dianjak ke hadapan (-3 ticks / ~5ms) untuk memacu momentum groove ke depan.
+  * Kunci Skala Pintar & Kuantisasi Masa Nyata (Smart Scale Lock & Snap-to-Key - src/AutoAccompaniment.h & .cpp):
+    - Fungsi SnapToKeyScale mengunci setiap not solo dan melodik kepada skala kunci lagu global yang dikesan secara automatik bagi mengelakkan not sumbang (dissonant notes).
+    - Fungsi QuantizeClock menyelaraskan kedudukan not ke grid pembahagian muzik terpilih dengan sokongan swing.
+  * Perpustakaan Irama Tradisional Nusantara & Moden (World & Contemporary Grooves - src/AutoAccompaniment.h & .cpp):
+    - Nusantara Zapin (STYLE_NUSANTARA_ZAPIN): Rentak marwas & gambus bersinkopasi dengan aksen pada 1, 2-and, 3-and, dan 4.
+    - Nusantara Joget (STYLE_NUSANTARA_JOGET): Irama tari rakyat rancak 2/4 - 4/4 dengan lantunan bes ceria dan aksen hi-hat terbuka pada offbeat.
+    - Nusantara Inang / Asli (STYLE_NUSANTARA_INANG): Irama lenggang anggun 8-rentak dengan pukulan gong lembut dan rebana berjiwa.
+    - Lo-Fi Chillhop (STYLE_LOFI_CHILLHOP): Rentak santai boom-bap dengan sub-bass hangat dan poket snare santai.
+  * Penambahbaikan Dialog (src/Dialogs/AutoAccompanimentDialog.h & .cpp):
+    - Ditambah kotak semak Micro-Timing Pocket dan Smart Scale Lock.
+    - Ditambah butang tindakan pantas [ 🎧 Export Audio WAV... ] dengan dialog pemilihan fail .wav.
+  * Pengesahan Ujian Unit Komprehensif (tests/test_main.cpp):
+    - Ditambah ujian unit 18 hingga 23 merangkumi tanda masa 3/4 & 6/8, sinkopasi Zapin, poket pemasaan mikro, penyesuaian skala pintar, pemetaan pembaris kord global, dan pengiraan kadar bait WAV PCM.
+
+24-10-2026 Raja Zahidi
 - Feature & Music Intelligence: Smart Studio Arranger Edition (Smooth Voice Leading, Song Form Dynamics, Key Center Detection, Smart Auto-Mixer & Live Jamming):
   * Pimpinan Suara Licin (Smooth Voice Leading Engine - src/AutoAccompaniment.h & .cpp):
     - Melaksanakan algoritma pemilihan pembalikan kord (*inversion selection*) yang meminimumkan jumlah jarak pergerakan semiton antara kord berturutan.

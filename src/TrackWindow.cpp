@@ -29,6 +29,7 @@
 #include "Player.h"
 #include "RecordingInfo.h"
 #include "Globals.h"
+#include "AutoAccompaniment.h"
 
 #include <wx/dcclient.h>
 #include <wx/dcmemory.h>
@@ -919,6 +920,12 @@ void JZTrackWindow::Draw(wxDC& Dc)
           LocalDc.SetPen(*wxBLACK_PEN);
           ostringstream Oss;
           Oss << BarInfo.GetBarIndex() + 1 - Intro;
+          int barIdx = BarInfo.GetBarIndex() - Intro;
+          string chordName = JZAutoAccompaniment::GetMeasureChordName(gpProject, barIdx);
+          if (!chordName.empty())
+          {
+            Oss << " [" << chordName << "]";
+          }
           LocalDc.DrawText(
             Oss.str().c_str(),
             x + mLittleBit,

@@ -54,6 +54,7 @@ class JZAutoAccompanimentDialog : public wxDialog
     void OnAuditionPreview(wxCommandEvent& Event);
     void OnStopPreview(wxCommandEvent& Event);
     void OnGenerateButton(wxCommandEvent& Event);
+    void OnExportWav(wxCommandEvent& Event);
     void OnCancelButton(wxCommandEvent& Event);
 
     void UpdateGenerateButtonLabel();
@@ -111,6 +112,8 @@ class JZAutoAccompanimentDialog : public wxDialog
     wxCheckBox* mpHumanizeVelCheckBox;
     wxCheckBox* mpSmoothVoiceLeadingCheckBox;
     wxCheckBox* mpGhostNotesCheckBox;
+    wxCheckBox* mpMicroPocketCheckBox;
+    wxCheckBox* mpScaleLockCheckBox;
     wxCheckBox* mpMixerPresetsCheckBox;
 
     // Bottom Controls
@@ -118,6 +121,7 @@ class JZAutoAccompanimentDialog : public wxDialog
     wxCheckBox* mpSimultaneousCheckBox;
     wxButton* mpAuditionButton;
     wxButton* mpStopAuditionButton;
+    wxButton* mpExportWavButton;
     wxButton* mpGenerateButton;
     wxButton* mpCancelButton;
 

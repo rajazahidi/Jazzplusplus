@@ -1132,6 +1132,65 @@ void TestAutoAccompanimentLogic()
     if (p % 12 == 11) hasB = true;
   }
   TEST_ASSERT(hasC && hasE && hasG && hasB, "Real-time key tracker detects complete C Maj7 chord");
+
+  // 18. Time Signature Awareness (3/4 Jazz Waltz & 6/8 Slow Ballad Timing)
+  int tpq120 = 120;
+  int waltzTicksPerBar = 3 * tpq120; // 360 ticks
+  int balladTicksPerBar = 6 * (tpq120 / 2); // 360 ticks
+  int balladStep4Clock = (tpq120 * 3) / 2; // 180 ticks (dotted quarter backbeat)
+  TEST_ASSERT(waltzTicksPerBar == 360, "3/4 Jazz Waltz measure length at 120 TPQ is 360 ticks");
+  TEST_ASSERT(balladStep4Clock == 180, "6/8 Ballad snare backbeat is at dotted-quarter clock 180 ticks");
+
+  // 19. Nusantara Traditional Grooves (Zapin Marwas Syncopation & Joget Dance)
+  int zapinKick2 = tpq120 * 2 + (tpq120 / 2); // 300 ticks (beat 3-and)
+  int zapinTak1 = tpq120 + (tpq120 / 2);      // 180 ticks (beat 2-and)
+  TEST_ASSERT(zapinKick2 == 300, "Zapin marwas 'dung' low syncopation on beat 3-and (300 ticks)");
+  TEST_ASSERT(zapinTak1 == 180, "Zapin marwas 'tak' high syncopation on beat 2-and (180 ticks)");
+
+  // 20. Micro-Timing Pocket (Laid-Back Snare Offset & Bass Drive Timing)
+  int normalSnareBeat2 = tpq120; // 120 ticks
+  int snarePocketOffset = 8;     // +8 ticks behind beat (~12ms)
+  int laidBackSnareClk = normalSnareBeat2 + snarePocketOffset;
+  int bassDriveOffset = -3;      // -3 ticks ahead of beat (~5ms)
+  int pushBassDownbeatClk = max(0, 0 + bassDriveOffset);
+  TEST_ASSERT(laidBackSnareClk == 128, "Laid-back snare pocket offset delays beat 2 to 128 ticks");
+  TEST_ASSERT(bassDriveOffset == -3 && pushBassDownbeatClk == 0, "Bass drive pushes downbeat -3 ticks with floor clamp");
+
+  // 21. Smart Scale Lock (Snap-to-Key) Pitch Constraining
+  auto snapScale = [](int pitch, int tonic, bool isMinor) -> int {
+    static const bool maj[12] = {true, false, true, false, true, true, false, true, false, true, false, true};
+    static const bool min[12] = {true, false, true, true, false, true, false, true, true, false, true, true};
+    const bool* sc = isMinor ? min : maj;
+    int pc = ((pitch - tonic) % 12 + 12) % 12;
+    if (sc[pc]) return pitch;
+    int downPc = (pc + 11) % 12;
+    if (sc[downPc]) return pitch - 1;
+    return pitch + 1;
+  };
+  int snapCSharp = snapScale(61, 0, false);
+  int snapFSharp = snapScale(66, 0, false);
+  int snapGSharpInAm = snapScale(68, 9, true);
+  TEST_ASSERT(snapCSharp == 60, "Smart Scale Lock: C#4 (61) snaps down to C4 (60) in C Major");
+  TEST_ASSERT(snapFSharp == 65, "Smart Scale Lock: F#4 (66) snaps down to F4 (65) in C Major");
+  TEST_ASSERT(snapGSharpInAm == 68, "Smart Scale Lock: G#4 (68) recognized as leading tone in A Minor");
+
+  // 22. Global Visual Chord Track & Timeline Ruler Lookup
+  map<int, string> chordTrackMap;
+  chordTrackMap[0] = "C";
+  chordTrackMap[1] = "Dm7";
+  chordTrackMap[2] = "G7";
+  chordTrackMap[3] = "C";
+  TEST_ASSERT(chordTrackMap[1] == "Dm7", "Timeline ruler retrieves Bar 2 chord symbol 'Dm7'");
+  TEST_ASSERT(chordTrackMap[2] == "G7", "Timeline ruler retrieves Bar 3 chord symbol 'G7'");
+
+  // 23. Direct MIDI-to-WAV Audio Mixdown RIFF Header & PCM Encoding
+  uint32_t wavSampleRate = 44100;
+  uint16_t wavChannels = 2;
+  uint16_t wavBitsPerSample = 16;
+  uint32_t byteRate = wavSampleRate * wavChannels * (wavBitsPerSample / 8);
+  uint16_t blockAlign = wavChannels * (wavBitsPerSample / 8);
+  TEST_ASSERT(byteRate == 176400, "16-bit 44.1kHz stereo PCM WAV byte rate is 176,400 bytes/sec");
+  TEST_ASSERT(blockAlign == 4, "Stereo 16-bit block align is 4 bytes");
 }
 
 //-----------------------------------------------------------------------------

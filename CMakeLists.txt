@@ -121,6 +121,7 @@ set(JAZZ_SOURCES
     src/AudioWaveform.cpp
     src/AutoAccompaniment.cpp
     src/AutomationEngine.cpp
+    src/ChordPerformancePads.cpp
     src/ChordScaleData.cpp
     src/ClipMatrixEngine.cpp
     src/Command.cpp
@@ -193,6 +194,7 @@ set(JAZZ_SOURCES
     src/MeasureChoice.cpp
     src/MidiDeviceDialog.cpp
     src/MidiEffects.cpp
+    src/MidSideProcessor.cpp
     src/MixerConsole.cpp
     src/MpeEngine.cpp
     src/MultibandCompressor.cpp
@@ -227,6 +229,8 @@ set(JAZZ_SOURCES
     src/SliderWindow.cpp
     src/Song.cpp
     src/SoundGenerator.cpp
+    src/SpatialAudioPanner.cpp
+    src/SpectralDenoise.cpp
     src/StandardFile.cpp
     src/StemsExporter.cpp
     src/StringReadWrite.cpp
@@ -234,12 +238,14 @@ set(JAZZ_SOURCES
     src/Synth.cpp
     src/SysexChannel.cpp
     src/TakesComping.cpp
+    src/TapeConsoleWarmer.cpp
     src/ToolBar.cpp
     src/Track.cpp
     src/TrackFrame.cpp
     src/TrackWindow.cpp
     src/TransientShaper.cpp
     src/TransientSlicer.cpp
+    src/VocalHarmonizer.cpp
     src/WasapiAudioDriver.cpp
 )
 

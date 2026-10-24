@@ -1,4 +1,27 @@
 24-10-2026 Raja Zahidi
+- Feature & Master Studio Spatial Audio, Vocal Harmony & Vintage Analog Suite v6.0: Spectral Noise Repair & Denoiser, 3D Spatial Audio & Surround Panner, Vocal Polyphonic Harmonizer, Stereo Mid-Side Matrix & Mono Bass Maker, Performance Chord Trigger Pads, Analog Tape Machine & Vintage Console Warmer:
+  * Pembersih Hingar Spektral & Pembaikan Audio (Studio Spectral Audio Denoiser & Noise Repair - src/SpectralDenoise.h & .cpp):
+    - JZSpectralDenoise melaksanakan penolakan profil hingar berketepatan tinggi (Spectral Subtraction) dengan fungsi pemerolehan profil hingar (Noise Fingerprint Capture).
+    - Membuang desisan mikrofon, dengungan 50Hz/60Hz, dan hingar bilik (0dB hingga 30dB) dengan kawalan lantai spektrum (Spectral Floor) untuk mengelakkan artefak burung berbunyi (musical noise), serta mod pendengaran hingar sahaja (Listen Noise Only).
+  * Audio Ruang 3D & Pemutar Bunyi Keliling (3D Spatial Audio & Surround Sound Panner - src/SpatialAudioPanner.h & .cpp):
+    - JZSpatialAudioPanner meletakkan audio dalam ruang 3 dimensi berasaskan Azimuth (0-360 deg), Elevation (-90 hingga +90 deg), dan Jarak (0.1m - 30m).
+    - Menyokong rendering fon kepala 3D Binaural berketepatan tinggi melalui Interaural Time Difference (Woodworth ITD) dan penapis bayang kepala (Head Shadow), serta penghalaan Quadraphonic dan bas 5.1 Surround Sound (L, C, R, LFE, Ls, Rs).
+  * Penjana Harmoni Vokal Polifonik Pintar (Intelligent Vocal Polyphonic Harmonizer - src/VocalHarmonizer.h & .cpp):
+    - JZVocalHarmonizer menjana sehingga 4 suara harmoni vokal diatonik polifonik serentak (+3rd, +5th, -4th, Octave Down Bass) mengikut tangga nada projek (Major / Minor).
+    - Dilengkapi pemeliharaan formant vokal semiton (-5st hingga +5st), tombol stereo pan bebas, dan fader aras volum per suara harmoni.
+  * Matriks Stereo Mid-Side & Pembuat Bes Mono (Stereo Mid-Side Matrix & Mono Bass Maker - src/MidSideProcessor.h & .cpp):
+    - JZMidSideProcessor menukar isyarat L/R kepada format Mid-Side secara dwiarah (M = (L+R)/sqrt(2), S = (L-R)/sqrt(2)).
+    - Ciri Mono Bass Maker menapis laluan tinggi saluran Side di bawah frekuensi ambang (20Hz - 300Hz, default 120Hz) untuk memastikan sub-bes sentiasa berfokus di tengah dan bebas masalah fasa mono. Dilengkapi pelarasan lebar stereo (0% hingga 200%) dan suis Solo Mid/Side.
+  * Pad Pemicu Kord Persembahan & Enjin Voicing (Performance Chord Trigger Pads & Voicing Engine - src/ChordPerformancePads.h & .cpp):
+    - JZChordPerformancePads menyediakan grid 16 pad pemicu kord pentas langsung dengan pratetap genre (Neo-Soul Jazz, Lo-Fi Chillhop, Pop Anthem, R&B Soul).
+    - Menyokong transformasi susunan not Drop-2 Voicing, Open Spread Voicing, humanisasi halaju, dan simulasi petikan gitar (Strum Spread Timing).
+  * Mesin Pita Analog & Pemanas Konsol Vintage (Analog Tape Machine & Vintage Console Warmer - src/TapeConsoleWarmer.h & .cpp):
+    - JZTapeConsoleWarmer mensimulasikan saturasi histeresis magnetik pita analog sebenar, harmonik tiub genap (2nd harmonic) dan transformer ganjil (3rd harmonic).
+    - Pilihan kelajuan pita 15 IPS (bes tebal head bump 72Hz) vs 30 IPS (kesetiaan tinggi audiophile), kawalan Tape Bias, dan modulasi motor halus (Wow & Flutter).
+  * Penambahan Ujian Unit 65 hingga 70 (tests/test_main.cpp):
+    - Menambah ujian matematik penolakan hingar spektral (-12dB), kelewatan masa antara telinga ITD binaural (~29 sampel), penjanaan suara harmoni diatonik C Major (C->E, D->F), pembalikan matriks Mid-Side, transformasi Drop-2 kord Cmaj7, dan ketepuan lengkung histeresis pita analog tanh.
+
+24-10-2026 Raja Zahidi
 - Feature & Master Studio Broadcast, Live Performance & Precision Dynamics Suite v5.0: Dynamic Vocal De-Esser, Audio Flex-Time Warping & Transient Quantizer, 3-Band Multiband Compressor, Non-Linear Clip Matrix & Live Launcher Grid, Transient Shaper & Punch Designer, ITU-R BS.1770-4 / EBU R128 Loudness Meter & True Peak Engine:
   * Penekan Desisan Vokal Dinamik (Dynamic Vocal De-Esser & Sibilance Suppressor - src/DynamicDeEsser.h & .cpp):
     - JZDynamicDeEsser melaksanakan pemampatan sibilance frekuensi terpilih (4kHz - 9kHz) untuk menghapuskan kekasaran desisan konsonan vokal ('S', 'T', 'CH').

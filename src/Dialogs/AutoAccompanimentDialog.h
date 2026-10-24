@@ -58,6 +58,10 @@ class JZAutoAccompanimentDialog : public wxDialog
     void OnExportStems(wxCommandEvent& Event);
     void OnExportLeadSheet(wxCommandEvent& Event);
     void OnInjectProgression(wxCommandEvent& Event);
+    void OnSavePreset(wxCommandEvent& Event);
+    void OnLoadPreset(wxCommandEvent& Event);
+    void OnHarmonizerButton(wxCommandEvent& Event);
+    void OnChordPadClicked(wxCommandEvent& Event);
     void OnCancelButton(wxCommandEvent& Event);
 
     void UpdateGenerateButtonLabel();
@@ -126,12 +130,22 @@ class JZAutoAccompanimentDialog : public wxDialog
     wxCheckBox* mpMicrotonalCheckBox;
     wxChoice* mpMicrotonalChoice;
     wxCheckBox* mpMixerPresetsCheckBox;
+    wxChoice* mpReharmonizeChoice;
+    wxCheckBox* mpAudioClickTrackCheckBox;
+    wxCheckBox* mpCountInCheckBox;
+    wxSpinCtrl* mpCountInBarsSpin;
+
+    // Interactive Chord Pads Matrix (8 Diatonic Pads)
+    wxButton* mpChordPadButtons[8];
 
     // Bottom Controls
     wxCheckBox* mpOverwriteCheckBox;
     wxCheckBox* mpSimultaneousCheckBox;
     wxButton* mpAuditionButton;
     wxButton* mpStopAuditionButton;
+    wxButton* mpHarmonizerButton;
+    wxButton* mpSavePresetButton;
+    wxButton* mpLoadPresetButton;
     wxButton* mpExportLeadSheetButton;
     wxButton* mpExportStemsButton;
     wxButton* mpExportWavButton;

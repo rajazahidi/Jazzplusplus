@@ -40,10 +40,14 @@ enum
   ID_BTN_EXPORT_STEMS,
   ID_BTN_EXPORT_LEADSHEET,
   ID_BTN_INJECT_PROGRESSION,
+  ID_BTN_SAVE_PRESET,
+  ID_BTN_LOAD_PRESET,
+  ID_BTN_HARMONIZER,
   ID_RANGE_ALL_RADIO,
   ID_RANGE_CUSTOM_RADIO,
   ID_NOTEBOOK_HUB,
-  ID_SIMULTANEOUS_CHECK
+  ID_SIMULTANEOUS_CHECK,
+  ID_CHORD_PAD_BASE
 };
 
 BEGIN_EVENT_TABLE(JZAutoAccompanimentDialog, wxDialog)
@@ -54,7 +58,11 @@ BEGIN_EVENT_TABLE(JZAutoAccompanimentDialog, wxDialog)
   EVT_BUTTON(ID_BTN_EXPORT_STEMS, JZAutoAccompanimentDialog::OnExportStems)
   EVT_BUTTON(ID_BTN_EXPORT_LEADSHEET, JZAutoAccompanimentDialog::OnExportLeadSheet)
   EVT_BUTTON(ID_BTN_INJECT_PROGRESSION, JZAutoAccompanimentDialog::OnInjectProgression)
+  EVT_BUTTON(ID_BTN_SAVE_PRESET, JZAutoAccompanimentDialog::OnSavePreset)
+  EVT_BUTTON(ID_BTN_LOAD_PRESET, JZAutoAccompanimentDialog::OnLoadPreset)
+  EVT_BUTTON(ID_BTN_HARMONIZER, JZAutoAccompanimentDialog::OnHarmonizerButton)
   EVT_BUTTON(wxID_CANCEL, JZAutoAccompanimentDialog::OnCancelButton)
+  EVT_COMMAND_RANGE(ID_CHORD_PAD_BASE, ID_CHORD_PAD_BASE + 7, wxEVT_COMMAND_BUTTON_CLICKED, JZAutoAccompanimentDialog::OnChordPadClicked)
   EVT_RADIOBUTTON(ID_RANGE_ALL_RADIO, JZAutoAccompanimentDialog::OnRangeRadio)
   EVT_RADIOBUTTON(ID_RANGE_CUSTOM_RADIO, JZAutoAccompanimentDialog::OnRangeRadio)
   EVT_NOTEBOOK_PAGE_CHANGED(ID_NOTEBOOK_HUB, JZAutoAccompanimentDialog::OnNotebookPageChanged)
@@ -118,16 +126,24 @@ JZAutoAccompanimentDialog::JZAutoAccompanimentDialog(
     mpMicrotonalCheckBox(0),
     mpMicrotonalChoice(0),
     mpMixerPresetsCheckBox(0),
+    mpReharmonizeChoice(0),
+    mpAudioClickTrackCheckBox(0),
+    mpCountInCheckBox(0),
+    mpCountInBarsSpin(0),
     mpOverwriteCheckBox(0),
     mpSimultaneousCheckBox(0),
     mpAuditionButton(0),
     mpStopAuditionButton(0),
+    mpHarmonizerButton(0),
+    mpSavePresetButton(0),
+    mpLoadPresetButton(0),
     mpExportLeadSheetButton(0),
     mpExportStemsButton(0),
     mpExportWavButton(0),
     mpGenerateButton(0),
     mpCancelButton(0)
 {
+  for (int p = 0; p < 8; ++p) mpChordPadButtons[p] = 0;
   CreateControls();
   SetMinSize(FromDIP(wxSize(560, 680)));
   Fit();
@@ -336,7 +352,49 @@ void JZAutoAccompanimentDialog::CreateControls()
   pRitMicroRow->Add(mpMicrotonalCheckBox, 1, 0, 0);
   pGrooveBox->Add(pRitMicroRow, 0, wxALL | wxEXPAND, FromDIP(4));
 
+  // Re-Harmonizer & Jazz Substitution Dropdown
+  wxBoxSizer* pReharmRow = new wxBoxSizer(wxHORIZONTAL);
+  pReharmRow->Add(new wxStaticText(this, wxID_ANY, "Re-Harmonizer & Substitutions:"), 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, FromDIP(8));
+  mpReharmonizeChoice = new wxChoice(this, wxID_ANY);
+  for (int rm = 0; rm < REHARM_COUNT; ++rm)
+  {
+    mpReharmonizeChoice->Append(JZAutoAccompaniment::GetReharmonizeModeName((JZReharmonizeMode)rm));
+  }
+  mpReharmonizeChoice->SetSelection(0);
+  pReharmRow->Add(mpReharmonizeChoice, 1, wxEXPAND);
+  pGrooveBox->Add(pReharmRow, 0, wxALL | wxEXPAND, FromDIP(4));
+
+  // Studio Metronome Audio Click Track & Count-in
+  wxBoxSizer* pClickRow = new wxBoxSizer(wxHORIZONTAL);
+  mpAudioClickTrackCheckBox = new wxCheckBox(this, wxID_ANY, "Woodblock Click Track (900Hz/580Hz)");
+  mpAudioClickTrackCheckBox->SetValue(false);
+  pClickRow->Add(mpAudioClickTrackCheckBox, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, FromDIP(12));
+
+  mpCountInCheckBox = new wxCheckBox(this, wxID_ANY, "Count-in:");
+  mpCountInCheckBox->SetValue(false);
+  pClickRow->Add(mpCountInCheckBox, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, FromDIP(4));
+
+  mpCountInBarsSpin = new wxSpinCtrl(this, wxID_ANY, "1", wxDefaultPosition, FromDIP(wxSize(50, -1)), wxSP_ARROW_KEYS, 1, 4, 1);
+  pClickRow->Add(mpCountInBarsSpin, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, FromDIP(4));
+  pClickRow->Add(new wxStaticText(this, wxID_ANY, "bar(s)"), 0, wxALIGN_CENTER_VERTICAL);
+  pGrooveBox->Add(pClickRow, 0, wxALL | wxEXPAND, FromDIP(4));
+
   pMainSizer->Add(pGrooveBox, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(6));
+
+  // Interactive Virtual Chord Pads Matrix (8 Diatonic Pads)
+  wxStaticBoxSizer* pChordPadsBox = new wxStaticBoxSizer(wxVERTICAL, this, "Interactive Chord Pads Matrix (Instant Live Audition)");
+  wxBoxSizer* pPadsGrid = new wxBoxSizer(wxHORIZONTAL);
+  static const char* sPadLabels[8] = {
+    "I (Tonic)", "ii (Supertonic)", "iii (Mediant)", "IV (Subdominant)",
+    "V7 (Dominant)", "vi (Submediant)", "vii° (Leading)", "bII7 (Tritone Sub)"
+  };
+  for (int pi = 0; pi < 8; ++pi)
+  {
+    mpChordPadButtons[pi] = new wxButton(this, ID_CHORD_PAD_BASE + pi, sPadLabels[pi]);
+    pPadsGrid->Add(mpChordPadButtons[pi], 1, wxALL | wxEXPAND, FromDIP(2));
+  }
+  pChordPadsBox->Add(pPadsGrid, 0, wxEXPAND | wxALL, FromDIP(2));
+  pMainSizer->Add(pChordPadsBox, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(6));
 
   // Bottom Options & Preview
   wxBoxSizer* pOptSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -365,6 +423,15 @@ void JZAutoAccompanimentDialog::CreateControls()
 
   // Final Action Buttons
   wxBoxSizer* pBtnSizer = new wxBoxSizer(wxHORIZONTAL);
+  mpSavePresetButton = new wxButton(this, ID_BTN_SAVE_PRESET, "💾 Save...");
+  pBtnSizer->Add(mpSavePresetButton, 0, wxRIGHT, FromDIP(6));
+
+  mpLoadPresetButton = new wxButton(this, ID_BTN_LOAD_PRESET, "📂 Load...");
+  pBtnSizer->Add(mpLoadPresetButton, 0, wxRIGHT, FromDIP(6));
+
+  mpHarmonizerButton = new wxButton(this, ID_BTN_HARMONIZER, "🎺 Harmonizer...");
+  pBtnSizer->Add(mpHarmonizerButton, 0, wxRIGHT, FromDIP(6));
+
   mpExportLeadSheetButton = new wxButton(this, ID_BTN_EXPORT_LEADSHEET, "📄 Lead Sheet...");
   pBtnSizer->Add(mpExportLeadSheetButton, 0, wxRIGHT, FromDIP(6));
 
@@ -792,7 +859,10 @@ void JZAutoAccompanimentDialog::OnExportWav(wxCommandEvent& Event)
   }
 
   string path = saveDlg.GetPath().ToStdString();
-  bool success = JZMidiAudioRenderer::ExportWav(mpProject->GetSong(), path);
+  bool clickTrack = mpAudioClickTrackCheckBox ? mpAudioClickTrackCheckBox->GetValue() : false;
+  bool countIn = mpCountInCheckBox ? mpCountInCheckBox->GetValue() : false;
+  int countBars = mpCountInBarsSpin ? mpCountInBarsSpin->GetValue() : 1;
+  bool success = JZMidiAudioRenderer::ExportWav(mpProject->GetSong(), path, 44100, 0, -1, clickTrack, countIn, countBars);
 
   if (success)
   {
@@ -832,7 +902,8 @@ void JZAutoAccompanimentDialog::OnExportStems(wxCommandEvent& Event)
 
   string folder = dirDlg.GetPath().ToStdString();
   vector<string> files;
-  bool ok = JZMidiAudioRenderer::ExportStems(mpProject->GetSong(), folder, files);
+  bool clickTrack = mpAudioClickTrackCheckBox ? mpAudioClickTrackCheckBox->GetValue() : false;
+  bool ok = JZMidiAudioRenderer::ExportStems(mpProject->GetSong(), folder, files, 44100, 0, -1, clickTrack);
 
   if (ok && !files.empty())
   {
@@ -1002,6 +1073,10 @@ void JZAutoAccompanimentDialog::OnGenerateButton(wxCommandEvent& Event)
                                 : (mConfig.style == STYLE_NUSANTARA_JOGET ? MICROTONAL_SLENDRO_PELOG : MICROTONAL_BAYATI_RAST);
   }
   if (mpMixerPresetsCheckBox) mConfig.applyMixerPresets = mpMixerPresetsCheckBox->GetValue();
+  if (mpReharmonizeChoice) mConfig.reharmonizeMode = (JZReharmonizeMode)mpReharmonizeChoice->GetSelection();
+  if (mpAudioClickTrackCheckBox) mConfig.enableAudioClickTrack = mpAudioClickTrackCheckBox->GetValue();
+  if (mpCountInCheckBox) mConfig.enableCountIn = mpCountInCheckBox->GetValue();
+  if (mpCountInBarsSpin) mConfig.countInBars = mpCountInBarsSpin->GetValue();
   if (mpSectionChoice) mConfig.songSection = (JZSongSection)mpSectionChoice->GetSelection();
   if (mpBassFeelChoice) mConfig.bassFeel = (JZBassFeel)mpBassFeelChoice->GetSelection();
 
@@ -1079,4 +1154,143 @@ void JZAutoAccompanimentDialog::OnGenerateButton(wxCommandEvent& Event)
     this);
 
   EndModal(wxID_OK);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZAutoAccompanimentDialog::OnChordPadClicked(wxCommandEvent& Event)
+{
+  int padIndex = Event.GetId() - ID_CHORD_PAD_BASE;
+  if (padIndex < 0 || padIndex >= 8) return;
+
+  int tonic = 0;
+  bool isMinor = false;
+  if (mpProject && mpProject->GetSong() && mpProject->GetSong()->GetTrack(0))
+  {
+    JZKeyCenter kc = JZAutoAccompaniment::DetectSongKeyCenter(mpProject->GetSong()->GetTrack(0));
+    tonic = kc.tonicPc;
+    isMinor = kc.isMinor;
+  }
+
+  JZDetectedChord ch = JZAutoAccompaniment::GetChordPadChord(tonic, isMinor, padIndex);
+  static const char* sPadsNames[8] = { "I (Tonic)", "ii (Supertonic)", "iii (Mediant)", "IV (Subdominant)",
+                                       "V7 (Dominant)", "vi (Submediant)", "vii° (Leading)", "bII7 (Tritone Sub)" };
+  if (mpKeyCenterLabel)
+  {
+    wxString msg;
+    msg.Printf("Pad %d: %s (%s)", padIndex + 1, sPadsNames[padIndex], JZAutoAccompaniment::GetPitchClassName(ch.rootPitchClass));
+    mpKeyCenterLabel->SetLabel(msg);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZAutoAccompanimentDialog::OnSavePreset(wxCommandEvent& Event)
+{
+  wxFileDialog dlg(
+    this,
+    "Save Arrangement Preset & Style Template",
+    "",
+    "ArrangementStyle.jazzstyle",
+    "Jazz++ Style Preset (*.jazzstyle)|*.jazzstyle",
+    wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+  if (dlg.ShowModal() != wxID_OK) return;
+
+  if (mpReharmonizeChoice) mConfig.reharmonizeMode = (JZReharmonizeMode)mpReharmonizeChoice->GetSelection();
+  if (mpAudioClickTrackCheckBox) mConfig.enableAudioClickTrack = mpAudioClickTrackCheckBox->GetValue();
+  if (mpCountInCheckBox) mConfig.enableCountIn = mpCountInCheckBox->GetValue();
+  if (mpCountInBarsSpin) mConfig.countInBars = mpCountInBarsSpin->GetValue();
+  if (mpSwingSlider) mConfig.swingPercent = mpSwingSlider->GetValue();
+  if (mpDrumFillsCheckBox) mConfig.enableDrumFills = mpDrumFillsCheckBox->GetValue();
+  if (mpSoloBendsCheckBox) mConfig.enableSoloBendsAndVibrato = mpSoloBendsCheckBox->GetValue();
+  if (mpSmoothVoiceLeadingCheckBox) mConfig.enableSmoothVoiceLeading = mpSmoothVoiceLeadingCheckBox->GetValue();
+  if (mpGhostNotesCheckBox) mConfig.enableGhostNotes = mpGhostNotesCheckBox->GetValue();
+  if (mpMicroPocketCheckBox) mConfig.enableMicroPocket = mpMicroPocketCheckBox->GetValue();
+  if (mpScaleLockCheckBox) mConfig.enableScaleLock = mpScaleLockCheckBox->GetValue();
+
+  string path = dlg.GetPath().ToStdString();
+  if (JZAutoAccompaniment::SaveArrangementPreset(mConfig, path))
+  {
+    wxMessageBox("Arrangement preset saved successfully!", "Preset Saved", wxOK | wxICON_INFORMATION, this);
+  }
+  else
+  {
+    wxMessageBox("Failed to save arrangement preset.", "Save Error", wxOK | wxICON_ERROR, this);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZAutoAccompanimentDialog::OnLoadPreset(wxCommandEvent& Event)
+{
+  wxFileDialog dlg(
+    this,
+    "Load Arrangement Preset & Style Template",
+    "",
+    "",
+    "Jazz++ Style Preset (*.jazzstyle)|*.jazzstyle",
+    wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+
+  if (dlg.ShowModal() != wxID_OK) return;
+
+  string path = dlg.GetPath().ToStdString();
+  if (JZAutoAccompaniment::LoadArrangementPreset(mConfig, path))
+  {
+    if (mpReharmonizeChoice) mpReharmonizeChoice->SetSelection((int)mConfig.reharmonizeMode);
+    if (mpAudioClickTrackCheckBox) mpAudioClickTrackCheckBox->SetValue(mConfig.enableAudioClickTrack);
+    if (mpCountInCheckBox) mpCountInCheckBox->SetValue(mConfig.enableCountIn);
+    if (mpCountInBarsSpin) mpCountInBarsSpin->SetValue(mConfig.countInBars);
+    if (mpSwingSlider) mpSwingSlider->SetValue(mConfig.swingPercent);
+    if (mpDrumFillsCheckBox) mpDrumFillsCheckBox->SetValue(mConfig.enableDrumFills);
+    if (mpSoloBendsCheckBox) mpSoloBendsCheckBox->SetValue(mConfig.enableSoloBendsAndVibrato);
+    if (mpSmoothVoiceLeadingCheckBox) mpSmoothVoiceLeadingCheckBox->SetValue(mConfig.enableSmoothVoiceLeading);
+    if (mpGhostNotesCheckBox) mpGhostNotesCheckBox->SetValue(mConfig.enableGhostNotes);
+    if (mpMicroPocketCheckBox) mpMicroPocketCheckBox->SetValue(mConfig.enableMicroPocket);
+    if (mpScaleLockCheckBox) mpScaleLockCheckBox->SetValue(mConfig.enableScaleLock);
+    wxMessageBox("Arrangement preset loaded successfully!", "Preset Loaded", wxOK | wxICON_INFORMATION, this);
+  }
+  else
+  {
+    wxMessageBox("Failed to load arrangement preset.", "Load Error", wxOK | wxICON_ERROR, this);
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZAutoAccompanimentDialog::OnHarmonizerButton(wxCommandEvent& Event)
+{
+  if (!mpProject || !mpProject->GetSong())
+  {
+    wxMessageBox("No active song project found.", "Harmonizer Error", wxOK | wxICON_ERROR, this);
+    return;
+  }
+
+  wxArrayString styles;
+  for (int s = 0; s < HARMONY_STYLE_COUNT; ++s)
+  {
+    styles.Add(JZAutoAccompaniment::GetHarmonizerStyleName((JZHarmonizerStyle)s));
+  }
+
+  wxSingleChoiceDialog styleDlg(this, "Select Vocal / Horn Harmonizer Style:", "Intelligent Harmonizer", styles);
+  if (styleDlg.ShowModal() != wxID_OK) return;
+
+  int sel = styleDlg.GetSelection();
+  JZHarmonizerConfig harmCfg;
+  harmCfg.sourceTrackIndex = mpSourceTrackChoice ? mpSourceTrackChoice->GetSelection() : 0;
+  harmCfg.targetTrackIndex = 4;
+  harmCfg.style = (JZHarmonizerStyle)sel;
+
+  int fromB = 0;
+  int toB = -1;
+  if (mpRangeCustomRadio && mpRangeCustomRadio->GetValue())
+  {
+    fromB = mpFromBarSpin->GetValue() - 1;
+    toB = mpToBarSpin->GetValue();
+  }
+
+  int notes = JZAutoAccompaniment::GenerateMelodicHarmony(mpProject->GetSong(), harmCfg, fromB, toB);
+  wxString msg;
+  msg.Printf("Generated %d harmony voice notes in Track 5 using style '%s'!", notes, JZAutoAccompaniment::GetHarmonizerStyleName(harmCfg.style));
+  wxMessageBox(msg, "Harmonizer Complete", wxOK | wxICON_INFORMATION, this);
 }

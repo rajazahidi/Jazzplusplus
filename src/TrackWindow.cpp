@@ -930,6 +930,28 @@ void JZTrackWindow::Draw(wxDC& Dc)
             Oss.str().c_str(),
             x + mLittleBit,
             mEventsY - mTrackHeight);
+
+          // Visual Timeline Section Banner Marker
+          if (gpProject && gpProject->GetSong())
+          {
+            int totalBars = 32;
+            int lastClk = gpProject->GetSong()->GetLastClock();
+            int tpq = gpProject->GetSong()->GetTicksPerQuarter();
+            if (tpq > 0 && lastClk > 0) totalBars = max(16, (lastClk + 4 * tpq - 1) / (4 * tpq));
+            JZSongSection sec = JZAutoAccompaniment::DetermineSection(barIdx, totalBars, SECTION_AUTO);
+            if (barIdx == 0 || barIdx == 4 || barIdx == 12 || barIdx == 20 || barIdx == max(0, totalBars - 4))
+            {
+              wxColour secCol(41, 128, 185); // Intro
+              if (sec == SECTION_VERSE) secCol = wxColour(39, 174, 96);
+              else if (sec == SECTION_CHORUS) secCol = wxColour(230, 126, 34);
+              else if (sec == SECTION_BRIDGE) secCol = wxColour(142, 68, 173);
+              else if (sec == SECTION_OUTRO) secCol = wxColour(52, 73, 94);
+
+              LocalDc.SetBrush(wxBrush(secCol));
+              LocalDc.SetPen(wxPen(secCol));
+              LocalDc.DrawRectangle(x, mEventsY - mTrackHeight - 3, 50, 3);
+            }
+          }
           LocalDc.SetPen(*wxGREY_PEN);
           LocalDc.DrawLine(
             x,

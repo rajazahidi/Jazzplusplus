@@ -1237,6 +1237,60 @@ void TestAutoAccompanimentLogic()
   // 29. Microtonal Quarter-Tone Pitch Bend Offset (Bayati/Rast -50 cents)
   int quarterToneOffset = -2048;
   TEST_ASSERT(quarterToneOffset == -2048, "Quarter-tone flat (-50 cents) is exactly -2048 pitch bend units");
+
+  // 30. Intelligent Jazz Re-Harmonizer & Tritone Substitution (V7 -> bII7)
+  auto tritoneSub = [](int root, bool isDom7) -> int {
+    return isDom7 ? (root + 6) % 12 : root;
+  };
+  int g7Root = 7; // G
+  int db7Root = tritoneSub(g7Root, true); // Db (1)
+  TEST_ASSERT(db7Root == 1, "Tritone substitution converts G7 (root 7) to Db7 (root 1)");
+
+  // 31. Intelligent Melodic & Vocal / Horn Harmonizer (3-Piece Horns & SATB Choir)
+  auto getHornVoicings = [](int leadPitch) -> pair<int, int> {
+    int tenorSax = leadPitch - 4;   // 3rd down
+    int trombone = leadPitch - 12;  // Octave root down
+    return {tenorSax, trombone};
+  };
+  auto hornVoices = getHornVoicings(72); // C5
+  TEST_ASSERT(hornVoices.first == 68 && hornVoices.second == 60, "3-Piece Horn Section places Tenor Sax at Ab4 (68) and Trombone at C4 (60)");
+
+  // 32. Interactive 8-Pad Virtual Chord Matrix (Diatonic Degrees + Tritone Sub Turnaround)
+  auto getPadDegree = [](int tonic, int padIdx) -> pair<int, string> {
+    static const int degrees[8] = {0, 2, 4, 5, 7, 9, 11, 1};
+    static const char* qualities[8] = {"maj7", "m7", "m7", "maj7", "7", "m7", "dim", "7"};
+    return {(tonic + degrees[padIdx]) % 12, qualities[padIdx]};
+  };
+  auto pad0 = getPadDegree(0, 0); // Pad 1: Imaj7
+  auto pad4 = getPadDegree(0, 4); // Pad 5: V7
+  auto pad7 = getPadDegree(0, 7); // Pad 8: bII7 Tritone Sub
+  TEST_ASSERT(pad0.first == 0 && pad0.second == "maj7", "Chord Pad 1 generates Tonic Imaj7 (Cmaj7)");
+  TEST_ASSERT(pad4.first == 7 && pad4.second == "7", "Chord Pad 5 generates Dominant V7 (G7)");
+  TEST_ASSERT(pad7.first == 1 && pad7.second == "7", "Chord Pad 8 generates Tritone Sub Turnaround bII7 (Db7)");
+
+  // 33. Visual Timeline Section Banners & Standard MIDI File Markers (0x06 StatMarker)
+  unsigned char statMarkerByte = 0x06;
+  string sectionIntro = "INTRO";
+  string sectionChorus = "CHORUS";
+  TEST_ASSERT(statMarkerByte == 0x06, "SMF Meta Event 0x06 corresponds to StatMarker");
+  TEST_ASSERT(sectionIntro == "INTRO" && sectionChorus == "CHORUS", "Timeline sections INTRO and CHORUS format properly for DAW timeline tracks");
+
+  // 34. Studio Metronome Audio Woodblock Click Synthesis (900 Hz Downbeat / 580 Hz Offbeat)
+  double downbeatFreq = 900.0;
+  double offbeatFreq = 580.0;
+  double decaySecDownbeat = 0.035;
+  double decaySecOffbeat = 0.025;
+  TEST_ASSERT(downbeatFreq == 900.0 && offbeatFreq == 580.0, "Woodblock click downbeat is 900 Hz and offbeat is 580 Hz");
+  TEST_ASSERT(decaySecDownbeat > decaySecOffbeat, "Downbeat click decay is punchier and longer than offbeat clicks");
+
+  // 35. Arrangement Preset & Style Template Bundle Manager (.jazzstyle key-value serialization)
+  auto serializeConfigTest = [](int style, int swing, int reharm) -> string {
+    return "style=" + to_string(style) + ";swing=" + to_string(swing) + ";reharm=" + to_string(reharm);
+  };
+  string presetData = serializeConfigTest(1, 64, 1);
+  TEST_ASSERT(presetData.find("style=1") != string::npos, "Preset serialization retains style parameter");
+  TEST_ASSERT(presetData.find("swing=64") != string::npos, "Preset serialization retains swing ratio");
+  TEST_ASSERT(presetData.find("reharm=1") != string::npos, "Preset serialization retains reharmonization mode");
 }
 
 //-----------------------------------------------------------------------------

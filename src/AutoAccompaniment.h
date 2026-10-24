@@ -159,6 +159,52 @@ enum JZMicrotonalTuning
   MICROTONAL_COUNT
 };
 
+// 8. Reharmonization & Chord Substitutions
+enum JZReharmonizeMode
+{
+  REHARM_NONE = 0,
+  REHARM_TRITONE_SUB,          // Tritone substitution: V7 -> bII7 (e.g. G7 -> Db7)
+  REHARM_SECONDARY_DOMINANTS,  // Precede target chords with secondary dominant (V7/x)
+  REHARM_PASSING_DIMINISHED,   // Chromatic passing diminished 7th chords
+  REHARM_MODAL_INTERCHANGE,    // Minor plagal cadence (iv minor / bVImaj7)
+  REHARM_COLTRANE_CHANGES,     // Coltrane 3-tonic matrix substitution
+  REHARM_COUNT
+};
+
+// 9. Intelligent Melodic & Vocal / Horn Harmonizer
+enum JZHarmonizerStyle
+{
+  HARMONY_PARALLEL_3RD = 0,    // Sweet diatonic 3rd above / 6th below
+  HARMONY_PARALLEL_6TH,        // Warm diatonic 6th below
+  HARMONY_3_PIECE_HORNS,       // Trumpet lead, Tenor Sax 3rd/7th, Trombone root/5th
+  HARMONY_4_PART_VOCAL_SATB,   // SATB 4-part choir close-voicing
+  HARMONY_STYLE_COUNT
+};
+
+struct JZHarmonizerConfig
+{
+  int sourceTrackIndex;        // Track with lead melody / vocal (default 0)
+  int targetTrackIndex;        // Destination track for harmony voices (default 4)
+  JZHarmonizerStyle style;     // HARMONY_PARALLEL_3RD, HARMONY_3_PIECE_HORNS, etc.
+  int midiChannel;             // Default 5
+  int patchNumber;             // Default 66 (Tenor Sax) or 53 (Choir Aahs)
+  int stereoPan;               // Default 75
+  int volume;                  // Default 95
+  int octaveShift;             // Default 0
+
+  JZHarmonizerConfig()
+    : sourceTrackIndex(0),
+      targetTrackIndex(4),
+      style(HARMONY_PARALLEL_3RD),
+      midiChannel(5),
+      patchNumber(66),
+      stereoPan(75),
+      volume(95),
+      octaveShift(0)
+  {
+  }
+};
+
 // Chord Qualities detected from piano track
 enum JZChordQuality
 {
@@ -326,6 +372,14 @@ struct JZAccompanimentConfig
   bool enableMicrotonalTuning;
   JZMicrotonalTuning microtonalTuning;
 
+  // Reharmonization Engine
+  JZReharmonizeMode reharmonizeMode;
+
+  // Audio Click Track & Metronome Count-in
+  bool enableAudioClickTrack;
+  bool enableCountIn;
+  int countInBars;
+
   // Range and Options
   int fromBar;          // 0-based bar index (0 = Bar 1)
   int toBar;            // 0-based bar index (-1 = up to end of song)
@@ -360,6 +414,10 @@ struct JZAccompanimentConfig
       outroSlowdownPercent(25),
       enableMicrotonalTuning(false),
       microtonalTuning(MICROTONAL_NONE),
+      reharmonizeMode(REHARM_NONE),
+      enableAudioClickTrack(false),
+      enableCountIn(false),
+      countInBars(1),
       fromBar(0),
       toBar(-1),
       overwriteExisting(true)
@@ -446,6 +504,30 @@ class JZAutoAccompaniment
       const std::string& filePath,
       const std::string& songTitle = "Untitled Jazz Project",
       const std::string& composer = "Jazz++ Arranger");
+
+    // Reharmonization & Chord Substitutions
+    static const char* GetReharmonizeModeName(JZReharmonizeMode mode);
+    static const char* GetHarmonizerStyleName(JZHarmonizerStyle style);
+
+    static int ApplyReharmonization(
+      JZSong* pSong,
+      JZReharmonizeMode mode,
+      int fromBar = 0,
+      int toBar = -1);
+
+    // Intelligent Melodic & Vocal / Horn Harmonizer
+    static int GenerateMelodicHarmony(
+      JZSong* pSong,
+      const JZHarmonizerConfig& config,
+      int fromBar = 0,
+      int toBar = -1);
+
+    // Interactive Chord Pad Matrix Scale Degree Helper
+    static JZDetectedChord GetChordPadChord(int tonicPc, bool isMinor, int padIndex);
+
+    // Arrangement Preset Serialization
+    static bool SaveArrangementPreset(const JZAccompanimentConfig& config, const std::string& filePath);
+    static bool LoadArrangementPreset(JZAccompanimentConfig& outConfig, const std::string& filePath);
 
     // Global Chord Track access for Timeline Ruler and Viewers
     static std::string GetMeasureChordName(JZSong* pSong, int barIndex);
@@ -584,7 +666,10 @@ class JZMidiAudioRenderer
       const std::string& wavFilePath,
       int sampleRate = 44100,
       int fromClock = 0,
-      int toClock = -1);
+      int toClock = -1,
+      bool includeClickTrack = false,
+      bool includeCountIn = false,
+      int countInBars = 1);
 
     // Multi-Track Stem Audio Export (renders each active track to separate stem WAV files)
     static bool ExportStems(
@@ -593,7 +678,8 @@ class JZMidiAudioRenderer
       std::vector<std::string>& outGeneratedFiles,
       int sampleRate = 44100,
       int fromClock = 0,
-      int toClock = -1);
+      int toClock = -1,
+      bool includeClickTrack = false);
 };
 
 // Real-Time Interactive Chord & Jamming Tracker

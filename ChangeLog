@@ -1,4 +1,32 @@
 24-10-2026 Raja Zahidi
+- Feature & Studio Arranger Pro Suite: Jazz Reharmonizer, Vocal & Horn Harmonizer, Chord Pads Matrix, Timeline Section Banners & SMF Markers, Studio Woodblock Click Track & Arrangement Presets:
+  * Penyelaras & Pengganti Harmoni Jazz Pintar (Intelligent Re-Harmonizer & Jazz Chord Substitutions - src/AutoAccompaniment.h & .cpp):
+    - Fungsi ApplyReharmonization melaksanakan peraturan harmoni jazz peringkat tinggi:
+      - Penggantian Tritone (Tritone Substitution): Menukar kord dominan V7 kepada bII7 (contoh: G7 -> Db7).
+      - Dominan Sekunder (Secondary Dominants): Menyisipkan V7/x mendahului kord sasaran dalam birama.
+      - Diminished Melintas (Passing Diminished 7th): Menghubungkan peralihan nada penuh dengan kord diminished kromatik.
+      - Pertukaran Modal (Modal Interchange / Minor Plagal): Menggantikan IV dengan iv minor (C -> Fm) atau bVImaj7 (Abmaj7).
+      - Matriks Perubahan Coltrane (Coltrane Changes): Kitaran pertukaran tonik 3-pusat major 3rd (Giant Steps).
+    - Terintegrasi secara langsung dalam penjanaan gubahan Session Band, Strumming, Riff, dan Lead Solo.
+  * Penjana Harmoni Vokal & Seksyen Tiupan Pintar (Intelligent Melodic & Vocal / Horn Harmonizer - src/AutoAccompaniment.h & .cpp):
+    - Fungsi GenerateMelodicHarmony menjana suara harmoni polifonik berdasarkan melodi utama:
+      - Duo Diatonik Selari (Parallel 3rds / 6ths): Harmoni kembar manis diatonik.
+      - Seksyen Tiupan 3-Suara (3-Piece Horn Section): Melodi Trompet, Tenor Sax pada pic ke-3/ke-7, dan Trombone pada pic asas/ke-5 oktaf bawah.
+      - Korus Vokal 4-Bahagian (4-Part Vocal SATB Choir): Susunan harmoni padat Soprano, Alto, Tenor, dan Bes.
+  * Matriks Pad Kord Maya Interaktif (Interactive Real-Time Virtual Chord Pads Matrix - src/Dialogs/AutoAccompanimentDialog.h & .cpp):
+    - 8 butang pad kord berpandukan tangga nada (I, ii, iii, IV, V7, vi, vii°, bII7) untuk cetusan kord pantas 1-klik dan latihan jamming masa nyata.
+  * Jalur Blok Warna Bahagian Garis Masa & Penanda Fail MIDI Piawai (Visual Timeline Section Banners & SMF Markers - src/TrackWindow.cpp & src/AutoAccompaniment.cpp):
+    - Jalur banner visual pada pembaris garis masa: Intro (Biru), Verse (Hijau), Chorus (Jingga/Kuning), Bridge (Ungu), dan Outro (Kelabu gelap).
+    - Penulisan acara meta SMF 0x06 JZMarkerEvent ke Trek 0 membolehkan DAW luar (Cubase, Ableton, FL Studio, Logic, Reaper) membaca nama bahagian lagu secara automatik.
+  * Trek Detik Metronom Audio Sintesis & Kiraan Awal (Studio Woodblock Click Track & Metronome Count-in - src/AutoAccompaniment.h & .cpp):
+    - Sintesis audio woodblock dwiton: Detik 1 (Downbeat) 900 Hz dan detik 2, 3, 4 (Offbeats) 580 Hz dengan pereputan pantas.
+    - Disepadukan dalam eksport WAV terus serta pilihan eksport trek detik berasingan (stem_click_track.wav).
+  * Pengurus Fail Pratetap Gubahan & Templat Gaya (Arrangement Preset & Style Template Bundle Manager - src/AutoAccompaniment.h & .cpp):
+    - Fungsi SaveArrangementPreset dan LoadArrangementPreset untuk menyimpan dan memuatkan konfigurasi gubahan lengkap dalam fail templat '.jazzstyle'.
+  * Kemas Kini Ujian Unit (tests/test_main.cpp):
+    - Menambah ujian unit komprehensif 30 hingga 35 merangkumi penggantian tritone, susunan harmoni tiupan, darjah pad kord, penanda SMF, frekuensi detik metronom, dan pengekalan konfigurasi fail pratetap.
+
+24-10-2026 Raja Zahidi
 - Feature & Studio Production Suite: Master Music Arranger & Producer Edition (Chord Progression Builder, Multi-Track Stems, Lead Sheet Generator, Outro Ritardando, Velocity Curves & Microtonal Tuning):
   * Pembina Progresi Kord Automatik 1-Klik (Smart Chord Progression Builder & Song Starters - src/AutoAccompaniment.h & .cpp):
     - Fungsi GenerateChordProgression menyuntik progresi kord lengkap dengan susunan pimpinan suara licin (smooth voice leading) ke dalam trek sasaran (piano/lead).

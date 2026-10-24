@@ -278,6 +278,48 @@ const char* JZAutoAccompaniment::GetMicrotonalTuningName(JZMicrotonalTuning tuni
 }
 
 //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+const char* JZAutoAccompaniment::GetReharmonizeModeName(JZReharmonizeMode mode)
+{
+  switch (mode)
+  {
+    case REHARM_NONE:
+      return "None (Original Chords)";
+    case REHARM_TRITONE_SUB:
+      return "Tritone Substitution (V7 -> bII7 e.g. G7 -> Db7)";
+    case REHARM_SECONDARY_DOMINANTS:
+      return "Secondary Dominants (V7/x Target Insertion)";
+    case REHARM_PASSING_DIMINISHED:
+      return "Passing Diminished 7th Chromatic Connectors";
+    case REHARM_MODAL_INTERCHANGE:
+      return "Modal Interchange / Minor Plagal (iv minor / bVImaj7)";
+    case REHARM_COLTRANE_CHANGES:
+      return "Coltrane Changes (Major 3rd Cycle Substitution)";
+    default:
+      return "None";
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+const char* JZAutoAccompaniment::GetHarmonizerStyleName(JZHarmonizerStyle style)
+{
+  switch (style)
+  {
+    case HARMONY_PARALLEL_3RD:
+      return "Parallel 3rds / 6ths (Sweet Diatonic Duo)";
+    case HARMONY_PARALLEL_6TH:
+      return "Parallel 6ths Below (Warm Diatonic Counterpoint)";
+    case HARMONY_3_PIECE_HORNS:
+      return "3-Piece Horn Section (Trumpet, Tenor Sax, Trombone)";
+    case HARMONY_4_PART_VOCAL_SATB:
+      return "4-Part Vocal Choir (SATB Close Harmony)";
+    default:
+      return "Parallel 3rds";
+  }
+}
+
+//-----------------------------------------------------------------------------
 // Dynamic Velocity Response Curve Transformer
 //-----------------------------------------------------------------------------
 unsigned char JZAutoAccompaniment::ApplyVelocityCurve(int baseVelocity, JZVelocityCurve curve, int step)
@@ -567,6 +609,379 @@ bool JZAutoAccompaniment::ExportLeadSheetHtml(
   if (!out.is_open()) return false;
   out << html;
   out.close();
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+// Intelligent Re-Harmonizer & Jazz Chord Substitutions
+//-----------------------------------------------------------------------------
+int JZAutoAccompaniment::ApplyReharmonization(
+  JZSong* pSong,
+  JZReharmonizeMode mode,
+  int fromBar,
+  int toBar)
+{
+  if (!pSong || mode == REHARM_NONE)
+  {
+    return 0;
+  }
+
+  JZTrack* pTrack = pSong->GetTrack(0);
+  JZKeyCenter kc = pTrack ? DetectSongKeyCenter(pTrack) : JZKeyCenter();
+  int tonic = kc.tonicPc;
+
+  int startBar = max(0, fromBar);
+  int endBar = (toBar > startBar) ? toBar : pSong->NumBars();
+  if (endBar <= startBar) endBar = startBar + 8;
+
+  int alteredCount = 0;
+  for (int b = startBar; b < endBar; ++b)
+  {
+    JZDetectedChord orig = JZChordTrack::Instance().GetChord(b);
+    if (!orig.hasNotes)
+    {
+      orig.rootPitchClass = tonic;
+      orig.quality = kc.isMinor ? CHORD_MINOR : CHORD_MAJOR;
+      orig.hasNotes = true;
+    }
+
+    JZDetectedChord reharm = orig;
+
+    switch (mode)
+    {
+      case REHARM_TRITONE_SUB:
+      {
+        if (reharm.quality == CHORD_DOMINANT7 || reharm.quality == CHORD_DOM7 ||
+            reharm.rootPitchClass == (tonic + 7) % 12)
+        {
+          reharm.rootPitchClass = (reharm.rootPitchClass + 6) % 12;
+          reharm.quality = CHORD_DOMINANT7;
+          alteredCount++;
+        }
+        break;
+      }
+
+      case REHARM_SECONDARY_DOMINANTS:
+      {
+        if (b + 1 < endBar)
+        {
+          JZDetectedChord nextCh = JZChordTrack::Instance().GetChord(b + 1);
+          int nextRoot = nextCh.hasNotes ? nextCh.rootPitchClass : tonic;
+          reharm.rootPitchClass = (nextRoot + 7) % 12;
+          reharm.quality = CHORD_DOMINANT7;
+          alteredCount++;
+        }
+        break;
+      }
+
+      case REHARM_PASSING_DIMINISHED:
+      {
+        if (b > startBar)
+        {
+          JZDetectedChord prevCh = JZChordTrack::Instance().GetChord(b - 1);
+          reharm.rootPitchClass = (prevCh.rootPitchClass + 1) % 12;
+          reharm.quality = CHORD_DIMINISHED;
+          alteredCount++;
+        }
+        break;
+      }
+
+      case REHARM_MODAL_INTERCHANGE:
+      {
+        int deg = (reharm.rootPitchClass - tonic + 12) % 12;
+        if (deg == 5)
+        {
+          reharm.quality = CHORD_MINOR;
+          alteredCount++;
+        }
+        else if ((b - startBar) % 4 == 3)
+        {
+          reharm.rootPitchClass = (tonic + 8) % 12;
+          reharm.quality = CHORD_MAJOR7;
+          alteredCount++;
+        }
+        break;
+      }
+
+      case REHARM_COLTRANE_CHANGES:
+      {
+        int step = (b - startBar) % 4;
+        if (step == 1)
+        {
+          reharm.rootPitchClass = (tonic + 8) % 12;
+          reharm.quality = CHORD_MAJOR7;
+          alteredCount++;
+        }
+        else if (step == 2)
+        {
+          reharm.rootPitchClass = (tonic + 4) % 12;
+          reharm.quality = CHORD_MAJOR7;
+          alteredCount++;
+        }
+        else if (step == 3)
+        {
+          reharm.rootPitchClass = (tonic + 7) % 12;
+          reharm.quality = CHORD_DOMINANT7;
+          alteredCount++;
+        }
+        break;
+      }
+
+      default:
+        break;
+    }
+
+    JZChordTrack::Instance().SetChord(b, reharm);
+  }
+
+  return alteredCount;
+}
+
+//-----------------------------------------------------------------------------
+// Intelligent Melodic & Vocal / Horn Harmonizer
+//-----------------------------------------------------------------------------
+int JZAutoAccompaniment::GenerateMelodicHarmony(
+  JZSong* pSong,
+  const JZHarmonizerConfig& config,
+  int fromBar,
+  int toBar)
+{
+  if (!pSong) return 0;
+
+  JZTrack* pSrc = pSong->GetTrack(config.sourceTrackIndex);
+  if (!pSrc) return 0;
+
+  int targetIdx = config.targetTrackIndex;
+  if (targetIdx < 0 || targetIdx >= pSong->GetTrackCount())
+  {
+    targetIdx = 4;
+    if (targetIdx >= pSong->GetTrackCount()) targetIdx = pSong->GetTrackCount() - 1;
+  }
+  JZTrack* pDst = pSong->GetTrack(targetIdx);
+  if (!pDst) return 0;
+
+  int startBar = max(0, fromBar);
+  int endBar = (toBar > startBar) ? toBar : pSong->NumBars();
+  if (endBar <= startBar) endBar = startBar + 8;
+
+  JZBarInfo startInfo(*pSong);
+  startInfo.SetBar(startBar);
+  int fromClock = startInfo.GetClock();
+
+  JZBarInfo endInfo(*pSong);
+  endInfo.SetBar(endBar);
+  int toClock = endInfo.GetClock();
+
+  ClearRange(pDst, fromClock, toClock);
+
+  pDst->Put(new JZProgramEvent(fromClock, config.midiChannel, (unsigned char)max(0, config.patchNumber - 1)));
+  pDst->Put(new JZControlEvent(fromClock, config.midiChannel, 7, (unsigned char)config.volume));
+  pDst->Put(new JZControlEvent(fromClock, config.midiChannel, 10, (unsigned char)config.stereoPan));
+
+  int notesCreated = 0;
+
+  for (int i = 0; i < pSrc->mEventCount; ++i)
+  {
+    JZEvent* pEv = pSrc->mppEvents[i];
+    if (!pEv || pEv->IsKilled()) continue;
+
+    JZKeyOnEvent* pKeyOn = pEv->IsKeyOn();
+    if (!pKeyOn) continue;
+
+    int clk = pKeyOn->GetClock();
+    if (clk < fromClock || clk >= toClock) continue;
+
+    int pitch = pKeyOn->GetPitch();
+    int vel = pKeyOn->GetVelocity();
+    int len = pKeyOn->GetLength();
+    if (len <= 0) len = pSong->GetTicksPerQuarter();
+
+    switch (config.style)
+    {
+      case HARMONY_PARALLEL_3RD:
+      {
+        int hPitch = pitch + 4 + (config.octaveShift * 12);
+        if (hPitch > 120) hPitch -= 12;
+        pDst->Put(new JZKeyOnEvent(clk, config.midiChannel, (unsigned char)hPitch, (unsigned char)(vel * 0.9), (unsigned short)len));
+        notesCreated++;
+        break;
+      }
+
+      case HARMONY_PARALLEL_6TH:
+      {
+        int hPitch = pitch - 9 + (config.octaveShift * 12);
+        if (hPitch < 36) hPitch += 12;
+        pDst->Put(new JZKeyOnEvent(clk, config.midiChannel, (unsigned char)hPitch, (unsigned char)(vel * 0.88), (unsigned short)len));
+        notesCreated++;
+        break;
+      }
+
+      case HARMONY_3_PIECE_HORNS:
+      {
+        int voice1 = pitch - 4 + (config.octaveShift * 12);
+        int voice2 = pitch - 12 + (config.octaveShift * 12);
+        if (voice1 < 36) voice1 += 12;
+        if (voice2 < 36) voice2 += 12;
+
+        pDst->Put(new JZKeyOnEvent(clk, config.midiChannel, (unsigned char)voice1, (unsigned char)(vel * 0.92), (unsigned short)len));
+        pDst->Put(new JZKeyOnEvent(clk, config.midiChannel, (unsigned char)voice2, (unsigned char)(vel * 0.85), (unsigned short)len));
+        notesCreated += 2;
+        break;
+      }
+
+      case HARMONY_4_PART_VOCAL_SATB:
+      {
+        int alto = pitch - 4 + (config.octaveShift * 12);
+        int tenor = pitch - 8 + (config.octaveShift * 12);
+        int bass = pitch - 16 + (config.octaveShift * 12);
+        if (bass < 36) bass += 12;
+        if (tenor < 40) tenor += 12;
+
+        pDst->Put(new JZKeyOnEvent(clk, config.midiChannel, (unsigned char)alto, (unsigned char)(vel * 0.88), (unsigned short)len));
+        pDst->Put(new JZKeyOnEvent(clk, config.midiChannel, (unsigned char)tenor, (unsigned char)(vel * 0.85), (unsigned short)len));
+        pDst->Put(new JZKeyOnEvent(clk, config.midiChannel, (unsigned char)bass, (unsigned char)(vel * 0.82), (unsigned short)len));
+        notesCreated += 3;
+        break;
+      }
+
+      default:
+        break;
+    }
+  }
+
+  return notesCreated;
+}
+
+//-----------------------------------------------------------------------------
+// Interactive Virtual Chord Pads Matrix Helper
+//-----------------------------------------------------------------------------
+JZDetectedChord JZAutoAccompaniment::GetChordPadChord(int tonicPc, bool isMinor, int padIndex)
+{
+  JZDetectedChord ch;
+  ch.hasNotes = true;
+  ch.inversion = 0;
+
+  tonicPc = (tonicPc % 12 + 12) % 12;
+
+  if (!isMinor)
+  {
+    switch (padIndex % 8)
+    {
+      case 0: ch.rootPitchClass = tonicPc; ch.quality = CHORD_MAJOR7; break;
+      case 1: ch.rootPitchClass = (tonicPc + 2) % 12; ch.quality = CHORD_MINOR7; break;
+      case 2: ch.rootPitchClass = (tonicPc + 4) % 12; ch.quality = CHORD_MINOR7; break;
+      case 3: ch.rootPitchClass = (tonicPc + 5) % 12; ch.quality = CHORD_MAJOR7; break;
+      case 4: ch.rootPitchClass = (tonicPc + 7) % 12; ch.quality = CHORD_DOMINANT7; break;
+      case 5: ch.rootPitchClass = (tonicPc + 9) % 12; ch.quality = CHORD_MINOR7; break;
+      case 6: ch.rootPitchClass = (tonicPc + 11) % 12; ch.quality = CHORD_DIMINISHED; break;
+      case 7: ch.rootPitchClass = (tonicPc + 1) % 12; ch.quality = CHORD_DOMINANT7; break;
+      default: ch.rootPitchClass = tonicPc; ch.quality = CHORD_MAJOR; break;
+    }
+  }
+  else
+  {
+    switch (padIndex % 8)
+    {
+      case 0: ch.rootPitchClass = tonicPc; ch.quality = CHORD_MINOR7; break;
+      case 1: ch.rootPitchClass = (tonicPc + 2) % 12; ch.quality = CHORD_DIMINISHED; break;
+      case 2: ch.rootPitchClass = (tonicPc + 3) % 12; ch.quality = CHORD_MAJOR7; break;
+      case 3: ch.rootPitchClass = (tonicPc + 5) % 12; ch.quality = CHORD_MINOR7; break;
+      case 4: ch.rootPitchClass = (tonicPc + 7) % 12; ch.quality = CHORD_DOMINANT7; break;
+      case 5: ch.rootPitchClass = (tonicPc + 8) % 12; ch.quality = CHORD_MAJOR7; break;
+      case 6: ch.rootPitchClass = (tonicPc + 10) % 12; ch.quality = CHORD_DOMINANT7; break;
+      case 7: ch.rootPitchClass = (tonicPc + 1) % 12; ch.quality = CHORD_DOMINANT7; break;
+      default: ch.rootPitchClass = tonicPc; ch.quality = CHORD_MINOR; break;
+    }
+  }
+
+  ch.bassPitchClass = ch.rootPitchClass;
+  ch.minPitch = 48 + ch.rootPitchClass;
+  return ch;
+}
+
+//-----------------------------------------------------------------------------
+// Arrangement Preset & Style Template Bundle Manager
+//-----------------------------------------------------------------------------
+bool JZAutoAccompaniment::SaveArrangementPreset(const JZAccompanimentConfig& config, const string& filePath)
+{
+  ofstream out(filePath.c_str());
+  if (!out.is_open()) return false;
+
+  out << "[JazzArrangementPreset]\n";
+  out << "version=1.0\n";
+  out << "mode=" << (int)config.mode << "\n";
+  out << "style=" << (int)config.style << "\n";
+  out << "generateBass=" << (config.generateBass ? 1 : 0) << "\n";
+  out << "bassTrackIndex=" << config.bassTrackIndex << "\n";
+  out << "generateDrums=" << (config.generateDrums ? 1 : 0) << "\n";
+  out << "drumsTrackIndex=" << config.drumsTrackIndex << "\n";
+  out << "generatePad=" << (config.generatePad ? 1 : 0) << "\n";
+  out << "padTrackIndex=" << config.padTrackIndex << "\n";
+  out << "songSection=" << (int)config.songSection << "\n";
+  out << "bassFeel=" << (int)config.bassFeel << "\n";
+  out << "applyMixerPresets=" << (config.applyMixerPresets ? 1 : 0) << "\n";
+  out << "enableSmoothVoiceLeading=" << (config.enableSmoothVoiceLeading ? 1 : 0) << "\n";
+  out << "enableGhostNotes=" << (config.enableGhostNotes ? 1 : 0) << "\n";
+  out << "swingPercent=" << config.swingPercent << "\n";
+  out << "enableDrumFills=" << (config.enableDrumFills ? 1 : 0) << "\n";
+  out << "enableSoloBendsAndVibrato=" << (config.enableSoloBendsAndVibrato ? 1 : 0) << "\n";
+  out << "reharmonizeMode=" << (int)config.reharmonizeMode << "\n";
+  out << "enableAudioClickTrack=" << (config.enableAudioClickTrack ? 1 : 0) << "\n";
+  out << "enableCountIn=" << (config.enableCountIn ? 1 : 0) << "\n";
+  out << "countInBars=" << config.countInBars << "\n";
+  out << "enableOutroRitardando=" << (config.enableOutroRitardando ? 1 : 0) << "\n";
+  out << "outroSlowdownPercent=" << config.outroSlowdownPercent << "\n";
+  out << "enableMicroPocket=" << (config.enableMicroPocket ? 1 : 0) << "\n";
+  out << "enableScaleLock=" << (config.enableScaleLock ? 1 : 0) << "\n";
+
+  out.close();
+  return true;
+}
+
+bool JZAutoAccompaniment::LoadArrangementPreset(JZAccompanimentConfig& outConfig, const string& filePath)
+{
+  ifstream in(filePath.c_str());
+  if (!in.is_open()) return false;
+
+  string line;
+  while (getline(in, line))
+  {
+    if (line.empty() || line[0] == '[' || line[0] == '#') continue;
+    size_t eq = line.find('=');
+    if (eq == string::npos) continue;
+
+    string key = line.substr(0, eq);
+    string val = line.substr(eq + 1);
+
+    int iVal = atoi(val.c_str());
+
+    if (key == "mode") outConfig.mode = (JZAccompanimentMode)iVal;
+    else if (key == "style") outConfig.style = (JZAccompanimentStyle)iVal;
+    else if (key == "generateBass") outConfig.generateBass = (iVal != 0);
+    else if (key == "bassTrackIndex") outConfig.bassTrackIndex = iVal;
+    else if (key == "generateDrums") outConfig.generateDrums = (iVal != 0);
+    else if (key == "drumsTrackIndex") outConfig.drumsTrackIndex = iVal;
+    else if (key == "generatePad") outConfig.generatePad = (iVal != 0);
+    else if (key == "padTrackIndex") outConfig.padTrackIndex = iVal;
+    else if (key == "songSection") outConfig.songSection = (JZSongSection)iVal;
+    else if (key == "bassFeel") outConfig.bassFeel = (JZBassFeel)iVal;
+    else if (key == "applyMixerPresets") outConfig.applyMixerPresets = (iVal != 0);
+    else if (key == "enableSmoothVoiceLeading") outConfig.enableSmoothVoiceLeading = (iVal != 0);
+    else if (key == "enableGhostNotes") outConfig.enableGhostNotes = (iVal != 0);
+    else if (key == "swingPercent") outConfig.swingPercent = iVal;
+    else if (key == "enableDrumFills") outConfig.enableDrumFills = (iVal != 0);
+    else if (key == "enableSoloBendsAndVibrato") outConfig.enableSoloBendsAndVibrato = (iVal != 0);
+    else if (key == "reharmonizeMode") outConfig.reharmonizeMode = (JZReharmonizeMode)iVal;
+    else if (key == "enableAudioClickTrack") outConfig.enableAudioClickTrack = (iVal != 0);
+    else if (key == "enableCountIn") outConfig.enableCountIn = (iVal != 0);
+    else if (key == "countInBars") outConfig.countInBars = iVal;
+    else if (key == "enableOutroRitardando") outConfig.enableOutroRitardando = (iVal != 0);
+    else if (key == "outroSlowdownPercent") outConfig.outroSlowdownPercent = iVal;
+    else if (key == "enableMicroPocket") outConfig.enableMicroPocket = (iVal != 0);
+    else if (key == "enableScaleLock") outConfig.enableScaleLock = (iVal != 0);
+  }
+
+  in.close();
   return true;
 }
 
@@ -1166,7 +1581,10 @@ bool JZMidiAudioRenderer::ExportWav(
   const string& wavFilePath,
   int sampleRate,
   int fromClock,
-  int toClock)
+  int toClock,
+  bool includeClickTrack,
+  bool includeCountIn,
+  int countInBars)
 {
   if (!pSong || sampleRate <= 0)
   {
@@ -1319,6 +1737,37 @@ bool JZMidiAudioRenderer::ExportWav(
     }
   }
 
+  // Dual-tone Studio Woodblock Click Track Synthesis (900 Hz / 580 Hz)
+  if (includeClickTrack || includeCountIn)
+  {
+    int tpqClick = tpq > 0 ? tpq : 96;
+    int clockPerBeat = tpqClick;
+    int totalBeats = (effectiveEndClock - effectiveStartClock) / clockPerBeat;
+
+    for (int b = 0; b <= totalBeats; ++b)
+    {
+      int clickClock = effectiveStartClock + b * clockPerBeat;
+      double beatSec = (double)(clickClock - effectiveStartClock) * secondsPerTick;
+      int startSamp = (int)(beatSec * (double)sampleRate);
+      if (startSamp >= totalSamples) break;
+
+      bool isDownbeat = (b % 4 == 0);
+      double freq = isDownbeat ? 900.0 : 580.0;
+      float amp = isDownbeat ? 0.70f : 0.45f;
+      double decaySec = isDownbeat ? 0.035 : 0.025;
+      int clickSamples = (int)(decaySec * (double)sampleRate);
+
+      for (int s = 0; s < clickSamples && (startSamp + s) < totalSamples; ++s)
+      {
+        double tSec = (double)s / (double)sampleRate;
+        float env = (float)exp(-tSec / (decaySec * 0.3));
+        float clickVal = amp * (float)sin(2.0 * 3.14159265358979323846 * freq * tSec) * env;
+        leftBuf[startSamp + s] += clickVal;
+        rightBuf[startSamp + s] += clickVal;
+      }
+    }
+  }
+
   // Peak Limiter & Soft Clipper (tanh)
   float peak = 0.0f;
   for (int s = 0; s < totalSamples; ++s)
@@ -1388,7 +1837,8 @@ bool JZMidiAudioRenderer::ExportStems(
   vector<string>& outGeneratedFiles,
   int sampleRate,
   int fromClock,
-  int toClock)
+  int toClock,
+  bool includeClickTrack)
 {
   if (!pSong || sampleRate <= 0) return false;
   outGeneratedFiles.clear();
@@ -1609,6 +2059,79 @@ bool JZMidiAudioRenderer::ExportStems(
     out.close();
 
     outGeneratedFiles.push_back(stemPath);
+  }
+
+  // Optional Dedicated Audio Click Track Stem
+  if (includeClickTrack)
+  {
+    vector<float> clickLeft(totalSamples, 0.0f);
+    vector<float> clickRight(totalSamples, 0.0f);
+    int clockPerBeat = tpq > 0 ? tpq : 96;
+    int totalBeats = (effectiveEndClock - effectiveStartClock) / clockPerBeat;
+
+    for (int b = 0; b <= totalBeats; ++b)
+    {
+      int clickClock = effectiveStartClock + b * clockPerBeat;
+      double beatSec = (double)(clickClock - effectiveStartClock) * secondsPerTick;
+      int startSamp = (int)(beatSec * (double)sampleRate);
+      if (startSamp >= totalSamples) break;
+
+      bool isDownbeat = (b % 4 == 0);
+      double freq = isDownbeat ? 900.0 : 580.0;
+      float amp = isDownbeat ? 0.70f : 0.45f;
+      double decaySec = isDownbeat ? 0.035 : 0.025;
+      int clickSamples = (int)(decaySec * (double)sampleRate);
+
+      for (int s = 0; s < clickSamples && (startSamp + s) < totalSamples; ++s)
+      {
+        double tSec = (double)s / (double)sampleRate;
+        float env = (float)exp(-tSec / (decaySec * 0.3));
+        float clickVal = amp * (float)sin(2.0 * 3.14159265358979323846 * freq * tSec) * env;
+        clickLeft[startSamp + s] += clickVal;
+        clickRight[startSamp + s] += clickVal;
+      }
+    }
+
+    string clickPath = outputDirectory + "/stem_click_track.wav";
+    ofstream outClick(clickPath.c_str(), ios::binary);
+    if (outClick.is_open())
+    {
+      uint32_t subchunk2Size = (uint32_t)totalSamples * 2 * 2;
+      uint32_t chunkSize = 36 + subchunk2Size;
+      uint16_t numChannels = 2;
+      uint32_t sRate = (uint32_t)sampleRate;
+      uint32_t byteRate = sRate * numChannels * 2;
+      uint16_t blockAlign = numChannels * 2;
+      uint16_t bitsPerSample = 16;
+      uint32_t subchunk1Size = 16;
+      uint16_t audioFormat = 1;
+
+      outClick.write("RIFF", 4);
+      outClick.write(reinterpret_cast<const char*>(&chunkSize), 4);
+      outClick.write("WAVE", 4);
+      outClick.write("fmt ", 4);
+      outClick.write(reinterpret_cast<const char*>(&subchunk1Size), 4);
+      outClick.write(reinterpret_cast<const char*>(&audioFormat), 2);
+      outClick.write(reinterpret_cast<const char*>(&numChannels), 2);
+      outClick.write(reinterpret_cast<const char*>(&sRate), 4);
+      outClick.write(reinterpret_cast<const char*>(&byteRate), 4);
+      outClick.write(reinterpret_cast<const char*>(&blockAlign), 2);
+      outClick.write(reinterpret_cast<const char*>(&bitsPerSample), 2);
+      outClick.write("data", 4);
+      outClick.write(reinterpret_cast<const char*>(&subchunk2Size), 4);
+
+      for (int s = 0; s < totalSamples; ++s)
+      {
+        float l = tanh(clickLeft[s]);
+        float r = tanh(clickRight[s]);
+        int16_t sampleL = (int16_t)max(-32767.0f, min(32767.0f, l * 32760.0f));
+        int16_t sampleR = (int16_t)max(-32767.0f, min(32767.0f, r * 32760.0f));
+        outClick.write(reinterpret_cast<const char*>(&sampleL), 2);
+        outClick.write(reinterpret_cast<const char*>(&sampleR), 2);
+      }
+      outClick.close();
+      outGeneratedFiles.push_back(clickPath);
+    }
   }
 
   return !outGeneratedFiles.empty();
@@ -3184,6 +3707,58 @@ JZAccompanimentResult JZAutoAccompaniment::Generate(JZSong* pSong, const JZAccom
     return res;
   }
 
+  // 1b. Apply Reharmonization & Chord Substitutions to Arranger Chords
+  if (config.reharmonizeMode != REHARM_NONE)
+  {
+    for (size_t ci = 0; ci < chords.size(); ++ci)
+    {
+      if (!chords[ci].hasNotes) continue;
+      switch (config.reharmonizeMode)
+      {
+        case REHARM_TRITONE_SUB:
+          if (chords[ci].quality == CHORD_DOMINANT7 || chords[ci].quality == CHORD_DOM7 ||
+              chords[ci].rootPitchClass == (detectedKey.tonicPc + 7) % 12)
+          {
+            chords[ci].rootPitchClass = (chords[ci].rootPitchClass + 6) % 12;
+            chords[ci].quality = CHORD_DOMINANT7;
+          }
+          break;
+        case REHARM_SECONDARY_DOMINANTS:
+          if (ci + 1 < chords.size() && chords[ci + 1].hasNotes)
+          {
+            chords[ci].rootPitchClass = (chords[ci + 1].rootPitchClass + 7) % 12;
+            chords[ci].quality = CHORD_DOMINANT7;
+          }
+          break;
+        case REHARM_PASSING_DIMINISHED:
+          if (ci > 0 && chords[ci - 1].hasNotes)
+          {
+            chords[ci].rootPitchClass = (chords[ci - 1].rootPitchClass + 1) % 12;
+            chords[ci].quality = CHORD_DIMINISHED;
+          }
+          break;
+        case REHARM_MODAL_INTERCHANGE:
+          if (chords[ci].rootPitchClass == (detectedKey.tonicPc + 5) % 12)
+          {
+            chords[ci].quality = CHORD_MINOR;
+          }
+          else if (ci % 4 == 3)
+          {
+            chords[ci].rootPitchClass = (detectedKey.tonicPc + 8) % 12;
+            chords[ci].quality = CHORD_MAJOR7;
+          }
+          break;
+        case REHARM_COLTRANE_CHANGES:
+          if (ci % 4 == 1) { chords[ci].rootPitchClass = (detectedKey.tonicPc + 8) % 12; chords[ci].quality = CHORD_MAJOR7; }
+          else if (ci % 4 == 2) { chords[ci].rootPitchClass = (detectedKey.tonicPc + 4) % 12; chords[ci].quality = CHORD_MAJOR7; }
+          else if (ci % 4 == 3) { chords[ci].rootPitchClass = (detectedKey.tonicPc + 7) % 12; chords[ci].quality = CHORD_DOMINANT7; }
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
   JZBarInfo startInfo(*pSong);
   startInfo.SetBar(startBar);
   int fromClock = startInfo.GetClock();
@@ -3223,8 +3798,18 @@ JZAccompanimentResult JZAutoAccompaniment::Generate(JZSong* pSong, const JZAccom
     // Register detected chord in Global Chord Track for Timeline Ruler
     JZChordTrack::Instance().SetChord(b, ch);
 
-    // 3. Dynamic Song Form Section Determination
+    // 3. Dynamic Song Form Section Determination & Standard MIDI File Section Markers
     JZSongSection section = DetermineSection(b, endBar, config.songSection);
+    static const char* sSecMarkerNames[] = { "INTRO", "VERSE", "CHORUS", "BRIDGE", "OUTRO", "AUTO" };
+    if (barIdx == 0 || (barIdx > 0 && section != DetermineSection(b - 1, endBar, config.songSection)))
+    {
+      JZTrack* pConductor = pSong->GetTrack(0);
+      if (pConductor)
+      {
+        const char* secName = (section >= 0 && section < 5) ? sSecMarkerNames[section] : "SECTION";
+        pConductor->Put(new JZMarkerEvent(bStart, (unsigned char*)secName, (unsigned short)strlen(secName)));
+      }
+    }
 
     // 4. Outro Ritardando Tempo Automation on Final 2 Measures
     if (config.enableOutroRitardando && endBar > 4 && b >= endBar - 2)

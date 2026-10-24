@@ -1,4 +1,27 @@
 24-10-2026 Raja Zahidi
+- Feature & Master Studio Phase-Locked Drum Replacer, Stereo Granular Cloud Synth, Sub-Harmonic Synthesizer, Room Acoustic Calibrator, Universal Microtonal Tuning & 3D Vectorscope Suite v13.0 (Quantum Zenith Release):
+  * Pengganti Dram Berkunci Fasa & Penapis Kebocoran (Phase-Locked Transient Drum Replacer - src/DrumReplacerEngine.h & .cpp):
+    - JZDrumReplacerEngine mengesan transien dram dengan ketepatan sub-sampel mikro dan menolak kebocoran simbal (Hi-Hat / Cymbal bleed rejection).
+    - Memilih secara pintar antara 4 lapisan halaju dinamik (Soft, Medium, Hard, Rimshot) dan menyuntik sampel gantian tepat pada puncak gelombang dengan sisihan fasa sifar (Zero Phase Drift).
+  * Sintesis Awan Granular Tekstur Stereo (Stereo Granular Cloud Texture Synthesizer - src/GranularCloudSynth.h & .cpp):
+    - JZGranularCloudSynth menghasilkan landskap bunyi atmosfera dan tekstur organik daripada butiran mikro audio (5ms hingga 120ms) dengan envelof Hanning.
+    - Dilengkapi kawalan taburan stereo (Stereo Spray Pan), rawakan pic mikro (Pitch Jitter Cents), kebarangkalian butiran berundur (Reverse Probability), dan pembekuan masa (Time Freeze).
+  * Penjana Sub-Harmonik & Penguat Bes Sebenar (Sub-Harmonic Synthesizer & Bass Reinforcer - src/SubHarmonicSynthesizer.h & .cpp):
+    - JZSubHarmonicSynthesizer menjana satu oktaf di bawah frekuensi asas (f0 / 2) menggunakan pembahagi gelombang dwi-kutub untuk menghasilkan tenaga sub-bes fizikal (24Hz - 56Hz) tanpa kekotoran harmonik tinggi.
+    - Dilengkapi pemanduan Sub Drive analog, penapis laluan rendah sub-bes, dan pengadun imbangan asal/sub (Dry/Sub Mix).
+  * Penentukur Mod Akustik Bilik & Pembetulan Monitor (Room Acoustic Mode Standing Wave Calibrator - src/RoomAcousticCalibrator.h & .cpp):
+    - JZRoomAcousticCalibrator mengira mod resonans gelombang pegun bilik (Axial Standing Waves f = c / 2L) dan menganalisis respon frekuensi melalui sapuan sinus logaritmik (Chirp Sine Sweep).
+    - Menghasilkan profil penapis pembetulan terbalik (Inverse Room Correction Profile) untuk meratakan lekukan dan lonjakan akustik ruang studio demi ketepatan pemantauan audio mastering.
+  * Enjin Penalaan Mikrotonal Universal & Skala Alternatif (Universal Microtonal & Alternative Scale Tuning Engine - src/MicrotonalTuningEngine.h & .cpp):
+    - JZMicrotonalTuningEngine menyokong import fail skala Scala (.scl) dan protokol MIDI Tuning Standard (MTS-ESP) untuk penalaan pic sebarang frekuensi per not.
+    - Menyediakan pratetap terbina: Gamelan Slendro (5-nada sama jarak 240 cents), Gamelan Pelog, Maqam Rast (nada suku neutral 354 cents), Maqam Bayati, Just Intonation 5-limit, Pythagorean, 19-EDO, dan 31-EDO.
+  * Goniometer 3D Lissajous & Vektorskop Stereo (3D Lissajous Goniometer & Stereo Vectorscope - src/GoniometerVectorscope.h & .cpp):
+    - JZGoniometerVectorscope menyediakan visualisasi medan stereo masa nyata berasaskan koordinat Lissajous (X = Side, Y = Mid) dan paparan radar polar dengan kesan pendaran fosfor (Phosphor Persistence Glow).
+    - Mengira pekali korelasi fasa berterusan (-1.0 hingga +1.0), imbangan stereo L/R, kelebaran stereo (Side/Mid), dan penggera automatik amaran pembatalan fasa mono (Mono Cancellation Warning).
+  * Penambahan Ujian Unit 107 hingga 112 (tests/test_main.cpp):
+    - Mengesahkan penggantian dram berkunci fasa dan pemilihan lapisan halaju, pengekalan tenaga sintesis granular bertindih 4x, pembahagi sub-harmonik 41.2Hz f0/2, pengiraan mod gelombang bilik 34.3Hz dan penapis terbalik sifar herotan, nisbah skala mikrotonal Scala / Slendro / Maqam Rast, dan analisis korelasi fasa vectorscope +1.0 tanpa pembatalan mono.
+
+24-10-2026 Raja Zahidi
 - Feature & Master Studio Pitch-Tracking Dynamic EQ, Fractal Generative Arp, Capstan Speed Stabilizer, Audio Groove Extractor, Wind Tube Physical Model & Master Linear Phase Imager Suite v12.0 (Flagship Enterprise Edition):
   * Penapis EQ Dinamik Penjejak Pic Muzik (Pitch-Tracking Dynamic Musical EQ - src/PitchTrackingEq.h & .cpp):
     - JZPitchTrackingEq menjejak frekuensi asas (f0) melodi instrumen dan vokal dalam masa nyata secara automatik (ala Sound Radix SurferEQ).

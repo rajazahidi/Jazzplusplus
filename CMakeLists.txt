@@ -169,6 +169,7 @@ set(JAZZ_SOURCES
     src/Dialogs/VelocityDialog.cpp
     src/Dialogs.cpp
     src/DitherFormatEncoder.cpp
+    src/DrumReplacerEngine.cpp
     src/DrumUtilities.cpp
     src/DynamicAutoWah.cpp
     src/DynamicDeEsser.cpp
@@ -185,6 +186,8 @@ set(JAZZ_SOURCES
     src/FrequencyTable.cpp
     src/GetOptionIndex.cpp
     src/Globals.cpp
+    src/GoniometerVectorscope.cpp
+    src/GranularCloudSynth.cpp
     src/GroovePool.cpp
     src/GuitarFrame.cpp
     src/GuitarAmpCabinetSim.cpp
@@ -209,6 +212,7 @@ set(JAZZ_SOURCES
     src/MatchEqProfiler.cpp
     src/MeasureChoice.cpp
     src/MicrophoneModeler.cpp
+    src/MicrotonalTuningEngine.cpp
     src/MidiDeviceDialog.cpp
     src/MidiEffects.cpp
     src/MidiHumanizerProbability.cpp
@@ -244,6 +248,7 @@ set(JAZZ_SOURCES
     src/Rectangle.cpp
     src/Rhythm.cpp
     src/RhythmArrayControl.cpp
+    src/RoomAcousticCalibrator.cpp
     src/Sample.cpp
     src/SampleCommand.cpp
     src/SampleDialog.cpp
@@ -264,6 +269,7 @@ set(JAZZ_SOURCES
     src/StreamingLoudnessInspector.cpp
     src/StringReadWrite.cpp
     src/StringUtilities.cpp
+    src/SubHarmonicSynthesizer.cpp
     src/Synth.cpp
     src/SysexChannel.cpp
     src/TakesComping.cpp

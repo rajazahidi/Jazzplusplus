@@ -1,505 +1,495 @@
 24-10-2026 Raja Zahidi
 - Feature & Master Studio Transient/Tonal Splitter, True-Peak Brickwall Clipper, Generative Drum Morpher, Tape Flutter Modeler, Immersive 3D Reverb & Broadcast Failover Suite v15.0 (Apex Singularity Release):
-  * Pengasingan Aliran Transien vs Tonal Spektral (Transient / Tonal Spectral Audio Splitter - src/TransientTonalSplitter.h & .cpp):
-    - JZTransientTonalSplitter membahagikan isyarat audio secara telus kepada dua aliran bebas: Aliran Transien (serangan pukulan, klik, petikan awal) dan Aliran Tonal (badan nada, harmonik dengungan, ekor resonansi).
-    - Membolehkan pelarasan aras gain, pereputan transien (5ms - 100ms), kepekaan pengesanan, dan mod solo berasingan dengan jaminan pembinaan semula lossless sempurna tanpa sebarang perubahan fasa.
-  * Pemotong Puncak Siling Sebenar Bebas Aliasing (True-Peak Brickwall Clipper & Oversampler - src/BrickwallClipperEngine.h & .cpp):
-    - JZBrickwallClipperEngine menyediakan pemotongan puncak master dengan penapis oversampling polifasa 4x / 8x fasa linear untuk menghapuskan herotan aliasing frekuensi tinggi.
-    - Dilengkapi 4 keluk pemotongan analog: Hard Brickwall, Soft-Knee Parabolic, Tube Diode, dan Apogee Soft-Limit, berserta siling puncak sebenar inter-sample (-0.1 dBTP) dan meter pengurangan dinamik.
-  * Penjana Variasi Dram & Morf Corak Generatif (Generative Drum Poly-Fill & Pattern Morpher - src/GenerativeDrumMorpher.h & .cpp):
-    - JZGenerativeDrumMorpher menginterpolasi corak rentak secara lancar (Pattern A ke Pattern B) dan menjana variasi fill dram poliritmik secara automatik pada bar penanda (Bar 4/8/16).
-    - Dilengkapi 4 gaya variasi (Snare Roll Crescendo, Tom Cascade Run, Polymetric Cross-Beat, Syncopated Choke), suntikan ghost notes kebarangkalian rawak, dan pemanusiaan mikro-pemasaan (jitter ticks).
-  * Pemodelan Fizik Mekanikal Fluktuasi Pita & Geseran Mikro (Analog Tape Scrape Flutter & Chaos Modeler - src/AnalogTapeFlutterModeler.h & .cpp):
-    - JZAnalogTapeFlutterModeler mensimulasikan getaran geseran mikro kepala pita (Scrape Flutter 2.2kHz - 4.2kHz mengikut kelajuan 7.5 / 15 / 30 IPS) dan ketaksekataan roda penekan (Pinch Roller 5.5Hz).
-    - Dilengkapi model hanyutan motor Brownian tak simetri, regangan ketegangan pita transien (Tension Sag), dan simulasi kehilangan mikro-zarah magnetik (Tape Dropouts).
-  * Reverb Konvolusi 3D Spatial Multichannel 7.1.4 (Immersive 3D Spatial Reverb Convolver - src/Immersive3DReverbConvolver.h & .cpp):
-    - JZImmersive3DReverbConvolver memodelkan pantulan awal geometri bilik mengikut vektor 3D (dinding depan, belakang, sisi, lantai, dan siling atas 7.1.4) dengan kelajuan bunyi fizikal 343 m/s.
-    - Dilengkapi rangkaian kelewatan maklum balas 8-saluran (8-Line Orthogonal FDN) dengan matriks pencampuran Householder untuk ekor reverb isotropik 3D yang padat bagi ruang Dewan Konsert, Katedral, dan Studio Live Room.
-  * Sistem Redundansi & Pensuisan Auto-Failover Siaran Konsert (Broadcast Audio Redundancy & Hot-Standby Failover - src/BroadcastFailoverEngine.h & .cpp):
-    - JZBroadcastFailoverEngine menyediakan perlindungan dwi-aliran audio (Primary vs Secondary Backup) dengan pengesanan kerosakan hiper-pantas (< 4ms bagi kesunyian, pembekuan penimbal, atau herotan nan/inf).
-    - Melaksanakan pensuisan pintas automatik kuasa sama rata (Equal-Power Crossfade 2ms) sifar-klik (Zero-Click Seamless Failover) demi kebolehpercayaan 100% konsert jelajah langsung dan penyiaran televisyen.
-  * Penambahan Ujian Unit 119 hingga 124 (tests/test_main.cpp):
-    - Mengesahkan pembinaan semula sempurna pemisah transien/tonal (0.48/0.16), keluk pemampatan parabolik pemotong siling 0.8875, interpolasi halaju 110 morf dram dan picuan Bar 8, variasi kelajuan flutter 28.13 sen pita, pantulan siling 810-sampel reverb 3D 7.1.4, dan pensuisan kuasa sama rata 1.0 failover siaran langsung.
+  * Real-Time Transient vs Tonal Spectral Audio Splitter (src/TransientTonalSplitter.h & .cpp):
+    - JZTransientTonalSplitter transparently separates audio into two independent streams: Transient Stream (percussive attacks, clicks, initial plucks) and Tonal Stream (harmonic body, drone resonances, tonal sustain).
+    - Features independent gain leveling, transient decay adjustment (5ms - 100ms), detection sensitivity, and solo monitoring with guaranteed lossless phase-coherent reconstruction.
+  * Aliasing-Free True-Peak Brickwall Clipper & Oversampler (src/BrickwallClipperEngine.h & .cpp):
+    - JZBrickwallClipperEngine provides master peak clipping powered by a 4x / 8x linear-phase polyphase oversampling filter to eliminate high-frequency intermodulation aliasing distortion.
+    - Features 4 analog clipping curves: Hard Brickwall, Soft-Knee Parabolic, Tube Diode, and Apogee Soft-Limit, with inter-sample True-Peak ceiling (-0.1 dBTP) and dynamic gain reduction metering.
+  * Generative Drum Poly-Fill & Pattern Morpher (src/GenerativeDrumMorpher.h & .cpp):
+    - JZGenerativeDrumMorpher seamlessly interpolates rhythm patterns (Pattern A to Pattern B) and automatically generates polyrhythmic drum fill variations at phrase boundaries (Bars 4/8/16).
+    - Features 4 variation styles (Snare Roll Crescendo, Tom Cascade Run, Polymetric Cross-Beat, Syncopated Choke), stochastic ghost note injection, and micro-timing humanization jitter.
+  * Analog Tape Scrape Flutter & Mechanical Chaos Modeler (src/AnalogTapeFlutterModeler.h & .cpp):
+    - JZAnalogTapeFlutterModeler simulates tape head micro-friction vibration (Scrape Flutter 2.2kHz - 4.2kHz according to 7.5 / 15 / 30 IPS speed) and pinch roller eccentricity (5.5Hz).
+    - Equipped with asymmetric Brownian motor drift, transient tension sag, and magnetic micro-particle tape dropout simulation.
+  * Immersive 3D Spatial Multichannel Reverb Convolver (src/Immersive3DReverbConvolver.h & .cpp):
+    - JZImmersive3DReverbConvolver calculates 3D room boundary early reflections (front, back, side walls, floor, and 7.1.4 ceiling speakers) with physical speed of sound (343 m/s).
+    - Equipped with an 8-Line Orthogonal Feedback Delay Network (FDN) and Householder mixing matrix for dense, isotropic 3D reverb tails tailored for Concert Hall, Cathedral, and Studio Live Room acoustics.
+  * Broadcast Audio Redundancy & Hot-Standby Failover (src/BroadcastFailoverEngine.h & .cpp):
+    - JZBroadcastFailoverEngine provides dual-stream audio protection (Primary vs Secondary Backup) with ultra-fast fault detection (< 4ms for silence dropouts, buffer stalls, or NaN/Inf corruption).
+    - Implements an equal-power 2ms zero-click crossfade bypass switch for 100% mission-critical reliability during live concert touring and broadcast feeds.
+  * Added Unit Tests 119 to 124 (tests/test_main.cpp):
+    - Validates lossless transient/tonal reconstruction (0.48/0.16), parabolic soft-knee 0.8875 clipping curve, drum morph velocity 110 and Bar 8 fill trigger, tape flutter 28.13-cent varispeed excursion, 810-sample 7.1.4 ceiling reflection, and equal-power 1.0 live failover switching.
 
 24-10-2026 Raja Zahidi
 - Feature & Master Studio Spectral Stem Rebalance, Binaural HRTF Spatializer, Through-Zero Flanger, Guitar Valve Amp Profiler, Dynamic Sidechain EQ & SMPTE Timecode Suite v14.0 (Aura Omniscience Release):
-  * Pengimbangan Semula Stems Audio Spektral Masa Nyata (Real-Time Spectral Stem Rebalancer - src/SpectralRebalanceEngine.h & .cpp):
-    - JZSpectralRebalanceEngine melaksanakan penguraian frekuensi multi-jalur dan pengesanan transien masa nyata bagi trek audio stereo siap (mixdown).
-    - Membolehkan pelarasan fader gain (-24dB ke +12dB), solo, mute, dan pan secara bebas untuk 4 stem (Vocals, Drums, Bass, Other) dengan rekonstruksi sempurna tanpa perlu mengeksport semula fail secara luar talian.
-  * Pemproses Binaural 3D & HRTF Fon Kepala (3D Binaural HRTF Headphone Spatializer - src/BinauralHrtfSpatializer.h & .cpp):
-    - JZBinauralHrtfSpatializer menukarkan isyarat titik 3D atau katil spatial multichannel (7.1.4 Dolby Atmos) kepada audio fon kepala stereo yang realistik.
-    - Dilengkapi model formula Woodworth untuk kelewatan antara-telinga (Interaural Time Difference ITD ~0.656ms), penapis bayang kepala frekuensi tinggi (Interaural Level Difference ILD), takukan spektral pinna untuk isyarat elevasi menegak, dan simulasi putaran kepala penjejakan (Head-Tracking Yaw/Pitch/Roll).
-  * Flanger Pita Analog Lintasan Fasa Sifar Sebenar (True Through-Zero Tape Flanger TZF - src/ThroughZeroFlanger.h & .cpp):
-    - JZThroughZeroFlanger menggunakan matriks kelewatan rujukan dwi-saluran dengan tunda rujukan negatif (Lookahead Offset) yang menyapu merentasi titik masa sifar sebenar (t = 0).
-    - Dilengkapi kutub fasa modular (Positive vs Inverted) yang menghasilkan pembatalan fasa kutub infiniti (Infinite Deep Notch Cancellation ala jet pejuang melintasi dinding bunyi), modulasi LFO BBD kuadratur stereo 90 darjah, dan saturasi analog pita.
-  * Pemprofil Penguat Tiub Gitar & Pemuat Dwi-IR Kabinet (Guitar Valve Amp Profiler & Dual-IR Convolver - src/GuitarAmpProfiler.h & .cpp):
-    - JZGuitarAmpProfiler memodelkan tiub preamp 12AX7 tak simetri, tiub kuasa kelas A/AB (EL34, 6L6, EL84), dan penurunan voltan bekalan kuasa dinamik (Power Supply Sag & Tube Bloom).
-    - Dilengkapi pemuat dwi-IR kabinet 64-tap (Vintage 30, Greenback, American Clean, Tweed), kawalan jarak mikrofon (0-10cm dengan kesan kedekatan bass proximity), dan sudut paksi (Center Cap, Cap Edge, Cone, 45-degree Off-Axis).
-  * Penapis Sidechain EQ Dinamik & Tebukan Spektral Pintar (Intelligent Dynamic Sidechain EQ & Carve - src/DynamicSidechainEq.h & .cpp):
-    - JZDynamicSidechainEq melaksanakan analisis tenaga spektral 5-jalur pada isyarat kawalan sidechain dan menebuk lekukan frekuensi dinamik pintar hanya pada zon yang bertindih sahaja.
-    - Mengelakkan masalah "broadband pumping", memisahkan Kick vs Bass (tebukan 60Hz) dan Lead Vocal vs Gitar/Muzik (tebukan 2.5kHz) secara telus dan kekal bertenaga.
-  * Enjin Penyegerakan Kod Masa Siaran & Filem SMPTE LTC / MTC (Broadcast SMPTE LTC / MTC Timecode Engine - src/SmpteTimecodeEngine.h & .cpp):
-    - JZSmpteTimecodeEngine menyediakan penjanaan dan penyahkodan isyarat audio SMPTE / EBU Linear Timecode (LTC) berformat 80-bit Biphase Mark Modulation pada 24, 25, 29.97 Drop-Frame, dan 30 fps.
-    - Menjana mesej MIDI Timecode (MTC Quarter-Frame dan Full-Frame SysEx) untuk penyegerakan sub-bingkai tepat dengan konsol filem, video, dan siaran televisyen komersial.
-  * Penambahan Ujian Unit 113 hingga 118 (tests/test_main.cpp):
-    - Mengesahkan pembinaan semula sempurna pengimbangan spektral 4-stem (+2.5dB gandaan vokal), kelewatan 0.656ms ITD Woodworth 90-darjah, pembatalan fasa sifar flanger TZF, penurunan voltan sag penguat tiub dan adunan dwi-IR, tebukan spektral -5.6dB sidechain 60Hz, dan perkongsian perkataan segerak 0x3FFD kod masa SMPTE 25fps.
+  * Real-Time Spectral Stem Rebalancer (src/SpectralRebalanceEngine.h & .cpp):
+    - JZSpectralRebalanceEngine performs real-time multiband frequency decomposition and transient detection on stereo mixdown tracks.
+    - Provides independent fader gain adjustments (-24dB to +12dB), solo, mute, and pan controls for 4 stems (Vocals, Drums, Bass, Other) with perfect reconstruction without offline re-rendering.
+  * 3D Binaural HRTF Headphone Spatializer (src/BinauralHrtfSpatializer.h & .cpp):
+    - JZBinauralHrtfSpatializer renders 3D point sources and multichannel spatial beds (7.1.4 Dolby Atmos) into realistic stereo headphone audio.
+    - Features Woodworth interaural time difference (ITD ~0.656ms), high-frequency interaural level difference (ILD) head-shadow filtering, pinna spectral notch cues for vertical elevation, and head-tracking simulation (Yaw/Pitch/Roll).
+  * True Through-Zero Tape Flanger TZF (src/ThroughZeroFlanger.h & .cpp):
+    - JZThroughZeroFlanger employs a dual-channel reference delay matrix with lookahead offset that sweeps across the true zero-delay boundary (t = 0).
+    - Features selectable phase polarity (Positive vs Inverted) producing infinite deep notch comb cancellation (jet-plane flyby effect), 90-degree quadrature stereo BBD LFO modulation, and tape saturation warm-up.
+  * Guitar Valve Amp Profiler & Dual-IR Convolver (src/GuitarAmpProfiler.h & .cpp):
+    - JZGuitarAmpProfiler models asymmetric 12AX7 preamp tubes, Class A/AB power stages (EL34, 6L6, EL84), dynamic power supply sag, and tube bloom.
+    - Includes a 64-tap dual-cabinet impulse response convolver (Vintage 30, Greenback, American Clean, Tweed), microphone distance controls (0-10cm with bass proximity effect), and placement angles (Center Cap, Cap Edge, Cone, 45-degree Off-Axis).
+  * Intelligent Dynamic Sidechain EQ & Carve (src/DynamicSidechainEq.h & .cpp):
+    - JZDynamicSidechainEq performs 5-band spectral energy analysis on external sidechain signals and dynamically carves surgical frequency notches only in overlapping conflict zones.
+    - Eliminates broadband pumping artifacts while transparently unmasking Kick vs Bass (60Hz carve) and Lead Vocal vs Guitars/Music (2.5kHz carve).
+  * Broadcast SMPTE LTC / MTC Timecode Engine (src/SmpteTimecodeEngine.h & .cpp):
+    - JZSmpteTimecodeEngine generates and decodes SMPTE / EBU Linear Timecode (LTC) audio signals using 80-bit Biphase Mark Modulation at 24, 25, 29.97 Drop-Frame, and 30 fps.
+    - Generates MIDI Timecode (MTC Quarter-Frame and Full-Frame SysEx) messages for sub-frame synchronization with film consoles, video suites, and broadcast television networks.
+  * Added Unit Tests 113 to 118 (tests/test_main.cpp):
+    - Validates 4-stem spectral rebalance reconstruction (+2.5dB vocal boost), Woodworth 90-degree 0.656ms ITD, TZF zero-crossing phase cancellation, tube power sag and dual-IR blend, -5.6dB 60Hz sidechain carve, and 25fps SMPTE 0x3FFD sync word synchronization.
 
 24-10-2026 Raja Zahidi
 - Feature & Master Studio Phase-Locked Drum Replacer, Stereo Granular Cloud Synth, Sub-Harmonic Synthesizer, Room Acoustic Calibrator, Universal Microtonal Tuning & 3D Vectorscope Suite v13.0 (Quantum Zenith Release):
-  * Pengganti Dram Berkunci Fasa & Penapis Kebocoran (Phase-Locked Transient Drum Replacer - src/DrumReplacerEngine.h & .cpp):
-    - JZDrumReplacerEngine mengesan transien dram dengan ketepatan sub-sampel mikro dan menolak kebocoran simbal (Hi-Hat / Cymbal bleed rejection).
-    - Memilih secara pintar antara 4 lapisan halaju dinamik (Soft, Medium, Hard, Rimshot) dan menyuntik sampel gantian tepat pada puncak gelombang dengan sisihan fasa sifar (Zero Phase Drift).
-  * Sintesis Awan Granular Tekstur Stereo (Stereo Granular Cloud Texture Synthesizer - src/GranularCloudSynth.h & .cpp):
-    - JZGranularCloudSynth menghasilkan landskap bunyi atmosfera dan tekstur organik daripada butiran mikro audio (5ms hingga 120ms) dengan envelof Hanning.
-    - Dilengkapi kawalan taburan stereo (Stereo Spray Pan), rawakan pic mikro (Pitch Jitter Cents), kebarangkalian butiran berundur (Reverse Probability), dan pembekuan masa (Time Freeze).
-  * Penjana Sub-Harmonik & Penguat Bes Sebenar (Sub-Harmonic Synthesizer & Bass Reinforcer - src/SubHarmonicSynthesizer.h & .cpp):
-    - JZSubHarmonicSynthesizer menjana satu oktaf di bawah frekuensi asas (f0 / 2) menggunakan pembahagi gelombang dwi-kutub untuk menghasilkan tenaga sub-bes fizikal (24Hz - 56Hz) tanpa kekotoran harmonik tinggi.
-    - Dilengkapi pemanduan Sub Drive analog, penapis laluan rendah sub-bes, dan pengadun imbangan asal/sub (Dry/Sub Mix).
-  * Penentukur Mod Akustik Bilik & Pembetulan Monitor (Room Acoustic Mode Standing Wave Calibrator - src/RoomAcousticCalibrator.h & .cpp):
-    - JZRoomAcousticCalibrator mengira mod resonans gelombang pegun bilik (Axial Standing Waves f = c / 2L) dan menganalisis respon frekuensi melalui sapuan sinus logaritmik (Chirp Sine Sweep).
-    - Menghasilkan profil penapis pembetulan terbalik (Inverse Room Correction Profile) untuk meratakan lekukan dan lonjakan akustik ruang studio demi ketepatan pemantauan audio mastering.
-  * Enjin Penalaan Mikrotonal Universal & Skala Alternatif (Universal Microtonal & Alternative Scale Tuning Engine - src/MicrotonalTuningEngine.h & .cpp):
-    - JZMicrotonalTuningEngine menyokong import fail skala Scala (.scl) dan protokol MIDI Tuning Standard (MTS-ESP) untuk penalaan pic sebarang frekuensi per not.
-    - Menyediakan pratetap terbina: Gamelan Slendro (5-nada sama jarak 240 cents), Gamelan Pelog, Maqam Rast (nada suku neutral 354 cents), Maqam Bayati, Just Intonation 5-limit, Pythagorean, 19-EDO, dan 31-EDO.
-  * Goniometer 3D Lissajous & Vektorskop Stereo (3D Lissajous Goniometer & Stereo Vectorscope - src/GoniometerVectorscope.h & .cpp):
-    - JZGoniometerVectorscope menyediakan visualisasi medan stereo masa nyata berasaskan koordinat Lissajous (X = Side, Y = Mid) dan paparan radar polar dengan kesan pendaran fosfor (Phosphor Persistence Glow).
-    - Mengira pekali korelasi fasa berterusan (-1.0 hingga +1.0), imbangan stereo L/R, kelebaran stereo (Side/Mid), dan penggera automatik amaran pembatalan fasa mono (Mono Cancellation Warning).
-  * Penambahan Ujian Unit 107 hingga 112 (tests/test_main.cpp):
-    - Mengesahkan penggantian dram berkunci fasa dan pemilihan lapisan halaju, pengekalan tenaga sintesis granular bertindih 4x, pembahagi sub-harmonik 41.2Hz f0/2, pengiraan mod gelombang bilik 34.3Hz dan penapis terbalik sifar herotan, nisbah skala mikrotonal Scala / Slendro / Maqam Rast, dan analisis korelasi fasa vectorscope +1.0 tanpa pembatalan mono.
+  * Phase-Locked Transient Drum Replacer (src/DrumReplacerEngine.h & .cpp):
+    - JZDrumReplacerEngine detects drum transients with sub-sample precision and rejects hi-hat / cymbal bleed.
+    - Dynamically selects across 4 velocity layers (Soft, Medium, Hard, Rimshot) and aligns sample triggers to incoming waveform peaks with zero phase drift.
+  * Stereo Granular Cloud Texture Synthesizer (src/GranularCloudSynth.h & .cpp):
+    - JZGranularCloudSynth creates atmospheric soundscapes and organic textures from micro-grains of audio (5ms to 120ms) with Hanning windowing.
+    - Features stereo spray panning, pitch jitter in cents, reverse grain playback probability, and time freeze capabilities.
+  * Sub-Harmonic Synthesizer & Bass Reinforcer (src/SubHarmonicSynthesizer.h & .cpp):
+    - JZSubHarmonicSynthesizer generates a sub-octave below the fundamental frequency (f0 / 2) via dual-pole wave-division to produce visceral sub-bass energy (24Hz - 56Hz) free of unwanted high-frequency harmonic distortion.
+    - Features analog Sub Drive saturation, dedicated low-pass filtering, and continuous dry/sub blend.
+  * Room Acoustic Mode Standing Wave Calibrator (src/RoomAcousticCalibrator.h & .cpp):
+    - JZRoomAcousticCalibrator calculates axial room standing wave modes (f = c / 2L) and measures frequency response via logarithmic chirp sine sweeps.
+    - Generates an inverse room correction filter profile to flatten room modal resonances and dips for surgical mastering monitor accuracy.
+  * Universal Microtonal & Alternative Scale Tuning Engine (src/MicrotonalTuningEngine.h & .cpp):
+    - JZMicrotonalTuningEngine supports Scala (.scl) scale file imports and MIDI Tuning Standard (MTS-ESP) protocols for arbitrary per-note pitch tuning.
+    - Includes built-in presets: Gamelan Slendro (5-tone equidistant 240 cents), Gamelan Pelog, Maqam Rast (neutral quarter-tone 354 cents), Maqam Bayati, Just Intonation 5-limit, Pythagorean, 19-EDO, and 31-EDO.
+  * 3D Lissajous Goniometer & Stereo Vectorscope (src/GoniometerVectorscope.h & .cpp):
+    - JZGoniometerVectorscope provides real-time stereo field visualization using Lissajous coordinates (X = Side, Y = Mid) and polar radar display with phosphor persistence decay.
+    - Computes continuous phase correlation coefficient (-1.0 to +1.0), stereo L/R balance, stereo width (Side/Mid), and automatic mono cancellation warning alerts.
+  * Added Unit Tests 107 to 112 (tests/test_main.cpp):
+    - Validates phase-locked drum replacement and velocity zone indexing, 4x grain overlap energy preservation, 41.2Hz f0/2 sub-harmonic frequency division, 34.3Hz room axial mode calculation and minimum-phase inverse filter, Scala / Slendro / Maqam Rast scale intervals, and vectorscope +1.0 phase correlation.
 
 24-10-2026 Raja Zahidi
 - Feature & Master Studio Pitch-Tracking Dynamic EQ, Fractal Generative Arp, Capstan Speed Stabilizer, Audio Groove Extractor, Wind Tube Physical Model & Master Linear Phase Imager Suite v12.0 (Flagship Enterprise Edition):
-  * Penapis EQ Dinamik Penjejak Pic Muzik (Pitch-Tracking Dynamic Musical EQ - src/PitchTrackingEq.h & .cpp):
-    - JZPitchTrackingEq menjejak frekuensi asas (f0) melodi instrumen dan vokal dalam masa nyata secara automatik (ala Sound Radix SurferEQ).
-    - Menggerakkan pusat penapis biquad mengikut siri harmonik muzik (Fundamental 1x, 2nd Harmonic 2x, 3rd Harmonic 3x) dengan kawalan pelicinan glissando (5ms - 100ms) untuk mengelakkan potongan frekuensi yang salah apabila pic bertukar nada.
-  * Arpeggiator Generatif Fraktal Berbilang Lapisan (Multi-Layer Fractal Generative Arpeggiator - src/FractalGenerativeArp.h & .cpp):
-    - JZFractalGenerativeArp menyediakan 4 lapisan arpeggiator serentak yang dipacu oleh jujukan matematik fraktal Fibonacci dan Mandelbrot.
-    - Dilengkapi panjang langkah poliritmik bebas per lapisan (contoh: 16, 12, 7, 5 langkah), kebarangkalian mutasi corak (0% - 100%), dan percabangan multi-oktaf.
-  * Penstabil & Pemulih Kelajuan Pita/Vinil (Capstan Speed Stabilizer & Wow/Flutter Corrector - src/CapstanSpeedStabilizer.h & .cpp):
-    - JZCapstanSpeedStabilizer memulihkan rakaman analog lama (kaset, reel-to-reel, piring hitam) yang mengalami ayunan kelajuan motor teruk (ala Celemony Capstan).
-    - Mengesan kontur hanyutan pic atau pembawa hum motor dan mengenakan resintesis masa terbalik (Inverse Dynamic Varispeed Time-Warping) untuk mengunci pic rakaman agar stabil dan rata.
-  * Pengekstrak Alur Dinamik Audio-ke-MIDI (Audio Transient Groove Extractor & Swing Quantize - src/AudioGrooveExtractor.h & .cpp):
-    - JZAudioGrooveExtractor mengekstrak anjakan masa mikro (sub-tick swing offsets) dan kontur halaju daripada rakaman audio sebenar (contoh: gelung dram funk James Brown).
-    - Menjana templat alur (Groove Template) yang boleh diaplikasikan secara terus untuk mengkuantisasi mana-mana trek MIDI pada Piano Roll.
-  * Pemodelan Fizikal Tiub Resonans Alat Tiup (Physical Modeling Wind & Brass Tube Resonator - src/WindTubePhysicalModel.h & .cpp):
-    - JZWindTubePhysicalModel mensimulasikan instrumen tiup akustik (seruling kayu, klarinet, saksofon, hon loyang) melalui sintesis digital waveguide dwi-arah dengan jadual rid tak linear (non-linear reed table).
-    - Membolehkan kawalan tekanan nafas (Breath Pressure), suntikan turbulensi nafas (Breath Noise), panjang bore akustik, dan redaman radiasi loceng.
-  * Pembahagi Fasa Linear Mastering & Pengimej Psikoakustik (Master Linear Phase FIR Crossover & Psychoacoustic Stereo Imager - src/MasterLinearPhaseImager.h & .cpp):
-    - JZMasterLinearPhaseImager menyediakan penapis silang 4-jalur fasa linear tanpa herotan fasa (Zero-Phase Symmetric 31-Tap FIR Crossover: Sub < 120Hz, Low-Mid 120Hz-1.2kHz, High-Mid 1.2kHz-6kHz, Air > 6kHz).
-    - Dilengkapi kawalan kelebaran stereo psikoakustik bebas per jalur (0% - 200%) dan penapis eliptik mono sub-bes bebas anjakan fasa (Elliptical Mono Bass Guard).
-  * Penambahan Ujian Unit 101 hingga 106 (tests/test_main.cpp):
-    - Mengesahkan penjejakan pic harmonik SurferEQ (110Hz, 220Hz, 330Hz), indeks permutasi siri Fibonacci dan Mandelbrot, pampasan masa terbalik 0.966x penstabil kelajuan kaset Capstan, kuantisasi alur mikro audio dram +6 ticks, pengiraan panjang delay 50-sampel tiub akustik 440Hz, dan pembinaan semula sempurna crossover FIR fasa linear 4-jalur.
+  * Pitch-Tracking Dynamic Musical EQ (src/PitchTrackingEq.h & .cpp):
+    - JZPitchTrackingEq tracks the fundamental pitch (f0) of vocal and melodic instrument tracks in real-time.
+    - Dynamically centers biquad filter bands to musical harmonics (Fundamental 1x, 2nd Harmonic 2x, 3rd Harmonic 3x) with glissando smoothing (5ms - 100ms) to prevent tracking artifacts.
+  * Multi-Layer Fractal Generative Arpeggiator (src/FractalGenerativeArp.h & .cpp):
+    - JZFractalGenerativeArp powers 4 concurrent arpeggiator layers driven by Fibonacci and Mandelbrot fractal sequences.
+    - Features independent polyrhythmic step lengths per layer (e.g., 16, 12, 7, 5 steps), pattern mutation probability (0% - 100%), and multi-octave branching.
+  * Capstan Speed Stabilizer & Wow/Flutter Corrector (src/CapstanSpeedStabilizer.h & .cpp):
+    - JZCapstanSpeedStabilizer restores vintage analog recordings (cassette, reel-to-reel, vinyl) plagued by motor speed instability.
+    - Detects pitch drift contours or motor hum carriers and applies inverse dynamic varispeed time-warping to lock playback pitch into rock-solid stability.
+  * Audio Transient Groove Extractor & Swing Quantize (src/AudioGrooveExtractor.h & .cpp):
+    - JZAudioGrooveExtractor extracts sub-tick swing timing offsets and velocity envelopes directly from live audio recordings (e.g. vintage funk drum breaks).
+    - Generates reusable Groove Templates that can be applied to quantize MIDI events on the Piano Roll.
+  * Physical Modeling Wind & Brass Tube Resonator (src/WindTubePhysicalModel.h & .cpp):
+    - JZWindTubePhysicalModel simulates acoustic wind instruments (wooden flute, clarinet, saxophone, brass horn) using bidirectional digital waveguide synthesis with non-linear reed tables.
+    - Features breath pressure modulation, breath turbulence noise injection, bore length acoustics, and bell radiation damping.
+  * Master Linear Phase FIR Crossover & Psychoacoustic Stereo Imager (src/MasterLinearPhaseImager.h & .cpp):
+    - JZMasterLinearPhaseImager provides a 4-band zero-phase 31-tap symmetric FIR crossover network (Sub < 120Hz, Low-Mid 120Hz-1.2kHz, High-Mid 1.2kHz-6kHz, Air > 6kHz).
+    - Features independent psychoacoustic stereo width controls per band (0% - 200%) and a zero-phase elliptical mono bass guard.
+  * Added Unit Tests 101 to 106 (tests/test_main.cpp):
+    - Validates pitch-tracking harmonic filters (110Hz, 220Hz, 330Hz), Fibonacci and Mandelbrot sequence permutations, 0.966x inverse varispeed capstan correction, +6 ticks groove extraction quantization, 50-sample waveguide acoustic delay, and 4-band linear-phase FIR crossover reconstruction.
 
 24-10-2026 Raja Zahidi
 - Feature & Master Studio Dual-Mic Phase Aligner, AI Melody/Counterpoint, Vocal Doubler, Multiband OTT, Mic Modeler & Streaming Inspector Suite v11.0 (Next-Gen Production):
-  * Penyelaras Fasa Dwi-Mikrofon Dinamik (Dual-Mic Dynamic Phase Aligner & Auto-Correlator - src/PhaseAlignerEngine.h & .cpp):
-    - JZPhaseAlignerEngine menyelesaikan masalah pembatalan fasa sisir (comb filtering) pada rakaman berbilang mikrofon (Snare Top/Bottom, Kick In/Out, stereo guitar cabs).
-    - Dilengkapi pengesan korelasi silang fasa automatik, pelarasan kelewatan sub-sampel mikro (0.01ms - 25.0ms), pemutar fasa all-pass berterusan (0 - 360 darjah), dan pembalik kutub 180 darjah (Polarity Flip).
-  * Penjana Melodi & Kontrapun AI Berpandukan Teori Muzik (AI MIDI Melody & Counterpoint Generator - src/AiMelodyCounterpointGenerator.h & .cpp):
-    - JZAiMelodyCounterpointGenerator menjana garis melodi utama ekspresif dan suara kedua kontrapun berlawanan arah (Contrary Motion Counterpoint) berdasarkan progresi kord harmoni projek.
-    - Mematuhi hukum teori muzik Fuxian (mengelakkan kelima dan oktaf sejajar, keutamaan pergerakan melangkah stepwise, dan resolusi ketegangan kord pada nada ke-3 dan ke-7).
-  * Pengganda Vokal Stereo & Ensembel Mikro-Detune (Vocal Stereo Doubler & Micro-Detune Ensemble - src/VocalDoublerEngine.h & .cpp):
-    - JZVocalDoublerEngine menjana 4 lapisan vokal kembar stereo dimensional serentak daripada trek vokal mono.
-    - Dilengkapi penalaan mikro bebas per suara (+/- 4 hingga 18 cents), fluktuasi masa manusia rawak (Jitter 0ms - 15ms), sebaran stereo ekstrem (Stereo Width 0% - 200%), dan pengawal fasa mono (Mono-Compatibility Phase Guard).
-  * Pemampat Multi-Jalur Dwi-Arah OTT (Upward / Downward OTT Multiband Dynamics Processor - src/MultibandOttProcessor.h & .cpp):
-    - JZMultibandOttProcessor melaksanakan pemampatan multi-jalur 3-jalur (Low < 140Hz, Mid 140Hz - 2.5kHz, High > 2.5kHz) dengan dwi-pemampatan serentak.
-    - Pemampatan Menurun (Downward Compression untuk menekan transien kasar) dan Pemampatan Menaik (Upward Compression sehingga +18dB untuk mengangkat butiran halus yang terpendam) dengan pemasaan hiper-pantas.
-  * Pemodelan Kapsul Mikrofon Studio Vintaj (Vintage Studio Microphone Modeler & Capsule Simulator - src/MicrophoneModeler.h & .cpp):
-    - JZMicrophoneModeler memodelkan respon frekuensi dan ciri akustik 4 mikrofon studio legenda: German U87 (kondenser serba boleh, mid jernih), Vintage 251 (tiub sutera berkilau), Broadcast 7B (dinamik penyiaran tebal), dan Ribbon R121 (pita ribbon hangat).
-    - Dilengkapi kawalan kesan kedekatan (Proximity Effect 0cm - 30cm), corak kutub (Cardioid, Omni, Figure-8), dan saturasi transformer tiub analog.
-  * Penganalisis Kenyaringan & Penormalan Penstriman (Streaming Loudness Target & True-Peak Inspector - src/StreamingLoudnessInspector.h & .cpp):
-    - JZStreamingLoudnessInspector mengukur Integrated LUFS, Short-Term LUFS, Loudness Range (LRA), dan Max True-Peak dBTP (standard ITU-R BS.1770-4 / EBU R128).
-    - Membandingkan adunan dengan sasaran rasmi platform komersial (Spotify -14 LUFS, Apple Music -16 LUFS, YouTube -14 LUFS, Tidal -14 LUFS, Broadcast EBU -23 LUFS), mengira penalti kenyaringan (Gain Penalty dB), dan menyediakan pengganda penormalan satu-klik (One-Click Match Target).
-  * Penambahan Ujian Unit 95 hingga 100 (tests/test_main.cpp - Genap 100 Ujian Unit!):
-    - Mengesahkan pengesanan korelasi fasa dwi-mikrofon dan pembalikan kutub, panduan suara kontrapun berlawanan arah AI, nisbah penalaan sen mikro pengganda vokal, keluk pemampatan menaik OTT (+4.5dB boost), pemodelan kapsul German U87, penalti kenyaringan penstriman Spotify (-3.5dB), dan penormalan volum satu-klik pada Ujian Unit ke-100!
+  * Dual-Mic Dynamic Phase Aligner & Auto-Correlator (src/PhaseAlignerEngine.h & .cpp):
+    - JZPhaseAlignerEngine resolves comb filtering and phase cancellation in multi-microphone tracking (Snare Top/Bottom, Kick In/Out, stereo guitar cabs).
+    - Features automatic cross-correlation phase detection, micro sub-sample delay adjustment (0.01ms - 25.0ms), continuous all-pass phase rotation (0 - 360 degrees), and 180-degree polarity flip.
+  * AI MIDI Melody & Counterpoint Generator (src/AiMelodyCounterpointGenerator.h & .cpp):
+    - JZAiMelodyCounterpointGenerator composes expressive melodic lines and contrary motion counterpoint voices based on project chord progressions.
+    - Adheres to classical Fuxian counterpoint rules (forbidding parallel fifths/octaves, prioritizing stepwise motion, resolving chordal 3rds and 7ths).
+  * Vocal Stereo Doubler & Micro-Detune Ensemble (src/VocalDoublerEngine.h & .cpp):
+    - JZVocalDoublerEngine synthesizes 4 distinct, dimensional stereo vocal double tracks from a mono vocal take.
+    - Features independent micro-pitch detuning (+/- 4 to 18 cents), random human timing jitter (0ms - 15ms), extreme stereo spreading (0% - 200%), and mono-compatibility phase protection.
+  * Upward / Downward OTT Multiband Dynamics Processor (src/MultibandOttProcessor.h & .cpp):
+    - JZMultibandOttProcessor executes simultaneous 3-band upward and downward dynamic compression (Low < 140Hz, Mid 140Hz - 2.5kHz, High > 2.5kHz).
+    - Features downward compression to tame harsh transients combined with upward compression (up to +18dB) to lift subtle background nuances with ultra-fast time constants.
+  * Vintage Studio Microphone Modeler & Capsule Simulator (src/MicrophoneModeler.h & .cpp):
+    - JZMicrophoneModeler captures the frequency response and acoustic character of 4 legendary studio microphones: German U87 condenser, Vintage 251 silky tube, Broadcast 7B dynamic, and Ribbon R121.
+    - Features variable proximity effect (0cm - 30cm), polar patterns (Cardioid, Omni, Figure-8), and tube transformer saturation.
+  * Streaming Loudness Target & True-Peak Inspector (src/StreamingLoudnessInspector.h & .cpp):
+    - JZStreamingLoudnessInspector meters Integrated LUFS, Short-Term LUFS, Loudness Range (LRA), and Max True-Peak dBTP per ITU-R BS.1770-4 / EBU R128 standards.
+    - Compares mixes against official streaming targets (Spotify -14 LUFS, Apple Music -16 LUFS, YouTube -14 LUFS, Tidal -14 LUFS, Broadcast EBU -23 LUFS), calculates gain penalties, and offers one-click target matching.
+  * Added Unit Tests 95 to 100 (tests/test_main.cpp - Century Mark Milestone!):
+    - Validates dual-mic phase auto-correlation and polarity inversion, AI contrary motion voice leading, vocal doubler micro-detune ratios, OTT upward compression boost (+4.5dB), German U87 capsule curve, Spotify -3.5dB penalty calculation, and one-click target gain normalization at Test 100!
 
 24-10-2026 Raja Zahidi
 - Feature & Master Studio Audio De-Clipper & De-Clicker, Guitar Strum Engine, 7.1.4 Immersive Audio, Vintage Lo-Fi Modeler, Key/Chord Detector & Resonance Tamer Suite v10.0 (Milestone Release):
-  * Pemulihan Audio Terpotong & Pembersih Klik Spektral (Spectral Audio De-Clipper & De-Clicker - src/AudioRestorationEngine.h & .cpp):
-    - JZAudioRestorationEngine melaksanakan rekonstruksi polinomial kubik bagi sampel audio yang mengalami herotan pemotongan digital (De-Clip), membentuk semula puncak kubah analog di atas paras ambang klip.
-    - Dilengkapi modul De-Clicker linear-predictive residual untuk mengesan dan menghapuskan letupan klik vinil, klik bibir vokal, dan lepasan digital tanpa merosakkan transien muzik asal.
-  * Enjin Petikan & Ayunan Gitar Sebenar (Realistic Guitar Strumming & Fingerpicking Engine - src/GuitarStrumEngine.h & .cpp):
-    - JZGuitarStrumEngine menukarkan blok kord MIDI kepada urutan petikan gitar realistik dengan arah ayunan berbeza (Downstroke / Upstroke / Alternating).
-    - Menyokong kelengahan masa mikro antara dawai (Strum Speed ticks), corak petikan jari klasik/akustik (P-I-M-A arpeggio), pengartikulasian redaman tapak tangan (Palm Muting), dan dinamik halaju dawai bes vs treble.
-  * Audio Imersif Dolby Atmos 7.1.4 & Pemutar Objek Ketinggian (Immersive 7.1.4 Spatial Bed & Height Object Panner - src/ImmersiveAudioPanner.h & .cpp):
-    - JZImmersiveAudioPanner menyediakan penghalaan 12 saluran imersif penuh (7 saluran keliling telinga: L, C, R, LFE, Lss, Rss, Lsr, Rsr; dan 4 pembesar suara ketinggian siling: Top Front L/R, Top Rear L/R).
-    - Membolehkan kedudukan objek 3D dimanipulasi secara bebas mengikut Azimuth (0-360 deg), Elevasi (-30 hingga +90 deg), dan Jarak dengan atenuasi kuasa terbalik.
-  * Pemproses Watak Kaset Retro & Ayunan Pic Lo-Fi (Vintage Lo-Fi Cassette Degradation & Pitch Wobble - src/VintageLofiProcessor.h & .cpp):
-    - JZVintageLofiProcessor mensimulasikan ketidakstabilan motor pita kaset retro dengan ayunan pic mikro (Slow Wow & Fast Flutter), pengurangan frekuensi tinggi akibat jajaran kepala pita kaset (Azimuth Rolloff), penjana desisan pita analog (Type I Ferric & Type II Chrome), dan kecacatan pita magnetik rawak (Tape Dropouts).
-  * Pengecam Kunci Muzik & Garis Masa Kord Automatik (Automatic Song Key, Scale & Chord Timeline Detector - src/KeyChordDetector.h & .cpp):
-    - JZKeyChordDetector mengekstrak profil kelas pic kromagram 12-jalur daripada audio atau acara MIDI projek.
-    - Algoritma Krumhansl-Schmuckler menentukan tangga nada utama lagu (24 nada Major/Minor) beserta skor keyakinan (Confidence Score 0% - 100%), dan memetakan perkembangan kord muzik pada garis masa lagu secara automatik.
-  * Penjinak Resonans Spektral Dinamik Pintar (Smart Dynamic Spectral Resonance Tamer - src/SpectralResonanceTamer.h & .cpp):
-    - JZSpectralResonanceTamer mengesan dan menolak lonjakan resonans frekuensi sempit yang tajam pada julat 1kHz - 11kHz secara automatik dan telus (ala Oeksound Soothe).
-    - Menghapuskan kekasaran sibilance vokal, simbal dram yang pedih di telinga, dan dengungan akustik dengan kawalan Depth (0% - 100%), Sharpness Q, dan mod Listen Delta.
-  * Penambahan Ujian Unit 89 hingga 94 (tests/test_main.cpp):
-    - Mengesahkan rekonstruksi kubah parabola analog De-Clipper, lengahan 20-tick ayunan gitar 6-dawai, pemisahan 100% tenaga pembesar suara siling imersif 7.1.4 pada elevasi 90 darjah, had ayunan pic fractional pita kaset Lo-Fi, korelasi profil Krumhansl-Schmuckler tangga nada C Major, dan atenuasi takuk dinamik penjinak resonans spektral.
+  * Spectral Audio De-Clipper & De-Clicker (src/AudioRestorationEngine.h & .cpp):
+    - JZAudioRestorationEngine performs cubic polynomial reconstruction of clipped audio samples, rebuilding smooth analog crests above digital clipping thresholds.
+    - Features linear-predictive residual de-clicking to detect and eliminate vinyl clicks, vocal mouth clicks, and digital pops without transient blunting.
+  * Realistic Guitar Strumming & Fingerpicking Engine (src/GuitarStrumEngine.h & .cpp):
+    - JZGuitarStrumEngine transforms block MIDI chords into authentic guitar strum patterns with directional strokes (Downstroke / Upstroke / Alternating).
+    - Supports inter-string strum delay timing, classical/acoustic fingerpicking patterns (P-I-M-A arpeggios), palm muting articulations, and bass/treble velocity dynamics.
+  * Immersive 7.1.4 Spatial Bed & Height Object Panner (src/ImmersiveAudioPanner.h & .cpp):
+    - JZImmersiveAudioPanner routes across full 12-channel immersive beds (7 surround ear-level: L, C, R, LFE, Lss, Rss, Lsr, Rsr; and 4 ceiling height channels: Top Front L/R, Top Rear L/R).
+    - Allows 3D object positioning via Azimuth (0-360 deg), Elevation (-30 to +90 deg), and distance-based inverse power attenuation.
+  * Vintage Lo-Fi Cassette Degradation & Pitch Wobble (src/VintageLofiProcessor.h & .cpp):
+    - JZVintageLofiProcessor models vintage cassette transport instability with dual-rate pitch wobble (Slow Wow & Fast Flutter), azimuth head misalignment roll-off, analog tape hiss generators (Type I Ferric & Type II Chrome), and stochastic magnetic dropouts.
+  * Automatic Song Key, Scale & Chord Timeline Detector (src/KeyChordDetector.h & .cpp):
+    - JZKeyChordDetector extracts 12-band pitch class chromagram profiles from audio or MIDI tracks.
+    - Uses Krumhansl-Schmuckler algorithms to determine song key and scale (24 Major/Minor keys) with confidence scoring, and automatically maps chord progressions along the timeline.
+  * Smart Dynamic Spectral Resonance Tamer (src/SpectralResonanceTamer.h & .cpp):
+    - JZSpectralResonanceTamer detects and transparently suppresses harsh resonant peaks in the 1kHz - 11kHz range.
+    - Removes vocal sibilance harshness, piercing cymbal wash, and acoustic boxiness with Depth (0% - 100%), Q sharpness, and Delta listen mode.
+  * Added Unit Tests 89 to 94 (tests/test_main.cpp):
+    - Validates cubic parabolic de-clipper reconstruction, 20-tick 6-string guitar strum delay, 100% ceiling height energy distribution at 90-degree elevation in 7.1.4, cassette pitch wobble bounds, C Major Krumhansl-Schmuckler profile correlation, and spectral resonance notch attenuation.
 
 24-10-2026 Raja Zahidi
 - Feature & Master Studio Vocal Note-Blob Pitch Editor, Stem Separator, Modulation Matrix, Guitar Amp Sim, Polymetric Drums & Match EQ Suite v9.0:
-  * Editor Pic Grafik Vokal Berskala Not (Vocal Graphical Note-Blob Pitch Editor - src/VocalPitchEditor.h & .cpp):
-    - JZVocalPitchEditor membahagikan rakaman vokal kepada blok segmen not muzik (Note-Blobs ala Melodyne/VariAudio).
-    - Membolehkan penalaan pic mikro (+/- 100 cents), pengikatan skala automatik (Snap to Scale), perataan hanyutan pic (Drift Slope Leveling), pelarasan amplitud vibrato vokal, dan pengekalan formant vokal (Formant-Lock).
-  * Enjin Pemisahan Batang Audio Pintar (AI Spectral Stem Separator & Audio Unmixing - src/StemSeparatorEngine.h & .cpp):
-    - JZStemSeparatorEngine memisahkan fail adunan audio stereo kepada 4 stem bebas serentak: Vokal (Vocal Formants), Dram (Percussive Transients), Bes (Sub-Bass < 220Hz), dan Lain-lain (Melodic Instruments).
-    - Algoritma Harmonic-Percussive Separation (HPSS) & Magnitude Masking dengan kawalan ketulenan isolasi (Isolation Purity 0.1 - 1.0) memelihara tenaga audio asal tanpa herotan pembatalan fasa.
-  * Matriks Modulasi Parameter Sejagat & Enjin Pelbagai Bentuk LFO (Universal Parameter Modulation Matrix & Multi-Shape LFO - src/ModulationMatrix.h & .cpp):
-    - JZModulationMatrix menyediakan 8 slot pemodulat dengan pelbagai bentuk gelombang (Sine, Triangle, Saw Up, Saw Down, Square, Random Sample & Hold, Envelope Follower, Chaos Wander).
-    - Menyokong penyegerakan tempo BPM projek (BPM Sync), pemetaan makro satu-ke-banyak, dan kedalaman modulasi dwiarah (Bipolar Depth -100% hingga +100%) untuk menggerakkan mana-mana parameter sintesis atau kesan FX secara modular.
-  * Pemodelan Amplifier Tiub Analog & Kabinet Pembesar Suara Gitar (Analog Guitar Tube Amp & Speaker Cabinet IR Simulator - src/GuitarAmpCabinetSim.h & .cpp):
-    - JZGuitarAmpCabinetSim mensimulasikan saturasi tabung 12AX7 pre-amp asimetrik (2nd harmonic warmth) dan peringkat kuasa EL34/6L6.
-    - Dilengkapi 3 model amplifier (American Clean, British Crunch, Modern High Gain), timbunan ton 3-jalur (Bass, Mid, Treble, Presence), dan penapis konvolusi tindak balas impuls kabinet pembesar suara (1x12 Vintage Tweed, 2x12 British Open-Back, 4x12 High-Gain Stack).
-  * Mesin Dram Polimeter & Poliritma Tingkat Lanjut (Polymetric & Polyrhythmic Drum Machine Sequencer - src/PolymetricDrumSequencer.h & .cpp):
-    - JZPolymetricDrumSequencer membolehkan setiap trek dram mempunyai kitaran panjang langkah bebas (contoh: Kick 16 langkah, Hi-hat 12 langkah = polimeter 3:4; Percussion 7 langkah = polimeter ganjil).
-    - Dilengkapi nisbah masa poliritma, hayunan alur (Groove Swing 0% - 75%), kebarangkalian pemicuan langkah (0% - 100%), dan letusan mikro (Ratchet Rolls 1-4 per langkah).
-  * Pemprofil Spektrum Rujukan & Pemadanan EQ Master (Master Reference Track Match EQ & Spectrum Profiler - src/MatchEqProfiler.h & .cpp):
-    - JZMatchEqProfiler menganalisis spektrum purata 64-jalur trek rujukan komersial berbanding trek adunan sasaran projek.
-    - Menjana keluk pembetulan EQ 64-jalur secara automatik dengan pelarasan keamatan padanan (Match Amount 0% - 100%), pelicin spektrum (Smoothing Radius 0 - 6), dan kawalan had siling pengukuhan (+/- 12 dB limit).
-  * Penambahan Ujian Unit 83 hingga 88 (tests/test_main.cpp):
-    - Mengesahkan formula nisbah frekuensi penalaan sen not vokal, pemuliharaan tenaga pemisahan 4 stem spektral, pemetaan modulasi dwiarah matriks makro, herotan asimetrik tiub 12AX7, penyegerakan kitaran fasa polimeter 48-langkah (12 vs 16 langkah), dan pengiraan pembetulan spektrum padanan Match EQ 64-jalur.
+  * Vocal Graphical Note-Blob Pitch Editor (src/VocalPitchEditor.h & .cpp):
+    - JZVocalPitchEditor segments vocal recordings into interactive note-blobs.
+    - Enables micro-tuning (+/- 100 cents), snap-to-scale quantizing, pitch drift leveling, vibrato depth adjustments, and formant-locking.
+  * AI Spectral Stem Separator & Audio Unmixing (src/StemSeparatorEngine.h & .cpp):
+    - JZStemSeparatorEngine splits stereo audio mixdowns into 4 independent stems: Vocals, Drums, Bass (< 220Hz), and Other.
+    - Leverages Harmonic-Percussive Separation (HPSS) and magnitude masking with isolation purity controls (0.1 - 1.0) for phase-coherent stem isolation.
+  * Universal Parameter Modulation Matrix & Multi-Shape LFO (src/ModulationMatrix.h & .cpp):
+    - JZModulationMatrix provides 8 modulation slots supporting multiple waveforms (Sine, Triangle, Saw Up, Saw Down, Square, Random Sample & Hold, Envelope Follower, Chaos Wander).
+    - Supports project BPM tempo-sync, one-to-many macro routing, and bipolar modulation depth (-100% to +100%) across all synth and FX parameters.
+  * Analog Guitar Tube Amp & Speaker Cabinet IR Simulator (src/GuitarAmpCabinetSim.h & .cpp):
+    - JZGuitarAmpCabinetSim simulates asymmetric 12AX7 preamp tube saturation and EL34/6L6 power amp stages.
+    - Includes 3 amplifier models (American Clean, British Crunch, Modern High Gain), 3-band tone stack (Bass, Mid, Treble, Presence), and impulse response speaker cabinet convolution (1x12 Tweed, 2x12 Open-Back, 4x12 Stack).
+  * Polymetric & Polyrhythmic Drum Machine Sequencer (src/PolymetricDrumSequencer.h & .cpp):
+    - JZPolymetricDrumSequencer allows independent step cycle lengths per track (e.g. Kick 16 steps, Hi-hat 12 steps = 3:4 polymeter; Percussion 7 steps).
+    - Features polyrhythmic time ratios, groove swing (0% - 75%), step trigger probabilities (0% - 100%), and ratchet rolls (1-4 bursts per step).
+  * Master Reference Track Match EQ & Spectrum Profiler (src/MatchEqProfiler.h & .cpp):
+    - JZMatchEqProfiler compares 64-band average spectrums between reference master tracks and target project mixes.
+    - Generates 64-band corrective EQ profiles with Match Amount (0% - 100%), smoothing radius controls, and max boost/cut limits (+/- 12 dB).
+  * Added Unit Tests 83 to 88 (tests/test_main.cpp):
+    - Validates vocal note cents-to-frequency tuning, 4-stem spectral energy preservation, macro matrix bipolar modulation mapping, 12AX7 asymmetric saturation, 48-step polymetric phase synchronization (12 vs 16 steps), and 64-band Match EQ profile correction.
 
 24-10-2026 Raja Zahidi
 - Feature & Master Studio FM Synthesis, MIDI Humanizer, Auto-Wah, Modulation Multi-FX, Vocal Aligner & Master True-Peak Limiter Suite v8.0:
-  * Pensintesis Modulasi Frekuensi 4-Operator (4-Operator FM Synthesizer & DX-Style Routing - src/FmSynthesizer.h & .cpp):
-    - JZFmSynthesizer melaksanakan sintesis FM 4-operator modular dengan 8 algoritma penghalaan (Series Cascade, Dual Modulator/Carrier, Parallel organ/bells, Additive 4-Op).
-    - Nisbah frekuensi boleh laras per operator (0.5x hingga 32.0x), maklum balas Operator 4 (Self-Feedback Loop 0.0 - 7.0), sampul ADSR 4-fasa bebas bagi setiap operator, dan polifoni 16-suara dengan pratetap legenda FM E-Piano, FM Solid Bass, Tubular Bells, dan FM Clavinet.
-  * Enjin Humanisasi MIDI & Kebarangkalian Not (MIDI Humanizer & Note Trigger Probability Engine - src/MidiHumanizerProbability.h & .cpp):
-    - JZMidiHumanizerProbability melencongkan masa not secara mikro dengan taburan Gaussian (+/- 8ms) untuk menghapuskan kekakuan kuantisasi robotik.
-    - Dilengkapi variasi halaju dinamik, kebarangkalian pemicuan not (Trigger Probability 0% - 100%) untuk penjanaan corak irama generatif, dan suntikan not bayang (Ghost Notes).
-  * Penapis Vokal Formant & Auto-Wah Dinamik (Dynamic Auto-Wah & Vowel Formant Filter - src/DynamicAutoWah.h & .cpp):
-    - JZDynamicAutoWah menyediakan modulasi penapis sampul dinamik funk berasaskan amplitud instrumen input (Envelope Follower dengan mod Sweep Up dan Sweep Down).
-    - Mod Vowel Formant dwi-resonans mensimulasikan rongga vokal manusia ('Ooh' ke 'Aah') dengan kawalan sensitiviti, resonans Q, dan campuran basah/kering (Dry/Wet).
-  * Suite Berbilang Kesan Modulasi Stereo (Stereo Modulation Multi-FX Suite - src/ModulationMultiFX.h & .cpp):
-    - JZModulationMultiFX menyatukan 3 modul kesan legendaris dalam satu enjin:
-      + Dimension Chorus: 4 talian lengah berfasa kuadratur silang (0, 90, 180, 270 darjah) untuk melebarkan stereo tanpa fluktuasi pic vibrato.
-      + 12-Stage Optical Phaser: 12 peringkat penapis all-pass dengan maklum balas analog dan ayunan stereo LFO.
-      + Through-Zero Tape Flanger: Flanger kaset pita tulen dengan pembatalan kutub sifar untuk kesan swoosh pesawat jet yang dramatik.
-  * Penyelaras Masa Vokal Automatik (Automatic Vocal Timing Aligner - src/VocalAligner.h & .cpp):
-    - JZVocalAligner menganalisis trajektori tenaga vokal rujukan (Guide Vocal) dan melaraskan masa konsonan transien vokal sokongan (Dub Vocal) secara automatik menggunakan Dynamic Time Warping (DTW).
-    - Menghapuskan fluktuasi masa nyanyian berganda tanpa herotan pic, melengkapkan penjajaran ketepatan sub-milisaat.
-  * Pematuh Had Puncak Sebenar Master (Master True-Peak Brickwall Limiter - src/MasterTruePeakLimiter.h & .cpp):
-    - JZMasterTruePeakLimiter menyediakan pematuh had brickwall bertaraf penyiaran komersial (pematuhan EBU R128 / ITU-R BS.1770).
-    - Dilengkapi 8x Polyphase Oversampling untuk pengesanan puncak inter-sample, penimbal pandang hadapan Lookahead (0.5ms - 5.0ms) untuk serangan segera tanpa herotan klik, dan kawalan siling ketat -0.1 dBTP.
-  * Penambahan Ujian Unit 77 hingga 82 (tests/test_main.cpp):
-    - Mengesahkan formula matriks modulasi fasa FM synth, had taburan Gaussian pemicu not humanizer, modulasi dinamik penjejak sampul Auto-Wah, pembatalan fasa kuadratur Dimension Chorus, penjajaran trajektori masa vokal DTW, dan pengesanan puncak inter-sample 8x limiter serta penguatkuasaan siling -0.1 dBTP.
+  * 4-Operator FM Synthesizer & DX-Style Routing (src/FmSynthesizer.h & .cpp):
+    - JZFmSynthesizer delivers modular 4-operator FM synthesis with 8 classic algorithms (Series Cascade, Dual Modulator/Carrier, Parallel organ/bells, Additive 4-Op).
+    - Features per-operator frequency ratios (0.5x to 32.0x), Operator 4 feedback loop (0.0 - 7.0), independent 4-stage ADSR envelopes, and 16-voice polyphony with legendary FM presets (E-Piano, Solid Bass, Tubular Bells, Clavinet).
+  * MIDI Humanizer & Note Trigger Probability Engine (src/MidiHumanizerProbability.h & .cpp):
+    - JZMidiHumanizerProbability applies Gaussian-distributed micro-timing deviations (+/- 8ms) to remove robotic grid stiffness.
+    - Features velocity randomization, note trigger probabilities (0% - 100%) for generative rhythm variations, and stochastic ghost note injection.
+  * Dynamic Auto-Wah & Vowel Formant Filter (src/DynamicAutoWah.h & .cpp):
+    - JZDynamicAutoWah provides envelope-following dynamic filter sweeps based on input signal amplitude (Sweep Up and Sweep Down modes).
+    - Includes dual-resonance Vowel Formant mode simulating human vocal tracts ('Ooh' to 'Aah') with sensitivity, Q resonance, and dry/wet blend.
+  * Stereo Modulation Multi-FX Suite (src/ModulationMultiFX.h & .cpp):
+    - JZModulationMultiFX consolidates 3 legendary modulation processors:
+      + Dimension Chorus: 4 quadrature phase-shifted delay lines (0, 90, 180, 270 degrees) for lush stereo width without pitch flutter.
+      + 12-Stage Optical Phaser: 12 cascaded all-pass stages with analog feedback and stereo LFO modulation.
+      + Through-Zero Tape Flanger: Analog tape flanger with true zero-delay phase cancellation.
+  * Automatic Vocal Timing Aligner (src/VocalAligner.h & .cpp):
+    - JZVocalAligner analyzes energy trajectories of guide vocal tracks and automatically aligns double/backing vocal takes using Dynamic Time Warping (DTW).
+    - Eliminates timing drift in layered vocal takes with sub-millisecond precision without pitch alteration.
+  * Master True-Peak Brickwall Limiter (src/MasterTruePeakLimiter.h & .cpp):
+    - JZMasterTruePeakLimiter provides broadcast-compliant master brickwall limiting (EBU R128 / ITU-R BS.1770).
+    - Equipped with 8x polyphase oversampling for inter-sample peak detection, lookahead buffer (0.5ms - 5.0ms) for click-free zero-overshoot limiting, and -0.1 dBTP ceiling enforcement.
+  * Added Unit Tests 77 to 82 (tests/test_main.cpp):
+    - Validates FM phase modulation matrix formulas, Gaussian humanizer timing bounds, dynamic Auto-Wah envelope tracking, Dimension Chorus quadrature phase offsets, DTW vocal trajectory alignment, and 8x oversampled limiter inter-sample peak detection with -0.1 dBTP ceiling.
 
 24-10-2026 Raja Zahidi
 - Feature & Master Studio Wavetable Synth, Audio-to-MIDI & Intelligent Mastering Suite v7.0: Modern Wavetable Synthesizer, Audio-to-MIDI Transcription Engine, 24-Band Vocoder, Physical Resonator, Mix Masking Collision Analyzer, Master TPDF Dithering & Multi-Format Encoder:
-  * Pensintesis Jadual Gelombang Moden & Unison Stereo (Modern Wavetable Synthesizer & Stereo Unison - src/WavetableSynth.h & .cpp):
-    - JZWavetableSynth menyediakan sintesis jadual gelombang 64-bingkai 2D dengan morfing fasa berterusan (Sinus -> Segitiga -> Gergaji -> Nadi -> Harmonik Logam).
-    - Enjin Stereo Unison Supersaw (1 hingga 16 suara serentak dengan sebaran stereo dan penalaan detune), penapis resonan dwi-kutub berbilang mod (LP/BP/HP), dan dwi-sampul modulasi ADSR polifonik 16-suara.
-  * Pengekstrak Not MIDI Daripada Audio Rakaman (Audio-to-MIDI Melody & Chord Transcription - src/AudioToMidiTranscriber.h & .cpp):
-    - JZAudioToMidiTranscriber menukarkan rakaman nyanyian suara vokal, gitar akustik, atau instrumen tiup secara langsung kepada acara not MIDI (Note-On, Note-Off, Velocity, Duration) pada Piano Roll.
-    - Algoritma gabungan penjejak onset transien dan pengesan frekuensi asas YIN/AMDF dengan kuncian pic skala diatonik atau kromatik 12-TET.
-  * Enjin Vocoder Dinamik 24-Jalur & Pertuturan Robotik (Dynamic 24-Band Vocoder & Speech Synthesizer - src/VocoderEngine.h & .cpp):
-    - JZVocoderEngine memetakan sampul formasi pertuturan vokal manusia (Modulator) ke atas gelombang pensintesis polifonik (Carrier) melalui bank penapis 24-jalur.
-    - Dilengkapi penjana pembawa dalaman (Internal Saw/Pulse Synth), anjakan formant vokal (-8 hingga +8 jalur), dan suntikan konsonan frekuensi tinggi (unvoiced sibilance pass-through).
-  * Harpa Resonans Pemodelan Akustik Fizikal (Karplus-Strong Physical Acoustic Resonator - src/PhysicalResonator.h & .cpp):
-    - JZPhysicalResonator menggunakan 4 bank penapis sisir resonan suap-balik untuk menukarkan sebarang ketukan perkusi kering, klik, atau desisan hingar menjadi petikan dawai harpa, marimba, atau tiub loceng akustik yang kaya.
-    - Pilihan talaan kord (Major, Minor, Sus4, Pentatonik), pelarasan masa resonans (Decay sehingga 8s), dan redaman frekuensi tinggi (Damping).
-  * Penganalisis Pertembungan Frekuensi Adunan Pintar (Intelligent Cross-Track Frequency Masking Analyzer - src/MixMaskingAnalyzer.h & .cpp):
-    - JZMixMaskingAnalyzer membandingkan matriks spektrum 32-jalur antara pelbagai trek projek serentak untuk mengesan trek yang menutupi kejelasan vokal atau instrumen utama (Frequency Masking).
-    - Mengira Indeks Keterukan Pertembungan (Masking Severity 0% - 100%) dan menjana cadangan pelarasan takuk EQ dinamik automatik (Smart Unmasking Recommendations).
-  * Dither Master TPDF & Pengekod Berbilang Format (Master TPDF Dithering & Multi-Format Audio Encoder - src/DitherFormatEncoder.h & .cpp):
-    - JZDitherFormatEncoder melaksanakan penambahan dither Triangular Probability Density Function (TPDF) dan pembentukan hingar psikoakustik (Noise Shaping) untuk menghapuskan herotan pemotongan kuantisasi apabila master 32-bit float diturunkan ke 16-bit atau 24-bit.
-    - Eksport terus fail master WAV 16-bit (CD Master Dithered), WAV 24-bit PCM, dan WAV 32-bit Float.
-  * Penambahan Ujian Unit 71 hingga 76 (tests/test_main.cpp):
-    - Menambah ujian morfing jadual gelombang 2D, penukaran frekuensi ke pic MIDI (440Hz -> A4 69, 261Hz -> C4 60), pemetaan anjakan formant vocoder 24-jalur, persamaan suap-balik resonan Karplus-Strong T60, pengesanan keterukan pertembungan masking adunan, dan penjana dither TPDF [-1.0, +1.0] LSB.
+  * Modern Wavetable Synthesizer & Stereo Unison (src/WavetableSynth.h & .cpp):
+    - JZWavetableSynth provides 2D 64-frame wavetable synthesis with continuous phase morphing (Sine -> Triangle -> Saw -> Pulse -> Metallic Harmonics).
+    - Includes Supersaw stereo unison (1 to 16 voices with spread and detune), multi-mode 2-pole resonant filter (LP/BP/HP), and dual ADSR modulation envelopes with 16-voice polyphony.
+  * Audio-to-MIDI Melody & Chord Transcription (src/AudioToMidiTranscriber.h & .cpp):
+    - JZAudioToMidiTranscriber converts live vocals, acoustic guitar, or wind instruments into MIDI note events (Note-On, Note-Off, Velocity, Duration) directly on the Piano Roll.
+    - Utilizes transient onset detection and YIN/AMDF fundamental frequency tracking with diatonic scale locking or 12-TET chromatic snapping.
+  * Dynamic 24-Band Vocoder & Speech Synthesizer (src/VocoderEngine.h & .cpp):
+    - JZVocoderEngine imprints vocal formant envelopes (Modulator) onto polyphonic synth carrier waveforms across 24 bandpass filter bands.
+    - Features built-in carrier synth (Saw/Pulse), vocal formant shift (-8 to +8 bands), and unvoiced sibilance pass-through.
+  * Karplus-Strong Physical Acoustic Resonator (src/PhysicalResonator.h & .cpp):
+    - JZPhysicalResonator employs 4 feedback resonant comb filter banks to transform percussive clicks, taps, or noise into resonant plucked strings, marimbas, or acoustic chimes.
+    - Supports chord tunings (Major, Minor, Sus4, Pentatonic), decay time up to 8s, and high-frequency damping.
+  * Intelligent Cross-Track Frequency Masking Analyzer (src/MixMaskingAnalyzer.h & .cpp):
+    - JZMixMaskingAnalyzer compares 32-band spectral matrices across multiple project tracks simultaneously to identify frequency masking collisions.
+    - Computes Masking Severity Indices (0% - 100%) and generates smart dynamic EQ unmasking recommendations.
+  * Master TPDF Dithering & Multi-Format Audio Encoder (src/DitherFormatEncoder.h & .cpp):
+    - JZDitherFormatEncoder applies Triangular Probability Density Function (TPDF) dithering and psychoacoustic noise shaping to eliminate quantization distortion when mastering 32-bit float audio down to 16-bit or 24-bit.
+    - Supports direct master audio export to 16-bit WAV (CD Master Dithered), 24-bit PCM WAV, and 32-bit Float WAV.
+  * Added Unit Tests 71 to 76 (tests/test_main.cpp):
+    - Validates 2D wavetable morphing, frequency-to-MIDI pitch conversion (440Hz -> A4 69, 261Hz -> C4 60), 24-band vocoder formant shift mapping, Karplus-Strong T60 feedback equations, mix masking severity index calculation, and TPDF [-1.0, +1.0] LSB dither distribution.
 
 24-10-2026 Raja Zahidi
 - Feature & Master Studio Spatial Audio, Vocal Harmony & Vintage Analog Suite v6.0: Spectral Noise Repair & Denoiser, 3D Spatial Audio & Surround Panner, Vocal Polyphonic Harmonizer, Stereo Mid-Side Matrix & Mono Bass Maker, Performance Chord Trigger Pads, Analog Tape Machine & Vintage Console Warmer:
-  * Pembersih Hingar Spektral & Pembaikan Audio (Studio Spectral Audio Denoiser & Noise Repair - src/SpectralDenoise.h & .cpp):
-    - JZSpectralDenoise melaksanakan penolakan profil hingar berketepatan tinggi (Spectral Subtraction) dengan fungsi pemerolehan profil hingar (Noise Fingerprint Capture).
-    - Membuang desisan mikrofon, dengungan 50Hz/60Hz, dan hingar bilik (0dB hingga 30dB) dengan kawalan lantai spektrum (Spectral Floor) untuk mengelakkan artefak burung berbunyi (musical noise), serta mod pendengaran hingar sahaja (Listen Noise Only).
-  * Audio Ruang 3D & Pemutar Bunyi Keliling (3D Spatial Audio & Surround Sound Panner - src/SpatialAudioPanner.h & .cpp):
-    - JZSpatialAudioPanner meletakkan audio dalam ruang 3 dimensi berasaskan Azimuth (0-360 deg), Elevation (-90 hingga +90 deg), dan Jarak (0.1m - 30m).
-    - Menyokong rendering fon kepala 3D Binaural berketepatan tinggi melalui Interaural Time Difference (Woodworth ITD) dan penapis bayang kepala (Head Shadow), serta penghalaan Quadraphonic dan bas 5.1 Surround Sound (L, C, R, LFE, Ls, Rs).
-  * Penjana Harmoni Vokal Polifonik Pintar (Intelligent Vocal Polyphonic Harmonizer - src/VocalHarmonizer.h & .cpp):
-    - JZVocalHarmonizer menjana sehingga 4 suara harmoni vokal diatonik polifonik serentak (+3rd, +5th, -4th, Octave Down Bass) mengikut tangga nada projek (Major / Minor).
-    - Dilengkapi pemeliharaan formant vokal semiton (-5st hingga +5st), tombol stereo pan bebas, dan fader aras volum per suara harmoni.
-  * Matriks Stereo Mid-Side & Pembuat Bes Mono (Stereo Mid-Side Matrix & Mono Bass Maker - src/MidSideProcessor.h & .cpp):
-    - JZMidSideProcessor menukar isyarat L/R kepada format Mid-Side secara dwiarah (M = (L+R)/sqrt(2), S = (L-R)/sqrt(2)).
-    - Ciri Mono Bass Maker menapis laluan tinggi saluran Side di bawah frekuensi ambang (20Hz - 300Hz, default 120Hz) untuk memastikan sub-bes sentiasa berfokus di tengah dan bebas masalah fasa mono. Dilengkapi pelarasan lebar stereo (0% hingga 200%) dan suis Solo Mid/Side.
-  * Pad Pemicu Kord Persembahan & Enjin Voicing (Performance Chord Trigger Pads & Voicing Engine - src/ChordPerformancePads.h & .cpp):
-    - JZChordPerformancePads menyediakan grid 16 pad pemicu kord pentas langsung dengan pratetap genre (Neo-Soul Jazz, Lo-Fi Chillhop, Pop Anthem, R&B Soul).
-    - Menyokong transformasi susunan not Drop-2 Voicing, Open Spread Voicing, humanisasi halaju, dan simulasi petikan gitar (Strum Spread Timing).
-  * Mesin Pita Analog & Pemanas Konsol Vintage (Analog Tape Machine & Vintage Console Warmer - src/TapeConsoleWarmer.h & .cpp):
-    - JZTapeConsoleWarmer mensimulasikan saturasi histeresis magnetik pita analog sebenar, harmonik tiub genap (2nd harmonic) dan transformer ganjil (3rd harmonic).
-    - Pilihan kelajuan pita 15 IPS (bes tebal head bump 72Hz) vs 30 IPS (kesetiaan tinggi audiophile), kawalan Tape Bias, dan modulasi motor halus (Wow & Flutter).
-  * Penambahan Ujian Unit 65 hingga 70 (tests/test_main.cpp):
-    - Menambah ujian matematik penolakan hingar spektral (-12dB), kelewatan masa antara telinga ITD binaural (~29 sampel), penjanaan suara harmoni diatonik C Major (C->E, D->F), pembalikan matriks Mid-Side, transformasi Drop-2 kord Cmaj7, dan ketepuan lengkung histeresis pita analog tanh.
+  * Studio Spectral Audio Denoiser & Noise Repair (src/SpectralDenoise.h & .cpp):
+    - JZSpectralDenoise performs spectral subtraction noise reduction with automated noise fingerprint capture.
+    - Eliminates microphone hiss, 50Hz/60Hz mains hum, and ambient room noise (0dB to 30dB) with spectral floor controls to prevent musical noise artifacts, plus Listen Noise Only audition mode.
+  * 3D Spatial Audio & Surround Sound Panner (src/SpatialAudioPanner.h & .cpp):
+    - JZSpatialAudioPanner positions audio in 3D space based on Azimuth (0-360 deg), Elevation (-90 to +90 deg), and Distance (0.1m - 30m).
+    - Supports high-precision binaural headphone rendering via Woodworth ITD and head-shadow filtering, as well as quadraphonic and 5.1 surround sound bus routing (L, C, R, LFE, Ls, Rs).
+  * Intelligent Vocal Polyphonic Harmonizer (src/VocalHarmonizer.h & .cpp):
+    - JZVocalHarmonizer generates up to 4 concurrent diatonic vocal harmony voices (+3rd, +5th, -4th, Octave Down Bass) locked to the project scale.
+    - Features formant preservation (-5st to +5st), individual stereo pan knobs, and independent level faders per voice.
+  * Stereo Mid-Side Matrix & Mono Bass Maker (src/MidSideProcessor.h & .cpp):
+    - JZMidSideProcessor performs bidirectional L/R to Mid-Side conversion (M = (L+R)/sqrt(2), S = (L-R)/sqrt(2)).
+    - Mono Bass Maker high-passes the side channel below a selectable cutoff (20Hz - 300Hz, default 120Hz) to ensure mono-compatible, focused sub-bass. Includes stereo width expansion (0% to 200%) and Mid/Side solo monitoring.
+  * Performance Chord Trigger Pads & Voicing Engine (src/ChordPerformancePads.h & .cpp):
+    - JZChordPerformancePads provides a 16-pad live performance chord grid with genre presets (Neo-Soul Jazz, Lo-Fi Chillhop, Pop Anthem, R&B Soul).
+    - Supports Drop-2 and Open Spread chord voicings, velocity humanization, and guitar strum timing emulation.
+  * Analog Tape Machine & Vintage Console Warmer (src/TapeConsoleWarmer.h & .cpp):
+    - JZTapeConsoleWarmer models magnetic tape hysteresis saturation, even 2nd harmonics (tube warmth), and odd 3rd harmonics (transformer saturation).
+    - Selectable tape speeds (15 IPS head bump at 72Hz vs 30 IPS audiophile high-fidelity), tape bias control, and subtle wow & flutter modulation.
+  * Added Unit Tests 65 to 70 (tests/test_main.cpp):
+    - Validates spectral noise subtraction (-12dB), binaural ITD delay (~29 samples), C Major diatonic harmony generation (C->E, D->F), Mid-Side matrix inversion, Cmaj7 Drop-2 transformation, and analog tape tanh hysteresis curve saturation.
 
 24-10-2026 Raja Zahidi
 - Feature & Master Studio Broadcast, Live Performance & Precision Dynamics Suite v5.0: Dynamic Vocal De-Esser, Audio Flex-Time Warping & Transient Quantizer, 3-Band Multiband Compressor, Non-Linear Clip Matrix & Live Launcher Grid, Transient Shaper & Punch Designer, ITU-R BS.1770-4 / EBU R128 Loudness Meter & True Peak Engine:
-  * Penekan Desisan Vokal Dinamik (Dynamic Vocal De-Esser & Sibilance Suppressor - src/DynamicDeEsser.h & .cpp):
-    - JZDynamicDeEsser melaksanakan pemampatan sibilance frekuensi terpilih (4kHz - 9kHz) untuk menghapuskan kekasaran desisan konsonan vokal ('S', 'T', 'CH').
-    - Menyokong mod pemampatan Split-Band (hanya melemahkan frekuensi desisan) dan mod Wideband, mod pratonton pendengaran sibilance (Listen Mode), serta pemeteran pengurangan gandaan masa nyata.
-  * Penala Masa Anjal Audio & Kuantisasi Transien (Audio Flex-Time Warping & Transient Quantizer - src/AudioFlexTimeWarp.h & .cpp):
-    - JZAudioFlexTimeWarp menyediakan sistem penanda anjal (Warp Markers / Anchor Pins) yang membolehkan manipulasi masa audio secara setempat tanpa memusnahkan bentuk gelombang.
-    - Fungsi AutoQuantizeTransients mengesan transien audio secara automatik dan menguncinya tepat ke grid tempo projek (1/8, 1/16, 1/32) dengan pelarasan peratusan kekuatan kuantisasi (Quantize Strength).
-  * Pemampat Dinamik 3-Jalur Fasa Linear (3-Band Studio Multiband Compressor - src/MultibandCompressor.h & .cpp):
-    - JZMultibandCompressor membahagikan spektrum audio kepada 3 jalur (Low/Sub < 140Hz, Mid 140Hz - 2.5kHz, High > 2.5kHz) menggunakan penapis silang fasa-linear Linkwitz-Riley darjah ke-4 (24 dB/oktaf).
-    - Setiap jalur dilengkapi ambang (-50dB hingga 0dB), nisbah pemampatan, masa attack/release, solekan volum, butang Solo/Mute, dan meter pengurangan gandaan bebas.
-  * Matriks Klip Sesi & Pelancar Gelung Langsung (Non-Linear Session View Clip Matrix & Live Launcher Grid - src/ClipMatrixEngine.h & .cpp):
-    - JZClipMatrixEngine menyediakan persekitaran persembahan langsung ala Ableton Live / Logic Live Loops bergrid (8 Trek x 8 Adegan/Scenes).
-    - Menyokong pelancaran adegan berkuantisasi (1 Bar, 1/2 Bar, 1/4 Bar) tanpa menghentikan pengangkutan audio, mod sel Trigger/Gate/Toggle, gelung berulang (looping), dan rakaman langsung sesi ke garis masa susunan lagu (Record Session to Arrangement).
-  * Pembentuk Pukulan Transien & Pereka Resonans Ekor (Studio Audio Transient Shaper & Punch Designer - src/TransientShaper.h & .cpp):
-    - JZTransientShaper memisahkan komponen transien pantas dan komponen getaran berterusan (sustain body) secara bebas daripada ambang volum (threshold-independent).
-    - Pelarasan gandaan Attack (+-15 dB) untuk hentakan dram bertenaga dan gandaan Sustain (+-15 dB) untuk resonans bilik yang padu, dilindungi pemotongan analog lembut (tanh soft-clipping).
-  * Meter Kenyaringan Penyiaran EBU R128 & Puncak Benar Antara Sampel (ITU-R BS.1770-4 / EBU R128 Loudness Meter & True Peak - src/LoudnessMeterEBU.h & .cpp):
-    - JZLoudnessMeterEBU mematuhi spesifikasi antarabangsa ITU-R BS.1770-4 dengan penapis pra-kenyaringan K-weighting (High-Shelf + RLB High-Pass).
-    - Memaparkan Momentary LUFS (400ms), Short-Term LUFS (3s), Integrated Gated LUFS, Loudness Range (LRA), dan True Peak Meter (dBTP) dengan 4x oversampling untuk mengelakkan herotan penstriman di Spotify, Apple Music, dan YouTube Music.
-  * Kemas Kini Ujian Unit 59 hingga 64 (tests/test_main.cpp):
-    - Menambah ujian pengesahan matematik pengurangan De-Esser (-8.33dB), pemetaan anjal flex-time (output 600 -> orig 500), pemeliharaan tenaga penapis silang 3-jalur, peralihan adegan matriks klip berkuantisasi, pengesanan hentakan transien, dan formula kenyaringan LKFS/LUFS.
+  * Dynamic Vocal De-Esser & Sibilance Suppressor (src/DynamicDeEsser.h & .cpp):
+    - JZDynamicDeEsser performs frequency-conscious dynamic compression (4kHz - 9kHz) to eliminate vocal sibilance ('S', 'T', 'CH').
+    - Supports Split-Band (attenuating only sibilance frequencies) and Wideband modes, sibilance Listen Mode auditioning, and real-time gain reduction metering.
+  * Audio Flex-Time Warping & Transient Quantizer (src/AudioFlexTimeWarp.h & .cpp):
+    - JZAudioFlexTimeWarp provides an anchor-pin warp marker system for elastic time manipulation without audio artifacts.
+    - AutoQuantizeTransients automatically detects audio transients and snaps them to the project tempo grid (1/8, 1/16, 1/32) with adjustable quantize strength.
+  * 3-Band Studio Multiband Compressor (src/MultibandCompressor.h & .cpp):
+    - JZMultibandCompressor splits audio into 3 frequency bands (Low < 140Hz, Mid 140Hz - 2.5kHz, High > 2.5kHz) using 4th-order Linkwitz-Riley linear-phase crossover filters (24 dB/octave).
+    - Each band features threshold (-50dB to 0dB), ratio, attack/release times, make-up gain, solo/mute switches, and independent gain reduction meters.
+  * Non-Linear Session View Clip Matrix & Live Launcher Grid (src/ClipMatrixEngine.h & .cpp):
+    - JZClipMatrixEngine delivers a live clip launching grid (8 Tracks x 8 Scenes).
+    - Supports quantized scene triggering (1 Bar, 1/2 Bar, 1/4 Bar) without stopping playback, Trigger/Gate/Toggle cell modes, clip looping, and direct session-to-arrangement recording.
+  * Studio Audio Transient Shaper & Punch Designer (src/TransientShaper.h & .cpp):
+    - JZTransientShaper independently manipulates attack transients and sustain resonance independently of audio signal amplitude thresholds.
+    - Attack gain adjustment (+/- 15 dB) for punchy drums, Sustain gain adjustment (+/- 15 dB) for room tail control, protected by tanh analog soft-clipping.
+  * ITU-R BS.1770-4 / EBU R128 Loudness Meter & True Peak (src/LoudnessMeterEBU.h & .cpp):
+    - JZLoudnessMeterEBU adheres to ITU-R BS.1770-4 specifications with K-weighting pre-filters (High-Shelf + RLB High-Pass).
+    - Displays Momentary LUFS (400ms), Short-Term LUFS (3s), Integrated Gated LUFS, Loudness Range (LRA), and 4x oversampled inter-sample True Peak Meter (dBTP).
+  * Added Unit Tests 59 to 64 (tests/test_main.cpp):
+    - Validates De-Esser gain reduction (-8.33dB), flex-time mapping, 3-band crossover energy conservation, quantized scene launch transitions, transient attack detection, and LKFS/LUFS loudness calculations.
 
 24-10-2026 Raja Zahidi
 - Feature & Master Studio Production & Mastering Suite v4.0: Sidechain Compression & Dynamic Ducking Engine, Multi-Track Stems Exporter & Batch Render, Real-Time Vocal Pitch Correction & Auto-Tune, Convolution Reverb & IR Cabinet Simulator, Multi-Velocity Zone Sampler Instrument, Master Spectrum Analyzer & Stereo Goniometer Visualizer:
-  * Pemampatan Sidechain & Enjin Pengelakan Dinamik (Studio Sidechain Compressor & Dynamic Ducking - src/SidechainCompressor.h & .cpp):
-    - JZSidechainCompressor menyokong laluan isyarat pengesanan aux luaran (external sidechain bus) untuk pengepaman bass-kick dinamik atau ducking vokal.
-    - Parameter studio: Ambang aras dB (-60dB hingga 0dB), nisbah pemampatan (1:1 hingga 30:1), masa Attack (0.1ms hingga 100ms), masa Release (10ms hingga 1500ms), lutut peralihan lembut/keras (Soft/Hard Knee), ganjaran solekan (Make-up Gain), penapis laluan tinggi pengesan (Sidechain High-Pass Filter 20Hz-500Hz), dan pemeteran pengurangan gandaan masa nyata.
-  * Pengeksport Stem Berbilang Trek & Enjin Render Kelompok (Multi-Track Stems Exporter & Batch Render Engine - src/StemsExporter.h & .cpp):
-    - JZStemsExporter membolehkan pengeksportan serentak semua trek individu (Kick, Snare, Bass, Piano, Vocals) dengan 1-klik ke dalam format WAV standard.
-    - Menyokong kadar pensampelan 44.1kHz, 48kHz, dan 96kHz dengan kedalaman bit 16-bit, 24-bit PCM, dan 32-bit IEEE Float.
-    - Ciri pintar: Pemangkasan kesenyapan automatik (Auto-Silence Trimming bounds) dan penormalan puncak stem (Peak Normalization ke siling -0.1 dB True Peak).
-  * Pembetulan Pic Vokal Masa Nyata & Enjin Penala Mikro Auto-Tune (Real-Time Vocal Pitch Correction & Microtonal Auto-Tune - src/PitchCorrectionEngine.h & .cpp):
-    - JZPitchCorrectionEngine menggunakan algoritma autokorelasi (YIN / AMDF) berketepatan sub-sampel untuk mengesan frekuensi asas suara manusia (F0).
-    - Mengkuantisasikan pic kepada not skala muzik terdekat (Kromatik, Major, Minor, Dorian, Pentatonik, Blues) dengan pelarasan kelajuan pembetulan (Retune Speed) daripada pembetulan semula jadi telus sehingga kesan lekat pic ikonik robotik.
-  * Reverb Konvolusi & Simulator Kabinet Respon Impuls IR (Convolution Reverb & IR Cabinet Simulator - src/ConvolutionEngine.h & .cpp):
-    - JZConvolutionEngine memproses konvolusi domain-masa resolusi tinggi dengan tindak balas impuls ruang fizikal (Concert Hall, Jazz Club, Vintage Spring Reverb) dan kabinet pembesar suara gitar/bes (4x12 Vintage 30 Celestion, 8x10 Bass Cab).
-    - Menyokong pemuatan fail WAV IR tersuai, pelarasan skala pereputan (decay scaling), pra-lengah (pre-delay), dan imbangan Wet/Dry seimbang.
-  * Instrumen Pensampel Zon Berbilang Halaju (Multi-Velocity Zone Sampler Instrument - src/MultiVelocitySampler.h & .cpp):
-    - JZMultiVelocitySampler menyediakan enjin pensampel polifonik dengan pemetaan zon kekunci (Key-Range) dan lapisan halaju dinamik (Soft 1-45, Medium 46-95, Hard 96-127).
-    - Setiap zon dilengkapi sampul ADSR bebas (Attack, Decay, Sustain, Release) dan penapis resonan laluan rendah dwi-kutub dengan modulasi halaju.
-    - Mempunyai set instrumen pratetap terbina: Piano Grand Konsert Akustik dan Kit Dram Studio Pukulan Realistik.
-  * Penganalisis Spektrum Induk & Visualiser Goniometer Stereo (Master Spectrum Analyzer & Stereo Goniometer Visualizer - src/MasterVisualizer.h & .cpp):
-    - JZMasterVisualizer memaparkan taburan tenaga frekuensi masa nyata 31-jalur 1/3 oktaf ISO (20Hz hingga 20,000Hz) dengan penunjuk aras puncak (Peak Hold).
-    - Skop Vektor Goniometer Lissajous memaparkan penyebaran medan stereo kiri-kanan (Mid-Side coordinates) untuk mengelakkan ketidakseimbangan stereo.
-    - Meter Korelasi Fasa Stereo (-1.0 hingga +1.0) memantau pembatalan fasa (phase cancellation) demi menjamin keserasian mono yang sempurna.
-  * Penambahan Ujian Unit 53 hingga 58 (tests/test_main.cpp):
-    - Menambah ujian unit pengurangan pemampatan sidechain, pengepala PCM WAV 24-bit stems, kuantisasi pic vokal 445Hz ke A4, pemprosesan konvolusi delta impuls, pemadanan lapisan halaju pensampel, dan pengesahan korelasi fasa stereo (+1.0 mono, -1.0 terbalik).
+  * Studio Sidechain Compressor & Dynamic Ducking (src/SidechainCompressor.h & .cpp):
+    - JZSidechainCompressor supports external sidechain routing for dynamic kick-bass ducking and vocal unmasking.
+    - Parameters: Threshold (-60dB to 0dB), ratio (1:1 to 30:1), attack (0.1ms to 100ms), release (10ms to 1500ms), soft/hard knee, make-up gain, sidechain HPF (20Hz-500Hz), and gain reduction metering.
+  * Multi-Track Stems Exporter & Batch Render Engine (src/StemsExporter.h & .cpp):
+    - JZStemsExporter renders all individual tracks (Kick, Snare, Bass, Piano, Vocals) with one click into standard WAV files.
+    - Supports sample rates of 44.1kHz, 48kHz, and 96kHz at 16-bit, 24-bit PCM, and 32-bit Float formats, with auto-silence trimming and peak normalization to -0.1 dB True Peak.
+  * Real-Time Vocal Pitch Correction & Microtonal Auto-Tune (src/PitchCorrectionEngine.h & .cpp):
+    - JZPitchCorrectionEngine uses sub-sample autocorrelation (YIN / AMDF) to track vocal pitch (F0).
+    - Quantizes pitch to musical scales (Chromatic, Major, Minor, Dorian, Pentatonic, Blues) with variable retune speed from transparent natural correction to hard-tuned vocal effects.
+  * Convolution Reverb & IR Cabinet Simulator (src/ConvolutionEngine.h & .cpp):
+    - JZConvolutionEngine processes high-resolution time-domain convolution with acoustic spaces (Concert Hall, Jazz Club, Spring Reverb) and guitar/bass speaker cabinets (4x12 Celestion V30, 8x10 Bass Cab).
+    - Supports custom WAV impulse responses, decay scaling, pre-delay, and wet/dry mix.
+  * Multi-Velocity Zone Sampler Instrument (src/MultiVelocitySampler.h & .cpp):
+    - JZMultiVelocitySampler provides a polyphonic sampler engine with key-zone mapping and dynamic velocity layers (Soft 1-45, Medium 46-95, Hard 96-127).
+    - Features per-zone ADSR envelopes and 2-pole resonant low-pass filters with velocity modulation. Includes Concert Grand Piano and Studio Drum Kit presets.
+  * Master Spectrum Analyzer & Stereo Goniometer Visualizer (src/MasterVisualizer.h & .cpp):
+    - JZMasterVisualizer displays real-time 31-band 1/3-octave ISO frequency distribution (20Hz to 20,000Hz) with peak hold indicators.
+    - Features Lissajous goniometer vectorscope for stereo image spread and continuous phase correlation metering (-1.0 to +1.0) for mono compatibility.
+  * Added Unit Tests 53 to 58 (tests/test_main.cpp):
+    - Validates sidechain compression reduction, 24-bit PCM stem WAV header creation, vocal pitch quantization (445Hz to A4), delta impulse convolution, multi-velocity sampler layer matching, and stereo phase correlation (+1.0 mono, -1.0 inverted).
 
 24-10-2026 Raja Zahidi
 - Feature & Master Studio DAW Ultimate Suite: WSOLA Audio Time-Stretching & Pitch-Shifting, Virtual Mixing Console Desk, Transient Slicer & Beat Detective, Euclidean Rhythm & Algorithmic Arpeggiator, In-Key Piano Roll & Chord Stamp Tool, Loop Takes & Comping System:
-  * Anjakan Masa & Nada Audio Masa Nyata (Audio Time-Stretching & Pitch-Shifting - src/AudioTimeStretch.h & .cpp):
-    - Enjin WSOLA (Waveform Similarity Overlap-Add) melaksanakan regangan masa audio berketepatan tinggi (0.25x hingga 4.0x) dengan tetingkap Hanning dan korelasi-silang tanpa gangguan fasa.
-    - Fungsi WarpAudioBpm menyelaraskan gelung audio (WAV) secara automatik mengikut tempo projek (Auto-BPM Warping).
-    - Fungsi ProcessPitchShift membolehkan transposisi pic audio (+-12 semiton) secara bebas tanpa mengubah tempoh masa main balik sampel.
-  * Konsol Pengadun Maya Multi-Saluran Studio (Professional Virtual Mixing Console Desk - src/MixerConsole.h & .cpp):
-    - Kelas JZVirtualMixer dan JZChannelStrip menyediakan jalur saluran menegak untuk setiap trek dengan fader aras volum skala dB (-inf hingga +6dB), meter puncak stereo LED, tombol stereo pan, serta butang Mute, Solo, dan Record Arm.
-    - Saluran bantuan Aux Send A (Reverb) dan Aux Send B (Delay).
-    - Fader induk (Master Bus) dilengkapi pematuh aras had analog lembut (Brickwall Limiter tanh saturation).
-  * Pengecaman Transien & Pemotong Rentak Dram Pintar (Audio Transient Slicing & Beat Detective - src/TransientSlicer.h & .cpp):
-    - Algoritma JZTransientDetector mengesan transien pukulan dram (kick, snare, hi-hat) berasaskan pembezaan tenaga gelombang pendek.
-    - Fungsi SliceToMidiTrack memotong gelung audio kepada penanda hirisan dan menjana trek MIDI kromatik automatik (C3, C#3, D3, dll.).
-  * Penjana Irama Poliritmik Euclidean & Pengarpeggio Polifonik (Euclidean Rhythm & Algorithmic Arpeggiator - src/EuclideanArp.h & .cpp):
-    - Kelas JZEuclideanRhythm melaksanakan algoritma Bresenham/Bjorklund E(k, n) untuk menjana rentak poliritmik eksotik: E(5,8) Cinquillo Cuba, E(3,8) Tresillo, E(7,16) Samba Brazil, E(4,12) 12/8 Blues Shuffle, dan E(5,16) Afrobeat.
-    - Kelas JZAlgorithmicArpeggiator menyokong corak arpeggio lanjutan: Strum Roll, Chord Repeat, Walking Octaves, dan Random Polyphonic.
-  * Kecerdasan Skala & Pengecap Kord Piano Roll (In-Key Piano Roll Scale Snapping & Chord Stamp Tool - src/PianoScaleChordHelper.h & .cpp):
-    - JZPianoScaleChordHelper menyediakan penentuan not dalam skala dan lekatan diatonik automatik (Snap-to-Scale).
-    - Koleksi Pengecap Kord 1-Klik: Triad (Major, Minor, Dim, Aug), 7th (Maj7, Min7, Dom7, m7b5, Dim7), 9th, 7#9 Hendrix, 11th, 7#11 Lydian Dominant, 13th, dan 7alt Super Locrian.
-  * Sistem Rakaman Berbilang Laluan & Pengkomposan (Loop Recording Takes & Comping System - src/TakesComping.h & .cpp):
-    - JZCompingManager menguruskan lorong sub-rakaman (Take 1, Take 2, Take 3) bagi setiap pusingan rakaman gelung.
-    - Menyokong Swipe Comping dan fungsi FlattenCompToTrack untuk menyatukan bahagian-bahagian terbaik daripada setiap take ke trek induk.
-  * Kemas Kini Ujian Unit (tests/test_main.cpp):
-    - Menambah ujian unit komprehensif 45 hingga 52 merangkumi nisbah regangan WSOLA, pergeseran pic granular, fader dB pengadun, pematuh had, pembezaan tenaga transien, algoritma Euclidean E(5,8), pengecap kord Hendrix, dan pengkomposan take.
+  * Audio Time-Stretching & Pitch-Shifting (src/AudioTimeStretch.h & .cpp):
+    - WSOLA (Waveform Similarity Overlap-Add) high-fidelity time-stretching (0.25x to 4.0x) with Hanning windowing and phase-aligned cross-correlation.
+    - Automatic BPM loop warping (WarpAudioBpm) and pitch-shifting (ProcessPitchShift, +/- 12 semitones) without tempo changes.
+  * Professional Virtual Mixing Console Desk (src/MixerConsole.h & .cpp):
+    - JZVirtualMixer and JZChannelStrip deliver vertical channel strips with dB-scaled faders (-inf to +6dB), LED stereo peak meters, pan knobs, Mute, Solo, and Record Arm.
+    - Aux Send A (Reverb) and Aux Send B (Delay), plus master bus equipped with brickwall limiter tanh analog saturation.
+  * Audio Transient Slicing & Beat Detective (src/TransientSlicer.h & .cpp):
+    - JZTransientDetector detects drum hits via short-term energy differential analysis.
+    - SliceToMidiTrack slices audio loops into hit markers and generates chromatic MIDI trigger tracks (C3, C#3, D3, etc.).
+  * Euclidean Rhythm & Algorithmic Arpeggiator (src/EuclideanArp.h & .cpp):
+    - JZEuclideanRhythm implements Bresenham/Bjorklund E(k, n) algorithms for polyrhythmic patterns: E(5,8) Cuban Cinquillo, E(3,8) Tresillo, E(7,16) Brazilian Samba, E(4,12) Blues Shuffle, and E(5,16) Afrobeat.
+    - JZAlgorithmicArpeggiator supports Strum Roll, Chord Repeat, Walking Octaves, and Random Polyphonic modes.
+  * In-Key Piano Roll Scale Snapping & Chord Stamp Tool (src/PianoScaleChordHelper.h & .cpp):
+    - JZPianoScaleChordHelper provides scale awareness and automatic diatonic snap-to-scale.
+    - One-click chord stamp tool: Triads (Major, Minor, Dim, Aug), 7ths (Maj7, Min7, Dom7, m7b5, Dim7), 9ths, 7#9 Hendrix chord, 11ths, 7#11 Lydian Dominant, 13ths, and 7alt Super Locrian.
+  * Loop Recording Takes & Comping System (src/TakesComping.h & .cpp):
+    - JZCompingManager manages sub-take lanes across loop recording cycles.
+    - Supports swipe comping and FlattenCompToTrack to merge the best sections into master tracks.
+  * Added Unit Tests 45 to 52 (tests/test_main.cpp):
+    - Validates WSOLA stretch ratio, pitch-shifting, mixer dB faders, limiter saturation, transient energy detection, Euclidean E(5,8), Hendrix chord stamp, and take comping.
 
 24-10-2026 Raja Zahidi
 - Feature & Professional DAW Architecture Suite: Dynamic Automation Curves, WASAPI Low-Latency Audio Driver, Waveform Display & Non-Destructive Clip Editing, Groove Pool Manager, MPE Polyphonic Expression & MusicXML, Self-Contained Project Bundles (.jazzbundle):
-  * Liku Automasi Dinamik & Lorong Sampul Visual (Dynamic Automation Curves & Visual Envelope Lanes - src/AutomationEngine.h & .cpp):
-    - Struktur nodus JZAutomationNode dan lengkung JZAutomationCurve menyokong interpolasi Linear, Bezier (dengan pelarasan tegangan kelengkungan ease-in/ease-out), Eksponen (sapuan penapis audio), dan Sigmoid S-Curve.
-    - Menjana aliran acara MIDI CC (Volume CC7, Pan CC10, Cutoff CC74, Expression CC11, Pitch Bend, Tempo) secara optimum dengan pengurangan ketumpatan (density thinning) tanpa membebankan penimbal MIDI.
-    - Pengurus JZAutomationManager membolehkan pelbagai lorong automasi bebas diuruskan bagi setiap trek.
-  * Pemacu Audio Kependaman Rendah WASAPI & Profiler Penimbal (Low-Latency WASAPI Audio Driver - src/WasapiAudioDriver.h & .cpp):
-    - Kelas JZWasapiAudioDriver menyokong mod perkakasan terus WASAPI Exclusive dan WASAPI Shared.
-    - Membolehkan saiz penimbal audio dikurangkan kepada 64 atau 128 bingkai bagi mencapai kependaman masa nyata bawah 3 milisaat (2.67ms @ 48kHz) untuk rakaman dan pemantauan masa nyata.
-  * Paparan Bentuk Gelombang Audio Garis Masa & Suntingan Klip Tanpa Musnah (Timeline Audio Waveform Display & Clip Editing - src/AudioWaveform.h & .cpp):
-    - Modul JZWaveformThumbnail menjana lakaran kecil puncak (Peak & RMS) audio multi-resolusi piramid (64, 256, dan 1024 sampel seblok) untuk paparan bentuk gelombang pantas tanpa lengah masa.
-    - Kelas JZAudioClip membolehkan pemotongan klip (SplitAt), pemangkasan permulaan/penamat (TrimStart/TrimEnd), dan pengurusan palung (Fade-in / Fade-out) secara tanpa musnah (non-destructive).
-  * Kumpulan Alur & Templat Kuantisasi Muzikal Lanjutan (Groove Pool & Humanize Groove Templates - src/GroovePool.h & .cpp):
-    - Koleksi templat alur legenda pengeluar muzik: Roger Linn MPC-60 Classic Swing (62%), Akai MPC-3000 Hip-Hop (66%), J Dilla & Questlove Drunken Loose Swing, Clyde Stubblefield Funky Drummer Pocket, dan Fela Kuti Afrobeat Push.
-    - Fungsi ApplyGroove memetakan anjakan mikro-masa (tick offsets) dan aksen halaju ke atas acara not trek.
-    - Fungsi ExtractGroove mengekstrak corak variasi alur masa dan dinamik daripada persembahan langsung pemuzik.
-  * Enjin Skor MusicXML Dua Hala & Ekspresi Polifonik MIDI (MusicXML & MPE Engine - src/MpeEngine.h & .cpp):
-    - JZMusicXmlEngine menyokong eksport skor format piawai MusicXML 3.1 Partwise (<score-partwise>) dan import skor notasi ke dalam trek Jazz++.
-    - JZMpeManager memperuntukkan saluran ahli (Channels 2-16) secara bebas bagi setiap not polifonik untuk modulasi gelinciran pic (pitch bend), tekanan (pressure), dan timbre (slide CC74) tanpa silang-bicara (no crosstalk).
-  * Pembungkusan & Pengarkiban Projek Lengkap Mandiri (.jazzbundle Archiver - src/ProjectBundle.h & .cpp):
-    - Format kontena arkib tunggal JZProjectBundle (.jazzbundle) membungkus data susunan MIDI, manifes projek, templat gaya gubahan (.jazzstyle), lorong automasi, dan rujukan sampel ke dalam satu fail padat.
-    - Menyokong pemindahan projek antara komputer secara bebas tanpa masalah laluan fail terputus (broken sample paths).
-  * Kemas Kini Ujian Unit (tests/test_main.cpp):
-    - Menambah ujian unit 36 hingga 44 merangkumi lengkung Bezier, S-curve, metrik kependaman WASAPI, puncak gelombang RMS, hirisan klip audio, ayunan MPC Groove Pool, saluran MPE, skema MusicXML, dan integriti bekas fail .jazzbundle.
+  * Dynamic Automation Curves & Visual Envelope Lanes (src/AutomationEngine.h & .cpp):
+    - JZAutomationNode and JZAutomationCurve support Linear, Bezier (with ease-in/ease-out curvature tension), Exponential (filter sweeps), and Sigmoid S-Curve interpolations.
+    - Generates optimized MIDI CC event streams (Volume CC7, Pan CC10, Cutoff CC74, Expression CC11, Pitch Bend, Tempo) with density thinning to prevent buffer saturation.
+    - JZAutomationManager coordinates multiple independent automation lanes per track.
+  * Low-Latency WASAPI Audio Driver (src/WasapiAudioDriver.h & .cpp):
+    - JZWasapiAudioDriver supports direct hardware access in both WASAPI Exclusive and Shared modes.
+    - Enables low buffer sizes (64 or 128 frames) achieving sub-3ms latency (2.67ms @ 48kHz) for real-time monitoring and recording.
+  * Timeline Audio Waveform Display & Non-Destructive Clip Editing (src/AudioWaveform.h & .cpp):
+    - JZWaveformThumbnail computes multi-resolution pyramid peak and RMS audio thumbnails (64, 256, 1024 samples/block) for lag-free waveform rendering.
+    - JZAudioClip provides non-destructive splitting (SplitAt), trimming (TrimStart/TrimEnd), and fade in/out envelopes.
+  * Groove Pool & Humanize Groove Templates (src/GroovePool.h & .cpp):
+    - Producer groove library: Roger Linn MPC-60 Classic Swing (62%), Akai MPC-3000 Hip-Hop (66%), J Dilla & Questlove Drunken Loose Swing, Clyde Stubblefield Funky Drummer Pocket, and Fela Kuti Afrobeat Push.
+    - ApplyGroove maps micro-timing tick offsets and velocity accents onto track notes; ExtractGroove captures live performer groove templates.
+  * MusicXML & MPE Engine (src/MpeEngine.h & .cpp):
+    - JZMusicXmlEngine exports standard MusicXML 3.1 Partwise (<score-partwise>) scores and imports notation into Jazz++ tracks.
+    - JZMpeManager allocates dedicated member channels (Channels 2-16) per polyphonic note for crosstalk-free pitch bend, pressure, and CC74 timbre modulation.
+  * Self-Contained Project Bundles (.jazzbundle Archiver - src/ProjectBundle.h & .cpp):
+    - JZProjectBundle archive container bundles MIDI arrangement data, project manifest, style templates (.jazzstyle), automation lanes, and audio sample references into a single portable package.
+  * Added Unit Tests 36 to 44 (tests/test_main.cpp):
+    - Validates Bezier curves, S-curve, WASAPI latency metrics, RMS waveform peaks, audio clip splitting, MPC Groove Pool swing, MPE channels, MusicXML schema, and .jazzbundle integrity.
 
 24-10-2026 Raja Zahidi
 - Feature & Studio Arranger Pro Suite: Jazz Reharmonizer, Vocal & Horn Harmonizer, Chord Pads Matrix, Timeline Section Banners & SMF Markers, Studio Woodblock Click Track & Arrangement Presets:
-  * Penyelaras & Pengganti Harmoni Jazz Pintar (Intelligent Re-Harmonizer & Jazz Chord Substitutions - src/AutoAccompaniment.h & .cpp):
-    - Fungsi ApplyReharmonization melaksanakan peraturan harmoni jazz peringkat tinggi:
-      - Penggantian Tritone (Tritone Substitution): Menukar kord dominan V7 kepada bII7 (contoh: G7 -> Db7).
-      - Dominan Sekunder (Secondary Dominants): Menyisipkan V7/x mendahului kord sasaran dalam birama.
-      - Diminished Melintas (Passing Diminished 7th): Menghubungkan peralihan nada penuh dengan kord diminished kromatik.
-      - Pertukaran Modal (Modal Interchange / Minor Plagal): Menggantikan IV dengan iv minor (C -> Fm) atau bVImaj7 (Abmaj7).
-      - Matriks Perubahan Coltrane (Coltrane Changes): Kitaran pertukaran tonik 3-pusat major 3rd (Giant Steps).
-    - Terintegrasi secara langsung dalam penjanaan gubahan Session Band, Strumming, Riff, dan Lead Solo.
-  * Penjana Harmoni Vokal & Seksyen Tiupan Pintar (Intelligent Melodic & Vocal / Horn Harmonizer - src/AutoAccompaniment.h & .cpp):
-    - Fungsi GenerateMelodicHarmony menjana suara harmoni polifonik berdasarkan melodi utama:
-      - Duo Diatonik Selari (Parallel 3rds / 6ths): Harmoni kembar manis diatonik.
-      - Seksyen Tiupan 3-Suara (3-Piece Horn Section): Melodi Trompet, Tenor Sax pada pic ke-3/ke-7, dan Trombone pada pic asas/ke-5 oktaf bawah.
-      - Korus Vokal 4-Bahagian (4-Part Vocal SATB Choir): Susunan harmoni padat Soprano, Alto, Tenor, dan Bes.
-  * Matriks Pad Kord Maya Interaktif (Interactive Real-Time Virtual Chord Pads Matrix - src/Dialogs/AutoAccompanimentDialog.h & .cpp):
-    - 8 butang pad kord berpandukan tangga nada (I, ii, iii, IV, V7, vi, vii°, bII7) untuk cetusan kord pantas 1-klik dan latihan jamming masa nyata.
-  * Jalur Blok Warna Bahagian Garis Masa & Penanda Fail MIDI Piawai (Visual Timeline Section Banners & SMF Markers - src/TrackWindow.cpp & src/AutoAccompaniment.cpp):
-    - Jalur banner visual pada pembaris garis masa: Intro (Biru), Verse (Hijau), Chorus (Jingga/Kuning), Bridge (Ungu), dan Outro (Kelabu gelap).
-    - Penulisan acara meta SMF 0x06 JZMarkerEvent ke Trek 0 membolehkan DAW luar (Cubase, Ableton, FL Studio, Logic, Reaper) membaca nama bahagian lagu secara automatik.
-  * Trek Detik Metronom Audio Sintesis & Kiraan Awal (Studio Woodblock Click Track & Metronome Count-in - src/AutoAccompaniment.h & .cpp):
-    - Sintesis audio woodblock dwiton: Detik 1 (Downbeat) 900 Hz dan detik 2, 3, 4 (Offbeats) 580 Hz dengan pereputan pantas.
-    - Disepadukan dalam eksport WAV terus serta pilihan eksport trek detik berasingan (stem_click_track.wav).
-  * Pengurus Fail Pratetap Gubahan & Templat Gaya (Arrangement Preset & Style Template Bundle Manager - src/AutoAccompaniment.h & .cpp):
-    - Fungsi SaveArrangementPreset dan LoadArrangementPreset untuk menyimpan dan memuatkan konfigurasi gubahan lengkap dalam fail templat '.jazzstyle'.
-  * Kemas Kini Ujian Unit (tests/test_main.cpp):
-    - Menambah ujian unit komprehensif 30 hingga 35 merangkumi penggantian tritone, susunan harmoni tiupan, darjah pad kord, penanda SMF, frekuensi detik metronom, dan pengekalan konfigurasi fail pratetap.
+  * Intelligent Re-Harmonizer & Jazz Chord Substitutions (src/AutoAccompaniment.h & .cpp):
+    - ApplyReharmonization executes advanced jazz harmonic principles:
+      - Tritone Substitution: V7 to bII7 (e.g., G7 -> Db7).
+      - Secondary Dominants: Inserts V7/x preceding target chords.
+      - Passing Diminished 7th: Chromatically bridges full-step transitions.
+      - Modal Interchange / Minor Plagal: Replaces IV with iv minor (C -> Fm) or bVImaj7 (Abmaj7).
+      - Coltrane Changes: Giant Steps 3-tonic major 3rd cycle.
+    - Fully integrated into Session Band, Strumming, Riff, and Lead Solo generation.
+  * Intelligent Melodic & Vocal / Horn Harmonizer (src/AutoAccompaniment.h & .cpp):
+    - GenerateMelodicHarmony generates polyphonic harmony voices:
+      - Parallel Diatonic Duos (3rds / 6ths): Sweet melodic duets.
+      - 3-Piece Horn Section: Trumpet melody, Tenor Sax on 3rd/7th, and Trombone on root/5th an octave below.
+      - 4-Part Vocal SATB Choir: Tight choral voicings for Soprano, Alto, Tenor, and Bass.
+  * Interactive Real-Time Virtual Chord Pads Matrix (src/Dialogs/AutoAccompanimentDialog.h & .cpp):
+    - 8 scale-degree chord buttons (I, ii, iii, IV, V7, vi, vii°, bII7) for one-click chord triggers and live jamming.
+  * Visual Timeline Section Banners & SMF Markers (src/TrackWindow.cpp & src/AutoAccompaniment.cpp):
+    - Color-coded section banners on timeline ruler: Intro (Blue), Verse (Green), Chorus (Orange/Yellow), Bridge (Purple), Outro (Dark Grey).
+    - Writes SMF 0x06 meta markers (JZMarkerEvent) to Track 0 for compatibility with external DAWs (Cubase, Ableton, FL Studio, Logic, Reaper).
+  * Studio Woodblock Click Track & Metronome Count-in (src/AutoAccompaniment.h & .cpp):
+    - Synthesizes dual-tone woodblock click audio: Beat 1 (Downbeat) 900 Hz, Beats 2, 3, 4 (Offbeats) 580 Hz with rapid decay.
+    - Integrated into direct WAV export and isolated click stem export (stem_click_track.wav).
+  * Arrangement Preset & Style Template Bundle Manager (src/AutoAccompaniment.h & .cpp):
+    - SaveArrangementPreset and LoadArrangementPreset to save and load full arrangement configs in '.jazzstyle' files.
+  * Added Unit Tests 30 to 35 (tests/test_main.cpp):
+    - Validates tritone substitution, horn section voicings, chord pad degrees, SMF markers, metronome click frequencies, and preset persistence.
 
 24-10-2026 Raja Zahidi
 - Feature & Studio Production Suite: Master Music Arranger & Producer Edition (Chord Progression Builder, Multi-Track Stems, Lead Sheet Generator, Outro Ritardando, Velocity Curves & Microtonal Tuning):
-  * Pembina Progresi Kord Automatik 1-Klik (Smart Chord Progression Builder & Song Starters - src/AutoAccompaniment.h & .cpp):
-    - Fungsi GenerateChordProgression menyuntik progresi kord lengkap dengan susunan pimpinan suara licin (smooth voice leading) ke dalam trek sasaran (piano/lead).
-    - Menyokong templat standard industri: Jazz Classic Cadence (ii-V-I-vi), Pop/Rock 4-Chords (I-V-vi-IV), Neo-Soul & R&B (ii9-V13-Imaj9), 12-Bar Blues Traditional, Nusantara Folk / Zapin-Joget (Am-Dm-E7-Am), Andalusian Cadence (Am-G-F-E), Pachelbel Canon, dan Lo-Fi Chillhop Vamp.
-    - Kord didaftarkan secara automatik ke dalam JZChordTrack agar pembaris garis masa memaparkannya serta-merta.
-  * Eksport Audio Stems Berasingan Multi-Trek (Multi-Track Stem Audio Export - src/AutoAccompaniment.h & .cpp):
-    - Fungsi JZMidiAudioRenderer::ExportStems merender setiap trek aktif secara berasingan ke fail audio WAV PCM 16-bit 44.1kHz (01_Drums_Stem.wav, 02_Bass_Stem.wav, dll.) di dalam folder pilihan pengguna.
-    - Membolehkan pengadunan profesional (mixing & mastering) dalam perisian DAW luar seperti FL Studio, Ableton Live, Logic Pro, Cubase, dan Reaper.
-  * Penjana Carta Kord & Lembaran Muzik Pentas (Printable Musician's Lead Sheet / Real Book Generator - src/AutoAccompaniment.h & .cpp):
-    - Fungsi GenerateLeadSheetHtml & ExportLeadSheetHtml menjana carta kord format HTML grid 4-birama standard The Real Book.
-    - Dilengkapi penanda seksyen (Intro, Verse, Chorus, Bridge, Outro), simbol kord berani, nombor birama, maklumat tempo & kunci, serta butang cetak mesra PDF.
-  * Otomasi Tempo & Liku Perlambatan Penamat (Outro Ritardando Tempo Automation - src/AutoAccompaniment.h & .cpp):
-    - Penurunan tempo lancar pada 2 birama terakhir bahagian Outro (diselaraskan sebanyak 15% hingga 25% lebih perlahan) melalui acara JZSetTempoEvent untuk menghasilkan penamat konsert akustik semula jadi.
-  * Keluk Respons Halaju Dinamik (Velocity Dynamic Touch Curves - src/AutoAccompaniment.h & .cpp):
-    - Fungsi ApplyVelocityCurve memetakan sentuhan pemuzik mengikut profil terpilih: Standard Balanced Linear, Soft & Lyrical Touch (logaritma), Punchy & Aggressive Attack (eksponen), dan Vintage Analog Tape Drift.
-  * Penalaan Mikro Tradisional Nusantara & Timur (Microtonal Quarter-Tone Tuning - src/AutoAccompaniment.h & .cpp):
-    - Modul talaan mikro menjana acara MIDI Pitch Bend (-2048 unit = -50 sen) pada not ke-3 neutral bagi skala Bayati / Rast Zapin dan Gamelan Slendro / Pelog (+35 sen).
-  * Antara Muka Pengguna Dipertingkat (src/Dialogs/AutoAccompanimentDialog.h & .cpp):
-    - Kotak Song Starter dengan menu pilihan progresi kord dan butang [ 🎹 Inject Chords to Track 1 ].
-    - Pilihan Velocity Response Curve, Outro Ritardando, dan Microtonal Tuning.
-    - Butang tindakan pantas [ 📄 Lead Sheet... ], [ 📦 Stems (WAV)... ], dan [ 🎧 Mix (WAV)... ].
-  * Pengesahan Ujian Unit Komprehensif (tests/test_main.cpp):
-    - Ditambah ujian unit 24 hingga 29 (progresi kord, pembersihan nama fail stems, susun atur grid 4-lajur lead sheet, formula ritardando, liku halaju sentuhan, dan penalaan mikro suku-ton -50 sen).
+  * Smart Chord Progression Builder & Song Starters (src/AutoAccompaniment.h & .cpp):
+    - GenerateChordProgression injects industry-standard chord progressions with smooth voice leading into piano/lead tracks.
+    - Presets: Jazz Classic Cadence (ii-V-I-vi), Pop/Rock 4-Chords (I-V-vi-IV), Neo-Soul & R&B (ii9-V13-Imaj9), 12-Bar Blues Traditional, Nusantara Folk / Zapin-Joget (Am-Dm-E7-Am), Andalusian Cadence (Am-G-F-E), Pachelbel Canon, and Lo-Fi Chillhop Vamp.
+    - Chords automatically register to JZChordTrack for visual timeline display.
+  * Multi-Track Stem Audio Export (src/AutoAccompaniment.h & .cpp):
+    - JZMidiAudioRenderer::ExportStems exports active tracks individually as 16-bit 44.1kHz PCM WAV files (01_Drums_Stem.wav, 02_Bass_Stem.wav, etc.) for external DAW mixing.
+  * Printable Musician's Lead Sheet / Real Book Generator (src/AutoAccompaniment.h & .cpp):
+    - GenerateLeadSheetHtml & ExportLeadSheetHtml produce printable 4-bar grid HTML lead sheets in The Real Book style with section headers, bold chord symbols, measure numbers, and PDF-friendly styling.
+  * Outro Ritardando Tempo Automation (src/AutoAccompaniment.h & .cpp):
+    - Smooth 15%-25% tempo deceleration across the final 2 measures of the Outro using JZSetTempoEvent for a natural concert finale.
+  * Velocity Dynamic Touch Curves (src/AutoAccompaniment.h & .cpp):
+    - ApplyVelocityCurve maps dynamic velocity response profiles: Standard Balanced Linear, Soft & Lyrical Touch (logarithmic), Punchy & Aggressive Attack (exponential), and Vintage Analog Tape Drift.
+  * Microtonal Quarter-Tone Tuning (src/AutoAccompaniment.h & .cpp):
+    - Microtonal module emitting MIDI Pitch Bend (-2048 units = -50 cents) on neutral 3rd scale degrees for Bayati / Rast Zapin and Gamelan Slendro / Pelog (+35 cents).
+  * Enhanced UI (src/Dialogs/AutoAccompanimentDialog.h & .cpp):
+    - Song Starter box with chord progression selection and [ 🎹 Inject Chords to Track 1 ] button.
+    - Options for Velocity Response Curve, Outro Ritardando, and Microtonal Tuning.
+    - Quick-action buttons: [ 📄 Lead Sheet... ], [ 📦 Stems (WAV)... ], and [ 🎧 Mix (WAV)... ].
+  * Added Unit Tests 24 to 29 (tests/test_main.cpp):
+    - Validates chord progression generation, stem file naming, lead sheet 4-column layout, ritardando calculations, velocity touch curves, and -50 cent microtonal pitch bends.
 
 24-10-2026 Raja Zahidi
 - Feature & DAW Audio Intelligence: Professional DAW-Grade Upgrades (Global Chord Track, 3/4 & 6/8 Meters, Nusantara Grooves, Micro-Timing Pocket, Smart Scale Lock & Direct WAV Audio Mixdown):
-  * Trek Kord Visual Global & Pembaris Garis Masa (Global Visual Chord Track & Timeline Ruler - src/AutoAccompaniment.h, .cpp, src/TrackWindow.cpp):
-    - Kelas pengurusan kord global JZChordTrack menyimpan simbol kord bagi setiap birama lagu secara berpusat.
-    - Pembaris garis masa (JZTrackWindow::OnPaint) memaparkan simbol kord secara visual di atas bar birama (contoh: 1 [C], 5 [Am7], 9 [Dm7], 13 [G7]).
-  * Eksport Terus Adunan Audio WAV Bebas Dependensi (Direct MIDI-to-WAV Audio Mixdown - src/AutoAccompaniment.h & .cpp):
-    - Enjin sintesis PCM stereo 16-bit 44.1kHz JZMidiAudioRenderer::ExportWav menjana fail WAV master lengkap tanpa memerlukan soundfont atau DLL luaran.
-    - Sintesis berbilang lapisan: sweep frekuensi punchy untuk Kick drum, tone + noise burst untuk Snare/Rimshot, metallic noise decay untuk Hi-Hats/Cymbals, sine + harmonic blend untuk Bass, dan hybrid wave dengan ADSR envelope untuk instrumen melodik.
-    - Dilengkapi pemprosesan soft-limiting tanh & peak normalization automatik untuk mencegah herotan clipping.
-  * Sokongan Penuh Tanda Masa 3/4 & 6/8 (Full Time Signature Awareness - src/AutoAccompaniment.h & .cpp):
-    - Gaya Jazz Waltz 3/4 (STYLE_JAZZ_WALTZ_3_4 & STRUM_WALTZ_3_4): 3 rentak setiap birama dengan bass berayun, corak ride waltz spang-a-lang, hi-hat pedal pada rentak 2, dan kocokan akustik Down/Down-Up.
-    - Gaya Slow Soul / Blues Ballad 6/8 (STYLE_BALLAD_6_8 & PLUCK_BALLAD_6_8): 6 not perlapan dengan rentak kencang snare pada langkah ke-4 (dotted quarter) dan arpeggio 6-langkah yang mengalir.
-  * Poket Pemasaan Mikro & Sentuhan Manusia (Micro-Timing Pocket & Humanization - src/AutoAccompaniment.h & .cpp):
-    - Snare Pocket Delay: Not snare pada backbeat dianjak ke belakang (+8 ticks / ~12ms) untuk menghasilkan 'laid-back pocket feel' gaya J Dilla / Neo-Soul / Chillhop.
-    - Bass Forward Drive: Not bass pada downbeat dianjak ke hadapan (-3 ticks / ~5ms) untuk memacu momentum groove ke depan.
-  * Kunci Skala Pintar & Kuantisasi Masa Nyata (Smart Scale Lock & Snap-to-Key - src/AutoAccompaniment.h & .cpp):
-    - Fungsi SnapToKeyScale mengunci setiap not solo dan melodik kepada skala kunci lagu global yang dikesan secara automatik bagi mengelakkan not sumbang (dissonant notes).
-    - Fungsi QuantizeClock menyelaraskan kedudukan not ke grid pembahagian muzik terpilih dengan sokongan swing.
-  * Perpustakaan Irama Tradisional Nusantara & Moden (World & Contemporary Grooves - src/AutoAccompaniment.h & .cpp):
-    - Nusantara Zapin (STYLE_NUSANTARA_ZAPIN): Rentak marwas & gambus bersinkopasi dengan aksen pada 1, 2-and, 3-and, dan 4.
-    - Nusantara Joget (STYLE_NUSANTARA_JOGET): Irama tari rakyat rancak 2/4 - 4/4 dengan lantunan bes ceria dan aksen hi-hat terbuka pada offbeat.
-    - Nusantara Inang / Asli (STYLE_NUSANTARA_INANG): Irama lenggang anggun 8-rentak dengan pukulan gong lembut dan rebana berjiwa.
-    - Lo-Fi Chillhop (STYLE_LOFI_CHILLHOP): Rentak santai boom-bap dengan sub-bass hangat dan poket snare santai.
-  * Penambahbaikan Dialog (src/Dialogs/AutoAccompanimentDialog.h & .cpp):
-    - Ditambah kotak semak Micro-Timing Pocket dan Smart Scale Lock.
-    - Ditambah butang tindakan pantas [ 🎧 Export Audio WAV... ] dengan dialog pemilihan fail .wav.
-  * Pengesahan Ujian Unit Komprehensif (tests/test_main.cpp):
-    - Ditambah ujian unit 18 hingga 23 merangkumi tanda masa 3/4 & 6/8, sinkopasi Zapin, poket pemasaan mikro, penyesuaian skala pintar, pemetaan pembaris kord global, dan pengiraan kadar bait WAV PCM.
+  * Global Visual Chord Track & Timeline Ruler (src/AutoAccompaniment.h, .cpp, src/TrackWindow.cpp):
+    - JZChordTrack centrally stores per-measure chords.
+    - Timeline ruler (JZTrackWindow::OnPaint) renders visual chord markers above measure bars (e.g., 1 [C], 5 [Am7], 9 [Dm7], 13 [G7]).
+  * Direct MIDI-to-WAV Audio Mixdown (src/AutoAccompaniment.h & .cpp):
+    - Dependency-free 16-bit 44.1kHz stereo PCM synthesis engine (JZMidiAudioRenderer::ExportWav) exports master WAV files without soundfonts or external DLLs.
+    - Multi-layered synthesis: frequency-swept punchy kick, tone + noise burst snare/rimshot, metallic decay hi-hats/cymbals, sine + harmonic bass, and hybrid wave melodic voices with ADSR envelopes and tanh soft-limiting.
+  * Full Time Signature Awareness: 3/4 & 6/8 (src/AutoAccompaniment.h & .cpp):
+    - 3/4 Jazz Waltz (STYLE_JAZZ_WALTZ_3_4 & STRUM_WALTZ_3_4): 3 beats per bar with walking bass, ride spang-a-lang waltz, pedal hi-hat on beat 2, and acoustic Down/Down-Up strumming.
+    - 6/8 Slow Soul / Blues Ballad (STYLE_BALLAD_6_8 & PLUCK_BALLAD_6_8): 6 eighth notes with snare backbeat on 4th step and flowing 6-step arpeggios.
+  * Micro-Timing Pocket & Humanization (src/AutoAccompaniment.h & .cpp):
+    - Snare Pocket Delay: Backbeat snare delayed (+8 ticks / ~12ms) for relaxed J Dilla / Neo-Soul / Chillhop pocket feel.
+    - Bass Forward Drive: Downbeat bass advanced (-3 ticks / ~5ms) to drive forward groove momentum.
+  * Smart Scale Lock & Snap-to-Key (src/AutoAccompaniment.h & .cpp):
+    - SnapToKeyScale locks solo and melodic notes to detected global song key to prevent dissonant notes.
+    - QuantizeClock aligns note timings to musical subdivisions with swing support.
+  * World & Contemporary Grooves (src/AutoAccompaniment.h & .cpp):
+    - Nusantara Zapin (STYLE_NUSANTARA_ZAPIN): Syncopated marwas & gambus rhythm with accents on 1, 2-and, 3-and, and 4.
+    - Nusantara Joget (STYLE_NUSANTARA_JOGET): Lively 2/4 - 4/4 folk dance rhythm with upbeat bass bouncing and open hi-hat offbeat accents.
+    - Nusantara Inang / Asli (STYLE_NUSANTARA_INANG): Graceful 8-beat rhythm with gentle gong and rebana pulses.
+    - Lo-Fi Chillhop (STYLE_LOFI_CHILLHOP): Relaxed boom-bap rhythm with warm sub-bass and laid-back snare pocket.
+  * Dialog Enhancements (src/Dialogs/AutoAccompanimentDialog.h & .cpp):
+    - Added checkboxes for Micro-Timing Pocket and Smart Scale Lock.
+    - Added quick-action button [ 🎧 Export Audio WAV... ] with file dialog.
+  * Added Unit Tests 18 to 23 (tests/test_main.cpp):
+    - Validates 3/4 & 6/8 meters, Zapin syncopation, micro-timing pocket, smart scale snapping, global chord ruler mapping, and PCM WAV byte rate calculations.
 
 24-10-2026 Raja Zahidi
 - Feature & Music Intelligence: Smart Studio Arranger Edition (Smooth Voice Leading, Song Form Dynamics, Key Center Detection, Smart Auto-Mixer & Live Jamming):
-  * Pimpinan Suara Licin (Smooth Voice Leading Engine - src/AutoAccompaniment.h & .cpp):
-    - Melaksanakan algoritma pemilihan pembalikan kord (*inversion selection*) yang meminimumkan jumlah jarak pergerakan semiton antara kord berturutan.
-    - Not sepunya (*common tones*) dikekalkan pada pic yang sama tanpa lompatan kasar bagi lapisan Pad dan Strings (cth: peralihan C Maj -> F Maj menggunakan pembalikan kedua F/C dengan jumlah jarak lompatan hanya 3 semiton berbanding 15 semiton dalam kedudukan asas).
-  * Struktur Lagu & Dinamik Bahagian (Song Form & Dynamic Arrangement):
-    - Pengenalan sistem bahagian lagu: Intro, Verse, Chorus, Bridge, dan Outro secara automatik mengikut kepanjangan lagu atau pilihan pengguna.
-    - Dinamik Dram Mengikut Bahagian: Intro (hi-hat tertutup/ride bell lembut, kick beat 1 sahaja), Verse (rimshot 37 & closed hi-hat dalam poket kemas), Chorus (ride cymbal 51 / open hi-hat bertenaga dengan snare padu 38 dan double kick accents), Bridge (breakdown toms), dan Outro (decrescendo ride wash dengan crash penamat).
-    - Dinamik Solo Mengikut Bahagian: Kepadatan dan halaju solo dilaraskan secara dinamik—lebih berjiwa dan renggang dalam Verse/Intro dan melonjak kepada frasa virtuoso bertenaga tinggi dengan lengkungan pic dalam Chorus.
-  * Pengecaman Kunci Lagu Global (Global Key Center Detection):
-    - Pelaksanaan algoritma Krumhansl-Schmuckler Key-Finding yang menganalisis taburan frekuensi pic (*pitch class duration profile*) ke atas keseluruhan trek sumber.
-    - Mengira korelasi Pearson terhadap templat Krumhansl-Kessler bagi kesemua 24 kunci Major dan Minor untuk menentukan tonik lagu berserta tahap keyakinan (*tonal confidence score*).
-  * Pratetap Adunan Pintar Automatik (Smart Auto-Mixer Studio Presets):
-    - Konfigurasi automatik bagi pemisahan stereo (*stereo panning*) dan imbangan aras volum:
-      - Bass: Pan 64 (Center), Volum 100, Reverb 15 (punchy & kering di tengah).
-      - Drums: Pan 64 (Center), Volum 106, Reverb 25 (padu & bertenaga di tengah).
-      - Pad / Strings: Pan 85 (Kanan 35%), Volum 72, Reverb 65, Chorus 45 (lebar, hangat dan berdimensi).
-      - Strum / Pluck Guitar: Pan 40 (Kiri 38%), Volum 84, Reverb 40, Chorus 20 (lebar di sebelah kiri).
-      - Riffs / Hooks: Pan 48 (Kiri Tengah), Volum 92, Reverb 35, Chorus 15.
-      - Solo Lead: Pan 64 (Center-Front), Volum 110, Reverb 50, Chorus 20 (menyerlah di barisan hadapan).
-  * Artikulasi Bes Lanjutan (Advanced Bass Articulations):
-    - Peralihan automatik atau manual antara 2-feel (not separuh pada beat 1 & 3 dalam Verse) dan 4-feel (walking bass berterusan dalam Chorus).
-    - Penjanaan not hantu (*ghost notes*) berhalaju rendah (35-45) pada offbeat (beat 2-and dan 4-and) untuk groove akustik semula jadi.
-    - Penurunan oktaf automatik (*octave drop*) bagi pic melebihi 44 untuk memastikan frekuensi sub-bass kekal tebal dan mantap.
-  * Enjin Jamming Masa Nyata Interaktif (Live Real-Time Jam Engine):
-    - Penjejak kord interaktif (JZLiveJamEngine) yang memantau not MIDI In secara langsung, mengira pic aktif, dan mengenal pasti kord serta pembalikannya secara masa nyata untuk sokongan jamming langsung.
-  * Antara Muka Pengguna Dipertingkat (src/Dialogs/AutoAccompanimentDialog.h & .cpp):
-    - Paparan Kunci Global lagu secara masa nyata dalam pengepala dialog.
-    - Kawalan Song Section (Auto / Intro / Verse / Chorus / Bridge / Outro) dan Bass Articulation Feel.
-    - Kotak semak pilihan Smooth Voice Leading, Bass Ghost Notes, dan Smart Auto-Mixer Presets.
+  * Smooth Voice Leading Engine (src/AutoAccompaniment.h & .cpp):
+    - Chord inversion selection minimizing total semitone interval movement between successive chords.
+    - Preserves common tones at identical pitch registers for pad and strings layers (e.g. C Maj -> F Maj uses second inversion F/C with only 3 semitones of movement vs 15 semitones in root position).
+  * Song Form & Dynamic Arrangement:
+    - Automatic song section structure: Intro, Verse, Chorus, Bridge, and Outro.
+    - Section-dependent drum dynamics: Intro (closed hats/gentle ride bell, kick on beat 1 only), Verse (rimshot 37 & closed hats in tight pocket), Chorus (ride cymbal 51 / open hats with punchy snare 38 and double kicks), Bridge (breakdown toms), and Outro (decrescendo ride wash with crash cymbal finale).
+    - Section-dependent solo dynamics: Sparse, lyrical phrasing in Verse/Intro transitioning to energetic virtuoso lines with pitch bends in Chorus.
+  * Global Key Center Detection:
+    - Krumhansl-Schmuckler Key-Finding algorithm analyzing pitch class duration profiles across the source track.
+    - Calculates Pearson correlation against Krumhansl-Kessler templates for all 24 Major and Minor keys with tonal confidence scores.
+  * Smart Auto-Mixer Studio Presets:
+    - Automated stereo panning and volume balancing:
+      - Bass: Pan 64 (Center), Volume 100, Reverb 15 (punchy & dry center).
+      - Drums: Pan 64 (Center), Volume 106, Reverb 25 (solid center punch).
+      - Pad / Strings: Pan 85 (Right 35%), Volume 72, Reverb 65, Chorus 45 (wide, warm, dimensional).
+      - Strum / Pluck Guitar: Pan 40 (Left 38%), Volume 84, Reverb 40, Chorus 20 (wide left soundstage).
+      - Riffs / Hooks: Pan 48 (Mid-Left), Volume 92, Reverb 35, Chorus 15.
+      - Solo Lead: Pan 64 (Center-Front), Volume 110, Reverb 50, Chorus 20 (prominent front lead).
+  * Advanced Bass Articulations:
+    - Automatic or manual switching between 2-feel (half notes on beats 1 & 3 in Verse) and 4-feel (walking bass in Chorus).
+    - Generates low-velocity (35-45) ghost notes on offbeats (beats 2-and & 4-and) for natural acoustic groove.
+    - Automatic octave drop for pitches above 44 to maintain solid sub-bass weight.
+  * Interactive Live Real-Time Jam Engine:
+    - JZLiveJamEngine monitors live MIDI In notes, computes active pitches, and identifies chords and inversions in real time.
+  * Enhanced UI (src/Dialogs/AutoAccompanimentDialog.h & .cpp):
+    - Real-time global key display in dialog header.
+    - Song Section controls (Auto / Intro / Verse / Chorus / Bridge / Outro) and Bass Articulation Feel.
+    - Checkboxes for Smooth Voice Leading, Bass Ghost Notes, and Smart Auto-Mixer Presets.
 
 23-10-2026 Raja Zahidi
 - Feature & Music Intelligence: Smart Music Intelligence & Session Band Hub (Pro Edition):
-  * Ketepatan Harmoni Lanjutan (src/AutoAccompaniment.h & src/AutoAccompaniment.cpp):
-    - Pengesanan 2 kord sebirama (Half-Bar Split Detection): mengesan pertukaran kord pertengahan birama (cth: ii-V) agar bass, kocokan, riff dan solo mengikut perubahan harmoni dengan tepat.
-    - Pengecaman Kord Pembalikan & Not Slash (Chord Inversion Disambiguation): mengenal pasti pembalikan kord pertama, kedua, dan ketiga (cth: C/E, G/B, C/G, G7/F) tanpa tersilap menganggap not bes sebagai not akar triad.
-  * Smart Drum Fills & Peralihan Frasa:
-    - Penjanaan dram fill dinamik secara automatik pada sempadan frasa (birama ke-4, ke-8, ke-12, ke-16) menggunakan snare roll 16th dan cascading toms (High Tom 50, Mid Tom 47, Low Tom 45, Floor Tom 41) menuju ke hentakan simbal crash pada permulaan frasa baru.
-  * Ekspresi Solo Lanjutan (MIDI Pitch Bend & Vibrato Modulation CC 1):
-    - Penjanaan lengkungan pic automatik (JZPitchEvent) pada not-not blues (flat-5th ke 5th) untuk meniru bend gitar dan saksofon sebenar.
-    - Penjanaan modulasi vibrato automatik (JZControlEvent CC 1) pada not-not solo berpanjangan (> 1 beat).
-  * Kawalan Groove & Humanisasi Pemasaan:
-    - Slider Groove Swing Ratio (50% straight hingga 70% heavy swing).
-    - Variasi rawak halaju semulajadi (velocity drift +/- 4) agar persembahan tidak kedengaran kaku/robotik.
-  * Pratonton Audio Langsung Dalam Dialog (Live Audition Preview):
-    - Butang [▶ Preview] dan [■ Stop] untuk mendengar corak muzik, kocokan gitar, riff atau solo secara masa nyata sebelum menjana ke dalam trek projek.
-  * Hab Bersepadu Berbilang Tab wxNotebook (src/Dialogs/AutoAccompanimentDialog.h & .cpp):
-    - Tab 1 [Session Band]: Penjanaan iringan penuh (Bass, Drums, Pad) dalam 5 genre (Jazz Swing, Bossa Nova, Blues Shuffle, Pop/Rock, Funk Groove).
-    - Tab 2 [Strum & Pluck]: Kocokan berirama gitar & papan kekunci dengan micro-delay pemasaan manusia (10-35ms), sapuan Downstroke (↓) & Upstroke (↑), perkusif chucks (x), petikan Travis Picking, Ballad Arpeggio, P-I-M-A Classical, dan Neo-Soul spread voicings.
-    - Tab 3 [Riffs & Hooks]: Penjana riff harmoni automatik berasaskan skala kord (Blues Rock boogie, Funk brass section hits, Hard Rock palm-muted power riffs, Synthwave 16th rolling bass, dan Jazz Bebop chromatic enclosures).
-    - Tab 4 [Auto-Solo Lead]: Penjana solo & melodi pintar dengan padanan skala kord (Dorian, Mixolydian, Lydian, Blues Scale), struktur frasa Call-and-Response 2-birama, peluncuran not blues, dan pelarasan kepadatan frasa (Sparse, Balanced, Virtuoso).
-    - Sokongan penjanaan serentak semua lapisan (Simultaneous Multi-layer Generation) atau secara berasingan bagi setiap tab.
-    - Sokongan penuh sistem Undo song-wide (gpProject->NewUndoBuffer()) untuk pembalikan satu klik.
-    - Pintasan menu 'Auto-Accompaniment (Smart Band)...' (Ctrl+B) dalam Tools menu (TrackFrame) dan Edit menu (PianoFrame).
+  * Advanced Harmonic Accuracy (src/AutoAccompaniment.h & .cpp):
+    - Half-Bar Split Detection: Tracks mid-measure chord changes (e.g. ii-V) ensuring bass, rhythm strums, riffs, and solos track harmonic shifts accurately.
+    - Chord Inversion Disambiguation: Identifies 1st, 2nd, and 3rd chord inversions and slash chords (e.g. C/E, G/B, C/G, G7/F) without mistaking bass notes for chord roots.
+  * Smart Drum Fills & Phrase Transitions:
+    - Automatic dynamic drum fills on phrase boundaries (measures 4, 8, 12, 16) with 16th snare rolls and cascading toms (High Tom 50, Mid Tom 47, Low Tom 45, Floor Tom 41) leading into crash cymbal hits.
+  * Advanced Solo Expressions:
+    - Automatic pitch bend events (JZPitchEvent) on blues notes (flat-5th to 5th) emulating expressive guitar and saxophone bends.
+    - Automatic vibrato modulation (JZControlEvent CC 1) on sustained solo notes (> 1 beat).
+  * Groove Control & Timing Humanization:
+    - Groove Swing Ratio slider (50% straight to 70% heavy swing).
+    - Natural velocity drift (+/- 4) to eliminate robotic rigidity.
+  * Live Audition Preview in Dialog:
+    - [▶ Preview] and [■ Stop] buttons to audition rhythm styles, strums, riffs, or solos in real time before generating to tracks.
+  * Multi-Tab Integrated Hub (src/Dialogs/AutoAccompanimentDialog.h & .cpp):
+    - Tab 1 [Session Band]: Full accompaniment (Bass, Drums, Pad) across 5 genres (Jazz Swing, Bossa Nova, Blues Shuffle, Pop/Rock, Funk Groove).
+    - Tab 2 [Strum & Pluck]: Guitar and keyboard rhythmic strums with humanized micro-delays (10-35ms), Downstroke (↓) & Upstroke (↑), percussive chucks (x), Travis Picking, Ballad Arpeggio, P-I-M-A Classical, and Neo-Soul spread voicings.
+    - Tab 3 [Riffs & Hooks]: Chord-scale harmonic riffs (Blues Rock boogie, Funk brass hits, Hard Rock palm-muted riffs, Synthwave 16th rolling bass, Jazz Bebop chromatic enclosures).
+    - Tab 4 [Auto-Solo Lead]: Intelligent solo generator with chord-scale matching (Dorian, Mixolydian, Lydian, Blues), 2-bar Call-and-Response phrasing, blues note slides, and phrase density controls (Sparse, Balanced, Virtuoso).
+    - Simultaneous multi-layer generation or individual tab generation.
+    - Full song-wide Undo support (gpProject->NewUndoBuffer()).
+    - Menu shortcut 'Auto-Accompaniment (Smart Band)...' (Ctrl+B) in Tools menu (TrackFrame) and Edit menu (PianoFrame).
 
 23-10-2026 Raja Zahidi
-- Brand Identity & Visual Design: Pelaksanaan rasmi logo baharu Konsep 1 'The Golden Horn & Digital Flow':
-  * Vektor Master SVG (resources/icons/jazz.svg): Reka bentuk berprofil tinggi menampilkan corong saksofon loyang emas berkilau (metallic gold brass) dengan gelombang audio neon sian/emas dan lencana berkembar '++'.
-  * Ikon Pelbagai Resolusi: Penjanaan semula kesemua saiz ikon PNG (16x16, 32x32, 48x48, 64x64, 128x128, 256x256) menggunakan penapisan Lanczos berkualiti tinggi.
-  * Ikon Windows (.ico): Penjanaan pakej multi-layer ICO rasmi (resources/icons/jazz.ico & src/mswin/jazz.ico) untuk paparan Windows Explorer dan Taskbar.
-  * Ikon Tetingkap Aplikasi (src/Bitmaps/jazz_icon.xpm): Pengemaskinian kod XPM 32x32 bagi ikon tetingkap wxWidgets.
+- Brand Identity & Visual Design: Official implementation of new Concept 1 logo 'The Golden Horn & Digital Flow':
+  * Master SVG Vector (resources/icons/jazz.svg): Modern design featuring a gleaming metallic gold brass saxophone bell with cyan/gold audio neon waves and twin '++' badge.
+  * Multi-Resolution Icons: Regenerated all PNG icon sizes (16x16, 32x32, 48x48, 64x64, 128x128, 256x256) using Lanczos filtering.
+  * Windows Icons (.ico): Generated official multi-layer ICO packages (resources/icons/jazz.ico & src/mswin/jazz.ico) for Windows Explorer and Taskbar.
+  * Application Window Icon (src/Bitmaps/jazz_icon.xpm): Updated 32x32 XPM icon code for wxWidgets window frame.
 
 23-10-2026 Raja Zahidi
-- UI & High-DPI Modernization: Penskalaan dan pembesaran antaramuka bagi paparan monitor desktop moden (1080p, 1440p, 4K):
-  * Toolbar Icons: Menaik taraf saiz ikon toolbar daripada 20x19px kepada FromDIP(24x24px) dengan penskalaan lancar berkualiti tinggi (wxIMAGE_QUALITY_HIGH) dan margin yang lebih lapang.
-  * Arranger / Track Window: Ketinggian baris trek (mTrackHeight) dinaikkan daripada ~18px kepada minimum FromDIP(28px) dengan fon yang jelas dan pemusatan teks menegak yang kemas pada lajur nama trek, nombor trek, status bisu/solo, dan nombor patch.
-  * Piano Roll: Ketinggian semitone dinaikkan kepada minimum FromDIP(20px) dan kelebaran papan kekunci piano (mPianoWidth) dinaikkan kepada minimum FromDIP(140px).
-  * Dimensi Tetingkap Lalai: Saiz tetingkap mulaan (fallback) Track Window dan Piano Roll dinaikkan daripada 600x400 / 640x480 kepada 1280x720 (min 800x480).
+- UI & High-DPI Modernization: Desktop scaling and modern monitor support (1080p, 1440p, 4K):
+  * Toolbar Icons: Upgraded toolbar icon sizes from 20x19px to FromDIP(24x24px) with high-quality scaling (wxIMAGE_QUALITY_HIGH) and generous margins.
+  * Arranger / Track Window: Track row height (mTrackHeight) increased from ~18px to minimum FromDIP(28px) with clear typography and vertical text centering on track name, number, mute/solo status, and patch columns.
+  * Piano Roll: Semitone height increased to minimum FromDIP(20px) and piano keyboard width (mPianoWidth) increased to minimum FromDIP(140px).
+  * Default Window Dimensions: Initial window sizes for Track Window and Piano Roll increased from 600x400 / 640x480 to 1280x720 (minimum 800x480).
 
 23-10-2026 Raja Zahidi
-- Audit, Simulasi & Pembaikan Antara Muka (Toolbar Buttons & Menu Bar):
-  * Pembaikan Tombol Mati (Dead Buttons):
-    - JZTrackFrame: Menghidupkan tombol toolbar 'duplicate selection' (wxID_DUPLICATE / repl_xpm) dengan menyambungkan event handler OnDuplicate serta menambah pilihan menu 'Duplicate' (Ctrl+D) di bawah Edit menu. Logik penggandaan menyokong pemilihan pelbagai birama merentasi berbilang trek secara bersiri dengan sokongan penuh fungsi Undo.
-    - JZPianoFrame: Menambah sokongan penggandaan nota/frasa (wxID_DUPLICATE / Ctrl+D) di dalam Piano Roll.
-    - JZRhythmGeneratorFrame: Menghidupkan tombol toolbar dan menu 'move instrument up' (ID_INSTRUMENT_UP), 'move instrument down' (ID_INSTRUMENT_DOWN), 'Save As...' (wxID_SAVEAS), dan 'Close' (wxID_CLOSE).
-    - JZHarmonyBrowserFrame: Menghidupkan tombol dan item menu 'Analyze trackwin selection' (MEN_ANALYZE), 'Transpose trackwin selection' (MEN_TRANSPOSE), dan 'Global Settings' (ID_VIEW_SETTINGS) yang sebelum ini terpadam dalam jadual event.
-    - JZSampleFrame: Menyambungkan pemetaan acara (Event Table) bagi seluruh bar alatan dan menu Penyunting Sampel Audio (Waveform Editor) agar semua perintah pemprosesan audio berfungsi.
-    - JZSliderWindow: Menyambungkan penghalaan menu bagi tdefs dialog Additive Synthesis.
-  * Pembetulan Ralat Logik & Typos:
-    - JZHarmonyBrowserFrame: Membaiki ralat taip ID event table MEN_EQ1 -> MEN_EQ0 pada OnUpdateZeroEqualNotes dan MEN_MAJSCALE -> MEN_HAUNSCH pada OnUpdateHaunschildLayout.
-  * Penyingkiran Redundansi (Duplicate Menu Items):
-    - JZTrackFrame: Memadam penduaan 'Insert Chord / Scale...' dari Edit Menu; kekal teratur di dalam Tools Menu bersama alatan gubahan muzik lain.
-    - JZPianoFrame: Memadam penduaan 'MIDI Effects Suite' dan 'Procedural SFX & Synth Drums' dari Edit Menu; kekal kemas di bawah menu teras Effects.
+- Audit, Simulation & UI Repairs (Toolbar Buttons & Menu Bar):
+  * Restored Inactive Buttons:
+    - JZTrackFrame: Connected toolbar 'duplicate selection' (wxID_DUPLICATE / repl_xpm) to OnDuplicate event handler and added 'Duplicate' (Ctrl+D) menu entry under Edit menu with full multi-bar, multi-track, and Undo support.
+    - JZPianoFrame: Added note/phrase duplication support (wxID_DUPLICATE / Ctrl+D) inside Piano Roll.
+    - JZRhythmGeneratorFrame: Connected toolbar and menu items for 'move instrument up' (ID_INSTRUMENT_UP), 'move instrument down' (ID_INSTRUMENT_DOWN), 'Save As...' (wxID_SAVEAS), and 'Close' (wxID_CLOSE).
+    - JZHarmonyBrowserFrame: Restored 'Analyze trackwin selection' (MEN_ANALYZE), 'Transpose trackwin selection' (MEN_TRANSPOSE), and 'Global Settings' (ID_VIEW_SETTINGS) event handlers.
+    - JZSampleFrame: Connected event table mappings for toolbar and menu commands across the Waveform Sample Editor.
+    - JZSliderWindow: Connected menu routing for Additive Synthesis dialog definitions.
+  * Typo and Event ID Fixes:
+    - JZHarmonyBrowserFrame: Fixed event table ID typos MEN_EQ1 -> MEN_EQ0 on OnUpdateZeroEqualNotes and MEN_MAJSCALE -> MEN_HAUNSCH on OnUpdateHaunschildLayout.
+  * Redundancy Removal:
+    - JZTrackFrame: Removed duplicate 'Insert Chord / Scale...' entry from Edit menu; preserved cleanly under Tools menu.
+    - JZPianoFrame: Removed duplicate 'MIDI Effects Suite' and 'Procedural SFX & Synth Drums' from Edit menu; preserved under Effects menu.
 
 23-10-2026 Raja Zahidi
-- Upgrade: Naik taraf pustaka teras GUI kepada wxWidgets v3.3.4 (Latest Feature Release):
-  * Kemas kini CI GitHub Actions (.github/workflows/ci.yml) bagi binaan Windows MSVC x64 menggunakan wxWidgets 3.3.4.
-  * Tambah sokongan Windows 11 Dark Mode asli melalui MSWEnableDarkMode(DarkMode_Auto) dalam JZJazzPlusPlusApplication::OnInit().
-  * Pengoptimuman kelajuan muat turun aset CI dengan curl.exe.
-  * Kemas kini dokumentasi README.md.
+- Upgrade: Core GUI Library Upgrade to wxWidgets v3.3.4 (Latest Feature Release):
+  * Updated GitHub Actions CI (.github/workflows/ci.yml) for Windows MSVC x64 build using wxWidgets 3.3.4.
+  * Added native Windows 11 Dark Mode support via MSWEnableDarkMode(DarkMode_Auto) in JZJazzPlusPlusApplication::OnInit().
+  * Optimized CI asset download speeds with curl.exe.
+  * Updated README.md documentation.
 ChangeLog for Development Version
 
 09-11-2026 Raja Zahidi

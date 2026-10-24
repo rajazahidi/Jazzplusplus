@@ -114,11 +114,13 @@ set(JAZZ_SOURCES
     src/AboutDialog.cpp
     src/AiMelodyCounterpointGenerator.cpp
     src/AnalogTapeFlutterModeler.cpp
+    src/Ara2HostBridge.cpp
     src/ArrayControl.cpp
     src/AsciiMidiFile.cpp
     src/Audio.cpp
     src/AudioEffects.cpp
     src/AudioFlexTimeWarp.cpp
+    src/AudioGraphScheduler.cpp
     src/AudioGrooveExtractor.cpp
     src/AudioRestorationEngine.cpp
     src/AudioTimeStretch.cpp
@@ -221,6 +223,7 @@ set(JAZZ_SOURCES
     src/MeasureChoice.cpp
     src/MicrophoneModeler.cpp
     src/MicrotonalTuningEngine.cpp
+    src/Midi2UniversalPacketEngine.cpp
     src/MidiDeviceDialog.cpp
     src/MidiEffects.cpp
     src/MidiHumanizerProbability.cpp
@@ -238,6 +241,7 @@ set(JAZZ_SOURCES
     src/NamedChoice.cpp
     src/NamedValue.cpp
     src/NamedValueChoice.cpp
+    src/NeuralAudioEngine.cpp
     src/PhaseAlignerEngine.cpp
     src/PhysicalResonator.cpp
     src/PianoFrame.cpp
@@ -245,6 +249,7 @@ set(JAZZ_SOURCES
     src/PianoWindow.cpp
     src/PitchCorrectionEngine.cpp
     src/PitchTrackingEq.cpp
+    src/PluginHostBridge.cpp
     src/Player.cpp
     src/PolymetricDrumSequencer.cpp
     src/Project.cpp
@@ -270,6 +275,7 @@ set(JAZZ_SOURCES
     src/Song.cpp
     src/SoundGenerator.cpp
     src/SpatialAudioPanner.cpp
+    src/SpatialHeadTracker.cpp
     src/SpectralDenoise.cpp
     src/SpectralRebalanceEngine.cpp
     src/SpectralResonanceTamer.cpp

@@ -8,6 +8,12 @@
 #include "AudioEffects.h"
 #include "SoundGenerator.h"
 #include "MidiEffects.h"
+#include "PluginHostBridge.h"
+#include "AudioGraphScheduler.h"
+#include "Midi2UniversalPacketEngine.h"
+#include "Ara2HostBridge.h"
+#include "SpatialHeadTracker.h"
+#include "NeuralAudioEngine.h"
 
 #include <cassert>
 #include <cmath>
@@ -1990,6 +1996,108 @@ void TestAutoAccompanimentLogic()
   float wSec = sin(crossAngle);
   float powerSum = wPrim * wPrim + wSec * wSec;
   TEST_ASSERT(fabs(powerSum - 1.0f) < 0.0001f && fabs(wPrim - 0.7071f) < 0.001f, "Broadcast Failover Engine maintains exact 1.0 equal-power sum at 50% crossfade for zero-click protection");
+
+  // 125. VST3/CLAP Plugin Host Bridge & Out-of-Process Sandboxing Crash Recovery
+  Jazz::JZPluginHostBridge pluginHost(Jazz::PluginFormat::CLAP, Jazz::PluginSandboxMode::SANDBOXED_SUBPROCESS);
+  bool loaded = pluginHost.loadPlugin("/plugins/FabComp.clap", "synth_compressor_vst3");
+  pluginHost.initialize(48000.0f, 256);
+  pluginHost.registerParameter(10, "Drive", 0.5f, 0.0f, 1.0f);
+  pluginHost.setParameter(10, 1.5f); // Clamps to 1.0
+  float clampedParam = pluginHost.getParameter(10);
+  pluginHost.triggerHeartbeat();
+  bool healthyBefore = pluginHost.checkWatchdogHealthy();
+  pluginHost.simulateSubprocessCrash();
+  bool crashed = pluginHost.hasCrashed();
+  bool recovered = pluginHost.recoverFromCrash();
+  TEST_ASSERT(loaded && clampedParam == 1.0f && healthyBefore && crashed && recovered && !pluginHost.hasCrashed(),
+              "Plugin Host Bridge validates CLAP/VST3 initialization, parameter clamping, watchdog heartbeat, and crash recovery");
+
+  // 126. Audio DAG Graph Scheduler Multithreading & Dependency Level Partitioning
+  Jazz::JZAudioGraphScheduler scheduler(8);
+  uint32_t nodeKick = scheduler.addNode("Track_Kick", Jazz::AudioNodeType::TRACK_CHANNEL);
+  uint32_t nodeBass = scheduler.addNode("Track_Bass", Jazz::AudioNodeType::TRACK_CHANNEL);
+  uint32_t nodeDrumBus = scheduler.addNode("Aux_DrumBus", Jazz::AudioNodeType::AUX_BUS);
+  uint32_t nodeMaster = scheduler.addNode("Master_Bus", Jazz::AudioNodeType::MASTER_BUS);
+
+  scheduler.addEdge(nodeKick, nodeDrumBus);
+  scheduler.addEdge(nodeDrumBus, nodeMaster);
+  scheduler.addEdge(nodeBass, nodeMaster);
+
+  bool graphCompiled = scheduler.compileGraph();
+  const auto& levels = scheduler.getParallelLevels();
+  TEST_ASSERT(graphCompiled && !scheduler.hasCycle() && levels.size() >= 3 &&
+              levels[0].size() == 2 && levels[1].size() == 1 && levels[2].size() == 1,
+              "Audio Graph Scheduler verifies DAG topological compilation, cycle-free status, and 3-tier parallel level partitioning");
+
+  // 127. MIDI 2.0 Universal MIDI Packet (UMP) & 32-bit High-Resolution CC Resolution
+  Jazz::JZMidi2UniversalPacketEngine midi2Engine;
+  uint8_t vel7 = 100;
+  uint16_t vel16 = Jazz::JZMidi2UniversalPacketEngine::midi1ToMidi2Velocity(vel7);
+  uint8_t roundTripVel7 = Jazz::JZMidi2UniversalPacketEngine::midi2ToMidi1Velocity(vel16);
+
+  Jazz::UniversalMidiPacket noteOnPkt = midi2Engine.makeNoteOn(0, 1, 60, vel16);
+  uint8_t parsedCh = 0, parsedNote = 0;
+  uint32_t parsedVal = 0;
+  bool parsed = midi2Engine.parseUmp(noteOnPkt, parsedCh, parsedNote, parsedVal);
+
+  uint32_t cc32 = 0x80000000; // 50% in 32-bit
+  uint8_t cc7 = Jazz::JZMidi2UniversalPacketEngine::midi2ToMidi1Controller(cc32);
+
+  midi2Engine.initiateCapabilityInquiry(0x10, 0x20);
+  std::string ciJson = "{\"header\":{\"action\":\"reply\",\"resource\":\"patchList\"},\"body\":{\"value\":\"JazzGrand\"}}";
+  std::string resName, resVal;
+  bool ciParsed = midi2Engine.parsePropertyExchangeReply(ciJson, resName, resVal);
+
+  TEST_ASSERT(vel16 > 50000 && roundTripVel7 == 100 && parsed && parsedCh == 1 && parsedNote == 60 && parsedVal == vel16 &&
+              cc7 == 64 && midi2Engine.isCiNegotiated() && ciParsed && resName == "patchList" && resVal == "JazzGrand",
+              "MIDI 2.0 UMP Engine validates 16-bit velocity scaling, 32-bit CC resolution, and MIDI-CI Property Exchange parsing");
+
+  // 128. ARA2 Audio Random Access Timeline & Sample Query Resolution
+  Jazz::JZAra2HostBridge araBridge("Session_Master");
+  uint32_t ctxId = araBridge.addMusicalContext("MainGrid", 128.0, 4, 4);
+  uint32_t srcId = araBridge.addAudioSource("audio/vocal_lead.wav", 44100.0, 441000, 2); // 10 seconds
+  uint32_t modId = araBridge.addAudioModification(srcId, "Melodyne_Tuned_Take1");
+  araBridge.setModificationFlags(modId, true, false, false);
+  uint32_t regId = araBridge.addPlaybackRegion(modId, 2.0, 5.0, 0, 220500); // starts at 2.0s on timeline
+
+  int64_t sampleAt3Sec = araBridge.timelineTimeToSourceSample(regId, 3.0); // 1.0s into region -> 44100 samples
+  bool graphValid = araBridge.validateDocumentGraph();
+  const Jazz::AraMusicalContext* ctx = araBridge.getMusicalContext(ctxId);
+
+  TEST_ASSERT(graphValid && sampleAt3Sec == 44100 && ctx != nullptr && ctx->tempoBpm == 128.0,
+              "ARA2 Host Bridge validates document graph integrity, musical context 128 BPM, and timeline-to-sample random access translation");
+
+  // 129. Spatial Audio 6-DoF Head-Tracking & Dynamic Listener Relative Orientation
+  Jazz::JZSpatialHeadTracker headTracker;
+  std::vector<float> oscArgs = { 45.0f, 10.0f, 0.0f }; // Yaw 45 deg right, Pitch 10 deg up
+  bool oscSuccess = headTracker.parseOscMessage("/spatial/tracker/rot", oscArgs);
+
+  float worldSourceAzimuth = 90.0f; // Sound source 90 deg right in room
+  float worldSourceElevation = 10.0f;
+  float relAzimuth = 0.0f, relElevation = 0.0f;
+  headTracker.transformWorldToListenerCoordinates(worldSourceAzimuth, worldSourceElevation, relAzimuth, relElevation);
+
+  TEST_ASSERT(oscSuccess && fabs(relAzimuth - 45.0f) < 0.01f && fabs(relElevation - 0.0f) < 0.01f,
+              "Spatial Head Tracker verifies OSC 6-DoF message parsing and listener-relative 3D coordinate transformation");
+
+  // 130. Embedded Neural Audio Inference GELU Activation & 4-Stem Energy Conservation
+  Jazz::JZNeuralAudioEngine neuralEngine(Jazz::NeuralModelType::DEEP_STEM_SEPARATOR);
+  float geluZero = Jazz::JZNeuralAudioEngine::computeGelu(0.0f);
+  float geluOne = Jazz::JZNeuralAudioEngine::computeGelu(1.0f);
+
+  const int numSamples = 64;
+  std::vector<float> mixL(numSamples, 1.0f);
+  std::vector<float> mixR(numSamples, 0.8f);
+  std::vector<float> vocL, vocR, drumL, drumR, bassL, bassR, othL, othR;
+
+  bool sepSuccess = neuralEngine.separateStems(mixL.data(), mixR.data(), numSamples,
+                                              vocL, vocR, drumL, drumR, bassL, bassR, othL, othR);
+  float totalL = vocL[0] + drumL[0] + bassL[0] + othL[0];
+  float totalR = vocR[0] + drumR[0] + bassR[0] + othR[0];
+
+  TEST_ASSERT(fabs(geluZero) < 0.0001f && fabs(geluOne - 0.8412f) < 0.001f && sepSuccess &&
+              fabs(totalL - 1.0f) < 0.0001f && fabs(totalR - 0.8f) < 0.0001f,
+              "Neural Audio Engine validates GELU activation 0.8412 and 4-stem deep learning softmask exact 1.0 energy conservation");
 }
 
 //-----------------------------------------------------------------------------

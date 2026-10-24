@@ -3,7 +3,7 @@
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Site-00d2ff?logo=github)](https://rajazahidi.github.io/Jazzplusplus/)
 [![Latest Release](https://img.shields.io/github/v/release/rajazahidi/Jazzplusplus?color=10b981)](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v5.4.16)
 [![CI Build](https://github.com/rajazahidi/Jazzplusplus/actions/workflows/ci.yml/badge.svg)](https://github.com/rajazahidi/Jazzplusplus/actions/workflows/ci.yml)
-[![Tests: 124 Passing](https://img.shields.io/badge/Tests-124%20Passing%20(100%25)-10b981.svg)](tests/test_main.cpp)
+[![Tests: 130 Passing](https://img.shields.io/badge/Tests-130%20Passing%20(100%25)-10b981.svg)](tests/test_main.cpp)
 [![License: GPL-2.0](https://img.shields.io/badge/License-GPL_v2-blue.svg)](COPYING)
 
 **Jazz++** is a full-featured open-source MIDI sequencer and digital audio workstation for Linux and Windows. Built using **wxWidgets**, it provides a rich visual environment for composing, editing, arranging, and recording multi-track MIDI music and digital audio.
@@ -30,11 +30,19 @@ Originally created by Andreas Voss and Per Sigmond, with subsequent development 
 
 ---
 
-## Apex Singularity Master Studio Pro Suites (v1.0 – v15.0)
+## Apex Quantum Enterprise Master Studio Suites (v1.0 – v16.0)
 
-Jazz++ features a comprehensive studio-grade DSP, synthesis, and music intelligence architecture comprising 15 specialized production suites:
+Jazz++ features an enterprise-grade studio DSP, neural inference, synthesis, and music intelligence architecture comprising 16 specialized production suites:
 
-### 1. Apex Singularity Master Studio Pro (Suite v15.0)
+### 1. Apex Quantum Enterprise Suite (Suite v16.0)
+- **Modern VST3 & CLAP Plugin Host Bridge with Out-of-Process Sandboxing** (`JZPluginHostBridge`): Full 3rd-party plugin support (CLAP and VST3) with isolated crash-resilient subprocess execution, lock-free parameter automation, and watchdog recovery.
+- **Multithreaded DAG Audio Processing Graph Scheduler** (`JZAudioGraphScheduler`): Directed Acyclic Graph (DAG) task scheduling allocating audio processing nodes across 8 to 32 CPU cores with lock-free atomic queues, zero-buffer-underrun multi-core parallelization, and cycle detection.
+- **Next-Generation MIDI 2.0 Universal MIDI Packet (UMP) Engine** (`JZMidi2UniversalPacketEngine`): 64-bit and 128-bit UMP packet formats, 16-bit note velocities, 32-bit CC resolution (4.29 billion steps) eliminating zipper noise, per-note pitch bend, and bi-directional MIDI-CI Property Exchange.
+- **ARA2 (Audio Random Access 2) Non-Destructive Host Bridge** (`JZAra2HostBridge`): Direct, random-access sample and timeline communication with Celemony Melodyne, Synchro Arts VocALign, and Steinberg SpectraLayers without streaming capture.
+- **Real-Time Spatial 6-DoF Head-Tracking Telemetry Engine** (`JZSpatialHeadTracker`): 360-degree head-tracking via Open Sound Control (OSC) and IMU Bluetooth sensors with quaternion sensor fusion, dynamically rotating 3D sound fields relative to listener position for binaural monitoring.
+- **Embedded Neural Audio & Deep Learning DSP Engine** (`JZNeuralAudioEngine`): Local ONNX Runtime deep learning architecture supporting 4-stem deep neural unmixing (Demucs v4 style), accelerated GELU/ReLU activations, and Differentiable DSP (DDSP) harmonic resynthesis.
+
+### 2. Apex Singularity Master Studio Pro (Suite v15.0)
 - **Real-Time Transient / Tonal Spectral Audio Splitter** (`JZTransientTonalSplitter`): Separates complex mixdown signals into independent transient attack and tonal sustain streams with lossless, phase-coherent reconstruction.
 - **Aliasing-Free True-Peak Brickwall Clipper & Oversampler** (`JZBrickwallClipperEngine`): Features 4x/8x linear-phase polyphase oversampling, inter-sample true-peak enforcement (-0.1 dBTP), and 4 analog saturation curves (Hard Brickwall, Soft-Knee Parabolic, Tube Diode, and Apogee Soft-Limit).
 - **Generative Drum Poly-Fill & Pattern Morpher** (`JZGenerativeDrumMorpher`): Stochastically morphs rhythm patterns and generates automated polyrhythmic drum fills at phrase boundaries (Bars 4/8/16) across 4 variation styles with timing jitter and ghost notes.
@@ -42,7 +50,7 @@ Jazz++ features a comprehensive studio-grade DSP, synthesis, and music intellige
 - **Immersive 3D Spatial Multichannel Reverb Convolver** (`JZImmersive3DReverbConvolver`): Computes 3D room boundary early reflections across 7.1.4 Dolby Atmos ceiling geometries (343 m/s) coupled with an 8-line orthogonal Feedback Delay Network (FDN) and Householder unitary mixing matrix.
 - **Broadcast Audio Redundancy & Hot-Standby Failover** (`JZBroadcastFailoverEngine`): Ultra-fast fault detection (< 4ms for silence, buffer stall, NaN/Inf) with 2ms equal-power zero-click crossfading for tour concerts and live broadcast networks.
 
-### 2. Aura Omniscience & Quantum Zenith Suites (Suites v13.0 – v14.0)
+### 3. Aura Omniscience & Quantum Zenith Suites (Suites v13.0 – v14.0)
 - **Real-Time Spectral Stem Rebalancing** (`JZSpectralRebalanceEngine`): Multiband decomposition isolating Vocals, Drums, Bass, and Other with independent gain, pan, solo, and mute controls.
 - **3D Binaural HRTF Headphone Spatializer** (`JZBinauralHrtfSpatializer`): Woodworth ITD calculation (~0.656ms), spherical head-shadow ILD filtering, pinna vertical elevation cues, and yaw/pitch/roll head tracking.
 - **True Through-Zero Tape Flanger** (`JZThroughZeroFlanger`): Negative lookahead delay matrix sweeping across true $t = 0$ zero delay, yielding infinite comb-filter cancellations and jet-flanger sweeps.
@@ -56,7 +64,7 @@ Jazz++ features a comprehensive studio-grade DSP, synthesis, and music intellige
 - **Universal Microtonal Tuning Engine** (`JZMicrotonalTuningEngine`): Scala (.scl) and MTS-ESP tuning support with built-in presets (Gamelan Slendro, Pelog, Maqam Rast, Bayati, Pythagorean, 19-EDO, 31-EDO).
 - **3D Lissajous Goniometer & Vectorscope** (`JZGoniometerVectorscope`): Real-time polar and Lissajous stereo field imaging, continuous phase correlation metering, and mono-cancellation warning alerts.
 
-### 3. Flagship Enterprise & Next-Gen Production (Suites v11.0 – v12.0)
+### 4. Flagship Enterprise & Next-Gen Production (Suites v11.0 – v12.0)
 - **Pitch-Tracking Dynamic Musical EQ** (`JZPitchTrackingEq`): Real-time fundamental pitch ($f_0$) tracking automatically moving biquad center frequencies to musical harmonics with glissando smoothing.
 - **Multi-Layer Fractal Generative Arpeggiator** (`JZFractalGenerativeArp`): 4 concurrent arpeggiator layers driven by Fibonacci and Mandelbrot mathematical sequences with polyrhythmic step lengths.
 - **Capstan Speed Stabilizer & Wow/Flutter Corrector** (`JZCapstanSpeedStabilizer`): Inverse dynamic varispeed time-warping correcting motor speed fluctuations on degraded analog tapes and vinyl recordings.
@@ -70,7 +78,7 @@ Jazz++ features a comprehensive studio-grade DSP, synthesis, and music intellige
 - **Vintage Studio Microphone Modeler** (`JZMicrophoneModeler`): Accurate acoustic modeling of German U87, Vintage 251, Broadcast 7B, and Ribbon R121 capsules with proximity effect controls.
 - **Streaming Loudness Target & True-Peak Inspector** (`JZStreamingLoudnessInspector`): Integrated LUFS, Short-Term LUFS, LRA, and True-Peak dBTP metering with official Spotify, Apple Music, YouTube, and EBU R128 targets.
 
-### 4. Core Production, Arranger & Mastering Architecture (Suites v1.0 – v10.0)
+### 5. Core Production, Arranger & Mastering Architecture (Suites v1.0 – v10.0)
 - **Audio Restoration**: Cubic polynomial De-Clipper and linear-predictive residual De-Clicker (`JZAudioRestorationEngine`).
 - **Realistic Guitar Strumming & Fingerpicking**: Strum timing delays, Down/Up alternating strokes, and P-I-M-A classical picking patterns (`JZGuitarStrumEngine`).
 - **Immersive 7.1.4 Bed Panner**: 12-channel surround and ceiling elevation object panning (`JZImmersiveAudioPanner`).
@@ -137,7 +145,7 @@ Jazz++ features a comprehensive studio-grade DSP, synthesis, and music intellige
 Jazz++ includes a comprehensive, automated test suite covering all DSP engines, musical generators, and file formats:
 
 ```bash
-# Run all 124 unit tests via CTest
+# Run all 130 unit tests via CTest
 ctest --test-dir build --output-on-failure
 ```
 
@@ -150,7 +158,7 @@ Test project C:/Project/jazz/build
 Total Test time (real) =   0.18 sec
 ```
 
-All **124 test suites** pass with 100% accuracy, verifying sample-accurate DSP processing, numerical stability, and memory safety.
+All **130 test suites** pass with 100% accuracy, verifying sample-accurate DSP processing, numerical stability, and memory safety.
 
 ---
 
@@ -254,7 +262,7 @@ This installs:
 - [`midinetd/`](midinetd/): Standalone remote MIDI daemon (ONC/Sun RPC).
 - [`codeblocks/`](codeblocks/): Code::Blocks project files.
 - [`vc12/`](vc12/): Visual Studio 2013 project files.
-- [`tests/`](tests/): Automated unit test suite covering 124 unit test suites.
+- [`tests/`](tests/): Automated unit test suite covering 130 unit test suites.
 
 ---
 

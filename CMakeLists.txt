@@ -118,6 +118,7 @@ set(JAZZ_SOURCES
     src/AudioEffects.cpp
     src/AudioFlexTimeWarp.cpp
     src/AudioTimeStretch.cpp
+    src/AudioToMidiTranscriber.cpp
     src/AudioWaveform.cpp
     src/AutoAccompaniment.cpp
     src/AutomationEngine.cpp
@@ -163,6 +164,7 @@ set(JAZZ_SOURCES
     src/Dialogs/TransposeDialog.cpp
     src/Dialogs/VelocityDialog.cpp
     src/Dialogs.cpp
+    src/DitherFormatEncoder.cpp
     src/DrumUtilities.cpp
     src/DynamicDeEsser.cpp
     src/ErrorMessage.cpp
@@ -196,6 +198,7 @@ set(JAZZ_SOURCES
     src/MidiEffects.cpp
     src/MidSideProcessor.cpp
     src/MixerConsole.cpp
+    src/MixMaskingAnalyzer.cpp
     src/MpeEngine.cpp
     src/MultibandCompressor.cpp
     src/MultiVelocitySampler.cpp
@@ -204,6 +207,7 @@ set(JAZZ_SOURCES
     src/NamedChoice.cpp
     src/NamedValue.cpp
     src/NamedValueChoice.cpp
+    src/PhysicalResonator.cpp
     src/PianoFrame.cpp
     src/PianoScaleChordHelper.cpp
     src/PianoWindow.cpp
@@ -246,7 +250,9 @@ set(JAZZ_SOURCES
     src/TransientShaper.cpp
     src/TransientSlicer.cpp
     src/VocalHarmonizer.cpp
+    src/VocoderEngine.cpp
     src/WasapiAudioDriver.cpp
+    src/WavetableSynth.cpp
 )
 
 add_executable(jazz ${GUI_TYPE} ${JAZZ_SOURCES} ${PLATFORM_SOURCES})

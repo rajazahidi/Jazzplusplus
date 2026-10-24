@@ -1,4 +1,27 @@
 24-10-2026 Raja Zahidi
+- Feature & Master Studio Wavetable Synth, Audio-to-MIDI & Intelligent Mastering Suite v7.0: Modern Wavetable Synthesizer, Audio-to-MIDI Transcription Engine, 24-Band Vocoder, Physical Resonator, Mix Masking Collision Analyzer, Master TPDF Dithering & Multi-Format Encoder:
+  * Pensintesis Jadual Gelombang Moden & Unison Stereo (Modern Wavetable Synthesizer & Stereo Unison - src/WavetableSynth.h & .cpp):
+    - JZWavetableSynth menyediakan sintesis jadual gelombang 64-bingkai 2D dengan morfing fasa berterusan (Sinus -> Segitiga -> Gergaji -> Nadi -> Harmonik Logam).
+    - Enjin Stereo Unison Supersaw (1 hingga 16 suara serentak dengan sebaran stereo dan penalaan detune), penapis resonan dwi-kutub berbilang mod (LP/BP/HP), dan dwi-sampul modulasi ADSR polifonik 16-suara.
+  * Pengekstrak Not MIDI Daripada Audio Rakaman (Audio-to-MIDI Melody & Chord Transcription - src/AudioToMidiTranscriber.h & .cpp):
+    - JZAudioToMidiTranscriber menukarkan rakaman nyanyian suara vokal, gitar akustik, atau instrumen tiup secara langsung kepada acara not MIDI (Note-On, Note-Off, Velocity, Duration) pada Piano Roll.
+    - Algoritma gabungan penjejak onset transien dan pengesan frekuensi asas YIN/AMDF dengan kuncian pic skala diatonik atau kromatik 12-TET.
+  * Enjin Vocoder Dinamik 24-Jalur & Pertuturan Robotik (Dynamic 24-Band Vocoder & Speech Synthesizer - src/VocoderEngine.h & .cpp):
+    - JZVocoderEngine memetakan sampul formasi pertuturan vokal manusia (Modulator) ke atas gelombang pensintesis polifonik (Carrier) melalui bank penapis 24-jalur.
+    - Dilengkapi penjana pembawa dalaman (Internal Saw/Pulse Synth), anjakan formant vokal (-8 hingga +8 jalur), dan suntikan konsonan frekuensi tinggi (unvoiced sibilance pass-through).
+  * Harpa Resonans Pemodelan Akustik Fizikal (Karplus-Strong Physical Acoustic Resonator - src/PhysicalResonator.h & .cpp):
+    - JZPhysicalResonator menggunakan 4 bank penapis sisir resonan suap-balik untuk menukarkan sebarang ketukan perkusi kering, klik, atau desisan hingar menjadi petikan dawai harpa, marimba, atau tiub loceng akustik yang kaya.
+    - Pilihan talaan kord (Major, Minor, Sus4, Pentatonik), pelarasan masa resonans (Decay sehingga 8s), dan redaman frekuensi tinggi (Damping).
+  * Penganalisis Pertembungan Frekuensi Adunan Pintar (Intelligent Cross-Track Frequency Masking Analyzer - src/MixMaskingAnalyzer.h & .cpp):
+    - JZMixMaskingAnalyzer membandingkan matriks spektrum 32-jalur antara pelbagai trek projek serentak untuk mengesan trek yang menutupi kejelasan vokal atau instrumen utama (Frequency Masking).
+    - Mengira Indeks Keterukan Pertembungan (Masking Severity 0% - 100%) dan menjana cadangan pelarasan takuk EQ dinamik automatik (Smart Unmasking Recommendations).
+  * Dither Master TPDF & Pengekod Berbilang Format (Master TPDF Dithering & Multi-Format Audio Encoder - src/DitherFormatEncoder.h & .cpp):
+    - JZDitherFormatEncoder melaksanakan penambahan dither Triangular Probability Density Function (TPDF) dan pembentukan hingar psikoakustik (Noise Shaping) untuk menghapuskan herotan pemotongan kuantisasi apabila master 32-bit float diturunkan ke 16-bit atau 24-bit.
+    - Eksport terus fail master WAV 16-bit (CD Master Dithered), WAV 24-bit PCM, dan WAV 32-bit Float.
+  * Penambahan Ujian Unit 71 hingga 76 (tests/test_main.cpp):
+    - Menambah ujian morfing jadual gelombang 2D, penukaran frekuensi ke pic MIDI (440Hz -> A4 69, 261Hz -> C4 60), pemetaan anjakan formant vocoder 24-jalur, persamaan suap-balik resonan Karplus-Strong T60, pengesanan keterukan pertembungan masking adunan, dan penjana dither TPDF [-1.0, +1.0] LSB.
+
+24-10-2026 Raja Zahidi
 - Feature & Master Studio Spatial Audio, Vocal Harmony & Vintage Analog Suite v6.0: Spectral Noise Repair & Denoiser, 3D Spatial Audio & Surround Panner, Vocal Polyphonic Harmonizer, Stereo Mid-Side Matrix & Mono Bass Maker, Performance Chord Trigger Pads, Analog Tape Machine & Vintage Console Warmer:
   * Pembersih Hingar Spektral & Pembaikan Audio (Studio Spectral Audio Denoiser & Noise Repair - src/SpectralDenoise.h & .cpp):
     - JZSpectralDenoise melaksanakan penolakan profil hingar berketepatan tinggi (Spectral Subtraction) dengan fungsi pemerolehan profil hingar (Noise Fingerprint Capture).

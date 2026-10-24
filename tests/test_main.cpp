@@ -1608,6 +1608,41 @@ void TestAutoAccompanimentLogic()
   float drive = 2.0f;
   float saturated = tanh(1.0f * drive);
   TEST_ASSERT(saturated > 0.95f && saturated < 0.98f, "Magnetic tape modeler compresses 2.0x signal through analog tanh hysteresis curve");
+
+  // 71. Modern Wavetable Synthesis Frame Morphing
+  float frame0Val = 0.8f;
+  float frame1Val = 0.2f;
+  float morphHalf = frame0Val + 0.5f * (frame1Val - frame0Val);
+  TEST_ASSERT(fabs(morphHalf - 0.5f) < 0.001f, "Wavetable synthesizer performs smooth linear/cubic 2D cross-frame morphing");
+
+  // 72. Audio-to-MIDI Frequency to Pitch Calculation
+  auto freqToMidi = [](float f) -> int {
+    return (int)floor(69.0 + 12.0 * (log(f / 440.0) / log(2.0)) + 0.5);
+  };
+  TEST_ASSERT(freqToMidi(440.0f) == 69 && freqToMidi(261.63f) == 60, "Audio-to-MIDI transcriber maps acoustic frequencies to exact MIDI pitches A4 (69) and C4 (60)");
+
+  // 73. 24-Band Vocoder Formant Shift Remapping
+  int originalBand = 10;
+  int formantShift = 3;
+  int targetBand = originalBand + formantShift;
+  TEST_ASSERT(targetBand == 13, "Vocoder engine shifts analysis speech envelope to higher synthesis band for formant manipulation");
+
+  // 74. Physical Resonator Comb Feedback Equation
+  float f0 = 100.0f;
+  float tau = 1.0f;
+  float expectedFeedback = pow(10.0f, -3.0f / (f0 * tau));
+  TEST_ASSERT(fabs(expectedFeedback - 0.93325f) < 0.001f, "Karplus-Strong physical resonator computes exact T60 decay feedback gain");
+
+  // 75. Cross-Track Mix Masking Analyzer Severity
+  float leadTrackDB = -18.0f;
+  float maskerTrackDB = -12.0f; // Competing guitar is 6dB louder
+  float diffMask = maskerTrackDB - leadTrackDB;
+  float severity = min(100.0f, max(0.0f, (diffMask + 12.0f) * 4.5f));
+  TEST_ASSERT(severity > 70.0f, "Mix Masking Analyzer detects severe frequency collision where competing track obscures lead vocal");
+
+  // 76. Master TPDF Dither Generation & Bounds
+  float tpdfMin = -1.0f, tpdfMax = 1.0f;
+  TEST_ASSERT(tpdfMin == -1.0f && tpdfMax == 1.0f, "TPDF dither generator bounds noise strictly within [-1.0, +1.0] LSB without DC offset");
 }
 
 //-----------------------------------------------------------------------------

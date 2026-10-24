@@ -118,12 +118,14 @@ set(JAZZ_SOURCES
     src/Audio.cpp
     src/AudioEffects.cpp
     src/AudioFlexTimeWarp.cpp
+    src/AudioGrooveExtractor.cpp
     src/AudioRestorationEngine.cpp
     src/AudioTimeStretch.cpp
     src/AudioToMidiTranscriber.cpp
     src/AudioWaveform.cpp
     src/AutoAccompaniment.cpp
     src/AutomationEngine.cpp
+    src/CapstanSpeedStabilizer.cpp
     src/ChordPerformancePads.cpp
     src/ChordScaleData.cpp
     src/ClipMatrixEngine.cpp
@@ -179,6 +181,7 @@ set(JAZZ_SOURCES
     src/Filter.cpp
     src/FindFile.cpp
     src/FmSynthesizer.cpp
+    src/FractalGenerativeArp.cpp
     src/FrequencyTable.cpp
     src/GetOptionIndex.cpp
     src/Globals.cpp
@@ -200,6 +203,7 @@ set(JAZZ_SOURCES
     src/Knob.cpp
     src/LoudnessMeterEBU.cpp
     src/Mapper.cpp
+    src/MasterLinearPhaseImager.cpp
     src/MasterTruePeakLimiter.cpp
     src/MasterVisualizer.cpp
     src/MatchEqProfiler.cpp
@@ -228,6 +232,7 @@ set(JAZZ_SOURCES
     src/PianoScaleChordHelper.cpp
     src/PianoWindow.cpp
     src/PitchCorrectionEngine.cpp
+    src/PitchTrackingEq.cpp
     src/Player.cpp
     src/PolymetricDrumSequencer.cpp
     src/Project.cpp
@@ -277,6 +282,7 @@ set(JAZZ_SOURCES
     src/VocoderEngine.cpp
     src/WasapiAudioDriver.cpp
     src/WavetableSynth.cpp
+    src/WindTubePhysicalModel.cpp
 )
 
 add_executable(jazz ${GUI_TYPE} ${JAZZ_SOURCES} ${PLATFORM_SOURCES})

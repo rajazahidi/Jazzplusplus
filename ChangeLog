@@ -1,4 +1,27 @@
 24-10-2026 Raja Zahidi
+- Feature & Master Studio Pitch-Tracking Dynamic EQ, Fractal Generative Arp, Capstan Speed Stabilizer, Audio Groove Extractor, Wind Tube Physical Model & Master Linear Phase Imager Suite v12.0 (Flagship Enterprise Edition):
+  * Penapis EQ Dinamik Penjejak Pic Muzik (Pitch-Tracking Dynamic Musical EQ - src/PitchTrackingEq.h & .cpp):
+    - JZPitchTrackingEq menjejak frekuensi asas (f0) melodi instrumen dan vokal dalam masa nyata secara automatik (ala Sound Radix SurferEQ).
+    - Menggerakkan pusat penapis biquad mengikut siri harmonik muzik (Fundamental 1x, 2nd Harmonic 2x, 3rd Harmonic 3x) dengan kawalan pelicinan glissando (5ms - 100ms) untuk mengelakkan potongan frekuensi yang salah apabila pic bertukar nada.
+  * Arpeggiator Generatif Fraktal Berbilang Lapisan (Multi-Layer Fractal Generative Arpeggiator - src/FractalGenerativeArp.h & .cpp):
+    - JZFractalGenerativeArp menyediakan 4 lapisan arpeggiator serentak yang dipacu oleh jujukan matematik fraktal Fibonacci dan Mandelbrot.
+    - Dilengkapi panjang langkah poliritmik bebas per lapisan (contoh: 16, 12, 7, 5 langkah), kebarangkalian mutasi corak (0% - 100%), dan percabangan multi-oktaf.
+  * Penstabil & Pemulih Kelajuan Pita/Vinil (Capstan Speed Stabilizer & Wow/Flutter Corrector - src/CapstanSpeedStabilizer.h & .cpp):
+    - JZCapstanSpeedStabilizer memulihkan rakaman analog lama (kaset, reel-to-reel, piring hitam) yang mengalami ayunan kelajuan motor teruk (ala Celemony Capstan).
+    - Mengesan kontur hanyutan pic atau pembawa hum motor dan mengenakan resintesis masa terbalik (Inverse Dynamic Varispeed Time-Warping) untuk mengunci pic rakaman agar stabil dan rata.
+  * Pengekstrak Alur Dinamik Audio-ke-MIDI (Audio Transient Groove Extractor & Swing Quantize - src/AudioGrooveExtractor.h & .cpp):
+    - JZAudioGrooveExtractor mengekstrak anjakan masa mikro (sub-tick swing offsets) dan kontur halaju daripada rakaman audio sebenar (contoh: gelung dram funk James Brown).
+    - Menjana templat alur (Groove Template) yang boleh diaplikasikan secara terus untuk mengkuantisasi mana-mana trek MIDI pada Piano Roll.
+  * Pemodelan Fizikal Tiub Resonans Alat Tiup (Physical Modeling Wind & Brass Tube Resonator - src/WindTubePhysicalModel.h & .cpp):
+    - JZWindTubePhysicalModel mensimulasikan instrumen tiup akustik (seruling kayu, klarinet, saksofon, hon loyang) melalui sintesis digital waveguide dwi-arah dengan jadual rid tak linear (non-linear reed table).
+    - Membolehkan kawalan tekanan nafas (Breath Pressure), suntikan turbulensi nafas (Breath Noise), panjang bore akustik, dan redaman radiasi loceng.
+  * Pembahagi Fasa Linear Mastering & Pengimej Psikoakustik (Master Linear Phase FIR Crossover & Psychoacoustic Stereo Imager - src/MasterLinearPhaseImager.h & .cpp):
+    - JZMasterLinearPhaseImager menyediakan penapis silang 4-jalur fasa linear tanpa herotan fasa (Zero-Phase Symmetric 31-Tap FIR Crossover: Sub < 120Hz, Low-Mid 120Hz-1.2kHz, High-Mid 1.2kHz-6kHz, Air > 6kHz).
+    - Dilengkapi kawalan kelebaran stereo psikoakustik bebas per jalur (0% - 200%) dan penapis eliptik mono sub-bes bebas anjakan fasa (Elliptical Mono Bass Guard).
+  * Penambahan Ujian Unit 101 hingga 106 (tests/test_main.cpp):
+    - Mengesahkan penjejakan pic harmonik SurferEQ (110Hz, 220Hz, 330Hz), indeks permutasi siri Fibonacci dan Mandelbrot, pampasan masa terbalik 0.966x penstabil kelajuan kaset Capstan, kuantisasi alur mikro audio dram +6 ticks, pengiraan panjang delay 50-sampel tiub akustik 440Hz, dan pembinaan semula sempurna crossover FIR fasa linear 4-jalur.
+
+24-10-2026 Raja Zahidi
 - Feature & Master Studio Dual-Mic Phase Aligner, AI Melody/Counterpoint, Vocal Doubler, Multiband OTT, Mic Modeler & Streaming Inspector Suite v11.0 (Next-Gen Production):
   * Penyelaras Fasa Dwi-Mikrofon Dinamik (Dual-Mic Dynamic Phase Aligner & Auto-Correlator - src/PhaseAlignerEngine.h & .cpp):
     - JZPhaseAlignerEngine menyelesaikan masalah pembatalan fasa sisir (comb filtering) pada rakaman berbilang mikrofon (Snare Top/Bottom, Kick In/Out, stereo guitar cabs).

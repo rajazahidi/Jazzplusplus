@@ -113,6 +113,7 @@ include_directories(
 set(JAZZ_SOURCES
     src/AboutDialog.cpp
     src/AiMelodyCounterpointGenerator.cpp
+    src/AnalogTapeFlutterModeler.cpp
     src/ArrayControl.cpp
     src/AsciiMidiFile.cpp
     src/Audio.cpp
@@ -126,6 +127,8 @@ set(JAZZ_SOURCES
     src/AutoAccompaniment.cpp
     src/AutomationEngine.cpp
     src/BinauralHrtfSpatializer.cpp
+    src/BrickwallClipperEngine.cpp
+    src/BroadcastFailoverEngine.cpp
     src/CapstanSpeedStabilizer.cpp
     src/ChordPerformancePads.cpp
     src/ChordScaleData.cpp
@@ -186,6 +189,7 @@ set(JAZZ_SOURCES
     src/FmSynthesizer.cpp
     src/FractalGenerativeArp.cpp
     src/FrequencyTable.cpp
+    src/GenerativeDrumMorpher.cpp
     src/GetOptionIndex.cpp
     src/Globals.cpp
     src/GoniometerVectorscope.cpp
@@ -202,6 +206,7 @@ set(JAZZ_SOURCES
     src/Harmony.cpp
     src/HarmonyP.cpp
     src/Help.cpp
+    src/Immersive3DReverbConvolver.cpp
     src/ImmersiveAudioPanner.cpp
     src/JazzPlusPlusApplication.cpp
     src/KeyChordDetector.cpp
@@ -287,6 +292,7 @@ set(JAZZ_SOURCES
     src/TrackWindow.cpp
     src/TransientShaper.cpp
     src/TransientSlicer.cpp
+    src/TransientTonalSplitter.cpp
     src/VocalAligner.cpp
     src/VocalDoublerEngine.cpp
     src/VocalHarmonizer.cpp

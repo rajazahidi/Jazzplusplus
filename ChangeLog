@@ -1,4 +1,27 @@
 24-10-2026 Raja Zahidi
+- Feature & Master Studio Transient/Tonal Splitter, True-Peak Brickwall Clipper, Generative Drum Morpher, Tape Flutter Modeler, Immersive 3D Reverb & Broadcast Failover Suite v15.0 (Apex Singularity Release):
+  * Pengasingan Aliran Transien vs Tonal Spektral (Transient / Tonal Spectral Audio Splitter - src/TransientTonalSplitter.h & .cpp):
+    - JZTransientTonalSplitter membahagikan isyarat audio secara telus kepada dua aliran bebas: Aliran Transien (serangan pukulan, klik, petikan awal) dan Aliran Tonal (badan nada, harmonik dengungan, ekor resonansi).
+    - Membolehkan pelarasan aras gain, pereputan transien (5ms - 100ms), kepekaan pengesanan, dan mod solo berasingan dengan jaminan pembinaan semula lossless sempurna tanpa sebarang perubahan fasa.
+  * Pemotong Puncak Siling Sebenar Bebas Aliasing (True-Peak Brickwall Clipper & Oversampler - src/BrickwallClipperEngine.h & .cpp):
+    - JZBrickwallClipperEngine menyediakan pemotongan puncak master dengan penapis oversampling polifasa 4x / 8x fasa linear untuk menghapuskan herotan aliasing frekuensi tinggi.
+    - Dilengkapi 4 keluk pemotongan analog: Hard Brickwall, Soft-Knee Parabolic, Tube Diode, dan Apogee Soft-Limit, berserta siling puncak sebenar inter-sample (-0.1 dBTP) dan meter pengurangan dinamik.
+  * Penjana Variasi Dram & Morf Corak Generatif (Generative Drum Poly-Fill & Pattern Morpher - src/GenerativeDrumMorpher.h & .cpp):
+    - JZGenerativeDrumMorpher menginterpolasi corak rentak secara lancar (Pattern A ke Pattern B) dan menjana variasi fill dram poliritmik secara automatik pada bar penanda (Bar 4/8/16).
+    - Dilengkapi 4 gaya variasi (Snare Roll Crescendo, Tom Cascade Run, Polymetric Cross-Beat, Syncopated Choke), suntikan ghost notes kebarangkalian rawak, dan pemanusiaan mikro-pemasaan (jitter ticks).
+  * Pemodelan Fizik Mekanikal Fluktuasi Pita & Geseran Mikro (Analog Tape Scrape Flutter & Chaos Modeler - src/AnalogTapeFlutterModeler.h & .cpp):
+    - JZAnalogTapeFlutterModeler mensimulasikan getaran geseran mikro kepala pita (Scrape Flutter 2.2kHz - 4.2kHz mengikut kelajuan 7.5 / 15 / 30 IPS) dan ketaksekataan roda penekan (Pinch Roller 5.5Hz).
+    - Dilengkapi model hanyutan motor Brownian tak simetri, regangan ketegangan pita transien (Tension Sag), dan simulasi kehilangan mikro-zarah magnetik (Tape Dropouts).
+  * Reverb Konvolusi 3D Spatial Multichannel 7.1.4 (Immersive 3D Spatial Reverb Convolver - src/Immersive3DReverbConvolver.h & .cpp):
+    - JZImmersive3DReverbConvolver memodelkan pantulan awal geometri bilik mengikut vektor 3D (dinding depan, belakang, sisi, lantai, dan siling atas 7.1.4) dengan kelajuan bunyi fizikal 343 m/s.
+    - Dilengkapi rangkaian kelewatan maklum balas 8-saluran (8-Line Orthogonal FDN) dengan matriks pencampuran Householder untuk ekor reverb isotropik 3D yang padat bagi ruang Dewan Konsert, Katedral, dan Studio Live Room.
+  * Sistem Redundansi & Pensuisan Auto-Failover Siaran Konsert (Broadcast Audio Redundancy & Hot-Standby Failover - src/BroadcastFailoverEngine.h & .cpp):
+    - JZBroadcastFailoverEngine menyediakan perlindungan dwi-aliran audio (Primary vs Secondary Backup) dengan pengesanan kerosakan hiper-pantas (< 4ms bagi kesunyian, pembekuan penimbal, atau herotan nan/inf).
+    - Melaksanakan pensuisan pintas automatik kuasa sama rata (Equal-Power Crossfade 2ms) sifar-klik (Zero-Click Seamless Failover) demi kebolehpercayaan 100% konsert jelajah langsung dan penyiaran televisyen.
+  * Penambahan Ujian Unit 119 hingga 124 (tests/test_main.cpp):
+    - Mengesahkan pembinaan semula sempurna pemisah transien/tonal (0.48/0.16), keluk pemampatan parabolik pemotong siling 0.8875, interpolasi halaju 110 morf dram dan picuan Bar 8, variasi kelajuan flutter 28.13 sen pita, pantulan siling 810-sampel reverb 3D 7.1.4, dan pensuisan kuasa sama rata 1.0 failover siaran langsung.
+
+24-10-2026 Raja Zahidi
 - Feature & Master Studio Spectral Stem Rebalance, Binaural HRTF Spatializer, Through-Zero Flanger, Guitar Valve Amp Profiler, Dynamic Sidechain EQ & SMPTE Timecode Suite v14.0 (Aura Omniscience Release):
   * Pengimbangan Semula Stems Audio Spektral Masa Nyata (Real-Time Spectral Stem Rebalancer - src/SpectralRebalanceEngine.h & .cpp):
     - JZSpectralRebalanceEngine melaksanakan penguraian frekuensi multi-jalur dan pengesanan transien masa nyata bagi trek audio stereo siap (mixdown).

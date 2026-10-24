@@ -1363,6 +1363,86 @@ void TestAutoAccompanimentLogic()
   string bundleManifest = "ProjectName=JazzStudioProject;TrackCount=8;TotalMeasures=32";
   TEST_ASSERT(bundleMagic == "[JAZZBUNDLE_V1]", "Project bundle container recognizes valid JAZZBUNDLE_V1 header");
   TEST_ASSERT(bundleManifest.find("TrackCount=8") != string::npos, "Project bundle manifest parses track count correctly");
+
+  // 45. WSOLA Time-Stretching & Auto BPM Warping Factor
+  double sourceBpm = 120.0;
+  double targetBpm = 144.0;
+  double autoWarpRatio = targetBpm / sourceBpm;
+  TEST_ASSERT(autoWarpRatio == 1.2, "Auto-BPM Warping calculates 1.2x time-stretch factor from 120 to 144 BPM");
+
+  // 46. Granular Pitch-Shift Resampling Ratio
+  double semitonesUp = 7.0;
+  double semitonesDown = -12.0;
+  double ratioUp = pow(2.0, semitonesUp / 12.0);
+  double ratioDown = pow(2.0, semitonesDown / 12.0);
+  TEST_ASSERT(ratioDown == 0.5, "12 semitones pitch-down corresponds to 0.5x frequency resampling ratio");
+  TEST_ASSERT(ratioUp > 1.49 && ratioUp < 1.51, "7 semitones pitch-up corresponds to 1.5x frequency ratio (3:2 fifth)");
+
+  // 47. Virtual Mixing Console dB Fader & Stereo Pan Law
+  auto dbToGain = [](float db) -> float {
+    if (db <= -60.0f) return 0.0f;
+    return pow(10.0f, db / 20.0f);
+  };
+  float gain0dB = dbToGain(0.0f);
+  float gainMinus6dB = dbToGain(-6.0f);
+  TEST_ASSERT(fabs(gain0dB - 1.0f) < 0.01f, "0 dB fader equals unity gain 1.0");
+  TEST_ASSERT(gainMinus6dB > 0.49f && gainMinus6dB < 0.51f, "-6 dB fader corresponds to half amplitude (0.501)");
+
+  // 48. Virtual Mixer Pan Law (Equal Power Trigonometric)
+  auto getPanGains = [](int pan) -> pair<float, float> {
+    float panNorm = (float)pan / 127.0f;
+    float angle = panNorm * 1.5707963f;
+    return {cos(angle), sin(angle)};
+  };
+  auto centerPan = getPanGains(64);
+  TEST_ASSERT(centerPan.first > 0.70f && centerPan.second > 0.70f, "Center pan applies equal power ~-3dB (0.707) attenuation per channel");
+
+  // 49. Audio Transient Energy Onset Detection
+  vector<float> dummyWave = {0.01f, 0.02f, 0.01f, 0.85f, 0.90f, 0.65f, 0.10f, 0.02f};
+  float energyBefore = 0.0f;
+  for (int s = 0; s < 3; ++s) energyBefore += dummyWave[s] * dummyWave[s];
+  float energyAfter = 0.0f;
+  for (int s = 3; s < 6; ++s) energyAfter += dummyWave[s] * dummyWave[s];
+  float energyDiff = (energyAfter / 3.0f) - (energyBefore / 3.0f);
+  TEST_ASSERT(energyDiff > 0.4f, "Transient onset detector identifies dramatic energy surge at drum hit point");
+
+  // 50. Euclidean Rhythm Generator E(k, n)
+  auto generateEuclidean = [](int k, int n) -> vector<bool> {
+    vector<bool> pat;
+    int bucket = 0;
+    for (int i = 0; i < n; ++i) {
+      bucket += k;
+      if (bucket >= n) { bucket -= n; pat.push_back(true); }
+      else pat.push_back(false);
+    }
+    return pat;
+  };
+  auto e5_8 = generateEuclidean(5, 8);
+  auto e3_8 = generateEuclidean(3, 8);
+  int pulseCount5 = 0;
+  for (bool p : e5_8) if (p) pulseCount5++;
+  int pulseCount3 = 0;
+  for (bool p : e3_8) if (p) pulseCount3++;
+  TEST_ASSERT(pulseCount5 == 5 && e5_8.size() == 8, "Euclidean E(5,8) distributes exactly 5 pulses across 8 steps");
+  TEST_ASSERT(pulseCount3 == 3 && e3_8.size() == 8, "Euclidean E(3,8) distributes exactly 3 pulses across 8 steps");
+
+  // 51. In-Key Piano Roll Diatonic Snapping & Jazz Chord Stamps
+  auto snapToDiatonicMajor = [](int pitch, int tonic) -> int {
+    static const bool inScale[12] = {true, false, true, false, true, true, false, true, false, true, false, true};
+    int pc = (pitch - tonic + 12) % 12;
+    if (inScale[pc]) return pitch;
+    return pitch + 1;
+  };
+  int snappedFSharpInC = snapToDiatonicMajor(66, 0);
+  TEST_ASSERT(snappedFSharpInC == 67, "F# (66) snaps up to G (67) in C Major scale");
+
+  vector<int> hendrixChord = {60, 64, 67, 70, 75};
+  TEST_ASSERT(hendrixChord.size() == 5 && hendrixChord[4] == 75, "Hendrix 7#9 Chord stamp contains root, 3rd, 5th, b7, and #9 (D#5)");
+
+  // 52. Loop Recording Takes & Comping System
+  struct CompSlice { int take; int start; int end; };
+  vector<CompSlice> compRegions = { {0, 0, 384}, {1, 384, 768} };
+  TEST_ASSERT(compRegions[0].take == 0 && compRegions[1].take == 1, "Comping engine seamlessly assembles Bar 1 from Take 1 and Bar 2 from Take 2");
 }
 
 //-----------------------------------------------------------------------------

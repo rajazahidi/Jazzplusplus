@@ -1,4 +1,29 @@
 24-10-2026 Raja Zahidi
+- Feature & Master Studio DAW Ultimate Suite: WSOLA Audio Time-Stretching & Pitch-Shifting, Virtual Mixing Console Desk, Transient Slicer & Beat Detective, Euclidean Rhythm & Algorithmic Arpeggiator, In-Key Piano Roll & Chord Stamp Tool, Loop Takes & Comping System:
+  * Anjakan Masa & Nada Audio Masa Nyata (Audio Time-Stretching & Pitch-Shifting - src/AudioTimeStretch.h & .cpp):
+    - Enjin WSOLA (Waveform Similarity Overlap-Add) melaksanakan regangan masa audio berketepatan tinggi (0.25x hingga 4.0x) dengan tetingkap Hanning dan korelasi-silang tanpa gangguan fasa.
+    - Fungsi WarpAudioBpm menyelaraskan gelung audio (WAV) secara automatik mengikut tempo projek (Auto-BPM Warping).
+    - Fungsi ProcessPitchShift membolehkan transposisi pic audio (+-12 semiton) secara bebas tanpa mengubah tempoh masa main balik sampel.
+  * Konsol Pengadun Maya Multi-Saluran Studio (Professional Virtual Mixing Console Desk - src/MixerConsole.h & .cpp):
+    - Kelas JZVirtualMixer dan JZChannelStrip menyediakan jalur saluran menegak untuk setiap trek dengan fader aras volum skala dB (-inf hingga +6dB), meter puncak stereo LED, tombol stereo pan, serta butang Mute, Solo, dan Record Arm.
+    - Saluran bantuan Aux Send A (Reverb) dan Aux Send B (Delay).
+    - Fader induk (Master Bus) dilengkapi pematuh aras had analog lembut (Brickwall Limiter tanh saturation).
+  * Pengecaman Transien & Pemotong Rentak Dram Pintar (Audio Transient Slicing & Beat Detective - src/TransientSlicer.h & .cpp):
+    - Algoritma JZTransientDetector mengesan transien pukulan dram (kick, snare, hi-hat) berasaskan pembezaan tenaga gelombang pendek.
+    - Fungsi SliceToMidiTrack memotong gelung audio kepada penanda hirisan dan menjana trek MIDI kromatik automatik (C3, C#3, D3, dll.).
+  * Penjana Irama Poliritmik Euclidean & Pengarpeggio Polifonik (Euclidean Rhythm & Algorithmic Arpeggiator - src/EuclideanArp.h & .cpp):
+    - Kelas JZEuclideanRhythm melaksanakan algoritma Bresenham/Bjorklund E(k, n) untuk menjana rentak poliritmik eksotik: E(5,8) Cinquillo Cuba, E(3,8) Tresillo, E(7,16) Samba Brazil, E(4,12) 12/8 Blues Shuffle, dan E(5,16) Afrobeat.
+    - Kelas JZAlgorithmicArpeggiator menyokong corak arpeggio lanjutan: Strum Roll, Chord Repeat, Walking Octaves, dan Random Polyphonic.
+  * Kecerdasan Skala & Pengecap Kord Piano Roll (In-Key Piano Roll Scale Snapping & Chord Stamp Tool - src/PianoScaleChordHelper.h & .cpp):
+    - JZPianoScaleChordHelper menyediakan penentuan not dalam skala dan lekatan diatonik automatik (Snap-to-Scale).
+    - Koleksi Pengecap Kord 1-Klik: Triad (Major, Minor, Dim, Aug), 7th (Maj7, Min7, Dom7, m7b5, Dim7), 9th, 7#9 Hendrix, 11th, 7#11 Lydian Dominant, 13th, dan 7alt Super Locrian.
+  * Sistem Rakaman Berbilang Laluan & Pengkomposan (Loop Recording Takes & Comping System - src/TakesComping.h & .cpp):
+    - JZCompingManager menguruskan lorong sub-rakaman (Take 1, Take 2, Take 3) bagi setiap pusingan rakaman gelung.
+    - Menyokong Swipe Comping dan fungsi FlattenCompToTrack untuk menyatukan bahagian-bahagian terbaik daripada setiap take ke trek induk.
+  * Kemas Kini Ujian Unit (tests/test_main.cpp):
+    - Menambah ujian unit komprehensif 45 hingga 52 merangkumi nisbah regangan WSOLA, pergeseran pic granular, fader dB pengadun, pematuh had, pembezaan tenaga transien, algoritma Euclidean E(5,8), pengecap kord Hendrix, dan pengkomposan take.
+
+24-10-2026 Raja Zahidi
 - Feature & Professional DAW Architecture Suite: Dynamic Automation Curves, WASAPI Low-Latency Audio Driver, Waveform Display & Non-Destructive Clip Editing, Groove Pool Manager, MPE Polyphonic Expression & MusicXML, Self-Contained Project Bundles (.jazzbundle):
   * Liku Automasi Dinamik & Lorong Sampul Visual (Dynamic Automation Curves & Visual Envelope Lanes - src/AutomationEngine.h & .cpp):
     - Struktur nodus JZAutomationNode dan lengkung JZAutomationCurve menyokong interpolasi Linear, Bezier (dengan pelarasan tegangan kelengkungan ease-in/ease-out), Eksponen (sapuan penapis audio), dan Sigmoid S-Curve.

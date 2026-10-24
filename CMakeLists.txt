@@ -116,6 +116,7 @@ set(JAZZ_SOURCES
     src/AsciiMidiFile.cpp
     src/Audio.cpp
     src/AudioEffects.cpp
+    src/AudioTimeStretch.cpp
     src/AudioWaveform.cpp
     src/AutoAccompaniment.cpp
     src/AutomationEngine.cpp
@@ -160,6 +161,7 @@ set(JAZZ_SOURCES
     src/Dialogs.cpp
     src/DrumUtilities.cpp
     src/ErrorMessage.cpp
+    src/EuclideanArp.cpp
     src/Events.cpp
     src/EventFrame.cpp
     src/EventWindow.cpp
@@ -185,6 +187,7 @@ set(JAZZ_SOURCES
     src/MeasureChoice.cpp
     src/MidiDeviceDialog.cpp
     src/MidiEffects.cpp
+    src/MixerConsole.cpp
     src/MpeEngine.cpp
     src/Metronome.cpp
     src/MouseAction.cpp
@@ -192,6 +195,7 @@ set(JAZZ_SOURCES
     src/NamedValue.cpp
     src/NamedValueChoice.cpp
     src/PianoFrame.cpp
+    src/PianoScaleChordHelper.cpp
     src/PianoWindow.cpp
     src/Player.cpp
     src/Project.cpp
@@ -218,10 +222,12 @@ set(JAZZ_SOURCES
     src/StringUtilities.cpp
     src/Synth.cpp
     src/SysexChannel.cpp
+    src/TakesComping.cpp
     src/ToolBar.cpp
     src/Track.cpp
     src/TrackFrame.cpp
     src/TrackWindow.cpp
+    src/TransientSlicer.cpp
     src/WasapiAudioDriver.cpp
 )
 

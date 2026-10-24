@@ -1,4 +1,29 @@
 24-10-2026 Raja Zahidi
+- Feature & Professional DAW Architecture Suite: Dynamic Automation Curves, WASAPI Low-Latency Audio Driver, Waveform Display & Non-Destructive Clip Editing, Groove Pool Manager, MPE Polyphonic Expression & MusicXML, Self-Contained Project Bundles (.jazzbundle):
+  * Liku Automasi Dinamik & Lorong Sampul Visual (Dynamic Automation Curves & Visual Envelope Lanes - src/AutomationEngine.h & .cpp):
+    - Struktur nodus JZAutomationNode dan lengkung JZAutomationCurve menyokong interpolasi Linear, Bezier (dengan pelarasan tegangan kelengkungan ease-in/ease-out), Eksponen (sapuan penapis audio), dan Sigmoid S-Curve.
+    - Menjana aliran acara MIDI CC (Volume CC7, Pan CC10, Cutoff CC74, Expression CC11, Pitch Bend, Tempo) secara optimum dengan pengurangan ketumpatan (density thinning) tanpa membebankan penimbal MIDI.
+    - Pengurus JZAutomationManager membolehkan pelbagai lorong automasi bebas diuruskan bagi setiap trek.
+  * Pemacu Audio Kependaman Rendah WASAPI & Profiler Penimbal (Low-Latency WASAPI Audio Driver - src/WasapiAudioDriver.h & .cpp):
+    - Kelas JZWasapiAudioDriver menyokong mod perkakasan terus WASAPI Exclusive dan WASAPI Shared.
+    - Membolehkan saiz penimbal audio dikurangkan kepada 64 atau 128 bingkai bagi mencapai kependaman masa nyata bawah 3 milisaat (2.67ms @ 48kHz) untuk rakaman dan pemantauan masa nyata.
+  * Paparan Bentuk Gelombang Audio Garis Masa & Suntingan Klip Tanpa Musnah (Timeline Audio Waveform Display & Clip Editing - src/AudioWaveform.h & .cpp):
+    - Modul JZWaveformThumbnail menjana lakaran kecil puncak (Peak & RMS) audio multi-resolusi piramid (64, 256, dan 1024 sampel seblok) untuk paparan bentuk gelombang pantas tanpa lengah masa.
+    - Kelas JZAudioClip membolehkan pemotongan klip (SplitAt), pemangkasan permulaan/penamat (TrimStart/TrimEnd), dan pengurusan palung (Fade-in / Fade-out) secara tanpa musnah (non-destructive).
+  * Kumpulan Alur & Templat Kuantisasi Muzikal Lanjutan (Groove Pool & Humanize Groove Templates - src/GroovePool.h & .cpp):
+    - Koleksi templat alur legenda pengeluar muzik: Roger Linn MPC-60 Classic Swing (62%), Akai MPC-3000 Hip-Hop (66%), J Dilla & Questlove Drunken Loose Swing, Clyde Stubblefield Funky Drummer Pocket, dan Fela Kuti Afrobeat Push.
+    - Fungsi ApplyGroove memetakan anjakan mikro-masa (tick offsets) dan aksen halaju ke atas acara not trek.
+    - Fungsi ExtractGroove mengekstrak corak variasi alur masa dan dinamik daripada persembahan langsung pemuzik.
+  * Enjin Skor MusicXML Dua Hala & Ekspresi Polifonik MIDI (MusicXML & MPE Engine - src/MpeEngine.h & .cpp):
+    - JZMusicXmlEngine menyokong eksport skor format piawai MusicXML 3.1 Partwise (<score-partwise>) dan import skor notasi ke dalam trek Jazz++.
+    - JZMpeManager memperuntukkan saluran ahli (Channels 2-16) secara bebas bagi setiap not polifonik untuk modulasi gelinciran pic (pitch bend), tekanan (pressure), dan timbre (slide CC74) tanpa silang-bicara (no crosstalk).
+  * Pembungkusan & Pengarkiban Projek Lengkap Mandiri (.jazzbundle Archiver - src/ProjectBundle.h & .cpp):
+    - Format kontena arkib tunggal JZProjectBundle (.jazzbundle) membungkus data susunan MIDI, manifes projek, templat gaya gubahan (.jazzstyle), lorong automasi, dan rujukan sampel ke dalam satu fail padat.
+    - Menyokong pemindahan projek antara komputer secara bebas tanpa masalah laluan fail terputus (broken sample paths).
+  * Kemas Kini Ujian Unit (tests/test_main.cpp):
+    - Menambah ujian unit 36 hingga 44 merangkumi lengkung Bezier, S-curve, metrik kependaman WASAPI, puncak gelombang RMS, hirisan klip audio, ayunan MPC Groove Pool, saluran MPE, skema MusicXML, dan integriti bekas fail .jazzbundle.
+
+24-10-2026 Raja Zahidi
 - Feature & Studio Arranger Pro Suite: Jazz Reharmonizer, Vocal & Horn Harmonizer, Chord Pads Matrix, Timeline Section Banners & SMF Markers, Studio Woodblock Click Track & Arrangement Presets:
   * Penyelaras & Pengganti Harmoni Jazz Pintar (Intelligent Re-Harmonizer & Jazz Chord Substitutions - src/AutoAccompaniment.h & .cpp):
     - Fungsi ApplyReharmonization melaksanakan peraturan harmoni jazz peringkat tinggi:

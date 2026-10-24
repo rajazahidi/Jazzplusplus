@@ -116,7 +116,9 @@ set(JAZZ_SOURCES
     src/AsciiMidiFile.cpp
     src/Audio.cpp
     src/AudioEffects.cpp
+    src/AudioWaveform.cpp
     src/AutoAccompaniment.cpp
+    src/AutomationEngine.cpp
     src/ChordScaleData.cpp
     src/Command.cpp
     src/Configuration.cpp
@@ -167,6 +169,7 @@ set(JAZZ_SOURCES
     src/FrequencyTable.cpp
     src/GetOptionIndex.cpp
     src/Globals.cpp
+    src/GroovePool.cpp
     src/GuitarFrame.cpp
     src/GuitarSettings.cpp
     src/GuitarSettingsDialog.cpp
@@ -182,6 +185,7 @@ set(JAZZ_SOURCES
     src/MeasureChoice.cpp
     src/MidiDeviceDialog.cpp
     src/MidiEffects.cpp
+    src/MpeEngine.cpp
     src/Metronome.cpp
     src/MouseAction.cpp
     src/NamedChoice.cpp
@@ -191,6 +195,7 @@ set(JAZZ_SOURCES
     src/PianoWindow.cpp
     src/Player.cpp
     src/Project.cpp
+    src/ProjectBundle.cpp
     src/ProjectManager.cpp
     src/PropertyListDialog.cpp
     src/Random.cpp
@@ -217,6 +222,7 @@ set(JAZZ_SOURCES
     src/Track.cpp
     src/TrackFrame.cpp
     src/TrackWindow.cpp
+    src/WasapiAudioDriver.cpp
 )
 
 add_executable(jazz ${GUI_TYPE} ${JAZZ_SOURCES} ${PLATFORM_SOURCES})

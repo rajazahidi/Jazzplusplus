@@ -125,6 +125,7 @@ set(JAZZ_SOURCES
     src/AudioWaveform.cpp
     src/AutoAccompaniment.cpp
     src/AutomationEngine.cpp
+    src/BinauralHrtfSpatializer.cpp
     src/CapstanSpeedStabilizer.cpp
     src/ChordPerformancePads.cpp
     src/ChordScaleData.cpp
@@ -173,6 +174,7 @@ set(JAZZ_SOURCES
     src/DrumUtilities.cpp
     src/DynamicAutoWah.cpp
     src/DynamicDeEsser.cpp
+    src/DynamicSidechainEq.cpp
     src/ErrorMessage.cpp
     src/EuclideanArp.cpp
     src/Events.cpp
@@ -191,6 +193,7 @@ set(JAZZ_SOURCES
     src/GroovePool.cpp
     src/GuitarFrame.cpp
     src/GuitarAmpCabinetSim.cpp
+    src/GuitarAmpProfiler.cpp
     src/GuitarSettings.cpp
     src/GuitarSettingsDialog.cpp
     src/GuitarStrumEngine.cpp
@@ -258,10 +261,12 @@ set(JAZZ_SOURCES
     src/SidechainCompressor.cpp
     src/Signal2.cpp
     src/SliderWindow.cpp
+    src/SmpteTimecodeEngine.cpp
     src/Song.cpp
     src/SoundGenerator.cpp
     src/SpatialAudioPanner.cpp
     src/SpectralDenoise.cpp
+    src/SpectralRebalanceEngine.cpp
     src/SpectralResonanceTamer.cpp
     src/StandardFile.cpp
     src/StemSeparatorEngine.cpp
@@ -274,6 +279,7 @@ set(JAZZ_SOURCES
     src/SysexChannel.cpp
     src/TakesComping.cpp
     src/TapeConsoleWarmer.cpp
+    src/ThroughZeroFlanger.cpp
     src/VintageLofiProcessor.cpp
     src/ToolBar.cpp
     src/Track.cpp

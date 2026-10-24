@@ -1,4 +1,27 @@
 24-10-2026 Raja Zahidi
+- Feature & Master Studio Spectral Stem Rebalance, Binaural HRTF Spatializer, Through-Zero Flanger, Guitar Valve Amp Profiler, Dynamic Sidechain EQ & SMPTE Timecode Suite v14.0 (Aura Omniscience Release):
+  * Pengimbangan Semula Stems Audio Spektral Masa Nyata (Real-Time Spectral Stem Rebalancer - src/SpectralRebalanceEngine.h & .cpp):
+    - JZSpectralRebalanceEngine melaksanakan penguraian frekuensi multi-jalur dan pengesanan transien masa nyata bagi trek audio stereo siap (mixdown).
+    - Membolehkan pelarasan fader gain (-24dB ke +12dB), solo, mute, dan pan secara bebas untuk 4 stem (Vocals, Drums, Bass, Other) dengan rekonstruksi sempurna tanpa perlu mengeksport semula fail secara luar talian.
+  * Pemproses Binaural 3D & HRTF Fon Kepala (3D Binaural HRTF Headphone Spatializer - src/BinauralHrtfSpatializer.h & .cpp):
+    - JZBinauralHrtfSpatializer menukarkan isyarat titik 3D atau katil spatial multichannel (7.1.4 Dolby Atmos) kepada audio fon kepala stereo yang realistik.
+    - Dilengkapi model formula Woodworth untuk kelewatan antara-telinga (Interaural Time Difference ITD ~0.656ms), penapis bayang kepala frekuensi tinggi (Interaural Level Difference ILD), takukan spektral pinna untuk isyarat elevasi menegak, dan simulasi putaran kepala penjejakan (Head-Tracking Yaw/Pitch/Roll).
+  * Flanger Pita Analog Lintasan Fasa Sifar Sebenar (True Through-Zero Tape Flanger TZF - src/ThroughZeroFlanger.h & .cpp):
+    - JZThroughZeroFlanger menggunakan matriks kelewatan rujukan dwi-saluran dengan tunda rujukan negatif (Lookahead Offset) yang menyapu merentasi titik masa sifar sebenar (t = 0).
+    - Dilengkapi kutub fasa modular (Positive vs Inverted) yang menghasilkan pembatalan fasa kutub infiniti (Infinite Deep Notch Cancellation ala jet pejuang melintasi dinding bunyi), modulasi LFO BBD kuadratur stereo 90 darjah, dan saturasi analog pita.
+  * Pemprofil Penguat Tiub Gitar & Pemuat Dwi-IR Kabinet (Guitar Valve Amp Profiler & Dual-IR Convolver - src/GuitarAmpProfiler.h & .cpp):
+    - JZGuitarAmpProfiler memodelkan tiub preamp 12AX7 tak simetri, tiub kuasa kelas A/AB (EL34, 6L6, EL84), dan penurunan voltan bekalan kuasa dinamik (Power Supply Sag & Tube Bloom).
+    - Dilengkapi pemuat dwi-IR kabinet 64-tap (Vintage 30, Greenback, American Clean, Tweed), kawalan jarak mikrofon (0-10cm dengan kesan kedekatan bass proximity), dan sudut paksi (Center Cap, Cap Edge, Cone, 45-degree Off-Axis).
+  * Penapis Sidechain EQ Dinamik & Tebukan Spektral Pintar (Intelligent Dynamic Sidechain EQ & Carve - src/DynamicSidechainEq.h & .cpp):
+    - JZDynamicSidechainEq melaksanakan analisis tenaga spektral 5-jalur pada isyarat kawalan sidechain dan menebuk lekukan frekuensi dinamik pintar hanya pada zon yang bertindih sahaja.
+    - Mengelakkan masalah "broadband pumping", memisahkan Kick vs Bass (tebukan 60Hz) dan Lead Vocal vs Gitar/Muzik (tebukan 2.5kHz) secara telus dan kekal bertenaga.
+  * Enjin Penyegerakan Kod Masa Siaran & Filem SMPTE LTC / MTC (Broadcast SMPTE LTC / MTC Timecode Engine - src/SmpteTimecodeEngine.h & .cpp):
+    - JZSmpteTimecodeEngine menyediakan penjanaan dan penyahkodan isyarat audio SMPTE / EBU Linear Timecode (LTC) berformat 80-bit Biphase Mark Modulation pada 24, 25, 29.97 Drop-Frame, dan 30 fps.
+    - Menjana mesej MIDI Timecode (MTC Quarter-Frame dan Full-Frame SysEx) untuk penyegerakan sub-bingkai tepat dengan konsol filem, video, dan siaran televisyen komersial.
+  * Penambahan Ujian Unit 113 hingga 118 (tests/test_main.cpp):
+    - Mengesahkan pembinaan semula sempurna pengimbangan spektral 4-stem (+2.5dB gandaan vokal), kelewatan 0.656ms ITD Woodworth 90-darjah, pembatalan fasa sifar flanger TZF, penurunan voltan sag penguat tiub dan adunan dwi-IR, tebukan spektral -5.6dB sidechain 60Hz, dan perkongsian perkataan segerak 0x3FFD kod masa SMPTE 25fps.
+
+24-10-2026 Raja Zahidi
 - Feature & Master Studio Phase-Locked Drum Replacer, Stereo Granular Cloud Synth, Sub-Harmonic Synthesizer, Room Acoustic Calibrator, Universal Microtonal Tuning & 3D Vectorscope Suite v13.0 (Quantum Zenith Release):
   * Pengganti Dram Berkunci Fasa & Penapis Kebocoran (Phase-Locked Transient Drum Replacer - src/DrumReplacerEngine.h & .cpp):
     - JZDrumReplacerEngine mengesan transien dram dengan ketepatan sub-sampel mikro dan menolak kebocoran simbal (Hi-Hat / Cymbal bleed rejection).

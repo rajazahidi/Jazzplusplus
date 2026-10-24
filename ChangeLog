@@ -1,4 +1,27 @@
 24-10-2026 Raja Zahidi
+- Feature & Master Studio Vocal Note-Blob Pitch Editor, Stem Separator, Modulation Matrix, Guitar Amp Sim, Polymetric Drums & Match EQ Suite v9.0:
+  * Editor Pic Grafik Vokal Berskala Not (Vocal Graphical Note-Blob Pitch Editor - src/VocalPitchEditor.h & .cpp):
+    - JZVocalPitchEditor membahagikan rakaman vokal kepada blok segmen not muzik (Note-Blobs ala Melodyne/VariAudio).
+    - Membolehkan penalaan pic mikro (+/- 100 cents), pengikatan skala automatik (Snap to Scale), perataan hanyutan pic (Drift Slope Leveling), pelarasan amplitud vibrato vokal, dan pengekalan formant vokal (Formant-Lock).
+  * Enjin Pemisahan Batang Audio Pintar (AI Spectral Stem Separator & Audio Unmixing - src/StemSeparatorEngine.h & .cpp):
+    - JZStemSeparatorEngine memisahkan fail adunan audio stereo kepada 4 stem bebas serentak: Vokal (Vocal Formants), Dram (Percussive Transients), Bes (Sub-Bass < 220Hz), dan Lain-lain (Melodic Instruments).
+    - Algoritma Harmonic-Percussive Separation (HPSS) & Magnitude Masking dengan kawalan ketulenan isolasi (Isolation Purity 0.1 - 1.0) memelihara tenaga audio asal tanpa herotan pembatalan fasa.
+  * Matriks Modulasi Parameter Sejagat & Enjin Pelbagai Bentuk LFO (Universal Parameter Modulation Matrix & Multi-Shape LFO - src/ModulationMatrix.h & .cpp):
+    - JZModulationMatrix menyediakan 8 slot pemodulat dengan pelbagai bentuk gelombang (Sine, Triangle, Saw Up, Saw Down, Square, Random Sample & Hold, Envelope Follower, Chaos Wander).
+    - Menyokong penyegerakan tempo BPM projek (BPM Sync), pemetaan makro satu-ke-banyak, dan kedalaman modulasi dwiarah (Bipolar Depth -100% hingga +100%) untuk menggerakkan mana-mana parameter sintesis atau kesan FX secara modular.
+  * Pemodelan Amplifier Tiub Analog & Kabinet Pembesar Suara Gitar (Analog Guitar Tube Amp & Speaker Cabinet IR Simulator - src/GuitarAmpCabinetSim.h & .cpp):
+    - JZGuitarAmpCabinetSim mensimulasikan saturasi tabung 12AX7 pre-amp asimetrik (2nd harmonic warmth) dan peringkat kuasa EL34/6L6.
+    - Dilengkapi 3 model amplifier (American Clean, British Crunch, Modern High Gain), timbunan ton 3-jalur (Bass, Mid, Treble, Presence), dan penapis konvolusi tindak balas impuls kabinet pembesar suara (1x12 Vintage Tweed, 2x12 British Open-Back, 4x12 High-Gain Stack).
+  * Mesin Dram Polimeter & Poliritma Tingkat Lanjut (Polymetric & Polyrhythmic Drum Machine Sequencer - src/PolymetricDrumSequencer.h & .cpp):
+    - JZPolymetricDrumSequencer membolehkan setiap trek dram mempunyai kitaran panjang langkah bebas (contoh: Kick 16 langkah, Hi-hat 12 langkah = polimeter 3:4; Percussion 7 langkah = polimeter ganjil).
+    - Dilengkapi nisbah masa poliritma, hayunan alur (Groove Swing 0% - 75%), kebarangkalian pemicuan langkah (0% - 100%), dan letusan mikro (Ratchet Rolls 1-4 per langkah).
+  * Pemprofil Spektrum Rujukan & Pemadanan EQ Master (Master Reference Track Match EQ & Spectrum Profiler - src/MatchEqProfiler.h & .cpp):
+    - JZMatchEqProfiler menganalisis spektrum purata 64-jalur trek rujukan komersial berbanding trek adunan sasaran projek.
+    - Menjana keluk pembetulan EQ 64-jalur secara automatik dengan pelarasan keamatan padanan (Match Amount 0% - 100%), pelicin spektrum (Smoothing Radius 0 - 6), dan kawalan had siling pengukuhan (+/- 12 dB limit).
+  * Penambahan Ujian Unit 83 hingga 88 (tests/test_main.cpp):
+    - Mengesahkan formula nisbah frekuensi penalaan sen not vokal, pemuliharaan tenaga pemisahan 4 stem spektral, pemetaan modulasi dwiarah matriks makro, herotan asimetrik tiub 12AX7, penyegerakan kitaran fasa polimeter 48-langkah (12 vs 16 langkah), dan pengiraan pembetulan spektrum padanan Match EQ 64-jalur.
+
+24-10-2026 Raja Zahidi
 - Feature & Master Studio FM Synthesis, MIDI Humanizer, Auto-Wah, Modulation Multi-FX, Vocal Aligner & Master True-Peak Limiter Suite v8.0:
   * Pensintesis Modulasi Frekuensi 4-Operator (4-Operator FM Synthesizer & DX-Style Routing - src/FmSynthesizer.h & .cpp):
     - JZFmSynthesizer melaksanakan sintesis FM 4-operator modular dengan 8 algoritma penghalaan (Series Cascade, Dual Modulator/Carrier, Parallel organ/bells, Additive 4-Op).

@@ -182,6 +182,7 @@ set(JAZZ_SOURCES
     src/Globals.cpp
     src/GroovePool.cpp
     src/GuitarFrame.cpp
+    src/GuitarAmpCabinetSim.cpp
     src/GuitarSettings.cpp
     src/GuitarSettingsDialog.cpp
     src/GuitarWindow.cpp
@@ -196,6 +197,7 @@ set(JAZZ_SOURCES
     src/Mapper.cpp
     src/MasterTruePeakLimiter.cpp
     src/MasterVisualizer.cpp
+    src/MatchEqProfiler.cpp
     src/MeasureChoice.cpp
     src/MidiDeviceDialog.cpp
     src/MidiEffects.cpp
@@ -204,6 +206,7 @@ set(JAZZ_SOURCES
     src/MixerConsole.cpp
     src/MixMaskingAnalyzer.cpp
     src/ModulationMultiFX.cpp
+    src/ModulationMatrix.cpp
     src/MpeEngine.cpp
     src/MultibandCompressor.cpp
     src/MultiVelocitySampler.cpp
@@ -218,6 +221,7 @@ set(JAZZ_SOURCES
     src/PianoWindow.cpp
     src/PitchCorrectionEngine.cpp
     src/Player.cpp
+    src/PolymetricDrumSequencer.cpp
     src/Project.cpp
     src/ProjectBundle.cpp
     src/ProjectManager.cpp
@@ -241,6 +245,7 @@ set(JAZZ_SOURCES
     src/SpatialAudioPanner.cpp
     src/SpectralDenoise.cpp
     src/StandardFile.cpp
+    src/StemSeparatorEngine.cpp
     src/StemsExporter.cpp
     src/StringReadWrite.cpp
     src/StringUtilities.cpp
@@ -256,6 +261,7 @@ set(JAZZ_SOURCES
     src/TransientSlicer.cpp
     src/VocalAligner.cpp
     src/VocalHarmonizer.cpp
+    src/VocalPitchEditor.cpp
     src/VocoderEngine.cpp
     src/WasapiAudioDriver.cpp
     src/WavetableSynth.cpp

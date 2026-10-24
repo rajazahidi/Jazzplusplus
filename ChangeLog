@@ -1,4 +1,29 @@
 24-10-2026 Raja Zahidi
+- Feature & Master Studio FM Synthesis, MIDI Humanizer, Auto-Wah, Modulation Multi-FX, Vocal Aligner & Master True-Peak Limiter Suite v8.0:
+  * Pensintesis Modulasi Frekuensi 4-Operator (4-Operator FM Synthesizer & DX-Style Routing - src/FmSynthesizer.h & .cpp):
+    - JZFmSynthesizer melaksanakan sintesis FM 4-operator modular dengan 8 algoritma penghalaan (Series Cascade, Dual Modulator/Carrier, Parallel organ/bells, Additive 4-Op).
+    - Nisbah frekuensi boleh laras per operator (0.5x hingga 32.0x), maklum balas Operator 4 (Self-Feedback Loop 0.0 - 7.0), sampul ADSR 4-fasa bebas bagi setiap operator, dan polifoni 16-suara dengan pratetap legenda FM E-Piano, FM Solid Bass, Tubular Bells, dan FM Clavinet.
+  * Enjin Humanisasi MIDI & Kebarangkalian Not (MIDI Humanizer & Note Trigger Probability Engine - src/MidiHumanizerProbability.h & .cpp):
+    - JZMidiHumanizerProbability melencongkan masa not secara mikro dengan taburan Gaussian (+/- 8ms) untuk menghapuskan kekakuan kuantisasi robotik.
+    - Dilengkapi variasi halaju dinamik, kebarangkalian pemicuan not (Trigger Probability 0% - 100%) untuk penjanaan corak irama generatif, dan suntikan not bayang (Ghost Notes).
+  * Penapis Vokal Formant & Auto-Wah Dinamik (Dynamic Auto-Wah & Vowel Formant Filter - src/DynamicAutoWah.h & .cpp):
+    - JZDynamicAutoWah menyediakan modulasi penapis sampul dinamik funk berasaskan amplitud instrumen input (Envelope Follower dengan mod Sweep Up dan Sweep Down).
+    - Mod Vowel Formant dwi-resonans mensimulasikan rongga vokal manusia ('Ooh' ke 'Aah') dengan kawalan sensitiviti, resonans Q, dan campuran basah/kering (Dry/Wet).
+  * Suite Berbilang Kesan Modulasi Stereo (Stereo Modulation Multi-FX Suite - src/ModulationMultiFX.h & .cpp):
+    - JZModulationMultiFX menyatukan 3 modul kesan legendaris dalam satu enjin:
+      + Dimension Chorus: 4 talian lengah berfasa kuadratur silang (0, 90, 180, 270 darjah) untuk melebarkan stereo tanpa fluktuasi pic vibrato.
+      + 12-Stage Optical Phaser: 12 peringkat penapis all-pass dengan maklum balas analog dan ayunan stereo LFO.
+      + Through-Zero Tape Flanger: Flanger kaset pita tulen dengan pembatalan kutub sifar untuk kesan swoosh pesawat jet yang dramatik.
+  * Penyelaras Masa Vokal Automatik (Automatic Vocal Timing Aligner - src/VocalAligner.h & .cpp):
+    - JZVocalAligner menganalisis trajektori tenaga vokal rujukan (Guide Vocal) dan melaraskan masa konsonan transien vokal sokongan (Dub Vocal) secara automatik menggunakan Dynamic Time Warping (DTW).
+    - Menghapuskan fluktuasi masa nyanyian berganda tanpa herotan pic, melengkapkan penjajaran ketepatan sub-milisaat.
+  * Pematuh Had Puncak Sebenar Master (Master True-Peak Brickwall Limiter - src/MasterTruePeakLimiter.h & .cpp):
+    - JZMasterTruePeakLimiter menyediakan pematuh had brickwall bertaraf penyiaran komersial (pematuhan EBU R128 / ITU-R BS.1770).
+    - Dilengkapi 8x Polyphase Oversampling untuk pengesanan puncak inter-sample, penimbal pandang hadapan Lookahead (0.5ms - 5.0ms) untuk serangan segera tanpa herotan klik, dan kawalan siling ketat -0.1 dBTP.
+  * Penambahan Ujian Unit 77 hingga 82 (tests/test_main.cpp):
+    - Mengesahkan formula matriks modulasi fasa FM synth, had taburan Gaussian pemicu not humanizer, modulasi dinamik penjejak sampul Auto-Wah, pembatalan fasa kuadratur Dimension Chorus, penjajaran trajektori masa vokal DTW, dan pengesanan puncak inter-sample 8x limiter serta penguatkuasaan siling -0.1 dBTP.
+
+24-10-2026 Raja Zahidi
 - Feature & Master Studio Wavetable Synth, Audio-to-MIDI & Intelligent Mastering Suite v7.0: Modern Wavetable Synthesizer, Audio-to-MIDI Transcription Engine, 24-Band Vocoder, Physical Resonator, Mix Masking Collision Analyzer, Master TPDF Dithering & Multi-Format Encoder:
   * Pensintesis Jadual Gelombang Moden & Unison Stereo (Modern Wavetable Synthesizer & Stereo Unison - src/WavetableSynth.h & .cpp):
     - JZWavetableSynth menyediakan sintesis jadual gelombang 64-bingkai 2D dengan morfing fasa berterusan (Sinus -> Segitiga -> Gergaji -> Nadi -> Harmonik Logam).

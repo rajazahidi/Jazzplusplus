@@ -166,6 +166,7 @@ set(JAZZ_SOURCES
     src/Dialogs.cpp
     src/DitherFormatEncoder.cpp
     src/DrumUtilities.cpp
+    src/DynamicAutoWah.cpp
     src/DynamicDeEsser.cpp
     src/ErrorMessage.cpp
     src/EuclideanArp.cpp
@@ -175,6 +176,7 @@ set(JAZZ_SOURCES
     src/FileSelector.cpp
     src/Filter.cpp
     src/FindFile.cpp
+    src/FmSynthesizer.cpp
     src/FrequencyTable.cpp
     src/GetOptionIndex.cpp
     src/Globals.cpp
@@ -192,13 +194,16 @@ set(JAZZ_SOURCES
     src/Knob.cpp
     src/LoudnessMeterEBU.cpp
     src/Mapper.cpp
+    src/MasterTruePeakLimiter.cpp
     src/MasterVisualizer.cpp
     src/MeasureChoice.cpp
     src/MidiDeviceDialog.cpp
     src/MidiEffects.cpp
+    src/MidiHumanizerProbability.cpp
     src/MidSideProcessor.cpp
     src/MixerConsole.cpp
     src/MixMaskingAnalyzer.cpp
+    src/ModulationMultiFX.cpp
     src/MpeEngine.cpp
     src/MultibandCompressor.cpp
     src/MultiVelocitySampler.cpp
@@ -249,6 +254,7 @@ set(JAZZ_SOURCES
     src/TrackWindow.cpp
     src/TransientShaper.cpp
     src/TransientSlicer.cpp
+    src/VocalAligner.cpp
     src/VocalHarmonizer.cpp
     src/VocoderEngine.cpp
     src/WasapiAudioDriver.cpp

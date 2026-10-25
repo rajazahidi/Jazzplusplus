@@ -118,6 +118,8 @@ class JZTrackFrame : public JZEventFrame, public JZButtonLabelInterface
 
     void OnSetCopyright(wxCommandEvent& Event);
 
+    void OnMeterChange(wxCommandEvent& Event);
+
     void OnMiscMergeTracks(wxCommandEvent& Event);
 
     void OnMiscSplitTracks(wxCommandEvent& Event);

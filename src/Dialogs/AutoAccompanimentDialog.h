@@ -52,6 +52,8 @@ class JZAutoAccompanimentDialog : public wxDialog
     wxPanel* CreateStrumPluckTab(wxWindow* pParent);
     wxPanel* CreateRiffTab(wxWindow* pParent);
     wxPanel* CreateSoloTab(wxWindow* pParent);
+    wxPanel* CreateGrooveTab(wxWindow* pParent);
+    wxPanel* CreateChordPadsTab(wxWindow* pParent);
 
     void OnNotebookPageChanged(wxBookCtrlEvent& Event);
     void OnRangeRadio(wxCommandEvent& Event);

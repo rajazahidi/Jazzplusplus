@@ -146,9 +146,33 @@ JZAutoAccompanimentDialog::JZAutoAccompanimentDialog(
 {
   for (int p = 0; p < 8; ++p) mpChordPadButtons[p] = 0;
   CreateControls();
-  SetMinSize(FromDIP(wxSize(560, 680)));
-  Fit();
-  CentreOnParent();
+
+  wxRect workArea = wxGetClientDisplayRect();
+  int targetW = FromDIP(740);
+  int targetH = FromDIP(580);
+  if (targetW > workArea.GetWidth() - FromDIP(20))
+  {
+    targetW = workArea.GetWidth() - FromDIP(20);
+  }
+  if (targetH > workArea.GetHeight() - FromDIP(40))
+  {
+    targetH = workArea.GetHeight() - FromDIP(40);
+  }
+  SetSize(targetW, targetH);
+  SetMinSize(FromDIP(wxSize(620, 460)));
+  CentreOnScreen();
+
+  wxPoint pos = GetPosition();
+  if (pos.y < workArea.GetTop() + FromDIP(10))
+  {
+    pos.y = workArea.GetTop() + FromDIP(10);
+    SetPosition(pos);
+  }
+  if (pos.x < workArea.GetLeft() + FromDIP(10))
+  {
+    pos.x = workArea.GetLeft() + FromDIP(10);
+    SetPosition(pos);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -222,7 +246,7 @@ void JZAutoAccompanimentDialog::CreateControls()
   mpKeyCenterLabel = new wxStaticText(this, wxID_ANY, keyText);
   pSourceBox->Add(mpKeyCenterLabel, 0, wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(4));
 
-  pTopRow->Add(pSourceBox, 1, wxALL | wxEXPAND, FromDIP(5));
+  pTopRow->Add(pSourceBox, 1, wxALL | wxEXPAND, FromDIP(4));
 
   // Measure Range Box
   wxStaticBoxSizer* pRangeBox = new wxStaticBoxSizer(wxVERTICAL, this, "Measure Range");
@@ -259,143 +283,20 @@ void JZAutoAccompanimentDialog::CreateControls()
   pCustomRangeSizer->Add(mpToBarSpin, 0, wxALIGN_CENTER_VERTICAL, 0);
 
   pRangeBox->Add(pCustomRangeSizer, 0, wxALL, FromDIP(2));
-  pTopRow->Add(pRangeBox, 1, wxALL | wxEXPAND, FromDIP(5));
+  pTopRow->Add(pRangeBox, 1, wxALL | wxEXPAND, FromDIP(4));
 
-  pMainSizer->Add(pTopRow, 0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(5));
+  pMainSizer->Add(pTopRow, 0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(4));
 
-  // Song Starter: 1-Click Chord Progression Generator Box
-  wxStaticBoxSizer* pProgBox = new wxStaticBoxSizer(wxHORIZONTAL, this, "Song Starter: 1-Click Chord Progression Builder");
-  mpProgressionChoice = new wxChoice(this, wxID_ANY);
-  for (int p = 0; p < PROGRESSION_COUNT; ++p)
-  {
-    mpProgressionChoice->Append(JZAutoAccompaniment::GetProgressionName((JZChordProgressionPreset)p));
-  }
-  mpProgressionChoice->SetSelection(0);
-  pProgBox->Add(mpProgressionChoice, 1, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
-
-  mpInjectProgressionButton = new wxButton(this, ID_BTN_INJECT_PROGRESSION, "🎹 Inject Chords to Track 1");
-  pProgBox->Add(mpInjectProgressionButton, 0, wxALIGN_CENTER_VERTICAL | wxALL, FromDIP(4));
-  pMainSizer->Add(pProgBox, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(6));
-
-  // Notebook Tabs
+  // Notebook Tabs (6 Integrated Tabs)
   mpNotebook = new wxNotebook(this, ID_NOTEBOOK_HUB);
-  mpNotebook->AddPage(CreateBandTab(mpNotebook), "🥁 Session Band", true);
-  mpNotebook->AddPage(CreateStrumPluckTab(mpNotebook), "🎸 Strum & Pluck", false);
-  mpNotebook->AddPage(CreateRiffTab(mpNotebook), "⚡ Riffs & Hooks", false);
-  mpNotebook->AddPage(CreateSoloTab(mpNotebook), "🎷 Auto-Solo", false);
+  mpNotebook->AddPage(CreateBandTab(mpNotebook), "Session Band", true);
+  mpNotebook->AddPage(CreateStrumPluckTab(mpNotebook), "Strum & Pluck", false);
+  mpNotebook->AddPage(CreateRiffTab(mpNotebook), "Riffs & Hooks", false);
+  mpNotebook->AddPage(CreateSoloTab(mpNotebook), "Auto-Solo", false);
+  mpNotebook->AddPage(CreateGrooveTab(mpNotebook), "Groove & Expression", false);
+  mpNotebook->AddPage(CreateChordPadsTab(mpNotebook), "Chord Builder & Pads", false);
 
   pMainSizer->Add(mpNotebook, 1, wxEXPAND | wxALL, FromDIP(6));
-
-  // Musical Expression & Groove Box
-  wxStaticBoxSizer* pGrooveBox = new wxStaticBoxSizer(wxVERTICAL, this, "Groove & Musical Expression");
-
-  wxBoxSizer* pSwingRow = new wxBoxSizer(wxHORIZONTAL);
-  pSwingRow->Add(new wxStaticText(this, wxID_ANY, "Swing Ratio: Straight (50%)"), 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, FromDIP(6));
-  mpSwingSlider = new wxSlider(this, wxID_ANY, 62, 50, 70, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_AUTOTICKS);
-  pSwingRow->Add(mpSwingSlider, 1, wxEXPAND | wxRIGHT, FromDIP(6));
-  pSwingRow->Add(new wxStaticText(this, wxID_ANY, "Hard (70%)"), 0, wxALIGN_CENTER_VERTICAL);
-  pGrooveBox->Add(pSwingRow, 0, wxALL | wxEXPAND, FromDIP(4));
-
-  wxBoxSizer* pExprRow = new wxBoxSizer(wxHORIZONTAL);
-  mpDrumFillsCheckBox = new wxCheckBox(this, wxID_ANY, "Smart Drum Fills (Bar 4/8/12/16)");
-  mpDrumFillsCheckBox->SetValue(true);
-  pExprRow->Add(mpDrumFillsCheckBox, 1, wxRIGHT, FromDIP(8));
-
-  mpSoloBendsCheckBox = new wxCheckBox(this, wxID_ANY, "Expressive Solo Bends & CC1 Vibrato");
-  mpSoloBendsCheckBox->SetValue(true);
-  pExprRow->Add(mpSoloBendsCheckBox, 1, 0, 0);
-  pGrooveBox->Add(pExprRow, 0, wxALL | wxEXPAND, FromDIP(4));
-
-  wxBoxSizer* pAdvRow = new wxBoxSizer(wxHORIZONTAL);
-  mpSmoothVoiceLeadingCheckBox = new wxCheckBox(this, wxID_ANY, "Smooth Voice Leading (Minimal Leaps)");
-  mpSmoothVoiceLeadingCheckBox->SetValue(true);
-  pAdvRow->Add(mpSmoothVoiceLeadingCheckBox, 1, wxRIGHT, FromDIP(8));
-
-  mpGhostNotesCheckBox = new wxCheckBox(this, wxID_ANY, "Bass Ghost Notes & Articulations");
-  mpGhostNotesCheckBox->SetValue(true);
-  pAdvRow->Add(mpGhostNotesCheckBox, 1, 0, 0);
-  pGrooveBox->Add(pAdvRow, 0, wxALL | wxEXPAND, FromDIP(4));
-
-  wxBoxSizer* pPocketRow = new wxBoxSizer(wxHORIZONTAL);
-  mpMicroPocketCheckBox = new wxCheckBox(this, wxID_ANY, "Micro-Timing Pocket (Laid-Back Snare & Push Bass)");
-  mpMicroPocketCheckBox->SetValue(true);
-  pPocketRow->Add(mpMicroPocketCheckBox, 1, wxRIGHT, FromDIP(8));
-
-  mpScaleLockCheckBox = new wxCheckBox(this, wxID_ANY, "Smart Scale Lock (Snap-to-Key)");
-  mpScaleLockCheckBox->SetValue(false);
-  pPocketRow->Add(mpScaleLockCheckBox, 1, 0, 0);
-  pGrooveBox->Add(pPocketRow, 0, wxALL | wxEXPAND, FromDIP(4));
-
-  wxBoxSizer* pMixRow = new wxBoxSizer(wxHORIZONTAL);
-  mpMixerPresetsCheckBox = new wxCheckBox(this, wxID_ANY, "Apply Smart Auto-Mixer Studio Presets (Stereo Pan, Levels & FX)");
-  mpMixerPresetsCheckBox->SetValue(true);
-  pMixRow->Add(mpMixerPresetsCheckBox, 1, 0, 0);
-  pGrooveBox->Add(pMixRow, 0, wxALL | wxEXPAND, FromDIP(4));
-
-  wxBoxSizer* pVelCurveRow = new wxBoxSizer(wxHORIZONTAL);
-  pVelCurveRow->Add(new wxStaticText(this, wxID_ANY, "Velocity Dynamic Response:"), 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, FromDIP(8));
-  mpVelocityCurveChoice = new wxChoice(this, wxID_ANY);
-  for (int vc = 0; vc < VELOCITY_CURVE_COUNT; ++vc)
-  {
-    mpVelocityCurveChoice->Append(JZAutoAccompaniment::GetVelocityCurveName((JZVelocityCurve)vc));
-  }
-  mpVelocityCurveChoice->SetSelection(0);
-  pVelCurveRow->Add(mpVelocityCurveChoice, 1, wxEXPAND);
-  pGrooveBox->Add(pVelCurveRow, 0, wxALL | wxEXPAND, FromDIP(4));
-
-  wxBoxSizer* pRitMicroRow = new wxBoxSizer(wxHORIZONTAL);
-  mpOutroRitardandoCheckBox = new wxCheckBox(this, wxID_ANY, "Outro Ritardando (Slow Cadence)");
-  mpOutroRitardandoCheckBox->SetValue(true);
-  pRitMicroRow->Add(mpOutroRitardandoCheckBox, 1, wxRIGHT, FromDIP(8));
-
-  mpMicrotonalCheckBox = new wxCheckBox(this, wxID_ANY, "Microtonal Eastern / Tradisi Tuning");
-  mpMicrotonalCheckBox->SetValue(false);
-  pRitMicroRow->Add(mpMicrotonalCheckBox, 1, 0, 0);
-  pGrooveBox->Add(pRitMicroRow, 0, wxALL | wxEXPAND, FromDIP(4));
-
-  // Re-Harmonizer & Jazz Substitution Dropdown
-  wxBoxSizer* pReharmRow = new wxBoxSizer(wxHORIZONTAL);
-  pReharmRow->Add(new wxStaticText(this, wxID_ANY, "Re-Harmonizer & Substitutions:"), 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, FromDIP(8));
-  mpReharmonizeChoice = new wxChoice(this, wxID_ANY);
-  for (int rm = 0; rm < REHARM_COUNT; ++rm)
-  {
-    mpReharmonizeChoice->Append(JZAutoAccompaniment::GetReharmonizeModeName((JZReharmonizeMode)rm));
-  }
-  mpReharmonizeChoice->SetSelection(0);
-  pReharmRow->Add(mpReharmonizeChoice, 1, wxEXPAND);
-  pGrooveBox->Add(pReharmRow, 0, wxALL | wxEXPAND, FromDIP(4));
-
-  // Studio Metronome Audio Click Track & Count-in
-  wxBoxSizer* pClickRow = new wxBoxSizer(wxHORIZONTAL);
-  mpAudioClickTrackCheckBox = new wxCheckBox(this, wxID_ANY, "Woodblock Click Track (900Hz/580Hz)");
-  mpAudioClickTrackCheckBox->SetValue(false);
-  pClickRow->Add(mpAudioClickTrackCheckBox, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, FromDIP(12));
-
-  mpCountInCheckBox = new wxCheckBox(this, wxID_ANY, "Count-in:");
-  mpCountInCheckBox->SetValue(false);
-  pClickRow->Add(mpCountInCheckBox, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, FromDIP(4));
-
-  mpCountInBarsSpin = new wxSpinCtrl(this, wxID_ANY, "1", wxDefaultPosition, FromDIP(wxSize(50, -1)), wxSP_ARROW_KEYS, 1, 4, 1);
-  pClickRow->Add(mpCountInBarsSpin, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, FromDIP(4));
-  pClickRow->Add(new wxStaticText(this, wxID_ANY, "bar(s)"), 0, wxALIGN_CENTER_VERTICAL);
-  pGrooveBox->Add(pClickRow, 0, wxALL | wxEXPAND, FromDIP(4));
-
-  pMainSizer->Add(pGrooveBox, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(6));
-
-  // Interactive Virtual Chord Pads Matrix (8 Diatonic Pads)
-  wxStaticBoxSizer* pChordPadsBox = new wxStaticBoxSizer(wxVERTICAL, this, "Interactive Chord Pads Matrix (Instant Live Audition)");
-  wxBoxSizer* pPadsGrid = new wxBoxSizer(wxHORIZONTAL);
-  static const char* sPadLabels[8] = {
-    "I (Tonic)", "ii (Supertonic)", "iii (Mediant)", "IV (Subdominant)",
-    "V7 (Dominant)", "vi (Submediant)", "vii° (Leading)", "bII7 (Tritone Sub)"
-  };
-  for (int pi = 0; pi < 8; ++pi)
-  {
-    mpChordPadButtons[pi] = new wxButton(this, ID_CHORD_PAD_BASE + pi, sPadLabels[pi]);
-    pPadsGrid->Add(mpChordPadButtons[pi], 1, wxALL | wxEXPAND, FromDIP(2));
-  }
-  pChordPadsBox->Add(pPadsGrid, 0, wxEXPAND | wxALL, FromDIP(2));
-  pMainSizer->Add(pChordPadsBox, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(6));
 
   // Bottom Options & Preview
   wxBoxSizer* pOptSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -412,44 +313,44 @@ void JZAutoAccompanimentDialog::CreateControls()
 
   // Audition Preview Buttons
   wxBoxSizer* pAuditionSizer = new wxBoxSizer(wxHORIZONTAL);
-  mpAuditionButton = new wxButton(this, ID_BTN_AUDITION, "▶ Preview");
+  mpAuditionButton = new wxButton(this, ID_BTN_AUDITION, "Preview");
   pAuditionSizer->Add(mpAuditionButton, 0, wxRIGHT, FromDIP(4));
 
-  mpStopAuditionButton = new wxButton(this, ID_BTN_STOP_AUDITION, "■ Stop");
+  mpStopAuditionButton = new wxButton(this, ID_BTN_STOP_AUDITION, "Stop");
   mpStopAuditionButton->Enable(false);
   pAuditionSizer->Add(mpStopAuditionButton, 0, 0, 0);
   pOptSizer->Add(pAuditionSizer, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, FromDIP(10));
 
-  pMainSizer->Add(pOptSizer, 0, wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(8));
+  pMainSizer->Add(pOptSizer, 0, wxLEFT | wxRIGHT | wxBOTTOM | wxEXPAND, FromDIP(6));
 
   // Final Action Buttons
   wxBoxSizer* pBtnSizer = new wxBoxSizer(wxHORIZONTAL);
-  mpSavePresetButton = new wxButton(this, ID_BTN_SAVE_PRESET, "💾 Save...");
-  pBtnSizer->Add(mpSavePresetButton, 0, wxRIGHT, FromDIP(6));
+  mpSavePresetButton = new wxButton(this, ID_BTN_SAVE_PRESET, "Save Preset...");
+  pBtnSizer->Add(mpSavePresetButton, 0, wxRIGHT, FromDIP(4));
 
-  mpLoadPresetButton = new wxButton(this, ID_BTN_LOAD_PRESET, "📂 Load...");
-  pBtnSizer->Add(mpLoadPresetButton, 0, wxRIGHT, FromDIP(6));
+  mpLoadPresetButton = new wxButton(this, ID_BTN_LOAD_PRESET, "Load Preset...");
+  pBtnSizer->Add(mpLoadPresetButton, 0, wxRIGHT, FromDIP(4));
 
-  mpHarmonizerButton = new wxButton(this, ID_BTN_HARMONIZER, "🎺 Harmonizer...");
-  pBtnSizer->Add(mpHarmonizerButton, 0, wxRIGHT, FromDIP(6));
+  mpHarmonizerButton = new wxButton(this, ID_BTN_HARMONIZER, "Harmonizer...");
+  pBtnSizer->Add(mpHarmonizerButton, 0, wxRIGHT, FromDIP(4));
 
-  mpExportLeadSheetButton = new wxButton(this, ID_BTN_EXPORT_LEADSHEET, "📄 Lead Sheet...");
-  pBtnSizer->Add(mpExportLeadSheetButton, 0, wxRIGHT, FromDIP(6));
+  mpExportLeadSheetButton = new wxButton(this, ID_BTN_EXPORT_LEADSHEET, "Lead Sheet...");
+  pBtnSizer->Add(mpExportLeadSheetButton, 0, wxRIGHT, FromDIP(4));
 
-  mpExportStemsButton = new wxButton(this, ID_BTN_EXPORT_STEMS, "📦 Stems (WAV)...");
-  pBtnSizer->Add(mpExportStemsButton, 0, wxRIGHT, FromDIP(6));
+  mpExportStemsButton = new wxButton(this, ID_BTN_EXPORT_STEMS, "Export Stems...");
+  pBtnSizer->Add(mpExportStemsButton, 0, wxRIGHT, FromDIP(4));
 
-  mpExportWavButton = new wxButton(this, ID_BTN_EXPORT_WAV, "🎧 Mix (WAV)...");
-  pBtnSizer->Add(mpExportWavButton, 0, wxRIGHT, FromDIP(10));
+  mpExportWavButton = new wxButton(this, ID_BTN_EXPORT_WAV, "Export Mix...");
+  pBtnSizer->Add(mpExportWavButton, 0, wxRIGHT, FromDIP(8));
 
   mpGenerateButton = new wxButton(this, ID_BTN_GENERATE, "Generate Session Band");
   mpGenerateButton->SetDefault();
-  pBtnSizer->Add(mpGenerateButton, 0, wxRIGHT, FromDIP(10));
+  pBtnSizer->Add(mpGenerateButton, 0, wxRIGHT, FromDIP(6));
 
   mpCancelButton = new wxButton(this, wxID_CANCEL, "Close");
   pBtnSizer->Add(mpCancelButton, 0, 0, 0);
 
-  pMainSizer->Add(pBtnSizer, 0, wxALIGN_RIGHT | wxALL, FromDIP(10));
+  pMainSizer->Add(pBtnSizer, 0, wxALIGN_RIGHT | wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(6));
 
   SetSizer(pMainSizer);
 }
@@ -689,6 +590,173 @@ wxPanel* JZAutoAccompanimentDialog::CreateSoloTab(wxWindow* pParent)
 }
 
 //-----------------------------------------------------------------------------
+// Tab 5: Groove & Musical Expression
+//-----------------------------------------------------------------------------
+wxPanel* JZAutoAccompanimentDialog::CreateGrooveTab(wxWindow* pParent)
+{
+  wxPanel* pPanel = new wxPanel(pParent);
+  wxBoxSizer* pSizer = new wxBoxSizer(wxVERTICAL);
+
+  // Swing & Micro-timing Pocket
+  wxStaticBoxSizer* pSwingBox = new wxStaticBoxSizer(wxVERTICAL, pPanel, "Swing Ratio & Micro-Timing Pocket");
+  wxBoxSizer* pSwingRow = new wxBoxSizer(wxHORIZONTAL);
+  pSwingRow->Add(new wxStaticText(pPanel, wxID_ANY, "Swing: Straight (50%)"), 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, FromDIP(6));
+  mpSwingSlider = new wxSlider(pPanel, wxID_ANY, 62, 50, 70, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_AUTOTICKS);
+  pSwingRow->Add(mpSwingSlider, 1, wxEXPAND | wxRIGHT, FromDIP(6));
+  pSwingRow->Add(new wxStaticText(pPanel, wxID_ANY, "Hard (70%)"), 0, wxALIGN_CENTER_VERTICAL);
+  pSwingBox->Add(pSwingRow, 0, wxALL | wxEXPAND, FromDIP(4));
+
+  wxBoxSizer* pPocketRow = new wxBoxSizer(wxHORIZONTAL);
+  mpMicroPocketCheckBox = new wxCheckBox(pPanel, wxID_ANY, "Micro-Timing Pocket (Laid-Back Snare & Push Bass)");
+  mpMicroPocketCheckBox->SetValue(true);
+  pPocketRow->Add(mpMicroPocketCheckBox, 1, wxRIGHT, FromDIP(8));
+
+  mpScaleLockCheckBox = new wxCheckBox(pPanel, wxID_ANY, "Smart Scale Lock (Snap-to-Key)");
+  mpScaleLockCheckBox->SetValue(false);
+  pPocketRow->Add(mpScaleLockCheckBox, 1, 0, 0);
+  pSwingBox->Add(pPocketRow, 0, wxALL | wxEXPAND, FromDIP(4));
+  pSizer->Add(pSwingBox, 0, wxALL | wxEXPAND, FromDIP(4));
+
+  // Performance Articulations & Expression
+  wxStaticBoxSizer* pExprBox = new wxStaticBoxSizer(wxVERTICAL, pPanel, "Performance Articulations & Expression");
+  wxBoxSizer* pExprRow1 = new wxBoxSizer(wxHORIZONTAL);
+  mpDrumFillsCheckBox = new wxCheckBox(pPanel, wxID_ANY, "Smart Drum Fills (Bar 4/8/12/16)");
+  mpDrumFillsCheckBox->SetValue(true);
+  pExprRow1->Add(mpDrumFillsCheckBox, 1, wxRIGHT, FromDIP(8));
+
+  mpSoloBendsCheckBox = new wxCheckBox(pPanel, wxID_ANY, "Expressive Solo Bends & CC1 Vibrato");
+  mpSoloBendsCheckBox->SetValue(true);
+  pExprRow1->Add(mpSoloBendsCheckBox, 1, 0, 0);
+  pExprBox->Add(pExprRow1, 0, wxALL | wxEXPAND, FromDIP(4));
+
+  wxBoxSizer* pExprRow2 = new wxBoxSizer(wxHORIZONTAL);
+  mpSmoothVoiceLeadingCheckBox = new wxCheckBox(pPanel, wxID_ANY, "Smooth Voice Leading (Minimal Leaps)");
+  mpSmoothVoiceLeadingCheckBox->SetValue(true);
+  pExprRow2->Add(mpSmoothVoiceLeadingCheckBox, 1, wxRIGHT, FromDIP(8));
+
+  mpGhostNotesCheckBox = new wxCheckBox(pPanel, wxID_ANY, "Bass Ghost Notes & Articulations");
+  mpGhostNotesCheckBox->SetValue(true);
+  pExprRow2->Add(mpGhostNotesCheckBox, 1, 0, 0);
+  pExprBox->Add(pExprRow2, 0, wxALL | wxEXPAND, FromDIP(4));
+  pSizer->Add(pExprBox, 0, wxALL | wxEXPAND, FromDIP(4));
+
+  // Dynamics, Tuning & Studio Mixer
+  wxStaticBoxSizer* pDynBox = new wxStaticBoxSizer(wxVERTICAL, pPanel, "Dynamics, Tuning & Studio Mixer");
+  wxBoxSizer* pVelRow = new wxBoxSizer(wxHORIZONTAL);
+  pVelRow->Add(new wxStaticText(pPanel, wxID_ANY, "Velocity Dynamic Response:"), 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, FromDIP(8));
+  mpVelocityCurveChoice = new wxChoice(pPanel, wxID_ANY);
+  for (int vc = 0; vc < VELOCITY_CURVE_COUNT; ++vc)
+  {
+    mpVelocityCurveChoice->Append(JZAutoAccompaniment::GetVelocityCurveName((JZVelocityCurve)vc));
+  }
+  mpVelocityCurveChoice->SetSelection(0);
+  pVelRow->Add(mpVelocityCurveChoice, 1, wxEXPAND);
+  pDynBox->Add(pVelRow, 0, wxALL | wxEXPAND, FromDIP(4));
+
+  wxBoxSizer* pReharmRow = new wxBoxSizer(wxHORIZONTAL);
+  pReharmRow->Add(new wxStaticText(pPanel, wxID_ANY, "Re-Harmonizer & Substitutions:"), 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, FromDIP(8));
+  mpReharmonizeChoice = new wxChoice(pPanel, wxID_ANY);
+  for (int rm = 0; rm < REHARM_COUNT; ++rm)
+  {
+    mpReharmonizeChoice->Append(JZAutoAccompaniment::GetReharmonizeModeName((JZReharmonizeMode)rm));
+  }
+  mpReharmonizeChoice->SetSelection(0);
+  pReharmRow->Add(mpReharmonizeChoice, 1, wxEXPAND);
+  pDynBox->Add(pReharmRow, 0, wxALL | wxEXPAND, FromDIP(4));
+
+  wxBoxSizer* pMiscRow = new wxBoxSizer(wxHORIZONTAL);
+  mpMixerPresetsCheckBox = new wxCheckBox(pPanel, wxID_ANY, "Apply Studio Mixer Presets (Stereo Pan, Levels & FX)");
+  mpMixerPresetsCheckBox->SetValue(true);
+  pMiscRow->Add(mpMixerPresetsCheckBox, 1, wxRIGHT, FromDIP(8));
+
+  mpOutroRitardandoCheckBox = new wxCheckBox(pPanel, wxID_ANY, "Outro Ritardando (Slow Cadence)");
+  mpOutroRitardandoCheckBox->SetValue(true);
+  pMiscRow->Add(mpOutroRitardandoCheckBox, 1, 0, 0);
+  pDynBox->Add(pMiscRow, 0, wxALL | wxEXPAND, FromDIP(4));
+
+  wxBoxSizer* pMicroClickRow = new wxBoxSizer(wxHORIZONTAL);
+  mpMicrotonalCheckBox = new wxCheckBox(pPanel, wxID_ANY, "Microtonal Eastern / Tradisi Tuning");
+  mpMicrotonalCheckBox->SetValue(false);
+  pMicroClickRow->Add(mpMicrotonalCheckBox, 1, wxRIGHT, FromDIP(8));
+
+  mpAudioClickTrackCheckBox = new wxCheckBox(pPanel, wxID_ANY, "Woodblock Click Track");
+  mpAudioClickTrackCheckBox->SetValue(false);
+  pMicroClickRow->Add(mpAudioClickTrackCheckBox, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, FromDIP(6));
+
+  mpCountInCheckBox = new wxCheckBox(pPanel, wxID_ANY, "Count-in:");
+  mpCountInCheckBox->SetValue(false);
+  pMicroClickRow->Add(mpCountInCheckBox, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, FromDIP(4));
+
+  mpCountInBarsSpin = new wxSpinCtrl(pPanel, wxID_ANY, "1", wxDefaultPosition, FromDIP(wxSize(50, -1)), wxSP_ARROW_KEYS, 1, 4, 1);
+  pMicroClickRow->Add(mpCountInBarsSpin, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, FromDIP(4));
+  pMicroClickRow->Add(new wxStaticText(pPanel, wxID_ANY, "bar(s)"), 0, wxALIGN_CENTER_VERTICAL);
+  pDynBox->Add(pMicroClickRow, 0, wxALL | wxEXPAND, FromDIP(4));
+
+  pSizer->Add(pDynBox, 0, wxALL | wxEXPAND, FromDIP(4));
+
+  pPanel->SetSizer(pSizer);
+  return pPanel;
+}
+
+//-----------------------------------------------------------------------------
+// Tab 6: 1-Click Chord Progression Builder & Interactive Pads
+//-----------------------------------------------------------------------------
+wxPanel* JZAutoAccompanimentDialog::CreateChordPadsTab(wxWindow* pParent)
+{
+  wxPanel* pPanel = new wxPanel(pParent);
+  wxBoxSizer* pSizer = new wxBoxSizer(wxVERTICAL);
+
+  // 1. Song Starter: 1-Click Chord Progression Generator Box
+  wxStaticBoxSizer* pProgBox = new wxStaticBoxSizer(wxVERTICAL, pPanel, "Song Starter: 1-Click Chord Progression Builder");
+  wxBoxSizer* pProgRow = new wxBoxSizer(wxHORIZONTAL);
+  mpProgressionChoice = new wxChoice(pPanel, wxID_ANY);
+  for (int p = 0; p < PROGRESSION_COUNT; ++p)
+  {
+    mpProgressionChoice->Append(JZAutoAccompaniment::GetProgressionName((JZChordProgressionPreset)p));
+  }
+  mpProgressionChoice->SetSelection(0);
+  pProgRow->Add(mpProgressionChoice, 1, wxALIGN_CENTER_VERTICAL | wxRIGHT, FromDIP(6));
+
+  mpInjectProgressionButton = new wxButton(pPanel, ID_BTN_INJECT_PROGRESSION, "Inject Chords to Source Track");
+  pProgRow->Add(mpInjectProgressionButton, 0, wxALIGN_CENTER_VERTICAL);
+  pProgBox->Add(pProgRow, 0, wxALL | wxEXPAND, FromDIP(4));
+
+  wxStaticText* pProgHint = new wxStaticText(pPanel, wxID_ANY, "Tip: Injects standard progressions (Pop, Jazz ii-V-I, 12-Bar Blues) directly into your selected Source Track.");
+  pProgBox->Add(pProgHint, 0, wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(4));
+  pSizer->Add(pProgBox, 0, wxALL | wxEXPAND, FromDIP(4));
+
+  // 2. Interactive Diatonic Chord Audition Pads Matrix (2 Rows of 4 Pads)
+  wxStaticBoxSizer* pPadsBox = new wxStaticBoxSizer(wxVERTICAL, pPanel, "Interactive Chord Pads (Instant Voicing Audition)");
+  static const char* sPadLabels[8] = {
+    "I (Tonic)", "ii (Supertonic)", "iii (Mediant)", "IV (Subdominant)",
+    "V7 (Dominant)", "vi (Submediant)", "vii dim (Leading)", "bII7 (Tritone Sub)"
+  };
+
+  wxBoxSizer* pRow1 = new wxBoxSizer(wxHORIZONTAL);
+  for (int pi = 0; pi < 4; ++pi)
+  {
+    mpChordPadButtons[pi] = new wxButton(pPanel, ID_CHORD_PAD_BASE + pi, sPadLabels[pi], wxDefaultPosition, FromDIP(wxSize(-1, 38)));
+    pRow1->Add(mpChordPadButtons[pi], 1, wxALL | wxEXPAND, FromDIP(3));
+  }
+  pPadsBox->Add(pRow1, 0, wxEXPAND | wxALL, FromDIP(2));
+
+  wxBoxSizer* pRow2 = new wxBoxSizer(wxHORIZONTAL);
+  for (int pi = 4; pi < 8; ++pi)
+  {
+    mpChordPadButtons[pi] = new wxButton(pPanel, ID_CHORD_PAD_BASE + pi, sPadLabels[pi], wxDefaultPosition, FromDIP(wxSize(-1, 38)));
+    pRow2->Add(mpChordPadButtons[pi], 1, wxALL | wxEXPAND, FromDIP(3));
+  }
+  pPadsBox->Add(pRow2, 0, wxEXPAND | wxALL, FromDIP(2));
+
+  wxStaticText* pPadHint = new wxStaticText(pPanel, wxID_ANY, "Click any pad to preview the harmony voicing instantly based on the detected key signature.");
+  pPadsBox->Add(pPadHint, 0, wxLEFT | wxRIGHT | wxTOP, FromDIP(4));
+  pSizer->Add(pPadsBox, 0, wxALL | wxEXPAND, FromDIP(4));
+
+  pPanel->SetSizer(pSizer);
+  return pPanel;
+}
+
+//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZAutoAccompanimentDialog::UpdateGenerateButtonLabel()
 {
@@ -710,6 +778,8 @@ void JZAutoAccompanimentDialog::UpdateGenerateButtonLabel()
     case 1: mpGenerateButton->SetLabel("Generate Strum / Pluck"); break;
     case 2: mpGenerateButton->SetLabel("Generate Riff / Hook"); break;
     case 3: mpGenerateButton->SetLabel("Generate Auto-Solo"); break;
+    case 4: mpGenerateButton->SetLabel("Apply Groove & Expression"); break;
+    case 5: mpGenerateButton->SetLabel("Generate Session Band"); break;
     default: mpGenerateButton->SetLabel("Generate Selected"); break;
   }
 }
@@ -758,7 +828,7 @@ void JZAutoAccompanimentDialog::OnAuditionPreview(wxCommandEvent& Event)
   int page = mpNotebook->GetSelection();
   JZTrack dummyTrack;
 
-  if (page == 0) // Band Preview: C Major / G7 preview
+  if (page == 0 || page >= 4) // Band or Groove / Chord Pads Preview: C Major / G7 preview
   {
     // Bass note
     JZKeyOnEvent bass1(0, 1, 36 /* C2 */, 95, 400);
@@ -914,7 +984,7 @@ void JZAutoAccompanimentDialog::OnExportStems(wxCommandEvent& Event)
     {
       size_t slash = files[i].find_last_of("/\\");
       string fn = (slash != string::npos) ? files[i].substr(slash + 1) : files[i];
-      oss << " • " << fn << "\n";
+      oss << " - " << fn << "\n";
     }
     wxMessageBox(wxString(oss.str().c_str(), wxConvUTF8), "Multi-Track Stems Exported", wxOK | wxICON_INFORMATION, this);
   }
@@ -1175,7 +1245,7 @@ void JZAutoAccompanimentDialog::OnChordPadClicked(wxCommandEvent& Event)
 
   JZDetectedChord ch = JZAutoAccompaniment::GetChordPadChord(tonic, isMinor, padIndex);
   static const char* sPadsNames[8] = { "I (Tonic)", "ii (Supertonic)", "iii (Mediant)", "IV (Subdominant)",
-                                       "V7 (Dominant)", "vi (Submediant)", "vii° (Leading)", "bII7 (Tritone Sub)" };
+                                       "V7 (Dominant)", "vi (Submediant)", "vii dim (Leading)", "bII7 (Tritone Sub)" };
   if (mpKeyCenterLabel)
   {
     wxString msg;

@@ -32,6 +32,7 @@
 #include "Dialogs/SoundGeneratorDialog.h"
 #include "Dialogs/AudioEffectsDialog.h"
 #include "Dialogs/AutoAccompanimentDialog.h"
+#include "Dialogs/MeterChangeDialog.h"
 #include "Dialogs/RealTracksDialog.h"
 #include "Filter.h"
 #include "Globals.h"
@@ -158,6 +159,8 @@ BEGIN_EVENT_TABLE(JZTrackFrame, JZEventFrame)
   EVT_MENU(ID_MISC_RESET_MIDI, JZTrackFrame::OnReset)
 
   EVT_MENU(ID_MISC_SET_COPYRIGHT, JZTrackFrame::OnSetCopyright)
+
+  EVT_MENU(ID_MISC_METER_CHANGE, JZTrackFrame::OnMeterChange)
 
   EVT_MENU(ID_MISC_TRACK_MERGE, JZTrackFrame::OnMiscMergeTracks)
 
@@ -382,19 +385,13 @@ void JZTrackFrame::CreateMenu()
 #endif
 
   wxMenu* pMiscMenu = new wxMenu;
-  pMiscMenu->Append(ID_MISC_TRACK_MERGE, "Mer&ge Tracks...");
-  pMiscMenu->Append(ID_MISC_SPLIT_TRACKS, "&Split Tracks...");
-  pMiscMenu->Append(ID_MISC_METER_CHANGE, "&Meter Change...");
-  pMiscMenu->Append(ID_MISC_RESET_MIDI, "&Reset Midi");
-#if 0
-  pMiscMenu->Append(MEN_RHYTHM,      "Random R&hythm...");
-  pMiscMenu->Append(MEN_SHUFFLE,     "Random Sh&uffle...");
-  pMiscMenu->Append(MEN_GENMELDY,    "Random Melod&y...");
-  pMiscMenu->Append(MEN_ARPEGGIO,    "Random Arpeggio...");
-  pMiscMenu->Append(MEN_MAPPER,      "Ma&pper...");
-  pMiscMenu->Append(MEN_EVENTLIST,   "Event &List...");
-#endif
-  pMiscMenu->Append(ID_MISC_SET_COPYRIGHT, "&Set Music Copyright...");
+  pMiscMenu->Append(ID_MISC_METER_CHANGE, "&Meter / Time Signature Change...");
+  pMiscMenu->AppendSeparator();
+  pMiscMenu->Append(ID_MISC_TRACK_MERGE, "Mer&ge Tracks into Track 1...");
+  pMiscMenu->Append(ID_MISC_SPLIT_TRACKS, "&Split Track 1 by Channel...");
+  pMiscMenu->AppendSeparator();
+  pMiscMenu->Append(ID_MISC_RESET_MIDI, "&Reset MIDI (Panic / All Notes Off)");
+  pMiscMenu->Append(ID_MISC_SET_COPYRIGHT, "&Set Music Copyright Notice...");
 
   mpToolsMenu = new wxMenu;
   mpToolsMenu->Append(ID_PIANOWIN, "&Piano Roll...\tCtrl+P");
@@ -1177,13 +1174,14 @@ void JZTrackFrame::OnReset(wxCommandEvent& Event)
   {
     gpMidiPlayer->AllNotesOff(true);
   }
+  SetStatusText("MIDI Reset sent: All notes off & controllers cleared.");
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnSetCopyright(wxCommandEvent& Event)
 {
-  JZTrack* pTrack = gpProject->GetTrack(0);
+  JZTrack* pTrack = gpProject ? gpProject->GetTrack(0) : 0;
   if (!pTrack)
   {
     return;
@@ -1194,6 +1192,23 @@ void JZTrackFrame::OnSetCopyright(wxCommandEvent& Event)
   if (!result.empty())
   {
     pTrack->SetCopyright(const_cast<char*>(static_cast<const char*>(result.mb_str())));
+    SetStatusText("Copyright notice updated.");
+  }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnMeterChange(wxCommandEvent& Event)
+{
+  JZMeterChangeDialog MeterChangeDialog(this);
+  if (MeterChangeDialog.ShowModal() == wxID_OK)
+  {
+    if (mpTrackWindow)
+    {
+      mpTrackWindow->Refresh();
+    }
+    JZProjectManager::Instance()->UpdateAllViews();
+    SetStatusText("Time signature / meter updated.");
   }
 }
 
@@ -1201,7 +1216,12 @@ void JZTrackFrame::OnSetCopyright(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnMiscMergeTracks(wxCommandEvent& Event)
 {
-  if (wxMessageBox("Merge all tracks into Track 0?", "Merge Tracks", wxYES_NO | wxICON_QUESTION, this) != wxYES)
+  if (!gpProject || gpProject->GetTrackCount() <= 1)
+  {
+    wxMessageBox("There are no additional tracks to merge.", "Merge Tracks", wxOK | wxICON_INFORMATION, this);
+    return;
+  }
+  if (wxMessageBox("Merge all tracks (Tracks 2..N) into Track 1?\n(Original track notes will be safely consolidated into Track 1)", "Merge Tracks", wxYES_NO | wxICON_QUESTION, this) != wxYES)
   {
     return;
   }
@@ -1211,28 +1231,40 @@ void JZTrackFrame::OnMiscMergeTracks(wxCommandEvent& Event)
   {
     return;
   }
+  int totalEventsMerged = 0;
   for (int i = 1; i < gpProject->GetTrackCount(); ++i)
   {
     JZTrack* pTrack = gpProject->GetTrack(i);
+    if (!pTrack) continue;
     JZEventIterator iter(pTrack);
     JZEvent* pEvent = iter.First();
     while (pEvent)
     {
       JZEvent* next = iter.Next();
+      JZEvent* pCopy = pEvent->Copy();
+      pTrack0->Put(pCopy);
       pTrack->Kill(pEvent);
-      pTrack0->Put(pEvent);
+      ++totalEventsMerged;
       pEvent = next;
     }
+    pTrack->Cleanup();
   }
+  pTrack0->Cleanup();
   JZProjectManager::Instance()->UpdateAllViews();
+  SetStatusText(wxString::Format("Merged %d events into Track 1.", totalEventsMerged));
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnMiscSplitTracks(wxCommandEvent& Event)
 {
+  if (!gpProject) return;
   JZTrack* pTrack0 = gpProject->GetTrack(0);
   if (!pTrack0)
+  {
+    return;
+  }
+  if (wxMessageBox("Split MIDI channel events from Track 1 into separate tracks (Tracks 2..N)?", "Split Tracks", wxYES_NO | wxICON_QUESTION, this) != wxYES)
   {
     return;
   }
@@ -1248,6 +1280,7 @@ void JZTrackFrame::OnMiscSplitTracks(wxCommandEvent& Event)
     }
     pEvent = iter.Next();
   }
+  int totalSplit = 0;
   for (size_t i = 0; i < toMove.size(); ++i)
   {
     JZEvent* ev = toMove[i];
@@ -1256,11 +1289,23 @@ void JZTrackFrame::OnMiscSplitTracks(wxCommandEvent& Event)
     if (destTrackIdx < gpProject->GetTrackCount())
     {
       JZTrack* destTrack = gpProject->GetTrack(destTrackIdx);
-      pTrack0->Kill(ev);
-      destTrack->Put(ev);
+      if (destTrack)
+      {
+        JZEvent* pCopy = ev->Copy();
+        destTrack->Put(pCopy);
+        pTrack0->Kill(ev);
+        ++totalSplit;
+      }
     }
   }
+  pTrack0->Cleanup();
+  for (int i = 1; i < gpProject->GetTrackCount(); ++i)
+  {
+    JZTrack* destTrack = gpProject->GetTrack(i);
+    if (destTrack) destTrack->Cleanup();
+  }
   JZProjectManager::Instance()->UpdateAllViews();
+  SetStatusText(wxString::Format("Split %d channel events from Track 1 into separate tracks.", totalSplit));
 }
 
 //-----------------------------------------------------------------------------

@@ -1,4 +1,5 @@
 #include "LiveStreamHealthTelemetryEngine.h"
+#include <cstdint>
 #include <cmath>
 #include <algorithm>
 

@@ -6,6 +6,7 @@
 //*****************************************************************************
 
 #include "PluginCrashSandboxEngine.h"
+#include <cstdint>
 #include <algorithm>
 #include <cstring>
 

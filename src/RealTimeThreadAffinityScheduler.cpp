@@ -5,6 +5,7 @@
 //*****************************************************************************
 
 #include "RealTimeThreadAffinityScheduler.h"
+#include <cstdint>
 #include <thread>
 #include <cmath>
 #include <algorithm>

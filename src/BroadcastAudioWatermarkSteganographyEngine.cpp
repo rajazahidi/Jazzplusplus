@@ -6,6 +6,7 @@
 //=============================================================================
 
 #include "BroadcastAudioWatermarkSteganographyEngine.h"
+#include <cstdint>
 #include <algorithm>
 
 namespace Jazz {

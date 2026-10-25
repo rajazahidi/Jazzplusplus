@@ -6,6 +6,7 @@
 //=============================================================================
 
 #include "LockFreeAudioBufferPoolAllocator.h"
+#include <cstdint>
 #include <algorithm>
 
 namespace Jazz {

@@ -6,6 +6,7 @@
 //*****************************************************************************
 
 #include "DynamicHermodeTuningEngine.h"
+#include <cstdint>
 #include <cmath>
 #include <algorithm>
 

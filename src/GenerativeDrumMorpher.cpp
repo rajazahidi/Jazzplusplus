@@ -1,4 +1,5 @@
 #include "GenerativeDrumMorpher.h"
+#include <cstdint>
 #include <algorithm>
 #include <cmath>
 

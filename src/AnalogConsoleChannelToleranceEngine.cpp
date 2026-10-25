@@ -6,6 +6,7 @@
 
 #include "AnalogConsoleChannelToleranceEngine.h"
 #include <cmath>
+#include <cstdint>
 #include <algorithm>
 
 namespace Jazz {

@@ -3914,7 +3914,7 @@ void TestAutoAccompanimentLogic()
   // 195. Reactive Load Box Speaker Impedance Simulation Engine
   {
   Jazz::JZReactiveLoadSpeakerImpedanceEngine loadBox(48000.0f);
-  loadBox.setCabinetType(Jazz::SpeakerCabinetType::CAB_4X12_VINTAGE30);
+  loadBox.setCabinetType(Jazz::SpeakerCabinetType::VINTAGE_4X12_V30);
   loadBox.setPowerSagAmount(0.35f);
 
   const size_t loadN = 256;
@@ -3922,7 +3922,7 @@ void TestAutoAccompanimentLogic()
   std::vector<float> loadOutL(loadN, 0.0f), loadOutR(loadN, 0.0f);
   loadBox.process(loadInL.data(), loadInR.data(), loadOutL.data(), loadOutR.data(), loadN);
 
-  TEST_ASSERT(loadBox.getCabinetType() == Jazz::SpeakerCabinetType::CAB_4X12_VINTAGE30 &&
+  TEST_ASSERT(loadBox.getCabinetType() == Jazz::SpeakerCabinetType::VINTAGE_4X12_V30 &&
               loadBox.getResonanceFreqHz() == 75.0f &&
               loadBox.getImpedancePeakOhms() == 32.0f &&
               loadBox.getPowerSagAmount() == 0.35f &&

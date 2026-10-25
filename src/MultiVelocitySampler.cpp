@@ -5,6 +5,7 @@
 //*****************************************************************************
 
 #include "MultiVelocitySampler.h"
+#include <cstdint>
 
 JZMultiVelocitySampler::JZMultiVelocitySampler(float sampleRate, int maxPolyphony)
   : mSampleRate(sampleRate > 1000.0f ? sampleRate : 44100.0f),

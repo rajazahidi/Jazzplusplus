@@ -5,6 +5,7 @@
 //*****************************************************************************
 
 #include "ConvolutionEngine.h"
+#include <cstdint>
 
 JZConvolutionEngine::JZConvolutionEngine(float sampleRate)
   : mSampleRate(sampleRate > 1000.0f ? sampleRate : 44100.0f),

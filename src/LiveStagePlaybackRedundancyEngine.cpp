@@ -5,6 +5,7 @@
 //*****************************************************************************
 
 #include "LiveStagePlaybackRedundancyEngine.h"
+#include <cstdint>
 #include <cmath>
 #include <algorithm>
 

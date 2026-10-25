@@ -5,6 +5,7 @@
 //*****************************************************************************
 
 #include "AudioWatermarkProvenanceEngine.h"
+#include <cstdint>
 #include <iomanip>
 #include <sstream>
 #include <algorithm>

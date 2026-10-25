@@ -1,4 +1,5 @@
 #include "NetworkSessionEngine.h"
+#include <cstdint>
 #include <algorithm>
 #include <cstring>
 

@@ -10,7 +10,9 @@
     - Added NumBars() measure calculation to JZSong (src/Song.h).
     - Added GetSong() and GetTicksPerBar() to JZProject (src/Project.h).
     - Fixed wxSingleChoiceDialog include (<wx/choicdlg.h>) and wxBookCtrlEvent (<wx/bookctrl.h>) in AutoAccompanimentDialog.
-    - Fixed missing <cstdint> in AnalogTapeFlutterModeler, CLEAN_AMERICAN_6L6 enum typo in GuitarAmpProfiler, and mDropoutCountdown in VintageCassetteLoFiTapeEngine.
+    - Fixed missing <cstdint> across all DSP engine headers and source files for GCC/Linux compatibility.
+    - Corrected SpeakerCabinetType::VINTAGE_4X12_V30 enum reference in Reactive Load Box unit test.
+    - Fixed CLEAN_AMERICAN_6L6 enum typo in GuitarAmpProfiler, and mDropoutCountdown in VintageCassetteLoFiTapeEngine.
 
 25-10-2026 Raja Zahidi
 - Feature & Master Studio Out-of-Process Plugin Sandbox, Multichannel 7.1.4 Atmos Loudness Meter, Broadcast Wave iXML Exporter, GPU Waveform Tile Cache, Complex Sidechain ADC Graph Resolver, & Dynamic Hermode Micro-Tuning Suite v35.0 (Apex Transcendence Sovereign Ultimate Release):

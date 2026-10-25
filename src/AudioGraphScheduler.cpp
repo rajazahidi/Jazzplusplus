@@ -1,4 +1,5 @@
 #include "AudioGraphScheduler.h"
+#include <cstdint>
 #include <queue>
 #include <algorithm>
 

@@ -5,6 +5,7 @@
 //*****************************************************************************
 
 #include "PtpClockPrecisionSyncEngine.h"
+#include <cstdint>
 #include <cmath>
 #include <algorithm>
 

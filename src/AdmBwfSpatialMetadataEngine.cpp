@@ -1,4 +1,5 @@
 #include "AdmBwfSpatialMetadataEngine.h"
+#include <cstdint>
 #include <algorithm>
 #include <sstream>
 #include <cstring>

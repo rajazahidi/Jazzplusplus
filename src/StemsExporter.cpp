@@ -5,6 +5,7 @@
 //*****************************************************************************
 
 #include "StemsExporter.h"
+#include <cstdint>
 #include <cstring>
 #include <sstream>
 

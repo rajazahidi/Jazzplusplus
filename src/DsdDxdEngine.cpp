@@ -5,6 +5,7 @@
 //*****************************************************************************
 
 #include "DsdDxdEngine.h"
+#include <cstdint>
 #include <algorithm>
 #include <cmath>
 

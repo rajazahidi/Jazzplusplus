@@ -1,4 +1,5 @@
 #include "Ara2HostBridge.h"
+#include <cstdint>
 #include <algorithm>
 
 namespace Jazz {

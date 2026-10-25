@@ -1,4 +1,5 @@
 #include "SmpteTimecodeEngine.h"
+#include <cstdint>
 #include <iomanip>
 #include <sstream>
 #include <cmath>

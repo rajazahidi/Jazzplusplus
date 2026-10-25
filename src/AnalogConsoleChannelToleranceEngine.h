@@ -16,6 +16,7 @@
 #include <string>
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <algorithm>
 
 namespace Jazz {

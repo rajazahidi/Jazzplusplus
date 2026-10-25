@@ -5,6 +5,7 @@
 //*****************************************************************************
 
 #include "AdaptiveHermodeTuningEngine.h"
+#include <cstdint>
 #include <algorithm>
 #include <cmath>
 

@@ -5,6 +5,7 @@
 //*****************************************************************************
 
 #include "AutoAccompaniment.h"
+#include <cstdint>
 #include "Song.h"
 #include "Track.h"
 #include "Events.h"

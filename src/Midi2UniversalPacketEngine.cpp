@@ -1,4 +1,5 @@
 #include "Midi2UniversalPacketEngine.h"
+#include <cstdint>
 #include <algorithm>
 
 namespace Jazz {

@@ -5,6 +5,7 @@
 //*****************************************************************************
 
 #include "MidiHumanizerProbability.h"
+#include <cstdint>
 
 JZMidiHumanizerProbability::JZMidiHumanizerProbability(uint32_t seed)
   : mRng(seed)

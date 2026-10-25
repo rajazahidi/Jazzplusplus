@@ -5,6 +5,7 @@
 //*****************************************************************************
 
 #include "DitherFormatEncoder.h"
+#include <cstdint>
 #include "StemsExporter.h" // For WAV header utility
 
 JZDitherFormatEncoder::JZDitherFormatEncoder()

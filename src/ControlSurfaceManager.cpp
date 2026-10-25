@@ -1,4 +1,5 @@
 #include "ControlSurfaceManager.h"
+#include <cstdint>
 #include <algorithm>
 #include <cstring>
 

@@ -1,4 +1,5 @@
 #include "PluginHostBridge.h"
+#include <cstdint>
 #include <algorithm>
 #include <cstring>
 #include <cmath>

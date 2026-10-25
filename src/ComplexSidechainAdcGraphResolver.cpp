@@ -6,6 +6,7 @@
 //*****************************************************************************
 
 #include "ComplexSidechainAdcGraphResolver.h"
+#include <cstdint>
 #include <algorithm>
 #include <queue>
 

@@ -6,6 +6,7 @@
 //*****************************************************************************
 
 #include "BroadcastWaveIxmlExporterEngine.h"
+#include <cstdint>
 #include <cstring>
 #include <sstream>
 #include <algorithm>

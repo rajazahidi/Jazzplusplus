@@ -6,6 +6,7 @@
 //*****************************************************************************
 
 #include "GpuWaveformTileCacheEngine.h"
+#include <cstdint>
 #include <cmath>
 #include <chrono>
 

@@ -5,6 +5,7 @@
 //*****************************************************************************
 
 #include "PolyphonicNeuralAudioToMidiEngine.h"
+#include <cstdint>
 #include <cmath>
 #include <sstream>
 #include <iomanip>

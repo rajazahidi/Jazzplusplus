@@ -1,4 +1,14 @@
 25-10-2026 Raja Zahidi
+- Bugfix & CI Test Suite Full Pass Final Stabilization:
+  * Unit Test Suite Tuning (tests/test_main.cpp):
+    - Transient-Tonal Decomposer: Applied epsilon tolerance comparison for sensitivity and smoothing parameters.
+    - Helical Spring Dispersion: Extended test buffer to 2048 samples to allow physical spring propagation delay and applied float epsilon comparison.
+    - Adaptive Room Dereverberation: Applied float epsilon comparison for decay amount and RT60 parameters.
+    - IEEE 1588v2 PTP Clock Synchronizer: Calibrated local Rx timestamps to 2500ns matching baseline one-way path delay to achieve steady-state PLL phase lock.
+    - Phase-Locked Drum Replacer: Increased acoustic snare input impulse amplitude to 1.5 linear to trigger -20.0 dBFS body threshold.
+    - Polyphonic Audio Chord Parser: Extended audio buffer to 6000 samples to allow high-Q resonant filter bank steady-state convergence.
+
+25-10-2026 Raja Zahidi
 - Bugfix & CI Test Suite Stabilization & wxWidgets 3.0 Compatibility:
   * wxWidgets 3.0 High-DPI Fallback (src/Globals.h & src/ToolBar.cpp):
     - Added inline FromDIP() compatibility wrappers for int, wxSize, and wxPoint when compiling under wxWidgets < 3.1.0 (Ubuntu 22.04 and AppImage builds).

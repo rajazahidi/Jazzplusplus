@@ -119,6 +119,7 @@ set(JAZZ_SOURCES
     src/AdmBwfSpatialMetadataEngine.cpp
     src/AiMelodyCounterpointGenerator.cpp
     src/AnalogBbdChorusDimensionEngine.cpp
+    src/AnalogConsoleChannelToleranceEngine.cpp
     src/AnalogSubharmonicBassExciterEngine.cpp
     src/AnalogTapeFlutterModeler.cpp
     src/Ara2HostBridge.cpp
@@ -139,6 +140,7 @@ set(JAZZ_SOURCES
     src/AutonomousMixAssistantEngine.cpp
     src/BinauralAcousticRoomConvolverEngine.cpp
     src/BinauralHrtfSpatializer.cpp
+    src/BinauralRoomImpulseInterpolationEngine.cpp
     src/BiomechanicalVocalTractEngine.cpp
     src/BodeFrequencyShifterWaveMultiplierEngine.cpp
     src/BrickwallClipperEngine.cpp
@@ -244,6 +246,7 @@ set(JAZZ_SOURCES
     src/LiveStagePlaybackRedundancyEngine.cpp
     src/LiveStreamHealthTelemetryEngine.cpp
     src/LoudnessMeterEBU.cpp
+    src/LoudnessRangeDynamicsSculptorEngine.cpp
     src/Mapper.cpp
     src/MasterBusGlueVcaCompressorEngine.cpp
     src/MasterLinearPhaseImager.cpp
@@ -280,8 +283,10 @@ set(JAZZ_SOURCES
     src/NeuralStemSeparatorEngine.cpp
     src/NeuralTimbreTransferEngine.cpp
     src/OpticalFilmAudioRestorationEngine.cpp
+    src/OpticalT4LevelingAmplifierEngine.cpp
     src/PersonalizedPinnaAcousticModeler.cpp
     src/PhaseAlignerEngine.cpp
+    src/PhaseLockedDrumReplacerEngine.cpp
     src/PhysicalResonator.cpp
     src/PianoFrame.cpp
     src/PianoScaleChordHelper.cpp
@@ -330,6 +335,7 @@ set(JAZZ_SOURCES
     src/SpectralAudioMorphEngine.cpp
     src/SpectralDenoise.cpp
     src/SpectralRebalanceEngine.cpp
+    src/SpectralResonanceSuppressorEngine.cpp
     src/SpectralResonanceTamer.cpp
     src/SpectralSidechainUnmaskerEngine.cpp
     src/SpeechDenoiseSpectralSubtractorEngine.cpp

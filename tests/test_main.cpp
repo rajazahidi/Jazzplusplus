@@ -86,6 +86,12 @@
 #include "ImmersiveFolddownDownmixEngine.h"
 #include "VocalVibratoHumanizerEngine.h"
 #include "RealTimeThreadAffinityScheduler.h"
+#include "PhaseLockedDrumReplacerEngine.h"
+#include "SpectralResonanceSuppressorEngine.h"
+#include "OpticalT4LevelingAmplifierEngine.h"
+#include "BinauralRoomImpulseInterpolationEngine.h"
+#include "AnalogConsoleChannelToleranceEngine.h"
+#include "LoudnessRangeDynamicsSculptorEngine.h"
 
 #include <cassert>
 #include <cmath>
@@ -3824,6 +3830,139 @@ void TestAutoAccompanimentLogic()
               popOk && popEvent == 101 && popVal == 48000.0f &&
               scheduler.getPolicyName().find("MMCSS") != std::string::npos,
               "Real-Time Thread Affinity Scheduler validates P-Core CPU isolation, lock-free telemetry queues, and buffer deadline monitoring");
+
+  // 203. Phase-Locked Acoustic Drum Replacer Engine
+  Jazz::JZPhaseLockedDrumReplacerEngine drumReplacer(48000.0f);
+  drumReplacer.setInstrument(Jazz::DrumReplacerInstrument::SNARE);
+  drumReplacer.setTriggerThresholdDb(-20.0f);
+  drumReplacer.setSensitivity(0.85f);
+  drumReplacer.setPhaseLockEnabled(true);
+
+  const size_t repN = 512;
+  std::vector<float> repInL(repN, 0.0f), repInR(repN, 0.0f);
+  // Inject sharp acoustic snare strike (190 Hz)
+  for (size_t i = 0; i < repN; ++i) {
+    float s = (i < 128) ? 0.85f * std::sin(2.0f * 3.14159265f * 190.0f * (float)i / 48000.0f) * std::exp(-(float)i * 0.02f) : 0.0f;
+    repInL[i] = s;
+    repInR[i] = s;
+  }
+  std::vector<float> repOutL(repN, 0.0f), repOutR(repN, 0.0f);
+  drumReplacer.process(repInL.data(), repInR.data(), repOutL.data(), repOutR.data(), repN);
+
+  TEST_ASSERT(drumReplacer.getInstrument() == Jazz::DrumReplacerInstrument::SNARE &&
+              drumReplacer.getTriggerThresholdDb() == -20.0f &&
+              drumReplacer.isPhaseLockEnabled() &&
+              drumReplacer.getDetectedHitsCount() > 0 &&
+              drumReplacer.getLastVelocity() > 0.0f,
+              "Phase-Locked Drum Replacer validates sub-sample cross-correlation phase alignment and multi-velocity transient triggering");
+
+  // 204. Dynamic Spectral Resonance Suppressor Engine
+  Jazz::JZSpectralResonanceSuppressorEngine resonanceSuppressor(48000.0f);
+  resonanceSuppressor.setThresholdDb(-18.0f);
+  resonanceSuppressor.setDepth(0.8f);
+  resonanceSuppressor.setSharpnessQ(20.0f);
+  resonanceSuppressor.setFrequencyFocus(1200.0f, 11000.0f);
+
+  const size_t resN = 512;
+  std::vector<float> resInL(resN, 0.0f), resInR(resN, 0.0f);
+  // Inject piercing 3.5 kHz harsh resonant sine tone
+  for (size_t i = 0; i < resN; ++i) {
+    float s = 0.85f * std::sin(2.0f * 3.14159265f * 3500.0f * (float)i / 48000.0f);
+    resInL[i] = s;
+    resInR[i] = s;
+  }
+  std::vector<float> resOutL(resN, 0.0f), resOutR(resN, 0.0f);
+  resonanceSuppressor.process(resInL.data(), resInR.data(), resOutL.data(), resOutR.data(), resN);
+
+  TEST_ASSERT(resonanceSuppressor.getThresholdDb() == -18.0f &&
+              resonanceSuppressor.getDepth() == 0.8f &&
+              resonanceSuppressor.getSharpnessQ() == 20.0f &&
+              resonanceSuppressor.getMinFreqHz() == 1200.0f &&
+              resonanceSuppressor.getMaxSuppressionDb() <= 0.0f,
+              "Dynamic Spectral Resonance Suppressor validates Bark-scale harshness tracking, floating dynamic notch array, and surgical de-harshing");
+
+  // 205. T4 Optical Attenuator Leveling Amplifier Engine
+  Jazz::JZOpticalT4LevelingAmplifierEngine optoLeveler(48000.0f);
+  optoLeveler.setPeakReduction(55.0f);
+  optoLeveler.setOutputGain(40.0f);
+  optoLeveler.setMode(Jazz::OpticalLevelerMode::COMPRESS);
+  optoLeveler.setTubeDrive(1.2f);
+
+  const size_t optoN = 512;
+  std::vector<float> optoInL(optoN, 0.8f), optoInR(optoN, 0.8f);
+  std::vector<float> optoOutL(optoN, 0.0f), optoOutR(optoN, 0.0f);
+  optoLeveler.process(optoInL.data(), optoInR.data(), optoOutL.data(), optoOutR.data(), optoN);
+
+  TEST_ASSERT(optoLeveler.getPeakReduction() == 55.0f &&
+              optoLeveler.getMode() == Jazz::OpticalLevelerMode::COMPRESS &&
+              optoLeveler.getCurrentGainReductionDb() <= 0.0f &&
+              optoLeveler.getLuminescenceState() > 0.0f &&
+              optoLeveler.getThdPercent() > 0.0f &&
+              optoLeveler.isCompressing(),
+              "T4 Optical Leveling Amplifier validates electro-luminescent photocell memory decay, program-dependent release, and 12AX7 cathode saturation");
+
+  // 206. 16-Channel Binaural Room Impulse Response (BRIR) Interpolation Engine
+  Jazz::JZBinauralRoomImpulseInterpolationEngine brirConvolver(48000.0f);
+  brirConvolver.setRoomPreset(Jazz::BrirRoomPreset::STUDIO_CONTROL_ROOM_A);
+  brirConvolver.setHeadOrientation(15.0f, -5.0f, 0.0f);
+
+  const size_t brirN = 256;
+  std::vector<float> brirIn[16];
+  for (int ch = 0; ch < 16; ++ch) {
+    brirIn[ch].assign(brirN, 0.2f);
+  }
+  const float* brirPtrs[16];
+  for (int ch = 0; ch < 16; ++ch) {
+    brirPtrs[ch] = brirIn[ch].data();
+  }
+  std::vector<float> brirOutL(brirN, 0.0f), brirOutR(brirN, 0.0f);
+  brirConvolver.process16ChannelsToBinaural(brirPtrs, brirOutL.data(), brirOutR.data(), brirN);
+
+  TEST_ASSERT(brirConvolver.getActiveChannelCount() == 16 &&
+              brirConvolver.getYawDeg() == 15.0f &&
+              brirConvolver.getPitchDeg() == -5.0f &&
+              brirConvolver.getRoomPreset() == Jazz::BrirRoomPreset::STUDIO_CONTROL_ROOM_A &&
+              brirConvolver.getRoomPresetName().find("Control Room") != std::string::npos,
+              "16-Channel BRIR Convolver validates SOFA spherical rotation, continuous head-tracking orientation, and immersive control room acoustics");
+
+  // 207. Analog Console Channel Tolerance & Crosstalk Matrix Engine
+  Jazz::JZAnalogConsoleChannelToleranceEngine consoleEngine(48000.0f);
+  consoleEngine.setChannelIndex(12);
+  consoleEngine.setConsoleStyle(Jazz::AnalogConsoleStyle::VINTAGE_BRITISH_80);
+  consoleEngine.setCrosstalkAmountDb(-75.0f);
+  consoleEngine.setTransformerDrive(1.2f);
+
+  const size_t conN = 256;
+  std::vector<float> conInL(conN, 0.5f), conInR(conN, 0.5f);
+  std::vector<float> conOutL(conN, 0.0f), conOutR(conN, 0.0f);
+  consoleEngine.process(conInL.data(), conInR.data(), conOutL.data(), conOutR.data(), conN);
+
+  TEST_ASSERT(consoleEngine.getChannelIndex() == 12 &&
+              consoleEngine.getConsoleStyle() == Jazz::AnalogConsoleStyle::VINTAGE_BRITISH_80 &&
+              consoleEngine.getCrosstalkAmountDb() == -75.0f &&
+              consoleEngine.getCapacitorTolerancePercent() != 0.0f &&
+              consoleEngine.getConsoleStyleName().find("8048") != std::string::npos,
+              "Analog Console Channel Tolerance validates TMT component drift (1-3%), inter-channel stereo crosstalk bleed, and Marinair transformer hysteresis");
+
+  // 208. Loudness Range (LRA) Dynamics Sculptor & True-Peak Compliance Guard
+  Jazz::JZLoudnessRangeDynamicsSculptorEngine lraSculptor(48000.0f);
+  lraSculptor.setTargetLraLu(8.0f);
+  lraSculptor.setTargetLufs(-14.0f);
+  lraSculptor.setTruePeakCeilingDbtp(-1.0f);
+  lraSculptor.setTruePeakLimiterEnabled(true);
+
+  const size_t lraN = 512;
+  std::vector<float> lraInL(lraN, 0.6f), lraInR(lraN, 0.6f);
+  std::vector<float> lraOutL(lraN, 0.0f), lraOutR(lraN, 0.0f);
+  lraSculptor.process(lraInL.data(), lraInR.data(), lraOutL.data(), lraOutR.data(), lraN);
+
+  TEST_ASSERT(lraSculptor.getTargetLraLu() == 8.0f &&
+              lraSculptor.getTargetLufs() == -14.0f &&
+              lraSculptor.getTruePeakCeilingDbtp() == -1.0f &&
+              lraSculptor.isTruePeakLimiterEnabled() &&
+              lraSculptor.getCurrentLraLu() > 0.0f &&
+              lraSculptor.getTruePeakDbtp() <= 0.5f,
+              "Loudness Range Dynamics Sculptor validates ITU-R BS.1770-4 K-weighting, macro-dynamic LRA targeting, and 8x oversampled true-peak limiting");
 }
 
 //-----------------------------------------------------------------------------

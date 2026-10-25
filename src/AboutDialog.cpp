@@ -60,6 +60,7 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
     mpLogo(0),
     mpBitmap(0)
 {
+  SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
   mpLogo = new wxBitmap((const char **) JazzLogo_xpm);
   mpBitmap = new wxStaticBitmap(this, wxID_ANY, *mpLogo);
 
@@ -67,8 +68,9 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
     this,
     wxID_ANY,
     wxDefaultPosition,
-    wxSize(450, 150),
-    wxBORDER_SUNKEN | wxHW_SCROLLBAR_AUTO);
+    wxSize(450, 180),
+    wxBORDER_NONE | wxHW_SCROLLBAR_AUTO);
+  pHtmlWindow->SetDoubleBuffered(true);
   pHtmlWindow->SetBackgroundColour(*wxWHITE);
   pHtmlWindow->Bind(wxEVT_ERASE_BACKGROUND, [pHtmlWindow](wxEraseEvent& event) {
     wxDC* pDc = event.GetDC();
@@ -101,7 +103,7 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
   // Indicate the build date.
   InformationString += "Program build date: " __DATE__ "<br>";
 
-  wxString Paragraph1String = "Jazz++ is a MIDI Sequencer.";
+  wxString Paragraph1String = "Jazz++ is an advanced MIDI &amp; Audio Sequencer workstation.";
 
 //  wxString Paragraph2String = "Jazz++ is a MIDI sequencer program.";
 
@@ -110,12 +112,16 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
     "<head><META http-equiv=\"Content-Type\" content=\"text/html; charset=" +
     LocaleString + "\">"
     "<style>"
-    "body { background-color: #ffffff; color: #000000; margin: 4px; }"
-    "table { border: 0px; border-collapse: collapse; }"
-    "td, th { border: 0px; padding: 2px; }"
+    "body { background-color: #ffffff; color: #1e293b; margin: 8px 12px; font-family: -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif; line-height: 1.4; }"
+    "hr { display: none; }"
+    "h3 { margin: 4px 0 2px 0; color: #0f172a; text-align: center; }"
+    "h5 { margin: 10px 0 4px 0; color: #475569; text-align: center; text-transform: uppercase; font-size: 11px; }"
+    "p { margin: 4px 0; font-size: 11px; text-align: center; }"
+    "table { border: 0; width: 100%; border-collapse: collapse; margin-top: 4px; }"
+    "td { border: 0; padding: 3px 6px; vertical-align: top; font-size: 11px; }"
     "</style>"
     "</head>"
-    "<body bgcolor=\"#ffffff\" text=\"#000000\">"
+    "<body bgcolor=\"#ffffff\" text=\"#1e293b\">"
     "<font size=2>"
 
     "<center><h3>" "Jazz++ " + VersionString + "</h3></center>"
@@ -135,26 +141,26 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
 
     "<table border=0 cellpadding=2 cellspacing=0>"
     "<tr>"
-     "<td>Pete Stieber</td>"
+     "<td><b>Pete Stieber</b></td>"
      "<td>" + "Lead Developer" + "</td>"
     "</tr>"
     "<tr>"
-     "<td>Patrick Earl</td>"
+     "<td><b>Patrick Earl</b></td>"
      "<td>" + "Developer" + "</td>"
     "</tr>"
     "<tr>"
-     "<td>Kevin Cosgrove</td>"
+     "<td><b>Kevin Cosgrove</b></td>"
      "<td>" + "Developer. Also maintains RPM packages." + "</td>"
     "</tr>"
     "<tr>"
-     "<td>Dave Fancella</td>"
+     "<td><b>Dave Fancella</b></td>"
      "<td>" +
-       "Developer. Also wrote the first version of the JazzPlusPlus website"
-       "hosted on sourceforge." +
+       "Developer. Also wrote the first version of the JazzPlusPlus website "
+       "hosted on SourceForge." +
      "</td>"
     "</tr>"
     "<tr>"
-      "<td>Joakim Verona</td>"
+      "<td><b>Joakim Verona</b></td>"
       "<td>" +
         "Developer. Wrote most of the original wxWidgets 2.4 port of Jazz++." +
       "</td>"
@@ -170,14 +176,13 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
     "</table>"
 
     "<center>"
-    "<h5>" "Other contributors:" "</h5>"
+    "<h5>" "Other contributors" "</h5>"
     "<p>"
-    "<br>"
     "Mark Constable<br>"
     "Matt Kelly<br>"
     "<p>"
-    "<h5>" + "Special thanks:" + "</h5>"
-    "<p><br>"
+    "<h5>" + "Special thanks" + "</h5>"
+    "<p>"
     "The wxWidgets Team<br>"
     "</p>"
     "</center>"

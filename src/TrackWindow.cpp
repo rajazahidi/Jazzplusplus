@@ -138,7 +138,7 @@ void JZTrackWindow::Create()
   Dc.GetTextExtent("M", &Width, &Height);
   mLittleBit = std::max(FromDIP(3), Width / 2);
 
-  mTopInfoHeight = std::max(FromDIP(26), mFixedFontHeight + 2 * mLittleBit + FromDIP(2));
+  mTopInfoHeight = std::max(FromDIP(28), mFixedFontHeight + FromDIP(8));
 
   Dc.GetTextExtent("HXWjgi", &Width, &Height);
   mTrackHeight = std::max(FromDIP(28), Height + 2 * mLittleBit + FromDIP(4));
@@ -1051,7 +1051,7 @@ void JZTrackWindow::Draw(wxDC& Dc)
   DrawSpeed(LocalDc);
   DrawCounters(LocalDc);
 
-  LineText(LocalDc, mStateX, -1, mStateWidth, "", mTopInfoHeight);
+  LineText(LocalDc, mStateX, 0, mStateWidth, "", mTopInfoHeight);
 
   DrawEvents(LocalDc);
 
@@ -1098,7 +1098,7 @@ void JZTrackWindow::Draw(wxDC& Dc)
 void JZTrackWindow::DrawNumbers(wxDC& Dc)
 {
   const char* pString = GetNumberString();
-  LineText(Dc, 0, -1, mNumberWidth, pString, mTopInfoHeight);
+  LineText(Dc, 0, 0, mNumberWidth, pString, mTopInfoHeight);
 
   Dc.SetClippingRegion(0, mEventsY, mNumberWidth, mEventsHeight);
   for (int i = mFromLine; i < mToLine; ++i)
@@ -1156,7 +1156,7 @@ void JZTrackWindow::DrawSpeed(wxDC& Dc, int Value, bool Down)
   LineText(
     Dc,
     mTrackNameX,
-    -1,
+    0,
     mTrackNameWidth,
     Oss.str().c_str(),
     mTopInfoHeight,
@@ -1260,7 +1260,7 @@ void JZTrackWindow::DrawCounters(wxDC& Dc)
 {
   int i;
   const char* pString = GetCounterString();
-  LineText(Dc, mPatchX, -1, mPatchWidth, pString, mTopInfoHeight);
+  LineText(Dc, mPatchX, 0, mPatchWidth, pString, mTopInfoHeight);
 
   Dc.SetClippingRegion(mPatchX, mEventsY, mPatchWidth, mEventsHeight);
   for (i = mFromLine; i < mToLine; i++)

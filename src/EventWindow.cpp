@@ -487,6 +487,11 @@ void JZEventWindow::LineText(
     Height = mTrackHeight;
     y = y2yLine(y);
   }
+  const int origX = x;
+  const int origY = y;
+  const int origW = Width;
+  const int origH = Height;
+
   if (Width && Height)
   {
     Dc.SetBrush(*mpGreyBrush);
@@ -519,8 +524,6 @@ void JZEventWindow::LineText(
       Dc.DrawLine(x,         y + Height, x + Width, y + Height);
     }
     Dc.SetPen(*wxBLACK_PEN);
-    x -= 2;
-    y -= 2;
   }
 
   if (pString && strlen(pString) > 0)
@@ -529,12 +532,9 @@ void JZEventWindow::LineText(
     Dc.SetTextBackground(*mpGreyColor);
     int TextWidth, TextHeight;
     Dc.GetTextExtent(pString, &TextWidth, &TextHeight);
-    int Margin = (Width - TextWidth) / 2;
-    if (Margin < mLittleBit)
-    {
-      Margin = mLittleBit;
-    }
-    Dc.DrawText(pString, x + Margin, y + mLittleBit);
+    int hMargin = std::max(mLittleBit, (origW - TextWidth) / 2);
+    int vMargin = std::max(1, (origH - TextHeight) / 2);
+    Dc.DrawText(pString, origX + hMargin, origY + vMargin);
     Dc.SetTextBackground(TextBackgroundColor);
   }
 }

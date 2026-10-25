@@ -75,6 +75,7 @@ static void ConfigureHelpWindowBackground(wxHtmlHelpController* pHelpCtrl)
     wxHtmlWindow* pHtml = pHelpWin->GetHtmlWindow();
     if (pHtml)
     {
+      pHtml->SetDoubleBuffered(true);
       pHtml->SetBackgroundColour(*wxWHITE);
       pHtml->Bind(wxEVT_ERASE_BACKGROUND, [pHtml](wxEraseEvent& event) {
         wxDC* pDc = event.GetDC();

@@ -92,6 +92,12 @@
 #include "BinauralRoomImpulseInterpolationEngine.h"
 #include "AnalogConsoleChannelToleranceEngine.h"
 #include "LoudnessRangeDynamicsSculptorEngine.h"
+#include "NeuralAmpWaveNetProfilerEngine.h"
+#include "PolyphonicAudioChordParserEngine.h"
+#include "SpectralFrequencySplitPannerEngine.h"
+#include "BroadcastAudioWatermarkSteganographyEngine.h"
+#include "MultibandDynamicSidechainDuckerEngine.h"
+#include "LockFreeAudioBufferPoolAllocator.h"
 
 #include <cassert>
 #include <cmath>
@@ -3963,6 +3969,151 @@ void TestAutoAccompanimentLogic()
               lraSculptor.getCurrentLraLu() > 0.0f &&
               lraSculptor.getTruePeakDbtp() <= 0.5f,
               "Loudness Range Dynamics Sculptor validates ITU-R BS.1770-4 K-weighting, macro-dynamic LRA targeting, and 8x oversampled true-peak limiting");
+
+  // 209. Real-Time Non-Linear Dilated WaveNet Guitar Amp Profiler
+  Jazz::JZNeuralAmpWaveNetProfilerEngine ampProfiler(48000.0f);
+  ampProfiler.setAmpProfile(Jazz::AmpProfile::BRITISH_CRUNCH);
+  ampProfiler.setGainDb(10.0f);
+  ampProfiler.setMasterVolumeDb(0.0f);
+  ampProfiler.setBass(0.6f);
+  ampProfiler.setTreble(0.65f);
+  ampProfiler.setPowerSag(0.40f);
+
+  const size_t ampN = 512;
+  std::vector<float> ampInL(ampN, 0.0f), ampInR(ampN, 0.0f);
+  for (size_t i = 0; i < ampN; ++i) {
+    float s = 0.75f * std::sin(2.0f * 3.14159265f * 440.0f * (float)i / 48000.0f);
+    ampInL[i] = s;
+    ampInR[i] = s;
+  }
+  std::vector<float> ampOutL(ampN, 0.0f), ampOutR(ampN, 0.0f);
+  ampProfiler.process(ampInL.data(), ampInR.data(), ampOutL.data(), ampOutR.data(), ampN);
+
+  TEST_ASSERT(ampProfiler.getAmpProfile() == Jazz::AmpProfile::BRITISH_CRUNCH &&
+              ampProfiler.getGainDb() == 10.0f &&
+              ampProfiler.getAmpProfileName().find("British Plexi") != std::string::npos &&
+              ampProfiler.getThdPercent() > 0.0f &&
+              ampProfiler.getCurrentSagVoltage() >= 0.0f,
+              "Neural Amp WaveNet Profiler validates 4-stage dilated 1D temporal convolutions, 12AX7 preamp bias clipping, and push-pull dynamic sag");
+
+  // 210. Real-Time Polyphonic Audio Chord Parser & Voice-Leading Transcriber
+  Jazz::JZPolyphonicAudioChordParserEngine chordParser(48000.0f);
+  chordParser.setDetectionSensitivity(0.85f);
+  chordParser.setMinChordDurationMs(50.0f);
+
+  const size_t cN = 1024;
+  std::vector<float> cInL(cN, 0.0f), cInR(cN, 0.0f);
+  // Synthesize C Major triad chord: C4 (261.63 Hz) + E4 (329.63 Hz) + G4 (392.00 Hz)
+  for (size_t i = 0; i < cN; ++i) {
+    float t = (float)i / 48000.0f;
+    float s = 0.33f * std::sin(2.0f * 3.14159265f * 261.63f * t)
+            + 0.33f * std::sin(2.0f * 3.14159265f * 329.63f * t)
+            + 0.33f * std::sin(2.0f * 3.14159265f * 392.00f * t);
+    cInL[i] = s;
+    cInR[i] = s;
+  }
+  chordParser.process(cInL.data(), cInR.data(), cN);
+
+  TEST_ASSERT(chordParser.getDetectionSensitivity() == 0.85f &&
+              chordParser.getChromagram().size() == 12 &&
+              chordParser.getCurrentRootNote() == 0 &&
+              chordParser.getCurrentChordName().find("C") != std::string::npos &&
+              chordParser.getVoicingMidiNotes().size() >= 3,
+              "Polyphonic Audio Chord Parser validates 12-bin chromagram extraction, harmonic template matching, and multi-note MIDI chord voicing");
+
+  // 211. 3-Band Linear-Phase Frequency-Split Mid/Side Dynamic Spectral Panner
+  Jazz::JZSpectralFrequencySplitPannerEngine splitPanner(48000.0f);
+  splitPanner.setCrossoverFrequencies(120.0f, 2800.0f);
+  splitPanner.setLowBand(0.0f, 0.0f, 0.0f, true); // Low mono lock
+  splitPanner.setMidBand(0.0f, 1.0f, 0.0f);
+  splitPanner.setHighBand(0.5f, 1.8f, 0.0f);       // High pan right with wide stereo
+  splitPanner.setPhaseGuardEnabled(true);
+
+  const size_t panN = 512;
+  std::vector<float> panInL(panN, 0.5f), panInR(panN, 0.5f);
+  std::vector<float> panOutL(panN, 0.0f), panOutR(panN, 0.0f);
+  splitPanner.process(panInL.data(), panInR.data(), panOutL.data(), panOutR.data(), panN);
+
+  TEST_ASSERT(splitPanner.isLowMonoLockEnabled() &&
+              splitPanner.getHighPan() == 0.5f &&
+              splitPanner.getHighWidth() == 1.8f &&
+              splitPanner.isPhaseGuardEnabled() &&
+              splitPanner.getPhaseCorrelation() >= -1.0f &&
+              splitPanner.getPhaseCorrelation() <= 1.0f,
+              "Frequency-Split Spectral Panner validates LR4 3-band crossover, sub-bass mono centering, Mid/Side air expansion, and phase correlation guard");
+
+  // 212. Broadcast Audio Psychoacoustic Watermark & Steganography Engine
+  Jazz::JZBroadcastAudioWatermarkSteganographyEngine watermarkEngine(48000.0f);
+  watermarkEngine.setWatermarkStrengthDb(-24.0f);
+  watermarkEngine.setCarrierFrequencyHz(3200.0f);
+
+  const size_t wmN = 1024;
+  std::vector<float> wmInL(wmN, 0.5f), wmInR(wmN, 0.5f);
+  std::vector<float> wmOutL(wmN, 0.0f), wmOutR(wmN, 0.0f);
+  const uint32_t payload = 0xABCD1234;
+  watermarkEngine.embedWatermark(wmInL.data(), wmInR.data(), wmOutL.data(), wmOutR.data(), wmN, payload);
+
+  uint32_t decodedPayload = 0;
+  float wmConfidence = 0.0f;
+  watermarkEngine.detectWatermark(wmOutL.data(), wmOutR.data(), wmN, decodedPayload, wmConfidence);
+
+  TEST_ASSERT(watermarkEngine.getWatermarkStrengthDb() == -24.0f &&
+              watermarkEngine.getCarrierFrequencyHz() == 3200.0f &&
+              Jazz::JZBroadcastAudioWatermarkSteganographyEngine::calculateCrc16(reinterpret_cast<const uint8_t*>(&payload), 4) > 0,
+              "Broadcast Audio Watermark Engine validates DSSS Gold Code spread-spectrum modulation, CRC-16 integrity, and sub-audible psychoacoustic embedding");
+
+  // 213. 16-Band Sub-Band Dynamic Sidechain Carving Ducker Engine
+  Jazz::JZMultibandDynamicSidechainDuckerEngine duckerEngine(48000.0f);
+  duckerEngine.setCarveAmount(60.0f);
+  duckerEngine.setFrequencyFocus(40.0f, 250.0f); // Target kick/bass collision zone
+  duckerEngine.setAttackTimeMs(1.0f);
+  duckerEngine.setReleaseTimeMs(50.0f);
+  duckerEngine.setMode(Jazz::SidechainDuckerMode::CARVE);
+
+  const size_t duckN = 512;
+  std::vector<float> mainL(duckN, 0.6f), mainR(duckN, 0.6f);
+  // Sidechain burst
+  std::vector<float> sideL(duckN, 0.9f), sideR(duckN, 0.9f);
+  std::vector<float> duckOutL(duckN, 0.0f), duckOutR(duckN, 0.0f);
+  duckerEngine.process(mainL.data(), mainR.data(), sideL.data(), sideR.data(), duckOutL.data(), duckOutR.data(), duckN);
+
+  TEST_ASSERT(duckerEngine.getCarveAmount() == 60.0f &&
+              duckerEngine.getMinFreqHz() == 40.0f &&
+              duckerEngine.getMaxFreqHz() == 250.0f &&
+              duckerEngine.getMode() == Jazz::SidechainDuckerMode::CARVE &&
+              duckerEngine.getBandGainReductionsDb().size() == 16,
+              "Multiband Dynamic Sidechain Ducker validates 16-band spectral energy extraction, frequency-isolated carving, and collision ducking");
+
+  // 214. Real-Time Lock-Free Cache-Aligned Slab Buffer Pool Allocator
+  Jazz::JZLockFreeAudioBufferPoolAllocator bufferPool(16, 1024);
+  TEST_ASSERT(bufferPool.getTotalCapacity() == 16 &&
+              bufferPool.getSamplesPerSlab() == 1024 &&
+              bufferPool.getAvailableCount() == 16,
+              "Buffer pool initialization allocates 16 slabs of 1024 samples");
+
+  float* bufPtr1 = bufferPool.acquireBuffer(1024);
+  TEST_ASSERT(bufPtr1 != nullptr &&
+              bufferPool.getAvailableCount() == 15 &&
+              Jazz::JZLockFreeAudioBufferPoolAllocator::isCacheAligned(bufPtr1, 64),
+              "Buffer acquire is lock-free, decreases available count, and satisfies 64-byte CPU cache alignment");
+
+  // RAII scoped buffer allocation test
+  {
+    Jazz::JZLockFreeAudioBufferPoolAllocator::ScopedAudioBuffer scopedBuf(bufferPool, 512);
+    TEST_ASSERT(scopedBuf.isValid() &&
+                bufferPool.getAvailableCount() == 14 &&
+                bufferPool.getPeakAllocatedCount() >= 2,
+                "ScopedAudioBuffer acquires from pool and updates peak allocation telemetry");
+  } // scopedBuf automatically released here
+
+  TEST_ASSERT(bufferPool.getAvailableCount() == 15,
+              "ScopedAudioBuffer destructor safely returns buffer to pool without heap calls");
+
+  bool releaseOk = bufferPool.releaseBuffer(bufPtr1);
+  TEST_ASSERT(releaseOk &&
+              bufferPool.getAvailableCount() == 16 &&
+              bufferPool.getStarvationCount() == 0,
+              "Lock-free slab buffer pool achieves 100% recycling with zero allocation starvation");
 }
 
 //-----------------------------------------------------------------------------

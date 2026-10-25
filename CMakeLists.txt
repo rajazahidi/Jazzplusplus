@@ -144,6 +144,7 @@ set(JAZZ_SOURCES
     src/BiomechanicalVocalTractEngine.cpp
     src/BodeFrequencyShifterWaveMultiplierEngine.cpp
     src/BrickwallClipperEngine.cpp
+    src/BroadcastAudioWatermarkSteganographyEngine.cpp
     src/BroadcastFailoverEngine.cpp
     src/CapstanSpeedStabilizer.cpp
     src/ChordPerformancePads.cpp
@@ -245,6 +246,7 @@ set(JAZZ_SOURCES
     src/Knob.cpp
     src/LiveStagePlaybackRedundancyEngine.cpp
     src/LiveStreamHealthTelemetryEngine.cpp
+    src/LockFreeAudioBufferPoolAllocator.cpp
     src/LoudnessMeterEBU.cpp
     src/LoudnessRangeDynamicsSculptorEngine.cpp
     src/Mapper.cpp
@@ -268,6 +270,7 @@ set(JAZZ_SOURCES
     src/MpeEngine.cpp
     src/MpegHInteractiveAudioEngine.cpp
     src/MultibandCompressor.cpp
+    src/MultibandDynamicSidechainDuckerEngine.cpp
     src/MultibandOttProcessor.cpp
     src/MultibandTransientSculptorEngine.cpp
     src/MultiMicPhaseAlignerEngine.cpp
@@ -279,6 +282,7 @@ set(JAZZ_SOURCES
     src/NamedValue.cpp
     src/NamedValueChoice.cpp
     src/NetworkSessionEngine.cpp
+    src/NeuralAmpWaveNetProfilerEngine.cpp
     src/NeuralAudioEngine.cpp
     src/NeuralStemSeparatorEngine.cpp
     src/NeuralTimbreTransferEngine.cpp
@@ -296,6 +300,7 @@ set(JAZZ_SOURCES
     src/PluginHostBridge.cpp
     src/Player.cpp
     src/PolymetricDrumSequencer.cpp
+    src/PolyphonicAudioChordParserEngine.cpp
     src/PolyphonicNeuralAudioToMidiEngine.cpp
     src/PolyphonicVocalFormantMorpherEngine.cpp
     src/Project.cpp
@@ -334,6 +339,7 @@ set(JAZZ_SOURCES
     src/SpatialAmbisonicsUpMixerEngine.cpp
     src/SpectralAudioMorphEngine.cpp
     src/SpectralDenoise.cpp
+    src/SpectralFrequencySplitPannerEngine.cpp
     src/SpectralRebalanceEngine.cpp
     src/SpectralResonanceSuppressorEngine.cpp
     src/SpectralResonanceTamer.cpp

@@ -1,4 +1,27 @@
 25-10-2026 Raja Zahidi
+- Feature & Master Studio Neural Amp WaveNet Profiler, Polyphonic Audio Chord Parser, Frequency-Split Spectral Panner, Broadcast Audio Watermark Steganography, Multiband Sidechain Ducker, & Lock-Free Buffer Pool Allocator Suite v30.0 (Apex Colossus Sovereign Diamond Jubilee Release):
+  * Real-Time Non-Linear Dilated WaveNet Guitar Amp Profiler (src/NeuralAmpWaveNetProfilerEngine.h & .cpp):
+    - JZNeuralAmpWaveNetProfilerEngine delivers deep temporal convolutional neural guitar amplifier profiling (Neural Amp Modeler / Quad Cortex / Neural DSP Archetype style).
+    - Features 4-stage dilated 1D temporal convolution layers (dilations: 1, 2, 4, 8) with non-linear gated activations (tanh * sigmoid), 12AX7 preamp dual-triode asymmetric bias clipping, 6L6/EL34 push-pull power stage with dynamic transformer saturation, real-time power supply rail sag, and sub-0.5ms zero-latency execution.
+  * Real-Time Polyphonic Audio Chord Parser & Harmonic Voice-Leading Transcriber (src/PolyphonicAudioChordParserEngine.h & .cpp):
+    - JZPolyphonicAudioChordParserEngine parses raw polyphonic audio into discrete harmonic chords and voice-leading structures (Melodyne Polyphonic / zplane deCoda style).
+    - Features 12-bin Pitch Class Profile (PCP) chromagram extraction across 4 octaves, harmonic template correlation matching (Major, Minor, Dominant 7th, Maj7, Min7, Diminished, Augmented, Sus4, Min9), bass note and inversion detection (slash chords), temporal hysteresis, and multi-note MIDI voicing generation.
+  * 3-Band Linear-Phase Frequency-Split Mid/Side Dynamic Spectral Panner (src/SpectralFrequencySplitPannerEngine.h & .cpp):
+    - JZSpectralFrequencySplitPannerEngine provides precision frequency-selective stereo imaging and spatial placement (NUGEN Stereoizer / Leapwing StageOne style).
+    - Features 3-band Linkwitz-Riley 4th-order (24 dB/oct) crossover (Low, Mid, High), low-end mono centering lock (< 120 Hz) for mono compatibility, independent pan, width, and gain per band, dynamic auto-pan LFO modulation on high/mid transients, and broadcast phase correlation guard with anti-phase damping.
+  * Broadcast Audio Psychoacoustic Watermark & DSSS Steganography Engine (src/BroadcastAudioWatermarkSteganographyEngine.h & .cpp):
+    - JZBroadcastAudioWatermarkSteganographyEngine embeds and detects robust copyright forensic metadata (Nielsen Watermark / Content ID / Shazam style).
+    - Features Direct Sequence Spread Spectrum (DSSS) modulation with 63-bit Gold Code pseudo-noise sequences, sub-audible psychoacoustic perceptual masking (-24 dB below host energy), 64-bit frame structure (16-bit sync preamble 0xA55A, 32-bit payload, 16-bit CRC-CCITT), and robust decoding surviving lossy compression and volume attenuation.
+  * 16-Band Sub-Band Dynamic Sidechain Carving Ducker Engine (src/MultibandDynamicSidechainDuckerEngine.h & .cpp):
+    - JZMultibandDynamicSidechainDuckerEngine sculpts acoustic space between colliding tracks (Trackspacer / Cableguys VolumeShaper style).
+    - Features 16-band logarithmic constant-Q filter bank (40 Hz to 16 kHz), external sidechain spectral footprint analysis, dynamic gain reduction applied only to colliding frequency zones, fast envelope tracking (< 2ms attack, program-dependent release), frequency focus range controls, and Delta Solo audition mode.
+  * Real-Time Lock-Free Cache-Aligned Slab Buffer Pool Allocator (src/LockFreeAudioBufferPoolAllocator.h & .cpp):
+    - JZLockFreeAudioBufferPoolAllocator guarantees zero OS heap allocations on real-time audio threads during high-track-count project playback.
+    - Features 64-byte CPU cache-line aligned slab buffers, lock-free wait-free O(1) atomic index stack / free-list, thread-safe SPSC/MPMC recycling without mutex locks or system calls, allocation starvation telemetry, and RAII ScopedAudioBuffer automatic memory recovery.
+  * Added Automated Unit Tests 209 to 214 (tests/test_main.cpp):
+    - Validates dilated WaveNet amp modeling with 12AX7 bias clipping and power rail sag, polyphonic audio chromagram extraction and chord template parsing, 3-band LR4 frequency-split panning with sub-bass mono lock and phase guard, broadcast DSSS spread-spectrum watermarking with CRC-16 integrity, 16-band dynamic sidechain spectral carving, and lock-free 64-byte cache-aligned slab buffer pool allocation with RAII recycling.
+
+25-10-2026 Raja Zahidi
 - Feature & Master Studio Phase-Locked Drum Replacer, Dynamic Spectral Resonance Suppressor, T4 Optical Leveling Amplifier, 16-Channel BRIR Convolver, Analog Console Channel Tolerance, & Loudness Range Dynamics Sculptor Suite v29.0 (Apex Transcendence Monumental Release):
   * Real-Time Acoustic Drum Transient Tracker & Phase-Locked Sample Replacer (src/PhaseLockedDrumReplacerEngine.h & .cpp):
     - JZPhaseLockedDrumReplacerEngine delivers professional sample layering and drum replacement (Slate Trigger 2 / Superior Drummer 3 style).

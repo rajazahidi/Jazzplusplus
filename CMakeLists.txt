@@ -112,10 +112,12 @@ include_directories(
 
 set(JAZZ_SOURCES
     src/AboutDialog.cpp
+    src/AcousticFeedbackSuppressorEngine.cpp
     src/AdaptiveHermodeTuningEngine.cpp
     src/AdaptiveRoomDereverberationEngine.cpp
     src/AdmBwfSpatialMetadataEngine.cpp
     src/AiMelodyCounterpointGenerator.cpp
+    src/AnalogBbdChorusDimensionEngine.cpp
     src/AnalogTapeFlutterModeler.cpp
     src/Ara2HostBridge.cpp
     src/ArrayControl.cpp
@@ -223,6 +225,7 @@ set(JAZZ_SOURCES
     src/HarmonyP.cpp
     src/HelicalSpringDispersionEngine.cpp
     src/Help.cpp
+    src/HighOrderAmbisonics3rdOrderEngine.cpp
     src/Immersive3DReverbConvolver.cpp
     src/ImmersiveAudioPanner.cpp
     src/ImmersiveSpeakerAlignmentEngine.cpp
@@ -257,6 +260,7 @@ set(JAZZ_SOURCES
     src/MultibandCompressor.cpp
     src/MultibandOttProcessor.cpp
     src/MultiMicPhaseAlignerEngine.cpp
+    src/MultiTrackDrumBleedRemoverEngine.cpp
     src/MultiVelocitySampler.cpp
     src/Metronome.cpp
     src/MouseAction.cpp
@@ -317,6 +321,7 @@ set(JAZZ_SOURCES
     src/SpectralResonanceTamer.cpp
     src/SpectralSidechainUnmaskerEngine.cpp
     src/StandardFile.cpp
+    src/SteelPlateReverbPhysicalEngine.cpp
     src/StemSeparatorEngine.cpp
     src/StemsExporter.cpp
     src/StreamingLoudnessInspector.cpp
@@ -345,6 +350,7 @@ set(JAZZ_SOURCES
     src/TransientTonalDecomposeEngine.cpp
     src/TransientTonalSplitter.cpp
     src/VocalAligner.cpp
+    src/VocalAlignmentTimeWarperEngine.cpp
     src/VocalDoublerEngine.cpp
     src/VocalHarmonizer.cpp
     src/VocalPitchEditor.cpp

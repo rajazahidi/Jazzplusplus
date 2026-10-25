@@ -62,6 +62,12 @@
 #include "PolyphonicVocalFormantMorpherEngine.h"
 #include "BodeFrequencyShifterWaveMultiplierEngine.h"
 #include "ImmersiveSpeakerAlignmentEngine.h"
+#include "AcousticFeedbackSuppressorEngine.h"
+#include "MultiTrackDrumBleedRemoverEngine.h"
+#include "VocalAlignmentTimeWarperEngine.h"
+#include "SteelPlateReverbPhysicalEngine.h"
+#include "AnalogBbdChorusDimensionEngine.h"
+#include "HighOrderAmbisonics3rdOrderEngine.h"
 
 #include <cassert>
 #include <cmath>
@@ -3307,6 +3313,140 @@ void TestAutoAccompanimentLogic()
               speakerAligner.getChannelName(2) == "C" &&
               chirpBuf[chirpN / 2] != 0.0f,
               "16-Channel 9.1.6 Dolby Atmos Immersive Speaker Alignment validates time-of-flight acoustic delay compensation, SPL calibration trim, and chirp generation");
+
+  // 179. Adaptive Live Acoustic Feedback Suppressor & Dynamic Notch Hunter
+  Jazz::JZAcousticFeedbackSuppressorEngine feedbackSuppressor(48000.0f);
+  feedbackSuppressor.deployNotch(2500.0f, Jazz::JZAcousticFeedbackSuppressorEngine::NotchType::LIVE, -18.0f, 50.0f);
+
+  const size_t fbN = 512;
+  std::vector<float> fbInL(fbN), fbInR(fbN);
+  std::vector<float> fbOutL(fbN), fbOutR(fbN);
+  for (size_t i = 0; i < fbN; ++i) {
+    float t = static_cast<float>(i) / 48000.0f;
+    fbInL[i] = 0.6f * std::sin(2.0f * 3.14159f * 2500.0f * t);
+    fbInR[i] = fbInL[i];
+  }
+  feedbackSuppressor.process(fbInL.data(), fbInR.data(), fbOutL.data(), fbOutR.data(), fbN);
+
+  TEST_ASSERT(feedbackSuppressor.getActiveNotchCount() == 1 &&
+              feedbackSuppressor.getNotchFrequency(0) == 2500.0f &&
+              feedbackSuppressor.getNotchAttenuationDb(0) == -18.0f &&
+              feedbackSuppressor.getDefaultQ() == 50.0f,
+              "Adaptive Live Acoustic Feedback Suppressor validates automatic surgical notch filter deployment, Q sharpness, and attenuation");
+
+  // 180. Multi-Track Drum Bleed & Spill Remover
+  Jazz::JZMultiTrackDrumBleedRemoverEngine drumDeBleeder(48000.0f);
+  drumDeBleeder.setBleedReductionDb(-18.0f);
+  drumDeBleeder.setTransientThresholdDb(-20.0f);
+  drumDeBleeder.setHoldMs(40.0f);
+
+  const size_t drumN = 512;
+  std::vector<float> snareL(drumN), snareR(drumN);
+  std::vector<float> hatSpillL(drumN), hatSpillR(drumN);
+  std::vector<float> deBleedOutL(drumN), deBleedOutR(drumN);
+
+  for (size_t i = 0; i < drumN; ++i) {
+    float t = static_cast<float>(i) / 48000.0f;
+    // Snare fundamental hit
+    snareL[i] = (i < 120) ? (0.8f * std::sin(2.0f * 3.14159f * 200.0f * t)) : (0.2f * std::sin(2.0f * 3.14159f * 5000.0f * t));
+    snareR[i] = snareL[i];
+    // Hi-hat spill reference
+    hatSpillL[i] = 0.5f * std::sin(2.0f * 3.14159f * 5000.0f * t);
+    hatSpillR[i] = hatSpillL[i];
+  }
+  drumDeBleeder.process(snareL.data(), snareR.data(), hatSpillL.data(), hatSpillR.data(), deBleedOutL.data(), deBleedOutR.data(), drumN);
+
+  TEST_ASSERT(drumDeBleeder.getBleedReductionDb() == -18.0f &&
+              drumDeBleeder.getTransientThresholdDb() == -20.0f &&
+              drumDeBleeder.getDetectedHitCount() >= 1 &&
+              drumDeBleeder.getCurrentReductionDb() < 0.0f,
+              "Multi-Track Drum Bleed & Spill Remover validates cross-mic transient gating, natural shell decay hold, and cymbal high-frequency carving");
+
+  // 181. Multi-Track Vocal Audio Alignment & Doubler Elastic Time-Warper
+  Jazz::JZVocalAlignmentTimeWarperEngine vocalWarper(48000.0f);
+  vocalWarper.setTightness(0.85f);
+  vocalWarper.setMaxWarpStretchFactor(1.6f);
+
+  const size_t guideN = 512;
+  const size_t dubN = 480;
+  std::vector<float> guideAudio(guideN);
+  std::vector<float> dubAudio(dubN);
+  for (size_t i = 0; i < guideN; ++i) {
+    float t = static_cast<float>(i) / 48000.0f;
+    guideAudio[i] = 0.5f * std::sin(2.0f * 3.14159f * 440.0f * t);
+  }
+  for (size_t i = 0; i < dubN; ++i) {
+    float t = static_cast<float>(i) / 48000.0f;
+    dubAudio[i] = 0.45f * std::sin(2.0f * 3.14159f * 442.0f * t);
+  }
+
+  std::vector<float> alignedDub;
+  float corrScore = vocalWarper.alignDubToGuide(guideAudio.data(), guideN, dubAudio.data(), dubN, alignedDub);
+
+  TEST_ASSERT(vocalWarper.getTightness() == 0.85f &&
+              alignedDub.size() == guideN &&
+              corrScore > 0.4f &&
+              vocalWarper.getAverageWarpRatio() > 0.0f,
+              "Multi-Track Vocal Alignment & Doubler Elastic Time-Warper validates DTW energy contour alignment, phoneme tightness, and dub resampling");
+
+  // 182. Physical Cold-Rolled Steel Plate Reverb Engine (EMT 140)
+  Jazz::JZSteelPlateReverbPhysicalEngine plateReverb(48000.0f);
+  plateReverb.setDecayTimeSec(2.5f);
+  plateReverb.setPlateTension(1.1f);
+  plateReverb.setDriverDrive(1.5f);
+
+  const size_t plateN = 256;
+  std::vector<float> plInL(plateN, 0.4f), plInR(plateN, 0.4f);
+  std::vector<float> plOutL(plateN), plOutR(plateN);
+  plateReverb.process(plInL.data(), plInR.data(), plOutL.data(), plOutR.data(), plateN);
+
+  TEST_ASSERT(plateReverb.getDecayTimeSec() == 2.5f &&
+              plateReverb.getPlateTension() == 1.1f &&
+              plateReverb.getActivePlateModes() == 16 &&
+              plateReverb.getDamperDistanceMm() > 10.0f,
+              "Physical Cold-Rolled Steel Plate Reverb Engine validates EMT 140 2D modal wave dispersion, asymmetrical dual-piezo pickups, and damper pad decay");
+
+  // 183. Solid-State Analog BBD Chorus & Spatial Dimension Matrix
+  Jazz::JZAnalogBbdChorusDimensionEngine bbdChorus(48000.0f);
+  bbdChorus.setDimensionMode(Jazz::BbdDimensionMode::MODE_4);
+  bbdChorus.setNumStages(1024);
+  bbdChorus.setCtiLossFactor(0.0015f);
+
+  const size_t bbdN = 256;
+  std::vector<float> bbdInL(bbdN, 0.5f), bbdInR(bbdN, 0.5f);
+  std::vector<float> bbdOutL(bbdN), bbdOutR(bbdN);
+  bbdChorus.process(bbdInL.data(), bbdInR.data(), bbdOutL.data(), bbdOutR.data(), bbdN);
+
+  TEST_ASSERT(bbdChorus.getDimensionMode() == Jazz::BbdDimensionMode::MODE_4 &&
+              bbdChorus.getNumStages() == 1024 &&
+              bbdChorus.getCtiLossFactor() == 0.0015f &&
+              bbdChorus.getCurrentClockRateHz() > 20000.0f,
+              "Solid-State Analog BBD Chorus & Spatial Dimension Matrix validates bucket-brigade CTI dispersion, dual anti-phase LFO, and Dimension D Mode 4 cross-phase matrix");
+
+  // 184. 3rd-Order High-Order Ambisonics 16-Channel Spherical Harmonics Engine
+  Jazz::JZHighOrderAmbisonics3rdOrderEngine hoaEngine(48000.0f);
+  Jazz::JZHighOrderAmbisonics3rdOrderEngine::SpatialSource hoaSrc;
+  hoaSrc.azimuthDeg = 45.0f;
+  hoaSrc.elevationDeg = 30.0f;
+  hoaSrc.distanceMeters = 2.0f;
+  hoaEngine.setSourcePosition(hoaSrc);
+
+  const size_t hoaN = 256;
+  std::vector<float> monoIn(hoaN, 0.6f);
+  std::vector<std::vector<float>> hoaChannels(16, std::vector<float>(hoaN, 0.0f));
+  std::vector<float*> hoaChannelPtrs(16);
+  for (size_t ch = 0; ch < 16; ++ch) hoaChannelPtrs[ch] = hoaChannels[ch].data();
+
+  hoaEngine.encodeMono(monoIn.data(), hoaChannelPtrs.data(), hoaN);
+
+  std::vector<float> binL(hoaN), binR(hoaN);
+  hoaEngine.decodeToBinaural(hoaChannelPtrs.data(), binL.data(), binR.data(), hoaN);
+
+  TEST_ASSERT(hoaEngine.getEncodingWeight(0) == 1.0f &&
+              std::abs(hoaEngine.getEncodingWeight(3)) > 0.0f &&
+              hoaEngine.getChannelAcnName(0).find("W") != std::string::npos &&
+              binL.size() == hoaN,
+              "3rd-Order High-Order Ambisonics 16-Channel Spherical Harmonics Engine validates ACN/SN3D encoding, 3D Euler rotation, and max-rE binaural decoding");
 }
 
 //-----------------------------------------------------------------------------

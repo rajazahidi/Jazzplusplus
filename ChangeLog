@@ -1,4 +1,27 @@
 25-10-2026 Raja Zahidi
+- Feature & Master Studio Acoustic Feedback Suppressor, Multi-Track Drum Bleed Remover, Vocal Alignment Time Warper, Steel Plate Reverb Physical Model, Analog BBD Chorus Dimension, & 3rd-Order High-Order Ambisonics Suite v25.0 (Apex Omnipresence Horizon Release):
+  * Adaptive Live Acoustic Feedback Suppressor & Dynamic Notch Hunter (src/AcousticFeedbackSuppressorEngine.h & .cpp):
+    - JZAcousticFeedbackSuppressorEngine provides automatic runaway feedback howl detection and elimination (Sabine FBX / dbx AFS style) for live concert PA and stage microphones.
+    - Features sub-10ms runaway oscillation peak tracking, up to 16 dynamic ultra-narrow surgical notch biquad filters (Q = 50 to 80, -6 to -36 dB depth), Fixed vs Live release decay modes, and instant panic limiter ducking.
+  * Multi-Track Drum Bleed & Spill Remover (src/MultiTrackDrumBleedRemoverEngine.h & .cpp):
+    - JZMultiTrackDrumBleedRemoverEngine eliminates cymbal and hi-hat leakage spilling into close-mic snare, kick, and tom tracks (Wilkinson De-Bleed / Oxford Drum Gate style).
+    - Features cross-microphone sidechain transient fingerprinting, bandpass drum body transient detection (220 Hz), natural shell decay hold (10-200 ms), high-shelf spill carving (-6 to -32 dB), and solo bleed monitoring.
+  * Multi-Track Vocal Audio Alignment & Doubler Elastic Time-Warper (src/VocalAlignmentTimeWarperEngine.h & .cpp):
+    - JZVocalAlignmentTimeWarperEngine provides automated vocal timing and phrasing synchronization (Synchro Arts VocALign / Revoice Pro style) for lead and backing vocal double stacks.
+    - Features Dynamic Time Warping (DTW) matrix alignment, phoneme energy contour extraction, tightness interpolation control (0.0 natural to 1.0 lock), and elastic audio dub resampling.
+  * Physical Cold-Rolled Steel Plate Reverb Engine (src/SteelPlateReverbPhysicalEngine.h & .cpp):
+    - JZSteelPlateReverbPhysicalEngine physically models historic mechanical steel plate reverberation (EMT 140 style).
+    - Features 2D modal wave dispersion across 16 rectangular plate eigenmodes (2m x 1m cold-rolled steel sheet), electromagnetic driver coil soft saturation, asymmetrical dual-piezo pickups (L & R) for natural stereo decorrelation, and mechanical porous damper pad decay adjustment (0.5 to 5.5 sec).
+  * Solid-State Analog BBD Chorus & Spatial Dimension Matrix (src/AnalogBbdChorusDimensionEngine.h & .cpp):
+    - JZAnalogBbdChorusDimensionEngine models discrete Bucket Brigade Device integrated circuits (Panasonic MN3005 / MN3007).
+    - Features Charge Transfer Inefficiency (CTI) smearing, clock-rate-dependent Sallen-Key reconstruction filter droop, ultrasonic clock feedthrough bleed, dual anti-phase LFO modulation, and a 4-mode spatial stereo dimension matrix (Roland Dimension D style).
+  * 3rd-Order High-Order Ambisonics 16-Channel Spherical Harmonics Engine (src/HighOrderAmbisonics3rdOrderEngine.h & .cpp):
+    - JZHighOrderAmbisonics3rdOrderEngine provides 16-channel 3rd-order spatial soundfield encoding and decoding adhering to ACN channel ordering and SN3D normalization.
+    - Features spherical harmonic decomposition up to order N=3, real-time 3D Euler coordinate rotation (Yaw, Pitch, Roll), and energy-preserving max-rE binaural stereo headphone and multi-channel surround decoding.
+  * Added Automated Unit Tests 179 to 184 (tests/test_main.cpp):
+    - Validates adaptive feedback notch deployment and Q sharpness, multi-mic drum bleed transient gating and spill reduction, vocal DTW alignment and dub resampling, EMT 140 2D modal plate dispersion and damper pad decay, analog BBD CTI dispersion and Dimension D Mode 4 cross-phase matrix, and 3rd-order HOA 16-channel spherical harmonic encoding and binaural decoding.
+
+25-10-2026 Raja Zahidi
 - Feature & Master Studio Spectral Sidechain Unmasker, Personalized Pinna Modeler, Tape Print-Through Demag, Polyphonic Vocal Formant Morpher, Bode Shifter Serge Multiplier, & 9.1.6 Immersive Speaker Aligner Suite v24.0 (Apex Transcendence Nexus Release):
   * Psychoacoustic 24-Band Dynamic Spectral Sidechain Unmasker (src/SpectralSidechainUnmaskerEngine.h & .cpp):
     - JZSpectralSidechainUnmaskerEngine provides real-time psychoacoustic dynamic spectral unmasking (smart:EQ / Soothe style) across 24 critical Bark-scale bands (50 Hz to 13.5 kHz).

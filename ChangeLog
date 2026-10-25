@@ -1,5 +1,5 @@
 25-10-2026 Raja Zahidi
-- Feature: Band-in-a-Box RealTracks, RealDrums & Studio RealAudio System:
+- Feature: Virtual Session Band RealTracks, RealDrums & Studio RealAudio System:
   * Acoustic RealDrums Engine (src/RealDrumsEngine.h, src/RealDrumsEngine.cpp):
     - Multi-velocity acoustic drum sample triggering and physical layering (Kick, Snare, Hi-Hats, Toms, Crash, Ride).
     - Intelligent Hi-Hat Choke Group logic: Closed and Pedal Hi-Hats cleanly damp/choke ringing Open Hi-Hat voices with exponential fade.
@@ -21,7 +21,7 @@
   * Interactive UI Dialog & Integration (src/Dialogs/RealTracksDialog.h, src/Dialogs/RealTracksDialog.cpp, src/TrackFrame.cpp, src/TrackFrame.h, src/Resources.h):
     - Tabbed wxWidgets dialog with RealDrums studio controls, RealTracks arrangement hub, and SoundFont/sample pack browser.
     - Live audition preview with rhythmic pattern generation.
-    - Added menu items: "Settings -> RealTracks & Acoustic Audio..." and "Audio -> Band-in-a-Box RealTracks & Acoustic Samples... (Ctrl+Alt+R)".
+    - Added menu items: "Settings -> RealTracks & Acoustic Audio..." and "Audio -> Virtual Session Band (RealTracks & RealDrums)... (Ctrl+Alt+R)".
   * Comprehensive Unit Test Suite (tests/test_main.cpp):
     - Test 44 validating RealDrums multi-velocity synthesis, choke group dampening, and round-robin micro-dynamics.
     - RealTracks WSOLA tempo stretch ratios (0.75x to 1.25x), chord transposition ratios, and finite non-zero energy rendering.

@@ -1,7 +1,7 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// RealTracksEngine.h - Band-in-a-Box Style Acoustic RealTracks Engine
+// RealTracksEngine.h - Virtual Session Band Acoustic RealTracks Engine
 //
 // Multi-style real acoustic audio phrase accompaniment:
 // - WSOLA (Waveform Similarity Overlap-Add) elastic time-stretching (50-240 BPM)

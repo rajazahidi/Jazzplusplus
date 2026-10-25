@@ -1,7 +1,7 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// RealDrumsEngine.h - Band-in-a-Box Style Acoustic RealDrums Engine
+// RealDrumsEngine.h - Virtual Session Band Acoustic RealDrums Engine
 //
 // Multi-velocity studio acoustic drum sample triggering & replacement:
 // - Multi-velocity dynamic layering (Soft vs Hard hit crossfading)

@@ -1,7 +1,7 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// RealTracksDialog.h - Band-in-a-Box RealTracks & RealDrums Studio Pro Dialog
+// RealTracksDialog.h - Studio RealBand: RealTracks & RealDrums Session Pro Dialog
 //
 // Interactive control center for RealDrums acoustic kit triggering,
 // RealTracks harmonic phrase accompaniment, SoundFont sound bank loading,

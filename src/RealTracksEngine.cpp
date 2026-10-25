@@ -1,7 +1,7 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// RealTracksEngine.cpp - Band-in-a-Box Style Acoustic RealTracks Engine
+// RealTracksEngine.cpp - Virtual Session Band Acoustic RealTracks Engine
 //*****************************************************************************
 
 #include "RealTracksEngine.h"

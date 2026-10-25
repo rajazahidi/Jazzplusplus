@@ -1,7 +1,7 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// RealTracksDialog.cpp - Band-in-a-Box RealTracks & RealDrums Studio Pro Dialog
+// RealTracksDialog.cpp - Studio RealBand: RealTracks & RealDrums Session Pro Dialog
 //*****************************************************************************
 
 #include "RealTracksDialog.h"
@@ -65,7 +65,7 @@ BEGIN_EVENT_TABLE(JZRealTracksDialog, wxDialog)
 END_EVENT_TABLE()
 
 JZRealTracksDialog::JZRealTracksDialog(wxWindow* pParent)
-    : wxDialog(pParent, wxID_ANY, "Band-in-a-Box RealTracks & RealDrums Studio Pro",
+    : wxDialog(pParent, wxID_ANY, "Studio RealBand: RealTracks & RealDrums Session Pro",
                wxDefaultPosition, wxSize(660, 680),
                wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER),
       m_mgr(JZRealInstrumentManager::getInstance()),

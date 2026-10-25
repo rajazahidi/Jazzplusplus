@@ -500,7 +500,7 @@ void JZTrackFrame::CreateMenu()
 #endif
 
   wxMenu* pAudioMenu = new wxMenu;
-  pAudioMenu->Append(ID_AUDIO_REALTRACKS_STUDIO, "Band-in-a-Box &RealTracks & Acoustic Samples...\tCtrl+Alt+R");
+  pAudioMenu->Append(ID_AUDIO_REALTRACKS_STUDIO, "Virtual &Session Band (RealTracks & RealDrums)...\tCtrl+Alt+R");
   pAudioMenu->AppendSeparator();
   pAudioMenu->Append(ID_AUDIO_GLOBAL_SETTINGS, "&Global Audio Settings...");
   pAudioMenu->Append(ID_AUDIO_SAMPLE_SETTINGS, "Sample Set Se&ttings... ");

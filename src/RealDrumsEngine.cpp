@@ -1,7 +1,7 @@
 //*****************************************************************************
 // The JAZZ++ Midi Sequencer
 //
-// RealDrumsEngine.cpp - Band-in-a-Box Style Acoustic RealDrums Engine
+// RealDrumsEngine.cpp - Virtual Session Band Acoustic RealDrums Engine
 //*****************************************************************************
 
 #include "RealDrumsEngine.h"

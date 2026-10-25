@@ -5229,11 +5229,11 @@ void TestMenusFunctionsAndKnobsSimulation()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-// Test 44: Band-in-a-Box RealTracks, RealDrums & Studio RealAudio Suite
+// Test 44: Virtual Session Band RealTracks, RealDrums & Studio RealAudio Suite
 //-----------------------------------------------------------------------------
 void TestRealDrumsRealTracksAndRealAudioSuite()
 {
-  cout << "Testing Band-in-a-Box RealTracks, RealDrums & Studio RealAudio..." << endl;
+  cout << "Testing Virtual Session Band RealTracks, RealDrums & Studio RealAudio..." << endl;
 
   // 1. RealDrums Acoustic Kit & Physical Multi-Velocity Synthesis
   {

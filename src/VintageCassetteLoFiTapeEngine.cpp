@@ -188,8 +188,8 @@ void JZVintageCassetteLoFiTapeEngine::process(const float* inL, const float* inR
         float satR = std::tanh(drivenR + 0.03f) - 0.02f;
 
         // 5. Magnetic Oxide Random Dropouts
-        if (mDropoutsCountdown > 0) {
-            mDropoutsCountdown--;
+        if (mDropoutCountdown > 0) {
+            mDropoutCountdown--;
             // Recovering
             mDropoutGainL += (1.0f - mDropoutGainL) * 0.02f;
             mDropoutGainR += (1.0f - mDropoutGainR) * 0.02f;
@@ -198,7 +198,7 @@ void JZVintageCassetteLoFiTapeEngine::process(const float* inL, const float* inR
             if (mDropoutsAmount > 0.0f && (getRandomFloat() < (mDropoutsAmount * 0.000008f))) {
                 mDropoutGainL = 0.25f + getRandomFloat() * 0.35f; // dip by 6-12 dB
                 mDropoutGainR = 0.35f + getRandomFloat() * 0.30f;
-                mDropoutsCountdown = static_cast<size_t>(mSampleRate * (0.01f + getRandomFloat() * 0.025f)); // 10-35ms
+                mDropoutCountdown = static_cast<size_t>(mSampleRate * (0.01f + getRandomFloat() * 0.025f)); // 10-35ms
                 mDropoutsCount++;
             }
         }

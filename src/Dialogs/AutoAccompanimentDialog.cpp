@@ -15,6 +15,7 @@
 #include <wx/button.h>
 #include <wx/checkbox.h>
 #include <wx/choice.h>
+#include <wx/choicdlg.h>
 #include <wx/dirdlg.h>
 #include <wx/filedlg.h>
 #include <wx/msgdlg.h>

@@ -11,6 +11,7 @@
 
 #include <wx/dialog.h>
 #include <wx/timer.h>
+#include <wx/bookctrl.h>
 #include "../AutoAccompaniment.h"
 
 class wxChoice;

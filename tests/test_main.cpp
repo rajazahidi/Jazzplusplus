@@ -1709,6 +1709,7 @@ void TestAutoAccompanimentLogic()
   TEST_ASSERT(thirdOfC == 64 && thirdOfD == 65, "Vocal harmonizer correctly shifts C to E (+4st) and D to F (+3st) in diatonic C Major");
 
   // 68. Mid-Side Matrix Bidirectional Inversion
+  {
   float inL = 0.8f, inR = 0.2f;
   const float invSq2 = 0.70710678f;
   float mid = (inL + inR) * invSq2;
@@ -1716,6 +1717,8 @@ void TestAutoAccompanimentLogic()
   float recL = (mid + side) * invSq2;
   float recR = (mid - side) * invSq2;
   TEST_ASSERT(fabs(recL - inL) < 0.001f && fabs(recR - inR) < 0.001f, "Mid-Side matrix perfectly reconstructs original stereo pair without phase error");
+
+  }
 
   // 69. Performance Chord Pads Drop-2 Voicing Transformation
   vector<int> rawCmaj7 = {60, 64, 67, 71}; // C4, E4, G4, B4
@@ -2112,6 +2115,7 @@ void TestAutoAccompanimentLogic()
   TEST_ASSERT(fabs(powerSum - 1.0f) < 0.0001f && fabs(wPrim - 0.7071f) < 0.001f, "Broadcast Failover Engine maintains exact 1.0 equal-power sum at 50% crossfade for zero-click protection");
 
   // 125. VST3/CLAP Plugin Host Bridge & Out-of-Process Sandboxing Crash Recovery
+  {
   Jazz::JZPluginHostBridge pluginHost(Jazz::PluginFormat::CLAP, Jazz::PluginSandboxMode::SANDBOXED_SUBPROCESS);
   bool loaded = pluginHost.loadPlugin("/plugins/FabComp.clap", "synth_compressor_vst3");
   pluginHost.initialize(48000.0f, 256);
@@ -2126,7 +2130,10 @@ void TestAutoAccompanimentLogic()
   TEST_ASSERT(loaded && clampedParam == 1.0f && healthyBefore && crashed && recovered && !pluginHost.hasCrashed(),
               "Plugin Host Bridge validates CLAP/VST3 initialization, parameter clamping, watchdog heartbeat, and crash recovery");
 
+  }
+
   // 126. Audio DAG Graph Scheduler Multithreading & Dependency Level Partitioning
+  {
   Jazz::JZAudioGraphScheduler scheduler(8);
   uint32_t nodeKick = scheduler.addNode("Track_Kick", Jazz::AudioNodeType::TRACK_CHANNEL);
   uint32_t nodeBass = scheduler.addNode("Track_Bass", Jazz::AudioNodeType::TRACK_CHANNEL);
@@ -2143,7 +2150,10 @@ void TestAutoAccompanimentLogic()
               levels[0].size() == 2 && levels[1].size() == 1 && levels[2].size() == 1,
               "Audio Graph Scheduler verifies DAG topological compilation, cycle-free status, and 3-tier parallel level partitioning");
 
+  }
+
   // 127. MIDI 2.0 Universal MIDI Packet (UMP) & 32-bit High-Resolution CC Resolution
+  {
   Jazz::JZMidi2UniversalPacketEngine midi2Engine;
   uint8_t vel7 = 100;
   uint16_t vel16 = Jazz::JZMidi2UniversalPacketEngine::midi1ToMidi2Velocity(vel7);
@@ -2166,7 +2176,10 @@ void TestAutoAccompanimentLogic()
               cc7 == 64 && midi2Engine.isCiNegotiated() && ciParsed && resName == "patchList" && resVal == "JazzGrand",
               "MIDI 2.0 UMP Engine validates 16-bit velocity scaling, 32-bit CC resolution, and MIDI-CI Property Exchange parsing");
 
+  }
+
   // 128. ARA2 Audio Random Access Timeline & Sample Query Resolution
+  {
   Jazz::JZAra2HostBridge araBridge("Session_Master");
   uint32_t ctxId = araBridge.addMusicalContext("MainGrid", 128.0, 4, 4);
   uint32_t srcId = araBridge.addAudioSource("audio/vocal_lead.wav", 44100.0, 441000, 2); // 10 seconds
@@ -2181,7 +2194,10 @@ void TestAutoAccompanimentLogic()
   TEST_ASSERT(graphValid && sampleAt3Sec == 44100 && ctx != nullptr && ctx->tempoBpm == 128.0,
               "ARA2 Host Bridge validates document graph integrity, musical context 128 BPM, and timeline-to-sample random access translation");
 
+  }
+
   // 129. Spatial Audio 6-DoF Head-Tracking & Dynamic Listener Relative Orientation
+  {
   Jazz::JZSpatialHeadTracker headTracker;
   std::vector<float> oscArgs = { 45.0f, 10.0f, 0.0f }; // Yaw 45 deg right, Pitch 10 deg up
   bool oscSuccess = headTracker.parseOscMessage("/spatial/tracker/rot", oscArgs);
@@ -2194,7 +2210,10 @@ void TestAutoAccompanimentLogic()
   TEST_ASSERT(oscSuccess && fabs(relAzimuth - 45.0f) < 0.01f && fabs(relElevation - 0.0f) < 0.01f,
               "Spatial Head Tracker verifies OSC 6-DoF message parsing and listener-relative 3D coordinate transformation");
 
+  }
+
   // 130. Embedded Neural Audio Inference GELU Activation & 4-Stem Energy Conservation
+  {
   Jazz::JZNeuralAudioEngine neuralEngine(Jazz::NeuralModelType::DEEP_STEM_SEPARATOR);
   float geluZero = Jazz::JZNeuralAudioEngine::computeGelu(0.0f);
   float geluOne = Jazz::JZNeuralAudioEngine::computeGelu(1.0f);
@@ -2213,7 +2232,10 @@ void TestAutoAccompanimentLogic()
               fabs(totalL - 1.0f) < 0.0001f && fabs(totalR - 0.8f) < 0.0001f,
               "Neural Audio Engine validates GELU activation 0.8412 and 4-stem deep learning softmask exact 1.0 energy conservation");
 
+  }
+
   // 131. Real-Time Audio-over-IP & Timeline Delta-CRDT Distributed Synchronization
+  {
   Jazz::JZNetworkSessionEngine netSession(1, "StudioA");
   bool peerRegistered = netSession.registerPeer(2, "StudioB", "192.168.1.50", 5004);
   size_t connectedPeers = netSession.getConnectedPeerCount();
@@ -2233,7 +2255,10 @@ void TestAutoAccompanimentLogic()
               netSession.getLamportClock() >= 1,
               "Network Session Engine validates AES67 AoIP audio packetization, remote ingestion, and Lamport CRDT timeline synchronization");
 
+  }
+
   // 132. Interactive Game Audio Middleware RTPC & Acoustic Obstruction Modeling
+  {
   Jazz::JZGameAudioBridge gameAudio(Jazz::GameEngineTarget::WWISE_MIDDLEWARE);
   gameAudio.registerRtpc("Player_Health", 100.0f, 0.0f, 100.0f);
   gameAudio.setRtpcValue("Player_Health", 75.0f);
@@ -2255,7 +2280,10 @@ void TestAutoAccompanimentLogic()
               sbXml.find("HeroSoundBank") != std::string::npos,
               "Game Audio Bridge validates RTPC controls, acoustic obstruction 4000Hz LPF cutoff, and SoundBank XML export");
 
+  }
+
   // 133. Studio Tape Machine Calibration, Operating Fluxivity & Alignment Tone
+  {
   Jazz::JZTapeMachineCalibrationEngine tapeCal(44100.0f);
   tapeCal.setOperatingFluxivity(320.0f);
   tapeCal.setEqualizationStandard(Jazz::TapeStandardEq::CCIR_IEC1);
@@ -2275,7 +2303,10 @@ void TestAutoAccompanimentLogic()
               fabs(outL - outR) < 0.0001f && outL > 0.1f && outL < 0.3f,
               "Tape Machine Calibration validates CCIR/NAB standard, 320 nWb/m fluxivity, 1kHz 0 VU alignment tone, and magnetic core saturation");
 
+  }
+
   // 134. Dolby Atmos ADM BWF ITU-R BS.2076-1 Metadata Packaging
+  {
   Jazz::JZAdmBwfSpatialMetadataEngine admEngine("Master_Dolby_Atmos");
   uint32_t bedLeft = admEngine.addBedChannel("Left", 1);
   uint32_t bedRight = admEngine.addBedChannel("Right", 2);
@@ -2293,7 +2324,10 @@ void TestAutoAccompanimentLogic()
               xmlAxml.find("SynthLead") != std::string::npos && chnaBin.size() >= 4 && isCompliant,
               "ADM BWF Metadata Engine validates ITU-R BS.2076-1 XML schema, 3D object azimuth/elevation, and binary <chna> chunk compliance");
 
+  }
+
   // 135. AI Assistive Mastering Psychoacoustic Profiling & Target Ceiling Enforcement
+  {
   Jazz::JZIntelligentMasteringAssistant masterAssist(Jazz::MasteringTargetProfile::STREAMING_SPOTIFY);
   float targetSpotifyLufs = Jazz::JZIntelligentMasteringAssistant::getTargetLufs(Jazz::MasteringTargetProfile::STREAMING_SPOTIFY);
   float targetSpotifyCeil = Jazz::JZIntelligentMasteringAssistant::getTargetCeilingDb(Jazz::MasteringTargetProfile::STREAMING_SPOTIFY);
@@ -2312,7 +2346,10 @@ void TestAutoAccompanimentLogic()
               !rec.requireMonoBassGuard && vinylRec.requireMonoBassGuard && vinylRec.limiterCeilingDb == -1.5f,
               "Intelligent Mastering Assistant validates Spotify vs Vinyl profile targets, crest factor profiling, and mono bass guard enforcement");
 
+  }
+
   // 136. Studio Hardware Control Surface MCU Motorized Fader & Scribble Strip Protocol
+  {
   Jazz::JZControlSurfaceManager surfaceManager(Jazz::ControlSurfaceProtocol::MACKIE_CONTROL_UNIVERSAL);
   surfaceManager.setTrackInfo(0, "KickSub", 0.75f, 0.5f);
   const Jazz::ChannelStripHardwareState* ch0 = surfaceManager.getChannelState(0);
@@ -2331,7 +2368,10 @@ void TestAutoAccompanimentLogic()
               sysexScr.size() == 64 && sysexScr[0] == 0xF0 && sysexScr[63] == 0xF7 && ticks == 48,
               "Control Surface Manager validates MCU 10-bit pitch-bend fader messages, 64-byte scribble strip SysEx, and jog wheel scrub delta");
 
+  }
+
   // 137. Audiophile 1-Bit DSD64/128/256 DoP v1.1 Framing & 352.8 kHz DXD Multi-Stage Decimation
+  {
   Jazz::JZDsdDxdEngine dsdEngine(Jazz::DsdRate::DSD64);
   double dsdFreq = dsdEngine.getDsdSamplingFrequencyHz();
   int decRatio = dsdEngine.getDecimationRatio();
@@ -2354,7 +2394,10 @@ void TestAutoAccompanimentLogic()
               decodedDsd == dsdStream && !dxdPcm.empty() && !modulatedDsd.empty(),
               "DSD/DXD Engine validates 2.8224MHz DSD64, 8:1 decimation to DXD, and lossless DoP v1.1 0x05/0xFA framing");
 
+  }
+
   // 138. SMPTE 29.97 Drop-Frame Cinema Arithmetic, PLL Chase Sync & Scene Cut EDL Detection
+  {
   Jazz::JZSmpteVideoSyncEngine videoSync(Jazz::VideoFrameRate::FPS_29_97_DF, 48000.0f);
   Jazz::VideoTimecode tcStart = {0, 10, 0, 0, 0};
   uint64_t totalFrames10Min = videoSync.timecodeToTotalFrames(tcStart);
@@ -2377,7 +2420,10 @@ void TestAutoAccompanimentLogic()
               cutId == 1 && foundCut && nearestCut.name == "ExplosionCue",
               "SMPTE Video Sync Engine validates 29.97DF 17,982 frames per 10min, PLL chase lock, and EDL scene cut alignment");
 
+  }
+
   // 139. Neural Spectral 4-Stem Separation, Bleed Suppression & Exact 1.0 Energy Conservation
+  {
   Jazz::JZNeuralStemSeparatorEngine stemSep(44100.0f);
   stemSep.setBleedSuppression(0.7f);
   stemSep.setVocalFormantBoost(true);
@@ -2401,7 +2447,10 @@ void TestAutoAccompanimentLogic()
               (vocE + drmE + basE + othE) > 0.99f && (vocE + drmE + basE + othE) < 1.01f,
               "Neural Stem Separator validates 4-stem demixing, zero reconstruction loss (<1e-4), and 1.0 total energy conservation");
 
+  }
+
   // 140. Studio Outboard Dirac Ping Detection, Sub-Sample Latency & Master Delay Alignment
+  {
   Jazz::JZHardwareInsertDelayCompensator delayComp(48000.0f);
   std::vector<float> pingSignal;
   delayComp.generatePingSignal(pingSignal, 1024, 64);
@@ -2425,7 +2474,10 @@ void TestAutoAccompanimentLogic()
               pingRes.latencyMilliseconds > 2.0 && maxComp == 250.0,
               "Hardware Insert Delay Compensator validates Dirac ping detection, sub-sample latency, phase flip detection, and master alignment");
 
+  }
+
   // 141. Acoustic Farina Sweep Deconvolution, Harman Target Curve & SOFA Headphone Profile
+  {
   Jazz::JZRoomAcousticCalibrationEngine roomEngine(48000.0f);
   std::vector<float> chirpSweep;
   roomEngine.generateLogSineSweep(chirpSweep, 0.5f, 20.0f, 20000.0f);
@@ -2447,7 +2499,10 @@ void TestAutoAccompanimentLogic()
               fabs(testL) > 0.0f && !roomEngine.isBypassed(),
               "Room Acoustic Calibration Engine validates Farina log-sine sweep, Harman target curve, and SOFA headphone profile correction");
 
+  }
+
   // 142. Bjorklund Euclidean Rhythms E(k, n), Multilane Polymetric Loop & Ratcheting
+  {
   auto eTresillo = Jazz::JZEuclideanPolyrhythmEngine::generateEuclidean(3, 8);
   auto eCinquillo = Jazz::JZEuclideanPolyrhythmEngine::generateEuclidean(5, 8);
 
@@ -2473,7 +2528,10 @@ void TestAutoAccompanimentLogic()
               polyEngine.getSwingPercent() == 60.0f,
               "Euclidean Polyrhythm Engine validates Bjorklund E(3,8) & E(5,8), multilane polymetric concurrency, and ratchet bursts");
 
+  }
+
   // 143. Non-Linear Volterra Kernel Dynamic Convolution & Harmonic Distortion THD
+  {
   Jazz::JZVolterraDynamicConvolutionEngine volterra(48000.0f, Jazz::VolterraModelType::VINTAGE_TUBE_PREAMP);
   volterra.setInputDriveDb(6.0f);
   volterra.setHarmonic2ndOrderMix(0.50f);
@@ -2490,7 +2548,10 @@ void TestAutoAccompanimentLogic()
               testOutL[0] > 0.0f && fabs(testOutL[0] - testOutR[0]) < 0.0001f,
               "Volterra Convolution validates 2nd/3rd order non-linear kernel expansion, tube saturation, and THD measurement");
 
+  }
+
   // 144. Multi-Microphone Phase Auto-Alignment & Spectral Cancellation Recovery
+  {
   Jazz::JZMultiMicPhaseAlignerEngine phaseAligner(48000.0f);
   int trkGuide = phaseAligner.registerTrack("Kick_In", true);
   int trkTarget = phaseAligner.registerTrack("Kick_Out", false);
@@ -2516,7 +2577,10 @@ void TestAutoAccompanimentLogic()
               alignRes->lowEndPowerGainDb >= 3.0f,
               "Multi-Mic Phase Aligner validates 24-sample lag cross-correlation, polarity flip detection, and low-end bass gain recovery");
 
+  }
+
   // 145. Polyphonic Spectral Audio Morphing, Formant Envelope & Hybrid Chimera
+  {
   Jazz::JZSpectralAudioMorphEngine morphEngine(48000.0f, 512);
   morphEngine.setMorphMode(Jazz::SpectralMorphMode::FORMANT_CROSS_SYNTHESIS);
   morphEngine.setMorphFactor(0.5f);
@@ -2536,7 +2600,10 @@ void TestAutoAccompanimentLogic()
               outMorphL[0] > 0.1f && outMorphL[0] < 0.9f && fabs(outMorphL[0] - outMorphR[0]) < 0.0001f,
               "Spectral Audio Morpher validates formant cross-synthesis, 50% morph factor interpolation, and hybrid chimera transmutation");
 
+  }
+
   // 146. Adaptive Hermode Tuning, Dynamic Just Intonation & 0-Cent Beating 3rds
+  {
   Jazz::JZAdaptiveHermodeTuningEngine hermode(Jazz::TemperamentMode::HERMODE_DYNAMIC_JUST, 440.0f);
   hermode.setTuningDepth(1.0f);
 
@@ -2557,7 +2624,10 @@ void TestAutoAccompanimentLogic()
               fabs(offsetFifthG - 1.96f) < 0.1f && freqE4Just < freqE4_12TET,
               "Adaptive Hermode Engine validates C Major chord detection, -13.69c pure Just major 3rd, and +1.96c pure 5th retuning");
 
+  }
+
   // 147. Binaural Virtual Studio Monitor Simulator, 60-Deg Cross-Feed & ITD Delay
+  {
   Jazz::JZVirtualStudioMonitorSimulator studioSim(48000.0f,
                                                   Jazz::VirtualStudioRoom::ABBEY_ROAD_STUDIO_3,
                                                   Jazz::VirtualSpeakerModel::NEARFIELD_NS10M);
@@ -2576,7 +2646,10 @@ void TestAutoAccompanimentLogic()
               binauralL[30] > 0.4f && crossfeedInRightEar > 0.05f && crossfeedInRightEar < binauralL[30],
               "Virtual Studio Simulator validates Abbey Road 3 acoustics, 60-degree crossfeed ITD/ILD, and NS-10M nearfield response");
 
+  }
+
   // 148. Psychoacoustic DSSS Watermark, Cryptographic SHA-256 Provenance & ISRC
+  {
   Jazz::JZAudioWatermarkProvenanceEngine watermarkEngine(0x5A827999);
   const size_t W = 2048;
   std::vector<float> testAudioL(W), testAudioR(W);
@@ -2604,7 +2677,10 @@ void TestAutoAccompanimentLogic()
               bextChunk.find("US-JAZ-26-00042") != std::string::npos,
               "Watermark Provenance Engine validates 32-bit DSSS watermark embedding/extraction, SHA-256 hashing, and BWF ISRC packaging");
 
+  }
+
   // 149. Dynamic Spectral Resonance Suppression & Threshold-Free Peak Damping (Soothe 2)
+  {
   Jazz::JZDynamicResonanceSuppressorEngine resonanceEngine(48000.0f);
   resonanceEngine.setDepth(0.75f);
   resonanceEngine.setSharpness(4.0f);
@@ -2631,7 +2707,10 @@ void TestAutoAccompanimentLogic()
               std::abs(suppressedOutL[resN - 1]) < std::abs(harshInL[resN - 1]),
               "Dynamic Resonance Suppressor validates harsh 3200Hz peak tracking, threshold-free notch damping, and dynamic suppression");
 
+  }
+
   // 150. Mastering Vinyl Disc Cutting Lathe Physics & Stylus Acceleration Guard
+  {
   Jazz::JZVinylLatheMechanicalSimulator lathe(48000.0f, Jazz::VinylRotationSpeed::RPM_33_THIRD);
   lathe.setCurrentRadiusCm(10.0f);
   lathe.setAccelerationLimitEnabled(true);
@@ -2655,7 +2734,10 @@ void TestAutoAccompanimentLogic()
               latheOutL.size() == vN && std::abs(latheOutL[vN - 1]) <= 1.0f,
               "Vinyl Lathe Simulator validates 33-1/3 RPM groove velocity, stylus acceleration tracking, and vertical excursion guard");
 
+  }
+
   // 151. Bio-Mechanical Vocal Tract Aero-Acoustics & Formant Vowel Synthesis
+  {
   Jazz::JZBiomechanicalVocalTractEngine vocalTract(48000.0f);
   vocalTract.setPitchHz(220.0f);
   vocalTract.setSubglottalPressure(12.0f);
@@ -2679,7 +2761,10 @@ void TestAutoAccompanimentLogic()
               energyA > 0.01f && energyI > 0.01f && vocAudioA[0] != vocAudioI[0],
               "Biomechanical Vocal Tract validates 2-mass glottal flow, 8-section waveguide tube, and /a/ vs /i/ formant articulation");
 
+  }
+
   // 152. Stereo-to-7.1.4 Dolby Atmos & 3D Ambisonics Soundfield Up-Mixer
+  {
   Jazz::JZSpatialAmbisonicsUpMixerEngine upMixer(48000.0f);
   upMixer.setCenterExtraction(0.70f);
   upMixer.setSurroundSpill(0.60f);
@@ -2697,7 +2782,10 @@ void TestAutoAccompanimentLogic()
               okB && bFormat.W.size() == upN && bFormat.W[0] > 0.5f && bFormat.X[0] > 0.3f,
               "Spatial Soundfield Up-Mixer validates direct-diffuse decomposition, 7.1.4 channel distribution, and 3D Ambisonics B-format");
 
+  }
+
   // 153. Autonomous AI Multi-Track Mix Balancing & Masking Collision Resolver
+  {
   Jazz::JZAutonomousMixAssistantEngine mixAssistant(48000.0f);
   int trkKick = mixAssistant.registerTrack("Kick_Drum", Jazz::MixTrackRole::KICK_DRUM);
   int trkBass = mixAssistant.registerTrack("Bass_Synth", Jazz::MixTrackRole::BASS_INSTRUMENT);
@@ -2729,7 +2817,10 @@ void TestAutoAccompanimentLogic()
               std::abs(bassBuf[mixN - 1]) < 0.7f,
               "Autonomous Mix Assistant validates 4-track spectral collision detection, 65Hz Kick/Bass clash, and dynamic EQ carving");
 
+  }
+
   // 154. 3D Wave-Terrain Mathematical Orbit & Optical Bitmap Synthesizer
+  {
   Jazz::JZWaveTerrainGraphicSynthEngine waveSynth(48000.0f);
   waveSynth.setFrequencyHz(130.81f);
   waveSynth.setSurfaceType(Jazz::WaveTerrainSurface::RIPPLE_TORUS);
@@ -2755,7 +2846,10 @@ void TestAutoAccompanimentLogic()
               opticalAudio.size() == synthN && opticalAudio[0] != synthAudio[0],
               "Wave-Terrain Graphic Synth validates 3D ripple surface orbital scanning, and optical 2D grayscale bitmap synthesis");
 
+  }
+
   // 155. Real-Time Neural Timbre Transfer & Resynthesis (RAVE / DDSP Style)
+  {
   Jazz::JZNeuralTimbreTransferEngine timbreEngine(48000.0f, Jazz::NeuralTimbreModel::STRADIVARIUS_VIOLIN);
   timbreEngine.setBlend(0.85f);
   timbreEngine.setNoiseAmount(0.2f);
@@ -2780,7 +2874,10 @@ void TestAutoAccompanimentLogic()
               std::abs(timbreOutL[timbreN / 2]) > 0.0f,
               "Neural Timbre Transfer Engine validates DDSP harmonic-plus-noise synthesis, Stradivarius/Flute modeling, and real-time buffer processing");
 
+  }
+
   // 156. Acoustic Guitar Sympathetic Coupling & Helmholtz Body Modeler
+  {
   Jazz::JZSympatheticGuitarResonanceEngine guitarEngine(48000.0f);
   guitarEngine.setCapoFret(2);
   guitarEngine.setSympatheticCoupling(0.55f);
@@ -2801,7 +2898,10 @@ void TestAutoAccompanimentLogic()
               std::abs(gtrOutL[64]) > 0.0f,
               "Sympathetic Guitar Resonance Engine validates 6-string coupling matrix, capo fret shift, and Helmholtz soundhole body projection");
 
+  }
+
   // 157. MPEG-H 3D Audio Interactive Broadcast Authoring (ISO/IEC 23008-3 / ATSC 3.0)
+  {
   Jazz::JZMpegHInteractiveAudioEngine mpegHEngine("LiveChampionshipFinals");
   int elemDialogue = mpegHEngine.addAudioElement("LeadCommentary_EN", Jazz::MpegHElementType::DIALOGUE_PRIMARY, "eng", -6.0f, 6.0f);
   int elemSpanish = mpegHEngine.addAudioElement("AltCommentary_ES", Jazz::MpegHElementType::COMMENTARY_ALT_LANG, "spa", -6.0f, 6.0f);
@@ -2818,7 +2918,10 @@ void TestAutoAccompanimentLogic()
               mpegHXml.find("LeadCommentary_EN") != std::string::npos,
               "MPEG-H Interactive Audio Engine validates dialogue accessibility gain boosting, multi-language switching, and ISO/IEC 23008-3 XML packaging");
 
+  }
+
   // 158. Infinite Barberpole Flanger Engine (Shepard-Risset Through-Zero)
+  {
   Jazz::JZInfiniteBarberpoleFlangerEngine barberpole(48000.0f);
   barberpole.setDirection(Jazz::BarberpoleDirection::INFINITE_UPWARD);
   barberpole.setRateHz(0.35f);
@@ -2845,7 +2948,10 @@ void TestAutoAccompanimentLogic()
               flgOutL.size() == flangerN,
               "Infinite Barberpole Flanger validates Shepard-Risset multi-phase comb sweeping, through-zero cancellation, and bi-directional sweeps");
 
+  }
+
   // 159. Sub-Harmonic Waveguide Bass Synthesizer & Phase-Locked Octave Generator
+  {
   Jazz::JZSubHarmonicWaveguideBassEngine subBass;
   subBass.initialize(48000.0f);
   Jazz::JZSubHarmonicWaveguideBassEngine::Parameters bassParams;
@@ -2874,7 +2980,10 @@ void TestAutoAccompanimentLogic()
               subBass.isLockAcquired() == true,
               "Sub-Harmonic Waveguide Bass Synthesizer validates zero-crossing phase lock, 45Hz sub-octave resonator, and saturation drive");
 
+  }
+
   // 160. MADI (AES10) / Dante Live Stream Health & Jitter Telemetry Hub
+  {
   Jazz::JZLiveStreamHealthTelemetryEngine liveTelemetry;
   liveTelemetry.initialize(48000.0f, 2048);
   Jazz::JZLiveStreamHealthTelemetryEngine::Configuration telemConfig;
@@ -2928,7 +3037,10 @@ void TestAutoAccompanimentLogic()
               telemB.status == Jazz::JZLiveStreamHealthTelemetryEngine::LinkStatus::OK,
               "Live Stream Health Telemetry Engine validates Dante/AES10 clock jitter tracking, parity error detection, and hitless failover switching");
 
+  }
+
   // 161. Real-Time 3-Way Transient-Tonal-Ambience Spectral Decomposition
+  {
   Jazz::JZTransientTonalDecomposeEngine decomposer(48000.0f);
   decomposer.setTransientSensitivity(0.75f);
   decomposer.setTonalSmoothingMs(30.0f);
@@ -2966,7 +3078,10 @@ void TestAutoAccompanimentLogic()
               std::abs(recL[ttaN / 2]) > 0.0f,
               "Transient-Tonal Decomposer validates 3-way spectral split, fast attack isolation, and phase-coherent recombination");
 
+  }
+
   // 162. Jiles-Atherton Tape Magnetic Hysteresis & Automatic Azimuth Skew Alignment
+  {
   Jazz::JZTapeHysteresisAzimuthEngine tapeHysteresis(48000.0f);
   tapeHysteresis.setDriveDb(4.5f);
   tapeHysteresis.setTapeSpeed(Jazz::TapeSpeed::IPS_15);
@@ -2991,7 +3106,10 @@ void TestAutoAccompanimentLogic()
               std::abs(tapeOutL[tapeN / 2]) > 0.0f,
               "Tape Hysteresis Azimuth Engine validates Jiles-Atherton magnetic domain simulation, 15 IPS head bump, and stereo phase skew compensation");
 
+  }
+
   // 163. Live Stage Dual-Rig Playback Redundancy & MIDI Panic Flush
+  {
   Jazz::JZLiveStagePlaybackRedundancyEngine stageRedundancy(48000.0f);
   Jazz::JZLiveStagePlaybackRedundancyEngine::Configuration stageConfig;
   stageConfig.pilotToneFreqHz = 1000.0f;
@@ -3028,7 +3146,10 @@ void TestAutoAccompanimentLogic()
               panicEvents[1].data1 == 123,
               "Live Stage Playback Redundancy validates pilot heartbeat loss detection, clickless Rig B failover, and 16-channel MIDI panic flush");
 
+  }
+
   // 164. Dynamic Xenharmonic Lattice Morpher & Tonality Diamond
+  {
   Jazz::JZXenharmonicLatticeMorpherEngine xenharmonic(440.0f);
   xenharmonic.setSourceTuning(Jazz::XenharmonicTuning::TET_12_STANDARD);
   xenharmonic.setTargetTuning(Jazz::XenharmonicTuning::PARTCH_43_TONE_DIAMOND);
@@ -3051,7 +3172,10 @@ void TestAutoAccompanimentLogic()
               xenharmonic.getMorphFactor() == 0.5f,
               "Xenharmonic Lattice Morpher validates Harry Partch 5/4 Just Major Third (550Hz), -13.7c tuning deviation, and Bohlen-Pierce morphing");
 
+  }
+
   // 165. ITU-R BS.1770-4 / EBU R128 S1 Dialogue-Gated Loudness Normalizer
+  {
   Jazz::JZDialogueGatedLoudnessEngine loudnessEngine(48000.0f);
   loudnessEngine.setTargetStandard(Jazz::DeliveryStandard::NETFLIX_STREAMING);
 
@@ -3077,7 +3201,10 @@ void TestAutoAccompanimentLogic()
               cert.find("Netflix Original Productions") != std::string::npos,
               "Dialogue-Gated Loudness Engine validates K-weighting pre-filter, speech activity detection (-10 LU relative gate), and Netflix/EBU delivery certificates");
 
+  }
+
   // 166. Physical Helical Spring Reverb Modeler & Mechanical Chirp Dispersion
+  {
   Jazz::JZHelicalSpringDispersionEngine springEngine(48000.0f);
   springEngine.setDecayTimeSec(3.5f);
   springEngine.setDispersion(0.8f);
@@ -3099,7 +3226,10 @@ void TestAutoAccompanimentLogic()
               std::abs(spgOutL[64]) > 0.0f,
               "Helical Spring Dispersion Engine validates multi-stage all-pass chirp dispersion, transducer saturation, and mechanical tank kick impacts");
 
+  }
+
   // 167. Psychoacoustic Phantom Missing Fundamental Bass Generator
+  {
   Jazz::JZPsychoacousticPhantomBassEngine phantomBass(48000.0f);
   phantomBass.setCrossoverFreq(85.0f);
   phantomBass.setHarmonicIntensity(1.2f);
@@ -3123,7 +3253,10 @@ void TestAutoAccompanimentLogic()
               phOutL.size() == phN,
               "Psychoacoustic Phantom Bass Generator validates 2nd-5th Chebyshev harmonic overtone synthesis and sub-bass missing fundamental projection");
 
+  }
+
   // 168. Quantum Gravitational Particle Granulator & Doppler Field
+  {
   Jazz::JZQuantumParticleGranularEngine quantumGranular(48000.0f);
   Jazz::JZQuantumParticleGranularEngine::Configuration qConfig;
   qConfig.maxParticles = 16;
@@ -3144,7 +3277,10 @@ void TestAutoAccompanimentLogic()
               std::abs(qOutL[32]) > 0.0f,
               "Quantum Particle Granulator validates N-body gravitational orbit motion, Lorentz chaos perturbation, and spatial Doppler pitch shifting");
 
+  }
+
   // 169. Adaptive Room Spectral Dereverberation Engine
+  {
   Jazz::JZAdaptiveRoomDereverberationEngine dereverb(48000.0f);
   dereverb.setDereverbAmount(0.75f);
   dereverb.setRoomRt60Sec(1.5f);
@@ -3168,7 +3304,10 @@ void TestAutoAccompanimentLogic()
               std::abs(drvOutL[drvN - 1]) < std::abs(drvInL[drvN - 1]),
               "Adaptive Room Dereverberation Engine validates Sabine decay slope tracking, diffuse tail suppression, and direct speech preservation");
 
+  }
+
   // 170. Polyphonic Neural Audio-to-MIDI DNA Transcriber
+  {
   Jazz::JZPolyphonicNeuralAudioToMidiEngine polyTranscriber(48000.0f);
   Jazz::JZPolyphonicNeuralAudioToMidiEngine::Configuration transConfig;
   transConfig.minNoteDurationMs = 40.0f;
@@ -3196,7 +3335,10 @@ void TestAutoAccompanimentLogic()
               musicXml.find("<pitch>") != std::string::npos,
               "Polyphonic DNA Audio-to-MIDI Transcriber validates simultaneous C-Major triad chord extraction, per-note onset/velocity, and MusicXML export");
 
+  }
+
   // 171. Optical Film Soundtrack Restoration Engine
+  {
   Jazz::JZOpticalFilmAudioRestorationEngine opticalRestoration(48000.0f);
   opticalRestoration.setSlitWidthMicrons(25.0f);
   opticalRestoration.setGrainDenoiseDb(14.0f);
@@ -3223,7 +3365,10 @@ void TestAutoAccompanimentLogic()
               optOutL.size() == optN,
               "Optical Film Audio Restoration validates scanning slit inverse sinc de-blurring, 24Hz shutter notch, and bilateral grain click repair");
 
+  }
+
   // 172. IEEE 1588v2 PTP Grandmaster Clock & SMPTE ST 2110-30 Synchronizer
+  {
   Jazz::JZPtpClockPrecisionSyncEngine ptpSync(48000.0f);
   Jazz::JZPtpClockPrecisionSyncEngine::PtpPacketHeader ptpHdr;
   ptpHdr.sequenceId = 1;
@@ -3251,7 +3396,10 @@ void TestAutoAccompanimentLogic()
               ptpTelemetry.rtpMediaClockSamples > 0,
               "IEEE 1588v2 PTP Precision Clock Synchronizer validates Grandmaster Phase-Locked Loop lock (<200ns), frequency drift tracking, and SMPTE ST 2110 media clock synthesis");
 
+  }
+
   // 173. Psychoacoustic 24-Band Dynamic Spectral Sidechain Unmasker
+  {
   Jazz::JZSpectralSidechainUnmaskerEngine unmasker(48000.0f);
   unmasker.setUnmaskingDepthDb(-9.0f);
   unmasker.setSensitivity(1.2f);
@@ -3277,7 +3425,10 @@ void TestAutoAccompanimentLogic()
               unmasker.getActiveMaskedBands() >= 1,
               "Psychoacoustic 24-Band Dynamic Spectral Sidechain Unmasker validates real-time Bark-scale harmonic unmasking and collision attenuation");
 
+  }
+
   // 174. Personalized Anthropometric Pinna & Ear Canal Modeler
+  {
   Jazz::JZPersonalizedPinnaAcousticModeler pinnaModeler(48000.0f);
   Jazz::JZPersonalizedPinnaAcousticModeler::EarGeometry earGeom;
   earGeom.headCircumferenceCm = 56.0f;
@@ -3303,7 +3454,10 @@ void TestAutoAccompanimentLogic()
               pinnaModeler.getEarGeometry().headCircumferenceCm == 56.0f,
               "Personalized Anthropometric Pinna & Ear Canal Modeler validates customized HRTF pinna notch, canal resonance, and interaural time delay synthesis");
 
+  }
+
   // 175. Analog Master Tape Reel Print-Through Pre/Post Echo & Demagnetization
+  {
   Jazz::JZTapePrintThroughDemagSimulator tapeDemag(48000.0f);
   tapeDemag.setReelRadiusCm(10.0f);
   tapeDemag.setPrintThroughLevelDb(-52.0f);
@@ -3321,7 +3475,10 @@ void TestAutoAccompanimentLogic()
               tapeDemag.getDemagnetizationLossDb() < 0.0f,
               "Analog Master Tape Print-Through and High-Frequency Demagnetization Simulator validates reel revolution pre/post-echo timing and multi-pass playback degradation");
 
+  }
+
   // 176. Polyphonic Vocal Formant, Throat Length Scaling & Gender Morpher
+  {
   Jazz::JZPolyphonicVocalFormantMorpherEngine vocalMorpher(48000.0f);
   vocalMorpher.setThroatLengthFactor(1.25f);
   vocalMorpher.setFormantShiftSemitones(3.0f);
@@ -3339,7 +3496,10 @@ void TestAutoAccompanimentLogic()
               vocalMorpher.getFormantF2Hz() > vocalMorpher.getFormantF1Hz(),
               "Polyphonic Vocal Formant & Throat Resynthesizer validates independent vocal tract scaling, formant frequency shifts, and gender morphing");
 
+  }
+
   // 177. True Bode Linear Frequency Shifter & Serge Wave Multiplier
+  {
   Jazz::JZBodeFrequencyShifterWaveMultiplierEngine bodeShifter(48000.0f);
   bodeShifter.setFrequencyShiftHz(35.0f);
   bodeShifter.setSidebandMode(Jazz::ShiftSidebandMode::STEREO_SPLIT);
@@ -3355,7 +3515,10 @@ void TestAutoAccompanimentLogic()
               bodeShifter.getWaveFoldAmount() == 2.5f,
               "True Bode Linear Frequency Shifter & Serge Wave Multiplier validates Hilbert quadrature frequency shifting and diode wave folding");
 
+  }
+
   // 178. 16-Channel 9.1.6 Dolby Atmos Immersive Speaker Alignment Engine
+  {
   Jazz::JZImmersiveSpeakerAlignmentEngine speakerAligner(48000.0f);
   speakerAligner.setSpeakerDistanceMeters(0, 2.5f); // Left
   speakerAligner.setSpeakerDistanceMeters(1, 2.5f); // Right
@@ -3374,7 +3537,10 @@ void TestAutoAccompanimentLogic()
               chirpBuf[chirpN / 2] != 0.0f,
               "16-Channel 9.1.6 Dolby Atmos Immersive Speaker Alignment validates time-of-flight acoustic delay compensation, SPL calibration trim, and chirp generation");
 
+  }
+
   // 179. Adaptive Live Acoustic Feedback Suppressor & Dynamic Notch Hunter
+  {
   Jazz::JZAcousticFeedbackSuppressorEngine feedbackSuppressor(48000.0f);
   feedbackSuppressor.deployNotch(2500.0f, Jazz::JZAcousticFeedbackSuppressorEngine::NotchType::LIVE, -18.0f, 50.0f);
 
@@ -3394,7 +3560,10 @@ void TestAutoAccompanimentLogic()
               feedbackSuppressor.getDefaultQ() == 50.0f,
               "Adaptive Live Acoustic Feedback Suppressor validates automatic surgical notch filter deployment, Q sharpness, and attenuation");
 
+  }
+
   // 180. Multi-Track Drum Bleed & Spill Remover
+  {
   Jazz::JZMultiTrackDrumBleedRemoverEngine drumDeBleeder(48000.0f);
   drumDeBleeder.setBleedReductionDb(-18.0f);
   drumDeBleeder.setTransientThresholdDb(-20.0f);
@@ -3422,7 +3591,10 @@ void TestAutoAccompanimentLogic()
               drumDeBleeder.getCurrentReductionDb() < 0.0f,
               "Multi-Track Drum Bleed & Spill Remover validates cross-mic transient gating, natural shell decay hold, and cymbal high-frequency carving");
 
+  }
+
   // 181. Multi-Track Vocal Audio Alignment & Doubler Elastic Time-Warper
+  {
   Jazz::JZVocalAlignmentTimeWarperEngine vocalWarper(48000.0f);
   vocalWarper.setTightness(0.85f);
   vocalWarper.setMaxWarpStretchFactor(1.6f);
@@ -3449,7 +3621,10 @@ void TestAutoAccompanimentLogic()
               vocalWarper.getAverageWarpRatio() > 0.0f,
               "Multi-Track Vocal Alignment & Doubler Elastic Time-Warper validates DTW energy contour alignment, phoneme tightness, and dub resampling");
 
+  }
+
   // 182. Physical Cold-Rolled Steel Plate Reverb Engine (EMT 140)
+  {
   Jazz::JZSteelPlateReverbPhysicalEngine plateReverb(48000.0f);
   plateReverb.setDecayTimeSec(2.5f);
   plateReverb.setPlateTension(1.1f);
@@ -3466,7 +3641,10 @@ void TestAutoAccompanimentLogic()
               plateReverb.getDamperDistanceMm() > 10.0f,
               "Physical Cold-Rolled Steel Plate Reverb Engine validates EMT 140 2D modal wave dispersion, asymmetrical dual-piezo pickups, and damper pad decay");
 
+  }
+
   // 183. Solid-State Analog BBD Chorus & Spatial Dimension Matrix
+  {
   Jazz::JZAnalogBbdChorusDimensionEngine bbdChorus(48000.0f);
   bbdChorus.setDimensionMode(Jazz::BbdDimensionMode::MODE_4);
   bbdChorus.setNumStages(1024);
@@ -3483,7 +3661,10 @@ void TestAutoAccompanimentLogic()
               bbdChorus.getCurrentClockRateHz() > 20000.0f,
               "Solid-State Analog BBD Chorus & Spatial Dimension Matrix validates bucket-brigade CTI dispersion, dual anti-phase LFO, and Dimension D Mode 4 cross-phase matrix");
 
+  }
+
   // 184. 3rd-Order High-Order Ambisonics 16-Channel Spherical Harmonics Engine
+  {
   Jazz::JZHighOrderAmbisonics3rdOrderEngine hoaEngine(48000.0f);
   Jazz::JZHighOrderAmbisonics3rdOrderEngine::SpatialSource hoaSrc;
   hoaSrc.azimuthDeg = 45.0f;
@@ -3508,7 +3689,10 @@ void TestAutoAccompanimentLogic()
               binL.size() == hoaN,
               "3rd-Order High-Order Ambisonics 16-Channel Spherical Harmonics Engine validates ACN/SN3D encoding, 3D Euler rotation, and max-rE binaural decoding");
 
+  }
+
   // 185. Acoustic Guitar Body Impulse Convolver Engine
+  {
   Jazz::JZAcousticGuitarBodyImpulseConvolverEngine guitarConvolver(48000.0f);
   guitarConvolver.setMicProfile(Jazz::GuitarMicProfile::KM184_SMALL_CONDENSER);
   guitarConvolver.setBodyResonanceAmount(0.7f);
@@ -3526,7 +3710,10 @@ void TestAutoAccompanimentLogic()
               guitarConvolver.getActiveProfileName().find("KM184") != std::string::npos,
               "Acoustic Guitar Body Impulse Convolver validates piezo anti-quack decompression, 102Hz Helmholtz resonance, and KM184 mic profile");
 
+  }
+
   // 186. Analog Subharmonic Bass & Optical Air Exciter Engine
+  {
   Jazz::JZAnalogSubharmonicBassExciterEngine bassExciter(48000.0f);
   bassExciter.setSubharmonicGainDb(3.0f);
   bassExciter.setOpticalAirGainDb(2.5f);
@@ -3544,7 +3731,10 @@ void TestAutoAccompanimentLogic()
               bassExciter.getAirCrossoverHz() == 4500.0f,
               "Analog Subharmonic Bass & Optical Air Exciter validates phase-locked sub-octave fundamental synthesis and high-frequency non-linear air generation");
 
+  }
+
   // 187. Multiband Transient & Sustain Sculptor Engine
+  {
   Jazz::JZMultibandTransientSculptorEngine transientSculptor(48000.0f);
   transientSculptor.setBandAttackDb(0, 4.0f);
   transientSculptor.setBandSustainDb(1, -2.0f);
@@ -3560,7 +3750,10 @@ void TestAutoAccompanimentLogic()
               transientSculptor.getBandAttackDb(2) == 3.0f,
               "Multiband Transient & Sustain Sculptor validates 4-band linear-phase crossover, independent transient punch attack, and sustain shaping");
 
+  }
+
   // 188. RotaFonic Rotary Speaker Cabinet Simulator (Leslie 122)
+  {
   Jazz::JZRotaFonicRotarySpeakerSimulator rotarySimulator(48000.0f);
   rotarySimulator.setSpeedMode(Jazz::RotarySpeedMode::TREMOLO);
   rotarySimulator.setDrive(1.5f);
@@ -3577,7 +3770,10 @@ void TestAutoAccompanimentLogic()
               rotarySimulator.getDrumRpm() > 20.0f,
               "RotaFonic Rotary Speaker Cabinet Simulator validates Leslie 122 rotating horn Doppler shift, wooden drum AM, and 12AX7 tube drive");
 
+  }
+
   // 189. Real-Time Speech Spectral Subtraction De-Noiser
+  {
   Jazz::JZSpeechDenoiseSpectralSubtractorEngine speechDenoise(48000.0f);
   speechDenoise.setReductionDb(-15.0f);
 
@@ -3594,7 +3790,10 @@ void TestAutoAccompanimentLogic()
               speechDenoise.getCurrentReductionDb() <= 0.0f,
               "Real-Time Speech Spectral Subtraction De-Noiser validates noise profile learning, adaptive Wiener suppression, and consonant preservation");
 
+  }
+
   // 190. Spatial Audio Headphone Ear Canal EQ Calibration Engine
+  {
   Jazz::JZSpatialAudioEarCanalEqCalibrationEngine headphoneCalibrator(48000.0f);
   headphoneCalibrator.setTargetCurve(Jazz::HeadphoneTargetCurve::HARMAN_OVER_EAR_2018);
   headphoneCalibrator.setHeadphoneModel(Jazz::HeadphoneModelPreset::SENNHEISER_HD650);
@@ -3612,7 +3811,10 @@ void TestAutoAccompanimentLogic()
               headphoneCalibrator.getHeadphoneModelName().find("HD650") != std::string::npos,
               "Spatial Audio Headphone Ear Canal EQ Calibration validates Harman 2018 Target curve matching and Sennheiser HD650 transducer linearization");
 
+  }
+
   // 191. Vocal Sibilance Split-Band Lookahead De-Esser Engine
+  {
   Jazz::JZVocalSibilanceSplitDeEsserEngine deEsser(48000.0f);
   deEsser.setFrequencyHz(6500.0f);
   deEsser.setThresholdDb(-22.0f);
@@ -3635,7 +3837,10 @@ void TestAutoAccompanimentLogic()
               deEsser.isSibilanceActive(),
               "Vocal Sibilance Split-Band De-Esser validates zero-phase crossover, intelligent high-frequency detection, and lookahead dynamic reduction");
 
+  }
+
   // 192. Tape Head-Bump Bass Resonance & Varispeed Transport Engine
+  {
   Jazz::JZTapeHeadBumpVarispeedTransportEngine tapeEngine(48000.0f);
   tapeEngine.setTapeSpeedIps(15.0f);
   tapeEngine.setHeadBumpAmount(1.2f);
@@ -3653,7 +3858,10 @@ void TestAutoAccompanimentLogic()
               tapeEngine.getHeadBumpAmount() == 1.2f,
               "Tape Head-Bump & Varispeed Transport validates Studer 15/30 IPS magnetic head gap resonance and motor varispeed continuous pitch-time scrubbing");
 
+  }
+
   // 193. Immersive 9.1.6 16-Channel Bass Management Crossover Engine
+  {
   Jazz::JZImmersiveBassManagementCrossoverEngine bassManager(48000.0f);
   bassManager.setCrossoverFreqHz(80.0f);
   bassManager.setLfeGainBoostDb(10.0f);
@@ -3680,7 +3888,10 @@ void TestAutoAccompanimentLogic()
               bassManager.getChannelName(3) == "LFE",
               "Immersive 9.1.6 Bass Management Crossover validates 80Hz 4th-order Linkwitz-Riley crossover filtering and +10dB cinema LFE redirection");
 
+  }
+
   // 194. Master Bus Glue VCA Compressor Engine
+  {
   Jazz::JZMasterBusGlueVcaCompressorEngine glueComp(48000.0f);
   glueComp.setThresholdDb(-16.0f);
   glueComp.setRatio(4.0f);
@@ -3698,7 +3909,10 @@ void TestAutoAccompanimentLogic()
               glueComp.isCompressing(),
               "Master Bus Glue VCA Compressor validates soft-knee VCA compression curve, Thrust high-pass sidechain weighting, and program-dependent auto-release");
 
+  }
+
   // 195. Reactive Load Box Speaker Impedance Simulation Engine
+  {
   Jazz::JZReactiveLoadSpeakerImpedanceEngine loadBox(48000.0f);
   loadBox.setCabinetType(Jazz::SpeakerCabinetType::CAB_4X12_VINTAGE30);
   loadBox.setPowerSagAmount(0.35f);
@@ -3715,7 +3929,10 @@ void TestAutoAccompanimentLogic()
               loadBox.getCabinetTypeName().find("4x12") != std::string::npos,
               "Reactive Load Box Speaker Impedance validates voice-coil LC reactive resonance (75Hz/2.8kHz), back-EMF damping, and tube power sag");
 
+  }
+
   // 196. Binaural Acoustic Mastering Room Convolver Engine
+  {
   Jazz::JZBinauralAcousticRoomConvolverEngine roomConvolver(48000.0f);
   roomConvolver.setRoomDimensions(8.5f, 6.2f, 3.4f);
   roomConvolver.setRoomSizeFactor(1.0f);
@@ -3735,7 +3952,10 @@ void TestAutoAccompanimentLogic()
               roomConvolver.getDryWet() == 0.4f,
               "Binaural Acoustic Mastering Room Convolver validates 3D shoebox early reflections, ITD/ILD head shadowing, and Eyring boundary decay");
 
+  }
+
   // 197. Variable-Mu Vintage Tube Compressor Engine
+  {
   Jazz::JZVariableMuVintageTubeCompressorEngine varMu(48000.0f);
   varMu.setThresholdDb(-18.0f);
   varMu.setTimeConstant(Jazz::VariableMuTimeConstant::AUTO_PROGRAM_1);
@@ -3755,7 +3975,10 @@ void TestAutoAccompanimentLogic()
               varMu.isCompressing(),
               "Variable-Mu Vintage Tube Compressor validates 6386 triode push-pull remote-cutoff bias reduction and continuous variable-slope knee");
 
+  }
+
   // 198. Elliptical Equalizer & Low-End Mono Centering Matrix
+  {
   Jazz::JZEllipticalMonoBassCenteringEngine eeq(48000.0f);
   eeq.setMonoCutoffHz(120.0f);
   eeq.setFilterSlope(Jazz::EllipticalFilterSlope::SLOPE_12DB_OCT);
@@ -3774,7 +3997,10 @@ void TestAutoAccompanimentLogic()
               eeq.getPhaseCorrelation() >= -1.0f,
               "Elliptical Equalizer validates Mid/Side sub-bass high-pass carving (120 Hz) and low-end mono centering preservation");
 
+  }
+
   // 199. Vocal Plosive & Microphone Wind Blast De-Popper Engine
+  {
   Jazz::JZVocalPlosiveDePopperEngine dePopper(48000.0f);
   dePopper.setThresholdDb(-18.0f);
   dePopper.setSensitivity(0.8f);
@@ -3800,7 +4026,10 @@ void TestAutoAccompanimentLogic()
               dePopper.getPlosivesDetectedCount() > 0,
               "Vocal Plosive De-Popper validates asymmetric pressure burst tracking (85 Hz) and dynamic pop-blast infrasonic suppression");
 
+  }
+
   // 200. ITU-R BS.775-3 Immersive Multichannel Folddown Downmix Engine
+  {
   Jazz::JZImmersiveFolddownDownmixEngine downmix(48000.0f);
   downmix.setTargetMode(Jazz::DownmixTargetMode::STEREO_2_0);
   downmix.setCenterTrimDb(-3.0f);
@@ -3827,7 +4056,10 @@ void TestAutoAccompanimentLogic()
               downmix.getOutputPeakLevelDb() > -60.0f,
               "ITU-R BS.775-3 Immersive Folddown validates 16-channel downmix, center buildup trim, and Hilbert quadrature phase steering");
 
+  }
+
   // 201. Vocal Vibrato, Pitch Drift & Micro-Flutter Humanizer Engine
+  {
   Jazz::JZVocalVibratoHumanizerEngine vibrato(48000.0f);
   vibrato.setVibratoRateHz(5.5f);
   vibrato.setVibratoDepthCents(45.0f);
@@ -3847,7 +4079,10 @@ void TestAutoAccompanimentLogic()
               std::abs(vibrato.getCurrentPitchOffsetCents()) >= 0.0f,
               "Vocal Vibrato & Pitch Drift Humanizer validates freeform LFO pitch modulation, onset attack delay ramp, and fractal drift");
 
+  }
+
   // 202. Real-Time CPU Thread Affinity & Audio Scheduler
+  {
   Jazz::JZRealTimeThreadAffinityScheduler scheduler;
   scheduler.setPriorityPolicy(Jazz::AudioThreadPriorityPolicy::PRO_AUDIO_MMCSS);
   scheduler.setLockToPerformanceCores(true);
@@ -3867,7 +4102,10 @@ void TestAutoAccompanimentLogic()
               scheduler.getPolicyName().find("MMCSS") != std::string::npos,
               "Real-Time Thread Affinity Scheduler validates P-Core CPU isolation, lock-free telemetry queues, and buffer deadline monitoring");
 
+  }
+
   // 203. Phase-Locked Acoustic Drum Replacer Engine
+  {
   Jazz::JZPhaseLockedDrumReplacerEngine drumReplacer(48000.0f);
   drumReplacer.setInstrument(Jazz::DrumReplacerInstrument::SNARE);
   drumReplacer.setTriggerThresholdDb(-20.0f);
@@ -3892,7 +4130,10 @@ void TestAutoAccompanimentLogic()
               drumReplacer.getLastVelocity() > 0.0f,
               "Phase-Locked Drum Replacer validates sub-sample cross-correlation phase alignment and multi-velocity transient triggering");
 
+  }
+
   // 204. Dynamic Spectral Resonance Suppressor Engine
+  {
   Jazz::JZSpectralResonanceSuppressorEngine resonanceSuppressor(48000.0f);
   resonanceSuppressor.setThresholdDb(-18.0f);
   resonanceSuppressor.setDepth(0.8f);
@@ -3917,7 +4158,10 @@ void TestAutoAccompanimentLogic()
               resonanceSuppressor.getMaxSuppressionDb() <= 0.0f,
               "Dynamic Spectral Resonance Suppressor validates Bark-scale harshness tracking, floating dynamic notch array, and surgical de-harshing");
 
+  }
+
   // 205. T4 Optical Attenuator Leveling Amplifier Engine
+  {
   Jazz::JZOpticalT4LevelingAmplifierEngine optoLeveler(48000.0f);
   optoLeveler.setPeakReduction(55.0f);
   optoLeveler.setOutputGain(40.0f);
@@ -3937,7 +4181,10 @@ void TestAutoAccompanimentLogic()
               optoLeveler.isCompressing(),
               "T4 Optical Leveling Amplifier validates electro-luminescent photocell memory decay, program-dependent release, and 12AX7 cathode saturation");
 
+  }
+
   // 206. 16-Channel Binaural Room Impulse Response (BRIR) Interpolation Engine
+  {
   Jazz::JZBinauralRoomImpulseInterpolationEngine brirConvolver(48000.0f);
   brirConvolver.setRoomPreset(Jazz::BrirRoomPreset::STUDIO_CONTROL_ROOM_A);
   brirConvolver.setHeadOrientation(15.0f, -5.0f, 0.0f);
@@ -3961,7 +4208,10 @@ void TestAutoAccompanimentLogic()
               brirConvolver.getRoomPresetName().find("Control Room") != std::string::npos,
               "16-Channel BRIR Convolver validates SOFA spherical rotation, continuous head-tracking orientation, and immersive control room acoustics");
 
+  }
+
   // 207. Analog Console Channel Tolerance & Crosstalk Matrix Engine
+  {
   Jazz::JZAnalogConsoleChannelToleranceEngine consoleEngine(48000.0f);
   consoleEngine.setChannelIndex(12);
   consoleEngine.setConsoleStyle(Jazz::AnalogConsoleStyle::VINTAGE_BRITISH_80);
@@ -3980,7 +4230,10 @@ void TestAutoAccompanimentLogic()
               consoleEngine.getConsoleStyleName().find("8048") != std::string::npos,
               "Analog Console Channel Tolerance validates TMT component drift (1-3%), inter-channel stereo crosstalk bleed, and Marinair transformer hysteresis");
 
+  }
+
   // 208. Loudness Range (LRA) Dynamics Sculptor & True-Peak Compliance Guard
+  {
   Jazz::JZLoudnessRangeDynamicsSculptorEngine lraSculptor(48000.0f);
   lraSculptor.setTargetLraLu(8.0f);
   lraSculptor.setTargetLufs(-14.0f);
@@ -4000,7 +4253,10 @@ void TestAutoAccompanimentLogic()
               lraSculptor.getTruePeakDbtp() <= 0.5f,
               "Loudness Range Dynamics Sculptor validates ITU-R BS.1770-4 K-weighting, macro-dynamic LRA targeting, and 8x oversampled true-peak limiting");
 
+  }
+
   // 209. Real-Time Non-Linear Dilated WaveNet Guitar Amp Profiler
+  {
   Jazz::JZNeuralAmpWaveNetProfilerEngine ampProfiler(48000.0f);
   ampProfiler.setAmpProfile(Jazz::AmpProfile::BRITISH_CRUNCH);
   ampProfiler.setGainDb(10.0f);
@@ -4026,7 +4282,10 @@ void TestAutoAccompanimentLogic()
               ampProfiler.getCurrentSagVoltage() >= 0.0f,
               "Neural Amp WaveNet Profiler validates 4-stage dilated 1D temporal convolutions, 12AX7 preamp bias clipping, and push-pull dynamic sag");
 
+  }
+
   // 210. Real-Time Polyphonic Audio Chord Parser & Voice-Leading Transcriber
+  {
   Jazz::JZPolyphonicAudioChordParserEngine chordParser(48000.0f);
   chordParser.setDetectionSensitivity(0.85f);
   chordParser.setMinChordDurationMs(50.0f);
@@ -4051,7 +4310,10 @@ void TestAutoAccompanimentLogic()
               chordParser.getVoicingMidiNotes().size() >= 3,
               "Polyphonic Audio Chord Parser validates 12-bin chromagram extraction, harmonic template matching, and multi-note MIDI chord voicing");
 
+  }
+
   // 211. 3-Band Linear-Phase Frequency-Split Mid/Side Dynamic Spectral Panner
+  {
   Jazz::JZSpectralFrequencySplitPannerEngine splitPanner(48000.0f);
   splitPanner.setCrossoverFrequencies(120.0f, 2800.0f);
   splitPanner.setLowBand(0.0f, 0.0f, 0.0f, true); // Low mono lock
@@ -4072,7 +4334,10 @@ void TestAutoAccompanimentLogic()
               splitPanner.getPhaseCorrelation() <= 1.0f,
               "Frequency-Split Spectral Panner validates LR4 3-band crossover, sub-bass mono centering, Mid/Side air expansion, and phase correlation guard");
 
+  }
+
   // 212. Broadcast Audio Psychoacoustic Watermark & Steganography Engine
+  {
   Jazz::JZBroadcastAudioWatermarkSteganographyEngine watermarkEngine(48000.0f);
   watermarkEngine.setWatermarkStrengthDb(-24.0f);
   watermarkEngine.setCarrierFrequencyHz(3200.0f);
@@ -4092,7 +4357,10 @@ void TestAutoAccompanimentLogic()
               Jazz::JZBroadcastAudioWatermarkSteganographyEngine::calculateCrc16(reinterpret_cast<const uint8_t*>(&payload), 4) > 0,
               "Broadcast Audio Watermark Engine validates DSSS Gold Code spread-spectrum modulation, CRC-16 integrity, and sub-audible psychoacoustic embedding");
 
+  }
+
   // 213. 16-Band Sub-Band Dynamic Sidechain Carving Ducker Engine
+  {
   Jazz::JZMultibandDynamicSidechainDuckerEngine duckerEngine(48000.0f);
   duckerEngine.setCarveAmount(60.0f);
   duckerEngine.setFrequencyFocus(40.0f, 250.0f); // Target kick/bass collision zone
@@ -4114,7 +4382,10 @@ void TestAutoAccompanimentLogic()
               duckerEngine.getBandGainReductionsDb().size() == 16,
               "Multiband Dynamic Sidechain Ducker validates 16-band spectral energy extraction, frequency-isolated carving, and collision ducking");
 
+  }
+
   // 214. Real-Time Lock-Free Cache-Aligned Slab Buffer Pool Allocator
+  {
   Jazz::JZLockFreeAudioBufferPoolAllocator bufferPool(16, 1024);
   TEST_ASSERT(bufferPool.getTotalCapacity() == 16 &&
               bufferPool.getSamplesPerSlab() == 1024 &&
@@ -4145,7 +4416,10 @@ void TestAutoAccompanimentLogic()
               bufferPool.getStarvationCount() == 0,
               "Lock-free slab buffer pool achieves 100% recycling with zero allocation starvation");
 
+  }
+
   // 215. Real-Time Neural Spectral Dereverberation & Early Reflection Stripper
+  {
   Jazz::JZNeuralSpectralDereverberationEngine dereverbEngine(48000.0f);
   dereverbEngine.setDereverbAmount(75.0f);
   dereverbEngine.setEarlyReflectionSuppressionDb(-14.0f);
@@ -4164,7 +4438,10 @@ void TestAutoAccompanimentLogic()
               dereverbEngine.getCurrentSuppressionDb() <= 0.0f,
               "Neural Spectral Dereverberation validates early reflection comb cancellation and unvoiced consonant protection");
 
+  }
+
   // 216. Vintage Compact Cassette Lo-Fi Tape & Mechanical Flutter/Dropouts Engine
+  {
   Jazz::JZVintageCassetteLoFiTapeEngine cassetteEngine(48000.0f);
   cassetteEngine.setTapeType(Jazz::CassetteTapeType::TYPE_I_FERRIC);
   cassetteEngine.setWowAmount(40.0f);
@@ -4184,7 +4461,10 @@ void TestAutoAccompanimentLogic()
               cassetteEngine.getCurrentWowDeviationCents() > 0.0f,
               "Vintage Cassette Lo-Fi Engine validates 1-7/8 IPS tape formulation, mechanical wow/flutter, and head-gap loss");
 
+  }
+
   // 217. Real-Time 4-Voice Intelligent Vocal Harmonizer & Key-Scale Follower Engine
+  {
   Jazz::JZIntelligentVocalHarmonizerEngine harmonizerEngine(48000.0f);
   harmonizerEngine.setKeyAndScale(0, Jazz::HarmonizerScaleMode::MAJOR); // C Major
   harmonizerEngine.setDryWet(60.0f);
@@ -4207,7 +4487,10 @@ void TestAutoAccompanimentLogic()
               harmonizerEngine.getDryWet() == 60.0f,
               "Intelligent Vocal Harmonizer validates diatonic scale mapping, 4-voice polyphonic generation, and micro-pitch humanization");
 
+  }
+
   // 218. Mastering Target Curve Spectrum Matcher & 32-Band Morphing Equalizer
+  {
   Jazz::JZMasteringTargetCurveMatcherEngine curveMatcher(48000.0f);
   curveMatcher.setTargetCurve(Jazz::MasteringTargetCurve::MODERN_POP_URBAN);
   curveMatcher.setMatchDepthPercent(100.0f);
@@ -4225,7 +4508,10 @@ void TestAutoAccompanimentLogic()
               curveMatcher.getMaxCorrectionDb() == 10.0f,
               "Mastering Target Curve Matcher validates 32-band LTAS analysis, standard commercial target curves, and morphing EQ");
 
+  }
+
   // 219. Digital True-Peak De-Clipper & Cubic Hermite Spline Waveform Inpainter
+  {
   Jazz::JZDigitalTruePeakDeClipperEngine deClipper(48000.0f);
   deClipper.setClippingThresholdDbFS(-0.2f);
   deClipper.setAutoHeadroomEnabled(true);
@@ -4244,12 +4530,15 @@ void TestAutoAccompanimentLogic()
   deClipper.process(clpInL.data(), clpInR.data(), clpOutL.data(), clpOutR.data(), clpN);
 
   TEST_ASSERT(deClipper.isAutoHeadroomEnabled() &&
-              deClipper.getClippedEventsCount() > 0 &&
+              deClipper.getDetectedClippedEvents() > 0 &&
               deClipper.getRepairedPeaksCount() > 0 &&
               deClipper.getReconstructionPurity() > 0.0f,
               "Digital True-Peak De-Clipper validates flat-top saturation detection, Cubic Hermite Spline inpainting, and headroom recovery");
 
+  }
+
   // 220. Stereo Transaural Acoustic Crosstalk Cancellation (XTC) & 3D Monitor Spatializer
+  {
   Jazz::JZTransauralCrosstalkCancellerEngine xtcEngine(48000.0f);
   xtcEngine.setSpeakerAngleDegrees(60.0f);
   xtcEngine.setCancellationDepthPercent(85.0f);
@@ -4267,7 +4556,10 @@ void TestAutoAccompanimentLogic()
               xtcEngine.isCancellationActive(),
               "Transaural Crosstalk Canceller validates Cooper-Bauck recursive XTC, Woodworth ITD calculation, and 180-degree 3D soundstage expansion");
 
+  }
+
   // 221. Real-Time Vocal Microphone Rustle, Clothing Friction & Mechanical Thud Attenuator
+  {
   Jazz::JZVocalMicRustleAttenuatorEngine rustleEngine(48000.0f);
   rustleEngine.setReductionAmount(75.0f);
   rustleEngine.setSensitivity(0.85f);
@@ -4284,7 +4576,10 @@ void TestAutoAccompanimentLogic()
               rustleEngine.getMaxFreqHz() == 1200.0f,
               "Vocal Mic Rustle Attenuator validates sub-band friction variance tracking and low-mid abrasive burst damping");
 
+  }
+
   // 222. Historic Robert Moog 4-Pole 24dB/Octave Non-Linear Transistor Ladder Filter Engine
+  {
   Jazz::JZMoogTransistorLadderFilterEngine moogFilter(48000.0f);
   moogFilter.setCutoffHz(1200.0f);
   moogFilter.setResonance(0.85f);
@@ -4301,7 +4596,10 @@ void TestAutoAccompanimentLogic()
               moogFilter.getThdPercent() > 0.0f,
               "Moog Transistor Ladder Filter validates 4-pole differential tanh saturation, negative resonance feedback, and analog drive");
 
+  }
+
   // 223. Spatial Mid/Side Transient-Tonal Polar Balancer & Stereo Image Sculptor
+  {
   Jazz::JZSpatialTransientTonalBalancerEngine balancerEngine(48000.0f);
   balancerEngine.setTransientWidth(0.5f);
   balancerEngine.setTonalWidth(1.6f);
@@ -4319,7 +4617,10 @@ void TestAutoAccompanimentLogic()
               balancerEngine.getPhaseCorrelation() <= 1.0f,
               "Spatial Transient-Tonal Balancer validates dual-envelope M/S decomposition, transient centering, and tonal width expansion");
 
+  }
+
   // 224. Adaptive Mains Hum (50/60Hz) & Electromagnetic Ground-Loop Harmonic De-Hummer
+  {
   Jazz::JZAdaptiveMainsHumRemoverEngine humRemover(48000.0f);
   humRemover.setGridFrequency(Jazz::GridFrequency::GRID_50HZ);
   humRemover.setSuppressionDepthDb(-40.0f);
@@ -4339,7 +4640,10 @@ void TestAutoAccompanimentLogic()
               humRemover.getGridFrequencyName().find("50 Hz") != std::string::npos,
               "Adaptive Mains Hum Remover validates 50Hz PLL tracking, 16-harmonic notch cascade, and electromagnetic de-humming");
 
+  }
+
   // 225. Concert Grand Piano Sympathetic String & Damper Pedal Acoustic Resonance Engine
+  {
   Jazz::JZGrandPianoSympatheticResonanceEngine grandResonance(48000.0f);
   grandResonance.setDamperPedal(true);
   grandResonance.setSympatheticDepth(70.0f);
@@ -4356,7 +4660,10 @@ void TestAutoAccompanimentLogic()
               grandResonance.getResonanceEnergyDb() > -90.0f,
               "Concert Grand Piano Sympathetic Resonance validates 88-string bridge cross-coupling, damper pedal release, and duplex overtones");
 
+  }
+
   // 226. 5-Band Linear-Phase Mastering Dynamics Processor & Multiband Compressor
+  {
   Jazz::JZMasterLinearPhaseMultibandDynamicsEngine multibandDynamics(48000.0f);
   multibandDynamics.setCrossovers(120.0f, 600.0f, 3000.0f, 9000.0f);
   multibandDynamics.setSoloBand(-1);
@@ -4371,7 +4678,10 @@ void TestAutoAccompanimentLogic()
               multibandDynamics.getBandGainReductionDb(0) <= 0.0f,
               "Master Linear-Phase Multiband Dynamics validates 5-band crossover, soft-knee logarithmic VCA compression, and lookahead");
 
+  }
+
   // 227. Dynamic Atmospheric Wind Buffeting & Diaphragm Overload Attenuator
+  {
   Jazz::JZDynamicWindTurbulenceSuppressorEngine windEngine(48000.0f);
   windEngine.setReductionDb(-24.0f);
   windEngine.setSensitivity(1.2f);
@@ -4389,7 +4699,10 @@ void TestAutoAccompanimentLogic()
               windEngine.getCurrentCutoffHz() >= 25.0f,
               "Dynamic Wind Turbulence Suppressor validates sub-band gust acceleration tracking, adaptive high-pass expansion, and delta solo");
 
+  }
+
   // 228. Historic Fasel / Halo Toroidal Inductor Wah-Wah & Resonant Drive Engine
+  {
   Jazz::JZVintageInductorWahPedalEngine wahEngine(48000.0f);
   wahEngine.setPedalPosition(0.65f);
   wahEngine.setDriveDb(4.0f);
@@ -4410,7 +4723,10 @@ void TestAutoAccompanimentLogic()
               wahEngine.getInductorTypeName().find("Fasel") != std::string::npos,
               "Vintage Inductor Wah Pedal validates 500mH Fasel core saturation, 100k ICAR S-taper curve, and resonant peaking");
 
+  }
+
   // 229. Ultra-Low-Latency Polyphase Anti-Aliasing Oversampling Wrapper Engine
+  {
   Jazz::JZPolyphaseAntiAliasingOversamplerEngine oversampler(48000.0f, Jazz::OversamplingFactor::X4, Jazz::OversamplingPhaseMode::LINEAR_PHASE);
 
   const size_t ovsN = 256;
@@ -4432,7 +4748,10 @@ void TestAutoAccompanimentLogic()
               oversampler.getLatencySamples() > 0,
               "Polyphase Anti-Aliasing Oversampler validates multi-rate polyphase FIR decomposition, linear phase, and alias-free wrapped processing");
 
+  }
+
   // 230. Electromechanical 91-Tonewheel Generator & 9-Drawbar Organ Engine
+  {
   Jazz::JZTonewheelOrganDrawbarEngine organEngine(48000.0f);
   organEngine.setAllDrawbars({8, 8, 8, 0, 0, 0, 0, 0, 0});
   organEngine.setPercussionEnabled(true);
@@ -4454,7 +4773,10 @@ void TestAutoAccompanimentLogic()
               organEngine.getPresetRegistrationString().find("88 80") != std::string::npos,
               "Tonewheel Organ Drawbar Engine validates 91-wheel gear train, 9-drawbar harmonic mix, harmonic percussion, and key click");
 
+  }
+
   // 231. ISO 9613-1 Atmospheric Air Molecular Absorption & Acoustic Distance Attenuator
+  {
   Jazz::JZAtmosphericAirAbsorptionSpatialEngine airSpatial(48000.0f);
   airSpatial.setDistanceMeters(25.0f);
   airSpatial.setTemperatureCelsius(22.0f);
@@ -4473,7 +4795,10 @@ void TestAutoAccompanimentLogic()
               airSpatial.getAbsorptionLossAt10kHzDb() < 0.0f,
               "Atmospheric Air Absorption Spatial Engine validates ISO 9613-1 molecular relaxation, distance damping, and speed of sound delay");
 
+  }
+
   // 232. Alan Blumlein Frequency-Dependent Stereo Shuffler & Polar Image Sculptor
+  {
   Jazz::JZStereoWidthSpectralShufflerEngine shuffler(48000.0f);
   shuffler.setShufflerGainDb(4.0f);
   shuffler.setShufflerCrossoverHz(650.0f);
@@ -4493,7 +4818,10 @@ void TestAutoAccompanimentLogic()
               shuffler.getPhaseCorrelation() <= 1.0f,
               "Stereo Width Spectral Shuffler validates Blumlein LF side boost, elliptical mono bass, and Air width expansion");
 
+  }
+
   // 233. Continuous Frequency-Dependent All-Pass Phase Dispersion & Multi-Mic Coherence Maximizer
+  {
   Jazz::JZSpectralPhaseDisperserEngine disperser(48000.0f);
   disperser.setBandPhaseDegrees(0, 45.0f);
   disperser.setBandPhaseDegrees(1, 135.0f);
@@ -4512,7 +4840,10 @@ void TestAutoAccompanimentLogic()
               disperser.getPhaseCorrelation() >= -1.0f,
               "Spectral Phase Disperser validates 4-band all-pass rotation, group delay dispersion, and multi-mic phase alignment");
 
+  }
+
   // 234. Bowed String Acoustic Body Impulse & Chladni Wood Resonator
+  {
   Jazz::JZBowedStringAcousticBodyConvolverEngine bowedConvolver(48000.0f);
   bowedConvolver.setInstrumentType(Jazz::BowedInstrumentType::CELLO);
   bowedConvolver.setBodyWoodAge(0.9f);
@@ -4531,7 +4862,10 @@ void TestAutoAccompanimentLogic()
               bowedConvolver.getInstrumentTypeName().find("Violoncello") != std::string::npos,
               "Bowed String Acoustic Body Convolver validates 98Hz Cello A0 Helmholtz cavity, Chladni wood plates, and bridge hill transmission");
 
+  }
+
   // 235. Transient-Gated Modal Ringing & Resonant Overhang Damping Engine
+  {
   Jazz::JZTransientRingingSuppressorEngine ringingSuppressor(48000.0f);
   ringingSuppressor.setDampingAmountDb(-18.0f);
   ringingSuppressor.setSensitivity(1.5f);
@@ -4548,7 +4882,10 @@ void TestAutoAccompanimentLogic()
               ringingSuppressor.getDominantRingingFrequencyHz() > 0.0f,
               "Transient Ringing Suppressor validates 15ms transient attack transparency, modal overhang tracking, and adaptive notch damping");
 
+  }
+
   // 236. Binaural Relativistic Acoustic Doppler & Moving Sound Source Spatializer
+  {
   Jazz::JZBinauralDopplerMotionSpatializerEngine dopplerSpatializer(48000.0f);
   dopplerSpatializer.setPosition(10.0f, 2.0f, 0.0f);
   dopplerSpatializer.setVelocity(-30.0f, 0.0f, 0.0f);
@@ -4566,7 +4903,10 @@ void TestAutoAccompanimentLogic()
               dopplerSpatializer.getRightEarDopplerRatio() > 0.0f,
               "Binaural Doppler Motion Spatializer validates 3D trajectory velocity, relativistic acoustic pitch shift, and interaural parallax");
 
+  }
+
   // 237. Dynamic Kick-to-Bass Fundamental Frequency Surgical Sidechain Carver
+  {
   Jazz::JZDynamicSubBassSpectralCarverEngine spectralCarver(48000.0f);
   spectralCarver.setCarveDepthDb(-16.0f);
   spectralCarver.setCarveQ(6.0f);
@@ -4585,7 +4925,10 @@ void TestAutoAccompanimentLogic()
               spectralCarver.getTrackedKickFundamentalHz() >= 35.0f,
               "Dynamic Sub-Bass Spectral Carver validates kick fundamental tracking, dynamic surgical notch carving, and unmasked low-end");
 
+  }
+
   // 238. Historic 18dB/24dB Diode Ladder Non-Linear Resonant Filter Engine
+  {
   Jazz::JZVintageDiodeLadderFilterEngine diodeLadder(48000.0f);
   diodeLadder.setCutoffHz(1400.0f);
   diodeLadder.setResonance(0.85f);
@@ -4604,7 +4947,10 @@ void TestAutoAccompanimentLogic()
               diodeLadder.getThdPercent() > 0.0f,
               "Vintage Diode Ladder Filter validates 18dB TB-303 slope, Shockley diode asymmetrical conduction, acid squelch, and bass retention");
 
+  }
+
   // 239. Out-of-Process VST3/CLAP Plugin Crash Sandboxing & Host Isolation Architecture
+  {
   Jazz::JZPluginCrashSandboxEngine sandbox(48000.0f);
   Jazz::JZPluginCrashSandboxEngine::Configuration sbConfig;
   sbConfig.pluginId = "Test_Amp_Modeler_Worker";
@@ -4632,7 +4978,10 @@ void TestAutoAccompanimentLogic()
               sandbox.isHostAlive(),
               "Plugin Crash Sandbox validates worker isolation, SEH trap, host survival, and auto-respawn state recovery");
 
+  }
+
   // 240. ITU-R BS.1770-4 Multichannel 7.1.4 Immersive Audio Loudness & Spatial True-Peak Meter
+  {
   Jazz::JZMultichannelAtmosLoudnessMeterEngine atmosMeter(48000.0f);
   const size_t atmN = 4800; // 100ms
   std::vector<float> chData[12];
@@ -4650,7 +4999,10 @@ void TestAutoAccompanimentLogic()
               atmosMeter.getGlobalMaxTruePeakDbFs() > -96.0f,
               "Multichannel Atmos Loudness Meter validates ITU-R BS.1770-4 K-weighting, 7.1.4 surround gain, and 4x True-Peak detection");
 
+  }
+
   // 241. Lossless Broadcast Wave Format (BWF / EBU Tech 3285) & iXML Multi-Stem Metadata Exporter
+  {
   Jazz::JZBroadcastWaveIxmlExporterEngine bwfExporter(48000.0f, 24, 2);
   Jazz::BwfMetadata bwfMeta;
   bwfMeta.description = "Orchestral Master Stem";
@@ -4675,7 +5027,10 @@ void TestAutoAccompanimentLogic()
               bwfHeader.size() > 700,
               "Broadcast Wave iXML Exporter validates RIFF chunk hierarchy, bext EBU R128 loudness metrics, and iXML stem schema");
 
+  }
+
   // 242. Multi-Resolution Hierarchical Pyramid GPU Waveform Tile Cache & Viewport Rasterizer
+  {
   Jazz::JZGpuWaveformTileCacheEngine gpuTileCache;
   gpuTileCache.initialize(1024);
 
@@ -4695,7 +5050,10 @@ void TestAutoAccompanimentLogic()
               gpuTileCache.getCacheStats().lastQueryLatencyMs < 1.0,
               "GPU Waveform Tile Cache validates 5-level LOD pyramid, LRU cache hits, and sub-millisecond 120 FPS timeline rasterization");
 
+  }
+
   // 243. Complex Sidechain Directed Acyclic Graph (DAG) Automatic Delay Compensation (ADC) Solver
+  {
   Jazz::JZComplexSidechainAdcGraphResolver adcResolver;
   adcResolver.addNode("Track_Kick", "Kick Drum", 0);
   adcResolver.addNode("Track_Bass", "Bass Guitar", 512); // Lookahead limiter
@@ -4716,7 +5074,10 @@ void TestAutoAccompanimentLogic()
               adcResolver.getCompensationForNode("Track_Bass") == 512,
               "Complex Sidechain ADC Resolver validates DAG topological sort, cycle detection, critical path latency, and sample alignment");
 
+  }
+
   // 244. Real-Time Polyphonic Dynamic Hermode Micro-Tuning & Pure Just Intonation Retuner
+  {
   Jazz::JZDynamicHermodeTuningEngine hermodeEngine(48000.0f);
   Jazz::JZDynamicHermodeTuningEngine::Parameters hmParams;
   hmParams.mode = Jazz::HermodeTuningMode::JUST_INTONATION_5_LIMIT;
@@ -4743,6 +5104,8 @@ void TestAutoAccompanimentLogic()
 //-----------------------------------------------------------------------------
 // Test 16: Comprehensive Simulation of Menus, Functions, Knobs & 4-Minute Master Songs
 //-----------------------------------------------------------------------------
+  }
+
 void TestMenusFunctionsAndKnobsSimulation()
 {
   cout << "[TEST] Running TestMenusFunctionsAndKnobsSimulation..." << endl;

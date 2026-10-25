@@ -219,7 +219,7 @@ float JZGuitarAmpProfiler::processSample(float in) {
     // Preamp drive calculation
     float preampDrive = 1.0f + m_gain * 2.8f;
     if (m_ampModel == AmpTubeModel::HIGH_GAIN_LEAD_6505) preampDrive *= 2.2f;
-    else if (m_ampModel == AmpTubeModel::CLEAN_AMERICAN_66L6) preampDrive *= 0.65f;
+    else if (m_ampModel == AmpTubeModel::CLEAN_AMERICAN_6L6) preampDrive *= 0.65f;
 
     // Preamp Tube Stage
     float v1 = triodePreampSaturate(in, preampDrive);

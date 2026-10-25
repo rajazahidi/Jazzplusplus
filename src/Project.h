@@ -48,6 +48,15 @@ class JZProject : public JZSong
 
     ~JZProject();
 
+    JZSong* GetSong() { return this; }
+    const JZSong* GetSong() const { return this; }
+
+    int GetTicksPerBar() const
+    {
+      int tpq = GetTicksPerQuarter();
+      return tpq > 0 ? tpq * 4 : 1920;
+    }
+
     // restart play here if space bar hit
     int mStartTime;
 

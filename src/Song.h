@@ -102,6 +102,14 @@ class JZSong
 
     int GetLastClock() const;
 
+    int NumBars() const
+    {
+      int tpb = mTicksPerQuarter * 4;
+      if (tpb <= 0) tpb = 1920;
+      int last = GetLastClock();
+      return (last <= 0) ? 1 : ((last + tpb - 1) / tpb);
+    }
+
     int NumUsedTracks();        // number of used tracks
 
     int Speed();

@@ -589,6 +589,13 @@ class JZTrack : public JZEventArray
     const char* GetName();
     void SetName(const char* Name);
 
+    bool IsKilled() const { return false; }
+    std::string GetTrackName() const
+    {
+      const char* n = const_cast<JZTrack*>(this)->GetName();
+      return n ? std::string(n) : std::string();
+    }
+
     const char* GetCopyright();
     void SetCopyright(char *Copyright);
 

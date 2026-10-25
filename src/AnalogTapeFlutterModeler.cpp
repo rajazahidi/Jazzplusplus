@@ -1,6 +1,7 @@
 #include "AnalogTapeFlutterModeler.h"
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 
 namespace Jazz {
 

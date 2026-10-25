@@ -455,13 +455,135 @@ file(COPY src/HelpFiles DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 enable_testing()
 add_executable(jazz_tests
     tests/test_main.cpp
-    src/ChordScaleData.cpp
+    src/AcousticFeedbackSuppressorEngine.cpp
+    src/AcousticGuitarBodyImpulseConvolverEngine.cpp
+    src/AdaptiveHermodeTuningEngine.cpp
+    src/AdaptiveMainsHumRemoverEngine.cpp
+    src/AdaptiveRoomDereverberationEngine.cpp
+    src/AdmBwfSpatialMetadataEngine.cpp
+    src/AnalogBbdChorusDimensionEngine.cpp
+    src/AnalogConsoleChannelToleranceEngine.cpp
+    src/AnalogSubharmonicBassExciterEngine.cpp
+    src/Ara2HostBridge.cpp
+    src/AtmosphericAirAbsorptionSpatialEngine.cpp
     src/AudioEffects.cpp
-    src/SoundGenerator.cpp
+    src/AudioGraphScheduler.cpp
+    src/AudioWatermarkProvenanceEngine.cpp
+    src/AutonomousMixAssistantEngine.cpp
+    src/BinauralAcousticRoomConvolverEngine.cpp
+    src/BinauralDopplerMotionSpatializerEngine.cpp
+    src/BinauralRoomImpulseInterpolationEngine.cpp
+    src/BiomechanicalVocalTractEngine.cpp
+    src/BodeFrequencyShifterWaveMultiplierEngine.cpp
+    src/BowedStringAcousticBodyConvolverEngine.cpp
+    src/BroadcastAudioWatermarkSteganographyEngine.cpp
+    src/BroadcastWaveIxmlExporterEngine.cpp
+    src/ChordScaleData.cpp
+    src/ComplexSidechainAdcGraphResolver.cpp
+    src/ControlSurfaceManager.cpp
+    src/DialogueGatedLoudnessEngine.cpp
+    src/DigitalTruePeakDeClipperEngine.cpp
+    src/DsdDxdEngine.cpp
+    src/DynamicHermodeTuningEngine.cpp
+    src/DynamicResonanceSuppressorEngine.cpp
+    src/DynamicSubBassSpectralCarverEngine.cpp
+    src/DynamicWindTurbulenceSuppressorEngine.cpp
+    src/EllipticalMonoBassCenteringEngine.cpp
+    src/EuclideanPolyrhythmEngine.cpp
+    src/GameAudioBridge.cpp
+    src/GpuWaveformTileCacheEngine.cpp
+    src/GrandPianoSympatheticResonanceEngine.cpp
+    src/HardwareInsertDelayCompensator.cpp
+    src/HelicalSpringDispersionEngine.cpp
+    src/HighOrderAmbisonics3rdOrderEngine.cpp
+    src/ImmersiveBassManagementCrossoverEngine.cpp
+    src/ImmersiveFolddownDownmixEngine.cpp
+    src/ImmersiveSpeakerAlignmentEngine.cpp
+    src/InfiniteBarberpoleFlangerEngine.cpp
+    src/IntelligentMasteringAssistant.cpp
+    src/IntelligentVocalHarmonizerEngine.cpp
+    src/LiveStagePlaybackRedundancyEngine.cpp
+    src/LiveStreamHealthTelemetryEngine.cpp
+    src/LockFreeAudioBufferPoolAllocator.cpp
+    src/LoudnessRangeDynamicsSculptorEngine.cpp
+    src/MasterBusGlueVcaCompressorEngine.cpp
+    src/MasterLinearPhaseMultibandDynamicsEngine.cpp
+    src/MasteringTargetCurveMatcherEngine.cpp
+    src/Midi2UniversalPacketEngine.cpp
     src/MidiEffects.cpp
+    src/MoogTransistorLadderFilterEngine.cpp
+    src/MpegHInteractiveAudioEngine.cpp
+    src/MultiMicPhaseAlignerEngine.cpp
+    src/MultiTrackDrumBleedRemoverEngine.cpp
+    src/MultibandDynamicSidechainDuckerEngine.cpp
+    src/MultibandTransientSculptorEngine.cpp
+    src/MultichannelAtmosLoudnessMeterEngine.cpp
+    src/NetworkSessionEngine.cpp
+    src/NeuralAmpWaveNetProfilerEngine.cpp
+    src/NeuralAudioEngine.cpp
+    src/NeuralSpectralDereverberationEngine.cpp
+    src/NeuralStemSeparatorEngine.cpp
+    src/NeuralTimbreTransferEngine.cpp
+    src/OpticalFilmAudioRestorationEngine.cpp
+    src/OpticalT4LevelingAmplifierEngine.cpp
+    src/PersonalizedPinnaAcousticModeler.cpp
+    src/PhaseLockedDrumReplacerEngine.cpp
+    src/PluginCrashSandboxEngine.cpp
+    src/PluginHostBridge.cpp
+    src/PolyphaseAntiAliasingOversamplerEngine.cpp
+    src/PolyphonicAudioChordParserEngine.cpp
+    src/PolyphonicNeuralAudioToMidiEngine.cpp
+    src/PolyphonicVocalFormantMorpherEngine.cpp
+    src/PsychoacousticPhantomBassEngine.cpp
+    src/PtpClockPrecisionSyncEngine.cpp
+    src/QuantumParticleGranularEngine.cpp
+    src/ReactiveLoadSpeakerImpedanceEngine.cpp
+    src/RealTimeThreadAffinityScheduler.cpp
+    src/RoomAcousticCalibrationEngine.cpp
+    src/RotaFonicRotarySpeakerSimulator.cpp
+    src/SmpteVideoSyncEngine.cpp
+    src/SoundGenerator.cpp
+    src/SpatialAmbisonicsUpMixerEngine.cpp
+    src/SpatialAudioEarCanalEqCalibrationEngine.cpp
+    src/SpatialHeadTracker.cpp
+    src/SpatialTransientTonalBalancerEngine.cpp
+    src/SpectralAudioMorphEngine.cpp
+    src/SpectralFrequencySplitPannerEngine.cpp
+    src/SpectralPhaseDisperserEngine.cpp
+    src/SpectralResonanceSuppressorEngine.cpp
+    src/SpectralSidechainUnmaskerEngine.cpp
+    src/SpeechDenoiseSpectralSubtractorEngine.cpp
+    src/SteelPlateReverbPhysicalEngine.cpp
+    src/StereoWidthSpectralShufflerEngine.cpp
+    src/SubHarmonicWaveguideBassEngine.cpp
+    src/SympatheticGuitarResonanceEngine.cpp
+    src/TapeHeadBumpVarispeedTransportEngine.cpp
+    src/TapeHysteresisAzimuthEngine.cpp
+    src/TapeMachineCalibrationEngine.cpp
+    src/TapePrintThroughDemagSimulator.cpp
+    src/TonewheelOrganDrawbarEngine.cpp
+    src/TransauralCrosstalkCancellerEngine.cpp
+    src/TransientRingingSuppressorEngine.cpp
+    src/TransientTonalDecomposeEngine.cpp
+    src/VariableMuVintageTubeCompressorEngine.cpp
+    src/VintageCassetteLoFiTapeEngine.cpp
+    src/VintageDiodeLadderFilterEngine.cpp
+    src/VintageInductorWahPedalEngine.cpp
+    src/VinylLatheMechanicalSimulator.cpp
+    src/VirtualStudioMonitorSimulator.cpp
+    src/VocalAlignmentTimeWarperEngine.cpp
+    src/VocalMicRustleAttenuatorEngine.cpp
+    src/VocalPlosiveDePopperEngine.cpp
+    src/VocalSibilanceSplitDeEsserEngine.cpp
+    src/VocalVibratoHumanizerEngine.cpp
+    src/VolterraDynamicConvolutionEngine.cpp
+    src/WaveTerrainGraphicSynthEngine.cpp
+    src/XenharmonicLatticeMorpherEngine.cpp
 )
 target_compile_definitions(jazz_tests PRIVATE JAZZ_UNIT_TEST)
 target_include_directories(jazz_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+find_package(Threads REQUIRED)
+target_link_libraries(jazz_tests PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
 add_test(NAME JazzCoreUnitTests COMMAND jazz_tests)
 set_tests_properties(JazzCoreUnitTests PROPERTIES WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 

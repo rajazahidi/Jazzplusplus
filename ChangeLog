@@ -13,6 +13,7 @@
     - Initialized default input device using Pm_GetDefaultInputDeviceID() in JZPortMidiPlayer constructor.
     - Added __WXOSX__ preprocessor guard compatibility in JZProject (src/Project.cpp).
     - Resolved Apple Clang -Wc++11-narrowing error in DrumMidiEvent initializer list in src/GenerativeDrumMorpher.cpp.
+    - Fixed Apple Clang -Wint-conversion errors by replacing NULL pointer initializers with 0 for integer CoreMIDI references (MIDIClientRef, MIDIPortRef, MIDIEndpointRef, MIDIEntityRef, MIDIDeviceRef).
   * Continuous Integration Workflow (.github/workflows/ci.yml):
     - Added build-macos job targeting macos-14 (Apple Silicon arm64).
     - Integrated Homebrew wxwidgets installation, parallel compilation, and ctest test suite execution.

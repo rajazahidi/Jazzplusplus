@@ -60,9 +60,9 @@
 #define MIDI_EOX        0xf7
 #define MIDI_STATUS_MASK 0x80
 
-static MIDIClientRef	client = NULL;	/* Client handle to the MIDI server */
-static MIDIPortRef	portIn = NULL;	/* Input port handle */
-static MIDIPortRef	portOut = NULL;	/* Output port handle */
+static MIDIClientRef	client = 0;	/* Client handle to the MIDI server */
+static MIDIPortRef	portIn = 0;	/* Input port handle */
+static MIDIPortRef	portOut = 0;	/* Output port handle */
 
 extern pm_fns_node pm_macosx_in_dictionary;
 extern pm_fns_node pm_macosx_out_dictionary;
@@ -308,7 +308,7 @@ midi_in_open(PmInternal *midi, void *driverInfo)
     }
     
     endpoint = (MIDIEndpointRef)(uintptr_t) descriptors[midi->device_id].descriptor;
-    if (endpoint == NULL) {
+    if (endpoint == 0) {
         return pmInvalidDeviceId;
     }
 
@@ -357,7 +357,7 @@ midi_in_close(PmInternal *midi)
     if (!m) return pmBadPtr;
 
     endpoint = (MIDIEndpointRef)(uintptr_t) descriptors[midi->device_id].descriptor;
-    if (endpoint == NULL) {
+    if (endpoint == 0) {
         pm_hosterror = pmBadPtr;
     }
     
@@ -651,9 +651,9 @@ CFStringRef EndpointName(MIDIEndpointRef endpoint, bool isExternal)
     CFRelease(str);
   }
   
-  MIDIEntityRef entity = NULL;
+  MIDIEntityRef entity = 0;
   MIDIEndpointGetEntity(endpoint, &entity);
-  if (entity == NULL)
+  if (entity == 0)
     // probably virtual
     return result;
   
@@ -667,9 +667,9 @@ CFStringRef EndpointName(MIDIEndpointRef endpoint, bool isExternal)
     }
   }
   // now consider the device's name
-  MIDIDeviceRef device = NULL;
+  MIDIDeviceRef device = 0;
   MIDIEntityGetDevice(entity, &device);
-  if (device == NULL)
+  if (device == 0)
     return result;
   
   str = NULL;
@@ -893,7 +893,7 @@ PmError pm_macosxcm_init(void)
     /* Iterate over the MIDI input devices */
     for (i = 0; i < numInputs; i++) {
         endpoint = MIDIGetSource(i);
-        if (endpoint == NULL) {
+        if (endpoint == 0) {
             continue;
         }
 
@@ -909,7 +909,7 @@ PmError pm_macosxcm_init(void)
     /* Iterate over the MIDI output devices */
     for (i = 0; i < numOutputs; i++) {
         endpoint = MIDIGetDestination(i);
-        if (endpoint == NULL) {
+        if (endpoint == 0) {
             continue;
         }
 
@@ -932,7 +932,7 @@ error_return:
 
 void pm_macosxcm_term(void)
 {
-    if (client != NULL)	 MIDIClientDispose(client);
-    if (portIn != NULL)	 MIDIPortDispose(portIn);
-    if (portOut != NULL) MIDIPortDispose(portOut);
+    if (client != 0)	 MIDIClientDispose(client);
+    if (portIn != 0)	 MIDIPortDispose(portIn);
+    if (portOut != 0) MIDIPortDispose(portOut);
 }

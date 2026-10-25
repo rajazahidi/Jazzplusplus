@@ -88,6 +88,18 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
     }
   });
 
+  pHtmlWindow->Bind(wxEVT_HTML_LINK_CLICKED, [](wxHtmlLinkEvent& event) {
+    const wxString href = event.GetLinkInfo().GetHref();
+    if (href.StartsWith("http://") || href.StartsWith("https://") || href.StartsWith("mailto:"))
+    {
+      wxLaunchDefaultBrowser(href);
+    }
+    else
+    {
+      event.Skip();
+    }
+  });
+
   wxString LocaleString = wxLocale::GetSystemEncodingName();
 
   wxString VersionString;

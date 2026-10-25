@@ -31,6 +31,7 @@
 #include <wx/dcclient.h>
 #include <wx/msgdlg.h>
 #include <wx/stdpaths.h>
+#include <wx/utils.h>
 
 #include <fstream>
 #include <vector>
@@ -77,20 +78,37 @@ static void ConfigureHelpWindowBackground(wxHtmlHelpController* pHelpCtrl)
     {
       pHtml->SetDoubleBuffered(true);
       pHtml->SetBackgroundColour(*wxWHITE);
-      pHtml->Bind(wxEVT_ERASE_BACKGROUND, [pHtml](wxEraseEvent& event) {
-        wxDC* pDc = event.GetDC();
-        if (pDc)
-        {
-          pDc->SetBackground(*wxWHITE_BRUSH);
-          pDc->Clear();
-        }
-        else
-        {
-          wxClientDC clientDc(pHtml);
-          clientDc.SetBackground(*wxWHITE_BRUSH);
-          clientDc.Clear();
-        }
-      });
+      if (pHtml->GetName() != "JazzHelpConfigured")
+      {
+        pHtml->SetName("JazzHelpConfigured");
+
+        pHtml->Bind(wxEVT_ERASE_BACKGROUND, [pHtml](wxEraseEvent& event) {
+          wxDC* pDc = event.GetDC();
+          if (pDc)
+          {
+            pDc->SetBackground(*wxWHITE_BRUSH);
+            pDc->Clear();
+          }
+          else
+          {
+            wxClientDC clientDc(pHtml);
+            clientDc.SetBackground(*wxWHITE_BRUSH);
+            clientDc.Clear();
+          }
+        });
+
+        pHtml->Bind(wxEVT_HTML_LINK_CLICKED, [](wxHtmlLinkEvent& event) {
+          const wxString href = event.GetLinkInfo().GetHref();
+          if (href.StartsWith("http://") || href.StartsWith("https://") || href.StartsWith("mailto:"))
+          {
+            wxLaunchDefaultBrowser(href);
+          }
+          else
+          {
+            event.Skip();
+          }
+        });
+      }
       pHtml->Refresh();
     }
   }

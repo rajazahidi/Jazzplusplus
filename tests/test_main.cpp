@@ -104,6 +104,12 @@
 #include "MasteringTargetCurveMatcherEngine.h"
 #include "DigitalTruePeakDeClipperEngine.h"
 #include "TransauralCrosstalkCancellerEngine.h"
+#include "VocalMicRustleAttenuatorEngine.h"
+#include "MoogTransistorLadderFilterEngine.h"
+#include "SpatialTransientTonalBalancerEngine.h"
+#include "AdaptiveMainsHumRemoverEngine.h"
+#include "GrandPianoSympatheticResonanceEngine.h"
+#include "MasterLinearPhaseMultibandDynamicsEngine.h"
 
 #include <cassert>
 #include <cmath>
@@ -4242,6 +4248,110 @@ void TestAutoAccompanimentLogic()
               xtcEngine.getInterauralDelaySamples() > 0 &&
               xtcEngine.isCancellationActive(),
               "Transaural Crosstalk Canceller validates Cooper-Bauck recursive XTC, Woodworth ITD calculation, and 180-degree 3D soundstage expansion");
+
+  // 221. Real-Time Vocal Microphone Rustle, Clothing Friction & Mechanical Thud Attenuator
+  Jazz::JZVocalMicRustleAttenuatorEngine rustleEngine(48000.0f);
+  rustleEngine.setReductionAmount(75.0f);
+  rustleEngine.setSensitivity(0.85f);
+  rustleEngine.setFrequencyBand(80.0f, 1200.0f);
+
+  const size_t rusN = 512;
+  std::vector<float> rusInL(rusN, 0.5f), rusInR(rusN, 0.5f);
+  std::vector<float> rusOutL(rusN, 0.0f), rusOutR(rusN, 0.0f);
+  rustleEngine.process(rusInL.data(), rusInR.data(), rusOutL.data(), rusOutR.data(), rusN);
+
+  TEST_ASSERT(rustleEngine.getReductionAmount() == 75.0f &&
+              rustleEngine.getSensitivity() == 0.85f &&
+              rustleEngine.getMinFreqHz() == 80.0f &&
+              rustleEngine.getMaxFreqHz() == 1200.0f,
+              "Vocal Mic Rustle Attenuator validates sub-band friction variance tracking and low-mid abrasive burst damping");
+
+  // 222. Historic Robert Moog 4-Pole 24dB/Octave Non-Linear Transistor Ladder Filter Engine
+  Jazz::JZMoogTransistorLadderFilterEngine moogFilter(48000.0f);
+  moogFilter.setCutoffHz(1200.0f);
+  moogFilter.setResonance(0.85f);
+  moogFilter.setDriveDb(6.0f);
+
+  const size_t moogN = 512;
+  std::vector<float> moogInL(moogN, 0.6f), moogInR(moogN, 0.6f);
+  std::vector<float> moogOutL(moogN, 0.0f), moogOutR(moogN, 0.0f);
+  moogFilter.process(moogInL.data(), moogInR.data(), moogOutL.data(), moogOutR.data(), moogN);
+
+  TEST_ASSERT(moogFilter.getCutoffHz() == 1200.0f &&
+              moogFilter.getResonance() == 0.85f &&
+              moogFilter.getDriveDb() == 6.0f &&
+              moogFilter.getThdPercent() > 0.0f,
+              "Moog Transistor Ladder Filter validates 4-pole differential tanh saturation, negative resonance feedback, and analog drive");
+
+  // 223. Spatial Mid/Side Transient-Tonal Polar Balancer & Stereo Image Sculptor
+  Jazz::JZSpatialTransientTonalBalancerEngine balancerEngine(48000.0f);
+  balancerEngine.setTransientWidth(0.5f);
+  balancerEngine.setTonalWidth(1.6f);
+  balancerEngine.setTransientPan(0.0f);
+  balancerEngine.setTonalPan(0.0f);
+
+  const size_t balN = 512;
+  std::vector<float> balInL(balN, 0.5f), balInR(balN, -0.2f);
+  std::vector<float> balOutL(balN, 0.0f), balOutR(balN, 0.0f);
+  balancerEngine.process(balInL.data(), balInR.data(), balOutL.data(), balOutR.data(), balN);
+
+  TEST_ASSERT(balancerEngine.getTransientWidth() == 0.5f &&
+              balancerEngine.getTonalWidth() == 1.6f &&
+              balancerEngine.getPhaseCorrelation() >= -1.0f &&
+              balancerEngine.getPhaseCorrelation() <= 1.0f,
+              "Spatial Transient-Tonal Balancer validates dual-envelope M/S decomposition, transient centering, and tonal width expansion");
+
+  // 224. Adaptive Mains Hum (50/60Hz) & Electromagnetic Ground-Loop Harmonic De-Hummer
+  Jazz::JZAdaptiveMainsHumRemoverEngine humRemover(48000.0f);
+  humRemover.setGridFrequency(Jazz::GridFrequency::GRID_50HZ);
+  humRemover.setSuppressionDepthDb(-40.0f);
+  humRemover.setNotchQ(60.0f);
+  humRemover.setHarmonicCount(12);
+
+  const size_t humN = 512;
+  std::vector<float> humInL(humN, 0.5f), humInR(humN, 0.5f);
+  std::vector<float> humOutL(humN, 0.0f), humOutR(humN, 0.0f);
+  humRemover.process(humInL.data(), humInR.data(), humOutL.data(), humOutR.data(), humN);
+
+  TEST_ASSERT(humRemover.getGridFrequency() == Jazz::GridFrequency::GRID_50HZ &&
+              humRemover.getTrackedGridFrequencyHz() == 50.0f &&
+              humRemover.getSuppressionDepthDb() == -40.0f &&
+              humRemover.getNotchQ() == 60.0f &&
+              humRemover.getHarmonicCount() == 12 &&
+              humRemover.getGridFrequencyName().find("50 Hz") != std::string::npos,
+              "Adaptive Mains Hum Remover validates 50Hz PLL tracking, 16-harmonic notch cascade, and electromagnetic de-humming");
+
+  // 225. Concert Grand Piano Sympathetic String & Damper Pedal Acoustic Resonance Engine
+  Jazz::JZGrandPianoSympatheticResonanceEngine grandResonance(48000.0f);
+  grandResonance.setDamperPedal(true);
+  grandResonance.setSympatheticDepth(70.0f);
+  grandResonance.setSoundboardSize(85.0f);
+
+  const size_t pnoN = 512;
+  std::vector<float> pnoInL(pnoN, 0.6f), pnoInR(pnoN, 0.6f);
+  std::vector<float> pnoOutL(pnoN, 0.0f), pnoOutR(pnoN, 0.0f);
+  grandResonance.process(pnoInL.data(), pnoInR.data(), pnoOutL.data(), pnoOutR.data(), pnoN);
+
+  TEST_ASSERT(grandResonance.isDamperPedalDown() &&
+              grandResonance.getSympatheticDepth() == 70.0f &&
+              grandResonance.getActiveResonatingStringsCount() == 88 &&
+              grandResonance.getResonanceEnergyDb() > -90.0f,
+              "Concert Grand Piano Sympathetic Resonance validates 88-string bridge cross-coupling, damper pedal release, and duplex overtones");
+
+  // 226. 5-Band Linear-Phase Mastering Dynamics Processor & Multiband Compressor
+  Jazz::JZMasterLinearPhaseMultibandDynamicsEngine multibandDynamics(48000.0f);
+  multibandDynamics.setCrossovers(120.0f, 600.0f, 3000.0f, 9000.0f);
+  multibandDynamics.setSoloBand(-1);
+
+  const size_t dynN = 512;
+  std::vector<float> dynInL(dynN, 0.5f), dynInR(dynN, 0.5f);
+  std::vector<float> dynOutL(dynN, 0.0f), dynOutR(dynN, 0.0f);
+  multibandDynamics.process(dynInL.data(), dynInR.data(), dynOutL.data(), dynOutR.data(), dynN);
+
+  TEST_ASSERT(multibandDynamics.getSoloBand() == -1 &&
+              multibandDynamics.getBandParameters(0).thresholdDb == -16.0f &&
+              multibandDynamics.getBandGainReductionDb(0) <= 0.0f,
+              "Master Linear-Phase Multiband Dynamics validates 5-band crossover, soft-knee logarithmic VCA compression, and lookahead");
 }
 
 //-----------------------------------------------------------------------------

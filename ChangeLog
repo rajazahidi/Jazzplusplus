@@ -1,4 +1,27 @@
 25-10-2026 Raja Zahidi
+- Feature & Master Studio Vocal Mic Rustle Attenuator, Moog Transistor Ladder Filter, Spatial Transient-Tonal Balancer, Adaptive Mains Hum Remover, Grand Piano Sympathetic Resonance, & Master Linear-Phase Multiband Dynamics Suite v32.0 (Apex Transcendence Sovereign Millennium Release):
+  * Real-Time Vocal Microphone Rustle, Clothing Friction & Mechanical Thud Attenuator (src/VocalMicRustleAttenuatorEngine.h & .cpp):
+    - JZVocalMicRustleAttenuatorEngine eliminates non-stationary clothing friction and mechanical mic capsule thuds (iZotope RX De-rustle / Accentize style).
+    - Features 8-band friction variance tracking (80 Hz to 1.2 kHz), fast dynamic suppression (-3 dB to -24 dB) with sub-5ms recovery, vocal formant and fundamental pitch preservation, and Rustle Delta Solo audition mode.
+  * Historic Robert Moog 4-Pole 24dB/Octave Non-Linear Transistor Ladder Filter Engine (src/MoogTransistorLadderFilterEngine.h & .cpp):
+    - JZMoogTransistorLadderFilterEngine delivers physical modeling of the legendary 1965 Minimoog Model D ladder filter.
+    - Features 4 cascaded differential transistor pairs with non-linear tanh() saturation, negative resonance feedback, pure sinusoidal self-oscillation at resonance >= 1.0, thermal voltage drift, and pre-filter analog drive (+18 dB).
+  * Spatial Mid/Side Transient-Tonal Polar Balancer & Stereo Image Sculptor (src/SpatialTransientTonalBalancerEngine.h & .cpp):
+    - JZSpatialTransientTonalBalancerEngine provides independent spatial positioning for transients versus sustained tonal bodies (Eventide SplitEQ / Sound Radix Powair style).
+    - Features dual-envelope M/S decomposition, independent transient width (0.0x - 2.0x) and tonal width (0.0x - 2.5x), polar angle panning, transient centering lock for mono punch, and broadcast phase correlation guard.
+  * Adaptive Mains Hum (50/60Hz) & Electromagnetic Ground-Loop Harmonic De-Hummer (src/AdaptiveMainsHumRemoverEngine.h & .cpp):
+    - JZAdaptiveMainsHumRemoverEngine removes electrical mains hum and ground loop buzz (iZotope RX De-hum / Waves WNS style).
+    - Features software Phase-Locked Loop (PLL) tracking electrical grid drift (+/- 2 Hz around 50 Hz and 60 Hz), an array of 16 phase-coherent narrow notch filters tracking all harmonics simultaneously, odd/even harmonic balance, and Hum Delta Solo mode.
+  * Concert Grand Piano Sympathetic String & Damper Pedal Acoustic Resonance Engine (src/GrandPianoSympatheticResonanceEngine.h & .cpp):
+    - JZGrandPianoSympatheticResonanceEngine physically simulates sympathetic soundboard and string coupling (Modartt Pianoteq / Ivory II style).
+    - Features physical 88-string bridge cross-coupling matrix (A0 to C8), damper pedal (MIDI CC 64) full-string un-damped harmonic wash, modal resonator bank for harmonic nodes, duplex scale inharmonic treble singing overtones, and spruce soundboard radiation.
+  * 5-Band Linear-Phase Mastering Dynamics Processor & Multiband Compressor (src/MasterLinearPhaseMultibandDynamicsEngine.h & .cpp):
+    - JZMasterLinearPhaseMultibandDynamicsEngine delivers zero-phase-smearing mastering dynamics (FabFilter Pro-MB / TC Electronic Master X HD style).
+    - Features 5-band linear-phase crossover (Sub, Low-Mid, Mid, High-Mid, Air), independent soft-knee logarithmic VCA compressor per band, ultra-fast attack and program-dependent release, individual band solo, and dynamic gain reduction telemetry.
+  * Added Automated Unit Tests 221 to 226 (tests/test_main.cpp):
+    - Validates vocal mic rustle sub-band variance suppression, Moog transistor ladder 4-pole differential tanh saturation and self-oscillation, spatial transient/tonal Mid-Side polar balancing, adaptive 50Hz PLL mains hum removal with 16-harmonic notch cascade, grand piano 88-string damper pedal sympathetic resonance, and 5-band linear-phase mastering multiband dynamics.
+
+25-10-2026 Raja Zahidi
 - Feature & Master Studio Neural Spectral Dereverberation, Vintage Cassette Lo-Fi Tape, Intelligent Vocal Harmonizer, Mastering Target Curve Matcher, Digital True-Peak De-Clipper, & Transaural Crosstalk Canceller Suite v31.0 (Apex Transcendence Sovereign Pinnacle Release):
   * Real-Time Neural Spectral Dereverberation & Early Reflection Stripper (src/NeuralSpectralDereverberationEngine.h & .cpp):
     - JZNeuralSpectralDereverberationEngine eliminates room acoustic boxiness and early wall reflections (< 40ms) with sub-band spectral cross-correlation and diffuse reverberant tail subtraction.

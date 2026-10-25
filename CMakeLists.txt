@@ -115,6 +115,7 @@ set(JAZZ_SOURCES
     src/AcousticFeedbackSuppressorEngine.cpp
     src/AcousticGuitarBodyImpulseConvolverEngine.cpp
     src/AdaptiveHermodeTuningEngine.cpp
+    src/AdaptiveMainsHumRemoverEngine.cpp
     src/AdaptiveRoomDereverberationEngine.cpp
     src/AdmBwfSpatialMetadataEngine.cpp
     src/AiMelodyCounterpointGenerator.cpp
@@ -218,6 +219,7 @@ set(JAZZ_SOURCES
     src/GetOptionIndex.cpp
     src/Globals.cpp
     src/GoniometerVectorscope.cpp
+    src/GrandPianoSympatheticResonanceEngine.cpp
     src/GranularCloudSynth.cpp
     src/GroovePool.cpp
     src/GuitarFrame.cpp
@@ -254,6 +256,7 @@ set(JAZZ_SOURCES
     src/Mapper.cpp
     src/MasterBusGlueVcaCompressorEngine.cpp
     src/MasterLinearPhaseImager.cpp
+    src/MasterLinearPhaseMultibandDynamicsEngine.cpp
     src/MasterTruePeakLimiter.cpp
     src/MasterVisualizer.cpp
     src/MasteringTargetCurveMatcherEngine.cpp
@@ -270,6 +273,7 @@ set(JAZZ_SOURCES
     src/MixMaskingAnalyzer.cpp
     src/ModulationMultiFX.cpp
     src/ModulationMatrix.cpp
+    src/MoogTransistorLadderFilterEngine.cpp
     src/MpeEngine.cpp
     src/MpegHInteractiveAudioEngine.cpp
     src/MultibandCompressor.cpp
@@ -337,10 +341,11 @@ set(JAZZ_SOURCES
     src/SmpteVideoSyncEngine.cpp
     src/Song.cpp
     src/SoundGenerator.cpp
+    src/SpatialAmbisonicsUpMixerEngine.cpp
     src/SpatialAudioEarCanalEqCalibrationEngine.cpp
     src/SpatialAudioPanner.cpp
     src/SpatialHeadTracker.cpp
-    src/SpatialAmbisonicsUpMixerEngine.cpp
+    src/SpatialTransientTonalBalancerEngine.cpp
     src/SpectralAudioMorphEngine.cpp
     src/SpectralDenoise.cpp
     src/SpectralFrequencySplitPannerEngine.cpp
@@ -386,6 +391,7 @@ set(JAZZ_SOURCES
     src/VocalAlignmentTimeWarperEngine.cpp
     src/VocalDoublerEngine.cpp
     src/VocalHarmonizer.cpp
+    src/VocalMicRustleAttenuatorEngine.cpp
     src/VocalPitchEditor.cpp
     src/VocalPlosiveDePopperEngine.cpp
     src/VocalSibilanceSplitDeEsserEngine.cpp

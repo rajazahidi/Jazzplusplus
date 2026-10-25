@@ -997,11 +997,11 @@
         </div>
       </a>
 
-      <a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v6.0.0/Jazz%2B%2B-Windows-x64.zip" class="btn-download windows">
+      <a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v6.0.0/Jazz%2B%2B-Windows-x64-Setup-v6.0.0.exe" class="btn-download windows">
         <div class="btn-icon">🪟</div>
         <div>
-          <span class="btn-text-main">Download Windows ZIP</span>
-          <span class="btn-text-sub">Windows 10/11 x64 • 21.8 MB • Portable</span>
+          <span class="btn-text-main">Download Windows Setup</span>
+          <span class="btn-text-sub">Windows 10/11 x64 • Setup (.exe)</span>
         </div>
       </a>
 
@@ -1357,13 +1357,20 @@
       <!-- Windows Tab -->
       <div id="tab-windows" style="display: none;">
         <p style="margin-bottom: 1rem; color: var(--text-muted);">
-          <span class="lang-en">The Windows release is completely portable and includes all required 64-bit runtime libraries:</span>
-          <span class="lang-bm" style="display:none;">Pakej Windows adalah sepenuhnya mudah alih (portable) dan mengandungi semua fail sokongan 64-bit:</span>
+          <span class="lang-en">Choose between the interactive Windows Setup Installer or the standalone portable ZIP package:</span>
+          <span class="lang-bm" style="display:none;">Pilih antara Pemasang Interaktif Windows (Setup Installer) atau arkib mudah alih (Portable ZIP):</span>
         </p>
+        <div style="margin-bottom: 1.25rem; display: flex; gap: 0.85rem; flex-wrap: wrap;">
+          <a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v6.0.0/Jazz%2B%2B-Windows-x64-Setup-v6.0.0.exe" style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.6rem 1.2rem; background:var(--accent-blue); color:#fff; border-radius:var(--radius-sm); text-decoration:none; font-weight:600; font-size:0.9rem;">
+            📥 Download Windows Setup (.exe)
+          </a>
+          <a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v6.0.0/Jazz%2B%2B-Windows-x64.zip" style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.6rem 1.2rem; background:rgba(255,255,255,0.08); border:1px solid var(--border-color); color:var(--text-main); border-radius:var(--radius-sm); text-decoration:none; font-weight:600; font-size:0.9rem;">
+            📦 Download Portable ZIP
+          </a>
+        </div>
         <ol style="margin-left: 1.5rem; color: var(--text-muted); line-height: 1.8;">
-          <li>Download <code style="color: var(--accent-cyan);">Jazz++-Windows-x64.zip</code>.</li>
-          <li>Extract the archive into any folder of your choice.</li>
-          <li>Double-click <code style="color: var(--accent-cyan);">jazz.exe</code> to begin. The default Microsoft GS Wavetable Synth will be connected automatically.</li>
+          <li><strong>Setup Installer (.exe) [Recommended]:</strong> Run <code style="color: var(--accent-cyan);">Jazz++-Windows-x64-Setup-v6.0.0.exe</code>. Creates Desktop and Start Menu shortcuts, associates <code style="color: var(--accent-cyan);">.jazz</code> and <code style="color: var(--accent-cyan);">.mid</code> files, and installs cleanly into Program Files.</li>
+          <li><strong>Portable Archive (.zip):</strong> Extract <code style="color: var(--accent-cyan);">Jazz++-Windows-x64.zip</code> to any location and run <code style="color: var(--accent-cyan);">jazz.exe</code> without requiring administrative privileges.</li>
         </ol>
       </div>
 
@@ -1442,6 +1449,7 @@
         <h4>Downloads</h4>
         <ul>
           <li><a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v6.0.0/Jazz%2B%2B-x86_64.AppImage">Linux AppImage (x86_64)</a></li>
+          <li><a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v6.0.0/Jazz%2B%2B-Windows-x64-Setup-v6.0.0.exe">Windows Setup Installer (.exe)</a></li>
           <li><a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v6.0.0/Jazz%2B%2B-Windows-x64.zip">Windows x64 Package (ZIP)</a></li>
           <li><a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v6.0.0/Jazz%2B%2B-macOS-arm64.zip">macOS Apple Silicon Package (ZIP)</a></li>
           <li><a href="https://github.com/rajazahidi/Jazzplusplus/releases/tag/v6.0.0">GitHub Release v6.0.0</a></li>

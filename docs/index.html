@@ -317,6 +317,19 @@
       border-color: rgba(255, 255, 255, 0.4);
     }
 
+    .btn-download.macos {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-download.macos:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 30px -5px rgba(16, 185, 129, 0.6);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
     .btn-download .btn-icon {
       font-size: 2rem;
       line-height: 1;
@@ -961,7 +974,15 @@
         <div class="btn-icon">🪟</div>
         <div>
           <span class="btn-text-main">Download Windows ZIP</span>
-          <span class="btn-text-sub">Windows 10/11 x64 • 18.2 MB • Portable</span>
+          <span class="btn-text-sub">Windows 10/11 x64 • 21.8 MB • Portable</span>
+        </div>
+      </a>
+
+      <a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v5.4.16/Jazz%2B%2B-macOS-arm64.zip" class="btn-download macos">
+        <div class="btn-icon">🍏</div>
+        <div>
+          <span class="btn-text-main">Download macOS Bundle</span>
+          <span class="btn-text-sub">Apple Silicon arm64 • 2.4 MB • Standalone</span>
         </div>
       </a>
     </div>
@@ -1058,7 +1079,8 @@
 
     <div class="install-box">
       <div class="os-tabs">
-        <button class="os-tab active" onclick="showTab('linux')">🐧 Linux (Ubuntu, Zorin OS, Debian, Mint, Fedora)</button>
+        <button class="os-tab active" onclick="showTab('linux')">🐧 Linux (AppImage / Ubuntu)</button>
+        <button class="os-tab" onclick="showTab('macos')">🍏 macOS (Apple Silicon)</button>
         <button class="os-tab" onclick="showTab('windows')">🪟 Windows (10 / 11)</button>
         <button class="os-tab" onclick="showTab('source')">⚙️ Build From Source</button>
       </div>
@@ -1078,6 +1100,19 @@
         <p style="font-size: 0.88rem; color: var(--text-dim); margin-top: 0.5rem;">
           💡 <strong>Tip:</strong> If you don't have a hardware MIDI synth connected, ensure a software synthesizer like FluidSynth is active (<code style="color:var(--accent-cyan);">fluidsynth -a pulseaudio /usr/share/sounds/sf2/default.sf2</code>). Jazz++ will detect and connect to it automatically.
         </p>
+      </div>
+
+      <!-- macOS Tab -->
+      <div id="tab-macos" style="display: none;">
+        <p style="margin-bottom: 1rem; color: var(--text-muted);">
+          Native macOS release supporting Apple Silicon (M1/M2/M3/M4) and Intel with low-latency Apple CoreMIDI and CoreAudio:
+        </p>
+        <ol style="margin-left: 1.5rem; color: var(--text-muted); line-height: 1.8;">
+          <li>Download <code style="color: var(--accent-cyan);">Jazz++-macOS-arm64.zip</code>.</li>
+          <li>Double-click to extract the <code style="color: var(--accent-cyan);">Jazz++.app</code> bundle.</li>
+          <li>Drag <code style="color: var(--accent-cyan);">Jazz++.app</code> into your <code style="color: var(--accent-cyan);">/Applications</code> folder.</li>
+          <li>Launch Jazz++ from Launchpad or Spotlight. Native CoreMIDI input/output endpoints are enumerated automatically.</li>
+        </ol>
       </div>
 
       <!-- Windows Tab -->
@@ -1169,6 +1204,7 @@
         <ul>
           <li><a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v5.4.16/Jazz%2B%2B-x86_64.AppImage">Linux AppImage (x86_64)</a></li>
           <li><a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v5.4.16/Jazz%2B%2B-Windows-x64.zip">Windows x64 Package (ZIP)</a></li>
+          <li><a href="https://github.com/rajazahidi/Jazzplusplus/releases/download/v5.4.16/Jazz%2B%2B-macOS-arm64.zip">macOS Apple Silicon Package (ZIP)</a></li>
           <li><a href="https://github.com/rajazahidi/Jazzplusplus/releases/tag/v5.4.16">GitHub Release v5.4.16</a></li>
         </ul>
       </div>
@@ -1201,17 +1237,21 @@
     function showTab(os) {
       document.querySelectorAll('.os-tab').forEach(el => el.classList.remove('active'));
       document.getElementById('tab-linux').style.display = 'none';
+      document.getElementById('tab-macos').style.display = 'none';
       document.getElementById('tab-windows').style.display = 'none';
       document.getElementById('tab-source').style.display = 'none';
 
       if (os === 'linux') {
         document.querySelectorAll('.os-tab')[0].classList.add('active');
         document.getElementById('tab-linux').style.display = 'block';
-      } else if (os === 'windows') {
+      } else if (os === 'macos') {
         document.querySelectorAll('.os-tab')[1].classList.add('active');
+        document.getElementById('tab-macos').style.display = 'block';
+      } else if (os === 'windows') {
+        document.querySelectorAll('.os-tab')[2].classList.add('active');
         document.getElementById('tab-windows').style.display = 'block';
       } else if (os === 'source') {
-        document.querySelectorAll('.os-tab')[2].classList.add('active');
+        document.querySelectorAll('.os-tab')[3].classList.add('active');
         document.getElementById('tab-source').style.display = 'block';
       }
     }

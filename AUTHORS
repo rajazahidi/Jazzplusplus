@@ -29,6 +29,8 @@ Other Contributors:
     * Audio DSP Engine (3-Band EQ, Reverb, Delay, Chorus, Limiter/Overdrive)
     * Overhauled and enlarged Guitar Board & Tablature editor (1040x280) with
       tuning indicators, fret markers, pearl inlays, and real-time audio preview
-    * Automated cross-platform CI for Linux (AppImage) and Windows x64 (ZIP)
-    * Comprehensive automated unit test suite via CTest (210 tests)
+    * Native macOS Apple Silicon (arm64) & Intel support via CoreMIDI, CoreAudio, and PortMidi
+    * 35 Apex Master Studio production suites (7.1.4/9.1.6 spatial audio, 3rd-order HOA, VST3/CLAP sandboxing, BWF/iXML, P-Core CPU affinity scheduler)
+    * Automated cross-platform CI for Linux (Ubuntu 24.04/22.04 & AppImage), Windows x64 (MSVC), and macOS (Apple Silicon .app bundle)
+    * Comprehensive automated unit test suite via CTest (555 test assertions with 100% pass rate)
 

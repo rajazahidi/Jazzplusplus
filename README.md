@@ -1,16 +1,30 @@
-# Jazz++ MIDI & Audio Sequencer
+# Jazz++ MIDI & Digital Audio Workstation
 
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Site-00d2ff?logo=github)](https://rajazahidi.github.io/Jazzplusplus/)
 [![Latest Release](https://img.shields.io/github/v/release/rajazahidi/Jazzplusplus?color=10b981)](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v5.4.16)
 [![CI Build](https://github.com/rajazahidi/Jazzplusplus/actions/workflows/ci.yml/badge.svg)](https://github.com/rajazahidi/Jazzplusplus/actions/workflows/ci.yml)
-[![Tests: 226 Passing](https://img.shields.io/badge/Tests-244%20Passing%20(100%25)-10b981.svg)](tests/test_main.cpp)
+[![Tests: 555 Passing](https://img.shields.io/badge/Tests-555%20Passing%20(100%25)-10b981.svg)](tests/test_main.cpp)
+[![Platforms](https://img.shields.io/badge/Platforms-Linux%20%7C%20macOS%20%7C%20Windows-blue.svg)](INSTALL.md)
+[![C++ Standard](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](CMakeLists.txt)
 [![License: GPL-2.0](https://img.shields.io/badge/License-GPL_v2-blue.svg)](COPYING)
 
-**Jazz++** is a full-featured open-source MIDI sequencer and digital audio workstation for Linux and Windows. Built using **wxWidgets**, it provides a rich visual environment for composing, editing, arranging, and recording multi-track MIDI music and digital audio.
+**Jazz++** is an enterprise-grade, open-source multi-track MIDI sequencer and digital audio workstation (DAW) for **Linux**, **macOS**, and **Windows**. Built using **modern C++17** and **wxWidgets**, it delivers an ultra-low-latency real-time audio pipeline, an extensive suite of 35 specialized Apex Master Studio DSP and spatial audio engines, out-of-process plugin crash sandboxing, physical acoustic modeling, and broadcast metadata export.
 
 Visit the official website: **[https://rajazahidi.github.io/Jazzplusplus/](https://rajazahidi.github.io/Jazzplusplus/)**
 
 Originally created by Andreas Voss and Per Sigmond, with subsequent development by Patrick Earl and Peter J. Stieber. Maintained, modernized, and expanded into a flagship Master Studio DAW by **Raja Zahidi** ([rajazahidi@aol.com](mailto:rajazahidi@aol.com)).
+
+---
+
+## Documentation Quick Links
+
+| Document | Description |
+| :--- | :--- |
+| [**`INSTALL.md`**](INSTALL.md) | Comprehensive step-by-step installation & build guide for Linux, macOS, and Windows |
+| [**`ARCHITECTURE.md`**](ARCHITECTURE.md) | In-depth system design, DAG ADC scheduling, real-time concurrency, and threading model |
+| [**`CONTRIBUTING.md`**](CONTRIBUTING.md) | Contribution guidelines, C++17 coding standards, and pull request workflow |
+| [**`SECURITY.md`**](SECURITY.md) | Security policy, vulnerability disclosure, and out-of-process plugin isolation details |
+| [**`ChangeLog`**](ChangeLog) | Complete history of changes, version announcements, and maintenance commits |
 
 ---
 
@@ -315,107 +329,85 @@ All **136 test suites** pass with 100% accuracy, verifying sample-accurate DSP p
 
 ---
 
-## Quick Start: Pre-built Binaries
+## Pre-Built Standalone Binaries
 
-Pre-compiled standalone packages for Linux and Windows are available from the [GitHub Releases](https://github.com/rajazahidi/Jazzplusplus/releases) page or [GitHub Actions Artifacts](https://github.com/rajazahidi/Jazzplusplus/actions).
+Official pre-built standalone binaries are generated automatically on every release:
 
-### Linux (AppImage)
-1. Download **`Jazz++-x86_64.AppImage`**.
-2. Make it executable and run:
-   ```bash
-   chmod +x Jazz++-x86_64.AppImage
-   ./Jazz++-x86_64.AppImage
-   ```
-
-### Windows (64-bit ZIP)
-1. Download **`Jazz++-Windows-x64.zip`**.
-2. Extract the archive and launch **`jazz.exe`**. All required wxWidgets 3.3.4 runtime DLLs are included.
+- **Linux AppImage**: Download [`Jazz++-x86_64.AppImage`](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v5.4.16), make executable with `chmod +x`, and run directly on Ubuntu 20.04+, Debian 11+, Fedora, Arch, or openSUSE.
+- **macOS Native Bundle**: Download [`Jazz++-macOS-arm64.zip`](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v5.4.16), extract `Jazz++.app`, and drag to your `/Applications` directory. Fully native on Apple Silicon (M1/M2/M3/M4) via CoreAudio and CoreMIDI.
+- **Windows Portable**: Download [`Jazz++-Windows-x64.zip`](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v5.4.16), extract to any folder, and double-click `jazz.exe`. All required 64-bit runtime libraries are included.
 
 ---
 
-## Smart Launcher & SoundFont Playback
+## Quick Build Instructions
 
-Jazz++ includes a smart launcher (`scripts/jazz-launcher.sh`) that automatically detects if an ALSA software synthesizer (such as FluidSynth or TiMidity) is already active. If none is running, it finds installed SoundFonts (e.g., `default-GM.sf2` or `FluidR3_GM.sf2`) and manages a lightweight background synthesizer so you can immediately hear MIDI playback without manual setup!
+For complete prerequisite commands and distro-specific instructions, see [**`INSTALL.md`**](INSTALL.md).
 
-To check your MIDI audio environment:
+### 1. Linux (Ubuntu / Debian / Fedora / Arch)
 ```bash
-./scripts/jazz-launcher.sh --check
-```
+# Install dependencies (Ubuntu/Debian)
+sudo apt update && sudo apt install -y build-essential cmake libasound2-dev libwxgtk3.2-dev
 
----
-
-## System Requirements & Prerequisites
-
-On Debian, Ubuntu, Linux Mint, or Zorin OS:
-
-```bash
-sudo apt update
-sudo apt install build-essential cmake libwxgtk3.2-dev libasound2-dev
-```
-
-*(For older Ubuntu releases, `libwxgtk3.0-gtk3-dev` can be used).*
-
----
-
-## Building Jazz++
-
-### Recommended: Modern CMake Build
-
-```bash
-# 1. Configure the build
+# Configure and compile using CMake
 cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel $(nproc)
 
-# 2. Compile using all available CPU cores
-cmake --build build -j$(nproc)
-
-# 3. Run the application
+# Run application & execute test suite
 ./build/jazz
+ctest --test-dir build --output-on-failure
 ```
 
-### Alternative: GNU Autotools Build
-
+### 2. macOS (Apple Silicon arm64 & Intel)
 ```bash
-# 1. Generate configure script
-./bootstrap
+# Install dependencies via Homebrew
+brew install cmake wxwidgets
 
-# 2. Configure with ALSA and audio driver support
-./configure --enable-alsa --enable-sequencer2
+# Configure and compile native application bundle
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel $(sysctl -n hw.ncpu)
 
-# 3. Compile
-make -j$(nproc)
+# Run Jazz++.app & execute test suite
+open build/jazz.app
+ctest --test-dir build --output-on-failure
+```
 
-# 4. Run
-./src/jazz
+### 3. Windows (MSVC x64)
+```powershell
+# Configure with CMake (pointing to wxWidgets directory)
+cmake -B build -DCMAKE_BUILD_TYPE=Release `
+  -DwxWidgets_ROOT_DIR="D:/wxWidgets" `
+  -DwxWidgets_LIB_DIR="D:/wxWidgets/lib/vc14x_x64_dll" `
+  -DwxWidgets_CONFIGURATION=mswu
+
+# Compile in Release mode
+cmake --build build --config Release --parallel
+
+# Run tests and executable
+ctest --test-dir build -C Release --output-on-failure
+.\build\Release\jazz.exe
 ```
 
 ---
 
-## Installation
+## Automated CI/CD & Test Coverage
 
-To install Jazz++ globally to `/usr/local/`:
-
-```bash
-sudo cmake --install build
-```
-
-This installs:
-- Executable: `/usr/local/bin/jazz`
-- Desktop Launcher: `/usr/local/share/applications/jazz.desktop`
-- Synthesizer Configurations: `/usr/local/share/jazz/conf/`
-- Demo Songs & Grooves: `/usr/local/share/jazz/song/`
+Jazz++ enforces enterprise-grade stability with an automated GitHub Actions CI matrix running on every push and pull request:
+- **macOS (macos-14 Apple Silicon arm64)**: Native Apple Clang compile, CoreMIDI / CoreAudio link, 100% CTest pass, `.app` bundle zip packaging.
+- **Linux (Ubuntu 24.04 LTS & 22.04 LTS)**: GCC 11/13 compile, ALSA kernel sequencing, 100% CTest pass.
+- **Universal Linux AppImage**: Self-contained portable AppImage generation on Ubuntu 22.04.
+- **Windows (MSVC x64)**: Visual Studio 2022 build, WASAPI driver integration, 100% CTest pass, standalone portable zip packaging.
 
 ---
 
 ## Directory Overview
 
-- [`src/`](src/): Main C++ application source code, UI frames, dialogs, and audio/MIDI drivers.
+- [`src/`](src/): Main C++ application source code, UI frames, dialogs, DSP audio engines, and MIDI drivers.
 - [`conf/`](conf/): Instrument maps (`.jzi`), drum sets, and default configuration (`jazz.cfg`).
-- [`song/`](song/): Demo songs (`.mid`), rhythm templates (`.rhy`), and sample audio (`.wav`).
-- [`portmidi/`](portmidi/): Embedded PortMidi library source code.
-- [`midinetd/`](midinetd/): Standalone remote MIDI daemon (ONC/Sun RPC).
-- [`codeblocks/`](codeblocks/): Code::Blocks project files.
-- [`vc12/`](vc12/): Visual Studio 2013 project files.
-- [`tests/`](tests/): Automated unit test suite covering 136 unit test suites.
+- [`song/`](song/): Demo songs (`.mid`), rhythm templates (`.rhy`), and sample audio files (`.wav`).
+- [`portmidi/`](portmidi/): Embedded PortMidi library source code supporting macOS CoreMIDI and cross-platform MIDI.
+- [`tests/`](tests/): Automated CTest unit test suite covering over 550 test assertions across all 35 studio suites.
+- [`resources/`](resources/): Vector SVG and multi-resolution PNG application icons.
+- [`scripts/`](scripts/): Packaging and launcher helper scripts (`build-appimage.sh`, `jazz-launcher.sh`).
 
 ---
 

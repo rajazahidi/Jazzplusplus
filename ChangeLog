@@ -1,4 +1,21 @@
 25-10-2026 Raja Zahidi
+- Documentation & Repository Modernization: Industry Standard Documentation & Cleanup:
+  * Comprehensive Documentation Suite:
+    - Overhauled README.md with cross-platform badges, quick-start guide, and architectural index.
+    - Authored INSTALL.md with complete building guides for Linux, macOS (Apple Silicon arm64 & Intel), and Windows (MSVC x64).
+    - Authored ARCHITECTURE.md detailing subsystem design, DAG ADC scheduling, real-time concurrency, and P-Core affinity.
+    - Authored CONTRIBUTING.md outlining C++17 coding conventions, real-time audio constraints, and PR workflows.
+    - Authored SECURITY.md covering vulnerability disclosure and out-of-process VST3/CLAP plugin sandboxing defenses.
+    - Updated AUTHORS and NEWS to reflect Version 5.4.16 release milestones and 100% CI pass rate.
+    - Modernized docs/index.html GitHub Pages site with native macOS download cards, tabs, and interactive scripts.
+  * Obsolete & Irrelevant File Removal:
+    - Removed obsolete 23-byte placeholder README in favor of canonical README.md.
+    - Removed deprecated LinuxInstall.txt, dialogs.txt, and wxwin2_port.txt legacy porting notes.
+    - Removed legacy 1990s contrib/ tree (contrib/borland, contrib/CakeWalk-Converter, contrib/vms-v26b.patch).
+    - Updated Makefile.am to eliminate dangling contrib reference.
+    - Purged untracked temporary autotools cache and build artifacts from workspace.
+
+25-10-2026 Raja Zahidi
 - Feature & Build Pipeline: Native macOS (Apple Silicon arm64) Build Support:
   * CMake Build Configuration (CMakeLists.txt):
     - Added elseif(APPLE) block configuring CoreMIDI and CoreAudio via PortMidi.

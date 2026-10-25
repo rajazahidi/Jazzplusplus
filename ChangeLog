@@ -12,6 +12,7 @@
     - Corrected input device setter in JZPortMidiPlayer::DeviceSelectionDialog() (src/PortMidiPlayer.cpp).
     - Initialized default input device using Pm_GetDefaultInputDeviceID() in JZPortMidiPlayer constructor.
     - Added __WXOSX__ preprocessor guard compatibility in JZProject (src/Project.cpp).
+    - Resolved Apple Clang -Wc++11-narrowing error in DrumMidiEvent initializer list in src/GenerativeDrumMorpher.cpp.
   * Continuous Integration Workflow (.github/workflows/ci.yml):
     - Added build-macos job targeting macos-14 (Apple Silicon arm64).
     - Integrated Homebrew wxwidgets installation, parallel compilation, and ctest test suite execution.

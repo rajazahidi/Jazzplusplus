@@ -134,7 +134,7 @@ void JZGenerativeDrumMorpher::generateFillEvents(int stepInBar, std::vector<Drum
         case DrumFillStyle::SNARE_ROLL_CRESCENDO: {
             // Snare roll getting louder up to velocity 125
             uint8_t vel = static_cast<uint8_t>(55.0f + progress * 70.0f);
-            outEvents.push_back({38, vel, (xorshift32() % 5) - 2});
+            outEvents.push_back({38, vel, static_cast<int>(xorshift32() % 5) - 2});
 
             // Occasional kick punch underneath
             if (stepInFill % 2 == 0) {

@@ -113,11 +113,13 @@ include_directories(
 set(JAZZ_SOURCES
     src/AboutDialog.cpp
     src/AcousticFeedbackSuppressorEngine.cpp
+    src/AcousticGuitarBodyImpulseConvolverEngine.cpp
     src/AdaptiveHermodeTuningEngine.cpp
     src/AdaptiveRoomDereverberationEngine.cpp
     src/AdmBwfSpatialMetadataEngine.cpp
     src/AiMelodyCounterpointGenerator.cpp
     src/AnalogBbdChorusDimensionEngine.cpp
+    src/AnalogSubharmonicBassExciterEngine.cpp
     src/AnalogTapeFlutterModeler.cpp
     src/Ara2HostBridge.cpp
     src/ArrayControl.cpp
@@ -259,6 +261,7 @@ set(JAZZ_SOURCES
     src/MpegHInteractiveAudioEngine.cpp
     src/MultibandCompressor.cpp
     src/MultibandOttProcessor.cpp
+    src/MultibandTransientSculptorEngine.cpp
     src/MultiMicPhaseAlignerEngine.cpp
     src/MultiTrackDrumBleedRemoverEngine.cpp
     src/MultiVelocitySampler.cpp
@@ -299,6 +302,7 @@ set(JAZZ_SOURCES
     src/RhythmArrayControl.cpp
     src/RoomAcousticCalibrationEngine.cpp
     src/RoomAcousticCalibrator.cpp
+    src/RotaFonicRotarySpeakerSimulator.cpp
     src/Sample.cpp
     src/SampleCommand.cpp
     src/SampleDialog.cpp
@@ -312,6 +316,7 @@ set(JAZZ_SOURCES
     src/SmpteVideoSyncEngine.cpp
     src/Song.cpp
     src/SoundGenerator.cpp
+    src/SpatialAudioEarCanalEqCalibrationEngine.cpp
     src/SpatialAudioPanner.cpp
     src/SpatialHeadTracker.cpp
     src/SpatialAmbisonicsUpMixerEngine.cpp
@@ -320,6 +325,7 @@ set(JAZZ_SOURCES
     src/SpectralRebalanceEngine.cpp
     src/SpectralResonanceTamer.cpp
     src/SpectralSidechainUnmaskerEngine.cpp
+    src/SpeechDenoiseSpectralSubtractorEngine.cpp
     src/StandardFile.cpp
     src/SteelPlateReverbPhysicalEngine.cpp
     src/StemSeparatorEngine.cpp

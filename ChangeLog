@@ -1,4 +1,27 @@
 25-10-2026 Raja Zahidi
+- Feature & Master Studio Acoustic Guitar Body Convolver, Subharmonic Bass & Optical Exciter, Multiband Transient Sculptor, RotaFonic Rotary Speaker, Speech Denoise Spectral Subtractor, & Spatial Audio Ear Canal EQ Calibration Suite v26.0 (Apex Genesis Zenith Release):
+  * Acoustic Guitar Body Impulse Convolver Engine (src/AcousticGuitarBodyImpulseConvolverEngine.h & .cpp):
+    - JZAcousticGuitarBodyImpulseConvolverEngine transforms harsh undersaddle piezo guitar pickups into pristine studio microphone recordings (Fishman Aura / ToneDexter / LR Baggs Voiceprint style).
+    - Features anti-quack non-linear decompression, 102 Hz Helmholtz soundboard body resonance, soundhole anti-feedback notch (80-250 Hz), polarity inversion, and studio microphone profile emulation (Neumann KM184, Royer R-121, AKG C414, Dreadnought Spruce Chamber).
+  * Analog Subharmonic Bass & Optical Air Exciter Engine (src/AnalogSubharmonicBassExciterEngine.h & .cpp):
+    - JZAnalogSubharmonicBassExciterEngine provides dual-band psychoacoustic harmonic excitation (Peavey Kosmos / Aphex Aural Exciter style).
+    - Features phase-locked sub-octave fundamental synthesis with low-frequency envelope tracking, infrasonic protection filtering, and program-dependent non-linear optical saturation generating even and odd harmonic air (3 kHz to 12 kHz).
+  * Multiband Transient & Sustain Sculptor Engine (src/MultibandTransientSculptorEngine.h & .cpp):
+    - JZMultibandTransientSculptorEngine provides frequency-split independent transient punch and sustain shaping (Softube Transient Shaper / Eventide Physion style).
+    - Features 4-band linear-phase crossover (Low, Low-Mid, High-Mid, High), dual fast/slow differential envelope followers, independent per-band attack and sustain gains (+/- 18 dB), and transient punch curvature modulation.
+  * RotaFonic Rotary Speaker Cabinet Simulator (src/RotaFonicRotarySpeakerSimulator.h & .cpp):
+    - JZRotaFonicRotarySpeakerSimulator physically models vintage mechanical dual-rotor Leslie speaker cabinets (Leslie 122 / 147 style).
+    - Features aero-acoustic rotating horn Doppler frequency modulation, wooden bass drum amplitude modulation, mechanical motor inertia acceleration/braking (Chorale, Tremolo, Brake), 12AX7 tube pre-amp saturation, and dual virtual stereo microphone cabinet placement (60-180 deg).
+  * Real-Time Speech Spectral Subtraction De-Noiser (src/SpeechDenoiseSpectralSubtractorEngine.h & .cpp):
+    - JZSpeechDenoiseSpectralSubtractorEngine eliminates continuous background room noise, HVAC hiss, and microphone preamp hum (iZotope Voice De-noise / Cedar Studio style).
+    - Features ambient noise profile learning across 16 critical frequency bands, adaptive Wiener filter gain suppression (-3 to -30 dB), over-subtraction musical noise artifact taming, and unvoiced consonant protection.
+  * Spatial Audio Headphone Ear Canal EQ Calibration Engine (src/SpatialAudioEarCanalEqCalibrationEngine.h & .cpp):
+    - JZSpatialAudioEarCanalEqCalibrationEngine optimizes headphones for Dolby Atmos 3D spatial binaural monitoring (Sonarworks SoundID Reference / AutoEq style).
+    - Features Harman 2018 Over-Ear & 2019 In-Ear Target Curve matching, diffuse-field / free-field flat reference profiles, headphone model compensation presets (Sennheiser HD650, Beyerdynamic DT990, Audio-Technica ATH-M50x, Apple AirPods Max), bass/treble tilt controls, and left/right transducer calibration trim.
+  * Added Automated Unit Tests 185 to 190 (tests/test_main.cpp):
+    - Validates acoustic guitar piezo anti-quack decompression and KM184 mic profiling, analog sub-octave synthesis and optical air excitation, 4-band transient punch and sustain envelope sculpting, Leslie 122 rotating horn Doppler and drum AM, speech spectral noise profile subtraction, and Harman 2018 headphone target curve calibration.
+
+25-10-2026 Raja Zahidi
 - Feature & Master Studio Acoustic Feedback Suppressor, Multi-Track Drum Bleed Remover, Vocal Alignment Time Warper, Steel Plate Reverb Physical Model, Analog BBD Chorus Dimension, & 3rd-Order High-Order Ambisonics Suite v25.0 (Apex Omnipresence Horizon Release):
   * Adaptive Live Acoustic Feedback Suppressor & Dynamic Notch Hunter (src/AcousticFeedbackSuppressorEngine.h & .cpp):
     - JZAcousticFeedbackSuppressorEngine provides automatic runaway feedback howl detection and elimination (Sabine FBX / dbx AFS style) for live concert PA and stage microphones.

@@ -68,6 +68,12 @@
 #include "SteelPlateReverbPhysicalEngine.h"
 #include "AnalogBbdChorusDimensionEngine.h"
 #include "HighOrderAmbisonics3rdOrderEngine.h"
+#include "AcousticGuitarBodyImpulseConvolverEngine.h"
+#include "AnalogSubharmonicBassExciterEngine.h"
+#include "MultibandTransientSculptorEngine.h"
+#include "RotaFonicRotarySpeakerSimulator.h"
+#include "SpeechDenoiseSpectralSubtractorEngine.h"
+#include "SpatialAudioEarCanalEqCalibrationEngine.h"
 
 #include <cassert>
 #include <cmath>
@@ -3447,6 +3453,110 @@ void TestAutoAccompanimentLogic()
               hoaEngine.getChannelAcnName(0).find("W") != std::string::npos &&
               binL.size() == hoaN,
               "3rd-Order High-Order Ambisonics 16-Channel Spherical Harmonics Engine validates ACN/SN3D encoding, 3D Euler rotation, and max-rE binaural decoding");
+
+  // 185. Acoustic Guitar Body Impulse Convolver Engine
+  Jazz::JZAcousticGuitarBodyImpulseConvolverEngine guitarConvolver(48000.0f);
+  guitarConvolver.setMicProfile(Jazz::GuitarMicProfile::KM184_SMALL_CONDENSER);
+  guitarConvolver.setBodyResonanceAmount(0.7f);
+  guitarConvolver.setAntiQuackAmount(0.6f);
+  guitarConvolver.setSoundholeNotchHz(108.0f);
+
+  const size_t gtrN = 256;
+  std::vector<float> gtrInL(gtrN, 0.5f), gtrInR(gtrN, 0.5f);
+  std::vector<float> gtrOutL(gtrN), gtrOutR(gtrN);
+  guitarConvolver.process(gtrInL.data(), gtrInR.data(), gtrOutL.data(), gtrOutR.data(), gtrN);
+
+  TEST_ASSERT(guitarConvolver.getMicProfile() == Jazz::GuitarMicProfile::KM184_SMALL_CONDENSER &&
+              guitarConvolver.getHelmholtzResonanceHz() == 102.0f &&
+              guitarConvolver.getSoundholeNotchHz() == 108.0f &&
+              guitarConvolver.getActiveProfileName().find("KM184") != std::string::npos,
+              "Acoustic Guitar Body Impulse Convolver validates piezo anti-quack decompression, 102Hz Helmholtz resonance, and KM184 mic profile");
+
+  // 186. Analog Subharmonic Bass & Optical Air Exciter Engine
+  Jazz::JZAnalogSubharmonicBassExciterEngine bassExciter(48000.0f);
+  bassExciter.setSubharmonicGainDb(3.0f);
+  bassExciter.setOpticalAirGainDb(2.5f);
+  bassExciter.setSubCrossoverHz(90.0f);
+  bassExciter.setAirCrossoverHz(4500.0f);
+
+  const size_t subN = 256;
+  std::vector<float> subInL(subN, 0.4f), subInR(subN, 0.4f);
+  std::vector<float> subOutL(subN), subOutR(subN);
+  bassExciter.process(subInL.data(), subInR.data(), subOutL.data(), subOutR.data(), subN);
+
+  TEST_ASSERT(bassExciter.getSubharmonicGainDb() == 3.0f &&
+              bassExciter.getOpticalAirGainDb() == 2.5f &&
+              bassExciter.getSubCrossoverHz() == 90.0f &&
+              bassExciter.getAirCrossoverHz() == 4500.0f,
+              "Analog Subharmonic Bass & Optical Air Exciter validates phase-locked sub-octave fundamental synthesis and high-frequency non-linear air generation");
+
+  // 187. Multiband Transient & Sustain Sculptor Engine
+  Jazz::JZMultibandTransientSculptorEngine transientSculptor(48000.0f);
+  transientSculptor.setBandAttackDb(0, 4.0f);
+  transientSculptor.setBandSustainDb(1, -2.0f);
+  transientSculptor.setBandAttackDb(2, 3.0f);
+
+  const size_t mbN = 256;
+  std::vector<float> mbInL(mbN, 0.5f), mbInR(mbN, 0.5f);
+  std::vector<float> mbOutL(mbN), mbOutR(mbN);
+  transientSculptor.process(mbInL.data(), mbInR.data(), mbOutL.data(), mbOutR.data(), mbN);
+
+  TEST_ASSERT(transientSculptor.getBandAttackDb(0) == 4.0f &&
+              transientSculptor.getBandSustainDb(1) == -2.0f &&
+              transientSculptor.getBandAttackDb(2) == 3.0f,
+              "Multiband Transient & Sustain Sculptor validates 4-band linear-phase crossover, independent transient punch attack, and sustain shaping");
+
+  // 188. RotaFonic Rotary Speaker Cabinet Simulator (Leslie 122)
+  Jazz::JZRotaFonicRotarySpeakerSimulator rotarySimulator(48000.0f);
+  rotarySimulator.setSpeedMode(Jazz::RotarySpeedMode::TREMOLO);
+  rotarySimulator.setDrive(1.5f);
+  rotarySimulator.setHornDrumBalance(0.55f);
+
+  const size_t rotN = 256;
+  std::vector<float> rotInL(rotN, 0.35f), rotInR(rotN, 0.35f);
+  std::vector<float> rotOutL(rotN), rotOutR(rotN);
+  rotarySimulator.process(rotInL.data(), rotInR.data(), rotOutL.data(), rotOutR.data(), rotN);
+
+  TEST_ASSERT(rotarySimulator.getSpeedMode() == Jazz::RotarySpeedMode::TREMOLO &&
+              rotarySimulator.getDrive() == 1.5f &&
+              rotarySimulator.getHornRpm() > 20.0f &&
+              rotarySimulator.getDrumRpm() > 20.0f,
+              "RotaFonic Rotary Speaker Cabinet Simulator validates Leslie 122 rotating horn Doppler shift, wooden drum AM, and 12AX7 tube drive");
+
+  // 189. Real-Time Speech Spectral Subtraction De-Noiser
+  Jazz::JZSpeechDenoiseSpectralSubtractorEngine speechDenoise(48000.0f);
+  speechDenoise.setReductionDb(-15.0f);
+
+  const size_t spN = 256;
+  std::vector<float> noiseBuf(spN, 0.05f);
+  speechDenoise.learnNoiseProfile(noiseBuf.data(), spN);
+
+  std::vector<float> spInL(spN, 0.4f), spInR(spN, 0.4f);
+  std::vector<float> spOutL(spN), spOutR(spN);
+  speechDenoise.process(spInL.data(), spInR.data(), spOutL.data(), spOutR.data(), spN);
+
+  TEST_ASSERT(speechDenoise.getReductionDb() == -15.0f &&
+              speechDenoise.getAverageNoiseFloorDb() < -10.0f &&
+              speechDenoise.getCurrentReductionDb() <= 0.0f,
+              "Real-Time Speech Spectral Subtraction De-Noiser validates noise profile learning, adaptive Wiener suppression, and consonant preservation");
+
+  // 190. Spatial Audio Headphone Ear Canal EQ Calibration Engine
+  Jazz::JZSpatialAudioEarCanalEqCalibrationEngine headphoneCalibrator(48000.0f);
+  headphoneCalibrator.setTargetCurve(Jazz::HeadphoneTargetCurve::HARMAN_OVER_EAR_2018);
+  headphoneCalibrator.setHeadphoneModel(Jazz::HeadphoneModelPreset::SENNHEISER_HD650);
+  headphoneCalibrator.setBassTiltDb(4.5f);
+
+  const size_t calN = 256;
+  std::vector<float> calInL(calN, 0.5f), calInR(calN, 0.5f);
+  std::vector<float> calOutL(calN), calOutR(calN);
+  headphoneCalibrator.process(calInL.data(), calInR.data(), calOutL.data(), calOutR.data(), calN);
+
+  TEST_ASSERT(headphoneCalibrator.getTargetCurve() == Jazz::HeadphoneTargetCurve::HARMAN_OVER_EAR_2018 &&
+              headphoneCalibrator.getHeadphoneModel() == Jazz::HeadphoneModelPreset::SENNHEISER_HD650 &&
+              headphoneCalibrator.getBassTiltDb() == 4.5f &&
+              headphoneCalibrator.getMaxCorrectionDb() > 0.0f &&
+              headphoneCalibrator.getHeadphoneModelName().find("HD650") != std::string::npos,
+              "Spatial Audio Headphone Ear Canal EQ Calibration validates Harman 2018 Target curve matching and Sennheiser HD650 transducer linearization");
 }
 
 //-----------------------------------------------------------------------------

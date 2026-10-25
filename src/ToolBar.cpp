@@ -38,19 +38,21 @@ JZToolBar::JZToolBar(wxFrame* pFrame, JZToolDef* pToolDef)
   mpToolBar = pFrame->CreateToolBar(
     wxTB_FLAT | wxTB_HORIZONTAL | wxTB_DOCKABLE);
 
-#if wxCHECK_VERSION(3, 1, 0)
-  int targetW = pFrame->FromDIP(24);
-  int targetH = pFrame->FromDIP(24);
+  int targetW = 20;
+  int targetH = 19;
 
-  mpToolBar->SetToolBitmapSize(wxSize(targetW, targetH));
+#if wxCHECK_VERSION(3, 1, 0)
+  if (pFrame->GetDPIScaleFactor() >= 1.75)
+  {
+    targetW = 40;
+    targetH = 38;
+  }
   mpToolBar->SetMargins(pFrame->FromDIP(4), pFrame->FromDIP(4));
 #else
-  int targetW = 24;
-  int targetH = 24;
-
-  mpToolBar->SetToolBitmapSize(wxSize(targetW, targetH));
   mpToolBar->SetMargins(4, 4);
 #endif
+
+  mpToolBar->SetToolBitmapSize(wxSize(targetW, targetH));
 
   while (pToolDef->mId != eToolBarEnd)
   {
@@ -61,15 +63,12 @@ JZToolBar::JZToolBar(wxFrame* pFrame, JZToolDef* pToolDef)
     else
     {
       wxBitmap Bitmap = wxBitmap((char **)pToolDef->mpResourceId);
-      if (Bitmap.IsOk())
+      if (Bitmap.IsOk() && (targetW != 20 || targetH != 19))
       {
         wxImage img = Bitmap.ConvertToImage();
         if (img.IsOk())
         {
-          if (img.GetWidth() != targetW || img.GetHeight() != targetH)
-          {
-            img.Rescale(targetW, targetH, wxIMAGE_QUALITY_HIGH);
-          }
+          img.Rescale(targetW, targetH, wxIMAGE_QUALITY_NEAREST);
           Bitmap = wxBitmap(img);
         }
       }

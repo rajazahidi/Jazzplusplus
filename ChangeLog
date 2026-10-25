@@ -1,4 +1,21 @@
 25-10-2026 Raja Zahidi
+- Fix UI Toolbar Button Clarity & wxHtmlWindow Background Grid Artifacts:
+  * Toolbar Buttons (src/ToolBar.cpp):
+    - Mengembalikan resolusi piksel asli (20x19) bagi ikon bar alat (toolbar buttons) tanpa penalaan semula interpolasi bikubik (wxIMAGE_QUALITY_HIGH) yang sebelum ini menyebabkan garisan sempadan ikon menjadi tebal, kabur dan gelap.
+    - Menggunakan mod penskalaan integer piksel tepat (wxIMAGE_QUALITY_NEAREST) hanya untuk paparan High-DPI (skala >= 1.75x) bagi memastikan ikon kekal tajam, kemas dan jelas.
+  * About Dialog & Help Viewer Content (src/AboutDialog.cpp, src/Help.cpp, src/HelpFiles/*.html):
+    - Menghapuskan masalah garisan kekisi (horizontal dotted/grid lines) yang telus dan muncul pada kandungan About Dialog dan fail Bantuan (Help).
+    - Menetapkan warna latar belakang legap (SetBackgroundColour(*wxWHITE)) serta mengikat pengendali wxEVT_ERASE_BACKGROUND pada wxHtmlWindow bagi menjamin kanvas dipadam dengan berus putih pepejal tanpa membiarkan garisan kekisi tetingkap di belakangnya bocor (bleed through).
+    - Menambah penggayaan CSS (border: 0; border-collapse: collapse; background-color: #ffffff;) pada fail HTML About dan Bantuan untuk memastikan teks dan jadual dipaparkan dengan bersih dan teratur.
+
+25-10-2026 Raja Zahidi
+- Fix UI Measure Ruler & Timeline Clipping (TrackWindow & PianoWindow):
+  * Membetulkan kedudukan menegak nombor bar/sukatan (measure numbers) dan penanda bahagian lagu (section banner markers) pada pembaris garis masa (timeline ruler) yang terpotong di sempadan atas kanvas akibat formula koordinat Y negatif (mEventsY - mTrackHeight).
+  * Menyelaraskan teks sukatan (1, 5, 9, 13, 17, ...) supaya berpusat secara menegak (textY = std::max(FromDIP(4), (mTopInfoHeight - mFixedFontHeight) / 2)) dan sebaris kemas dengan butang kawalan baris atas (speed, prg, M).
+  * Memastikan penanda seksyen visual (Intro, Verse, Chorus, Bridge, Outro) dilukis di bahagian atas pembaris (FromDIP(1)) tanpa terkeluar dari tetingkap.
+  * Menambah ketinggian mTopInfoHeight kepada FromDIP(26) minimum untuk memberi ruang menegak yang selesa pada paparan berketumpatan tinggi (High-DPI).
+
+25-10-2026 Raja Zahidi
 - Feature: Virtual Session Band RealTracks, RealDrums & Studio RealAudio System:
   * Acoustic RealDrums Engine (src/RealDrumsEngine.h, src/RealDrumsEngine.cpp):
     - Multi-velocity acoustic drum sample triggering and physical layering (Kick, Snare, Hi-Hats, Toms, Crash, Ride).

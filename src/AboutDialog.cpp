@@ -28,6 +28,7 @@
 
 #include <wx/button.h>
 #include <wx/html/htmlwin.h>
+#include <wx/dcclient.h>
 #include <wx/sizer.h>
 #include <wx/statbmp.h>
 #include <wx/version.h>
@@ -63,7 +64,26 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
   mpBitmap = new wxStaticBitmap(this, wxID_ANY, *mpLogo);
 
   wxHtmlWindow* pHtmlWindow = new wxHtmlWindow(
-    this, wxID_ANY, wxDefaultPosition, wxSize(450, 150), wxSUNKEN_BORDER);
+    this,
+    wxID_ANY,
+    wxDefaultPosition,
+    wxSize(450, 150),
+    wxBORDER_SUNKEN | wxHW_SCROLLBAR_AUTO);
+  pHtmlWindow->SetBackgroundColour(*wxWHITE);
+  pHtmlWindow->Bind(wxEVT_ERASE_BACKGROUND, [pHtmlWindow](wxEraseEvent& event) {
+    wxDC* pDc = event.GetDC();
+    if (pDc)
+    {
+      pDc->SetBackground(*wxWHITE_BRUSH);
+      pDc->Clear();
+    }
+    else
+    {
+      wxClientDC clientDc(pHtmlWindow);
+      clientDc.SetBackground(*wxWHITE_BRUSH);
+      clientDc.Clear();
+    }
+  });
 
   wxString LocaleString = wxLocale::GetSystemEncodingName();
 
@@ -88,8 +108,14 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
   wxString HtmlString =
     "<html>"
     "<head><META http-equiv=\"Content-Type\" content=\"text/html; charset=" +
-    LocaleString + "\"></head>"
-    "<body bgcolor=\"#ffffff\">"
+    LocaleString + "\">"
+    "<style>"
+    "body { background-color: #ffffff; color: #000000; margin: 4px; }"
+    "table { border: 0px; border-collapse: collapse; }"
+    "td, th { border: 0px; padding: 2px; }"
+    "</style>"
+    "</head>"
+    "<body bgcolor=\"#ffffff\" text=\"#000000\">"
     "<font size=2>"
 
     "<center><h3>" "Jazz++ " + VersionString + "</h3></center>"
@@ -107,7 +133,7 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
 
     "<center><h5>" + "Credits" + "</h5></center>"
 
-    "<table border=0>"
+    "<table border=0 cellpadding=2 cellspacing=0>"
     "<tr>"
      "<td>Pete Stieber</td>"
      "<td>" + "Lead Developer" + "</td>"

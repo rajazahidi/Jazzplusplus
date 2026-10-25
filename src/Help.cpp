@@ -26,6 +26,9 @@
 #include <wx/filefn.h>
 #include <wx/filename.h>
 #include <wx/html/helpctrl.h>
+#include <wx/html/helpwnd.h>
+#include <wx/html/htmlwin.h>
+#include <wx/dcclient.h>
 #include <wx/msgdlg.h>
 #include <wx/stdpaths.h>
 
@@ -60,6 +63,38 @@ JZHelp::~JZHelp()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+static void ConfigureHelpWindowBackground(wxHtmlHelpController* pHelpCtrl)
+{
+  if (!pHelpCtrl)
+  {
+    return;
+  }
+  wxHtmlHelpWindow* pHelpWin = pHelpCtrl->GetHelpWindow();
+  if (pHelpWin)
+  {
+    wxHtmlWindow* pHtml = pHelpWin->GetHtmlWindow();
+    if (pHtml)
+    {
+      pHtml->SetBackgroundColour(*wxWHITE);
+      pHtml->Bind(wxEVT_ERASE_BACKGROUND, [pHtml](wxEraseEvent& event) {
+        wxDC* pDc = event.GetDC();
+        if (pDc)
+        {
+          pDc->SetBackground(*wxWHITE_BRUSH);
+          pDc->Clear();
+        }
+        else
+        {
+          wxClientDC clientDc(pHtml);
+          clientDc.SetBackground(*wxWHITE_BRUSH);
+          clientDc.Clear();
+        }
+      });
+      pHtml->Refresh();
+    }
+  }
+}
+
 void JZHelp::ShowTopic(const wxString& TopicString)
 {
   ifstream test(mHelpFileName.mb_str());
@@ -83,6 +118,7 @@ void JZHelp::ShowTopic(const wxString& TopicString)
   }
   mpHelp->LoadFile(mHelpFileName);
   mpHelp->KeywordSearch(TopicString);
+  ConfigureHelpWindowBackground(mpHelp);
 }
 
 //-----------------------------------------------------------------------------
@@ -110,6 +146,7 @@ void JZHelp::DisplayHelpContents()
   }
   mpHelp->LoadFile(mHelpFileName);
   mpHelp->DisplayContents();
+  ConfigureHelpWindowBackground(mpHelp);
 }
 
 //-----------------------------------------------------------------------------

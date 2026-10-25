@@ -799,7 +799,7 @@ void JZPianoWindow::Setup()
   Dc.GetTextExtent("M", &Width, &Height);
   mLittleBit = std::max(FromDIP(2), Width / 2);
 
-  mTopInfoHeight = std::max(FromDIP(24), mFixedFontHeight + 2 * mLittleBit);
+  mTopInfoHeight = std::max(FromDIP(26), mFixedFontHeight + 2 * mLittleBit + FromDIP(2));
 
   Dc.GetTextExtent("HXWjgi", &Width, &Height);
   mTrackHeight = std::max(FromDIP(20), Height + 2 * mLittleBit);
@@ -967,14 +967,15 @@ void JZPianoWindow::Draw(wxDC& Dc)
     Oss << BarInfo.GetBarIndex() + 1 - intro;
     if (x > mEventsX)
     {
+      int textY = std::max(FromDIP(4), (mTopInfoHeight - mFixedFontHeight) / 2);
       LocalDc.DrawText(
         Oss.str().c_str(),
         x + mLittleBit,
-        mEventsY - mFixedFontHeight - 2);
+        textY);
       LocalDc.SetPen(*wxGREY_PEN);
       LocalDc.DrawLine(
         x,
-        mEventsY - mFixedFontHeight,
+        0,
         x,
         mEventsY + mEventsHeight);
     }

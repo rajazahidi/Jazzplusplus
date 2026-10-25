@@ -138,7 +138,7 @@ void JZTrackWindow::Create()
   Dc.GetTextExtent("M", &Width, &Height);
   mLittleBit = std::max(FromDIP(3), Width / 2);
 
-  mTopInfoHeight = std::max(FromDIP(24), mFixedFontHeight + 2 * mLittleBit);
+  mTopInfoHeight = std::max(FromDIP(26), mFixedFontHeight + 2 * mLittleBit + FromDIP(2));
 
   Dc.GetTextExtent("HXWjgi", &Width, &Height);
   mTrackHeight = std::max(FromDIP(28), Height + 2 * mLittleBit + FromDIP(4));
@@ -926,10 +926,6 @@ void JZTrackWindow::Draw(wxDC& Dc)
           {
             Oss << " [" << chordName << "]";
           }
-          LocalDc.DrawText(
-            Oss.str().c_str(),
-            x + mLittleBit,
-            mEventsY - mTrackHeight);
 
           // Visual Timeline Section Banner Marker
           if (gpProject && gpProject->GetSong())
@@ -949,13 +945,20 @@ void JZTrackWindow::Draw(wxDC& Dc)
 
               LocalDc.SetBrush(wxBrush(secCol));
               LocalDc.SetPen(wxPen(secCol));
-              LocalDc.DrawRectangle(x, mEventsY - mTrackHeight - 3, 50, 3);
+              LocalDc.DrawRectangle(x, FromDIP(1), std::max(FromDIP(45), 50), FromDIP(3));
             }
           }
+
+          int textY = std::max(FromDIP(4), (mTopInfoHeight - mFixedFontHeight) / 2);
+          LocalDc.DrawText(
+            Oss.str().c_str(),
+            x + mLittleBit,
+            textY);
+
           LocalDc.SetPen(*wxGREY_PEN);
           LocalDc.DrawLine(
             x,
-            mEventsY + 1 - mTrackHeight,
+            0,
             x,
             mEventsY + mEventsHeight);
         }

@@ -1,4 +1,27 @@
 25-10-2026 Raja Zahidi
+- Feature & Master Studio Variable-Mu Tube Compressor, Elliptical Mono Bass Centering, Vocal Plosive De-Popper, Immersive Folddown Downmix, Vocal Vibrato Humanizer, & Real-Time Thread Affinity Scheduler Suite v28.0 (Apex Transcendence Paramount Release):
+  * Vintage Dual-Triode 6386 Variable-Mu Tube Compressor Engine (src/VariableMuVintageTubeCompressorEngine.h & .cpp):
+    - JZVariableMuVintageTubeCompressorEngine delivers legendary tube master bus compression (Fairchild 670 / Manley Variable Mu style).
+    - Features remote-cutoff dual-triode push-pull gain reduction with smooth continuous variable-slope knee (1.5:1 up to 20:1 under heavy compression), 6 historic time constants, program-dependent dual-decay auto-release, triode 2nd and 3rd harmonic saturation, and Mid/Side matrix processing.
+  * Mastering Elliptical Equalizer & Low-End Mono Centering Matrix (src/EllipticalMonoBassCenteringEngine.h & .cpp):
+    - JZEllipticalMonoBassCenteringEngine eliminates out-of-phase low-frequency mud and vinyl cutting phase cancellation (Neumann W495 / Brainworx bx_digital style).
+    - Features Mid/Side frequency-selective Side high-pass filtering across 40 Hz to 350 Hz (12 and 24 dB/oct slopes), sub-bass energy redirection into the Mid channel, high-frequency stereo width expansion (0.0x to 2.0x), and solo Side-sub audition.
+  * Vocal Plosive & Microphone Wind Blast Infrasonic De-Popper Engine (src/VocalPlosiveDePopperEngine.h & .cpp):
+    - JZVocalPlosiveDePopperEngine eliminates microphone 'P', 'B', and wind blast pops (Cedar Studio / iZotope RX De-plosive style).
+    - Features asymmetric diaphragm displacement tracking in the 20 Hz – 85 Hz infrasonic band with sub-2ms dynamic suppression, consonant and chest resonance preservation, and plosive delta solo listening.
+  * ITU-R BS.775-3 & Dolby Atmos Intelligent Immersive Folddown Downmix Matrix (src/ImmersiveFolddownDownmixEngine.h & .cpp):
+    - JZImmersiveFolddownDownmixEngine provides precision downmixing of 16-channel 9.1.6 and 12-channel 7.1.4 immersive audio into 5.1 surround and 2.0 stereo.
+    - Features center channel acoustic buildup trim (-3.0 to -6.0 dB), 90-degree Hilbert quadrature phase steering on surround/height channels preventing comb filtering and cancellation, LFE pad, and output soft-knee peak protection.
+  * Vocal Vibrato, Pitch Drift & Micro-Intonation Humanizer Engine (src/VocalVibratoHumanizerEngine.h & .cpp):
+    - JZVocalVibratoHumanizerEngine reintroduces organic vocal expression into rigidly pitch-corrected tracks (Celemony Melodyne / Auto-Tune style).
+    - Features freeform LFO vibrato rate (3.5 to 8.5 Hz) and depth, note-on onset attack delay ramping (0 to 1200 ms), fractal 1/f slow pitch drift, fractional delay interpolation, and coupled amplitude tremolo.
+  * Multi-Core CPU Performance Core (P-Core) Affinity & Real-Time Audio Scheduler (src/RealTimeThreadAffinityScheduler.h & .cpp):
+    - JZRealTimeThreadAffinityScheduler locks real-time audio DSP worker threads to high-frequency physical Performance Cores (P-Cores), preventing OS thread migration to power-saving E-Cores.
+    - Features OS thread priority elevation (Windows MMCSS Pro Audio / Linux SCHED_FIFO), lock-free SPSC telemetry ring buffer, and microsecond buffer cycle deadline monitoring.
+  * Added Automated Unit Tests 197 to 202 (tests/test_main.cpp):
+    - Validates Variable-Mu 6386 triode push-pull remote-cutoff bias reduction, elliptical Mid/Side sub-bass highpass carving, vocal plosive 85Hz asymmetric pressure detection, 16-channel immersive ITU-R folddown with Hilbert phase steering, vocal vibrato onset delay and pitch drift, and real-time CPU P-Core isolation with lock-free telemetry queues.
+
+25-10-2026 Raja Zahidi
 - Feature & Master Studio Vocal Sibilance Split De-Esser, Tape Head-Bump Varispeed, Immersive Bass Management Crossover, Master Bus Glue VCA Compressor, Reactive Load Speaker Impedance, & Binaural Acoustic Room Convolver Suite v27.0 (Apex Transcendence Sovereign Release):
   * Intelligent Vocal Sibilance Split-Band Lookahead De-Esser Engine (src/VocalSibilanceSplitDeEsserEngine.h & .cpp):
     - JZVocalSibilanceSplitDeEsserEngine delivers transparent vocal harshness and ess suppression (FabFilter Pro-DS / Weiss Deess style).

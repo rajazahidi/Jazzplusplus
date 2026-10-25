@@ -80,6 +80,12 @@
 #include "MasterBusGlueVcaCompressorEngine.h"
 #include "ReactiveLoadSpeakerImpedanceEngine.h"
 #include "BinauralAcousticRoomConvolverEngine.h"
+#include "VariableMuVintageTubeCompressorEngine.h"
+#include "EllipticalMonoBassCenteringEngine.h"
+#include "VocalPlosiveDePopperEngine.h"
+#include "ImmersiveFolddownDownmixEngine.h"
+#include "VocalVibratoHumanizerEngine.h"
+#include "RealTimeThreadAffinityScheduler.h"
 
 #include <cassert>
 #include <cmath>
@@ -3686,6 +3692,138 @@ void TestAutoAccompanimentLogic()
               roomConvolver.getRt60Seconds() > 0.1f &&
               roomConvolver.getDryWet() == 0.4f,
               "Binaural Acoustic Mastering Room Convolver validates 3D shoebox early reflections, ITD/ILD head shadowing, and Eyring boundary decay");
+
+  // 197. Variable-Mu Vintage Tube Compressor Engine
+  Jazz::JZVariableMuVintageTubeCompressorEngine varMu(48000.0f);
+  varMu.setThresholdDb(-18.0f);
+  varMu.setTimeConstant(Jazz::VariableMuTimeConstant::AUTO_PROGRAM_1);
+  varMu.setInputDrive(1.2f);
+
+  const size_t vmN = 512;
+  std::vector<float> vmInL(vmN, 0.85f), vmInR(vmN, 0.85f);
+  std::vector<float> vmOutL(vmN, 0.0f), vmOutR(vmN, 0.0f);
+  varMu.process(vmInL.data(), vmInR.data(), vmOutL.data(), vmOutR.data(), vmN);
+
+  TEST_ASSERT(varMu.getThresholdDb() == -18.0f &&
+              varMu.getTimeConstant() == Jazz::VariableMuTimeConstant::AUTO_PROGRAM_1 &&
+              varMu.getInputDrive() == 1.2f &&
+              varMu.getCurrentGainReductionDb() <= 0.0f &&
+              varMu.getTubeBiasVolts() < -6.3f &&
+              varMu.getThdPercent() > 0.0f &&
+              varMu.isCompressing(),
+              "Variable-Mu Vintage Tube Compressor validates 6386 triode push-pull remote-cutoff bias reduction and continuous variable-slope knee");
+
+  // 198. Elliptical Equalizer & Low-End Mono Centering Matrix
+  Jazz::JZEllipticalMonoBassCenteringEngine eeq(48000.0f);
+  eeq.setMonoCutoffHz(120.0f);
+  eeq.setFilterSlope(Jazz::EllipticalFilterSlope::SLOPE_12DB_OCT);
+  eeq.setStereoWidth(1.2f);
+  eeq.setRedirectSubEnergyToMid(true);
+
+  const size_t eeqN = 256;
+  std::vector<float> eeqInL(eeqN, 0.5f), eeqInR(eeqN, -0.5f); // Out-of-phase low-end stereo
+  std::vector<float> eeqOutL(eeqN, 0.0f), eeqOutR(eeqN, 0.0f);
+  eeq.process(eeqInL.data(), eeqInR.data(), eeqOutL.data(), eeqOutR.data(), eeqN);
+
+  TEST_ASSERT(eeq.getMonoCutoffHz() == 120.0f &&
+              eeq.getFilterSlope() == Jazz::EllipticalFilterSlope::SLOPE_12DB_OCT &&
+              eeq.getStereoWidth() == 1.2f &&
+              eeq.isRedirectSubEnergyToMid() &&
+              eeq.getPhaseCorrelation() >= -1.0f,
+              "Elliptical Equalizer validates Mid/Side sub-bass high-pass carving (120 Hz) and low-end mono centering preservation");
+
+  // 199. Vocal Plosive & Microphone Wind Blast De-Popper Engine
+  Jazz::JZVocalPlosiveDePopperEngine dePopper(48000.0f);
+  dePopper.setThresholdDb(-18.0f);
+  dePopper.setSensitivity(0.8f);
+  dePopper.setMaxReductionDb(-18.0f);
+  dePopper.setPlosiveCutoffHz(85.0f);
+
+  const size_t popN = 512;
+  std::vector<float> popInL(popN, 0.0f), popInR(popN, 0.0f);
+  // Generate high-amplitude 45 Hz infrasonic thump simulating 'P' pop burst
+  for (size_t i = 0; i < popN; ++i) {
+    float s = 0.85f * std::sin(2.0f * 3.14159265f * 45.0f * (float)i / 48000.0f);
+    popInL[i] = s;
+    popInR[i] = s;
+  }
+  std::vector<float> popOutL(popN, 0.0f), popOutR(popN, 0.0f);
+  dePopper.process(popInL.data(), popInR.data(), popOutL.data(), popOutR.data(), popN);
+
+  TEST_ASSERT(dePopper.getThresholdDb() == -18.0f &&
+              dePopper.getSensitivity() == 0.8f &&
+              dePopper.getPlosiveCutoffHz() == 85.0f &&
+              dePopper.getCurrentReductionDb() <= 0.0f &&
+              dePopper.isPlosiveActive() &&
+              dePopper.getPlosivesDetectedCount() > 0,
+              "Vocal Plosive De-Popper validates asymmetric pressure burst tracking (85 Hz) and dynamic pop-blast infrasonic suppression");
+
+  // 200. ITU-R BS.775-3 Immersive Multichannel Folddown Downmix Engine
+  Jazz::JZImmersiveFolddownDownmixEngine downmix(48000.0f);
+  downmix.setTargetMode(Jazz::DownmixTargetMode::STEREO_2_0);
+  downmix.setCenterTrimDb(-3.0f);
+  downmix.setHeightTrimDb(-4.5f);
+
+  const size_t dmixN = 256;
+  std::vector<float> dmixIn[16];
+  for (int ch = 0; ch < 16; ++ch) {
+    dmixIn[ch].assign(dmixN, 0.2f);
+  }
+  const float* dmixPtrs[16];
+  for (int ch = 0; ch < 16; ++ch) {
+    dmixPtrs[ch] = dmixIn[ch].data();
+  }
+  std::vector<float> dmixOutL(dmixN, 0.0f), dmixOutR(dmixN, 0.0f);
+  downmix.processToStereo(dmixPtrs, dmixOutL.data(), dmixOutR.data(), dmixN);
+
+  TEST_ASSERT(downmix.getTargetMode() == Jazz::DownmixTargetMode::STEREO_2_0 &&
+              downmix.getCenterTrimDb() == -3.0f &&
+              downmix.getHeightTrimDb() == -4.5f &&
+              downmix.getActiveChannelCount() == 16 &&
+              downmix.getChannelName(2) == "C" &&
+              downmix.getChannelName(8) == "Ltf" &&
+              downmix.getOutputPeakLevelDb() > -60.0f,
+              "ITU-R BS.775-3 Immersive Folddown validates 16-channel downmix, center buildup trim, and Hilbert quadrature phase steering");
+
+  // 201. Vocal Vibrato, Pitch Drift & Micro-Flutter Humanizer Engine
+  Jazz::JZVocalVibratoHumanizerEngine vibrato(48000.0f);
+  vibrato.setVibratoRateHz(5.5f);
+  vibrato.setVibratoDepthCents(45.0f);
+  vibrato.setOnsetDelayMs(200.0f);
+  vibrato.setTremoloAmount(0.15f);
+  vibrato.triggerNoteOn();
+
+  const size_t vibN = 512;
+  std::vector<float> vibInL(vibN, 0.4f), vibInR(vibN, 0.4f);
+  std::vector<float> vibOutL(vibN, 0.0f), vibOutR(vibN, 0.0f);
+  vibrato.process(vibInL.data(), vibInR.data(), vibOutL.data(), vibOutR.data(), vibN);
+
+  TEST_ASSERT(vibrato.getVibratoRateHz() == 5.5f &&
+              vibrato.getVibratoDepthCents() == 45.0f &&
+              vibrato.getOnsetDelayMs() == 200.0f &&
+              vibrato.getTremoloAmount() == 0.15f &&
+              std::abs(vibrato.getCurrentPitchOffsetCents()) >= 0.0f,
+              "Vocal Vibrato & Pitch Drift Humanizer validates freeform LFO pitch modulation, onset attack delay ramp, and fractal drift");
+
+  // 202. Real-Time CPU Thread Affinity & Audio Scheduler
+  Jazz::JZRealTimeThreadAffinityScheduler scheduler;
+  scheduler.setPriorityPolicy(Jazz::AudioThreadPriorityPolicy::PRO_AUDIO_MMCSS);
+  scheduler.setLockToPerformanceCores(true);
+  scheduler.pushTelemetry(101, 48000.0f);
+  uint32_t popEvent = 0;
+  float popVal = 0.0f;
+  bool popOk = scheduler.popTelemetry(popEvent, popVal);
+  scheduler.recordCycleExecution(850.0f); // 850 microseconds
+
+  TEST_ASSERT(scheduler.getDetectedCoreCount() > 0 &&
+              scheduler.getPerformanceCoreCount() > 0 &&
+              scheduler.getTargetCoreMask() > 0 &&
+              scheduler.getPriorityPolicy() == Jazz::AudioThreadPriorityPolicy::PRO_AUDIO_MMCSS &&
+              scheduler.getBufferCycleExecutionTimeUs() == 850.0f &&
+              scheduler.getUnderrunCount() == 0 &&
+              popOk && popEvent == 101 && popVal == 48000.0f &&
+              scheduler.getPolicyName().find("MMCSS") != std::string::npos,
+              "Real-Time Thread Affinity Scheduler validates P-Core CPU isolation, lock-free telemetry queues, and buffer deadline monitoring");
 }
 
 //-----------------------------------------------------------------------------

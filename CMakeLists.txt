@@ -196,6 +196,7 @@ set(JAZZ_SOURCES
     src/DynamicDeEsser.cpp
     src/DynamicResonanceSuppressorEngine.cpp
     src/DynamicSidechainEq.cpp
+    src/EllipticalMonoBassCenteringEngine.cpp
     src/ErrorMessage.cpp
     src/EuclideanArp.cpp
     src/EuclideanPolyrhythmEngine.cpp
@@ -232,6 +233,7 @@ set(JAZZ_SOURCES
     src/Immersive3DReverbConvolver.cpp
     src/ImmersiveAudioPanner.cpp
     src/ImmersiveBassManagementCrossoverEngine.cpp
+    src/ImmersiveFolddownDownmixEngine.cpp
     src/ImmersiveSpeakerAlignmentEngine.cpp
     src/InfiniteBarberpoleFlangerEngine.cpp
     src/IntelligentMasteringAssistant.cpp
@@ -300,6 +302,7 @@ set(JAZZ_SOURCES
     src/QuantumParticleGranularEngine.cpp
     src/Random.cpp
     src/ReactiveLoadSpeakerImpedanceEngine.cpp
+    src/RealTimeThreadAffinityScheduler.cpp
     src/RecordingInfo.cpp
     src/Rectangle.cpp
     src/Rhythm.cpp
@@ -349,6 +352,7 @@ set(JAZZ_SOURCES
     src/TapeMachineCalibrationEngine.cpp
     src/TapePrintThroughDemagSimulator.cpp
     src/ThroughZeroFlanger.cpp
+    src/VariableMuVintageTubeCompressorEngine.cpp
     src/VintageLofiProcessor.cpp
     src/VinylLatheMechanicalSimulator.cpp
     src/VirtualStudioMonitorSimulator.cpp
@@ -365,7 +369,9 @@ set(JAZZ_SOURCES
     src/VocalDoublerEngine.cpp
     src/VocalHarmonizer.cpp
     src/VocalPitchEditor.cpp
+    src/VocalPlosiveDePopperEngine.cpp
     src/VocalSibilanceSplitDeEsserEngine.cpp
+    src/VocalVibratoHumanizerEngine.cpp
     src/VocoderEngine.cpp
     src/VolterraDynamicConvolutionEngine.cpp
     src/WasapiAudioDriver.cpp

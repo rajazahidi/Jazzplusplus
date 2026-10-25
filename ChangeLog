@@ -1,4 +1,11 @@
 25-10-2026 Raja Zahidi
+- Bugfix & CI Build Pipeline Dialog Header Stabilization:
+  * JZAutoAccompanimentDialog (src/Dialogs/AutoAccompanimentDialog.h):
+    - Added #include <wx/panel.h> and #include <wx/stattext.h> along with forward declarations for wxPanel and wxStaticText to resolve missing type declarations.
+  * JZAutoAccompaniment (src/AutoAccompaniment.h):
+    - Added GetPitchClassName(int pc) helper method for pitch class name resolution in UI dialogs and chord status displays.
+
+25-10-2026 Raja Zahidi
 - Bugfix & CI Build Pipeline Final Stabilization:
   * JZBroadcastWaveIxmlExporterEngine (src/BroadcastWaveIxmlExporterEngine.cpp):
     - Added const qualifier to buildBextChunk() implementation matching header definition and eliminated redundant const_cast.

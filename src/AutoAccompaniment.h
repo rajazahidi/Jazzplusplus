@@ -468,6 +468,15 @@ class JZAutoAccompaniment
     static const char* GetSectionName(JZSongSection section);
     static const char* GetBassFeelName(JZBassFeel feel);
 
+    static const char* GetPitchClassName(int pc)
+    {
+      static const char* sNames[12] = {
+        "C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"
+      };
+      if (pc < 0) pc = ((pc % 12) + 12) % 12;
+      return sNames[pc % 12];
+    }
+
     // Procedural song structure mapping
     static JZSongSection DetermineSection(int barIndex, int totalBars, JZSongSection overrideSection = SECTION_AUTO);
 

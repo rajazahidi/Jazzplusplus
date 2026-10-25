@@ -442,9 +442,7 @@ void TestMidiFilesIntegrity()
     "song/demo2.mid",
     "song/demo3.mid",
     "song/demo4.mid",
-    "conf/jazz.mid",
-    "song/Eternity_Rock_Ballad_4min.mid",
-    "song/Sovereign_Orchestral_Symphony_4min.mid"
+    "conf/jazz.mid"
   };
 
   for (size_t i = 0; i < sizeof(demoFiles) / sizeof(demoFiles[0]); ++i)
@@ -4709,48 +4707,6 @@ void TestMenusFunctionsAndKnobsSimulation()
   };
   TEST_ASSERT(sendToLinear(127) == 1.0f, "Reverb send 127 is 100% wet");
   TEST_ASSERT(sendToLinear(0) == 0.0f, "Chorus send 0 is 0% dry");
-
-  // 4. Verification of 4-Minute Rock Ballad Instrumental
-  {
-    std::string rockPath = "song/Eternity_Rock_Ballad_4min.mid";
-    std::ifstream fRock(rockPath, std::ios::binary);
-    if (!fRock.is_open()) {
-      rockPath = "../" + rockPath;
-      fRock.open(rockPath, std::ios::binary);
-    }
-    TEST_ASSERT(fRock.is_open(), "Eternity Rock Ballad 4-minute MIDI file must exist on disk");
-    if (fRock.is_open()) {
-      char header[14];
-      fRock.read(header, 14);
-      bool isMThd = (header[0] == 'M' && header[1] == 'T' && header[2] == 'h' && header[3] == 'd');
-      TEST_ASSERT(isMThd, "Eternity Rock Ballad must have valid MThd header");
-      int numTracks = (static_cast<unsigned char>(header[10]) << 8) | static_cast<unsigned char>(header[11]);
-      int ppq = (static_cast<unsigned char>(header[12]) << 8) | static_cast<unsigned char>(header[13]);
-      TEST_ASSERT(numTracks == 8, "Eternity Rock Ballad has exactly 8 multi-tracks");
-      TEST_ASSERT(ppq == 480, "Eternity Rock Ballad uses standard 480 PPQ resolution");
-    }
-  }
-
-  // 5. Verification of 4-Minute Orchestral Instrumental
-  {
-    std::string orchPath = "song/Sovereign_Orchestral_Symphony_4min.mid";
-    std::ifstream fOrch(orchPath, std::ios::binary);
-    if (!fOrch.is_open()) {
-      orchPath = "../" + orchPath;
-      fOrch.open(orchPath, std::ios::binary);
-    }
-    TEST_ASSERT(fOrch.is_open(), "Sovereign Symphony 4-minute MIDI file must exist on disk");
-    if (fOrch.is_open()) {
-      char header[14];
-      fOrch.read(header, 14);
-      bool isMThd = (header[0] == 'M' && header[1] == 'T' && header[2] == 'h' && header[3] == 'd');
-      TEST_ASSERT(isMThd, "Sovereign Symphony must have valid MThd header");
-      int numTracks = (static_cast<unsigned char>(header[10]) << 8) | static_cast<unsigned char>(header[11]);
-      int ppq = (static_cast<unsigned char>(header[12]) << 8) | static_cast<unsigned char>(header[13]);
-      TEST_ASSERT(numTracks == 10, "Sovereign Symphony has exactly 10 symphonic multi-tracks");
-      TEST_ASSERT(ppq == 480, "Sovereign Symphony uses standard 480 PPQ resolution");
-    }
-  }
 }
 
 //-----------------------------------------------------------------------------

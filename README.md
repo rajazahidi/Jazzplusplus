@@ -27,7 +27,7 @@ Originally created by Andreas Voss and Per Sigmond, with subsequent development 
 - **Digital Audio Mixing**: Audio track support with WAV sample playback and recording.
 - **ALSA & PortMidi Integration**: Native Linux ALSA sequencer (`snd_seq`) and PCM audio (`snd_pcm`) backend.
 - **Synthesizer Definitions**: Preset configurations (`.jzi`) for General MIDI (GM), Roland GS, Roland TD-20, Yamaha XG, and E-mu Proteus.
-- **Flagship 4-Minute Master Songs & Full Simulation Suite**: Includes complete 4-minute Rock Ballad ('Eternity') and 4-minute Orchestral Masterpiece ('Sovereign Symphony') with full multi-track orchestration, validated across automated transport, menu routing, and rotary controller simulations.
+- **Full Menu, Function & Knob Simulation Suite**: Validates automated transport controls (Play, Loop, Record, Metronome, Panic Reset), menu command routing across File, Edit, Tools, Settings, Audio, and Effects, as well as rotary knobs and faders scaling.
 
 ---
 

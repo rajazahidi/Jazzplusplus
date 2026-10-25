@@ -1,14 +1,9 @@
 25-10-2026 Raja Zahidi
-- Feature & Full Studio Simulation, Menus, Functions, Knobs Validation & 4-Minute Master Songs:
-  * 4-Minute Rock Ballad Instrumental (song/Eternity_Rock_Ballad_4min.mid):
-    - Composed and generated 4:00 minute (240.0s) 8-track Rock Ballad in E Minor / G Major at 70 BPM (70 bars, 134,400 ticks, 2939 notes).
-    - Features Intro clean guitar arpeggios, Verse 1 dynamic fingerstyle bass and cross-stick drums, Chorus 1 heavy overdriven power chords and soaring twin-lead anthems, Verse 2 ride cymbal variations, Bars 49-60 virtuoso electric guitar solo, Grand Tutti climax, and delicate Em9 acoustic outro.
-  * 4-Minute Orchestral Instrumental (song/Sovereign_Orchestral_Symphony_4min.mid):
-    - Composed and generated 4:00 minute (240.0s) 10-track Symphonic Masterpiece in D Major / B Minor at 80 BPM (80 bars, 153,600 ticks, 1863 notes).
-    - Features Maestoso Intro harp arpeggios and French horn calls, Theme A sweeping First Violins, Theme B B-minor Adagio solo cello, Scherzando brass fanfares and sixteenth-note staccato ostinatos, Grand Tutti Climax (fff) with crashing timpani and cymbals, and serene D Major harp Coda.
+- Maintenance & Full Studio Simulation, Menus, Functions & Knobs Validation:
   * Comprehensive Simulation Test Suite (tests/test_main.cpp):
-    - Added TestMenusFunctionsAndKnobsSimulation() verifying menu command routing across File, Edit, Tools, Settings, Audio, Effects, Misc, and Help menus.
-    - Validated transport play/loop/record/metronome states, volume logarithmic scaling (0..127 to dB), constant-power pan law, +/- 2 semitone pitch bend mapping, and binary MThd/MTrk header verification of both 4-minute master songs.
+    - Implemented TestMenusFunctionsAndKnobsSimulation() verifying menu command routing across File, Edit, Tools, Settings, Audio, Effects, Misc, and Help menus.
+    - Validated transport play/loop/record/metronome states, volume logarithmic scaling (0..127 to dB), constant-power pan law, +/- 2 semitone pitch bend mapping, and rotary knob dynamics.
+  * Cleaned up and removed temporary test songs per user request.
 
 25-10-2026 Raja Zahidi
 - Feature & Master Studio Spectral Phase Disperser, Bowed String Acoustic Body, Transient Ringing Suppressor, Binaural Doppler Motion, Dynamic Sub-Bass Spectral Carver, & Vintage Diode Ladder Filter Suite v34.0 (Apex Transcendence Sovereign Eternity Release):

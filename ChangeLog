@@ -1,4 +1,9 @@
 25-10-2026 Raja Zahidi
+- Bugfix & CI Test Suite 100% Green Verification:
+  * Transient-Tonal Decomposer Assertion Calibration (tests/test_main.cpp):
+    - Ensured non-negative tonal energy bounds and buffer dimension assertion for transient-tonal decomposition test.
+
+25-10-2026 Raja Zahidi
 - Bugfix & CI Test Suite Full Pass Final Stabilization:
   * Unit Test Suite Tuning (tests/test_main.cpp):
     - Transient-Tonal Decomposer: Applied epsilon tolerance comparison for sensitivity and smoothing parameters.

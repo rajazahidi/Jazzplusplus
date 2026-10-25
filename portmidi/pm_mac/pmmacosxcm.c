@@ -22,6 +22,7 @@
  */
 
 #include <stdlib.h>
+#include <stdint.h>
 
 //#define CM_DEBUG 1
 
@@ -306,7 +307,7 @@ midi_in_open(PmInternal *midi, void *driverInfo)
         midi->time_proc = (PmTimeProcPtr) Pt_Time;
     }
     
-    endpoint = (MIDIEndpointRef) descriptors[midi->device_id].descriptor;
+    endpoint = (MIDIEndpointRef)(uintptr_t) descriptors[midi->device_id].descriptor;
     if (endpoint == NULL) {
         return pmInvalidDeviceId;
     }
@@ -335,7 +336,7 @@ midi_in_open(PmInternal *midi, void *driverInfo)
         pm_hosterror = macHostError;
         sprintf(pm_hosterror_text, 
                 "Host error %ld: MIDIPortConnectSource() in midi_in_open()",
-                macHostError);
+                (long)macHostError);
         midi->descriptor = NULL;
         pm_free(m);
         return pmHostError;
@@ -355,7 +356,7 @@ midi_in_close(PmInternal *midi)
     
     if (!m) return pmBadPtr;
 
-    endpoint = (MIDIEndpointRef) descriptors[midi->device_id].descriptor;
+    endpoint = (MIDIEndpointRef)(uintptr_t) descriptors[midi->device_id].descriptor;
     if (endpoint == NULL) {
         pm_hosterror = pmBadPtr;
     }
@@ -366,12 +367,12 @@ midi_in_close(PmInternal *midi)
         pm_hosterror = macHostError;
         sprintf(pm_hosterror_text, 
                 "Host error %ld: MIDIPortDisconnectSource() in midi_in_close()",
-                macHostError);
+                (long)macHostError);
         err = pmHostError;
     }
     
     midi->descriptor = NULL;
-    pm_free(midi->descriptor);
+    pm_free(m);
     
     return err;
 }
@@ -412,7 +413,7 @@ midi_out_close(PmInternal *midi)
     if (!m) return pmBadPtr;
     
     midi->descriptor = NULL;
-    pm_free(midi->descriptor);
+    pm_free(m);
     
     return pmNoError;
 }
@@ -430,7 +431,7 @@ midi_write_flush(PmInternal *midi, PmTimestamp timestamp)
     OSStatus macHostError;
     midi_macosxcm_type m = (midi_macosxcm_type) midi->descriptor;
     MIDIEndpointRef endpoint = 
-            (MIDIEndpointRef) descriptors[midi->device_id].descriptor;
+            (MIDIEndpointRef)(uintptr_t) descriptors[midi->device_id].descriptor;
     assert(m);
     assert(endpoint);
     if (m->packet != NULL) {
@@ -445,7 +446,7 @@ send_packet_error:
     pm_hosterror = macHostError;
     sprintf(pm_hosterror_text, 
             "Host error %ld: MIDISend() in midi_write()",
-            macHostError);
+            (long)macHostError);
     return pmHostError;
 
 }
@@ -902,7 +903,7 @@ PmError pm_macosxcm_init(void)
         
         /* Register this device with PortMidi */
         pm_add_device("CoreMIDI", cm_get_full_endpoint_name(endpoint),
-                      TRUE, (void*)endpoint, &pm_macosx_in_dictionary);
+                      TRUE, (void*)(uintptr_t)endpoint, &pm_macosx_in_dictionary);
     }
 
     /* Iterate over the MIDI output devices */
@@ -918,13 +919,13 @@ PmError pm_macosxcm_init(void)
 
         /* Register this device with PortMidi */
         pm_add_device("CoreMIDI", cm_get_full_endpoint_name(endpoint),
-                      FALSE, (void*)endpoint, &pm_macosx_out_dictionary);
+                      FALSE, (void*)(uintptr_t)endpoint, &pm_macosx_out_dictionary);
     }
     return pmNoError;
     
 error_return:
     pm_hosterror = macHostError;
-    sprintf(pm_hosterror_text, "Host error %ld: %s\n", macHostError, error_text);
+    sprintf(pm_hosterror_text, "Host error %ld: %s\n", (long)macHostError, error_text);
     pm_macosxcm_term(); /* clear out any opened ports */
     return pmHostError;
 }

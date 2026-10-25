@@ -28,7 +28,7 @@ JZPortMidiPlayer::JZPortMidiPlayer(JZSong* pSong)
     mOutDev(-1)
 {
   InitPM();
-  mInDev = Pm_GetDefaultOutputDeviceID();
+  mInDev = Pm_GetDefaultInputDeviceID();
   mOutDev = Pm_GetDefaultOutputDeviceID();
   TermPM();
 
@@ -489,7 +489,7 @@ void JZPortMidiPlayer::DeviceSelectionDialog()
     {
       if (iDevice->second == InputDevice)
       {
-        SetOutputDevice(iDevice->first);
+        SetInputDevice(iDevice->first);
         break;
       }
     }

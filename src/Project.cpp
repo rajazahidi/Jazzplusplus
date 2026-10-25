@@ -38,7 +38,7 @@
 #include "WindowsAudioInterface.h"
 #elif __WXGTK__
 #include "AudioDriver.h"
-#elif __WXMAC__
+#elif defined(__WXMAC__) || defined(__WXOSX__)
 #include "PortMidiPlayer.h"
 #endif
 
@@ -267,7 +267,7 @@ JZProject::JZProject()
   }
 #endif // __WXMSW__
 
-#ifdef __WXMAC__
+#if defined(__WXMAC__) || defined(__WXOSX__)
   //------------------
   // Macintosh Drivers
   //------------------
@@ -283,7 +283,7 @@ JZProject::JZProject()
   {
     mpMidiPlayer = pPortMidiPlayer;
   }
-#endif // __WXMAC__
+#endif // defined(__WXMAC__) || defined(__WXOSX__)
 
   if (!mpMidiPlayer)
   {

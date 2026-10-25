@@ -1,4 +1,24 @@
 25-10-2026 Raja Zahidi
+- Feature & Build Pipeline: Native macOS (Apple Silicon arm64) Build Support:
+  * CMake Build Configuration (CMakeLists.txt):
+    - Added elseif(APPLE) block configuring CoreMIDI and CoreAudio via PortMidi.
+    - Linked Apple Frameworks: CoreMIDI, CoreAudio, CoreFoundation, AudioToolbox, AudioUnit.
+    - Configured MACOSX_BUNDLE target properties for native Jazz++.app bundle.
+    - Added bundle resource installation for configuration, song templates, and help files into jazz.app/Contents/Resources.
+  * PortMidi macOS Engine & Modern 64-bit Clang Stabilization:
+    - Fixed 64-bit pointer-to-integer conversion warnings in portmidi/pm_mac/pmmacosxcm.c via uintptr_t casting.
+    - Fixed memory deallocation bug in midi_in_close() and midi_out_close() by freeing node pointer before NULL reset.
+    - Converted legacy Objective-C #import to standard C #include in portmidi/porttime/ptmacosx_mach.c.
+    - Corrected input device setter in JZPortMidiPlayer::DeviceSelectionDialog() (src/PortMidiPlayer.cpp).
+    - Initialized default input device using Pm_GetDefaultInputDeviceID() in JZPortMidiPlayer constructor.
+    - Added __WXOSX__ preprocessor guard compatibility in JZProject (src/Project.cpp).
+  * Continuous Integration Workflow (.github/workflows/ci.yml):
+    - Added build-macos job targeting macos-14 (Apple Silicon arm64).
+    - Integrated Homebrew wxwidgets installation, parallel compilation, and ctest test suite execution.
+    - Packaged standalone Jazz++.app into Jazz++-macOS-arm64.zip preserving macOS bundle metadata.
+    - Added macOS release artifact to GitHub Release deployment job.
+
+25-10-2026 Raja Zahidi
 - Bugfix & CI Test Suite 100% Green Verification:
   * Transient-Tonal Decomposer Assertion Calibration (tests/test_main.cpp):
     - Ensured non-negative tonal energy bounds and buffer dimension assertion for transient-tonal decomposition test.

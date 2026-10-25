@@ -42,6 +42,7 @@
 #define ID_SETTINGS_MIDI_DEVICE              (wxID_HIGHEST + 12)
 #define ID_SETTINGS_PITCH_PAINTER            (wxID_HIGHEST + 13)
 #define ID_SETTINGS_WAHWAH                   (wxID_HIGHEST + 14)
+#define ID_SETTINGS_REALTRACKS               (wxID_HIGHEST + 17)
 
 #define ID_EDIT_PASTE_MERGE                  (wxID_HIGHEST + 15)
 #define ID_EDIT_MAXIMIZE_VOLUME              (wxID_HIGHEST + 16)
@@ -52,6 +53,7 @@
 #define ID_AUDIO_SAVE_SAMPLE_SET             (wxID_HIGHEST + 23)
 #define ID_AUDIO_SAVE_SAMPLE_SET_AS          (wxID_HIGHEST + 24)
 #define ID_AUDIO_NEW_SAMPLE_SET              (wxID_HIGHEST + 25)
+#define ID_AUDIO_REALTRACKS_STUDIO           (wxID_HIGHEST + 26)
 
 #define ID_EFFECTS_EQUALIZER                 (wxID_HIGHEST + 27)
 #define ID_EFFECTS_FILTER                    (wxID_HIGHEST + 28)

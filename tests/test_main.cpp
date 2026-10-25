@@ -128,6 +128,9 @@
 #include "GpuWaveformTileCacheEngine.h"
 #include "ComplexSidechainAdcGraphResolver.h"
 #include "DynamicHermodeTuningEngine.h"
+#include "RealDrumsEngine.h"
+#include "RealTracksEngine.h"
+#include "RealInstrumentManager.h" 
 
 #include <cassert>
 #include <cmath>
@@ -5225,6 +5228,161 @@ void TestMenusFunctionsAndKnobsSimulation()
 }
 
 //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// Test 44: Band-in-a-Box RealTracks, RealDrums & Studio RealAudio Suite
+//-----------------------------------------------------------------------------
+void TestRealDrumsRealTracksAndRealAudioSuite()
+{
+  cout << "Testing Band-in-a-Box RealTracks, RealDrums & Studio RealAudio..." << endl;
+
+  // 1. RealDrums Acoustic Kit & Physical Multi-Velocity Synthesis
+  {
+    Jazz::JZRealDrumsEngine drums(48000.0f);
+    TEST_ASSERT(drums.getKitType() == Jazz::JZDrumKitType::VINTAGE_MAPLE, "Default kit is Vintage Maple Studio");
+    TEST_ASSERT(drums.getKitName() == "Vintage Maple Studio", "Kit name correctly identified");
+
+    // Kit profile changes
+    drums.setKitType(Jazz::JZDrumKitType::MODERN_BIRCH);
+    TEST_ASSERT(drums.getKitType() == Jazz::JZDrumKitType::MODERN_BIRCH, "Kit switch to Modern Birch");
+    drums.setKitType(Jazz::JZDrumKitType::JAZZ_CUSTOM);
+    TEST_ASSERT(drums.getKitType() == Jazz::JZDrumKitType::JAZZ_CUSTOM, "Kit switch to Jazz Custom");
+    drums.setKitType(Jazz::JZDrumKitType::ROCK_STADIUM);
+    TEST_ASSERT(drums.getKitType() == Jazz::JZDrumKitType::ROCK_STADIUM, "Kit switch to Rock Stadium");
+
+    // Dynamic Multi-velocity layering
+    drums.reset();
+    drums.noteOn(36, 0.25f); // Soft Kick
+    TEST_ASSERT(drums.getActiveVoicesCount() == 1, "Kick voice allocated");
+    TEST_ASSERT(drums.getLastNote() == 36, "Last note tracked");
+    TEST_ASSERT(drums.getTotalHitsCount() == 1, "Total hits count updated");
+
+    std::vector<float> bufSoftL(512, 0.0f), bufSoftR(512, 0.0f);
+    drums.renderAudio(bufSoftL.data(), bufSoftR.data(), 512);
+
+    float peakSoft = 0.0f;
+    for (float s : bufSoftL) peakSoft = std::max(peakSoft, std::abs(s));
+    TEST_ASSERT(peakSoft > 0.001f, "Soft kick renders non-zero acoustic energy");
+
+    // Hard Kick hit
+    drums.reset();
+    drums.noteOn(36, 1.0f); // Hard Kick
+    std::vector<float> bufHardL(512, 0.0f), bufHardR(512, 0.0f);
+    drums.renderAudio(bufHardL.data(), bufHardR.data(), 512);
+
+    float peakHard = 0.0f;
+    for (float s : bufHardL) peakHard = std::max(peakHard, std::abs(s));
+    TEST_ASSERT(peakHard > peakSoft, "Hard kick attack amplitude exceeds soft kick");
+
+    // Hi-Hat Choke Group Logic: Open Hi-Hat (46) choked by Closed Hi-Hat (42)
+    drums.reset();
+    drums.setChokeGroupEnabled(true);
+    drums.noteOn(46, 0.8f); // Open Hi-Hat
+    TEST_ASSERT(drums.getActiveVoicesCount() == 1, "Open Hi-Hat voice sounding");
+
+    std::vector<float> bufChokeL(1024, 0.0f), bufChokeR(1024, 0.0f);
+    drums.renderAudio(bufChokeL.data(), bufChokeR.data(), 256); // Ringing
+
+    drums.noteOn(42, 0.7f); // Closed Hi-Hat triggers choke
+    drums.renderAudio(bufChokeL.data(), bufChokeR.data(), 768); // Decay down
+
+    // Round-robin micro-dynamics
+    drums.setRoundRobinEnabled(true);
+    for (int i = 0; i < 8; ++i) {
+      drums.noteOn(38, 0.75f); // Snare rolls
+    }
+    TEST_ASSERT(drums.getTotalHitsCount() >= 10, "Multi-hit snare roll processed");
+  }
+
+  // 2. RealTracks Multi-Style Phrase & WSOLA Time-Stretch Engine
+  {
+    Jazz::JZRealTracksEngine tracks(48000.0f);
+    TEST_ASSERT(tracks.getStyle() == Jazz::JZRealTracksStyle::JAZZ_SWING_TRIO, "Default RealTracks style is Jazz Swing Trio");
+    TEST_ASSERT(!tracks.getStyleName().empty(), "Style has descriptive name");
+
+    // Styles switching
+    tracks.setStyle(Jazz::JZRealTracksStyle::ACOUSTIC_FOLK_BALLAD);
+    TEST_ASSERT(tracks.getStyle() == Jazz::JZRealTracksStyle::ACOUSTIC_FOLK_BALLAD, "Style switched to Folk Ballad");
+    tracks.setStyle(Jazz::JZRealTracksStyle::BOSSA_NOVA_CLUB);
+    TEST_ASSERT(tracks.getStyle() == Jazz::JZRealTracksStyle::BOSSA_NOVA_CLUB, "Style switched to Bossa Nova");
+
+    // Harmonic Chord-Following & Pitch Transposition
+    tracks.setChord(0, Jazz::JZRealChordQuality::MAJOR); // C Major
+    TEST_ASSERT(tracks.getChordString() == "CMaj", "Chord display C Major");
+    TEST_ASSERT(std::abs(tracks.getPitchShiftRatio() - 1.0f) < 0.001f, "C Major pitch ratio is unity 1.0");
+
+    tracks.setChord(7, Jazz::JZRealChordQuality::MAJOR); // G Major (+7 or -5 semitones)
+    TEST_ASSERT(tracks.getChordString() == "GMaj", "Chord display G Major");
+    TEST_ASSERT(tracks.getPitchShiftRatio() < 1.0f && tracks.getPitchShiftRatio() > 0.7f, "G Major pitch transpose ratio calculated correctly");
+
+    tracks.setChord(9, Jazz::JZRealChordQuality::MINOR7); // A Minor 7
+    TEST_ASSERT(tracks.getChordString() == "Am7", "Chord display A Minor 7");
+
+    // WSOLA Elastic Time-Stretching (50 to 240 BPM)
+    tracks.setTempo(150.0);
+    TEST_ASSERT(std::abs(tracks.getStretchRatio() - 1.25) < 0.001, "150 BPM stretch ratio is 1.25x");
+    tracks.setTempo(90.0);
+    TEST_ASSERT(std::abs(tracks.getStretchRatio() - 0.75) < 0.001, "90 BPM stretch ratio is 0.75x");
+
+    // Track Enable & Volume controls
+    tracks.setTrackEnabled(Jazz::JZRealTrackType::BASS, true);
+    tracks.setTrackEnabled(Jazz::JZRealTrackType::GUITAR, true);
+    tracks.setTrackEnabled(Jazz::JZRealTrackType::PIANO, true);
+    TEST_ASSERT(tracks.isTrackEnabled(Jazz::JZRealTrackType::BASS), "Bass track enabled");
+    TEST_ASSERT(tracks.isTrackEnabled(Jazz::JZRealTrackType::GUITAR), "Guitar track enabled");
+    TEST_ASSERT(tracks.isTrackEnabled(Jazz::JZRealTrackType::PIANO), "Piano track enabled");
+
+    // Audio Rendering
+    std::vector<float> outL(1024, 0.0f), outR(1024, 0.0f);
+    tracks.renderAudio(outL.data(), outR.data(), 1024);
+
+    float sumEnergy = 0.0f;
+    for (size_t i = 0; i < 1024; ++i) {
+      TEST_ASSERT(!std::isnan(outL[i]) && !std::isinf(outL[i]), "RealTracks audio L is finite");
+      TEST_ASSERT(!std::isnan(outR[i]) && !std::isinf(outR[i]), "RealTracks audio R is finite");
+      sumEnergy += std::abs(outL[i]) + std::abs(outR[i]);
+    }
+    TEST_ASSERT(sumEnergy > 0.05f, "RealTracks audio phrase renders acoustic energy");
+  }
+
+  // 3. RealInstrumentManager Central Coordinator & Physical Modeling Chain
+  {
+    auto& mgr = Jazz::JZRealInstrumentManager::getInstance();
+    mgr.initialize(48000.0f);
+    mgr.setMode(Jazz::JZRealAudioMode::REALDRUMS_ENHANCED);
+    TEST_ASSERT(mgr.getMode() == Jazz::JZRealAudioMode::REALDRUMS_ENHANCED, "Manager mode set to RealDrums Enhanced");
+
+    // MIDI drum note interception
+    bool drumHandled = mgr.handleMidiNoteOn(10, 38, 110); // Snare hit on drum channel
+    TEST_ASSERT(drumHandled == true, "Drum hit on Channel 10 handled by RealDrums");
+
+    // Melodic MIDI note (updates chord & triggers resonance)
+    bool melodicHandled = mgr.handleMidiNoteOn(1, 60, 95); // Middle C on Piano
+    TEST_ASSERT(melodicHandled == false, "Melodic note passed through while tracking chord");
+
+    // CC 64 Damper Pedal
+    bool pedalHandled = mgr.handleMidiControlChange(1, 64, 127);
+    TEST_ASSERT(pedalHandled == true, "Damper pedal CC 64 handled for sympathetic resonance");
+
+    // Full RealTracks Band mode with physical modeling
+    mgr.setMode(Jazz::JZRealAudioMode::FULL_REALTRACKS_BAND);
+    mgr.setGuitarBodyResonanceEnabled(true);
+    mgr.setPianoSympatheticResonanceEnabled(true);
+    mgr.setBinauralRoomEnabled(true);
+
+    std::vector<float> masterL(512, 0.0f), masterR(512, 0.0f);
+    mgr.processMasterAudio(masterL.data(), masterR.data(), 512);
+
+    for (size_t i = 0; i < 512; ++i) {
+      TEST_ASSERT(!std::isnan(masterL[i]) && !std::isinf(masterL[i]), "Master RealAudio L is finite");
+      TEST_ASSERT(!std::isnan(masterR[i]) && !std::isinf(masterR[i]), "Master RealAudio R is finite");
+    }
+
+    // Blend control
+    mgr.setRealAudioBlend(0.5f);
+    TEST_ASSERT(std::abs(mgr.getRealAudioBlend() - 0.5f) < 0.01f, "Blend ratio set to 50%");
+  }
+}
+
 // Main Runner
 //-----------------------------------------------------------------------------
 int main()
@@ -5249,6 +5407,7 @@ int main()
   TestTimelineBarClickLogic();
   TestAutoAccompanimentLogic();
   TestMenusFunctionsAndKnobsSimulation();
+  TestRealDrumsRealTracksAndRealAudioSuite();
 
   cout << "==========================================" << endl;
   cout << "Tests Run:    " << gTestsRun << endl;

@@ -232,6 +232,7 @@ set(JAZZ_SOURCES
     src/Dialogs/PitchWheelDialog.cpp
     src/Dialogs/ProgramChangeDialog.cpp
     src/Dialogs/QuantizeDialog.cpp
+    src/Dialogs/RealTracksDialog.cpp
     src/Dialogs/SamplesDialog.cpp
     src/Dialogs/SearchAndReplaceDialog.cpp
     src/Dialogs/SetTempoDialog.cpp
@@ -381,7 +382,10 @@ set(JAZZ_SOURCES
     src/QuantumParticleGranularEngine.cpp
     src/Random.cpp
     src/ReactiveLoadSpeakerImpedanceEngine.cpp
+    src/RealDrumsEngine.cpp
+    src/RealInstrumentManager.cpp
     src/RealTimeThreadAffinityScheduler.cpp
+    src/RealTracksEngine.cpp
     src/RecordingInfo.cpp
     src/Rectangle.cpp
     src/Rhythm.cpp
@@ -609,7 +613,10 @@ add_executable(jazz_tests
     src/PtpClockPrecisionSyncEngine.cpp
     src/QuantumParticleGranularEngine.cpp
     src/ReactiveLoadSpeakerImpedanceEngine.cpp
+    src/RealDrumsEngine.cpp
+    src/RealInstrumentManager.cpp
     src/RealTimeThreadAffinityScheduler.cpp
+    src/RealTracksEngine.cpp
     src/RoomAcousticCalibrationEngine.cpp
     src/RotaFonicRotarySpeakerSimulator.cpp
     src/SmpteVideoSyncEngine.cpp

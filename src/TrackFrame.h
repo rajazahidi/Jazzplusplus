@@ -162,6 +162,8 @@ class JZTrackFrame : public JZEventFrame, public JZButtonLabelInterface
 
     void OnAudioNewSampleSet(wxCommandEvent& Event);
 
+    void OnRealTracksStudio(wxCommandEvent& Event);
+
     void OnHelpContents(wxCommandEvent& Event);
 
     void OnHelpAbout(wxCommandEvent& Event);

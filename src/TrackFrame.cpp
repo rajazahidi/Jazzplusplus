@@ -32,6 +32,7 @@
 #include "Dialogs/SoundGeneratorDialog.h"
 #include "Dialogs/AudioEffectsDialog.h"
 #include "Dialogs/AutoAccompanimentDialog.h"
+#include "Dialogs/RealTracksDialog.h"
 #include "Filter.h"
 #include "Globals.h"
 #include "Harmony.h"
@@ -181,6 +182,10 @@ BEGIN_EVENT_TABLE(JZTrackFrame, JZEventFrame)
   EVT_MENU(ID_SETTINGS_SYNTHESIZER, JZTrackFrame::OnSettingsSynthesizerType)
 
   EVT_MENU(ID_SETTINGS_MIDI_DEVICE, JZTrackFrame::OnSettingsMidiDevice)
+
+  EVT_MENU(ID_SETTINGS_REALTRACKS, JZTrackFrame::OnRealTracksStudio)
+
+  EVT_MENU(ID_AUDIO_REALTRACKS_STUDIO, JZTrackFrame::OnRealTracksStudio)
 
   EVT_MENU(ID_AUDIO_GLOBAL_SETTINGS, JZTrackFrame::OnAudioGlobalSettings)
 
@@ -468,6 +473,7 @@ void JZTrackFrame::CreateMenu()
   pSettingMenu->Append(MEN_MIDI_THRU, "&Midi Thru...");
 #endif
   pSettingMenu->Append(ID_SETTINGS_SYNTHESIZER, "&Synthesizer Type...");
+  pSettingMenu->Append(ID_SETTINGS_REALTRACKS, "&RealTracks & Acoustic Audio...");
 
 #ifdef __WXMSW__
   pSettingMenu->Append(ID_SETTINGS_MIDI_DEVICE, "&Midi Device...");
@@ -494,6 +500,8 @@ void JZTrackFrame::CreateMenu()
 #endif
 
   wxMenu* pAudioMenu = new wxMenu;
+  pAudioMenu->Append(ID_AUDIO_REALTRACKS_STUDIO, "Band-in-a-Box &RealTracks & Acoustic Samples...\tCtrl+Alt+R");
+  pAudioMenu->AppendSeparator();
   pAudioMenu->Append(ID_AUDIO_GLOBAL_SETTINGS, "&Global Audio Settings...");
   pAudioMenu->Append(ID_AUDIO_SAMPLE_SETTINGS, "Sample Set Se&ttings... ");
   pAudioMenu->Append(ID_AUDIO_LOAD_SAMPLE_SET, "&Load Sample Set...");
@@ -1446,6 +1454,14 @@ void JZTrackFrame::OnAudioSaveSampleSetAs(wxCommandEvent& Event)
 void JZTrackFrame::OnAudioNewSampleSet(wxCommandEvent& Event)
 {
   mpProject->ClearSampleSet(this);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZTrackFrame::OnRealTracksStudio(wxCommandEvent& WXUNUSED(Event))
+{
+  JZRealTracksDialog dlg(this);
+  dlg.ShowModal();
 }
 
 //-----------------------------------------------------------------------------

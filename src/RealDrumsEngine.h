@@ -174,4 +174,8 @@ namespace jazz {
     using JZDrumInstrument = Jazz::JZDrumInstrument;
 }
 
+using JZRealDrumsEngine = Jazz::JZRealDrumsEngine;
+using JZDrumKitType = Jazz::JZDrumKitType;
+using JZDrumInstrument = Jazz::JZDrumInstrument;
+
 #endif // JAZZ_REAL_DRUMS_ENGINE_H

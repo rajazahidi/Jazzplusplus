@@ -14,6 +14,8 @@
 #include <wx/timer.h>
 #include "../RealInstrumentManager.h"
 
+using namespace Jazz;
+
 class wxRadioBox;
 class wxChoice;
 class wxCheckBox;

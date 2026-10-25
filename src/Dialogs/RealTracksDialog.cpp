@@ -6,6 +6,8 @@
 
 #include "RealTracksDialog.h"
 
+using namespace Jazz;
+
 #include <wx/sizer.h>
 #include <wx/statbox.h>
 #include <wx/radiobox.h>

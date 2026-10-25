@@ -124,4 +124,7 @@ namespace jazz {
     using JZRealAudioMode = Jazz::JZRealAudioMode;
 }
 
+using JZRealInstrumentManager = Jazz::JZRealInstrumentManager;
+using JZRealAudioMode = Jazz::JZRealAudioMode;
+
 #endif // JAZZ_REAL_INSTRUMENT_MANAGER_H

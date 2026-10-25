@@ -157,4 +157,9 @@ namespace jazz {
     using JZRealChordQuality = Jazz::JZRealChordQuality;
 }
 
+using JZRealTracksEngine = Jazz::JZRealTracksEngine;
+using JZRealTracksStyle = Jazz::JZRealTracksStyle;
+using JZRealTrackType = Jazz::JZRealTrackType;
+using JZRealChordQuality = Jazz::JZRealChordQuality;
+
 #endif // JAZZ_REAL_TRACKS_ENGINE_H

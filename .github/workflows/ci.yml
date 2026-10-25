@@ -175,11 +175,24 @@ jobs:
           # Compress to zip
           Compress-Archive -Path $pkgDir -DestinationPath "Jazz++-Windows-x64.zip" -Force
 
-      - name: Upload Windows Artifact
+      - name: Build Windows Setup Installer (Inno Setup)
+        shell: pwsh
+        run: |
+          ./packaging/windows/build_installer.ps1 -PackageDir "$pkgDir" -Version "6.0.0" -OutputDir "dist"
+
+      - name: Upload Windows Artifact (ZIP)
         uses: actions/upload-artifact@v4
         with:
           name: Jazz++-Windows-x64
           path: Jazz++-Windows-x64.zip
+          if-no-files-found: error
+          overwrite: true
+
+      - name: Upload Windows Setup Installer Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Jazz++-Windows-x64-Setup
+          path: dist/Jazz++-Windows-x64-Setup-v6.0.0.exe
           if-no-files-found: error
           overwrite: true
 
@@ -257,10 +270,15 @@ jobs:
         with:
           name: Jazz++-x86_64.AppImage
 
-      - name: Download Windows Package
+      - name: Download Windows Package (ZIP)
         uses: actions/download-artifact@v4
         with:
           name: Jazz++-Windows-x64
+
+      - name: Download Windows Setup Installer
+        uses: actions/download-artifact@v4
+        with:
+          name: Jazz++-Windows-x64-Setup
 
       - name: Download macOS Package
         uses: actions/download-artifact@v4
@@ -272,6 +290,7 @@ jobs:
         with:
           files: |
             Jazz++-x86_64.AppImage
+            Jazz++-Windows-x64-Setup-v6.0.0.exe
             Jazz++-Windows-x64.zip
             Jazz++-macOS-arm64.zip
           generate_release_notes: true

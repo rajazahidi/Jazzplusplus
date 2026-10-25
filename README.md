@@ -335,7 +335,8 @@ Official pre-built standalone binaries are generated automatically on every rele
 
 - **Linux AppImage**: Download [`Jazz++-x86_64.AppImage`](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v6.0.0), make executable with `chmod +x`, and run directly on Ubuntu 20.04+, Debian 11+, Fedora, Arch, or openSUSE.
 - **macOS Native Bundle**: Download [`Jazz++-macOS-arm64.zip`](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v6.0.0), extract `Jazz++.app`, and drag to your `/Applications` directory. Fully native on Apple Silicon (M1/M2/M3/M4) via CoreAudio and CoreMIDI.
-- **Windows Portable**: Download [`Jazz++-Windows-x64.zip`](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v6.0.0), extract to any folder, and double-click `jazz.exe`. All required 64-bit runtime libraries are included.
+- **Windows Setup Installer**: Download [`Jazz++-Windows-x64-Setup-v6.0.0.exe`](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v6.0.0). Runs an interactive setup wizard to install Jazz++, create Start Menu & Desktop shortcuts, and configure `.jazz` file associations.
+- **Windows Portable**: Download [`Jazz++-Windows-x64.zip`](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v6.0.0), extract to any folder, and double-click `jazz.exe`. No installation required.
 
 ---
 

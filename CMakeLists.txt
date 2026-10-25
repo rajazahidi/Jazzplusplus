@@ -180,6 +180,7 @@ set(JAZZ_SOURCES
     src/Dialogs/TransposeDialog.cpp
     src/Dialogs/VelocityDialog.cpp
     src/Dialogs.cpp
+    src/DialogueGatedLoudnessEngine.cpp
     src/DitherFormatEncoder.cpp
     src/DrumReplacerEngine.cpp
     src/DrumUtilities.cpp
@@ -218,6 +219,7 @@ set(JAZZ_SOURCES
     src/HarmonyBrowserAnalyzer.cpp
     src/Harmony.cpp
     src/HarmonyP.cpp
+    src/HelicalSpringDispersionEngine.cpp
     src/Help.cpp
     src/Immersive3DReverbConvolver.cpp
     src/ImmersiveAudioPanner.cpp
@@ -227,6 +229,7 @@ set(JAZZ_SOURCES
     src/KeyChordDetector.cpp
     src/KeyStringConverters.cpp
     src/Knob.cpp
+    src/LiveStagePlaybackRedundancyEngine.cpp
     src/LiveStreamHealthTelemetryEngine.cpp
     src/LoudnessMeterEBU.cpp
     src/Mapper.cpp
@@ -314,8 +317,9 @@ set(JAZZ_SOURCES
     src/Synth.cpp
     src/SysexChannel.cpp
     src/TakesComping.cpp
-    src/TapeMachineCalibrationEngine.cpp
     src/TapeConsoleWarmer.cpp
+    src/TapeHysteresisAzimuthEngine.cpp
+    src/TapeMachineCalibrationEngine.cpp
     src/ThroughZeroFlanger.cpp
     src/VintageLofiProcessor.cpp
     src/VinylLatheMechanicalSimulator.cpp
@@ -326,6 +330,7 @@ set(JAZZ_SOURCES
     src/TrackWindow.cpp
     src/TransientShaper.cpp
     src/TransientSlicer.cpp
+    src/TransientTonalDecomposeEngine.cpp
     src/TransientTonalSplitter.cpp
     src/VocalAligner.cpp
     src/VocalDoublerEngine.cpp
@@ -337,6 +342,7 @@ set(JAZZ_SOURCES
     src/WavetableSynth.cpp
     src/WaveTerrainGraphicSynthEngine.cpp
     src/WindTubePhysicalModel.cpp
+    src/XenharmonicLatticeMorpherEngine.cpp
 )
 
 add_executable(jazz ${GUI_TYPE} ${JAZZ_SOURCES} ${PLATFORM_SOURCES})

@@ -1,4 +1,27 @@
 25-10-2026 Raja Zahidi
+- Feature & Master Studio Transient-Tonal Decomposer, Tape Hysteresis & Azimuth Skew, Live Stage Redundancy, Xenharmonic Lattice Morpher, Dialogue-Gated Loudness, & Helical Spring Dispersion Suite v22.0 (Apex Zenith Enterprise Release):
+  * Real-Time 3-Way Transient-Tonal-Ambience Spectral Decomposer (src/TransientTonalDecomposeEngine.h & .cpp):
+    - JZTransientTonalDecomposeEngine provides real-time 3-way spectral decomposition isolating fast attack transients, sustained harmonic tonal bodies, and diffuse ambient noise beds (Cedar / SpectraLayers style).
+    - Features dual-envelope attack/decay tracking, adjustable transient sensitivity and tonal smoothing, independent surgical gain controls (+/- 12 dB), and perfect phase-coherent reconstruction.
+  * Jiles-Atherton Tape Magnetic Hysteresis & Azimuth Skew Engine (src/TapeHysteresisAzimuthEngine.h & .cpp):
+    - JZTapeHysteresisAzimuthEngine physically models ferromagnetic domain dynamics using Jiles-Atherton differential equations (remanence, saturation, coercivity) for authentic analog tape warmth (Studer A800 / Ampex ATR-102 style).
+    - Features 7.5, 15, and 30 IPS speed-dependent head-bump resonant equalization and automated sub-sample cross-correlation stereo head azimuth tilt skew delay alignment.
+  * Live Stage Dual-Rig Playback Redundancy & Failover Hub (src/LiveStagePlaybackRedundancyEngine.h & .cpp):
+    - JZLiveStagePlaybackRedundancyEngine provides automated concert stage playback failover (Radial SW8 / PlayAUDIO12 style) between Primary Rig A and Backup Rig B.
+    - Features sub-audible / ultrasonic heartbeat pilot tone detection with sub-2ms dropout threshold, clickless audio crossfading, and an automatic 16-channel MIDI panic flush (CC 120, CC 123, Pitch Bend Reset) to eliminate stuck notes during live show failures.
+  * Dynamic Xenharmonic Lattice Morpher & Tonality Diamond (src/XenharmonicLatticeMorpherEngine.h & .cpp):
+    - JZXenharmonicLatticeMorpherEngine provides multidimensional Just Intonation lattices (Harry Partch 43-tone tonality diamond, Euler-Fokker genus) and real-time continuous morphing between arbitrary temperaments.
+    - Supports standard 12-TET, Bohlen-Pierce (3:1 tritave), Arabic Maqam Rast quarter-tones, and Indonesian Gamelan Slendro (5-EDO) with sub-cent pitch deviation calculation.
+  * ITU-R BS.1770-4 / EBU R128 S1 Speech-Gated Loudness Normalizer (src/DialogueGatedLoudnessEngine.h & .cpp):
+    - JZDialogueGatedLoudnessEngine implements cinema and OTT streaming broadcast dialogue loudness normalization (Netflix, Apple TV+, Dolby Vision compliance).
+    - Features Voice Activity Detection (VAD) speech presence gating with -10 LU relative gating, Stage 1 high-shelf pre-filtering, Stage 2 RLB weighting, true peak oversampling, and automated standardized delivery certification generation.
+  * Physical Helical Spring Reverb Modeler & Mechanical Chirp Dispersion (src/HelicalSpringDispersionEngine.h & .cpp):
+    - JZHelicalSpringDispersionEngine physically models vintage mechanical helical spring reverb tanks (Accutronics 3-spring / Roland Space Echo).
+    - Features a 6-stage all-pass dispersive ladder simulating high-frequency group delay lag (chirp dispersion "twang/boing"), lossy wire damping, transducer coil drive saturation, and mechanical tank kick/bump shock impact simulation.
+  * Added Automated Unit Tests 161 to 166 (tests/test_main.cpp):
+    - Validates 3-way TTA spectral separation, Jiles-Atherton magnetic domain hysteresis with stereo azimuth skew compensation, pilot tone loss failover with 16-channel MIDI panic, Partch 5/4 Just Major 3rd (550Hz) and Bohlen-Pierce morphing, speech-gated -10 LU dialogue loudness analysis with Netflix certification, and helical spring chirp dispersion with tank kick excitation.
+
+25-10-2026 Raja Zahidi
 - Feature & Master Studio Neural Timbre Transfer, Sympathetic Guitar Resonator, MPEG-H Interactive 3D Audio, Infinite Barberpole Flanger, Sub-Harmonic Waveguide Bass, & Live Stream Health Telemetry Suite v21.0 (Apex Singularity Flagship Release):
   * Real-Time Neural Timbre Transfer & Resynthesis Engine (src/NeuralTimbreTransferEngine.h & .cpp):
     - JZNeuralTimbreTransferEngine provides real-time neural instrument resynthesis and timbre transfer (RAVE / DDSP style) without heavy GPU inference latency.

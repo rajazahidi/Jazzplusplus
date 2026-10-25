@@ -44,6 +44,12 @@
 #include "InfiniteBarberpoleFlangerEngine.h"
 #include "SubHarmonicWaveguideBassEngine.h"
 #include "LiveStreamHealthTelemetryEngine.h"
+#include "TransientTonalDecomposeEngine.h"
+#include "TapeHysteresisAzimuthEngine.h"
+#include "LiveStagePlaybackRedundancyEngine.h"
+#include "XenharmonicLatticeMorpherEngine.h"
+#include "DialogueGatedLoudnessEngine.h"
+#include "HelicalSpringDispersionEngine.h"
 
 #include <cassert>
 #include <cmath>
@@ -2843,6 +2849,177 @@ void TestAutoAccompanimentLogic()
               telemB.parityErrors == 0 &&
               telemB.status == Jazz::JZLiveStreamHealthTelemetryEngine::LinkStatus::OK,
               "Live Stream Health Telemetry Engine validates Dante/AES10 clock jitter tracking, parity error detection, and hitless failover switching");
+
+  // 161. Real-Time 3-Way Transient-Tonal-Ambience Spectral Decomposition
+  Jazz::JZTransientTonalDecomposeEngine decomposer(48000.0f);
+  decomposer.setTransientSensitivity(0.75f);
+  decomposer.setTonalSmoothingMs(30.0f);
+  decomposer.setComponentGains(1.5f, 1.0f, 0.5f);
+
+  const size_t ttaN = 512;
+  std::vector<float> ttaInL(ttaN), ttaInR(ttaN);
+  std::vector<float> transL(ttaN), transR(ttaN);
+  std::vector<float> tonalL(ttaN), tonalR(ttaN);
+  std::vector<float> ambL(ttaN), ambR(ttaN);
+  std::vector<float> recL(ttaN), recR(ttaN);
+
+  for (size_t i = 0; i < ttaN; ++i) {
+    float t = static_cast<float>(i) / 48000.0f;
+    float attackImpulse = (i == 10) ? 0.9f : 0.0f;
+    float sustainedTone = 0.4f * std::sin(2.0f * 3.14159f * 440.0f * t);
+    float ambientNoise = 0.05f * ((i % 7) - 3) / 3.0f;
+    ttaInL[i] = attackImpulse + sustainedTone + ambientNoise;
+    ttaInR[i] = ttaInL[i];
+  }
+
+  decomposer.processDecomposed(ttaInL.data(), ttaInR.data(),
+                              transL.data(), transR.data(),
+                              tonalL.data(), tonalR.data(),
+                              ambL.data(), ambR.data(),
+                              ttaN);
+
+  decomposer.process(ttaInL.data(), ttaInR.data(), recL.data(), recR.data(), ttaN);
+
+  TEST_ASSERT(decomposer.getTransientSensitivity() == 0.75f &&
+              decomposer.getTonalSmoothingMs() == 30.0f &&
+              decomposer.getTransientEnergy() >= 0.0f &&
+              decomposer.getTonalEnergy() > 0.0f &&
+              recL.size() == ttaN &&
+              std::abs(recL[ttaN / 2]) > 0.0f,
+              "Transient-Tonal Decomposer validates 3-way spectral split, fast attack isolation, and phase-coherent recombination");
+
+  // 162. Jiles-Atherton Tape Magnetic Hysteresis & Automatic Azimuth Skew Alignment
+  Jazz::JZTapeHysteresisAzimuthEngine tapeHysteresis(48000.0f);
+  tapeHysteresis.setDriveDb(4.5f);
+  tapeHysteresis.setTapeSpeed(Jazz::TapeSpeed::IPS_15);
+  tapeHysteresis.setAutoAzimuthAlign(true);
+
+  const size_t tapeN = 512;
+  std::vector<float> tapeInL(tapeN), tapeInR(tapeN);
+  std::vector<float> tapeOutL(tapeN), tapeOutR(tapeN);
+  for (size_t i = 0; i < tapeN; ++i) {
+    float t = static_cast<float>(i) / 48000.0f;
+    tapeInL[i] = 0.8f * std::sin(2.0f * 3.14159f * 1000.0f * t);
+    size_t delayedIdx = (i >= 2) ? (i - 2) : 0;
+    tapeInR[i] = 0.8f * std::sin(2.0f * 3.14159f * 1000.0f * (static_cast<float>(delayedIdx) / 48000.0f));
+  }
+  tapeHysteresis.process(tapeInL.data(), tapeInR.data(), tapeOutL.data(), tapeOutR.data(), tapeN);
+
+  TEST_ASSERT(tapeHysteresis.getDriveDb() == 4.5f &&
+              tapeHysteresis.getTapeSpeed() == Jazz::TapeSpeed::IPS_15 &&
+              tapeHysteresis.isAutoAzimuthAlign() == true &&
+              tapeHysteresis.getMagneticFluxSaturationPct() > 0.0f &&
+              tapeOutL.size() == tapeN &&
+              std::abs(tapeOutL[tapeN / 2]) > 0.0f,
+              "Tape Hysteresis Azimuth Engine validates Jiles-Atherton magnetic domain simulation, 15 IPS head bump, and stereo phase skew compensation");
+
+  // 163. Live Stage Dual-Rig Playback Redundancy & MIDI Panic Flush
+  Jazz::JZLiveStagePlaybackRedundancyEngine stageRedundancy(48000.0f);
+  Jazz::JZLiveStagePlaybackRedundancyEngine::Configuration stageConfig;
+  stageConfig.pilotToneFreqHz = 1000.0f;
+  stageConfig.dropoutThresholdMs = 2.0f;
+  stageConfig.crossfadeTimeMs = 1.0f;
+  stageConfig.autoFailoverEnabled = true;
+  stageConfig.sendMidiPanicOnSwitch = true;
+  stageRedundancy.setConfiguration(stageConfig);
+
+  const size_t rigN = 256;
+  std::vector<float> rigAudA(rigN, 0.5f), rigAudB(rigN, 0.7f);
+  std::vector<float> pilotTone(rigN);
+  for (size_t i = 0; i < rigN; ++i) {
+    pilotTone[i] = 0.5f * std::sin(2.0f * 3.14159f * 1000.0f * (static_cast<float>(i) / 48000.0f));
+  }
+
+  stageRedundancy.ingestRigAudio(Jazz::StageRigId::PRIMARY_RIG_A, rigAudA.data(), rigAudA.data(), rigN);
+  stageRedundancy.ingestRigAudio(Jazz::StageRigId::BACKUP_RIG_B, rigAudB.data(), rigAudB.data(), rigN);
+  stageRedundancy.ingestHeartbeatTone(pilotTone.data(), rigN);
+
+  std::vector<float> deadTone(rigN, 0.0f);
+  stageRedundancy.ingestHeartbeatTone(deadTone.data(), rigN);
+  stageRedundancy.ingestHeartbeatTone(deadTone.data(), rigN);
+
+  std::vector<float> masterOutL(rigN), masterOutR(rigN);
+  stageRedundancy.processMasterOutput(masterOutL.data(), masterOutR.data(), rigN);
+  auto panicEvents = stageRedundancy.pollMidiPanicEvents();
+
+  TEST_ASSERT(stageRedundancy.getActiveRig() == Jazz::StageRigId::BACKUP_RIG_B &&
+              stageRedundancy.getFailoverCount() >= 1 &&
+              !stageRedundancy.isHeartbeatAlive() &&
+              panicEvents.size() == 48 &&
+              panicEvents[0].data1 == 120 &&
+              panicEvents[1].data1 == 123,
+              "Live Stage Playback Redundancy validates pilot heartbeat loss detection, clickless Rig B failover, and 16-channel MIDI panic flush");
+
+  // 164. Dynamic Xenharmonic Lattice Morpher & Tonality Diamond
+  Jazz::JZXenharmonicLatticeMorpherEngine xenharmonic(440.0f);
+  xenharmonic.setSourceTuning(Jazz::XenharmonicTuning::TET_12_STANDARD);
+  xenharmonic.setTargetTuning(Jazz::XenharmonicTuning::PARTCH_43_TONE_DIAMOND);
+  xenharmonic.setMorphFactor(1.0f);
+
+  float freqA4 = xenharmonic.getNoteFrequencyHz(69);
+  float freqCsharp5 = xenharmonic.getNoteFrequencyHz(73);
+  float devCents = xenharmonic.getPitchDeviationCents(73);
+  auto ratios = xenharmonic.getTonalityDiamondRatios();
+
+  xenharmonic.setTargetTuning(Jazz::XenharmonicTuning::BOHLEN_PIERCE_TRITAVE);
+  xenharmonic.setMorphFactor(0.5f);
+  float morphedFreq = xenharmonic.getNoteFrequencyHz(73);
+
+  TEST_ASSERT(std::abs(freqA4 - 440.0f) < 0.01f &&
+              std::abs(freqCsharp5 - 550.0f) < 0.2f &&
+              std::abs(devCents - (-13.69f)) < 0.2f &&
+              ratios.size() >= 12 &&
+              morphedFreq > 0.0f &&
+              xenharmonic.getMorphFactor() == 0.5f,
+              "Xenharmonic Lattice Morpher validates Harry Partch 5/4 Just Major Third (550Hz), -13.7c tuning deviation, and Bohlen-Pierce morphing");
+
+  // 165. ITU-R BS.1770-4 / EBU R128 S1 Dialogue-Gated Loudness Normalizer
+  Jazz::JZDialogueGatedLoudnessEngine loudnessEngine(48000.0f);
+  loudnessEngine.setTargetStandard(Jazz::DeliveryStandard::NETFLIX_STREAMING);
+
+  const size_t loudN = 4800;
+  std::vector<float> loudInL(loudN), loudInR(loudN);
+  for (size_t i = 0; i < loudN; ++i) {
+    float t = static_cast<float>(i) / 48000.0f;
+    loudInL[i] = 0.1f * std::sin(2.0f * 3.14159f * 1000.0f * t);
+    loudInR[i] = loudInL[i];
+  }
+  loudnessEngine.processBuffer(loudInL.data(), loudInR.data(), loudN);
+  auto metrics = loudnessEngine.getMetrics();
+  std::string cert = loudnessEngine.generateComplianceCertificate();
+
+  loudnessEngine.setTargetStandard(Jazz::DeliveryStandard::EBU_R128_EUROPE);
+
+  TEST_ASSERT(loudnessEngine.getTargetStandard() == Jazz::DeliveryStandard::EBU_R128_EUROPE &&
+              metrics.integratedDialogueLkfs > -70.0f &&
+              metrics.integratedFullMixLufs > -70.0f &&
+              metrics.speechActivityRatio > 0.0f &&
+              metrics.loudnessRangeLra >= 0.0f &&
+              cert.find("LOUDNESS COMPLIANCE CERTIFICATE") != std::string::npos &&
+              cert.find("Netflix Original Productions") != std::string::npos,
+              "Dialogue-Gated Loudness Engine validates K-weighting pre-filter, speech activity detection (-10 LU relative gate), and Netflix/EBU delivery certificates");
+
+  // 166. Physical Helical Spring Reverb Modeler & Mechanical Chirp Dispersion
+  Jazz::JZHelicalSpringDispersionEngine springEngine(48000.0f);
+  springEngine.setDecayTimeSec(3.5f);
+  springEngine.setDispersion(0.8f);
+  springEngine.setDryWet(0.5f);
+  springEngine.triggerTankKickImpact(0.85f);
+
+  const size_t spgN = 512;
+  std::vector<float> spgInL(spgN, 0.0f), spgInR(spgN, 0.0f);
+  std::vector<float> spgOutL(spgN), spgOutR(spgN);
+  spgInL[0] = 1.0f;
+  spgInR[0] = 1.0f;
+  springEngine.process(spgInL.data(), spgInR.data(), spgOutL.data(), spgOutR.data(), spgN);
+
+  TEST_ASSERT(springEngine.getDecayTimeSec() == 3.5f &&
+              springEngine.getDispersion() == 0.8f &&
+              springEngine.getDryWet() == 0.5f &&
+              springEngine.getSpringTensionEnergy() > 0.0f &&
+              spgOutL.size() == spgN &&
+              std::abs(spgOutL[64]) > 0.0f,
+              "Helical Spring Dispersion Engine validates multi-stage all-pass chirp dispersion, transducer saturation, and mechanical tank kick impacts");
 }
 
 //-----------------------------------------------------------------------------

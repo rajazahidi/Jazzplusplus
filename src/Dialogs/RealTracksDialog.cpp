@@ -511,7 +511,7 @@ void JZRealTracksDialog::OnAuditionToggle(wxCommandEvent& WXUNUSED(Event))
     if (m_isAuditioning) {
         mpAuditionBtn->SetLabel("Stop Audition");
         m_timer.Start(250); // Fire pulse every 250ms
-        mpStatusText->SetLabel("Auditioning RealBand groove in " + m_mgr.getRealTracks().getChordString().c_str());
+        mpStatusText->SetLabel(wxString::Format("Auditioning RealBand groove in %s", m_mgr.getRealTracks().getChordString().c_str()));
     } else {
         mpAuditionBtn->SetLabel("Live Audition Preview");
         m_timer.Stop();

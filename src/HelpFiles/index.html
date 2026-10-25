@@ -1,30 +1,68 @@
 <!DOCTYPE HTML>
 <html>
-<head><style>body { background-color: #ffffff !important; color: #000000 !important; font-family: Segoe UI, Arial, sans-serif; } table { border: 0 !important; } hr { display: none !important; }</style>
+<head>
 <meta charset="utf-8">
-<title>Jazz++ User Manual</title>
-  <style>
-    body { background-color: #ffffff; color: #000000; margin: 8px; }
-    table { border: 0px; border-collapse: collapse; }
-    td, th { border: 0px; padding: 2px; }
-  </style>
+<title>Jazz++ User Manual &amp; Reference Guide</title>
+
+<style>
+body {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 12px 18px;
+  line-height: 1.5;
+}
+hr { display: none !important; }
+h1 { color: #0f172a; font-size: 20px; margin-top: 8px; margin-bottom: 6px; border-bottom: 2px solid #38bdf8; padding-bottom: 4px; }
+h2 { color: #0369a1; font-size: 15px; margin-top: 16px; margin-bottom: 6px; }
+h3 { color: #334155; font-size: 13px; margin-top: 12px; margin-bottom: 4px; }
+p, li { font-size: 12px; color: #334155; }
+a { color: #0284c7; text-decoration: none; font-weight: 500; }
+a:hover { text-decoration: underline; }
+table { border: 0 !important; width: 100%; border-collapse: collapse; font-size: 12px; margin: 8px 0; }
+th { background-color: #f1f5f9; color: #0f172a; text-align: left; padding: 6px 8px; font-weight: 600; border-bottom: 1px solid #cbd5e1 !important; }
+td { border: 0 !important; padding: 5px 8px; border-bottom: 1px solid #f1f5f9 !important; }
+.nav { background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 4px; margin-bottom: 10px; font-size: 11px; }
+.card { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+.badge { background-color: #0284c7; color: #ffffff; padding: 2px 7px; border-radius: 3px; font-weight: bold; font-size: 10px; text-transform: uppercase; }
+.tip { background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 8px 12px; border-radius: 0 4px 4px 0; margin: 8px 0; font-size: 12px; }
+code { background-color: #f1f5f9; padding: 2px 5px; border-radius: 3px; font-family: Consolas, monospace; font-size: 11px; color: #0f172a; }
+</style>
+
+<style>
+ul.toc { list-style-type: none; padding-left: 0; }
+ul.toc li { padding: 6px 0; border-bottom: 1px solid #f1f5f9; }
+ul.toc li a { font-weight: 600; font-size: 13px; }
+</style>
 </head>
-<body bgcolor="#ffffff" text="#000000" style="background-color:#ffffff; color:#000000; font-family:Segoe UI, Arial, sans-serif; padding:8px;">
-<h1>Jazz++ MIDI Sequencer</h1>
-<h3>User Manual & Reference Guide</h3>
-<br>
-<ul>
-<li><a href="chapter1.html">Chapter 1: Introduction</a></li>
-<li><a href="chapter2.html">Chapter 2: Installation and Setup</a></li>
-<li><a href="chapter3.html">Chapter 3: Overview of using Jazz++</a></li>
-<li><a href="chapter4.html">Chapter 4: Track window</a></li>
-<li><a href="chapter5.html">Chapter 5: Piano window</a></li>
-<li><a href="chapter6.html">Chapter 6: Audio</a></li>
-<li><a href="chapter7.html">Chapter 7: Examples</a></li>
-<li><a href="chapter8.html">Chapter 8: Appendix</a></li>
-<li><a href="chapter9.html">Chapter 9: RoadMap</a></li>
+<body bgcolor="#ffffff" text="#1e293b">
+
+<h1>Jazz++ MIDI Sequencer &amp; Audio Workstation</h1>
+<h2 style="margin-top: 2px; color: #0284c7;">Version 6.0.0 Pro Studio &bull; User Manual &amp; Reference Guide</h2>
+
+<div class="card">
+<p><b>Welcome to Jazz++ 6.0.0!</b> Jazz++ is an advanced open-source MIDI sequencer and digital audio workstation designed for professional music composition, sequencing, and audio production across Windows, Linux, and macOS.</p>
+<p>Version 6.0.0 introduces the flagship <b>Virtual Session Band</b> (RealTracks &amp; RealDrums), 64-bit precision <b>Audio DSP Effects</b> (Reverb, Delay, Chorus, Flanger, EQ, Overdrive), procedural sound synthesis, interactive guitar fretboard explorer, auto-accompaniment, and modern multi-platform audio drivers.</p>
+</div>
+
+<h2 style="color: #0f172a; margin-top: 14px;">User Manual Chapters</h2>
+<ul class="toc">
+<li><a href="chapter1.html">Chapter 1: Introduction &amp; System Architecture</a> &mdash; Overview of Jazz++, core features, audio engine architecture, and system requirements.</li>
+<li><a href="chapter2.html">Chapter 2: Installation and Setup</a> &mdash; Installing on Windows (Inno Setup &amp; Portable), Linux (AppImage &amp; Deb), and macOS; configuring MIDI and audio interfaces.</li>
+<li><a href="chapter3.html">Chapter 3: Quick Start &amp; Workflow Overview</a> &mdash; Step-by-step tutorial on creating projects, recording MIDI/Audio, using the metronome, and sequencing.</li>
+<li><a href="chapter4.html">Chapter 4: Track Window &amp; Sequencer</a> &mdash; Multi-track sequencer arranger, track parameters, ruler timeline, mixer console, and quantization.</li>
+<li><a href="chapter5.html">Chapter 5: Piano Window &amp; Event Editing</a> &mdash; Piano roll note editing, velocity automation, pitch bend, continuous controllers (CC), and SysEx messages.</li>
+<li><a href="chapter6.html">Chapter 6: Audio Subsystem &amp; DSP Effects</a> &mdash; Multi-track audio recording, WAV samples, 64-bit DSP effects suite (Reverb, Delay, Chorus, Flanger, EQ, Distortion).</li>
+<li><a href="chapter7.html">Chapter 7: Virtual Session Band &amp; Advanced Tools</a> &mdash; RealTracks/RealDrums backing band, Procedural Sound Generator, Guitar Fretboard, and Chord Scale explorer.</li>
+<li><a href="chapter8.html">Chapter 8: Appendix: Shortcuts &amp; MIDI Reference</a> &mdash; Complete keyboard shortcuts reference, General MIDI instrument maps, and MIDI controller tables.</li>
+<li><a href="chapter9.html">Chapter 9: FAQ &amp; Troubleshooting</a> &mdash; Solutions for common audio latency, synthesizer configuration, and Windows security notifications.</li>
 </ul>
-<br>
-<p>Jazz++ is an advanced MIDI sequencer with full audio recording, editing, and synthesizers integration for Linux and Windows.</p>
+
+<div class="card" style="margin-top: 16px;">
+<p style="margin: 0; font-size: 11px; color: #64748b;">
+<b>Jazz++ Project 2026</b> &bull; Licensed under GNU General Public License v2+ &bull; Modern maintainer: Raja Zahidi &bull; Web: <a href="https://rajazahidi.github.io/Jazzplusplus/" target="_blank">rajazahidi.github.io/Jazzplusplus</a>
+</p>
+</div>
+
 </body>
 </html>

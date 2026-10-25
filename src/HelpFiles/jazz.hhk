@@ -197,5 +197,49 @@
 		<param name="Name" value="Velocity">
 		<param name="Local" value="chapter5.html#velocity">
 		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Virtual Session Band">
+		<param name="Local" value="chapter7.html#virtualband">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="RealTracks">
+		<param name="Local" value="chapter7.html#realsessionband">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="RealDrums">
+		<param name="Local" value="chapter7.html#realsessionband">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="DSP Effects">
+		<param name="Local" value="chapter6.html#dsp">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Reverb">
+		<param name="Local" value="chapter6.html#reverb">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Delay">
+		<param name="Local" value="chapter6.html#delay">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Sound Generator">
+		<param name="Local" value="chapter7.html#soundgenerator">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Guitar Fretboard">
+		<param name="Local" value="chapter7.html#fretboard">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Auto Accompaniment">
+		<param name="Local" value="chapter7.html#autoaccompaniment">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Keyboard Shortcuts">
+		<param name="Local" value="chapter8.html#shortcuts">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Troubleshooting">
+		<param name="Local" value="chapter9.html#troubleshooting">
+		</OBJECT>
 </UL>
 </BODY></HTML>

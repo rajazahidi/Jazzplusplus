@@ -1,166 +1,109 @@
 <!DOCTYPE HTML>
 <html>
-<head><style>body { background-color: #ffffff !important; color: #000000 !important; font-family: Segoe UI, Arial, sans-serif; } table { border: 0 !important; } hr { display: none !important; }</style>
+<head>
 <meta charset="utf-8">
-<title>RoadMap - Jazz++ Help</title>
-  <style>
-    body { background-color: #ffffff; color: #000000; margin: 8px; }
-    table { border: 0px; border-collapse: collapse; }
-    td, th { border: 0px; padding: 2px; }
-  </style>
+<title>Chapter 9: FAQ & Troubleshooting - Jazz++ Help</title>
+
+<style>
+body {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 12px 18px;
+  line-height: 1.5;
+}
+hr { display: none !important; }
+h1 { color: #0f172a; font-size: 20px; margin-top: 8px; margin-bottom: 6px; border-bottom: 2px solid #38bdf8; padding-bottom: 4px; }
+h2 { color: #0369a1; font-size: 15px; margin-top: 16px; margin-bottom: 6px; }
+h3 { color: #334155; font-size: 13px; margin-top: 12px; margin-bottom: 4px; }
+p, li { font-size: 12px; color: #334155; }
+a { color: #0284c7; text-decoration: none; font-weight: 500; }
+a:hover { text-decoration: underline; }
+table { border: 0 !important; width: 100%; border-collapse: collapse; font-size: 12px; margin: 8px 0; }
+th { background-color: #f1f5f9; color: #0f172a; text-align: left; padding: 6px 8px; font-weight: 600; border-bottom: 1px solid #cbd5e1 !important; }
+td { border: 0 !important; padding: 5px 8px; border-bottom: 1px solid #f1f5f9 !important; }
+.nav { background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 4px; margin-bottom: 10px; font-size: 11px; }
+.card { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+.badge { background-color: #0284c7; color: #ffffff; padding: 2px 7px; border-radius: 3px; font-weight: bold; font-size: 10px; text-transform: uppercase; }
+.tip { background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 8px 12px; border-radius: 0 4px 4px 0; margin: 8px 0; font-size: 12px; }
+code { background-color: #f1f5f9; padding: 2px 5px; border-radius: 3px; font-family: Consolas, monospace; font-size: 11px; color: #0f172a; }
+</style>
+
 </head>
-<body bgcolor="#ffffff" text="#000000" style="background-color:#ffffff; color:#000000; font-family:Segoe UI, Arial, sans-serif; padding:8px;">
-<table width="100%" border="0" cellpadding="2">
+<body bgcolor="#ffffff" text="#1e293b">
+<div class="nav">
+<table width="100%">
 <tr>
-<td align="left"><a href="chapter8.html">[ Previous ]</a> <a href="index.html">[ Contents ]</a> <a href="index.html">[ Next ]</a></td>
-<td align="right"><b>Jazz++ Manual</b></td>
+<td align="left">
+  <a href="chapter8.html">[&laquo; Chapter 8: Appendix]</a> &nbsp;|&nbsp;
+  <a href="index.html">[Table of Contents]</a> &nbsp;|&nbsp;
+  <a href="index.html">[Table of Contents &raquo;]</a>
+</td>
+<td align="right"><b>Jazz++ v6.0.0 Manual</b></td>
 </tr>
 </table>
-<br>
-<h1>Chapter 9: RoadMap</h1>
-<h2><a name="frequentlyaskedquestions">Frequently Asked Questions</a></h2>\title{FAQ}
-<h2><a name="jazzspecific">Jazz++ Specific</a></h2>
-<h2><a name="howpowerfuldoesmycomputerneedtobetorunjazzproperly">How powerful does my computer need to be to run JAZZ++ properly?</a></h2>
-<p>It is best to understand here, that it&rsquo;s not so much a matter of how much raw
-processing power your computer has -- it&rsquo;s more to do with JAZZ++ and other
-MIDI softwares being able to do what they want to do, -exactly when- they want
-to do it. If another software process happens to be using the CPU and OS at the
-exact same moment JAZZ++ or another MIDI program wants to send a MIDI event or
-else send PCM data to the soundcard (and both these things have to happen
-almost simultaneously), one or another process is going to have to wait. That
-can&rsquo;t technically happen in the MIDI domain, because the real time nature of
-compositional recording and playing doesn&rsquo;t allow for such.</p>
-<p>In practise, there&rsquo;s a tiny &rsquo;window&rsquo; in time for MIDI to complete any note
-event cycle. The practical size of this &rsquo;window&rsquo; is roughly bounded by the
-average human ear perception of what is actually &rsquo;in sync&rsquo; and what is &rsquo;out of
-sync&rsquo;. This percepton &rsquo;window&rsquo; tends to vary from individual to individual,
-but for example only here, most people don&rsquo;t perceive things being &rsquo;out of
-sync&rsquo; during MIDI performances, provided the note event &rsquo;window&rsquo; isn&rsquo;t longer
-than 20 milliseconds or so. However, in the case of music, it&rsquo;s perhaps better
-not to play the note at all, if it&rsquo;s too far out of time with the composition,
-and that &rsquo;window&rsquo; definitely closes when it comes time for the next MIDI event
-on the same channel or track. If your MIDI note event or softsynth is put on
-wait trying to access the CPU and hardware, this &rsquo;window&rsquo; becomes even smaller.</p>
-<p>If you use JAZZ++ with MIDI software synths and drum-machines etc, all these
-processes compete against each other for a slice of CPU time. Critically, they
-will all want to do this at exactly the same time in empathy with the real time
-nature of the MIDI compositional playing or recording processes. At a hardware
-level, this is sometimes impossible to do. This is especially so when you&rsquo;ve
-got MIDI softsynths running. Consider the analogy of a MIDI softsynth program
-as being akin to the old original analog synthesizers that used many discrete
-electronic components and circuits to create the actual sound one hears. Unlike
-these real world hardwares however, where one merely applies power and the
-hardware does the rest with sound emerging at end, MIDI softsynths require CPU
-cycles to render the waveform data and pass that onto the soundcard itself, to
-recreate the sound that you will eventually hear.</p>
-<p>This being the case, imagine you&rsquo;re replaying a MIDI composition using JAZZ++
-and a softsynth, to recreate the sound of a traditional string quartet. During
-replay, three of the instrument voices are engaged in a harmonic drone, while
-the lead violin plays solo....</p>
-<p>[ed: TBC.. ]</p>
-<h2><a name="windowsspecific">Windows Specific</a></h2>
-<p>[ed: TBC.. ]</p>
-<h2><a name="linuxspecific">Linux Specific</a></h2>
-<p>Here you will find topical reference for using JAZZ++ with Linux</p>
-<p>Note: At this time the following is only tested and known to be true when using
-JAZZ++ with Linux on Intel based ix86 architectures in both 32 and 64 bit
-flavors. If you are using Linux on another hardware platform, the following
-should be treated as a guide only.</p>
-<p>Q. Does Jazz++ work on all Linux distributions?</p>
-<p>A. Jazz++ should work on most all current Linux distributions. If there are
-no binary packages available to suit your particular installation, Jazz++
-should build, install, and run currectly from the source code contained in
-either the release tarball or the Jazz++ svn repository. Note: The source 
-code obtained from the Jazz++ svn repository should be considered as being
-the &rsquo;unstable&rsquo; development branch of the Jazz++ tree. Some Linux users may
-find that they have to update their system kernel (see below), however if
-you don&rsquo;t wish to (or don&rsquo;t feel up to) changing the Linux kernel on your
-installation, you might consider the following ;</p>
-<p>"It seems some Linux distibutors are now moving towards multimedia and
-  audio-visual &rsquo;studio&rsquo; type sub-distributions, specifically aimed for
-  people wanting to use Linux in this area. These distribution releases
-  have the low-latency, so called &rsquo;real time&rsquo; (RT) Linux kernel build as
-  standard, and this can &rsquo;ease the pain&rsquo; for a lot of Linux users..."</p>
-<p>Q. Do I need a low-latency or &rsquo;RT&rsquo; Linux kernel to run Jazz++ ?</p>
-<p>A. The answer to this question largely depends on what sort of Jazz++
-user you might be...ie; &rsquo;casual&rsquo; or &rsquo;serious&rsquo;....and exactly what kind
-of (MIDI) hardware you are using to render the actual sound with...ie;
-hardware MIDI/synth or softsynth. Generally speaking, if you experience
-latency problems with either the MIDI transports and/or sound rendering
-using softsynths, it is very likely you will need a &rsquo;RT&rsquo; Linux kernel.
-Such latency problems can manifest themselves in a number of ways. (see below)</p>
-<p>Q. What are &rsquo;latency problems&rsquo; when using Jazz++ with Linux?</p>
-<p>A. There are a couple places Linux kernel latency issues will obviate
-themselves. Each is a little different from the other, and one or more of these
-things might happen at any same given time -- they share a common cause.</p>
-<p>1. When using Jazz++ on Linux with externally connected MIDI equipment
-    and/or hardware MIDI/synth soundcard, your computer is only dealing with
-    the MIDI data being orchestrated by Jazz++. It can happen, especially
-    during complex MIDI passages, that certain notes are being seemingly
-    &rsquo;dropped&rsquo; on one or more channels.</p>
-<p>2. When using Jazz++ on Linux with software MIDI synthesizers, your
-    computer has to deal with transporting the MIDI data *and* render the
-    actual sound your hear as well. In this case, not only might there be
-    &rsquo;dropped&rsquo; notes, but also the actual sound of the softsynth might be
-    distorted, or have other unwanted sound artifacts such as &rsquo;clicks&rsquo; or a
-    harsh scratching noise - it varies on the type of softsynth used and
-    just how bad the actual problem itself is.</p>
-<p>Remember, Jazz++ itself is only dealing with MIDI data (when not being
-used cojointly with the audio mode features), and it attempts to both
-generate and receive that MIDI data in as close to real time as possible.
-However, getting this MIDI data to/from Jazz++ itself and real MIDI hardware
-devices, necessitates real time access to the actual -computer- hardware
-itself, and the -only- way that can happen is via the running Linux kernel.</p>
-<p>Likewise, softsynths have to actually render the sound data, and have real time
-access to the soundcard (PCM) ports, and this too has to travel through the
-Linux kernel layer. The only solution is to change your Linux kernel if you
-come across problems like these using Jazz++ on Linux, and in fact you might
-have to do this anyway if you intend to use a MIDI softsynth.</p>
-<p>Q. I think I have the above problems, where can I get a &rsquo;RT&rsquo; Linux kernel?</p>
-<p>A. With some 250+ Linux distributions out there, this will never be an
-exhaustive list -- however, here are some pointers to help people out ;</p>
-<p>1. Definitive: The latest Linux kernel release is always available from
-    www.kernel.org and mirrors. At the time of this writing, the &rsquo;current&rsquo;
-    stable Linux kernel is the 2.6.25.4 release. If you&rsquo;re up to configuring
-    and installing the Linux kernel from source, currently the &rsquo;RT&rsquo; patches
-    are available at www.kernel.org/pub/linux/kernel/projects/rt/</p>
-<p>2. I found this on a webpage: - "Many distributions have at least one 
-    specialised low-latency kernel package available via some sort of 
-    additional multimedia distribution or repository; consider using one of 
-    these. For example, Ubuntu -> Ubuntu Studio; Debian  -> 64 Studio or Musix;
-    Fedora  -> PlanetCCRMA; OpenSUSE -> JAD."</p>
-<p>3. Ubuntu: (quote) "Lowlatency kernel is in standard ubuntu repositories,
-    just run:</p>
-<p>sudo apt-get install linux-lowlatency</p>
-<p>Then reboot and select that kernel from the GRUB list. It should have no 
-    detrimental effects at all on normal usage."</p>
-<p>4. Debian: Have a look here ;</p>
-<p>http://apt.64studio.com/64studio/testing/pool/main/l/linux-2.6/</p>
-<p>Although these are intended for the 64studio release, these packages
-    may work with the current Debian 4.0 branch. There are also 32bit
-    packages here as well.</p>
-<p>5. Mandriva: Have a look here ;</p>
-<p>http://wiki.mandriva.com/en/Docs/Howto/Mandriva_Kernels#kernel-rt</p>
-<p>6. Fedora: Have a look here ;</p>
-<p>http://ccrma.stanford.edu/planetccrma/software/installplaneteight.html</p>
-<p>7. Other linux distributions: Yours not listed? Perhaps you know how
-    to address this issue with the Linux distribution you are using, and
-    would like to tell us? See the Jazz++ MailingList and let us know?</p>
-<p>Q. When I start jackd/QJACKCTL I get the following error, what&rsquo;s wrong?</p>
-<h3><a name="othermidisoftwareknowntoworkwithjazzandlinux">Other MIDI software known to work with JAZZ++ and Linux</a></h3>
-<p>The following may never be a complete list of MIDI software synthesizers and
-other MIDI based programs that work with JAZZ++ and Linux today, however we take
-the time here to mention some of the more popular and actively supported
-softwares of this type, that members of the JAZZ++ team have tried and tested.</p>
-<p>[ed: TBC.. ]</p>
-<h2><a name="macspecific">Mac Specific</a></h2>
-<p>[ed: TBC.. ]</p>
-<p>\end{document}</p>
-<br>
-<table width="100%" border="0" cellpadding="2">
+</div>
+
+<h1>Chapter 9: FAQ &amp; Troubleshooting</h1>
+<a name="faq"></a><a name="troubleshooting"></a>
+
+<h2><a name="nosound">Why do I hear no sound during playback?</a></h2>
+<p>If notes are playing in the timeline but no sound is produced, check the following:</p>
+<ol>
+<li><b>MIDI Output Device</b>: Open <b>Settings &rarr; MIDI Settings</b> and verify that a valid output synthesizer is selected.
+  <ul>
+    <li>On Windows, select <i>Microsoft GS Wavetable Synth</i> or an active virtual synth like FluidSynth.</li>
+    <li>On Linux, ensure an ALSA synth (e.g. <code>fluidsynth</code> or <code>timidity</code>) is running and selected.</li>
+    <li>On macOS, select the Apple DLS Synth or CoreMIDI output.</li>
+  </ul>
+</li>
+<li><b>Volume Levels</b>: Ensure the track volume (CC7) in the Track Window or Mixer is not set to 0, and that the track is not muted.</li>
+<li><b>Windows Volume Mixer</b>: Check your system volume tray icon to verify that the Jazz++ application output is unmuted and set to an audible level.</li>
+</ol>
+
+<h2><a name="latency">How can I eliminate audio latency or stuttering?</a></h2>
+<a name="audiodelay"></a>
+<p>Audio latency refers to the delay between striking a note and hearing the sound:</p>
+<ul>
+<li>Open <b>Settings &rarr; Audio Settings</b>.</li>
+<li>Reduce the <b>Audio Buffer Size</b> to <code>256</code> or <code>128</code> samples for immediate response during live recording.</li>
+<li>If you hear crackling, clicks, or dropouts, your CPU cannot fill the small buffer in time. Increase the buffer size to <code>512</code> or <code>1024</code> samples.</li>
+</ul>
+
+<h2><a name="defender">Why does Windows Defender / SmartScreen show a blue warning?</a></h2>
+<p>When downloading or installing Jazz++ on Windows, you may encounter a prompt stating <i>"Windows protected your PC - Microsoft Defender SmartScreen prevented an unrecognized app from starting"</i>:</p>
+<ul>
+<li><b>Cause</b>: Microsoft SmartScreen flags newly released open-source software that does not possess an expensive commercial EV Code Signing certificate.</li>
+<li><b>Safety</b>: Jazz++ is completely safe, 100% open-source, and contains zero adware, spyware, or trackers. All build steps and source code are publicly verifiable on GitHub.</li>
+<li><b>How to Run</b>: Click <b>"More info"</b> on the SmartScreen dialog, and then click the <b>"Run anyway"</b> button. The installer or application will launch normally.</li>
+</ul>
+
+<h2><a name="soundfonts">How do I use SoundFonts (.sf2) for realistic sounds?</a></h2>
+<p>For enhanced sound realism beyond the basic General MIDI synthesizer:</p>
+<ul>
+<li>Download any high-quality General MIDI SoundFont (such as <i>GeneralUser GS</i> or <i>FluidR3_GM</i>).</li>
+<li>On Windows, use a virtual synth driver such as <b>VirtualMIDISynth</b>, which loads SoundFonts into memory and creates a virtual MIDI device selectable in Jazz++.</li>
+<li>On Linux, run FluidSynth with your soundfont: <code>fluidsynth -a alsa -m alsa_seq /path/to/soundfont.sf2</code> and select it in Jazz++ MIDI settings.</li>
+</ul>
+
+<h2><a name="hungnotes">What should I do if a note gets stuck (hangs)?</a></h2>
+<p>Occasionally, an external MIDI cable disconnect or sudden sequence stop can cause a synthesizer note to stay sustained. Press <b>Esc</b> or click the <b>Panic</b> button on the toolbar to immediately silence all notes across all 16 channels.</p>
+
+<h2><a name="community">Project Links &amp; Reporting Bugs</a></h2>
+<p>Jazz++ is maintained as a community open-source project. Visit our official resources for the latest updates, bug reports, and discussions:</p>
+<ul>
+<li><b>GitHub Repository</b>: <a href="https://github.com/rajazahidi/Jazzplusplus" target="_blank">github.com/rajazahidi/Jazzplusplus</a></li>
+<li><b>Release Downloads</b>: <a href="https://github.com/rajazahidi/Jazzplusplus/releases" target="_blank">github.com/rajazahidi/Jazzplusplus/releases</a></li>
+<li><b>Issue Tracker</b>: Report bugs or request features on our GitHub Issues page.</li>
+</ul>
+
+<div class="nav" style="margin-top: 20px;">
+<table width="100%">
 <tr>
-<td align="left"><a href="chapter8.html">[ Previous ]</a> <a href="index.html">[ Contents ]</a> <a href="index.html">[ Next ]</a></td>
+<td align="left"><a href="chapter8.html">[&laquo; Chapter 8: Appendix]</a> &nbsp;|&nbsp; <a href="index.html">[Table of Contents]</a></td>
+<td align="right"><a href="index.html">[Table of Contents &raquo;]</a></td>
 </tr>
 </table>
+</div>
 </body>
 </html>

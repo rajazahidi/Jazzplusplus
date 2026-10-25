@@ -1,30 +1,115 @@
 <!DOCTYPE HTML>
 <html>
-<head><style>body { background-color: #ffffff !important; color: #000000 !important; font-family: Segoe UI, Arial, sans-serif; } table { border: 0 !important; } hr { display: none !important; }</style>
+<head>
 <meta charset="utf-8">
-<title>Appendix - Jazz++ Help</title>
-  <style>
-    body { background-color: #ffffff; color: #000000; margin: 8px; }
-    table { border: 0px; border-collapse: collapse; }
-    td, th { border: 0px; padding: 2px; }
-  </style>
+<title>Chapter 8: Appendix & Shortcuts - Jazz++ Help</title>
+
+<style>
+body {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 12px 18px;
+  line-height: 1.5;
+}
+hr { display: none !important; }
+h1 { color: #0f172a; font-size: 20px; margin-top: 8px; margin-bottom: 6px; border-bottom: 2px solid #38bdf8; padding-bottom: 4px; }
+h2 { color: #0369a1; font-size: 15px; margin-top: 16px; margin-bottom: 6px; }
+h3 { color: #334155; font-size: 13px; margin-top: 12px; margin-bottom: 4px; }
+p, li { font-size: 12px; color: #334155; }
+a { color: #0284c7; text-decoration: none; font-weight: 500; }
+a:hover { text-decoration: underline; }
+table { border: 0 !important; width: 100%; border-collapse: collapse; font-size: 12px; margin: 8px 0; }
+th { background-color: #f1f5f9; color: #0f172a; text-align: left; padding: 6px 8px; font-weight: 600; border-bottom: 1px solid #cbd5e1 !important; }
+td { border: 0 !important; padding: 5px 8px; border-bottom: 1px solid #f1f5f9 !important; }
+.nav { background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 4px; margin-bottom: 10px; font-size: 11px; }
+.card { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+.badge { background-color: #0284c7; color: #ffffff; padding: 2px 7px; border-radius: 3px; font-weight: bold; font-size: 10px; text-transform: uppercase; }
+.tip { background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 8px 12px; border-radius: 0 4px 4px 0; margin: 8px 0; font-size: 12px; }
+code { background-color: #f1f5f9; padding: 2px 5px; border-radius: 3px; font-family: Consolas, monospace; font-size: 11px; color: #0f172a; }
+</style>
+
 </head>
-<body bgcolor="#ffffff" text="#000000" style="background-color:#ffffff; color:#000000; font-family:Segoe UI, Arial, sans-serif; padding:8px;">
-<table width="100%" border="0" cellpadding="2">
+<body bgcolor="#ffffff" text="#1e293b">
+<div class="nav">
+<table width="100%">
 <tr>
-<td align="left"><a href="chapter7.html">[ Previous ]</a> <a href="index.html">[ Contents ]</a> <a href="chapter9.html">[ Next ]</a></td>
-<td align="right"><b>Jazz++ Manual</b></td>
+<td align="left">
+  <a href="chapter7.html">[&laquo; Chapter 7: Virtual Band]</a> &nbsp;|&nbsp;
+  <a href="index.html">[Table of Contents]</a> &nbsp;|&nbsp;
+  <a href="chapter9.html">[Chapter 9: FAQ &raquo;]</a>
+</td>
+<td align="right"><b>Jazz++ v6.0.0 Manual</b></td>
 </tr>
 </table>
-<br>
-<h1>Chapter 8: Appendix</h1>
-<a name="appendix"></a>
-The appendix has not been appended yet, come back soon!
-<br>
-<table width="100%" border="0" cellpadding="2">
+</div>
+
+<h1>Chapter 8: Appendix: Shortcuts &amp; MIDI Reference</h1>
+<a name="appendix"></a><a name="shortcuts"></a>
+
+<h2><a name="keyboardshortcuts">Complete Keyboard Shortcuts</a></h2>
+<table width="100%">
+<tr><th>Shortcut</th><th>Action</th><th>Scope</th></tr>
+<tr><td><b>Spacebar</b></td><td>Play / Stop playback</td><td>Global</td></tr>
+<tr><td><b>R</b></td><td>Start recording on armed tracks</td><td>Global</td></tr>
+<tr><td><b>L</b></td><td>Toggle loop playback mode</td><td>Global</td></tr>
+<tr><td><b>M</b></td><td>Toggle metronome click on/off</td><td>Global</td></tr>
+<tr><td><b>Esc</b></td><td>Panic: Stop all sound &amp; silence hung notes</td><td>Global</td></tr>
+<tr><td><b>Ctrl + N</b></td><td>Create a new project</td><td>Global</td></tr>
+<tr><td><b>Ctrl + O</b></td><td>Open an existing project or MIDI file</td><td>Global</td></tr>
+<tr><td><b>Ctrl + S</b></td><td>Save current project</td><td>Global</td></tr>
+<tr><td><b>Ctrl + Z</b></td><td>Undo last action</td><td>Global</td></tr>
+<tr><td><b>Ctrl + Y</b></td><td>Redo previously undone action</td><td>Global</td></tr>
+<tr><td><b>Ctrl + P</b></td><td>Open Piano Roll editor for selected track</td><td>Global</td></tr>
+<tr><td><b>Ctrl + M</b></td><td>Open Audio &amp; MIDI Mixer console</td><td>Global</td></tr>
+<tr><td><b>Ctrl + + / -</b></td><td>Zoom timeline in or out horizontally</td><td>Track &amp; Piano Windows</td></tr>
+<tr><td><b>Q</b></td><td>Open Quantize dialog for selected range</td><td>Sequencer</td></tr>
+<tr><td><b>Delete</b></td><td>Delete selected notes or track regions</td><td>Editor</td></tr>
+<tr><td><b>F1</b></td><td>Open Help documentation</td><td>Global</td></tr>
+</table>
+
+<h2><a name="gmmap">General MIDI (GM) Voice Patch Map</a></h2>
+<table width="100%">
+<tr><th>Patch Range</th><th>Instrument Category</th><th>Examples</th></tr>
+<tr><td><b>1 &ndash; 8</b></td><td>Piano</td><td>Acoustic Grand, Bright Piano, Electric Grand, Honky-tonk, Rhodes, Clavinet</td></tr>
+<tr><td><b>9 &ndash; 16</b></td><td>Chromatic Percussion</td><td>Celesta, Glockenspiel, Music Box, Vibraphone, Marimba, Xylophone, Tubular Bells</td></tr>
+<tr><td><b>17 &ndash; 24</b></td><td>Organ</td><td>Drawbar Organ, Percussive Organ, Rock Organ, Church Organ, Reed Organ, Accordion</td></tr>
+<tr><td><b>25 &ndash; 32</b></td><td>Guitar</td><td>Nylon Acoustic, Steel Acoustic, Jazz Electric, Clean Electric, Overdriven, Distortion</td></tr>
+<tr><td><b>33 &ndash; 40</b></td><td>Bass</td><td>Acoustic Upright, Electric Finger, Electric Pick, Fretless, Slap Bass, Synth Bass</td></tr>
+<tr><td><b>41 &ndash; 48</b></td><td>Strings &amp; Orchestral</td><td>Violin, Viola, Cello, Contrabass, Tremolo Strings, Pizzicato Strings, Orchestral Harp</td></tr>
+<tr><td><b>49 &ndash; 56</b></td><td>Ensemble</td><td>String Ensemble 1/2, Synth Strings, Choir Aahs, Voice Oohs, Synth Voice, Orchestra Hit</td></tr>
+<tr><td><b>57 &ndash; 64</b></td><td>Brass</td><td>Trumpet, Trombone, Tuba, Muted Trumpet, French Horn, Brass Section, Synth Brass</td></tr>
+<tr><td><b>65 &ndash; 72</b></td><td>Reed</td><td>Soprano Sax, Alto Sax, Tenor Sax, Baritone Sax, Oboe, English Horn, Bassoon, Clarinet</td></tr>
+<tr><td><b>73 &ndash; 80</b></td><td>Pipe</td><td>Piccolo, Flute, Recorder, Pan Flute, Blown Bottle, Shakuhachi, Whistle, Ocarina</td></tr>
+<tr><td><b>81 &ndash; 88</b></td><td>Synth Lead</td><td>Square Lead, Sawtooth Lead, Calliope, Chiff, Charang, Voice Lead, Fifths, Bass+Lead</td></tr>
+<tr><td><b>89 &ndash; 96</b></td><td>Synth Pad</td><td>New Age Pad, Warm Pad, Polysynth, Choir Pad, Bowed Pad, Metallic Pad, Halo, Sweep</td></tr>
+<tr><td><b>97 &ndash; 104</b></td><td>Synth Effects</td><td>Rain, Soundtrack, Crystal, Atmosphere, Brightness, Goblins, Echoes, Sci-Fi</td></tr>
+<tr><td><b>105 &ndash; 112</b></td><td>Ethnic</td><td>Sitar, Banjo, Shamisen, Koto, Kalimba, Bagpipe, Fiddle, Shanai</td></tr>
+<tr><td><b>113 &ndash; 120</b></td><td>Percussive</td><td>Tinkle Bell, Agogo, Steel Drums, Woodblock, Taiko Drum, Melodic Tom, Synth Drum</td></tr>
+<tr><td><b>121 &ndash; 128</b></td><td>Sound Effects</td><td>Guitar Fret Noise, Breath Noise, Seashore, Bird Tweet, Telephone, Helicopter, Applause, Gunshot</td></tr>
+</table>
+
+<h2><a name="controllers">Standard MIDI Continuous Controllers (CC)</a></h2>
+<table width="100%">
+<tr><th>CC Number</th><th>Standard Name</th><th>Function</th></tr>
+<tr><td><b>CC 0 / 32</b></td><td>Bank Select (MSB / LSB)</td><td>Selects sound bank for instruments beyond 128 GM presets</td></tr>
+<tr><td><b>CC 1</b></td><td>Modulation Wheel</td><td>Vibrato and modulation depth</td></tr>
+<tr><td><b>CC 7</b></td><td>Channel Volume</td><td>Primary channel volume level (0 = silent, 127 = maximum)</td></tr>
+<tr><td><b>CC 10</b></td><td>Pan</td><td>Stereo panning position (0 = hard left, 64 = center, 127 = hard right)</td></tr>
+<tr><td><b>CC 11</b></td><td>Expression</td><td>Secondary volume dynamics for realistic instrumental swells</td></tr>
+<tr><td><b>CC 64</b></td><td>Damper / Sustain Pedal</td><td>Sustain pedal switch (0&ndash;63 = pedal off, 64&ndash;127 = pedal depressed)</td></tr>
+<tr><td><b>CC 91</b></td><td>Reverb Send Level</td><td>Amount of signal sent to external/synthesizer reverb</td></tr>
+<tr><td><b>CC 93</b></td><td>Chorus Send Level</td><td>Amount of signal sent to external/synthesizer chorus</td></tr>
+<tr><td><b>CC 120 / 123</b></td><td>All Sound Off / All Notes Off</td><td>Emergency silence command silencing all playing notes</td></tr>
+</table>
+
+<div class="nav" style="margin-top: 20px;">
+<table width="100%">
 <tr>
-<td align="left"><a href="chapter7.html">[ Previous ]</a> <a href="index.html">[ Contents ]</a> <a href="chapter9.html">[ Next ]</a></td>
+<td align="left"><a href="chapter7.html">[&laquo; Chapter 7: Virtual Band]</a> &nbsp;|&nbsp; <a href="index.html">[Table of Contents]</a></td>
+<td align="right"><a href="chapter9.html">[Chapter 9: FAQ &raquo;]</a></td>
 </tr>
 </table>
+</div>
 </body>
 </html>

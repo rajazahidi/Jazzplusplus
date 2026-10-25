@@ -1,30 +1,109 @@
 <!DOCTYPE HTML>
 <html>
-<head><style>body { background-color: #ffffff !important; color: #000000 !important; font-family: Segoe UI, Arial, sans-serif; } table { border: 0 !important; } hr { display: none !important; }</style>
+<head>
 <meta charset="utf-8">
-<title>Overview of using Jazz++ - Jazz++ Help</title>
-  <style>
-    body { background-color: #ffffff; color: #000000; margin: 8px; }
-    table { border: 0px; border-collapse: collapse; }
-    td, th { border: 0px; padding: 2px; }
-  </style>
+<title>Chapter 3: Quick Start & Overview - Jazz++ Help</title>
+
+<style>
+body {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 12px 18px;
+  line-height: 1.5;
+}
+hr { display: none !important; }
+h1 { color: #0f172a; font-size: 20px; margin-top: 8px; margin-bottom: 6px; border-bottom: 2px solid #38bdf8; padding-bottom: 4px; }
+h2 { color: #0369a1; font-size: 15px; margin-top: 16px; margin-bottom: 6px; }
+h3 { color: #334155; font-size: 13px; margin-top: 12px; margin-bottom: 4px; }
+p, li { font-size: 12px; color: #334155; }
+a { color: #0284c7; text-decoration: none; font-weight: 500; }
+a:hover { text-decoration: underline; }
+table { border: 0 !important; width: 100%; border-collapse: collapse; font-size: 12px; margin: 8px 0; }
+th { background-color: #f1f5f9; color: #0f172a; text-align: left; padding: 6px 8px; font-weight: 600; border-bottom: 1px solid #cbd5e1 !important; }
+td { border: 0 !important; padding: 5px 8px; border-bottom: 1px solid #f1f5f9 !important; }
+.nav { background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 4px; margin-bottom: 10px; font-size: 11px; }
+.card { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+.badge { background-color: #0284c7; color: #ffffff; padding: 2px 7px; border-radius: 3px; font-weight: bold; font-size: 10px; text-transform: uppercase; }
+.tip { background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 8px 12px; border-radius: 0 4px 4px 0; margin: 8px 0; font-size: 12px; }
+code { background-color: #f1f5f9; padding: 2px 5px; border-radius: 3px; font-family: Consolas, monospace; font-size: 11px; color: #0f172a; }
+</style>
+
 </head>
-<body bgcolor="#ffffff" text="#000000" style="background-color:#ffffff; color:#000000; font-family:Segoe UI, Arial, sans-serif; padding:8px;">
-<table width="100%" border="0" cellpadding="2">
+<body bgcolor="#ffffff" text="#1e293b">
+<div class="nav">
+<table width="100%">
 <tr>
-<td align="left"><a href="chapter2.html">[ Previous ]</a> <a href="index.html">[ Contents ]</a> <a href="chapter4.html">[ Next ]</a></td>
-<td align="right"><b>Jazz++ Manual</b></td>
+<td align="left">
+  <a href="chapter2.html">[&laquo; Chapter 2: Installation]</a> &nbsp;|&nbsp;
+  <a href="index.html">[Table of Contents]</a> &nbsp;|&nbsp;
+  <a href="chapter4.html">[Chapter 4: Track Window &raquo;]</a>
+</td>
+<td align="right"><b>Jazz++ v6.0.0 Manual</b></td>
 </tr>
 </table>
-<br>
-<h1>Chapter 3: Overview of using Jazz++</h1>
-<a name="jazzwin"></a>
-<p>[ed: fill this in later - see opening]</p>
-<br>
-<table width="100%" border="0" cellpadding="2">
+</div>
+
+<h1>Chapter 3: Quick Start &amp; Workflow Overview</h1>
+<a name="overview"></a>
+
+<p>This chapter walks you through your first music production session in Jazz++ v6.0.0, from creating a blank project to recording melodies and exporting audio.</p>
+
+<h2><a name="firststeps">Creating Your First Project</a></h2>
+<ol>
+<li>Launch Jazz++. A blank song with 16 tracks is automatically initialized.</li>
+<li>Notice that <b>Track 1</b> is reserved as the <b>Master Track</b>. The master track handles global tempo (BPM), time signature (meter changes), and song structure markers. <i>Always record your musical instruments on Track 2 and above.</i></li>
+<li>Click on the track name of <b>Track 2</b> to open the <b>Track Settings Dialog</b>.
+  <ul>
+    <li>Enter a descriptive name (e.g. <code>Acoustic Piano</code>).</li>
+    <li>Set the <b>MIDI Channel</b> to <code>1</code>.</li>
+    <li>Select an instrument from the General MIDI list (e.g. <code>0: Acoustic Grand Piano</code>).</li>
+  </ul>
+</li>
+</ol>
+
+<h2><a name="recordingplayback">Recording and Playback</a></h2>
+<p>Jazz++ provides flexible methods to compose music &mdash; using a live MIDI keyboard, the computer mouse in the Piano Roll, or the automated Virtual Session Band:</p>
+<ul>
+<li><b>Metronome</b>: Click the <b>Metronome</b> button on the toolbar or press <b>M</b>. The metronome provides an audible count-in click during playback and recording.</li>
+<li><b>Tempo Adjustment</b>: Click the <b>speed: 120</b> box in the ruler to change the tempo in Beats Per Minute (BPM), or click and drag horizontally to slide the tempo smoothly.</li>
+<li><b>Live Recording</b>: Select Track 2, position the playback cursor at Bar 1, and click the red <b>Record</b> button (or press <b>R</b>). Play notes on your connected MIDI keyboard. Press <b>Spacebar</b> to stop recording.</li>
+<li><b>Playback</b>: Press the <b>Spacebar</b> or click the green <b>Play</b> button to play back your performance. Use the <b>Play Loop</b> button to loop a designated range of measures continuously.</li>
+</ul>
+
+<h2><a name="pianorollediting">Editing in the Piano Roll</a></h2>
+<p>Double-click any recorded track bar or click the <b>Piano Window</b> button on the toolbar to open the graphical <b>Piano Roll</b>:</p>
+<ul>
+<li>The vertical piano keyboard on the left represents pitch (notes from C-1 to G9).</li>
+<li>The horizontal grid represents time in measures, beats, and subdivisions.</li>
+<li>Use the left mouse button to draw new notes or drag existing notes to change their pitch and timing.</li>
+<li>Drag the right edge of any note to extend or shorten its duration.</li>
+<li>Use the velocity lane at the bottom to adjust individual note volume and dynamics.</li>
+</ul>
+
+<h2><a name="virtualbandquickstart">Using the Virtual Session Band</a></h2>
+<p>If you don't have a full rhythm section recorded, Jazz++ can generate one for you instantly!</p>
+<ol>
+<li>Open the <b>Virtual Session Band</b> from the <b>Tools</b> menu.</li>
+<li>Choose a musical style (e.g. <i>Jazz Swing</i>, <i>Bossa Nova</i>, or <i>Blues Shuffle</i>).</li>
+<li>Select your chord progression or click <b>Generate Accompaniment</b>.</li>
+<li>The engine generates synchronized RealTracks (Walking Bass, Piano Comping) and RealDrums directly into your project!</li>
+</ol>
+
+<h2><a name="savingexporting">Saving &amp; Exporting</a></h2>
+<ul>
+<li><b>Save Project</b>: Click <b>File &rarr; Save</b> (Ctrl+S) to save your project in the native Jazz++ <code>.jaz</code> format, preserving all audio tracks, mixer settings, and DSP effects.</li>
+<li><b>Export Standard MIDI</b>: Select <b>File &rarr; Export MIDI</b> to create a universal <code>.mid</code> file compatible with any DAW, notation program, or hardware keyboard.</li>
+<li><b>Export Audio WAV</b>: Select <b>File &rarr; Export Audio (WAV)</b> to render your entire song as an uncompressed 16-bit or 24-bit stereo audio file.</li>
+</ul>
+
+<div class="nav" style="margin-top: 20px;">
+<table width="100%">
 <tr>
-<td align="left"><a href="chapter2.html">[ Previous ]</a> <a href="index.html">[ Contents ]</a> <a href="chapter4.html">[ Next ]</a></td>
+<td align="left"><a href="chapter2.html">[&laquo; Chapter 2: Installation]</a> &nbsp;|&nbsp; <a href="index.html">[Table of Contents]</a></td>
+<td align="right"><a href="chapter4.html">[Chapter 4: Track Window &raquo;]</a></td>
 </tr>
 </table>
+</div>
 </body>
 </html>

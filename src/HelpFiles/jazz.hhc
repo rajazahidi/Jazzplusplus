@@ -13,7 +13,7 @@
 		<param name="Local" value="index.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Chapter 1: Introduction">
+		<param name="Name" value="Chapter 1: Introduction &amp; Architecture">
 		<param name="Local" value="chapter1.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
@@ -21,31 +21,31 @@
 		<param name="Local" value="chapter2.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Chapter 3: Overview of using Jazz++">
+		<param name="Name" value="Chapter 3: Quick Start &amp; Overview">
 		<param name="Local" value="chapter3.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Chapter 4: Track window">
+		<param name="Name" value="Chapter 4: Track Window &amp; Sequencer">
 		<param name="Local" value="chapter4.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Chapter 5: Piano window">
+		<param name="Name" value="Chapter 5: Piano Window &amp; Event Editing">
 		<param name="Local" value="chapter5.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Chapter 6: Audio">
+		<param name="Name" value="Chapter 6: Audio Subsystem &amp; DSP Effects">
 		<param name="Local" value="chapter6.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Chapter 7: Examples">
+		<param name="Name" value="Chapter 7: Virtual Session Band &amp; Advanced Tools">
 		<param name="Local" value="chapter7.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Chapter 8: Appendix">
+		<param name="Name" value="Chapter 8: Appendix: Shortcuts &amp; Reference">
 		<param name="Local" value="chapter8.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Chapter 9: RoadMap">
+		<param name="Name" value="Chapter 9: FAQ &amp; Troubleshooting">
 		<param name="Local" value="chapter9.html">
 		</OBJECT>
 </UL>

@@ -135,6 +135,7 @@ set(JAZZ_SOURCES
     src/AutonomousMixAssistantEngine.cpp
     src/BinauralHrtfSpatializer.cpp
     src/BiomechanicalVocalTractEngine.cpp
+    src/BodeFrequencyShifterWaveMultiplierEngine.cpp
     src/BrickwallClipperEngine.cpp
     src/BroadcastFailoverEngine.cpp
     src/CapstanSpeedStabilizer.cpp
@@ -224,6 +225,7 @@ set(JAZZ_SOURCES
     src/Help.cpp
     src/Immersive3DReverbConvolver.cpp
     src/ImmersiveAudioPanner.cpp
+    src/ImmersiveSpeakerAlignmentEngine.cpp
     src/InfiniteBarberpoleFlangerEngine.cpp
     src/IntelligentMasteringAssistant.cpp
     src/JazzPlusPlusApplication.cpp
@@ -266,6 +268,7 @@ set(JAZZ_SOURCES
     src/NeuralStemSeparatorEngine.cpp
     src/NeuralTimbreTransferEngine.cpp
     src/OpticalFilmAudioRestorationEngine.cpp
+    src/PersonalizedPinnaAcousticModeler.cpp
     src/PhaseAlignerEngine.cpp
     src/PhysicalResonator.cpp
     src/PianoFrame.cpp
@@ -277,6 +280,7 @@ set(JAZZ_SOURCES
     src/Player.cpp
     src/PolymetricDrumSequencer.cpp
     src/PolyphonicNeuralAudioToMidiEngine.cpp
+    src/PolyphonicVocalFormantMorpherEngine.cpp
     src/Project.cpp
     src/ProjectBundle.cpp
     src/ProjectManager.cpp
@@ -311,6 +315,7 @@ set(JAZZ_SOURCES
     src/SpectralDenoise.cpp
     src/SpectralRebalanceEngine.cpp
     src/SpectralResonanceTamer.cpp
+    src/SpectralSidechainUnmaskerEngine.cpp
     src/StandardFile.cpp
     src/StemSeparatorEngine.cpp
     src/StemsExporter.cpp
@@ -326,6 +331,7 @@ set(JAZZ_SOURCES
     src/TapeConsoleWarmer.cpp
     src/TapeHysteresisAzimuthEngine.cpp
     src/TapeMachineCalibrationEngine.cpp
+    src/TapePrintThroughDemagSimulator.cpp
     src/ThroughZeroFlanger.cpp
     src/VintageLofiProcessor.cpp
     src/VinylLatheMechanicalSimulator.cpp

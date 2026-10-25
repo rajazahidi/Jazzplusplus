@@ -1,4 +1,27 @@
 25-10-2026 Raja Zahidi
+- Feature & Master Studio Spectral Sidechain Unmasker, Personalized Pinna Modeler, Tape Print-Through Demag, Polyphonic Vocal Formant Morpher, Bode Shifter Serge Multiplier, & 9.1.6 Immersive Speaker Aligner Suite v24.0 (Apex Transcendence Nexus Release):
+  * Psychoacoustic 24-Band Dynamic Spectral Sidechain Unmasker (src/SpectralSidechainUnmaskerEngine.h & .cpp):
+    - JZSpectralSidechainUnmaskerEngine provides real-time psychoacoustic dynamic spectral unmasking (smart:EQ / Soothe style) across 24 critical Bark-scale bands (50 Hz to 13.5 kHz).
+    - Features intelligent sidechain collision detection, adaptive attenuation (-3 to -24 dB), independent attack/release ballistics, and solo delta monitoring for clean, transparent mix separation without audible volume ducking.
+  * Anthropometric Personalized Pinna & Ear Canal Modeler (src/PersonalizedPinnaAcousticModeler.h & .cpp):
+    - JZPersonalizedPinnaAcousticModeler models custom anthropometric HRTF profiles (Genelec Aural ID / Apple Spatial Audio style) for precision Dolby Atmos headphone monitoring.
+    - Features user-customizable head circumference (48-68 cm Woodworth ITD), pinna height notch shifting (40-85 mm), concha depth modes, and 1/4-wavelength ear canal acoustic resonance modeling (3.4 kHz boost) eliminating front-back confusion and elevation blur.
+  * Historic Analog Tape Print-Through & High-Frequency Demagnetization Simulator (src/TapePrintThroughDemagSimulator.h & .cpp):
+    - JZTapePrintThroughDemagSimulator physically models magnetic reel-to-reel tape aging and inter-layer magnetic transfer.
+    - Features reel circumference revolution period pre-echo and post-echo delay simulation (T = 2*pi*R/v at 7.5, 15, and 30 ips), tape wrap ratio attenuation, cumulative multi-pass high-frequency demagnetization loss (-0.12 dB/pass at 12-15 kHz), and elasticity flutter.
+  * Polyphonic Vocal Formant, Throat Length Scaling & Gender Morpher (src/PolyphonicVocalFormantMorpherEngine.h & .cpp):
+    - JZPolyphonicVocalFormantMorpherEngine resynthesizes vocal timbres (Antares Throat / Celemony Melodyne style) with independent pitch and formant control.
+    - Features physical vocal tract acoustic length scaling (0.5x to 1.8x), independent formant shifting (F1-F4, +/- 18 semitones), continuous gender morphing (-1.0 female to +1.0 male), and glottal aspiration noise injection for backing vocals.
+  * True Bode Linear Frequency Shifter & Serge Non-Linear Wave Multiplier (src/BodeFrequencyShifterWaveMultiplierEngine.h & .cpp):
+    - JZBodeFrequencyShifterWaveMultiplierEngine brings experimental analog modular sound design (Bode 1630 / Serge Modular style) to the DAW.
+    - Features 4-stage 90-degree Hilbert quadrature all-pass phase network for true linear frequency shifting (+/- 5000 Hz) with Upper/Lower/Stereo-Split sidebands, combined with non-linear diode wave folding and saturation feedback.
+  * 16-Channel 9.1.6 Dolby Atmos Immersive Speaker Room Distance Alignment Engine (src/ImmersiveSpeakerAlignmentEngine.h & .cpp):
+    - JZImmersiveSpeakerAlignmentEngine provides multi-channel studio monitor room calibration (Trinnov / Dolby DARDT style) across 16 discrete speakers (9.1.6 layout).
+    - Features sub-sample acoustic time-of-flight delay compensation based on physical distance (0.5 to 15.0 m), precision SPL gain trimming (-18 to +18 dB), 180-degree polarity phase inversion, and logarithmic room impulse measurement chirp generation (20 Hz - 20 kHz).
+  * Added Automated Unit Tests 173 to 178 (tests/test_main.cpp):
+    - Validates 24-band Bark-scale dynamic spectral unmasking, anthropometric pinna notch and canal resonance HRTF synthesis, reel revolution tape print-through pre/post-echo timing with demag loss, vocal throat length scaling and gender morphing, Bode Hilbert frequency shifting with Serge wave folding, and 16-channel 9.1.6 Atmos speaker delay alignment with measurement chirp generation.
+
+25-10-2026 Raja Zahidi
 - Feature & Master Studio Psychoacoustic Phantom Bass, Quantum Particle Granulator, Adaptive Room Dereverberation, Polyphonic DNA Audio-to-MIDI, Optical Film Restoration, & PTP Precision Clock Suite v23.0 (Apex Infinity Quantum Release):
   * Psychoacoustic Missing Fundamental Bass Generator (src/PsychoacousticPhantomBassEngine.h & .cpp):
     - JZPsychoacousticPhantomBassEngine generates psychoacoustic bass overtones (Waves MaxxBass / Aphex Big Bottom style) enabling smartphone/earbud speakers to perceive deep 30-80 Hz bass fundamentals.

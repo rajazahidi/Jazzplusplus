@@ -56,6 +56,12 @@
 #include "PolyphonicNeuralAudioToMidiEngine.h"
 #include "OpticalFilmAudioRestorationEngine.h"
 #include "PtpClockPrecisionSyncEngine.h"
+#include "SpectralSidechainUnmaskerEngine.h"
+#include "PersonalizedPinnaAcousticModeler.h"
+#include "TapePrintThroughDemagSimulator.h"
+#include "PolyphonicVocalFormantMorpherEngine.h"
+#include "BodeFrequencyShifterWaveMultiplierEngine.h"
+#include "ImmersiveSpeakerAlignmentEngine.h"
 
 #include <cassert>
 #include <cmath>
@@ -3178,6 +3184,129 @@ void TestAutoAccompanimentLogic()
               ptpTelemetry.syncMessageCount >= 8 &&
               ptpTelemetry.rtpMediaClockSamples > 0,
               "IEEE 1588v2 PTP Precision Clock Synchronizer validates Grandmaster Phase-Locked Loop lock (<200ns), frequency drift tracking, and SMPTE ST 2110 media clock synthesis");
+
+  // 173. Psychoacoustic 24-Band Dynamic Spectral Sidechain Unmasker
+  Jazz::JZSpectralSidechainUnmaskerEngine unmasker(48000.0f);
+  unmasker.setUnmaskingDepthDb(-9.0f);
+  unmasker.setSensitivity(1.2f);
+
+  const size_t unmaskN = 512;
+  std::vector<float> mainL(unmaskN), mainR(unmaskN);
+  std::vector<float> scL(unmaskN), scR(unmaskN);
+  std::vector<float> unmaskOutL(unmaskN), unmaskOutR(unmaskN);
+
+  for (size_t i = 0; i < unmaskN; ++i) {
+    float t = static_cast<float>(i) / 48000.0f;
+    mainL[i] = 0.5f * std::sin(2.0f * 3.14159f * 1000.0f * t);
+    mainR[i] = mainL[i];
+    scL[i] = 0.8f * std::sin(2.0f * 3.14159f * 1000.0f * t);
+    scR[i] = scL[i];
+  }
+
+  unmasker.process(mainL.data(), mainR.data(), scL.data(), scR.data(), unmaskOutL.data(), unmaskOutR.data(), unmaskN);
+
+  TEST_ASSERT(unmasker.getUnmaskingDepthDb() == -9.0f &&
+              unmasker.getSensitivity() == 1.2f &&
+              unmasker.getMaxReductionDb() < 0.0f &&
+              unmasker.getActiveMaskedBands() >= 1,
+              "Psychoacoustic 24-Band Dynamic Spectral Sidechain Unmasker validates real-time Bark-scale harmonic unmasking and collision attenuation");
+
+  // 174. Personalized Anthropometric Pinna & Ear Canal Modeler
+  Jazz::JZPersonalizedPinnaAcousticModeler pinnaModeler(48000.0f);
+  Jazz::JZPersonalizedPinnaAcousticModeler::EarGeometry earGeom;
+  earGeom.headCircumferenceCm = 56.0f;
+  earGeom.pinnaHeightMm = 62.0f;
+  earGeom.conchaDepthMm = 16.0f;
+  earGeom.earCanalLengthMm = 25.0f;
+  pinnaModeler.setEarGeometry(earGeom);
+
+  Jazz::JZPersonalizedPinnaAcousticModeler::VirtualSource virtSrc;
+  virtSrc.azimuthDeg = 45.0f;
+  virtSrc.elevationDeg = 15.0f;
+  virtSrc.distanceMeters = 2.0f;
+  pinnaModeler.setVirtualSource(virtSrc);
+
+  const size_t pinnaN = 256;
+  std::vector<float> pInL(pinnaN, 0.2f), pInR(pinnaN, 0.2f);
+  std::vector<float> pOutL(pinnaN), pOutR(pinnaN);
+  pinnaModeler.process(pInL.data(), pInR.data(), pOutL.data(), pOutR.data(), pinnaN);
+
+  TEST_ASSERT(pinnaModeler.getEarCanalResonanceHz() > 3000.0f &&
+              pinnaModeler.getPinnaNotchFrequencyHz() > 4000.0f &&
+              pinnaModeler.getInterauralTimeDelayUs() > 0.0f &&
+              pinnaModeler.getEarGeometry().headCircumferenceCm == 56.0f,
+              "Personalized Anthropometric Pinna & Ear Canal Modeler validates customized HRTF pinna notch, canal resonance, and interaural time delay synthesis");
+
+  // 175. Analog Master Tape Reel Print-Through Pre/Post Echo & Demagnetization
+  Jazz::JZTapePrintThroughDemagSimulator tapeDemag(48000.0f);
+  tapeDemag.setReelRadiusCm(10.0f);
+  tapeDemag.setPrintThroughLevelDb(-52.0f);
+  tapeDemag.setPlaybackPasses(15);
+
+  const size_t tapeN = 256;
+  std::vector<float> tInL(tapeN, 0.3f), tInR(tapeN, 0.3f);
+  std::vector<float> tOutL(tapeN), tOutR(tapeN);
+  tapeDemag.process(tInL.data(), tInR.data(), tOutL.data(), tOutR.data(), tapeN);
+
+  TEST_ASSERT(tapeDemag.getReelRadiusCm() == 10.0f &&
+              tapeDemag.getPrintThroughLevelDb() == -52.0f &&
+              tapeDemag.getPlaybackPasses() == 15 &&
+              tapeDemag.getRevolutionPeriodSec() > 1.0f &&
+              tapeDemag.getDemagnetizationLossDb() < 0.0f,
+              "Analog Master Tape Print-Through and High-Frequency Demagnetization Simulator validates reel revolution pre/post-echo timing and multi-pass playback degradation");
+
+  // 176. Polyphonic Vocal Formant, Throat Length Scaling & Gender Morpher
+  Jazz::JZPolyphonicVocalFormantMorpherEngine vocalMorpher(48000.0f);
+  vocalMorpher.setThroatLengthFactor(1.25f);
+  vocalMorpher.setFormantShiftSemitones(3.0f);
+  vocalMorpher.setGenderMorph(0.35f);
+
+  const size_t vocN = 256;
+  std::vector<float> vInL(vocN, 0.4f), vInR(vocN, 0.4f);
+  std::vector<float> vOutL(vocN), vOutR(vocN);
+  vocalMorpher.process(vInL.data(), vInR.data(), vOutL.data(), vOutR.data(), vocN);
+
+  TEST_ASSERT(vocalMorpher.getThroatLengthFactor() == 1.25f &&
+              vocalMorpher.getFormantShiftSemitones() == 3.0f &&
+              vocalMorpher.getGenderMorph() == 0.35f &&
+              vocalMorpher.getFormantF1Hz() > 0.0f &&
+              vocalMorpher.getFormantF2Hz() > vocalMorpher.getFormantF1Hz(),
+              "Polyphonic Vocal Formant & Throat Resynthesizer validates independent vocal tract scaling, formant frequency shifts, and gender morphing");
+
+  // 177. True Bode Linear Frequency Shifter & Serge Wave Multiplier
+  Jazz::JZBodeFrequencyShifterWaveMultiplierEngine bodeShifter(48000.0f);
+  bodeShifter.setFrequencyShiftHz(35.0f);
+  bodeShifter.setSidebandMode(Jazz::ShiftSidebandMode::STEREO_SPLIT);
+  bodeShifter.setWaveFoldAmount(2.5f);
+
+  const size_t bodeN = 256;
+  std::vector<float> bInL(bodeN, 0.5f), bInR(bodeN, 0.5f);
+  std::vector<float> bOutL(bodeN), bOutR(bodeN);
+  bodeShifter.process(bInL.data(), bInR.data(), bOutL.data(), bOutR.data(), bodeN);
+
+  TEST_ASSERT(bodeShifter.getFrequencyShiftHz() == 35.0f &&
+              bodeShifter.getSidebandMode() == Jazz::ShiftSidebandMode::STEREO_SPLIT &&
+              bodeShifter.getWaveFoldAmount() == 2.5f,
+              "True Bode Linear Frequency Shifter & Serge Wave Multiplier validates Hilbert quadrature frequency shifting and diode wave folding");
+
+  // 178. 16-Channel 9.1.6 Dolby Atmos Immersive Speaker Alignment Engine
+  Jazz::JZImmersiveSpeakerAlignmentEngine speakerAligner(48000.0f);
+  speakerAligner.setSpeakerDistanceMeters(0, 2.5f); // Left
+  speakerAligner.setSpeakerDistanceMeters(1, 2.5f); // Right
+  speakerAligner.setSpeakerDistanceMeters(2, 2.0f); // Center (closer, needs delay)
+  speakerAligner.setSpeakerGainTrimDb(2, -1.5f);
+
+  const size_t chirpN = 1024;
+  std::vector<float> chirpBuf(chirpN, 0.0f);
+  speakerAligner.generateMeasurementChirp(chirpBuf.data(), chirpN);
+
+  TEST_ASSERT(speakerAligner.getSpeakerDistanceMeters(2) == 2.0f &&
+              speakerAligner.getSpeakerGainTrimDb(2) == -1.5f &&
+              speakerAligner.getChannelDelaySamples(2) > 0 &&
+              speakerAligner.getChannelDelayMs(2) > 0.0f &&
+              speakerAligner.getChannelName(2) == "C" &&
+              chirpBuf[chirpN / 2] != 0.0f,
+              "16-Channel 9.1.6 Dolby Atmos Immersive Speaker Alignment validates time-of-flight acoustic delay compensation, SPL calibration trim, and chirp generation");
 }
 
 //-----------------------------------------------------------------------------

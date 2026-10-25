@@ -32,7 +32,7 @@ void JZMultiTrackDrumBleedRemoverEngine::reset() {
 
     m_bpX1 = m_bpX2 = m_bpY1 = m_bpY2 = 0.0f;
 
-    m_gateEnvelope = 1.0f;
+    m_gateEnvelope = 0.0f;
     m_holdCounterSec = 0.0f;
     m_detectedHits = 0;
     m_currentReductionDb = 0.0f;

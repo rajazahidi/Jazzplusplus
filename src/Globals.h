@@ -29,6 +29,14 @@
 // #define DEBUG(x) x
 #define DEBUG(x)
 
+#include <wx/version.h>
+#include <wx/gdicmn.h>
+#if !wxCHECK_VERSION(3, 1, 0)
+inline int FromDIP(int d) { return d; }
+inline wxSize FromDIP(const wxSize& s) { return s; }
+inline wxPoint FromDIP(const wxPoint& p) { return p; }
+#endif
+
 class JZConfiguration;
 class JZSong;
 class JZSynthesizer;

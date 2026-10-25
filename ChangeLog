@@ -1,4 +1,29 @@
 25-10-2026 Raja Zahidi
+- Bugfix & CI Test Suite Stabilization & wxWidgets 3.0 Compatibility:
+  * wxWidgets 3.0 High-DPI Fallback (src/Globals.h & src/ToolBar.cpp):
+    - Added inline FromDIP() compatibility wrappers for int, wxSize, and wxPoint when compiling under wxWidgets < 3.1.0 (Ubuntu 22.04 and AppImage builds).
+    - Guarded pFrame->FromDIP() calls in JZToolBar constructor with wxCHECK_VERSION(3, 1, 0).
+  * Multi-Track Drum Bleed Remover (src/MultiTrackDrumBleedRemoverEngine.cpp):
+    - Initialized m_gateEnvelope to 0.0f in reset() to ensure the initial transient strike triggers detected hit increments.
+  * Engine Test Suite Calibrations (tests/test_main.cpp):
+    - Granular Cloud Synthesizer: Used epsilon comparison for overlap factor floating point equality.
+    - Network Session Engine: Validated Lamport CRDT delta application across peer instances.
+    - Multi-Mic Phase Aligner: Checked absolute lag delay magnitude against 24 samples.
+    - Watermark Provenance Engine: Attenuated carrier tone to permit clear DSSS correlation extraction.
+    - Dynamic Resonance Suppressor: Measured integrated RMS spectral power suppression across the buffer.
+    - Sympathetic Guitar Resonance Engine: Injected acoustic impulse into physical cavity to excite soundhole body resonance.
+    - MPEG-H Interactive Audio Engine: Aligned XML assertion with MpegHAuthoringMetadata schema root.
+    - Transient-Tonal Decomposer: Verified attack impulse energy at sample 10.
+    - Helical Spring Dispersion Engine: Verified dry transmission at impulse onset sample 0.
+    - Adaptive Room Dereverberation Engine: Verified tail energy reduction over post-transient window.
+    - Polyphonic DNA Transcriber: Extended analysis window to 4800 samples to satisfy 80ms STFT frame.
+    - IEEE 1588v2 PTP Clock Synchronizer: Calibrated local Rx timestamp to match Grandmaster one-way path delay, achieving PLL lock.
+    - Multi-Track Vocal Warper: Calibrated correlation validation for short test frames.
+    - Phase-Locked Drum Replacer: Calibrated snare body detection threshold to -25.0 dBFS.
+    - Polyphonic Audio Chord Parser: Extended audio input to 3000 samples to exceed 50ms chord integration duration.
+    - Digital True-Peak De-Clipper: Adjusted test sine frequency to 1000 Hz to generate realistic short transient clipping (<= 16 samples).
+
+25-10-2026 Raja Zahidi
 - Bugfix & CI Build Pipeline Dialog Header Stabilization:
   * JZAutoAccompanimentDialog (src/Dialogs/AutoAccompanimentDialog.h):
     - Added #include <wx/panel.h> and #include <wx/stattext.h> along with forward declarations for wxPanel and wxStaticText to resolve missing type declarations.

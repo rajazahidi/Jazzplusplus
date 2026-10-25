@@ -38,11 +38,19 @@ JZToolBar::JZToolBar(wxFrame* pFrame, JZToolDef* pToolDef)
   mpToolBar = pFrame->CreateToolBar(
     wxTB_FLAT | wxTB_HORIZONTAL | wxTB_DOCKABLE);
 
+#if wxCHECK_VERSION(3, 1, 0)
   int targetW = pFrame->FromDIP(24);
   int targetH = pFrame->FromDIP(24);
 
   mpToolBar->SetToolBitmapSize(wxSize(targetW, targetH));
   mpToolBar->SetMargins(pFrame->FromDIP(4), pFrame->FromDIP(4));
+#else
+  int targetW = 24;
+  int targetH = 24;
+
+  mpToolBar->SetToolBitmapSize(wxSize(targetW, targetH));
+  mpToolBar->SetMargins(4, 4);
+#endif
 
   while (pToolDef->mId != eToolBarEnd)
   {

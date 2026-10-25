@@ -178,7 +178,7 @@ jobs:
       - name: Build Windows Setup Installer (Inno Setup)
         shell: pwsh
         run: |
-          ./packaging/windows/build_installer.ps1 -PackageDir "$pkgDir" -Version "6.0.0" -OutputDir "dist"
+          pwsh -ExecutionPolicy Bypass -File .\packaging\windows\build_installer.ps1 -PackageDir "Jazz++-Windows-x64" -Version "6.0.0" -OutputDir "dist"
 
       - name: Upload Windows Artifact (ZIP)
         uses: actions/upload-artifact@v4

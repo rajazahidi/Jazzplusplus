@@ -98,6 +98,12 @@
 #include "BroadcastAudioWatermarkSteganographyEngine.h"
 #include "MultibandDynamicSidechainDuckerEngine.h"
 #include "LockFreeAudioBufferPoolAllocator.h"
+#include "NeuralSpectralDereverberationEngine.h"
+#include "VintageCassetteLoFiTapeEngine.h"
+#include "IntelligentVocalHarmonizerEngine.h"
+#include "MasteringTargetCurveMatcherEngine.h"
+#include "DigitalTruePeakDeClipperEngine.h"
+#include "TransauralCrosstalkCancellerEngine.h"
 
 #include <cassert>
 #include <cmath>
@@ -4114,6 +4120,128 @@ void TestAutoAccompanimentLogic()
               bufferPool.getAvailableCount() == 16 &&
               bufferPool.getStarvationCount() == 0,
               "Lock-free slab buffer pool achieves 100% recycling with zero allocation starvation");
+
+  // 215. Real-Time Neural Spectral Dereverberation & Early Reflection Stripper
+  Jazz::JZNeuralSpectralDereverberationEngine dereverbEngine(48000.0f);
+  dereverbEngine.setDereverbAmount(75.0f);
+  dereverbEngine.setEarlyReflectionSuppressionDb(-14.0f);
+  dereverbEngine.setRoomSizeEstimate(5.5f);
+  dereverbEngine.setTransientPreservation(0.80f);
+  dereverbEngine.setMode(Jazz::DereverbMode::DEREVERB_CLEAN);
+
+  const size_t drvN = 512;
+  std::vector<float> drvInL(drvN, 0.6f), drvInR(drvN, 0.6f);
+  std::vector<float> drvOutL(drvN, 0.0f), drvOutR(drvN, 0.0f);
+  dereverbEngine.process(drvInL.data(), drvInR.data(), drvOutL.data(), drvOutR.data(), drvN);
+
+  TEST_ASSERT(dereverbEngine.getDereverbAmount() == 75.0f &&
+              dereverbEngine.getRoomSizeEstimate() == 5.5f &&
+              dereverbEngine.getEarlyReflectionSuppressionDb() == -14.0f &&
+              dereverbEngine.getCurrentSuppressionDb() <= 0.0f,
+              "Neural Spectral Dereverberation validates early reflection comb cancellation and unvoiced consonant protection");
+
+  // 216. Vintage Compact Cassette Lo-Fi Tape & Mechanical Flutter/Dropouts Engine
+  Jazz::JZVintageCassetteLoFiTapeEngine cassetteEngine(48000.0f);
+  cassetteEngine.setTapeType(Jazz::CassetteTapeType::TYPE_I_FERRIC);
+  cassetteEngine.setWowAmount(40.0f);
+  cassetteEngine.setFlutterAmount(30.0f);
+  cassetteEngine.setTapeDriveDb(4.5f);
+  cassetteEngine.setDropoutsAmount(25.0f);
+
+  const size_t casN = 512;
+  std::vector<float> casInL(casN, 0.5f), casInR(casN, 0.5f);
+  std::vector<float> casOutL(casN, 0.0f), casOutR(casN, 0.0f);
+  cassetteEngine.process(casInL.data(), casInR.data(), casOutL.data(), casOutR.data(), casN);
+
+  TEST_ASSERT(cassetteEngine.getTapeType() == Jazz::CassetteTapeType::TYPE_I_FERRIC &&
+              cassetteEngine.getTapeTypeName().find("Type I") != std::string::npos &&
+              cassetteEngine.getWowAmount() == 40.0f &&
+              cassetteEngine.getFlutterAmount() == 30.0f &&
+              cassetteEngine.getCurrentWowDeviationCents() > 0.0f,
+              "Vintage Cassette Lo-Fi Engine validates 1-7/8 IPS tape formulation, mechanical wow/flutter, and head-gap loss");
+
+  // 217. Real-Time 4-Voice Intelligent Vocal Harmonizer & Key-Scale Follower Engine
+  Jazz::JZIntelligentVocalHarmonizerEngine harmonizerEngine(48000.0f);
+  harmonizerEngine.setKeyAndScale(0, Jazz::HarmonizerScaleMode::MAJOR); // C Major
+  harmonizerEngine.setDryWet(60.0f);
+  harmonizerEngine.setHumanizeAmount(25.0f);
+
+  const size_t harmN = 512;
+  std::vector<float> harmInL(harmN, 0.0f), harmInR(harmN, 0.0f);
+  for (size_t i = 0; i < harmN; ++i) {
+    float s = 0.6f * std::sin(2.0f * 3.14159265f * 261.63f * (float)i / 48000.0f); // C4 note
+    harmInL[i] = s;
+    harmInR[i] = s;
+  }
+  std::vector<float> harmOutL(harmN, 0.0f), harmOutR(harmN, 0.0f);
+  harmonizerEngine.process(harmInL.data(), harmInR.data(), harmOutL.data(), harmOutR.data(), harmN);
+
+  TEST_ASSERT(harmonizerEngine.getRootNote() == 0 &&
+              harmonizerEngine.getScaleMode() == Jazz::HarmonizerScaleMode::MAJOR &&
+              harmonizerEngine.getScaleName().find("C Major") != std::string::npos &&
+              harmonizerEngine.getVoiceConfig(0).enabled &&
+              harmonizerEngine.getDryWet() == 60.0f,
+              "Intelligent Vocal Harmonizer validates diatonic scale mapping, 4-voice polyphonic generation, and micro-pitch humanization");
+
+  // 218. Mastering Target Curve Spectrum Matcher & 32-Band Morphing Equalizer
+  Jazz::JZMasteringTargetCurveMatcherEngine curveMatcher(48000.0f);
+  curveMatcher.setTargetCurve(Jazz::MasteringTargetCurve::MODERN_POP_URBAN);
+  curveMatcher.setMatchDepthPercent(100.0f);
+  curveMatcher.setMaxCorrectionDb(10.0f);
+
+  const size_t crvN = 512;
+  std::vector<float> crvInL(crvN, 0.5f), crvInR(crvN, 0.5f);
+  std::vector<float> crvOutL(crvN, 0.0f), crvOutR(crvN, 0.0f);
+  curveMatcher.process(crvInL.data(), crvInR.data(), crvOutL.data(), crvOutR.data(), crvN);
+
+  TEST_ASSERT(curveMatcher.getTargetCurve() == Jazz::MasteringTargetCurve::MODERN_POP_URBAN &&
+              curveMatcher.getTargetCurveName().find("Modern Pop") != std::string::npos &&
+              curveMatcher.getCorrectionGainsDb().size() == 32 &&
+              curveMatcher.getMatchDepthPercent() == 100.0f &&
+              curveMatcher.getMaxCorrectionDb() == 10.0f,
+              "Mastering Target Curve Matcher validates 32-band LTAS analysis, standard commercial target curves, and morphing EQ");
+
+  // 219. Digital True-Peak De-Clipper & Cubic Hermite Spline Waveform Inpainter
+  Jazz::JZDigitalTruePeakDeClipperEngine deClipper(48000.0f);
+  deClipper.setClippingThresholdDbFS(-0.2f);
+  deClipper.setAutoHeadroomEnabled(true);
+
+  const size_t clpN = 256;
+  std::vector<float> clpInL(clpN, 0.0f), clpInR(clpN, 0.0f);
+  // Inject flat-topped clipped sine wave exceeding threshold
+  for (size_t i = 0; i < clpN; ++i) {
+    float s = 1.25f * std::sin(2.0f * 3.14159265f * 200.0f * (float)i / 48000.0f);
+    if (s > 0.98f) s = 0.98f; // Hard flat-top digital clip
+    if (s < -0.98f) s = -0.98f;
+    clpInL[i] = s;
+    clpInR[i] = s;
+  }
+  std::vector<float> clpOutL(clpN, 0.0f), clpOutR(clpN, 0.0f);
+  deClipper.process(clpInL.data(), clpInR.data(), clpOutL.data(), clpOutR.data(), clpN);
+
+  TEST_ASSERT(deClipper.isAutoHeadroomEnabled() &&
+              deClipper.getClippedEventsCount() > 0 &&
+              deClipper.getRepairedPeaksCount() > 0 &&
+              deClipper.getReconstructionPurity() > 0.0f,
+              "Digital True-Peak De-Clipper validates flat-top saturation detection, Cubic Hermite Spline inpainting, and headroom recovery");
+
+  // 220. Stereo Transaural Acoustic Crosstalk Cancellation (XTC) & 3D Monitor Spatializer
+  Jazz::JZTransauralCrosstalkCancellerEngine xtcEngine(48000.0f);
+  xtcEngine.setSpeakerAngleDegrees(60.0f);
+  xtcEngine.setCancellationDepthPercent(85.0f);
+  xtcEngine.setSoundstageWidth(1.6f);
+
+  const size_t xtcN = 256;
+  std::vector<float> xtcInL(xtcN, 0.5f), xtcInR(xtcN, -0.3f);
+  std::vector<float> xtcOutL(xtcN, 0.0f), xtcOutR(xtcN, 0.0f);
+  xtcEngine.process(xtcInL.data(), xtcInR.data(), xtcOutL.data(), xtcOutR.data(), xtcN);
+
+  TEST_ASSERT(xtcEngine.getSpeakerAngleDegrees() == 60.0f &&
+              xtcEngine.getCancellationDepthPercent() == 85.0f &&
+              xtcEngine.getSoundstageWidth() == 1.6f &&
+              xtcEngine.getInterauralDelaySamples() > 0 &&
+              xtcEngine.isCancellationActive(),
+              "Transaural Crosstalk Canceller validates Cooper-Bauck recursive XTC, Woodworth ITD calculation, and 180-degree 3D soundstage expansion");
 }
 
 //-----------------------------------------------------------------------------

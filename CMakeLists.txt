@@ -191,6 +191,7 @@ set(JAZZ_SOURCES
     src/Dialogs/VelocityDialog.cpp
     src/Dialogs.cpp
     src/DialogueGatedLoudnessEngine.cpp
+    src/DigitalTruePeakDeClipperEngine.cpp
     src/DitherFormatEncoder.cpp
     src/DrumReplacerEngine.cpp
     src/DrumUtilities.cpp
@@ -240,6 +241,7 @@ set(JAZZ_SOURCES
     src/ImmersiveSpeakerAlignmentEngine.cpp
     src/InfiniteBarberpoleFlangerEngine.cpp
     src/IntelligentMasteringAssistant.cpp
+    src/IntelligentVocalHarmonizerEngine.cpp
     src/JazzPlusPlusApplication.cpp
     src/KeyChordDetector.cpp
     src/KeyStringConverters.cpp
@@ -254,6 +256,7 @@ set(JAZZ_SOURCES
     src/MasterLinearPhaseImager.cpp
     src/MasterTruePeakLimiter.cpp
     src/MasterVisualizer.cpp
+    src/MasteringTargetCurveMatcherEngine.cpp
     src/MatchEqProfiler.cpp
     src/MeasureChoice.cpp
     src/MicrophoneModeler.cpp
@@ -284,6 +287,7 @@ set(JAZZ_SOURCES
     src/NetworkSessionEngine.cpp
     src/NeuralAmpWaveNetProfilerEngine.cpp
     src/NeuralAudioEngine.cpp
+    src/NeuralSpectralDereverberationEngine.cpp
     src/NeuralStemSeparatorEngine.cpp
     src/NeuralTimbreTransferEngine.cpp
     src/OpticalFilmAudioRestorationEngine.cpp
@@ -365,6 +369,7 @@ set(JAZZ_SOURCES
     src/TapePrintThroughDemagSimulator.cpp
     src/ThroughZeroFlanger.cpp
     src/VariableMuVintageTubeCompressorEngine.cpp
+    src/VintageCassetteLoFiTapeEngine.cpp
     src/VintageLofiProcessor.cpp
     src/VinylLatheMechanicalSimulator.cpp
     src/VirtualStudioMonitorSimulator.cpp
@@ -372,6 +377,7 @@ set(JAZZ_SOURCES
     src/Track.cpp
     src/TrackFrame.cpp
     src/TrackWindow.cpp
+    src/TransauralCrosstalkCancellerEngine.cpp
     src/TransientShaper.cpp
     src/TransientSlicer.cpp
     src/TransientTonalDecomposeEngine.cpp

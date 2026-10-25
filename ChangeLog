@@ -1,4 +1,27 @@
 25-10-2026 Raja Zahidi
+- Feature & Master Studio Neural Spectral Dereverberation, Vintage Cassette Lo-Fi Tape, Intelligent Vocal Harmonizer, Mastering Target Curve Matcher, Digital True-Peak De-Clipper, & Transaural Crosstalk Canceller Suite v31.0 (Apex Transcendence Sovereign Pinnacle Release):
+  * Real-Time Neural Spectral Dereverberation & Early Reflection Stripper (src/NeuralSpectralDereverberationEngine.h & .cpp):
+    - JZNeuralSpectralDereverberationEngine eliminates room acoustic boxiness and early wall reflections (< 40ms) with sub-band spectral cross-correlation and diffuse reverberant tail subtraction.
+    - Features unvoiced consonant transient protection preserving vocal clarity and bite, room size acoustic modeling (2.0 to 25.0 meters), and Reverb Tail Delta Solo audition mode.
+  * Vintage Compact Cassette Lo-Fi Tape & Mechanical Flutter/Dropouts Engine (src/VintageCassetteLoFiTapeEngine.h & .cpp):
+    - JZVintageCassetteLoFiTapeEngine physically simulates 1-7/8 IPS compact cassette tape decks (Universal Audio Oxide / RC-20 / SketchCassette style).
+    - Features 3 tape formulations (Type I Ferric, Type II Chrome, Type IV Metal), chaotic dual-motor mechanical Wow (0.5 - 3.5 Hz) and Flutter (20 - 50 Hz), Bessel head-gap loss high-frequency rolloff, tape hiss profile, and random magnetic oxide signal dropouts.
+  * Real-Time 4-Voice Intelligent Vocal Harmonizer & Key-Scale Follower Engine (src/IntelligentVocalHarmonizerEngine.h & .cpp):
+    - JZIntelligentVocalHarmonizerEngine generates 4-part backing vocal stacks conforming to musical key and diatonic scale (Eventide H9000 / Antares Harmony Engine style).
+    - Features YIN/autocorrelation fundamental pitch tracking (70 Hz - 1000 Hz), scale follower (Major, Minor, Dorian, Mixolydian, Phrygian, Lydian, Harmonic Minor), independent formant shifting, per-voice 3D stereo panning and gain, and humanized micro-pitch detune drift (+/- 12 cents).
+  * Mastering Target Curve Spectrum Matcher & 32-Band Morphing Equalizer (src/MasteringTargetCurveMatcherEngine.h & .cpp):
+    - JZMasteringTargetCurveMatcherEngine aligns mix balances with commercial mastering curves (FabFilter Pro-Q 3 Match EQ / iZotope Ozone style).
+    - Features 32-band Long-Term Average Spectrum (LTAS) analysis, standard target curves (Pink Noise -4.5dB/oct, Modern Pop/Urban, Warm Acoustic, Classical Hi-Fi, EDM Sub), Gaussian spectral curve smoothing, and adjustable match depth (0% to 200%).
+  * Digital True-Peak De-Clipper & Cubic Hermite Spline Waveform Inpainter (src/DigitalTruePeakDeClipperEngine.h & .cpp):
+    - JZDigitalTruePeakDeClipperEngine repairs harsh digital overs and flat-topped waveform clipping (iZotope RX De-clip / Cedar Audio Declip style).
+    - Features adaptive flat-top saturation detection, Cubic Hermite Spline inpainting reconstructing lost peak trajectories above 0 dBFS, harmonic peak resynthesis, and automatic dynamic headroom compensation.
+  * Stereo Transaural Acoustic Crosstalk Cancellation (XTC) & 3D Monitor Spatializer (src/TransauralCrosstalkCancellerEngine.h & .cpp):
+    - JZTransauralCrosstalkCancellerEngine delivers 180-degree immersive 3D soundfields across physical studio nearfield monitors without headphones (BACCH 3D Sound / Universal Audio Transaural style).
+    - Features Cooper-Bauck recursive 2nd-order cancellation matrix, Woodworth inter-aural time difference (ITD) delay calculation, head shadow acoustic modeling, and adjustable monitor aperture angle (20 to 90 degrees).
+  * Added Automated Unit Tests 215 to 220 (tests/test_main.cpp):
+    - Validates neural spectral dereverberation with early reflection comb cancellation, vintage cassette wow/flutter and gap-loss, 4-voice diatonic vocal harmonization, 32-band mastering target curve matching, digital true-peak cubic Hermite inpainting, and transaural crosstalk cancellation with 180-degree stereo expansion.
+
+25-10-2026 Raja Zahidi
 - Feature & Master Studio Neural Amp WaveNet Profiler, Polyphonic Audio Chord Parser, Frequency-Split Spectral Panner, Broadcast Audio Watermark Steganography, Multiband Sidechain Ducker, & Lock-Free Buffer Pool Allocator Suite v30.0 (Apex Colossus Sovereign Diamond Jubilee Release):
   * Real-Time Non-Linear Dilated WaveNet Guitar Amp Profiler (src/NeuralAmpWaveNetProfilerEngine.h & .cpp):
     - JZNeuralAmpWaveNetProfilerEngine delivers deep temporal convolutional neural guitar amplifier profiling (Neural Amp Modeler / Quad Cortex / Neural DSP Archetype style).

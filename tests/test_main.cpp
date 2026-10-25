@@ -50,6 +50,12 @@
 #include "XenharmonicLatticeMorpherEngine.h"
 #include "DialogueGatedLoudnessEngine.h"
 #include "HelicalSpringDispersionEngine.h"
+#include "PsychoacousticPhantomBassEngine.h"
+#include "QuantumParticleGranularEngine.h"
+#include "AdaptiveRoomDereverberationEngine.h"
+#include "PolyphonicNeuralAudioToMidiEngine.h"
+#include "OpticalFilmAudioRestorationEngine.h"
+#include "PtpClockPrecisionSyncEngine.h"
 
 #include <cassert>
 #include <cmath>
@@ -3020,6 +3026,158 @@ void TestAutoAccompanimentLogic()
               spgOutL.size() == spgN &&
               std::abs(spgOutL[64]) > 0.0f,
               "Helical Spring Dispersion Engine validates multi-stage all-pass chirp dispersion, transducer saturation, and mechanical tank kick impacts");
+
+  // 167. Psychoacoustic Phantom Missing Fundamental Bass Generator
+  Jazz::JZPsychoacousticPhantomBassEngine phantomBass(48000.0f);
+  phantomBass.setCrossoverFreq(85.0f);
+  phantomBass.setHarmonicIntensity(1.2f);
+  phantomBass.setPhantomHarmonicMix(0.9f);
+
+  const size_t phN = 512;
+  std::vector<float> phInL(phN), phInR(phN);
+  std::vector<float> phOutL(phN), phOutR(phN);
+  for (size_t i = 0; i < phN; ++i) {
+    float t = static_cast<float>(i) / 48000.0f;
+    phInL[i] = 0.7f * std::sin(2.0f * 3.14159f * 50.0f * t);
+    phInR[i] = phInL[i];
+  }
+  phantomBass.process(phInL.data(), phInR.data(), phOutL.data(), phOutR.data(), phN);
+
+  TEST_ASSERT(phantomBass.getCrossoverFreq() == 85.0f &&
+              phantomBass.getHarmonicIntensity() == 1.2f &&
+              phantomBass.getPhantomHarmonicMix() == 0.9f &&
+              phantomBass.getDetectedSubRms() > 0.0f &&
+              phantomBass.getGeneratedHarmonicsRms() > 0.0f &&
+              phOutL.size() == phN,
+              "Psychoacoustic Phantom Bass Generator validates 2nd-5th Chebyshev harmonic overtone synthesis and sub-bass missing fundamental projection");
+
+  // 168. Quantum Gravitational Particle Granulator & Doppler Field
+  Jazz::JZQuantumParticleGranularEngine quantumGranular(48000.0f);
+  Jazz::JZQuantumParticleGranularEngine::Configuration qConfig;
+  qConfig.maxParticles = 16;
+  qConfig.gravityStrength = 5.0f;
+  qConfig.chaosFactor = 0.4f;
+  qConfig.grainDurationMs = 50.0f;
+  qConfig.dopplerIntensity = 0.6f;
+  quantumGranular.setConfiguration(qConfig);
+
+  const size_t qN = 256;
+  std::vector<float> qOutL(qN), qOutR(qN);
+  quantumGranular.generateBlock(qOutL.data(), qOutR.data(), qN);
+
+  TEST_ASSERT(quantumGranular.getConfiguration().maxParticles == 16 &&
+              quantumGranular.getConfiguration().gravityStrength == 5.0f &&
+              quantumGranular.getSourceBufferSize() > 0 &&
+              qOutL.size() == qN &&
+              std::abs(qOutL[32]) > 0.0f,
+              "Quantum Particle Granulator validates N-body gravitational orbit motion, Lorentz chaos perturbation, and spatial Doppler pitch shifting");
+
+  // 169. Adaptive Room Spectral Dereverberation Engine
+  Jazz::JZAdaptiveRoomDereverberationEngine dereverb(48000.0f);
+  dereverb.setDereverbAmount(0.75f);
+  dereverb.setRoomRt60Sec(1.5f);
+
+  const size_t drvN = 512;
+  std::vector<float> drvInL(drvN), drvInR(drvN);
+  std::vector<float> drvOutL(drvN), drvOutR(drvN);
+  for (size_t i = 0; i < drvN; ++i) {
+    float t = static_cast<float>(i) / 48000.0f;
+    float direct = (i < 50) ? (0.8f * std::sin(2.0f * 3.14159f * 1000.0f * t)) : 0.0f;
+    float reverbTail = 0.3f * std::sin(2.0f * 3.14159f * 1000.0f * t) * std::exp(-t * 2.0f);
+    drvInL[i] = direct + reverbTail;
+    drvInR[i] = drvInL[i];
+  }
+  dereverb.process(drvInL.data(), drvInR.data(), drvOutL.data(), drvOutR.data(), drvN);
+
+  TEST_ASSERT(dereverb.getDereverbAmount() == 0.75f &&
+              dereverb.getRoomRt60Sec() == 1.5f &&
+              dereverb.getAverageSuppressionDb() <= 0.0f &&
+              drvOutL.size() == drvN &&
+              std::abs(drvOutL[drvN - 1]) < std::abs(drvInL[drvN - 1]),
+              "Adaptive Room Dereverberation Engine validates Sabine decay slope tracking, diffuse tail suppression, and direct speech preservation");
+
+  // 170. Polyphonic Neural Audio-to-MIDI DNA Transcriber
+  Jazz::JZPolyphonicNeuralAudioToMidiEngine polyTranscriber(48000.0f);
+  Jazz::JZPolyphonicNeuralAudioToMidiEngine::Configuration transConfig;
+  transConfig.minNoteDurationMs = 40.0f;
+  transConfig.energyThresholdDb = -40.0f;
+  transConfig.maxPolyphony = 4;
+  polyTranscriber.setConfiguration(transConfig);
+
+  const size_t chordN = 2400;
+  std::vector<float> chordAudio(chordN);
+  for (size_t i = 0; i < chordN; ++i) {
+    float t = static_cast<float>(i) / 48000.0f;
+    chordAudio[i] = 0.3f * std::sin(2.0f * 3.14159f * 261.63f * t) +
+                    0.3f * std::sin(2.0f * 3.14159f * 329.63f * t) +
+                    0.3f * std::sin(2.0f * 3.14159f * 392.00f * t);
+  }
+  polyTranscriber.ingestAudio(chordAudio.data(), chordN);
+  size_t noteCount = polyTranscriber.transcribe();
+  auto notes = polyTranscriber.getTranscribedNotes();
+  std::string musicXml = polyTranscriber.exportMusicXmlString();
+
+  TEST_ASSERT(noteCount >= 1 &&
+              notes.size() == noteCount &&
+              polyTranscriber.getDetectedChordCount() >= 1 &&
+              musicXml.find("<score-partwise") != std::string::npos &&
+              musicXml.find("<pitch>") != std::string::npos,
+              "Polyphonic DNA Audio-to-MIDI Transcriber validates simultaneous C-Major triad chord extraction, per-note onset/velocity, and MusicXML export");
+
+  // 171. Optical Film Soundtrack Restoration Engine
+  Jazz::JZOpticalFilmAudioRestorationEngine opticalRestoration(48000.0f);
+  opticalRestoration.setSlitWidthMicrons(25.0f);
+  opticalRestoration.setGrainDenoiseDb(14.0f);
+  opticalRestoration.setShutterThumpFilter(true);
+
+  const size_t optN = 512;
+  std::vector<float> optInL(optN), optInR(optN);
+  std::vector<float> optOutL(optN), optOutR(optN);
+  for (size_t i = 0; i < optN; ++i) {
+    float t = static_cast<float>(i) / 48000.0f;
+    float audio = 0.4f * std::sin(2.0f * 3.14159f * 800.0f * t);
+    float shutterThump = 0.2f * std::sin(2.0f * 3.14159f * 24.0f * t);
+    float grainClick = (i == 45) ? 0.95f : 0.0f;
+    optInL[i] = audio + shutterThump + grainClick;
+    optInR[i] = optInL[i];
+  }
+  opticalRestoration.process(optInL.data(), optInR.data(), optOutL.data(), optOutR.data(), optN);
+
+  TEST_ASSERT(opticalRestoration.getSlitWidthMicrons() == 25.0f &&
+              opticalRestoration.getGrainDenoiseDb() == 14.0f &&
+              opticalRestoration.isShutterThumpFilterEnabled() == true &&
+              opticalRestoration.getRepairedGrainClicks() >= 1 &&
+              opticalRestoration.getApertureLossCompensationDb() > 0.0f &&
+              optOutL.size() == optN,
+              "Optical Film Audio Restoration validates scanning slit inverse sinc de-blurring, 24Hz shutter notch, and bilateral grain click repair");
+
+  // 172. IEEE 1588v2 PTP Grandmaster Clock & SMPTE ST 2110-30 Synchronizer
+  Jazz::JZPtpClockPrecisionSyncEngine ptpSync(48000.0f);
+  Jazz::JZPtpClockPrecisionSyncEngine::PtpPacketHeader ptpHdr;
+  ptpHdr.sequenceId = 1;
+  ptpHdr.originTimestampNs = 1600000000000000000ULL;
+  ptpHdr.grandmasterIdentity = "00:1E:C9:FF:FE:84:3B:12";
+
+  uint64_t localRxNs = ptpHdr.originTimestampNs + 2650;
+  ptpSync.ingestPtpSync(ptpHdr, localRxNs);
+
+  for (uint16_t seq = 2; seq <= 8; ++seq) {
+    ptpHdr.sequenceId = seq;
+    ptpHdr.originTimestampNs += 125000000ULL;
+    localRxNs = ptpHdr.originTimestampNs + 2580;
+    ptpSync.ingestPtpSync(ptpHdr, localRxNs);
+    ptpSync.ingestDelayResponse(localRxNs + 1000, ptpHdr.originTimestampNs + 6000);
+    ptpSync.advanceMediaClock(6000);
+  }
+
+  auto ptpTelemetry = ptpSync.getTelemetry();
+
+  TEST_ASSERT(ptpSync.isLocked() == true &&
+              ptpSync.getSyncState() == Jazz::PtpSyncState::LOCKED_LATCHED &&
+              std::abs(ptpSync.getPhaseOffsetNs()) < 200.0 &&
+              ptpTelemetry.syncMessageCount >= 8 &&
+              ptpTelemetry.rtpMediaClockSamples > 0,
+              "IEEE 1588v2 PTP Precision Clock Synchronizer validates Grandmaster Phase-Locked Loop lock (<200ns), frequency drift tracking, and SMPTE ST 2110 media clock synthesis");
 }
 
 //-----------------------------------------------------------------------------

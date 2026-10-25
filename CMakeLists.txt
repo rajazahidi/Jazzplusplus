@@ -113,6 +113,7 @@ include_directories(
 set(JAZZ_SOURCES
     src/AboutDialog.cpp
     src/AdaptiveHermodeTuningEngine.cpp
+    src/AdaptiveRoomDereverberationEngine.cpp
     src/AdmBwfSpatialMetadataEngine.cpp
     src/AiMelodyCounterpointGenerator.cpp
     src/AnalogTapeFlutterModeler.cpp
@@ -264,6 +265,7 @@ set(JAZZ_SOURCES
     src/NeuralAudioEngine.cpp
     src/NeuralStemSeparatorEngine.cpp
     src/NeuralTimbreTransferEngine.cpp
+    src/OpticalFilmAudioRestorationEngine.cpp
     src/PhaseAlignerEngine.cpp
     src/PhysicalResonator.cpp
     src/PianoFrame.cpp
@@ -274,10 +276,14 @@ set(JAZZ_SOURCES
     src/PluginHostBridge.cpp
     src/Player.cpp
     src/PolymetricDrumSequencer.cpp
+    src/PolyphonicNeuralAudioToMidiEngine.cpp
     src/Project.cpp
     src/ProjectBundle.cpp
     src/ProjectManager.cpp
     src/PropertyListDialog.cpp
+    src/PsychoacousticPhantomBassEngine.cpp
+    src/PtpClockPrecisionSyncEngine.cpp
+    src/QuantumParticleGranularEngine.cpp
     src/Random.cpp
     src/RecordingInfo.cpp
     src/Rectangle.cpp

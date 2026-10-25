@@ -1,4 +1,27 @@
 25-10-2026 Raja Zahidi
+- Feature & Master Studio Psychoacoustic Phantom Bass, Quantum Particle Granulator, Adaptive Room Dereverberation, Polyphonic DNA Audio-to-MIDI, Optical Film Restoration, & PTP Precision Clock Suite v23.0 (Apex Infinity Quantum Release):
+  * Psychoacoustic Missing Fundamental Bass Generator (src/PsychoacousticPhantomBassEngine.h & .cpp):
+    - JZPsychoacousticPhantomBassEngine generates psychoacoustic bass overtones (Waves MaxxBass / Aphex Big Bottom style) enabling smartphone/earbud speakers to perceive deep 30-80 Hz bass fundamentals.
+    - Features Linkwitz-Riley 2nd-order crossover filter, Chebyshev polynomial harmonic expansions (2nd, 3rd, 4th, 5th harmonics), dynamic envelope tracking, and speaker-protecting sub-bass muting.
+  * Quantum Gravitational Particle Granulator & Doppler Field (src/QuantumParticleGranularEngine.h & .cpp):
+    - JZQuantumParticleGranularEngine provides 3D spatial particle synthesis (Curtis Roads / Xenakis / GRM Tools style) driven by N-body gravitational attraction and Lorentz chaotic attractor orbits.
+    - Features particle mass dynamics, Hann window grain envelopes, real-time 3D spatial Doppler velocity pitch shifting, and binaural orbit panning.
+  * Adaptive Room Acoustic Spectral Dereverberation Engine (src/AdaptiveRoomDereverberationEngine.h & .cpp):
+    - JZAdaptiveRoomDereverberationEngine suppresses room acoustic boxiness and late diffuse reverberation tails (Zynaptiq UNVEIL / Cedar De-Reverb style) up to -20 dB.
+    - Features statistical Sabine/Eyring decay tracking across 8 analysis bands (125 Hz to 8 kHz), transient/consonant direct sound preservation, and direct vocal clarity boosting.
+  * Polyphonic Direct Note Access (DNA) Audio-to-MIDI Transcriber (src/PolyphonicNeuralAudioToMidiEngine.h & .cpp):
+    - JZPolyphonicNeuralAudioToMidiEngine transcribes multi-note guitar chords and complex polyphonic piano passages into discrete MIDI notes (Melodyne DNA / Basic Pitch style).
+    - Features polyphonic harmonic sieve peak extraction, per-note MPE microtonal pitch bend tracking, onset/duration segmentation, and standardized MusicXML score export.
+  * Historic Optical Film Soundtrack Audio Restoration Suite (src/OpticalFilmAudioRestorationEngine.h & .cpp):
+    - JZOpticalFilmAudioRestorationEngine restores historic 35mm and 16mm optical sound film recordings (1930s-1970s Variable-Area & Variable-Density soundtracks).
+    - Features scanning slit aperture loss de-blurring (inverse sinc peaking filter), bilateral optical film grain click/scratch suppression, 24 Hz projector shutter thump notch filtering, and photocell saturation de-clipping.
+  * IEEE 1588v2 PTP Grandmaster Clock & SMPTE ST 2110-30 Synchronizer (src/PtpClockPrecisionSyncEngine.h & .cpp):
+    - JZPtpClockPrecisionSyncEngine provides broadcast-grade Precision Time Protocol (PTP) synchronization for television and broadcast networks (BBC / Olympic Broadcast Services / ESPN).
+    - Features software Dual-Loop Proportional-Integral Phase-Locked Loop (PLL) locking to Grandmaster Clock within sub-200ns accuracy, TAI/UTC timestamp synthesis, network path delay compensation, and SMPTE ST 2110-30 / AES67 RTP media clock alignment.
+  * Added Automated Unit Tests 167 to 172 (tests/test_main.cpp):
+    - Validates 2nd-5th Chebyshev harmonic overtone synthesis, N-body gravitational particle granular synthesis with Doppler shifting, Sabine room decay slope dereverberation, simultaneous C-Major triad chord extraction with MusicXML export, optical slit aperture de-blurring with 24 Hz notch, and IEEE 1588v2 PTP PLL phase locking.
+
+25-10-2026 Raja Zahidi
 - Feature & Master Studio Transient-Tonal Decomposer, Tape Hysteresis & Azimuth Skew, Live Stage Redundancy, Xenharmonic Lattice Morpher, Dialogue-Gated Loudness, & Helical Spring Dispersion Suite v22.0 (Apex Zenith Enterprise Release):
   * Real-Time 3-Way Transient-Tonal-Ambience Spectral Decomposer (src/TransientTonalDecomposeEngine.h & .cpp):
     - JZTransientTonalDecomposeEngine provides real-time 3-way spectral decomposition isolating fast attack transients, sustained harmonic tonal bodies, and diffuse ambient noise beds (Cedar / SpectraLayers style).

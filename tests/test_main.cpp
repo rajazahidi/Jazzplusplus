@@ -26,6 +26,12 @@
 #include "HardwareInsertDelayCompensator.h"
 #include "RoomAcousticCalibrationEngine.h"
 #include "EuclideanPolyrhythmEngine.h"
+#include "VolterraDynamicConvolutionEngine.h"
+#include "MultiMicPhaseAlignerEngine.h"
+#include "SpectralAudioMorphEngine.h"
+#include "AdaptiveHermodeTuningEngine.h"
+#include "VirtualStudioMonitorSimulator.h"
+#include "AudioWatermarkProvenanceEngine.h"
 
 #include <cassert>
 #include <cmath>
@@ -2370,6 +2376,137 @@ void TestAutoAccompanimentLogic()
               polyEngine.getLaneCount() == 3 && trig0 && events.size() >= 3 &&
               polyEngine.getSwingPercent() == 60.0f,
               "Euclidean Polyrhythm Engine validates Bjorklund E(3,8) & E(5,8), multilane polymetric concurrency, and ratchet bursts");
+
+  // 143. Non-Linear Volterra Kernel Dynamic Convolution & Harmonic Distortion THD
+  Jazz::JZVolterraDynamicConvolutionEngine volterra(48000.0f, Jazz::VolterraModelType::VINTAGE_TUBE_PREAMP);
+  volterra.setInputDriveDb(6.0f);
+  volterra.setHarmonic2ndOrderMix(0.50f);
+  volterra.setHarmonic3rdOrderMix(0.25f);
+  float thdDb = volterra.measureHarmonicDistortionThdDb();
+
+  float testInL[64], testInR[64];
+  for (int i = 0; i < 64; ++i) { testInL[i] = 0.5f; testInR[i] = 0.5f; }
+  float testOutL[64] = {0}, testOutR[64] = {0};
+  volterra.process(testInL, testInR, testOutL, testOutR, 64);
+
+  TEST_ASSERT(volterra.getModelType() == Jazz::VolterraModelType::VINTAGE_TUBE_PREAMP &&
+              volterra.getInputDriveDb() == 6.0f && thdDb > -40.0f && thdDb < -10.0f &&
+              testOutL[0] > 0.0f && fabs(testOutL[0] - testOutR[0]) < 0.0001f,
+              "Volterra Convolution validates 2nd/3rd order non-linear kernel expansion, tube saturation, and THD measurement");
+
+  // 144. Multi-Microphone Phase Auto-Alignment & Spectral Cancellation Recovery
+  Jazz::JZMultiMicPhaseAlignerEngine phaseAligner(48000.0f);
+  int trkGuide = phaseAligner.registerTrack("Kick_In", true);
+  int trkTarget = phaseAligner.registerTrack("Kick_Out", false);
+
+  const size_t N = 512;
+  std::vector<float> guideSig(N), targetSig(N);
+  for (size_t i = 0; i < N; ++i) {
+    float t = static_cast<float>(i) / 48000.0f;
+    guideSig[i] = std::sin(2.0f * 3.14159f * 80.0f * t);
+  }
+  for (size_t i = 0; i < N; ++i) {
+    targetSig[i] = (i >= 24) ? -guideSig[i - 24] : 0.0f;
+  }
+
+  bool aligned = phaseAligner.analyzeAlignment(trkTarget, guideSig.data(), targetSig.data(), N);
+  const Jazz::MicTrackAlignment* alignRes = phaseAligner.getTrackAlignment(trkTarget);
+
+  std::vector<float> alignedTarget(N);
+  phaseAligner.processTrack(trkTarget, targetSig.data(), alignedTarget.data(), N);
+
+  TEST_ASSERT(aligned && alignRes != nullptr && alignRes->polarityInverted &&
+              fabs(alignRes->measuredDelaySamples - 24.0) < 1.0 &&
+              alignRes->lowEndPowerGainDb >= 3.0f,
+              "Multi-Mic Phase Aligner validates 24-sample lag cross-correlation, polarity flip detection, and low-end bass gain recovery");
+
+  // 145. Polyphonic Spectral Audio Morphing, Formant Envelope & Hybrid Chimera
+  Jazz::JZSpectralAudioMorphEngine morphEngine(48000.0f, 512);
+  morphEngine.setMorphMode(Jazz::SpectralMorphMode::FORMANT_CROSS_SYNTHESIS);
+  morphEngine.setMorphFactor(0.5f);
+  morphEngine.setFormantPreservation(0.8f);
+
+  const size_t M = 128;
+  std::vector<float> aL(M, 0.4f), aR(M, 0.4f);
+  std::vector<float> bL(M, 0.6f), bR(M, 0.6f);
+  std::vector<float> outMorphL(M), outMorphR(M);
+
+  morphEngine.processMorph(aL.data(), aR.data(), bL.data(), bR.data(), outMorphL.data(), outMorphR.data(), M);
+
+  morphEngine.setMorphMode(Jazz::SpectralMorphMode::HYBRID_CHIMERA);
+  morphEngine.processMorph(aL.data(), aR.data(), bL.data(), bR.data(), outMorphL.data(), outMorphR.data(), M);
+
+  TEST_ASSERT(morphEngine.getMorphFactor() == 0.5f && morphEngine.getFormantPreservation() == 0.8f &&
+              outMorphL[0] > 0.1f && outMorphL[0] < 0.9f && fabs(outMorphL[0] - outMorphR[0]) < 0.0001f,
+              "Spectral Audio Morpher validates formant cross-synthesis, 50% morph factor interpolation, and hybrid chimera transmutation");
+
+  // 146. Adaptive Hermode Tuning, Dynamic Just Intonation & 0-Cent Beating 3rds
+  Jazz::JZAdaptiveHermodeTuningEngine hermode(Jazz::TemperamentMode::HERMODE_DYNAMIC_JUST, 440.0f);
+  hermode.setTuningDepth(1.0f);
+
+  hermode.noteOn(60, 100);
+  hermode.noteOn(64, 100);
+  hermode.noteOn(67, 100);
+
+  float offsetRootC = hermode.getPitchOffsetCents(60);
+  float offsetThirdE = hermode.getPitchOffsetCents(64);
+  float offsetFifthG = hermode.getPitchOffsetCents(67);
+  std::string chordName = hermode.getDetectedChordName();
+
+  double freqE4Just = hermode.noteToFrequencyHz(64);
+  double freqE4_12TET = 440.0 * std::pow(2.0, (64 - 69) / 12.0);
+
+  TEST_ASSERT(hermode.getActiveNoteCount() == 3 && chordName.find("Major") != std::string::npos &&
+              fabs(offsetRootC) < 0.01f && fabs(offsetThirdE - (-13.69f)) < 0.1f &&
+              fabs(offsetFifthG - 1.96f) < 0.1f && freqE4Just < freqE4_12TET,
+              "Adaptive Hermode Engine validates C Major chord detection, -13.69c pure Just major 3rd, and +1.96c pure 5th retuning");
+
+  // 147. Binaural Virtual Studio Monitor Simulator, 60-Deg Cross-Feed & ITD Delay
+  Jazz::JZVirtualStudioMonitorSimulator studioSim(48000.0f,
+                                                  Jazz::VirtualStudioRoom::ABBEY_ROAD_STUDIO_3,
+                                                  Jazz::VirtualSpeakerModel::NEARFIELD_NS10M);
+  studioSim.setCrossfeedAmount(100.0f);
+  studioSim.setRoomAmbienceAmount(50.0f);
+
+  const size_t S = 128;
+  std::vector<float> pannedL(S, 0.8f), pannedR(S, 0.0f);
+  std::vector<float> binauralL(S), binauralR(S);
+  studioSim.process(pannedL.data(), pannedR.data(), binauralL.data(), binauralR.data(), S);
+
+  float crossfeedInRightEar = binauralR[30];
+
+  TEST_ASSERT(studioSim.getRoomProfile() == Jazz::VirtualStudioRoom::ABBEY_ROAD_STUDIO_3 &&
+              studioSim.getSpeakerModel() == Jazz::VirtualSpeakerModel::NEARFIELD_NS10M &&
+              binauralL[30] > 0.4f && crossfeedInRightEar > 0.05f && crossfeedInRightEar < binauralL[30],
+              "Virtual Studio Simulator validates Abbey Road 3 acoustics, 60-degree crossfeed ITD/ILD, and NS-10M nearfield response");
+
+  // 148. Psychoacoustic DSSS Watermark, Cryptographic SHA-256 Provenance & ISRC
+  Jazz::JZAudioWatermarkProvenanceEngine watermarkEngine(0x5A827999);
+  const size_t W = 2048;
+  std::vector<float> testAudioL(W), testAudioR(W);
+  for (size_t i = 0; i < W; ++i) {
+    float t = static_cast<float>(i) / 48000.0f;
+    testAudioL[i] = 0.5f * std::sin(2.0f * 3.14159f * 440.0f * t);
+    testAudioR[i] = 0.5f * std::sin(2.0f * 3.14159f * 440.0f * t);
+  }
+
+  uint32_t payload = 0xDEADBEEF;
+  bool embedOk = watermarkEngine.embedWatermark(testAudioL.data(), testAudioR.data(), W, payload, 0.003f);
+
+  uint32_t detectedPayload = 0;
+  float confidence = 0.0f;
+  bool detectOk = watermarkEngine.detectWatermark(testAudioL.data(), testAudioR.data(), W, detectedPayload, confidence);
+
+  Jazz::AudioProvenanceMetadata meta = watermarkEngine.generateProvenancePackage(
+      "Sovereign Anthem", "Jazz Orchestra", "US-JAZ-26-00042", "T-034.524.680-1",
+      testAudioL.data(), testAudioR.data(), W, payload);
+  bool hashMatch = watermarkEngine.verifyAudioIntegrity(testAudioL.data(), testAudioR.data(), W, meta.sha256AudioHash);
+  std::string bextChunk = watermarkEngine.exportBwfBextMetadata(meta);
+
+  TEST_ASSERT(embedOk && detectOk && detectedPayload == payload && confidence > 0.5f &&
+              hashMatch && meta.sha256AudioHash.length() == 64 &&
+              bextChunk.find("US-JAZ-26-00042") != std::string::npos,
+              "Watermark Provenance Engine validates 32-bit DSSS watermark embedding/extraction, SHA-256 hashing, and BWF ISRC packaging");
 }
 
 //-----------------------------------------------------------------------------

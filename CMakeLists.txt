@@ -112,6 +112,7 @@ include_directories(
 
 set(JAZZ_SOURCES
     src/AboutDialog.cpp
+    src/AdaptiveHermodeTuningEngine.cpp
     src/AdmBwfSpatialMetadataEngine.cpp
     src/AiMelodyCounterpointGenerator.cpp
     src/AnalogTapeFlutterModeler.cpp
@@ -126,6 +127,7 @@ set(JAZZ_SOURCES
     src/AudioRestorationEngine.cpp
     src/AudioTimeStretch.cpp
     src/AudioToMidiTranscriber.cpp
+    src/AudioWatermarkProvenanceEngine.cpp
     src/AudioWaveform.cpp
     src/AutoAccompaniment.cpp
     src/AutomationEngine.cpp
@@ -242,6 +244,7 @@ set(JAZZ_SOURCES
     src/MpeEngine.cpp
     src/MultibandCompressor.cpp
     src/MultibandOttProcessor.cpp
+    src/MultiMicPhaseAlignerEngine.cpp
     src/MultiVelocitySampler.cpp
     src/Metronome.cpp
     src/MouseAction.cpp
@@ -287,6 +290,7 @@ set(JAZZ_SOURCES
     src/SoundGenerator.cpp
     src/SpatialAudioPanner.cpp
     src/SpatialHeadTracker.cpp
+    src/SpectralAudioMorphEngine.cpp
     src/SpectralDenoise.cpp
     src/SpectralRebalanceEngine.cpp
     src/SpectralResonanceTamer.cpp
@@ -304,6 +308,7 @@ set(JAZZ_SOURCES
     src/TapeConsoleWarmer.cpp
     src/ThroughZeroFlanger.cpp
     src/VintageLofiProcessor.cpp
+    src/VirtualStudioMonitorSimulator.cpp
     src/ToolBar.cpp
     src/Track.cpp
     src/TrackFrame.cpp
@@ -316,6 +321,7 @@ set(JAZZ_SOURCES
     src/VocalHarmonizer.cpp
     src/VocalPitchEditor.cpp
     src/VocoderEngine.cpp
+    src/VolterraDynamicConvolutionEngine.cpp
     src/WasapiAudioDriver.cpp
     src/WavetableSynth.cpp
     src/WindTubePhysicalModel.cpp

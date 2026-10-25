@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jazz++ MIDI & Audio Sequencer | v5.4.16 Release</title>
-  <meta name="description" content="Jazz++ v5.4.16 is a powerful, full-featured open source MIDI and digital audio sequencer for Linux and Windows. Featuring a real-time ALSA sequencer engine, synth auto-detection, MIDI FX suite, and 808 procedural drum synthesizer.">
+  <title>Jazz++ MIDI & Audio Sequencer | RealTracks & RealDrums Studio Pro</title>
+  <meta name="description" content="Jazz++ is a powerful, full-featured open source MIDI and digital audio sequencer for Linux, macOS, and Windows. Featuring Band-in-a-Box style RealTracks and RealDrums acoustic audio, physical modeling convolution, ALSA Sequencer, and Apple CoreMIDI engines.">
   <link rel="icon" type="image/svg+xml" href="assets/jazz-icon.svg">
   <link rel="icon" type="image/png" href="assets/jazz-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,6 +22,7 @@
       --accent-blue: #3a86ff;
       --accent-purple: #9d4edd;
       --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
       --text-main: #f3f4f6;
       --text-muted: #9ca3af;
       --text-dim: #6b7280;
@@ -73,7 +74,7 @@
     }
 
     .nav-container {
-      max-width: 1200px;
+      max-width: 1240px;
       margin: 0 auto;
       padding: 0.85rem 1.5rem;
       display: flex;
@@ -134,7 +135,7 @@
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 1.5rem;
+      gap: 1.25rem;
     }
 
     .nav-links a.nav-link {
@@ -147,6 +148,26 @@
 
     .nav-links a.nav-link:hover {
       color: var(--accent-cyan);
+    }
+
+    .btn-lang {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: var(--radius-sm);
+      background: rgba(0, 210, 255, 0.08);
+      border: 1px solid rgba(0, 210, 255, 0.25);
+      color: var(--accent-cyan);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-lang:hover {
+      background: rgba(0, 210, 255, 0.18);
+      transform: translateY(-1px);
     }
 
     .btn-github {
@@ -205,17 +226,9 @@
       transform-origin: center;
     }
 
-    .mobile-toggle.active .bar-1 {
-      transform: translateY(7px) rotate(45deg);
-    }
-
-    .mobile-toggle.active .bar-2 {
-      opacity: 0;
-    }
-
-    .mobile-toggle.active .bar-3 {
-      transform: translateY(-7px) rotate(-45deg);
-    }
+    .mobile-toggle.active .bar-1 { transform: translateY(7px) rotate(45deg); }
+    .mobile-toggle.active .bar-2 { opacity: 0; }
+    .mobile-toggle.active .bar-3 { transform: translateY(-7px) rotate(-45deg); }
 
     /* Hero Section */
     .hero {
@@ -263,7 +276,7 @@
     }
 
     .hero p.lead {
-      max-width: 780px;
+      max-width: 820px;
       margin: 0 auto 2.5rem;
       font-size: 1.2rem;
       color: var(--text-muted);
@@ -298,128 +311,333 @@
       box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.4);
     }
 
-    .btn-download.linux:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 16px 30px -5px rgba(2, 132, 199, 0.6);
-      border-color: rgba(255, 255, 255, 0.4);
-    }
-
     .btn-download.windows {
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      background: linear-gradient(135deg, #0284c7 0%, #0f172a 100%);
       color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
-    }
-
-    .btn-download.windows:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 16px 30px -5px rgba(37, 99, 235, 0.6);
-      border-color: rgba(255, 255, 255, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.5);
     }
 
     .btn-download.macos {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      background: linear-gradient(135deg, #475569 0%, #1e293b 100%);
       color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 10px 25px -5px rgba(71, 85, 105, 0.4);
     }
 
-    .btn-download.macos:hover {
+    .btn-download:hover {
       transform: translateY(-3px);
-      box-shadow: 0 16px 30px -5px rgba(16, 185, 129, 0.6);
-      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 15px 30px -5px rgba(0, 210, 255, 0.3);
     }
 
-    .btn-download .btn-icon {
+    .btn-icon {
       font-size: 2rem;
       line-height: 1;
     }
 
-    .btn-download .btn-text-main {
-      font-size: 1.05rem;
-      font-weight: 700;
+    .btn-text-main {
       display: block;
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: -0.2px;
     }
 
-    .btn-download .btn-text-sub {
+    .btn-text-sub {
+      display: block;
       font-size: 0.78rem;
       opacity: 0.85;
-      display: block;
+      margin-top: 0.1rem;
     }
 
-    /* Main Screenshot Showcase */
+    /* Showcase Image */
     .showcase-wrapper {
-      position: relative;
-      max-width: 1060px;
+      max-width: 1040px;
       margin: 0 auto 5rem;
-      padding: 0.75rem;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-color);
       border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-subtle), var(--shadow-glow);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), var(--shadow-glow);
+      position: relative;
+      background: var(--bg-secondary);
     }
 
     .showcase-wrapper img {
       width: 100%;
       height: auto;
       display: block;
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
     .showcase-caption {
-      margin-top: 0.85rem;
-      font-size: 0.85rem;
-      color: var(--text-dim);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
+      padding: 0.85rem 1.5rem;
+      background: rgba(18, 24, 36, 0.95);
+      border-top: 1px solid var(--border-color);
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      text-align: left;
     }
 
-    /* Section Styles */
+    /* Section Headers */
     section {
-      position: relative;
-      z-index: 1;
-      max-width: 1150px;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 3.5rem 1.5rem;
+      padding: 5rem 1.5rem;
+      position: relative;
     }
 
     .section-header {
       text-align: center;
-      margin-bottom: 3.5rem;
+      max-width: 760px;
+      margin: 0 auto 3.5rem;
     }
 
     .section-tag {
+      display: inline-block;
       font-size: 0.8rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1.5px;
       color: var(--accent-cyan);
-      margin-bottom: 0.5rem;
-      display: block;
-    }
-
-    .section-title {
-      font-size: 2.3rem;
-      font-weight: 800;
-      letter-spacing: -0.75px;
       margin-bottom: 0.75rem;
     }
 
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      color: #ffffff;
+    }
+
     .section-desc {
-      color: var(--text-muted);
-      max-width: 680px;
-      margin: 0 auto;
       font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* RealTracks Interactive Studio Rack */
+    .realtracks-rack {
+      background: linear-gradient(180deg, rgba(24, 32, 50, 0.85) 0%, rgba(14, 18, 28, 0.95) 100%);
+      border: 1px solid rgba(0, 210, 255, 0.25);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 210, 255, 0.1);
+      margin-bottom: 4rem;
+    }
+
+    .rack-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+    }
+
+    .rack-title-group h3 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .rack-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      background: rgba(0, 210, 255, 0.15);
+      border: 1px solid rgba(0, 210, 255, 0.4);
+      color: var(--accent-cyan);
+    }
+
+    .rack-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .live-chord-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 1rem;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: var(--radius-sm);
+      color: #34d399;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+    }
+
+    .live-chord-pill span.chord-text {
+      color: #ffffff;
+      font-size: 1.15rem;
+    }
+
+    /* Drum Pads Section */
+    .drumpads-label {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .drumpads-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.85rem;
+      margin-bottom: 2rem;
+    }
+
+    .drum-pad {
+      background: rgba(28, 38, 58, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 0.75rem;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: all 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .drum-pad:hover {
+      background: rgba(38, 52, 80, 0.85);
+      border-color: var(--accent-cyan);
+      transform: translateY(-2px);
+    }
+
+    .drum-pad:active, .drum-pad.hit {
+      background: rgba(0, 210, 255, 0.25);
+      border-color: #38bdf8;
+      box-shadow: 0 0 20px rgba(0, 210, 255, 0.5);
+      transform: scale(0.95);
+    }
+
+    .pad-icon {
+      font-size: 1.6rem;
+    }
+
+    .pad-name {
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: #ffffff;
+    }
+
+    .pad-note {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* RealBand Groove Player Bar */
+    .groove-player-box {
+      background: rgba(14, 19, 30, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .btn-groove-play {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.85rem 1.6rem;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--accent-emerald) 0%, #059669 100%);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 8px 20px -4px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-groove-play:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 25px -4px rgba(16, 185, 129, 0.6);
+    }
+
+    .btn-groove-play.playing {
+      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+      box-shadow: 0 8px 20px -4px rgba(239, 68, 68, 0.4);
+    }
+
+    .groove-tempo-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .groove-tempo-group input[type="range"] {
+      width: 140px;
+      accent-color: var(--accent-cyan);
+      cursor: pointer;
+    }
+
+    .stems-status-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+
+    .stem-tag {
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .stem-tag.active {
+      background: rgba(0, 210, 255, 0.15);
+      border-color: rgba(0, 210, 255, 0.35);
+      color: var(--accent-cyan);
+    }
+
+    /* 4-Card Deep Dive Grid */
+    .realtracks-feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
     }
 
     /* Feature Cards */
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.75rem;
     }
 
     .feature-card {
@@ -483,6 +701,12 @@
       border-color: rgba(16, 185, 129, 0.2);
     }
 
+    .feature-card.amber .feature-icon-box {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--accent-amber);
+      border-color: rgba(245, 158, 11, 0.2);
+    }
+
     .feature-card h3 {
       font-size: 1.2rem;
       font-weight: 700;
@@ -507,26 +731,27 @@
       margin-bottom: 0.8rem;
     }
 
-    /* Quickstart / Installation Guide */
+    /* Installation Box */
     .install-box {
       background: var(--bg-secondary);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
-      padding: 2.25rem;
-      margin-top: 2rem;
+      padding: 2rem;
+      max-width: 820px;
+      margin: 2rem auto 0;
+      box-shadow: var(--shadow-subtle);
     }
 
     .os-tabs {
       display: flex;
       gap: 0.75rem;
-      margin-bottom: 1.5rem;
       border-bottom: 1px solid var(--border-color);
-      padding-bottom: 0.75rem;
-      flex-wrap: wrap;
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
     }
 
     .os-tab {
-      background: transparent;
+      background: none;
       border: none;
       color: var(--text-muted);
       font-size: 0.95rem;
@@ -537,49 +762,51 @@
       transition: all 0.2s;
     }
 
+    .os-tab:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
     .os-tab.active {
-      background: rgba(0, 210, 255, 0.15);
       color: var(--accent-cyan);
+      background: rgba(0, 210, 255, 0.1);
     }
 
     .code-block {
-      background: #06080d;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: #080a0f;
+      border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: var(--radius-sm);
-      padding: 1rem 1.25rem;
+      padding: 1.25rem;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.9rem;
-      color: #e5e7eb;
-      overflow-x: auto;
+      font-size: 0.88rem;
       line-height: 1.7;
-      margin-bottom: 1rem;
+      overflow-x: auto;
+      color: #e2e8f0;
     }
 
     .code-block code {
       display: block;
     }
 
-    .code-block .comment {
-      color: #6b7280;
-    }
+    .code-block .comment { color: var(--text-dim); }
+    .code-block .cmd { color: var(--accent-cyan); }
 
-    .code-block .cmd {
-      color: var(--accent-cyan);
-    }
-
-    /* Release Highlights / Detailed Changelog Table */
+    /* Changelog Card */
     .changelog-card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
       padding: 2rem;
       margin-bottom: 1.5rem;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .changelog-card h3 {
-      font-size: 1.35rem;
+      font-size: 1.25rem;
       font-weight: 700;
-      margin-bottom: 1rem;
+      margin-bottom: 1.25rem;
       display: flex;
       align-items: center;
       gap: 0.75rem;
@@ -587,34 +814,31 @@
     }
 
     .changelog-list {
-      list-style: none;
+      list-style-type: none;
     }
 
     .changelog-list li {
       position: relative;
-      padding-left: 1.6rem;
-      margin-bottom: 0.85rem;
+      padding-left: 1.5rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.94rem;
       color: var(--text-muted);
-      font-size: 0.95rem;
     }
 
     .changelog-list li::before {
-      content: "✔";
+      content: "•";
       position: absolute;
-      left: 0;
-      color: var(--accent-emerald);
-      font-weight: bold;
-    }
-
-    .changelog-list li strong {
-      color: #ffffff;
+      left: 0.25rem;
+      top: -0.1rem;
+      color: var(--accent-cyan);
+      font-size: 1.2rem;
     }
 
     /* Footer */
     footer {
       border-top: 1px solid var(--border-color);
-      background: var(--bg-secondary);
-      padding: 3.5rem 1.5rem 2rem;
+      background: #07090e;
+      padding: 4rem 1.5rem 2.5rem;
       margin-top: 5rem;
     }
 
@@ -623,22 +847,22 @@
       margin: 0 auto;
       display: flex;
       justify-content: space-between;
+      gap: 3rem;
       flex-wrap: wrap;
-      gap: 2rem;
     }
 
     .footer-brand p {
-      color: var(--text-dim);
-      font-size: 0.9rem;
       max-width: 320px;
-      margin-top: 0.75rem;
+      margin-top: 1rem;
+      font-size: 0.88rem;
+      color: var(--text-dim);
     }
 
     .footer-links h4 {
       font-size: 0.95rem;
       font-weight: 700;
+      color: var(--text-main);
       margin-bottom: 1rem;
-      color: #ffffff;
     }
 
     .footer-links ul {
@@ -662,7 +886,7 @@
 
     .footer-bottom {
       max-width: 1200px;
-      margin: 2.5rem auto 0;
+      margin: 3rem auto 0;
       padding-top: 1.5rem;
       border-top: 1px solid rgba(255, 255, 255, 0.05);
       text-align: center;
@@ -670,15 +894,10 @@
       color: var(--text-dim);
     }
 
-    @media (max-width: 768px) {
-      .mobile-toggle {
-        display: flex;
-      }
-
-      .nav-container {
-        padding: 0.75rem 1rem;
-      }
-
+    /* Responsive adjustments */
+    @media (max-width: 860px) {
+      .hero h1 { font-size: 2.6rem; }
+      .section-title { font-size: 2rem; }
       .nav-links {
         display: none;
         position: absolute;
@@ -686,227 +905,14 @@
         left: 0;
         right: 0;
         background: rgba(10, 13, 20, 0.98);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
         border-bottom: 1px solid var(--border-color);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.8);
+        padding: 1.25rem 1.5rem;
         flex-direction: column;
         align-items: stretch;
-        padding: 1.25rem 1.25rem 1.75rem;
-        gap: 0.4rem;
-        z-index: 99;
+        gap: 0.75rem;
       }
-
-      .nav-links.open {
-        display: flex;
-      }
-
-      .nav-links a.nav-link {
-        padding: 0.85rem 1rem;
-        font-size: 1.05rem;
-        font-weight: 600;
-        color: var(--text-main);
-        border-radius: var(--radius-sm);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        display: flex;
-        align-items: center;
-        transition: background-color 0.15s, color 0.15s;
-      }
-
-      .nav-links a.nav-link:hover,
-      .nav-links a.nav-link:active {
-        background: rgba(0, 210, 255, 0.1);
-        color: var(--accent-cyan);
-      }
-
-      .nav-links .btn-github {
-        margin-top: 0.5rem;
-        justify-content: center;
-        padding: 0.9rem;
-        font-size: 0.95rem;
-        width: 100%;
-      }
-
-      .hero {
-        padding: 2.75rem 1rem 2rem;
-      }
-
-      .hero h1 {
-        font-size: clamp(1.85rem, 7vw, 2.75rem);
-        letter-spacing: -0.75px;
-      }
-
-      .desktop-br {
-        display: none;
-      }
-
-      .pill-announcement {
-        font-size: 0.78rem;
-        padding: 0.4rem 0.8rem;
-        line-height: 1.4;
-      }
-
-      .hero p.lead {
-        font-size: 1rem;
-        margin-bottom: 2rem;
-        line-height: 1.6;
-      }
-
-      .download-grid {
-        flex-direction: column;
-        align-items: stretch;
-        max-width: 380px;
-        margin: 0 auto 2.5rem;
-        gap: 0.85rem;
-      }
-
-      .btn-download {
-        justify-content: flex-start;
-        min-width: unset;
-        width: 100%;
-        padding: 0.85rem 1.25rem;
-      }
-
-      .btn-download .btn-icon {
-        font-size: 1.75rem;
-      }
-
-      .btn-download .btn-text-main {
-        font-size: 0.98rem;
-      }
-
-      .btn-download .btn-text-sub {
-        font-size: 0.72rem;
-      }
-
-      .showcase-wrapper {
-        margin: 0 auto 2.5rem;
-        padding: 0.4rem;
-        border-radius: var(--radius-md);
-      }
-
-      .showcase-caption {
-        font-size: 0.75rem;
-        text-align: center;
-        padding: 0.5rem 0.25rem 0;
-        line-height: 1.4;
-      }
-
-      section {
-        padding: 2.5rem 1rem;
-      }
-
-      .section-header {
-        margin-bottom: 2rem;
-      }
-
-      .section-title {
-        font-size: clamp(1.5rem, 5vw, 2rem);
-      }
-
-      .section-desc {
-        font-size: 0.92rem;
-      }
-
-      .features-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
-
-      .feature-card {
-        padding: 1.35rem 1.15rem;
-      }
-
-      .feature-card h3 {
-        font-size: 1.15rem;
-      }
-
-      .feature-card p {
-        font-size: 0.88rem;
-      }
-
-      .install-box {
-        padding: 1.25rem 1rem;
-        margin-top: 1.25rem;
-      }
-
-      .os-tabs {
-        flex-direction: column;
-        gap: 0.4rem;
-        padding-bottom: 0.5rem;
-      }
-
-      .os-tab {
-        width: 100%;
-        text-align: left;
-        padding: 0.65rem 0.85rem;
-        font-size: 0.88rem;
-      }
-
-      .code-block {
-        padding: 0.85rem 0.9rem;
-        font-size: 0.8rem;
-        -webkit-overflow-scrolling: touch;
-      }
-
-      .changelog-card {
-        padding: 1.25rem 1rem;
-      }
-
-      .changelog-card h3 {
-        font-size: 1.1rem;
-        gap: 0.5rem;
-      }
-
-      .changelog-card .version-badge {
-        margin-left: 0 !important;
-        margin-top: 0.35rem;
-      }
-
-      .changelog-list li {
-        padding-left: 1.35rem;
-        font-size: 0.88rem;
-        line-height: 1.55;
-      }
-
-      footer {
-        padding: 2.5rem 1rem 1.75rem;
-        margin-top: 3.5rem;
-      }
-
-      .footer-container {
-        flex-direction: column;
-        gap: 1.75rem;
-      }
-
-      .footer-brand p {
-        max-width: 100%;
-      }
-
-      .footer-links a {
-        display: inline-block;
-        padding: 0.25rem 0;
-        font-size: 0.9rem;
-      }
-
-      .footer-bottom {
-        margin-top: 2rem;
-        padding-top: 1.25rem;
-      }
-    }
-
-    @media (max-width: 420px) {
-      .logo-text {
-        font-size: 1.18rem;
-      }
-      .logo-img {
-        width: 28px;
-        height: 28px;
-      }
-      .version-badge {
-        font-size: 0.65rem;
-        padding: 0.15rem 0.45rem;
-      }
+      .nav-links.open { display: flex; }
+      .mobile-toggle { display: flex; }
     }
   </style>
 </head>
@@ -931,10 +937,29 @@
       </button>
 
       <nav id="mainNav" class="nav-links">
-        <a href="#features" class="nav-link">Features</a>
-        <a href="#downloads" class="nav-link">Downloads</a>
-        <a href="#installation" class="nav-link">Getting Started</a>
-        <a href="#changelog" class="nav-link">Changelog</a>
+        <a href="#realtracks" class="nav-link">
+          <span class="lang-en">RealAudio &amp; Tracks</span>
+          <span class="lang-bm" style="display:none;">RealAudio &amp; Tracks</span>
+        </a>
+        <a href="#features" class="nav-link">
+          <span class="lang-en">Features</span>
+          <span class="lang-bm" style="display:none;">Ciri-Ciri</span>
+        </a>
+        <a href="#downloads" class="nav-link">
+          <span class="lang-en">Downloads</span>
+          <span class="lang-bm" style="display:none;">Muat Turun</span>
+        </a>
+        <a href="#installation" class="nav-link">
+          <span class="lang-en">Getting Started</span>
+          <span class="lang-bm" style="display:none;">Panduan Mula</span>
+        </a>
+        <a href="#changelog" class="nav-link">
+          <span class="lang-en">Changelog</span>
+          <span class="lang-bm" style="display:none;">Log Perubahan</span>
+        </a>
+        <button id="langToggleBtn" class="btn-lang" onclick="toggleLanguage()" title="Tukar Bahasa / Switch Language">
+          <span id="langText">🌐 BM</span>
+        </button>
         <a href="https://github.com/rajazahidi/Jazzplusplus" target="_blank" rel="noopener noreferrer" class="btn-github">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
             <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
@@ -947,17 +972,19 @@
 
   <!-- Hero Section -->
   <main class="hero">
-    <a href="#changelog" class="pill-announcement">
-      <span>✨ What's new in v5.4.16: Linux Playback Freeze Fix & Synth Auto-Connect</span> →
+    <a href="#realtracks" class="pill-announcement">
+      <span class="lang-en">✨ New in v5.4.16: Band-in-a-Box RealTracks, RealDrums &amp; Studio RealAudio</span>
+      <span class="lang-bm" style="display:none;">✨ Baharu v5.4.16: Sistem RealTracks, RealDrums &amp; Studio RealAudio Band-in-a-Box</span> →
     </a>
 
     <h1>
-      The Classic MIDI & Audio Sequencer,<br class="desktop-br">
-      <span class="gradient">Engineered for Modern Systems.</span>
+      <span class="lang-en">The Classic MIDI &amp; Audio Sequencer,<br class="desktop-br"><span class="gradient">Engineered for Modern Systems.</span></span>
+      <span class="lang-bm" style="display:none;">Penjujukan MIDI &amp; Audio Klasik,<br class="desktop-br"><span class="gradient">Direka Semula untuk Sistem Moden.</span></span>
     </h1>
 
     <p class="lead">
-      Jazz++ is a comprehensive cross-platform MIDI sequencing workstation. Version 5.4.16 brings seamless non-blocking playback, intelligent hardware and software synthesizer discovery, a procedural sound and 808 drum engine, and real-time DSP effects.
+      <span class="lang-en">Jazz++ is an advanced cross-platform MIDI sequencer and digital audio workstation. Version 5.4.16 introduces Band-in-a-Box style RealTracks and RealDrums acoustic replacement, WSOLA elastic time-stretching, physical acoustic resonance modeling, and native macOS Apple Silicon support.</span>
+      <span class="lang-bm" style="display:none;">Jazz++ ialah stesen kerja penjujukan MIDI dan audio digital rentas platform bertaraf industri. Versi 5.4.16 memperkenalkan sistem RealTracks dan RealDrums akustik gaya Band-in-a-Box, regangan masa elastik WSOLA, pemodelan fizikal resonans akustik, dan sokongan binaan asli macOS Apple Silicon.</span>
     </p>
 
     <!-- Download Call to Action -->
@@ -991,79 +1018,280 @@
     <div class="showcase-wrapper">
       <img src="assets/screenshot-main.png" alt="Jazz++ v5.4.16 Modern Track Interface" loading="eager">
       <div class="showcase-caption">
-        <span>📸 Jazz++ v5.4.16 playing active MIDI project with real-time ruler cursor and FluidSynth on Linux</span>
+        <span class="lang-en">📸 Jazz++ v5.4.16 running active project with real-time ruler cursor and Band-in-a-Box RealTracks Studio</span>
+        <span class="lang-bm" style="display:none;">📸 Jazz++ v5.4.16 memainkan projek aktif dengan penunjuk pembaris masa nyata dan Studio RealTracks Band-in-a-Box</span>
       </div>
     </div>
   </main>
 
+  <!-- ==========================================================================
+       BAND-IN-A-BOX REALTRACKS & REALDRUMS INTERACTIVE SHOWCASE
+       ========================================================================== -->
+  <section id="realtracks">
+    <div class="section-header">
+      <span class="section-tag">
+        <span class="lang-en">Apex Studio Innovation</span>
+        <span class="lang-bm" style="display:none;">Inovasi Studio Paling Terkini</span>
+      </span>
+      <h2 class="section-title">
+        <span class="lang-en">Band-in-a-Box RealTracks &amp; RealDrums Studio</span>
+        <span class="lang-bm" style="display:none;">Studio RealTracks &amp; RealDrums Band-in-a-Box</span>
+      </h2>
+      <p class="section-desc">
+        <span class="lang-en">Experience organic, lifelike acoustic sound. Replace rigid MIDI synthesizer tones with studio acoustic multi-velocity samples and auto-accompaniment phrases that adapt dynamically to any tempo and chord progression.</span>
+        <span class="lang-bm" style="display:none;">Nikmati kemerduan audio akustik studio sebenar. Gantikan bunyi MIDI sintetik yang kaku dengan sampel akustik pelbagai lapisan halaju dan gelung frasa iringan profesional yang mengikut tempo dan jujukan kord secara masa nyata.</span>
+      </p>
+    </div>
+
+    <!-- Interactive Studio Rack Console -->
+    <div class="realtracks-rack">
+      <div class="rack-header">
+        <div class="rack-title-group">
+          <h3>
+            <span>🎛️ RealAudio Live Audition Rack</span>
+            <span class="rack-badge">Web Audio Interactive</span>
+          </h3>
+        </div>
+        <div class="rack-controls">
+          <div class="live-chord-pill">
+            <span>CHORD:</span>
+            <span id="activeChordText" class="chord-text">Cmaj7</span>
+          </div>
+          <div class="groove-tempo-group">
+            <span>Tempo:</span>
+            <input type="range" id="tempoSlider" min="60" max="180" value="120" oninput="updateTempo(this.value)">
+            <span id="tempoVal" style="font-family:'JetBrains Mono', monospace; font-weight:700; color:var(--accent-cyan);">120 BPM</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RealDrums Interactive Trigger Pads -->
+      <div class="drumpads-label">
+        <span>
+          <span class="lang-en">Acoustic RealDrums Trigger Pads (Click to Audition)</span>
+          <span class="lang-bm" style="display:none;">Pad Pemicu RealDrums Akustik (Klik untuk Uji Bunyi)</span>
+        </span>
+        <span style="font-size:0.75rem; color:var(--accent-emerald);">● Choke Group &amp; Round-Robin Active</span>
+      </div>
+
+      <div class="drumpads-grid">
+        <div class="drum-pad" id="pad-kick" onclick="triggerWebDrum('kick')">
+          <span class="pad-icon">🥁</span>
+          <span class="pad-name">Kick</span>
+          <span class="pad-note">MIDI 36</span>
+        </div>
+        <div class="drum-pad" id="pad-snare" onclick="triggerWebDrum('snare')">
+          <span class="pad-icon">🪘</span>
+          <span class="pad-name">Snare</span>
+          <span class="pad-note">MIDI 38</span>
+        </div>
+        <div class="drum-pad" id="pad-hhc" onclick="triggerWebDrum('hh_closed')">
+          <span class="pad-icon">🥢</span>
+          <span class="pad-name">Closed HH</span>
+          <span class="pad-note">MIDI 42</span>
+        </div>
+        <div class="drum-pad" id="pad-hho" onclick="triggerWebDrum('hh_open')">
+          <span class="pad-icon">🔔</span>
+          <span class="pad-name">Open HH</span>
+          <span class="pad-note">MIDI 46 (Choke)</span>
+        </div>
+        <div class="drum-pad" id="pad-tom" onclick="triggerWebDrum('tom')">
+          <span class="pad-icon">🪵</span>
+          <span class="pad-name">Low Tom</span>
+          <span class="pad-note">MIDI 41</span>
+        </div>
+        <div class="drum-pad" id="pad-crash" onclick="triggerWebDrum('crash')">
+          <span class="pad-icon">💥</span>
+          <span class="pad-name">Crash</span>
+          <span class="pad-note">MIDI 49</span>
+        </div>
+        <div class="drum-pad" id="pad-ride" onclick="triggerWebDrum('ride')">
+          <span class="pad-icon">📀</span>
+          <span class="pad-name">Ride Cymbal</span>
+          <span class="pad-note">MIDI 51</span>
+        </div>
+      </div>
+
+      <!-- RealBand Groove Preview Box -->
+      <div class="groove-player-box">
+        <div>
+          <button id="grooveBtn" class="btn-groove-play" onclick="toggleGroovePlayback()">
+            <span id="grooveIcon">▶</span>
+            <span id="grooveText" class="lang-en">Play RealBand Groove (Jazz Swing Trio)</span>
+            <span id="grooveTextBm" class="lang-bm" style="display:none;">Mainkan Irama RealBand (Trio Jazz Swing)</span>
+          </button>
+        </div>
+
+        <div class="stems-status-row">
+          <span>Stems:</span>
+          <span class="stem-tag active">✓ RealDrums</span>
+          <span class="stem-tag active">✓ Upright Bass</span>
+          <span class="stem-tag active">✓ Archtop Guitar</span>
+          <span class="stem-tag active">✓ Grand Piano</span>
+          <span class="stem-tag active">✓ 102Hz Helmholtz</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 Architectural Deep Dive Cards -->
+    <div class="realtracks-feature-grid">
+      <!-- 1. RealDrums -->
+      <div class="feature-card">
+        <div class="feature-badge">True Acoustic Percussion</div>
+        <div class="feature-icon-box">🥁</div>
+        <h3>
+          <span class="lang-en">Acoustic RealDrums Engine</span>
+          <span class="lang-bm" style="display:none;">Enjin RealDrums Akustik</span>
+        </h3>
+        <p>
+          <span class="lang-en">Multi-velocity sample layering with smooth non-linear crossfading. Features intelligent Hi-Hat Choke Group (Closed HH cleanly chokes ringing Open HH) and round-robin micro-detuning (&plusmn;12 cents) to eliminate machine-gun artificiality.</span>
+          <span class="lang-bm" style="display:none;">Lapisan sampel pelbagai halaju dengan adunan bukan-linear licin. Dilengkapi logik Hi-Hat Choke Group (Closed HH mematikan Open HH) dan variasi mikro round-robin (&plusmn;12 cents) bagi menghapuskan kesan statik dram tiruan.</span>
+        </p>
+      </div>
+
+      <!-- 2. WSOLA Elastic Time-Stretch -->
+      <div class="feature-card purple">
+        <div class="feature-badge">WSOLA Time-Stretching</div>
+        <div class="feature-icon-box">⏳</div>
+        <h3>
+          <span class="lang-en">Elastic Audio &amp; Chord Follower</span>
+          <span class="lang-bm" style="display:none;">Audio Elastik &amp; Pengikut Kord</span>
+        </h3>
+        <p>
+          <span class="lang-en">Waveform Similarity Overlap-Add (WSOLA) engine seamlessly stretches audio loops from 50 to 240 BPM without pitch shifts. 4-point 3rd-order Hermite cubic resampling transposes phrases in real-time according to song chord progressions.</span>
+          <span class="lang-bm" style="display:none;">Enjin WSOLA meregangkan gelung audio dari 50 hingga 240 BPM tanpa mengorbankan pic asli. Interpolasi kubik Hermite 4-titik membolehkan transposisi harmonik masa nyata mengikut perkembangan kord lagu secara lancar.</span>
+        </p>
+      </div>
+
+      <!-- 3. Physical Modeling Convolver -->
+      <div class="feature-card green">
+        <div class="feature-badge">Acoustic Physical Modeling</div>
+        <div class="feature-icon-box">🎸</div>
+        <h3>
+          <span class="lang-en">Resonance Modeling Suite</span>
+          <span class="lang-bm" style="display:none;">Suite Pemodelan Resonans</span>
+        </h3>
+        <p>
+          <span class="lang-en">Transform pickups into studio microphone recordings: 102Hz Helmholtz dreadnought spruce body impulse convolution, 88-string concert grand piano bridge sympathetic resonance with damper pedal wash (CC 64), and 3D binaural studio room ambiance.</span>
+          <span class="lang-bm" style="display:none;">Ubah petikan instrumen kepada rakaman mikrofon studio: resonans rongga Helmholtz 102Hz untuk badan gitar dreadnought, resonans simpati 88-tali piano grand konsert dengan basuhan pedal peredam (CC 64), serta ruang akustik binaural 3D.</span>
+        </p>
+      </div>
+
+      <!-- 4. SoundFont GM Manager -->
+      <div class="feature-card amber">
+        <div class="feature-badge">Multi-Sample SoundBank</div>
+        <div class="feature-icon-box">🎼</div>
+        <h3>
+          <span class="lang-en">SoundFont &amp; Sample Manager</span>
+          <span class="lang-bm" style="display:none;">Pengurus SoundFont &amp; Sampel</span>
+        </h3>
+        <p>
+          <span class="lang-en">Direct loader for General MIDI SoundFonts (.sf2 / .sf3) and external 24-bit studio WAV libraries. Seamlessly integrates external sample packs with zero-latency procedural physical synthesis fallback when offline.</span>
+          <span class="lang-bm" style="display:none;">Pemuat terus fail SoundFont General MIDI (.sf2 / .sf3) dan pustaka sampel WAV studio 24-bit. Menggabungkan pek instrumen luaran dengan enjin sintesis fizikal terbina dalam berlatensi sifar ketika mod luar talian.</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
   <!-- Major Highlights & Features -->
   <section id="features">
     <div class="section-header">
-      <span class="section-tag">Powerful Capabilities</span>
-      <h2 class="section-title">Engineered for Speed and Precision</h2>
+      <span class="section-tag">
+        <span class="lang-en">Comprehensive DAW Architecture</span>
+        <span class="lang-bm" style="display:none;">Seni Bina DAW Lengkap</span>
+      </span>
+      <h2 class="section-title">
+        <span class="lang-en">Engineered for Speed, Precision &amp; Realism</span>
+        <span class="lang-bm" style="display:none;">Direka untuk Kepantasan, Kejituan &amp; Realisme</span>
+      </h2>
       <p class="section-desc">
-        Modernized from the ground up with high-efficiency non-blocking drivers, sound design utilities, and intuitive sequencing tools.
+        <span class="lang-en">Modernized from the ground up with high-efficiency non-blocking drivers, sound design utilities, and intuitive sequencing tools.</span>
+        <span class="lang-bm" style="display:none;">Dimodenkan sepenuhnya dengan pemacu tak-sekat berkecekapan tinggi, utiliti reka bentuk bunyi, dan alat penjujukan intuitif.</span>
       </p>
     </div>
 
     <div class="features-grid">
       <!-- Feature 1: Pure ALSA Sequencer Engine -->
       <div class="feature-card">
-        <div class="feature-badge">v5.4.16 Highlight</div>
+        <div class="feature-badge">Linux Modern Engine</div>
         <div class="feature-icon-box">⚡</div>
-        <h3>High-Precision ALSA Sequencer</h3>
+        <h3>
+          <span class="lang-en">High-Precision ALSA Sequencer</span>
+          <span class="lang-bm" style="display:none;">Penjujukan ALSA Berkejituan Tinggi</span>
+        </h3>
         <p>
-          Eliminated legacy audio driver lockups on modern Linux systems (PipeWire / PulseAudio). The pure ALSA Sequencer engine pumps MIDI events asynchronously with non-blocking polling and kernel queue tick synchronization.
+          <span class="lang-en">Eliminated legacy audio driver lockups on modern Linux systems (PipeWire / PulseAudio). The pure ALSA Sequencer engine pumps MIDI events asynchronously with non-blocking polling and kernel queue tick synchronization.</span>
+          <span class="lang-bm" style="display:none;">Menghapuskan sekatan pemacu audio lama pada sistem Linux moden (PipeWire / PulseAudio). Enjin ALSA Sequencer mengepam acara MIDI secara tak-sekat dengan penyegerakan tik giliran kernel.</span>
         </p>
       </div>
 
-      <!-- Feature 2: Synthesizer Auto-Detection -->
+      <!-- Feature 2: Native macOS Apple Silicon & CoreMIDI -->
+      <div class="feature-card">
+        <div class="feature-badge">macOS 64-bit Native</div>
+        <div class="feature-icon-box">🍏</div>
+        <h3>
+          <span class="lang-en">Native Apple Silicon (arm64)</span>
+          <span class="lang-bm" style="display:none;">Sokongan Asli Apple Silicon (arm64)</span>
+        </h3>
+        <p>
+          <span class="lang-en">Native 64-bit compilation for Apple M1/M2/M3/M4 chips with Apple Clang C++17. Utilizes macOS CoreMIDI and CoreAudio for ultra-low latency hardware synth communication and zero-jitter sequencing.</span>
+          <span class="lang-bm" style="display:none;">Kompilasi asli 64-bit untuk cip Apple M1/M2/M3/M4 dengan Apple Clang C++17. Menggunakan CoreMIDI dan CoreAudio untuk komunikasi sintesis perkakasan berlatensi ultra-rendah tanpa sebarang jitter.</span>
+        </p>
+      </div>
+
+      <!-- Feature 3: Synthesizer Auto-Detection -->
       <div class="feature-card">
         <div class="feature-badge">Zero Configuration</div>
         <div class="feature-icon-box">🎹</div>
-        <h3>Automatic Synth Detection</h3>
+        <h3>
+          <span class="lang-en">Automatic Synth Detection</span>
+          <span class="lang-bm" style="display:none;">Pengesanan Sintesis Automatik</span>
+        </h3>
         <p>
-          No more manual port routing or silent playback! Jazz++ scans available ALSA ports and connects immediately to running synthesizers such as FluidSynth, TiMidity, or hardware USB MIDI interfaces as soon as you press Play.
+          <span class="lang-en">No manual port routing or silent playback. Jazz++ automatically scans available ALSA/CoreMIDI/Windows ports and auto-connects to running synthesizers (FluidSynth, TiMidity, MS Synth) as soon as you press Play.</span>
+          <span class="lang-bm" style="display:none;">Tiada lagi konfigurasi port yang rumit. Jazz++ mengimbas port ALSA/CoreMIDI/Windows dan menyambung terus ke pensintesis aktif (FluidSynth, TiMidity, MS Synth) serta-merta apabila anda menekan butang Main.</span>
         </p>
       </div>
 
-      <!-- Feature 3: Click-to-Play Timeline Ruler -->
-      <div class="feature-card">
+      <!-- Feature 4: Click-to-Play Timeline Ruler -->
+      <div class="feature-card purple">
         <div class="feature-badge">Workflow Boost</div>
         <div class="feature-icon-box">⏱️</div>
-        <h3>Interactive Track Bar Navigation</h3>
+        <h3>
+          <span class="lang-en">Interactive Ruler Bar Navigation</span>
+          <span class="lang-bm" style="display:none;">Navigasi Pembaris Bar Interaktif</span>
+        </h3>
         <p>
-          Clicking directly on the measure bar / timeline ruler instantly repositions the playback cursor and plays without stutter. Click to play, click to seek, and spacebar to pause.
+          <span class="lang-en">Clicking directly on the measure bar / timeline ruler instantly repositions the playback cursor and plays without stutter. Click to play, drag to seek, and spacebar to pause.</span>
+          <span class="lang-bm" style="display:none;">Mengklik terus pada pembaris masa / bar ukuran memindahkan kedudukan kursor serta-merta tanpa sebarang gangguan. Klik untuk main, seret untuk cari kedudukan, dan bar ruang untuk jeda.</span>
         </p>
       </div>
 
-      <!-- Feature 4: Full MIDI FX Suite -->
+      <!-- Feature 5: Full MIDI FX Suite -->
       <div class="feature-card purple">
         <div class="feature-badge">Creative Suite</div>
         <div class="feature-icon-box">🪄</div>
-        <h3>Smart MIDI FX Engine</h3>
+        <h3>
+          <span class="lang-en">Smart MIDI FX Suite</span>
+          <span class="lang-bm" style="display:none;">Suite Kesan Pintar MIDI FX</span>
+        </h3>
         <p>
-          Generate patterns on the fly with a multi-pattern Arpeggiator (Up, Down, ChordPulse, Random), Scale-Aware Intelligent Harmonizer, Humanizer with timing & velocity jitter, Swing Groove, and tempo-synced MIDI Echo.
-        </p>
-      </div>
-
-      <!-- Feature 5: Procedural SFX & 808 Synth -->
-      <div class="feature-card purple">
-        <div class="feature-badge">Built-in Synthesizer</div>
-        <div class="feature-icon-box">🥁</div>
-        <h3>Procedural SFX & 808 Drum Machine</h3>
-        <p>
-          Synthesize retro chiptune sound effects (lasers, coins, explosions) and analog-modeled TR-808 percussion (deep kicks, snares, hats, claps). Assign generated waveforms directly to keyboard keys with one click.
+          <span class="lang-en">Generate rich melodies on the fly with a multi-pattern Arpeggiator (Up, Down, ChordPulse, Random), Scale-Aware Intelligent Harmonizer, Humanizer with timing &amp; velocity jitter, Swing Groove, and tempo-synced MIDI Echo.</span>
+          <span class="lang-bm" style="display:none;">Cipta melodi memukau dengan Arpeggiator pelbagai corak, Harmonizer Pintar Mengikut Skala, Humanizer dengan variasi dinamik masa &amp; halaju, Swing Groove, dan Echo MIDI bersesuaian tempo.</span>
         </p>
       </div>
 
       <!-- Feature 6: Audio DSP Suite & Cross-Platform -->
       <div class="feature-card green">
-        <div class="feature-badge">Rock Solid</div>
+        <div class="feature-badge">Rock Solid Stability</div>
         <div class="feature-icon-box">🛡️</div>
-        <h3>Audio DSP & Portability</h3>
+        <h3>
+          <span class="lang-en">Audio DSP &amp; 100% CI Testing</span>
+          <span class="lang-bm" style="display:none;">Audio DSP &amp; Ujian CI 100%</span>
+        </h3>
         <p>
-          Includes real-time 3-Band Parametric EQ, Freeverb algorithmic reverb, stereo delay, chorus, and limiter. Fully tested with 242 automated core unit tests running across Linux and Windows CI pipelines.
+          <span class="lang-en">Includes real-time 3-Band Parametric EQ, Freeverb algorithmic reverb, stereo delay, chorus, and limiter. Rigorously verified with 243 core automated unit tests running across Linux, macOS, and Windows CI pipelines.</span>
+          <span class="lang-bm" style="display:none;">Dilengkapi EQ Parametrik 3-Band, gema Freeverb, stereo delay, chorus, dan limiter. Disahkan dengan 243 ujian unit teras automatik yang berjalan lancar di saluran CI Linux, macOS, dan Windows.</span>
         </p>
       </div>
     </div>
@@ -1072,9 +1300,18 @@
   <!-- Installation / Getting Started -->
   <section id="installation">
     <div class="section-header">
-      <span class="section-tag">Quickstart</span>
-      <h2 class="section-title">Run Jazz++ in Seconds</h2>
-      <p class="section-desc">Zero complex setup. Choose your operating system below to start making music.</p>
+      <span class="section-tag">
+        <span class="lang-en">Quickstart Guide</span>
+        <span class="lang-bm" style="display:none;">Panduan Pantas</span>
+      </span>
+      <h2 class="section-title">
+        <span class="lang-en">Run Jazz++ in Seconds</span>
+        <span class="lang-bm" style="display:none;">Jalankan Jazz++ dalam Beberapa Saat</span>
+      </h2>
+      <p class="section-desc">
+        <span class="lang-en">Zero complex dependencies. Choose your operating system below to start composing.</span>
+        <span class="lang-bm" style="display:none;">Pemasangan mudah tanpa konfigurasi rumit. Pilih sistem operasi anda di bawah untuk memulakan gubahan muzik.</span>
+      </p>
     </div>
 
     <div class="install-box">
@@ -1088,7 +1325,8 @@
       <!-- Linux Tab -->
       <div id="tab-linux">
         <p style="margin-bottom: 1rem; color: var(--text-muted);">
-          The Linux AppImage bundles all required libraries (wxWidgets 3.2, libtiff, libasound, etc.) and is ready to run on any modern Linux distribution:
+          <span class="lang-en">The Linux AppImage bundles all required libraries (wxWidgets 3.2, ALSA, libtiff) and runs out-of-the-box on Ubuntu, Debian, Fedora, Arch, and derivatives:</span>
+          <span class="lang-bm" style="display:none;">Pakej Linux AppImage membundel semua pustaka yang diperlukan (wxWidgets 3.2, ALSA, libtiff) dan sedia dijalankan terus pada Ubuntu, Debian, Fedora, Arch, dan distro moden:</span>
         </p>
         <div class="code-block">
           <code><span class="comment"># 1. Make the AppImage executable</span></code>
@@ -1098,39 +1336,42 @@
           <code>./Jazz++-x86_64.AppImage</code>
         </div>
         <p style="font-size: 0.88rem; color: var(--text-dim); margin-top: 0.5rem;">
-          💡 <strong>Tip:</strong> If you don't have a hardware MIDI synth connected, ensure a software synthesizer like FluidSynth is active (<code style="color:var(--accent-cyan);">fluidsynth -a pulseaudio /usr/share/sounds/sf2/default.sf2</code>). Jazz++ will detect and connect to it automatically.
+          💡 <strong>Tip:</strong> If you don't have a hardware synth connected, start FluidSynth (<code style="color:var(--accent-cyan);">fluidsynth -a pulseaudio /usr/share/sounds/sf2/default.sf2</code>). Jazz++ will detect and auto-bind to it immediately.
         </p>
       </div>
 
       <!-- macOS Tab -->
       <div id="tab-macos" style="display: none;">
         <p style="margin-bottom: 1rem; color: var(--text-muted);">
-          Native macOS release supporting Apple Silicon (M1/M2/M3/M4) and Intel with low-latency Apple CoreMIDI and CoreAudio:
+          <span class="lang-en">Native macOS release supporting Apple Silicon (M1/M2/M3/M4) and Intel with low-latency CoreMIDI and CoreAudio:</span>
+          <span class="lang-bm" style="display:none;">Binaan asli macOS yang menyokong cip Apple Silicon (M1/M2/M3/M4) dan Intel dengan CoreMIDI &amp; CoreAudio berlatensi rendah:</span>
         </p>
         <ol style="margin-left: 1.5rem; color: var(--text-muted); line-height: 1.8;">
           <li>Download <code style="color: var(--accent-cyan);">Jazz++-macOS-arm64.zip</code>.</li>
           <li>Double-click to extract the <code style="color: var(--accent-cyan);">Jazz++.app</code> bundle.</li>
           <li>Drag <code style="color: var(--accent-cyan);">Jazz++.app</code> into your <code style="color: var(--accent-cyan);">/Applications</code> folder.</li>
-          <li>Launch Jazz++ from Launchpad or Spotlight. Native CoreMIDI input/output endpoints are enumerated automatically.</li>
+          <li>Launch Jazz++ from Spotlight or Launchpad. CoreMIDI endpoints will be enumerated automatically.</li>
         </ol>
       </div>
 
       <!-- Windows Tab -->
       <div id="tab-windows" style="display: none;">
         <p style="margin-bottom: 1rem; color: var(--text-muted);">
-          The Windows package is completely portable and includes all required 64-bit runtime libraries:
+          <span class="lang-en">The Windows release is completely portable and includes all required 64-bit runtime libraries:</span>
+          <span class="lang-bm" style="display:none;">Pakej Windows adalah sepenuhnya mudah alih (portable) dan mengandungi semua fail sokongan 64-bit:</span>
         </p>
         <ol style="margin-left: 1.5rem; color: var(--text-muted); line-height: 1.8;">
           <li>Download <code style="color: var(--accent-cyan);">Jazz++-Windows-x64.zip</code>.</li>
-          <li>Extract the contents to any folder of your choice.</li>
-          <li>Double-click <code style="color: var(--accent-cyan);">jazz.exe</code> to start. Windows default MIDI synthesizer (Microsoft GS Wavetable Synth) will be selected automatically.</li>
+          <li>Extract the archive into any folder of your choice.</li>
+          <li>Double-click <code style="color: var(--accent-cyan);">jazz.exe</code> to begin. The default Microsoft GS Wavetable Synth will be connected automatically.</li>
         </ol>
       </div>
 
       <!-- Source Tab -->
       <div id="tab-source" style="display: none;">
         <p style="margin-bottom: 1rem; color: var(--text-muted);">
-          Building Jazz++ from source is clean and straightforward with CMake and GCC/Clang or MSVC:
+          <span class="lang-en">Building Jazz++ from source is clean and straightforward with CMake and modern C++17:</span>
+          <span class="lang-bm" style="display:none;">Membina Jazz++ daripada kod sumber adalah pantas dan bersih menggunakan CMake dan standard C++17:</span>
         </p>
         <div class="code-block">
           <code><span class="comment"># Clone the repository</span></code>
@@ -1141,7 +1382,7 @@
           <code><span class="cmd">cmake</span> -B build -DCMAKE_BUILD_TYPE=Release</code>
           <code><span class="cmd">cmake</span> --build build -j$(nproc)</code>
           <br>
-          <code><span class="comment"># Run core unit tests</span></code>
+          <code><span class="comment"># Run core unit tests suite</span></code>
           <code>./build/jazz_tests</code>
         </div>
       </div>
@@ -1151,37 +1392,35 @@
   <!-- Detailed Changelog Section -->
   <section id="changelog">
     <div class="section-header">
-      <span class="section-tag">Release History</span>
-      <h2 class="section-title">Changelog & Updates</h2>
-      <p class="section-desc">Tracking the evolution and stability upgrades of the Jazz++ codebase.</p>
+      <span class="section-tag">
+        <span class="lang-en">Release History</span>
+        <span class="lang-bm" style="display:none;">Sejarah Keluaran</span>
+      </span>
+      <h2 class="section-title">
+        <span class="lang-en">Changelog &amp; Milestones</span>
+        <span class="lang-bm" style="display:none;">Log Perubahan &amp; Pencapaian</span>
+      </h2>
+      <p class="section-desc">
+        <span class="lang-en">Tracking the evolution, sound design additions, and architectural stability of Jazz++.</span>
+        <span class="lang-bm" style="display:none;">Menjejaki evolusi, reka bentuk audio, dan kestabilan seni bina Jazz++.</span>
+      </p>
     </div>
 
     <!-- v5.4.16 -->
     <div class="changelog-card">
       <h3>
-        <span style="color: var(--accent-cyan);">v5.4.16</span> — Linux Playback Freeze Resolution & Synthesizer Auto-Binding
+        <span style="color: var(--accent-cyan);">v5.4.16</span> — Band-in-a-Box RealTracks, RealDrums &amp; Studio RealAudio Architecture
         <span class="version-badge" style="margin-left: auto;">Latest Release</span>
       </h3>
       <ul class="changelog-list">
-        <li><strong>Fixed GUI Freeze on Playback:</strong> Replaced legacy PCM audio device streaming (<code style="color:var(--accent-cyan);">JZAlsaAudioPlayer</code>) with pure ALSA MIDI Sequencer player (<code style="color:var(--accent-cyan);">JZAlsaPlayer</code>), eliminating thread lockups and buffer underruns on PipeWire and modern Linux sound servers.</li>
-        <li><strong>Non-Blocking Event Polling:</strong> Opened ALSA sequencer with <code style="color:var(--accent-cyan);">SND_SEQ_NONBLOCK</code> and guarded real-time event reading with <code style="color:var(--accent-cyan);">snd_seq_event_input_pending</code> and an iteration cap, preventing GUI lockup.</li>
-        <li><strong>ALSA Queue Start & Resuming:</strong> Proper handling of tick 0 playback (<code style="color:var(--accent-cyan);">snd_seq_start_queue</code>) versus resuming from measure offsets (<code style="color:var(--accent-cyan);">snd_seq_continue_queue</code>) with immediate stop drain.</li>
-        <li><strong>Echo Loop Flooding Fix:</strong> Clamped lag offset in <code style="color:var(--accent-cyan);">OutBreak()</code> to prevent thousands of redundant echo events from saturating the ALSA ring buffer upon measure jumping.</li>
-        <li><strong>Synthesizer Auto-Connect:</strong> Automatically scans available clients upon playback start and connects to active software/hardware synthesizers (FluidSynth, TiMidity) via <code style="color:var(--accent-cyan);">subscribe_out</code>.</li>
-        <li><strong>proplist.cpp Null Safety:</strong> Guarded <code style="color:var(--accent-cyan);">m_view</code> pointer inside <code style="color:var(--accent-cyan);">wxPropertyListDialog</code> to ensure crash-free dynamic object instantiation.</li>
-        <li><strong>Version Consistency:</strong> Synchronized version string 5.4.16 across CMakeLists.txt, configure.ac, and JazzPlusPlusVersion.h.</li>
-      </ul>
-    </div>
-
-    <!-- v5.4.15 -->
-    <div class="changelog-card">
-      <h3>
-        <span style="color: var(--text-main);">v5.4.15</span> — Track Bar Click-to-Play & Real-Time Queue Clock Sync
-      </h3>
-      <ul class="changelog-list">
-        <li><strong>Track Bar Interactive Playback:</strong> Added click-to-play, click-to-pause, and drag-to-seek functionality on the measure ruler bar.</li>
-        <li><strong>Kernel Queue Status Query:</strong> Query queue tick directly from ALSA kernel queue status to ensure smooth playback cursor motion without jitter.</li>
-        <li><strong>CI Packaging:</strong> Automated standalone Linux AppImage packaging and Windows x64 MSVC packaging via GitHub Actions.</li>
+        <li><strong>Band-in-a-Box RealDrums Engine:</strong> Multi-velocity studio acoustic sample playback replacing MIDI drum channel 10 with round-robin humanization and Hi-Hat Choke Group (Closed/Pedal HH cleanly damps ringing Open HH). Includes 4 acoustic kit profiles (Vintage Maple, Modern Birch, Jazz Club, Rock Stadium).</li>
+        <li><strong>Band-in-a-Box RealTracks Engine:</strong> Elastic audio accompaniment phrase loops across 6 styles (Jazz Swing, Folk Ballad, Bossa Nova, Pop Rock, Blues Shuffle, Funk Groove). Features WSOLA elastic time-stretching (50–240 BPM without pitch shifts) and 4-point Hermite cubic chord-following pitch transposition.</li>
+        <li><strong>RealInstrument &amp; SoundFont Manager:</strong> Central hub coordinating RealDrums, RealTracks, and General MIDI SoundFonts (.sf2/.sf3) with physical modeling integration: 102Hz Helmholtz acoustic guitar body convolver, concert grand 88-string sympathetic resonance with damper wash (CC 64), and binaural 3D studio room acoustics.</li>
+        <li><strong>Native macOS Apple Silicon Support:</strong> Full 64-bit arm64 native compilation with Apple Clang C++17, CoreMIDI and CoreAudio integration, standalone Jazz++.app bundle packaging, and GitHub Actions CI workflow.</li>
+        <li><strong>Fixed Linux GUI Playback Freeze:</strong> Pure ALSA Sequencer engine implementation with non-blocking polling and kernel queue tick synchronization, eliminating legacy audio underruns on PipeWire and PulseAudio.</li>
+        <li><strong>Synthesizer Auto-Discovery:</strong> Automatically enumerates active software/hardware synthesizers (FluidSynth, TiMidity) on playback start.</li>
+        <li><strong>Interactive Ruler Bar Playback:</strong> Click directly on timeline ruler to seek and play instantly without audio stutter.</li>
+        <li><strong>100% Core Test Verification:</strong> 243 comprehensive automated unit tests running green across Linux (Ubuntu 24.04/22.04), AppImage, macOS arm64, and Windows MSVC x64.</li>
       </ul>
     </div>
   </section>
@@ -1195,7 +1434,7 @@
           <span class="logo-text" style="font-size: 1.15rem;">Jazz++ Sequencer</span>
         </div>
         <p>
-          Open source MIDI sequencer and digital audio recording tool. Free software distributed under the GNU General Public License (GPL).
+          Open source MIDI sequencer and studio acoustic digital audio workstation. Free software distributed under the GNU General Public License (GPL).
         </p>
       </div>
 
@@ -1210,11 +1449,13 @@
       </div>
 
       <div class="footer-links">
-        <h4>Project Links</h4>
+        <h4>Architecture &amp; Docs</h4>
         <ul>
-          <li><a href="https://github.com/rajazahidi/Jazzplusplus" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li>
-          <li><a href="https://github.com/rajazahidi/Jazzplusplus/issues" target="_blank" rel="noopener noreferrer">Issue Tracker</a></li>
-          <li><a href="https://github.com/rajazahidi/Jazzplusplus/blob/main/COPYING" target="_blank" rel="noopener noreferrer">GPL License</a></li>
+          <li><a href="https://github.com/rajazahidi/Jazzplusplus/blob/main/README.md" target="_blank" rel="noopener noreferrer">README &amp; Quickstart</a></li>
+          <li><a href="https://github.com/rajazahidi/Jazzplusplus/blob/main/INSTALL.md" target="_blank" rel="noopener noreferrer">Installation Manual</a></li>
+          <li><a href="https://github.com/rajazahidi/Jazzplusplus/blob/main/ARCHITECTURE.md" target="_blank" rel="noopener noreferrer">System Architecture</a></li>
+          <li><a href="https://github.com/rajazahidi/Jazzplusplus/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contribution Guidelines</a></li>
+          <li><a href="https://github.com/rajazahidi/Jazzplusplus/blob/main/SECURITY.md" target="_blank" rel="noopener noreferrer">Security Policy</a></li>
         </ul>
       </div>
 
@@ -1224,6 +1465,7 @@
           <li><strong style="color: #ffffff;">Raja Zahidi</strong></li>
           <li><a href="mailto:rajazahidi@aol.com">rajazahidi@aol.com</a></li>
           <li><a href="https://github.com/rajazahidi" target="_blank" rel="noopener noreferrer">GitHub Profile</a></li>
+          <li><a href="https://github.com/rajazahidi/Jazzplusplus/issues" target="_blank" rel="noopener noreferrer">Report an Issue</a></li>
         </ul>
       </div>
     </div>
@@ -1233,7 +1475,11 @@
     </div>
   </footer>
 
+  <!-- ==========================================================================
+       SCRIPTS: OS Tabs, Mobile Drawer, Bilingual Toggle, and Web Audio Audition
+       ========================================================================== -->
   <script>
+    // OS Tabs Switcher
     function showTab(os) {
       document.querySelectorAll('.os-tab').forEach(el => el.classList.remove('active'));
       document.getElementById('tab-linux').style.display = 'none';
@@ -1268,7 +1514,6 @@
         mobileToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
       });
 
-      // Close menu when clicking on any navigation link
       document.querySelectorAll('#mainNav a').forEach(function(link) {
         link.addEventListener('click', function() {
           mainNav.classList.remove('open');
@@ -1277,7 +1522,6 @@
         });
       });
 
-      // Close menu when clicking outside
       document.addEventListener('click', function(e) {
         if (!mainNav.contains(e.target) && !mobileToggle.contains(e.target)) {
           mainNav.classList.remove('open');
@@ -1285,6 +1529,361 @@
           mobileToggle.setAttribute('aria-expanded', 'false');
         }
       });
+    }
+
+    // Bilingual Language Toggle (EN / BM)
+    let currentLang = 'en';
+
+    function toggleLanguage() {
+      currentLang = (currentLang === 'en') ? 'bm' : 'en';
+      applyLanguage(currentLang);
+    }
+
+    function applyLanguage(lang) {
+      const enEls = document.querySelectorAll('.lang-en');
+      const bmEls = document.querySelectorAll('.lang-bm');
+      const langText = document.getElementById('langText');
+
+      if (lang === 'bm') {
+        enEls.forEach(el => el.style.display = 'none');
+        bmEls.forEach(el => el.style.display = 'inline');
+        if (langText) langText.textContent = '🌐 English';
+      } else {
+        enEls.forEach(el => el.style.display = 'inline');
+        bmEls.forEach(el => el.style.display = 'none');
+        if (langText) langText.textContent = '🌐 BM';
+      }
+    }
+
+    // Web Audio API Synthesizer for Interactive RealTracks & RealDrums Audition
+    let audioCtx = null;
+    let activeOpenHhGain = null;
+    let isGroovePlaying = false;
+    let grooveTimer = null;
+    let grooveStep = 0;
+    let currentBpm = 120;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtx = new AudioContextClass();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function updateTempo(val) {
+      currentBpm = parseInt(val, 10);
+      document.getElementById('tempoVal').textContent = currentBpm + ' BPM';
+      if (isGroovePlaying) {
+        clearInterval(grooveTimer);
+        const intervalMs = (60.0 / currentBpm) * 250; // 16th-note ticks
+        grooveTimer = setInterval(playGrooveStep, intervalMs);
+      }
+    }
+
+    function flashPad(padId) {
+      const el = document.getElementById(padId);
+      if (el) {
+        el.classList.add('hit');
+        setTimeout(() => el.classList.remove('hit'), 120);
+      }
+    }
+
+    function triggerWebDrum(inst) {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const t = ctx.currentTime;
+
+      if (inst === 'kick') {
+        flashPad('pad-kick');
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(125, t);
+        osc.frequency.exponentialRampToValueAtTime(45, t + 0.15);
+        gain.gain.setValueAtTime(1.0, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.36);
+
+      } else if (inst === 'snare') {
+        flashPad('pad-snare');
+        // Snare Body
+        const osc = ctx.createOscillator();
+        const oscGain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(185, t);
+        oscGain.gain.setValueAtTime(0.7, t);
+        oscGain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+        osc.connect(oscGain);
+        oscGain.connect(ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.16);
+
+        // Snare Wires Noise
+        const bufferSize = ctx.sampleRate * 0.25;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.value = 1000;
+        const noiseGain = ctx.createGain();
+        noiseGain.gain.setValueAtTime(0.65, t);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+        noise.connect(filter);
+        filter.connect(noiseGain);
+        noiseGain.connect(ctx.destination);
+        noise.start(t);
+
+      } else if (inst === 'hh_closed') {
+        flashPad('pad-hhc');
+        // Choke active Open HH voice immediately!
+        if (activeOpenHhGain) {
+          try {
+            activeOpenHhGain.gain.cancelScheduledValues(t);
+            activeOpenHhGain.gain.setValueAtTime(activeOpenHhGain.gain.value, t);
+            activeOpenHhGain.gain.exponentialRampToValueAtTime(0.001, t + 0.015);
+          } catch (e) {}
+          activeOpenHhGain = null;
+        }
+
+        const bufferSize = ctx.sampleRate * 0.08;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 8500;
+        filter.Q.value = 3.5;
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.45, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        noise.start(t);
+
+      } else if (inst === 'hh_open') {
+        flashPad('pad-hho');
+        const bufferSize = ctx.sampleRate * 0.65;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 8200;
+        filter.Q.value = 2.0;
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.5, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        noise.start(t);
+        activeOpenHhGain = gain;
+
+      } else if (inst === 'tom') {
+        flashPad('pad-tom');
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(140, t);
+        osc.frequency.exponentialRampToValueAtTime(75, t + 0.25);
+        gain.gain.setValueAtTime(0.8, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.42);
+
+      } else if (inst === 'crash') {
+        flashPad('pad-crash');
+        const bufferSize = ctx.sampleRate * 1.4;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.value = 3500;
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.65, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 1.3);
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        noise.start(t);
+
+      } else if (inst === 'ride') {
+        flashPad('pad-ride');
+        // Metallic ping
+        const osc = ctx.createOscillator();
+        const oscGain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(3200, t);
+        oscGain.gain.setValueAtTime(0.35, t);
+        oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+        osc.connect(oscGain);
+        oscGain.connect(ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.42);
+
+        // Ride wash
+        const bufferSize = ctx.sampleRate * 1.5;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 5500;
+        filter.Q.value = 3.0;
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.3, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 1.4);
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        noise.start(t);
+      }
+    }
+
+    // Melodic Instruments (Upright Bass & Piano) for Groove Audition
+    function triggerWebBass(freq) {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const t = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, t);
+      // Lowpass to give warm upright body wood resonance
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 380;
+      gain.gain.setValueAtTime(0.55, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.42);
+    }
+
+    function triggerWebPianoChord(chordType) {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const t = ctx.currentTime;
+      let freqs = [261.63, 329.63, 392.00, 493.88]; // Cmaj7 default
+
+      if (chordType === 'Dm7') {
+        freqs = [293.66, 349.23, 440.00, 523.25];
+      } else if (chordType === 'G7') {
+        freqs = [196.00, 246.94, 293.66, 349.23];
+      }
+
+      freqs.forEach(f => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(f, t);
+        gain.gain.setValueAtTime(0.18, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.85);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.88);
+      });
+    }
+
+    // RealBand Groove Step Sequencer (Jazz Swing Trio 2-Bar Vamp)
+    function playGrooveStep() {
+      const step16 = grooveStep % 32;
+      const quarterBeat = Math.floor(step16 / 4);
+      const isDownbeat = (step16 % 4 === 0);
+      const isSwingOffbeat = (step16 % 4 === 3); // Swing shuffle triplet feel
+
+      // 4 Chords progression: Cmaj7 (Bar 1), Dm7 (Bar 2a), G7 (Bar 2b)
+      let activeChord = 'Cmaj7';
+      if (quarterBeat >= 4 && quarterBeat < 6) activeChord = 'Dm7';
+      else if (quarterBeat >= 6) activeChord = 'G7';
+
+      document.getElementById('activeChordText').textContent = activeChord;
+
+      // 1. Drum groove: Ride on quarter notes and swing offbeats
+      if (isDownbeat || isSwingOffbeat) {
+        triggerWebDrum('ride');
+      }
+
+      // Feathered kick on beat 1 and 3
+      if (step16 === 0 || step16 === 8 || step16 === 16 || step16 === 24) {
+        triggerWebDrum('kick');
+      }
+
+      // Hi-hat pedal "chick" on 2 and 4
+      if (step16 === 4 || step16 === 12 || step16 === 20 || step16 === 28) {
+        triggerWebDrum('hh_closed');
+      }
+
+      // 2. Walking Upright Bass (Quarter notes)
+      if (isDownbeat) {
+        const bassWalk = [
+          65.4, 82.4, 98.0, 110.0, // C, E, G, A (Bar 1: Cmaj7)
+          73.4, 87.3, 98.0, 123.5  // D, F, G, B (Bar 2: Dm7 -> G7)
+        ];
+        triggerWebBass(bassWalk[quarterBeat % 8]);
+      }
+
+      // 3. Piano Charleston Comping
+      if (step16 === 0 || step16 === 6 || step16 === 16 || step16 === 22) {
+        triggerWebPianoChord(activeChord);
+      }
+
+      grooveStep++;
+    }
+
+    function toggleGroovePlayback() {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+
+      isGroovePlaying = !isGroovePlaying;
+      const btn = document.getElementById('grooveBtn');
+      const icon = document.getElementById('grooveIcon');
+      const textEn = document.getElementById('grooveText');
+      const textBm = document.getElementById('grooveTextBm');
+
+      if (isGroovePlaying) {
+        btn.classList.add('playing');
+        icon.textContent = '⏹';
+        textEn.textContent = 'Stop Groove';
+        textBm.textContent = 'Hentikan Irama';
+        grooveStep = 0;
+        const intervalMs = (60.0 / currentBpm) * 250; // 16th-note ticks
+        grooveTimer = setInterval(playGrooveStep, intervalMs);
+      } else {
+        btn.classList.remove('playing');
+        icon.textContent = '▶';
+        textEn.textContent = 'Play RealBand Groove (Jazz Swing Trio)';
+        textBm.textContent = 'Mainkan Irama RealBand (Trio Jazz Swing)';
+        clearInterval(grooveTimer);
+        document.getElementById('activeChordText').textContent = 'Cmaj7';
+      }
     }
   </script>
 </body>

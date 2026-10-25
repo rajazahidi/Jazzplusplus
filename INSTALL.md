@@ -46,6 +46,11 @@ Official pre-built standalone releases are generated on every release by our con
   3. Drag `Jazz++.app` into your `/Applications` directory.
   4. Launch Jazz++ from Finder, Spotlight, or Launchpad.
 
+- **Windows Setup Installer (.exe)**:
+  1. Download `Jazz++-Windows-x64-Setup-v6.0.0.exe`.
+  2. Run the installer wizard. It configures shortcuts, file associations (`.jaz`, `.mid`), and all required runtime DLLs.
+  3. Launch Jazz++ from the Start Menu or Desktop.
+
 - **Windows Portable ZIP**:
   1. Download `Jazz++-Windows-x64.zip`.
   2. Extract to your preferred location (e.g. `C:\Program Files\Jazz++` or desktop).
@@ -143,7 +148,17 @@ open build/jazz.app
 
 ### 3. Windows
 
-#### Option A: Pre-Compiled wxWidgets (Recommended)
+#### Option A: Automated Local Build Script (Fastest)
+
+Jazz++ provides a fully automated Windows build and test pipeline script:
+
+```powershell
+# Run the automated build pipeline and unit test runner
+.\build_local.ps1 -Config Release -RunTests
+```
+This script automatically discovers MSVC (VS 2022 Community/Professional), Windows 10/11 SDK, wxWidgets, and Ninja, compiles all translation units in parallel, deploys required runtime DLLs, and executes all 3,659 unit tests.
+
+#### Option B: Manual CMake & Ninja / Visual Studio Build
 
 1. Download **wxWidgets 3.2+** Development and Header 7z archives from [wxWidgets Releases](https://github.com/wxWidgets/wxWidgets/releases).
 2. Extract to a directory such as `D:\wxWidgets`.
@@ -172,7 +187,7 @@ cmake --build build --config Release --parallel
 
 ## Running Unit Tests
 
-Jazz++ includes a comprehensive automated DSP and core sequencing test suite (over 550 test assertions covering all 35 studio suites and audio engines).
+Jazz++ includes a comprehensive automated DSP and core sequencing test suite (over 3,659 unit tests covering all 35 studio suites, MIDI sequencing logic, DSP engines, and UI workflows).
 
 To execute the test suite:
 

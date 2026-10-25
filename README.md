@@ -3,7 +3,7 @@
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Site-00d2ff?logo=github)](https://rajazahidi.github.io/Jazzplusplus/)
 [![Latest Release](https://img.shields.io/github/v/release/rajazahidi/Jazzplusplus?color=10b981)](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v6.0.0)
 [![CI Build](https://github.com/rajazahidi/Jazzplusplus/actions/workflows/ci.yml/badge.svg)](https://github.com/rajazahidi/Jazzplusplus/actions/workflows/ci.yml)
-[![Tests: 555 Passing](https://img.shields.io/badge/Tests-555%20Passing%20(100%25)-10b981.svg)](tests/test_main.cpp)
+[![Tests: 3,659 Passing](https://img.shields.io/badge/Tests-3%2C659%20Passing%20(100%25)-10b981.svg)](tests/test_main.cpp)
 [![Platforms](https://img.shields.io/badge/Platforms-Linux%20%7C%20macOS%20%7C%20Windows-blue.svg)](INSTALL.md)
 [![C++ Standard](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](CMakeLists.txt)
 [![License: GPL-2.0](https://img.shields.io/badge/License-GPL_v2-blue.svg)](COPYING)
@@ -13,6 +13,21 @@
 Visit the official website: **[https://rajazahidi.github.io/Jazzplusplus/](https://rajazahidi.github.io/Jazzplusplus/)**
 
 Originally created by Andreas Voss and Per Sigmond, with subsequent development by Patrick Earl and Peter J. Stieber. Maintained, modernized, and expanded into a flagship Master Studio DAW by **Raja Zahidi** ([rajazahidi@aol.com](mailto:rajazahidi@aol.com)).
+
+---
+
+---
+
+## Downloads & Quick Installation (v6.0.0)
+
+| Platform | Package Format | Direct Download / Instructions |
+| :--- | :--- | :--- |
+| **Windows 10 / 11** | **Setup Installer (.exe)** | [**`Jazz++-Windows-x64-Setup-v6.0.0.exe`**](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v6.0.0) &mdash; Standard Windows installation with Start Menu integration |
+| **Windows 10 / 11** | **Portable (.zip)** | [**`Jazz++-Windows-x64.zip`**](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v6.0.0) &mdash; Standalone portable archive, extract and run `jazz.exe` directly |
+| **Linux (Universal)** | **AppImage (.AppImage)** | [**`Jazz++-x86_64.AppImage`**](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v6.0.0) &mdash; `chmod +x` and run on Ubuntu, Debian, Fedora, Arch |
+| **macOS (Apple Silicon)** | **App Bundle (.zip)** | [**`Jazz++-macOS-arm64.zip`**](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v6.0.0) &mdash; Native M1/M2/M3/M4 build, drag into `/Applications` |
+
+> **Note for Windows Defender / SmartScreen**: As an open-source community release, Windows SmartScreen may present a protection notification on first run. Click **"More info"** &rarr; **"Run anyway"** to launch. All binaries are built openly via GitHub Actions CI from 100% public source code.
 
 ---
 
@@ -406,7 +421,7 @@ Jazz++ enforces enterprise-grade stability with an automated GitHub Actions CI m
 - [`conf/`](conf/): Instrument maps (`.jzi`), drum sets, and default configuration (`jazz.cfg`).
 - [`song/`](song/): Demo songs (`.mid`), rhythm templates (`.rhy`), and sample audio files (`.wav`).
 - [`portmidi/`](portmidi/): Embedded PortMidi library source code supporting macOS CoreMIDI and cross-platform MIDI.
-- [`tests/`](tests/): Automated CTest unit test suite covering over 550 test assertions across all 35 studio suites.
+- [`tests/`](tests/): Automated CTest unit test suite covering 3,659 automated unit tests across all 35 studio suites.
 - [`resources/`](resources/): Vector SVG and multi-resolution PNG application icons.
 - [`scripts/`](scripts/): Packaging and launcher helper scripts (`build-appimage.sh`, `jazz-launcher.sh`).
 

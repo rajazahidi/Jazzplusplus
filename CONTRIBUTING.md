@@ -40,9 +40,15 @@ Feature requests and enhancement ideas are encouraged! When submitting a feature
    ```
 3. **Follow Coding Standards** (see below).
 4. **Ensure All Unit Tests Pass**:
-   ```bash
-   ctest --test-dir build --output-on-failure
-   ```
+   - On Linux / macOS:
+     ```bash
+     ctest --test-dir build --output-on-failure
+     ```
+   - On Windows:
+     ```powershell
+     .\build_local.ps1 -Config Release -RunTests
+     ```
+   All 3,659 unit tests must pass with 0 failures before opening a pull request.
 5. **Commit with Clear Messages**: Follow conventional commits (e.g., `feat(dsp): Add dynamic oversampling filter`, `fix(ui): Correct piano roll note snap`).
 6. **Push and Open a Pull Request**: Provide a concise summary of the changes and link to any relevant issues.
 

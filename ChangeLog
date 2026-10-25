@@ -1,4 +1,21 @@
 25-10-2026 Raja Zahidi
+- Release v6.0.0 Polish, Modernized Help Content & Cross-Platform CI:
+  * Help Documentation Overhaul (src/HelpFiles/*.html, jazz.hhc, jazz.hhk):
+    - Completely updated all 10 user manual chapters and table of contents to v6.0.0 Pro Studio.
+    - Removed obsolete 1999 LaTeX macros (\helpref, {\em}, \begin{figure}) and outdated Pentium/486 hardware references.
+    - Added full documentation for Virtual Session Band (RealTracks & RealDrums), 64-bit Audio DSP Effects suite, Procedural Sound Generator, Guitar Fretboard Explorer, and Keyboard Shortcuts reference.
+    - Updated keyword search index (jazz.hhk) with modern terminology.
+  * UI Toolbar & Ruler Polishing:
+    - Redesigned 18 core toolbar icons (Play, Record, Metronome, Undo, Redo, Zoom, Panic, Help, Quantize, Mixer, Piano Window) with modern studio color palette.
+    - Fixed ruler ascender text clipping on TrackWindow and EventWindow (centered text vertically, removed negative coordinate offsets).
+    - Modernized About Dialog with a high-resolution dark studio banner (JazzLogo.xpm), double-buffered opaque background, and borderless layout.
+  * Cross-Platform CI & Packaging:
+    - Added Inno Setup Windows installer (Jazz++-Windows-x64-Setup-v6.0.0.exe).
+    - Added automated local Windows build pipeline script (build_local.ps1) with automatic MSVC/SDK/wxWidgets detection.
+    - Resolved GCC/Clang compatibility issues on Linux (Ubuntu 22.04/24.04) and macOS (<wx/settings.h>, <algorithm>, and FromDIP macro version guards).
+    - Expanded automated unit test suite to 3,659 passing tests (100% success rate).
+
+25-10-2026 Raja Zahidi
 - Fix UI Toolbar Button Clarity & wxHtmlWindow Background Grid Artifacts:
   * Toolbar Buttons (src/ToolBar.cpp):
     - Mengembalikan resolusi piksel asli (20x19) bagi ikon bar alat (toolbar buttons) tanpa penalaan semula interpolasi bikubik (wxIMAGE_QUALITY_HIGH) yang sebelum ini menyebabkan garisan sempadan ikon menjadi tebal, kabur dan gelap.

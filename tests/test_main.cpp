@@ -32,6 +32,12 @@
 #include "AdaptiveHermodeTuningEngine.h"
 #include "VirtualStudioMonitorSimulator.h"
 #include "AudioWatermarkProvenanceEngine.h"
+#include "DynamicResonanceSuppressorEngine.h"
+#include "VinylLatheMechanicalSimulator.h"
+#include "BiomechanicalVocalTractEngine.h"
+#include "SpatialAmbisonicsUpMixerEngine.h"
+#include "AutonomousMixAssistantEngine.h"
+#include "WaveTerrainGraphicSynthEngine.h"
 
 #include <cassert>
 #include <cmath>
@@ -2507,6 +2513,157 @@ void TestAutoAccompanimentLogic()
               hashMatch && meta.sha256AudioHash.length() == 64 &&
               bextChunk.find("US-JAZ-26-00042") != std::string::npos,
               "Watermark Provenance Engine validates 32-bit DSSS watermark embedding/extraction, SHA-256 hashing, and BWF ISRC packaging");
+
+  // 149. Dynamic Spectral Resonance Suppression & Threshold-Free Peak Damping (Soothe 2)
+  Jazz::JZDynamicResonanceSuppressorEngine resonanceEngine(48000.0f);
+  resonanceEngine.setDepth(0.75f);
+  resonanceEngine.setSharpness(4.0f);
+  resonanceEngine.setSelectivity(0.80f);
+
+  const size_t resN = 256;
+  std::vector<float> harshInL(resN), harshInR(resN);
+  for (size_t i = 0; i < resN; ++i) {
+    float t = static_cast<float>(i) / 48000.0f;
+    float broad = 0.2f * std::sin(2.0f * 3.14159f * 250.0f * t);
+    float harsh = 0.6f * std::sin(2.0f * 3.14159f * 3200.0f * t);
+    harshInL[i] = broad + harsh;
+    harshInR[i] = broad + harsh;
+  }
+
+  std::vector<float> suppressedOutL(resN), suppressedOutR(resN);
+  resonanceEngine.process(harshInL.data(), harshInR.data(), suppressedOutL.data(), suppressedOutR.data(), resN);
+
+  size_t activePeaks = resonanceEngine.getActiveResonanceCount();
+  float maxSuppDb = resonanceEngine.getMaxSuppressionDb();
+
+  TEST_ASSERT(resonanceEngine.getDepth() == 0.75f && resonanceEngine.getSharpness() == 4.0f &&
+              activePeaks > 0 && maxSuppDb > 1.0f &&
+              std::abs(suppressedOutL[resN - 1]) < std::abs(harshInL[resN - 1]),
+              "Dynamic Resonance Suppressor validates harsh 3200Hz peak tracking, threshold-free notch damping, and dynamic suppression");
+
+  // 150. Mastering Vinyl Disc Cutting Lathe Physics & Stylus Acceleration Guard
+  Jazz::JZVinylLatheMechanicalSimulator lathe(48000.0f, Jazz::VinylRotationSpeed::RPM_33_THIRD);
+  lathe.setCurrentRadiusCm(10.0f);
+  lathe.setAccelerationLimitEnabled(true);
+  lathe.setEllipticalBassMonoFrequencyHz(120.0f);
+
+  const size_t vN = 256;
+  std::vector<float> audioInL(vN), audioInR(vN);
+  for (size_t i = 0; i < vN; ++i) {
+    float t = static_cast<float>(i) / 48000.0f;
+    audioInL[i] = 0.8f * std::sin(2.0f * 3.14159f * 12000.0f * t);
+    audioInR[i] = -0.8f * std::sin(2.0f * 3.14159f * 12000.0f * t);
+  }
+
+  std::vector<float> latheOutL(vN), latheOutR(vN);
+  lathe.process(audioInL.data(), audioInR.data(), latheOutL.data(), latheOutR.data(), vN);
+  Jazz::VinylGrooveTelemetry telem = lathe.getTelemetry();
+
+  TEST_ASSERT(lathe.getRotationSpeed() == Jazz::VinylRotationSpeed::RPM_33_THIRD &&
+              lathe.getCurrentRadiusCm() == 10.0f &&
+              telem.peakAccelerationG > 0.0f && telem.peakVerticalExcursionUm > 0.0f &&
+              latheOutL.size() == vN && std::abs(latheOutL[vN - 1]) <= 1.0f,
+              "Vinyl Lathe Simulator validates 33-1/3 RPM groove velocity, stylus acceleration tracking, and vertical excursion guard");
+
+  // 151. Bio-Mechanical Vocal Tract Aero-Acoustics & Formant Vowel Synthesis
+  Jazz::JZBiomechanicalVocalTractEngine vocalTract(48000.0f);
+  vocalTract.setPitchHz(220.0f);
+  vocalTract.setSubglottalPressure(12.0f);
+  vocalTract.setVowel(Jazz::VocalTractVowel::VOWEL_A);
+
+  const size_t vocN = 256;
+  std::vector<float> vocAudioA(vocN);
+  vocalTract.generate(vocAudioA.data(), vocN);
+
+  vocalTract.setVowel(Jazz::VocalTractVowel::VOWEL_I);
+  std::vector<float> vocAudioI(vocN);
+  vocalTract.generate(vocAudioI.data(), vocN);
+
+  float energyA = 0.0f, energyI = 0.0f;
+  for (size_t i = 0; i < vocN; ++i) {
+    energyA += vocAudioA[i] * vocAudioA[i];
+    energyI += vocAudioI[i] * vocAudioI[i];
+  }
+
+  TEST_ASSERT(vocalTract.getPitchHz() == 220.0f && vocalTract.getSubglottalPressure() == 12.0f &&
+              energyA > 0.01f && energyI > 0.01f && vocAudioA[0] != vocAudioI[0],
+              "Biomechanical Vocal Tract validates 2-mass glottal flow, 8-section waveguide tube, and /a/ vs /i/ formant articulation");
+
+  // 152. Stereo-to-7.1.4 Dolby Atmos & 3D Ambisonics Soundfield Up-Mixer
+  Jazz::JZSpatialAmbisonicsUpMixerEngine upMixer(48000.0f);
+  upMixer.setCenterExtraction(0.70f);
+  upMixer.setSurroundSpill(0.60f);
+  upMixer.setHeightCeilingEnergy(0.50f);
+
+  const size_t upN = 128;
+  std::vector<float> stL(upN, 0.6f), stR(upN, 0.6f);
+  Jazz::Surround714Channels ch714;
+  bool ok714 = upMixer.processUpMix714(stL.data(), stR.data(), upN, ch714);
+
+  Jazz::AmbisonicsBFormat bFormat;
+  bool okB = upMixer.processUpMixBFormat(stL.data(), stR.data(), upN, bFormat);
+
+  TEST_ASSERT(ok714 && ch714.size() == upN && ch714.C[0] > 0.2f && ch714.LFE[0] >= 0.0f &&
+              okB && bFormat.W.size() == upN && bFormat.W[0] > 0.5f && bFormat.X[0] > 0.3f,
+              "Spatial Soundfield Up-Mixer validates direct-diffuse decomposition, 7.1.4 channel distribution, and 3D Ambisonics B-format");
+
+  // 153. Autonomous AI Multi-Track Mix Balancing & Masking Collision Resolver
+  Jazz::JZAutonomousMixAssistantEngine mixAssistant(48000.0f);
+  int trkKick = mixAssistant.registerTrack("Kick_Drum", Jazz::MixTrackRole::KICK_DRUM);
+  int trkBass = mixAssistant.registerTrack("Bass_Synth", Jazz::MixTrackRole::BASS_INSTRUMENT);
+  int trkVocal = mixAssistant.registerTrack("Lead_Vocal", Jazz::MixTrackRole::LEAD_VOCAL);
+  int trkGuitar = mixAssistant.registerTrack("Guitars", Jazz::MixTrackRole::GUITARS_SYNTHS);
+
+  const size_t mixN = 512;
+  std::vector<float> kickBuf(mixN), bassBuf(mixN), vocBuf(mixN), gtrBuf(mixN);
+  for (size_t i = 0; i < mixN; ++i) {
+    float t = static_cast<float>(i) / 48000.0f;
+    kickBuf[i] = 0.8f * std::sin(2.0f * 3.14159f * 65.0f * t);
+    bassBuf[i] = 0.7f * std::sin(2.0f * 3.14159f * 65.0f * t);
+    vocBuf[i] = 0.5f * std::sin(2.0f * 3.14159f * 2400.0f * t);
+    gtrBuf[i] = 0.6f * std::sin(2.0f * 3.14159f * 2400.0f * t);
+  }
+
+  mixAssistant.ingestTrackAudio(trkKick, kickBuf.data(), mixN);
+  mixAssistant.ingestTrackAudio(trkBass, bassBuf.data(), mixN);
+  mixAssistant.ingestTrackAudio(trkVocal, vocBuf.data(), mixN);
+  mixAssistant.ingestTrackAudio(trkGuitar, gtrBuf.data(), mixN);
+
+  mixAssistant.analyzeMixCollisions();
+  const auto& collisions = mixAssistant.getDetectedCollisions();
+
+  mixAssistant.applyDynamicCarve(trkBass, bassBuf.data(), mixN);
+
+  TEST_ASSERT(mixAssistant.getTrackCount() == 4 && collisions.size() >= 2 &&
+              collisions[0].centerFrequencyHz == 65.0f && collisions[0].recommendedCarveDb < 0.0f &&
+              std::abs(bassBuf[mixN - 1]) < 0.7f,
+              "Autonomous Mix Assistant validates 4-track spectral collision detection, 65Hz Kick/Bass clash, and dynamic EQ carving");
+
+  // 154. 3D Wave-Terrain Mathematical Orbit & Optical Bitmap Synthesizer
+  Jazz::JZWaveTerrainGraphicSynthEngine waveSynth(48000.0f);
+  waveSynth.setFrequencyHz(130.81f);
+  waveSynth.setSurfaceType(Jazz::WaveTerrainSurface::RIPPLE_TORUS);
+  waveSynth.setTrajectoryType(Jazz::WaveTerrainTrajectory::CIRCULAR_ORBIT);
+  waveSynth.setOrbitRadius(1.2f);
+
+  const size_t synthN = 256;
+  std::vector<float> synthAudio(synthN);
+  waveSynth.generate(synthAudio.data(), synthN);
+
+  std::vector<float> grayscaleMap(64 * 64, 0.5f);
+  for (size_t y = 0; y < 64; ++y) {
+    for (size_t x = 0; x < 64; ++x) {
+      grayscaleMap[y * 64 + x] = static_cast<float>((x ^ y) % 32) / 32.0f;
+    }
+  }
+  bool mapLoaded = waveSynth.loadBitmapSurface(grayscaleMap, 64, 64);
+  std::vector<float> opticalAudio(synthN);
+  waveSynth.generate(opticalAudio.data(), synthN);
+
+  TEST_ASSERT(waveSynth.getFrequencyHz() == 130.81f && waveSynth.getOrbitRadius() == 1.2f &&
+              synthAudio.size() == synthN && mapLoaded && waveSynth.hasBitmapSurface() &&
+              opticalAudio.size() == synthN && opticalAudio[0] != synthAudio[0],
+              "Wave-Terrain Graphic Synth validates 3D ripple surface orbital scanning, and optical 2D grayscale bitmap synthesis");
 }
 
 //-----------------------------------------------------------------------------

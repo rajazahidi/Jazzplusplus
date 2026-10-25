@@ -131,7 +131,9 @@ set(JAZZ_SOURCES
     src/AudioWaveform.cpp
     src/AutoAccompaniment.cpp
     src/AutomationEngine.cpp
+    src/AutonomousMixAssistantEngine.cpp
     src/BinauralHrtfSpatializer.cpp
+    src/BiomechanicalVocalTractEngine.cpp
     src/BrickwallClipperEngine.cpp
     src/BroadcastFailoverEngine.cpp
     src/CapstanSpeedStabilizer.cpp
@@ -184,6 +186,7 @@ set(JAZZ_SOURCES
     src/DsdDxdEngine.cpp
     src/DynamicAutoWah.cpp
     src/DynamicDeEsser.cpp
+    src/DynamicResonanceSuppressorEngine.cpp
     src/DynamicSidechainEq.cpp
     src/ErrorMessage.cpp
     src/EuclideanArp.cpp
@@ -290,6 +293,7 @@ set(JAZZ_SOURCES
     src/SoundGenerator.cpp
     src/SpatialAudioPanner.cpp
     src/SpatialHeadTracker.cpp
+    src/SpatialAmbisonicsUpMixerEngine.cpp
     src/SpectralAudioMorphEngine.cpp
     src/SpectralDenoise.cpp
     src/SpectralRebalanceEngine.cpp
@@ -308,6 +312,7 @@ set(JAZZ_SOURCES
     src/TapeConsoleWarmer.cpp
     src/ThroughZeroFlanger.cpp
     src/VintageLofiProcessor.cpp
+    src/VinylLatheMechanicalSimulator.cpp
     src/VirtualStudioMonitorSimulator.cpp
     src/ToolBar.cpp
     src/Track.cpp
@@ -324,6 +329,7 @@ set(JAZZ_SOURCES
     src/VolterraDynamicConvolutionEngine.cpp
     src/WasapiAudioDriver.cpp
     src/WavetableSynth.cpp
+    src/WaveTerrainGraphicSynthEngine.cpp
     src/WindTubePhysicalModel.cpp
 )
 

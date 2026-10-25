@@ -3,7 +3,7 @@
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Site-00d2ff?logo=github)](https://rajazahidi.github.io/Jazzplusplus/)
 [![Latest Release](https://img.shields.io/github/v/release/rajazahidi/Jazzplusplus?color=10b981)](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v5.4.16)
 [![CI Build](https://github.com/rajazahidi/Jazzplusplus/actions/workflows/ci.yml/badge.svg)](https://github.com/rajazahidi/Jazzplusplus/actions/workflows/ci.yml)
-[![Tests: 148 Passing](https://img.shields.io/badge/Tests-148%20Passing%20(100%25)-10b981.svg)](tests/test_main.cpp)
+[![Tests: 154 Passing](https://img.shields.io/badge/Tests-154%20Passing%20(100%25)-10b981.svg)](tests/test_main.cpp)
 [![License: GPL-2.0](https://img.shields.io/badge/License-GPL_v2-blue.svg)](COPYING)
 
 **Jazz++** is a full-featured open-source MIDI sequencer and digital audio workstation for Linux and Windows. Built using **wxWidgets**, it provides a rich visual environment for composing, editing, arranging, and recording multi-track MIDI music and digital audio.
@@ -30,11 +30,19 @@ Originally created by Andreas Voss and Per Sigmond, with subsequent development 
 
 ---
 
-## Apex Colossus Flagship Master Studio Suites (v1.0 – v19.0)
+## Apex Colossus Flagship Master Studio Suites (v1.0 – v20.0)
 
-Jazz++ features an enterprise-grade studio DSP, neural inference, spatial metadata, collaborative AoIP, and hardware control surface architecture comprising 19 specialized production suites:
+Jazz++ features an enterprise-grade studio DSP, neural inference, spatial metadata, collaborative AoIP, and hardware control surface architecture comprising 20 specialized production suites:
 
-### 1. Apex Transcendence Flagship Suite (Suite v19.0)
+### 1. Apex Omniverse Jubilee Suite (Suite v20.0)
+- **Dynamic Spectral Resonance Suppression & De-Bleeder Engine** (`JZDynamicResonanceSuppressorEngine`): Threshold-free dynamic resonance damping and harsh frequency taming (Oeksound Soothe 2 style) across 8 critical tracking bands (650Hz - 9.2kHz) with sharpness/selectivity Q controls and delta monitoring.
+- **Mastering Vinyl Disc Cutting Lathe & Stylus Simulator** (`JZVinylLatheMechanicalSimulator`): Physical electro-mechanical modeling of vinyl cutting lathes (Neumann VMS-80 / SX-74) featuring 33-1/3 vs 45 RPM speeds, high-frequency stylus acceleration limiting, elliptical bass mono filter, vertical excursion lift-off guard, and Pinch Effect tracing distortion.
+- **Bio-Mechanical Vocal Tract Aero-Acoustics Engine** (`JZBiomechanicalVocalTractEngine`): Sampleless physical human singing voice synthesis powered by a 2-mass vocal fold Bernoulli flow model, 8-section acoustic waveguide tube (pharynx, velum, oral cavity, lips radiation), and formant vowel articulation (/a/, /e/, /i/, /o/, /u/).
+- **Stereo-to-7.1.4 Dolby Atmos & 3D Ambisonics Soundfield Up-Mixer** (`JZSpatialAmbisonicsUpMixerEngine`): Transforms 2-channel stereo audio into immersive 7.1.4 Dolby Atmos and 3D Ambisonics (B-format W, X, Y, Z) via direct-diffuse soundfield decomposition, phantom center dialogue anchoring, LFE subwoofer extraction (80 Hz), and decorrelated ceiling height channels.
+- **Autonomous AI Multi-Track Mix Balancing & Masking Resolver** (`JZAutonomousMixAssistantEngine`): Multi-bus spectral monitoring detecting masking clashes (Kick vs Bass at 65Hz, Guitars vs Vocals at 2.4kHz) with automated dynamic sidechain EQ notch carving and fader balance leveling recommendations.
+- **3D Wave-Terrain & Optical Graphic Synthesizer Engine** (`JZWaveTerrainGraphicSynthEngine`): 3D wave-terrain mathematical and optical synthesis (Daphne Oram Oramics & ANS Synthesizer style) featuring 2D/3D topographical surfaces (Radial Ripple Torus, Hyperbolic Saddle, Chaotic Attractor), orbital trajectories (Circular, Ellipse, Lissajous a:b, Spiral Galaxy), and direct 2D grayscale optical bitmap-to-audio wave generation.
+
+### 2. Apex Transcendence Flagship Suite (Suite v19.0)
 - **Non-Linear Volterra Kernel Dynamic Convolution Engine** (`JZVolterraDynamicConvolutionEngine`): Dynamic analog warmth and harmonic saturation (Acustica Audio style) using 1st-order linear, 2nd-order quadratic (even harmonics), and 3rd-order cubic (odd harmonics) Volterra series expansion with vintage tube, analog tape, and transformer models.
 - **Multi-Microphone Phase Auto-Alignment & Comb Filter Recovery Engine** (`JZMultiMicPhaseAlignerEngine`): Eliminates acoustic phase cancellation across multi-microphone drum kits and multi-amp guitar setups via sub-sample cross-correlation, automated polarity inversion, and low-end bass power recovery (+3.5 dB).
 - **Polyphonic Spectral Audio Morphing & Formant Cross-Synthesis Engine** (`JZSpectralAudioMorphEngine`): Cinematic spectral transmutation and cross-synthesis (Kyma / Zynaptiq Morph style) featuring optimal transport energy interpolation, formant envelope transplantation, and transient-tonal chimera hybridization.
@@ -42,7 +50,7 @@ Jazz++ features an enterprise-grade studio DSP, neural inference, spatial metada
 - **Binaural Virtual Studio Control Room Acoustic Simulator** (`JZVirtualStudioMonitorSimulator`): Reproduces iconic physical mixing control rooms inside headphones (Abbey Road Studio 3, Ocean Way Nashville, Mastering Lab Hollywood, Car Audio) with 60-degree cross-feed ITD/ILD delays, early room reflections, and NS-10M/Genelec/Soffit monitor models.
 - **Psychoacoustic Audio Watermarking & Cryptographic Provenance Engine** (`JZAudioWatermarkProvenanceEngine`): Imperceptible Direct Sequence Spread Spectrum (DSSS) psychoacoustic watermark embedding with 32-bit PN-coded payloads, SHA-256 raw PCM audio hashing for tamper detection, and standardized ISRC/ISWC/BWF broadcast metadata packaging.
 
-### 2. Apex Sovereign Ultimate Flagship Suite (Suite v18.0)
+### 3. Apex Sovereign Ultimate Flagship Suite (Suite v18.0)
 - **Ultra-High-Resolution DSD / DXD Audio Engine** (JZDsdDxdEngine): Audiophile SACD Direct Stream Digital format processing (DSD64 at 2.8224 MHz, DSD128 at 5.6448 MHz, DSD256 at 11.2896 MHz) featuring DoP v1.1 24-bit framing with 0x05/0xFA markers, multi-stage FIR decimation to 352.8 kHz 32-bit float DXD, 5th-order Delta-Sigma feedback modulation, and ultrasonic noise floor tracking.
 - **Hollywood Film Scoring SMPTE Video Reference & PLL Genlock Sync Engine** (JZSmpteVideoSyncEngine): Frame-accurate cinema video synchronization across 23.976 fps, 24 fps theatrical, 25 fps PAL, 29.97 DF/NDF, 30 fps, and 59.94 DF UHD formats featuring SMPTE drop-frame arithmetic (17,982 frames per 10min), sub-frame PLL chase locking, freewheel drop-out recovery, and EDL scene-cut alignment.
 - **Deep Learning Spectral 4-Stem Audio Demixing Engine** (JZNeuralStemSeparatorEngine): Demucs-style deep unmixing of stereo mixes into Vocals, Drums, Bass, and Other using multi-band soft-mask spectral decomposition, transient onset percussive tracking, mid-band vocal formant enhancement, and strict mathematical 1.0 energy conservation with zero residual loss (< 1e-4).
@@ -50,7 +58,7 @@ Jazz++ features an enterprise-grade studio DSP, neural inference, spatial metada
 - **Acoustic Room Correction & SOFA Headphone Profile Engine** (JZRoomAcousticCalibrationEngine): Farina logarithmic sine sweep generation (20 Hz - 20,000 Hz) with room impulse response deconvolution, acoustic target curves (Flat Reference, Harman Studio Curve, B&K 1974, SMPTE 202M Cinema X-Curve), automated standing-wave resonant biquad filters, and SOFA binaural headphone correction.
 - **Bjorklund Euclidean & Multilane Polymetric Generative Sequencer** (JZEuclideanPolyrhythmEngine): Algorithmic Euclidean rhythm generator E(k, n) (Tresillo, Cinquillo, etc.) coupled with concurrent multilane polymetric sequencing (independent step lengths per lane), probabilistic triggers, velocity jitter, sub-step ratcheting bursts, and micro-timing swing offset.
 
-### 3. Apex Colossus Flagship Suite (Suite v17.0)
+### 4. Apex Colossus Flagship Suite (Suite v17.0)
 - **Real-Time Audio-over-IP & Timeline Delta-CRDT Collaboration** (`JZNetworkSessionEngine`): AES67 and WebRTC peer-to-peer low-latency streaming audio frames with jitter buffer packet-loss concealment (PLC) and conflict-free replicated data type (delta-CRDT) timeline synchronization.
 - **Interactive Game Audio Middleware Bridge** (`JZGameAudioBridge`): Direct game audio integration (Wwise, FMOD Studio, Unreal Engine 5, Unity) featuring Real-Time Parameter Controls (RTPC), game state triggers, ray-traced acoustic obstruction/occlusion LPF (20kHz to 800Hz), and SoundBank XML packaging.
 - **Studio Tape Machine Alignment & Fluxivity Engine** (`JZTapeMachineCalibrationEngine`): High-end mastering tape machine modeling (Studer A800, Ampex ATR-102, Otari MTR-90) with NAB and CCIR/IEC1 equalizations, elevated fluxivity levels (185 to 355 nWb/m), 1kHz 0 VU and 10kHz azimuth alignment tones, and magnetic hysteresis saturation.

@@ -1,4 +1,27 @@
 25-10-2026 Raja Zahidi
+- Feature & Master Studio Dynamic Resonance Suppressor, Vinyl Lathe Simulator, Bio-Mechanical Vocal Tract, Spatial Ambisonics Up-Mixer, Autonomous Mix Assistant, & Wave-Terrain Graphic Synth Suite v20.0 (Apex Omniverse Jubilee Release):
+  * Dynamic Spectral Resonance Suppression & De-Bleeder Engine (src/DynamicResonanceSuppressorEngine.h & .cpp):
+    - JZDynamicResonanceSuppressorEngine provides threshold-free dynamic resonance suppression and harsh frequency damping (Oeksound Soothe 2 style).
+    - Features multi-band dynamic notch damping across 8 critical tracking bands (650 Hz - 9.2 kHz), sharpness/selectivity Q controls, attack/release ballistics, and delta monitoring to isolate and audition removed spectral harshness.
+  * Mastering Vinyl Disc Cutting Lathe & Stylus Simulator (src/VinylLatheMechanicalSimulator.h & .cpp):
+    - JZVinylLatheMechanicalSimulator models electro-mechanical cutting dynamics of mastering disc lathes (Neumann VMS-80 / SX-74 cutter head).
+    - Features 33 1/3 vs 45 RPM rotation, disc radius tracking (14.5 cm outer to 5.8 cm inner), high-frequency stylus acceleration limiting to prevent cutter coil burnout, elliptical bass mono filter (40-300 Hz), vertical excursion guard, and inner-groove Pinch Effect tracing distortion simulation.
+  * Bio-Mechanical Vocal Tract Aero-Acoustics Engine (src/BiomechanicalVocalTractEngine.h & .cpp):
+    - JZBiomechanicalVocalTractEngine synthesizes human singing voice physically without samples.
+    - Features a 2-mass vocal fold model driven by subglottal lung pressure and Bernoulli fluid flow, an 8-section acoustic waveguide tube (pharynx, velum, tongue body/blade, lips), Kelly-Lochbaum reflection junctions, lip radiation impedance, and formant vowel articulation (/a/, /e/, /i/, /o/, /u/).
+  * Stereo-to-7.1.4 Dolby Atmos & 3D Ambisonics Soundfield Up-Mixer (src/SpatialAmbisonicsUpMixerEngine.h & .cpp):
+    - JZSpatialAmbisonicsUpMixerEngine transforms 2-channel stereo recordings into immersive 7.1.4 Dolby Atmos and 1st-order 3D Ambisonics (B-format W, X, Y, Z).
+    - Features inter-channel cross-correlation decorrelation, direct-diffuse soundfield decomposition, phantom center dialogue anchoring without comb filtering, LFE subwoofer extraction (80 Hz), and decorrelated ceiling height channel generation.
+  * Autonomous AI Multi-Track Mix Balancing & Masking Resolver (src/AutonomousMixAssistantEngine.h & .cpp):
+    - JZAutonomousMixAssistantEngine continuously monitors spectral energy across all registered project buses simultaneously.
+    - Features cross-spectral collision detection (Kick vs Bass fundamental clash at 65 Hz, Guitars/Keys vs Vocal presence at 2.4 kHz), masking severity indexing, and automated dynamic sidechain notch carving.
+  * 3D Wave-Terrain & Optical Graphic Synthesizer Engine (src/WaveTerrainGraphicSynthEngine.h & .cpp):
+    - JZWaveTerrainGraphicSynthEngine provides 3D wave-terrain mathematical and optical synthesis (Daphne Oram Oramics & ANS Synthesizer style).
+    - Features 2D/3D topographical mathematical surfaces (Radial Ripple Torus, Hyperbolic Saddle, Chaotic Attractor), orbital trajectories (Circular, Ellipse, Lissajous a:b, Spiral Galaxy), and direct 2D grayscale optical bitmap-to-audio wave generation.
+  * Added Automated Unit Tests 149 to 154 (tests/test_main.cpp):
+    - Validates 3200 Hz resonance peak damping, 33-1/3 RPM vinyl lathe stylus acceleration tracking and vertical excursion guard, 2-mass glottal flow and vocal tract formant vowels, 7.1.4 Atmos up-mix direct/diffuse routing, 4-track spectral collision detection with dynamic EQ carving, and 3D wave-terrain surface orbital scanning.
+
+25-10-2026 Raja Zahidi
 - Feature & Master Studio Dynamic Volterra Convolution, Multi-Mic Phase Auto-Aligner, Spectral Audio Morpher, Adaptive Hermode Tuning, Virtual Control Room Simulator, & Audio Watermark Provenance Suite v19.0 (Apex Transcendence Flagship Release):
   * Non-Linear Volterra Kernel Dynamic Convolution Engine (src/VolterraDynamicConvolutionEngine.h & .cpp):
     - JZVolterraDynamicConvolutionEngine models level-dependent harmonic saturation and dynamic analog warmth (Acustica Audio style) using 1st-order linear, 2nd-order quadratic (even harmonics), and 3rd-order cubic (odd harmonics) Volterra series kernel expansion.

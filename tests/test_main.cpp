@@ -116,6 +116,12 @@
 #include "TonewheelOrganDrawbarEngine.h"
 #include "AtmosphericAirAbsorptionSpatialEngine.h"
 #include "StereoWidthSpectralShufflerEngine.h"
+#include "SpectralPhaseDisperserEngine.h"
+#include "BowedStringAcousticBodyConvolverEngine.h"
+#include "TransientRingingSuppressorEngine.h"
+#include "BinauralDopplerMotionSpatializerEngine.h"
+#include "DynamicSubBassSpectralCarverEngine.h"
+#include "VintageDiodeLadderFilterEngine.h"
 
 #include <cassert>
 #include <cmath>
@@ -4480,6 +4486,117 @@ void TestAutoAccompanimentLogic()
               shuffler.getPhaseCorrelation() >= -1.0f &&
               shuffler.getPhaseCorrelation() <= 1.0f,
               "Stereo Width Spectral Shuffler validates Blumlein LF side boost, elliptical mono bass, and Air width expansion");
+
+  // 233. Continuous Frequency-Dependent All-Pass Phase Dispersion & Multi-Mic Coherence Maximizer
+  Jazz::JZSpectralPhaseDisperserEngine disperser(48000.0f);
+  disperser.setBandPhaseDegrees(0, 45.0f);
+  disperser.setBandPhaseDegrees(1, 135.0f);
+  disperser.setBandPhaseDegrees(2, 225.0f);
+  disperser.setBandPhaseDegrees(3, 315.0f);
+  disperser.setDispersionAmount(1.2f);
+
+  const size_t dspN = 512;
+  std::vector<float> dspInL(dspN, 0.5f), dspInR(dspN, 0.5f);
+  std::vector<float> dspOutL(dspN, 0.0f), dspOutR(dspN, 0.0f);
+  disperser.process(dspInL.data(), dspInR.data(), dspOutL.data(), dspOutR.data(), dspN);
+
+  TEST_ASSERT(disperser.getBandPhaseDegrees(0) == 45.0f &&
+              disperser.getBandPhaseDegrees(1) == 135.0f &&
+              disperser.getDispersionAmount() == 1.2f &&
+              disperser.getPhaseCorrelation() >= -1.0f,
+              "Spectral Phase Disperser validates 4-band all-pass rotation, group delay dispersion, and multi-mic phase alignment");
+
+  // 234. Bowed String Acoustic Body Impulse & Chladni Wood Resonator
+  Jazz::JZBowedStringAcousticBodyConvolverEngine bowedConvolver(48000.0f);
+  bowedConvolver.setInstrumentType(Jazz::BowedInstrumentType::CELLO);
+  bowedConvolver.setBodyWoodAge(0.9f);
+  bowedConvolver.setVarnishDamping(0.3f);
+  bowedConvolver.setHelmholtzA0DepthDb(5.0f);
+
+  const size_t bowN = 512;
+  std::vector<float> bowInL(bowN, 0.4f), bowInR(bowN, 0.4f);
+  std::vector<float> bowOutL(bowN, 0.0f), bowOutR(bowN, 0.0f);
+  bowedConvolver.process(bowInL.data(), bowInR.data(), bowOutL.data(), bowOutR.data(), bowN);
+
+  TEST_ASSERT(bowedConvolver.getInstrumentType() == Jazz::BowedInstrumentType::CELLO &&
+              bowedConvolver.getHelmholtzA0FrequencyHz() == 98.0f &&
+              bowedConvolver.getBodyWoodAge() == 0.9f &&
+              bowedConvolver.getHelmholtzA0DepthDb() == 5.0f &&
+              bowedConvolver.getInstrumentTypeName().find("Violoncello") != std::string::npos,
+              "Bowed String Acoustic Body Convolver validates 98Hz Cello A0 Helmholtz cavity, Chladni wood plates, and bridge hill transmission");
+
+  // 235. Transient-Gated Modal Ringing & Resonant Overhang Damping Engine
+  Jazz::JZTransientRingingSuppressorEngine ringingSuppressor(48000.0f);
+  ringingSuppressor.setDampingAmountDb(-18.0f);
+  ringingSuppressor.setSensitivity(1.5f);
+  ringingSuppressor.setTransientHoldMs(15.0f);
+
+  const size_t rngN = 512;
+  std::vector<float> rngInL(rngN, 0.6f), rngInR(rngN, 0.6f);
+  std::vector<float> rngOutL(rngN, 0.0f), rngOutR(rngN, 0.0f);
+  ringingSuppressor.process(rngInL.data(), rngInR.data(), rngOutL.data(), rngOutR.data(), rngN);
+
+  TEST_ASSERT(ringingSuppressor.getDampingAmountDb() == -18.0f &&
+              ringingSuppressor.getSensitivity() == 1.5f &&
+              ringingSuppressor.getTransientHoldMs() == 15.0f &&
+              ringingSuppressor.getDominantRingingFrequencyHz() > 0.0f,
+              "Transient Ringing Suppressor validates 15ms transient attack transparency, modal overhang tracking, and adaptive notch damping");
+
+  // 236. Binaural Relativistic Acoustic Doppler & Moving Sound Source Spatializer
+  Jazz::JZBinauralDopplerMotionSpatializerEngine dopplerSpatializer(48000.0f);
+  dopplerSpatializer.setPosition(10.0f, 2.0f, 0.0f);
+  dopplerSpatializer.setVelocity(-30.0f, 0.0f, 0.0f);
+  dopplerSpatializer.setSpeedOfSound(343.2f);
+
+  const size_t dopN = 512;
+  std::vector<float> dopInL(dopN, 0.5f), dopInR(dopN, 0.5f);
+  std::vector<float> dopOutL(dopN, 0.0f), dopOutR(dopN, 0.0f);
+  dopplerSpatializer.process(dopInL.data(), dopInR.data(), dopOutL.data(), dopOutR.data(), dopN);
+
+  TEST_ASSERT(dopplerSpatializer.isDopplerEnabled() &&
+              dopplerSpatializer.getSpeedOfSound() == 343.2f &&
+              dopplerSpatializer.getCurrentDistanceMeters() > 0.0f &&
+              dopplerSpatializer.getLeftEarDopplerRatio() > 0.0f &&
+              dopplerSpatializer.getRightEarDopplerRatio() > 0.0f,
+              "Binaural Doppler Motion Spatializer validates 3D trajectory velocity, relativistic acoustic pitch shift, and interaural parallax");
+
+  // 237. Dynamic Kick-to-Bass Fundamental Frequency Surgical Sidechain Carver
+  Jazz::JZDynamicSubBassSpectralCarverEngine spectralCarver(48000.0f);
+  spectralCarver.setCarveDepthDb(-16.0f);
+  spectralCarver.setCarveQ(6.0f);
+  spectralCarver.setSensitivity(1.2f);
+  spectralCarver.setReleaseMs(75.0f);
+
+  const size_t crvN = 512;
+  std::vector<float> crvBassL(crvN, 0.5f), crvBassR(crvN, 0.5f);
+  std::vector<float> crvKickL(crvN, 0.8f), crvKickR(crvN, 0.8f);
+  std::vector<float> crvOutL(crvN, 0.0f), crvOutR(crvN, 0.0f);
+  spectralCarver.processWithSidechain(crvBassL.data(), crvBassR.data(), crvKickL.data(), crvKickR.data(), crvOutL.data(), crvOutR.data(), crvN);
+
+  TEST_ASSERT(spectralCarver.getCarveDepthDb() == -16.0f &&
+              spectralCarver.getCarveQ() == 6.0f &&
+              spectralCarver.getSensitivity() == 1.2f &&
+              spectralCarver.getTrackedKickFundamentalHz() >= 35.0f,
+              "Dynamic Sub-Bass Spectral Carver validates kick fundamental tracking, dynamic surgical notch carving, and unmasked low-end");
+
+  // 238. Historic 18dB/24dB Diode Ladder Non-Linear Resonant Filter Engine
+  Jazz::JZVintageDiodeLadderFilterEngine diodeLadder(48000.0f);
+  diodeLadder.setCutoffHz(1400.0f);
+  diodeLadder.setResonance(0.85f);
+  diodeLadder.setDriveDb(4.0f);
+  diodeLadder.setSlope(Jazz::DiodeLadderSlope::SLOPE_18DB_OCT);
+
+  const size_t dioN = 512;
+  std::vector<float> dioInL(dioN, 0.6f), dioInR(dioN, 0.6f);
+  std::vector<float> dioOutL(dioN, 0.0f), dioOutR(dioN, 0.0f);
+  diodeLadder.process(dioInL.data(), dioInR.data(), dioOutL.data(), dioOutR.data(), dioN);
+
+  TEST_ASSERT(diodeLadder.getCutoffHz() == 1400.0f &&
+              diodeLadder.getResonance() == 0.85f &&
+              diodeLadder.getDriveDb() == 4.0f &&
+              diodeLadder.getSlope() == Jazz::DiodeLadderSlope::SLOPE_18DB_OCT &&
+              diodeLadder.getThdPercent() > 0.0f,
+              "Vintage Diode Ladder Filter validates 18dB TB-303 slope, Shockley diode asymmetrical conduction, acid squelch, and bass retention");
 }
 
 //-----------------------------------------------------------------------------

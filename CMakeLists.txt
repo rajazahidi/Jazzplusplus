@@ -141,10 +141,12 @@ set(JAZZ_SOURCES
     src/AutomationEngine.cpp
     src/AutonomousMixAssistantEngine.cpp
     src/BinauralAcousticRoomConvolverEngine.cpp
+    src/BinauralDopplerMotionSpatializerEngine.cpp
     src/BinauralHrtfSpatializer.cpp
     src/BinauralRoomImpulseInterpolationEngine.cpp
     src/BiomechanicalVocalTractEngine.cpp
     src/BodeFrequencyShifterWaveMultiplierEngine.cpp
+    src/BowedStringAcousticBodyConvolverEngine.cpp
     src/BrickwallClipperEngine.cpp
     src/BroadcastAudioWatermarkSteganographyEngine.cpp
     src/BroadcastFailoverEngine.cpp
@@ -202,6 +204,7 @@ set(JAZZ_SOURCES
     src/DynamicDeEsser.cpp
     src/DynamicResonanceSuppressorEngine.cpp
     src/DynamicSidechainEq.cpp
+    src/DynamicSubBassSpectralCarverEngine.cpp
     src/DynamicWindTurbulenceSuppressorEngine.cpp
     src/EllipticalMonoBassCenteringEngine.cpp
     src/ErrorMessage.cpp
@@ -352,6 +355,7 @@ set(JAZZ_SOURCES
     src/SpectralAudioMorphEngine.cpp
     src/SpectralDenoise.cpp
     src/SpectralFrequencySplitPannerEngine.cpp
+    src/SpectralPhaseDisperserEngine.cpp
     src/SpectralRebalanceEngine.cpp
     src/SpectralResonanceSuppressorEngine.cpp
     src/SpectralResonanceTamer.cpp
@@ -379,6 +383,7 @@ set(JAZZ_SOURCES
     src/ThroughZeroFlanger.cpp
     src/VariableMuVintageTubeCompressorEngine.cpp
     src/VintageCassetteLoFiTapeEngine.cpp
+    src/VintageDiodeLadderFilterEngine.cpp
     src/VintageInductorWahPedalEngine.cpp
     src/VintageLofiProcessor.cpp
     src/VinylLatheMechanicalSimulator.cpp
@@ -389,6 +394,7 @@ set(JAZZ_SOURCES
     src/TrackFrame.cpp
     src/TrackWindow.cpp
     src/TransauralCrosstalkCancellerEngine.cpp
+    src/TransientRingingSuppressorEngine.cpp
     src/TransientShaper.cpp
     src/TransientSlicer.cpp
     src/TransientTonalDecomposeEngine.cpp

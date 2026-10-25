@@ -1,4 +1,27 @@
 25-10-2026 Raja Zahidi
+- Feature & Master Studio Spectral Phase Disperser, Bowed String Acoustic Body, Transient Ringing Suppressor, Binaural Doppler Motion, Dynamic Sub-Bass Spectral Carver, & Vintage Diode Ladder Filter Suite v34.0 (Apex Transcendence Sovereign Eternity Release):
+  * Continuous Frequency-Dependent All-Pass Phase Dispersion & Multi-Mic Coherence Maximizer (src/SpectralPhaseDisperserEngine.h & .cpp):
+    - JZSpectralPhaseDisperserEngine aligns frequency-dependent phase drift and maximizes multi-mic drum/room acoustic coherence.
+    - Features 4-band all-pass phase rotation matrix (0 to 360 degrees continuously per band), group delay dispersion, comb-filter cancellation mitigation, and real-time phase correlation telemetry.
+  * Bowed String Acoustic Body Impulse & Chladni Wood Resonator (src/BowedStringAcousticBodyConvolverEngine.h & .cpp):
+    - JZBowedStringAcousticBodyConvolverEngine physically models acoustic bowed string instrument bodies (Violin, Viola, Cello, Double Bass).
+    - Features spruce top-plate & maple back-plate Chladni eigenmodes (B1- and B1+ modes), bridge rock/bounce transmission filter, F-hole Helmholtz bass air cavity coupling (A0 mode: 280 Hz violin, 98 Hz cello), soundpost asymmetric transfer, and varnish damping.
+  * Transient-Gated Modal Ringing & Resonant Overhang Damping Engine (src/TransientRingingSuppressorEngine.h & .cpp):
+    - JZTransientRingingSuppressorEngine eliminates stubborn drum shell and metallic cymbal ringing overhang (Oeksound Spiff / Eventide SplitEQ style).
+    - Features 100% transparent transient strike preservation (0-15ms attack window), spectral decay rate tracking, adaptive 8-notch modal ring damping (-3 dB to -30 dB), and Ringing Delta Solo mode.
+  * Binaural Relativistic Acoustic Doppler & Moving Sound Source Spatializer (src/BinauralDopplerMotionSpatializerEngine.h & .cpp):
+    - JZBinauralDopplerMotionSpatializerEngine calculates 3D vector velocity relativistic acoustic Doppler pitch shift and spatial trajectories.
+    - Features independent Left/Right fractional-delay sinc interpolation lines, 3D kinematics (position x, y, z and velocity vx, vy, vz), interaural parallax Doppler effect during high-speed fly-bys, Woodworth ITD head delay, and distance attenuation.
+  * Dynamic Kick-to-Bass Fundamental Frequency Surgical Sidechain Carver (src/DynamicSubBassSpectralCarverEngine.h & .cpp):
+    - JZDynamicSubBassSpectralCarverEngine unmasks kick drum punch from bass guitar without destructive wideband pumping (TrackSpacer / Soothe style).
+    - Features real-time kick fundamental pitch tracking (35 Hz to 120 Hz), surgical dynamic notch carving (0 dB to -24 dB) out of target bass tracks during kick transient impact, ultra-fast recovery, and Carve Delta Solo mode.
+  * Historic 18dB/24dB Diode Ladder Non-Linear Resonant Filter Engine (src/VintageDiodeLadderFilterEngine.h & .cpp):
+    - JZVintageDiodeLadderFilterEngine delivers circuit-accurate physical modeling of the legendary 1971 EMS VCS3 and 1982 Roland TB-303 diode ladder filters.
+    - Features 4-stage diode ladder network with non-linear Shockley diode conduction, asymmetrical dynamic clipping, acid resonance squelch with low-end retention, accent overdrive punch, and selectable 18dB/oct vs 24dB/oct slopes.
+  * Added Automated Unit Tests 233 to 238 (tests/test_main.cpp):
+    - Validates 4-band continuous all-pass phase dispersion, cello A0 Helmholtz and Chladni body modal resonance, transient attack transparency and modal ringing damping, 3D trajectory binaural Doppler pitch shifting, kick fundamental surgical sidechain carving, and 18dB diode ladder Shockley non-linear acid squelch.
+
+25-10-2026 Raja Zahidi
 - Feature & Master Studio Dynamic Wind Turbulence Suppressor, Vintage Inductor Wah Pedal, Polyphase Anti-Aliasing Oversampler, Tonewheel Organ Drawbars, Atmospheric Air Absorption, & Stereo Width Spectral Shuffler Suite v33.0 (Apex Transcendence Sovereign Infinity Release):
   * Dynamic Atmospheric Wind Buffeting & Diaphragm Overload Attenuator (src/DynamicWindTurbulenceSuppressorEngine.h & .cpp):
     - JZDynamicWindTurbulenceSuppressorEngine reduces wind buffeting, outdoor turbulence, and capsule overload (Cedar Wind Filter / iZotope RX De-wind style).

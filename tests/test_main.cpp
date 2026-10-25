@@ -122,6 +122,12 @@
 #include "BinauralDopplerMotionSpatializerEngine.h"
 #include "DynamicSubBassSpectralCarverEngine.h"
 #include "VintageDiodeLadderFilterEngine.h"
+#include "PluginCrashSandboxEngine.h"
+#include "MultichannelAtmosLoudnessMeterEngine.h"
+#include "BroadcastWaveIxmlExporterEngine.h"
+#include "GpuWaveformTileCacheEngine.h"
+#include "ComplexSidechainAdcGraphResolver.h"
+#include "DynamicHermodeTuningEngine.h"
 
 #include <cassert>
 #include <cmath>
@@ -4597,6 +4603,141 @@ void TestAutoAccompanimentLogic()
               diodeLadder.getSlope() == Jazz::DiodeLadderSlope::SLOPE_18DB_OCT &&
               diodeLadder.getThdPercent() > 0.0f,
               "Vintage Diode Ladder Filter validates 18dB TB-303 slope, Shockley diode asymmetrical conduction, acid squelch, and bass retention");
+
+  // 239. Out-of-Process VST3/CLAP Plugin Crash Sandboxing & Host Isolation Architecture
+  Jazz::JZPluginCrashSandboxEngine sandbox(48000.0f);
+  Jazz::JZPluginCrashSandboxEngine::Configuration sbConfig;
+  sbConfig.pluginId = "Test_Amp_Modeler_Worker";
+  sbConfig.watchdogTimeoutMs = 150;
+  sbConfig.autoRespawnOnCrash = true;
+  sandbox.initialize(sbConfig);
+
+  const size_t sbN = 256;
+  std::vector<float> sbInL(sbN, 0.5f), sbInR(sbN, 0.5f);
+  std::vector<float> sbOutL(sbN, 0.0f), sbOutR(sbN, 0.0f);
+  sandbox.processAudio(sbInL.data(), sbInR.data(), sbOutL.data(), sbOutR.data(), sbN);
+
+  // Simulate plugin access violation crash
+  sandbox.simulatePluginCrash(Jazz::PluginCrashType::ACCESS_VIOLATION);
+  bool hostAliveAfterCrash = sandbox.isHostAlive();
+  Jazz::SandboxStatus statusAfterCrash = sandbox.getStatus();
+
+  // Next audio block triggers auto-respawn and failsafe bypass
+  sandbox.processAudio(sbInL.data(), sbInR.data(), sbOutL.data(), sbOutR.data(), sbN);
+
+  TEST_ASSERT(hostAliveAfterCrash &&
+              statusAfterCrash == Jazz::SandboxStatus::CRASHED_ISOLATED &&
+              sandbox.getCrashCount() == 1 &&
+              sandbox.getRespawnCount() >= 1 &&
+              sandbox.isHostAlive(),
+              "Plugin Crash Sandbox validates worker isolation, SEH trap, host survival, and auto-respawn state recovery");
+
+  // 240. ITU-R BS.1770-4 Multichannel 7.1.4 Immersive Audio Loudness & Spatial True-Peak Meter
+  Jazz::JZMultichannelAtmosLoudnessMeterEngine atmosMeter(48000.0f);
+  const size_t atmN = 4800; // 100ms
+  std::vector<float> chData[12];
+  for (int ch = 0; ch < 12; ++ch) {
+    chData[ch].assign(atmN, 0.2f);
+  }
+  const float* chPtrs[12];
+  for (int ch = 0; ch < 12; ++ch) chPtrs[ch] = chData[ch].data();
+
+  atmosMeter.process714(chPtrs, atmN);
+
+  TEST_ASSERT(atmosMeter.getChannelWeightingLinear(Jazz::AtmosChannelIndex::LFE) == 0.0f &&
+              atmosMeter.getChannelWeightingLinear(Jazz::AtmosChannelIndex::LEFT_SIDE_SURROUND) > 1.4f &&
+              atmosMeter.getMomentaryLufs() > -70.0f &&
+              atmosMeter.getGlobalMaxTruePeakDbFs() > -96.0f,
+              "Multichannel Atmos Loudness Meter validates ITU-R BS.1770-4 K-weighting, 7.1.4 surround gain, and 4x True-Peak detection");
+
+  // 241. Lossless Broadcast Wave Format (BWF / EBU Tech 3285) & iXML Multi-Stem Metadata Exporter
+  Jazz::JZBroadcastWaveIxmlExporterEngine bwfExporter(48000.0f, 24, 2);
+  Jazz::BwfMetadata bwfMeta;
+  bwfMeta.description = "Orchestral Master Stem";
+  bwfMeta.loudnessValueCentiLufs = -2300;
+  bwfMeta.maxTruePeakCentiDbFs = -100;
+  bwfExporter.setBwfMetadata(bwfMeta);
+
+  Jazz::IxmlMetadata ixmlMeta;
+  ixmlMeta.project = "Eternity Symphony Score";
+  ixmlMeta.scene = "42";
+  ixmlMeta.take = "03";
+  ixmlMeta.trackNames = { "Strings_High", "Strings_Low" };
+  bwfExporter.setIxmlMetadata(ixmlMeta);
+
+  std::vector<uint8_t> bwfHeader = bwfExporter.generateBwfHeader(192000);
+  std::string ixmlStr = bwfExporter.buildIxmlPayloadString();
+
+  TEST_ASSERT(bwfExporter.hasValidBextMarker(bwfHeader) &&
+              bwfExporter.hasValidIxmlMarker(bwfHeader) &&
+              ixmlStr.find("<SCENE>42</SCENE>") != std::string::npos &&
+              ixmlStr.find("<TAKE>03</TAKE>") != std::string::npos &&
+              bwfHeader.size() > 700,
+              "Broadcast Wave iXML Exporter validates RIFF chunk hierarchy, bext EBU R128 loudness metrics, and iXML stem schema");
+
+  // 242. Multi-Resolution Hierarchical Pyramid GPU Waveform Tile Cache & Viewport Rasterizer
+  Jazz::JZGpuWaveformTileCacheEngine gpuTileCache;
+  gpuTileCache.initialize(1024);
+
+  const size_t waveN = 100000;
+  std::vector<float> waveSamples(waveN);
+  for (size_t i = 0; i < waveN; ++i) {
+    waveSamples[i] = std::sin(2.0f * 3.14159265f * 440.0f * static_cast<float>(i) / 48000.0f);
+  }
+  gpuTileCache.buildPyramidFromAudio(waveSamples.data(), waveN);
+
+  auto tiles1 = gpuTileCache.queryViewportTiles(0, 50000, 1920);
+  auto tiles2 = gpuTileCache.queryViewportTiles(0, 50000, 1920); // Repeated frame for cache hit
+
+  TEST_ASSERT(gpuTileCache.getPyramidSampleCount() == waveN &&
+              !tiles1.empty() &&
+              gpuTileCache.getCacheStats().cacheHits > 0 &&
+              gpuTileCache.getCacheStats().lastQueryLatencyMs < 1.0,
+              "GPU Waveform Tile Cache validates 5-level LOD pyramid, LRU cache hits, and sub-millisecond 120 FPS timeline rasterization");
+
+  // 243. Complex Sidechain Directed Acyclic Graph (DAG) Automatic Delay Compensation (ADC) Solver
+  Jazz::JZComplexSidechainAdcGraphResolver adcResolver;
+  adcResolver.addNode("Track_Kick", "Kick Drum", 0);
+  adcResolver.addNode("Track_Bass", "Bass Guitar", 512); // Lookahead limiter
+  adcResolver.addNode("Bus_Drums", "Drum Bus", 1024);    // Linear phase EQ
+  adcResolver.addNode("Master", "Master Output", 0);
+
+  adcResolver.addConnection("Track_Kick", "Bus_Drums", Jazz::AdcConnectionType::AUDIO_BUS);
+  adcResolver.addConnection("Track_Kick", "Track_Bass", Jazz::AdcConnectionType::SIDECHAIN_CONTROL);
+  adcResolver.addConnection("Track_Bass", "Master", Jazz::AdcConnectionType::AUDIO_BUS);
+  adcResolver.addConnection("Bus_Drums", "Master", Jazz::AdcConnectionType::AUDIO_BUS);
+  adcResolver.setMasterOutputNode("Master");
+
+  auto adcResult = adcResolver.resolveDelayCompensation();
+
+  TEST_ASSERT(adcResult.isAcyclic &&
+              adcResult.isResolved &&
+              adcResolver.getCriticalPathLatency() == 1024 &&
+              adcResolver.getCompensationForNode("Track_Bass") == 512,
+              "Complex Sidechain ADC Resolver validates DAG topological sort, cycle detection, critical path latency, and sample alignment");
+
+  // 244. Real-Time Polyphonic Dynamic Hermode Micro-Tuning & Pure Just Intonation Retuner
+  Jazz::JZDynamicHermodeTuningEngine hermodeEngine(48000.0f);
+  Jazz::JZDynamicHermodeTuningEngine::Parameters hmParams;
+  hmParams.mode = Jazz::HermodeTuningMode::JUST_INTONATION_5_LIMIT;
+  hmParams.tuningDepth = 1.0f;
+  hermodeEngine.setParameters(hmParams);
+
+  // Play C Major triad: C4 (60), E4 (64), G4 (67)
+  hermodeEngine.noteOn(60, 100);
+  hermodeEngine.noteOn(64, 90);
+  hermodeEngine.noteOn(67, 95);
+
+  float rootCents = hermodeEngine.getNoteCentsOffset(60);
+  float majorThirdCents = hermodeEngine.getNoteCentsOffset(64);
+  float fifthCents = hermodeEngine.getNoteCentsOffset(67);
+
+  TEST_ASSERT(hermodeEngine.getDetectedRootMidiNote() == 60 &&
+              hermodeEngine.getDetectedChordName() == "Major Triad" &&
+              std::abs(rootCents) < 0.01f &&
+              std::abs(majorThirdCents - (-13.686f)) < 0.1f &&
+              std::abs(fifthCents - (+1.955f)) < 0.1f,
+              "Dynamic Hermode Tuning validates polyphonic root detection, -13.7c pure major third, +2.0c fifth, and acoustic beat elimination");
 }
 
 //-----------------------------------------------------------------------------

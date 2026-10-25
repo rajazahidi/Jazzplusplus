@@ -150,11 +150,13 @@ set(JAZZ_SOURCES
     src/BrickwallClipperEngine.cpp
     src/BroadcastAudioWatermarkSteganographyEngine.cpp
     src/BroadcastFailoverEngine.cpp
+    src/BroadcastWaveIxmlExporterEngine.cpp
     src/CapstanSpeedStabilizer.cpp
     src/ChordPerformancePads.cpp
     src/ChordScaleData.cpp
     src/ClipMatrixEngine.cpp
     src/Command.cpp
+    src/ComplexSidechainAdcGraphResolver.cpp
     src/Configuration.cpp
     src/ControlSurfaceManager.cpp
     src/ControlEdit.cpp
@@ -202,6 +204,7 @@ set(JAZZ_SOURCES
     src/DsdDxdEngine.cpp
     src/DynamicAutoWah.cpp
     src/DynamicDeEsser.cpp
+    src/DynamicHermodeTuningEngine.cpp
     src/DynamicResonanceSuppressorEngine.cpp
     src/DynamicSidechainEq.cpp
     src/DynamicSubBassSpectralCarverEngine.cpp
@@ -224,6 +227,7 @@ set(JAZZ_SOURCES
     src/GetOptionIndex.cpp
     src/Globals.cpp
     src/GoniometerVectorscope.cpp
+    src/GpuWaveformTileCacheEngine.cpp
     src/GrandPianoSympatheticResonanceEngine.cpp
     src/GranularCloudSynth.cpp
     src/GroovePool.cpp
@@ -285,6 +289,7 @@ set(JAZZ_SOURCES
     src/MultibandDynamicSidechainDuckerEngine.cpp
     src/MultibandOttProcessor.cpp
     src/MultibandTransientSculptorEngine.cpp
+    src/MultichannelAtmosLoudnessMeterEngine.cpp
     src/MultiMicPhaseAlignerEngine.cpp
     src/MultiTrackDrumBleedRemoverEngine.cpp
     src/MultiVelocitySampler.cpp
@@ -310,6 +315,7 @@ set(JAZZ_SOURCES
     src/PianoWindow.cpp
     src/PitchCorrectionEngine.cpp
     src/PitchTrackingEq.cpp
+    src/PluginCrashSandboxEngine.cpp
     src/PluginHostBridge.cpp
     src/Player.cpp
     src/PolymetricDrumSequencer.cpp

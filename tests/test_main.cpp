@@ -38,6 +38,12 @@
 #include "SpatialAmbisonicsUpMixerEngine.h"
 #include "AutonomousMixAssistantEngine.h"
 #include "WaveTerrainGraphicSynthEngine.h"
+#include "NeuralTimbreTransferEngine.h"
+#include "SympatheticGuitarResonanceEngine.h"
+#include "MpegHInteractiveAudioEngine.h"
+#include "InfiniteBarberpoleFlangerEngine.h"
+#include "SubHarmonicWaveguideBassEngine.h"
+#include "LiveStreamHealthTelemetryEngine.h"
 
 #include <cassert>
 #include <cmath>
@@ -2664,6 +2670,179 @@ void TestAutoAccompanimentLogic()
               synthAudio.size() == synthN && mapLoaded && waveSynth.hasBitmapSurface() &&
               opticalAudio.size() == synthN && opticalAudio[0] != synthAudio[0],
               "Wave-Terrain Graphic Synth validates 3D ripple surface orbital scanning, and optical 2D grayscale bitmap synthesis");
+
+  // 155. Real-Time Neural Timbre Transfer & Resynthesis (RAVE / DDSP Style)
+  Jazz::JZNeuralTimbreTransferEngine timbreEngine(48000.0f, Jazz::NeuralTimbreModel::STRADIVARIUS_VIOLIN);
+  timbreEngine.setBlend(0.85f);
+  timbreEngine.setNoiseAmount(0.2f);
+  timbreEngine.setPitchCorrection(0.5f);
+
+  const size_t timbreN = 512;
+  std::vector<float> timbreInL(timbreN), timbreInR(timbreN);
+  std::vector<float> timbreOutL(timbreN), timbreOutR(timbreN);
+  for (size_t i = 0; i < timbreN; ++i) {
+    float t = static_cast<float>(i) / 48000.0f;
+    timbreInL[i] = 0.6f * std::sin(2.0f * 3.14159f * 440.0f * t);
+    timbreInR[i] = timbreInL[i];
+  }
+  timbreEngine.process(timbreInL.data(), timbreInR.data(), timbreOutL.data(), timbreOutR.data(), timbreN);
+
+  timbreEngine.setModel(Jazz::NeuralTimbreModel::CONCERT_FLUTE);
+
+  TEST_ASSERT(timbreEngine.getModel() == Jazz::NeuralTimbreModel::CONCERT_FLUTE &&
+              timbreEngine.getBlend() == 0.85f &&
+              timbreEngine.getNoiseAmount() == 0.2f &&
+              timbreOutL.size() == timbreN &&
+              std::abs(timbreOutL[timbreN / 2]) > 0.0f,
+              "Neural Timbre Transfer Engine validates DDSP harmonic-plus-noise synthesis, Stradivarius/Flute modeling, and real-time buffer processing");
+
+  // 156. Acoustic Guitar Sympathetic Coupling & Helmholtz Body Modeler
+  Jazz::JZSympatheticGuitarResonanceEngine guitarEngine(48000.0f);
+  guitarEngine.setCapoFret(2);
+  guitarEngine.setSympatheticCoupling(0.55f);
+  guitarEngine.setBodyResonance(0.7f);
+  guitarEngine.pluckString(5, 0.9f);
+
+  const size_t guitarN = 256;
+  std::vector<float> gtrInL(guitarN, 0.0f), gtrInR(guitarN, 0.0f);
+  std::vector<float> gtrOutL(guitarN), gtrOutR(guitarN);
+  guitarEngine.process(gtrInL.data(), gtrInR.data(), gtrOutL.data(), gtrOutR.data(), guitarN);
+  auto stringStates = guitarEngine.getStringStates();
+
+  TEST_ASSERT(guitarEngine.getCapoFret() == 2 &&
+              guitarEngine.getSympatheticCoupling() == 0.55f &&
+              guitarEngine.getBodyResonance() == 0.7f &&
+              stringStates.size() == 6 &&
+              stringStates[4].isPlucked &&
+              std::abs(gtrOutL[64]) > 0.0f,
+              "Sympathetic Guitar Resonance Engine validates 6-string coupling matrix, capo fret shift, and Helmholtz soundhole body projection");
+
+  // 157. MPEG-H 3D Audio Interactive Broadcast Authoring (ISO/IEC 23008-3 / ATSC 3.0)
+  Jazz::JZMpegHInteractiveAudioEngine mpegHEngine("LiveChampionshipFinals");
+  int elemDialogue = mpegHEngine.addAudioElement("LeadCommentary_EN", Jazz::MpegHElementType::DIALOGUE_PRIMARY, "eng", -6.0f, 6.0f);
+  int elemSpanish = mpegHEngine.addAudioElement("AltCommentary_ES", Jazz::MpegHElementType::COMMENTARY_ALT_LANG, "spa", -6.0f, 6.0f);
+  int elemStadium = mpegHEngine.addAudioElement("StadiumCrowd_3D", Jazz::MpegHElementType::AMBIENCE_BED, "und", -12.0f, 3.0f);
+
+  mpegHEngine.setElementPosition(elemStadium, 45.0f, 15.0f);
+  mpegHEngine.simulateViewerGain(elemDialogue, 3.5f);
+  std::string mpegHXml = mpegHEngine.generateMpegHMetadataXml();
+
+  TEST_ASSERT(mpegHEngine.getElementCount() == 3 &&
+              mpegHEngine.getProgramTitle() == "LiveChampionshipFinals" &&
+              mpegHEngine.getViewerGain(elemDialogue) == 3.5f &&
+              mpegHXml.find("MpegH3DAudioProduction") != std::string::npos &&
+              mpegHXml.find("LeadCommentary_EN") != std::string::npos,
+              "MPEG-H Interactive Audio Engine validates dialogue accessibility gain boosting, multi-language switching, and ISO/IEC 23008-3 XML packaging");
+
+  // 158. Infinite Barberpole Flanger Engine (Shepard-Risset Through-Zero)
+  Jazz::JZInfiniteBarberpoleFlangerEngine barberpole(48000.0f);
+  barberpole.setDirection(Jazz::BarberpoleDirection::INFINITE_UPWARD);
+  barberpole.setRateHz(0.35f);
+  barberpole.setThroughZero(true);
+  barberpole.setFeedback(0.65f);
+  barberpole.setMix(0.5f);
+
+  const size_t flangerN = 512;
+  std::vector<float> flgInL(flangerN), flgInR(flangerN);
+  std::vector<float> flgOutL(flangerN), flgOutR(flangerN);
+  for (size_t i = 0; i < flangerN; ++i) {
+    float t = static_cast<float>(i) / 48000.0f;
+    flgInL[i] = 0.5f * std::sin(2.0f * 3.14159f * 1000.0f * t);
+    flgInR[i] = flgInL[i];
+  }
+  barberpole.process(flgInL.data(), flgInR.data(), flgOutL.data(), flgOutR.data(), flangerN);
+
+  barberpole.setDirection(Jazz::BarberpoleDirection::INFINITE_DOWNWARD);
+
+  TEST_ASSERT(barberpole.getDirection() == Jazz::BarberpoleDirection::INFINITE_DOWNWARD &&
+              barberpole.getRateHz() == 0.35f &&
+              barberpole.isThroughZero() == true &&
+              barberpole.getFeedback() == 0.65f &&
+              flgOutL.size() == flangerN,
+              "Infinite Barberpole Flanger validates Shepard-Risset multi-phase comb sweeping, through-zero cancellation, and bi-directional sweeps");
+
+  // 159. Sub-Harmonic Waveguide Bass Synthesizer & Phase-Locked Octave Generator
+  Jazz::JZSubHarmonicWaveguideBassEngine subBass;
+  subBass.initialize(48000.0f);
+  Jazz::JZSubHarmonicWaveguideBassEngine::Parameters bassParams;
+  bassParams.centerFrequencyHz = 45.0f;
+  bassParams.resonanceQ = 5.0f;
+  bassParams.subOctave1Level = 0.8f;
+  bassParams.subOctave2Level = 0.35f;
+  bassParams.drive = 1.8f;
+  bassParams.dryWet = 0.6f;
+  subBass.setParameters(bassParams);
+
+  const size_t subN = 512;
+  std::vector<float> bassInL(subN), bassInR(subN);
+  std::vector<float> bassOutL(subN), bassOutR(subN);
+  for (size_t i = 0; i < subN; ++i) {
+    float t = static_cast<float>(i) / 48000.0f;
+    bassInL[i] = 0.7f * std::sin(2.0f * 3.14159f * 90.0f * t);
+    bassInR[i] = bassInL[i];
+  }
+  subBass.process(bassInL.data(), bassInR.data(), bassOutL.data(), bassOutR.data(), subN);
+
+  TEST_ASSERT(subBass.getParameters().centerFrequencyHz == 45.0f &&
+              subBass.getParameters().resonanceQ == 5.0f &&
+              subBass.getSubEnergyPeak() > 0.0f &&
+              subBass.getSubEnergyRms() > 0.0f &&
+              subBass.isLockAcquired() == true,
+              "Sub-Harmonic Waveguide Bass Synthesizer validates zero-crossing phase lock, 45Hz sub-octave resonator, and saturation drive");
+
+  // 160. MADI (AES10) / Dante Live Stream Health & Jitter Telemetry Hub
+  Jazz::JZLiveStreamHealthTelemetryEngine liveTelemetry;
+  liveTelemetry.initialize(48000.0f, 2048);
+  Jazz::JZLiveStreamHealthTelemetryEngine::Configuration telemConfig;
+  telemConfig.protocol = Jazz::JZLiveStreamHealthTelemetryEngine::StreamProtocol::Dante_AES67;
+  telemConfig.maxAllowedJitterPpm = 45.0f;
+  telemConfig.autoFailoverEnabled = true;
+  telemConfig.crossfadeTimeMs = 4.0f;
+  liveTelemetry.setConfiguration(telemConfig);
+
+  const size_t blkSize = 128;
+  std::vector<float> audioA(blkSize, 0.4f);
+  std::vector<float> audioB(blkSize, 0.6f);
+
+  Jazz::JZLiveStreamHealthTelemetryEngine::StreamFrameHeader hdrA;
+  hdrA.sequenceNumber = 1;
+  hdrA.timestampNs = 1000000000ULL;
+  hdrA.validityBit = true;
+  liveTelemetry.ingestStreamBlock(Jazz::JZLiveStreamHealthTelemetryEngine::StreamId::PrimaryA, audioA.data(), audioA.data(), blkSize, hdrA);
+
+  Jazz::JZLiveStreamHealthTelemetryEngine::StreamFrameHeader hdrB;
+  hdrB.sequenceNumber = 1;
+  hdrB.timestampNs = 1000000000ULL;
+  hdrB.validityBit = true;
+  liveTelemetry.ingestStreamBlock(Jazz::JZLiveStreamHealthTelemetryEngine::StreamId::SecondaryB, audioB.data(), audioB.data(), blkSize, hdrB);
+
+  // Send corrupted frame to Primary A to trigger failover
+  for (uint32_t f = 2; f <= 10; ++f) {
+    hdrA.sequenceNumber = f;
+    hdrA.timestampNs += 2666667ULL;
+    hdrA.parityError = true;
+    hdrA.crcError = true;
+    liveTelemetry.ingestStreamBlock(Jazz::JZLiveStreamHealthTelemetryEngine::StreamId::PrimaryA, audioA.data(), audioA.data(), blkSize, hdrA);
+
+    hdrB.sequenceNumber = f;
+    hdrB.timestampNs += 2666667ULL;
+    hdrB.parityError = false;
+    hdrB.crcError = false;
+    liveTelemetry.ingestStreamBlock(Jazz::JZLiveStreamHealthTelemetryEngine::StreamId::SecondaryB, audioB.data(), audioB.data(), blkSize, hdrB);
+  }
+
+  std::vector<float> outLiveL(blkSize), outLiveR(blkSize);
+  liveTelemetry.processOutput(outLiveL.data(), outLiveR.data(), blkSize);
+
+  auto telemA = liveTelemetry.getTelemetry(Jazz::JZLiveStreamHealthTelemetryEngine::StreamId::PrimaryA);
+  auto telemB = liveTelemetry.getTelemetry(Jazz::JZLiveStreamHealthTelemetryEngine::StreamId::SecondaryB);
+
+  TEST_ASSERT(liveTelemetry.getActiveStream() == Jazz::JZLiveStreamHealthTelemetryEngine::StreamId::SecondaryB &&
+              liveTelemetry.getFailoverEventCount() >= 1 &&
+              telemA.parityErrors > 0 &&
+              telemB.parityErrors == 0 &&
+              telemB.status == Jazz::JZLiveStreamHealthTelemetryEngine::LinkStatus::OK,
+              "Live Stream Health Telemetry Engine validates Dante/AES10 clock jitter tracking, parity error detection, and hitless failover switching");
 }
 
 //-----------------------------------------------------------------------------

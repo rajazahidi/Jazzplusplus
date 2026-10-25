@@ -219,13 +219,15 @@ set(JAZZ_SOURCES
     src/Harmony.cpp
     src/HarmonyP.cpp
     src/Help.cpp
-    src/IntelligentMasteringAssistant.cpp
     src/Immersive3DReverbConvolver.cpp
     src/ImmersiveAudioPanner.cpp
+    src/InfiniteBarberpoleFlangerEngine.cpp
+    src/IntelligentMasteringAssistant.cpp
     src/JazzPlusPlusApplication.cpp
     src/KeyChordDetector.cpp
     src/KeyStringConverters.cpp
     src/Knob.cpp
+    src/LiveStreamHealthTelemetryEngine.cpp
     src/LoudnessMeterEBU.cpp
     src/Mapper.cpp
     src/MasterLinearPhaseImager.cpp
@@ -245,6 +247,7 @@ set(JAZZ_SOURCES
     src/ModulationMultiFX.cpp
     src/ModulationMatrix.cpp
     src/MpeEngine.cpp
+    src/MpegHInteractiveAudioEngine.cpp
     src/MultibandCompressor.cpp
     src/MultibandOttProcessor.cpp
     src/MultiMicPhaseAlignerEngine.cpp
@@ -257,6 +260,7 @@ set(JAZZ_SOURCES
     src/NetworkSessionEngine.cpp
     src/NeuralAudioEngine.cpp
     src/NeuralStemSeparatorEngine.cpp
+    src/NeuralTimbreTransferEngine.cpp
     src/PhaseAlignerEngine.cpp
     src/PhysicalResonator.cpp
     src/PianoFrame.cpp
@@ -305,6 +309,8 @@ set(JAZZ_SOURCES
     src/StringReadWrite.cpp
     src/StringUtilities.cpp
     src/SubHarmonicSynthesizer.cpp
+    src/SubHarmonicWaveguideBassEngine.cpp
+    src/SympatheticGuitarResonanceEngine.cpp
     src/Synth.cpp
     src/SysexChannel.cpp
     src/TakesComping.cpp

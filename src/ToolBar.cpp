@@ -21,6 +21,7 @@
 //*****************************************************************************
 
 #include "ToolBar.h"
+#include "Globals.h"
 
 #include <wx/frame.h>
 #include <wx/toolbar.h>
@@ -38,9 +39,15 @@ JZToolBar::JZToolBar(wxFrame* pFrame, JZToolDef* pToolDef)
   mpToolBar = pFrame->CreateToolBar(
     wxTB_FLAT | wxTB_HORIZONTAL | wxTB_NODIVIDER);
 
+#if wxCHECK_VERSION(3, 1, 0)
   int targetW = pFrame->FromDIP(22);
   int targetH = pFrame->FromDIP(22);
   mpToolBar->SetMargins(pFrame->FromDIP(4), pFrame->FromDIP(4));
+#else
+  int targetW = 22;
+  int targetH = 22;
+  mpToolBar->SetMargins(4, 4);
+#endif
   mpToolBar->SetToolBitmapSize(wxSize(targetW, targetH));
 
   while (pToolDef->mId != eToolBarEnd)

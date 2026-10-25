@@ -29,6 +29,7 @@
 #include <wx/button.h>
 #include <wx/html/htmlwin.h>
 #include <wx/dcclient.h>
+#include <wx/settings.h>
 #include <wx/sizer.h>
 #include <wx/statbmp.h>
 #include <wx/version.h>

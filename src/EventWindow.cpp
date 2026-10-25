@@ -44,6 +44,8 @@
 #include <wx/dc.h>
 #include <wx/msgdlg.h>
 
+#include <algorithm>
+
 using namespace std;
 
 //*****************************************************************************

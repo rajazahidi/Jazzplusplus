@@ -1,4 +1,15 @@
 25-10-2026 Raja Zahidi
+- Bugfix & CI Build Pipeline Final Stabilization:
+  * JZBroadcastWaveIxmlExporterEngine (src/BroadcastWaveIxmlExporterEngine.cpp):
+    - Added const qualifier to buildBextChunk() implementation matching header definition and eliminated redundant const_cast.
+  * JZAutoAccompaniment & JZChordQuality (src/AutoAccompaniment.h):
+    - Added CHORD_DOM7 alias in enum JZChordQuality.
+    - Added typedef JZGenerationMode JZAccompanimentMode for legacy configuration compatibility.
+    - Promoted AnalyzeWindow helper method to public scope to support chord track analysis callers.
+  * JZTrack Member Accessors (src/Track.h):
+    - Added IsMute() and IsSolo() state query methods on JZTrack.
+
+25-10-2026 Raja Zahidi
 - Bugfix & CI Build Pipeline Stabilization:
   * CMake Build Configuration (CMakeLists.txt):
     - Added all 124 engine source files and Threads::Threads to the jazz_tests target, ensuring seamless compilation and linking across Linux and Windows runners.

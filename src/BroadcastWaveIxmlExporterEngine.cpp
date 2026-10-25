@@ -65,7 +65,7 @@ static void appendPaddedString(std::vector<uint8_t>& buf, const std::string& str
     }
 }
 
-std::vector<uint8_t> JZBroadcastWaveIxmlExporterEngine::buildBextChunk()
+std::vector<uint8_t> JZBroadcastWaveIxmlExporterEngine::buildBextChunk() const
 {
     std::vector<uint8_t> chunk;
     // FourCC 'bext'
@@ -150,7 +150,7 @@ std::vector<uint8_t> JZBroadcastWaveIxmlExporterEngine::generateBwfHeader(size_t
     header.push_back('W'); header.push_back('A'); header.push_back('V'); header.push_back('E');
 
     // 1. 'bext' Broadcast Extension chunk
-    std::vector<uint8_t> bextChunk = const_cast<JZBroadcastWaveIxmlExporterEngine*>(this)->buildBextChunk();
+    std::vector<uint8_t> bextChunk = buildBextChunk();
     header.insert(header.end(), bextChunk.begin(), bextChunk.end());
 
     // 2. 'iXML' chunk

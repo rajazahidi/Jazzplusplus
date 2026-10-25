@@ -27,6 +27,7 @@ enum JZGenerationMode
   MODE_AUTO_SOLO,         // Intelligent Lead Improviser / Solo Generator
   MODE_ALL_SIMULTANEOUS   // Generate all selected layers together
 };
+typedef JZGenerationMode JZAccompanimentMode;
 
 // Song Form Dynamic Sections
 enum JZSongSection
@@ -211,6 +212,7 @@ enum JZChordQuality
   CHORD_MAJOR = 0,
   CHORD_MINOR,
   CHORD_DOMINANT7,
+  CHORD_DOM7 = CHORD_DOMINANT7,
   CHORD_MAJOR7,
   CHORD_MINOR7,
   CHORD_DIMINISHED,
@@ -620,8 +622,6 @@ class JZAutoAccompaniment
 
     // Clear key-on notes in clock range [fromClock, toClock)
     static void ClearRange(JZTrack* pTrack, int fromClock, int toClock);
-
-  private:
 
     // Helper for analyzing notes within an arbitrary clock window
     static bool AnalyzeWindow(

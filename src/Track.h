@@ -590,6 +590,8 @@ class JZTrack : public JZEventArray
     void SetName(const char* Name);
 
     bool IsKilled() const { return false; }
+    bool IsMute() const { return mState == tsMute; }
+    bool IsSolo() const { return mState == tsSolo; }
     std::string GetTrackName() const
     {
       const char* n = const_cast<JZTrack*>(this)->GetName();

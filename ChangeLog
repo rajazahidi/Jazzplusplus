@@ -1,4 +1,27 @@
 25-10-2026 Raja Zahidi
+- Feature & Master Studio Vocal Sibilance Split De-Esser, Tape Head-Bump Varispeed, Immersive Bass Management Crossover, Master Bus Glue VCA Compressor, Reactive Load Speaker Impedance, & Binaural Acoustic Room Convolver Suite v27.0 (Apex Transcendence Sovereign Release):
+  * Intelligent Vocal Sibilance Split-Band Lookahead De-Esser Engine (src/VocalSibilanceSplitDeEsserEngine.h & .cpp):
+    - JZVocalSibilanceSplitDeEsserEngine delivers transparent vocal harshness and ess suppression (FabFilter Pro-DS / Weiss Deess style).
+    - Features zero-phase 4th-order Linkwitz-Riley split-band crossover (4 kHz to 12 kHz), psychoacoustic high-frequency energy detection with fast peak follower, program-dependent dynamic attenuation (-1 to -24 dB), sidechain audition mode, and lookahead transient preservation.
+  * Master Tape Electro-Magnetic Head-Bump Bass Resonance & Varispeed Transport Engine (src/TapeHeadBumpVarispeedTransportEngine.h & .cpp):
+    - JZTapeHeadBumpVarispeedTransportEngine physically simulates analog master tape machine transport physics and magnetic head pole geometry (Studer A800 / Ampex ATR-102 style).
+    - Features speed-dependent head-bump bass resonance (55 Hz bump at 15 IPS, 110 Hz bump at 30 IPS), continuous motor varispeed pitch/speed scrubbing (+/- 100%), and mechanical motor brake tape-stop inertia wind-down.
+  * Immersive 9.1.6 16-Channel Bass Management & LFE Sub Crossover Matrix (src/ImmersiveBassManagementCrossoverEngine.h & .cpp):
+    - JZImmersiveBassManagementCrossoverEngine delivers professional theater-grade bass management for Dolby Atmos and immersive 3D audio listening environments (Trinnov Altitude / JBL Synthesis style).
+    - Features 16-channel discrete routing, 4th-order (24 dB/oct) Linkwitz-Riley crossover filtering at 80 Hz, high-pass acoustic protection on main and height satellite monitors, +10 dB cinema LFE subwoofer gain boost, and comprehensive phase-aligned low-frequency redirection.
+  * Master Bus Glue VCA Compressor & Thrust Sidechain Engine (src/MasterBusGlueVcaCompressorEngine.h & .cpp):
+    - JZMasterBusGlueVcaCompressorEngine models legendary British analog console stereo master bus VCA compression (SSL 4000 G-Master / API 2500 style).
+    - Features soft-knee logarithmic VCA compression curve, -3 dB/octave High-Pass Thrust sidechain filter preventing low-frequency pumping, program-dependent dual-decay auto-release, and parallel wet/dry master blend.
+  * Reactive Load Box Speaker Voice-Coil Impedance Simulation Engine (src/ReactiveLoadSpeakerImpedanceEngine.h & .cpp):
+    - JZReactiveLoadSpeakerImpedanceEngine simulates physical tube amplifier voice-coil reactive interactions (Suhr Reactive Load / Two Notes Torpedo style).
+    - Features dual-resonant LC reactive impedance curve (75 Hz bass resonance with 32 Ohm peak, 2.8 kHz inductive voice-coil rise), power soak attenuation with back-EMF damping, tube amplifier high-voltage power supply rail sag, and multi-cabinet impedance profiling (Vintage 30 4x12, Greenback 4x12, Creamback 2x12, Alnico Blue 1x12).
+  * Binaural Acoustic Mastering Room & Boundary Decay Convolver Engine (src/BinauralAcousticRoomConvolverEngine.h & .cpp):
+    - JZBinauralAcousticRoomConvolverEngine transforms spatial Atmos headphone mixes into world-class acoustic mastering control room monitoring (Abbey Road Studio 3 / Sunset Sound Studio style).
+    - Features 3D shoebox room geometry modeling, image-source discrete early reflection taps with Woodworth spherical head model ITD and head shadow ILD filtering, Eyring boundary reverberant decay matching target RT60, and binaural speaker monitor crossfeed.
+  * Added Automated Unit Tests 191 to 196 (tests/test_main.cpp):
+    - Validates vocal split-band de-esser zero-phase crossover and lookahead reduction, tape head-bump 15/30 IPS magnetic resonance and varispeed scrubbing, 9.1.6 16-channel 80Hz Linkwitz-Riley bass management and +10dB LFE boost, SSL-style master bus glue VCA compression and Thrust sidechain, reactive load voice-coil LC resonance and power sag, and 3D acoustic room early reflection ITD/ILD convolution.
+
+25-10-2026 Raja Zahidi
 - Feature & Master Studio Acoustic Guitar Body Convolver, Subharmonic Bass & Optical Exciter, Multiband Transient Sculptor, RotaFonic Rotary Speaker, Speech Denoise Spectral Subtractor, & Spatial Audio Ear Canal EQ Calibration Suite v26.0 (Apex Genesis Zenith Release):
   * Acoustic Guitar Body Impulse Convolver Engine (src/AcousticGuitarBodyImpulseConvolverEngine.h & .cpp):
     - JZAcousticGuitarBodyImpulseConvolverEngine transforms harsh undersaddle piezo guitar pickups into pristine studio microphone recordings (Fishman Aura / ToneDexter / LR Baggs Voiceprint style).

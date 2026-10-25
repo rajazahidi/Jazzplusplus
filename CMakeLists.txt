@@ -137,6 +137,7 @@ set(JAZZ_SOURCES
     src/AutoAccompaniment.cpp
     src/AutomationEngine.cpp
     src/AutonomousMixAssistantEngine.cpp
+    src/BinauralAcousticRoomConvolverEngine.cpp
     src/BinauralHrtfSpatializer.cpp
     src/BiomechanicalVocalTractEngine.cpp
     src/BodeFrequencyShifterWaveMultiplierEngine.cpp
@@ -230,6 +231,7 @@ set(JAZZ_SOURCES
     src/HighOrderAmbisonics3rdOrderEngine.cpp
     src/Immersive3DReverbConvolver.cpp
     src/ImmersiveAudioPanner.cpp
+    src/ImmersiveBassManagementCrossoverEngine.cpp
     src/ImmersiveSpeakerAlignmentEngine.cpp
     src/InfiniteBarberpoleFlangerEngine.cpp
     src/IntelligentMasteringAssistant.cpp
@@ -241,6 +243,7 @@ set(JAZZ_SOURCES
     src/LiveStreamHealthTelemetryEngine.cpp
     src/LoudnessMeterEBU.cpp
     src/Mapper.cpp
+    src/MasterBusGlueVcaCompressorEngine.cpp
     src/MasterLinearPhaseImager.cpp
     src/MasterTruePeakLimiter.cpp
     src/MasterVisualizer.cpp
@@ -296,6 +299,7 @@ set(JAZZ_SOURCES
     src/PtpClockPrecisionSyncEngine.cpp
     src/QuantumParticleGranularEngine.cpp
     src/Random.cpp
+    src/ReactiveLoadSpeakerImpedanceEngine.cpp
     src/RecordingInfo.cpp
     src/Rectangle.cpp
     src/Rhythm.cpp
@@ -340,6 +344,7 @@ set(JAZZ_SOURCES
     src/SysexChannel.cpp
     src/TakesComping.cpp
     src/TapeConsoleWarmer.cpp
+    src/TapeHeadBumpVarispeedTransportEngine.cpp
     src/TapeHysteresisAzimuthEngine.cpp
     src/TapeMachineCalibrationEngine.cpp
     src/TapePrintThroughDemagSimulator.cpp
@@ -360,6 +365,7 @@ set(JAZZ_SOURCES
     src/VocalDoublerEngine.cpp
     src/VocalHarmonizer.cpp
     src/VocalPitchEditor.cpp
+    src/VocalSibilanceSplitDeEsserEngine.cpp
     src/VocoderEngine.cpp
     src/VolterraDynamicConvolutionEngine.cpp
     src/WasapiAudioDriver.cpp

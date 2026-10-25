@@ -74,6 +74,12 @@
 #include "RotaFonicRotarySpeakerSimulator.h"
 #include "SpeechDenoiseSpectralSubtractorEngine.h"
 #include "SpatialAudioEarCanalEqCalibrationEngine.h"
+#include "VocalSibilanceSplitDeEsserEngine.h"
+#include "TapeHeadBumpVarispeedTransportEngine.h"
+#include "ImmersiveBassManagementCrossoverEngine.h"
+#include "MasterBusGlueVcaCompressorEngine.h"
+#include "ReactiveLoadSpeakerImpedanceEngine.h"
+#include "BinauralAcousticRoomConvolverEngine.h"
 
 #include <cassert>
 #include <cmath>
@@ -3557,6 +3563,129 @@ void TestAutoAccompanimentLogic()
               headphoneCalibrator.getMaxCorrectionDb() > 0.0f &&
               headphoneCalibrator.getHeadphoneModelName().find("HD650") != std::string::npos,
               "Spatial Audio Headphone Ear Canal EQ Calibration validates Harman 2018 Target curve matching and Sennheiser HD650 transducer linearization");
+
+  // 191. Vocal Sibilance Split-Band Lookahead De-Esser Engine
+  Jazz::JZVocalSibilanceSplitDeEsserEngine deEsser(48000.0f);
+  deEsser.setFrequencyHz(6500.0f);
+  deEsser.setThresholdDb(-22.0f);
+  deEsser.setRangeDb(-12.0f);
+
+  const size_t deEssN = 512;
+  std::vector<float> deEssInL(deEssN, 0.0f), deEssInR(deEssN, 0.0f);
+  for (size_t i = 0; i < deEssN; ++i) {
+    float s = 0.7f * std::sin(2.0f * 3.14159265f * 6500.0f * (float)i / 48000.0f);
+    deEssInL[i] = s;
+    deEssInR[i] = s;
+  }
+  std::vector<float> deEssOutL(deEssN, 0.0f), deEssOutR(deEssN, 0.0f);
+  deEsser.process(deEssInL.data(), deEssInR.data(), deEssOutL.data(), deEssOutR.data(), deEssN);
+
+  TEST_ASSERT(deEsser.getFrequencyHz() == 6500.0f &&
+              deEsser.getThresholdDb() == -22.0f &&
+              deEsser.getRangeDb() == -12.0f &&
+              deEsser.getCurrentGainReductionDb() <= 0.0f &&
+              deEsser.isSibilanceActive(),
+              "Vocal Sibilance Split-Band De-Esser validates zero-phase crossover, intelligent high-frequency detection, and lookahead dynamic reduction");
+
+  // 192. Tape Head-Bump Bass Resonance & Varispeed Transport Engine
+  Jazz::JZTapeHeadBumpVarispeedTransportEngine tapeEngine(48000.0f);
+  tapeEngine.setTapeSpeedIps(15.0f);
+  tapeEngine.setHeadBumpAmount(1.2f);
+  tapeEngine.setVarispeedFactor(1.05f);
+
+  const size_t tapeN = 256;
+  std::vector<float> tapeInL(tapeN, 0.3f), tapeInR(tapeN, 0.3f);
+  std::vector<float> tapeOutL(tapeN, 0.0f), tapeOutR(tapeN, 0.0f);
+  tapeEngine.process(tapeInL.data(), tapeInR.data(), tapeOutL.data(), tapeOutR.data(), tapeN);
+
+  TEST_ASSERT(tapeEngine.getTapeSpeedIps() == 15.0f &&
+              tapeEngine.getHeadBumpCenterHz() == 55.0f &&
+              tapeEngine.getCurrentSpeed() > 0.0f &&
+              tapeEngine.getVarispeedFactor() == 1.05f &&
+              tapeEngine.getHeadBumpAmount() == 1.2f,
+              "Tape Head-Bump & Varispeed Transport validates Studer 15/30 IPS magnetic head gap resonance and motor varispeed continuous pitch-time scrubbing");
+
+  // 193. Immersive 9.1.6 16-Channel Bass Management Crossover Engine
+  Jazz::JZImmersiveBassManagementCrossoverEngine bassManager(48000.0f);
+  bassManager.setCrossoverFreqHz(80.0f);
+  bassManager.setLfeGainBoostDb(10.0f);
+
+  const size_t bmN = 256;
+  std::vector<float> bmIn[16];
+  std::vector<float> bmOut[16];
+  for (int ch = 0; ch < 16; ++ch) {
+    bmIn[ch].assign(bmN, 0.25f);
+    bmOut[ch].assign(bmN, 0.0f);
+  }
+  const float* inPtrs[16];
+  float* outPtrs[16];
+  for (int ch = 0; ch < 16; ++ch) {
+    inPtrs[ch] = bmIn[ch].data();
+    outPtrs[ch] = bmOut[ch].data();
+  }
+  bassManager.process16Channels(inPtrs, outPtrs, bmN);
+
+  TEST_ASSERT(bassManager.getCrossoverFreqHz() == 80.0f &&
+              bassManager.getLfeGainBoostDb() == 10.0f &&
+              bassManager.isBassManagementEnabled() &&
+              bassManager.getSubwooferOutputEnergy() >= 0.0f &&
+              bassManager.getChannelName(3) == "LFE",
+              "Immersive 9.1.6 Bass Management Crossover validates 80Hz 4th-order Linkwitz-Riley crossover filtering and +10dB cinema LFE redirection");
+
+  // 194. Master Bus Glue VCA Compressor Engine
+  Jazz::JZMasterBusGlueVcaCompressorEngine glueComp(48000.0f);
+  glueComp.setThresholdDb(-16.0f);
+  glueComp.setRatio(4.0f);
+  glueComp.setThrustFilterEnabled(true);
+
+  const size_t glueN = 512;
+  std::vector<float> glueInL(glueN, 0.7f), glueInR(glueN, 0.7f);
+  std::vector<float> glueOutL(glueN, 0.0f), glueOutR(glueN, 0.0f);
+  glueComp.process(glueInL.data(), glueInR.data(), glueOutL.data(), glueOutR.data(), glueN);
+
+  TEST_ASSERT(glueComp.getThresholdDb() == -16.0f &&
+              glueComp.getRatio() == 4.0f &&
+              glueComp.isThrustFilterEnabled() &&
+              glueComp.getCurrentGainReductionDb() <= 0.0f &&
+              glueComp.isCompressing(),
+              "Master Bus Glue VCA Compressor validates soft-knee VCA compression curve, Thrust high-pass sidechain weighting, and program-dependent auto-release");
+
+  // 195. Reactive Load Box Speaker Impedance Simulation Engine
+  Jazz::JZReactiveLoadSpeakerImpedanceEngine loadBox(48000.0f);
+  loadBox.setCabinetType(Jazz::SpeakerCabinetType::CAB_4X12_VINTAGE30);
+  loadBox.setPowerSagAmount(0.35f);
+
+  const size_t loadN = 256;
+  std::vector<float> loadInL(loadN, 0.5f), loadInR(loadN, 0.5f);
+  std::vector<float> loadOutL(loadN, 0.0f), loadOutR(loadN, 0.0f);
+  loadBox.process(loadInL.data(), loadInR.data(), loadOutL.data(), loadOutR.data(), loadN);
+
+  TEST_ASSERT(loadBox.getCabinetType() == Jazz::SpeakerCabinetType::CAB_4X12_VINTAGE30 &&
+              loadBox.getResonanceFreqHz() == 75.0f &&
+              loadBox.getImpedancePeakOhms() == 32.0f &&
+              loadBox.getPowerSagAmount() == 0.35f &&
+              loadBox.getCabinetTypeName().find("4x12") != std::string::npos,
+              "Reactive Load Box Speaker Impedance validates voice-coil LC reactive resonance (75Hz/2.8kHz), back-EMF damping, and tube power sag");
+
+  // 196. Binaural Acoustic Mastering Room Convolver Engine
+  Jazz::JZBinauralAcousticRoomConvolverEngine roomConvolver(48000.0f);
+  roomConvolver.setRoomDimensions(8.5f, 6.2f, 3.4f);
+  roomConvolver.setRoomSizeFactor(1.0f);
+  roomConvolver.setDamping(0.45f);
+  roomConvolver.setDryWet(0.4f);
+
+  const size_t roomN = 256;
+  std::vector<float> rInL(roomN, 0.3f), rInR(roomN, 0.3f);
+  std::vector<float> rOutL(roomN, 0.0f), rOutR(roomN, 0.0f);
+  roomConvolver.processStereo(rInL.data(), rInR.data(), rOutL.data(), rOutR.data(), roomN);
+
+  TEST_ASSERT(roomConvolver.getRoomVolumeCubicMeters() > 100.0f &&
+              roomConvolver.getTotalSurfaceAreaSquareMeters() > 100.0f &&
+              roomConvolver.getEarlyReflectionCount() > 0 &&
+              roomConvolver.getAverageAbsorption() > 0.0f &&
+              roomConvolver.getRt60Seconds() > 0.1f &&
+              roomConvolver.getDryWet() == 0.4f,
+              "Binaural Acoustic Mastering Room Convolver validates 3D shoebox early reflections, ITD/ILD head shadowing, and Eyring boundary decay");
 }
 
 //-----------------------------------------------------------------------------

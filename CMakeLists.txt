@@ -126,6 +126,7 @@ set(JAZZ_SOURCES
     src/Ara2HostBridge.cpp
     src/ArrayControl.cpp
     src/AsciiMidiFile.cpp
+    src/AtmosphericAirAbsorptionSpatialEngine.cpp
     src/Audio.cpp
     src/AudioEffects.cpp
     src/AudioFlexTimeWarp.cpp
@@ -201,6 +202,7 @@ set(JAZZ_SOURCES
     src/DynamicDeEsser.cpp
     src/DynamicResonanceSuppressorEngine.cpp
     src/DynamicSidechainEq.cpp
+    src/DynamicWindTurbulenceSuppressorEngine.cpp
     src/EllipticalMonoBassCenteringEngine.cpp
     src/ErrorMessage.cpp
     src/EuclideanArp.cpp
@@ -311,6 +313,7 @@ set(JAZZ_SOURCES
     src/PolyphonicAudioChordParserEngine.cpp
     src/PolyphonicNeuralAudioToMidiEngine.cpp
     src/PolyphonicVocalFormantMorpherEngine.cpp
+    src/PolyphaseAntiAliasingOversamplerEngine.cpp
     src/Project.cpp
     src/ProjectBundle.cpp
     src/ProjectManager.cpp
@@ -358,6 +361,7 @@ set(JAZZ_SOURCES
     src/SteelPlateReverbPhysicalEngine.cpp
     src/StemSeparatorEngine.cpp
     src/StemsExporter.cpp
+    src/StereoWidthSpectralShufflerEngine.cpp
     src/StreamingLoudnessInspector.cpp
     src/StringReadWrite.cpp
     src/StringUtilities.cpp
@@ -375,9 +379,11 @@ set(JAZZ_SOURCES
     src/ThroughZeroFlanger.cpp
     src/VariableMuVintageTubeCompressorEngine.cpp
     src/VintageCassetteLoFiTapeEngine.cpp
+    src/VintageInductorWahPedalEngine.cpp
     src/VintageLofiProcessor.cpp
     src/VinylLatheMechanicalSimulator.cpp
     src/VirtualStudioMonitorSimulator.cpp
+    src/TonewheelOrganDrawbarEngine.cpp
     src/ToolBar.cpp
     src/Track.cpp
     src/TrackFrame.cpp

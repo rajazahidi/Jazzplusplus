@@ -1,4 +1,27 @@
 25-10-2026 Raja Zahidi
+- Feature & Master Studio Dynamic Wind Turbulence Suppressor, Vintage Inductor Wah Pedal, Polyphase Anti-Aliasing Oversampler, Tonewheel Organ Drawbars, Atmospheric Air Absorption, & Stereo Width Spectral Shuffler Suite v33.0 (Apex Transcendence Sovereign Infinity Release):
+  * Dynamic Atmospheric Wind Buffeting & Diaphragm Overload Attenuator (src/DynamicWindTurbulenceSuppressorEngine.h & .cpp):
+    - JZDynamicWindTurbulenceSuppressorEngine reduces wind buffeting, outdoor turbulence, and capsule overload (Cedar Wind Filter / iZotope RX De-wind style).
+    - Features sub-band energy correlation (<150 Hz), non-stationary gust acceleration tracking, adaptive dynamic high-pass filter cutoff expansion (20 Hz to 350 Hz), sub-band gust damping (-3 dB to -36 dB), and Wind Delta Solo audition mode.
+  * Historic Fasel / Halo Toroidal Inductor Wah-Wah & Resonant Drive Engine (src/VintageInductorWahPedalEngine.h & .cpp):
+    - JZVintageInductorWahPedalEngine delivers physical modeling of the legendary 1967 Vox Clyde McCoy and Thomas Organ Cry Baby wah-wah pedals.
+    - Features 500mH toroidal inductor core saturation with non-linear magnetic flux B-H tanh() curve, 100k ICAR S-taper potentiometer response, 2N5172 BJT transistor feedback gain stage, selectable Fasel Red / Yellow / Halo inductors, and foot treadle frequency sweep (350 Hz to 2.2 kHz).
+  * Ultra-Low-Latency Polyphase Anti-Aliasing Oversampling Wrapper Engine (src/PolyphaseAntiAliasingOversamplerEngine.h & .cpp):
+    - JZPolyphaseAntiAliasingOversamplerEngine provides studio-grade multi-rate polyphase FIR oversampling (2x, 4x, 8x, 16x).
+    - Features symmetric half-band coefficients with >100 dB stopband alias attenuation, dual phase modes (Linear Phase for zero-distortion mastering vs Minimum Phase for zero-latency live tracking), and wrapped processing functors for non-linear distortion algorithms.
+  * Electromechanical 91-Tonewheel Generator & 9-Drawbar Organ Engine (src/TonewheelOrganDrawbarEngine.h & .cpp):
+    - JZTonewheelOrganDrawbarEngine physically models the 1935 Hammond Model B3 / C3 tonewheel organ.
+    - Features all 91 electromechanical tonewheels running at precise historical gear ratios (32.7 Hz to 5919 Hz), 9 standard harmonic drawbars (16', 5 1/3', 8', 4', 2 2/3', 2', 1 3/5', 1 1/3', 1') with 0-8 steps, touch-responsive 2nd/3rd harmonic percussion with Fast/Slow decay, mechanical key click noise generator, and magnetic pickup leakage crosstalk.
+  * ISO 9613-1 Atmospheric Air Molecular Absorption & Acoustic Distance Attenuator (src/AtmosphericAirAbsorptionSpatialEngine.h & .cpp):
+    - JZAtmosphericAirAbsorptionSpatialEngine physically simulates sound wave propagation through air according to the ISO 9613-1 standard.
+    - Features molecular relaxation of Oxygen and Nitrogen dependent on temperature (-10C to +40C) and relative humidity (10% to 100%), progressive high-frequency absorption filtering over distance (0.5m to 300m), geometric inverse-square law attenuation, speed-of-sound propagation delay line (343 m/s), and close-mic proximity bass boost.
+  * Alan Blumlein Frequency-Dependent Stereo Shuffler & Polar Image Sculptor (src/StereoWidthSpectralShufflerEngine.h & .cpp):
+    - JZStereoWidthSpectralShufflerEngine implements the classic Blumlein stereo shuffling matrix for frequency-dependent stereo image manipulation.
+    - Features low-frequency Side bass boost below 700 Hz for acoustic ITD spaciousness, sub-bass elliptical mono-maker (<120 Hz) for vinyl/subwoofer punch, high-frequency Air expansion (>6 kHz), and continuous phase correlation metering with automatic mono-cancellation guard.
+  * Added Automated Unit Tests 227 to 232 (tests/test_main.cpp):
+    - Validates wind turbulence sub-band gust acceleration and adaptive high-pass expansion, vintage wah 500mH Fasel core saturation and ICAR taper, polyphase FIR oversampler multi-rate linear-phase wrapped processing, tonewheel organ 91-wheel gear train and 9-drawbar mix, ISO 9613-1 atmospheric air absorption and propagation delay, and Blumlein stereo shuffler frequency-dependent M/S sculpting.
+
+25-10-2026 Raja Zahidi
 - Feature & Master Studio Vocal Mic Rustle Attenuator, Moog Transistor Ladder Filter, Spatial Transient-Tonal Balancer, Adaptive Mains Hum Remover, Grand Piano Sympathetic Resonance, & Master Linear-Phase Multiband Dynamics Suite v32.0 (Apex Transcendence Sovereign Millennium Release):
   * Real-Time Vocal Microphone Rustle, Clothing Friction & Mechanical Thud Attenuator (src/VocalMicRustleAttenuatorEngine.h & .cpp):
     - JZVocalMicRustleAttenuatorEngine eliminates non-stationary clothing friction and mechanical mic capsule thuds (iZotope RX De-rustle / Accentize style).

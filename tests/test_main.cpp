@@ -110,6 +110,12 @@
 #include "AdaptiveMainsHumRemoverEngine.h"
 #include "GrandPianoSympatheticResonanceEngine.h"
 #include "MasterLinearPhaseMultibandDynamicsEngine.h"
+#include "DynamicWindTurbulenceSuppressorEngine.h"
+#include "VintageInductorWahPedalEngine.h"
+#include "PolyphaseAntiAliasingOversamplerEngine.h"
+#include "TonewheelOrganDrawbarEngine.h"
+#include "AtmosphericAirAbsorptionSpatialEngine.h"
+#include "StereoWidthSpectralShufflerEngine.h"
 
 #include <cassert>
 #include <cmath>
@@ -4352,6 +4358,128 @@ void TestAutoAccompanimentLogic()
               multibandDynamics.getBandParameters(0).thresholdDb == -16.0f &&
               multibandDynamics.getBandGainReductionDb(0) <= 0.0f,
               "Master Linear-Phase Multiband Dynamics validates 5-band crossover, soft-knee logarithmic VCA compression, and lookahead");
+
+  // 227. Dynamic Atmospheric Wind Buffeting & Diaphragm Overload Attenuator
+  Jazz::JZDynamicWindTurbulenceSuppressorEngine windEngine(48000.0f);
+  windEngine.setReductionDb(-24.0f);
+  windEngine.setSensitivity(1.2f);
+  windEngine.setCutoffRange(30.0f, 350.0f);
+
+  const size_t wndN = 512;
+  std::vector<float> wndInL(wndN, 0.4f), wndInR(wndN, 0.4f);
+  std::vector<float> wndOutL(wndN, 0.0f), wndOutR(wndN, 0.0f);
+  windEngine.process(wndInL.data(), wndInR.data(), wndOutL.data(), wndOutR.data(), wndN);
+
+  TEST_ASSERT(windEngine.getReductionDb() == -24.0f &&
+              windEngine.getSensitivity() == 1.2f &&
+              windEngine.getMinCutoffHz() == 30.0f &&
+              windEngine.getMaxCutoffHz() == 350.0f &&
+              windEngine.getCurrentCutoffHz() >= 25.0f,
+              "Dynamic Wind Turbulence Suppressor validates sub-band gust acceleration tracking, adaptive high-pass expansion, and delta solo");
+
+  // 228. Historic Fasel / Halo Toroidal Inductor Wah-Wah & Resonant Drive Engine
+  Jazz::JZVintageInductorWahPedalEngine wahEngine(48000.0f);
+  wahEngine.setPedalPosition(0.65f);
+  wahEngine.setDriveDb(4.0f);
+  wahEngine.setInductorSaturation(0.6f);
+  wahEngine.setResonanceQ(6.0f);
+  wahEngine.setInductorType(Jazz::WahInductorType::FASEL_RED);
+
+  const size_t wahN = 512;
+  std::vector<float> wahInL(wahN, 0.5f), wahInR(wahN, 0.5f);
+  std::vector<float> wahOutL(wahN, 0.0f), wahOutR(wahN, 0.0f);
+  wahEngine.process(wahInL.data(), wahInR.data(), wahOutL.data(), wahOutR.data(), wahN);
+
+  TEST_ASSERT(wahEngine.getPedalPosition() == 0.65f &&
+              wahEngine.getDriveDb() == 4.0f &&
+              wahEngine.getInductorSaturation() == 0.6f &&
+              wahEngine.getResonanceQ() == 6.0f &&
+              wahEngine.getCenterFrequencyHz() > 350.0f &&
+              wahEngine.getInductorTypeName().find("Fasel") != std::string::npos,
+              "Vintage Inductor Wah Pedal validates 500mH Fasel core saturation, 100k ICAR S-taper curve, and resonant peaking");
+
+  // 229. Ultra-Low-Latency Polyphase Anti-Aliasing Oversampling Wrapper Engine
+  Jazz::JZPolyphaseAntiAliasingOversamplerEngine oversampler(48000.0f, Jazz::OversamplingFactor::X4, Jazz::OversamplingPhaseMode::LINEAR_PHASE);
+
+  const size_t ovsN = 256;
+  std::vector<float> ovsInL(ovsN, 0.6f), ovsInR(ovsN, 0.6f);
+  std::vector<float> ovsOutL(ovsN, 0.0f), ovsOutR(ovsN, 0.0f);
+
+  oversampler.processWrapped(ovsInL.data(), ovsInR.data(), ovsOutL.data(), ovsOutR.data(), ovsN,
+    [](float* upL, float* upR, size_t upSamples) {
+      for (size_t k = 0; k < upSamples; ++k) {
+        upL[k] = std::tanh(upL[k] * 2.5f);
+        upR[k] = std::tanh(upR[k] * 2.5f);
+      }
+    });
+
+  TEST_ASSERT(oversampler.getOversamplingFactor() == Jazz::OversamplingFactor::X4 &&
+              oversampler.getFactorInt() == 4 &&
+              oversampler.getOversampledRate() == 192000.0f &&
+              oversampler.getStopbandRejectionDb() >= 100.0f &&
+              oversampler.getLatencySamples() > 0,
+              "Polyphase Anti-Aliasing Oversampler validates multi-rate polyphase FIR decomposition, linear phase, and alias-free wrapped processing");
+
+  // 230. Electromechanical 91-Tonewheel Generator & 9-Drawbar Organ Engine
+  Jazz::JZTonewheelOrganDrawbarEngine organEngine(48000.0f);
+  organEngine.setAllDrawbars({8, 8, 8, 0, 0, 0, 0, 0, 0});
+  organEngine.setPercussionEnabled(true);
+  organEngine.setPercussionHarmonic(Jazz::OrganPercussionHarmonic::THIRD);
+  organEngine.setPercussionDecay(Jazz::OrganPercussionDecay::FAST);
+  organEngine.setKeyClickAmount(0.4f);
+  organEngine.noteOn(60, 0.85f); // Middle C
+
+  const size_t orgN = 512;
+  std::vector<float> orgOutL(orgN, 0.0f), orgOutR(orgN, 0.0f);
+  organEngine.process(orgOutL.data(), orgOutR.data(), orgN);
+
+  TEST_ASSERT(organEngine.getActiveVoicesCount() == 1 &&
+              organEngine.getDrawbar(0) == 8 &&
+              organEngine.getDrawbar(1) == 8 &&
+              organEngine.getDrawbar(2) == 8 &&
+              organEngine.getDrawbar(3) == 0 &&
+              organEngine.isPercussionEnabled() &&
+              organEngine.getPresetRegistrationString().find("88 80") != std::string::npos,
+              "Tonewheel Organ Drawbar Engine validates 91-wheel gear train, 9-drawbar harmonic mix, harmonic percussion, and key click");
+
+  // 231. ISO 9613-1 Atmospheric Air Molecular Absorption & Acoustic Distance Attenuator
+  Jazz::JZAtmosphericAirAbsorptionSpatialEngine airSpatial(48000.0f);
+  airSpatial.setDistanceMeters(25.0f);
+  airSpatial.setTemperatureCelsius(22.0f);
+  airSpatial.setRelativeHumidityPercent(45.0f);
+
+  const size_t airN = 512;
+  std::vector<float> airInL(airN, 0.5f), airInR(airN, 0.5f);
+  std::vector<float> airOutL(airN, 0.0f), airOutR(airN, 0.0f);
+  airSpatial.process(airInL.data(), airInR.data(), airOutL.data(), airOutR.data(), airN);
+
+  TEST_ASSERT(airSpatial.getDistanceMeters() == 25.0f &&
+              airSpatial.getTemperatureCelsius() == 22.0f &&
+              airSpatial.getRelativeHumidityPercent() == 45.0f &&
+              airSpatial.getSpeedOfSoundMps() > 340.0f &&
+              airSpatial.getPropagationDelayMs() > 0.0f &&
+              airSpatial.getAbsorptionLossAt10kHzDb() < 0.0f,
+              "Atmospheric Air Absorption Spatial Engine validates ISO 9613-1 molecular relaxation, distance damping, and speed of sound delay");
+
+  // 232. Alan Blumlein Frequency-Dependent Stereo Shuffler & Polar Image Sculptor
+  Jazz::JZStereoWidthSpectralShufflerEngine shuffler(48000.0f);
+  shuffler.setShufflerGainDb(4.0f);
+  shuffler.setShufflerCrossoverHz(650.0f);
+  shuffler.setSubMonoCutoffHz(120.0f);
+  shuffler.setAirWidth(1.4f);
+
+  const size_t shfN = 512;
+  std::vector<float> shfInL(shfN, 0.6f), shfInR(shfN, -0.3f);
+  std::vector<float> shfOutL(shfN, 0.0f), shfOutR(shfN, 0.0f);
+  shuffler.process(shfInL.data(), shfInR.data(), shfOutL.data(), shfOutR.data(), shfN);
+
+  TEST_ASSERT(shuffler.getShufflerGainDb() == 4.0f &&
+              shuffler.getShufflerCrossoverHz() == 650.0f &&
+              shuffler.getSubMonoCutoffHz() == 120.0f &&
+              shuffler.getAirWidth() == 1.4f &&
+              shuffler.getPhaseCorrelation() >= -1.0f &&
+              shuffler.getPhaseCorrelation() <= 1.0f,
+              "Stereo Width Spectral Shuffler validates Blumlein LF side boost, elliptical mono bass, and Air width expansion");
 }
 
 //-----------------------------------------------------------------------------

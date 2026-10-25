@@ -18,7 +18,7 @@ Before reporting a bug, please search the [GitHub Issues](https://github.com/raj
 
 If creating a new bug report, please include:
 - **Operating System & Version**: (e.g. Ubuntu 24.04 LTS, macOS 14.5 Sonoma arm64, Windows 11 x64).
-- **Jazz++ Version**: (e.g. 5.4.16 or specific git commit hash).
+- **Jazz++ Version**: (e.g. 6.0.0 or specific git commit hash).
 - **Audio & MIDI Hardware**: (e.g. Focusrite Scarlett 2i2, ALSA snd_seq, CoreMIDI, WASAPI).
 - **Steps to Reproduce**: Clear step-by-step instructions.
 - **Expected vs Actual Behavior**.

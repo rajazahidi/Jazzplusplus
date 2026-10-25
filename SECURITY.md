@@ -10,7 +10,7 @@ Security updates, bug fixes, and stability patches are applied to the active rel
 
 | Version | Supported | Status |
 | :--- | :---: | :--- |
-| **5.4.x** (v5.4.16) | :white_check_mark: | Current Stable Release (Actively Maintained) |
+| **6.0.x** (v6.0.0) | :white_check_mark: | Current Stable Release (Actively Maintained) |
 | < 5.4.0 | :x: | End of Life (Upgrade Recommended) |
 
 ---

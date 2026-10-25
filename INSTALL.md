@@ -1,6 +1,6 @@
 # Installation & Build Guide
 
-Welcome to the installation and build guide for **Jazz++ MIDI & Digital Audio Sequencer** (Version 5.4.16).
+Welcome to the installation and build guide for **Jazz++ MIDI & Digital Audio Sequencer** (Version 6.0.0).
 
 ---
 

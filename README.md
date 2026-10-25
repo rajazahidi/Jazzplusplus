@@ -1,7 +1,7 @@
 # Jazz++ MIDI & Digital Audio Workstation
 
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Site-00d2ff?logo=github)](https://rajazahidi.github.io/Jazzplusplus/)
-[![Latest Release](https://img.shields.io/github/v/release/rajazahidi/Jazzplusplus?color=10b981)](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v5.4.16)
+[![Latest Release](https://img.shields.io/github/v/release/rajazahidi/Jazzplusplus?color=10b981)](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v6.0.0)
 [![CI Build](https://github.com/rajazahidi/Jazzplusplus/actions/workflows/ci.yml/badge.svg)](https://github.com/rajazahidi/Jazzplusplus/actions/workflows/ci.yml)
 [![Tests: 555 Passing](https://img.shields.io/badge/Tests-555%20Passing%20(100%25)-10b981.svg)](tests/test_main.cpp)
 [![Platforms](https://img.shields.io/badge/Platforms-Linux%20%7C%20macOS%20%7C%20Windows-blue.svg)](INSTALL.md)
@@ -333,9 +333,9 @@ All **136 test suites** pass with 100% accuracy, verifying sample-accurate DSP p
 
 Official pre-built standalone binaries are generated automatically on every release:
 
-- **Linux AppImage**: Download [`Jazz++-x86_64.AppImage`](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v5.4.16), make executable with `chmod +x`, and run directly on Ubuntu 20.04+, Debian 11+, Fedora, Arch, or openSUSE.
-- **macOS Native Bundle**: Download [`Jazz++-macOS-arm64.zip`](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v5.4.16), extract `Jazz++.app`, and drag to your `/Applications` directory. Fully native on Apple Silicon (M1/M2/M3/M4) via CoreAudio and CoreMIDI.
-- **Windows Portable**: Download [`Jazz++-Windows-x64.zip`](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v5.4.16), extract to any folder, and double-click `jazz.exe`. All required 64-bit runtime libraries are included.
+- **Linux AppImage**: Download [`Jazz++-x86_64.AppImage`](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v6.0.0), make executable with `chmod +x`, and run directly on Ubuntu 20.04+, Debian 11+, Fedora, Arch, or openSUSE.
+- **macOS Native Bundle**: Download [`Jazz++-macOS-arm64.zip`](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v6.0.0), extract `Jazz++.app`, and drag to your `/Applications` directory. Fully native on Apple Silicon (M1/M2/M3/M4) via CoreAudio and CoreMIDI.
+- **Windows Portable**: Download [`Jazz++-Windows-x64.zip`](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v6.0.0), extract to any folder, and double-click `jazz.exe`. All required 64-bit runtime libraries are included.
 
 ---
 

@@ -1,5 +1,5 @@
 ==============================================================================
-Jazz++ Version 5.4.16 (October 2026) - Release Announcement
+Jazz++ Version 6.0.0 (October 2026) - Release Announcement
 ==============================================================================
 
 Main Developer & Maintainer:
@@ -10,7 +10,7 @@ audio workstation and MIDI sequencer across Linux, macOS (Apple Silicon arm64 &
 Intel), and Windows with full 100% CI pass rate, 35 Apex Master Studio production
 suites, out-of-process plugin sandboxing, and spatial audio mastering.
 
-HIGHLIGHTS & NEW FEATURES (v5.4.16)
+HIGHLIGHTS & NEW FEATURES (v6.0.0)
 -----------------------------------
 * Native macOS Support (Apple Silicon M-Series & Intel):
   - Fully native macOS support via Apple CoreAudio and CoreMIDI frameworks.

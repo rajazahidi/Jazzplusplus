@@ -3,7 +3,7 @@
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Site-00d2ff?logo=github)](https://rajazahidi.github.io/Jazzplusplus/)
 [![Latest Release](https://img.shields.io/github/v/release/rajazahidi/Jazzplusplus?color=10b981)](https://github.com/rajazahidi/Jazzplusplus/releases/tag/v5.4.16)
 [![CI Build](https://github.com/rajazahidi/Jazzplusplus/actions/workflows/ci.yml/badge.svg)](https://github.com/rajazahidi/Jazzplusplus/actions/workflows/ci.yml)
-[![Tests: 136 Passing](https://img.shields.io/badge/Tests-136%20Passing%20(100%25)-10b981.svg)](tests/test_main.cpp)
+[![Tests: 142 Passing](https://img.shields.io/badge/Tests-142%20Passing%20(100%25)-10b981.svg)](tests/test_main.cpp)
 [![License: GPL-2.0](https://img.shields.io/badge/License-GPL_v2-blue.svg)](COPYING)
 
 **Jazz++** is a full-featured open-source MIDI sequencer and digital audio workstation for Linux and Windows. Built using **wxWidgets**, it provides a rich visual environment for composing, editing, arranging, and recording multi-track MIDI music and digital audio.
@@ -30,11 +30,19 @@ Originally created by Andreas Voss and Per Sigmond, with subsequent development 
 
 ---
 
-## Apex Colossus Flagship Master Studio Suites (v1.0 – v17.0)
+## Apex Colossus Flagship Master Studio Suites (v1.0 – v18.0)
 
-Jazz++ features an enterprise-grade studio DSP, neural inference, spatial metadata, collaborative AoIP, and hardware control surface architecture comprising 17 specialized production suites:
+Jazz++ features an enterprise-grade studio DSP, neural inference, spatial metadata, collaborative AoIP, and hardware control surface architecture comprising 18 specialized production suites:
 
-### 1. Apex Colossus Flagship Suite (Suite v17.0)
+### 1. Apex Sovereign Ultimate Flagship Suite (Suite v18.0)
+- **Ultra-High-Resolution DSD / DXD Audio Engine** (JZDsdDxdEngine): Audiophile SACD Direct Stream Digital format processing (DSD64 at 2.8224 MHz, DSD128 at 5.6448 MHz, DSD256 at 11.2896 MHz) featuring DoP v1.1 24-bit framing with 0x05/0xFA markers, multi-stage FIR decimation to 352.8 kHz 32-bit float DXD, 5th-order Delta-Sigma feedback modulation, and ultrasonic noise floor tracking.
+- **Hollywood Film Scoring SMPTE Video Reference & PLL Genlock Sync Engine** (JZSmpteVideoSyncEngine): Frame-accurate cinema video synchronization across 23.976 fps, 24 fps theatrical, 25 fps PAL, 29.97 DF/NDF, 30 fps, and 59.94 DF UHD formats featuring SMPTE drop-frame arithmetic (17,982 frames per 10min), sub-frame PLL chase locking, freewheel drop-out recovery, and EDL scene-cut alignment.
+- **Deep Learning Spectral 4-Stem Audio Demixing Engine** (JZNeuralStemSeparatorEngine): Demucs-style deep unmixing of stereo mixes into Vocals, Drums, Bass, and Other using multi-band soft-mask spectral decomposition, transient onset percussive tracking, mid-band vocal formant enhancement, and strict mathematical 1.0 energy conservation with zero residual loss (< 1e-4).
+- **Hybrid Studio Hardware Outboard Ping Latency Compensator** (JZHardwareInsertDelayCompensator): Automatic round-trip analog latency calibration for outboard hardware (Neve, SSL, Pultec) using single-sample Dirac ping impulses, 3-point parabolic sub-sample peak interpolation, polarity flip detection, and master multi-track delay alignment buffers.
+- **Acoustic Room Correction & SOFA Headphone Profile Engine** (JZRoomAcousticCalibrationEngine): Farina logarithmic sine sweep generation (20 Hz - 20,000 Hz) with room impulse response deconvolution, acoustic target curves (Flat Reference, Harman Studio Curve, B&K 1974, SMPTE 202M Cinema X-Curve), automated standing-wave resonant biquad filters, and SOFA binaural headphone correction.
+- **Bjorklund Euclidean & Multilane Polymetric Generative Sequencer** (JZEuclideanPolyrhythmEngine): Algorithmic Euclidean rhythm generator E(k, n) (Tresillo, Cinquillo, etc.) coupled with concurrent multilane polymetric sequencing (independent step lengths per lane), probabilistic triggers, velocity jitter, sub-step ratcheting bursts, and micro-timing swing offset.
+
+### 2. Apex Colossus Flagship Suite (Suite v17.0)
 - **Real-Time Audio-over-IP & Timeline Delta-CRDT Collaboration** (`JZNetworkSessionEngine`): AES67 and WebRTC peer-to-peer low-latency streaming audio frames with jitter buffer packet-loss concealment (PLC) and conflict-free replicated data type (delta-CRDT) timeline synchronization.
 - **Interactive Game Audio Middleware Bridge** (`JZGameAudioBridge`): Direct game audio integration (Wwise, FMOD Studio, Unreal Engine 5, Unity) featuring Real-Time Parameter Controls (RTPC), game state triggers, ray-traced acoustic obstruction/occlusion LPF (20kHz to 800Hz), and SoundBank XML packaging.
 - **Studio Tape Machine Alignment & Fluxivity Engine** (`JZTapeMachineCalibrationEngine`): High-end mastering tape machine modeling (Studer A800, Ampex ATR-102, Otari MTR-90) with NAB and CCIR/IEC1 equalizations, elevated fluxivity levels (185 to 355 nWb/m), 1kHz 0 VU and 10kHz azimuth alignment tones, and magnetic hysteresis saturation.
@@ -42,7 +50,7 @@ Jazz++ features an enterprise-grade studio DSP, neural inference, spatial metada
 - **AI Assistive Mastering & Spectral Crest Profiler** (`JZIntelligentMasteringAssistant`): Psychoacoustic mix analysis computing Integrated LUFS, Spectral Centroid, and Dynamic Crest Factor with one-click automated mastering chains tailored for Spotify (-14 LUFS), Apple Music (-16 LUFS), Vinyl (-18 LUFS with mono bass guard), and Cinema (-23 LUFS).
 - **Studio Hardware Control Surface MCU / HUI Protocol Hub** (`JZControlSurfaceManager`): Bi-directional Mackie Control Universal (MCU) and Mackie HUI protocol integration with 10-bit motorized fader pitch-bend messages, 7-character LCD scribble strip SysEx formatting, V-Pot LED rings, and transport jog-wheel scrub tracking.
 
-### 2. Apex Quantum Enterprise Suite (Suite v16.0)
+### 3. Apex Quantum Enterprise Suite (Suite v16.0)
 - **Modern VST3 & CLAP Plugin Host Bridge with Out-of-Process Sandboxing** (`JZPluginHostBridge`): Full 3rd-party plugin support (CLAP and VST3) with isolated crash-resilient subprocess execution, lock-free parameter automation, and watchdog recovery.
 - **Multithreaded DAG Audio Processing Graph Scheduler** (`JZAudioGraphScheduler`): Directed Acyclic Graph (DAG) task scheduling allocating audio processing nodes across 8 to 32 CPU cores with lock-free atomic queues, zero-buffer-underrun multi-core parallelization, and cycle detection.
 - **Next-Generation MIDI 2.0 Universal MIDI Packet (UMP) Engine** (`JZMidi2UniversalPacketEngine`): 64-bit and 128-bit UMP packet formats, 16-bit note velocities, 32-bit CC resolution (4.29 billion steps) eliminating zipper noise, per-note pitch bend, and bi-directional MIDI-CI Property Exchange.
@@ -50,7 +58,7 @@ Jazz++ features an enterprise-grade studio DSP, neural inference, spatial metada
 - **Real-Time Spatial 6-DoF Head-Tracking Telemetry Engine** (`JZSpatialHeadTracker`): 360-degree head-tracking via Open Sound Control (OSC) and IMU Bluetooth sensors with quaternion sensor fusion, dynamically rotating 3D sound fields relative to listener position for binaural monitoring.
 - **Embedded Neural Audio & Deep Learning DSP Engine** (`JZNeuralAudioEngine`): Local ONNX Runtime deep learning architecture supporting 4-stem deep neural unmixing (Demucs v4 style), accelerated GELU/ReLU activations, and Differentiable DSP (DDSP) harmonic resynthesis.
 
-### 3. Apex Singularity Master Studio Pro (Suite v15.0)
+### 4. Apex Singularity Master Studio Pro (Suite v15.0)
 - **Real-Time Transient / Tonal Spectral Audio Splitter** (`JZTransientTonalSplitter`): Separates complex mixdown signals into independent transient attack and tonal sustain streams with lossless, phase-coherent reconstruction.
 - **Aliasing-Free True-Peak Brickwall Clipper & Oversampler** (`JZBrickwallClipperEngine`): Features 4x/8x linear-phase polyphase oversampling, inter-sample true-peak enforcement (-0.1 dBTP), and 4 analog saturation curves (Hard Brickwall, Soft-Knee Parabolic, Tube Diode, and Apogee Soft-Limit).
 - **Generative Drum Poly-Fill & Pattern Morpher** (`JZGenerativeDrumMorpher`): Stochastically morphs rhythm patterns and generates automated polyrhythmic drum fills at phrase boundaries (Bars 4/8/16) across 4 variation styles with timing jitter and ghost notes.

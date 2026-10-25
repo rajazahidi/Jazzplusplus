@@ -1,4 +1,27 @@
 25-10-2026 Raja Zahidi
+- Feature & Master Studio DSD/DXD Audiophile Mastering, SMPTE Film Video Sync, Neural Stem Separator, Hardware Outboard Ping Compensator, Room Acoustic & SOFA Calibration, & Euclidean Polyrhythm Suite v18.0 (Enterprise Ultimate Flagship Release):
+  * Ultra-High-Resolution DSD / DXD Audio Engine (src/DsdDxdEngine.h & .cpp):
+    - JZDsdDxdEngine provides direct support for audiophile SACD and Direct Stream Digital formats (DSD64 at 2.8224 MHz, DSD128 at 5.6448 MHz, DSD256 at 11.2896 MHz).
+    - Features DSD-over-PCM (DoP v1.1) 24-bit container packing with alternating 0x05 / 0xFA marker bytes, 8:1 / 16:1 / 32:1 multi-stage linear-phase FIR decimation to 352.8 kHz 32-bit float DXD, 5th-order Delta-Sigma feedback modulation, and ultrasonic noise floor analysis above 50 kHz.
+  * Hollywood Film Scoring SMPTE Video Reference & PLL Genlock Sync Engine (src/SmpteVideoSyncEngine.h & .cpp):
+    - JZSmpteVideoSyncEngine provides frame-accurate cinema timecode synchronization for 23.976 fps, 24 fps theatrical, 25 fps PAL, 29.97 DF/NDF, 30 fps, and 59.94 DF UHD broadcast.
+    - Features SMPTE drop-frame arithmetic (17,982 frames per 10 minutes), PLL jitter-smoothed chase synchronization with sub-frame accuracy (< 0.1 frame), freewheeling drop-out protection, and EDL scene-cut cue alignment.
+  * Deep Learning Spectral 4-Stem Audio Demixing Engine (src/NeuralStemSeparatorEngine.h & .cpp):
+    - JZNeuralStemSeparatorEngine decomposes complex stereo mixdowns into 4 isolated stems (Vocals, Drums, Bass, Other) using deep learning soft-mask spectral decomposition.
+    - Features multi-band crossover tracking, transient onset weighting for percussive isolation, vocal formant mid-band enhancement (1.5 kHz - 3 kHz), adjustable cross-stem bleed suppression, and strict mathematical 1.0 energy conservation ensuring zero residual loss (< 1e-4).
+  * Hybrid Studio Hardware Outboard Ping Latency Compensator (src/HardwareInsertDelayCompensator.h & .cpp):
+    - JZHardwareInsertDelayCompensator automatically calibrates round-trip analog latency for outboard hardware processors (Neve, SSL, Pultec, Manley).
+    - Generates single-sample Dirac ping impulses, performs cross-correlation with 3-point parabolic sub-sample peak interpolation, detects hardware polarity inversion, and applies ring-buffer delay alignment across all project tracks.
+  * Acoustic Room Correction & SOFA Headphone Profile Engine (src/RoomAcousticCalibrationEngine.h & .cpp):
+    - JZRoomAcousticCalibrationEngine implements Farina logarithmic sine sweep generation (20 Hz - 20,000 Hz) and room impulse response deconvolution.
+    - Features target curve presets (Flat Reference, Harman Studio Curve, B&K 1974, SMPTE 202M Cinema X-Curve), automated standing-wave resonant mode peaking/notch biquad filter synthesis, max boost limit safety guards, and SOFA binaural headphone correction profiles.
+  * Bjorklund Euclidean & Multilane Polymetric Generative Sequencer (src/EuclideanPolyrhythmEngine.h & .cpp):
+    - JZEuclideanPolyrhythmEngine generates mathematical Euclidean rhythms E(k, n) using Bjorklund's distribution algorithm (Tresillo E(3,8), Cinquillo E(5,8), etc.).
+    - Features concurrent multilane polymetric sequencing with independent step lengths per lane, per-step probabilistic triggering, velocity jitter, sub-step ratcheting bursts (flams and trap rolls), and micro-timing swing offset.
+  * Added Automated Unit Tests 137 to 142 (tests/test_main.cpp):
+    - Validates 2.8224 MHz DSD64 DoP v1.1 framing and DXD decimation, SMPTE 29.97DF 17,982 frames/10min and PLL chase sync, neural 4-stem demixing with exact 1.0 energy conservation, Dirac ping sub-sample latency and phase flip detection, Farina room sweep and Harman target curve, and Bjorklund E(3,8)/E(5,8) polymetric sequencing.
+
+25-10-2026 Raja Zahidi
 - Feature & Master Studio AoIP Collaboration, Game Audio Bridge, Tape Alignment Calibration, ADM BWF Spatial Metadata, AI Mastering & MCU Control Surface Suite v17.0 (Apex Colossus Flagship Release):
   * Real-Time Audio-over-IP & Timeline Delta-CRDT Distributed Synchronization (src/NetworkSessionEngine.h & .cpp):
     - JZNetworkSessionEngine provides peer-to-peer remote session collaboration using AES67 / WebRTC Audio-over-IP (AoIP) streaming frames.

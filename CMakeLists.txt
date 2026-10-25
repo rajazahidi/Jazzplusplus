@@ -179,11 +179,13 @@ set(JAZZ_SOURCES
     src/DitherFormatEncoder.cpp
     src/DrumReplacerEngine.cpp
     src/DrumUtilities.cpp
+    src/DsdDxdEngine.cpp
     src/DynamicAutoWah.cpp
     src/DynamicDeEsser.cpp
     src/DynamicSidechainEq.cpp
     src/ErrorMessage.cpp
     src/EuclideanArp.cpp
+    src/EuclideanPolyrhythmEngine.cpp
     src/Events.cpp
     src/EventFrame.cpp
     src/EventWindow.cpp
@@ -207,6 +209,7 @@ set(JAZZ_SOURCES
     src/GuitarSettingsDialog.cpp
     src/GuitarStrumEngine.cpp
     src/GuitarWindow.cpp
+    src/HardwareInsertDelayCompensator.cpp
     src/HarmonyBrowserAnalyzer.cpp
     src/Harmony.cpp
     src/HarmonyP.cpp
@@ -247,6 +250,7 @@ set(JAZZ_SOURCES
     src/NamedValueChoice.cpp
     src/NetworkSessionEngine.cpp
     src/NeuralAudioEngine.cpp
+    src/NeuralStemSeparatorEngine.cpp
     src/PhaseAlignerEngine.cpp
     src/PhysicalResonator.cpp
     src/PianoFrame.cpp
@@ -266,6 +270,7 @@ set(JAZZ_SOURCES
     src/Rectangle.cpp
     src/Rhythm.cpp
     src/RhythmArrayControl.cpp
+    src/RoomAcousticCalibrationEngine.cpp
     src/RoomAcousticCalibrator.cpp
     src/Sample.cpp
     src/SampleCommand.cpp
@@ -277,6 +282,7 @@ set(JAZZ_SOURCES
     src/Signal2.cpp
     src/SliderWindow.cpp
     src/SmpteTimecodeEngine.cpp
+    src/SmpteVideoSyncEngine.cpp
     src/Song.cpp
     src/SoundGenerator.cpp
     src/SpatialAudioPanner.cpp

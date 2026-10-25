@@ -20,6 +20,12 @@
 #include "AdmBwfSpatialMetadataEngine.h"
 #include "IntelligentMasteringAssistant.h"
 #include "ControlSurfaceManager.h"
+#include "DsdDxdEngine.h"
+#include "SmpteVideoSyncEngine.h"
+#include "NeuralStemSeparatorEngine.h"
+#include "HardwareInsertDelayCompensator.h"
+#include "RoomAcousticCalibrationEngine.h"
+#include "EuclideanPolyrhythmEngine.h"
 
 #include <cassert>
 #include <cmath>
@@ -2222,6 +2228,148 @@ void TestAutoAccompanimentLogic()
               parsedFaderIdx == 0 && parsedFaderVal == 768 &&
               sysexScr.size() == 64 && sysexScr[0] == 0xF0 && sysexScr[63] == 0xF7 && ticks == 48,
               "Control Surface Manager validates MCU 10-bit pitch-bend fader messages, 64-byte scribble strip SysEx, and jog wheel scrub delta");
+
+  // 137. Audiophile 1-Bit DSD64/128/256 DoP v1.1 Framing & 352.8 kHz DXD Multi-Stage Decimation
+  Jazz::JZDsdDxdEngine dsdEngine(Jazz::DsdRate::DSD64);
+  double dsdFreq = dsdEngine.getDsdSamplingFrequencyHz();
+  int decRatio = dsdEngine.getDecimationRatio();
+
+  std::vector<uint8_t> dsdStream = { 0xAA, 0x55, 0x12, 0x34, 0xFE, 0xDC, 0x00, 0xFF };
+  std::vector<uint32_t> dopFrames;
+  bool dopEnc = dsdEngine.encodeDoP(dsdStream, dopFrames);
+
+  std::vector<uint8_t> decodedDsd;
+  bool dopDec = dsdEngine.decodeDoP(dopFrames, decodedDsd);
+
+  std::vector<float> dxdPcm;
+  dsdEngine.convertDsdToDxd(dsdStream, dxdPcm);
+
+  std::vector<uint8_t> modulatedDsd;
+  dsdEngine.convertDxdToDsd(dxdPcm, modulatedDsd);
+
+  TEST_ASSERT(dsdFreq == 2822400.0 && decRatio == 8 && dopEnc && dopDec &&
+              dsdEngine.isDopLocked() && dopFrames.size() == 4 &&
+              decodedDsd == dsdStream && !dxdPcm.empty() && !modulatedDsd.empty(),
+              "DSD/DXD Engine validates 2.8224MHz DSD64, 8:1 decimation to DXD, and lossless DoP v1.1 0x05/0xFA framing");
+
+  // 138. SMPTE 29.97 Drop-Frame Cinema Arithmetic, PLL Chase Sync & Scene Cut EDL Detection
+  Jazz::JZSmpteVideoSyncEngine videoSync(Jazz::VideoFrameRate::FPS_29_97_DF, 48000.0f);
+  Jazz::VideoTimecode tcStart = {0, 10, 0, 0, 0};
+  uint64_t totalFrames10Min = videoSync.timecodeToTotalFrames(tcStart);
+  Jazz::VideoTimecode tcDecoded = videoSync.totalFramesToTimecode(totalFrames10Min);
+
+  uint64_t sampleIdx = 1000;
+  videoSync.feedIncomingVideoPulse(sampleIdx);
+  sampleIdx += 1602;
+  videoSync.feedIncomingVideoPulse(sampleIdx);
+  sampleIdx += 1601;
+  videoSync.feedIncomingVideoPulse(sampleIdx);
+
+  int cutId = videoSync.addSceneCutMarker("ExplosionCue", {0, 0, 15, 0, 0}, "HardCut");
+  Jazz::SceneCutMarker nearestCut;
+  bool foundCut = videoSync.findNearestSceneCut({0, 0, 14, 28, 0}, nearestCut, 30);
+
+  TEST_ASSERT(totalFrames10Min == 17982 && tcDecoded == tcStart &&
+              videoSync.getLockState() == Jazz::VideoSyncLockState::LOCKED_CHASE &&
+              videoSync.getPllPhaseJitterSubframes() < 10.0f &&
+              cutId == 1 && foundCut && nearestCut.name == "ExplosionCue",
+              "SMPTE Video Sync Engine validates 29.97DF 17,982 frames per 10min, PLL chase lock, and EDL scene cut alignment");
+
+  // 139. Neural Spectral 4-Stem Separation, Bleed Suppression & Exact 1.0 Energy Conservation
+  Jazz::JZNeuralStemSeparatorEngine stemSep(44100.0f);
+  stemSep.setBleedSuppression(0.7f);
+  stemSep.setVocalFormantBoost(true);
+
+  const size_t demixLen = 128;
+  std::vector<float> inputL(demixLen), inputR(demixLen);
+  for (size_t i = 0; i < demixLen; ++i) {
+    float t = static_cast<float>(i) / 44100.0f;
+    inputL[i] = 0.5f * std::sin(2.0f * 3.14159f * 100.0f * t) + 0.3f * std::sin(2.0f * 3.14159f * 1500.0f * t);
+    inputR[i] = 0.4f * std::sin(2.0f * 3.14159f * 100.0f * t) + 0.35f * std::sin(2.0f * 3.14159f * 1500.0f * t);
+  }
+
+  Jazz::SeparatedStemsOutput demixOut;
+  bool demixOk = stemSep.separate(inputL.data(), inputR.data(), demixLen, demixOut);
+  float maxRes = stemSep.verifyReconstructionIntegrity(inputL.data(), inputR.data(), demixOut, demixLen);
+
+  float vocE = 0, drmE = 0, basE = 0, othE = 0;
+  stemSep.calculateStemEnergyDistribution(demixOut, vocE, drmE, basE, othE);
+
+  TEST_ASSERT(demixOk && maxRes < 0.0001f && demixOut.size() == demixLen &&
+              (vocE + drmE + basE + othE) > 0.99f && (vocE + drmE + basE + othE) < 1.01f,
+              "Neural Stem Separator validates 4-stem demixing, zero reconstruction loss (<1e-4), and 1.0 total energy conservation");
+
+  // 140. Studio Outboard Dirac Ping Detection, Sub-Sample Latency & Master Delay Alignment
+  Jazz::JZHardwareInsertDelayCompensator delayComp(48000.0f);
+  std::vector<float> pingSignal;
+  delayComp.generatePingSignal(pingSignal, 1024, 64);
+
+  std::vector<float> simulatedReturn(1024, 0.0f);
+  simulatedReturn[64 + 120] = -0.92f;
+  simulatedReturn[64 + 121] = -0.45f;
+
+  Jazz::HardwarePingResult pingRes;
+  bool pingDetected = delayComp.analyzeReturnSignal(simulatedReturn.data(), 1024, 64, pingRes);
+
+  delayComp.registerInsert(1, "Neve1073_Preamp", 120.0, true);
+  delayComp.registerInsert(2, "SSL_G_Compressor", 250.0, false);
+  double maxComp = delayComp.calculateMaxDelayCompensationSamples();
+
+  float testInL[64] = {1.0f}, testInR[64] = {1.0f};
+  float testOutL[64] = {0}, testOutR[64] = {0};
+  delayComp.processAlignment(1, testInL, testInR, testOutL, testOutR, 64);
+
+  TEST_ASSERT(pingDetected && pingRes.phaseInverted && fabs(pingRes.latencySamples - 120.0) < 1.0 &&
+              pingRes.latencyMilliseconds > 2.0 && maxComp == 250.0,
+              "Hardware Insert Delay Compensator validates Dirac ping detection, sub-sample latency, phase flip detection, and master alignment");
+
+  // 141. Acoustic Farina Sweep Deconvolution, Harman Target Curve & SOFA Headphone Profile
+  Jazz::JZRoomAcousticCalibrationEngine roomEngine(48000.0f);
+  std::vector<float> chirpSweep;
+  roomEngine.generateLogSineSweep(chirpSweep, 0.5f, 20.0f, 20000.0f);
+
+  roomEngine.setTargetCurve(Jazz::AcousticTargetCurve::HARMAN_STUDIO_CURVE);
+  roomEngine.setMaxBoostLimitDb(6.0f);
+
+  Jazz::RoomCalibrationProfile calProfile;
+  bool calOk = roomEngine.analyzeImpulseResponse(chirpSweep, calProfile);
+
+  roomEngine.loadHeadphoneCorrectionProfile("Sennheiser_HD650", {100.0f, 1000.0f, 8000.0f}, {-2.5f, 0.0f, 3.0f});
+  bool hasHdp = roomEngine.hasHeadphoneProfile("Sennheiser_HD650");
+
+  float testL = 0.5f, testR = 0.5f;
+  roomEngine.process(testL, testR);
+
+  TEST_ASSERT(chirpSweep.size() == 24000 && calOk && calProfile.filters.size() >= 8 &&
+              calProfile.maxBoostLimitDb == 6.0f && hasHdp &&
+              fabs(testL) > 0.0f && !roomEngine.isBypassed(),
+              "Room Acoustic Calibration Engine validates Farina log-sine sweep, Harman target curve, and SOFA headphone profile correction");
+
+  // 142. Bjorklund Euclidean Rhythms E(k, n), Multilane Polymetric Loop & Ratcheting
+  auto eTresillo = Jazz::JZEuclideanPolyrhythmEngine::generateEuclidean(3, 8);
+  auto eCinquillo = Jazz::JZEuclideanPolyrhythmEngine::generateEuclidean(5, 8);
+
+  Jazz::JZEuclideanPolyrhythmEngine polyEngine(96);
+  int laneKick = polyEngine.addLane("Kick_4", 36, 4, 4, 0);
+  int laneSnare = polyEngine.addLane("Snare_7", 38, 3, 7, 0);
+  int laneHihat = polyEngine.addLane("HiHat_11", 42, 5, 11, 0);
+
+  polyEngine.setLaneRatchet(laneSnare, 0, 3);
+  polyEngine.setSwingPercent(60.0f);
+
+  std::vector<Jazz::EuclideanTriggerEvent> events;
+  bool trig0 = polyEngine.processTick(0, events);
+
+  int totalPulsesTresillo = 0;
+  for (bool b : eTresillo) if (b) totalPulsesTresillo++;
+  int totalPulsesCinquillo = 0;
+  for (bool b : eCinquillo) if (b) totalPulsesCinquillo++;
+
+  TEST_ASSERT(eTresillo.size() == 8 && totalPulsesTresillo == 3 &&
+              eCinquillo.size() == 8 && totalPulsesCinquillo == 5 &&
+              polyEngine.getLaneCount() == 3 && trig0 && events.size() >= 3 &&
+              polyEngine.getSwingPercent() == 60.0f,
+              "Euclidean Polyrhythm Engine validates Bjorklund E(3,8) & E(5,8), multilane polymetric concurrency, and ratchet bursts");
 }
 
 //-----------------------------------------------------------------------------

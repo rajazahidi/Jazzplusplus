@@ -983,8 +983,8 @@
     </h1>
 
     <p class="lead">
-      <span class="lang-en">Jazz++ is an advanced cross-platform MIDI sequencer and digital audio workstation. Version 6.0.0 introduces Virtual Session Band RealTracks and RealDrums acoustic replacement, WSOLA elastic time-stretching, physical acoustic resonance modeling, and native macOS Apple Silicon support.</span>
-      <span class="lang-bm" style="display:none;">Jazz++ ialah stesen kerja penjujukan MIDI dan audio digital rentas platform bertaraf industri. Versi 6.0.0 memperkenalkan sistem RealTracks dan RealDrums pemuzik sesi maya berasaskan rakaman akustik sebenar, regangan masa elastik WSOLA, pemodelan fizikal resonans akustik, dan sokongan binaan asli macOS Apple Silicon.</span>
+      <span class="lang-en">Jazz++ is a modern 64-bit revival and community fork of the classic open-source MIDI sequencer, re-engineered for modern operating systems by Raja Zahidi. Version 6.0.0 introduces Virtual Session Band RealTracks and RealDrums acoustic replacement, WSOLA elastic time-stretching, physical acoustic resonance modeling, and native 64-bit performance across Windows, Linux, and macOS.</span>
+      <span class="lang-bm" style="display:none;">Jazz++ ialah projek kebangkitan semula (revival) dan fork komuniti 64-bit moden daripada penjujukan MIDI sumber terbuka klasik, direka kejuruteraan semula untuk sistem operasi moden oleh Raja Zahidi. Versi 6.0.0 memperkenalkan sistem RealTracks dan RealDrums pemuzik sesi maya berasaskan rakaman akustik sebenar, regangan masa elastik WSOLA, pemodelan fizikal resonans akustik, dan prestasi 64-bit asli di Windows, Linux, dan macOS.</span>
     </p>
 
     <!-- Download Call to Action -->
@@ -1290,8 +1290,8 @@
           <span class="lang-bm" style="display:none;">Audio DSP &amp; Ujian CI 100%</span>
         </h3>
         <p>
-          <span class="lang-en">Includes real-time 3-Band Parametric EQ, Freeverb algorithmic reverb, stereo delay, chorus, and limiter. Rigorously verified with 243 core automated unit tests running across Linux, macOS, and Windows CI pipelines.</span>
-          <span class="lang-bm" style="display:none;">Dilengkapi EQ Parametrik 3-Band, gema Freeverb, stereo delay, chorus, dan limiter. Disahkan dengan 243 ujian unit teras automatik yang berjalan lancar di saluran CI Linux, macOS, dan Windows.</span>
+          <span class="lang-en">Includes real-time 3-Band Parametric EQ, Freeverb algorithmic reverb, stereo delay, chorus, and limiter. Rigorously verified with 3,659 automated unit tests running across Linux, macOS, and Windows CI pipelines.</span>
+          <span class="lang-bm" style="display:none;">Dilengkapi EQ Parametrik 3-Band, gema Freeverb, stereo delay, chorus, dan limiter. Disahkan dengan 3,659 ujian unit automatik yang berjalan lancar di saluran CI Linux, macOS, dan Windows.</span>
         </p>
       </div>
     </div>
@@ -1413,6 +1413,18 @@
       </p>
     </div>
 
+    <!-- Version Heritage Banner -->
+    <div style="background: rgba(0, 210, 255, 0.05); border: 1px solid rgba(0, 210, 255, 0.2); border-radius: var(--radius-sm); padding: 1.25rem 1.5rem; margin-bottom: 2rem;">
+      <h4 style="margin: 0 0 0.5rem 0; color: var(--accent-cyan); font-size: 1.05rem;">
+        <span class="lang-en">📜 The 64-Bit Revival Milestone: From v4.x Legacy to v6.0.0</span>
+        <span class="lang-bm" style="display:none;">📜 Detik Bersejarah Kebangkitan 64-Bit: Dari Legasi v4.x ke v6.0.0</span>
+      </h4>
+      <p style="margin: 0; color: var(--text-muted); font-size: 0.92rem; line-height: 1.65;">
+        <span class="lang-en">The original classic Jazz++ development reached its final stable releases in the v4.x era (1994–2000s) on 32-bit platforms before entering a long period of dormancy. This independent 2026 community revival and fork has fully reconstructed the engine for modern 64-bit systems (C++17, wxWidgets, and CMake), fixed long-standing ALSA/CoreAudio/MSWin drivers, and added next-generation acoustic physical modeling and Virtual Session Band RealTracks. The version jump to <strong>v6.0.0</strong> marks this comprehensive modern renaissance.</span>
+        <span class="lang-bm" style="display:none;">Pembangunan klasik asal Jazz++ mencapai keluaran stabil terakhirnya di era v4.x (1994–2000-an) pada platform 32-bit sebelum melalui tempoh dorman yang panjang. Projek kebangkitan semula dan fork komuniti 2026 ini telah membina semula enjin sepenuhnya untuk sistem 64-bit moden (C++17, wxWidgets, dan CMake), membaiki pemacu ALSA/CoreAudio/MSWin, serta menambah pemodelan fizikal akustik generasi baharu dan RealTracks Pemuzik Maya. Lompatan versi ke <strong>v6.0.0</strong> menandakan era kelahiran semula moden yang menyeluruh ini.</span>
+      </p>
+    </div>
+
     <!-- v6.0.0 -->
     <div class="changelog-card">
       <h3>
@@ -1427,7 +1439,7 @@
         <li><strong>Fixed Linux GUI Playback Freeze:</strong> Pure ALSA Sequencer engine implementation with non-blocking polling and kernel queue tick synchronization, eliminating legacy audio underruns on PipeWire and PulseAudio.</li>
         <li><strong>Synthesizer Auto-Discovery:</strong> Automatically enumerates active software/hardware synthesizers (FluidSynth, TiMidity) on playback start.</li>
         <li><strong>Interactive Ruler Bar Playback:</strong> Click directly on timeline ruler to seek and play instantly without audio stutter.</li>
-        <li><strong>100% Core Test Verification:</strong> 243 comprehensive automated unit tests running green across Linux (Ubuntu 24.04/22.04), AppImage, macOS arm64, and Windows MSVC x64.</li>
+        <li><strong>100% Core Test Verification:</strong> 3,659 comprehensive automated unit tests running green across Linux (Ubuntu 24.04/22.04), AppImage, macOS arm64, and Windows MSVC x64.</li>
       </ul>
     </div>
   </section>
@@ -1441,7 +1453,8 @@
           <span class="logo-text" style="font-size: 1.15rem;">Jazz++ Sequencer</span>
         </div>
         <p>
-          Open source MIDI sequencer and studio acoustic digital audio workstation. Free software distributed under the GNU General Public License (GPL).
+          <span class="lang-en">A modern 64-bit community revival and fork of the classic open-source MIDI sequencer. Free software distributed under the GNU General Public License (GPL v2).</span>
+          <span class="lang-bm" style="display:none;">Projek kebangkitan semula dan fork komuniti 64-bit moden daripada penjujukan MIDI sumber terbuka klasik. Perisian percuma di bawah lesen GNU General Public License (GPL v2).</span>
         </p>
       </div>
 
@@ -1468,18 +1481,36 @@
       </div>
 
       <div class="footer-links">
-        <h4>Maintainer &amp; Contact</h4>
+        <h4>Heritage &amp; Credits</h4>
+        <ul>
+          <li><strong style="color: #ffffff;">Original Authors (1993–2000s):</strong></li>
+          <li style="color: var(--text-muted); font-size: 0.85rem;">Andreas Voss &amp; Per Sigmond</li>
+          <li style="margin-top: 0.4rem;"><strong style="color: #ffffff;">Legacy Contributors:</strong></li>
+          <li style="color: var(--text-muted); font-size: 0.85rem;">Patrick Earl, Peter J. Stieber</li>
+          <li style="margin-top: 0.4rem;"><strong style="color: #ffffff;">Modern Revival (2026):</strong></li>
+          <li style="color: var(--text-muted); font-size: 0.85rem;">Raja Zahidi (<a href="mailto:rajazahidi@aol.com">rajazahidi@aol.com</a>)</li>
+        </ul>
+      </div>
+
+      <div class="footer-links">
+        <h4>Maintainer &amp; Community</h4>
         <ul>
           <li><strong style="color: #ffffff;">Raja Zahidi</strong></li>
           <li><a href="mailto:rajazahidi@aol.com">rajazahidi@aol.com</a></li>
           <li><a href="https://github.com/rajazahidi" target="_blank" rel="noopener noreferrer">GitHub Profile</a></li>
           <li><a href="https://github.com/rajazahidi/Jazzplusplus/issues" target="_blank" rel="noopener noreferrer">Report an Issue</a></li>
+          <li><a href="https://github.com/rajazahidi/Jazzplusplus" target="_blank" rel="noopener noreferrer">Source Repository</a></li>
         </ul>
       </div>
     </div>
 
     <div class="footer-bottom">
-      <p>&copy; 1994–2026 Andreas Voss, Per Sigmond, Peter J. Stieber &amp; Raja Zahidi. All rights reserved.</p>
+      <div style="max-width: 960px; margin: 0 auto 1.5rem; line-height: 1.6; font-size: 0.88rem; color: var(--text-muted);">
+        <strong style="color: #ffffff;"><span class="lang-en">Heritage &amp; License:</span><span class="lang-bm" style="display:none;">Warisan &amp; Lesen:</span></strong><br>
+        <span class="lang-en">Jazz++ v6.0.0 is an independent open-source project licensed under GNU GPL. Originally created by Andreas Voss, Per Sigmond, and contributors (1993–2000s), modernized and enhanced in 2026.</span>
+        <span class="lang-bm" style="display:none;">Jazz++ v6.0.0 ialah projek sumber terbuka bebas di bawah lesen GNU GPL. Asalnya dicipta oleh Andreas Voss, Per Sigmond, dan penyumbang (1993–2000-an), dimodenkan dan dipertingkatkan pada tahun 2026.</span>
+      </div>
+      <p>&copy; 1994–2026 Andreas Voss, Per Sigmond, Patrick Earl, Peter J. Stieber &amp; Raja Zahidi. All rights reserved.</p>
     </div>
   </footer>
 

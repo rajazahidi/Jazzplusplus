@@ -116,7 +116,7 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
   // Indicate the build date.
   InformationString += "Program build date: " __DATE__ "<br>";
 
-  wxString Paragraph1String = "Jazz++ is an advanced MIDI &amp; Audio Sequencer workstation.";
+  wxString Paragraph1String = "Jazz++ is a modern 64-bit revival and community fork of the classic open-source MIDI &amp; audio sequencer, originally created by Andreas Voss and Per Sigmond (1994–2000s) and modernized in 2026 by Raja Zahidi.";
 
 //  wxString Paragraph2String = "Jazz++ is a MIDI sequencer program.";
 
@@ -154,12 +154,16 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
 
     "<table border=0 cellpadding=2 cellspacing=0>"
     "<tr>"
+     "<td><b>Andreas Voss &amp; Per Sigmond</b></td>"
+     "<td>" + "Original Creators &amp; Lead Architects (1994–2000)" + "</td>"
+    "</tr>"
+    "<tr>"
      "<td><b>Pete Stieber</b></td>"
-     "<td>" + "Lead Developer" + "</td>"
+     "<td>" + "Lead Developer (Legacy wxWidgets port)" + "</td>"
     "</tr>"
     "<tr>"
      "<td><b>Patrick Earl</b></td>"
-     "<td>" + "Developer" + "</td>"
+     "<td>" + "Developer (Legacy Windows &amp; ALSA audio)" + "</td>"
     "</tr>"
     "<tr>"
      "<td><b>Kevin Cosgrove</b></td>"
@@ -181,9 +185,9 @@ JZAboutDialog::JZAboutDialog(wxWindow* pParent)
     "<tr>"
       "<td><b>Raja Zahidi</b><br>&lt;rajazahidi@aol.com&gt;</td>"
       "<td>" +
-        "Developer &amp; Maintainer. Core codebase fixes, stability &amp; crash repairs, modern ALSA audio subsystem, "
-        "MIDI Effects Suite, Procedural Sound FX &amp; Drums, Audio DSP Engine, "
-        "automated test suite (2026)." +
+        "Modern Revival Developer &amp; Maintainer (2026). Modern 64-bit revival, "
+        "Virtual Session Band RealTracks &amp; RealDrums, MIDI Effects Suite, Procedural Sound FX, "
+        "Audio DSP Engine, 35 Apex Master Studio engines, automated test suite." +
       "</td>"
     "</tr>"
     "</table>"

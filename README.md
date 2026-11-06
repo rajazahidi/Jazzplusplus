@@ -8,13 +8,18 @@
 [![C++ Standard](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](CMakeLists.txt)
 [![License: GPL-2.0](https://img.shields.io/badge/License-GPL_v2-blue.svg)](COPYING)
 
-**Jazz++** is an enterprise-grade, open-source multi-track MIDI sequencer and digital audio workstation (DAW) for **Linux**, **macOS**, and **Windows**. Built using **modern C++17** and **wxWidgets**, it delivers an ultra-low-latency real-time audio pipeline, an extensive suite of 35 specialized Apex Master Studio DSP and spatial audio engines, out-of-process plugin crash sandboxing, physical acoustic modeling, and broadcast metadata export.
+**Jazz++** is a modern 64-bit revival and community fork of the classic open-source multi-track MIDI sequencer and digital audio workstation (DAW) for **Linux**, **macOS**, and **Windows**. Built using **modern C++17** and **wxWidgets**, it delivers an ultra-low-latency real-time audio pipeline, an extensive suite of 35 specialized Apex Master Studio DSP and spatial audio engines, out-of-process plugin crash sandboxing, physical acoustic modeling, and broadcast metadata export.
 
 Visit the official website: **[https://rajazahidi.github.io/Jazzplusplus/](https://rajazahidi.github.io/Jazzplusplus/)**
 
-Originally created by Andreas Voss and Per Sigmond, with subsequent development by Patrick Earl and Peter J. Stieber. Maintained, modernized, and expanded into a flagship Master Studio DAW by **Raja Zahidi** ([rajazahidi@aol.com](mailto:rajazahidi@aol.com)).
+### Heritage, Community Fork & License Notice
 
----
+- **Project Status**: Independent Open-Source Community Fork & Modern 64-Bit Revival.
+- **Original Creators & Architects (1993–2000s)**: Andreas Voss, Per Sigmond, Dave Fancella, and Joakim Verona.
+- **Legacy Maintenance**: Patrick Earl, Peter J. Stieber, and Kevin Cosgrove.
+- **Modern 64-Bit Revival & Maintainer (2026)**: Re-engineered, modernized, and expanded by **Raja Zahidi** ([rajazahidi@aol.com](mailto:rajazahidi@aol.com)).
+- **License**: Free Software released under the [GNU General Public License v2 (GPL-2.0)](COPYING).
+- **Version Milestone (From v4.x to v6.0.0)**: Original official releases concluded in the 32-bit v4.x era. Version 6.0.0 denotes the modern 64-bit revival, complete architectural refactoring for modern operating systems, and Virtual Session Band RealTracks acoustic technology.
 
 ---
 

@@ -24,7 +24,7 @@ Welcome to the installation and build guide for **Jazz++ MIDI & Digital Audio Se
 | Platform | Supported Architectures | Minimum OS Version | Recommended Audio/MIDI Backend |
 | :--- | :--- | :--- | :--- |
 | **Linux** | `x86_64` | Ubuntu 22.04 LTS / Debian 11+ | ALSA Sequencer (`snd_seq`) & ALSA PCM |
-| **macOS** | `arm64` (Apple Silicon), `x86_64` | macOS 14 Sonoma (macOS 13+) | Apple CoreAudio & CoreMIDI |
+| **macOS** | `arm64` (Apple Silicon), `x86_64` | macOS 14 / 15 (macOS 13+) | Apple CoreAudio & CoreMIDI |
 | **Windows** | `x64` | Windows 10 (Build 19041+) / 11 | Windows WASAPI & MMSystem |
 
 ---

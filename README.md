@@ -413,7 +413,7 @@ ctest --test-dir build -C Release --output-on-failure
 ## Automated CI/CD & Test Coverage
 
 Jazz++ enforces enterprise-grade stability with an automated GitHub Actions CI matrix running on every push and pull request:
-- **macOS (macos-14 Apple Silicon arm64)**: Native Apple Clang compile, CoreMIDI / CoreAudio link, 100% CTest pass, `.app` bundle zip packaging.
+- **macOS (macos-15 Apple Silicon arm64)**: Native Apple Clang compile, CoreMIDI / CoreAudio link, 100% CTest pass, `.app` bundle zip packaging.
 - **Linux (Ubuntu 24.04 LTS & 22.04 LTS)**: GCC 11/13 compile, ALSA kernel sequencing, 100% CTest pass.
 - **Universal Linux AppImage**: Self-contained portable AppImage generation on Ubuntu 22.04.
 - **Windows (MSVC x64)**: Visual Studio 2022 build, WASAPI driver integration, 100% CTest pass, standalone portable zip packaging.

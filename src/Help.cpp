@@ -35,6 +35,7 @@
 #include <wx/stdpaths.h>
 #include <wx/toplevel.h>
 #include <wx/utils.h>
+#include <wx/window.h>
 
 #include <fstream>
 #include <vector>
@@ -137,9 +138,9 @@ static wxWindow* ResolveModalParent(wxWindow* pParent, bool& outIsModal)
   // Check top level windows for any active modal dialog
   if (wxTheApp)
   {
-    for (wxWindowList::compatibility_iterator node = wxTopLevelWindows.GetFirst(); node; node = node->GetNext())
+    for (wxWindow* win : wxTopLevelWindows)
     {
-      wxDialog* dlg = wxDynamicCast(node->GetData(), wxDialog);
+      wxDialog* dlg = wxDynamicCast(win, wxDialog);
       if (dlg && dlg->IsModal())
       {
         outIsModal = true;

@@ -107,5 +107,5 @@ bool JZMeterChangeDialog::TransferDataFromWindow()
 //-----------------------------------------------------------------------------
 void JZMeterChangeDialog::OnHelp(wxCommandEvent& Event)
 {
-  JZHelp::Instance().ShowTopic("Meterchange");
+  JZHelp::Instance().ShowTopic("Meterchange", this);
 }

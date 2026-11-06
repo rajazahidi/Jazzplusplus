@@ -25,6 +25,7 @@
 #include <wx/string.h>
 
 class wxHtmlHelpController;
+class wxWindow;
 
 //*****************************************************************************
 // Description:
@@ -39,9 +40,9 @@ class JZHelp
 
     void ConfigureHelp();
 
-    void ShowTopic(const wxString& TopicString);
+    void ShowTopic(const wxString& TopicString, wxWindow* pParent = nullptr);
 
-    void DisplayHelpContents();
+    void DisplayHelpContents(wxWindow* pParent = nullptr);
 
     void CloseHelp();
 
@@ -52,6 +53,8 @@ class JZHelp
     ~JZHelp();
 
     bool FindAndRegisterHelpFilePath(wxString& HelpFilePath) const;
+
+    bool EnsureHelpBookLoaded(wxHtmlHelpController* pHelpCtrl);
 
   private:
 

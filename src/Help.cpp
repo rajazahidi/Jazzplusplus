@@ -22,15 +22,18 @@
 
 #include "Help.h"
 
+#include <wx/dialog.h>
 #include <wx/filedlg.h>
 #include <wx/filefn.h>
 #include <wx/filename.h>
 #include <wx/html/helpctrl.h>
+#include <wx/html/helpdlg.h>
 #include <wx/html/helpwnd.h>
 #include <wx/html/htmlwin.h>
 #include <wx/dcclient.h>
 #include <wx/msgdlg.h>
 #include <wx/stdpaths.h>
+#include <wx/toplevel.h>
 #include <wx/utils.h>
 
 #include <fstream>
@@ -82,7 +85,7 @@ static void ConfigureHelpWindowBackground(wxHtmlHelpController* pHelpCtrl)
       {
         pHtml->SetName("JazzHelpConfigured");
 
-        pHtml->Bind(wxEVT_ERASE_BACKGROUND, [pHtml](wxEraseEvent& event) {
+        pHtml->Bind(wxEVT_ERASE_BACKGROUND, [](wxEraseEvent& event) {
           wxDC* pDc = event.GetDC();
           if (pDc)
           {
@@ -91,9 +94,7 @@ static void ConfigureHelpWindowBackground(wxHtmlHelpController* pHelpCtrl)
           }
           else
           {
-            wxClientDC clientDc(pHtml);
-            clientDc.SetBackground(*wxWHITE_BRUSH);
-            clientDc.Clear();
+            event.Skip();
           }
         });
 
@@ -114,7 +115,41 @@ static void ConfigureHelpWindowBackground(wxHtmlHelpController* pHelpCtrl)
   }
 }
 
-void JZHelp::ShowTopic(const wxString& TopicString)
+//-----------------------------------------------------------------------------
+// Helper to locate active modal dialog
+//-----------------------------------------------------------------------------
+static wxWindow* ResolveModalParent(wxWindow* pParent, bool& outIsModal)
+{
+  outIsModal = false;
+  if (!pParent)
+  {
+    pParent = wxGetActiveWindow();
+  }
+  if (pParent)
+  {
+    wxDialog* pDialog = wxDynamicCast(pParent, wxDialog);
+    if (pDialog && pDialog->IsModal())
+    {
+      outIsModal = true;
+      return pParent;
+    }
+  }
+  // Check top level windows for any active modal dialog
+  for (wxWindowList::compatibility_iterator node = wxTopLevelWindows.GetFirst(); node; node = node->GetNext())
+  {
+    wxDialog* dlg = wxDynamicCast(node->GetData(), wxDialog);
+    if (dlg && dlg->IsModal())
+    {
+      outIsModal = true;
+      return dlg;
+    }
+  }
+  return pParent;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+bool JZHelp::EnsureHelpBookLoaded(wxHtmlHelpController* pHelpCtrl)
 {
   ifstream test(mHelpFileName.mb_str());
   if (!test.is_open())
@@ -127,43 +162,109 @@ void JZHelp::ShowTopic(const wxString& TopicString)
       if (FindAndRegisterHelpFilePath(HelpFilePath))
       {
         mHelpFileName = HelpFilePath + "jazz.hhp";
-        mpHelp->AddBook(mHelpFileName);
+        if (pHelpCtrl)
+        {
+          pHelpCtrl->AddBook(mHelpFileName);
+        }
+        return true;
       }
-      else
-      {
-        return;
-      }
+      return false;
     }
   }
-  mpHelp->LoadFile(mHelpFileName);
-  mpHelp->KeywordSearch(TopicString);
+  if (pHelpCtrl)
+  {
+    pHelpCtrl->AddBook(mHelpFileName);
+  }
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void JZHelp::ShowTopic(const wxString& TopicString, wxWindow* pParent)
+{
+  bool isModal = false;
+  pParent = ResolveModalParent(pParent, isModal);
+
+  if (isModal && pParent)
+  {
+    if (!EnsureHelpBookLoaded(nullptr))
+    {
+      return;
+    }
+    // Launch a modal help controller with wxHF_DIALOG | wxHF_MODAL.
+    // This creates an interactive wxHtmlHelpDialog as a direct modal child of
+    // the active modal dialog, preventing Windows from disabling the window,
+    // allowing it to be clicked, navigated, and closed via [X] or Close button
+    // without hanging or crashing.
+    wxHtmlHelpController modalHelp(pParent, wxHF_DEFAULT_STYLE | wxHF_DIALOG | wxHF_MODAL);
+    modalHelp.UseConfig(wxConfigBase::Get());
+    modalHelp.SetTempDir(wxStandardPaths::Get().GetUserDataDir());
+    modalHelp.AddBook(mHelpFileName);
+    ConfigureHelpWindowBackground(&modalHelp);
+
+    bool displayed = false;
+    if (!TopicString.IsEmpty())
+    {
+      displayed = modalHelp.KeywordSearch(TopicString);
+      if (!displayed)
+      {
+        displayed = modalHelp.Display(TopicString);
+      }
+    }
+    if (!displayed)
+    {
+      modalHelp.DisplayContents();
+    }
+    return;
+  }
+
+  // Modeless invocation (from main application frame or piano roll)
+  if (!EnsureHelpBookLoaded(mpHelp))
+  {
+    return;
+  }
+  bool displayed = false;
+  if (!TopicString.IsEmpty())
+  {
+    displayed = mpHelp->KeywordSearch(TopicString);
+    if (!displayed)
+    {
+      displayed = mpHelp->Display(TopicString);
+    }
+  }
+  if (!displayed)
+  {
+    mpHelp->DisplayContents();
+  }
   ConfigureHelpWindowBackground(mpHelp);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void JZHelp::DisplayHelpContents()
+void JZHelp::DisplayHelpContents(wxWindow* pParent)
 {
-  ifstream test(mHelpFileName.mb_str());
-  if (!test.is_open())
+  bool isModal = false;
+  pParent = ResolveModalParent(pParent, isModal);
+
+  if (isModal && pParent)
   {
-    ConfigureHelp();
-    ifstream test2(mHelpFileName.mb_str());
-    if (!test2.is_open())
+    if (!EnsureHelpBookLoaded(nullptr))
     {
-      wxString HelpFilePath;
-      if (FindAndRegisterHelpFilePath(HelpFilePath))
-      {
-        mHelpFileName = HelpFilePath + "jazz.hhp";
-        mpHelp->AddBook(mHelpFileName);
-      }
-      else
-      {
-        return;
-      }
+      return;
     }
+    wxHtmlHelpController modalHelp(pParent, wxHF_DEFAULT_STYLE | wxHF_DIALOG | wxHF_MODAL);
+    modalHelp.UseConfig(wxConfigBase::Get());
+    modalHelp.SetTempDir(wxStandardPaths::Get().GetUserDataDir());
+    modalHelp.AddBook(mHelpFileName);
+    ConfigureHelpWindowBackground(&modalHelp);
+    modalHelp.DisplayContents();
+    return;
   }
-  mpHelp->LoadFile(mHelpFileName);
+
+  if (!EnsureHelpBookLoaded(mpHelp))
+  {
+    return;
+  }
   mpHelp->DisplayContents();
   ConfigureHelpWindowBackground(mpHelp);
 }
@@ -172,11 +273,17 @@ void JZHelp::DisplayHelpContents()
 //-----------------------------------------------------------------------------
 void JZHelp::CloseHelp()
 {
-  // GetFrame returns NULL if there is no help frame active.
+  if (!mpHelp)
+  {
+    return;
+  }
   if (mpHelp->GetFrame())
   {
-    // Close the help frame; this will cause the config data to get written.
     mpHelp->GetFrame()->Close(true);
+  }
+  if (mpHelp->GetDialog())
+  {
+    mpHelp->GetDialog()->Close(true);
   }
 }
 

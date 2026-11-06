@@ -22,12 +22,12 @@
 
 #include "Help.h"
 
+#include <wx/app.h>
 #include <wx/dialog.h>
 #include <wx/filedlg.h>
 #include <wx/filefn.h>
 #include <wx/filename.h>
 #include <wx/html/helpctrl.h>
-#include <wx/html/helpdlg.h>
 #include <wx/html/helpwnd.h>
 #include <wx/html/htmlwin.h>
 #include <wx/dcclient.h>
@@ -135,13 +135,16 @@ static wxWindow* ResolveModalParent(wxWindow* pParent, bool& outIsModal)
     }
   }
   // Check top level windows for any active modal dialog
-  for (wxWindowList::compatibility_iterator node = wxTopLevelWindows.GetFirst(); node; node = node->GetNext())
+  if (wxTheApp)
   {
-    wxDialog* dlg = wxDynamicCast(node->GetData(), wxDialog);
-    if (dlg && dlg->IsModal())
+    for (wxWindowList::compatibility_iterator node = wxTopLevelWindows.GetFirst(); node; node = node->GetNext())
     {
-      outIsModal = true;
-      return dlg;
+      wxDialog* dlg = wxDynamicCast(node->GetData(), wxDialog);
+      if (dlg && dlg->IsModal())
+      {
+        outIsModal = true;
+        return dlg;
+      }
     }
   }
   return pParent;
@@ -196,7 +199,8 @@ void JZHelp::ShowTopic(const wxString& TopicString, wxWindow* pParent)
     // the active modal dialog, preventing Windows from disabling the window,
     // allowing it to be clicked, navigated, and closed via [X] or Close button
     // without hanging or crashing.
-    wxHtmlHelpController modalHelp(pParent, wxHF_DEFAULT_STYLE | wxHF_DIALOG | wxHF_MODAL);
+    // (int style, wxWindow* parent) matches wxWidgets 3.0, 3.1, and 3.2+.
+    wxHtmlHelpController modalHelp(wxHF_DEFAULT_STYLE | wxHF_DIALOG | wxHF_MODAL, pParent);
     modalHelp.UseConfig(wxConfigBase::Get());
     modalHelp.SetTempDir(wxStandardPaths::Get().GetUserDataDir());
     modalHelp.AddBook(mHelpFileName);
@@ -252,7 +256,7 @@ void JZHelp::DisplayHelpContents(wxWindow* pParent)
     {
       return;
     }
-    wxHtmlHelpController modalHelp(pParent, wxHF_DEFAULT_STYLE | wxHF_DIALOG | wxHF_MODAL);
+    wxHtmlHelpController modalHelp(wxHF_DEFAULT_STYLE | wxHF_DIALOG | wxHF_MODAL, pParent);
     modalHelp.UseConfig(wxConfigBase::Get());
     modalHelp.SetTempDir(wxStandardPaths::Get().GetUserDataDir());
     modalHelp.AddBook(mHelpFileName);
@@ -280,10 +284,6 @@ void JZHelp::CloseHelp()
   if (mpHelp->GetFrame())
   {
     mpHelp->GetFrame()->Close(true);
-  }
-  if (mpHelp->GetDialog())
-  {
-    mpHelp->GetDialog()->Close(true);
   }
 }
 

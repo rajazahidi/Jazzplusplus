@@ -34,13 +34,12 @@ using namespace std;
 //*****************************************************************************
 int SelectControllerDlg()
 {
-  int i, n = 0;
   wxArrayString Names;
+  vector<int> Controllers;
 
   const vector<pair<string, int> >& ControlNames =
     gpConfig->GetControlNames();
 
-  int Controllers[130];
   for (
     vector<pair<string, int> >::const_iterator iControlName =
       ControlNames.begin();
@@ -50,14 +49,14 @@ int SelectControllerDlg()
     const string& Name = iControlName->first;
     if (!Name.empty())
     {
-      Controllers[n] = iControlName->second;
+      Controllers.push_back(iControlName->second);
       Names.Add(Name);
     }
   }
 
-  i = ::wxGetSingleChoiceIndex("Controller", "Select a controller", Names);
+  int i = ::wxGetSingleChoiceIndex("Controller", "Select a controller", Names);
 
-  if (i >= 0)
+  if (i >= 0 && i < static_cast<int>(Controllers.size()))
   {
     return Controllers[i];
   }

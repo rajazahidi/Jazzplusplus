@@ -52,7 +52,8 @@ BEGIN_EVENT_TABLE(JZInsertChordScaleDialog, wxDialog)
   EVT_CHOICE(ID_OCTAVE_CHOICE, JZInsertChordScaleDialog::OnRootOrOctaveChange)
   EVT_BUTTON(ID_BTN_PREVIEW, JZInsertChordScaleDialog::OnPreviewButton)
   EVT_BUTTON(ID_BTN_INSERT, JZInsertChordScaleDialog::OnInsertButton)
-  EVT_BUTTON(ID_BTN_CLOSE, JZInsertChordScaleDialog::OnCloseButton)
+  EVT_BUTTON(wxID_CANCEL, JZInsertChordScaleDialog::OnCloseButton)
+  EVT_CLOSE(JZInsertChordScaleDialog::OnCloseWindow)
 END_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
@@ -236,7 +237,7 @@ void JZInsertChordScaleDialog::CreateControls()
   mpInsertButton->SetDefault();
   pBtnSizer->Add(mpInsertButton, 0, wxRIGHT, 6);
 
-  mpCloseButton = new wxButton(this, ID_BTN_CLOSE, "&Close");
+  mpCloseButton = new wxButton(this, wxID_CANCEL, "&Close");
   pBtnSizer->Add(mpCloseButton, 0);
 
   pMainSizer->Add(pBtnSizer, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 6);
@@ -657,5 +658,10 @@ void JZInsertChordScaleDialog::OnInsertButton(wxCommandEvent&)
 //-----------------------------------------------------------------------------
 void JZInsertChordScaleDialog::OnCloseButton(wxCommandEvent&)
 {
-  Close();
+  EndModal(wxID_CANCEL);
+}
+
+void JZInsertChordScaleDialog::OnCloseWindow(wxCloseEvent&)
+{
+  EndModal(wxID_CANCEL);
 }

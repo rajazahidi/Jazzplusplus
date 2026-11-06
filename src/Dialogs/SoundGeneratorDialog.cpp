@@ -52,7 +52,8 @@ BEGIN_EVENT_TABLE(JZSoundGeneratorDialog, wxDialog)
   EVT_BUTTON(ID_DRUM_BTN_PREVIEW, JZSoundGeneratorDialog::OnDrumPreview)
   EVT_BUTTON(ID_DRUM_BTN_EXPORT, JZSoundGeneratorDialog::OnDrumExportWav)
   EVT_BUTTON(ID_DRUM_BTN_INSERT, JZSoundGeneratorDialog::OnDrumInsertTrack)
-  EVT_BUTTON(ID_BTN_CLOSE, JZSoundGeneratorDialog::OnCloseButton)
+  EVT_BUTTON(wxID_CANCEL, JZSoundGeneratorDialog::OnCloseButton)
+  EVT_CLOSE(JZSoundGeneratorDialog::OnClose)
 END_EVENT_TABLE()
 
 JZSoundGeneratorDialog::JZSoundGeneratorDialog(
@@ -261,19 +262,21 @@ void JZSoundGeneratorDialog::CreateControls()
   // Close Button
   wxBoxSizer* pBottomSizer = new wxBoxSizer(wxHORIZONTAL);
   pBottomSizer->AddStretchSpacer();
-  mpCloseButton = new wxButton(this, ID_BTN_CLOSE, "Close");
+  mpCloseButton = new wxButton(this, wxID_CANCEL, "Close");
   pBottomSizer->Add(mpCloseButton, 0);
   pTopSizer->Add(pBottomSizer, 0, wxEXPAND | wxALL, 10);
 
   SetSizer(pTopSizer);
   pTopSizer->Fit(this);
 
-  wxSize sz = GetSize();
-  if (sz.x < 740) sz.x = 740;
-  if (sz.y < 600) sz.y = 600;
-  SetSize(sz);
-  SetMinSize(wxSize(680, 540));
-  CentreOnParent();
+  wxRect workArea = wxGetClientDisplayRect();
+  int targetW = FromDIP(800);
+  int targetH = FromDIP(620);
+  if (targetW > workArea.GetWidth() - FromDIP(30)) targetW = workArea.GetWidth() - FromDIP(30);
+  if (targetH > workArea.GetHeight() - FromDIP(50)) targetH = workArea.GetHeight() - FromDIP(50);
+  SetSize(targetW, targetH);
+  SetMinSize(FromDIP(wxSize(680, 520)));
+  CentreOnScreen();
 }
 
 void JZSoundGeneratorDialog::OnSFXPresetChange(wxCommandEvent& Event)
@@ -564,6 +567,11 @@ void JZSoundGeneratorDialog::OnDrumInsertTrack(wxCommandEvent& Event)
 }
 
 void JZSoundGeneratorDialog::OnCloseButton(wxCommandEvent& Event)
+{
+  EndModal(wxID_CANCEL);
+}
+
+void JZSoundGeneratorDialog::OnClose(wxCloseEvent& Event)
 {
   EndModal(wxID_CANCEL);
 }

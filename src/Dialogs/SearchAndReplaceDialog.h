@@ -21,6 +21,7 @@
 #pragma once
 
 #include <wx/dialog.h>
+#include <vector>
 
 class wxListBox;
 
@@ -32,6 +33,12 @@ class JZSearchAndReplaceDialog : public wxDialog
 
     JZSearchAndReplaceDialog(short From, short To, wxWindow* pParent);
 
+    short GetFrom() const { return mFrom; }
+    short GetTo() const { return mTo; }
+
+    virtual bool TransferDataToWindow();
+    virtual bool TransferDataFromWindow();
+
   private:
 
     void OnHelp(wxCommandEvent& Event);
@@ -40,6 +47,8 @@ class JZSearchAndReplaceDialog : public wxDialog
 
     short mFrom;
     short mTo;
+
+    std::vector<int> mControlNumbers;
 
     wxListBox* mpFromListBox;
     wxListBox* mpToListBox;

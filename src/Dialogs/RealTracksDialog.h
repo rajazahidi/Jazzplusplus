@@ -50,6 +50,8 @@ private:
     void OnTimer(wxTimerEvent& Event);
     void OnApply(wxCommandEvent& Event);
     void OnOK(wxCommandEvent& Event);
+    void OnCancel(wxCommandEvent& Event);
+    void OnClose(wxCloseEvent& Event);
 
     void TransferDataToControls();
     void TransferDataFromControls();

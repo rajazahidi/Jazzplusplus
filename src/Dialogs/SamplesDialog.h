@@ -40,16 +40,29 @@ class JZSamplesDialog : public wxDialog
 
   private:
 
+    void LoadSampleToControls(int Index);
+    void SaveControlsToSample(int Index);
+
     void OnSelectSampleFile(wxCommandEvent& Event);
+    void OnListBoxSelect(wxCommandEvent& Event);
+    void OnPlaySample(wxCommandEvent& Event);
+    void OnClearSample(wxCommandEvent& Event);
+    void OnOk(wxCommandEvent& Event);
+    void OnCancel(wxCommandEvent& Event);
+    void OnClose(wxCloseEvent& Event);
+    void OnHelp(wxCommandEvent& Event);
 
   private:
 
     JZSampleSet& mSampleSet;
+    int mCurrentIndex;
 
     wxListBox* mpListBox;
     wxTextCtrl* mpLabelEdit;
     wxTextCtrl* mpFileNameEdit;
     wxButton* mpFileNameBrowseButton;
+    wxButton* mpPlayButton;
+    wxButton* mpClearButton;
     wxSlider* mpVolumeSlider;
     wxSlider* mpPanSlider;
     wxSlider* mpPitchSlider;

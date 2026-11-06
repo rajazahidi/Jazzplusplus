@@ -42,7 +42,8 @@ enum
 
 BEGIN_EVENT_TABLE(JZMidiEffectsDialog, wxDialog)
   EVT_BUTTON(ID_BTN_APPLY, JZMidiEffectsDialog::OnApplyButton)
-  EVT_BUTTON(ID_BTN_CLOSE, JZMidiEffectsDialog::OnCloseButton)
+  EVT_BUTTON(wxID_CANCEL, JZMidiEffectsDialog::OnCloseButton)
+  EVT_CLOSE(JZMidiEffectsDialog::OnClose)
 END_EVENT_TABLE()
 
 JZMidiEffectsDialog::JZMidiEffectsDialog(
@@ -374,7 +375,7 @@ void JZMidiEffectsDialog::CreateControls()
   mpApplyButton->SetDefault();
   pButtonSizer->Add(mpApplyButton, 0, wxRIGHT, 10);
 
-  mpCloseButton = new wxButton(this, ID_BTN_CLOSE, "Close");
+  mpCloseButton = new wxButton(this, wxID_CANCEL, "Close");
   pButtonSizer->Add(mpCloseButton, 0);
 
   pTopSizer->Add(pButtonSizer, 0, wxEXPAND | wxALL, 10);
@@ -382,12 +383,14 @@ void JZMidiEffectsDialog::CreateControls()
   SetSizer(pTopSizer);
   pTopSizer->Fit(this);
 
-  wxSize sz = GetSize();
-  if (sz.x < 740) sz.x = 740;
-  if (sz.y < 580) sz.y = 580;
-  SetSize(sz);
-  SetMinSize(wxSize(680, 520));
-  CentreOnParent();
+  wxRect workArea = wxGetClientDisplayRect();
+  int targetW = FromDIP(800);
+  int targetH = FromDIP(620);
+  if (targetW > workArea.GetWidth() - FromDIP(30)) targetW = workArea.GetWidth() - FromDIP(30);
+  if (targetH > workArea.GetHeight() - FromDIP(50)) targetH = workArea.GetHeight() - FromDIP(50);
+  SetSize(targetW, targetH);
+  SetMinSize(FromDIP(wxSize(680, 520)));
+  CentreOnScreen();
 }
 
 void JZMidiEffectsDialog::OnApplyButton(wxCommandEvent& Event)
@@ -442,6 +445,11 @@ void JZMidiEffectsDialog::OnApplyButton(wxCommandEvent& Event)
 }
 
 void JZMidiEffectsDialog::OnCloseButton(wxCommandEvent& Event)
+{
+  EndModal(wxID_CANCEL);
+}
+
+void JZMidiEffectsDialog::OnClose(wxCloseEvent& Event)
 {
   EndModal(wxID_CANCEL);
 }

@@ -70,6 +70,7 @@ class JZAutoAccompanimentDialog : public wxDialog
     void OnHarmonizerButton(wxCommandEvent& Event);
     void OnChordPadClicked(wxCommandEvent& Event);
     void OnCancelButton(wxCommandEvent& Event);
+    void OnClose(wxCloseEvent& Event);
 
     void UpdateGenerateButtonLabel();
     void StopAudition();

@@ -41,9 +41,13 @@
 #include "Song.h"
 #include "Synth.h"
 
+#include <wx/button.h>
+#include <wx/checkbox.h>
 #include <wx/dcclient.h>
 #include <wx/dcmemory.h>
 #include <wx/msgdlg.h>
+#include <wx/numdlg.h>
+#include <wx/sizer.h>
 
 #include <algorithm>
 #include <sstream>
@@ -3523,74 +3527,95 @@ void JZPianoWindow::SetVisibleAllTracks(bool Value)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void JZPianoWindow::ActivateSettingsDialog()
 {
-//  jppResourceDialog Dialog(this, "windowSettings");
-//
-//  Dialog.Attach("use_colours", &mUseColors);
-//  Dialog.Attach("font_size", &mFontSize, mPianoFontSizes);
-//
-//  if (Dialog.ShowModal() == wxID_OK)
-//  {
-//    Setup();
-//    SetScrollRanges();
-//    Refresh();
-//  }
+  wxDialog dlg(this, wxID_ANY, "Piano Window Settings", wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE);
+  wxBoxSizer* pSizer = new wxBoxSizer(wxVERTICAL);
+
+  wxCheckBox* pColorsCheck = new wxCheckBox(&dlg, wxID_ANY, "Use Velocity Color Highlighting for Notes");
+  pColorsCheck->SetValue(mUseColors);
+  pSizer->Add(pColorsCheck, 0, wxALL, 10);
+
+  wxCheckBox* pNamesCheck = new wxCheckBox(&dlg, wxID_ANY, "Show Note Names on Piano Roll");
+  pNamesCheck->SetValue(mVisibleNoteNames);
+  pSizer->Add(pNamesCheck, 0, wxLEFT | wxRIGHT | wxBOTTOM, 10);
+
+  wxBoxSizer* pBtnSizer = new wxBoxSizer(wxHORIZONTAL);
+  wxButton* pOkBtn = new wxButton(&dlg, wxID_OK, "&OK");
+  pOkBtn->SetDefault();
+  pBtnSizer->Add(pOkBtn, 0, wxRIGHT, 8);
+  pBtnSizer->Add(new wxButton(&dlg, wxID_CANCEL, "Cancel"), 0);
+  pSizer->Add(pBtnSizer, 0, wxALIGN_RIGHT | wxALL, 10);
+
+  dlg.SetSizer(pSizer);
+  pSizer->Fit(&dlg);
+  dlg.CentreOnParent();
+
+  if (dlg.ShowModal() == wxID_OK)
+  {
+    mUseColors = pColorsCheck->GetValue();
+    mVisibleNoteNames = pNamesCheck->GetValue();
+    Refresh();
+  }
 }
 
 //-----------------------------------------------------------------------------
 // Description:
-//   This is a test to see how to implement a dialog with Patrick's system.
-// It replaces JZMidiDelayDlg, which isnt necesarily a good idea.
+//   MIDI Delay dialog.
 //-----------------------------------------------------------------------------
 void JZPianoWindow::ActivateMidiDelayDialog()
 {
-//  if (!EventsSelected())
-//  {
-//    return;
-//  }
-//
-//  int scale = 50; //in percent
-//  int clockDelay = 10;
-//  int repeat = 6;
-//
-//  jppResourceDialog dialog(this, "midiDelay");
-//
-//  dialog.Attach("scale", &scale);
-//  dialog.Attach("clockDelay", &clockDelay);
-//  dialog.Attach("repeat", &repeat);
-//
-//  if (dialog.ShowModal() == wxID_OK)
-//  {
-//    //execute the command
-//    JZCommandMidiDelay cmd(mpFilter, scale / 100.0, clockDelay, repeat);
-//    cmd.Execute();
-//    SetScrollRanges();
-//    Refresh();
-//  }
+  if (!EventsSelected("Please select a range of events or notes first."))
+  {
+    return;
+  }
+
+  long repeats = wxGetNumberFromUser(
+    "Enter number of delay echo repeats (1..16):",
+    "Echo Repeats:",
+    "MIDI Delay Echo",
+    3, 1, 16,
+    this);
+
+  if (repeats > 0)
+  {
+    int tpq = mpProject ? mpProject->GetTicksPerQuarter() : 480;
+    long clockDelay = tpq / 2; // Default 1/8 note
+    double decayScale = 0.70;
+
+    gpProject->NewUndoBuffer();
+    JZCommandMidiDelay cmd(mpFilter, decayScale, clockDelay, static_cast<int>(repeats + 1));
+    cmd.Execute();
+    SetScrollRanges();
+    Refresh();
+    JZProjectManager::Instance()->UpdateAllViews();
+  }
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZPianoWindow::ActivateSequenceLengthDialog()
 {
-//  if (!EventsSelected())
-//  {
-//    return;
-//  }
-//
-//  int scale = 100; //in percent
-//
-//  jppResourceDialog dialog(this, "sequenceLength");
-//
-//  dialog.Attach("scale", &scale);
-//
-//  if (dialog.ShowModal() == wxID_OK)
-//  {
-//    //execute the command
-//    JZCommandSequenceLength cmd(mpFilter, scale / 100.0);
-//    cmd.Execute();
-//    SetScrollRanges();
-//    Refresh();
-//  }
+  if (!EventsSelected("Please select a range of events or notes first."))
+  {
+    return;
+  }
+
+  long scale = wxGetNumberFromUser(
+    "Enter percentage to scale sequence length (e.g. 50 = half time, 200 = double time):",
+    "Scale (%):",
+    "Sequence Length",
+    100, 10, 1000,
+    this);
+
+  if (scale > 0 && scale != 100)
+  {
+    gpProject->NewUndoBuffer();
+    JZCommandSequenceLength cmd(mpFilter, static_cast<double>(scale) / 100.0);
+    cmd.Execute();
+    SetScrollRanges();
+    Refresh();
+    JZProjectManager::Instance()->UpdateAllViews();
+  }
 }

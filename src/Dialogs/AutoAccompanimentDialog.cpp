@@ -63,6 +63,7 @@ BEGIN_EVENT_TABLE(JZAutoAccompanimentDialog, wxDialog)
   EVT_BUTTON(ID_BTN_LOAD_PRESET, JZAutoAccompanimentDialog::OnLoadPreset)
   EVT_BUTTON(ID_BTN_HARMONIZER, JZAutoAccompanimentDialog::OnHarmonizerButton)
   EVT_BUTTON(wxID_CANCEL, JZAutoAccompanimentDialog::OnCancelButton)
+  EVT_CLOSE(JZAutoAccompanimentDialog::OnClose)
   EVT_COMMAND_RANGE(ID_CHORD_PAD_BASE, ID_CHORD_PAD_BASE + 7, wxEVT_COMMAND_BUTTON_CLICKED, JZAutoAccompanimentDialog::OnChordPadClicked)
   EVT_RADIOBUTTON(ID_RANGE_ALL_RADIO, JZAutoAccompanimentDialog::OnRangeRadio)
   EVT_RADIOBUTTON(ID_RANGE_CUSTOM_RADIO, JZAutoAccompanimentDialog::OnRangeRadio)
@@ -899,6 +900,12 @@ void JZAutoAccompanimentDialog::OnStopPreview(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void JZAutoAccompanimentDialog::OnCancelButton(wxCommandEvent& Event)
+{
+  StopAudition();
+  EndModal(wxID_CANCEL);
+}
+
+void JZAutoAccompanimentDialog::OnClose(wxCloseEvent& Event)
 {
   StopAudition();
   EndModal(wxID_CANCEL);

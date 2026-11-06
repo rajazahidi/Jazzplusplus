@@ -1399,11 +1399,11 @@ void JZSamplesDlg::ListClick(wxItem& itm, wxCommandEvent& event)
 //-----------------------------------------------------------------------------
 void JZSampleSet::SamplesDlg()
 {
-  if (mpSamplesDialog == 0)
-  {
-    mpSamplesDialog = new JZSamplesDialog(gpTrackWindow, *this);
-  }
-  mpSamplesDialog->Show(true);
+  wxWindow* pParent = gpTrackFrame ? static_cast<wxWindow*>(gpTrackFrame) : gpTrackWindow;
+  JZSamplesDialog SamplesDialog(pParent, *this);
+  mpSamplesDialog = &SamplesDialog;
+  SamplesDialog.ShowModal();
+  mpSamplesDialog = 0;
 }
 
 //-----------------------------------------------------------------------------

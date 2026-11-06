@@ -129,6 +129,7 @@ class JZPianoFrame : public wxFrame
     void OnConvertToModulation(wxCommandEvent& Event);
     void OnMeterChange(wxCommandEvent& Event);
     void OnHelpPiano(wxCommandEvent& Event);
+    void OnHelpAbout(wxCommandEvent& Event);
 
     //==============================================
     // These are facades for piano window functions.

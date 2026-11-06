@@ -37,6 +37,7 @@ class JZAudioEffectsDialog : public wxDialog
     void OnApplyButton(wxCommandEvent& Event);
     void OnPreviewButton(wxCommandEvent& Event);
     void OnCloseButton(wxCommandEvent& Event);
+    void OnClose(wxCloseEvent& Event);
     void OnSampleSelect(wxCommandEvent& Event);
 
     void ProcessAudio(short* pBuffer, int numSamples, int channels, int sampleRate);

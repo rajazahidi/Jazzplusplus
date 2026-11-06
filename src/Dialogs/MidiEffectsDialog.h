@@ -40,6 +40,7 @@ class JZMidiEffectsDialog : public wxDialog
     // Event Handlers
     void OnApplyButton(wxCommandEvent& Event);
     void OnCloseButton(wxCommandEvent& Event);
+    void OnClose(wxCloseEvent& Event);
 
     void ApplyArpeggiator(JZTrack* pTrack, long fromClock, long toClock);
     void ApplyHumanizer(JZTrack* pTrack, long fromClock, long toClock);

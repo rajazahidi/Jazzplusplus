@@ -60,6 +60,19 @@ JZTrackFrame* JZProjectManager::CreateTrackView()
     gpConfig->Get(C_TrackWinWidth, Width);
     gpConfig->Get(C_TrackWinHeight, Height);
 
+    wxRect workArea = wxGetClientDisplayRect();
+    int screenW = workArea.GetWidth();
+    int screenH = workArea.GetHeight();
+
+    if (XPosition < workArea.GetLeft() || XPosition + 200 > workArea.GetRight())
+    {
+      XPosition = workArea.GetLeft() + 40;
+    }
+    if (YPosition < workArea.GetTop() || YPosition + 150 > workArea.GetBottom())
+    {
+      YPosition = workArea.GetTop() + 40;
+    }
+
     if (Width < 900)
     {
       Width = 1280;
@@ -68,6 +81,8 @@ JZTrackFrame* JZProjectManager::CreateTrackView()
     {
       Height = 720;
     }
+    if (Width > screenW) Width = screenW - 60;
+    if (Height > screenH) Height = screenH - 60;
 
     wxPoint Position(XPosition, YPosition);
 
@@ -112,6 +127,19 @@ void JZProjectManager::CreatePianoView(int TrackIndex)
     gpConfig->Get(C_PianoWinWidth, Width);
     gpConfig->Get(C_PianoWinHeight, Height);
 
+    wxRect workArea = wxGetClientDisplayRect();
+    int screenW = workArea.GetWidth();
+    int screenH = workArea.GetHeight();
+
+    if (XPosition < workArea.GetLeft() || XPosition + 200 > workArea.GetRight())
+    {
+      XPosition = workArea.GetLeft() + 60;
+    }
+    if (YPosition < workArea.GetTop() || YPosition + 150 > workArea.GetBottom())
+    {
+      YPosition = workArea.GetTop() + 60;
+    }
+
     if (Width < 800)
     {
       Width = 1280;
@@ -120,6 +148,8 @@ void JZProjectManager::CreatePianoView(int TrackIndex)
     {
       Height = 720;
     }
+    if (Width > screenW) Width = screenW - 60;
+    if (Height > screenH) Height = screenH - 60;
 
     wxPoint Position(XPosition, YPosition);
 
@@ -158,7 +188,7 @@ void JZProjectManager::CreateGuitarView()
 {
   if (!mpGuitarFrame)
   {
-    wxWindow* pParent = mpPianoFrame ? static_cast<wxWindow*>(mpPianoFrame) : static_cast<wxWindow*>(mpTrackFrame);
+    wxWindow* pParent = mpTrackFrame;
     mpGuitarFrame = new JZGuitarFrame(pParent);
   }
   if (mpGuitarFrame)

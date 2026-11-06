@@ -45,6 +45,7 @@ class JZSoundGeneratorDialog : public wxDialog
     void OnSFXInsertTrack(wxCommandEvent& Event);
     void OnDrumInsertTrack(wxCommandEvent& Event);
     void OnCloseButton(wxCommandEvent& Event);
+    void OnClose(wxCloseEvent& Event);
 
     std::vector<short> GenerateCurrentSFX();
     std::vector<short> GenerateCurrentDrum();

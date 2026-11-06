@@ -86,16 +86,18 @@ JZMetronomeSettingsDialog::JZMetronomeSettingsDialog(
     }
   }
 
-  if (mMetronomeInfo.GetKeyNormal() < mPitchToIndex.size())
+  map<int, int>::const_iterator itNormal =
+    mPitchToIndex.find(mMetronomeInfo.GetKeyNormal());
+  if (itNormal != mPitchToIndex.end() && itNormal->second < static_cast<int>(mIndexToName.size()))
   {
-    mKeyNormalName =
-      mIndexToName[mPitchToIndex[mMetronomeInfo.GetKeyNormal()]];
+    mKeyNormalName = mIndexToName[itNormal->second];
   }
 
-  if (mMetronomeInfo.GetKeyAccented() < mPitchToIndex.size())
+  map<int, int>::const_iterator itAccented =
+    mPitchToIndex.find(mMetronomeInfo.GetKeyAccented());
+  if (itAccented != mPitchToIndex.end() && itAccented->second < static_cast<int>(mIndexToName.size()))
   {
-    mKeyAccentedName =
-      mIndexToName[mPitchToIndex[mMetronomeInfo.GetKeyAccented()]];
+    mKeyAccentedName = mIndexToName[itAccented->second];
   }
 
   mpVelocityKnob = new JZKnob(this, IDC_KB_VOLUME, 100, 0, 127);

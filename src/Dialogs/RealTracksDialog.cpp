@@ -62,6 +62,8 @@ BEGIN_EVENT_TABLE(JZRealTracksDialog, wxDialog)
     EVT_TIMER(ID_RT_TIMER, JZRealTracksDialog::OnTimer)
     EVT_BUTTON(ID_RT_APPLY_BTN, JZRealTracksDialog::OnApply)
     EVT_BUTTON(wxID_OK, JZRealTracksDialog::OnOK)
+    EVT_BUTTON(wxID_CANCEL, JZRealTracksDialog::OnCancel)
+    EVT_CLOSE(JZRealTracksDialog::OnClose)
 END_EVENT_TABLE()
 
 JZRealTracksDialog::JZRealTracksDialog(wxWindow* pParent)
@@ -142,6 +144,15 @@ void JZRealTracksDialog::CreateControls()
     pMainSizer->Add(pBottomBox, 0, wxEXPAND | wxALL, 8);
 
     SetSizer(pMainSizer);
+    pMainSizer->Fit(this);
+    wxRect workArea = wxGetClientDisplayRect();
+    int targetW = FromDIP(840);
+    int targetH = FromDIP(640);
+    if (targetW > workArea.GetWidth() - FromDIP(30)) targetW = workArea.GetWidth() - FromDIP(30);
+    if (targetH > workArea.GetHeight() - FromDIP(50)) targetH = workArea.GetHeight() - FromDIP(50);
+    SetSize(targetW, targetH);
+    SetMinSize(FromDIP(wxSize(720, 520)));
+    CentreOnScreen();
 }
 
 wxPanel* JZRealTracksDialog::CreateRealDrumsPanel(wxWindow* pParent)
@@ -549,6 +560,25 @@ void JZRealTracksDialog::OnOK(wxCommandEvent& Event)
     if (m_timer.IsRunning()) {
         m_timer.Stop();
     }
+    m_isAuditioning = false;
     TransferDataFromControls();
     EndModal(wxID_OK);
+}
+
+void JZRealTracksDialog::OnCancel(wxCommandEvent& Event)
+{
+    if (m_timer.IsRunning()) {
+        m_timer.Stop();
+    }
+    m_isAuditioning = false;
+    EndModal(wxID_CANCEL);
+}
+
+void JZRealTracksDialog::OnClose(wxCloseEvent& Event)
+{
+    if (m_timer.IsRunning()) {
+        m_timer.Stop();
+    }
+    m_isAuditioning = false;
+    EndModal(wxID_CANCEL);
 }

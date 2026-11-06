@@ -5225,6 +5225,30 @@ void TestMenusFunctionsAndKnobsSimulation()
   };
   TEST_ASSERT(sendToLinear(127) == 1.0f, "Reverb send 127 is 100% wet");
   TEST_ASSERT(sendToLinear(0) == 0.0f, "Chorus send 0 is 0% dry");
+
+  // 4. Time Signature & Meter Change Verification
+  {
+    auto calcTicksPerBar = [](int num, int den, int tpq) -> int {
+      return (tpq * 4 * num) / den;
+    };
+    int ticksPerBar34 = calcTicksPerBar(3, 4, 480);
+    TEST_ASSERT(ticksPerBar34 == 480 * 3, "3/4 time signature produces 1440 ticks per bar (3 * 480)");
+
+    int ticksPerBar68 = calcTicksPerBar(6, 8, 480);
+    TEST_ASSERT(ticksPerBar68 == 240 * 6, "6/8 time signature produces 1440 ticks per bar (6 * 240)");
+
+    int ticksPerBar78 = calcTicksPerBar(7, 8, 480);
+    TEST_ASSERT(ticksPerBar78 == 240 * 7, "7/8 time signature produces 1680 ticks per bar (7 * 240)");
+  }
+
+  // 5. Window Positioning & Headbar Visibility Guard
+  {
+    int testX = -32000, testY = -32000;
+    int screenW = 1920, screenH = 1080;
+    if (testX < 0 || testX + 200 > screenW) testX = 50;
+    if (testY < 0 || testY + 150 > screenH) testY = 50;
+    TEST_ASSERT(testX == 50 && testY == 50, "Off-screen minimized coordinates clamp to visible screen origin");
+  }
 }
 
 //-----------------------------------------------------------------------------

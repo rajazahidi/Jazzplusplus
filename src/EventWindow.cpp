@@ -335,6 +335,9 @@ void JZEventWindow::SearchReplace()
   JZSearchAndReplaceDialog SearchAndReplaceDialog(From, To, this);
   if (SearchAndReplaceDialog.ShowModal() == wxID_OK)
   {
+    From = SearchAndReplaceDialog.GetFrom();
+    To = SearchAndReplaceDialog.GetTo();
+
     JZCommandSearchReplace SearchAndReplaceCommand(mpFilter, From - 1, To - 1);
 
     SearchAndReplaceCommand.Execute();
@@ -347,8 +350,16 @@ void JZEventWindow::SearchReplace()
 //-----------------------------------------------------------------------------
 void JZEventWindow::EditMeter()
 {
-  JZMeterChangeDialog MeterChangeDialog(this);
-  MeterChangeDialog.ShowModal();
+  int defaultBar = 1;
+  JZMeterChangeDialog MeterChangeDialog(this, defaultBar);
+  if (MeterChangeDialog.ShowModal() == wxID_OK && mpProject && mpProject->GetSong())
+  {
+    mpProject->GetSong()->SetMeterChange(
+      MeterChangeDialog.GetBar(),
+      MeterChangeDialog.GetNumerator(),
+      MeterChangeDialog.GetDenominator());
+    JZProjectManager::Instance()->UpdateAllViews();
+  }
 }
 
 //-----------------------------------------------------------------------------

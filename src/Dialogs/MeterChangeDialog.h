@@ -23,6 +23,7 @@
 #include <wx/dialog.h>
 
 class wxComboBox;
+class wxSpinCtrl;
 
 //*****************************************************************************
 //*****************************************************************************
@@ -30,7 +31,13 @@ class JZMeterChangeDialog : public wxDialog
 {
   public:
 
-    JZMeterChangeDialog(wxWindow* pParent);
+    JZMeterChangeDialog(wxWindow* pParent, int DefaultBar = 1, int DefaultNum = 4, int DefaultDenom = 4);
+
+    int GetNumerator() const { return mNumerator; }
+    int GetDenominator() const { return mDenominator; }
+    int GetBar() const { return mBar; }
+
+    virtual bool TransferDataFromWindow();
 
   private:
 
@@ -38,8 +45,12 @@ class JZMeterChangeDialog : public wxDialog
 
   private:
 
-    wxComboBox* mpNumeratorComboBox;
+    int mBar;
+    int mNumerator;
+    int mDenominator;
 
+    wxSpinCtrl* mpBarSpinCtrl;
+    wxComboBox* mpNumeratorComboBox;
     wxComboBox* mpDenominatorComboBox;
 
   DECLARE_EVENT_TABLE();

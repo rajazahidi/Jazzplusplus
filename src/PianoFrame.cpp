@@ -22,6 +22,7 @@
 
 #include "PianoFrame.h"
 
+#include "AboutDialog.h"
 #include "Command.h"
 #include "ControlEdit.h"
 #include "Dialogs.h"
@@ -215,12 +216,7 @@ BEGIN_EVENT_TABLE(JZPianoFrame, wxFrame)
   EVT_CLOSE(JZPianoFrame::ActCloseEvent)
   EVT_MENU(ACT_CLOSE, JZPianoFrame::ActClose)
   EVT_MENU(ACT_HELP_MOUSE, JZPianoFrame::ActHelpMouse)
-
-//  EVT_MENU(wxID_EXIT, JZPianoFrame::OnFileExit)
-
-//  EVT_MENU(wxID_HELP_CONTENTS, JZPianoFrame::OnHelpContents)
-
-//  EVT_MENU(wxID_ABOUT, JZPianoFrame::OnHelpAbout)
+  EVT_MENU(wxID_ABOUT, JZPianoFrame::OnHelpAbout)
 
 END_EVENT_TABLE()
 
@@ -269,15 +265,20 @@ JZPianoFrame::JZPianoFrame(
 //-----------------------------------------------------------------------------
 JZPianoFrame::~JZPianoFrame()
 {
-  int XPosition, YPosition, Width, Height;
+  if (!IsIconized() && !IsMaximized())
+  {
+    int XPosition, YPosition, Width, Height;
+    GetPosition(&XPosition, &YPosition);
+    GetSize(&Width, &Height);
 
-  GetPosition(&XPosition, &YPosition);
-  GetSize(&Width, &Height);
-
-  gpConfig->Put(C_PianoWinXpos, XPosition);
-  gpConfig->Put(C_PianoWinYpos, YPosition);
-  gpConfig->Put(C_PianoWinWidth, Width);
-  gpConfig->Put(C_PianoWinHeight, Height);
+    if (XPosition >= 0 && YPosition >= 0)
+    {
+      gpConfig->Put(C_PianoWinXpos, XPosition);
+      gpConfig->Put(C_PianoWinYpos, YPosition);
+      gpConfig->Put(C_PianoWinWidth, Width);
+      gpConfig->Put(C_PianoWinHeight, Height);
+    }
+  }
 
   delete mpPianoWindow;
 
@@ -336,9 +337,12 @@ void JZPianoFrame::OnGuitar(wxCommandEvent& Event)
 void JZPianoFrame::CreateMenu()
 {
   wxMenu *win_menu = new wxMenu;
-  win_menu->Append(ACT_CLOSE, "&Close");
+  win_menu->Append(ACT_CLOSE, "&Close\tCtrl+W");
 
-  wxMenu *edit_menu = new wxMenu("",wxMENU_TEAROFF);
+  wxMenu *edit_menu = new wxMenu("", wxMENU_TEAROFF);
+  edit_menu->Append(wxID_UNDO, "&Undo\tCtrl+Z");
+  edit_menu->Append(wxID_REDO, "&Redo\tCtrl+Y");
+  edit_menu->AppendSeparator();
   edit_menu->Append(wxID_DELETE, "&Delete\tDel");
   edit_menu->Append(wxID_COPY, "&Copy\tCtrl+C");
   edit_menu->Append(wxID_CUT, "&Cut\tCtrl+X");
@@ -349,21 +353,21 @@ void JZPianoFrame::CreateMenu()
   edit_menu->Append(ID_INSERT_CHORD_SCALE, "&Insert Chord / Scale...\tCtrl+I");
   edit_menu->Append(ID_TOOLS_AUTO_ACCOMPANIMENT, "&Auto-Accompaniment (Smart Band)...\tCtrl+B");
   edit_menu->AppendSeparator();
-  edit_menu->Append(ID_SHIFT, "&Shift...");
+  edit_menu->Append(ID_SHIFT, "&Shift Selection...");
   edit_menu->Append(ID_QUANTIZE, "&Quantize...");
   edit_menu->Append(ID_SET_CHANNEL, "&Set MIDI Channel...");
   edit_menu->Append(ID_TRANSPOSE, "&Transpose...");
   edit_menu->Append(ID_VELOCITY, "&Velocity...");
   edit_menu->Append(ID_LENGTH, "&Length...");
   edit_menu->AppendSeparator();
-  edit_menu->Append(MEN_SEQLENGTH, "&Sequence Length...");
-  edit_menu->Append(MEN_MIDIDELAY, "&Midi Delay...");
+  edit_menu->Append(MEN_SEQLENGTH, "&Sequence Length (Scale Time)...");
+  edit_menu->Append(MEN_MIDIDELAY, "&Midi Delay Echo...");
   edit_menu->Append(MEN_CONVERT_TO_MODULATION, "&Convert to Modulation (experimental)");
   edit_menu->AppendSeparator();
-  edit_menu->Append(MEN_LERI, "&Left <-> Right");
-  edit_menu->Append(MEN_UPDN, "&Up <-> Down");
-  edit_menu->Append(ID_CLEANUP, "&Cleanup...");
-  edit_menu->Append(ID_SEARCH_AND_REPLACE, "&Search Replace...");
+  edit_menu->Append(MEN_LERI, "&Left <-> Right (Retrograde / Reverse)");
+  edit_menu->Append(MEN_UPDN, "&Up <-> Down (Invert Pitches)");
+  edit_menu->Append(ID_CLEANUP, "&Cleanup Overlapping Events...");
+  edit_menu->Append(ID_SEARCH_AND_REPLACE, "&Search and Replace Controllers...");
 
   wxMenu *effects_menu = new wxMenu("", wxMENU_TEAROFF);
   effects_menu->Append(ID_EFFECTS_MIDI, "&MIDI Effects Suite (Arp, Humanize, Echo)...");
@@ -371,32 +375,37 @@ void JZPianoFrame::CreateMenu()
   effects_menu->Append(ID_EFFECTS_AUDIO_DSP, "&Audio Effects DSP (EQ, Reverb, Delay)...");
 
   wxMenu *setting_menu = new wxMenu("", wxMENU_TEAROFF);
-  setting_menu->Append(MEN_FILTER, "&Filter...");
-  setting_menu->Append(ACT_SETTINGS, "&Window...");
-  setting_menu->Append(MEN_VISIBLE, "&Events...");
-  setting_menu->Append(ID_SNAP, "&Snap...");
-  setting_menu->Append(ID_MISC_METER_CHANGE, "&Meter Change...");
+  setting_menu->Append(MEN_FILTER, "&Filter Events...");
+  setting_menu->Append(ACT_SETTINGS, "&Window Settings...");
+  setting_menu->Append(ID_SNAP, "&Snap Resolution...");
+  setting_menu->Append(ID_MISC_METER_CHANGE, "&Meter / Time Signature Change...");
+  setting_menu->AppendSeparator();
   setting_menu->AppendCheckItem(ID_NOTE_NAMES, "&Note Names\tCtrl+N", "Toggle note names on piano roll");
   setting_menu->Check(ID_NOTE_NAMES, true);
 
-  wxMenu *misc_menu = new wxMenu("",wxMENU_TEAROFF);
-  misc_menu->Append(wxID_UNDO, "&Undo");
-  misc_menu->Append(wxID_REDO, "&Redo");
-  misc_menu->Append(MEN_CTRL_PITCH,        "Edit &Pitch");
-  misc_menu->Append(MEN_CTRL_VELOC,        "Edit &Velocity");
-  misc_menu->Append(MEN_CTRL_MODUL,        "Edit &Modulation");
+  wxMenu *ctrl_lane_menu = new wxMenu;
+  ctrl_lane_menu->Append(MEN_CTRL_NONE, "Hide CC Lanes / &None");
+  ctrl_lane_menu->Append(MEN_CTRL_VELOC, "Note &Velocity Lane");
+  ctrl_lane_menu->Append(MEN_CTRL_PITCH, "&Pitch Bend Lane");
+  ctrl_lane_menu->Append(MEN_CTRL_MODUL, "&Modulation (CC 1) Lane");
+  ctrl_lane_menu->Append(MEN_CTRL_POLY_AFTER, "&Key (Poly) Aftertouch Lane");
+  ctrl_lane_menu->Append(MEN_CTRL_CHANNEL_AFTER, "&Channel Aftertouch Lane");
+  ctrl_lane_menu->Append(MEN_CTRL_CONTR, "&Select Other CC Controller...");
+  ctrl_lane_menu->Append(MEN_CTRL_TEMPO, "&Tempo Curve Lane");
 
-  misc_menu->Append(MEN_CTRL_POLY_AFTER, "Edit &Key Aftertouch");
-  misc_menu->Append(MEN_CTRL_CHANNEL_AFTER,  "Edit &Chn Aftertouch");
+  wxMenu *misc_menu = new wxMenu("", wxMENU_TEAROFF);
+  misc_menu->AppendSubMenu(ctrl_lane_menu, "CC &Controller Edit Lanes");
+  misc_menu->AppendSeparator();
+  misc_menu->Append(MEN_GUITAR, "&Guitar Board & Tab...\tCtrl+G");
+  misc_menu->AppendSeparator();
+  misc_menu->Append(ID_MISC_RESET_MIDI, "&Reset MIDI (Panic / All Notes Off)");
 
-  misc_menu->Append(MEN_CTRL_CONTR,        "Edit &Controller...");
-  misc_menu->Append(MEN_CTRL_TEMPO,        "Edit &Tempo");
-  misc_menu->Append(MEN_CTRL_NONE,        "Edit &None");
-  misc_menu->Append(MEN_GUITAR,           "&Guitar Board & Tab...\tCtrl+G");
-
-  wxMenu *help_menu = new wxMenu("",wxMENU_TEAROFF);
-  help_menu->Append(ID_HELP_PIANO_WINDOW, "&Pianowin");
-  help_menu->Append(ACT_HELP_MOUSE, "&Mouse");
+  wxMenu *help_menu = new wxMenu("", wxMENU_TEAROFF);
+  help_menu->Append(wxID_HELP_CONTENTS, "&Contents\tF1");
+  help_menu->Append(ID_HELP_PIANO_WINDOW, "&Piano Roll Help");
+  help_menu->Append(ACT_HELP_MOUSE, "&Mouse Shortcuts Help");
+  help_menu->AppendSeparator();
+  help_menu->Append(wxID_ABOUT, "&About Jazz++");
 
   wxMenuBar *menu_bar = new wxMenuBar;
   menu_bar->Append(win_menu,     "&Window");
@@ -666,6 +675,12 @@ void JZPianoFrame::OnMeterChange(wxCommandEvent& Event)
 void JZPianoFrame::OnHelpPiano(wxCommandEvent& Event)
 {
   JZHelp::Instance().ShowTopic("Piano Window");
+}
+
+void JZPianoFrame::OnHelpAbout(wxCommandEvent& Event)
+{
+  JZAboutDialog Dialog(this);
+  Dialog.ShowModal();
 }
 
 void JZPianoFrame::OnMSelect(wxCommandEvent& Event)

@@ -58,7 +58,8 @@ BEGIN_EVENT_TABLE(JZAudioEffectsDialog, wxDialog)
   EVT_CHOICE(ID_SAMPLE_CHOICE, JZAudioEffectsDialog::OnSampleSelect)
   EVT_BUTTON(ID_BTN_PREVIEW, JZAudioEffectsDialog::OnPreviewButton)
   EVT_BUTTON(ID_BTN_APPLY, JZAudioEffectsDialog::OnApplyButton)
-  EVT_BUTTON(ID_BTN_CLOSE, JZAudioEffectsDialog::OnCloseButton)
+  EVT_BUTTON(wxID_CANCEL, JZAudioEffectsDialog::OnCloseButton)
+  EVT_CLOSE(JZAudioEffectsDialog::OnClose)
 END_EVENT_TABLE()
 
 JZAudioEffectsDialog::JZAudioEffectsDialog(
@@ -312,7 +313,7 @@ void JZAudioEffectsDialog::CreateControls()
   mpApplyButton->SetDefault();
   pBtnSizer->Add(mpApplyButton, 0, wxRIGHT, 10);
 
-  mpCloseButton = new wxButton(this, ID_BTN_CLOSE, "Close");
+  mpCloseButton = new wxButton(this, wxID_CANCEL, "Close");
   pBtnSizer->Add(mpCloseButton, 0);
 
   pTopSizer->Add(pBtnSizer, 0, wxEXPAND | wxALL, 10);
@@ -320,12 +321,14 @@ void JZAudioEffectsDialog::CreateControls()
   SetSizer(pTopSizer);
   pTopSizer->Fit(this);
 
-  wxSize sz = GetSize();
-  if (sz.x < 740) sz.x = 740;
-  if (sz.y < 580) sz.y = 580;
-  SetSize(sz);
-  SetMinSize(wxSize(680, 520));
-  CentreOnParent();
+  wxRect workArea = wxGetClientDisplayRect();
+  int targetW = FromDIP(800);
+  int targetH = FromDIP(620);
+  if (targetW > workArea.GetWidth() - FromDIP(30)) targetW = workArea.GetWidth() - FromDIP(30);
+  if (targetH > workArea.GetHeight() - FromDIP(50)) targetH = workArea.GetHeight() - FromDIP(50);
+  SetSize(targetW, targetH);
+  SetMinSize(FromDIP(wxSize(680, 520)));
+  CentreOnScreen();
 }
 
 void JZAudioEffectsDialog::OnSampleSelect(wxCommandEvent& Event)
@@ -491,6 +494,11 @@ void JZAudioEffectsDialog::OnApplyButton(wxCommandEvent& Event)
 }
 
 void JZAudioEffectsDialog::OnCloseButton(wxCommandEvent& Event)
+{
+  EndModal(wxID_CANCEL);
+}
+
+void JZAudioEffectsDialog::OnClose(wxCloseEvent& Event)
 {
   EndModal(wxID_CANCEL);
 }

@@ -251,15 +251,20 @@ JZTrackFrame::JZTrackFrame(
 //-----------------------------------------------------------------------------
 JZTrackFrame::~JZTrackFrame()
 {
-  int XPosition, YPosition, Width, Height;
+  if (!IsIconized() && !IsMaximized())
+  {
+    int XPosition, YPosition, Width, Height;
+    GetPosition(&XPosition, &YPosition);
+    GetSize(&Width, &Height);
 
-  GetPosition(&XPosition, &YPosition);
-  GetSize(&Width, &Height);
-
-  gpConfig->Put(C_TrackWinXpos, XPosition);
-  gpConfig->Put(C_TrackWinYpos, YPosition);
-  gpConfig->Put(C_TrackWinWidth, Width);
-  gpConfig->Put(C_TrackWinHeight, Height);
+    if (XPosition >= 0 && YPosition >= 0)
+    {
+      gpConfig->Put(C_TrackWinXpos, XPosition);
+      gpConfig->Put(C_TrackWinYpos, YPosition);
+      gpConfig->Put(C_TrackWinWidth, Width);
+      gpConfig->Put(C_TrackWinHeight, Height);
+    }
+  }
 
   delete mpToolBar;
 }
@@ -1200,15 +1205,21 @@ void JZTrackFrame::OnSetCopyright(wxCommandEvent& Event)
 //-----------------------------------------------------------------------------
 void JZTrackFrame::OnMeterChange(wxCommandEvent& Event)
 {
-  JZMeterChangeDialog MeterChangeDialog(this);
-  if (MeterChangeDialog.ShowModal() == wxID_OK)
+  int defaultBar = 1;
+  JZMeterChangeDialog MeterChangeDialog(this, defaultBar);
+  if (MeterChangeDialog.ShowModal() == wxID_OK && gpProject && gpProject->GetSong())
   {
+    int bar = MeterChangeDialog.GetBar();
+    int num = MeterChangeDialog.GetNumerator();
+    int den = MeterChangeDialog.GetDenominator();
+
+    gpProject->GetSong()->SetMeterChange(bar, num, den);
     if (mpTrackWindow)
     {
       mpTrackWindow->Refresh();
     }
     JZProjectManager::Instance()->UpdateAllViews();
-    SetStatusText("Time signature / meter updated.");
+    SetStatusText(wxString::Format("Time signature set to %d/%d at Bar %d.", num, den, bar));
   }
 }
 
@@ -1286,11 +1297,12 @@ void JZTrackFrame::OnMiscSplitTracks(wxCommandEvent& Event)
     JZEvent* ev = toMove[i];
     int ch = ev->IsChannelEvent()->GetChannel();
     int destTrackIdx = ch + 1;
-    if (destTrackIdx < gpProject->GetTrackCount())
+    if (destTrackIdx >= 0 && destTrackIdx < gpProject->GetTrackCount())
     {
       JZTrack* destTrack = gpProject->GetTrack(destTrackIdx);
       if (destTrack)
       {
+        destTrack->mChannel = ch + 1;
         JZEvent* pCopy = ev->Copy();
         destTrack->Put(pCopy);
         pTrack0->Kill(ev);

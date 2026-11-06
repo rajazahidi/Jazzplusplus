@@ -53,6 +53,7 @@ class JZInsertChordScaleDialog : public wxDialog
     void OnPreviewButton(wxCommandEvent& Event);
     void OnInsertButton(wxCommandEvent& Event);
     void OnCloseButton(wxCommandEvent& Event);
+    void OnCloseWindow(wxCloseEvent& Event);
 
   private:
 

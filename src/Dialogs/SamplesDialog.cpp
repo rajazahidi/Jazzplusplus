@@ -21,6 +21,7 @@
 #include "SamplesDialog.h"
 
 #include "../Audio.h"
+#include "../Globals.h"
 #include "../Help.h"
 #include "../Resources.h"
 #include "../Sample.h"

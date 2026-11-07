@@ -5,6 +5,7 @@
 //*****************************************************************************
 
 #include "RealTracksDialog.h"
+#include "../Globals.h"
 
 using namespace Jazz;
 
